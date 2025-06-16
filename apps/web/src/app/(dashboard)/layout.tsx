@@ -2,11 +2,24 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
+import { Suspense } from 'react'
 import { useStore } from '@/store'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 import { cn } from '@/lib/utils'
 
+
+// Lazy load des composants lourds
+const Charts = dynamic(() => import('@/components/charts'), {
+  ssr: false,
+  loading: () => <div>Chargement des graphiques...</div>
+})
+
+const Viewer3D = dynamic(() => import('@/components/3d-viewer'), {
+  ssr: false,
+  loading: () => <div>Chargement du viewer 3D...</div>
+})
 export default function DashboardLayout({
   children,
 }: {
