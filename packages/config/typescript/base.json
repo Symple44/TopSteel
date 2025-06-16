@@ -1,15 +1,26 @@
+// packages/config/typescript/base.json
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
     "lib": ["ES2022"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "allowJs": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
     "declaration": true,
-    "declarationMap": true
-  }
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*"]
 }
