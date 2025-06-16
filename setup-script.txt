@@ -1,0 +1,65 @@
+@echo off
+REM Script de configuration pour Windows - ERP Métallerie
+
+echo.
+echo 🚀 Configuration de l'ERP Metallerie...
+echo.
+
+REM Vérifier Node.js
+echo 📌 Verification de Node.js...
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ❌ Node.js n'est pas installe. Veuillez installer Node.js 18.17 ou superieur.
+    echo 👉 https://nodejs.org/
+    pause
+    exit /b 1
+)
+
+for /f "tokens=2 delims=v" %%i in ('node -v') do set NODE_VERSION=%%i
+echo ✅ Node.js v%NODE_VERSION% detecte
+echo.
+
+REM Détection du gestionnaire de paquets
+echo 📌 Detection du gestionnaire de paquets...
+if exist "pnpm-lock.yaml" (
+    set PKG_MANAGER=pnpm
+) else if exist "yarn.lock" (
+    set PKG_MANAGER=yarn
+) else (
+    set PKG_MANAGER=npm
+)
+echo ✅ Utilisation de %PKG_MANAGER%
+echo.
+
+REM Installer les dépendances
+echo 📦 Installation des dependances...
+call %PKG_MANAGER% install
+echo.
+
+REM Créer le fichier .env.local s'il n'existe pas
+if not exist ".env.local" (
+    echo 🔧 Creation du fichier .env.local...
+    copy .env.example .env.local >nul
+    echo ✅ Fichier .env.local cree
+    echo ⚠️  N'oubliez pas de configurer vos variables d'environnement dans .env.local
+    echo.
+)
+
+REM Vérifier les types TypeScript
+echo 🔍 Verification des types TypeScript...
+call %PKG_MANAGER% run type-check
+if %errorlevel% neq 0 (
+    echo ⚠️  Quelques erreurs de type detectees (normal au premier lancement)
+)
+echo.
+
+REM Lancer l'application
+echo 🎉 Lancement de l'application...
+echo 👉 L'application sera accessible sur http://localhost:3000
+echo.
+echo 📝 Compte de demonstration:
+echo    Email: demo@metallerie.fr
+echo    Mot de passe: password
+echo.
+
+call %PKG_MANAGER% run dev

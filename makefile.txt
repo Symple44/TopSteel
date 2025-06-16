@@ -1,0 +1,84 @@
+# Makefile pour ERP Métallerie
+# Commandes utiles pour le développement
+
+.PHONY: help install dev build start clean test lint format docker-up docker-down
+
+# Afficher l'aide
+help:
+	@echo "📋 Commandes disponibles:"
+	@echo ""
+	@echo "  make install    - Installer les dépendances"
+	@echo "  make dev        - Lancer en mode développement"
+	@echo "  make build      - Compiler pour la production"
+	@echo "  make start      - Lancer la version de production"
+	@echo "  make clean      - Nettoyer les fichiers générés"
+	@echo "  make test       - Lancer les tests"
+	@echo "  make lint       - Vérifier le code"
+	@echo "  make format     - Formater le code"
+	@echo "  make docker-up  - Lancer avec Docker"
+	@echo "  make docker-down - Arrêter Docker"
+	@echo ""
+
+# Installer les dépendances
+install:
+	@echo "📦 Installation des dépendances..."
+	@npm install
+
+# Lancer en mode développement
+dev:
+	@echo "🚀 Lancement en mode développement..."
+	@npm run dev
+
+# Compiler pour la production
+build:
+	@echo "🔨 Compilation pour la production..."
+	@npm run build
+
+# Lancer la version de production
+start:
+	@echo "🚀 Lancement de la version de production..."
+	@npm run start
+
+# Nettoyer les fichiers générés
+clean:
+	@echo "🧹 Nettoyage des fichiers générés..."
+	@rm -rf .next
+	@rm -rf node_modules
+	@rm -rf dist
+	@rm -rf coverage
+	@echo "✅ Nettoyage terminé"
+
+# Lancer les tests
+test:
+	@echo "🧪 Lancement des tests..."
+	@npm run test
+
+# Vérifier le code
+lint:
+	@echo "🔍 Vérification du code..."
+	@npm run lint
+	@npm run type-check
+
+# Formater le code
+format:
+	@echo "✨ Formatage du code..."
+	@npm run format
+
+# Lancer avec Docker
+docker-up:
+	@echo "🐳 Lancement avec Docker..."
+	@docker-compose up -d
+
+# Arrêter Docker
+docker-down:
+	@echo "🐳 Arrêt de Docker..."
+	@docker-compose down
+
+# Installation complète (première fois)
+setup: install
+	@echo "🎉 Configuration initiale terminée!"
+	@echo ""
+	@echo "Prochaines étapes:"
+	@echo "1. Configurez votre fichier .env.local"
+	@echo "2. Lancez 'make dev' pour démarrer"
+	@echo ""
