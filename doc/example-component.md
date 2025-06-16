@@ -1,6 +1,6 @@
 # Guide de création de composants
 
-Ce guide montre comment créer des composants dans le projet ERP Métallerie.
+Ce guide montre comment créer des composants dans le projet ERP TOPSTEEL.
 
 ## Structure d'un composant
 

@@ -2,7 +2,7 @@
 {
   "name": "@erp/config",
   "version": "1.0.0",
-  "description": "Configurations partagées pour l'ERP Métallerie",
+  "description": "Configurations partagées pour l'ERP TOPSTEEL",
   "main": "index.js",
   "files": [
     "eslint",

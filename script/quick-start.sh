@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Script de démarrage rapide pour ERP Métallerie
+# Script de démarrage rapide pour ERP TOPSTEEL
 # Ce script configure l'environnement et lance l'application
 
-echo "🚀 Configuration de l'ERP Métallerie..."
+echo "🚀 Configuration de l'ERP TOPSTEEL..."
 echo ""
 
 # Vérifier Node.js

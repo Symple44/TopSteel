@@ -1,18 +1,18 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Loader2, Mail, Lock, Building2 } from 'lucide-react'
-import { useStore } from '@/store'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useStore } from '@/store'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Building2, Loader2, Lock, Mail } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -60,9 +60,9 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary text-primary-foreground rounded-xl mb-4 shadow-lg">
             <Building2 className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">ERP Métallerie</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">ERP TOPSTEEL</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Gérez vos projets de métallerie efficacement
+            Gérez vos projets de construction métallique efficacement
           </p>
         </div>
 
@@ -160,7 +160,7 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            © 2025 ERP Métallerie. Tous droits réservés.
+            © 2025 ERP TOPSTEEL. Tous droits réservés.
           </p>
         </div>
       </div>

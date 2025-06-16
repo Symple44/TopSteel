@@ -1,6 +1,6 @@
-# ERP Métallerie - Front-end
+# ERP TOPSTEEL - Front-end
 
-Un système ERP moderne et complet pour les entreprises de métallerie, développé avec Next.js 14, TypeScript et Tailwind CSS.
+Un système ERP moderne et complet pour les entreprises de construction métallique et métallerie, développé avec Next.js 14, TypeScript et Tailwind CSS.
 
 ## 🚀 Fonctionnalités principales
 
@@ -229,4 +229,4 @@ Pour toute question ou support :
 
 ---
 
-Développé avec ❤️ pour l'industrie de la métallerie
+Développé avec ❤️ pour l'industrie de la construction métallique

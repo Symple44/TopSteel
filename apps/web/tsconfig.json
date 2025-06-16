@@ -1,4 +1,3 @@
-// apps/web/tsconfig.json
 {
   "extends": "@erp/config/typescript/next.json",
   "compilerOptions": {
