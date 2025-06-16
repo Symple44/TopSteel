@@ -1,0 +1,32 @@
+[
+  {
+    "key": "ctrl+shift+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🚀 Turbo Dev"
+  },
+  {
+    "key": "ctrl+shift+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔨 Turbo Build"
+  },
+  {
+    "key": "ctrl+shift+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🧪 Tests - All"
+  },
+  {
+    "key": "ctrl+shift+w",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🧪 Tests - Watch Mode"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔍 Lint - All"
+  },
+  {
+    "key": "ctrl+shift+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🧹 Clean All"
+  }
+]

@@ -10,7 +10,15 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "type-check": "turbo type-check"
+    "type-check": "turbo type-check",
+    "audit": "audit-ci --config audit-ci.json",
+    "deps:check": "pnpm audit && depcheck",
+    "deps:update": "node scripts/update-deps.js",
+    "deps:outdated": "pnpm outdated --recursive",
+    "deps:unused": "depcheck --json | jq '.dependencies'",
+    "security:audit": "better-npm-audit audit",
+    "security:snyk": "snyk test --all-projects",
+    "deps:full-check": "pnpm deps:check && pnpm deps:outdated && pnpm security:audit"
   },
   "devDependencies": {
     "turbo": "^1.10.0",

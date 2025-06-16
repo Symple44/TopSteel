@@ -1,0 +1,10 @@
+# Snyk (https://snyk.io) policy file
+version: v1.0.0
+ignore: {}
+patch: {}
+
+# Options de configuration
+language-settings:
+  javascript:
+    vulnThreshold: high
+    licenseThreshold: medium

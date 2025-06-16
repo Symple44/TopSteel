@@ -1,0 +1,31 @@
+{
+  "ignoreBinPackage": false,
+  "skipMissing": false,
+  "ignorePatterns": [
+    "dist",
+    "build",
+    ".next",
+    "coverage"
+  ],
+  "ignoreMatches": [
+    "@types/*",
+    "eslint-*",
+    "prettier"
+  ],
+  "parsers": {
+    "*.js": "es6",
+    "*.jsx": "jsx",
+    "*.ts": "typescript",
+    "*.tsx": "tsx"
+  },
+  "detectors": [
+    "requireCallExpression",
+    "importDeclaration"
+  ],
+  "specials": [
+    "eslint",
+    "prettier",
+    "jest",
+    "webpack"
+  ]
+}

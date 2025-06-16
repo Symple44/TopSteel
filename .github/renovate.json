@@ -1,4 +1,3 @@
-# .github/renovate.json
 {
   "extends": ["config:base"],
   "packageRules": [
@@ -10,12 +9,27 @@
     },
     {
       "matchPackagePatterns": ["^@types/"],
-      "automerge": true
+      "automerge": true,
+      "groupName": "TypeScript definitions"
     },
     {
       "matchPackageNames": ["typescript", "eslint", "prettier"],
-      "groupName": "dev tools"
+      "groupName": "dev tools",
+      "schedule": ["before 6am on Monday"]
+    },
+    {
+      "matchPackagePatterns": ["^@radix-ui/"],
+      "groupName": "Radix UI components"
+    },
+    {
+      "matchManagers": ["npm"],
+      "rangeStrategy": "bump",
+      "semanticCommits": "enabled"
     }
   ],
-  "schedule": ["before 6am on Monday"]
+  "schedule": ["before 6am on Monday"],
+  "timezone": "Europe/Paris",
+  "labels": ["dependencies"],
+  "assignees": ["votre-username"],
+  "reviewers": ["votre-team"]
 }

@@ -1,0 +1,50 @@
+version: 2
+updates:
+  # Package.json principal
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "votre-username"
+    assignees:
+      - "votre-username"
+    labels:
+      - "dependencies"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier*"
+          - "typescript"
+      ui-dependencies:
+        patterns:
+          - "@radix-ui/*"
+          - "lucide-react"
+      security-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "security"
+
+  # Packages workspace
+  - package-ecosystem: "npm"
+    directory: "/packages/ui"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+
+  # Actions GitHub
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

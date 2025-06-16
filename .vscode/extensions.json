@@ -11,6 +11,19 @@
     "christian-kohler.path-intellisense",
     "mikestead.dotenv",
     "usernamehw.errorlens",
-    "yoavbls.pretty-ts-errors"
+    "yoavbls.pretty-ts-errors",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-json",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-npm-script",
+    "gruntfuggly.todo-tree",
+    "usernamehw.errorlens",
+    "yoavbls.pretty-ts-errors",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-jest",
+    "firsttris.vscode-jest-runner"
   ]
 }

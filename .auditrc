@@ -1,0 +1,12 @@
+{
+  "low": true,
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "exclude": [],
+  "registry": "https://registry.npmjs.org/",
+  "report": {
+    "type": "summary",
+    "full": false
+  }
+}
