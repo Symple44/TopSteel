@@ -1,0 +1,21 @@
+# .github/renovate.json
+{
+  "extends": ["config:base"],
+  "packageRules": [
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "matchPackagePatterns": ["^@types/"],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": ["typescript", "eslint", "prettier"],
+      "groupName": "dev tools"
+    }
+  ],
+  "schedule": ["before 6am on Monday"]
+}
