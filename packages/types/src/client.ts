@@ -1,4 +1,6 @@
 // packages/types/src/client.ts
+import { BaseEntity, Address, Contact } from './common'
+
 export enum ClientType {
   PARTICULIER = 'PARTICULIER',
   PROFESSIONNEL = 'PROFESSIONNEL',

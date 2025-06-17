@@ -1,43 +1,44 @@
 // packages/utils/src/index.ts
-// Formatage
-export * from './format/currency'
-export * from './format/date'
-export * from './format/number'
-
-// Calculs
-export * from './calculation/pricing'
-export * from './calculation/materials'
-
-// Validation
-export * from './validation/schemas'
-
-// Constantes
-export * from './constants/metallurgy'
-
-// Helpers
-export * from './helpers/array'
-export * from './helpers/string'
-
-// Fonction générale cn (className)
-import clsx, { ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Fonctions de debug
-export function debug(label: string, data: any): void {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[DEBUG] ${label}:`, data)
+// Utilitaires de formatage
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR'
+  }).format(amount)
+}
+
+export function formatDate(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date
+  return new Intl.DateTimeFormat('fr-FR').format(d)
+}
+
+// Utilitaires de validation
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
+
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim()
+}
+
+// Utilitaire de debug sûr
+export function debugLog(message: string, data?: any): void {
+  if (typeof window !== 'undefined' && window.console) {
+    console.log(message, data)
   }
 }
-
-export function logError(error: Error, context?: string): void {
-  console.error(`[ERROR] ${context || 'Unknown'}:`, error)
-}
-
-// Type utilities
-export type NonNullable<T> = T extends null | undefined ? never : T
-export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
-export type RequiredKeys<T, K extends keyof T> = T & Required<Pick<T, K>>

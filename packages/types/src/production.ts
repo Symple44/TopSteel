@@ -1,4 +1,10 @@
 // packages/types/src/production.ts
+import { BaseEntity } from './common'
+import type { Projet } from './projet'
+import { ProjetPriorite } from './projet'
+import type { User } from './user'
+import type { Stock } from './stock'
+
 export enum OrdreFabricationStatut {
   EN_ATTENTE = 'EN_ATTENTE',
   EN_COURS = 'EN_COURS',
@@ -11,44 +17,40 @@ export interface OrdreFabrication extends BaseEntity {
   numero: string
   projetId: string
   projet: Projet
-  description: string
   statut: OrdreFabricationStatut
+  description: string
   priorite: ProjetPriorite
-  dateDebut: Date
-  dateFin?: Date
-  dateFinPrevue: Date
-  tempsEstime: number // en heures
-  tempsReel?: number // en heures
-  avancement: number // en pourcentage
-  machine?: string
-  operateur?: User
-  operateurId?: string
-  materiaux: MaterialOrdreFabrication[]
-  operations: OperationFabrication[]
-  notes?: string
-}
-
-export interface MaterialOrdreFabrication {
-  id: string
-  stockId: string
-  stock: Stock
-  quantiteNecessaire: number
-  quantiteUtilisee?: number
-  quantiteReservee: number
-}
-
-export interface OperationFabrication extends BaseEntity {
-  ordreId: string
-  ordre: OrdreFabrication
-  nom: string
-  description?: string
-  dureeEstimee: number // en minutes
-  dureeReelle?: number // en minutes
-  statut: 'EN_ATTENTE' | 'EN_COURS' | 'TERMINE' | 'PAUSE'
-  operateurId?: string
-  operateur?: User
-  machineId?: string
   dateDebut?: Date
   dateFin?: Date
-  ordre_execution: number
+  dateFinPrevue?: Date
+  notes?: string
+  responsable?: User
+  responsableId?: string
+  taches: TacheFabrication[]
+  materiaux: MateriauRequis[]
+  coutMain: number
+  coutMateriaux: number
+  coutTotal: number
+}
+
+export interface MateriauRequis {
+  stockId: string
+  stock: Stock
+  quantiteRequise: number
+  quantiteUtilisee: number
+  cout: number
+}
+
+export interface TacheFabrication extends BaseEntity {
+  ordreFabricationId: string
+  nom: string
+  description?: string
+  statut: 'EN_ATTENTE' | 'EN_COURS' | 'TERMINEE'
+  dureeEstimee: number
+  dureeRealise?: number
+  dateDebut?: Date
+  dateFin?: Date
+  responsable?: User
+  responsableId?: string
+  notes?: string
 }

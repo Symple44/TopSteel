@@ -1,4 +1,7 @@
 // packages/types/src/stock.ts
+import { BaseEntity, Unit } from './common'
+import type { User } from './user'
+
 export enum StockType {
   MATIERE_PREMIERE = 'MATIERE_PREMIERE',
   PRODUIT_FINI = 'PRODUIT_FINI',
@@ -6,18 +9,11 @@ export enum StockType {
   OUTILLAGE = 'OUTILLAGE'
 }
 
-export enum StockStatut {
-  ACTIF = 'ACTIF',
-  OBSOLETE = 'OBSOLETE',
-  QUARANTAINE = 'QUARANTAINE'
-}
-
 export interface Stock extends BaseEntity {
   reference: string
   designation: string
   description?: string
   type: StockType
-  statut: StockStatut
   quantiteStock: number
   quantiteMin: number
   quantiteMax: number
@@ -26,24 +22,19 @@ export interface Stock extends BaseEntity {
   prixAchat: number
   prixVente?: number
   fournisseur: string
-  fournisseurRef?: string
   emplacement: string
-  datePeremption?: Date
-  dateLastInventaire?: Date
-  isActif: boolean
+  alerteStockBas: boolean
 }
 
 export interface MouvementStock extends BaseEntity {
   stockId: string
-  stock: Stock
-  type: 'ENTREE' | 'SORTIE' | 'CORRECTION' | 'INVENTAIRE'
+  type: 'ENTREE' | 'SORTIE' | 'AJUSTEMENT' | 'RESERVATION' | 'LIBERATION'
   quantite: number
   quantiteAvant: number
   quantiteApres: number
   motif: string
   reference?: string
-  projetId?: string
-  ordreId?: string
-  utilisateurId: string
-  utilisateur: User
+  cout?: number
+  utilisateur?: User
+  utilisateurId?: string
 }

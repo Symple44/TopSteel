@@ -1,4 +1,8 @@
 // packages/types/src/projet.ts
+import { BaseEntity, Address } from './common'
+import type { Client } from './client'
+import type { User } from './user'
+
 export enum ProjetStatut {
   BROUILLON = 'BROUILLON',
   EN_ATTENTE = 'EN_ATTENTE',

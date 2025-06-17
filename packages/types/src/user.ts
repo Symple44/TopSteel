@@ -1,4 +1,6 @@
 // packages/types/src/user.ts
+import { BaseEntity } from './common'
+
 export enum UserRole {
   ADMIN = 'ADMIN',
   MANAGER = 'MANAGER',

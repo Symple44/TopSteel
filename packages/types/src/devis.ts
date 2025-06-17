@@ -1,4 +1,8 @@
 // packages/types/src/devis.ts
+import { BaseEntity, Unit } from './common'
+import type { Projet } from './projet'
+import type { Client } from './client'
+
 export enum DevisStatut {
   BROUILLON = 'BROUILLON',
   ENVOYE = 'ENVOYE',
