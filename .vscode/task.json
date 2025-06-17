@@ -2,31 +2,13 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Check Dependencies",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["deps:full-check"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Update Dependencies",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["deps:update"],
-      "group": "build"
-    },
-    {
-      "label": "🚀 Turbo Dev",
+      "label": "🚀 Turbo Dev (All Apps)",
       "type": "shell",
       "command": "pnpm",
       "args": ["dev"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "presentation": {
         "echo": true,
@@ -42,10 +24,47 @@
       "problemMatcher": []
     },
     {
-      "label": "🔨 Turbo Build",
+      "label": "🌐 Web App Only",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@erp/web", "dev"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔨 Build All",
       "type": "shell",
       "command": "pnpm",
       "args": ["build"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔨 Build Web Only",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@erp/web", "build"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "presentation": {
         "echo": true,
@@ -60,6 +79,26 @@
       "type": "shell",
       "command": "pnpm",
       "args": ["test"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Tests - Web App",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@erp/web", "test"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "test",
       "presentation": {
         "echo": true,
@@ -73,7 +112,10 @@
       "label": "🧪 Tests - Watch Mode",
       "type": "shell",
       "command": "pnpm",
-      "args": ["test:watch"],
+      "args": ["--filter", "@erp/web", "test:watch"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "test",
       "presentation": {
         "echo": true,
@@ -85,24 +127,13 @@
       "problemMatcher": []
     },
     {
-      "label": "🧪 Tests - Web App Only",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["--filter", "@erp/web", "test"],
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🔍 Lint - All",
+      "label": "🔍 Lint All",
       "type": "shell",
       "command": "pnpm",
       "args": ["lint"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "presentation": {
         "echo": true,
@@ -117,6 +148,9 @@
       "type": "shell",
       "command": "pnpm",
       "args": ["type-check"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "presentation": {
         "echo": true,
@@ -131,6 +165,9 @@
       "type": "shell",
       "command": "pnpm",
       "args": ["install"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "presentation": {
         "echo": true,
@@ -145,20 +182,9 @@
       "type": "shell",
       "command": "pnpm",
       "args": ["clean"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
+      "options": {
+        "cwd": "${workspaceFolder}"
       },
-      "problemMatcher": []
-    },
-    {
-      "label": "🎯 Turbo Cache Status",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["turbo", "run", "build", "--dry"],
       "group": "build",
       "presentation": {
         "echo": true,
