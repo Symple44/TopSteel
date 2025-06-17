@@ -197,7 +197,7 @@
     {
       "label": "🔄 Restart Dev Server",
       "type": "shell",
-      "command": "pkill -f 'next dev' && pnpm dev",
+      "command": "taskkill /F /IM node.exe & pnpm dev",
       "options": {
         "cwd": "${workspaceFolder}"
       },

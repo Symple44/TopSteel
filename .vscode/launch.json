@@ -8,7 +8,7 @@
       "program": "${workspaceFolder}/node_modules/.bin/next",
       "args": ["dev", "--port", "3000"],
       "cwd": "${workspaceFolder}/apps/web",
-      "envFile": "${workspaceFolder}/.vscode/launch.env",
+      "envFile": "${workspaceFolder}/apps/web/.env.local",
       "env": {
         "NODE_ENV": "development"
       },

@@ -1,112 +1,218 @@
 # Script de configuration Windows pour ERP TOPSTEEL
 
-Write-Host "🚀 Configuration de l'environnement ERP TOPSTEEL pour Windows..." -ForegroundColor Green
+param(
+    [switch]$Force,
+    [switch]$Verbose
+)
+
+function Write-Section($title) {
+    Write-Host ""
+    Write-Host "🔹 $title" -ForegroundColor Cyan
+    Write-Host ("-" * 50) -ForegroundColor Gray
+}
+
+function Test-Command($cmd) {
+    try {
+        Get-Command $cmd -ErrorAction Stop | Out-Null
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+Write-Host "🚀 SCRIPT DE CONFIGURATION ERP TOPSTEEL" -ForegroundColor Green
+Write-Host "=" * 60
 Write-Host ""
 
-# Vérifier si on est dans le bon dossier
+# Phase 1: Diagnostic complet
+Write-Section "DIAGNOSTIC SYSTÈME"
+
+# Vérifier l'emplacement
 $currentPath = Get-Location
-Write-Host "📍 Dossier actuel: $currentPath" -ForegroundColor Yellow
+Write-Host "📍 Emplacement: $currentPath"
 
-# Vérifier si on est à la racine du projet
-if (Test-Path "apps\web" -and Test-Path "packages") {
-    Write-Host "✅ Vous êtes à la racine du projet" -ForegroundColor Green
-} elseif (Test-Path "..\..\apps\web" -and Test-Path "..\..\packages") {
-    Write-Host "⚠️  Vous êtes dans apps/web, navigation vers la racine..." -ForegroundColor Yellow
-    Set-Location "..\.."
-    $currentPath = Get-Location
-    Write-Host "📍 Nouveau dossier: $currentPath" -ForegroundColor Green
+if ((Test-Path "apps\web") -and (Test-Path "packages")) {
+    Write-Host "✅ Structure monorepo détectée" -ForegroundColor Green
 } else {
-    Write-Host "❌ Structure de projet non trouvée. Assurez-vous d'être dans le bon dossier." -ForegroundColor Red
+    Write-Host "❌ Structure incorrecte - Naviguez vers la racine du projet" -ForegroundColor Red
     exit 1
 }
 
-# Vérifier Node.js
-Write-Host ""
-Write-Host "📌 Vérification de Node.js..." -ForegroundColor Cyan
-try {
-    $nodeVersion = node --version
-    Write-Host "✅ Node.js $nodeVersion détecté" -ForegroundColor Green
-} catch {
-    Write-Host "❌ Node.js n'est pas installé. Installez Node.js 18.17+ depuis https://nodejs.org/" -ForegroundColor Red
-    exit 1
+# Vérifier les outils
+Write-Host "🛠️  Node.js: $(if (Test-Command "node") { "✅ $(node --version)" } else { "❌ Non installé" })"
+Write-Host "🛠️  pnpm: $(if (Test-Command "pnpm") { "✅ v$(pnpm --version)" } else { "❌ Non installé" })"
+
+# Phase 2: Analyse des fichiers critiques
+Write-Section "ANALYSE DES FICHIERS"
+
+$criticalFiles = @{
+    "package.json" = "Racine"
+    "turbo.json" = "Turbo config"
+    "apps\web\package.json" = "Web app"
+    "apps\web\.env.local" = "Environment"
 }
 
-# Installer pnpm si nécessaire
-Write-Host ""
-Write-Host "📌 Vérification de pnpm..." -ForegroundColor Cyan
-try {
-    $pnpmVersion = pnpm --version
-    Write-Host "✅ pnpm $pnpmVersion déjà installé" -ForegroundColor Green
-} catch {
-    Write-Host "❌ pnpm non trouvé. Installation en cours..." -ForegroundColor Yellow
-    npm install -g pnpm
-    Write-Host "✅ pnpm installé !" -ForegroundColor Green
+foreach ($file in $criticalFiles.Keys) {
+    if (Test-Path $file) {
+        Write-Host "✅ $($criticalFiles[$file]): $file" -ForegroundColor Green
+    } else {
+        Write-Host "❌ $($criticalFiles[$file]): $file" -ForegroundColor Red
+    }
 }
 
-# Installer les dépendances
-Write-Host ""
-Write-Host "📦 Installation des dépendances..." -ForegroundColor Cyan
-pnpm install
+# Lire le package.json de l'app web
+if (Test-Path "apps\web\package.json") {
+    try {
+        $webPackage = Get-Content "apps\web\package.json" -Raw | ConvertFrom-Json
+        Write-Host "📋 App name: $($webPackage.name)"
+        Write-Host "📋 Version: $($webPackage.version)"
+        
+        if ($webPackage.dependencies.next) {
+            Write-Host "✅ Next.js dans dependencies: $($webPackage.dependencies.next)" -ForegroundColor Green
+        } else {
+            Write-Host "❌ Next.js non trouvé dans dependencies" -ForegroundColor Red
+        }
+    } catch {
+        Write-Host "❌ Erreur lecture package.json" -ForegroundColor Red
+    }
+}
 
-# Créer le fichier .env.local s'il n'existe pas
-Write-Host ""
-Write-Host "🔧 Configuration des variables d'environnement..." -ForegroundColor Cyan
+# Phase 3: Nettoyage et réinstallation forcée
+Write-Section "NETTOYAGE ET RÉINSTALLATION"
+
+if ($Force -or (Read-Host "Voulez-vous nettoyer et réinstaller ? (y/N)") -eq "y") {
+    
+    Write-Host "🧹 Nettoyage des node_modules..."
+    
+    # Supprimer les node_modules existants
+    if (Test-Path "node_modules") {
+        Remove-Item "node_modules" -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "✅ node_modules racine supprimé"
+    }
+    
+    if (Test-Path "apps\web\node_modules") {
+        Remove-Item "apps\web\node_modules" -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "✅ apps\web\node_modules supprimé"
+    }
+
+    # Nettoyer les caches
+    Write-Host "🧹 Nettoyage des caches..."
+    pnpm store prune | Out-Null
+    
+    # Installation fraîche
+    Write-Host "📦 Installation fraîche des dépendances..."
+    pnpm install --no-frozen-lockfile
+    
+    # Installation spécifique dans apps/web
+    Write-Host "📦 Installation spécifique web..."
+    Set-Location "apps\web"
+    pnpm install --no-frozen-lockfile
+    Set-Location "..\.."
+}
+
+# Phase 4: Vérification post-installation
+Write-Section "VÉRIFICATION POST-INSTALLATION"
+
+$paths = @(
+    "node_modules",
+    "apps\web\node_modules",
+    "node_modules\.bin\next.cmd",
+    "apps\web\node_modules\.bin\next.cmd",
+    "node_modules\.bin\turbo.cmd"
+)
+
+foreach ($path in $paths) {
+    if (Test-Path $path) {
+        Write-Host "✅ $path" -ForegroundColor Green
+    } else {
+        Write-Host "❌ $path" -ForegroundColor Red
+    }
+}
+
+# Phase 5: Création du fichier .env.local si manquant
+Write-Section "CONFIGURATION ENVIRONNEMENT"
+
 if (-not (Test-Path "apps\web\.env.local")) {
-    Write-Host "📝 Création du fichier .env.local..." -ForegroundColor Yellow
+    Write-Host "📝 Création de .env.local..."
     $envContent = @"
-# Base URLs
+# Variables d'environnement pour le développement local
 NEXT_PUBLIC_API_URL=http://localhost:3001/api
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Database
 DATABASE_URL=postgresql://user:password@localhost:5432/erp_dev
-
-# Auth
 NEXTAUTH_SECRET=your-development-secret-key-change-in-production
 NEXTAUTH_URL=http://localhost:3000
-
-# Optional services
-NEXT_PUBLIC_SENTRY_DSN=
-UPLOADTHING_SECRET=
-UPLOADTHING_APP_ID=
+NODE_ENV=development
+NEXT_PUBLIC_APP_NAME=ERP TOPSTEEL
+NEXT_PUBLIC_APP_VERSION=1.0.0
 "@
     $envContent | Out-File -FilePath "apps\web\.env.local" -Encoding UTF8
-    Write-Host "✅ Fichier .env.local créé" -ForegroundColor Green
+    Write-Host "✅ .env.local créé" -ForegroundColor Green
 } else {
-    Write-Host "✅ Fichier .env.local existe déjà" -ForegroundColor Green
+    Write-Host "✅ .env.local existe" -ForegroundColor Green
 }
 
-# Construire les packages partagés
-Write-Host ""
-Write-Host "🔨 Construction des packages partagés..." -ForegroundColor Cyan
-pnpm build --filter="!@erp/web"
+# Phase 6: Test de lancement
+Write-Section "TEST DE LANCEMENT"
 
-# Vérification finale
-Write-Host ""
-Write-Host "🔍 Vérification de l'installation..." -ForegroundColor Cyan
-if (Test-Path "node_modules") {
-    Write-Host "✅ node_modules présent" -ForegroundColor Green
+Write-Host "🧪 Test 1: Commande directe Next.js..."
+Set-Location "apps\web"
+if (Test-Path "node_modules\.bin\next.cmd") {
+    Write-Host "✅ Next.js trouvé - Lancement test (3 secondes)..." -ForegroundColor Green
+    
+    # Lancer Next.js en arrière-plan pour tester
+    $job = Start-Job -ScriptBlock {
+        Set-Location $args[0]
+        & ".\node_modules\.bin\next.cmd" "dev" "--port" "3000"
+    } -ArgumentList (Get-Location)
+    
+    Start-Sleep -Seconds 3
+    
+    if ($job.State -eq "Running") {
+        Write-Host "✅ Next.js démarre correctement !" -ForegroundColor Green
+        Stop-Job $job
+        Remove-Job $job
+    } else {
+        Write-Host "❌ Problème de démarrage Next.js" -ForegroundColor Red
+        Receive-Job $job
+        Remove-Job $job
+    }
 } else {
-    Write-Host "❌ node_modules manquant" -ForegroundColor Red
+    Write-Host "❌ Next.js non trouvé" -ForegroundColor Red
 }
 
-if (Test-Path "apps\web\node_modules") {
-    Write-Host "✅ Dépendances web installées" -ForegroundColor Green
-} else {
-    Write-Host "❌ Dépendances web manquantes" -ForegroundColor Red
-}
+Set-Location "..\.."
 
 Write-Host ""
-Write-Host "✅ Configuration terminée !" -ForegroundColor Green
+Write-Host "🧪 Test 2: Commande pnpm..."
+try {
+    $testOutput = pnpm --filter "@erp/web" exec next --version 2>&1
+    if ($testOutput -match "\d+\.\d+\.\d+") {
+        Write-Host "✅ pnpm peut exécuter Next.js: $testOutput" -ForegroundColor Green
+    } else {
+        Write-Host "❌ pnpm ne trouve pas Next.js" -ForegroundColor Red
+    }
+} catch {
+    Write-Host "❌ Erreur avec pnpm: $_" -ForegroundColor Red
+}
+
+# Phase 7: Instructions finales
+Write-Section "INSTRUCTIONS FINALES"
+
+Write-Host "🎯 COMMANDES DE LANCEMENT:" -ForegroundColor Yellow
 Write-Host ""
-Write-Host "🎯 Prochaines étapes :" -ForegroundColor Yellow
-Write-Host "  1. Fermez VS Code complètement" -ForegroundColor White
-Write-Host "  2. Rouvrez VS Code depuis la RACINE du projet:" -ForegroundColor White
-Write-Host "     code ." -ForegroundColor Cyan
-Write-Host "  3. Appuyez sur F5 pour lancer avec le debugger" -ForegroundColor White
-Write-Host "  4. Ou utilisez la commande:" -ForegroundColor White
-Write-Host "     pnpm dev" -ForegroundColor Cyan
+Write-Host "Option 1 (Recommandée):" -ForegroundColor White
+Write-Host "  cd apps\web" -ForegroundColor Cyan
+Write-Host "  npx next dev" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "🌐 L'application sera accessible sur:" -ForegroundColor Yellow
-Write-Host "   http://localhost:3000" -ForegroundColor Cyan
+Write-Host "Option 2:" -ForegroundColor White
+Write-Host "  pnpm --filter @erp/web dev" -ForegroundColor Cyan
 Write-Host ""
+Write-Host "Option 3 (VS Code):" -ForegroundColor White
+Write-Host "  1. Fermez VS Code" -ForegroundColor Gray
+Write-Host "  2. code ." -ForegroundColor Cyan
+Write-Host "  3. Appuyez sur F5" -ForegroundColor Cyan
+Write-Host ""
+
+Write-Host "🌐 L'application sera sur: http://localhost:3000" -ForegroundColor Green
+Write-Host ""
+Write-Host "🔧 Si problème persiste, contactez le support avec cette sortie." -ForegroundColor Yellow
