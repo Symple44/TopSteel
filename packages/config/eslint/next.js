@@ -1,41 +1,47 @@
-// packages/config/eslint/nextjs.js - Configuration ESLint 9.x pour Next.js
-import baseConfig from "./base.js";
+// packages/config/eslint/next.js - Configuration ESLint 9 pour Next.js 15
+import { FlatCompat } from "@eslint/eslintrc";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import reactConfig from "./react.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
 
 export default [
-  ...baseConfig,
+  ...reactConfig,
+
+  // Configuration Next.js avec FlatCompat pour la compatibilité
+  ...compat.extends("next/core-web-vitals"),
+  ...compat.extends("next/typescript"),
 
   // Configuration spécifique Next.js
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
-    languageOptions: {
-      globals: {
-        React: "readonly",
-        JSX: "readonly",
-      },
-    },
     rules: {
       // Règles Next.js
-      "@next/next/no-html-link-for-pages": "error",
       "@next/next/no-img-element": "warn",
-      "@next/next/no-sync-scripts": "error",
-      "@next/next/no-title-in-document-head": "error",
+      "@next/next/no-html-link-for-pages": "error",
 
-      // Règles React
-      "react/react-in-jsx-scope": "off", // Next.js auto-import React
-      "react/prop-types": "off", // TypeScript gère les props
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-
-      // Désactiver les règles conflictuelles
-      "no-console": ["warn", { allow: ["warn", "error", "info"] }],
+      // Pages Next.js nécessitent default export
+      "import/no-default-export": "off",
     },
   },
 
-  // Configuration pour les fichiers de pages Next.js
+  // Configuration pour les pages Next.js
   {
-    files: ["**/pages/**/*.{js,ts,tsx}", "**/app/**/*.{js,ts,tsx}"],
+    files: [
+      "**/app/**/*.{js,ts,tsx}",
+      "**/src/app/**/*.{js,ts,tsx}",
+      "**/pages/**/*.{js,ts,tsx}",
+      "next.config.{js,mjs,ts}",
+    ],
     rules: {
-      "import/no-default-export": "off", // Les pages Next.js nécessitent des exports par défaut
+      "import/no-default-export": "off",
+      "@typescript-eslint/no-var-requires": "off", // next.config.js
     },
   },
 ];

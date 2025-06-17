@@ -1,5 +1,5 @@
 {
-  "name": "erp-metallerie",
+  "name": "erp-TOPSTEEL",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
@@ -21,7 +21,7 @@
     "deps:full-check": "pnpm deps:check && pnpm deps:outdated && pnpm security:audit"
   },
   "devDependencies": {
-    "turbo": "^1.10.0",
-    "typescript": "^5.3.3"
+    "turbo": "^2.0.0",
+    "typescript": "^5.6.0"
   }
 }

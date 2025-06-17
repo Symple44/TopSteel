@@ -1,4 +1,4 @@
-// packages/config/eslint/base.js - Configuration ESLint 9.x
+// packages/config/eslint/base.js - Configuration ESLint 9 avec flat config
 import js from "@eslint/js";
 import typescript from "@typescript-eslint/eslint-plugin";
 import typescriptParser from "@typescript-eslint/parser";
@@ -19,6 +19,7 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
+        project: ["./tsconfig.json"],
       },
       globals: {
         console: "readonly",
@@ -46,6 +47,10 @@ export default [
       "@typescript-eslint/no-non-null-assertion": "warn",
       "@typescript-eslint/prefer-const": "error",
       "@typescript-eslint/no-var-requires": "error",
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports" },
+      ],
 
       // Règles JavaScript générales
       "no-console": ["warn", { allow: ["warn", "error"] }],
