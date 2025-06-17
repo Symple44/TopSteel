@@ -22,12 +22,14 @@ Un système ERP moderne et complet pour les entreprises de construction métalli
 ## 🛠️ Installation
 
 1. **Cloner le repository**
+
 ```bash
 git clone https://github.com/votre-username/erp-metallerie.git
 cd erp-metallerie
 ```
 
 2. **Installer les dépendances**
+
 ```bash
 npm install
 # ou
@@ -37,17 +39,20 @@ pnpm install
 ```
 
 3. **Configurer les variables d'environnement**
+
 ```bash
 cp .env.example .env.local
 ```
 
 Éditer `.env.local` avec vos valeurs :
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001/api
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 4. **Lancer le serveur de développement**
+
 ```bash
 npm run dev
 # ou
@@ -113,30 +118,35 @@ Le projet utilise un système de composants basé sur [shadcn/ui](https://ui.sha
 ## 📦 Modules principaux
 
 ### 1. Authentification
+
 - Connexion/Déconnexion
 - Gestion des tokens JWT
 - Refresh token automatique
 - Protection des routes
 
 ### 2. Projets
+
 - Liste des projets avec filtres
 - Détail projet avec onglets
 - Création/Modification
 - Suivi de l'avancement
 
 ### 3. Production
+
 - Ordres de fabrication
 - Planning de production
 - Suivi des opérations
 - Affectation des techniciens
 
 ### 4. Stocks
+
 - Inventaire temps réel
 - Alertes stock critique
 - Gestion des mouvements
 - Optimisation des chutes
 
 ### 5. Chiffrage
+
 - Calculateur avancé
 - Templates réutilisables
 - Export PDF des devis
@@ -153,18 +163,21 @@ Le projet utilise un système de composants basé sur [shadcn/ui](https://ui.sha
 ## 🚀 Déploiement
 
 ### Vercel (Recommandé)
+
 ```bash
 npm install -g vercel
 vercel
 ```
 
 ### Docker
+
 ```bash
 docker build -t erp-metallerie .
 docker run -p 3000:3000 erp-metallerie
 ```
 
 ### Serveur traditionnel
+
 ```bash
 npm run build
 npm run start
@@ -173,6 +186,7 @@ npm run start
 ## 🧪 Tests (À implémenter)
 
 Le projet est préparé pour :
+
 - Tests unitaires avec Jest
 - Tests d'intégration avec Testing Library
 - Tests E2E avec Playwright
@@ -182,12 +196,14 @@ Le projet est préparé pour :
 L'API backend doit exposer les endpoints suivants :
 
 ### Auth
+
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `POST /api/auth/refresh`
 - `GET /api/auth/me`
 
 ### Projets
+
 - `GET /api/projets`
 - `GET /api/projets/:id`
 - `POST /api/projets`
@@ -195,6 +211,7 @@ L'API backend doit exposer les endpoints suivants :
 - `DELETE /api/projets/:id`
 
 ### Stocks
+
 - `GET /api/stocks`
 - `GET /api/stocks/:id`
 - `POST /api/stocks/mouvements`
@@ -223,7 +240,8 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 ## 📞 Support
 
 Pour toute question ou support :
-- Email : support@erp-metallerie.fr
+
+- Email : support@oweo-consulting.fr
 - Documentation : [https://docs.erp-metallerie.fr](https://docs.erp-metallerie.fr)
 - Issues : [GitHub Issues](https://github.com/votre-username/erp-metallerie/issues)
 
