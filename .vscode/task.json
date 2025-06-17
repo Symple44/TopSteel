@@ -193,6 +193,72 @@
         "panel": "shared"
       },
       "problemMatcher": []
+    },
+    {
+      "label": "🔄 Restart Dev Server",
+      "type": "shell",
+      "command": "pkill -f 'next dev' && pnpm dev",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Bundle Analyzer",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@erp/web", "analyze"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔧 Fix All Issues",
+      "type": "shell",
+      "command": "pnpm lint -- --fix && pnpm format",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🎭 E2E Tests - UI Mode",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@erp/web", "test:e2e", "--ui"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
     }
   ]
 }

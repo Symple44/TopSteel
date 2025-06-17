@@ -2,30 +2,83 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "🚀 Launch Web App (pnpm)",
+      "name": "🚀 Launch Web App (Next.js)",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/node_modules/.bin/next",
-      "args": ["dev"],
+      "args": ["dev", "--port", "3000"],
       "cwd": "${workspaceFolder}/apps/web",
+      "envFile": "${workspaceFolder}/.vscode/launch.env",
       "env": {
         "NODE_ENV": "development"
       },
       "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"],
-      "runtimeArgs": ["--experimental-network-inspection"]
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "runtimeArgs": ["--experimental-network-inspection"],
+      "serverReadyAction": {
+        "pattern": "- Local:.*http://localhost:([0-9]+)",
+        "uriFormat": "http://localhost:%s",
+        "action": "openExternally"
+      },
+      "restart": true,
+      "presentation": {
+        "hidden": false,
+        "group": "development",
+        "order": 1
+      }
     },
     {
-      "name": "🧪 Debug Tests (pnpm)",
+      "name": "🧪 Debug Tests (Jest)",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": ["--runInBand", "--no-cache"],
-      "cwd": "${workspaceFolder}",
+      "args": ["--runInBand", "--no-cache", "--watchAll=false", "--verbose"],
+      "cwd": "${workspaceFolder}/apps/web",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "env": {
         "NODE_ENV": "test"
+      },
+      "presentation": {
+        "hidden": false,
+        "group": "testing",
+        "order": 1
+      }
+    },
+    {
+      "name": "🧪 Debug Current Test File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["${relativeFile}", "--runInBand", "--no-cache", "--verbose"],
+      "cwd": "${workspaceFolder}/apps/web",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "presentation": {
+        "hidden": false,
+        "group": "testing",
+        "order": 2
+      }
+    },
+    {
+      "name": "🎭 Debug Playwright Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/playwright",
+      "args": ["test", "--debug", "--headed"],
+      "cwd": "${workspaceFolder}/apps/web",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "presentation": {
+        "hidden": false,
+        "group": "testing",
+        "order": 3
       }
     },
     {
@@ -36,7 +89,42 @@
       "args": ["build"],
       "cwd": "${workspaceFolder}/apps/web",
       "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "production",
+        "ANALYZE": "true"
+      },
+      "presentation": {
+        "hidden": false,
+        "group": "build",
+        "order": 1
+      }
+    },
+    {
+      "name": "📊 Debug API Route",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}/apps/web",
+      "remoteRoot": "${workspaceFolder}/apps/web",
+      "skipFiles": ["<node_internals>/**"],
+      "presentation": {
+        "hidden": false,
+        "group": "development",
+        "order": 2
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🚀 Full Stack Debug",
+      "configurations": ["🚀 Launch Web App (Next.js)", "📊 Debug API Route"],
+      "presentation": {
+        "hidden": false,
+        "group": "compound",
+        "order": 1
+      }
     }
   ]
 }

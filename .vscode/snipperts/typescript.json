@@ -1,0 +1,94 @@
+{
+  "React Functional Component": {
+    "prefix": "rfc",
+    "body": [
+      "import { FC } from 'react'",
+      "",
+      "interface ${1:ComponentName}Props {",
+      "  $2",
+      "}",
+      "",
+      "export const ${1:ComponentName}: FC<${1:ComponentName}Props> = ({$3}) => {",
+      "  return (",
+      "    <div>$4</div>",
+      "  )",
+      "}",
+      "",
+      "export default ${1:ComponentName}"
+    ],
+    "description": "Create a React functional component with TypeScript"
+  },
+  "Zustand Store": {
+    "prefix": "zustand",
+    "body": [
+      "import { create } from 'zustand'",
+      "import { devtools } from 'zustand/middleware'",
+      "",
+      "interface ${1:Store}State {",
+      "  $2",
+      "}",
+      "",
+      "interface ${1:Store}Actions {",
+      "  $3",
+      "}",
+      "",
+      "export const use${1:Store} = create<${1:Store}State & ${1:Store}Actions>()(devtools((set, get) => ({",
+      "  $4",
+      "}), { name: '${1:store}' }))"
+    ],
+    "description": "Create a Zustand store with TypeScript"
+  },
+  "API Route": {
+    "prefix": "apiroute",
+    "body": [
+      "import { NextRequest, NextResponse } from 'next/server'",
+      "",
+      "export async function GET(request: NextRequest) {",
+      "  try {",
+      "    $1",
+      "    return NextResponse.json({ message: 'Success' })",
+      "  } catch (error) {",
+      "    return NextResponse.json(",
+      "      { error: 'Internal Server Error' },",
+      "      { status: 500 }",
+      "    )",
+      "  }",
+      "}",
+      "",
+      "export async function POST(request: NextRequest) {",
+      "  try {",
+      "    const body = await request.json()",
+      "    $2",
+      "    return NextResponse.json({ message: 'Created' }, { status: 201 })",
+      "  } catch (error) {",
+      "    return NextResponse.json(",
+      "      { error: 'Internal Server Error' },",
+      "      { status: 500 }",
+      "    )",
+      "  }",
+      "}"
+    ],
+    "description": "Create a Next.js API route with TypeScript"
+  },
+  "Custom Hook": {
+    "prefix": "hook",
+    "body": [
+      "import { useState, useEffect } from 'react'",
+      "",
+      "export function use${1:HookName}($2) {",
+      "  const [${3:state}, set${3/(.*)/${3:/capitalize}/}] = useState($4)",
+      "",
+      "  useEffect(() => {",
+      "    $5",
+      "  }, [$6])",
+      "",
+      "  return {",
+      "    $3,",
+      "    set${3/(.*)/${3:/capitalize}/},",
+      "    $7",
+      "  }",
+      "}"
+    ],
+    "description": "Create a custom React hook"
+  }
+}

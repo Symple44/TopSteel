@@ -1,29 +1,20 @@
 {
   "recommendations": [
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
-    "prisma.prisma",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
     "ms-vscode.vscode-typescript-next",
     "formulahendry.auto-rename-tag",
-    "steoates.autoimport",
-    "dsznajder.es7-react-js-snippets",
     "christian-kohler.path-intellisense",
-    "mikestead.dotenv",
-    "usernamehw.errorlens",
     "yoavbls.pretty-ts-errors",
-    "bradlc.vscode-tailwindcss",
-    "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint",
+    "ms-playwright.playwright",
+    "orta.vscode-jest",
     "ms-vscode.vscode-json",
-    "formulahendry.auto-rename-tag",
-    "christian-kohler.path-intellisense",
-    "ms-vscode.vscode-npm-script",
-    "gruntfuggly.todo-tree",
-    "usernamehw.errorlens",
-    "yoavbls.pretty-ts-errors",
+    "redhat.vscode-yaml",
     "bradlc.vscode-tailwindcss",
-    "ms-vscode.vscode-jest",
-    "firsttris.vscode-jest-runner"
-  ]
+    "gruntfuggly.todo-tree",
+    "ms-vscode.vscode-json",
+    "streetsidesoftware.code-spell-checker"
+  ],
+  "unwantedRecommendations": ["ms-vscode.vscode-typescript"]
 }
