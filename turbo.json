@@ -1,28 +1,45 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": ["**/.env.*local", ".env"],
+  "globalEnv": [
+    "NODE_ENV",
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "ANALYZE"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["NODE_ENV"]
+      "env": ["NODE_ENV", "PORT", "NEXT_PUBLIC_*"]
     },
     "start:dev": {
       "cache": false,
       "persistent": true,
-      "env": ["NODE_ENV", "PORT", "DB_*", "REDIS_*", "JWT_*"]
+      "env": [
+        "NODE_ENV",
+        "PORT",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "JWT_*",
+        "CORS_*"
+      ]
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**", "build/**"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"],
       "env": [
         "NODE_ENV",
         "NEXT_PUBLIC_*",
-        "DB_*",
-        "REDIS_*",
+        "DATABASE_URL",
+        "REDIS_URL",
         "JWT_*",
         "APP_*",
-        "CORS_*"
+        "CORS_*",
+        "ANALYZE",
+        "BUNDLE_ANALYZE"
       ]
     },
     "start": {
@@ -33,19 +50,22 @@
     "start:prod": {
       "dependsOn": ["build"],
       "cache": false,
-      "env": ["NODE_ENV", "PORT", "DB_*", "REDIS_*", "JWT_*"]
+      "env": ["NODE_ENV", "PORT", "DATABASE_URL", "REDIS_URL", "JWT_*"]
     },
     "lint": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": [],
+      "cache": true
     },
     "lint:fix": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "type-check": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": ["*.tsbuildinfo"],
+      "cache": true
     },
     "test": {
       "dependsOn": ["^build"],
@@ -54,41 +74,81 @@
         "src/**/*.{ts,tsx}",
         "test/**/*.{ts,tsx}",
         "**/*.test.{ts,tsx}",
-        "**/*.spec.{ts,tsx}"
-      ]
+        "**/*.spec.{ts,tsx}",
+        "jest.config.*",
+        "tsconfig.json"
+      ],
+      "env": ["NODE_ENV", "CI"],
+      "cache": true
     },
     "test:watch": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": ["NODE_ENV"]
     },
-    "test:cov": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
-    },
-    "test:e2e": {
+    "test:coverage": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "env": ["NODE_ENV", "DB_*", "REDIS_*"]
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "test/**/*.{ts,tsx}",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}"
+      ],
+      "env": ["NODE_ENV", "CI"],
+      "cache": true
     },
-    "migration:run": {
-      "cache": false,
-      "env": ["DB_*"]
-    },
-    "migration:generate": {
-      "cache": false,
-      "env": ["DB_*"]
-    },
-    "migration:revert": {
-      "cache": false,
-      "env": ["DB_*"]
-    },
-    "seed:run": {
-      "cache": false,
-      "env": ["DB_*"]
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "outputs": ["playwright-report/**", "test-results/**"],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "NEXT_PUBLIC_API_URL",
+        "E2E_TEST"
+      ],
+      "cache": false
     },
     "format": {
       "outputs": [],
       "cache": false
+    },
+    "clean": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "db:seed": {
+      "cache": false,
+      "dependsOn": ["db:migrate"],
+      "env": ["DATABASE_URL"]
+    },
+    "migration:generate": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "migration:run": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "migration:revert": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "seed:run": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "storybook": {
+      "cache": false,
+      "persistent": true
+    },
+    "storybook:build": {
+      "outputs": ["storybook-static/**"],
+      "cache": true
     }
   }
 }
