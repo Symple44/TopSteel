@@ -1,20 +1,68 @@
+// .vscode/extensions.json
 {
   "recommendations": [
-    "bradlc.vscode-tailwindcss",
-    "esbenp.prettier-vscode",
+    // Essentiels
     "dbaeumer.vscode-eslint",
-    "ms-vscode.vscode-typescript-next",
-    "formulahendry.auto-rename-tag",
-    "christian-kohler.path-intellisense",
-    "yoavbls.pretty-ts-errors",
-    "ms-playwright.playwright",
-    "orta.vscode-jest",
-    "ms-vscode.vscode-json",
-    "redhat.vscode-yaml",
+    "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+
+    // Développement React/Next.js
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+    "naumovs.color-highlight",
+    "csstools.postcss",
+
+    // NestJS
+    "ashinzekene.nestjs",
+
+    // Amélioration de productivité
+    "christian-kohler.path-intellisense",
+    "aaron-bond.better-comments",
+    "streetsidesoftware.code-spell-checker",
+    "usernamehw.errorlens",
+    "yoavbls.pretty-ts-errors",
     "gruntfuggly.todo-tree",
-    "ms-vscode.vscode-json",
-    "streetsidesoftware.code-spell-checker"
+
+    // Git
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // Testing
+    "orta.vscode-jest",
+    "ms-playwright.playwright",
+
+    // Base de données
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg",
+    "prisma.prisma",
+
+    // Fichiers et formats
+    "mikestead.dotenv",
+    "redhat.vscode-yaml",
+    "yzhang.markdown-all-in-one",
+
+    // Outils de debug
+    "msjsdiag.debugger-for-chrome",
+
+    // Turbo et Monorepo
+    "turbo.turbo-vsc",
+
+    // Icônes et thèmes
+    "pkief.material-icon-theme",
+    "zhuangtongfa.material-theme",
+
+    // Docker (si utilisé)
+    "ms-azuretools.vscode-docker",
+
+    // AI Assistant (optionnel)
+    "github.copilot",
+    "github.copilot-chat"
   ],
-  "unwantedRecommendations": ["ms-vscode.vscode-typescript"]
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript",
+    "hookyqr.beautify",
+    "dbaeumer.jshint",
+    "eg2.tslint"
+  ]
 }

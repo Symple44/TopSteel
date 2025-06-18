@@ -1,29 +1,60 @@
+// .vscode/keybindings.json
+// Copier ce contenu dans: File > Preferences > Keyboard Shortcuts > Open Keyboard Shortcuts (JSON)
 [
+  // Développement
   {
     "key": "ctrl+shift+d",
     "command": "workbench.action.tasks.runTask",
-    "args": "🚀 Turbo Dev"
+    "args": "🚀 Turbo Dev - All"
   },
+  {
+    "key": "ctrl+alt+w",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌐 Dev - Web Only"
+  },
+  {
+    "key": "ctrl+alt+a",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔧 Dev - API Only"
+  },
+
+  // Build
   {
     "key": "ctrl+shift+b",
     "command": "workbench.action.tasks.runTask",
-    "args": "🔨 Turbo Build"
+    "args": "🔨 Build - All"
   },
+
+  // Tests
   {
     "key": "ctrl+shift+t",
     "command": "workbench.action.tasks.runTask",
-    "args": "🧪 Tests - All"
+    "args": "🧪 Test - All"
   },
   {
     "key": "ctrl+shift+w",
     "command": "workbench.action.tasks.runTask",
-    "args": "🧪 Tests - Watch Mode"
+    "args": "🧪 Test - Watch"
   },
+
+  // Qualité du code
   {
     "key": "ctrl+shift+l",
     "command": "workbench.action.tasks.runTask",
     "args": "🔍 Lint - All"
   },
+  {
+    "key": "ctrl+shift+f",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔧 Lint - Fix All"
+  },
+  {
+    "key": "ctrl+alt+f",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🎨 Format Code"
+  },
+
+  // Maintenance
   {
     "key": "ctrl+shift+c",
     "command": "workbench.action.tasks.runTask",
@@ -32,23 +63,22 @@
   {
     "key": "ctrl+shift+r",
     "command": "workbench.action.tasks.runTask",
-    "args": "🔄 Restart Dev Server"
+    "args": "🔄 Reset Project"
+  },
+
+  // Base de données
+  {
+    "key": "ctrl+alt+m",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🗄️ DB - Run Migrations"
   },
   {
-    "key": "ctrl+shift+f",
+    "key": "ctrl+alt+s",
     "command": "workbench.action.tasks.runTask",
-    "args": "🔧 Fix All Issues"
+    "args": "🌱 DB - Seed Data"
   },
-  {
-    "key": "ctrl+shift+e",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🎭 E2E Tests - UI Mode"
-  },
-  {
-    "key": "ctrl+shift+a",
-    "command": "workbench.action.tasks.runTask",
-    "args": "📊 Bundle Analyzer"
-  },
+
+  // Debug
   {
     "key": "f5",
     "command": "workbench.action.debug.start",
@@ -58,5 +88,43 @@
     "key": "ctrl+f5",
     "command": "workbench.action.debug.run",
     "when": "!inDebugMode"
+  },
+  {
+    "key": "shift+f5",
+    "command": "workbench.action.debug.stop",
+    "when": "inDebugMode"
+  },
+
+  // Navigation rapide
+  {
+    "key": "ctrl+1",
+    "command": "workbench.action.terminal.focusAtIndex1"
+  },
+  {
+    "key": "ctrl+2",
+    "command": "workbench.action.terminal.focusAtIndex2"
+  },
+  {
+    "key": "ctrl+3",
+    "command": "workbench.action.terminal.focusAtIndex3"
+  },
+
+  // Raccourcis personnalisés
+  {
+    "key": "ctrl+alt+n",
+    "command": "workbench.action.terminal.new",
+    "args": {
+      "cwd": "${workspaceFolder}"
+    }
+  },
+  {
+    "key": "ctrl+alt+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔍 Type Check"
+  },
+  {
+    "key": "ctrl+alt+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📊 Bundle Analyzer"
   }
 ]

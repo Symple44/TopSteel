@@ -1,29 +1,49 @@
+// .vscode/settings.json
 {
+  // Formatage et éditeur
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
+
+  // Configuration TypeScript pour monorepo
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.suggest.autoImports": true,
+  "typescript.inlayHints.parameterNames.enabled": "literals",
+  "typescript.inlayHints.variableTypes.enabled": false,
+  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "typescript.inlayHints.enumMemberValues.enabled": true,
+
+  // ESLint
   "eslint.validate": [
     "javascript",
     "javascriptreact",
     "typescript",
     "typescriptreact"
   ],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+
+  // Tailwind CSS
   "tailwindCSS.includeLanguages": {
     "typescript": "javascript",
     "typescriptreact": "javascript"
   },
-  "files.associations": {
-    "*.css": "tailwindcss"
-  },
-  "emmet.includeLanguages": {
-    "javascript": "javascriptreact",
-    "typescript": "typescriptreact"
-  },
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["twMerge\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+
+  // Prettier
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -33,78 +53,161 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/.next": true,
-    "**/dist": true,
-    "**/build": true,
-    "**/.git": true
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "typescript.preferences.include.packageJsonAutoImports": "on",
-  "typescript.suggest.autoImports": true,
-  "typescript.preferences.includePackageJsonAutoImports": "on",
-  "typescript.inlayHints.parameterNames.enabled": "all",
-  "typescript.inlayHints.variableTypes.enabled": true,
-  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 
-  // Jest/Tests
+  // Jest
   "jest.autoRun": {
     "watch": false,
     "onSave": "test-src-file"
   },
   "jest.showCoverageOnLoad": true,
-  "jest.jestCommandLine": "pnpm test --",
-  "jest.rootPath": "apps/web",
-
-  // Tailwind amélioré
-  "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
-    ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
-  ],
-  "tailwindCSS.includeLanguages": {
-    "typescript": "javascript",
-    "typescriptreact": "javascript"
+  "jest.coverageColors": {
+    "covered": "rgba(9, 128, 76, 0.2)",
+    "uncovered": "rgba(121, 31, 10, 0.2)",
+    "partially-covered": "rgba(235, 198, 52, 0.2)"
   },
 
-  // File watchers optimisés
+  // Recherche et exclusions
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.turbo": true,
+    "**/coverage": true,
+    "**/.git": true,
+    "**/pnpm-lock.yaml": true
+  },
+
+  // File watchers
   "files.watcherExclude": {
-    "**/.next/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
     "**/node_modules/**": true,
-    "**/.git/**": true,
+    "**/.next/**": true,
     "**/dist/**": true,
     "**/build/**": true,
     "**/.turbo/**": true,
     "**/coverage/**": true
   },
 
-  // Auto-save et formatage
+  // Associations de fichiers
+  "files.associations": {
+    "*.css": "tailwindcss",
+    ".env*": "properties",
+    "turbo.json": "jsonc"
+  },
+
+  // Emmet
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  },
+
+  // Auto-save
   "files.autoSave": "onFocusChange",
-  "editor.formatOnPaste": true,
-  "editor.formatOnType": false,
+
+  // Éditeur avancé
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": true,
+  "editor.linkedEditing": true,
+  "editor.suggestSelection": "first",
+  "editor.snippetSuggestions": "top",
+  "editor.wordWrap": "on",
 
   // Terminal
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.defaultProfile.osx": "zsh",
   "terminal.integrated.defaultProfile.linux": "bash",
   "terminal.integrated.fontFamily": "JetBrains Mono, 'Courier New', monospace",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.env.windows": {
+    "PNPM_HOME": "${env:APPDATA}\\npm"
+  },
 
   // Git
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
+  "git.postCommitCommand": "none",
 
   // Explorer
   "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
-
-  // Problems panel
-  "problems.showCurrentInStatus": true,
+  "explorer.compactFolders": false,
 
   // Breadcrumbs
   "breadcrumbs.enabled": true,
   "breadcrumbs.filePath": "on",
-  "breadcrumbs.symbolPath": "on"
+  "breadcrumbs.symbolPath": "on",
+
+  // Problems
+  "problems.showCurrentInStatus": true,
+
+  // Configurations spécifiques aux workspaces
+  "eslint.workingDirectories": [
+    "./apps/web",
+    "./apps/api",
+    "./packages/ui",
+    "./packages/types",
+    "./packages/utils",
+    "./packages/config"
+  ],
+
+  // Jest pour différents workspaces
+  "jest.jestCommandLine": "pnpm test --",
+  "jest.rootPath": "${workspaceFolder}",
+
+  // Chemins d'importation pour IntelliSense
+  "path-intellisense.mappings": {
+    "@": "${workspaceFolder}/apps/web/src",
+    "@erp/ui": "${workspaceFolder}/packages/ui/src",
+    "@erp/types": "${workspaceFolder}/packages/types/src",
+    "@erp/utils": "${workspaceFolder}/packages/utils/src",
+    "@erp/config": "${workspaceFolder}/packages/config/src"
+  },
+
+  // Todo Tree
+  "todo-tree.highlights.enabled": true,
+  "todo-tree.general.tags": [
+    "TODO",
+    "FIXME",
+    "HACK",
+    "BUG",
+    "NOTE",
+    "OPTIMIZE",
+    "REFACTOR"
+  ],
+
+  // Spell Checker
+  "cSpell.words": [
+    "topsteel",
+    "erp",
+    "nestjs",
+    "typeorm",
+    "pnpm",
+    "turbo",
+    "tailwindcss",
+    "clsx",
+    "lucide",
+    "radix",
+    "shadcn",
+    "zustand",
+    "metallurgie",
+    "devis",
+    "facturation"
+  ],
+
+  // NestJS specific
+  "[nest-cli.json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Turbo
+  "turbo.useLocalTurbo": true
 }

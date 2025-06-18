@@ -1,11 +1,36 @@
+// .vscode/tasks.json
 {
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "🚀 Turbo Dev (All Apps)",
+      "label": "🚀 Turbo Dev - All",
       "type": "shell",
       "command": "pnpm",
       "args": ["dev"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "clear": true
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🌐 Dev - Web Only",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["dev:web"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -14,20 +39,15 @@
         "echo": true,
         "reveal": "always",
         "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
+        "panel": "dedicated"
       },
       "problemMatcher": []
     },
     {
-      "label": "🌐 Web App Only",
+      "label": "🔧 Dev - API Only",
       "type": "shell",
       "command": "pnpm",
-      "args": ["--filter", "@erp/web", "dev"],
+      "args": ["dev:api"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -35,13 +55,13 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "dedicated"
       },
       "problemMatcher": []
     },
     {
-      "label": "🔨 Build All",
+      "label": "🔨 Build - All",
       "type": "shell",
       "command": "pnpm",
       "args": ["build"],
@@ -58,24 +78,7 @@
       "problemMatcher": []
     },
     {
-      "label": "🔨 Build Web Only",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["--filter", "@erp/web", "build"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🧪 Tests - All",
+      "label": "🧪 Test - All",
       "type": "shell",
       "command": "pnpm",
       "args": ["test"],
@@ -92,27 +95,10 @@
       "problemMatcher": []
     },
     {
-      "label": "🧪 Tests - Web App",
+      "label": "🧪 Test - Watch",
       "type": "shell",
       "command": "pnpm",
-      "args": ["--filter", "@erp/web", "test"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🧪 Tests - Watch Mode",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["--filter", "@erp/web", "test:watch"],
+      "args": ["test:watch"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -127,10 +113,27 @@
       "problemMatcher": []
     },
     {
-      "label": "🔍 Lint All",
+      "label": "🔍 Lint - All",
       "type": "shell",
       "command": "pnpm",
       "args": ["lint"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "🔧 Lint - Fix All",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["lint:fix"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -158,7 +161,7 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": ["$tsc"]
     },
     {
       "label": "📦 Install Dependencies",
@@ -195,13 +198,82 @@
       "problemMatcher": []
     },
     {
-      "label": "🔄 Restart Dev Server",
+      "label": "🔄 Reset Project",
       "type": "shell",
-      "command": "taskkill /F /IM node.exe & pnpm dev",
+      "command": "pnpm",
+      "args": ["reset"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🎨 Format Code",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["format"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗄️ DB - Run Migrations",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["db:migrate"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗄️ DB - Generate Migration",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["db:migrate:generate"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🌱 DB - Seed Data",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["db:seed"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -228,13 +300,14 @@
       "problemMatcher": []
     },
     {
-      "label": "🔧 Fix All Issues",
+      "label": "🔍 Check Dependencies",
       "type": "shell",
-      "command": "pnpm lint -- --fix && pnpm format",
+      "command": "pnpm",
+      "args": ["deps:check"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "group": "build",
+      "group": "none",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -244,10 +317,78 @@
       "problemMatcher": []
     },
     {
-      "label": "🎭 E2E Tests - UI Mode",
+      "label": "📋 Outdated Dependencies",
       "type": "shell",
       "command": "pnpm",
-      "args": ["--filter", "@erp/web", "test:e2e", "--ui"],
+      "args": ["deps:outdated"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔒 Security Audit",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["security:audit"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Start Production",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["start"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🛠️ Setup Environment",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["setup:env"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🎭 E2E Tests",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["test:e2e"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
