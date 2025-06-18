@@ -47,6 +47,7 @@ async function bootstrap() {
   app.use(
     helmet({
       contentSecurityPolicy: env === "production" ? undefined : false,
+      crossOriginEmbedderPolicy: env === "production",
     })
   );
 
@@ -55,57 +56,70 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: configService.get<string[]>("app.corsOrigins", [
-      "http://localhost:3000",
-    ]),
+    origin: configService.get("app.cors.origin", ["http://localhost:3000"]),
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   });
 
-  // Préfixe global
-  app.setGlobalPrefix("api");
+  // Prefix global pour l'API
+  app.setGlobalPrefix("api", {
+    exclude: ["/", "/health"],
+  });
 
-  // Versioning
+  // Versioning de l'API
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: "1",
   });
 
-  // Pipes globaux
+  // Validation globale
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
-      transform: true,
       transformOptions: {
         enableImplicitConversion: true,
       },
     })
   );
 
-  // Filtres globaux
+  // Filtres et intercepteurs globaux
   app.useGlobalFilters(new HttpExceptionFilter());
-
-  // Intercepteurs globaux
   app.useGlobalInterceptors(
-    new TransformInterceptor(),
-    new LoggingInterceptor()
+    new LoggingInterceptor(),
+    new TransformInterceptor()
   );
 
-  // Configuration Swagger
+  // Documentation Swagger
   if (env !== "production") {
     const config = new DocumentBuilder()
       .setTitle("ERP TOPSTEEL API")
-      .setDescription("API pour la gestion ERP de métallerie")
+      .setDescription("API pour l'ERP de gestion métallurgique TOPSTEEL")
       .setVersion("1.0")
-      .addBearerAuth()
-      .addTag("auth", "Authentification")
-      .addTag("users", "Gestion des utilisateurs")
-      .addTag("projets", "Gestion des projets")
-      .addTag("clients", "Gestion des clients")
-      .addTag("production", "Gestion de la production")
-      .addTag("stocks", "Gestion des stocks")
-      .addTag("devis", "Gestion des devis")
-      .addTag("documents", "Gestion des documents")
+      .addBearerAuth(
+        {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          name: "JWT",
+          description: "Enter JWT token",
+          in: "header",
+        },
+        "JWT-auth"
+      )
+      .addTag("Auth", "Authentification et autorisation")
+      .addTag("Users", "Gestion des utilisateurs")
+      .addTag("Clients", "Gestion des clients")
+      .addTag("Fournisseurs", "Gestion des fournisseurs")
+      .addTag("Projets", "Gestion des projets")
+      .addTag("Devis", "Gestion des devis")
+      .addTag("Facturation", "Gestion de la facturation")
+      .addTag("Stocks", "Gestion des stocks")
+      .addTag("Production", "Gestion de la production")
+      .addTag("Documents", "Gestion des documents")
+      .addTag("Notifications", "Système de notifications")
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
@@ -114,22 +128,30 @@ async function bootstrap() {
         persistAuthorization: true,
       },
     });
+
+    logger.log(`📚 Documentation Swagger disponible sur: http://localhost:${port}/api/docs`);
   }
 
   // Graceful shutdown
-  app.enableShutdownHooks();
+  const gracefulShutdown = () => {
+    logger.log("🔄 Arrêt gracieux du serveur...");
+    app.close().then(() => {
+      logger.log("✅ Serveur arrêté avec succès");
+      process.exit(0);
+    });
+  };
 
-  // Démarrage du serveur
+  process.on("SIGTERM", gracefulShutdown);
+  process.on("SIGINT", gracefulShutdown);
+
   await app.listen(port);
-  logger.log(
-    `🚀 Application running on: http://localhost:${port}/api`,
-    "Bootstrap"
-  );
-  logger.log(
-    `📚 Documentation available at: http://localhost:${port}/api/docs`,
-    "Bootstrap"
-  );
-  logger.log(`🌍 Environment: ${env}`, "Bootstrap");
+
+  logger.log(`🚀 Serveur NestJS démarré sur: http://localhost:${port}`);
+  logger.log(`🌟 Environnement: ${env}`);
+  logger.log(`📊 Health check: http://localhost:${port}/health`);
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error("❌ Erreur lors du démarrage du serveur:", error);
+  process.exit(1);
+});

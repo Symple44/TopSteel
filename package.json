@@ -1,6 +1,7 @@
 {
-  "name": "erp-TOPSTEEL",
+  "name": "erp-topsteel",
   "version": "1.0.0",
+  "description": "ERP TOPSTEEL - Système de gestion métallurgique",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -9,8 +10,26 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=@erp/web",
+    "dev:api": "turbo start:dev --filter=@erp/api",
+    "dev:all": "turbo dev",
+    "start": "turbo start",
+    "start:web": "turbo start --filter=@erp/web",
+    "start:api": "turbo start:prod --filter=@erp/api",
     "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
     "type-check": "turbo type-check",
+    "test": "turbo test",
+    "test:watch": "turbo test:watch",
+    "test:cov": "turbo test:cov",
+    "test:e2e": "turbo test:e2e",
+    "format": "turbo format",
+    "clean": "turbo clean && rm -rf node_modules/.cache .turbo",
+    "reset": "pnpm clean && rm -rf node_modules && pnpm install",
+    "db:migrate": "turbo migration:run --filter=@erp/api",
+    "db:migrate:generate": "turbo migration:generate --filter=@erp/api",
+    "db:migrate:revert": "turbo migration:revert --filter=@erp/api",
+    "db:seed": "turbo seed:run --filter=@erp/api",
     "audit": "audit-ci --config audit-ci.json",
     "deps:check": "pnpm audit && depcheck",
     "deps:update": "node scripts/update-deps.js",
@@ -18,10 +37,30 @@
     "deps:unused": "depcheck --json | jq '.dependencies'",
     "security:audit": "better-npm-audit audit",
     "security:snyk": "snyk test --all-projects",
-    "deps:full-check": "pnpm deps:check && pnpm deps:outdated && pnpm security:audit"
+    "deps:full-check": "pnpm deps:check && pnpm deps:outdated && pnpm security:audit",
+    "setup": "pnpm install && pnpm build --filter=\"!@erp/web\" --filter=\"!@erp/api\"",
+    "setup:env": "cp apps/web/.env.example apps/web/.env.local && cp apps/api/.env.example apps/api/.env.local"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
-    "typescript": "^5.6.0"
-  }
+    "typescript": "^5.6.0",
+    "depcheck": "^1.4.7",
+    "audit-ci": "^7.0.1",
+    "better-npm-audit": "^3.7.3",
+    "jq": "^1.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "keywords": [
+    "erp",
+    "metallurgy",
+    "topsteel",
+    "management",
+    "production"
+  ],
+  "author": "TOPSTEEL",
+  "license": "UNLICENSED"
 }

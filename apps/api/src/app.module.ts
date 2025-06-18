@@ -5,7 +5,6 @@ import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 import { ThrottlerModule } from "@nestjs/throttler";
-import { TypeOrmModule } from "@nestjs/typeorm";
 import * as redisStore from "cache-manager-redis-store";
 
 // Configuration
@@ -27,57 +26,46 @@ import { ProjetsModule } from "./modules/projets/projets.module";
 import { StocksModule } from "./modules/stocks/stocks.module";
 import { UsersModule } from "./modules/users/users.module";
 
+// Common modules
+import { DatabaseModule } from "./database/database.module";
+
 // Middleware
 import { LoggerMiddleware } from "./common/middleware/logger.middleware";
 
 // Controllers
 import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
 
 @Module({
   imports: [
-    // Configuration
+    // Configuration globale
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, databaseConfig, jwtConfig, redisConfig],
       envFilePath: [".env.local", ".env"],
+      expandVariables: true,
     }),
 
     // Base de données
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: "postgres",
-        host: configService.get("database.host"),
-        port: configService.get("database.port"),
-        username: configService.get("database.username"),
-        password: configService.get("database.password"),
-        database: configService.get("database.name"),
-        entities: [__dirname + "/**/*.entity{.ts,.js}"],
-        synchronize: configService.get("app.env") === "development",
-        logging: configService.get("app.env") === "development",
-        ssl: configService.get("database.ssl"),
-        extra: {
-          max: configService.get("database.maxConnections", 100),
-        },
-      }),
-      inject: [ConfigService],
-    }),
+    DatabaseModule,
 
     // Cache Redis
     CacheModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
+        store: redisStore as any,
         host: configService.get("redis.host"),
         port: configService.get("redis.port"),
         password: configService.get("redis.password"),
-        ttl: 60 * 60, // 1 heure par défaut
+        db: configService.get("redis.db"),
+        ttl: configService.get("redis.ttl"),
+        max: configService.get("redis.max"),
       }),
       inject: [ConfigService],
       isGlobal: true,
     }),
 
-    // Queue Redis (Bull)
+    // Bull Queue (Redis)
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -90,30 +78,36 @@ import { AppController } from "./app.controller";
       inject: [ConfigService],
     }),
 
-    // Planification des tâches
+    // Scheduler pour les tâches cron
     ScheduleModule.forRoot(),
 
     // Rate limiting
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 100,
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => [
+        {
+          ttl: configService.get("app.throttle.ttl", 60000),
+          limit: configService.get("app.throttle.limit", 10),
+        },
+      ],
+      inject: [ConfigService],
     }),
 
     // Modules métier
     AuthModule,
     UsersModule,
-    ProjetsModule,
     ClientsModule,
-    ProductionModule,
-    StocksModule,
-    DevisModule,
-    DocumentsModule,
     FournisseursModule,
+    ProjetsModule,
+    DevisModule,
     FacturationModule,
+    StocksModule,
+    ProductionModule,
+    DocumentsModule,
     NotificationsModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
