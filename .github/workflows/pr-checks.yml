@@ -5,105 +5,118 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-env:
-  NODE_VERSION: "18.17.0"
-  PNPM_VERSION: "8.15.0"
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: write
 
 jobs:
-  # Vérification de la taille du bundle
-  bundle-size:
-    name: Bundle Size Check
+  # Vérification de la taille de la PR
+  pr-size:
+    name: Check PR Size
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
+      - name: Check PR size
+        uses: actions/github-script@v7
         with:
-          version: ${{ env.PNPM_VERSION }}
+          script: |
+            const pr = context.payload.pull_request;
+            const additions = pr.additions;
+            const deletions = pr.deletions;
+            const total = additions + deletions;
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+            let label = '';
+            if (total < 10) label = 'size/XS';
+            else if (total < 50) label = 'size/S';
+            else if (total < 200) label = 'size/M';
+            else if (total < 500) label = 'size/L';
+            else label = 'size/XL';
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            // Ajouter le label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: [label]
+            });
 
-      - name: Build application
-        run: pnpm build --filter @erp/web
+            // Avertir si la PR est trop grande
+            if (total > 500) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: '⚠️ Cette PR contient plus de 500 lignes de changements. Considérez la diviser en PRs plus petites pour faciliter la review.'
+              });
+            }
 
-      - name: Analyze bundle size
-        uses: treosh/lighthouse-ci-action@v9
-        with:
-          uploadArtifacts: true
-          temporaryPublicStorage: true
-
-  # Vérification des types
-  type-safety:
-    name: Type Safety Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run type check
-        run: pnpm type-check
-
-  # Vérification du formatage
-  code-quality:
-    name: Code Quality
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Check formatting
-        run: |
-          pnpm format:check || (echo "Code is not formatted. Run 'pnpm format' locally." && exit 1)
-
-      - name: Run ESLint
-        run: pnpm lint
-
-  # Label automatique des PRs
+  # Auto-labeling basé sur les fichiers modifiés
   auto-label:
-    name: Auto Label PR
+    name: Auto Label
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/labeler@v4
+      - uses: actions/labeler@v5
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: .github/labeler.yml
+
+  # Vérification des commits conventionnels
+  commitlint:
+    name: Lint Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commits
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: .commitlintrc.json
+
+  # Analyse des fichiers modifiés
+  changed-files:
+    name: Analyze Changed Files
+    runs-on: ubuntu-latest
+    outputs:
+      web: ${{ steps.changes.outputs.web }}
+      api: ${{ steps.changes.outputs.api }}
+      packages: ${{ steps.changes.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            web:
+              - 'apps/web/**'
+            api:
+              - 'apps/api/**'
+            packages:
+              - 'packages/**'
+
+      - name: Comment changed areas
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const changes = {
+              web: ${{ steps.changes.outputs.web }},
+              api: ${{ steps.changes.outputs.api }},
+              packages: ${{ steps.changes.outputs.packages }}
+            };
+
+            const affected = Object.entries(changes)
+              .filter(([_, changed]) => changed === 'true')
+              .map(([area, _]) => area);
+
+            if (affected.length > 0) {
+              const body = `📦 **Zones affectées**: ${affected.join(', ')}`;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
+              });
+            }

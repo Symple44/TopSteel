@@ -1,0 +1,85 @@
+# .github/ISSUE_TEMPLATE/
+name: ✨ Feature Request
+description: Suggérer une nouvelle fonctionnalité
+title: "[FEATURE] "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de proposer une nouvelle fonctionnalité !
+        Veuillez fournir autant de détails que possible.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problème à résoudre
+      description: Décrivez le problème que cette fonctionnalité résoudrait
+      placeholder: "Je suis frustré quand..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution proposée
+      description: Décrivez comment vous imaginez cette fonctionnalité
+      placeholder: "J'aimerais pouvoir..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considérées
+      description: Avez-vous envisagé d'autres solutions ?
+      placeholder: "J'ai aussi pensé à..."
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorité
+      description: Quelle est l'importance de cette fonctionnalité pour vous ?
+      options:
+        - Critique (bloquant pour mon utilisation)
+        - Haute (très important)
+        - Moyenne (serait bien à avoir)
+        - Basse (nice to have)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module concerné
+      description: Quel module serait affecté ?
+      multiple: true
+      options:
+        - Frontend (Web)
+        - Backend (API)
+        - Base de données
+        - UI Components
+        - Utils
+        - Types
+        - Nouveau module
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Seriez-vous prêt à contribuer ?
+      options:
+        - label: Je suis prêt à implémenter cette fonctionnalité
+        - label: Je peux aider avec les tests
+        - label: Je peux aider avec la documentation
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Maquettes / Exemples
+      description: Si applicable, ajoutez des maquettes ou exemples
+      placeholder: "Ajoutez des images ou du code exemple..."

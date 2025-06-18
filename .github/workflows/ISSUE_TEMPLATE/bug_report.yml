@@ -1,0 +1,119 @@
+# .github/ISSUE_TEMPLATE/bug_report.yml
+name: 🐛 Bug Report
+description: Signaler un bug dans l'application
+title: "[BUG] "
+labels: ["bug", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de prendre le temps de signaler ce bug ! 
+        Veuillez remplir le formulaire ci-dessous avec autant de détails que possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description du bug
+      description: Une description claire et concise du bug
+      placeholder: "Décrivez le bug ici..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes pour reproduire
+      description: Étapes pour reproduire le comportement
+      placeholder: |
+        1. Aller à '...'
+        2. Cliquer sur '...'
+        3. Faire défiler jusqu'à '...'
+        4. Voir l'erreur
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportement attendu
+      description: Une description claire de ce que vous attendiez
+      placeholder: "Je m'attendais à ce que..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportement actuel
+      description: Ce qui se passe réellement
+      placeholder: "Au lieu de cela, il se passe..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Sévérité
+      description: Quelle est la gravité de ce bug ?
+      options:
+        - Critique (bloque complètement l'utilisation)
+        - Majeur (fonctionnalité importante cassée)
+        - Mineur (problème cosmétique ou mineur)
+        - Trivial
+    validations:
+      required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module affecté
+      description: Quel module est affecté ?
+      options:
+        - Frontend (Web)
+        - Backend (API)
+        - Base de données
+        - UI Components
+        - Utils
+        - Types
+        - CI/CD
+        - Documentation
+        - Autre
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environnement
+      description: Informations sur votre environnement
+      placeholder: |
+        - OS: [e.g. Windows 11, macOS 14, Ubuntu 22.04]
+        - Navigateur: [e.g. Chrome 120, Firefox 121]
+        - Version Node.js: [e.g. 18.17.0]
+        - Version pnpm: [e.g. 8.15.0]
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Captures d'écran
+      description: Si applicable, ajoutez des captures d'écran
+      placeholder: "Glissez-déposez vos images ici"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Logs pertinents (erreurs console, logs serveur, etc.)
+      render: shell
+      placeholder: "Collez les logs ici..."
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Contexte additionnel
+      description: Toute autre information pertinente
+      placeholder: "Informations supplémentaires..."

@@ -57,5 +57,5 @@ ci/cd:
 database:
   - '**/migrations/**/*'
   - '**/seeds/**/*'
-  - '**/entities/**/*
-  - '**/schemas/**/*
+  - '**/entities/**/*''
+  - '**/schemas/**/*'
