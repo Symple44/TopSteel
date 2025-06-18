@@ -12,50 +12,50 @@ backend:
 
 # Documentation
 documentation:
-  - '**/*.md'
+  - "**/*.md"
   - docs/**/*
 
 # Tests
 tests:
-  - '**/*.test.ts'
-  - '**/*.test.tsx'
-  - '**/*.spec.ts'
-  - '**/*.spec.tsx'
-  - '**/tests/**/*'
-  - '**/__tests__/**/*'
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+  - "**/tests/**/*"
+  - "**/__tests__/**/*"
 
 # Configuration
 configuration:
   - .github/**/*
-  - '*.json'
-  - '*.yml'
-  - '*.yaml'
-  - .env*
-  - '.*rc*'
+  - "*.json"
+  - "*.yml"
+  - "*.yaml"
+  - ".env*"
+  - ".*rc*"
 
 # Dependencies
 dependencies:
-  - '**/package.json'
+  - "**/package.json"
   - pnpm-lock.yaml
   - .npmrc
 
 # Types
 types:
   - packages/types/**/*
-  - '**/*.d.ts'
+  - "**/*.d.ts"
 
 # Utils
 utils:
   - packages/utils/**/*
 
 # CI/CD
-ci/cd:
+"ci/cd":
   - .github/workflows/**/*
   - scripts/**/*
 
 # Database
 database:
-  - '**/migrations/**/*'
-  - '**/seeds/**/*'
-  - '**/entities/**/*''
-  - '**/schemas/**/*'
+  - "**/migrations/**/*"
+  - "**/seeds/**/*"
+  - "**/entities/**/*"
+  - "**/schemas/**/*"
