@@ -1,21 +1,21 @@
-import { StateCreator } from 'zustand'
-import { User } from '@/types'
-import { authService } from '@/services/auth.service'
+import { StateCreator } from "zustand";
+import { User } from "@/types";
+import { authService } from "@/services/auth.service";
 
 export interface AuthSlice {
   // État
-  user: User | null
-  accessToken: string | null
-  refreshToken: string | null
-  isAuthenticated: boolean
-  isLoading: boolean
+  user: User | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  isAuthenticated: boolean;
+  isAuthLoading: boolean;
 
   // Actions
-  login: (email: string, password: string) => Promise<void>
-  logout: () => void
-  refreshTokens: () => Promise<void>
-  checkAuth: () => Promise<void>
-  updateUser: (user: Partial<User>) => void
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  refreshTokens: () => Promise<void>;
+  checkAuth: () => Promise<void>;
+  updateUser: (user: Partial<User>) => void;
 }
 
 export const createAuthSlice: StateCreator<AuthSlice> = (set, get) => ({
@@ -24,23 +24,23 @@ export const createAuthSlice: StateCreator<AuthSlice> = (set, get) => ({
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
-  isLoading: false,
+  isAuthLoading: false,
 
   // Actions
   login: async (email: string, password: string) => {
-    set({ isLoading: true })
+    set({ isAuthLoading: true });
     try {
-      const response = await authService.login(email, password)
+      const response = await authService.login(email, password);
       set({
         user: response.user,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
         isAuthenticated: true,
-        isLoading: false,
-      })
+        isAuthLoading: false,
+      });
     } catch (error) {
-      set({ isLoading: false })
-      throw error
+      set({ isAuthLoading: false });
+      throw error;
     }
   },
 
@@ -50,50 +50,50 @@ export const createAuthSlice: StateCreator<AuthSlice> = (set, get) => ({
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
-    })
+    });
     // Rediriger vers la page de connexion
-    window.location.href = '/login'
+    window.location.href = "/login";
   },
 
   refreshTokens: async () => {
-    const { refreshToken } = get()
+    const { refreshToken } = get();
     if (!refreshToken) {
-      get().logout()
-      return
+      get().logout();
+      return;
     }
 
     try {
-      const response = await authService.refreshToken(refreshToken)
+      const response = await authService.refreshToken(refreshToken);
       set({
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
-      })
+      });
     } catch (error) {
-      get().logout()
-      throw error
+      get().logout();
+      throw error;
     }
   },
 
   checkAuth: async () => {
-    const { accessToken } = get()
+    const { accessToken } = get();
     if (!accessToken) {
-      set({ isAuthenticated: false })
-      return
+      set({ isAuthenticated: false });
+      return;
     }
 
     try {
-      const user = await authService.getMe()
-      set({ user, isAuthenticated: true })
+      const user = await authService.getMe();
+      set({ user, isAuthenticated: true });
     } catch (error) {
-      get().logout()
-      throw error
+      get().logout();
+      throw error;
     }
   },
 
   updateUser: (userData: Partial<User>) => {
-    const { user } = get()
+    const { user } = get();
     if (user) {
-      set({ user: { ...user, ...userData } })
+      set({ user: { ...user, ...userData } });
     }
   },
-})
+});

@@ -126,3 +126,6 @@ docs/.vitepress/dist/
 # Local development
 .local/
 scratch/
+
+#Scripts ephémères
+*.ps1
