@@ -1,4 +1,4 @@
-# scripts/check-environment.ps1
+﻿# scripts/check-environment.ps1
 # Script de vérification complète de l'environnement ERP TopSteel
 
 param(
@@ -272,4 +272,5 @@ if ($Fix -or $totalIssues -gt 0) {
     }
 }
 
-Write-ColorText "`n✅ Vérification terminée à $(Get-Date -Format 'HH:mm:ss')" "Success"
+Write-ColorText "`n✅ Vérification terminée à $(Get-Date -Format 'HH:mm:ss') - Success"
+

@@ -128,4 +128,4 @@ docs/.vitepress/dist/
 scratch/
 
 #Scripts ephémères
-*.ps1
+/*.ps1
