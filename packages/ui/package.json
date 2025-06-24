@@ -1,9 +1,8 @@
 {
   "name": "@erp/ui",
   "version": "1.0.0",
-  "description": "UI Components TopSteel",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.mjs", 
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -12,15 +11,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": [
-    "dist/**"
-  ],
   "scripts": {
-    "build": "node -e \"console.log('Building @erp/ui...'); require('./build-simple.js');\"",
-    "dev": "node -e \"console.log('Dev mode @erp/ui...'); require('./build-simple.js');\"",
-    "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\""
-  },
-  "peerDependencies": {
-    "react": ">=18.0.0"
+    "build": "node create-dist.js"
   }
 }
