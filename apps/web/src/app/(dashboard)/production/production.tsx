@@ -326,7 +326,7 @@ export default function ProductionPage() {
                 <div className="flex items-center gap-4">
                   <Select value={filterStatut} onValueChange={setFilterStatut}>
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Statut" />
+                      <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Statut" /></SelectTrigger></SelectTrigger>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="tous">Tous les statuts</SelectItem>

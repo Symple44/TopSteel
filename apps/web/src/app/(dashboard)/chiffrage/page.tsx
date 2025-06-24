@@ -243,7 +243,7 @@ export default function ChiffragePage() {
                   <Label htmlFor="client">Client</Label>
                   <Select>
                     <SelectTrigger id="client">
-                      <SelectValue placeholder="Sélectionner un client" />
+                      <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Sélectionner un client" /></SelectTrigger></SelectTrigger>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="1">Entreprise ABC</SelectItem>
@@ -257,7 +257,7 @@ export default function ChiffragePage() {
                   <Label htmlFor="projet">Projet (optionnel)</Label>
                   <Select>
                     <SelectTrigger id="projet">
-                      <SelectValue placeholder="Lier à un projet" />
+                      <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Lier à un projet" /></SelectTrigger></SelectTrigger>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="1">PRJ-2025-0142</SelectItem>

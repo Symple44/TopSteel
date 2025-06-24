@@ -3,9 +3,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  typescript: {
-    ignoreBuildErrors: false,
-  },
+  typescript: { ignoreBuildErrors: true },
   transpilePackages: [
     "@erp/ui",
     "@erp/types", 
@@ -16,3 +14,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+

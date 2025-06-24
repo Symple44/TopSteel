@@ -224,7 +224,7 @@ export default function ClientsPage() {
                 </div>
                 <Select value={filterType} onValueChange={setFilterType}>
                   <SelectTrigger className="w-full md:w-[180px]">
-                    <SelectValue placeholder="Type de client" />
+                    <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Type de client" /></SelectTrigger></SelectTrigger>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="tous">Tous les types</SelectItem>
@@ -440,3 +440,4 @@ export default function ClientsPage() {
     </div>
   )
 }
+

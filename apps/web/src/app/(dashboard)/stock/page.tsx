@@ -329,7 +329,7 @@ export default function StocksPage() {
                 </div>
                 <Select value={filterCategorie} onValueChange={setFilterCategorie}>
                   <SelectTrigger className="w-full md:w-[180px]">
-                    <SelectValue placeholder="Catégorie" />
+                    <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Catégorie" /></SelectTrigger></SelectTrigger>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="tous">Toutes les catégories</SelectItem>

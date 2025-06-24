@@ -1,7 +1,4 @@
-// Service de gestion des projets
-import { Projet } from '@/types/projet';
-
-// Interface pour les projets
+// Service de gestion des projets TopSteel
 export interface ProjetData {
   id: string;
   nom: string;
@@ -27,15 +24,12 @@ const projetsDB: ProjetData[] = [
 
 // Service des projets
 export class ProjetsService {
-  // Récupérer tous les projets
   static async getProjets(): Promise<ProjetData[]> {
-    // Simulation d'une requête API
     return new Promise((resolve) => {
       setTimeout(() => resolve([...projetsDB]), 500);
     });
   }
 
-  // Récupérer un projet par ID
   static async getProjetById(id: string): Promise<ProjetData | null> {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -45,7 +39,6 @@ export class ProjetsService {
     });
   }
 
-  // Créer un nouveau projet
   static async createProjet(projetData: Omit<ProjetData, 'id' | 'dateCreation' | 'dateModification'>): Promise<ProjetData> {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -61,7 +54,6 @@ export class ProjetsService {
     });
   }
 
-  // Mettre à jour un projet
   static async updateProjet(id: string, updates: Partial<Omit<ProjetData, 'id' | 'dateCreation'>>): Promise<ProjetData | null> {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -81,7 +73,6 @@ export class ProjetsService {
     });
   }
 
-  // Supprimer un projet
   static async deleteProjet(id: string): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -96,30 +87,8 @@ export class ProjetsService {
       }, 300);
     });
   }
-
-  // Récupérer les projets par statut
-  static async getProjetsByStatut(statut: ProjetData['statut']): Promise<ProjetData[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const projets = projetsDB.filter(p => p.statut === statut);
-        resolve(projets);
-      }, 400);
-    });
-  }
-
-  // Rechercher des projets
-  static async searchProjets(query: string): Promise<ProjetData[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const projets = projetsDB.filter(p => 
-          p.nom.toLowerCase().includes(query.toLowerCase()) ||
-          (p.description && p.description.toLowerCase().includes(query.toLowerCase()))
-        );
-        resolve(projets);
-      }, 350);
-    });
-  }
 }
 
-// Export par défaut
+// UN SEUL export pour éviter la duplication
+export const projetsService = ProjetsService;
 export default ProjetsService;

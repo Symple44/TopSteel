@@ -191,7 +191,7 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
             </div>
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Type de document" />
+                <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Type de document" /></SelectTrigger></SelectTrigger>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="tous">Tous les types</SelectItem>
