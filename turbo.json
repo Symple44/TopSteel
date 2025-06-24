@@ -1,154 +1,30 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local", ".env"],
-  "globalEnv": [
-    "NODE_ENV",
-    "CI",
-    "VERCEL",
-    "VERCEL_ENV",
-    "VERCEL_URL",
-    "ANALYZE"
-  ],
+  "": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
   "tasks": {
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["NODE_ENV", "PORT", "NEXT_PUBLIC_*"]
-    },
-    "start:dev": {
-      "cache": false,
-      "persistent": true,
-      "env": [
-        "NODE_ENV",
-        "PORT",
-        "DATABASE_URL",
-        "REDIS_URL",
-        "JWT_*",
-        "CORS_*"
-      ]
+      "env": ["NODE_ENV"]
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"],
-      "env": [
-        "NODE_ENV",
-        "NEXT_PUBLIC_*",
-        "DATABASE_URL",
-        "REDIS_URL",
-        "JWT_*",
-        "APP_*",
-        "CORS_*",
-        "ANALYZE",
-        "BUNDLE_ANALYZE"
-      ]
-    },
-    "start": {
-      "dependsOn": ["build"],
-      "cache": false,
-      "env": ["NODE_ENV", "PORT"]
-    },
-    "start:prod": {
-      "dependsOn": ["build"],
-      "cache": false,
-      "env": ["NODE_ENV", "PORT", "DATABASE_URL", "REDIS_URL", "JWT_*"]
+      "outputs": [".next/**", "dist/**", "build/**"]
     },
     "lint": {
       "dependsOn": ["^build"],
-      "outputs": [],
-      "cache": true
-    },
-    "lint:fix": {
-      "dependsOn": ["^build"],
-      "outputs": [],
-      "cache": false
+      "outputs": []
     },
     "type-check": {
       "dependsOn": ["^build"],
-      "outputs": ["*.tsbuildinfo"],
-      "cache": true
+      "outputs": []
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**/*.{ts,tsx}",
-        "test/**/*.{ts,tsx}",
-        "**/*.test.{ts,tsx}",
-        "**/*.spec.{ts,tsx}",
-        "jest.config.*",
-        "tsconfig.json"
-      ],
-      "env": ["NODE_ENV", "CI"],
-      "cache": true
-    },
-    "test:watch": {
-      "cache": false,
-      "persistent": true,
-      "env": ["NODE_ENV"]
-    },
-    "test:coverage": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**/*.{ts,tsx}",
-        "test/**/*.{ts,tsx}",
-        "**/*.test.{ts,tsx}",
-        "**/*.spec.{ts,tsx}"
-      ],
-      "env": ["NODE_ENV", "CI"],
-      "cache": true
-    },
-    "test:e2e": {
-      "dependsOn": ["build"],
-      "outputs": ["playwright-report/**", "test-results/**"],
-      "env": [
-        "NODE_ENV",
-        "DATABASE_URL",
-        "REDIS_URL",
-        "NEXT_PUBLIC_API_URL",
-        "E2E_TEST"
-      ],
-      "cache": false
+      "outputs": ["coverage/**"]
     },
     "format": {
-      "outputs": [],
-      "cache": false
-    },
-    "clean": {
-      "cache": false
-    },
-    "db:migrate": {
-      "cache": false,
-      "env": ["DATABASE_URL"]
-    },
-    "db:seed": {
-      "cache": false,
-      "dependsOn": ["db:migrate"],
-      "env": ["DATABASE_URL"]
-    },
-    "migration:generate": {
-      "cache": false,
-      "env": ["DATABASE_URL"]
-    },
-    "migration:run": {
-      "cache": false,
-      "env": ["DATABASE_URL"]
-    },
-    "migration:revert": {
-      "cache": false,
-      "env": ["DATABASE_URL"]
-    },
-    "seed:run": {
-      "cache": false,
-      "env": ["DATABASE_URL"]
-    },
-    "storybook": {
-      "cache": false,
-      "persistent": true
-    },
-    "storybook:build": {
-      "outputs": ["storybook-static/**"],
-      "cache": true
+      "outputs": []
     }
   }
 }
