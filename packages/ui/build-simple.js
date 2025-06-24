@@ -1,8 +1,8 @@
-// build.js - Script de build ultra-simple pour @erp/ui
+// build-simple.js - Script de build ultra-simple et fonctionnel
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔨 Build @erp/ui...');
+console.log('🔨 Building @erp/ui...');
 
 // Créer le dossier dist
 const distDir = path.join(__dirname, 'dist');
@@ -10,20 +10,231 @@ if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true });
 }
 
-// Contenu JavaScript simple
-const jsContent = "use strict";
+// Contenu CommonJS (.js)
+const cjsContent = "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+
+const React = require('react');
 
 // Utilitaire de base
 function cn() {
-  return Array.from(arguments).filter(Boolean).join(' ');
+  var classes = Array.prototype.slice.call(arguments);
+  return classes.filter(Boolean).join(' ');
 }
 exports.cn = cn;
 
-// Composant Button simple
-const React = require('react');
-
+// Composant Button
 exports.Button = React.forwardRef(function Button(props, ref) {
+  var className = props.className || '';
+  var variant = props.variant || 'default';
+  var size = props.size || 'default';
+  var children = props.children;
+  var rest = {};
+  
+  // Copier les autres props
+  for (var key in props) {
+    if (key !== 'className' && key !== 'variant' && key !== 'size' && key !== 'children') {
+      rest[key] = props[key];
+    }
+  }
+  
+  var baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors disabled:opacity-50';
+  
+  var variantClasses = {
+    default: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
+    outline: 'border border-gray-300 bg-white hover:bg-gray-50'
+  };
+  
+  var sizeClasses = {
+    default: 'h-10 px-4 py-2 text-sm',
+    sm: 'h-8 px-3 text-xs',
+    lg: 'h-12 px-6 text-base'
+  };
+  
+  var combinedClasses = cn(
+    baseClasses,
+    variantClasses[variant] || variantClasses.default,
+    sizeClasses[size] || sizeClasses.default,
+    className
+  );
+
+  return React.createElement('button', Object.assign({
+    className: combinedClasses,
+    ref: ref
+  }, rest), children);
+});
+
+// Composants Card
+exports.Card = React.forwardRef(function Card(props, ref) {
+  var className = props.className || '';
+  var children = props.children;
+  var rest = {};
+  for (var key in props) {
+    if (key !== 'className' && key !== 'children') {
+      rest[key] = props[key];
+    }
+  }
+  return React.createElement('div', Object.assign({
+    ref: ref,
+    className: cn('rounded-lg border bg-white shadow-sm', className)
+  }, rest), children);
+});
+
+exports.CardHeader = React.forwardRef(function CardHeader(props, ref) {
+  var className = props.className || '';
+  var children = props.children;
+  var rest = {};
+  for (var key in props) {
+    if (key !== 'className' && key !== 'children') {
+      rest[key] = props[key];
+    }
+  }
+  return React.createElement('div', Object.assign({
+    ref: ref,
+    className: cn('flex flex-col space-y-1.5 p-6', className)
+  }, rest), children);
+});
+
+exports.CardTitle = React.forwardRef(function CardTitle(props, ref) {
+  var className = props.className || '';
+  var children = props.children;
+  var rest = {};
+  for (var key in props) {
+    if (key !== 'className' && key !== 'children') {
+      rest[key] = props[key];
+    }
+  }
+  return React.createElement('h3', Object.assign({
+    ref: ref,
+    className: cn('text-2xl font-semibold leading-none tracking-tight', className)
+  }, rest), children);
+});
+
+exports.CardDescription = React.forwardRef(function CardDescription(props, ref) {
+  var className = props.className || '';
+  var children = props.children;
+  var rest = {};
+  for (var key in props) {
+    if (key !== 'className' && key !== 'children') {
+      rest[key] = props[key];
+    }
+  }
+  return React.createElement('p', Object.assign({
+    ref: ref,
+    className: cn('text-sm text-gray-600', className)
+  }, rest), children);
+});
+
+exports.CardContent = React.forwardRef(function CardContent(props, ref) {
+  var className = props.className || '';
+  var children = props.children;
+  var rest = {};
+  for (var key in props) {
+    if (key !== 'className' && key !== 'children') {
+      rest[key] = props[key];
+    }
+  }
+  return React.createElement('div', Object.assign({
+    ref: ref,
+    className: cn('p-6 pt-0', className)
+  }, rest), children);
+});
+
+exports.CardFooter = React.forwardRef(function CardFooter(props, ref) {
+  var className = props.className || '';
+  var children = props.children;
+  var rest = {};
+  for (var key in props) {
+    if (key !== 'className' && key !== 'children') {
+      rest[key] = props[key];
+    }
+  }
+  return React.createElement('div', Object.assign({
+    ref: ref,
+    className: cn('flex items-center p-6 pt-0', className)
+  }, rest), children);
+});
+
+// Composant Input
+exports.Input = React.forwardRef(function Input(props, ref) {
+  var className = props.className || '';
+  var type = props.type || 'text';
+  var rest = {};
+  for (var key in props) {
+    if (key !== 'className' && key !== 'type') {
+      rest[key] = props[key];
+    }
+  }
+  return React.createElement('input', Object.assign({
+    type: type,
+    className: cn('flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50', className),
+    ref: ref
+  }, rest));
+});
+
+// Composant Label
+exports.Label = React.forwardRef(function Label(props, ref) {
+  var className = props.className || '';
+  var children = props.children;
+  var rest = {};
+  for (var key in props) {
+    if (key !== 'className' && key !== 'children') {
+      rest[key] = props[key];
+    }
+  }
+  return React.createElement('label', Object.assign({
+    ref: ref,
+    className: cn('text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70', className)
+  }, rest), children);
+});
+
+// Composants stub simples
+var stubComponents = [
+  'Badge', 'Avatar', 'AvatarImage', 'AvatarFallback',
+  'Tabs', 'TabsContent', 'TabsList', 'TabsTrigger',
+  'Select', 'SelectContent', 'SelectItem', 'SelectTrigger', 'SelectValue',
+  'Dialog', 'DialogContent', 'DialogDescription', 'DialogFooter', 'DialogHeader', 'DialogTitle', 'DialogTrigger',
+  'Table', 'TableBody', 'TableCaption', 'TableCell', 'TableFooter', 'TableHead', 'TableHeader', 'TableRow',
+  'Alert', 'AlertDescription', 'AlertTitle',
+  'Toast', 'ToastAction', 'ToastClose', 'ToastDescription', 'ToastProvider', 'ToastTitle', 'ToastViewport',
+  'Skeleton', 'Spinner', 'Sheet', 'SheetContent', 'SheetDescription', 'SheetFooter', 'SheetHeader', 'SheetTitle', 'SheetTrigger',
+  'Breadcrumb', 'BreadcrumbItem', 'BreadcrumbLink', 'BreadcrumbList', 'BreadcrumbPage', 'BreadcrumbSeparator',
+  'Form', 'FormField', 'FormItem', 'FormLabel', 'FormControl', 'FormDescription', 'FormMessage',
+  'Textarea', 'Checkbox', 'RadioGroup', 'RadioGroupItem', 'Container', 'Grid', 'Stack', 'DataTable'
+];
+
+stubComponents.forEach(function(name) {
+  exports[name] = function(props) {
+    var children = props ? props.children : null;
+    var rest = {};
+    if (props) {
+      for (var key in props) {
+        if (key !== 'children') {
+          rest[key] = props[key];
+        }
+      }
+    }
+    return React.createElement('div', Object.assign({
+      'data-component': name.toLowerCase()
+    }, rest), children);
+  };
+});
+
+console.log('✅ @erp/ui CommonJS build completed');
+;
+
+// Contenu ESM (.mjs)
+const esmContent = import React from 'react';
+
+// Utilitaire de base
+export function cn() {
+  const classes = Array.prototype.slice.call(arguments);
+  return classes.filter(Boolean).join(' ');
+}
+
+// Composant Button
+export const Button = React.forwardRef(function Button(props, ref) {
   const { className = '', variant = 'default', size = 'default', children, ...rest } = props;
   
   const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors disabled:opacity-50';
@@ -54,8 +265,8 @@ exports.Button = React.forwardRef(function Button(props, ref) {
   }, children);
 });
 
-// Composants Card simples
-exports.Card = React.forwardRef(function Card(props, ref) {
+// Composants Card
+export const Card = React.forwardRef(function Card(props, ref) {
   const { className = '', children, ...rest } = props;
   return React.createElement('div', {
     ref: ref,
@@ -64,7 +275,7 @@ exports.Card = React.forwardRef(function Card(props, ref) {
   }, children);
 });
 
-exports.CardHeader = React.forwardRef(function CardHeader(props, ref) {
+export const CardHeader = React.forwardRef(function CardHeader(props, ref) {
   const { className = '', children, ...rest } = props;
   return React.createElement('div', {
     ref: ref,
@@ -73,7 +284,7 @@ exports.CardHeader = React.forwardRef(function CardHeader(props, ref) {
   }, children);
 });
 
-exports.CardTitle = React.forwardRef(function CardTitle(props, ref) {
+export const CardTitle = React.forwardRef(function CardTitle(props, ref) {
   const { className = '', children, ...rest } = props;
   return React.createElement('h3', {
     ref: ref,
@@ -82,7 +293,7 @@ exports.CardTitle = React.forwardRef(function CardTitle(props, ref) {
   }, children);
 });
 
-exports.CardDescription = React.forwardRef(function CardDescription(props, ref) {
+export const CardDescription = React.forwardRef(function CardDescription(props, ref) {
   const { className = '', children, ...rest } = props;
   return React.createElement('p', {
     ref: ref,
@@ -91,7 +302,7 @@ exports.CardDescription = React.forwardRef(function CardDescription(props, ref) 
   }, children);
 });
 
-exports.CardContent = React.forwardRef(function CardContent(props, ref) {
+export const CardContent = React.forwardRef(function CardContent(props, ref) {
   const { className = '', children, ...rest } = props;
   return React.createElement('div', {
     ref: ref,
@@ -100,7 +311,7 @@ exports.CardContent = React.forwardRef(function CardContent(props, ref) {
   }, children);
 });
 
-exports.CardFooter = React.forwardRef(function CardFooter(props, ref) {
+export const CardFooter = React.forwardRef(function CardFooter(props, ref) {
   const { className = '', children, ...rest } = props;
   return React.createElement('div', {
     ref: ref,
@@ -109,8 +320,8 @@ exports.CardFooter = React.forwardRef(function CardFooter(props, ref) {
   }, children);
 });
 
-// Composant Input simple
-exports.Input = React.forwardRef(function Input(props, ref) {
+// Composant Input
+export const Input = React.forwardRef(function Input(props, ref) {
   const { className = '', type = 'text', ...rest } = props;
   return React.createElement('input', {
     type: type,
@@ -120,8 +331,8 @@ exports.Input = React.forwardRef(function Input(props, ref) {
   });
 });
 
-// Composant Label simple
-exports.Label = React.forwardRef(function Label(props, ref) {
+// Composant Label
+export const Label = React.forwardRef(function Label(props, ref) {
   const { className = '', children, ...rest } = props;
   return React.createElement('label', {
     ref: ref,
@@ -130,7 +341,7 @@ exports.Label = React.forwardRef(function Label(props, ref) {
   }, children);
 });
 
-// Tous les autres composants comme stubs simples
+// Composants stub
 const stubComponents = [
   'Badge', 'Avatar', 'AvatarImage', 'AvatarFallback',
   'Tabs', 'TabsContent', 'TabsList', 'TabsTrigger',
@@ -146,22 +357,28 @@ const stubComponents = [
 ];
 
 stubComponents.forEach(name => {
-  exports[name] = function(props) {
+  const component = function(props) {
     const { children, ...rest } = props || {};
     return React.createElement('div', {
       'data-component': name.toLowerCase(),
       ...rest
     }, children);
   };
+  
+  // Export dynamique
+  if (typeof window === 'undefined') {
+    // Node.js/SSR
+    eval('export const ' + name + ' = component');
+  } else {
+    // Browser - ajouter au global
+    window['UI_' + name] = component;
+  }
 });
 
-console.log('✅ @erp/ui built successfully');
+console.log('✅ @erp/ui ESM build completed');
 ;
 
-// Contenu ESM
-const mjsContent = jsContent.replace(/exports\./g, 'export const ').replace(/module\.exports/g, 'export default');
-
-// Contenu TypeScript definitions
+// Contenu TypeScript definitions (.d.ts)
 const dtsContent = import * as React from 'react';
 
 export declare function cn(...classes: string[]): string;
@@ -260,18 +477,18 @@ export declare const DataTable: React.FC<any>;
 
 // Écrire les fichiers
 try {
-  fs.writeFileSync(path.join(distDir, 'index.js'), jsContent);
-  fs.writeFileSync(path.join(distDir, 'index.mjs'), mjsContent);
+  fs.writeFileSync(path.join(distDir, 'index.js'), cjsContent);
+  fs.writeFileSync(path.join(distDir, 'index.mjs'), esmContent);
   fs.writeFileSync(path.join(distDir, 'index.d.ts'), dtsContent);
   fs.writeFileSync(path.join(distDir, 'index.d.mts'), dtsContent);
   
-  console.log('✅ Fichiers générés:');
-  console.log('  - dist/index.js');
-  console.log('  - dist/index.mjs');
-  console.log('  - dist/index.d.ts');
-  console.log('  - dist/index.d.mts');
+  console.log('✅ Generated files:');
+  console.log('  - dist/index.js (CommonJS)');
+  console.log('  - dist/index.mjs (ESM)'); 
+  console.log('  - dist/index.d.ts (TypeScript definitions)');
+  console.log('  - dist/index.d.mts (TypeScript ESM definitions)');
   
 } catch (error) {
-  console.error('❌ Erreur lors de la génération:', error.message);
+  console.error('❌ Build error:', error.message);
   process.exit(1);
 }

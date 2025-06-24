@@ -16,14 +16,11 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "node build.js",
-    "dev": "node build.js",
+    "build": "node -e \"console.log('Building @erp/ui...'); require('./build-simple.js');\"",
+    "dev": "node -e \"console.log('Dev mode @erp/ui...'); require('./build-simple.js');\"",
     "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\""
   },
   "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
-  },
-  "keywords": ["react", "components", "ui", "topsteel"],
-  "license": "MIT"
+    "react": ">=18.0.0"
+  }
 }
