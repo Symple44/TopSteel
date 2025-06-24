@@ -48,6 +48,7 @@
     "better-npm-audit": "^3.7.3",
     "depcheck": "^1.4.7",
     "jest": "^29.7.0",
+    "jq": "^1.7.2",
     "ts-jest": "^29.1.1",
     "turbo": "^2.0.0",
     "typescript": "^5.6.0"
@@ -65,10 +66,5 @@
     "production"
   ],
   "author": "TOPSTEEL",
-  "license": "UNLICENSED",
-  "pnpm": {
-    "overrides": {
-      "esbuild": "^0.25.0"
-    }
-  }
+  "license": "UNLICENSED"
 }
