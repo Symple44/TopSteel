@@ -186,21 +186,22 @@
 
   // Spell Checker
   "cSpell.words": [
-    "topsteel",
-    "erp",
-    "nestjs",
-    "typeorm",
-    "pnpm",
-    "turbo",
-    "tailwindcss",
     "clsx",
+    "devis",
+    "erp",
+    "facturation",
     "lucide",
+    "metallurgie",
+    "nestjs",
+    "pnpm",
     "radix",
     "shadcn",
-    "zustand",
-    "metallurgie",
-    "devis",
-    "facturation"
+    "snyk",
+    "tailwindcss",
+    "topsteel",
+    "turbo",
+    "typeorm",
+    "zustand"
   ],
 
   // NestJS specific
