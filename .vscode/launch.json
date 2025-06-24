@@ -1,4 +1,3 @@
-// .vscode/launch.json
 {
   "version": "0.2.0",
   "configurations": [
@@ -18,7 +17,8 @@
         "pattern": "- Local:.+(https?://\\S+|[0-9]+)",
         "uriFormat": "http://localhost:3000",
         "action": "debugWithChrome"
-      }
+      },
+      "preLaunchTask": "🔍 Vérification Environnement Complet"
     },
     {
       "name": "🌐 Next.js: debug client-side",
@@ -45,7 +45,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**", "node_modules/**"],
       "outFiles": ["${workspaceFolder}/apps/api/dist/**/*.js"],
-      "sourceMaps": true
+      "sourceMaps": true,
+      "preLaunchTask": "🔍 Vérification Environnement Complet"
     },
     {
       "name": "🧪 Jest: debug current test file",
@@ -117,14 +118,125 @@
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "outFiles": ["${workspaceFolder}/**/dist/**/*.js"]
+    },
+
+    // === NOUVELLES CONFIGURATIONS AJOUTÉES ===
+    {
+      "name": "🚀 Démarrer Full Stack (avec vérification)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/turbo",
+      "args": ["dev"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "preLaunchTask": "🔍 Vérification Environnement Complet"
+    },
+    {
+      "name": "🌐 Debug API NestJS (avancé)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/api/src/main.ts",
+      "args": [],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register",
+        "-r",
+        "tsconfig-paths/register"
+      ],
+      "cwd": "${workspaceFolder}/apps/api",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development",
+        "TS_NODE_PROJECT": "${workspaceFolder}/apps/api/tsconfig.json"
+      },
+      "envFile": "${workspaceFolder}/apps/api/.env.local",
+      "sourceMaps": true,
+      "restart": true,
+      "protocol": "inspector",
+      "outFiles": ["${workspaceFolder}/apps/api/dist/**/*.js"],
+      "preLaunchTask": "🔍 Vérification Environnement Complet"
+    },
+    {
+      "name": "🎨 Debug Frontend Next.js (port dédié)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/next",
+      "args": ["dev"],
+      "cwd": "${workspaceFolder}/apps/web",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "envFile": "${workspaceFolder}/apps/web/.env.local",
+      "port": 9229
+    },
+    {
+      "name": "🧪 Debug Tests avec couverture",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--runInBand", "--no-cache", "--coverage"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "🗄️ Debug avec PostgreSQL",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/api/src/main.ts",
+      "args": [],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register",
+        "-r",
+        "tsconfig-paths/register"
+      ],
+      "cwd": "${workspaceFolder}/apps/api",
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development",
+        "DB_HOST": "localhost",
+        "DB_PORT": "5432",
+        "DB_USERNAME": "postgres"
+      },
+      "envFile": "${workspaceFolder}/apps/api/.env.local",
+      "preLaunchTask": "🗄️ Configuration PostgreSQL uniquement"
     }
   ],
   "compounds": [
+    // === VOS COMPOUNDS EXISTANTS (préservés) ===
     {
       "name": "🚀 Full Stack: Web + API",
       "configurations": [
         "🌐 Next.js: debug client-side",
         "🔧 NestJS: debug server"
+      ],
+      "stopAll": true
+    },
+
+    // === NOUVEAUX COMPOUNDS AJOUTÉS ===
+    {
+      "name": "🚀 Full Stack Debug (avec vérification)",
+      "configurations": [
+        "🌐 Debug API NestJS (avancé)",
+        "🎨 Debug Frontend Next.js (port dédié)"
+      ],
+      "stopAll": true,
+      "preLaunchTask": "🔍 Vérification Environnement Complet"
+    },
+    {
+      "name": "🧪 Debug Complet (Tests + Apps)",
+      "configurations": [
+        "🧪 Debug Tests avec couverture",
+        "🌐 Debug API NestJS (avancé)"
       ],
       "stopAll": true
     }

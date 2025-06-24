@@ -16,12 +16,9 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": false,
+        "focus": true,
         "panel": "dedicated",
-        "clear": true
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
+        "showReuseMessage": false
       },
       "problemMatcher": []
     },
@@ -37,7 +34,7 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": false,
+        "focus": true,
         "panel": "dedicated"
       },
       "problemMatcher": []
@@ -54,7 +51,7 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": false,
+        "focus": true,
         "panel": "dedicated"
       },
       "problemMatcher": []
@@ -71,10 +68,10 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": ["$tsc"]
     },
     {
       "label": "🧪 Test - All",
@@ -89,7 +86,7 @@
         "echo": true,
         "reveal": "always",
         "focus": true,
-        "panel": "shared"
+        "panel": "dedicated"
       },
       "problemMatcher": []
     },
@@ -105,11 +102,11 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": false,
+        "focus": true,
         "panel": "dedicated"
       },
-      "isBackground": true,
-      "problemMatcher": []
+      "problemMatcher": [],
+      "isBackground": true
     },
     {
       "label": "🔍 Lint - All",
@@ -123,7 +120,7 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "shared"
       },
       "problemMatcher": ["$eslint-stylish"]
@@ -146,6 +143,23 @@
       "problemMatcher": []
     },
     {
+      "label": "🎨 Format Code",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["format"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "🔍 Type Check",
       "type": "shell",
       "command": "pnpm",
@@ -157,27 +171,10 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "shared"
       },
       "problemMatcher": ["$tsc"]
-    },
-    {
-      "label": "📦 Install Dependencies",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["install"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
     },
     {
       "label": "🧹 Clean All",
@@ -187,7 +184,7 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "group": "build",
+      "group": "none",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -204,24 +201,7 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🎨 Format Code",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["format"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
+      "group": "none",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -235,23 +215,6 @@
       "type": "shell",
       "command": "pnpm",
       "args": ["db:migrate"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🗄️ DB - Generate Migration",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["db:migrate:generate"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -285,11 +248,11 @@
       "label": "📊 Bundle Analyzer",
       "type": "shell",
       "command": "pnpm",
-      "args": ["--filter", "@erp/web", "analyze"],
+      "args": ["analyze"],
       "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}/apps/web"
       },
-      "group": "build",
+      "group": "none",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -299,7 +262,7 @@
       "problemMatcher": []
     },
     {
-      "label": "🔍 Check Dependencies",
+      "label": "🔍 Dependencies Check",
       "type": "shell",
       "command": "pnpm",
       "args": ["deps:check"],
@@ -397,6 +360,250 @@
         "reveal": "always",
         "focus": true,
         "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 Vérification Environnement Complet",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/check-environment.ps1",
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}/scripts/check-environment.ps1"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/check-environment.sh"]
+      },
+      "osx": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/check-environment.sh"]
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Setup Complet + PostgreSQL",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/full-setup.ps1",
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}/scripts/full-setup.ps1"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/full-setup.sh"]
+      },
+      "osx": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/full-setup.sh"]
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🗄️ Configuration PostgreSQL uniquement",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/setup-postgres.ps1",
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}/scripts/setup-postgres.ps1"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/setup-postgres.sh"]
+      },
+      "osx": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/setup-postgres.sh"]
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🔧 Réparation rapide",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/quick-fix.ps1",
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}/scripts/quick-fix.ps1"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/quick-fix.sh"]
+      },
+      "osx": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/quick-fix.sh"]
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🗄️ Test connexion PostgreSQL",
+      "type": "shell",
+      "command": "psql",
+      "args": [
+        "-h",
+        "localhost",
+        "-U",
+        "postgres",
+        "-d",
+        "postgres",
+        "-c",
+        "SELECT version();"
+      ],
+      "windows": {
+        "options": {
+          "env": {
+            "PGPASSWORD": "postgres"
+          }
+        }
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔄 Redémarrer PostgreSQL",
+      "type": "shell",
+      "command": "sudo systemctl restart postgresql",
+      "windows": {
+        "command": "powershell",
+        "args": ["-Command", "Restart-Service postgresql*"]
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧹 Nettoyage complet (cache + node_modules)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["clean"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📋 Vérification des dépendances",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["deps:full-check"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Logs en temps réel",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["dev"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated"
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "💾 Sauvegarde configuration",
+      "type": "shell",
+      "command": "git",
+      "args": ["add", ".vscode/", "scripts/", "*.json", "*.md"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
       },
       "problemMatcher": []
     }
