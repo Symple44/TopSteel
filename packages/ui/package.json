@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "UI Components TopSteel",
   "scripts": {
-    "build": "echo 'UI build skipped temporarily'",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
     "type-check": "echo 'UI type-check skipped temporarily'"
   },
   "dependencies": {},
