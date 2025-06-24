@@ -68,7 +68,7 @@ export const createStockSlice: StateCreator<StockSlice> = (set, get) => ({
       const stock = state.stocks.find((s) => s.stockId === mouvement.stockId)
       if (!stock) return state
 
-      let updatedStock = { ...stock }
+      const updatedStock = { ...stock }
 
       switch (mouvement.type) {
         case 'ENTREE':

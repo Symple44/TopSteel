@@ -1,5 +1,5 @@
 {
-  "": "https://turbo.build/schema.json",
+  "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
   "tasks": {
     "dev": {
@@ -7,11 +7,39 @@
       "persistent": true,
       "env": ["NODE_ENV"]
     },
+    "start:dev": {
+      "cache": false,
+      "persistent": true,
+      "env": ["NODE_ENV", "PORT", "DB_*", "REDIS_*", "JWT_*"]
+    },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**", "build/**"]
+      "outputs": [".next/**", "dist/**", "build/**"],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "DB_*",
+        "REDIS_*",
+        "JWT_*",
+        "APP_*",
+        "CORS_*"
+      ]
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["NODE_ENV", "PORT"]
+    },
+    "start:prod": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["NODE_ENV", "PORT", "DB_*", "REDIS_*", "JWT_*"]
     },
     "lint": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "lint:fix": {
       "dependsOn": ["^build"],
       "outputs": []
     },
@@ -21,10 +49,46 @@
     },
     "test": {
       "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "test/**/*.{ts,tsx}",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}"
+      ]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:cov": {
+      "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
     },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "env": ["NODE_ENV", "DB_*", "REDIS_*"]
+    },
+    "migration:run": {
+      "cache": false,
+      "env": ["DB_*"]
+    },
+    "migration:generate": {
+      "cache": false,
+      "env": ["DB_*"]
+    },
+    "migration:revert": {
+      "cache": false,
+      "env": ["DB_*"]
+    },
+    "seed:run": {
+      "cache": false,
+      "env": ["DB_*"]
+    },
     "format": {
-      "outputs": []
+      "outputs": [],
+      "cache": false
     }
   }
 }

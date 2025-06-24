@@ -2,68 +2,58 @@
 
 import { useState } from 'react'
 import { 
-  Users, 
-  Plus, 
-  Search,
-  Building2,
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  FileText,
-  Euro,
-  Calendar,
-  MoreVertical,
-  Edit,
-  Eye,
-  Trash2,
-  TrendingUp,
-  Download
+  Users, Plus, Search, Building2, User, Mail, Phone, MapPin, 
+  FileText, Euro, MoreVertical, Edit, Eye, Trash2, TrendingUp, Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatCurrency, formatDate, getInitials } from '@/lib/utils'
-import { ClientType } from '@/types'
 
-// Données mockées pour la démonstration
-const mockClients = [
+// Types
+enum ClientType {
+  PARTICULIER = 'PARTICULIER',
+  PROFESSIONNEL = 'PROFESSIONNEL',
+  COLLECTIVITE = 'COLLECTIVITE',
+}
+
+interface Client {
+  id: string
+  type: ClientType
+  nom: string
+  email: string
+  telephone: string
+  adresse: { rue: string; codePostal: string; ville: string; pays: string }
+  siret?: string
+  dateCreation: Date
+  projetsActifs: number
+  projetsTotaux: number
+  chiffreAffaires: number
+  dernierContact: Date
+}
+
+// Données mockées
+const mockClients: Client[] = [
   {
     id: '1',
     type: ClientType.PROFESSIONNEL,
     nom: 'Entreprise ABC',
     email: 'contact@abc.fr',
     telephone: '02 40 12 34 56',
-    adresse: {
-      rue: '123 Rue de l\'Industrie',
-      codePostal: '44100',
-      ville: 'Nantes',
+    adresse: { 
+      rue: '123 Rue de l&apos;Industrie', 
+      codePostal: '44100', 
+      ville: 'Nantes', 
+      pays: 'France' 
     },
     siret: '123 456 789 00012',
     dateCreation: new Date('2023-05-15'),
@@ -78,10 +68,11 @@ const mockClients = [
     nom: 'Société XYZ',
     email: 'info@xyz.fr',
     telephone: '02 51 23 45 67',
-    adresse: {
-      rue: '45 Avenue des Entrepreneurs',
-      codePostal: '44800',
-      ville: 'Saint-Herblain',
+    adresse: { 
+      rue: '45 Avenue des Entrepreneurs', 
+      codePostal: '44800', 
+      ville: 'Saint-Herblain', 
+      pays: 'France' 
     },
     siret: '987 654 321 00023',
     dateCreation: new Date('2022-10-20'),
@@ -92,32 +83,15 @@ const mockClients = [
   },
   {
     id: '3',
-    type: ClientType.COLLECTIVITE,
-    nom: 'Mairie de Saint-Herblain',
-    email: 'contact@mairie-saint-herblain.fr',
-    telephone: '02 28 25 50 00',
-    adresse: {
-      rue: '2 Rue de l\'Hôtel de Ville',
-      codePostal: '44800',
-      ville: 'Saint-Herblain',
-    },
-    siret: '214 401 622 00015',
-    dateCreation: new Date('2021-03-10'),
-    projetsActifs: 1,
-    projetsTotaux: 5,
-    chiffreAffaires: 567000,
-    dernierContact: new Date('2025-06-08'),
-  },
-  {
-    id: '4',
     type: ClientType.PARTICULIER,
     nom: 'Jean Dupont',
     email: 'jean.dupont@email.fr',
     telephone: '06 12 34 56 78',
-    adresse: {
-      rue: '15 Rue des Lilas',
-      codePostal: '44300',
-      ville: 'Nantes',
+    adresse: { 
+      rue: '15 Rue des Lilas', 
+      codePostal: '44300', 
+      ville: 'Nantes', 
+      pays: 'France' 
     },
     dateCreation: new Date('2024-08-12'),
     projetsActifs: 0,
@@ -126,25 +100,6 @@ const mockClients = [
     dernierContact: new Date('2025-05-20'),
   },
 ]
-
-const mockProjetsByClient = {
-  '1': [
-    {
-      reference: 'PRJ-2025-0142',
-      description: 'Garde-corps et escalier métallique',
-      statut: 'En cours',
-      montant: 45250,
-      date: new Date('2025-06-15'),
-    },
-    {
-      reference: 'PRJ-2025-0138',
-      description: 'Structure métallique hangar',
-      statut: 'Terminé',
-      montant: 67800,
-      date: new Date('2025-05-20'),
-    },
-  ],
-}
 
 export default function ClientsPage() {
   const [activeTab, setActiveTab] = useState('liste')
@@ -156,10 +111,8 @@ export default function ClientsPage() {
     const matchSearch = 
       client.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.ville.toLowerCase().includes(searchTerm.toLowerCase())
-    
+      client.adresse.ville.toLowerCase().includes(searchTerm.toLowerCase())
     const matchType = filterType === 'tous' || client.type === filterType
-    
     return matchSearch && matchType
   })
 
@@ -173,27 +126,13 @@ export default function ClientsPage() {
   }).length
 
   const getTypeBadge = (type: ClientType) => {
-    const typeConfig = {
-      [ClientType.PARTICULIER]: { 
-        label: 'Particulier', 
-        variant: 'secondary' as const,
-        icon: User 
-      },
-      [ClientType.PROFESSIONNEL]: { 
-        label: 'Professionnel', 
-        variant: 'default' as const,
-        icon: Building2 
-      },
-      [ClientType.COLLECTIVITE]: { 
-        label: 'Collectivité', 
-        variant: 'outline' as const,
-        icon: Building2 
-      },
-    }
+    const config = {
+      [ClientType.PARTICULIER]: { label: 'Particulier', variant: 'secondary' as const, icon: User },
+      [ClientType.PROFESSIONNEL]: { label: 'Professionnel', variant: 'default' as const, icon: Building2 },
+      [ClientType.COLLECTIVITE]: { label: 'Collectivité', variant: 'outline' as const, icon: Building2 },
+    }[type]
     
-    const config = typeConfig[type]
     const Icon = config.icon
-    
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
@@ -207,9 +146,7 @@ export default function ClientsPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Gestion des clients</h1>
-          <p className="text-muted-foreground">
-            Gérez votre base de clients et prospects
-          </p>
+          <p className="text-muted-foreground">Gérez votre base de clients et prospects</p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -226,9 +163,7 @@ export default function ClientsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalClients}</div>
-            <p className="text-xs text-muted-foreground">
-              {clientsActifs} actifs
-            </p>
+            <p className="text-xs text-muted-foreground">{clientsActifs} actifs</p>
           </CardContent>
         </Card>
 
@@ -239,9 +174,7 @@ export default function ClientsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(chiffreAffairesTotal)}</div>
-            <p className="text-xs text-muted-foreground">
-              Depuis le début
-            </p>
+            <p className="text-xs text-muted-foreground">Depuis le début</p>
           </CardContent>
         </Card>
 
@@ -252,9 +185,7 @@ export default function ClientsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+{nouveauxClients}</div>
-            <p className="text-xs text-muted-foreground">
-              Ces 3 derniers mois
-            </p>
+            <p className="text-xs text-muted-foreground">Ces 3 derniers mois</p>
           </CardContent>
         </Card>
 
@@ -264,12 +195,8 @@ export default function ClientsPage() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(chiffreAffairesTotal / totalClients)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Par client
-            </p>
+            <div className="text-2xl font-bold">{formatCurrency(chiffreAffairesTotal / totalClients)}</div>
+            <p className="text-xs text-muted-foreground">Par client</p>
           </CardContent>
         </Card>
       </div>
@@ -288,11 +215,11 @@ export default function ClientsPage() {
               <div className="flex flex-col gap-4 md:flex-row">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Rechercher par nom, email ou ville..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9"
+                  <Input 
+                    placeholder="Rechercher par nom, email ou ville..." 
+                    value={searchTerm} 
+                    onChange={(e) => setSearchTerm(e.target.value)} 
+                    className="pl-9" 
                   />
                 </div>
                 <Select value={filterType} onValueChange={setFilterType}>
@@ -344,16 +271,12 @@ export default function ClientsPage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
-                              <AvatarFallback>
-                                {getInitials(client.nom)}
-                              </AvatarFallback>
+                              <AvatarFallback>{getInitials(client.nom)}</AvatarFallback>
                             </Avatar>
                             <div>
                               <p className="font-medium">{client.nom}</p>
                               {client.siret && (
-                                <p className="text-xs text-muted-foreground">
-                                  SIRET: {client.siret}
-                                </p>
+                                <p className="text-xs text-muted-foreground">SIRET: {client.siret}</p>
                               )}
                             </div>
                           </div>
@@ -369,9 +292,7 @@ export default function ClientsPage() {
                         <TableCell className="text-center">
                           <div className="space-y-1">
                             <p className="font-medium">{client.projetsActifs}</p>
-                            <p className="text-xs text-muted-foreground">
-                              / {client.projetsTotaux} total
-                            </p>
+                            <p className="text-xs text-muted-foreground">/ {client.projetsTotaux} total</p>
                           </div>
                         </TableCell>
                         <TableCell className="text-right font-medium">
@@ -512,42 +433,6 @@ export default function ClientsPage() {
                   </CardContent>
                 </Card>
               </div>
-
-              {/* Projets récents */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Projets récents</CardTitle>
-                    <Button variant="outline" size="sm">
-                      Voir tous les projets
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {mockProjetsByClient[selectedClient.id as keyof typeof mockProjetsByClient] ? (
-                    <div className="space-y-3">
-                      {mockProjetsByClient[selectedClient.id as keyof typeof mockProjetsByClient].map((projet, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
-                          <div>
-                            <p className="font-medium">{projet.reference}</p>
-                            <p className="text-sm text-muted-foreground">{projet.description}</p>
-                          </div>
-                          <div className="text-right">
-                            <Badge variant={projet.statut === 'En cours' ? 'default' : 'secondary'}>
-                              {projet.statut}
-                            </Badge>
-                            <p className="text-sm font-medium mt-1">{formatCurrency(projet.montant)}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-muted-foreground py-8">
-                      Aucun projet pour ce client
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
             </>
           )}
         </TabsContent>
