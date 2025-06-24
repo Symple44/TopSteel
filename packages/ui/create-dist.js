@@ -268,6 +268,31 @@ export declare const Container: React.FC<any>;
 export declare const Grid: React.FC<any>;
 export declare const Stack: React.FC<any>;
 export declare const DataTable: React.FC<any>;
+// Composants spécialisés TopSteel
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
+}
+export declare const Badge: React.FC<BadgeProps>;
+
+export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  title?: string;
+  description?: string;
+  actions?: React.ReactNode;
+}
+export declare const PageHeader: React.FC<PageHeaderProps>;
+
+export interface ProjetCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  projet?: any;
+}
+export declare const ProjetCard: React.FC<ProjetCardProps>;
+
+export interface DataTableProps extends React.HTMLAttributes<HTMLDivElement> {
+  data?: any[];
+  columns?: any[];
+}
+export declare const DataTable: React.FC<DataTableProps>;
+
+export declare const Toaster: React.FC<React.HTMLAttributes<HTMLDivElement>>;
 `;
 
 // Écrire tous les fichiers
@@ -288,3 +313,4 @@ try {
   console.error('❌ Error:', error.message);
   process.exit(1);
 }
+

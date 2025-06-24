@@ -1,38 +1,46 @@
-import React from "react"
+import * as React from "react"
+import { cn } from "@/lib/utils"
 
-interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode
-  value?: any
-  onValueChange?: any
-  asChild?: boolean
-  variant?: string
-  size?: string
-}
-
-export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
-    if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as any, { ...props, ref })
-    }
-    
-    return (
-      <div className={className} ref={ref} {...props}>
-        {children}
-      </div>
-    )
-  }
-)
-
+const Avatar = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+      className
+    )}
+    {...props}
+  />
+))
 Avatar.displayName = "Avatar"
 
-// Export des sous-composants courants si nécessaire
-export const AvatarContent = Avatar
-export const AvatarTrigger = Avatar  
-export const AvatarItem = Avatar
-export const AvatarValue = Avatar
-export const AvatarHeader = Avatar
-export const AvatarTitle = Avatar
-export const AvatarDescription = Avatar
-export const AvatarFooter = Avatar
-export const AvatarSeparator = Avatar
-export const AvatarList = Avatar
+const AvatarImage = React.forwardRef<
+  HTMLImageElement,
+  React.ImgHTMLAttributes<HTMLImageElement>
+>(({ className, ...props }, ref) => (
+  <img
+    ref={ref}
+    className={cn("aspect-square h-full w-full", className)}
+    {...props}
+  />
+))
+AvatarImage.displayName = "AvatarImage"
+
+const AvatarFallback = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      className
+    )}
+    {...props}
+  />
+))
+AvatarFallback.displayName = "AvatarFallback"
+
+export { Avatar, AvatarImage, AvatarFallback }

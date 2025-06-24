@@ -1,38 +1,59 @@
-import React from "react"
+import * as React from "react"
+import { cn } from "@/lib/utils"
 
-interface DropdownMenuProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode
-  value?: any
-  onValueChange?: any
-  asChild?: boolean
-  variant?: string
-  size?: string
-}
-
-export const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
-    if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as any, { ...props, ref })
-    }
-    
-    return (
-      <div className={className} ref={ref} {...props}>
-        {children}
-      </div>
-    )
-  }
+const DropdownMenu = ({ children, ...props }: any) => (
+  <div {...props}>{children}</div>
 )
 
-DropdownMenu.displayName = "DropdownMenu"
+const DropdownMenuTrigger = ({ children, ...props }: any) => (
+  <button {...props}>{children}</button>
+)
 
-// Export des sous-composants courants si nécessaire
-export const DropdownMenuContent = DropdownMenu
-export const DropdownMenuTrigger = DropdownMenu  
-export const DropdownMenuItem = DropdownMenu
-export const DropdownMenuValue = DropdownMenu
-export const DropdownMenuHeader = DropdownMenu
-export const DropdownMenuTitle = DropdownMenu
-export const DropdownMenuDescription = DropdownMenu
-export const DropdownMenuFooter = DropdownMenu
-export const DropdownMenuSeparator = DropdownMenu
-export const DropdownMenuList = DropdownMenu
+const DropdownMenuContent = ({ children, className, ...props }: any) => (
+  <div
+    className={cn(
+      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+)
+
+const DropdownMenuItem = ({ children, className, ...props }: any) => (
+  <div
+    className={cn(
+      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground",
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+)
+
+const DropdownMenuLabel = ({ children, className, ...props }: any) => (
+  <div
+    className={cn("px-2 py-1.5 text-sm font-semibold", className)}
+    {...props}
+  >
+    {children}
+  </div>
+)
+
+const DropdownMenuSeparator = ({ className, ...props }: any) => (
+  <div
+    className={cn("-mx-1 my-1 h-px bg-muted", className)}
+    {...props}
+  />
+)
+
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+}
