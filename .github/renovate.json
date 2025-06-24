@@ -1,35 +1,175 @@
 {
-  "extends": ["config:base"],
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Configuration Renovate pour TopSteel ERP - Automation des mises à jour",
+  "extends": [
+    "config:base",
+    "schedule:weekdays",
+    ":maintainLockFilesWeekly",
+    ":separateMajorReleases",
+    ":combinePatchMinorReleases",
+    ":ignoreUnstable",
+    ":updateNotScheduled",
+    ":semanticCommits",
+    ":timezone(Europe/Paris)"
+  ],
+  "labels": ["dependencies", "renovate"],
+  "assignees": ["@topsteel-team"],
+  "reviewers": ["@topsteel-team"],
+  "schedule": ["before 9am on Monday"],
+  "timezone": "Europe/Paris",
+  "separateMinorPatch": true,
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true,
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 5,
+  "branchConcurrentLimit": 10,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "commitMessagePrefix": "🔄 ",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on Monday"],
+    "commitMessageAction": "Lock file maintenance"
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": ["at any time"],
+    "assignees": ["@topsteel-security-team"],
+    "labels": ["security", "vulnerability"],
+    "prPriority": 10
+  },
   "packageRules": [
     {
+      "description": "Security patches - immediate",
+      "matchPackagePatterns": ["*"],
+      "vulnerabilityAlerts": true,
+      "schedule": ["at any time"],
+      "prPriority": 10,
+      "labels": ["security", "critical"]
+    },
+    {
+      "description": "Critical dependencies - weekly",
+      "matchPackageNames": [
+        "next",
+        "@nestjs/core",
+        "@nestjs/common",
+        "react",
+        "react-dom",
+        "typescript",
+        "turbo"
+      ],
+      "schedule": ["before 9am on Monday"],
+      "prPriority": 5,
+      "labels": ["critical-deps"]
+    },
+    {
+      "description": "Dev dependencies - patch auto-merge",
       "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch"],
       "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true
-    },
-    {
-      "matchPackagePatterns": ["^@types/"],
-      "automerge": true,
-      "groupName": "TypeScript definitions"
-    },
-    {
-      "matchPackageNames": ["typescript", "eslint", "prettier"],
-      "groupName": "dev tools",
       "schedule": ["before 6am on Monday"]
     },
     {
-      "matchPackagePatterns": ["^@radix-ui/"],
-      "groupName": "Radix UI components"
+      "description": "Test dependencies",
+      "matchPackagePatterns": [
+        "@testing-library/*",
+        "jest",
+        "playwright",
+        "@types/jest"
+      ],
+      "schedule": ["before 9am on Monday"],
+      "groupName": "test dependencies"
     },
     {
-      "matchManagers": ["npm"],
-      "rangeStrategy": "bump",
-      "semanticCommits": "enabled"
+      "description": "Storybook dependencies",
+      "matchPackagePatterns": ["@storybook/*"],
+      "schedule": ["before 9am on Monday"],
+      "groupName": "storybook",
+      "labels": ["storybook"]
+    },
+    {
+      "description": "ESLint and Prettier",
+      "matchPackagePatterns": ["eslint", "prettier", "@typescript-eslint/*"],
+      "schedule": ["before 9am on Monday"],
+      "groupName": "linting",
+      "automerge": true,
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "description": "Major updates - require manual review",
+      "matchUpdateTypes": ["major"],
+      "schedule": ["before 9am on Monday"],
+      "prPriority": 1,
+      "labels": ["major-update", "review-required"],
+      "assignees": ["@topsteel-lead-dev"],
+      "automerge": false
+    },
+    {
+      "description": "Pin Docker digests",
+      "matchDatasources": ["docker"],
+      "pinDigests": true
+    },
+    {
+      "description": "Group NestJS updates",
+      "matchPackagePatterns": ["@nestjs/*"],
+      "groupName": "nestjs",
+      "schedule": ["before 9am on Monday"]
+    },
+    {
+      "description": "Group React ecosystem",
+      "matchPackagePatterns": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "groupName": "react ecosystem",
+      "schedule": ["before 9am on Monday"]
+    },
+    {
+      "description": "Group Radix UI components",
+      "matchPackagePatterns": ["@radix-ui/*"],
+      "groupName": "radix-ui",
+      "schedule": ["before 9am on Monday"]
     }
   ],
-  "schedule": ["before 6am on Monday"],
-  "timezone": "Europe/Paris",
-  "labels": ["dependencies"],
-  "assignees": ["votre-username"],
-  "reviewers": ["votre-team"]
+  "prBodyTemplate": "## 📦 Dependencies Update\n\n{{{table}}}\n\n{{{notes}}}\n\n{{{changelogs}}}\n\n---\n\n### 🔍 Checklist\n- [ ] Tests passent\n- [ ] Build réussit\n- [ ] Audit de sécurité OK\n- [ ] Pas de breaking changes\n\n🤖 Cette PR a été générée automatiquement par Renovate",
+  "prTitle": "🔄 {{semanticCommitType}}{{#if semanticCommitScope}}({{semanticCommitScope}}){{/if}}: {{#if isPin}}pin{{else}}update{{/if}} {{#if isSingleVersion}}{{depName}} to {{newVersion}}{{else}}{{#if isGroup}}{{groupName}}{{else}}dependencies{{/if}}{{/if}}",
+  "regexManagers": [
+    {
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": [
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?_VERSION=(?<currentValue>.*?)\\s"
+      ]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^scripts/.*\\.sh$"],
+      "matchStrings": ["NODE_VERSION=\"(?<currentValue>.*)\""],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version"
+    }
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**",
+    "**/examples/**",
+    "**/test/fixtures/**",
+    "**/__tests__/**",
+    "**/tests/**"
+  ],
+  "ignoreDeps": ["@types/node"],
+  "osvVulnerabilityAlerts": true,
+  "transitiveRemediation": true,
+  "enabledManagers": ["npm", "dockerfile", "github-actions"],
+  "platformAutomerge": true,
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "📊 Dependency Dashboard - TopSteel ERP",
+  "dependencyDashboardHeader": "## 📦 Statut des dépendances TopSteel ERP\n\nCe tableau de bord liste toutes les mises à jour de dépendances détectées par Renovate.\n\n### 🔍 Légende\n- 🟢 **Ready**: PR prête à être mergée\n- 🟡 **Pending**: En attente de validation\n- 🔴 **Error**: Erreur lors de la création de la PR\n- 🛡️ **Security**: Mise à jour de sécurité critique",
+  "dependencyDashboardLabels": ["dependencies", "dashboard"],
+  "configWarningReuseIssue": false
 }
