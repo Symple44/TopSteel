@@ -1,353 +1,520 @@
 # scripts/setup-postgres.ps1
-# Script dédié à l'installation et configuration de PostgreSQL
+# Script d'installation et configuration PostgreSQL
 
 param(
     [string]$Password = "postgres",
     [switch]$Force,
-    [switch]$Verbose
+    [switch]$SkipInstall
 )
 
-# Configuration des couleurs
-$colors = @{
-    Success = "Green"
-    Error = "Red"
-    Warning = "Yellow"
-    Info = "Cyan"
-    Header = "Magenta"
+Clear-Host
+Write-Host "============================================================" -ForegroundColor Magenta
+Write-Host " CONFIGURATION POSTGRESQL POUR ERP TOPSTEEL" -ForegroundColor Magenta
+Write-Host "============================================================" -ForegroundColor Magenta
+Write-Host ""
+
+# Fonction pour tester les commandes
+function Test-Command($cmd) {
+    try {
+        Get-Command $cmd -ErrorAction Stop | Out-Null
+        return $true
+    }
+    catch {
+        return $false
+    }
 }
 
-function Write-ColorText($Text, $Color) {
-    Write-Host $Text -ForegroundColor $colors[$Color]
-}
-
-function Write-Section($Title) {
-    Write-Host "`n" + "="*50 -ForegroundColor $colors.Header
-    Write-Host " $Title" -ForegroundColor $colors.Header
-    Write-Host "="*50 -ForegroundColor $colors.Header
-}
-
-function Test-Command($Command) {
-    $null = Get-Command $Command -ErrorAction SilentlyContinue
-    return $?
-}
-
+# Fonction pour tester les droits admin
 function Test-AdminRights() {
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
-function Install-PostgreSQLWindows() {
-    Write-ColorText "🗄️ Installation de PostgreSQL sur Windows..." "Info"
+# Rechercher les installations PostgreSQL
+function Get-PostgreSQLInstallation() {
+    Write-Host "Recherche des installations PostgreSQL..." -ForegroundColor Cyan
     
-    # Vérifier les droits admin
-    if (-not (Test-AdminRights)) {
-        Write-ColorText "⚠️ Droits administrateur requis pour installer PostgreSQL" "Warning"
-        Write-ColorText "Solutions:" "Info"
-        Write-ColorText "  1. Relancez VS Code en tant qu'administrateur" "Info"
-        Write-ColorText "  2. Ou installez PostgreSQL manuellement depuis: https://www.postgresql.org/download/windows/" "Info"
-        return $false
-    }
+    $possiblePaths = @(
+        "C:\Program Files\PostgreSQL\16\bin",
+        "C:\Program Files\PostgreSQL\15\bin", 
+        "C:\Program Files\PostgreSQL\14\bin",
+        "C:\Program Files\PostgreSQL\13\bin",
+        "C:\Program Files (x86)\PostgreSQL\16\bin",
+        "C:\Program Files (x86)\PostgreSQL\15\bin"
+    )
     
-    # Méthode 1: winget (Windows 10/11)
-    if (Test-Command "winget") {
-        Write-ColorText "📦 Tentative d'installation via winget..." "Info"
-        try {
-            $result = winget install --id PostgreSQL.PostgreSQL --silent --accept-package-agreements --accept-source-agreements
-            if ($LASTEXITCODE -eq 0) {
-                Write-ColorText "✅ PostgreSQL installé via winget" "Success"
-                Start-Sleep 15  # Attendre la fin de l'installation
-                return $true
+    foreach ($path in $possiblePaths) {
+        if (Test-Path "$path\psql.exe") {
+            Write-Host "[OK] PostgreSQL trouve: $path" -ForegroundColor Green
+            return @{
+                Found = $true
+                BinPath = $path
+                Version = & "$path\psql.exe" --version 2>$null
             }
-        } catch {
-            Write-ColorText "⚠️ Échec installation via winget: $($_.Exception.Message)" "Warning"
         }
     }
     
-    # Méthode 2: Chocolatey
-    if (Test-Command "choco") {
-        Write-ColorText "📦 Tentative d'installation via Chocolatey..." "Info"
-        try {
-            choco install postgresql --yes --params "/Password:$Password"
-            if ($LASTEXITCODE -eq 0) {
-                Write-ColorText "✅ PostgreSQL installé via Chocolatey" "Success"
-                return $true
-            }
-        } catch {
-            Write-ColorText "⚠️ Échec installation via Chocolatey: $($_.Exception.Message)" "Warning"
+    # Verifier dans le PATH
+    if (Test-Command "psql") {
+        $psqlPath = (Get-Command psql).Source
+        Write-Host "[OK] PostgreSQL trouve dans PATH: $psqlPath" -ForegroundColor Green
+        return @{
+            Found = $true
+            BinPath = Split-Path $psqlPath
+            Version = psql --version 2>$null
         }
     }
     
-    # Méthode 3: Téléchargement direct
-    Write-ColorText "📥 Téléchargement et installation manuelle..." "Info"
-    $downloadUrl = "https://get.enterprisedb.com/postgresql/postgresql-15.5-1-windows-x64.exe"
-    $installerPath = "$env:TEMP\postgresql-installer.exe"
-    
-    try {
-        Write-ColorText "⬇️ Téléchargement de PostgreSQL..." "Info"
-        Invoke-WebRequest -Uri $downloadUrl -OutFile $installerPath -UseBasicParsing
-        
-        Write-ColorText "🚀 Installation silencieuse en cours..." "Info"
-        $installArgs = @(
-            "--mode", "unattended",
-            "--unattendedmodeui", "none",
-            "--superpassword", $Password,
-            "--servicename", "postgresql-x64-15",
-            "--servicepassword", $Password,
-            "--serverport", "5432"
-        )
-        
-        Start-Process -FilePath $installerPath -ArgumentList $installArgs -Wait -NoNewWindow
-        
-        # Nettoyer le fichier temporaire
-        Remove-Item $installerPath -Force -ErrorAction SilentlyContinue
-        
-        Write-ColorText "✅ PostgreSQL installé avec succès" "Success"
-        return $true
-        
-    } catch {
-        Write-ColorText "❌ Erreur lors de l'installation: $($_.Exception.Message)" "Error"
-        Write-ColorText "📝 Veuillez installer PostgreSQL manuellement depuis: https://www.postgresql.org/download/windows/" "Info"
-        return $false
-    }
+    Write-Host "[INFO] Aucune installation PostgreSQL detectee" -ForegroundColor Yellow
+    return @{ Found = $false }
 }
 
-function Start-PostgreSQLService() {
-    Write-ColorText "🔄 Démarrage du service PostgreSQL..." "Info"
+# Installer PostgreSQL sur Windows
+function Install-PostgreSQLWindows() {
+    Write-Host "Installation de PostgreSQL sur Windows..." -ForegroundColor Cyan
     
-    # Noms de services possibles
-    $serviceNames = @("postgresql-x64-15", "postgresql-x64-14", "postgresql-x64-13", "postgresql", "PostgreSQL")
+    # Verifier les droits admin
+    if (-not (Test-AdminRights)) {
+        Write-Host "[ERREUR] Droits administrateur requis" -ForegroundColor Red
+        Write-Host "Solutions:" -ForegroundColor Yellow
+        Write-Host "  1. Relancez VS Code en tant qu'administrateur" -ForegroundColor Gray
+        Write-Host "  2. Ou installez manuellement: https://www.postgresql.org/download/windows/" -ForegroundColor Gray
+        return $false
+    }
+    
+    # Methode 1: winget
+    if (Test-Command "winget") {
+        Write-Host "Installation via winget..." -ForegroundColor Yellow
+        try {
+            winget install --id PostgreSQL.PostgreSQL.15 --silent --accept-package-agreements --accept-source-agreements
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "[OK] PostgreSQL installe via winget" -ForegroundColor Green
+                Start-Sleep 20
+                return $true
+            }
+        }
+        catch {
+            Write-Host "[INFO] Winget a echoue" -ForegroundColor Yellow
+        }
+    }
+    
+    # Methode 2: Chocolatey (avec timeout)
+    if (Test-Command "choco") {
+        Write-Host "Installation via Chocolatey (timeout 120s)..." -ForegroundColor Yellow
+        try {
+            $job = Start-Job -ScriptBlock {
+                param($Password)
+                choco install postgresql15 --yes --params "/Password:$Password /Port:5432"
+                return $LASTEXITCODE
+            } -ArgumentList $Password
+            
+            # Attendre 120 secondes maximum
+            $completed = $job | Wait-Job -Timeout 120
+            
+            if ($completed) {
+                $exitCode = Receive-Job $job
+                Remove-Job $job
+                
+                if ($exitCode -eq 0) {
+                    Write-Host "[OK] PostgreSQL installe via Chocolatey" -ForegroundColor Green
+                    return $true
+                }
+                else {
+                    Write-Host "[INFO] Chocolatey a echoue (code: $exitCode)" -ForegroundColor Yellow
+                }
+            }
+            else {
+                Write-Host "[INFO] Chocolatey timeout - trop lent" -ForegroundColor Yellow
+                Remove-Job $job -Force
+            }
+        }
+        catch {
+            Write-Host "[INFO] Chocolatey a echoue: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    }
+    
+    # Si tout echoue, guider vers installation manuelle
+    Write-Host ""
+    Write-Host "[INFO] Installation automatique impossible" -ForegroundColor Yellow
+    Write-Host "Installation manuelle recommandee (5 minutes) :" -ForegroundColor Cyan
+    Write-Host "  1. Ouvrez: https://www.postgresql.org/download/windows/" -ForegroundColor Gray
+    Write-Host "  2. Telechargez la version 15.x pour Windows x86-64" -ForegroundColor Gray
+    Write-Host "  3. Installez avec :" -ForegroundColor Gray
+    Write-Host "     - Port: 5432" -ForegroundColor Gray
+    Write-Host "     - Mot de passe: $Password" -ForegroundColor Gray
+    Write-Host "     - Utilisateur: postgres" -ForegroundColor Gray
+    Write-Host "  4. Relancez ce script apres installation" -ForegroundColor Gray
+    Write-Host ""
+    
+    return $false
+}
+
+# Rechercher et demarrer le service PostgreSQL
+function Start-PostgreSQLService() {
+    $serviceNames = @(
+        "postgresql-x64-16",
+        "postgresql-x64-15", 
+        "postgresql-x64-14",
+        "postgresql-x64-13",
+        "postgresql",
+        "PostgreSQL"
+    )
     
     foreach ($serviceName in $serviceNames) {
         $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
         if ($service) {
-            Write-ColorText "📍 Service trouvé: $serviceName" "Info"
+            Write-Host "[INFO] Service trouve: $serviceName (Status: $($service.Status))" -ForegroundColor Cyan
             
             if ($service.Status -ne "Running") {
                 try {
                     Start-Service -Name $serviceName
-                    Write-ColorText "✅ Service PostgreSQL démarré: $serviceName" "Success"
+                    Write-Host "[OK] Service $serviceName demarre" -ForegroundColor Green
+                    Start-Sleep 5
                     return $true
-                } catch {
-                    Write-ColorText "⚠️ Impossible de démarrer le service $serviceName : $($_.Exception.Message)" "Warning"
                 }
-            } else {
-                Write-ColorText "✅ Service PostgreSQL déjà en cours: $serviceName" "Success"
+                catch {
+                    Write-Host "[ERREUR] Impossible de demarrer $serviceName" -ForegroundColor Red
+                }
+            }
+            else {
+                Write-Host "[OK] Service $serviceName deja en cours" -ForegroundColor Green
                 return $true
             }
         }
     }
     
-    Write-ColorText "❌ Aucun service PostgreSQL trouvé" "Error"
-    Write-ColorText "📝 Services disponibles:" "Info"
-    Get-Service | Where-Object { $_.Name -like "*postgres*" } | ForEach-Object {
-        Write-ColorText "  - $($_.Name): $($_.Status)" "Info"
-    }
-    
+    Write-Host "[ERREUR] Aucun service PostgreSQL trouve" -ForegroundColor Red
     return $false
 }
 
+# Ajouter PostgreSQL au PATH
 function Add-PostgreSQLToPath() {
-    Write-ColorText "🛤️ Ajout de PostgreSQL au PATH..." "Info"
+    Write-Host "Configuration du PATH..." -ForegroundColor Cyan
     
-    $possiblePaths = @(
-        "C:\Program Files\PostgreSQL\15\bin",
-        "C:\Program Files\PostgreSQL\14\bin",
-        "C:\Program Files\PostgreSQL\13\bin",
-        "C:\PostgreSQL\15\bin",
-        "C:\PostgreSQL\14\bin"
-    )
-    
-    foreach ($pgPath in $possiblePaths) {
-        if (Test-Path $pgPath) {
-            $currentPath = [Environment]::GetEnvironmentVariable("PATH", "User")
-            if ($currentPath -notlike "*$pgPath*") {
-                [Environment]::SetEnvironmentVariable("PATH", "$currentPath;$pgPath", "User")
-                $env:PATH += ";$pgPath"
-                Write-ColorText "✅ PostgreSQL ajouté au PATH: $pgPath" "Success"
-                return $true
-            } else {
-                Write-ColorText "✅ PostgreSQL déjà dans le PATH: $pgPath" "Success"
-                return $true
-            }
-        }
+    $installation = Get-PostgreSQLInstallation
+    if (-not $installation.Found) {
+        Write-Host "[ERREUR] PostgreSQL non trouve pour PATH" -ForegroundColor Red
+        return $false
     }
     
-    Write-ColorText "⚠️ Impossible de trouver le dossier bin de PostgreSQL" "Warning"
-    return $false
-}
-
-function Test-PostgreSQLConnection() {
-    Write-ColorText "🔌 Test de connexion à PostgreSQL..." "Info"
+    $binPath = $installation.BinPath
+    $currentPath = [Environment]::GetEnvironmentVariable("PATH", "User")
     
-    # Attendre que PostgreSQL soit prêt
-    Start-Sleep 5
-    
-    $env:PGPASSWORD = $Password
+    if ($currentPath -like "*$binPath*") {
+        Write-Host "[OK] PostgreSQL deja dans le PATH" -ForegroundColor Green
+        return $true
+    }
     
     try {
-        $result = psql -h localhost -U postgres -d postgres -c "SELECT version();" 2>$null
-        if ($result -and $result -match "PostgreSQL") {
-            Write-ColorText "✅ Connexion PostgreSQL réussie" "Success"
-            Write-ColorText "📊 Version: $($result | Select-String 'PostgreSQL')" "Info"
-            return $true
-        } else {
-            Write-ColorText "❌ Impossible de se connecter à PostgreSQL" "Error"
-            return $false
-        }
-    } catch {
-        Write-ColorText "❌ Erreur de connexion: $($_.Exception.Message)" "Error"
+        $newPath = "$currentPath;$binPath"
+        [Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
+        $env:PATH += ";$binPath"
+        Write-Host "[OK] PostgreSQL ajoute au PATH" -ForegroundColor Green
+        return $true
+    }
+    catch {
+        Write-Host "[ERREUR] Impossible d'ajouter au PATH" -ForegroundColor Red
         return $false
-    } finally {
-        Remove-Item env:PGPASSWORD -ErrorAction SilentlyContinue
     }
 }
 
-function Create-Databases() {
-    Write-ColorText "🗃️ Création des bases de données..." "Info"
+# Tester la connexion PostgreSQL
+function Test-PostgreSQLConnection() {
+    Write-Host "Test de connexion a PostgreSQL..." -ForegroundColor Cyan
+    Write-Host "=================================" -ForegroundColor Gray
     
     $env:PGPASSWORD = $Password
     
+    Write-Host "Parametres de connexion:" -ForegroundColor Yellow
+    Write-Host "  Host: localhost" -ForegroundColor Gray
+    Write-Host "  Port: 5432" -ForegroundColor Gray
+    Write-Host "  User: postgres" -ForegroundColor Gray
+    Write-Host "  Password: $Password" -ForegroundColor Gray
+    Write-Host ""
+    
+    # Test 1: Verification que psql est accessible
+    Write-Host "Test 1: Verification de psql..." -ForegroundColor Yellow
+    if (Test-Command "psql") {
+        Write-Host "[OK] psql est accessible" -ForegroundColor Green
+    }
+    else {
+        Write-Host "[ERREUR] psql non trouve dans PATH" -ForegroundColor Red
+        return $false
+    }
+    
+    # Test 2: Test de port
+    Write-Host "Test 2: Verification du port 5432..." -ForegroundColor Yellow
+    try {
+        $tcpClient = New-Object System.Net.Sockets.TcpClient
+        $tcpClient.Connect("localhost", 5432)
+        $tcpClient.Close()
+        Write-Host "[OK] Port 5432 accessible" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "[ERREUR] Port 5432 non accessible" -ForegroundColor Red
+        Write-Host "Causes possibles:" -ForegroundColor Yellow
+        Write-Host "  - Service PostgreSQL arrete" -ForegroundColor Gray
+        Write-Host "  - Port utilise par un autre processus" -ForegroundColor Gray
+        Write-Host "  - Pare-feu bloque le port" -ForegroundColor Gray
+        return $false
+    }
+    
+    # Test 3: Connexion reelle a la base
+    Write-Host "Test 3: Connexion a la base postgres..." -ForegroundColor Yellow
+    try {
+        $result = psql -h localhost -p 5432 -U postgres -d postgres -c "SELECT version();" 2>$null
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "[OK] Connexion PostgreSQL reussie !" -ForegroundColor Green
+            Write-Host "Version PostgreSQL:" -ForegroundColor Cyan
+            Write-Host "  $($result | Select-Object -First 1)" -ForegroundColor Gray
+            return $true
+        }
+        else {
+            Write-Host "[ERREUR] Echec de connexion (code: $LASTEXITCODE)" -ForegroundColor Red
+        }
+    }
+    catch {
+        Write-Host "[ERREUR] Exception lors de la connexion: $($_.Exception.Message)" -ForegroundColor Red
+    }
+    
+    Write-Host ""
+    Write-Host "DIAGNOSTIC DETAILLE:" -ForegroundColor Yellow
+    Write-Host "===================" -ForegroundColor Gray
+    
+    # Diagnostic des services
+    Write-Host "Services PostgreSQL detectes:" -ForegroundColor Yellow
+    $serviceNames = @("postgresql-x64-16", "postgresql-x64-15", "postgresql-x64-14", "postgresql")
+    $foundServices = $false
+    
+    foreach ($serviceName in $serviceNames) {
+        $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+        if ($service) {
+            $foundServices = $true
+            $statusColor = if ($service.Status -eq "Running") { "Green" } else { "Red" }
+            Write-Host "  - $($service.Name): $($service.Status)" -ForegroundColor $statusColor
+        }
+    }
+    
+    if (-not $foundServices) {
+        Write-Host "  Aucun service PostgreSQL trouve" -ForegroundColor Red
+    }
+    
+    return $false
+}
+
+# Creer les bases de donnees
+function Create-Databases() {
+    Write-Host "Creation des bases de donnees..." -ForegroundColor Cyan
+    
+    $env:PGPASSWORD = $Password
     $databases = @("erp_topsteel_dev", "erp_topsteel_test")
     
-    foreach ($dbName in $databases) {
+    foreach ($db in $databases) {
         try {
-            Write-ColorText "📊 Création de la base: $dbName" "Info"
-            $result = psql -h localhost -U postgres -d postgres -c "CREATE DATABASE $dbName;" 2>$null
+            # Verifier si la base existe
+            $exists = psql -h localhost -p 5432 -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$db';"
             
-            # Vérifier si la base existe (même si elle existait déjà)
-            $checkResult = psql -h localhost -U postgres -d postgres -c "SELECT datname FROM pg_database WHERE datname='$dbName';" 2>$null
-            if ($checkResult -match $dbName) {
-                Write-ColorText "✅ Base de données '$dbName' prête" "Success"
+            if ($exists -eq "1") {
+                Write-Host "[OK] Base de donnees '$db' existe deja" -ForegroundColor Green
             }
-        } catch {
-            Write-ColorText "⚠️ Erreur lors de la création de $dbName : $($_.Exception.Message)" "Warning"
+            else {
+                # Creer la base de donnees
+                psql -h localhost -p 5432 -U postgres -d postgres -c "CREATE DATABASE $db;"
+                
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "[OK] Base de donnees '$db' creee" -ForegroundColor Green
+                }
+                else {
+                    Write-Host "[ERREUR] Echec de creation de '$db'" -ForegroundColor Red
+                }
+            }
+        }
+        catch {
+            Write-Host "[ERREUR] Erreur lors de la creation de '$db'" -ForegroundColor Red
         }
     }
-    
-    Remove-Item env:PGPASSWORD -ErrorAction SilentlyContinue
 }
 
+# Mettre a jour le fichier .env
 function Update-EnvFile() {
-    Write-ColorText "📝 Mise à jour du fichier .env.local..." "Info"
+    Write-Host "Mise a jour du fichier .env..." -ForegroundColor Cyan
     
-    $envPath = "apps/api/.env.local"
-    $envContent = @"
-# Application
-NODE_ENV=development
-PORT=3001
-APP_URL=http://localhost:3001
-
-# CORS
-CORS_ORIGIN=http://localhost:3000
-CORS_CREDENTIALS=true
-
-# Database PostgreSQL
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=$Password
-DB_NAME=erp_topsteel_dev
-DB_SSL=false
-DB_MAX_CONNECTIONS=100
-
-# Redis (optionnel)
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=
-REDIS_DB=0
-
-# JWT
-JWT_SECRET=development-secret-key-$(Get-Random)
-JWT_EXPIRES_IN=24h
-JWT_REFRESH_SECRET=development-refresh-secret-$(Get-Random)
-JWT_REFRESH_EXPIRES_IN=7d
-
-# Logging
-LOG_LEVEL=debug
-"@
+    $envPath = "apps\api\.env.local"
     
-    Set-Content -Path $envPath -Value $envContent -Encoding UTF8
-    Write-ColorText "✅ Fichier .env.local mis à jour" "Success"
-}
-
-# SCRIPT PRINCIPAL
-Clear-Host
-Write-ColorText "🗄️ CONFIGURATION POSTGRESQL - ERP TOPSTEEL" "Header"
-Write-ColorText "Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" "Info"
-
-# Vérification préalable
-if (-not (Test-Path "package.json")) {
-    Write-ColorText "❌ Vous devez être dans la racine du projet ERP TOPSTEEL" "Error"
-    exit 1
-}
-
-# Phase 1: Vérifier si PostgreSQL est déjà installé
-Write-Section "🔍 VÉRIFICATION"
-
-if (Test-Command "psql") {
-    Write-ColorText "✅ PostgreSQL déjà installé" "Success"
-    
-    if (Start-PostgreSQLService) {
-        if (Test-PostgreSQLConnection) {
-            Write-ColorText "🎉 PostgreSQL fonctionne parfaitement !" "Success"
-            Create-Databases
-            Update-EnvFile
-            
-            Write-Section "✅ CONFIGURATION TERMINÉE"
-            Write-ColorText "🚀 PostgreSQL est prêt pour le développement !" "Success"
-            Write-ColorText "" "Info"
-            Write-ColorText "📋 Informations de connexion :" "Info"
-            Write-ColorText "  Host: localhost" "Info"
-            Write-ColorText "  Port: 5432" "Info"
-            Write-ColorText "  User: postgres" "Info"
-            Write-ColorText "  Password: $Password" "Info"
-            Write-ColorText "  Databases: erp_topsteel_dev, erp_topsteel_test" "Info"
-            exit 0
+    if (-not (Test-Path $envPath)) {
+        if (Test-Path "apps\api\.env.example") {
+            Copy-Item "apps\api\.env.example" $envPath
+            Write-Host "[OK] Fichier .env.local cree depuis .env.example" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[INFO] Aucun fichier .env.example trouve" -ForegroundColor Yellow
+            return
         }
     }
-} else {
-    Write-ColorText "❌ PostgreSQL non installé" "Error"
+    
+    # Mettre a jour les variables PostgreSQL
+    $content = Get-Content $envPath
+    $content = $content -replace "^DB_PASSWORD=.*", "DB_PASSWORD=$Password"
+    $content = $content -replace "^DB_HOST=.*", "DB_HOST=localhost"
+    $content = $content -replace "^DB_PORT=.*", "DB_PORT=5432"
+    $content = $content -replace "^DB_USERNAME=.*", "DB_USERNAME=postgres"
+    $content = $content -replace "^DB_NAME=.*", "DB_NAME=erp_topsteel_dev"
+    
+    Set-Content $envPath $content
+    Write-Host "[OK] Fichier .env.local mis a jour" -ForegroundColor Green
 }
 
-# Phase 2: Installation
-Write-Section "📦 INSTALLATION"
+# ================================
+# SCRIPT PRINCIPAL
+# ================================
 
-$installSuccess = Install-PostgreSQLWindows
+# Vérifier si on est admin et se relancer si nécessaire
+$currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+$isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-if (-not $installSuccess) {
-    Write-ColorText "❌ Échec de l'installation automatique" "Error"
-    Write-ColorText "📋 Installation manuelle requise :" "Info"
-    Write-ColorText "  1. Téléchargez PostgreSQL: https://www.postgresql.org/download/windows/" "Info"
-    Write-ColorText "  2. Utilisez le mot de passe: $Password" "Info"
-    Write-ColorText "  3. Relancez ce script après l'installation" "Info"
-    exit 1
+if (-not $isAdmin) {
+    Write-Host "============================================================" -ForegroundColor Yellow
+    Write-Host " ELEVATION EN ADMINISTRATEUR REQUISE" -ForegroundColor Yellow
+    Write-Host "============================================================" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Le script va se relancer avec les droits administrateur..." -ForegroundColor Cyan
+    Write-Host "Cliquez sur 'Oui' dans la popup UAC." -ForegroundColor Yellow
+    Write-Host ""
+    
+    try {
+        $scriptPath = $MyInvocation.MyCommand.Path
+        $arguments = "-ExecutionPolicy Bypass -File `"$scriptPath`""
+        if ($Password -ne "postgres") { $arguments += " -Password `"$Password`"" }
+        if ($Force) { $arguments += " -Force" }
+        if ($SkipInstall) { $arguments += " -SkipInstall" }
+        
+        Start-Process PowerShell -ArgumentList $arguments -Verb RunAs -Wait
+        Write-Host "[OK] Installation PostgreSQL terminee !" -ForegroundColor Green
+        exit 0
+    }
+    catch {
+        Write-Host "[ERREUR] Impossible de relancer en admin: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "Veuillez lancer PowerShell en tant qu'administrateur manuellement." -ForegroundColor Yellow
+        exit 1
+    }
+}
+
+Write-Host "Script demarre a $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Gray
+Write-Host "[INFO] Execution en mode administrateur" -ForegroundColor Green
+
+# Phase 1: Verification de l'installation existante
+Write-Host ""
+Write-Host "VERIFICATION" -ForegroundColor Cyan
+Write-Host "============" -ForegroundColor Gray
+
+$installation = Get-PostgreSQLInstallation
+
+if ($installation.Found) {
+    Write-Host "[OK] PostgreSQL detecte: $($installation.Version)" -ForegroundColor Green
+    
+    if (-not $SkipInstall) {
+        # Verifier si le service fonctionne
+        if (Start-PostgreSQLService) {
+            Add-PostgreSQLToPath
+            
+            if (Test-PostgreSQLConnection) {
+                Write-Host "[INFO] PostgreSQL est deja configure et fonctionnel !" -ForegroundColor Green
+                Create-Databases
+                Update-EnvFile
+                
+                Write-Host ""
+                Write-Host "CONFIGURATION TERMINEE" -ForegroundColor Green
+                Write-Host "======================" -ForegroundColor Gray
+                Write-Host "[OK] PostgreSQL est pret pour le developpement !" -ForegroundColor Green
+                Write-Host ""
+                Write-Host "Informations de connexion :" -ForegroundColor Cyan
+                Write-Host "  Host: localhost" -ForegroundColor Gray
+                Write-Host "  Port: 5432" -ForegroundColor Gray
+                Write-Host "  User: postgres" -ForegroundColor Gray
+                Write-Host "  Password: $Password" -ForegroundColor Gray
+                Write-Host "  Databases: erp_topsteel_dev, erp_topsteel_test" -ForegroundColor Gray
+                exit 0
+            }
+        }
+    }
+}
+else {
+    Write-Host "[INFO] PostgreSQL non installe" -ForegroundColor Yellow
+}
+
+# Phase 2: Installation si necessaire
+if (-not $SkipInstall) {
+    Write-Host ""
+    Write-Host "INSTALLATION" -ForegroundColor Cyan
+    Write-Host "============" -ForegroundColor Gray
+    
+    $installSuccess = Install-PostgreSQLWindows
+    
+    if (-not $installSuccess) {
+        Write-Host "[ERREUR] Echec de l'installation automatique" -ForegroundColor Red
+        Write-Host "Installation manuelle requise :" -ForegroundColor Yellow
+        Write-Host "  1. Telechargez PostgreSQL: https://www.postgresql.org/download/windows/" -ForegroundColor Gray
+        Write-Host "  2. Utilisez le mot de passe: $Password" -ForegroundColor Gray
+        Write-Host "  3. Relancez ce script avec -SkipInstall apres l'installation" -ForegroundColor Gray
+        exit 1
+    }
+    
+    # Attendre que l'installation soit complete
+    Start-Sleep 10
 }
 
 # Phase 3: Configuration post-installation
-Write-Section "⚙️ CONFIGURATION"
+Write-Host ""
+Write-Host "CONFIGURATION" -ForegroundColor Cyan
+Write-Host "=============" -ForegroundColor Gray
+
+# Actualiser la detection apres installation
+$installation = Get-PostgreSQLInstallation
+
+if (-not $installation.Found) {
+    Write-Host "[ERREUR] PostgreSQL toujours non detecte apres installation" -ForegroundColor Red
+    Write-Host "Verifications manuelles requises" -ForegroundColor Yellow
+    exit 1
+}
 
 Add-PostgreSQLToPath
-Start-PostgreSQLService
+$serviceStarted = Start-PostgreSQLService
 
-if (Test-PostgreSQLConnection) {
+if ($serviceStarted -and (Test-PostgreSQLConnection)) {
     Create-Databases
     Update-EnvFile
     
-    Write-Section "🎉 SUCCÈS"
-    Write-ColorText "✅ PostgreSQL installé et configuré avec succès !" "Success"
-    Write-ColorText "" "Info"
-    Write-ColorText "📋 Prochaines étapes :" "Info"
-    Write-ColorText "  1. 🚀 Démarrez l'API : pnpm dev:api" "Info"
-    Write-ColorText "  2. 🗄️ Testez la connexion DB dans votre application" "Info"
-    Write-ColorText "  3. 📊 Créez vos premières migrations : pnpm db:migrate:generate" "Info"
-    
-} else {
-    Write-ColorText "❌ PostgreSQL installé mais problème de connexion" "Error"
-    Write-ColorText "🔧 Vérifications à faire :" "Info"
-    Write-ColorText "  1. Service PostgreSQL démarré" "Info"
-    Write-ColorText "  2. Port 5432 disponible" "Info"
-    Write-ColorText "  3. Mot de passe correct: $Password" "Info"
+    Write-Host ""
+    Write-Host "SUCCES" -ForegroundColor Green
+    Write-Host "======" -ForegroundColor Gray
+    Write-Host "[OK] PostgreSQL installe et configure avec succes !" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Informations de connexion :" -ForegroundColor Cyan
+    Write-Host "  Host: localhost" -ForegroundColor Gray
+    Write-Host "  Port: 5432" -ForegroundColor Gray
+    Write-Host "  User: postgres" -ForegroundColor Gray
+    Write-Host "  Password: $Password" -ForegroundColor Gray
+    Write-Host "  Databases: erp_topsteel_dev, erp_topsteel_test" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "Prochaines etapes :" -ForegroundColor Cyan
+    Write-Host "  1. Demarrez l'API : pnpm dev:api" -ForegroundColor Gray
+    Write-Host "  2. Testez la connexion DB dans votre application" -ForegroundColor Gray
+    Write-Host "  3. Creez vos premieres migrations : pnpm db:migrate:generate" -ForegroundColor Gray
+}
+else {
+    Write-Host ""
+    Write-Host "PROBLEME" -ForegroundColor Yellow
+    Write-Host "========" -ForegroundColor Gray
+    Write-Host "[ERREUR] PostgreSQL installe mais probleme de connexion" -ForegroundColor Red
+    Write-Host "Verifications a faire :" -ForegroundColor Yellow
+    Write-Host "  1. Service PostgreSQL demarre" -ForegroundColor Gray
+    Write-Host "  2. Port 5432 disponible" -ForegroundColor Gray
+    Write-Host "  3. Mot de passe correct: $Password" -ForegroundColor Gray
+    Write-Host "  4. Pare-feu Windows autorise PostgreSQL" -ForegroundColor Gray
 }
 
-Write-ColorText "`n✅ Script terminé à $(Get-Date -Format 'HH:mm:ss')" "Success"
+Write-Host ""
+Write-Host "Script termine a $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Green
