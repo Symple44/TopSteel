@@ -1,5 +1,6 @@
 // apps/web/src/lib/api-client.ts
-import axios, { AxiosInstance, AxiosError } from 'axios'
+import type { AxiosInstance, AxiosError } from 'axios';
+import axios from 'axios'
 import { useAuthStore } from '@/hooks/use-auth'
 
 class ApiClient {

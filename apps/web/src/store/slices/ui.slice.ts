@@ -1,5 +1,5 @@
 // apps/web/src/store/slices/ui.slice.ts - VERSION CORRIGÉE
-import { StateCreator } from "zustand";
+import type { StateCreator } from "zustand";
 
 export interface Notification {
   id: string;

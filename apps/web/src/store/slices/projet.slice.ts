@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand'
-import { Projet, ProjetFilters } from '@/types'
+import type { StateCreator } from 'zustand'
+import type { Projet, ProjetFilters } from '@/types'
 
 export interface ProjetSlice {
   // État

@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { formatDate, formatCurrency } from '@/lib/utils'
-import { Projet } from '@/types'
+import type { Projet } from '@/types'
 import { 
   Calendar, 
   Clock, 

@@ -1,9 +1,13 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { AuthSlice, createAuthSlice } from "./slices/auth.slice";
-import { ProjetSlice, createProjetSlice } from "./slices/projet.slice";
-import { StockSlice, createStockSlice } from "./slices/stock.slice";
-import { UISlice, createUISlice } from "./slices/ui.slice";
+import type { AuthSlice} from "./slices/auth.slice";
+import { createAuthSlice } from "./slices/auth.slice";
+import type { ProjetSlice} from "./slices/projet.slice";
+import { createProjetSlice } from "./slices/projet.slice";
+import type { StockSlice} from "./slices/stock.slice";
+import { createStockSlice } from "./slices/stock.slice";
+import type { UISlice} from "./slices/ui.slice";
+import { createUISlice } from "./slices/ui.slice";
 
 export type StoreState = AuthSlice & UISlice & ProjetSlice & StockSlice;
 

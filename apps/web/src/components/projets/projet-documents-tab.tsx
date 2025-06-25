@@ -33,7 +33,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { formatDate } from '@/lib/utils'
-import { Projet, TypeDocument } from '@/types'
+import type { Projet} from '@/types';
+import { TypeDocument } from '@/types'
 
 interface ProjetDocumentsTabProps {
   projet: Projet

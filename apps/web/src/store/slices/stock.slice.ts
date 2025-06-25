@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand'
-import { Stock, Produit, MouvementStock, StockFilters } from '@/types'
+import type { StateCreator } from 'zustand'
+import type { Stock, Produit, MouvementStock, StockFilters } from '@/types'
 
 export interface StockSlice {
   // État

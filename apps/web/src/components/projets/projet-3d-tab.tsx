@@ -20,7 +20,7 @@ import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Projet } from '@/types'
+import type { Projet } from '@/types'
 
 interface Projet3DTabProps {
   projet: Projet

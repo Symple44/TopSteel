@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client'
-import { User } from '@/types'
+import type { User } from '@/types'
 
 interface LoginResponse {
   user: User

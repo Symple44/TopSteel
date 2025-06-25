@@ -34,7 +34,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { formatDate, formatCurrency } from '@/lib/utils'
-import { Projet, DevisStatut } from '@/types'
+import type { Projet} from '@/types';
+import { DevisStatut } from '@/types'
 
 interface ProjetDevisTabProps {
   projet: Projet

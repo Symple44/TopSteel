@@ -19,7 +19,8 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDate, getInitials } from '@/lib/utils'
-import { Projet, StatutProduction, PrioriteProduction } from '@/types'
+import type { Projet} from '@/types';
+import { StatutProduction, PrioriteProduction } from '@/types'
 
 interface ProjetProductionTabProps {
   projet: Projet
