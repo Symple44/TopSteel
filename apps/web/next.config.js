@@ -1,66 +1,67 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuration TypeScript
+  // Configuration TypeScript stricte
   typescript: {
-    ignoreBuildErrors: true, // Temporaire pour éviter les blocages
+    ignoreBuildErrors: false,
   },
-
+  
   // Configuration ESLint
   eslint: {
     ignoreDuringBuilds: false,
   },
 
+  // Configuration des images
+  images: {
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    domains: ["localhost"],
+    minimumCacheTTL: 60,
+  },
+
+  // Configuration Turbopack (nouvelle syntaxe stable)
+  turbopack: {
+    resolveAlias: {
+      '@': './src',
+    },
+  },
+
+  // Optimisations
+  experimental: {
+    optimizePackageImports: [
+      "@erp/ui", 
+      "lucide-react", 
+      "recharts", 
+      "date-fns"
+    ],
+  },
+
   // Configuration du transpilation pour les packages du monorepo
-  transpilePackages: ["@erp/ui", "@erp/types", "@erp/utils", "@erp/config"],
+  transpilePackages: [
+    "@erp/ui",
+    "@erp/types", 
+    "@erp/utils",
+    "@erp/config"
+  ],
 
   // Compression activée
   compress: true,
 
-  // Configuration spécifique pour OneDrive/Windows
-  experimental: {
-    // Désactiver les optimisations qui peuvent causer des problèmes sur OneDrive
-    isrMemoryCacheSize: 0,
-    workerThreads: false,
-    // Optimiser seulement les packages nécessaires
-    optimizePackageImports: ["@erp/ui", "lucide-react"],
-  },
-
-  // Configuration du cache pour éviter les problèmes de symlinks
-  onDemandEntries: {
-    // Réduire le timeout pour éviter les problèmes de cache
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
-  },
-
-  // Désactiver certaines optimisations problématiques sur OneDrive
-  swcMinify: true,
-
-  // Configuration des images
-  images: {
-    domains: ["localhost"],
-    unoptimized: true, // Évite les problèmes avec OneDrive
-  },
-
-  // Configuration du serveur pour le développement
-  ...(process.env.NODE_ENV === "development" && {
-    // Configuration spécifique pour le développement sur OneDrive
-    webpack: (config, { dev, isServer }) => {
-      if (dev && !isServer) {
-        // Optimisations pour OneDrive
-        config.watchOptions = {
-          poll: 1000,
-          aggregateTimeout: 300,
-          ignored: ["**/node_modules", "**/.next"],
-        };
-      }
-      return config;
-    },
-  }),
-
   // Variables d'environnement publiques
   env: {
-    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || "ERP TOPSTEEL",
-    NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || "1.0.0",
+    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'ERP TOPSTEEL',
+    NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
+  },
+
+  // Configuration des redirections
+  async redirects() {
+    return [
+      {
+        source: '/auth',
+        destination: '/login',
+        permanent: true,
+      },
+    ]
   },
 };
 
