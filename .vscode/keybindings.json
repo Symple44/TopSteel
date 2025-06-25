@@ -1,9 +1,10 @@
 [
-  // Développement
+  // ==================== DÉVELOPPEMENT ====================
   {
     "key": "ctrl+shift+d",
     "command": "workbench.action.tasks.runTask",
-    "args": "🚀 Turbo Dev - All"
+    "args": "🚀 Turbo Dev - All",
+    "when": "!inDebugMode"
   },
   {
     "key": "ctrl+alt+w",
@@ -16,14 +17,24 @@
     "args": "🔧 Dev - API Only"
   },
 
-  // Build
+  // ==================== BUILD ====================
   {
     "key": "ctrl+shift+b",
     "command": "workbench.action.tasks.runTask",
     "args": "🔨 Build - All"
   },
+  {
+    "key": "ctrl+alt+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌐 Build - Web Only"
+  },
+  {
+    "key": "ctrl+shift+alt+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📦 Build - Packages Only"
+  },
 
-  // Tests
+  // ==================== TESTS ====================
   {
     "key": "ctrl+shift+t",
     "command": "workbench.action.tasks.runTask",
@@ -34,8 +45,13 @@
     "command": "workbench.action.tasks.runTask",
     "args": "🧪 Test - Watch"
   },
+  {
+    "key": "ctrl+shift+alt+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📊 Test - Coverage"
+  },
 
-  // Qualité du code
+  // ==================== QUALITÉ CODE ====================
   {
     "key": "ctrl+shift+l",
     "command": "workbench.action.tasks.runTask",
@@ -51,12 +67,27 @@
     "command": "workbench.action.tasks.runTask",
     "args": "🎨 Format Code"
   },
+  {
+    "key": "ctrl+alt+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔍 Type Check"
+  },
 
-  // Maintenance
+  // ==================== NETTOYAGE (RIMRAF) ====================
   {
     "key": "ctrl+shift+c",
     "command": "workbench.action.tasks.runTask",
-    "args": "🧹 Clean All"
+    "args": "🧹 Clean - Standard"
+  },
+  {
+    "key": "ctrl+alt+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🗑️ Clean - Cache Only"
+  },
+  {
+    "key": "ctrl+shift+alt+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "💣 Clean - Deep Clean"
   },
   {
     "key": "ctrl+shift+r",
@@ -64,7 +95,7 @@
     "args": "🔄 Reset Project"
   },
 
-  // Base de données
+  // ==================== BASE DE DONNÉES ====================
   {
     "key": "ctrl+alt+m",
     "command": "workbench.action.tasks.runTask",
@@ -75,8 +106,59 @@
     "command": "workbench.action.tasks.runTask",
     "args": "🌱 DB - Seed Data"
   },
+  {
+    "key": "ctrl+shift+alt+m",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔄 DB - Generate Migration"
+  },
 
-  // Debug (vos raccourcis existants)
+  // ==================== POSTGRESQL ====================
+  {
+    "key": "ctrl+shift+alt+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🗄️ Test connexion PostgreSQL"
+  },
+  {
+    "key": "ctrl+shift+alt+r",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔄 Redémarrer PostgreSQL"
+  },
+
+  // ==================== SETUP & MAINTENANCE ====================
+  {
+    "key": "ctrl+shift+alt+v",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔍 Vérification Environnement Complet"
+  },
+  {
+    "key": "ctrl+shift+alt+s",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🚀 Setup Complet + PostgreSQL"
+  },
+  {
+    "key": "ctrl+shift+alt+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🗄️ Configuration PostgreSQL uniquement"
+  },
+
+  // ==================== ANALYSE & RAPPORTS ====================
+  {
+    "key": "ctrl+alt+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📊 Bundle Analyzer"
+  },
+  {
+    "key": "ctrl+shift+alt+x",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📋 Vérification des dépendances"
+  },
+  {
+    "key": "ctrl+shift+alt+u",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔒 Security Audit"
+  },
+
+  // ==================== DEBUG ====================
   {
     "key": "f5",
     "command": "workbench.action.debug.start",
@@ -92,106 +174,13 @@
     "command": "workbench.action.debug.stop",
     "when": "inDebugMode"
   },
-
-  // Navigation rapide
-  {
-    "key": "ctrl+1",
-    "command": "workbench.action.terminal.focusAtIndex1"
-  },
-  {
-    "key": "ctrl+2",
-    "command": "workbench.action.terminal.focusAtIndex2"
-  },
-  {
-    "key": "ctrl+3",
-    "command": "workbench.action.terminal.focusAtIndex3"
-  },
-
-  // Raccourcis personnalisés existants
-  {
-    "key": "ctrl+alt+n",
-    "command": "workbench.action.terminal.new",
-    "args": {
-      "cwd": "${workspaceFolder}"
-    }
-  },
-  {
-    "key": "ctrl+alt+t",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🔍 Type Check"
-  },
-  {
-    "key": "ctrl+alt+p",
-    "command": "workbench.action.tasks.runTask",
-    "args": "📊 Bundle Analyzer"
-  },
-
-  // === NOUVEAUX RACCOURCIS AJOUTÉS ===
-
-  // Vérification et Setup environnement
-  {
-    "key": "ctrl+shift+alt+c",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🔍 Vérification Environnement Complet",
-    "when": "!inDebugMode"
-  },
-  {
-    "key": "ctrl+shift+alt+s",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🚀 Setup Complet + PostgreSQL",
-    "when": "!inDebugMode"
-  },
-  {
-    "key": "ctrl+shift+alt+p",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🗄️ Configuration PostgreSQL uniquement",
-    "when": "!inDebugMode"
-  },
-  {
-    "key": "ctrl+shift+alt+f",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🔧 Réparation rapide",
-    "when": "!inDebugMode"
-  },
-
-  // Debug amélioré
   {
     "key": "ctrl+shift+f5",
     "command": "workbench.action.debug.selectandstart",
     "when": "!inDebugMode"
   },
-  {
-    "key": "ctrl+alt+f5",
-    "command": "workbench.action.debug.start",
-    "args": "🚀 Démarrer Full Stack (avec vérification)",
-    "when": "!inDebugMode"
-  },
 
-  // PostgreSQL et Base de données
-  {
-    "key": "ctrl+shift+alt+d",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🗄️ Test connexion PostgreSQL"
-  },
-  {
-    "key": "ctrl+shift+alt+r",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🔄 Redémarrer PostgreSQL"
-  },
-
-  // Maintenance avancée
-  {
-    "key": "ctrl+shift+alt+x",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🧹 Nettoyage complet (cache + node_modules)"
-  },
-  {
-    "key": "ctrl+shift+alt+v",
-    "command": "workbench.action.tasks.runTask",
-    "args": "📋 Vérification des dépendances"
-  },
-
-  // Accès rapide aux outils
+  // ==================== TERMINAUX SPÉCIALISÉS ====================
   {
     "key": "ctrl+shift+alt+1",
     "command": "workbench.action.terminal.new",
@@ -217,15 +206,36 @@
     }
   },
 
-  // Commandes rapides pour le développement
+  // ==================== NAVIGATION RAPIDE ====================
   {
-    "key": "ctrl+shift+alt+l",
-    "command": "workbench.action.tasks.runTask",
-    "args": "📊 Logs en temps réel"
+    "key": "ctrl+1",
+    "command": "workbench.action.terminal.focusAtIndex1"
   },
   {
-    "key": "ctrl+shift+alt+m",
+    "key": "ctrl+2",
+    "command": "workbench.action.terminal.focusAtIndex2"
+  },
+  {
+    "key": "ctrl+3",
+    "command": "workbench.action.terminal.focusAtIndex3"
+  },
+
+  // ==================== UTILITAIRES ====================
+  {
+    "key": "ctrl+alt+n",
+    "command": "workbench.action.terminal.new",
+    "args": {
+      "cwd": "${workspaceFolder}"
+    }
+  },
+  {
+    "key": "ctrl+shift+alt+g",
     "command": "workbench.action.tasks.runTask",
     "args": "💾 Sauvegarde configuration"
+  },
+  {
+    "key": "ctrl+shift+alt+i",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📦 Install Dependencies"
   }
 ]

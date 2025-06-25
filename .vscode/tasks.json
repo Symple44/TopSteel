@@ -1,6 +1,7 @@
 {
   "version": "2.0.0",
   "tasks": [
+    // ==================== DÉVELOPPEMENT ====================
     {
       "label": "🚀 Turbo Dev - All",
       "type": "shell",
@@ -20,7 +21,9 @@
         "panel": "dedicated",
         "showReuseMessage": false
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Démarre tous les services en mode développement"
     },
     {
       "label": "🌐 Dev - Web Only",
@@ -37,7 +40,9 @@
         "focus": true,
         "panel": "dedicated"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Démarre uniquement l'application web Next.js"
     },
     {
       "label": "🔧 Dev - API Only",
@@ -54,8 +59,12 @@
         "focus": true,
         "panel": "dedicated"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Démarre uniquement l'API NestJS"
     },
+
+    // ==================== BUILD ====================
     {
       "label": "🔨 Build - All",
       "type": "shell",
@@ -71,8 +80,47 @@
         "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": ["$tsc"]
+      "problemMatcher": ["$tsc"],
+      "detail": "Build tous les packages avec Turbo"
     },
+    {
+      "label": "🌐 Build - Web Only",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["build", "--filter=@erp/web"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"],
+      "detail": "Build uniquement l'application web"
+    },
+    {
+      "label": "📦 Build - Packages Only",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["build", "--filter=\"!@erp/web\"", "--filter=\"!@erp/api\""],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"],
+      "detail": "Build uniquement les packages partagés"
+    },
+
+    // ==================== TESTS ====================
     {
       "label": "🧪 Test - All",
       "type": "shell",
@@ -88,7 +136,8 @@
         "focus": true,
         "panel": "dedicated"
       },
-      "problemMatcher": []
+      "problemMatcher": ["$jest"],
+      "detail": "Exécute tous les tests"
     },
     {
       "label": "🧪 Test - Watch",
@@ -105,9 +154,30 @@
         "focus": true,
         "panel": "dedicated"
       },
-      "problemMatcher": [],
-      "isBackground": true
+      "problemMatcher": ["$jest"],
+      "isBackground": true,
+      "detail": "Tests en mode watch"
     },
+    {
+      "label": "📊 Test - Coverage",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["test:coverage"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$jest"],
+      "detail": "Tests avec rapport de couverture"
+    },
+
+    // ==================== QUALITÉ CODE ====================
     {
       "label": "🔍 Lint - All",
       "type": "shell",
@@ -123,7 +193,8 @@
         "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": ["$eslint-stylish"]
+      "problemMatcher": ["$eslint-stylish"],
+      "detail": "Vérification ESLint sur tout le projet"
     },
     {
       "label": "🔧 Lint - Fix All",
@@ -140,7 +211,8 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": ["$eslint-stylish"],
+      "detail": "Correction automatique ESLint"
     },
     {
       "label": "🎨 Format Code",
@@ -157,7 +229,8 @@
         "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Formatage avec Prettier"
     },
     {
       "label": "🔍 Type Check",
@@ -174,10 +247,13 @@
         "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": ["$tsc"]
+      "problemMatcher": ["$tsc"],
+      "detail": "Vérification TypeScript"
     },
+
+    // ==================== NETTOYAGE (RIMRAF) ====================
     {
-      "label": "🧹 Clean All",
+      "label": "🧹 Clean - Standard",
       "type": "shell",
       "command": "pnpm",
       "args": ["clean"],
@@ -191,7 +267,62 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Nettoyage standard avec rimraf et réinstallation"
+    },
+    {
+      "label": "🗑️ Clean - Cache Only",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["clean:cache"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Supprime uniquement les caches (.turbo, node_modules/.cache)"
+    },
+    {
+      "label": "🔨 Clean - Build Only",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["clean:build"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Supprime uniquement les dossiers de build"
+    },
+    {
+      "label": "💣 Clean - Deep Clean",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["clean:deep"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Nettoyage complet incluant tous les node_modules"
     },
     {
       "label": "🔄 Reset Project",
@@ -208,8 +339,11 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Reset complet du projet"
     },
+
+    // ==================== BASE DE DONNÉES ====================
     {
       "label": "🗄️ DB - Run Migrations",
       "type": "shell",
@@ -225,7 +359,8 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Exécute les migrations de base de données"
     },
     {
       "label": "🌱 DB - Seed Data",
@@ -242,30 +377,14 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Charge les données de test"
     },
     {
-      "label": "📊 Bundle Analyzer",
+      "label": "🔄 DB - Generate Migration",
       "type": "shell",
       "command": "pnpm",
-      "args": ["analyze"],
-      "options": {
-        "cwd": "${workspaceFolder}/apps/web"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🔍 Dependencies Check",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["deps:check"],
+      "args": ["db:migrate:generate"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -276,221 +395,11 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Génère une nouvelle migration"
     },
-    {
-      "label": "📋 Outdated Dependencies",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["deps:outdated"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🔒 Security Audit",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["security:audit"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🚀 Start Production",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["start"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🛠️ Setup Environment",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["setup:env"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🎭 E2E Tests",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["test:e2e"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🔍 Vérification Environnement Complet",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/check-environment.ps1",
-      "windows": {
-        "command": "powershell",
-        "args": [
-          "-ExecutionPolicy",
-          "Bypass",
-          "-File",
-          "${workspaceFolder}/scripts/check-environment.ps1"
-        ]
-      },
-      "linux": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/check-environment.sh"]
-      },
-      "osx": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/check-environment.sh"]
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "new",
-        "showReuseMessage": true,
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🚀 Setup Complet + PostgreSQL",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/full-setup.ps1",
-      "windows": {
-        "command": "powershell",
-        "args": [
-          "-ExecutionPolicy",
-          "Bypass",
-          "-File",
-          "${workspaceFolder}/scripts/full-setup.ps1"
-        ]
-      },
-      "linux": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/full-setup.sh"]
-      },
-      "osx": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/full-setup.sh"]
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "new",
-        "showReuseMessage": false,
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🗄️ Configuration PostgreSQL uniquement",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/setup-postgres.ps1",
-      "windows": {
-        "command": "powershell",
-        "args": [
-          "-ExecutionPolicy",
-          "Bypass",
-          "-File",
-          "${workspaceFolder}/scripts/setup-postgres.ps1"
-        ]
-      },
-      "linux": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/setup-postgres.sh"]
-      },
-      "osx": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/setup-postgres.sh"]
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "new"
-      }
-    },
-    {
-      "label": "🔧 Réparation rapide",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/quick-fix.ps1",
-      "windows": {
-        "command": "powershell",
-        "args": [
-          "-ExecutionPolicy",
-          "Bypass",
-          "-File",
-          "${workspaceFolder}/scripts/quick-fix.ps1"
-        ]
-      },
-      "linux": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/quick-fix.sh"]
-      },
-      "osx": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/quick-fix.sh"]
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      }
-    },
+
+    // ==================== POSTGRESQL ====================
     {
       "label": "🗄️ Test connexion PostgreSQL",
       "type": "shell",
@@ -519,12 +428,14 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Teste la connexion à PostgreSQL"
     },
     {
       "label": "🔄 Redémarrer PostgreSQL",
       "type": "shell",
-      "command": "sudo systemctl restart postgresql",
+      "command": "sudo",
+      "args": ["systemctl", "restart", "postgresql"],
       "windows": {
         "command": "powershell",
         "args": ["-Command", "Restart-Service postgresql*"]
@@ -536,13 +447,98 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Redémarre le service PostgreSQL"
+    },
+
+    // ==================== SETUP & MAINTENANCE ====================
+    {
+      "label": "🔍 Vérification Environnement Complet",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/debug-info.js"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Diagnostic complet de l'environnement"
     },
     {
-      "label": "🧹 Nettoyage complet (cache + node_modules)",
+      "label": "🚀 Setup Complet + PostgreSQL",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/full-setup.ps1"
+      ],
+      "linux": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/full-setup.sh"]
+      },
+      "osx": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/full-setup.sh"]
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Configuration complète du projet"
+    },
+    {
+      "label": "🗄️ Configuration PostgreSQL uniquement",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/setup-postgres.ps1"
+      ],
+      "linux": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/setup-postgres.sh"]
+      },
+      "osx": {
+        "command": "bash",
+        "args": ["${workspaceFolder}/scripts/setup-postgres.sh"]
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "problemMatcher": [],
+      "detail": "Configuration PostgreSQL uniquement"
+    },
+
+    // ==================== ANALYSE & RAPPORTS ====================
+    {
+      "label": "📊 Bundle Analyzer",
       "type": "shell",
       "command": "pnpm",
-      "args": ["clean"],
+      "args": ["analyze", "--filter=@erp/web"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -553,7 +549,8 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Analyse de la taille du bundle"
     },
     {
       "label": "📋 Vérification des dépendances",
@@ -570,13 +567,14 @@
         "focus": true,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Audit complet des dépendances"
     },
     {
-      "label": "📊 Logs en temps réel",
+      "label": "🔒 Security Audit",
       "type": "shell",
       "command": "pnpm",
-      "args": ["dev"],
+      "args": ["security:audit"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -585,11 +583,13 @@
         "echo": true,
         "reveal": "always",
         "focus": true,
-        "panel": "dedicated"
+        "panel": "shared"
       },
       "problemMatcher": [],
-      "isBackground": true
+      "detail": "Audit de sécurité des dépendances"
     },
+
+    // ==================== UTILITAIRES ====================
     {
       "label": "💾 Sauvegarde configuration",
       "type": "shell",
@@ -605,7 +605,26 @@
         "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Sauvegarde les fichiers de configuration"
+    },
+    {
+      "label": "📦 Install Dependencies",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["install"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Installation des dépendances"
     }
   ]
 }

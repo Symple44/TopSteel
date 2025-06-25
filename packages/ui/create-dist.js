@@ -1,11 +1,11 @@
 // create-dist.js - Générateur direct des fichiers @erp/ui
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-console.log('🔨 Generating @erp/ui files...');
+console.log("🔨 Generating @erp/ui files...");
 
 // Créer le dossier dist
-const distDir = path.join(__dirname, 'dist');
+const distDir = path.join(__dirname, "dist");
 if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true });
 }
@@ -83,7 +83,7 @@ exports.Label = React.forwardRef(function Label(props, ref) {
 });
 
 // Composants stub
-const stubs = ['Badge', 'Avatar', 'AvatarImage', 'AvatarFallback', 'Tabs', 'TabsContent', 'TabsList', 'TabsTrigger', 'Select', 'SelectContent', 'SelectItem', 'SelectTrigger', 'SelectValue', 'Dialog', 'DialogContent', 'DialogDescription', 'DialogFooter', 'DialogHeader', 'DialogTitle', 'DialogTrigger', 'Table', 'TableBody', 'TableCaption', 'TableCell', 'TableFooter', 'TableHead', 'TableHeader', 'TableRow', 'Alert', 'AlertDescription', 'AlertTitle', 'Toast', 'ToastAction', 'ToastClose', 'ToastDescription', 'ToastProvider', 'ToastTitle', 'ToastViewport', 'Skeleton', 'Spinner', 'Sheet', 'SheetContent', 'SheetDescription', 'SheetFooter', 'SheetHeader', 'SheetTitle', 'SheetTrigger', 'Breadcrumb', 'BreadcrumbItem', 'BreadcrumbLink', 'BreadcrumbList', 'BreadcrumbPage', 'BreadcrumbSeparator', 'Form', 'FormField', 'FormItem', 'FormLabel', 'FormControl', 'FormDescription', 'FormMessage', 'Textarea', 'Checkbox', 'RadioGroup', 'RadioGroupItem', 'Container', 'Grid', 'Stack', 'DataTable'];
+const stubs = ['Badge', 'Avatar', 'AvatarImage', 'AvatarFallback', 'Tabs', 'TabsContent', 'TabsList', 'TabsTrigger', 'Select', 'SelectContent', 'SelectItem', 'SelectTrigger', 'SelectValue', 'Dialog', 'DialogContent', 'DialogDescription', 'DialogFooter', 'DialogHeader', 'DialogTitle', 'DialogTrigger', 'Table', 'TableBody', 'TableCaption', 'TableCell', 'TableFooter', 'TableHead', 'TableHeader', 'TableRow', 'Alert', 'AlertDescription', 'AlertTitle', 'Toast', 'ToastAction', 'ToastClose', 'ToastDescription', 'ToastProvider', 'ToastTitle', 'ToastViewport', 'Toaster', 'Skeleton', 'Spinner', 'Sheet', 'SheetContent', 'SheetDescription', 'SheetFooter', 'SheetHeader', 'SheetTitle', 'SheetTrigger', 'Breadcrumb', 'BreadcrumbItem', 'BreadcrumbLink', 'BreadcrumbList', 'BreadcrumbPage', 'BreadcrumbSeparator', 'Form', 'FormField', 'FormItem', 'FormLabel', 'FormControl', 'FormDescription', 'FormMessage', 'Textarea', 'Checkbox', 'RadioGroup', 'RadioGroupItem', 'Container', 'Grid', 'Stack', 'DataTable'];
 
 stubs.forEach(name => {
   exports[name] = function(props) {
@@ -297,20 +297,18 @@ export declare const Toaster: React.FC<React.HTMLAttributes<HTMLDivElement>>;
 
 // Écrire tous les fichiers
 try {
-  fs.writeFileSync(path.join(distDir, 'index.js'), indexJs);
-  fs.writeFileSync(path.join(distDir, 'index.mjs'), indexMjs);
-  fs.writeFileSync(path.join(distDir, 'index.d.ts'), indexDts);
-  fs.writeFileSync(path.join(distDir, 'index.d.mts'), indexDts);
-  
-  console.log('✅ Successfully generated:');
-  console.log('  - dist/index.js');
-  console.log('  - dist/index.mjs');
-  console.log('  - dist/index.d.ts');
-  console.log('  - dist/index.d.mts');
-  console.log('🎉 @erp/ui build completed!');
-  
+  fs.writeFileSync(path.join(distDir, "index.js"), indexJs);
+  fs.writeFileSync(path.join(distDir, "index.mjs"), indexMjs);
+  fs.writeFileSync(path.join(distDir, "index.d.ts"), indexDts);
+  fs.writeFileSync(path.join(distDir, "index.d.mts"), indexDts);
+
+  console.log("✅ Successfully generated:");
+  console.log("  - dist/index.js");
+  console.log("  - dist/index.mjs");
+  console.log("  - dist/index.d.ts");
+  console.log("  - dist/index.d.mts");
+  console.log("🎉 @erp/ui build completed!");
 } catch (error) {
-  console.error('❌ Error:', error.message);
+  console.error("❌ Error:", error.message);
   process.exit(1);
 }
-
