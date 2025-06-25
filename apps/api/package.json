@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "API TopSteel ERP",
   "scripts": {
-    "build": "echo 'API build skipped temporarily'",
-    "type-check": "echo 'API type-check skipped temporarily'",
-    "start": "echo 'API start skipped temporarily'",
-    "dev": "echo 'API dev skipped temporarily'"
+    "build": "nest build",
+    "dev": "nest start --watch",
+    "start": "node dist/main",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main"
   },
   "dependencies": {},
   "devDependencies": {}
