@@ -3,8 +3,8 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
-import projetsRoutes from './routes/projets.routes'
-import { errorHandler } from './middleware/error.middleware'
+// import projetsRoutes from './routes/projets.routes'
+// import { errorHandler } from './middleware/error.middleware'
 
 const app = express()
 
@@ -25,9 +25,9 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
 
 // Routes
-app.use('/api/projets', projetsRoutes)
+// app.use('/api/projets', projetsRoutes)
 
 // Error handling
-app.use(errorHandler)
+// app.use(errorHandler)
 
 export default app

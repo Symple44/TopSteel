@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('documents')
-export class Document {
+@Entity('produits')
+export class Produit {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -9,16 +9,13 @@ export class Document {
   nom: string;
 
   @Column()
-  chemin: string;
+  reference: string;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  prix: number;
 
   @Column({ nullable: true })
-  type?: string;
-
-  @Column({ nullable: true })
-  taille?: number;
-
-  @Column({ nullable: true })
-  projet?: number;
+  fournisseurPrincipal?: number;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -93,7 +93,8 @@ export class AuthService {
   }
 
   async logout(userId: string) {
-    await this.usersService.updateRefreshToken(userId, null);
+    await this.usersService.updateRefreshToken(typeof userId === 'string' ? parseInt(userId, 10) : userId, null);
     return { message: "Déconnexion réussie" };
   }
 }
+

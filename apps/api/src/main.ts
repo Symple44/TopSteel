@@ -4,7 +4,7 @@ import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as compression from "compression";
-import * as helmet from "helmet";
+// import * as helmet from "helmet";
 import { WinstonModule } from "nest-winston";
 import * as winston from "winston";
 import { AppModule } from "./app.module";

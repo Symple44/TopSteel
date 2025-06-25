@@ -28,6 +28,7 @@ import { UserRole } from "../users/entities/user.entity";
 import { CreateProjetDto } from "./dto/create-projet.dto";
 import { ProjetQueryDto } from "./dto/projet-query.dto";
 import { UpdateProjetDto } from "./dto/update-projet.dto";
+import { ProjetStatut } from "./entities/projet.entity";
 import { ProjetsService } from "./projets.service";
 
 @Controller("projets")
@@ -45,7 +46,7 @@ export class ProjetsController {
     @Body() createProjetDto: CreateProjetDto,
     @CurrentUser() user: any
   ) {
-    return this.projetsService.create(createProjetDto, user.id);
+    return this.projetsService.create(createProjetDto);
   }
 
   @Get()
@@ -79,7 +80,7 @@ export class ProjetsController {
     @Body() updateProjetDto: UpdateProjetDto,
     @CurrentUser() user: any
   ) {
-    return this.projetsService.update(id, updateProjetDto, user.id);
+    return this.projetsService.update(id, updateProjetDto);
   }
 
   @Patch(":id/statut")
@@ -90,7 +91,7 @@ export class ProjetsController {
     @Body("statut") statut: ProjetStatut,
     @CurrentUser() user: any
   ) {
-    return this.projetsService.updateStatut(id, statut, user.id);
+    return this.projetsService.updateStatut(id, statut);
   }
 
   @Patch(":id/avancement")
@@ -125,3 +126,4 @@ export class ProjetsController {
     return this.projetsService.getTimeline(id);
   }
 }
+

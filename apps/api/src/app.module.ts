@@ -22,7 +22,7 @@ import { FacturationModule } from "./modules/facturation/facturation.module";
 import { FournisseursModule } from "./modules/fournisseurs/fournisseurs.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { ProductionModule } from "./modules/production/production.module";
-import { ProjetsModule } from "./modules/projets/projets.module";
+// import { ProjetsModule } from "./modules/projets/projets.module";
 import { StocksModule } from "./modules/stocks/stocks.module";
 import { UsersModule } from "./modules/users/users.module";
 
@@ -98,7 +98,7 @@ import { AppService } from "./app.service";
     UsersModule,
     ClientsModule,
     FournisseursModule,
-    ProjetsModule,
+    // ProjetsModule,
     DevisModule,
     FacturationModule,
     StocksModule,

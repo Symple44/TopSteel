@@ -1,24 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('documents')
-export class Document {
+@Entity('commandes')
+export class Commande {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  nom: string;
+  numero: string;
 
-  @Column()
-  chemin: string;
-
-  @Column({ nullable: true })
-  type?: string;
+  @Column('decimal', { precision: 10, scale: 2 })
+  montant: number;
 
   @Column({ nullable: true })
-  taille?: number;
-
-  @Column({ nullable: true })
-  projet?: number;
+  fournisseur?: number;
 
   @CreateDateColumn()
   createdAt: Date;

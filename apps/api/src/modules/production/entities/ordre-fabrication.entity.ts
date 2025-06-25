@@ -1,21 +1,15 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('documents')
-export class Document {
+@Entity('ordre_fabrication')
+export class OrdreFabrication {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  nom: string;
+  numero: string;
 
   @Column()
-  chemin: string;
-
-  @Column({ nullable: true })
-  type?: string;
-
-  @Column({ nullable: true })
-  taille?: number;
+  statut: string;
 
   @Column({ nullable: true })
   projet?: number;

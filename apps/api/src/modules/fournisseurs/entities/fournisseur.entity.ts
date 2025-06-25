@@ -1,24 +1,27 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('documents')
-export class Document {
+@Entity('fournisseurs')
+export class Fournisseur {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   nom: string;
 
-  @Column()
-  chemin: string;
+  @Column({ unique: true })
+  email: string;
 
   @Column({ nullable: true })
-  type?: string;
+  telephone?: string;
 
   @Column({ nullable: true })
-  taille?: number;
+  adresse?: string;
 
   @Column({ nullable: true })
-  projet?: number;
+  siret?: string;
+
+  @Column({ default: true })
+  actif: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
