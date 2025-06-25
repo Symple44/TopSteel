@@ -1,4 +1,4 @@
-// create-dist.js - Générateur direct des fichiers @erp/ui
+// create-dist.js - Générateur complet des fichiers @erp/ui
 const fs = require("fs");
 const path = require("path");
 
@@ -20,6 +20,7 @@ function cn() {
 }
 exports.cn = cn;
 
+// Composants de base
 exports.Button = React.forwardRef(function Button(props, ref) {
   const { className = '', variant = 'default', size = 'default', children, ...rest } = props;
   const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors disabled:opacity-50';
@@ -82,15 +83,424 @@ exports.Label = React.forwardRef(function Label(props, ref) {
   return React.createElement('label', { ref, className: cn('text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70', className), ...rest }, children);
 });
 
-// Composants stub
-const stubs = ['Badge', 'Avatar', 'AvatarImage', 'AvatarFallback', 'Tabs', 'TabsContent', 'TabsList', 'TabsTrigger', 'Select', 'SelectContent', 'SelectItem', 'SelectTrigger', 'SelectValue', 'Dialog', 'DialogContent', 'DialogDescription', 'DialogFooter', 'DialogHeader', 'DialogTitle', 'DialogTrigger', 'Table', 'TableBody', 'TableCaption', 'TableCell', 'TableFooter', 'TableHead', 'TableHeader', 'TableRow', 'Alert', 'AlertDescription', 'AlertTitle', 'Toast', 'ToastAction', 'ToastClose', 'ToastDescription', 'ToastProvider', 'ToastTitle', 'ToastViewport', 'Toaster', 'Skeleton', 'Spinner', 'Sheet', 'SheetContent', 'SheetDescription', 'SheetFooter', 'SheetHeader', 'SheetTitle', 'SheetTrigger', 'Breadcrumb', 'BreadcrumbItem', 'BreadcrumbLink', 'BreadcrumbList', 'BreadcrumbPage', 'BreadcrumbSeparator', 'Form', 'FormField', 'FormItem', 'FormLabel', 'FormControl', 'FormDescription', 'FormMessage', 'Textarea', 'Checkbox', 'RadioGroup', 'RadioGroupItem', 'Container', 'Grid', 'Stack', 'DataTable'];
-
-stubs.forEach(name => {
-  exports[name] = function(props) {
-    const { children, ...rest } = props || {};
-    return React.createElement('div', { 'data-component': name.toLowerCase(), ...rest }, children);
+// Badge component
+exports.Badge = React.forwardRef(function Badge(props, ref) {
+  const { className = '', variant = 'default', children, ...rest } = props;
+  const baseClasses = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium';
+  const variants = {
+    default: 'bg-gray-100 text-gray-800',
+    primary: 'bg-blue-100 text-blue-800',
+    success: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    danger: 'bg-red-100 text-red-800'
   };
+  const classes = cn(baseClasses, variants[variant] || variants.default, className);
+  return React.createElement('span', { ref, className: classes, ...rest }, children);
 });
+
+// PageHeader component
+exports.PageHeader = React.forwardRef(function PageHeader(props, ref) {
+  const { className = '', title, description, actions, children, ...rest } = props;
+  return React.createElement('div', { ref, className: cn('flex flex-col space-y-4 pb-6', className), ...rest }, [
+    React.createElement('div', { key: 'header', className: 'flex items-center justify-between' }, [
+      React.createElement('div', { key: 'content', className: 'space-y-1' }, [
+        title && React.createElement('h1', { key: 'title', className: 'text-2xl font-semibold tracking-tight' }, title),
+        description && React.createElement('p', { key: 'description', className: 'text-gray-500' }, description)
+      ]),
+      actions && React.createElement('div', { key: 'actions', className: 'flex items-center space-x-2' }, actions)
+    ]),
+    children
+  ]);
+});
+
+// ProjetCard component
+exports.ProjetCard = React.forwardRef(function ProjetCard(props, ref) {
+  const { className = '', projet, children, ...rest } = props;
+  return React.createElement('div', { ref, className: cn('rounded-lg border bg-white p-6 shadow-sm hover:shadow-md transition-shadow', className), ...rest }, [
+    projet && [
+      React.createElement('h3', { key: 'title', className: 'font-semibold' }, projet.nom || 'Projet'),
+      React.createElement('p', { key: 'description', className: 'text-sm text-gray-600 mt-1' }, projet.description || ''),
+      React.createElement('div', { key: 'meta', className: 'mt-4 flex items-center justify-between text-xs text-gray-500' }, [
+        React.createElement('span', { key: 'client' }, projet.client?.nom || ''),
+        React.createElement('span', { key: 'status' }, projet.statut || '')
+      ])
+    ],
+    children
+  ]);
+});
+
+// DataTable component
+exports.DataTable = React.forwardRef(function DataTable(props, ref) {
+  const { className = '', data = [], columns = [], children, ...rest } = props;
+  return React.createElement('div', { ref, className: cn('w-full overflow-auto', className), ...rest }, [
+    React.createElement('table', { key: 'table', className: 'w-full caption-bottom text-sm' }, [
+      React.createElement('thead', { key: 'thead' }, [
+        React.createElement('tr', { key: 'header-row', className: 'border-b' }, 
+          columns.map((column, index) => 
+            React.createElement('th', { 
+              key: index, 
+              className: 'h-12 px-4 text-left align-middle font-medium text-gray-500' 
+            }, column.label || column.key)
+          )
+        )
+      ]),
+      React.createElement('tbody', { key: 'tbody' }, 
+        data.map((row, rowIndex) => 
+          React.createElement('tr', { key: rowIndex, className: 'border-b' }, 
+            columns.map((column, colIndex) => 
+              React.createElement('td', { 
+                key: colIndex, 
+                className: 'p-4 align-middle' 
+              }, column.render ? column.render(row[column.key], row) : row[column.key])
+            )
+          )
+        )
+      )
+    ]),
+    children
+  ]);
+});
+
+// Toaster component
+exports.Toaster = React.forwardRef(function Toaster(props, ref) {
+  const { className = '', children, ...rest } = props;
+  return React.createElement('div', { 
+    ref, 
+    className: cn('fixed bottom-0 right-0 z-50 w-full md:max-w-[420px] p-4', className), 
+    ...rest 
+  }, children);
+});
+
+// Composants stub pour compatibilité
+exports.Avatar = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'avatar', ...rest }, children);
+};
+
+exports.AvatarImage = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('img', { 'data-component': 'avatarimage', ...rest });
+};
+
+exports.AvatarFallback = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'avatarfallback', ...rest }, children);
+};
+
+exports.Tabs = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'tabs', ...rest }, children);
+};
+
+exports.TabsContent = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'tabscontent', ...rest }, children);
+};
+
+exports.TabsList = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'tabslist', ...rest }, children);
+};
+
+exports.TabsTrigger = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'tabstrigger', ...rest }, children);
+};
+
+exports.Select = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'select', ...rest }, children);
+};
+
+exports.SelectContent = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'selectcontent', ...rest }, children);
+};
+
+exports.SelectItem = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'selectitem', ...rest }, children);
+};
+
+exports.SelectTrigger = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'selecttrigger', ...rest }, children);
+};
+
+exports.SelectValue = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('span', { 'data-component': 'selectvalue', ...rest }, children);
+};
+
+exports.Dialog = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'dialog', ...rest }, children);
+};
+
+exports.DialogContent = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'dialogcontent', ...rest }, children);
+};
+
+exports.DialogDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'dialogdescription', ...rest }, children);
+};
+
+exports.DialogFooter = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'dialogfooter', ...rest }, children);
+};
+
+exports.DialogHeader = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'dialogheader', ...rest }, children);
+};
+
+exports.DialogTitle = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('h2', { 'data-component': 'dialogtitle', ...rest }, children);
+};
+
+exports.DialogTrigger = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'dialogtrigger', ...rest }, children);
+};
+
+exports.Table = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('table', { 'data-component': 'table', ...rest }, children);
+};
+
+exports.TableBody = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('tbody', { 'data-component': 'tablebody', ...rest }, children);
+};
+
+exports.TableCaption = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('caption', { 'data-component': 'tablecaption', ...rest }, children);
+};
+
+exports.TableCell = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('td', { 'data-component': 'tablecell', ...rest }, children);
+};
+
+exports.TableFooter = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('tfoot', { 'data-component': 'tablefooter', ...rest }, children);
+};
+
+exports.TableHead = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('th', { 'data-component': 'tablehead', ...rest }, children);
+};
+
+exports.TableHeader = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('thead', { 'data-component': 'tableheader', ...rest }, children);
+};
+
+exports.TableRow = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('tr', { 'data-component': 'tablerow', ...rest }, children);
+};
+
+exports.Alert = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'alert', ...rest }, children);
+};
+
+exports.AlertDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'alertdescription', ...rest }, children);
+};
+
+exports.AlertTitle = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('h3', { 'data-component': 'alerttitle', ...rest }, children);
+};
+
+exports.Toast = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'toast', ...rest }, children);
+};
+
+exports.ToastAction = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'toastaction', ...rest }, children);
+};
+
+exports.ToastClose = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'toastclose', ...rest }, children);
+};
+
+exports.ToastDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'toastdescription', ...rest }, children);
+};
+
+exports.ToastProvider = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'toastprovider', ...rest }, children);
+};
+
+exports.ToastTitle = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('h3', { 'data-component': 'toasttitle', ...rest }, children);
+};
+
+exports.ToastViewport = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'toastviewport', ...rest }, children);
+};
+
+exports.Skeleton = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'skeleton', ...rest }, children);
+};
+
+exports.Spinner = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'spinner', ...rest }, children);
+};
+
+exports.Sheet = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'sheet', ...rest }, children);
+};
+
+exports.SheetContent = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'sheetcontent', ...rest }, children);
+};
+
+exports.SheetDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'sheetdescription', ...rest }, children);
+};
+
+exports.SheetFooter = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'sheetfooter', ...rest }, children);
+};
+
+exports.SheetHeader = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'sheetheader', ...rest }, children);
+};
+
+exports.SheetTitle = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('h2', { 'data-component': 'sheettitle', ...rest }, children);
+};
+
+exports.SheetTrigger = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'sheettrigger', ...rest }, children);
+};
+
+exports.Breadcrumb = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('nav', { 'data-component': 'breadcrumb', ...rest }, children);
+};
+
+exports.BreadcrumbItem = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('li', { 'data-component': 'breadcrumbitem', ...rest }, children);
+};
+
+exports.BreadcrumbLink = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('a', { 'data-component': 'breadcrumblink', ...rest }, children);
+};
+
+exports.BreadcrumbList = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('ol', { 'data-component': 'breadcrumblist', ...rest }, children);
+};
+
+exports.BreadcrumbPage = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('span', { 'data-component': 'breadcrumbpage', ...rest }, children);
+};
+
+exports.BreadcrumbSeparator = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('span', { 'data-component': 'breadcrumbseparator', ...rest }, children);
+};
+
+exports.Form = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('form', { 'data-component': 'form', ...rest }, children);
+};
+
+exports.FormField = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'formfield', ...rest }, children);
+};
+
+exports.FormItem = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'formitem', ...rest }, children);
+};
+
+exports.FormLabel = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('label', { 'data-component': 'formlabel', ...rest }, children);
+};
+
+exports.FormControl = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'formcontrol', ...rest }, children);
+};
+
+exports.FormDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'formdescription', ...rest }, children);
+};
+
+exports.FormMessage = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'formmessage', ...rest }, children);
+};
+
+exports.Textarea = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('textarea', { 'data-component': 'textarea', ...rest }, children);
+};
+
+exports.Checkbox = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('input', { type: 'checkbox', 'data-component': 'checkbox', ...rest });
+};
+
+exports.RadioGroup = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'radiogroup', ...rest }, children);
+};
+
+exports.RadioGroupItem = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('input', { type: 'radio', 'data-component': 'radiogroupitem', ...rest });
+};
+
+exports.Container = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'container', ...rest }, children);
+};
+
+exports.Grid = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'grid', ...rest }, children);
+};
+
+exports.Stack = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'stack', ...rest }, children);
+};
 `;
 
 // Fichier ESM index.mjs
@@ -162,23 +572,430 @@ export const Label = React.forwardRef(function Label(props, ref) {
   return React.createElement('label', { ref, className: cn('text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70', className), ...rest }, children);
 });
 
-// Composants stub
-const stubs = ['Badge', 'Avatar', 'AvatarImage', 'AvatarFallback', 'Tabs', 'TabsContent', 'TabsList', 'TabsTrigger', 'Select', 'SelectContent', 'SelectItem', 'SelectTrigger', 'SelectValue', 'Dialog', 'DialogContent', 'DialogDescription', 'DialogFooter', 'DialogHeader', 'DialogTitle', 'DialogTrigger', 'Table', 'TableBody', 'TableCaption', 'TableCell', 'TableFooter', 'TableHead', 'TableHeader', 'TableRow', 'Alert', 'AlertDescription', 'AlertTitle', 'Toast', 'ToastAction', 'ToastClose', 'ToastDescription', 'ToastProvider', 'ToastTitle', 'ToastViewport', 'Skeleton', 'Spinner', 'Sheet', 'SheetContent', 'SheetDescription', 'SheetFooter', 'SheetHeader', 'SheetTitle', 'SheetTrigger', 'Breadcrumb', 'BreadcrumbItem', 'BreadcrumbLink', 'BreadcrumbList', 'BreadcrumbPage', 'BreadcrumbSeparator', 'Form', 'FormField', 'FormItem', 'FormLabel', 'FormControl', 'FormDescription', 'FormMessage', 'Textarea', 'Checkbox', 'RadioGroup', 'RadioGroupItem', 'Container', 'Grid', 'Stack', 'DataTable'];
-
-stubs.forEach(name => {
-  const comp = function(props) {
-    const { children, ...rest } = props || {};
-    return React.createElement('div', { 'data-component': name.toLowerCase(), ...rest }, children);
+// Badge component
+export const Badge = React.forwardRef(function Badge(props, ref) {
+  const { className = '', variant = 'default', children, ...rest } = props;
+  const baseClasses = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium';
+  const variants = {
+    default: 'bg-gray-100 text-gray-800',
+    primary: 'bg-blue-100 text-blue-800',
+    success: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    danger: 'bg-red-100 text-red-800'
   };
-  // Export dynamique pour ESM
-  eval('export const ' + name + ' = comp');
+  const classes = cn(baseClasses, variants[variant] || variants.default, className);
+  return React.createElement('span', { ref, className: classes, ...rest }, children);
 });
+
+// PageHeader component
+export const PageHeader = React.forwardRef(function PageHeader(props, ref) {
+  const { className = '', title, description, actions, children, ...rest } = props;
+  return React.createElement('div', { ref, className: cn('flex flex-col space-y-4 pb-6', className), ...rest }, [
+    React.createElement('div', { key: 'header', className: 'flex items-center justify-between' }, [
+      React.createElement('div', { key: 'content', className: 'space-y-1' }, [
+        title && React.createElement('h1', { key: 'title', className: 'text-2xl font-semibold tracking-tight' }, title),
+        description && React.createElement('p', { key: 'description', className: 'text-gray-500' }, description)
+      ]),
+      actions && React.createElement('div', { key: 'actions', className: 'flex items-center space-x-2' }, actions)
+    ]),
+    children
+  ]);
+});
+
+// ProjetCard component
+export const ProjetCard = React.forwardRef(function ProjetCard(props, ref) {
+  const { className = '', projet, children, ...rest } = props;
+  return React.createElement('div', { ref, className: cn('rounded-lg border bg-white p-6 shadow-sm hover:shadow-md transition-shadow', className), ...rest }, [
+    projet && [
+      React.createElement('h3', { key: 'title', className: 'font-semibold' }, projet.nom || 'Projet'),
+      React.createElement('p', { key: 'description', className: 'text-sm text-gray-600 mt-1' }, projet.description || ''),
+      React.createElement('div', { key: 'meta', className: 'mt-4 flex items-center justify-between text-xs text-gray-500' }, [
+        React.createElement('span', { key: 'client' }, projet.client?.nom || ''),
+        React.createElement('span', { key: 'status' }, projet.statut || '')
+      ])
+    ],
+    children
+  ]);
+});
+
+// DataTable component
+export const DataTable = React.forwardRef(function DataTable(props, ref) {
+  const { className = '', data = [], columns = [], children, ...rest } = props;
+  return React.createElement('div', { ref, className: cn('w-full overflow-auto', className), ...rest }, [
+    React.createElement('table', { key: 'table', className: 'w-full caption-bottom text-sm' }, [
+      React.createElement('thead', { key: 'thead' }, [
+        React.createElement('tr', { key: 'header-row', className: 'border-b' }, 
+          columns.map((column, index) => 
+            React.createElement('th', { 
+              key: index, 
+              className: 'h-12 px-4 text-left align-middle font-medium text-gray-500' 
+            }, column.label || column.key)
+          )
+        )
+      ]),
+      React.createElement('tbody', { key: 'tbody' }, 
+        data.map((row, rowIndex) => 
+          React.createElement('tr', { key: rowIndex, className: 'border-b' }, 
+            columns.map((column, colIndex) => 
+              React.createElement('td', { 
+                key: colIndex, 
+                className: 'p-4 align-middle' 
+              }, column.render ? column.render(row[column.key], row) : row[column.key])
+            )
+          )
+        )
+      )
+    ]),
+    children
+  ]);
+});
+
+// Toaster component
+export const Toaster = React.forwardRef(function Toaster(props, ref) {
+  const { className = '', children, ...rest } = props;
+  return React.createElement('div', { 
+    ref, 
+    className: cn('fixed bottom-0 right-0 z-50 w-full md:max-w-[420px] p-4', className), 
+    ...rest 
+  }, children);
+});
+
+// Composants stub pour compatibilité
+export const Avatar = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'avatar', ...rest }, children);
+};
+
+export const AvatarImage = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('img', { 'data-component': 'avatarimage', ...rest });
+};
+
+export const AvatarFallback = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'avatarfallback', ...rest }, children);
+};
+
+export const Tabs = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'tabs', ...rest }, children);
+};
+
+export const TabsContent = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'tabscontent', ...rest }, children);
+};
+
+export const TabsList = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'tabslist', ...rest }, children);
+};
+
+export const TabsTrigger = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'tabstrigger', ...rest }, children);
+};
+
+export const Select = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'select', ...rest }, children);
+};
+
+export const SelectContent = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'selectcontent', ...rest }, children);
+};
+
+export const SelectItem = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'selectitem', ...rest }, children);
+};
+
+export const SelectTrigger = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'selecttrigger', ...rest }, children);
+};
+
+export const SelectValue = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('span', { 'data-component': 'selectvalue', ...rest }, children);
+};
+
+export const Dialog = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'dialog', ...rest }, children);
+};
+
+export const DialogContent = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'dialogcontent', ...rest }, children);
+};
+
+export const DialogDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'dialogdescription', ...rest }, children);
+};
+
+export const DialogFooter = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'dialogfooter', ...rest }, children);
+};
+
+export const DialogHeader = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'dialogheader', ...rest }, children);
+};
+
+export const DialogTitle = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('h2', { 'data-component': 'dialogtitle', ...rest }, children);
+};
+
+export const DialogTrigger = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'dialogtrigger', ...rest }, children);
+};
+
+export const Table = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('table', { 'data-component': 'table', ...rest }, children);
+};
+
+export const TableBody = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('tbody', { 'data-component': 'tablebody', ...rest }, children);
+};
+
+export const TableCaption = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('caption', { 'data-component': 'tablecaption', ...rest }, children);
+};
+
+export const TableCell = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('td', { 'data-component': 'tablecell', ...rest }, children);
+};
+
+export const TableFooter = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('tfoot', { 'data-component': 'tablefooter', ...rest }, children);
+};
+
+export const TableHead = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('th', { 'data-component': 'tablehead', ...rest }, children);
+};
+
+export const TableHeader = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('thead', { 'data-component': 'tableheader', ...rest }, children);
+};
+
+export const TableRow = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('tr', { 'data-component': 'tablerow', ...rest }, children);
+};
+
+export const Alert = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'alert', ...rest }, children);
+};
+
+export const AlertDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'alertdescription', ...rest }, children);
+};
+
+export const AlertTitle = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('h3', { 'data-component': 'alerttitle', ...rest }, children);
+};
+
+export const Toast = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'toast', ...rest }, children);
+};
+
+export const ToastAction = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'toastaction', ...rest }, children);
+};
+
+export const ToastClose = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'toastclose', ...rest }, children);
+};
+
+export const ToastDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'toastdescription', ...rest }, children);
+};
+
+export const ToastProvider = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'toastprovider', ...rest }, children);
+};
+
+export const ToastTitle = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('h3', { 'data-component': 'toasttitle', ...rest }, children);
+};
+
+export const ToastViewport = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'toastviewport', ...rest }, children);
+};
+
+export const Skeleton = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'skeleton', ...rest }, children);
+};
+
+export const Spinner = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'spinner', ...rest }, children);
+};
+
+export const Sheet = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'sheet', ...rest }, children);
+};
+
+export const SheetContent = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'sheetcontent', ...rest }, children);
+};
+
+export const SheetDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'sheetdescription', ...rest }, children);
+};
+
+export const SheetFooter = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'sheetfooter', ...rest }, children);
+};
+
+export const SheetHeader = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'sheetheader', ...rest }, children);
+};
+
+export const SheetTitle = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('h2', { 'data-component': 'sheettitle', ...rest }, children);
+};
+
+export const SheetTrigger = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('button', { 'data-component': 'sheettrigger', ...rest }, children);
+};
+
+export const Breadcrumb = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('nav', { 'data-component': 'breadcrumb', ...rest }, children);
+};
+
+export const BreadcrumbItem = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('li', { 'data-component': 'breadcrumbitem', ...rest }, children);
+};
+
+export const BreadcrumbLink = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('a', { 'data-component': 'breadcrumblink', ...rest }, children);
+};
+
+export const BreadcrumbList = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('ol', { 'data-component': 'breadcrumblist', ...rest }, children);
+};
+
+export const BreadcrumbPage = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('span', { 'data-component': 'breadcrumbpage', ...rest }, children);
+};
+
+export const BreadcrumbSeparator = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('span', { 'data-component': 'breadcrumbseparator', ...rest }, children);
+};
+
+export const Form = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('form', { 'data-component': 'form', ...rest }, children);
+};
+
+export const FormField = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'formfield', ...rest }, children);
+};
+
+export const FormItem = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'formitem', ...rest }, children);
+};
+
+export const FormLabel = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('label', { 'data-component': 'formlabel', ...rest }, children);
+};
+
+export const FormControl = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'formcontrol', ...rest }, children);
+};
+
+export const FormDescription = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'formdescription', ...rest }, children);
+};
+
+export const FormMessage = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('p', { 'data-component': 'formmessage', ...rest }, children);
+};
+
+export const Textarea = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('textarea', { 'data-component': 'textarea', ...rest }, children);
+};
+
+export const Checkbox = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('input', { type: 'checkbox', 'data-component': 'checkbox', ...rest });
+};
+
+export const RadioGroup = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'radiogroup', ...rest }, children);
+};
+
+export const RadioGroupItem = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('input', { type: 'radio', 'data-component': 'radiogroupitem', ...rest });
+};
+
+export const Container = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'container', ...rest }, children);
+};
+
+export const Grid = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'grid', ...rest }, children);
+};
+
+export const Stack = function(props) {
+  const { children, ...rest } = props || {};
+  return React.createElement('div', { 'data-component': 'stack', ...rest }, children);
+};
 `;
 
-// Fichier TypeScript definitions
-const indexDts = `import * as React from 'react';
+// Fichier TypeScript index.d.ts
+const indexDts = `import React from 'react';
 
-export declare function cn(...classes: string[]): string;
+export function cn(...classes: any[]): string;
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'secondary' | 'outline';
@@ -200,7 +1017,33 @@ export declare const Input: React.ForwardRefExoticComponent<InputProps & React.R
 export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {}
 export declare const Label: React.ForwardRefExoticComponent<LabelProps & React.RefAttributes<HTMLLabelElement>>;
 
-export declare const Badge: React.FC<React.HTMLAttributes<HTMLSpanElement>>;
+// Composants spécialisés TopSteel
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
+}
+export declare const Badge: React.ForwardRefExoticComponent<BadgeProps & React.RefAttributes<HTMLSpanElement>>;
+
+export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  title?: string;
+  description?: string;
+  actions?: React.ReactNode;
+}
+export declare const PageHeader: React.ForwardRefExoticComponent<PageHeaderProps & React.RefAttributes<HTMLDivElement>>;
+
+export interface ProjetCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  projet?: any;
+}
+export declare const ProjetCard: React.ForwardRefExoticComponent<ProjetCardProps & React.RefAttributes<HTMLDivElement>>;
+
+export interface DataTableProps extends React.HTMLAttributes<HTMLDivElement> {
+  data?: any[];
+  columns?: any[];
+}
+export declare const DataTable: React.ForwardRefExoticComponent<DataTableProps & React.RefAttributes<HTMLDivElement>>;
+
+export declare const Toaster: React.ForwardRefExoticComponent<React.HTMLAttributes<HTMLDivElement> & React.RefAttributes<HTMLDivElement>>;
+
+// Autres composants
 export declare const Avatar: React.FC<React.HTMLAttributes<HTMLDivElement>>;
 export declare const AvatarImage: React.FC<React.ImgHTMLAttributes<HTMLImageElement>>;
 export declare const AvatarFallback: React.FC<React.HTMLAttributes<HTMLDivElement>>;
@@ -267,32 +1110,6 @@ export declare const RadioGroupItem: React.FC<any>;
 export declare const Container: React.FC<any>;
 export declare const Grid: React.FC<any>;
 export declare const Stack: React.FC<any>;
-export declare const DataTable: React.FC<any>;
-// Composants spécialisés TopSteel
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
-}
-export declare const Badge: React.FC<BadgeProps>;
-
-export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: string;
-  description?: string;
-  actions?: React.ReactNode;
-}
-export declare const PageHeader: React.FC<PageHeaderProps>;
-
-export interface ProjetCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  projet?: any;
-}
-export declare const ProjetCard: React.FC<ProjetCardProps>;
-
-export interface DataTableProps extends React.HTMLAttributes<HTMLDivElement> {
-  data?: any[];
-  columns?: any[];
-}
-export declare const DataTable: React.FC<DataTableProps>;
-
-export declare const Toaster: React.FC<React.HTMLAttributes<HTMLDivElement>>;
 `;
 
 // Écrire tous les fichiers
