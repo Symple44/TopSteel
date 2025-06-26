@@ -12,7 +12,7 @@ export class ClientsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.clientsService.findOne(id);
+    return this.clientsService.findOne(+id);
   }
 
   @Post()
@@ -22,11 +22,13 @@ export class ClientsController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() data: any) {
-    return this.clientsService.update(id, data);
+    return this.clientsService.update(+id, data);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.clientsService.remove(id);
+    return this.clientsService.remove(+id);
   }
 }
+
+

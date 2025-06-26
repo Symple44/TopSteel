@@ -1,125 +1,19 @@
 {
-  "recommendations": [
-    // Essentiels
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "bradlc.vscode-tailwindcss",
-    "ms-vscode.vscode-typescript-next",
-
-    // Développement React/Next.js
-    "dsznajder.es7-react-js-snippets",
-    "formulahendry.auto-rename-tag",
-    "naumovs.color-highlight",
-    "csstools.postcss",
-
-    // NestJS
-    "ashinzekene.nestjs",
-
-    // Amélioration de productivité
-    "christian-kohler.path-intellisense",
-    "aaron-bond.better-comments",
-    "streetsidesoftware.code-spell-checker",
-    "usernamehw.errorlens",
-    "yoavbls.pretty-ts-errors",
-    "gruntfuggly.todo-tree",
-
-    // Git
-    "eamodio.gitlens",
-    "mhutchie.git-graph",
-
-    // Testing
-    "orta.vscode-jest",
-    "ms-playwright.playwright",
-
-    // Base de données
-    "mtxr.sqltools",
-    "mtxr.sqltools-driver-pg",
-    "prisma.prisma",
-
-    // Fichiers et formats
-    "mikestead.dotenv",
-    "redhat.vscode-yaml",
-    "yzhang.markdown-all-in-one",
-
-    // Outils de debug
-    "msjsdiag.debugger-for-chrome",
-
-    // Turbo et Monorepo
-    "turbo.turbo-vsc",
-
-    // Icônes et thèmes
-    "pkief.material-icon-theme",
-    "zhuangtongfa.material-theme",
-
-    // Docker (si utilisé)
-    "ms-azuretools.vscode-docker",
-
-    // AI Assistant (optionnel)
-    "github.copilot",
-    "github.copilot-chat",
-
-    // === NOUVELLES EXTENSIONS AJOUTÉES ===
-
-    // PowerShell pour les scripts Windows
-    "ms-vscode.powershell",
-
-    // Support PostgreSQL avancé
-    "ckolkman.vscode-postgres",
-    "ms-mssql.mssql",
-
-    // Monitoring et debugging avancé
-    "ms-vscode.vscode-node-debug2",
-    "ms-vscode.hexeditor",
-
-    // Extensions pour les containers et remote
-    "ms-vscode-remote.remote-containers",
-    "ms-vscode-remote.remote-wsl",
-    "ms-vscode-remote.vscode-remote-extensionpack",
-
-    // Outils de qualité de code additionnels
-    "sonarsource.sonarlint-vscode",
-    "ms-vscode.vscode-todo-highlight",
-
-    // Support pour les fichiers de configuration
-    "ms-vscode.vscode-json",
-    "redhat.vscode-xml",
-
-    // Extensions pour la documentation
-    "bierner.markdown-mermaid",
-    "shd101wyy.markdown-preview-enhanced",
-
-    // Outils de productivité supplémentaires
-    "alefragnani.bookmarks",
-    "formulahendry.code-runner",
-    "christian-kohler.npm-intellisense",
-
-    // Support pour les tests avancés
-    "hbenl.vscode-test-explorer",
-    "ms-vscode.test-adapter-converter",
-
-    // Thèmes supplémentaires pour le debug
-    "ms-vscode.theme-monokai-dimmed",
-
-    // Extensions pour les API et REST
-    "humao.rest-client",
-    "rangav.vscode-thunder-client",
-
-    // Support pour les logs et monitoring
-    "emilast.logfilehighlighter",
-    "ibm.output-colorizer"
-  ],
   "unwantedRecommendations": [
-    // === VOS EXTENSIONS NON DÉSIRÉES (préservées) ===
     "ms-vscode.vscode-typescript",
-    "hookyqr.beautify",
-    "dbaeumer.jshint",
-    "eg2.tslint",
-
-    // === NOUVELLES EXTENSIONS NON DÉSIRÉES AJOUTÉES ===
-    "ms-vscode.vscode-typescript", // Remplacé par vscode-typescript-next
-    "bradlc.vscode-tailwindcss-duplicate", // Éviter les doublons
-    "ms-vscode.vscode-eslint-duplicate", // Éviter les doublons
-    "vscode.typescript-language-features", // Déjà inclus
-    "vscode.json-language-features" // Déjà inclus
+    "hookyqr.beautify"
+  ],
+  "recommendations": [
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.powershell",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ckolkman.vscode-postgres",
+    "rangav.vscode-thunder-client",
+    "usernamehw.errorlens",
+    "gruntfuggly.todo-tree"
   ]
 }

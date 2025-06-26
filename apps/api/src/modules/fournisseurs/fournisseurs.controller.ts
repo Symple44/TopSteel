@@ -63,19 +63,19 @@ import { FournisseursService } from './fournisseurs.service';
     @Get(':id')
     @ApiOperation({ summary: 'Récupérer un fournisseur par ID' })
     findOne(@Param('id', ParseUUIDPipe) id: string) {
-      return this.fournisseursService.findOne(id);
+      return this.fournisseursService.findOne(+id);
     }
   
     @Get(':id/produits')
     @ApiOperation({ summary: 'Lister les produits d\'un fournisseur' })
     getProduits(@Param('id', ParseUUIDPipe) id: string) {
-      return this.fournisseursService.getProduits(id);
+      return this.fournisseursService.getProduits(+id);
     }
   
     @Get(':id/commandes')
     @ApiOperation({ summary: 'Historique des commandes' })
     getCommandes(@Param('id', ParseUUIDPipe) id: string) {
-      return this.fournisseursService.getCommandes(id);
+      return this.fournisseursService.getCommandes(+id);
     }
   
     @Patch(':id')
@@ -85,20 +85,21 @@ import { FournisseursService } from './fournisseurs.service';
       @Param('id', ParseUUIDPipe) id: string,
       @Body() updateFournisseurDto: UpdateFournisseurDto,
     ) {
-      return this.fournisseursService.update(id, updateFournisseurDto);
+      return this.fournisseursService.update(+id, updateFournisseurDto);
     }
   
     @Patch(':id/toggle-actif')
     @Roles(UserRole.ADMIN)
     @ApiOperation({ summary: 'Activer/Désactiver un fournisseur' })
     toggleActif(@Param('id', ParseUUIDPipe) id: string) {
-      return this.fournisseursService.toggleActif(id);
+      return this.fournisseursService.toggleActif(+id);
     }
   
     @Delete(':id')
     @Roles(UserRole.ADMIN)
     @ApiOperation({ summary: 'Supprimer un fournisseur' })
     remove(@Param('id', ParseUUIDPipe) id: string) {
-      return this.fournisseursService.remove(id);
+      return this.fournisseursService.remove(+id);
     }
   }
+

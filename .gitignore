@@ -129,3 +129,19 @@ scratch/
 
 #Scripts ephémères
 /*.ps1
+# Fichiers d'environnement
+.env.local
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Garder .env comme template
+# .env
+
+# Logs
+logs/
+*.log
+
+# Uploads
+uploads/

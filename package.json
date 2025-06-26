@@ -39,22 +39,48 @@
     "security:snyk": "snyk test --all-projects",
     "deps:full-check": "pnpm deps:check && pnpm deps:outdated && pnpm security:audit",
     "_comment_setup": "--- Installation et configuration ---",
-    "setup": "pnpm install && pnpm build --filter=\"!@erp/web\" --filter=\"!@erp/api\"",
     "setup:env": "cp apps/web/.env.example apps/web/.env.local && cp apps/api/.env.example apps/api/.env.local",
     "setup:rimraf": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-rimraf.ps1",
     "test:coverage": "turbo test:coverage",
     "_comment_clean": "--- Scripts de nettoyage avec rimraf ---",
     "clean": "rimraf --glob node_modules/.cache .turbo .next dist apps/web/.next 'packages/*/dist' && pnpm install",
-    "clean:cache": "rimraf node_modules/.cache .turbo",
     "clean:explicit": "rimraf node_modules/.cache && rimraf .turbo && rimraf .next && rimraf dist && rimraf apps/web/.next && rimraf packages/ui/dist && rimraf packages/types/dist && rimraf packages/utils/dist && rimraf packages/config/dist && pnpm install",
-    "clean:build": "rimraf --glob .next dist apps/web/.next 'packages/*/dist'",
     "clean:all": "rimraf --glob node_modules/.cache .turbo .next dist apps/web/.next 'packages/*/dist' node_modules && pnpm install",
     "clean:safe": "rimraf --verbose --glob node_modules/.cache .turbo .next dist apps/web/.next 'packages/*/dist' && pnpm install",
-    "reset": "pnpm clean:all"
+    "reset": "pnpm clean:all",
+    "build:packages": "pnpm build --filter='@erp/types' --filter='@erp/utils' --filter='@erp/config'",
+    "dev:full": "pnpm build:packages && pnpm dev",
+    "check:env": "node -e \"console.log('API URL:', process.env.NEXT_PUBLIC_API_URL); console.log('DB Host:', process.env.DB_HOST);\"",
+    "setup": "pwsh scripts/setup-erp.ps1",
+    "setup:force": "pwsh scripts/setup-erp.ps1 -Force",
+    "clean:cache": "Remove-Item -Recurse -Force .turbo, node_modules/.cache -ErrorAction SilentlyContinue",
+    "sql:seed": "psql -h localhost -U postgres -d erp_topsteel -f sql/seeds/01-sample-data.sql",
+    "db:reset": "psql -h localhost -U postgres -c \"DROP DATABASE IF EXISTS erp_topsteel; CREATE DATABASE erp_topsteel;\" && pnpm sql:full-with-data",
+    "db:create": "psql -h localhost -U postgres -c \"CREATE DATABASE IF NOT EXISTS erp_topsteel;\"",
+    "env:copy": "Copy-Item .env.example .env.local",
+    "sql:views": "psql -h localhost -U postgres -d erp_topsteel -f sql/views/01-business-views.sql",
+    "_comment_env": "--- Environnement ---",
+    "sql:triggers": "psql -h localhost -U postgres -d erp_topsteel -f sql/triggers/01-audit-triggers.sql",
+    "sql:schema": "psql -h localhost -U postgres -d erp_topsteel -f sql/schemas/01-main-schema.sql",
+    "db:status": "psql -h localhost -U postgres -d erp_topsteel -c \"\\\\dt\"",
+    "tools:inventory": "pwsh scripts/inventory.ps1",
+    "db:restore": "echo \"Usage: pnpm db:restore --file=backup.sql\"",
+    "env:validate": "node scripts/validate-env.js",
+    "sql:full-with-data": "pnpm sql:full-setup && pnpm sql:seed",
+    "db:backup": "pg_dump -h localhost -U postgres erp_topsteel > sql/backups/backup-$(Get-Date -Format 'yyyyMMdd-HHmmss').sql",
+    "_comment_db_enhanced": "--- Scripts DB améliorés ---",
+    "sql:full-setup": "pnpm sql:schema && pnpm sql:indexes && pnpm sql:triggers && pnpm sql:views",
+    "sql:maintenance": "psql -h localhost -U postgres -d erp_topsteel -f sql/maintenance/01-cleanup-scripts.sql",
+    "env:check": "node -e \"console.log('API:', process.env.NEXT_PUBLIC_API_URL); console.log('DB:', process.env.DB_HOST);\"",
+    "clean:build": "Remove-Item -Recurse -Force dist, build, .next -ErrorAction SilentlyContinue",
+    "sql:indexes": "psql -h localhost -U postgres -d erp_topsteel -f sql/indexes/01-performance-indexes.sql",
+    "clean:deep": "pnpm clean:cache; pnpm clean:build; Remove-Item -Recurse -Force node_modules -ErrorAction SilentlyContinue",
+    "_comment_sql": "--- Scripts SQL centralisés ---",
+    "_comment_tools_enhanced": "--- Outils améliorés ---",
+    "tools:sql-manager": "pwsh scripts/sql-manager.ps1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.7",
-    "@types/express-rate-limit": "^6.0.2",
     "@types/jest": "^29.5.8",
     "@types/node": "^24.0.4",
     "audit-ci": "^7.0.1",
@@ -84,5 +110,8 @@
     "overrides": {
       "esbuild": "^0.25.0"
     }
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
   }
 }

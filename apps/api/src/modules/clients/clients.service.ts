@@ -14,7 +14,7 @@ export class ClientsService {
     return this.clientsRepository.find();
   }
 
-  async findOne(id: string): Promise<Clients> {
+  async findOne(id: number): Promise<Clients> {
     return this.clientsRepository.findOne({ where: { id } });
   }
 
@@ -23,12 +23,13 @@ export class ClientsService {
     return this.clientsRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Clients>): Promise<Clients> {
+  async update(id: number, data: Partial<Clients>): Promise<Clients> {
     await this.clientsRepository.update(id, data);
     return this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     await this.clientsRepository.delete(id);
   }
 }
+

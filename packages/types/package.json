@@ -15,7 +15,6 @@
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
-    "@types/express-rate-limit": "^6.0.2",
     "typescript": "^5.3.3"
   }
 }

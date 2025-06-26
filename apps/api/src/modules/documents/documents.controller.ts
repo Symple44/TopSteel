@@ -12,7 +12,7 @@ export class DocumentsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.documentsService.findOne(id);
+    return this.documentsService.findOne(+id);
   }
 
   @Post()
@@ -22,11 +22,13 @@ export class DocumentsController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() data: any) {
-    return this.documentsService.update(id, data);
+    return this.documentsService.update(+id, data);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.documentsService.remove(id);
+    return this.documentsService.remove(+id);
   }
 }
+
+

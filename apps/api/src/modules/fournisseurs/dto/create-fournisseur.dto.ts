@@ -1,32 +1,32 @@
-import { IsString, IsEmail, IsOptional, IsBoolean } from 'class-validator';
+import { IsEmail, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateFournisseurDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Nom du fournisseur' })
   @IsString()
+  @MaxLength(255)
   nom: string;
 
-  @ApiProperty()
-  @IsEmail()
-  email: string;
-
-  @ApiPropertyOptional()
-  @IsString()
+  @ApiPropertyOptional({ description: 'Email de contact' })
   @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiPropertyOptional({ description: 'Numero de telephone' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
   telephone?: string;
 
-  @ApiPropertyOptional()
-  @IsString()
+  @ApiPropertyOptional({ description: 'Adresse complete' })
   @IsOptional()
+  @IsString()
+  @MaxLength(500)
   adresse?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: 'Numero SIRET' })
+  @IsOptional()
   @IsString()
-  @IsOptional()
+  @MaxLength(14)
   siret?: string;
-
-  @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  actif?: boolean;
 }

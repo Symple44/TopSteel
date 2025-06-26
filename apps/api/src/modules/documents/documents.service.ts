@@ -1,34 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Documents } from './entities/documents.entity';
+import { Document } from './entities/Document.entity';
 
 @Injectable()
 export class DocumentsService {
   constructor(
-    @InjectRepository(Documents)
-    private documentsRepository: Repository<Documents>,
+    @InjectRepository(Document)
+    private documentsRepository: Repository<Document>,
   ) {}
 
-  async findAll(): Promise<Documents[]> {
+  async findAll(): Promise<Document[]> {
     return this.documentsRepository.find();
   }
 
-  async findOne(id: string): Promise<Documents> {
+  async findOne(id: number): Promise<Document> {
     return this.documentsRepository.findOne({ where: { id } });
   }
 
-  async create(data: Partial<Documents>): Promise<Documents> {
+  async create(data: Partial<Document>): Promise<Document> {
     const entity = this.documentsRepository.create(data);
     return this.documentsRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Documents>): Promise<Documents> {
+  async update(id: number, data: Partial<Document>): Promise<Document> {
     await this.documentsRepository.update(id, data);
     return this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     await this.documentsRepository.delete(id);
   }
 }
+
+
+

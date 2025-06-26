@@ -1,630 +1,160 @@
 {
   "version": "2.0.0",
   "tasks": [
-    // ==================== DÉVELOPPEMENT ====================
     {
-      "label": "🚀 Turbo Dev - All",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["dev"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
+      "command": "pwsh",
+      "detail": "Installation complète du projet ERP TopSteel",
+      "label": "🚀 ERP: Setup Complet",
+      "problemMatcher": [],
       "group": {
-        "kind": "build",
-        "isDefault": true
+        "isDefault": true,
+        "kind": "build"
       },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false
-      },
-      "problemMatcher": [],
-      "isBackground": true,
-      "detail": "Démarre tous les services en mode développement"
-    },
-    {
-      "label": "🌐 Dev - Web Only",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["dev:web"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": [],
-      "isBackground": true,
-      "detail": "Démarre uniquement l'application web Next.js"
-    },
-    {
-      "label": "🔧 Dev - API Only",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["dev:api"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": [],
-      "isBackground": true,
-      "detail": "Démarre uniquement l'API NestJS"
-    },
-
-    // ==================== BUILD ====================
-    {
-      "label": "🔨 Build - All",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["build"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$tsc"],
-      "detail": "Build tous les packages avec Turbo"
-    },
-    {
-      "label": "🌐 Build - Web Only",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["build", "--filter=@erp/web"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$tsc"],
-      "detail": "Build uniquement l'application web"
-    },
-    {
-      "label": "📦 Build - Packages Only",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["build", "--filter=\"!@erp/web\"", "--filter=\"!@erp/api\""],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$tsc"],
-      "detail": "Build uniquement les packages partagés"
-    },
-
-    // ==================== TESTS ====================
-    {
-      "label": "🧪 Test - All",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["test"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": ["$jest"],
-      "detail": "Exécute tous les tests"
-    },
-    {
-      "label": "🧪 Test - Watch",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["test:watch"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": ["$jest"],
-      "isBackground": true,
-      "detail": "Tests en mode watch"
-    },
-    {
-      "label": "📊 Test - Coverage",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["test:coverage"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$jest"],
-      "detail": "Tests avec rapport de couverture"
-    },
-
-    // ==================== QUALITÉ CODE ====================
-    {
-      "label": "🔍 Lint - All",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["lint"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$eslint-stylish"],
-      "detail": "Vérification ESLint sur tout le projet"
-    },
-    {
-      "label": "🔧 Lint - Fix All",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["lint:fix"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$eslint-stylish"],
-      "detail": "Correction automatique ESLint"
-    },
-    {
-      "label": "🎨 Format Code",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["format"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Formatage avec Prettier"
-    },
-    {
-      "label": "🔍 Type Check",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["type-check"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$tsc"],
-      "detail": "Vérification TypeScript"
-    },
-
-    // ==================== NETTOYAGE (RIMRAF) ====================
-    {
-      "label": "🧹 Clean - Standard",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["clean"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Nettoyage standard avec rimraf et réinstallation"
-    },
-    {
-      "label": "🗑️ Clean - Cache Only",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["clean:cache"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Supprime uniquement les caches (.turbo, node_modules/.cache)"
-    },
-    {
-      "label": "🔨 Clean - Build Only",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["clean:build"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Supprime uniquement les dossiers de build"
-    },
-    {
-      "label": "💣 Clean - Deep Clean",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["clean:deep"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Nettoyage complet incluant tous les node_modules"
-    },
-    {
-      "label": "🔄 Reset Project",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["reset"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Reset complet du projet"
-    },
-
-    // ==================== BASE DE DONNÉES ====================
-    {
-      "label": "🗄️ DB - Run Migrations",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["db:migrate"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Exécute les migrations de base de données"
-    },
-    {
-      "label": "🌱 DB - Seed Data",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["db:seed"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Charge les données de test"
-    },
-    {
-      "label": "🔄 DB - Generate Migration",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["db:migrate:generate"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Génère une nouvelle migration"
-    },
-
-    // ==================== POSTGRESQL ====================
-    {
-      "label": "🗄️ Test connexion PostgreSQL",
-      "type": "shell",
-      "command": "psql",
       "args": [
-        "-h",
-        "localhost",
-        "-U",
-        "postgres",
-        "-d",
-        "postgres",
-        "-c",
-        "SELECT version();"
+        "scripts/setup-erp.ps1"
       ],
-      "windows": {
-        "options": {
-          "env": {
-            "PGPASSWORD": "postgres"
-          }
-        }
-      },
-      "group": "none",
       "presentation": {
         "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Teste la connexion à PostgreSQL"
-    },
-    {
-      "label": "🔄 Redémarrer PostgreSQL",
-      "type": "shell",
-      "command": "sudo",
-      "args": ["systemctl", "restart", "postgresql"],
-      "windows": {
-        "command": "powershell",
-        "args": ["-Command", "Restart-Service postgresql*"]
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Redémarre le service PostgreSQL"
-    },
-
-    // ==================== SETUP & MAINTENANCE ====================
-    {
-      "label": "🔍 Vérification Environnement Complet",
-      "type": "shell",
-      "command": "node",
-      "args": ["scripts/debug-info.js"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
         "panel": "new",
-        "clear": true
-      },
-      "problemMatcher": [],
-      "detail": "Diagnostic complet de l'environnement"
-    },
-    {
-      "label": "🚀 Setup Complet + PostgreSQL",
-      "type": "shell",
-      "command": "powershell",
-      "args": [
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/scripts/full-setup.ps1"
-      ],
-      "linux": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/full-setup.sh"]
-      },
-      "osx": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/full-setup.sh"]
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "new",
-        "showReuseMessage": false,
-        "clear": true
-      },
-      "problemMatcher": [],
-      "detail": "Configuration complète du projet"
-    },
-    {
-      "label": "🗄️ Configuration PostgreSQL uniquement",
-      "type": "shell",
-      "command": "powershell",
-      "args": [
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/scripts/setup-postgres.ps1"
-      ],
-      "linux": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/setup-postgres.sh"]
-      },
-      "osx": {
-        "command": "bash",
-        "args": ["${workspaceFolder}/scripts/setup-postgres.sh"]
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "new"
-      },
-      "problemMatcher": [],
-      "detail": "Configuration PostgreSQL uniquement"
-    },
-
-    // ==================== ANALYSE & RAPPORTS ====================
-    {
-      "label": "📊 Bundle Analyzer",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["analyze", "--filter=@erp/web"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Analyse de la taille du bundle"
-    },
-    {
-      "label": "📋 Vérification des dépendances",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["deps:full-check"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Audit complet des dépendances"
-    },
-    {
-      "label": "🔒 Security Audit",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["security:audit"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Audit de sécurité des dépendances"
-    },
-
-    // ==================== UTILITAIRES ====================
-    {
-      "label": "💾 Sauvegarde configuration",
-      "type": "shell",
-      "command": "git",
-      "args": ["add", ".vscode/", "scripts/", "*.json", "*.md"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
         "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": [],
-      "detail": "Sauvegarde les fichiers de configuration"
+        "reveal": "always"
+      }
     },
     {
-      "label": "📦 Install Dependencies",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["install"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
       "presentation": {
         "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
+        "panel": "new",
+        "reveal": "always"
       },
-      "problemMatcher": [],
-      "detail": "Installation des dépendances"
+      "type": "shell",
+      "label": "🔄 ERP: Setup Force (Reset)",
+      "detail": "Réinstallation forcée avec suppression des données existantes",
+      "command": "pwsh",
+      "args": [
+        "scripts/setup-erp.ps1",
+        "-Force"
+      ],
+      "group": "build"
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "panel": "new",
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "▶️ ERP: Démarrer Serveurs",
+      "detail": "Démarre les serveurs API et Web en mode développement",
+      "command": "pnpm",
+      "args": [
+        "dev"
+      ],
+      "group": "build"
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🏗️ ERP: Build Packages",
+      "detail": "Construit les packages partagés (types, utils, config)",
+      "command": "pnpm",
+      "args": [
+        "build:packages"
+      ],
+      "group": "build"
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "panel": "new",
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🗄️ DB: Status",
+      "detail": "Affiche l'état de la base de données",
+      "command": "pwsh",
+      "args": [
+        "scripts/manage-db.ps1",
+        "status"
+      ],
+      "group": "test"
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "panel": "new",
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "💾 DB: Backup",
+      "detail": "Crée une sauvegarde de la base de données",
+      "command": "pwsh",
+      "args": [
+        "scripts/manage-db.ps1",
+        "backup"
+      ],
+      "group": "build"
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "panel": "new",
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🔄 DB: Reset Database",
+      "detail": "Remet à zéro la base de données (ATTENTION: destructif)",
+      "command": "pwsh",
+      "args": [
+        "scripts/manage-db.ps1",
+        "reset"
+      ],
+      "group": "build"
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🔍 ERP: Lint",
+      "detail": "Vérifie la qualité du code",
+      "command": "pnpm",
+      "args": [
+        "lint"
+      ],
+      "group": "test"
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🧹 ERP: Clean",
+      "detail": "Nettoie les fichiers de build et cache",
+      "command": "pnpm",
+      "args": [
+        "clean"
+      ],
+      "group": "build"
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🔧 ERP: Check Environment",
+      "detail": "Vérifie les variables d'environnement",
+      "command": "pnpm",
+      "args": [
+        "check:env"
+      ],
+      "group": "test"
     }
   ]
 }
