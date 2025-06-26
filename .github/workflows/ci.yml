@@ -22,7 +22,7 @@ on:
           - production
 
 env:
-  NODE_VERSION: "18.17.0"
+  NODE_VERSION: "20.18.0"
   PNPM_VERSION: "8.15.0"
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
@@ -590,3 +590,4 @@ jobs:
         run: |
           echo "🎉 All checks passed successfully!"
           echo "✅ Code quality, tests, build, and security are all green!"
+

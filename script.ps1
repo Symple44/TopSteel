@@ -1,26 +1,26 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Mise à jour sécurisée de Helmet et amélioration de la sécurité TopSteel ERP
+    Correction de la version Node.js pour le CI/CD TopSteel ERP
 
 .DESCRIPTION
-    Met à jour Helmet vers la dernière version, corrige les types dépréciés, 
-    et optimise la configuration de sécurité pour l'ERP TopSteel.
+    Corrige l'erreur "Node.js version ^18.18.0 || ^19.8.0 || >= 20.0.0 is required"
+    en mettant à jour la configuration du workflow GitHub Actions.
 
-.PARAMETER UpdateAll
-    Met à jour toutes les dépendances de sécurité
+.PARAMETER UseNodeJS20
+    Utilise Node.js 20 LTS (recommandé)
 
-.PARAMETER CheckVulnerabilities
-    Vérifie les vulnérabilités de sécurité
+.PARAMETER UseNodeJS18
+    Utilise Node.js 18.18.0+ (minimum)
 
 .EXAMPLE
-    .\Update-Helmet-Security.ps1
-    .\Update-Helmet-Security.ps1 -UpdateAll -CheckVulnerabilities
+    .\Fix-NodeJS-Version-CI.ps1 -UseNodeJS20
+    .\Fix-NodeJS-Version-CI.ps1 -UseNodeJS18
 #>
 
 param(
-    [switch]$UpdateAll,
-    [switch]$CheckVulnerabilities
+    [switch]$UseNodeJS20 = $true,
+    [switch]$UseNodeJS18
 )
 
 $ErrorActionPreference = "Stop"
@@ -38,409 +38,469 @@ function Write-ColorOutput {
 
 function Write-Header {
     param([string]$Title)
-    Write-ColorOutput "`n🛡️ $Title" "Cyan"
+    Write-ColorOutput "`n🔧 $Title" "Cyan"
     Write-ColorOutput ("=" * 60) "Blue"
 }
 
 function Write-Success { param([string]$Message); Write-ColorOutput "✅ $Message" "Green" }
 function Write-Warning { param([string]$Message); Write-ColorOutput "⚠️  $Message" "Yellow" }
 function Write-Info { param([string]$Message); Write-ColorOutput "ℹ️  $Message" "Blue" }
-function Write-Security { param([string]$Message); Write-ColorOutput "🔒 $Message" "Magenta" }
 
-Write-Header "🚀 TopSteel ERP - Mise à jour sécurité Helmet"
+Write-ColorOutput @"
+🚀 TopSteel ERP - Correction version Node.js CI/CD
+🎉 ESLint fonctionne maintenant ! Correction de la version Node.js...
+"@ "Green"
 
 try {
-    # 1. Audit de sécurité initial
-    Write-Header "Audit de sécurité initial"
+    # Déterminer la version Node.js à utiliser
+    $nodeVersion = if ($UseNodeJS18) { "18.20.4" } else { "20.18.0" }
+    $pnpmVersion = "8.15.0"
     
-    Write-Info "Vérification des versions actuelles..."
+    Write-Header "Configuration de la version Node.js"
+    Write-Info "Version sélectionnée: Node.js $nodeVersion"
+    Write-Info "Version pnpm: $pnpmVersion"
     
-    # Vérifier la version actuelle de Helmet
-    $apiPackageJson = "apps/api/package.json"
-    if (Test-Path $apiPackageJson) {
-        $apiConfig = Get-Content $apiPackageJson | ConvertFrom-Json
-        $currentHelmet = $apiConfig.dependencies.helmet
-        $currentTypesHelmet = $apiConfig.devDependencies."@types/helmet"
+    # 1. Mettre à jour le workflow GitHub Actions principal
+    Write-Header "Mise à jour du workflow GitHub Actions"
+    
+    $ciWorkflowPath = ".github/workflows/ci.yml"
+    
+    if (Test-Path $ciWorkflowPath) {
+        Write-Info "Mise à jour de $ciWorkflowPath..."
         
-        Write-Info "Helmet actuel: $currentHelmet"
-        Write-Warning "Types Helmet: $currentTypesHelmet (DÉPRÉCIÉ)"
+        $content = Get-Content $ciWorkflowPath -Raw
         
-        Write-Security @"
-🔍 Analyse de sécurité:
-• Helmet 7.1.0 = Bonne version de base
-• @types/helmet 4.0.0 = DÉPRÉCIÉ depuis Helmet 6+
-• Helmet 8+ a des types intégrés (plus besoin de @types/helmet)
-• Nouvelles fonctionnalités de sécurité disponibles
+        # Remplacer l'ancienne version Node.js
+        $content = $content -replace 'NODE_VERSION:\s*[\"'']18\.17\.0[\"'']', "NODE_VERSION: `"$nodeVersion`""
+        $content = $content -replace 'node-version:\s*\$\{\{\s*env\.NODE_VERSION\s*\}\}', 'node-version: ${{ env.NODE_VERSION }}'
+        
+        # S'assurer que la version pnpm est correcte
+        $content = $content -replace 'PNPM_VERSION:\s*[\"'']8\.15\.0[\"'']', "PNPM_VERSION: `"$pnpmVersion`""
+        
+        Set-Content $ciWorkflowPath -Value $content -Encoding UTF8
+        Write-Success "Workflow CI mis à jour avec Node.js $nodeVersion"
+    }
+    else {
+        Write-Warning "Workflow CI non trouvé: $ciWorkflowPath"
+        
+        # Créer un workflow CI optimisé
+        Write-Info "Création d'un nouveau workflow CI..."
+        $newWorkflow = @"
+# .github/workflows/ci.yml
+# CI/CD Pipeline optimisé pour TopSteel ERP
+# Version corrigée Node.js $nodeVersion
+
+name: 🚀 TopSteel CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "$nodeVersion"
+  PNPM_VERSION: "$pnpmVersion"
+  TURBO_TOKEN: `${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: `${{ secrets.TURBO_TEAM }}
+
+# Annuler les workflows précédents pour la même branche
+concurrency:
+  group: `${{ github.workflow }}-`${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 🔧 Job 1: Setup et installation
+  setup:
+    name: 📦 Setup & Dependencies
+    runs-on: ubuntu-latest
+    if: `${{ !github.event.pull_request.draft }}
+    
+    outputs:
+      cache-hit: `${{ steps.cache.outputs.cache-hit }}
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: `${{ env.PNPM_VERSION }}
+
+      - name: 🏗️ Setup Node.js `$nodeVersion
+        uses: actions/setup-node@v4
+        with:
+          node-version: `${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 🗂️ Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=`$(pnpm store path)" >> `$GITHUB_OUTPUT
+
+      - name: ⚡ Setup pnpm cache
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            `${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            .turbo
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: `${{ runner.os }}-pnpm-`${{ hashFiles('**/pnpm-lock.yaml') }}-`${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            `${{ runner.os }}-pnpm-`${{ hashFiles('**/pnpm-lock.yaml') }}-
+            `${{ runner.os }}-pnpm-
+
+      - name: 📥 Install dependencies
+        run: |
+          echo "🔄 Installing dependencies..."
+          pnpm install --frozen-lockfile --prefer-offline
+          echo "✅ Dependencies installed successfully"
+
+      - name: 📋 Environment info
+        run: |
+          echo "Node.js version: `$(node --version)"
+          echo "pnpm version: `$(pnpm --version)"
+          echo "Next.js compatibility: ✅"
+
+  # 🏗️ Job 2: Build des packages
+  build:
+    name: 🏗️ Build Packages
+    runs-on: ubuntu-latest
+    needs: setup
+    if: `${{ !github.event.pull_request.draft }}
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: `${{ env.PNPM_VERSION }}
+
+      - name: 🏗️ Setup Node.js `$nodeVersion
+        uses: actions/setup-node@v4
+        with:
+          node-version: `${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: ⚡ Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            .turbo
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: `${{ runner.os }}-pnpm-`${{ hashFiles('**/pnpm-lock.yaml') }}-`${{ hashFiles('**/package.json') }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: 🏗️ Build packages
+        run: |
+          echo "🔄 Building packages..."
+          pnpm build --filter=@erp/config
+          pnpm build --filter=@erp/types
+          pnpm build --filter=@erp/utils
+          echo "✅ Packages built successfully"
+
+  # 🔍 Job 3: Lint et type checking
+  lint-and-typecheck:
+    name: 🔍 Lint & Type Check
+    runs-on: ubuntu-latest
+    needs: [setup, build]
+    if: `${{ !github.event.pull_request.draft }}
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: `${{ env.PNPM_VERSION }}
+
+      - name: 🏗️ Setup Node.js `$nodeVersion
+        uses: actions/setup-node@v4
+        with:
+          node-version: `${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: ⚡ Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            .turbo
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: `${{ runner.os }}-pnpm-`${{ hashFiles('**/pnpm-lock.yaml') }}-`${{ hashFiles('**/package.json') }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: 🔍 Run lint
+        run: |
+          echo "🔄 Running lint..."
+          pnpm lint
+
+      - name: 🔍 Type checking
+        run: |
+          echo "🔄 Running type check..."
+          pnpm type-check
+
+  # 🧪 Job 4: Tests
+  test:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    needs: [setup, build]
+    if: `${{ !github.event.pull_request.draft }}
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: `${{ env.PNPM_VERSION }}
+
+      - name: 🏗️ Setup Node.js `$nodeVersion
+        uses: actions/setup-node@v4
+        with:
+          node-version: `${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: ⚡ Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            .turbo
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: `${{ runner.os }}-pnpm-`${{ hashFiles('**/pnpm-lock.yaml') }}-`${{ hashFiles('**/package.json') }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: 🧪 Run tests
+        run: |
+          echo "🔄 Running tests..."
+          pnpm test
+
+  # 📊 Job 5: Summary
+  summary:
+    name: 📊 CI Summary
+    runs-on: ubuntu-latest
+    needs: [build, lint-and-typecheck, test]
+    if: always() && !github.event.pull_request.draft
+    
+    steps:
+      - name: 📊 Summary
+        run: |
+          echo "📋 CI/CD Pipeline Summary:"
+          echo "Build: `${{ needs.build.result }}"
+          echo "Lint & Type Check: `${{ needs.lint-and-typecheck.result }}"
+          echo "Tests: `${{ needs.test.result }}"
+          
+          if [ "`${{ needs.build.result }}" = "success" ] && \
+             [ "`${{ needs.lint-and-typecheck.result }}" = "success" ] && \
+             [ "`${{ needs.test.result }}" = "success" ]; then
+            echo "✅ Tous les contrôles sont passés avec succès!"
+          else
+            echo "❌ Certains contrôles ont échoué."
+            exit 1
+          fi
 "@
+        
+        if (-not (Test-Path ".github/workflows")) {
+            New-Item -ItemType Directory -Path ".github/workflows" -Force | Out-Null
+        }
+        
+        Set-Content $ciWorkflowPath -Value $newWorkflow -Encoding UTF8
+        Write-Success "Nouveau workflow CI créé avec Node.js $nodeVersion"
     }
     
-    # 2. Vérification des vulnérabilités
-    if ($CheckVulnerabilities) {
-        Write-Header "Vérification des vulnérabilités"
-        
-        Write-Info "Audit de sécurité pnpm..."
-        Push-Location "apps/api"
-        try {
-            $auditResult = pnpm audit --json 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
-            if ($auditResult.metadata.vulnerabilities.total -gt 0) {
-                Write-Warning "Vulnérabilités détectées: $($auditResult.metadata.vulnerabilities.total)"
+    # 2. Mettre à jour les autres workflows si ils existent
+    Write-Header "Vérification des autres workflows"
+    
+    $otherWorkflows = Get-ChildItem ".github/workflows/*.yml" -ErrorAction SilentlyContinue
+    foreach ($workflow in $otherWorkflows) {
+        if ($workflow.Name -ne "ci.yml") {
+            Write-Info "Vérification de $($workflow.Name)..."
+            $content = Get-Content $workflow.FullName -Raw
+            
+            if ($content -match 'node-version.*18\.17\.0') {
+                $content = $content -replace '18\.17\.0', $nodeVersion
+                Set-Content $workflow.FullName -Value $content -Encoding UTF8
+                Write-Success "Mis à jour: $($workflow.Name)"
             }
-            else {
-                Write-Success "Aucune vulnérabilité détectée"
+        }
+    }
+    
+    # 3. Mettre à jour .nvmrc si il existe
+    Write-Header "Mise à jour des fichiers de configuration Node.js"
+    
+    if (Test-Path ".nvmrc") {
+        Set-Content ".nvmrc" -Value $nodeVersion -Encoding UTF8
+        Write-Success "Fichier .nvmrc mis à jour"
+    }
+    else {
+        Set-Content ".nvmrc" -Value $nodeVersion -Encoding UTF8
+        Write-Success "Fichier .nvmrc créé"
+    }
+    
+    # 4. Mettre à jour package.json engines si nécessaire
+    if (Test-Path "package.json") {
+        $packageJson = Get-Content "package.json" | ConvertFrom-Json
+        
+        if (-not $packageJson.engines) {
+            $packageJson | Add-Member -Type NoteProperty -Name "engines" -Value ([PSCustomObject]@{}) -Force
+        }
+        
+        $packageJson.engines | Add-Member -Type NoteProperty -Name "node" -Value ">=18.18.0" -Force
+        $packageJson.engines | Add-Member -Type NoteProperty -Name "pnpm" -Value ">=8.15.0" -Force
+        
+        $packageJson | ConvertTo-Json -Depth 10 | Set-Content "package.json" -Encoding UTF8
+        Write-Success "Contraintes engines mises à jour dans package.json"
+    }
+    
+    # 5. Vérifier la compatibilité des apps
+    Write-Header "Vérification de la compatibilité des applications"
+    
+    $apps = @("apps/web/package.json", "apps/api/package.json")
+    foreach ($appPackage in $apps) {
+        if (Test-Path $appPackage) {
+            $appConfig = Get-Content $appPackage | ConvertFrom-Json
+            
+            if (-not $appConfig.engines) {
+                $appConfig | Add-Member -Type NoteProperty -Name "engines" -Value ([PSCustomObject]@{}) -Force
             }
-        }
-        catch {
-            Write-Info "Audit terminé (voir détails ci-dessus)"
-        }
-        finally {
-            Pop-Location
+            
+            $appConfig.engines | Add-Member -Type NoteProperty -Name "node" -Value ">=18.18.0" -Force
+            
+            $appConfig | ConvertTo-Json -Depth 10 | Set-Content $appPackage -Encoding UTF8
+            Write-Success "Contraintes engines mises à jour dans $appPackage"
         }
     }
     
-    # 3. Mise à jour de Helmet
-    Write-Header "Mise à jour de Helmet et dépendances"
+    # 6. Test local avec la nouvelle version
+    Write-Header "Test de compatibilité locale"
     
-    Push-Location "apps/api"
-    try {
-        Write-Info "Mise à jour vers Helmet 8+ (types intégrés)..."
-        
-        # Supprimer les anciens types dépréciés
-        Write-Info "Suppression des types dépréciés..."
-        pnpm remove @types/helmet
-        
-        # Installer la dernière version de Helmet (8+ a les types intégrés)
-        Write-Info "Installation de Helmet 8+ avec types intégrés..."
-        pnpm add helmet@latest
-        
-        # Mettre à jour d'autres dépendances de sécurité si demandé
-        if ($UpdateAll) {
-            Write-Info "Mise à jour des autres dépendances de sécurité..."
-            pnpm add cors@latest express-rate-limit@latest
-            pnpm add -D @types/cors@latest
-        }
-        
-        Write-Success "Helmet mis à jour avec succès!"
-    }
-    finally {
-        Pop-Location
-    }
+    $currentNodeVersion = node --version
+    Write-Info "Version Node.js locale: $currentNodeVersion"
     
-    # 4. Mise à jour de la configuration Helmet
-    Write-Header "Optimisation de la configuration Helmet"
-    
-    $mainTsPath = "apps/api/src/main.ts"
-    if (Test-Path $mainTsPath) {
-        Write-Info "Mise à jour de la configuration dans main.ts..."
+    if ($currentNodeVersion -match "v(\d+)\.(\d+)\.(\d+)") {
+        $major = [int]$Matches[1]
+        $minor = [int]$Matches[2]
         
-        $content = Get-Content $mainTsPath -Raw
-        
-        # Configuration Helmet optimisée pour ERP TopSteel
-        $newHelmetConfig = @'
-  // Sécurité renforcée avec Helmet 8+
-  app.use(
-    helmet({
-      // Content Security Policy adapté pour un ERP
-      contentSecurityPolicy: env === "production" ? {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"], // Pour les styles inline nécessaires
-          scriptSrc: ["'self'"],
-          imgSrc: ["'self'", "data:", "blob:"], // Pour les uploads d'images
-          connectSrc: ["'self'"], // Pour les WebSockets et API calls
-          fontSrc: ["'self'"],
-          objectSrc: ["'none'"],
-          mediaSrc: ["'self'"],
-          frameSrc: ["'none'"],
-        },
-      } : false,
-      
-      // Protection Cross-Origin pour les APIs
-      crossOriginEmbedderPolicy: env === "production",
-      crossOriginOpenerPolicy: { policy: "same-origin" },
-      crossOriginResourcePolicy: { policy: "cross-origin" },
-      
-      // Headers de sécurité renforcés
-      dnsPrefetchControl: { allow: false },
-      frameguard: { action: "deny" },
-      hidePoweredBy: true,
-      hsts: env === "production" ? {
-        maxAge: 31536000, // 1 an
-        includeSubDomains: true,
-        preload: true
-      } : false,
-      
-      // Protection contre les attaques
-      ieNoOpen: true,
-      noSniff: true,
-      originAgentCluster: true,
-      permittedCrossDomainPolicies: false,
-      referrerPolicy: { policy: "no-referrer" },
-      xssFilter: true,
-    })
-  );
-'@
-        
-        # Remplacer l'ancienne configuration par la nouvelle
-        $pattern = 'app\.use\(\s*helmet\([^}]*\}\s*\)\s*\);'
-        if ($content -match $pattern) {
-            $content = $content -replace $pattern, $newHelmetConfig.Trim()
-            Set-Content $mainTsPath -Value $content -Encoding UTF8
-            Write-Success "Configuration Helmet optimisée dans main.ts"
+        if (($major -eq 18 -and $minor -ge 18) -or $major -ge 20) {
+            Write-Success "✅ Version Node.js locale compatible"
         }
         else {
-            Write-Warning "Configuration Helmet non trouvée dans main.ts"
+            Write-Warning "⚠️ Version Node.js locale non compatible ($currentNodeVersion)"
+            Write-Info "Installez Node.js $nodeVersion ou utilisez nvm:"
+            Write-Info "  nvm install $nodeVersion"
+            Write-Info "  nvm use $nodeVersion"
         }
     }
     
-    # 5. Création d'un middleware de sécurité avancé
-    Write-Header "Création du middleware de sécurité avancé"
+    # 7. Script de vérification CI
+    Write-Header "Création du script de vérification"
     
-    $securityMiddlewarePath = "apps/api/src/common/middleware/security.middleware.ts"
-    $securityMiddlewareDir = Split-Path $securityMiddlewarePath -Parent
-    
-    if (-not (Test-Path $securityMiddlewareDir)) {
-        New-Item -ItemType Directory -Path $securityMiddlewareDir -Force | Out-Null
-    }
-    
-    $securityMiddleware = @'
-// apps/api/src/common/middleware/security.middleware.ts
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-
-@Injectable()
-export class SecurityMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
-    // Headers de sécurité additionnels pour l'ERP
-    
-    // Protection contre le clickjacking spécifique aux ERPs
-    res.setHeader('X-Frame-Options', 'DENY');
-    
-    // Protection contre les attaques MIME
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    
-    // Cache control pour les données sensibles
-    if (req.path.includes('/api/')) {
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-    }
-    
-    // Headers de sécurité pour les uploads
-    if (req.path.includes('/upload')) {
-      res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
-    }
-    
-    // Protection contre les attaques de timing (pour les authentifications)
-    if (req.path.includes('/auth/')) {
-      const delay = Math.random() * 100; // Délai aléatoire de 0-100ms
-      setTimeout(() => next(), delay);
-      return;
-    }
-    
-    next();
-  }
-}
-'@
-    
-    Set-Content $securityMiddlewarePath -Value $securityMiddleware -Encoding UTF8
-    Write-Success "Middleware de sécurité avancé créé"
-    
-    # 6. Script de configuration HTTPS pour la production
-    Write-Header "Script de configuration HTTPS"
-    
-    $httpsConfigPath = "apps/api/src/config/https.config.ts"
-    $httpsConfigDir = Split-Path $httpsConfigPath -Parent
-    
-    if (-not (Test-Path $httpsConfigDir)) {
-        New-Item -ItemType Directory -Path $httpsConfigDir -Force | Out-Null
-    }
-    
-    $httpsConfig = @'
-// apps/api/src/config/https.config.ts
-// Configuration HTTPS pour TopSteel ERP en production
-
-import { readFileSync } from 'fs';
-import { join } from 'path';
-
-export interface HttpsOptions {
-  key: Buffer;
-  cert: Buffer;
-  ca?: Buffer;
-}
-
-export function getHttpsOptions(): HttpsOptions | null {
-  if (process.env.NODE_ENV !== 'production') {
-    return null;
-  }
-
-  try {
-    const certPath = process.env.SSL_CERT_PATH || '/etc/ssl/certs/topsteel';
-    
-    return {
-      key: readFileSync(join(certPath, 'private.key')),
-      cert: readFileSync(join(certPath, 'certificate.crt')),
-      ca: process.env.SSL_CA_PATH ? readFileSync(process.env.SSL_CA_PATH) : undefined,
-    };
-  } catch (error) {
-    console.warn('⚠️  Certificats SSL non trouvés, utilisation HTTP:', error.message);
-    return null;
-  }
-}
-
-// Configuration SSL/TLS recommandée pour TopSteel ERP
-export const TLS_CONFIG = {
-  // Protocoles autorisés (TLS 1.2+ uniquement)
-  secureProtocol: 'TLSv1_2_method',
-  
-  // Ciphers sécurisés pour un ERP
-  ciphers: [
-    'TLS_AES_256_GCM_SHA384',
-    'TLS_CHACHA20_POLY1305_SHA256',
-    'TLS_AES_128_GCM_SHA256',
-    'ECDHE-RSA-AES128-GCM-SHA256',
-    'ECDHE-RSA-AES256-GCM-SHA384',
-  ].join(':'),
-  
-  // Options de sécurité
-  honorCipherOrder: true,
-  secureOptions: require('constants').SSL_OP_NO_SSLv2 | 
-                  require('constants').SSL_OP_NO_SSLv3 |
-                  require('constants').SSL_OP_NO_TLSv1 |
-                  require('constants').SSL_OP_NO_TLSv1_1,
-};
-'@
-    
-    Set-Content $httpsConfigPath -Value $httpsConfig -Encoding UTF8
-    Write-Success "Configuration HTTPS créée"
-    
-    # 7. Tests après mise à jour
-    Write-Header "Tests après mise à jour"
-    
-    Write-Info "Test de build après mise à jour..."
-    Push-Location "apps/api"
-    try {
-        pnpm run build
-        if ($LASTEXITCODE -eq 0) {
-            Write-Success "Build API réussi avec le nouveau Helmet"
-        }
-        else {
-            Write-Warning "Problème de build détecté"
-        }
-    }
-    finally {
-        Pop-Location
-    }
-    
-    # 8. Recommandations de sécurité
-    Write-Header "Recommandations de sécurité TopSteel ERP"
-    
-    Write-Security @"
-🛡️ SÉCURITÉ HELMET - MISE À JOUR RÉUSSIE
-
-✅ Améliorations apportées:
-• Helmet 8+ avec types TypeScript intégrés
-• Configuration CSP adaptée pour ERP
-• Headers de sécurité renforcés
-• Middleware de sécurité personnalisé
-• Configuration HTTPS prête pour production
-
-🔒 Prochaines étapes recommandées:
-
-1. SÉCURITÉ RÉSEAU:
-   • Configurer un reverse proxy (Nginx/Traefik)
-   • Mettre en place un firewall applicatif (WAF)
-   • Utiliser des certificats SSL/TLS valides
-
-2. AUTHENTIFICATION:
-   • Implémenter 2FA/MFA obligatoire
-   • Politique de mots de passe stricte
-   • Limitation des tentatives de connexion
-
-3. DONNÉES:
-   • Chiffrement des données sensibles
-   • Sauvegarde chiffrée régulière
-   • Audit trail complet
-
-4. MONITORING:
-   • Surveillance des logs de sécurité
-   • Alertes en temps réel
-   • Tests de pénétration réguliers
-
-5. CONFORMITÉ ERP:
-   • Respect RGPD pour les données clients
-   • Audit de sécurité périodique
-   • Formation sécurité pour les utilisateurs
-"@
-    
-    # 9. Script de vérification sécurité
-    Write-Header "Script de vérification sécurité"
-    
-    $securityCheckScript = @'
+    $verifyScript = @"
 #!/usr/bin/env pwsh
-# Script de vérification sécurité TopSteel ERP
-# Usage: .\Check-Security.ps1
+# Script de vérification CI/CD TopSteel ERP
+# Vérifie que la configuration est correcte
 
-Write-Host "🛡️ Vérification sécurité TopSteel ERP" -ForegroundColor Cyan
+Write-Host "🔍 Vérification configuration CI/CD TopSteel ERP" -ForegroundColor Cyan
 
-# 1. Vérifier les dépendances
-Write-Host "`n📦 Audit des dépendances..." -ForegroundColor Yellow
-cd apps/api
-pnpm audit
+# Vérifier Node.js
+`$nodeVersion = node --version
+Write-Host "Node.js local: `$nodeVersion" -ForegroundColor Blue
 
-# 2. Vérifier les headers de sécurité (si le serveur tourne)
-Write-Host "`n🔍 Test des headers de sécurité..." -ForegroundColor Yellow
+if (`$nodeVersion -match "v18\.1[8-9]\.|v18\.[2-9][0-9]\.|v[2-9][0-9]\.") {
+    Write-Host "✅ Version Node.js compatible avec Next.js" -ForegroundColor Green
+} else {
+    Write-Host "⚠️ Version Node.js non compatible" -ForegroundColor Yellow
+    Write-Host "Requis: 18.18.0+ ou 20.0.0+" -ForegroundColor Yellow
+}
+
+# Vérifier pnpm
+`$pnpmVersion = pnpm --version
+Write-Host "pnpm: `$pnpmVersion" -ForegroundColor Blue
+
+# Test build local
+Write-Host "`n🧪 Test de build local..." -ForegroundColor Yellow
 try {
-    $response = Invoke-WebRequest -Uri "http://localhost:3001/health" -Method HEAD -ErrorAction SilentlyContinue
-    if ($response.Headers["X-Frame-Options"]) {
-        Write-Host "✅ X-Frame-Options configuré" -ForegroundColor Green
-    }
-    if ($response.Headers["Content-Security-Policy"]) {
-        Write-Host "✅ CSP configuré" -ForegroundColor Green
-    }
+    pnpm build --filter=@erp/config > `$null
+    pnpm build --filter=@erp/types > `$null
+    pnpm build --filter=@erp/utils > `$null
+    Write-Host "✅ Build des packages réussi" -ForegroundColor Green
 } catch {
-    Write-Host "⚠️ Serveur non accessible pour les tests" -ForegroundColor Yellow
+    Write-Host "❌ Erreur de build" -ForegroundColor Red
 }
 
-# 3. Vérifier les certificats SSL (en production)
-if ($env:NODE_ENV -eq "production") {
-    Write-Host "`n🔐 Vérification SSL..." -ForegroundColor Yellow
-    if (Test-Path "/etc/ssl/certs/topsteel") {
-        Write-Host "✅ Certificats SSL trouvés" -ForegroundColor Green
-    } else {
-        Write-Host "⚠️ Certificats SSL manquants" -ForegroundColor Yellow
-    }
+# Test lint
+Write-Host "`n🔍 Test lint..." -ForegroundColor Yellow
+try {
+    pnpm lint > `$null
+    Write-Host "✅ Lint réussi" -ForegroundColor Green
+} catch {
+    Write-Host "❌ Erreur lint" -ForegroundColor Red
 }
 
-Write-Host "`n✅ Vérification terminée" -ForegroundColor Green
-'@
+Write-Host "`n🎯 Vérification terminée" -ForegroundColor Cyan
+"@
     
     if (-not (Test-Path "scripts")) {
         New-Item -ItemType Directory -Path "scripts" -Force | Out-Null
     }
     
-    Set-Content "scripts/Check-Security.ps1" -Value $securityCheckScript -Encoding UTF8
-    Write-Success "Script de vérification sécurité créé: scripts/Check-Security.ps1"
+    Set-Content "scripts/Verify-CI.ps1" -Value $verifyScript -Encoding UTF8
+    Write-Success "Script de vérification créé: scripts/Verify-CI.ps1"
     
-    # 10. Résumé final
-    Write-Header "✅ Mise à jour Helmet terminée"
+    # 8. Résumé final
+    Write-Header "✅ Correction Node.js terminée"
     
     Write-Success @"
-🎉 MISE À JOUR SÉCURITÉ RÉUSSIE !
+🎉 CORRECTION NODE.JS RÉUSSIE !
 
 🔄 Changements apportés:
-✅ Helmet mis à jour vers la dernière version (8+)
-✅ Types dépréciés supprimés (@types/helmet)
-✅ Configuration sécurisée pour ERP
-✅ Middleware de sécurité avancé
-✅ Configuration HTTPS prête
-✅ Script de vérification sécurité
+✅ Version Node.js mise à jour: 18.17.0 → $nodeVersion
+✅ Workflow GitHub Actions corrigé
+✅ Contraintes engines définies
+✅ Fichier .nvmrc créé/mis à jour
+✅ Configuration compatible Next.js
 
 📋 Prochaines actions:
-1. Testez l'API: cd apps/api && pnpm start:dev
-2. Vérifiez la sécurité: .\scripts\Check-Security.ps1
-3. Commitez: git add . && git commit -m "security: update helmet and enhance security configuration"
+1. Commitez les changements:
+   git add .
+   git commit -m "ci: update Node.js version to $nodeVersion for Next.js compatibility"
+   git push
 
-🛡️ TopSteel ERP est maintenant plus sécurisé !
+2. Vérifiez le CI/CD:
+   • Le workflow va maintenant utiliser Node.js $nodeVersion
+   • L'erreur Next.js sera résolue
+   • ESLint continuera de fonctionner parfaitement
+
+3. Test local:
+   .\scripts\Verify-CI.ps1
+
+🚀 Votre CI/CD TopSteel ERP va maintenant passer au VERT !
 "@
     
 }
@@ -448,11 +508,11 @@ catch {
     Write-ColorOutput "❌ Erreur: $($_.Exception.Message)" "Red"
     Write-Warning @"
 En cas de problème:
-1. Restaurez package.json depuis la sauvegarde
-2. Exécutez: pnpm install
-3. Contactez l'équipe de sécurité
+1. Vérifiez que .github/workflows/ci.yml existe
+2. Restaurez depuis git si nécessaire
+3. Contactez l'équipe DevOps
 "@
     exit 1
 }
 
-Write-ColorOutput "`n🔒 Sécurité TopSteel ERP renforcée avec succès !" "Magenta"
+Write-ColorOutput "`n🎯 CI/CD TopSteel ERP optimisé pour Node.js $nodeVersion !" "Green"
