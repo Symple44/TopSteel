@@ -2,7 +2,7 @@
 // Temporary solution to fix TypeScript errors
 
 declare module "@erp/ui" {
-  import * as React from "react";
+  import type * as React from "react";
   
   // Button props with asChild support
   export interface ButtonProps {
@@ -114,3 +114,4 @@ declare module "@/types" {
 declare module "@/lib/utils" {
   export * from "@erp/utils";
 }
+
