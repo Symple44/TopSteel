@@ -1,5 +1,6 @@
 'use client'
 
+import { Input } from "@/components/ui/input"
 import {
     Badge,
     Button,
@@ -7,7 +8,6 @@ import {
     CardContent,
     CardHeader,
     CardTitle,
-    Input,
     Select,
     SelectContent,
     SelectItem,

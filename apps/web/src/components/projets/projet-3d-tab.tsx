@@ -1,6 +1,7 @@
 'use client'
 
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Slider, Switch } from '@erp/ui'
+import { Slider } from "@/components/ui/slider"
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Switch } from '@erp/ui'
 import {
   Download,
   Eye,

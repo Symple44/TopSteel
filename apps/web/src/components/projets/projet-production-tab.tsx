@@ -1,26 +1,26 @@
 'use client'
 
-import { useState } from 'react'
-import { 
-  Plus, 
-  Factory, 
-  Clock, 
-  CheckCircle2, 
-  AlertCircle,
-  Play,
-  Pause,
-  User,
-  Calendar,
-  Wrench
-} from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDate, getInitials } from '@/lib/utils'
-import type { Projet} from '@/types';
-import { StatutProduction, PrioriteProduction } from '@/types'
+import type { Projet } from '@/types'
+import { PrioriteProduction, StatutProduction } from '@/types'
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Factory,
+  Pause,
+  Play,
+  Plus,
+  User,
+  Wrench
+} from 'lucide-react'
+import { useState } from 'react'
 
 interface ProjetProductionTabProps {
   projet: Projet
@@ -361,7 +361,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
                       {operation.technicien && (
                         <div className="flex items-center gap-2">
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={`/api/avatar/${operation.technicien.id}`} />
+                            <AvatarImage src={`/api/avatar/${operation.technicien.id}`} alt="Photo" />
                             <AvatarFallback>
                               {getInitials(operation.technicien.nom)}
                             </AvatarFallback>

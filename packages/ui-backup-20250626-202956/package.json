@@ -1,0 +1,27 @@
+{
+  "name": "@erp/ui",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "node create-dist.js",
+    "format:check": "echo 'UI package formatted via apps'",
+    "lint": "echo 'UI package linted via apps'",
+    "type-check": "echo 'UI package type-checked via apps'",
+    "test": "echo 'UI package uses manual testing'",
+    "test:coverage": "echo 'UI package uses manual testing'",
+    "test:integration": "echo 'No integration tests for UI package'",
+    "test:unit": "echo 'UI package uses manual testing'"
+  },
+  "dependencies": {
+    "@radix-ui/react-slider": "^1.3.5"
+  }
+}

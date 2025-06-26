@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@erp/ui'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from '@/lib/utils'
 import {
     AlertCircle,
@@ -202,12 +202,12 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
     if (isCollapsed && hasChildren) {
       return (
-        <TooltipProvider delayDuration={0}>
-          <Tooltip delayDuration={0}>
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
             <TooltipTrigger asChild>
               {content}
             </TooltipTrigger>
-            <TooltipContent side="right" className="flex flex-col gap-1">
+            <TooltipContent side="right" className="p-2">
               <div className="font-medium">{item.title}</div>
               {item.children?.map((child) => (
                 <Button
@@ -306,7 +306,3 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     </div>
   )
 }
-
-
-
-

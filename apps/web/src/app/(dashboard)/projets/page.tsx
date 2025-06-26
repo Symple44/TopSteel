@@ -1,14 +1,16 @@
 // apps/web/src/app/(dashboard)/projets/page.tsx
 'use client'
 
-import React from 'react'
-import Link from 'next/link'
-import { Button, DataTable, PageHeader, ProjetCard } from '@erp/ui'
+import { DataTable } from "@/components/ui/data-table"
+import { PageHeader } from "@/components/ui/page-header"
+import { ProjetCard } from "@/components/ui/projet-card"
 import { useProjets } from '@/hooks/use-projets'
-import { Plus, Grid, List } from 'lucide-react'
-import { Badge } from '@erp/ui'
-import { formatCurrency, formatDate } from '@erp/utils'
 import type { Projet } from '@erp/types'
+import { Badge, Button } from '@erp/ui'
+import { formatCurrency, formatDate } from '@erp/utils'
+import { Grid, List, Plus } from 'lucide-react'
+import Link from 'next/link'
+import React from 'react'
 
 export default function ProjetsPage() {
   const { data: projets = [], isLoading } = useProjets()

@@ -1,8 +1,8 @@
 // apps/web/src/app/layout.tsx
+import { Providers } from '@/components/providers'
+import { Toaster } from "@/components/ui/toaster"
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Providers } from '@/components/providers'
-import { Toaster } from '@erp/ui'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })

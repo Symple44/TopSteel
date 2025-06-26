@@ -1,26 +1,25 @@
 // Core components
-export * from './badge'
-export * from './button'
-export * from './card'
-export * from './label'
-export * from './separator'
+export * from "./components/button"
+export * from "./components/card"
+export * from "./components/input"
+export * from "./components/badge"
 
-// Form components  
-export * from './avatar'
-export * from './select'
-export * from './slider'
-export * from './switch'
-export * from './tooltip'
+// Navigation & Layout
+export * from "./components/tabs"
+export * from "./components/tooltip"
 
-// Layout components
-export * from './data-table'
-export * from './page-header'
-export * from './projet-card'
-export * from './toaster'
+// Form components
+export * from "./components/slider"
 
-// Utils
-export * from './lib/utils'
+// Data display
+export * from "./components/data-table"
 
-// Manual exports for missing components
-export { Input } from './input'
-export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
+// Business components  
+export * from "./components/page-header"
+export * from "./components/projet-card"
+
+// Notifications
+export * from "./components/toaster"
+
+// Utilities
+export * from "./lib/utils"

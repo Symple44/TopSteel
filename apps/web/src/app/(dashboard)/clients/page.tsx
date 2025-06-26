@@ -1,5 +1,7 @@
 'use client'
 
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Badge,
   Button,
@@ -7,16 +9,11 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
 } from '@erp/ui'
 import { Download, Edit, Eye, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'

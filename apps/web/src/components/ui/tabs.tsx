@@ -1,38 +1,42 @@
-import React from "react"
+import * as React from "react"
 
-interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode
-  value?: any
-  onValueChange?: any
-  asChild?: boolean
-  variant?: string
-  size?: string
+interface TabsProps {
+  children?: React.ReactNode;
+  defaultValue?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  className?: string;
 }
 
-export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
-    if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as any, { ...props, ref })
-    }
-    
-    return (
-      <div className={className} ref={ref} {...props}>
-        {children}
-      </div>
-    )
-  }
-)
+interface TabsContentProps {
+  children?: React.ReactNode;
+  value: string;
+  className?: string;
+}
 
-Tabs.displayName = "Tabs"
+interface TabsListProps {
+  children?: React.ReactNode;
+  className?: string;
+}
 
-// Export des sous-composants courants si nécessaire
-export const TabsContent = Tabs
-export const TabsTrigger = Tabs  
-export const TabsItem = Tabs
-export const TabsValue = Tabs
-export const TabsHeader = Tabs
-export const TabsTitle = Tabs
-export const TabsDescription = Tabs
-export const TabsFooter = Tabs
-export const TabsSeparator = Tabs
-export const TabsList = Tabs
+interface TabsTriggerProps {
+  children?: React.ReactNode;
+  value: string;
+  className?: string;
+}
+
+export const Tabs: React.FC<TabsProps> = ({ children, className, ...props }) => {
+  return <div className={className} {...props}>{children}</div>
+}
+
+export const TabsContent: React.FC<TabsContentProps> = ({ children, className, ...props }) => {
+  return <div className={className} {...props}>{children}</div>
+}
+
+export const TabsList: React.FC<TabsListProps> = ({ children, className, ...props }) => {
+  return <div className={className} {...props}>{children}</div>
+}
+
+export const TabsTrigger: React.FC<TabsTriggerProps> = ({ children, className, ...props }) => {
+  return <button className={className} {...props}>{children}</button>
+}

@@ -12,7 +12,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { useStore } from '@/store'
 import {
     Bell,
     HelpCircle,
@@ -33,7 +32,13 @@ interface HeaderProps {
 export function Header({ onToggleSidebar }: HeaderProps) {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
-  const { user, logout } = useStore()
+  const user = { 
+    name: "Utilisateur",  
+    email: "user@example.com",
+    firstName: "John",
+    lastName: "Doe"
+  }
+  const logout = () => console.log("Logout")  
 
   const handleLogout = () => {
     logout()

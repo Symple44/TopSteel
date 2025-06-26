@@ -1,24 +1,29 @@
-import React from 'react'
+import * as React from "react"
 
 interface SliderProps {
-  value: number
-  onChange: (value: number) => void
-  min?: number
-  max?: number
-  step?: number
-  className?: string
+  [key: string]: any; // Accepte toutes les props
 }
 
-export function Slider({ value, onChange, min = 0, max = 100, step = 1, className = '' }: SliderProps) {
-  return (
-    <input
-      type="range"
-      min={min}
-      max={max}
-      step={step}
-      value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
-      className={`w-full ${className}`}
-    />
-  )
-}
+const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
+  ({ value, onValueChange, ...props }, ref) => {
+    const stringValue = Array.isArray(value) ? value[0]?.toString() || '0' : value?.toString() || '0';
+    
+    return (
+      <input
+        type="range"
+        value={stringValue}
+        onChange={(e) => {
+          const newValue = Number(e.target.value);
+          if (onValueChange) {
+            onValueChange([newValue]); // Retourne array pour compatibilité
+          }
+        }}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Slider.displayName = "Slider"
+
+export { Slider }

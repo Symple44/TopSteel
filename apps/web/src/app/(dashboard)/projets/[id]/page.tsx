@@ -1,31 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { 
-  ArrowLeft, 
-  Calendar, 
-  Euro, 
-  FileText, 
-  Package, 
-  Factory,
-  Box,
-  Paperclip,
-  MoreVertical,
-  Edit,
-  Trash2,
-  Download,
-  Send,
-  CheckCircle,
-  Clock,
-  AlertCircle
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Projet3DTab from "@/components/projets/projet-3d-tab"
+import { ProjetDevisTab } from '@/components/projets/projet-devis-tab'
+import ProjetDocumentsTab from "@/components/projets/projet-documents-tab"
+import { ProjetInfoTab } from '@/components/projets/projet-info-tab'
+import { ProjetProductionTab } from '@/components/projets/projet-production-tab'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,14 +16,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useProjet } from '@/hooks/use-projets'
-import { cn, formatDate, formatCurrency, getDaysUntil } from '@/lib/utils'
+import { cn, formatCurrency, formatDate, getDaysUntil } from '@/lib/utils'
 import { ProjetStatut } from '@/types'
-import { ProjetInfoTab } from '@/components/projets/projet-info-tab'
-import { ProjetDevisTab } from '@/components/projets/projet-devis-tab'
-import { ProjetProductionTab } from '@/components/projets/projet-production-tab'
-import { ProjetDocumentsTab } from '@/components/projets/projet-documents-tab'
-import { Projet3DTab } from '@/components/projets/projet-3d-tab'
+import {
+  AlertCircle,
+  ArrowLeft,
+  Box,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Download,
+  Edit,
+  Euro,
+  Factory,
+  FileText,
+  MoreVertical,
+  Package,
+  Paperclip,
+  Send,
+  Trash2
+} from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 interface ProjetDetailPageProps {
   params: {

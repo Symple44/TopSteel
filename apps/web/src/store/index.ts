@@ -24,3 +24,9 @@ export type AppDispatch = typeof store.dispatch
 // Hooks typés pour l'utilisation dans les composants
 export const useAppDispatch = () => useDispatch<AppDispatch>()
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+
+// Export useStore pour la compatibilité
+export const useStore = () => ({
+  dispatch: useAppDispatch(),
+  selector: useAppSelector,
+})
