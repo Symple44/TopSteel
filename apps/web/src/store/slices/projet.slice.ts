@@ -1,76 +1,81 @@
-import type { StateCreator } from 'zustand'
-import type { Projet, ProjetFilters } from '@/types'
+import { Projet, ProjetFilters } from '@erp/types'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-export interface ProjetSlice {
-  // État
+interface ProjetState {
   projets: Projet[]
   selectedProjet: Projet | null
-  projetFilters: ProjetFilters
-  isLoadingProjets: boolean
-
-  // Actions
-  setProjets: (projets: Projet[]) => void
-  addProjet: (projet: Projet) => void
-  updateProjet: (id: string, updates: Partial<Projet>) => void
-  deleteProjet: (id: string) => void
-  setSelectedProjet: (projet: Projet | null) => void
-  setProjetFilters: (filters: Partial<ProjetFilters>) => void
-  resetProjetFilters: () => void
-  setLoadingProjets: (isLoading: boolean) => void
+  loading: boolean
+  error: string | null
+  filters: ProjetFilters
+  searchTerm: string
 }
 
-const defaultFilters: ProjetFilters = {
-  search: '',
-  statut: [],
-  clientId: undefined,
-  dateDebut: undefined,
-  dateFin: undefined,
-  montantMin: undefined,
-  montantMax: undefined,
-}
-
-export const createProjetSlice: StateCreator<ProjetSlice> = (set, get) => ({
-  // État initial
+const initialState: ProjetState = {
   projets: [],
   selectedProjet: null,
-  projetFilters: defaultFilters,
-  isLoadingProjets: false,
+  loading: false,
+  error: null,
+  filters: {
+    statut: "",
+    client: "",
+    dateDebut: "",
+    dateFin: ""
+  },
+  searchTerm: ""
+}
 
-  // Actions
-  setProjets: (projets) => set({ projets }),
-
-  addProjet: (projet) =>
-    set((state) => ({
-      projets: [projet, ...state.projets],
-    })),
-
-  updateProjet: (id, updates) =>
-    set((state) => ({
-      projets: state.projets.map((projet) =>
-        projet.id === id ? { ...projet, ...updates } : projet
-      ),
-      selectedProjet:
-        state.selectedProjet?.id === id
-          ? { ...state.selectedProjet, ...updates }
-          : state.selectedProjet,
-    })),
-
-  deleteProjet: (id) =>
-    set((state) => ({
-      projets: state.projets.filter((projet) => projet.id !== id),
-      selectedProjet: state.selectedProjet?.id === id ? null : state.selectedProjet,
-    })),
-
-  setSelectedProjet: (projet) => set({ selectedProjet: projet }),
-
-  setProjetFilters: (filters) =>
-    set((state) => ({
-      projetFilters: { ...state.projetFilters, ...filters },
-    })),
-
-  resetProjetFilters: () => set({ projetFilters: defaultFilters }),
-
-  setLoadingProjets: (isLoading) => set({ isLoadingProjets: isLoading }),
+const projetSlice = createSlice({
+  name: 'projets',
+  initialState,
+  reducers: {
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload
+    },
+    setProjets: (state, action: PayloadAction<Projet[]>) => {
+      state.projets = action.payload
+    },
+    addProjet: (state, action: PayloadAction<Projet>) => {
+      state.projets.push(action.payload)
+    },
+    updateProjet: (state, action: PayloadAction<Projet>) => {
+      const index = state.projets.findIndex(p => p.id === action.payload.id)
+      if (index !== -1) {
+        state.projets[index] = action.payload
+      }
+    },
+    deleteProjet: (state, action: PayloadAction<string>) => {
+      state.projets = state.projets.filter(p => p.id !== action.payload)
+    },
+    setSelectedProjet: (state, action: PayloadAction<Projet | null>) => {
+      state.selectedProjet = action.payload
+    },
+    setFilters: (state, action: PayloadAction<Partial<ProjetFilters>>) => {
+      state.filters = { ...state.filters, ...action.payload }
+    },
+    setSearchTerm: (state, action: PayloadAction<string>) => {
+      state.searchTerm = action.payload
+    },
+    resetFilters: (state) => {
+      state.filters = initialState.filters
+      state.searchTerm = ""
+    }
+  }
 })
 
+export const {
+  setLoading,
+  setError,
+  setProjets,
+  addProjet,
+  updateProjet,
+  deleteProjet,
+  setSelectedProjet,
+  setFilters,
+  setSearchTerm,
+  resetFilters
+} = projetSlice.actions
 
+export default projetSlice.reducer

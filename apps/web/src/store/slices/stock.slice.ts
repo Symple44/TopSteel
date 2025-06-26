@@ -1,114 +1,106 @@
-import { create } from 'zustand'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface Stock {
+interface StockItem {
   id: string
+  nom: string
   reference: string
-  designation: string
-  quantiteStock: number
-  quantiteReservee: number
-  quantiteDisponible: number
-  quantiteMin: number
-  quantiteMax: number
-  type: string
+  categorie: string
+  quantite: number
+  unite: string
+  seuilAlerte: number
+  prix: number
+  fournisseur: string
+  emplacement: string
+  dateEntree: string
+  dateDerniereModification: string
 }
 
 interface StockState {
-  stocks: Stock[]
-  filteredStocks: Stock[]
-  selectedStock: Stock | null
-  filters: {
-    search: string
-    categorie: string
-    statut: string
-  }
+  items: StockItem[]
   loading: boolean
   error: string | null
+  selectedItem: StockItem | null
+  filters: {
+    categorie: string
+    fournisseur: string
+    alerteStock: boolean
+  }
+  searchTerm: string
 }
 
-interface StockActions {
-  setStocks: (stocks: Stock[]) => void
-  addStock: (stock: Stock) => void
-  updateStock: (id: string, updates: Partial<Stock>) => void
-  deleteStock: (id: string) => void
-  setSelectedStock: (stock: Stock | null) => void
-  setFilters: (filters: Partial<StockState['filters']>) => void
-  applyFilters: () => void
-  setLoading: (loading: boolean) => void
-  setError: (error: string | null) => void
-}
-
-export const useStockStore = create<StockState & StockActions>((set, get) => ({
-  stocks: [],
-  filteredStocks: [],
-  selectedStock: null,
-  filters: { search: '', categorie: '', statut: '' },
+const initialState: StockState = {
+  items: [],
   loading: false,
   error: null,
-
-  setStocks: (stocks) => {
-    set({ stocks, filteredStocks: stocks })
-    get().applyFilters()
+  selectedItem: null,
+  filters: {
+    categorie: '',
+    fournisseur: '',
+    alerteStock: false
   },
+  searchTerm: ''
+}
 
-  addStock: (stock) => {
-    const { stocks } = get()
-    const newStocks = [...stocks, stock]
-    set({ stocks: newStocks })
-    get().applyFilters()
-  },
-
-  updateStock: (id, updates) => {
-    const { stocks } = get()
-    const newStocks = stocks.map(stock => 
-      stock.id === id ? { ...stock, ...updates } : stock
-    )
-    set({ stocks: newStocks })
-    get().applyFilters()
-  },
-
-  deleteStock: (id) => {
-    const { stocks } = get()
-    const newStocks = stocks.filter(stock => stock.id !== id)
-    set({ stocks: newStocks })
-    get().applyFilters()
-  },
-
-  setSelectedStock: (stock) => set({ selectedStock: stock }),
-
-  setFilters: (newFilters) => {
-    const { filters } = get()
-    set({ filters: { ...filters, ...newFilters } })
-    get().applyFilters()
-  },
-
-  applyFilters: () => {
-    const { stocks, filters } = get()
-    let filtered = stocks
-
-    if (filters.search) {
-      filtered = filtered.filter(stock => 
-        stock.reference?.toLowerCase().includes(filters.search.toLowerCase()) ||
-        stock.designation?.toLowerCase().includes(filters.search.toLowerCase())
-      )
+const stockSlice = createSlice({
+  name: 'stock',
+  initialState,
+  reducers: {
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload
+    },
+    setItems: (state, action: PayloadAction<StockItem[]>) => {
+      state.items = action.payload
+    },
+    addItem: (state, action: PayloadAction<StockItem>) => {
+      state.items.push(action.payload)
+    },
+    updateItem: (state, action: PayloadAction<StockItem>) => {
+      const index = state.items.findIndex(item => item.id === action.payload.id)
+      if (index !== -1) {
+        state.items[index] = action.payload
+      }
+    },
+    deleteItem: (state, action: PayloadAction<string>) => {
+      state.items = state.items.filter(item => item.id !== action.payload)
+    },
+    setSelectedItem: (state, action: PayloadAction<StockItem | null>) => {
+      state.selectedItem = action.payload
+    },
+    setFilters: (state, action: PayloadAction<Partial<StockState['filters']>>) => {
+      state.filters = { ...state.filters, ...action.payload }
+    },
+    setSearchTerm: (state, action: PayloadAction<string>) => {
+      state.searchTerm = action.payload
+    },
+    updateQuantite: (state, action: PayloadAction<{ id: string; quantite: number }>) => {
+      const item = state.items.find(item => item.id === action.payload.id)
+      if (item) {
+        item.quantite = action.payload.quantite
+        item.dateDerniereModification = new Date().toISOString()
+      }
+    },
+    resetFilters: (state) => {
+      state.filters = initialState.filters
+      state.searchTerm = ''
     }
+  }
+})
 
-    if (filters.categorie) {
-      filtered = filtered.filter(stock => stock.type === filters.categorie)
-    }
+export const {
+  setLoading,
+  setError,
+  setItems,
+  addItem,
+  updateItem,
+  deleteItem,
+  setSelectedItem,
+  setFilters,
+  setSearchTerm,
+  updateQuantite,
+  resetFilters
+} = stockSlice.actions
 
-    set({ filteredStocks: filtered })
-  },
-
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error })
-}))
-
-
-export type slice = typeof slice;
-export const createslice = slice;
-
-
-// Exports pour compatibilité
-export type StockSlice = typeof stockSlice;
-export const createStockSlice = stockSlice;
-
+export default stockSlice.reducer

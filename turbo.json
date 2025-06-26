@@ -116,5 +116,9 @@
       ],
       "cache": false
     }
-  }
+  },
+  "globalEnv": [
+    "TURBO_FORCE",
+    "CI"
+  ]
 }

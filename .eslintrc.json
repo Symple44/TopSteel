@@ -1,0 +1,7 @@
+{
+  "rules": {},
+  "extends": [
+    "next/core-web-vitals",
+    "turbo"
+  ]
+}

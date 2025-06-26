@@ -1,140 +1,129 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import {
+    Badge,
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    Input,
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
-import { formatDate } from '@/lib/utils'
-import type { Projet } from '@/types'
-import { TypeDocument } from '@/types'
-import {
-    Download,
-    Eye,
-    File,
-    FileText,
-    Image,
-    MoreVertical,
-    Search,
-    Trash2,
-    Upload
-} from 'lucide-react'
+    SelectValue
+} from '@erp/ui'
+import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
 import { useState } from 'react'
 
-interface ProjetDocumentsTabProps {
-  projet: Projet
+interface Document {
+  id: string
+  nom: string
+  type: 'PDF' | 'Image' | 'CAD' | 'Excel' | 'Word'
+  taille: string
+  dateAjout: string
+  auteur: string
+  categorie: 'Plan' | 'Photo' | 'Facture' | 'Devis' | 'Rapport' | 'Autre'
+  url: string
 }
 
-// Données mockées pour la démonstration
-const mockDocuments = [
+const mockDocuments: Document[] = [
   {
     id: '1',
-    nom: 'Plan de structure métallique.pdf',
-    type: TypeDocument.PLAN,
-    url: '#',
-    taille: 2457600, // 2.4 MB
-    uploadePar: 'Jean Dupont',
-    createdAt: new Date('2025-06-15T10:30:00'),
+    nom: 'Plan_Hangar_A_v2.pdf',
+    type: 'PDF',
+    taille: '2.4 MB',
+    dateAjout: '2024-03-15',
+    auteur: 'Pierre Martin',
+    categorie: 'Plan',
+    url: '/documents/plan_hangar_a_v2.pdf'
   },
   {
     id: '2',
-    nom: 'Devis initial.pdf',
-    type: TypeDocument.DEVIS,
-    url: '#',
-    taille: 524288, // 512 KB
-    uploadePar: 'Marie Martin',
-    createdAt: new Date('2025-06-14T14:20:00'),
+    nom: 'Photo_chantier_001.jpg',
+    type: 'Image',
+    taille: '1.8 MB',
+    dateAjout: '2024-03-14',
+    auteur: 'Jean Dupuis',
+    categorie: 'Photo',
+    url: '/documents/photo_chantier_001.jpg'
   },
   {
     id: '3',
-    nom: 'Photos chantier - Avant travaux.zip',
-    type: TypeDocument.PHOTO,
-    url: '#',
-    taille: 15728640, // 15 MB
-    uploadePar: 'Pierre Durand',
-    createdAt: new Date('2025-06-16T09:00:00'),
+    nom: 'Devis_materiaux.xlsx',
+    type: 'Excel',
+    taille: '542 KB',
+    dateAjout: '2024-03-13',
+    auteur: 'Marie Claire',
+    categorie: 'Devis',
+    url: '/documents/devis_materiaux.xlsx'
   },
   {
     id: '4',
-    nom: 'Bon de commande matériaux.pdf',
-    type: TypeDocument.BON_COMMANDE,
-    url: '#',
-    taille: 312000, // 305 KB
-    uploadePar: 'Jean Dupont',
-    createdAt: new Date('2025-06-17T11:45:00'),
+    nom: 'Rapport_controle_qualite.docx',
+    type: 'Word',
+    taille: '1.2 MB',
+    dateAjout: '2024-03-12',
+    auteur: 'Pierre Martin',
+    categorie: 'Rapport',
+    url: '/documents/rapport_controle_qualite.docx'
   },
   {
     id: '5',
-    nom: 'Note de calcul structure.xlsx',
-    type: TypeDocument.AUTRE,
-    url: '#',
-    taille: 892928, // 872 KB
-    uploadePar: 'Marc Leblanc',
-    createdAt: new Date('2025-06-18T16:30:00'),
-  },
+    nom: 'Structure_3D.dwg',
+    type: 'CAD',
+    taille: '5.1 MB',
+    dateAjout: '2024-03-11',
+    auteur: 'Jean Dupuis',
+    categorie: 'Plan',
+    url: '/documents/structure_3d.dwg'
+  }
 ]
 
-export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
+export default function ProjetDocumentsTab() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<string>('tous')
+  const [filterType, setFilterType] = useState('tous')
+  const [filterCategorie, setFilterCategorie] = useState('toutes')
   const [isUploading, setIsUploading] = useState(false)
 
-  const getDocumentIcon = (type: TypeDocument) => {
-    switch (type) {
-      case TypeDocument.PLAN:
-        return <FileText className="h-8 w-8 text-blue-500" />
-      case TypeDocument.PHOTO:
-        return <Image className="h-8 w-8 text-green-500" />
-      case TypeDocument.DEVIS:
-      case TypeDocument.FACTURE:
-      case TypeDocument.BON_COMMANDE:
-      case TypeDocument.BON_LIVRAISON:
-        return <FileText className="h-8 w-8 text-orange-500" />
-      default:
-        return <File className="h-8 w-8 text-gray-500" />
-    }
-  }
-
-  const getTypeBadge = (type: TypeDocument) => {
-    const typeLabels = {
-      [TypeDocument.PLAN]: 'Plan',
-      [TypeDocument.DEVIS]: 'Devis',
-      [TypeDocument.FACTURE]: 'Facture',
-      [TypeDocument.BON_COMMANDE]: 'Bon de commande',
-      [TypeDocument.BON_LIVRAISON]: 'Bon de livraison',
-      [TypeDocument.PHOTO]: 'Photo',
-      [TypeDocument.AUTRE]: 'Autre',
-    }
+  const filteredDocuments = mockDocuments.filter(document => {
+    const matchesSearch = document.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         document.auteur.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesType = filterType === 'tous' || document.type === filterType
+    const matchesCategorie = filterCategorie === 'toutes' || document.categorie === filterCategorie
     
-    return <Badge variant="outline">{typeLabels[type]}</Badge>
-  }
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
-
-  const filteredDocuments = mockDocuments.filter((doc) => {
-    const matchSearch = doc.nom.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchType = filterType === 'tous' || doc.type === filterType
-    return matchSearch && matchType
+    return matchesSearch && matchesType && matchesCategorie
   })
+
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case 'PDF':
+        return <FileText className="h-5 w-5 text-red-500" />
+      case 'Image':
+        return <Image className="h-5 w-5 text-green-500" />
+      case 'CAD':
+        return <File className="h-5 w-5 text-blue-500" />
+      case 'Excel':
+        return <FileText className="h-5 w-5 text-green-600" />
+      case 'Word':
+        return <FileText className="h-5 w-5 text-blue-600" />
+      default:
+        return <File className="h-5 w-5 text-gray-500" />
+    }
+  }
+
+  const getCategorieBadge = (categorie: string) => {
+    const variants = {
+      'Plan': 'default',
+      'Photo': 'secondary',
+      'Facture': 'outline',
+      'Devis': 'outline',
+      'Rapport': 'secondary',
+      'Autre': 'outline'
+    }
+    return <Badge variant={variants[categorie] as any}>{categorie}</Badge>
+  }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -143,147 +132,152 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
       // Simulation d'upload
       setTimeout(() => {
         setIsUploading(false)
-        // Ici, appeler l'API pour uploader le fichier
+        console.log('Fichier(s) uploadé(s):', files)
       }, 2000)
     }
   }
 
   return (
     <div className="space-y-6">
-      {/* Barre d'actions */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Documents du Projet</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Télécharger Tout
+          </Button>
+          <label htmlFor="file-upload">
+            <Button disabled={isUploading} size="sm">
+              <Upload className="h-4 w-4 mr-2" />
+              {isUploading ? 'Upload...' : 'Ajouter'}
+            </Button>
+          </label>
+          <input
+            id="file-upload"
+            type="file"
+            multiple
+            className="hidden"
+            onChange={handleFileUpload}
+            accept=".pdf,.jpg,.jpeg,.png,.dwg,.xlsx,.docx"
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Rechercher un document..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Select value={filterType} onValueChange={setFilterType}>
+            <SelectTrigger className="w-[130px]">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="tous">Tous types</SelectItem>
+              <SelectItem value="PDF">PDF</SelectItem>
+              <SelectItem value="Image">Image</SelectItem>
+              <SelectItem value="CAD">CAD</SelectItem>
+              <SelectItem value="Excel">Excel</SelectItem>
+              <SelectItem value="Word">Word</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filterCategorie} onValueChange={setFilterCategorie}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Catégorie" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="toutes">Toutes catégories</SelectItem>
+              <SelectItem value="Plan">Plan</SelectItem>
+              <SelectItem value="Photo">Photo</SelectItem>
+              <SelectItem value="Facture">Facture</SelectItem>
+              <SelectItem value="Devis">Devis</SelectItem>
+              <SelectItem value="Rapport">Rapport</SelectItem>
+              <SelectItem value="Autre">Autre</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <Card>
         <CardHeader>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <CardTitle>Documents du projet</CardTitle>
-              <CardDescription>
-                Gérez tous les documents liés au projet
-              </CardDescription>
-            </div>
-            <div className="relative">
-              <input
-                type="file"
-                id="file-upload"
-                className="hidden"
-                onChange={handleFileUpload}
-                multiple
-              />
-              <Button asChild disabled={isUploading}>
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="mr-2 h-4 w-4" />
-                  {isUploading ? 'Upload en cours...' : 'Uploader des documents'}
-                </label>
-              </Button>
-            </div>
-          </div>
+          <CardTitle>Documents ({filteredDocuments.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher un document..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Type de document" /></SelectTrigger></SelectTrigger>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="tous">Tous les types</SelectItem>
-                <SelectItem value={TypeDocument.PLAN}>Plans</SelectItem>
-                <SelectItem value={TypeDocument.DEVIS}>Devis</SelectItem>
-                <SelectItem value={TypeDocument.FACTURE}>Factures</SelectItem>
-                <SelectItem value={TypeDocument.BON_COMMANDE}>Bons de commande</SelectItem>
-                <SelectItem value={TypeDocument.BON_LIVRAISON}>Bons de livraison</SelectItem>
-                <SelectItem value={TypeDocument.PHOTO}>Photos</SelectItem>
-                <SelectItem value={TypeDocument.AUTRE}>Autres</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-3">
+            {filteredDocuments.map((document) => (
+              <div key={document.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    {getFileIcon(document.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {document.nom}
+                    </p>
+                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                      <span>{document.taille}</span>
+                      <span>•</span>
+                      <span>Ajouté le {new Date(document.dateAjout).toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span>Par {document.auteur}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {getCategorieBadge(document.categorie)}
+                    <Badge variant="outline">{document.type}</Badge>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm">
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
+          
+          {filteredDocuments.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p>Aucun document trouvé</p>
+              <p className="text-sm">Essayez de modifier vos filtres</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Grille de documents */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredDocuments.map((document) => (
-          <Card key={document.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                {getDocumentIcon(document.type)}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Prévisualiser
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Download className="mr-2 h-4 w-4" />
-                      Télécharger
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Supprimer
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm truncate" title={document.nom}>
-                  {document.nom}
-                </h4>
-                <div className="flex items-center gap-2">
-                  {getTypeBadge(document.type)}
-                  <span className="text-xs text-muted-foreground">
-                    {formatFileSize(document.taille)}
-                  </span>
+      <Card>
+        <CardHeader>
+          <CardTitle>Statistiques des Documents</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {['PDF', 'Image', 'CAD', 'Excel', 'Word'].map((type) => (
+              <div key={type} className="text-center p-4 border rounded">
+                <div className="text-2xl font-bold">
+                  {mockDocuments.filter(doc => doc.type === type).length}
                 </div>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p>Ajouté par {document.uploadePar}</p>
-                  <p>{formatDate(document.createdAt, 'time')}</p>
-                </div>
+                <div className="text-sm text-gray-500">{type}</div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {filteredDocuments.length === 0 && (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <File className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Aucun document trouvé</p>
-            <p className="text-sm text-muted-foreground">
-              Modifiez vos filtres ou uploadez un nouveau document
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Zone de drag & drop */}
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <Upload className="h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-lg font-medium mb-2">Glissez vos fichiers ici</p>
-          <p className="text-sm text-muted-foreground mb-4">
-            ou cliquez sur le bouton "Uploader des documents"
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Formats acceptés : PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, ZIP
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Taille maximale : 50 MB par fichier
-          </p>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -26,7 +26,7 @@
     "build:api": "turbo build --filter=@erp/api",
     "build:all": "pnpm build:packages && turbo build",
     "lint": "turbo lint",
-    "lint:fix": "turbo lint --fix",
+    "lint:fix": "turbo lint:fix",
     "format": "turbo format",
     "type-check": "turbo type-check",
     "test": "turbo test",

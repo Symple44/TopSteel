@@ -1,0 +1,10 @@
+{
+  "root": true,
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "@typescript-eslint/recommended"
+  ]
+}
