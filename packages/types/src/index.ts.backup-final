@@ -57,7 +57,7 @@ export interface UniteMesure {
 
 // Types d'authentification
 export interface LoginResponse {
-  user: any;
+  user: User;
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
@@ -83,5 +83,4 @@ export interface ApiResponse<T = any> {
   errors?: string[];
 }
 
-
-
+export * from './additional';
