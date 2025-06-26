@@ -1,30 +1,116 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**", "build/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "dist/**",
+        "build/**"
+      ]
     },
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "lint:fix": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "type-check": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
     },
     "format": {
       "outputs": []
+    },
+    "test:unit": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "CI"
+      ],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "jest.config.{js,ts}",
+        "package.json"
+      ]
+    },
+    "format:check": {
+      "outputs": [],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx,json,md}",
+        ".prettierrc*",
+        ".prettierignore",
+        "package.json"
+      ]
+    },
+    "test:integration": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "CI",
+        "DB_*",
+        "REDIS_*"
+      ],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "**/*.integration.test.{ts,tsx}",
+        "**/*.integration.spec.{ts,tsx}",
+        "jest.config.{js,ts}",
+        "package.json"
+      ]
+    },
+    "test:coverage": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "CI"
+      ],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "jest.config.{js,ts}",
+        "package.json"
+      ]
     }
   }
 }
