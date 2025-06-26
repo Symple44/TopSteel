@@ -40,3 +40,147 @@ export function isStock(obj: any): obj is Stock {
     Object.values(StockType).includes(obj.type)
   );
 }
+
+// === TYPES MANQUANTS ===
+
+// Types pour les produits et stock
+export interface CategorieProduit {
+  id: string;
+  nom: string;
+  description?: string;
+  couleur?: string;
+}
+
+export interface UniteMesure {
+  id: string;
+  nom: string;
+  symbole: string;
+  type: 'longueur' | 'poids' | 'volume' | 'surface' | 'quantite';
+}
+
+export interface Stock {
+  id: string;
+  produitId: string;
+  quantite: number;
+  quantiteReservee: number;
+  quantiteDisponible: number;
+  emplacement: string;
+  dateModification: Date;
+}
+
+export interface Produit {
+  id: string;
+  nom: string;
+  reference: string;
+  description?: string;
+  categorieId: string;
+  uniteId: string;
+  prixUnitaire: number;
+  stock?: Stock;
+}
+
+export interface MouvementStock {
+  id: string;
+  produitId: string;
+  type: 'entree' | 'sortie' | 'transfert' | 'inventaire';
+  quantite: number;
+  motif: string;
+  dateMovement: Date;
+  utilisateurId: string;
+}
+
+// Types pour les projets et production
+export enum StatutProduction {
+  EN_ATTENTE = 'en_attente',
+  EN_COURS = 'en_cours',
+  TERMINEE = 'terminee',
+  SUSPENDUE = 'suspendue'
+}
+
+export enum PrioriteProduction {
+  BASSE = 'basse',
+  NORMALE = 'normale',
+  HAUTE = 'haute',
+  URGENTE = 'urgente'
+}
+
+export enum ProjetStatut {
+  BROUILLON = 'brouillon',
+  EN_COURS = 'en_cours',
+  EN_ATTENTE = 'en_attente',
+  TERMINE = 'termine',
+  ANNULE = 'annule'
+}
+
+export enum DevisStatut {
+  BROUILLON = 'brouillon',
+  ENVOYE = 'envoye',
+  ACCEPTE = 'accepte',
+  REFUSE = 'refuse',
+  EXPIRE = 'expire'
+}
+
+export enum TypeDocument {
+  DEVIS = 'devis',
+  FACTURE = 'facture',
+  BON_COMMANDE = 'bon_commande',
+  PLAN = 'plan',
+  PHOTO = 'photo',
+  AUTRE = 'autre'
+}
+
+// Projet avec alias pour compatibilité
+export interface Project {
+  id: string;
+  nom: string;
+  description?: string;
+  statut: ProjetStatut;
+  clientId: string;
+  dateDebut: Date;
+  dateFin?: Date;
+  budget?: number;
+}
+
+export type Projet = Project; // Alias pour compatibilité
+
+export interface ProjetFilters {
+  statut?: ProjetStatut;
+  clientId?: string;
+  dateDebut?: Date;
+  dateFin?: Date;
+}
+
+export interface StockFilters {
+  categorieId?: string;
+  quantiteMin?: number;
+  quantiteMax?: number;
+  emplacement?: string;
+}
+
+// Types pour l'API
+export interface ApiResponse<T = any> {
+  data: T;
+  success: boolean;
+  message?: string;
+  errors?: string[];
+}
+
+// Types d'authentification
+export interface LoginResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
