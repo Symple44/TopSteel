@@ -1,7 +1,7 @@
 // packages/types/src/production.ts
-import { BaseEntity } from './common'
+import type { BaseEntity } from './common'
 import type { Projet } from './projet'
-import { ProjetPriorite } from './projet'
+import type { ProjetPriorite } from './projet'
 import type { User } from './user'
 import type { Stock } from './stock'
 

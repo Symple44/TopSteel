@@ -9,16 +9,17 @@ export type { DeepPartial, DeepRequired } from './types';
 
 // Função de debug sécurisée
 export function safeLog(...args: any[]) {
-  if (typeof console !== 'undefined' && console.log) {
-    console.log(...args);
+  if (typeof console !== 'undefined' && console.info) {
+    console.info(...args);
   }
 }
 
 // Vérification de l'environnement
 export function isBrowser() {
-  return typeof window !== 'undefined' && typeof window.document !== 'undefined';
+  return typeof globalThis !== 'undefined' && typeof globalThis.document !== 'undefined';
 }
 
 export function isNode() {
   return typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 }
+

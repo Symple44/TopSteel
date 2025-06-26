@@ -1,5 +1,12 @@
 // packages/utils/src/lib/functions.ts
 
+// Types pour l'environnement runtime
+declare global {
+  function setTimeout(callback: (...args: any[]) => void, ms?: number): NodeJS.Timeout;
+  function clearTimeout(timeoutId: NodeJS.Timeout): void;
+}
+
+
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
@@ -37,3 +44,4 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+

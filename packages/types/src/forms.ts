@@ -1,8 +1,8 @@
 // packages/types/src/forms.ts
-import { Address, Contact, Unit } from './common'
-import { ProjetType, ProjetPriorite } from './projet'
-import { ClientType } from './client'
-import { StockType } from './stock'
+import type { Address, Contact, Unit } from './common'
+import type { ProjetType, ProjetPriorite } from './projet'
+import type { ClientType } from './client'
+import type { StockType } from './stock'
 
 export interface LoginFormData {
   email: string

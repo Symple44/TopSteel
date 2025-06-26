@@ -78,3 +78,4 @@ export type TelephoneFrancais = z.infer<typeof telephoneFrancaisSchema>;
 export type CodePostalFrancais = z.infer<typeof codePostalFrancaisSchema>;
 export type UtilisateurSecurise = z.infer<typeof utilisateurSecuriseSchema>;
 export type EntrepriseSecurise = z.infer<typeof entrepriseSecuriseSchema>;
+

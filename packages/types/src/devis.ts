@@ -1,5 +1,5 @@
 // packages/types/src/devis.ts
-import { BaseEntity, Unit } from './common'
+import type { BaseEntity, Unit } from './common'
 import type { Projet } from './projet'
 import type { Client } from './client'
 

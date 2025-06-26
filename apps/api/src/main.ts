@@ -44,10 +44,46 @@ async function bootstrap() {
   const env = configService.get<string>("app.env", "development");
 
   // Sécurité
+  // Sécurité renforcée avec Helmet 8+
   app.use(
     helmet({
-      contentSecurityPolicy: env === "production" ? undefined : false,
+      // Content Security Policy adapté pour un ERP
+      contentSecurityPolicy: env === "production" ? {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"], // Pour les styles inline nécessaires
+          scriptSrc: ["'self'"],
+          imgSrc: ["'self'", "data:", "blob:"], // Pour les uploads d'images
+          connectSrc: ["'self'"], // Pour les WebSockets et API calls
+          fontSrc: ["'self'"],
+          objectSrc: ["'none'"],
+          mediaSrc: ["'self'"],
+          frameSrc: ["'none'"],
+        },
+      } : false,
+      
+      // Protection Cross-Origin pour les APIs
       crossOriginEmbedderPolicy: env === "production",
+      crossOriginOpenerPolicy: { policy: "same-origin" },
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+      
+      // Headers de sécurité renforcés
+      dnsPrefetchControl: { allow: false },
+      frameguard: { action: "deny" },
+      hidePoweredBy: true,
+      hsts: env === "production" ? {
+        maxAge: 31536000, // 1 an
+        includeSubDomains: true,
+        preload: true
+      } : false,
+      
+      // Protection contre les attaques
+      ieNoOpen: true,
+      noSniff: true,
+      originAgentCluster: true,
+      permittedCrossDomainPolicies: false,
+      referrerPolicy: { policy: "no-referrer" },
+      xssFilter: true,
     })
   );
 
@@ -155,5 +191,6 @@ bootstrap().catch((error) => {
   console.error("❌ Erreur lors du démarrage du serveur:", error);
   process.exit(1);
 });
+
 
 

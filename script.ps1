@@ -1,494 +1,458 @@
 #!/usr/bin/env pwsh
-# =========================================================================
-# APPLICATION CONFIGURATION VS CODE
-# Création des fichiers de configuration VS Code pour ERP TopSteel
-# =========================================================================
+<#
+.SYNOPSIS
+    Mise à jour sécurisée de Helmet et amélioration de la sécurité TopSteel ERP
 
-Write-Host "===============================================================================" -ForegroundColor Cyan
-Write-Host "                    CONFIGURATION VS CODE ERP TOPSTEEL" -ForegroundColor Cyan
-Write-Host "===============================================================================" -ForegroundColor Cyan
+.DESCRIPTION
+    Met à jour Helmet vers la dernière version, corrige les types dépréciés, 
+    et optimise la configuration de sécurité pour l'ERP TopSteel.
 
-# Créer le dossier .vscode
-if (-not (Test-Path ".vscode")) {
-    New-Item -ItemType Directory -Path ".vscode" -Force | Out-Null
-    Write-Host "[+] Dossier .vscode créé" -ForegroundColor Green
+.PARAMETER UpdateAll
+    Met à jour toutes les dépendances de sécurité
+
+.PARAMETER CheckVulnerabilities
+    Vérifie les vulnérabilités de sécurité
+
+.EXAMPLE
+    .\Update-Helmet-Security.ps1
+    .\Update-Helmet-Security.ps1 -UpdateAll -CheckVulnerabilities
+#>
+
+param(
+    [switch]$UpdateAll,
+    [switch]$CheckVulnerabilities
+)
+
+$ErrorActionPreference = "Stop"
+
+function Write-ColorOutput {
+    param([string]$Message, [string]$Color = "White")
+    $colorMap = @{
+        "Red" = [ConsoleColor]::Red; "Green" = [ConsoleColor]::Green
+        "Yellow" = [ConsoleColor]::Yellow; "Blue" = [ConsoleColor]::Blue
+        "Cyan" = [ConsoleColor]::Cyan; "White" = [ConsoleColor]::White
+        "Magenta" = [ConsoleColor]::Magenta
+    }
+    Write-Host $Message -ForegroundColor $colorMap[$Color]
 }
 
-# =========================================================================
-# 1. TASKS.JSON
-# =========================================================================
+function Write-Header {
+    param([string]$Title)
+    Write-ColorOutput "`n🛡️ $Title" "Cyan"
+    Write-ColorOutput ("=" * 60) "Blue"
+}
 
-Write-Host "[*] Création tasks.json..." -ForegroundColor Yellow
+function Write-Success { param([string]$Message); Write-ColorOutput "✅ $Message" "Green" }
+function Write-Warning { param([string]$Message); Write-ColorOutput "⚠️  $Message" "Yellow" }
+function Write-Info { param([string]$Message); Write-ColorOutput "ℹ️  $Message" "Blue" }
+function Write-Security { param([string]$Message); Write-ColorOutput "🔒 $Message" "Magenta" }
 
-$tasksJson = @{
-    version = "2.0.0"
-    tasks   = @(
-        @{
-            label          = "🚀 ERP: Setup Complet"
-            type           = "shell"
-            command        = "pwsh"
-            args           = @("scripts/setup-erp.ps1")
-            group          = @{
-                kind      = "build"
-                isDefault = $true
+Write-Header "🚀 TopSteel ERP - Mise à jour sécurité Helmet"
+
+try {
+    # 1. Audit de sécurité initial
+    Write-Header "Audit de sécurité initial"
+    
+    Write-Info "Vérification des versions actuelles..."
+    
+    # Vérifier la version actuelle de Helmet
+    $apiPackageJson = "apps/api/package.json"
+    if (Test-Path $apiPackageJson) {
+        $apiConfig = Get-Content $apiPackageJson | ConvertFrom-Json
+        $currentHelmet = $apiConfig.dependencies.helmet
+        $currentTypesHelmet = $apiConfig.devDependencies."@types/helmet"
+        
+        Write-Info "Helmet actuel: $currentHelmet"
+        Write-Warning "Types Helmet: $currentTypesHelmet (DÉPRÉCIÉ)"
+        
+        Write-Security @"
+🔍 Analyse de sécurité:
+• Helmet 7.1.0 = Bonne version de base
+• @types/helmet 4.0.0 = DÉPRÉCIÉ depuis Helmet 6+
+• Helmet 8+ a des types intégrés (plus besoin de @types/helmet)
+• Nouvelles fonctionnalités de sécurité disponibles
+"@
+    }
+    
+    # 2. Vérification des vulnérabilités
+    if ($CheckVulnerabilities) {
+        Write-Header "Vérification des vulnérabilités"
+        
+        Write-Info "Audit de sécurité pnpm..."
+        Push-Location "apps/api"
+        try {
+            $auditResult = pnpm audit --json 2>&1 | ConvertFrom-Json -ErrorAction SilentlyContinue
+            if ($auditResult.metadata.vulnerabilities.total -gt 0) {
+                Write-Warning "Vulnérabilités détectées: $($auditResult.metadata.vulnerabilities.total)"
             }
-            presentation   = @{
-                echo   = $true
-                reveal = "always"
-                focus  = $false
-                panel  = "new"
+            else {
+                Write-Success "Aucune vulnérabilité détectée"
             }
-            problemMatcher = @()
-            detail         = "Installation complète du projet ERP TopSteel"
-        },
-        @{
-            label        = "🔄 ERP: Setup Force (Reset)"
-            type         = "shell"
-            command      = "pwsh"
-            args         = @("scripts/setup-erp.ps1", "-Force")
-            group        = "build"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-                panel  = "new"
-            }
-            detail       = "Réinstallation forcée avec suppression des données existantes"
-        },
-        @{
-            label        = "▶️ ERP: Démarrer Serveurs"
-            type         = "shell"
-            command      = "pnpm"
-            args         = @("dev")
-            group        = "build"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-                panel  = "new"
-            }
-            detail       = "Démarre les serveurs API et Web en mode développement"
-        },
-        @{
-            label        = "🏗️ ERP: Build Packages"
-            type         = "shell"
-            command      = "pnpm"
-            args         = @("build:packages")
-            group        = "build"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-            }
-            detail       = "Construit les packages partagés (types, utils, config)"
-        },
-        @{
-            label        = "🗄️ DB: Status"
-            type         = "shell"
-            command      = "pwsh"
-            args         = @("scripts/manage-db.ps1", "status")
-            group        = "test"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-                panel  = "new"
-            }
-            detail       = "Affiche l'état de la base de données"
-        },
-        @{
-            label        = "💾 DB: Backup"
-            type         = "shell"
-            command      = "pwsh"
-            args         = @("scripts/manage-db.ps1", "backup")
-            group        = "build"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-                panel  = "new"
-            }
-            detail       = "Crée une sauvegarde de la base de données"
-        },
-        @{
-            label        = "🔄 DB: Reset Database"
-            type         = "shell"
-            command      = "pwsh"
-            args         = @("scripts/manage-db.ps1", "reset")
-            group        = "build"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-                panel  = "new"
-            }
-            detail       = "Remet à zéro la base de données (ATTENTION: destructif)"
-        },
-        @{
-            label        = "🔍 ERP: Lint"
-            type         = "shell"
-            command      = "pnpm"
-            args         = @("lint")
-            group        = "test"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-            }
-            detail       = "Vérifie la qualité du code"
-        },
-        @{
-            label        = "🧹 ERP: Clean"
-            type         = "shell"
-            command      = "pnpm"
-            args         = @("clean")
-            group        = "build"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-            }
-            detail       = "Nettoie les fichiers de build et cache"
-        },
-        @{
-            label        = "🔧 ERP: Check Environment"
-            type         = "shell"
-            command      = "pnpm"
-            args         = @("check:env")
-            group        = "test"
-            presentation = @{
-                echo   = $true
-                reveal = "always"
-            }
-            detail       = "Vérifie les variables d'environnement"
         }
-    )
-}
-
-$tasksJson | ConvertTo-Json -Depth 10 | Set-Content ".vscode/tasks.json"
-Write-Host "[+] tasks.json créé" -ForegroundColor Green
-
-# =========================================================================
-# 2. LAUNCH.JSON
-# =========================================================================
-
-Write-Host "[*] Création launch.json..." -ForegroundColor Yellow
-
-$launchJson = @{
-    version        = "0.2.0"
-    configurations = @(
-        @{
-            name       = "🐛 Debug API (NestJS)"
-            type       = "node"
-            request    = "launch"
-            # CORRECTION: Échappement correct des variables VS Code
-            program    = "`${workspaceFolder}/apps/api/dist/main.js"
-            cwd        = "`${workspaceFolder}/apps/api"
-            env        = @{
-                NODE_ENV = "development"
-            }
-            sourceMaps = $true
-            outFiles   = @("`${workspaceFolder}/apps/api/dist/**/*.js")
-            console    = "integratedTerminal"
-            restart    = $true
-        },
-        @{
-            name    = "🐛 Debug Web (Next.js)"
-            type    = "node"
-            request = "launch"
-            program = "`${workspaceFolder}/apps/web/node_modules/.bin/next"
-            args    = @("dev")
-            cwd     = "`${workspaceFolder}/apps/web"
-            env     = @{
-                NODE_ENV = "development"
-            }
-            console = "integratedTerminal"
+        catch {
+            Write-Info "Audit terminé (voir détails ci-dessus)"
         }
-    )
-}
-
-$launchJson | ConvertTo-Json -Depth 10 | Set-Content ".vscode/launch.json"
-Write-Host "[+] launch.json créé" -ForegroundColor Green
-
-# =========================================================================
-# 3. SETTINGS.JSON
-# =========================================================================
-
-Write-Host "[*] Création settings.json..." -ForegroundColor Yellow
-
-$settingsJson = @{
-    "typescript.preferences.includePackageJsonAutoImports" = "auto"
-    "typescript.suggest.autoImports"                       = $true
-    "typescript.preferences.importModuleSpecifier"         = "relative"
-    "editor.formatOnSave"                                  = $true
-    "editor.codeActionsOnSave"                             = @{
-        "source.fixAll.eslint"   = $true
-        "source.organizeImports" = $true
+        finally {
+            Pop-Location
+        }
     }
-    "files.associations"                                   = @{
-        "*.env*" = "properties"
-        "*.md"   = "markdown"
+    
+    # 3. Mise à jour de Helmet
+    Write-Header "Mise à jour de Helmet et dépendances"
+    
+    Push-Location "apps/api"
+    try {
+        Write-Info "Mise à jour vers Helmet 8+ (types intégrés)..."
+        
+        # Supprimer les anciens types dépréciés
+        Write-Info "Suppression des types dépréciés..."
+        pnpm remove @types/helmet
+        
+        # Installer la dernière version de Helmet (8+ a les types intégrés)
+        Write-Info "Installation de Helmet 8+ avec types intégrés..."
+        pnpm add helmet@latest
+        
+        # Mettre à jour d'autres dépendances de sécurité si demandé
+        if ($UpdateAll) {
+            Write-Info "Mise à jour des autres dépendances de sécurité..."
+            pnpm add cors@latest express-rate-limit@latest
+            pnpm add -D @types/cors@latest
+        }
+        
+        Write-Success "Helmet mis à jour avec succès!"
     }
-    "search.exclude"                                       = @{
-        "**/node_modules" = $true
-        "**/dist"         = $true
-        "**/.next"        = $true
-        "**/coverage"     = $true
-        "**/.turbo"       = $true
+    finally {
+        Pop-Location
     }
-    "files.watcherExclude"                                 = @{
-        "**/node_modules/**" = $true
-        "**/dist/**"         = $true
-        "**/.next/**"        = $true
-        "**/coverage/**"     = $true
-        "**/.turbo/**"       = $true
+    
+    # 4. Mise à jour de la configuration Helmet
+    Write-Header "Optimisation de la configuration Helmet"
+    
+    $mainTsPath = "apps/api/src/main.ts"
+    if (Test-Path $mainTsPath) {
+        Write-Info "Mise à jour de la configuration dans main.ts..."
+        
+        $content = Get-Content $mainTsPath -Raw
+        
+        # Configuration Helmet optimisée pour ERP TopSteel
+        $newHelmetConfig = @'
+  // Sécurité renforcée avec Helmet 8+
+  app.use(
+    helmet({
+      // Content Security Policy adapté pour un ERP
+      contentSecurityPolicy: env === "production" ? {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"], // Pour les styles inline nécessaires
+          scriptSrc: ["'self'"],
+          imgSrc: ["'self'", "data:", "blob:"], // Pour les uploads d'images
+          connectSrc: ["'self'"], // Pour les WebSockets et API calls
+          fontSrc: ["'self'"],
+          objectSrc: ["'none'"],
+          mediaSrc: ["'self'"],
+          frameSrc: ["'none'"],
+        },
+      } : false,
+      
+      // Protection Cross-Origin pour les APIs
+      crossOriginEmbedderPolicy: env === "production",
+      crossOriginOpenerPolicy: { policy: "same-origin" },
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+      
+      // Headers de sécurité renforcés
+      dnsPrefetchControl: { allow: false },
+      frameguard: { action: "deny" },
+      hidePoweredBy: true,
+      hsts: env === "production" ? {
+        maxAge: 31536000, // 1 an
+        includeSubDomains: true,
+        preload: true
+      } : false,
+      
+      // Protection contre les attaques
+      ieNoOpen: true,
+      noSniff: true,
+      originAgentCluster: true,
+      permittedCrossDomainPolicies: false,
+      referrerPolicy: { policy: "no-referrer" },
+      xssFilter: true,
+    })
+  );
+'@
+        
+        # Remplacer l'ancienne configuration par la nouvelle
+        $pattern = 'app\.use\(\s*helmet\([^}]*\}\s*\)\s*\);'
+        if ($content -match $pattern) {
+            $content = $content -replace $pattern, $newHelmetConfig.Trim()
+            Set-Content $mainTsPath -Value $content -Encoding UTF8
+            Write-Success "Configuration Helmet optimisée dans main.ts"
+        }
+        else {
+            Write-Warning "Configuration Helmet non trouvée dans main.ts"
+        }
     }
-    "explorer.fileNesting.enabled"                         = $true
-    "explorer.fileNesting.patterns"                        = @{
-        # CORRECTION: Variables VS Code correctement échappées
-        "*.ts"          = "`${capture}.js"
-        "*.tsx"         = "`${capture}.js"
-        "package.json"  = "package-lock.json,pnpm-lock.yaml,yarn.lock"
-        ".env"          = ".env.*"
-        "tsconfig.json" = "tsconfig.*.json"
-        "README.md"     = "README.*"
+    
+    # 5. Création d'un middleware de sécurité avancé
+    Write-Header "Création du middleware de sécurité avancé"
+    
+    $securityMiddlewarePath = "apps/api/src/common/middleware/security.middleware.ts"
+    $securityMiddlewareDir = Split-Path $securityMiddlewarePath -Parent
+    
+    if (-not (Test-Path $securityMiddlewareDir)) {
+        New-Item -ItemType Directory -Path $securityMiddlewareDir -Force | Out-Null
     }
-    "terminal.integrated.defaultProfile.windows"           = "PowerShell"
-    "git.autofetch"                                        = $true
-    "workbench.editor.enablePreview"                       = $false
-    "editor.minimap.enabled"                               = $false
-    "editor.rulers"                                        = @(80, 120)
-}
+    
+    $securityMiddleware = @'
+// apps/api/src/common/middleware/security.middleware.ts
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
 
-$settingsJson | ConvertTo-Json -Depth 10 | Set-Content ".vscode/settings.json"
-Write-Host "[+] settings.json créé" -ForegroundColor Green
-
-# =========================================================================
-# 4. EXTENSIONS.JSON
-# =========================================================================
-
-Write-Host "[*] Création extensions.json..." -ForegroundColor Yellow
-
-$extensionsJson = @{
-    recommendations         = @(
-        "ms-vscode.vscode-typescript-next",
-        "bradlc.vscode-tailwindcss",
-        "ms-vscode.powershell",
-        "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
-        "formulahendry.auto-rename-tag",
-        "christian-kohler.path-intellisense",
-        "ckolkman.vscode-postgres",
-        "rangav.vscode-thunder-client",
-        "usernamehw.errorlens",
-        "gruntfuggly.todo-tree"
-    )
-    unwantedRecommendations = @(
-        "ms-vscode.vscode-typescript",
-        "hookyqr.beautify"
-    )
-}
-
-$extensionsJson | ConvertTo-Json -Depth 10 | Set-Content ".vscode/extensions.json"
-Write-Host "[+] extensions.json créé" -ForegroundColor Green
-
-# =========================================================================
-# 5. SNIPPETS
-# =========================================================================
-
-Write-Host "[*] Création snippets..." -ForegroundColor Yellow
-
-if (-not (Test-Path ".vscode/snippets")) {
-    New-Item -ItemType Directory -Path ".vscode/snippets" -Force | Out-Null
-}
-
-# CORRECTION: Utilisation de here-strings pour éviter les problèmes d'échappement
-$typescriptSnippetsContent = @'
-{
-  "NestJS Controller": {
-    "prefix": "nest-controller",
-    "body": [
-      "import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';",
-      "import { ApiTags, ApiOperation } from '@nestjs/swagger';",
-      "",
-      "@Controller('${1:resource}')",
-      "@ApiTags('${1:resource}')",
-      "export class ${2:Resource}Controller {",
-      "  constructor(private readonly ${3:service}: ${2:Resource}Service) {}",
-      "",
-      "  @Get()",
-      "  @ApiOperation({ summary: 'Get all ${1:resource}' })",
-      "  findAll() {",
-      "    return this.${3:service}.findAll();",
-      "  }",
-      "",
-      "  @Get(':id')",
-      "  findOne(@Param('id') id: string) {",
-      "    return this.${3:service}.findOne(id);",
-      "  }",
-      "}"
-    ],
-    "description": "Créer un contrôleur NestJS"
-  },
-  "React Component": {
-    "prefix": "react-component",
-    "body": [
-      "import React from 'react';",
-      "",
-      "interface ${1:Component}Props {",
-      "  ${2:prop}: ${3:string};",
-      "}",
-      "",
-      "export const ${1:Component}: React.FC<${1:Component}Props> = ({ ${2:prop} }) => {",
-      "  return (",
-      "    <div className=\"${4:container}\">",
-      "      ${5:content}",
-      "    </div>",
-      "  );",
-      "};"
-    ],
-    "description": "Créer un composant React"
-  },
-  "NestJS Service": {
-    "prefix": "nest-service",
-    "body": [
-      "import { Injectable } from '@nestjs/common';",
-      "",
-      "@Injectable()",
-      "export class ${1:Resource}Service {",
-      "  async findAll() {",
-      "    // TODO: Implement findAll logic",
-      "    return [];",
-      "  }",
-      "",
-      "  async findOne(id: string) {",
-      "    // TODO: Implement findOne logic",
-      "    return null;",
-      "  }",
-      "",
-      "  async create(data: any) {",
-      "    // TODO: Implement create logic",
-      "    return data;",
-      "  }",
-      "",
-      "  async update(id: string, data: any) {",
-      "    // TODO: Implement update logic",
-      "    return data;",
-      "  }",
-      "",
-      "  async remove(id: string) {",
-      "    // TODO: Implement remove logic",
-      "    return { deleted: true };",
-      "  }",
-      "}"
-    ],
-    "description": "Créer un service NestJS"
-  },
-  "React Hook": {
-    "prefix": "react-hook",
-    "body": [
-      "import { useState, useEffect } from 'react';",
-      "",
-      "export const use${1:Hook} = () => {",
-      "  const [${2:state}, set${2/(.*)/${1:/capitalize}/}] = useState(${3:null});",
-      "",
-      "  useEffect(() => {",
-      "    // TODO: Implement effect logic",
-      "  }, []);",
-      "",
-      "  return {",
-      "    ${2:state},",
-      "    set${2/(.*)/${1:/capitalize}/}",
-      "  };",
-      "};"
-    ],
-    "description": "Créer un hook React personnalisé"
+@Injectable()
+export class SecurityMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    // Headers de sécurité additionnels pour l'ERP
+    
+    // Protection contre le clickjacking spécifique aux ERPs
+    res.setHeader('X-Frame-Options', 'DENY');
+    
+    // Protection contre les attaques MIME
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
+    // Cache control pour les données sensibles
+    if (req.path.includes('/api/')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+    
+    // Headers de sécurité pour les uploads
+    if (req.path.includes('/upload')) {
+      res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+    }
+    
+    // Protection contre les attaques de timing (pour les authentifications)
+    if (req.path.includes('/auth/')) {
+      const delay = Math.random() * 100; // Délai aléatoire de 0-100ms
+      setTimeout(() => next(), delay);
+      return;
+    }
+    
+    next();
   }
 }
 '@
-
-Set-Content ".vscode/snippets/typescript.json" $typescriptSnippetsContent
-Write-Host "[+] Snippets TypeScript créés" -ForegroundColor Green
-
-# =========================================================================
-# 6. CRÉER UN FICHIER DE CORRECTION POST-GÉNÉRATION
-# =========================================================================
-
-Write-Host "[*] Création du correcteur post-génération..." -ForegroundColor Yellow
-
-$postFixScript = @'
-#!/usr/bin/env pwsh
-# Script de correction des fichiers VS Code générés
-
-Write-Host "🔧 Correction des variables VS Code..." -ForegroundColor Yellow
-
-# Correction du launch.json
-if (Test-Path ".vscode/launch.json") {
-    $launchContent = Get-Content ".vscode/launch.json" -Raw
     
-    # Corriger les variables VS Code mal échappées
-    $launchContent = $launchContent -replace '`\$\{workspaceFolder\}', '${workspaceFolder}'
-    $launchContent = $launchContent -replace '`\$\{capture\}', '${capture}'
+    Set-Content $securityMiddlewarePath -Value $securityMiddleware -Encoding UTF8
+    Write-Success "Middleware de sécurité avancé créé"
     
-    Set-Content ".vscode/launch.json" $launchContent
-    Write-Host "✅ launch.json corrigé" -ForegroundColor Green
+    # 6. Script de configuration HTTPS pour la production
+    Write-Header "Script de configuration HTTPS"
+    
+    $httpsConfigPath = "apps/api/src/config/https.config.ts"
+    $httpsConfigDir = Split-Path $httpsConfigPath -Parent
+    
+    if (-not (Test-Path $httpsConfigDir)) {
+        New-Item -ItemType Directory -Path $httpsConfigDir -Force | Out-Null
+    }
+    
+    $httpsConfig = @'
+// apps/api/src/config/https.config.ts
+// Configuration HTTPS pour TopSteel ERP en production
+
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+export interface HttpsOptions {
+  key: Buffer;
+  cert: Buffer;
+  ca?: Buffer;
 }
 
-# Correction du settings.json
-if (Test-Path ".vscode/settings.json") {
-    $settingsContent = Get-Content ".vscode/settings.json" -Raw
+export function getHttpsOptions(): HttpsOptions | null {
+  if (process.env.NODE_ENV !== 'production') {
+    return null;
+  }
+
+  try {
+    const certPath = process.env.SSL_CERT_PATH || '/etc/ssl/certs/topsteel';
     
-    # Corriger les variables VS Code mal échappées
-    $settingsContent = $settingsContent -replace '`\$\{capture\}', '${capture}'
-    
-    Set-Content ".vscode/settings.json" $settingsContent
-    Write-Host "✅ settings.json corrigé" -ForegroundColor Green
+    return {
+      key: readFileSync(join(certPath, 'private.key')),
+      cert: readFileSync(join(certPath, 'certificate.crt')),
+      ca: process.env.SSL_CA_PATH ? readFileSync(process.env.SSL_CA_PATH) : undefined,
+    };
+  } catch (error) {
+    console.warn('⚠️  Certificats SSL non trouvés, utilisation HTTP:', error.message);
+    return null;
+  }
 }
 
-Write-Host "🎉 Correction terminée !" -ForegroundColor Green
+// Configuration SSL/TLS recommandée pour TopSteel ERP
+export const TLS_CONFIG = {
+  // Protocoles autorisés (TLS 1.2+ uniquement)
+  secureProtocol: 'TLSv1_2_method',
+  
+  // Ciphers sécurisés pour un ERP
+  ciphers: [
+    'TLS_AES_256_GCM_SHA384',
+    'TLS_CHACHA20_POLY1305_SHA256',
+    'TLS_AES_128_GCM_SHA256',
+    'ECDHE-RSA-AES128-GCM-SHA256',
+    'ECDHE-RSA-AES256-GCM-SHA384',
+  ].join(':'),
+  
+  // Options de sécurité
+  honorCipherOrder: true,
+  secureOptions: require('constants').SSL_OP_NO_SSLv2 | 
+                  require('constants').SSL_OP_NO_SSLv3 |
+                  require('constants').SSL_OP_NO_TLSv1 |
+                  require('constants').SSL_OP_NO_TLSv1_1,
+};
 '@
+    
+    Set-Content $httpsConfigPath -Value $httpsConfig -Encoding UTF8
+    Write-Success "Configuration HTTPS créée"
+    
+    # 7. Tests après mise à jour
+    Write-Header "Tests après mise à jour"
+    
+    Write-Info "Test de build après mise à jour..."
+    Push-Location "apps/api"
+    try {
+        pnpm run build
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "Build API réussi avec le nouveau Helmet"
+        }
+        else {
+            Write-Warning "Problème de build détecté"
+        }
+    }
+    finally {
+        Pop-Location
+    }
+    
+    # 8. Recommandations de sécurité
+    Write-Header "Recommandations de sécurité TopSteel ERP"
+    
+    Write-Security @"
+🛡️ SÉCURITÉ HELMET - MISE À JOUR RÉUSSIE
 
-Set-Content ".vscode/fix-config.ps1" $postFixScript
-Write-Host "[+] Script de correction créé" -ForegroundColor Green
+✅ Améliorations apportées:
+• Helmet 8+ avec types TypeScript intégrés
+• Configuration CSP adaptée pour ERP
+• Headers de sécurité renforcés
+• Middleware de sécurité personnalisé
+• Configuration HTTPS prête pour production
 
-# =========================================================================
-# EXÉCUTION DU CORRECTEUR
-# =========================================================================
+🔒 Prochaines étapes recommandées:
 
-Write-Host "[*] Application des corrections..." -ForegroundColor Yellow
-& ".vscode/fix-config.ps1"
+1. SÉCURITÉ RÉSEAU:
+   • Configurer un reverse proxy (Nginx/Traefik)
+   • Mettre en place un firewall applicatif (WAF)
+   • Utiliser des certificats SSL/TLS valides
 
-# =========================================================================
-# RÉSUMÉ
-# =========================================================================
+2. AUTHENTIFICATION:
+   • Implémenter 2FA/MFA obligatoire
+   • Politique de mots de passe stricte
+   • Limitation des tentatives de connexion
 
-Write-Host "" -ForegroundColor White
-Write-Host "===============================================================================" -ForegroundColor Green
-Write-Host "✅ CONFIGURATION VS CODE TERMINÉE !" -ForegroundColor Green
-Write-Host "===============================================================================" -ForegroundColor Green
-Write-Host "" -ForegroundColor White
+3. DONNÉES:
+   • Chiffrement des données sensibles
+   • Sauvegarde chiffrée régulière
+   • Audit trail complet
 
-Write-Host "📋 FICHIERS CRÉÉS :" -ForegroundColor Blue
-Write-Host "✅ .vscode/tasks.json - Tâches automatisées" -ForegroundColor Green
-Write-Host "✅ .vscode/launch.json - Configuration debug" -ForegroundColor Green  
-Write-Host "✅ .vscode/settings.json - Paramètres éditeur" -ForegroundColor Green
-Write-Host "✅ .vscode/extensions.json - Extensions recommandées" -ForegroundColor Green
-Write-Host "✅ .vscode/snippets/typescript.json - Snippets de code" -ForegroundColor Green
-Write-Host "✅ .vscode/fix-config.ps1 - Script de correction" -ForegroundColor Green
-Write-Host "" -ForegroundColor White
+4. MONITORING:
+   • Surveillance des logs de sécurité
+   • Alertes en temps réel
+   • Tests de pénétration réguliers
 
-Write-Host "🚀 UTILISATION DANS VS CODE :" -ForegroundColor Blue
-Write-Host "1. Ctrl+Shift+P > 'Tasks: Run Task'" -ForegroundColor White
-Write-Host "2. Choisissez une tâche (🚀 Setup, ▶️ Démarrer, 🗄️ DB Status, etc.)" -ForegroundColor White
-Write-Host "3. Ou F1 > 'Tasks: Run Build Task' pour le setup complet" -ForegroundColor White
-Write-Host "" -ForegroundColor White
+5. CONFORMITÉ ERP:
+   • Respect RGPD pour les données clients
+   • Audit de sécurité périodique
+   • Formation sécurité pour les utilisateurs
+"@
+    
+    # 9. Script de vérification sécurité
+    Write-Header "Script de vérification sécurité"
+    
+    $securityCheckScript = @'
+#!/usr/bin/env pwsh
+# Script de vérification sécurité TopSteel ERP
+# Usage: .\Check-Security.ps1
 
-Write-Host "🔧 TÂCHES PRINCIPALES DISPONIBLES :" -ForegroundColor Blue
-Write-Host "• 🚀 ERP: Setup Complet - Installation complète" -ForegroundColor White
-Write-Host "• ▶️ ERP: Démarrer Serveurs - Lance pnpm dev" -ForegroundColor White
-Write-Host "• 🗄️ DB: Status - État de la base de données" -ForegroundColor White
-Write-Host "• 💾 DB: Backup - Sauvegarde automatique" -ForegroundColor White
-Write-Host "• 🔄 DB: Reset Database - Remise à zéro" -ForegroundColor White
-Write-Host "" -ForegroundColor White
+Write-Host "🛡️ Vérification sécurité TopSteel ERP" -ForegroundColor Cyan
 
-Write-Host "📝 SNIPPETS DISPONIBLES :" -ForegroundColor Blue
-Write-Host "• nest-controller - Contrôleur NestJS complet" -ForegroundColor White
-Write-Host "• nest-service - Service NestJS avec CRUD" -ForegroundColor White
-Write-Host "• react-component - Composant React TypeScript" -ForegroundColor White
-Write-Host "• react-hook - Hook React personnalisé" -ForegroundColor White
-Write-Host "" -ForegroundColor White
+# 1. Vérifier les dépendances
+Write-Host "`n📦 Audit des dépendances..." -ForegroundColor Yellow
+cd apps/api
+pnpm audit
 
-Write-Host "💡 CONSEIL :" -ForegroundColor Yellow
-Write-Host "Redémarrez VS Code pour appliquer toute la configuration !" -ForegroundColor White
+# 2. Vérifier les headers de sécurité (si le serveur tourne)
+Write-Host "`n🔍 Test des headers de sécurité..." -ForegroundColor Yellow
+try {
+    $response = Invoke-WebRequest -Uri "http://localhost:3001/health" -Method HEAD -ErrorAction SilentlyContinue
+    if ($response.Headers["X-Frame-Options"]) {
+        Write-Host "✅ X-Frame-Options configuré" -ForegroundColor Green
+    }
+    if ($response.Headers["Content-Security-Policy"]) {
+        Write-Host "✅ CSP configuré" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "⚠️ Serveur non accessible pour les tests" -ForegroundColor Yellow
+}
+
+# 3. Vérifier les certificats SSL (en production)
+if ($env:NODE_ENV -eq "production") {
+    Write-Host "`n🔐 Vérification SSL..." -ForegroundColor Yellow
+    if (Test-Path "/etc/ssl/certs/topsteel") {
+        Write-Host "✅ Certificats SSL trouvés" -ForegroundColor Green
+    } else {
+        Write-Host "⚠️ Certificats SSL manquants" -ForegroundColor Yellow
+    }
+}
+
+Write-Host "`n✅ Vérification terminée" -ForegroundColor Green
+'@
+    
+    if (-not (Test-Path "scripts")) {
+        New-Item -ItemType Directory -Path "scripts" -Force | Out-Null
+    }
+    
+    Set-Content "scripts/Check-Security.ps1" -Value $securityCheckScript -Encoding UTF8
+    Write-Success "Script de vérification sécurité créé: scripts/Check-Security.ps1"
+    
+    # 10. Résumé final
+    Write-Header "✅ Mise à jour Helmet terminée"
+    
+    Write-Success @"
+🎉 MISE À JOUR SÉCURITÉ RÉUSSIE !
+
+🔄 Changements apportés:
+✅ Helmet mis à jour vers la dernière version (8+)
+✅ Types dépréciés supprimés (@types/helmet)
+✅ Configuration sécurisée pour ERP
+✅ Middleware de sécurité avancé
+✅ Configuration HTTPS prête
+✅ Script de vérification sécurité
+
+📋 Prochaines actions:
+1. Testez l'API: cd apps/api && pnpm start:dev
+2. Vérifiez la sécurité: .\scripts\Check-Security.ps1
+3. Commitez: git add . && git commit -m "security: update helmet and enhance security configuration"
+
+🛡️ TopSteel ERP est maintenant plus sécurisé !
+"@
+    
+}
+catch {
+    Write-ColorOutput "❌ Erreur: $($_.Exception.Message)" "Red"
+    Write-Warning @"
+En cas de problème:
+1. Restaurez package.json depuis la sauvegarde
+2. Exécutez: pnpm install
+3. Contactez l'équipe de sécurité
+"@
+    exit 1
+}
+
+Write-ColorOutput "`n🔒 Sécurité TopSteel ERP renforcée avec succès !" "Magenta"

@@ -1,5 +1,5 @@
 // packages/types/src/stock.ts
-import { BaseEntity, Unit } from './common'
+import type { BaseEntity, Unit } from './common'
 import type { User } from './user'
 
 export enum StockType {
