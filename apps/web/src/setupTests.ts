@@ -1,10 +1,8 @@
 import '@testing-library/jest-dom'
 
-// Extend Jest matchers
-declare global {
-  namespace jest {
-    interface Matchers<R> {
-      toBeInTheDocument(): R
-    }
+// Extend Jest matchers with module declaration
+declare module '@jest/expect' {
+  interface Matchers<R> {
+    toBeInTheDocument(): R
   }
 }

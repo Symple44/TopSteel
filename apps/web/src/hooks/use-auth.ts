@@ -21,22 +21,18 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       login: async (email: string, password: string) => {
-        try {
-          const response = await authService.login(email, password)
-          const tokens = {
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
-            expiresIn: response.expiresIn
-          }
-          
-          set({
-            user: response.user,
-            tokens,
-            isAuthenticated: true,
-          })
-        } catch (error) {
-          throw error
+        const response = await authService.login(email, password)
+        const tokens = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          expiresIn: response.expiresIn
         }
+        
+        set({
+          user: response.user,
+          tokens,
+          isAuthenticated: true,
+        })
       },
 
       logout: () => {
@@ -54,23 +50,14 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('No refresh token available')
         }
 
-        try {
-          const response = await authService.refreshToken(tokens.refreshToken)
-          const newTokens = {
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
-            expiresIn: response.expiresIn
-          }
-          
-          set({ tokens: newTokens })
-        } catch (error) {
-          set({
-            user: null,
-            tokens: null,
-            isAuthenticated: false,
-          })
-          throw error
+        const response = await authService.refreshToken(tokens.refreshToken)
+        const newTokens = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          expiresIn: response.expiresIn
         }
+        
+        set({ tokens: newTokens })
       },
 
       setUser: (user: User) => set({ user }),

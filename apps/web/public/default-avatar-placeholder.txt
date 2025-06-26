@@ -1,0 +1,2 @@
+<!-- Placeholder pour default-avatar.png -->
+<!-- Remplacez ce fichier par une vraie image PNG de 40x40px -->

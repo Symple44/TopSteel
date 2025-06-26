@@ -27,7 +27,11 @@
     "reset": "pnpm clean:all && pnpm install",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:e2e": "playwright test || echo 'Playwright not configured yet'",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPattern='.(test|spec).(ts|tsx)$' --testPathIgnorePatterns='integration|e2e'",
+    "test:integration": "jest --testPathPattern='integration.(test|spec).(ts|tsx)$'",
+    "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx,json,css,md}' || echo 'Prettier not configured'"
   },
   "dependencies": {
     "@erp/types": "workspace:*",

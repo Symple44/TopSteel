@@ -7,7 +7,7 @@ export default [
   {
     ignores: [
       ".next/**",
-      "out/**",
+      "out/**", 
       "node_modules/**",
       ".turbo/**",
       "coverage/**",
@@ -18,34 +18,49 @@ export default [
   {
     files: ["src/**/*.{ts,tsx,js,jsx}"],
     rules: {
-      // Règles temporairement désactivées pour migration progressive
-      "react/no-unescaped-entities": "off", // Trop d'erreurs à corriger
-      "@typescript-eslint/no-explicit-any": "off", // Composants génériques
-      "@typescript-eslint/no-unused-vars": "off", // Variables en cours de dev
-      "@typescript-eslint/no-empty-object-type": "off", // Interfaces vides OK
-      "@typescript-eslint/no-non-null-assertion": "off", // API calls
-      "jsx-a11y/alt-text": "off", // Images à optimiser plus tard
-      "react/no-array-index-key": "off", // Keys temporaires
-      "no-console": "off", // Debug en développement
-
-      // Garder seulement les erreurs critiques
-      "@next/next/no-img-element": "warn", // Performance importante
-      "react-hooks/rules-of-hooks": "error", // Sécurité React
-      "react-hooks/exhaustive-deps": "warn", // Performance React
+      // Règles strictes pour la qualité
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      
+      // Warnings non-bloquants
+      "@next/next/no-img-element": "warn",
+      "@typescript-eslint/no-namespace": "warn",
+      "no-useless-catch": "warn",
+      
+      // Règles désactivées temporairement
+      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "jsx-a11y/alt-text": "off",
+      "react/no-array-index-key": "off",
+      "no-console": "off",
     },
   },
 
-  // Composants UI génériques - très permissifs
+  // Composants UI - règles plus souples
   {
     files: ["src/components/ui/**/*.{ts,tsx}"],
     rules: {
-      "@typescript-eslint/no-explicit-any": "off", // OK pour composants génériques
-      "@typescript-eslint/no-empty-object-type": "off", // Interfaces props vides OK
-      "jsx-a11y/alt-text": "off", // Géré par les composants parents
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "jsx-a11y/alt-text": "off",
+      "@next/next/no-img-element": "off", // OK pour composants UI génériques
     },
   },
 
-  // Configuration pour les fichiers de configuration
+  // Tests - règles adaptées
+  {
+    files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "**/setupTests.ts"],
+    rules: {
+      "@typescript-eslint/no-namespace": "off", // OK pour extend Jest
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-console": "off",
+    },
+  },
+
+  // Configuration files
   {
     files: ["*.config.{js,mjs,ts}", "*.setup.{js,ts}"],
     rules: {

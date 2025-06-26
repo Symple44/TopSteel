@@ -83,7 +83,11 @@
     "db:reset": "pwsh scripts/manage-db.ps1 reset",
     "db:status": "pwsh scripts/manage-db.ps1 status",
     "db:backup": "pwsh scripts/manage-db.ps1 backup",
-    "postinstall-original": "pnpm build:packages"
+    "postinstall-original": "pnpm build:packages",
+    "format:check": "turbo format:check",
+    "test:coverage": "turbo test:coverage",
+    "test:unit": "turbo test:unit",
+    "test:integration": "turbo test:integration"
   },
   "dependencies": {
     "dotenv": "^16.5.0"
