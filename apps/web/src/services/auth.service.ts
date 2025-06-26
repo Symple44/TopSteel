@@ -1,24 +1,14 @@
 import { apiClient } from '@/lib/api-client'
-import type { User } from '@/types'
-
-interface LoginResponse {
-  user: User
-  accessToken: string
-  refreshToken: string
-}
-
-interface RefreshTokenResponse {
-  accessToken: string
-  refreshToken: string
-}
+import type { User, LoginResponse, RefreshTokenResponse } from '@/types'
 
 class AuthService {
   async login(email: string, password: string): Promise<LoginResponse> {
-    return apiClient.post('/auth/login', { email, password })
+    const response = await apiClient.post<LoginResponse>('/auth/login', { email, password })
+    return response.data
   }
 
   async logout(): Promise<void> {
-    return apiClient.post('/auth/logout')
+    await apiClient.post('/auth/logout')
   }
 
   async register(data: {
@@ -28,41 +18,44 @@ class AuthService {
     prenom: string
     entreprise?: string
   }): Promise<LoginResponse> {
-    return apiClient.post('/auth/register', data)
+    const response = await apiClient.post<LoginResponse>('/auth/register', data)
+    return response.data
   }
 
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
-    return apiClient.post('/auth/refresh', { refreshToken })
+    const response = await apiClient.post<RefreshTokenResponse>('/auth/refresh', { refreshToken })
+    return response.data
   }
 
   async getMe(): Promise<User> {
-    return apiClient.get('/auth/me')
+    const response = await apiClient.get<User>('/auth/me')
+    return response.data
   }
 
   async updatePassword(currentPassword: string, newPassword: string): Promise<void> {
-    return apiClient.post('/auth/change-password', {
+    await apiClient.post('/auth/change-password', {
       currentPassword,
       newPassword,
     })
   }
 
   async requestPasswordReset(email: string): Promise<void> {
-    return apiClient.post('/auth/forgot-password', { email })
+    await apiClient.post('/auth/forgot-password', { email })
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    return apiClient.post('/auth/reset-password', {
+    await apiClient.post('/auth/reset-password', {
       token,
       newPassword,
     })
   }
 
   async verifyEmail(token: string): Promise<void> {
-    return apiClient.post('/auth/verify-email', { token })
+    await apiClient.post('/auth/verify-email', { token })
   }
 
   async resendVerificationEmail(): Promise<void> {
-    return apiClient.post('/auth/resend-verification')
+    await apiClient.post('/auth/resend-verification')
   }
 }
 

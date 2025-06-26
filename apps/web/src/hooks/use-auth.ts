@@ -1,16 +1,12 @@
-// apps/web/src/hooks/use-auth.ts
-'use client'
-
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { authService } from '@/services/auth.service'
-import type { User, AuthTokens } from '@erp/types'
+import type { User, AuthTokens } from '@/types'
 
 interface AuthState {
   user: User | null
   tokens: AuthTokens | null
   isAuthenticated: boolean
-  isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   refreshToken: () => Promise<void>
@@ -23,26 +19,28 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       tokens: null,
       isAuthenticated: false,
-      isLoading: false,
 
       login: async (email: string, password: string) => {
-        set({ isLoading: true })
         try {
-          const response = await authService.login({ email, password })
+          const response = await authService.login(email, password)
+          const tokens = {
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken,
+            expiresIn: response.expiresIn
+          }
+          
           set({
             user: response.user,
-            tokens: response.tokens,
+            tokens,
             isAuthenticated: true,
-            isLoading: false,
           })
         } catch (error) {
-          set({ isLoading: false })
           throw error
         }
       },
 
       logout: () => {
-        authService.logout()
+        authService.logout().catch(console.error)
         set({
           user: null,
           tokens: null,
@@ -52,41 +50,40 @@ export const useAuthStore = create<AuthState>()(
 
       refreshToken: async () => {
         const { tokens } = get()
-        if (!tokens?.refreshToken) return
+        if (!tokens?.refreshToken) {
+          throw new Error('No refresh token available')
+        }
 
         try {
-          const newTokens = await authService.refreshToken(tokens.refreshToken)
+          const response = await authService.refreshToken(tokens.refreshToken)
+          const newTokens = {
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken,
+            expiresIn: response.expiresIn
+          }
+          
           set({ tokens: newTokens })
         } catch (error) {
-          get().logout()
+          set({
+            user: null,
+            tokens: null,
+            isAuthenticated: false,
+          })
           throw error
         }
       },
 
-      setUser: (user: User) => {
-        set({ user })
-      },
+      setUser: (user: User) => set({ user }),
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user,
-        tokens: state.tokens,
-        isAuthenticated: state.isAuthenticated,
+      partialize: (state) => ({ 
+        user: state.user, 
+        tokens: state.tokens, 
+        isAuthenticated: state.isAuthenticated 
       }),
     }
   )
 )
 
-export const useAuth = () => {
-  const store = useAuthStore()
-  return {
-    user: store.user,
-    isAuthenticated: store.isAuthenticated,
-    isLoading: store.isLoading,
-    login: store.login,
-    logout: store.logout,
-    refreshToken: store.refreshToken,
-    setUser: store.setUser,
-  }
-}
+export const useAuth = () => useAuthStore()

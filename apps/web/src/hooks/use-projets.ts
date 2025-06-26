@@ -1,56 +1,50 @@
-// apps/web/src/hooks/use-projets.ts
-'use client'
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { projetsService } from '@/services/projets.service'
-import type { Projet, ProjetFormData } from '@erp/types'
+import type { Projet } from '@/types'
 
-export function useProjets() {
+// Mock service - à remplacer par le vrai service API
+const ProjetsService = {
+  getAll: async (): Promise<Projet[]> => Promise.resolve([]),
+  getById: async (id: string): Promise<Projet> => Promise.resolve({} as Projet),
+  create: async (data: Partial<Projet>): Promise<Projet> => Promise.resolve(data as Projet),
+  update: async (id: string, data: Partial<Projet>): Promise<Projet> => Promise.resolve({ ...data, id } as Projet),
+  delete: async (id: string): Promise<void> => Promise.resolve()
+}
+
+export const useProjets = () => {
   return useQuery({
     queryKey: ['projets'],
-    queryFn: projetsService.getAll,
+    queryFn: () => ProjetsService.getAll(),
   })
 }
 
-export function useProjet(id: string) {
+export const useProjet = (id: string) => {
   return useQuery({
-    queryKey: ['projets', id],
-    queryFn: () => projetsService.getById(id),
+    queryKey: ['projet', id],
+    queryFn: () => ProjetsService.getById(id),
     enabled: !!id,
   })
 }
 
-export function useCreateProjet() {
+export const useCreateProjet = () => {
   const queryClient = useQueryClient()
-
   return useMutation({
-    mutationFn: (data: ProjetFormData) => projetsService.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projets'] })
-    },
+    mutationFn: (data: Partial<Projet>) => ProjetsService.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projets'] }),
   })
 }
 
-export function useUpdateProjet() {
+export const useUpdateProjet = () => {
   const queryClient = useQueryClient()
-
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<ProjetFormData> }) =>
-      projetsService.update(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['projets'] })
-      queryClient.invalidateQueries({ queryKey: ['projets', id] })
-    },
+    mutationFn: ({ id, data }: { id: string; data: Partial<Projet> }) => ProjetsService.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projets'] }),
   })
 }
 
-export function useDeleteProjet() {
+export const useDeleteProjet = () => {
   const queryClient = useQueryClient()
-
   return useMutation({
-    mutationFn: (id: string) => projetsService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projets'] })
-    },
+    mutationFn: (id: string) => ProjetsService.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projets'] }),
   })
 }

@@ -1,25 +1,17 @@
-// apps/web/src/lib/react-query.ts
 import { QueryClient } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Réduire la fréquence de refetch
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      
-      // Optimiser les retry
-      retry: (failureCount, error) => {
+      retry: (failureCount, error: any) => {
         if (error?.status === 404) return false
-        return failureCount < 2
+        return failureCount < 3
       },
-      
-      // Background refetch intelligent
+      staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: 'always',
     },
     mutations: {
-      retry: 1,
+      retry: false,
     },
   },
 })

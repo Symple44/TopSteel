@@ -40,7 +40,8 @@ export function isStock(obj: any): obj is Stock {
     Object.values(StockType).includes(obj.type)
   );
 }
-// Types sûrs (pas de conflit)
+
+// === TYPES POUR COMPATIBILITÉ CI ===
 export interface CategorieProduit {
   id: string;
   nom: string;
@@ -83,10 +84,7 @@ export interface ApiResponse<T = any> {
   errors?: string[];
 }
 
-
-
-
-// Exports manquants pour le CI
+// === ENUMS MANQUANTS POUR LE CI (UNIQUES) ===
 export enum StatutProduction {
   EN_ATTENTE = 'en_attente',
   EN_COURS = 'en_cours',
@@ -96,7 +94,59 @@ export enum StatutProduction {
 
 export enum PrioriteProduction {
   BASSE = 'basse',
-  NORMALE = 'normale', 
+  NORMALE = 'normale',
   HAUTE = 'haute',
   URGENTE = 'urgente'
+}
+
+export enum TypeDocument {
+  DEVIS = 'devis',
+  FACTURE = 'facture',
+  BON_COMMANDE = 'bon_commande',
+  PLAN = 'plan',
+  PHOTO = 'photo',
+  AUTRE = 'autre'
+}
+
+// === CONSTANTES POUR USAGE COMME VALEURS ===
+export const UNITES_MESURE = {
+  PIECE: { id: 'piece', nom: 'Pièce', symbole: 'pc' },
+  METRE: { id: 'm', nom: 'Mètre', symbole: 'm' },
+  METRE_CARRE: { id: 'm2', nom: 'Mètre carré', symbole: 'm²' },
+  KILOGRAMME: { id: 'kg', nom: 'Kilogramme', symbole: 'kg' },
+  LITRE: { id: 'l', nom: 'Litre', symbole: 'l' }
+} as const;
+
+export const CATEGORIES_PRODUIT = {
+  PROFILE: { id: 'profile', nom: 'Profilé', couleur: '#3B82F6' },
+  TUBE: { id: 'tube', nom: 'Tube', couleur: '#10B981' },
+  TOLE: { id: 'tole', nom: 'Tôle', couleur: '#F59E0B' },
+  CONSOMMABLE: { id: 'consommable', nom: 'Consommable', couleur: '#EF4444' },
+  ACCESSOIRE: { id: 'accessoire', nom: 'Accessoire', couleur: '#8B5CF6' },
+  QUINCAILLERIE: { id: 'quincaillerie', nom: 'Quincaillerie', couleur: '#6B7280' }
+} as const;
+
+// === TYPES ÉTENDUS POUR COMPATIBILITÉ ===
+export interface ProjetFilters {
+  statut?: string
+  clientId?: string
+  dateDebut?: Date
+  dateFin?: Date
+}
+
+export interface StockFilters {
+  categorieId?: string
+  quantiteMin?: number
+  quantiteMax?: number
+  emplacement?: string
+}
+
+export interface Produit {
+  id: string
+  nom: string
+  reference: string
+  description?: string
+  categorieId: string
+  uniteId: string
+  prixUnitaire: number
 }
