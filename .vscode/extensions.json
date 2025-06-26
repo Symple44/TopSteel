@@ -1,8 +1,4 @@
 {
-  "unwantedRecommendations": [
-    "ms-vscode.vscode-typescript",
-    "hookyqr.beautify"
-  ],
   "recommendations": [
     "ms-vscode.vscode-typescript-next",
     "bradlc.vscode-tailwindcss",
@@ -15,5 +11,9 @@
     "rangav.vscode-thunder-client",
     "usernamehw.errorlens",
     "gruntfuggly.todo-tree"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript",
+    "hookyqr.beautify"
   ]
 }

@@ -145,3 +145,6 @@ logs/
 
 # Uploads
 uploads/
+
+# Backup Database
+sql/backups/

@@ -1,46 +1,46 @@
 {
-  "search.exclude": {
-    "**/dist": true,
-    "**/coverage": true,
-    "**/.next": true,
-    "**/.turbo": true,
-    "**/node_modules": true
-  },
-  "terminal.integrated.defaultProfile.windows": "PowerShell",
-  "editor.minimap.enabled": false,
-  "files.watcherExclude": {
-    "**/.next/**": true,
-    "**/node_modules/**": true,
-    "**/.turbo/**": true,
-    "**/coverage/**": true,
-    "**/dist/**": true
-  },
-  "explorer.fileNesting.patterns": {
-    "package.json": "package-lock.json,pnpm-lock.yaml,yarn.lock",
-    "*.tsx": "${capture}.js",
-    "tsconfig.json": "tsconfig.*.json",
-    "README.md": "README.*",
-    ".env": ".env.*",
-    "*.ts": "${capture}.js"
-  },
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.suggest.autoImports": true,
-  "explorer.fileNesting.enabled": true,
-  "workbench.editor.enablePreview": false,
-  "typescript.preferences.includePackageJsonAutoImports": "auto",
   "editor.rulers": [
     80,
     120
   ],
-  "editor.formatOnSave": true,
   "files.associations": {
-    "*.env*": "properties",
-    "*.md": "markdown"
+    "*.md": "markdown",
+    "*.env*": "properties"
   },
+  "explorer.fileNesting.enabled": true,
+  "files.watcherExclude": {
+    "**/coverage/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.next/**": true,
+    "**/.turbo/**": true
+  },
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "editor.minimap.enabled": false,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.turbo": true,
+    "**/coverage": true,
+    "**/.next": true,
+    "**/dist": true
+  },
+  "workbench.editor.enablePreview": false,
   "git.autofetch": true,
+  "editor.formatOnSave": true,
+  "explorer.fileNesting.patterns": {
+    ".env": ".env.*",
+    "README.md": "README.*",
+    "package.json": "package-lock.json,pnpm-lock.yaml,yarn.lock",
+    "tsconfig.json": "tsconfig.*.json",
+    "*.ts": "${capture}.js",
+    "*.tsx": "${capture}.js"
+  },
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true,
-    "source.fixAll.eslint": true
-  }
+    "source.organizeImports": "explicit",
+    "source.fixAll.eslint": "explicit"
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
 }
 
