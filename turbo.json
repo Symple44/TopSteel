@@ -61,16 +61,18 @@
         "**/*.spec.{ts,tsx}",
         "jest.config.{js,ts}",
         "package.json"
-      ]
+      ],
+      "cache": false
     },
     "format:check": {
-      "outputs": [],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx,json,md}",
         ".prettierrc*",
         ".prettierignore",
         "package.json"
-      ]
+      ],
+      "outputs": [],
+      "cache": false
     },
     "test:integration": {
       "dependsOn": [
@@ -91,7 +93,8 @@
         "**/*.integration.spec.{ts,tsx}",
         "jest.config.{js,ts}",
         "package.json"
-      ]
+      ],
+      "cache": false
     },
     "test:coverage": {
       "dependsOn": [
@@ -110,7 +113,8 @@
         "**/*.spec.{ts,tsx}",
         "jest.config.{js,ts}",
         "package.json"
-      ]
+      ],
+      "cache": false
     }
   }
 }

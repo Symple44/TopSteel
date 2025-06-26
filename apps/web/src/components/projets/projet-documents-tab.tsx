@@ -1,40 +1,38 @@
 'use client'
 
-import { useState } from 'react'
-import { 
-  Upload, 
-  Download, 
-  FileText, 
-  Image, 
-  File,
-  Trash2,
-  Eye,
-  MoreVertical,
-  Search,
-  Filter
-} from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select'
 import { formatDate } from '@/lib/utils'
-import type { Projet} from '@/types';
+import type { Projet } from '@/types'
 import { TypeDocument } from '@/types'
+import {
+    Download,
+    Eye,
+    File,
+    FileText,
+    Image,
+    MoreVertical,
+    Search,
+    Trash2,
+    Upload
+} from 'lucide-react'
+import { useState } from 'react'
 
 interface ProjetDocumentsTabProps {
   projet: Projet

@@ -1,8 +1,4 @@
 import '@testing-library/jest-dom'
 
-// Extend Jest matchers with module declaration
-declare module '@jest/expect' {
-  interface Matchers<R> {
-    toBeInTheDocument(): R
-  }
-}
+// Configuration globale pour les tests
+// Ce fichier est automatiquement chargé par Jest

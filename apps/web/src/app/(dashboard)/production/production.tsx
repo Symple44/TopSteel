@@ -311,7 +311,7 @@ export default function ProductionPage() {
       </div>
 
       {/* Tabs de contenu */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="ordres">Ordres de fabrication</TabsTrigger>
           <TabsTrigger value="planning">Planning</TabsTrigger>
@@ -324,7 +324,7 @@ export default function ProductionPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <Select value={filterStatut} onValueChange={setFilterStatut}>
+                  <Select value={filterStatut} onChange={setFilterStatut}>
                     <SelectTrigger className="w-[180px]">
                       <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Statut" /></SelectTrigger></SelectTrigger>
                     </SelectTrigger>
@@ -466,7 +466,7 @@ export default function ProductionPage() {
                     Vue hebdomadaire de l'affectation des techniciens
                   </CardDescription>
                 </div>
-                <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+                <Select value={selectedWeek} onChange={setSelectedWeek}>
                   <SelectTrigger className="w-[200px]">
                     <SelectValue />
                   </SelectTrigger>
@@ -620,3 +620,4 @@ export default function ProductionPage() {
     </div>
   )
 }
+

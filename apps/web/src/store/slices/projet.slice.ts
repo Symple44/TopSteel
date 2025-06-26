@@ -72,3 +72,5 @@ export const createProjetSlice: StateCreator<ProjetSlice> = (set, get) => ({
 
   setLoadingProjets: (isLoading) => set({ isLoadingProjets: isLoading }),
 })
+
+

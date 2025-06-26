@@ -14,6 +14,7 @@ export interface User extends BaseEntity {
   email: string
   nom: string
   prenom: string
+  avatar?: string
   role: UserRole
   telephone?: string
   isActive: boolean

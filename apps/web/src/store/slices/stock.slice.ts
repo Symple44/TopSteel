@@ -102,3 +102,13 @@ export const useStockStore = create<StockState & StockActions>((set, get) => ({
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error })
 }))
+
+
+export type slice = typeof slice;
+export const createslice = slice;
+
+
+// Exports pour compatibilité
+export type StockSlice = typeof stockSlice;
+export const createStockSlice = stockSlice;
+

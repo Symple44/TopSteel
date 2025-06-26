@@ -155,7 +155,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                   </Label>
                   <Switch
                     id="show-grid"
-                    checked={showGrid}
+                    defaultChecked={showGrid}
                     onCheckedChange={setShowGrid}
                   />
                 </div>
@@ -166,7 +166,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                   </Label>
                   <Switch
                     id="show-wireframe"
-                    checked={showWireframe}
+                    defaultChecked={showWireframe}
                     onCheckedChange={setShowWireframe}
                   />
                 </div>
@@ -177,7 +177,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                   </Label>
                   <Switch
                     id="show-measurements"
-                    checked={showMeasurements}
+                    defaultChecked={showMeasurements}
                     onCheckedChange={setShowMeasurements}
                   />
                 </div>

@@ -202,7 +202,7 @@ export default function ClientsPage() {
       </div>
 
       {/* Tabs de contenu */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="liste">Liste des clients</TabsTrigger>
           <TabsTrigger value="detail">Fiche client</TabsTrigger>
@@ -222,7 +222,7 @@ export default function ClientsPage() {
                     className="pl-9" 
                   />
                 </div>
-                <Select value={filterType} onValueChange={setFilterType}>
+                <Select value={filterType} onChange={setFilterType}>
                   <SelectTrigger className="w-full md:w-[180px]">
                     <SelectValue /><SelectTrigger><SelectValue  /><SelectTrigger><SelectValue placeholder="Type de client" /></SelectTrigger></SelectTrigger>
                   </SelectTrigger>
@@ -440,4 +440,5 @@ export default function ClientsPage() {
     </div>
   )
 }
+
 

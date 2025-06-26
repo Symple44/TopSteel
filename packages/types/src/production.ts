@@ -5,6 +5,18 @@ import type { ProjetPriorite } from './projet'
 import type { User } from './user'
 import type { Stock } from './stock'
 
+export enum StatutProduction {
+  EN_ATTENTE = 'en_attente',
+  PLANIFIE = 'planifie',
+  EN_COURS = 'en_cours',
+  EN_PAUSE = 'en_pause',
+  PAUSE = 'pause',
+  TERMINEE = 'terminee',
+  TERMINE = 'termine',
+  SUSPENDUE = 'suspendue',
+  ANNULE = 'annule'
+}
+
 export enum OrdreFabricationStatut {
   EN_ATTENTE = 'EN_ATTENTE',
   EN_COURS = 'EN_COURS',

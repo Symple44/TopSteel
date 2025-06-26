@@ -41,7 +41,7 @@ export function isStock(obj: any): obj is Stock {
   );
 }
 
-// === TYPES POUR COMPATIBILITÉ CI ===
+// === INTERFACES POUR TYPES MÉTIER ===
 export interface CategorieProduit {
   id: string;
   nom: string;
@@ -55,6 +55,55 @@ export interface UniteMesure {
   symbole: string;
   type: 'longueur' | 'poids' | 'volume' | 'surface' | 'quantite';
 }
+
+// === ENUMS COMPLETS POUR CI/CD ===
+export enum StatutProduction {
+  EN_ATTENTE = 'en_attente',
+  PLANIFIE = 'planifie',
+  EN_COURS = 'en_cours',
+  EN_PAUSE = 'en_pause',
+  PAUSE = 'pause',
+  TERMINEE = 'terminee',
+  TERMINE = 'termine',
+  SUSPENDUE = 'suspendue',
+  ANNULE = 'annule'
+}
+
+export enum TypeDocument {
+  DEVIS = 'devis',
+  FACTURE = 'facture',
+  BON_COMMANDE = 'bon_commande',
+  BON_LIVRAISON = 'bon_livraison',
+  PLAN = 'plan',
+  PHOTO = 'photo',
+  CONTRAT = 'contrat',
+  AUTRE = 'autre'
+}
+
+export enum PrioriteProduction {
+  BASSE = 'basse',
+  NORMALE = 'normale',
+  HAUTE = 'haute',
+  URGENTE = 'urgente'
+}
+
+// === CONSTANTES POUR USAGE COMME VALEURS ===
+export const UNITES_MESURE = {
+  PIECE: { id: 'piece', nom: 'Pièce', symbole: 'pc', type: 'quantite' as const },
+  METRE: { id: 'm', nom: 'Mètre', symbole: 'm', type: 'longueur' as const },
+  METRE_CARRE: { id: 'm2', nom: 'Mètre carré', symbole: 'm²', type: 'surface' as const },
+  KILOGRAMME: { id: 'kg', nom: 'Kilogramme', symbole: 'kg', type: 'poids' as const },
+  LITRE: { id: 'l', nom: 'Litre', symbole: 'l', type: 'volume' as const }
+} as const;
+
+export const CATEGORIES_PRODUIT = {
+  PROFILE: { id: 'profile', nom: 'Profilé', couleur: '#3B82F6' },
+  TUBE: { id: 'tube', nom: 'Tube', couleur: '#10B981' },
+  TOLE: { id: 'tole', nom: 'Tôle', couleur: '#F59E0B' },
+  CONSOMMABLE: { id: 'consommable', nom: 'Consommable', couleur: '#EF4444' },
+  ACCESSOIRE: { id: 'accessoire', nom: 'Accessoire', couleur: '#8B5CF6' },
+  QUINCAILLERIE: { id: 'quincaillerie', nom: 'Quincaillerie', couleur: '#6B7280' }
+} as const;
 
 // Types d'authentification
 export interface LoginResponse {
@@ -84,48 +133,6 @@ export interface ApiResponse<T = any> {
   errors?: string[];
 }
 
-// === ENUMS MANQUANTS POUR LE CI (UNIQUES) ===
-export enum StatutProduction {
-  EN_ATTENTE = 'en_attente',
-  EN_COURS = 'en_cours',
-  TERMINEE = 'terminee',
-  SUSPENDUE = 'suspendue'
-}
-
-export enum PrioriteProduction {
-  BASSE = 'basse',
-  NORMALE = 'normale',
-  HAUTE = 'haute',
-  URGENTE = 'urgente'
-}
-
-export enum TypeDocument {
-  DEVIS = 'devis',
-  FACTURE = 'facture',
-  BON_COMMANDE = 'bon_commande',
-  PLAN = 'plan',
-  PHOTO = 'photo',
-  AUTRE = 'autre'
-}
-
-// === CONSTANTES POUR USAGE COMME VALEURS ===
-export const UNITES_MESURE = {
-  PIECE: { id: 'piece', nom: 'Pièce', symbole: 'pc' },
-  METRE: { id: 'm', nom: 'Mètre', symbole: 'm' },
-  METRE_CARRE: { id: 'm2', nom: 'Mètre carré', symbole: 'm²' },
-  KILOGRAMME: { id: 'kg', nom: 'Kilogramme', symbole: 'kg' },
-  LITRE: { id: 'l', nom: 'Litre', symbole: 'l' }
-} as const;
-
-export const CATEGORIES_PRODUIT = {
-  PROFILE: { id: 'profile', nom: 'Profilé', couleur: '#3B82F6' },
-  TUBE: { id: 'tube', nom: 'Tube', couleur: '#10B981' },
-  TOLE: { id: 'tole', nom: 'Tôle', couleur: '#F59E0B' },
-  CONSOMMABLE: { id: 'consommable', nom: 'Consommable', couleur: '#EF4444' },
-  ACCESSOIRE: { id: 'accessoire', nom: 'Accessoire', couleur: '#8B5CF6' },
-  QUINCAILLERIE: { id: 'quincaillerie', nom: 'Quincaillerie', couleur: '#6B7280' }
-} as const;
-
 // === TYPES ÉTENDUS POUR COMPATIBILITÉ ===
 export interface ProjetFilters {
   statut?: string
@@ -150,3 +157,4 @@ export interface Produit {
   uniteId: string
   prixUnitaire: number
 }
+

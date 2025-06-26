@@ -4,13 +4,15 @@ import type { Client } from './client'
 import type { User } from './user'
 
 export enum ProjetStatut {
-  BROUILLON = 'BROUILLON',
-  EN_ATTENTE = 'EN_ATTENTE',
-  EN_COURS = 'EN_COURS',
-  EN_PAUSE = 'EN_PAUSE',
-  TERMINE = 'TERMINE',
-  ANNULE = 'ANNULE',
-  FACTURE = 'FACTURE'
+  BROUILLON = 'brouillon',
+  DEVIS = 'devis',
+  EN_ATTENTE = 'en_attente',
+  ACCEPTE = 'accepte',
+  EN_COURS = 'en_cours',
+  EN_PAUSE = 'en_pause',
+  TERMINE = 'termine',
+  ANNULE = 'annule',
+  FACTURE = 'facture'
 }
 
 export enum ProjetType {
@@ -45,6 +47,7 @@ export interface Projet extends BaseEntity {
   dateDebut?: Date
   dateFin?: Date
   dateFinPrevue?: Date
+  dateCreation: Date
   adresseChantier: Address
   montantHT: number
   montantTTC: number
@@ -55,6 +58,8 @@ export interface Projet extends BaseEntity {
   alertes?: string[]
   responsable?: User
   responsableId?: string
+  devis?: any
+  documents?: any[]
   documentsIds: string[]
   ordresFabricationIds: string[]
 }
