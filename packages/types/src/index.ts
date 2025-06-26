@@ -85,3 +85,18 @@ export interface ApiResponse<T = any> {
 
 
 
+
+// Exports manquants pour le CI
+export enum StatutProduction {
+  EN_ATTENTE = 'en_attente',
+  EN_COURS = 'en_cours',
+  TERMINEE = 'terminee',
+  SUSPENDUE = 'suspendue'
+}
+
+export enum PrioriteProduction {
+  BASSE = 'basse',
+  NORMALE = 'normale', 
+  HAUTE = 'haute',
+  URGENTE = 'urgente'
+}
