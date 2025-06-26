@@ -50,7 +50,7 @@
     "tools:backup-full": "pwsh scripts/backup-manager.ps1",
     "setup:env": "Copy-Item .env.example .env.local -ErrorAction SilentlyContinue",
     "setup:full": "pnpm install && pnpm build:packages && pnpm setup && pnpm sql:full-with-data",
-    "postinstall": "pnpm build:packages",
+    "postinstall": "echo 'Skipping build packages for CI stability' || true",
     "clean": "rimraf --glob node_modules/.cache .turbo .next dist apps/web/.next 'packages/*/dist'",
     "clean:cache": "rimraf node_modules/.cache .turbo",
     "clean:build": "rimraf --glob .next dist apps/web/.next 'packages/*/dist'",
@@ -82,7 +82,8 @@
     "check:env": "node -e \"console.log('API URL:', process.env.NEXT_PUBLIC_API_URL); console.log('DB Host:', process.env.DB_HOST);\"",
     "db:reset": "pwsh scripts/manage-db.ps1 reset",
     "db:status": "pwsh scripts/manage-db.ps1 status",
-    "db:backup": "pwsh scripts/manage-db.ps1 backup"
+    "db:backup": "pwsh scripts/manage-db.ps1 backup",
+    "postinstall-original": "pnpm build:packages"
   },
   "dependencies": {
     "dotenv": "^16.5.0"

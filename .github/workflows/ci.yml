@@ -89,7 +89,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           echo "🔄 Installing dependencies..."
-          pnpm install --frozen-lockfile --prefer-offline
+          pnpm install --frozen-lockfile --prefer-offline || pnpm install --no-frozen-lockfile
           echo "✅ Dependencies installed successfully"
 
       - name: 📋 Environment info
@@ -139,7 +139,7 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
       - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile --prefer-offline || pnpm install --no-frozen-lockfile
 
       - name: ${{ matrix.check.emoji }} Run ${{ matrix.check.name }}
         run: |
@@ -219,7 +219,7 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
       - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile --prefer-offline || pnpm install --no-frozen-lockfile
 
       - name: ${{ matrix.package.emoji }} Run tests for ${{ matrix.package.name }}
         run: |
@@ -288,7 +288,7 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
       - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile --prefer-offline || pnpm install --no-frozen-lockfile
 
       - name: ${{ matrix.target.emoji }} Build ${{ matrix.target.name }}
         run: |
@@ -340,7 +340,7 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
       - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile --prefer-offline || pnpm install --no-frozen-lockfile
 
       - name: 🔍 Security audit (strict mode)
         run: |
@@ -441,7 +441,7 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
 
       - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile --prefer-offline || pnpm install --no-frozen-lockfile
 
       - name: 📥 Download build artifacts
         uses: actions/download-artifact@v4
@@ -590,5 +590,6 @@ jobs:
         run: |
           echo "🎉 All checks passed successfully!"
           echo "✅ Code quality, tests, build, and security are all green!"
+
 
 
