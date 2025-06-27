@@ -28,8 +28,8 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return "TopSteel ERP API v1.0 - Running!"', () => {
+      expect(appController.getHello()).toBe('TopSteel ERP API v1.0 - Running!');
     });
   });
 });
