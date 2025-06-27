@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { formatDate, formatCurrency, cn } from '@/lib/utils'
-import { Projet } from '@/types'
+import type { Projet } from '@/types'
 
 interface ProjetInfoTabProps {
   projet: Projet

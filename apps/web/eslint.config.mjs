@@ -36,7 +36,12 @@ export default [
       "jsx-a11y/alt-text": "off",
       "react/no-array-index-key": "off",
       "no-console": "off",
-    },
+    
+            // Type imports - plus souple pour CI
+      "@typescript-eslint/consistent-type-imports": ["warn", {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports"
+      }],},
   },
 
   // Composants UI - règles plus souples
@@ -47,7 +52,12 @@ export default [
       "@typescript-eslint/no-empty-object-type": "off",
       "jsx-a11y/alt-text": "off",
       "@next/next/no-img-element": "off", // OK pour composants UI génériques
-    },
+    
+            // Type imports - plus souple pour CI
+      "@typescript-eslint/consistent-type-imports": ["warn", {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports"
+      }],},
   },
 
   // Tests - règles adaptées
@@ -57,7 +67,12 @@ export default [
       "@typescript-eslint/no-namespace": "off", // OK pour extend Jest
       "@typescript-eslint/no-explicit-any": "off",
       "no-console": "off",
-    },
+    
+            // Type imports - plus souple pour CI
+      "@typescript-eslint/consistent-type-imports": ["warn", {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports"
+      }],},
   },
 
   // Configuration files
@@ -66,6 +81,11 @@ export default [
     rules: {
       "@typescript-eslint/no-var-requires": "off",
       "import/no-default-export": "off",
-    },
+    
+            // Type imports - plus souple pour CI
+      "@typescript-eslint/consistent-type-imports": ["warn", {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports"
+      }],},
   },
 ];

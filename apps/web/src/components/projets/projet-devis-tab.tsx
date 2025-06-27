@@ -29,7 +29,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatDate, formatCurrency } from '@/lib/utils'
-import { Projet } from '@/types'
+import type { Projet } from '@/types'
 
 interface ProjetDevisTabProps {
   projet: Projet

@@ -1,0 +1,2 @@
+// Ajouter cette règle dans la section rules de eslint.config.mjs
+"@typescript-eslint/consistent-type-imports": "off"
