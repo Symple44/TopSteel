@@ -12,4 +12,3 @@ export { DEVIS_STATUT, PROJET_STATUT, STATUT_PRODUCTION, PRIORITE_PRODUCTION } f
 export type { ProjetStatut } from "./projet"
 export type { DevisStatut } from "./devis"
 export type { StatutProduction, PrioriteProduction } from "./production"
-
