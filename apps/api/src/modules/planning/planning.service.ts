@@ -42,7 +42,7 @@ export class PlanningService {
   }
 
   async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log(Suppression logique planning id: ${id} par user: ${userId});
+    this.logger.log(`Suppression logique planning id: ${id} par user: ${userId}`);
     await this.repository.update(id, { 
       actif: false, 
       updated_by: userId 

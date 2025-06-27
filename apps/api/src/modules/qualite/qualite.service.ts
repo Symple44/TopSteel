@@ -51,7 +51,7 @@ export class QualiteService {
 
   // Méthodes métier spécifiques
   async findByStatus(status: string): Promise<ControleQualite[]> {
-    return this.repository.find({ where: { statut: status, actif: true } });
+    return this.repository.find({ where: { type_controle: status, actif: true } });
   }
 
   async getStatistics(): Promise<any> {

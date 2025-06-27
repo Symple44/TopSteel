@@ -51,7 +51,7 @@ export class TracabiliteService {
 
   // Méthodes métier spécifiques
   async findByStatus(status: string): Promise<Tracabilite[]> {
-    return this.repository.find({ where: { statut: status, actif: true } });
+    return this.repository.find({ where: { actif: true } });
   }
 
   async getStatistics(): Promise<any> {

@@ -51,7 +51,7 @@ export class MateriauxService {
 
   // Méthodes métier spécifiques
   async findByStatus(status: string): Promise<Materiau[]> {
-    return this.repository.find({ where: { statut: status, actif: true } });
+    return this.repository.find({ where: { type_acier: status, actif: true } });
   }
 
   async getStatistics(): Promise<any> {

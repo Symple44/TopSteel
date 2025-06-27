@@ -42,7 +42,7 @@ export class MachinesService {
   }
 
   async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log`(Suppression logique machines id: ${id} par user: ${userId}`);
+    this.logger.log(`Suppression logique machines id: ${id} par user: ${userId}`);
     await this.repository.update(id, { 
       actif: false, 
       updated_by: userId 

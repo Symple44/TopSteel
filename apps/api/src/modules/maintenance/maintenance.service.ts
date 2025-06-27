@@ -51,7 +51,7 @@ export class MaintenanceService {
 
   // Méthodes métier spécifiques
   async findByStatus(status: string): Promise<Maintenance[]> {
-    return this.repository.find({ where: { statut: status, actif: true } });
+    return this.repository.find({ where: { type_maintenance: status, actif: true } });
   }
 
   async getStatistics(): Promise<any> {
