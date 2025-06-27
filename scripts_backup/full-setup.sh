@@ -290,6 +290,8 @@ JWT_SECRET=development-secret-key-change-in-production-$(date +%s)
 JWT_EXPIRES_IN=24h
 JWT_REFRESH_SECRET=development-refresh-secret-$(date +%s)
 JWT_REFRESH_EXPIRES_IN=7d
+JWT_ISSUER=topsteel-erp
+JWT_AUDIENCE=topsteel-users
 
 # Rate Limiting
 THROTTLE_TTL=60000

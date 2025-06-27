@@ -42,7 +42,8 @@ function Test-CommandExists {
     try {
         Get-Command $Command -ErrorAction Stop | Out-Null
         return $true
-    } catch {
+    }
+    catch {
         return $false
     }
 }
@@ -60,7 +61,8 @@ function Test-Prerequisites {
     if (Test-CommandExists "node") {
         $nodeVersion = node --version
         Write-Success "Node.js $nodeVersion"
-    } else {
+    }
+    else {
         $missing += "Node.js"
         Write-Error "Node.js non trouvé"
     }
@@ -69,7 +71,8 @@ function Test-Prerequisites {
     if (Test-CommandExists "pnpm") {
         $pnpmVersion = pnpm --version
         Write-Success "pnpm $pnpmVersion"
-    } else {
+    }
+    else {
         $missing += "pnpm"
         Write-Error "pnpm non trouvé"
     }
@@ -85,16 +88,19 @@ function Test-Prerequisites {
                 $result = psql -h $DBHost -p $DBPort -U $DBUser -d postgres -c "SELECT version();" 2>&1
                 if ($LASTEXITCODE -eq 0) {
                     Write-Success "Connexion PostgreSQL OK"
-                } else {
+                }
+                else {
                     Write-Warning "PostgreSQL non accessible - base de données ignorée"
                     $script:SkipDatabase = $true
                 }
-            } catch {
+            }
+            catch {
                 Write-Warning "PostgreSQL non accessible - base de données ignorée"
                 $script:SkipDatabase = $true
             }
             $env:PGPASSWORD = $null
-        } else {
+        }
+        else {
             Write-Warning "PostgreSQL client non trouvé - base de données ignorée"
             $script:SkipDatabase = $true
         }
@@ -103,7 +109,8 @@ function Test-Prerequisites {
     # Git
     if (Test-CommandExists "git") {
         Write-Success "Git trouvé"
-    } else {
+    }
+    else {
         Write-Warning "Git non trouvé (optionnel)"
     }
     
@@ -195,6 +202,8 @@ JWT_SECRET=development-secret-key-change-in-production
 JWT_EXPIRES_IN=24h
 JWT_REFRESH_SECRET=development-refresh-secret
 JWT_REFRESH_EXPIRES_IN=7d
+JWT_ISSUER=topsteel-erp
+JWT_AUDIENCE=topsteel-users
 
 # NEXTAUTH
 NEXTAUTH_URL=http://localhost:3000
@@ -309,7 +318,8 @@ function Install-Dependencies {
     
     if ($LASTEXITCODE -eq 0) {
         Write-Success "Dépendances installées avec succès"
-    } else {
+    }
+    else {
         Write-Error "Erreur lors de l'installation des dépendances"
         exit 1
     }
@@ -320,7 +330,8 @@ function Install-Dependencies {
     
     if ($LASTEXITCODE -eq 0) {
         Write-Success "Packages partagés construits"
-    } else {
+    }
+    else {
         Write-Warning "Erreur construction packages - continuons"
     }
 }
@@ -346,7 +357,8 @@ function Initialize-Database {
         if ($Force) {
             Write-Warning "Base '$DBName' existe, suppression forcée..."
             psql -h $DBHost -p $DBPort -U $DBUser -d postgres -c "DROP DATABASE IF EXISTS $DBName;" | Out-Null
-        } else {
+        }
+        else {
             Write-Info "Base '$DBName' existe déjà"
         }
     }
@@ -357,7 +369,8 @@ function Initialize-Database {
     
     if ($LASTEXITCODE -eq 0 -or $createResult -match "already exists") {
         Write-Success "Base de données prête"
-    } else {
+    }
+    else {
         Write-Error "Erreur création base: $createResult"
         $env:PGPASSWORD = $null
         return
@@ -436,7 +449,8 @@ CREATE TABLE IF NOT EXISTS documents (
     
     if ($LASTEXITCODE -eq 0) {
         Write-Success "Schéma de base créé"
-    } else {
+    }
+    else {
         Write-Warning "Erreur création schéma: $schemaResult"
     }
     
@@ -470,7 +484,8 @@ ON CONFLICT (email) DO NOTHING;
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Données de test ajoutées"
-        } else {
+        }
+        else {
             Write-Warning "Erreur données de test: $dataResult"
         }
         
@@ -555,14 +570,14 @@ switch (`$Action) {
         
         # Ajouter scripts utiles
         $newScripts = @{
-            "setup" = "pwsh scripts/setup-erp.ps1"
-            "setup:force" = "pwsh scripts/setup-erp.ps1 -Force"
-            "db:status" = "pwsh scripts/manage-db.ps1 status"
-            "db:backup" = "pwsh scripts/manage-db.ps1 backup"
-            "db:reset" = "pwsh scripts/manage-db.ps1 reset"
-            "dev:full" = "pnpm build:packages && pnpm dev"
+            "setup"          = "pwsh scripts/setup-erp.ps1"
+            "setup:force"    = "pwsh scripts/setup-erp.ps1 -Force"
+            "db:status"      = "pwsh scripts/manage-db.ps1 status"
+            "db:backup"      = "pwsh scripts/manage-db.ps1 backup"
+            "db:reset"       = "pwsh scripts/manage-db.ps1 reset"
+            "dev:full"       = "pnpm build:packages && pnpm dev"
             "build:packages" = "pnpm build --filter='@erp/types' --filter='@erp/utils' --filter='@erp/config'"
-            "check:env" = "node -e `"console.log('API URL:', process.env.NEXT_PUBLIC_API_URL); console.log('DB Host:', process.env.DB_HOST);`""
+            "check:env"      = "node -e `"console.log('API URL:', process.env.NEXT_PUBLIC_API_URL); console.log('DB Host:', process.env.DB_HOST);`""
         }
         
         foreach ($script in $newScripts.GetEnumerator()) {
@@ -589,88 +604,88 @@ function Setup-VSCodeIntegration {
     # Tasks.json
     $tasksJson = @{
         version = "2.0.0"
-        tasks = @(
+        tasks   = @(
             @{
-                label = "ERP: Setup Complet"
-                type = "shell"
-                command = "pwsh"
-                args = @("scripts/setup-erp.ps1")
-                group = @{
-                    kind = "build"
+                label          = "ERP: Setup Complet"
+                type           = "shell"
+                command        = "pwsh"
+                args           = @("scripts/setup-erp.ps1")
+                group          = @{
+                    kind      = "build"
                     isDefault = $true
                 }
-                presentation = @{
-                    echo = $true
+                presentation   = @{
+                    echo   = $true
                     reveal = "always"
-                    focus = $false
-                    panel = "new"
+                    focus  = $false
+                    panel  = "new"
                 }
                 problemMatcher = @()
             },
             @{
-                label = "ERP: Setup Force"
-                type = "shell" 
-                command = "pwsh"
-                args = @("scripts/setup-erp.ps1", "-Force")
-                group = "build"
+                label        = "ERP: Setup Force"
+                type         = "shell" 
+                command      = "pwsh"
+                args         = @("scripts/setup-erp.ps1", "-Force")
+                group        = "build"
                 presentation = @{
-                    echo = $true
+                    echo   = $true
                     reveal = "always"
-                    panel = "new"
+                    panel  = "new"
                 }
             },
             @{
-                label = "ERP: Reset Database"
-                type = "shell"
-                command = "pwsh"
-                args = @("scripts/manage-db.ps1", "reset")
-                group = "build"
+                label        = "ERP: Reset Database"
+                type         = "shell"
+                command      = "pwsh"
+                args         = @("scripts/manage-db.ps1", "reset")
+                group        = "build"
                 presentation = @{
-                    echo = $true
+                    echo   = $true
                     reveal = "always"
-                    panel = "new"
+                    panel  = "new"
                 }
             },
             @{
-                label = "ERP: Start Dev Servers"
-                type = "shell"
-                command = "pnpm"
-                args = @("dev")
-                group = @{
-                    kind = "build" 
+                label        = "ERP: Start Dev Servers"
+                type         = "shell"
+                command      = "pnpm"
+                args         = @("dev")
+                group        = @{
+                    kind      = "build" 
                     isDefault = $false
                 }
                 presentation = @{
-                    echo = $true
+                    echo   = $true
                     reveal = "always"
-                    panel = "new"
+                    panel  = "new"
                 }
-                runOptions = @{
+                runOptions   = @{
                     runOn = "folderOpen"
                 }
             },
             @{
-                label = "ERP: Database Status"
-                type = "shell"
-                command = "pwsh"
-                args = @("scripts/manage-db.ps1", "status")
-                group = "test"
+                label        = "ERP: Database Status"
+                type         = "shell"
+                command      = "pwsh"
+                args         = @("scripts/manage-db.ps1", "status")
+                group        = "test"
                 presentation = @{
-                    echo = $true
+                    echo   = $true
                     reveal = "always"
-                    panel = "new"
+                    panel  = "new"
                 }
             },
             @{
-                label = "ERP: Backup Database"
-                type = "shell"
-                command = "pwsh"
-                args = @("scripts/manage-db.ps1", "backup")
-                group = "build"
+                label        = "ERP: Backup Database"
+                type         = "shell"
+                command      = "pwsh"
+                args         = @("scripts/manage-db.ps1", "backup")
+                group        = "build"
                 presentation = @{
-                    echo = $true
+                    echo   = $true
                     reveal = "always"
-                    panel = "new"
+                    panel  = "new"
                 }
             }
         )
@@ -681,29 +696,29 @@ function Setup-VSCodeIntegration {
     
     # Launch.json pour le debugging
     $launchJson = @{
-        version = "0.2.0"
+        version        = "0.2.0"
         configurations = @(
             @{
-                name = "Debug API (NestJS)"
-                type = "node"
-                request = "launch"
-                program = "`${workspaceFolder}/apps/api/dist/main.js"
-                cwd = "`${workspaceFolder}/apps/api"
-                env = @{
+                name          = "Debug API (NestJS)"
+                type          = "node"
+                request       = "launch"
+                program       = "`${workspaceFolder}/apps/api/dist/main.js"
+                cwd           = "`${workspaceFolder}/apps/api"
+                env           = @{
                     NODE_ENV = "development"
                 }
                 preLaunchTask = "ERP: Build API"
-                sourceMaps = $true
-                outFiles = @("`${workspaceFolder}/apps/api/dist/**/*.js")
+                sourceMaps    = $true
+                outFiles      = @("`${workspaceFolder}/apps/api/dist/**/*.js")
             },
             @{
-                name = "Debug Web (Next.js)"
-                type = "node"
+                name    = "Debug Web (Next.js)"
+                type    = "node"
                 request = "launch"
                 program = "`${workspaceFolder}/apps/web/node_modules/.bin/next"
-                args = @("dev")
-                cwd = "`${workspaceFolder}/apps/web"
-                env = @{
+                args    = @("dev")
+                cwd     = "`${workspaceFolder}/apps/web"
+                env     = @{
                     NODE_ENV = "development"
                 }
             }
@@ -716,23 +731,23 @@ function Setup-VSCodeIntegration {
     # Settings.json
     $settingsJson = @{
         "typescript.preferences.includePackageJsonAutoImports" = "auto"
-        "typescript.suggest.autoImports" = $true
-        "editor.formatOnSave" = $true
-        "editor.codeActionsOnSave" = @{
+        "typescript.suggest.autoImports"                       = $true
+        "editor.formatOnSave"                                  = $true
+        "editor.codeActionsOnSave"                             = @{
             "source.fixAll.eslint" = $true
         }
-        "files.associations" = @{
+        "files.associations"                                   = @{
             "*.env*" = "properties"
         }
-        "search.exclude" = @{
+        "search.exclude"                                       = @{
             "**/node_modules" = $true
-            "**/dist" = $true
-            "**/.next" = $true
+            "**/dist"         = $true
+            "**/.next"        = $true
         }
-        "files.watcherExclude" = @{
+        "files.watcherExclude"                                 = @{
             "**/node_modules/**" = $true
-            "**/dist/**" = $true
-            "**/.next/**" = $true
+            "**/dist/**"         = $true
+            "**/.next/**"        = $true
         }
     }
     
@@ -818,7 +833,8 @@ function Main {
         Write-Host "• Scripts: pnpm setup, pnpm db:status, pnpm db:backup" -ForegroundColor White
         Write-Host "• Gestion DB: ./scripts/manage-db.ps1 [status|backup|reset]" -ForegroundColor White
         
-    } catch {
+    }
+    catch {
         Write-Error "Erreur lors du setup: $($_.Exception.Message)"
         Write-Error "Ligne: $($_.InvocationInfo.ScriptLineNumber)"
         exit 1

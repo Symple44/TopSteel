@@ -1,6 +1,6 @@
 // apps/api/src/config/env.config.ts
-import { join } from 'path';
 import { config } from 'dotenv';
+import { join } from 'path';
 
 // Charger les fichiers .env dans l'ordre de priorité
 // 1. .env.local (local overrides)
@@ -37,6 +37,9 @@ export const envConfig = {
     expiresIn: process.env.JWT_EXPIRES_IN || '24h',
     refreshSecret: process.env.JWT_REFRESH_SECRET || 'fallback-refresh',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+    issuer: process.env.JWT_ISSUER || 'topsteel-erp',
+    audience: process.env.JWT_AUDIENCE || 'topsteel-users',
+    
   },
   
   // Redis
