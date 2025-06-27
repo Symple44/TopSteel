@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { formatDate, getInitials } from '@/lib/utils'
-import { PRIORITE_PRODUCTION, STATUT_PRODUCTION } from '@/types'
+import { DEVIS_STATUT, PROJET_STATUT, STATUT_PRODUCTION } from '@erp/types/dist/constants'
 import { AlertCircle, Calendar, CheckCircle2, Clock, Factory, Pause, Play, Plus, User, Wrench } from 'lucide-react'
 import { useState } from 'react'
-import type { Projet, PrioriteProduction, StatutProduction } from '@/types'
+import { DEVIS_STATUT, PROJET_STATUT, STATUT_PRODUCTION } from '@erp/types/dist/constants'
 
 interface ProjetProductionTabProps {
   projet: Projet
@@ -102,27 +102,27 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
 
   const getStatutBadge = (statut: StatutProduction) => {
     const statusConfig = {
-      [STATUT_PRODUCTION.PLANIFIE]: {
+      [StatutProduction.PLANIFIE]: {
         label: 'Planifié',
         variant: 'outline' as const,
         icon: Calendar
       },
-      [STATUT_PRODUCTION.EN_COURS]: {
+      [StatutProduction.EN_COURS]: {
         label: 'En cours',
         variant: 'default' as const,
         icon: Play
       },
-      [STATUT_PRODUCTION.PAUSE]: {
+      [StatutProduction.PAUSE]: {
         label: 'En pause',
         variant: 'secondary' as const,
         icon: Pause
       },
-      [STATUT_PRODUCTION.TERMINE]: {
+      [StatutProduction.TERMINE]: {
         label: 'Terminé',
         variant: 'secondary' as const,
         icon: CheckCircle2
       },
-      [STATUT_PRODUCTION.ANNULE]: {
+      [StatutProduction.ANNULE]: {
         label: 'Annulé',
         variant: 'destructive' as const,
         icon: AlertCircle
@@ -370,6 +370,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     </div>
   )
 }
+
 
 
 

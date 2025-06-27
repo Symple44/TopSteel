@@ -1,41 +1,15 @@
-// packages/types/src/index.ts - Version finale et propre
 export * from "./client"
 export * from "./common" 
 export * from "./devis"
 export * from "./projet"
 export * from "./stock"
 export * from "./user"
+export * from "./production"
+// Export explicite des constantes (fix webpack)
+export { DEVIS_STATUT, PROJET_STATUT, STATUT_PRODUCTION, PRIORITE_PRODUCTION } from "./constants"
 
-// === CONSTANTES EXPORTÉES ===
-export const DEVIS_STATUT = {
-  BROUILLON: 'BROUILLON',
-  DEVIS: 'DEVIS',
-  ENVOYE: 'ENVOYE',
-  ACCEPTE: 'ACCEPTE',
-  REFUSE: 'REFUSE'
-} as const
+// Type exports
+export type { ProjetStatut } from "./projet"
+export type { DevisStatut } from "./devis"
+export type { StatutProduction, PrioriteProduction } from "./production"
 
-export const PROJET_STATUT = {
-  NOUVEAU: 'NOUVEAU',
-  DEVIS: 'DEVIS',
-  EN_COURS: 'EN_COURS',
-  TERMINE: 'TERMINE',
-  ANNULE: 'ANNULE',
-  EN_ATTENTE: 'EN_ATTENTE'
-} as const
-
-export const STATUT_PRODUCTION = {
-  EN_ATTENTE: 'EN_ATTENTE',
-  PLANIFIE: 'PLANIFIE',
-  EN_COURS: 'EN_COURS',
-  TERMINE: 'TERMINE',
-  ANNULE: 'ANNULE',
-  PAUSE: 'PAUSE'
-} as const
-
-export const PRIORITE_PRODUCTION = {
-  BASSE: 'BASSE',
-  NORMALE: 'NORMALE',
-  HAUTE: 'HAUTE',
-  URGENTE: 'URGENTE'
-} as const

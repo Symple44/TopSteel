@@ -1,8 +1,6 @@
 // packages/types/src/production.ts
 import type { BaseEntity } from './common'
-import type { Projet } from './projet'
-import type { User } from './user'
-import type { Stock } from './stock'
+
 
 export enum StatutProduction {
   EN_ATTENTE = 'EN_ATTENTE',

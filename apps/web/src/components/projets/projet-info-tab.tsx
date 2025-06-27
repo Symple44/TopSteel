@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { PROJET_STATUT } from '@erp/types'
+import { DEVIS_STATUT, PROJET_STATUT, STATUT_PRODUCTION } from '@erp/types/dist/constants'
 import { 
   Building2, 
   Calendar, 
@@ -77,7 +77,7 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div>
               <Label>Statut</Label>
               <div className="mt-1">
-                <Badge variant={projet.statut === PROJET_STATUT.EN_COURS ? 'default' : 'secondary'}>
+                <Badge variant={projet.statut === ProjetStatut.EN_COURS ? 'default' : 'secondary'}>
                   {projet.statut?.replace('_', ' ') || 'Nouveau'}
                 </Badge>
               </div>
@@ -200,5 +200,6 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
     </div>
   )
 }
+
 
 
