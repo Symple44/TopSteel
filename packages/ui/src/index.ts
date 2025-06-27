@@ -1,25 +1,33 @@
 // Core components
-export * from "./components/button"
-export * from "./components/card"
-export * from "./components/input"
-export * from "./components/badge"
+export * from './badge'
+export * from './button'
+export * from './card'
+export * from './input'
+export * from './label'
+export * from './separator'
 
-// Navigation & Layout
-export * from "./components/tabs"
-export * from "./components/tooltip"
+// Form components  
+export * from './avatar'
+export * from './select'
+export * from './slider'
+export * from './switch'
+export * from './tabs'
+export * from './tooltip'
 
-// Form components
-export * from "./components/slider"
+// Layout components
+export * from './data-table'
+export * from './page-header'
+export * from './projet-card'
+export * from './toaster'
 
-// Data display
-export * from "./components/data-table"
+// Utils
+export * from './lib/utils'
 
-// Business components  
-export * from "./components/page-header"
-export * from "./components/projet-card"
-
-// Notifications
-export * from "./components/toaster"
-
-// Utilities
-export * from "./lib/utils"
+// Additional specific exports for clarity
+export { Input } from './input'
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip'
+export { DataTable } from './data-table'
+export { PageHeader } from './page-header'
+export { ProjetCard } from './projet-card'
+export { Toaster } from './toaster'

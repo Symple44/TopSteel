@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "../lib/utils"
 
 export interface DataTableProps {
   children: React.ReactNode
@@ -9,7 +10,7 @@ export interface DataTableProps {
 
 export function DataTable({ children, className }: DataTableProps) {
   return (
-    <div className={ounded-md border }>
+    <div className={cn("rounded-md border", className)}>
       <table className="w-full caption-bottom text-sm">
         {children}
       </table>

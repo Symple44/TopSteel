@@ -1,5 +1,12 @@
 'use client'
 
+import { Projet } from '@/types'
+
+interface ProjetDocumentsTabProps {
+  projet: Projet
+}
+
+
 import { Input } from "@/components/ui/input"
 import {
     Badge,
@@ -81,7 +88,7 @@ const mockDocuments: Document[] = [
   }
 ]
 
-export default function ProjetDocumentsTab() {
+export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('tous')
   const [filterCategorie, setFilterCategorie] = useState('toutes')

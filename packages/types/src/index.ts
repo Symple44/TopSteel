@@ -1,160 +1,149 @@
-// packages/types/src/index.ts
-// Common types
-export * from "./client";
-export * from "./common";
-export * from "./devis";
-export * from "./forms";
-export * from "./production";
-export * from "./projet";
-export * from "./stock";
-export * from "./user";
+// Types de base
+export type ProjetStatut = 'NOUVEAU' | 'EN_COURS' | 'TERMINE' | 'ANNULE' | 'EN_ATTENTE'
+export type DevisStatut = 'BROUILLON' | 'ENVOYE' | 'ACCEPTE' | 'REFUSE'
+export type PrioriteProduction = 'BASSE' | 'NORMALE' | 'HAUTE' | 'URGENTE'
+export type StatutProduction = 'EN_ATTENTE' | 'PLANIFIE' | 'EN_COURS' | 'TERMINE' | 'ANNULE' | 'PAUSE'
 
-// Type guards - imports corrects
-import type { Client } from "./client";
-import { ClientType } from "./client";
-import type { Projet } from "./projet";
-import { ProjetStatut } from "./projet";
-import type { Stock } from "./stock";
-import { StockType } from "./stock";
-
-export function isProjet(obj: any): obj is Projet {
-  return (
-    obj &&
-    typeof obj.reference === "string" &&
-    Object.values(ProjetStatut).includes(obj.statut)
-  );
+// Interface Client
+export interface Client {
+  id: string
+  nom: string
+  email?: string
+  telephone?: string
+  adresse?: {
+    rue?: string
+    ville?: string
+    codePostal?: string
+  }
+  siret?: string
 }
 
-export function isClient(obj: any): obj is Client {
-  return (
-    obj &&
-    typeof obj.nom === "string" &&
-    Object.values(ClientType).includes(obj.type)
-  );
+// Interface Projet complète
+export interface Projet {
+  id: string
+  nom: string
+  description?: string
+  client?: Client
+  statut?: ProjetStatut
+  montantHT: number
+  montantTTC: number
+  dateCreation?: Date
+  dateEcheance?: Date
+  dateFin?: Date
+  reference?: string
+  avancement?: number
+  devis?: Devis[]
+  documents?: any[]
+  responsable?: {
+    id: string
+    nom: string
+  }
 }
 
-export function isStock(obj: any): obj is Stock {
-  return (
-    obj &&
-    typeof obj.reference === "string" &&
-    Object.values(StockType).includes(obj.type)
-  );
+// Interface Devis
+export interface Devis {
+  id: string
+  numero: string
+  version: string
+  projetId: string
+  dateCreation: Date
+  dateValidite: Date
+  statut: DevisStatut
+  montantHT: number
+  montantTTC: number
+  accepte: boolean
 }
-
-// === INTERFACES POUR TYPES MÉTIER ===
-export interface CategorieProduit {
-  id: string;
-  nom: string;
-  description?: string;
-  couleur?: string;
-}
-
-export interface UniteMesure {
-  id: string;
-  nom: string;
-  symbole: string;
-  type: 'longueur' | 'poids' | 'volume' | 'surface' | 'quantite';
-}
-
-// === ENUMS COMPLETS POUR CI/CD ===
-export enum StatutProduction {
-  EN_ATTENTE = 'en_attente',
-  PLANIFIE = 'planifie',
-  EN_COURS = 'en_cours',
-  EN_PAUSE = 'en_pause',
-  PAUSE = 'pause',
-  TERMINEE = 'terminee',
-  TERMINE = 'termine',
-  SUSPENDUE = 'suspendue',
-  ANNULE = 'annule'
-}
-
-export enum TypeDocument {
-  DEVIS = 'devis',
-  FACTURE = 'facture',
-  BON_COMMANDE = 'bon_commande',
-  BON_LIVRAISON = 'bon_livraison',
-  PLAN = 'plan',
-  PHOTO = 'photo',
-  CONTRAT = 'contrat',
-  AUTRE = 'autre'
-}
-
-export enum PrioriteProduction {
-  BASSE = 'basse',
-  NORMALE = 'normale',
-  HAUTE = 'haute',
-  URGENTE = 'urgente'
-}
-
-// === CONSTANTES POUR USAGE COMME VALEURS ===
-export const UNITES_MESURE = {
-  PIECE: { id: 'piece', nom: 'Pièce', symbole: 'pc', type: 'quantite' as const },
-  METRE: { id: 'm', nom: 'Mètre', symbole: 'm', type: 'longueur' as const },
-  METRE_CARRE: { id: 'm2', nom: 'Mètre carré', symbole: 'm²', type: 'surface' as const },
-  KILOGRAMME: { id: 'kg', nom: 'Kilogramme', symbole: 'kg', type: 'poids' as const },
-  LITRE: { id: 'l', nom: 'Litre', symbole: 'l', type: 'volume' as const }
-} as const;
-
-export const CATEGORIES_PRODUIT = {
-  PROFILE: { id: 'profile', nom: 'Profilé', couleur: '#3B82F6' },
-  TUBE: { id: 'tube', nom: 'Tube', couleur: '#10B981' },
-  TOLE: { id: 'tole', nom: 'Tôle', couleur: '#F59E0B' },
-  CONSOMMABLE: { id: 'consommable', nom: 'Consommable', couleur: '#EF4444' },
-  ACCESSOIRE: { id: 'accessoire', nom: 'Accessoire', couleur: '#8B5CF6' },
-  QUINCAILLERIE: { id: 'quincaillerie', nom: 'Quincaillerie', couleur: '#6B7280' }
-} as const;
 
 // Types d'authentification
 export interface LoginResponse {
-  user: any;
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-}
-
-export interface RefreshTokenResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
+  user: User
 }
 
 export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
 }
 
-// API Response type
-export interface ApiResponse<T = any> {
-  data: T;
-  success: boolean;
-  message?: string;
-  errors?: string[];
+export interface RefreshTokenResponse {
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
 }
 
-// === TYPES ÉTENDUS POUR COMPATIBILITÉ ===
-export interface ProjetFilters {
-  statut?: string
-  clientId?: string
-  dateDebut?: Date
-  dateFin?: Date
+export interface ProjetFormData {
+  nom: string
+  description?: string
+  clientId: string
+  montantHT: number
+  dateEcheance?: Date
+  responsableId?: string
 }
 
-export interface StockFilters {
-  categorieId?: string
-  quantiteMin?: number
-  quantiteMax?: number
-  emplacement?: string
+export interface User {
+  id: string
+  nom: string
+  email: string
+  role: string
 }
 
 export interface Produit {
   id: string
-  nom: string
   reference: string
-  description?: string
-  categorieId: string
-  uniteId: string
-  prixUnitaire: number
+  designation: string
+  categorie: string
+  unite: string
+  prixAchat: number
+  prixVente: number
 }
 
+export interface Stock {
+  id: string
+  produit: Produit
+  quantiteDisponible: number
+  quantiteReservee: number
+  quantiteMinimale: number
+  emplacement: string
+}
+
+// Constantes
+export const PROJET_STATUT = {
+  NOUVEAU: 'NOUVEAU',
+  EN_COURS: 'EN_COURS',
+  TERMINE: 'TERMINE',
+  ANNULE: 'ANNULE',
+  EN_ATTENTE: 'EN_ATTENTE'
+} as const
+
+export const PRIORITE_PRODUCTION = {
+  BASSE: 'BASSE',
+  NORMALE: 'NORMALE',
+  HAUTE: 'HAUTE',
+  URGENTE: 'URGENTE'
+} as const
+
+export const STATUT_PRODUCTION = {
+  EN_ATTENTE: 'EN_ATTENTE',
+  PLANIFIE: 'PLANIFIE',
+  EN_COURS: 'EN_COURS',
+  TERMINE: 'TERMINE',
+  ANNULE: 'ANNULE',
+  PAUSE: 'PAUSE'
+} as const
+
+export interface ApiResponse<T = any> {
+  success: boolean
+  data?: T
+  error?: string
+  message?: string
+}
+
+export const DEVIS_STATUT = {
+  BROUILLON: 'BROUILLON',
+  DEVIS: 'DEVIS', 
+  ACCEPTE: 'ACCEPTE',
+  REFUSE: 'REFUSE'
+} as const

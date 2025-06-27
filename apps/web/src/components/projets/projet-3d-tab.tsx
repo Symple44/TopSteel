@@ -1,216 +1,111 @@
 'use client'
 
-import { Slider } from "@/components/ui/slider"
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Switch } from '@erp/ui'
-import {
-  Download,
+import { useState } from 'react'
+import { 
+  Box,
   Eye,
-  Grid3X3,
+  Download,
   Maximize,
   RefreshCw,
-  RotateCw,
-  Settings,
-  ZoomIn,
-  ZoomOut
+  Grid3X3,
+  Layers,
+  Ruler,
+  Palette
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Projet } from '@/types'
 
-export default function Projet3DTab() {
+interface Projet3DTabProps {
+  projet: Projet
+}
+
+export function Projet3DTab({ projet }: Projet3DTabProps) {
+  const [isLoading, setIsLoading] = useState(false)
   const [showGrid, setShowGrid] = useState(true)
-  const [showWireframe, setShowWireframe] = useState(false)
-  const [showMeasurements, setShowMeasurements] = useState(true)
-  const [opacity, setOpacity] = useState(85)
-  const [isLoading, setIsLoading] = useState(true)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    // Simulation du chargement du modèle 3D
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 2000)
-
-    return () => clearTimeout(timer)
-  }, [])
 
   const handleResetView = () => {
-    console.log('Reset camera view')
-  }
-
-  const handleExport = () => {
-    console.log('Export 3D model')
+    console.log('Reset view')
   }
 
   const handleFullscreen = () => {
-    console.log('Toggle fullscreen')
+    console.log('Fullscreen')
   }
-
-  const controls = [
-    { icon: RotateCw, label: 'Rotation libre', action: () => console.log('Rotate') },
-    { icon: ZoomIn, label: 'Zoom avant', action: () => console.log('Zoom in') },
-    { icon: ZoomOut, label: 'Zoom arrière', action: () => console.log('Zoom out') },
-    { icon: RefreshCw, label: 'Reset vue', action: handleResetView },
-    { icon: Maximize, label: 'Plein écran', action: handleFullscreen },
-  ]
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Visualisation 3D</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            Exporter
+      {/* Contrôles de la vue 3D */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold">Vue 3D du projet</h2>
+          <p className="text-sm text-muted-foreground">
+            Visualisation tridimensionnelle et outils de mesure
+          </p>
+        </div>
+        
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
+            <Grid3X3 className="h-4 w-4 mr-2" />
+            Grille
           </Button>
           <Button variant="outline" size="sm">
-            <Settings className="h-4 w-4 mr-2" />
-            Paramètres
+            <Ruler className="h-4 w-4 mr-2" />
+            Mesures
+          </Button>
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Exporter
           </Button>
         </div>
       </div>
 
+      {/* Viewer 3D principal */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Contrôles */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Contrôles</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {controls.map((control, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={control.action}
-                >
-                  <control.icon className="h-4 w-4 mr-2" />
-                  {control.label}
-                </Button>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Affichage</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label htmlFor="grid-toggle" className="text-sm font-medium">
-                  Grille
-                </label>
-                <Switch
-                  id="grid-toggle"
-                  checked={showGrid}
-                  onCheckedChange={setShowGrid}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label htmlFor="wireframe-toggle" className="text-sm font-medium">
-                  Wireframe
-                </label>
-                <Switch
-                  id="wireframe-toggle"
-                  checked={showWireframe}
-                  onCheckedChange={setShowWireframe}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label htmlFor="measurements-toggle" className="text-sm font-medium">
-                  Mesures
-                </label>
-                <Switch
-                  id="measurements-toggle"
-                  checked={showMeasurements}
-                  onCheckedChange={setShowMeasurements}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Opacité: {opacity}%
-                </label>
-                <Slider
-                  value={[opacity]}
-                  onValueChange={(values) => setOpacity(values[0])}
-                  max={100}
-                  min={0}
-                  step={5}
-                  className="w-full"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Informations</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Vertices:</span>
-                <Badge variant="outline">12,453</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Faces:</span>
-                <Badge variant="outline">8,742</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Matériaux:</span>
-                <Badge variant="outline">3</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Taille:</span>
-                <Badge variant="outline">15.2 MB</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Visualiseur 3D */}
         <div className="lg:col-span-3">
-          <Card className="h-[600px]">
+          <Card>
             <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Modèle 3D - Structure Métallique</CardTitle>
-                <div className="flex gap-2">
-                  {showGrid && <Badge variant="outline">Grille</Badge>}
-                  {showWireframe && <Badge variant="outline">Wireframe</Badge>}
-                  {showMeasurements && <Badge variant="outline">Mesures</Badge>}
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center">
+                  <Box className="h-5 w-5 mr-2" />
+                  Vue principale
+                </CardTitle>
+                <div className="flex space-x-1">
+                  <Button variant="outline" size="sm">
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleResetView}>
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleFullscreen}>
+                    <Maximize className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="h-full">
-              <div className="relative w-full h-full bg-gray-100 rounded-lg overflow-hidden">
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-full">
+            <CardContent className="p-0">
+              <div className="relative bg-gray-100 dark:bg-gray-800 aspect-video rounded-b-lg overflow-hidden">
+                {/* Placeholder pour le viewer 3D */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {isLoading ? (
                     <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                      <p className="text-gray-600">Chargement du modèle 3D...</p>
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                      <p className="text-sm text-muted-foreground">Chargement du modèle 3D...</p>
                     </div>
-                  </div>
-                ) : (
-                  <canvas
-                    ref={canvasRef}
-                    className="w-full h-full"
-                    style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
-                  >
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center text-white">
-                        <Grid3X3 className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                        <p className="text-lg font-medium">Visualiseur 3D</p>
-                        <p className="text-sm opacity-75">
-                          Le modèle 3D sera affiché ici une fois Three.js intégré
-                        </p>
-                      </div>
+                  ) : (
+                    <div className="text-center">
+                      <Box className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-sm text-muted-foreground">
+                        Viewer 3D - Modèle en cours de développement
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {projet.nom}
+                      </p>
                     </div>
-                  </canvas>
-                )}
+                  )}
+                </div>
 
-                {/* Overlay avec informations */}
+                {/* Informations overlay */}
                 {!isLoading && (
                   <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded text-sm">
                     <div>Vue: Perspective</div>
@@ -218,28 +113,56 @@ export default function Projet3DTab() {
                     <div>Position: 0, 0, 0</div>
                   </div>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-                {/* Mini contrôles overlay */}
-                {!isLoading && (
-                  <div className="absolute bottom-4 right-4 flex gap-2">
-                    <Button size="sm" variant="secondary" onClick={() => console.log('Zoom fit')}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="secondary" onClick={handleResetView}>
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="secondary" onClick={handleFullscreen}>
-                      <Maximize className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
+        {/* Panneau latéral */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Couches</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Structure</span>
+                <Badge variant="outline">Visible</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Bardage</span>
+                <Badge variant="outline">Visible</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Fondations</span>
+                <Badge variant="secondary">Masqué</Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Propriétés</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <div>
+                <span className="text-muted-foreground">Dimensions:</span>
+                <div>12m × 8m × 4m</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Surface:</span>
+                <div>96 m²</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Volume:</span>
+                <div>384 m³</div>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Légende et instructions */}
+      {/* Instructions d'utilisation */}
       <Card>
         <CardHeader>
           <CardTitle>Instructions</CardTitle>
@@ -248,7 +171,7 @@ export default function Projet3DTab() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
               <h4 className="font-medium mb-2">Navigation</h4>
-              <ul className="space-y-1 text-gray-600">
+              <ul className="space-y-1 text-muted-foreground">
                 <li>• Clic gauche + glisser: Rotation</li>
                 <li>• Molette: Zoom</li>
                 <li>• Clic droit + glisser: Panoramique</li>
@@ -256,7 +179,7 @@ export default function Projet3DTab() {
             </div>
             <div>
               <h4 className="font-medium mb-2">Raccourcis</h4>
-              <ul className="space-y-1 text-gray-600">
+              <ul className="space-y-1 text-muted-foreground">
                 <li>• G: Afficher/masquer grille</li>
                 <li>• W: Mode wireframe</li>
                 <li>• M: Afficher mesures</li>
@@ -265,7 +188,7 @@ export default function Projet3DTab() {
             </div>
             <div>
               <h4 className="font-medium mb-2">Export</h4>
-              <ul className="space-y-1 text-gray-600">
+              <ul className="space-y-1 text-muted-foreground">
                 <li>• PNG: Image haute résolution</li>
                 <li>• GLB: Modèle 3D</li>
                 <li>• PDF: Vue avec annotations</li>

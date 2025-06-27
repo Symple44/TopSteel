@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { formatDate, getInitials } from '@/lib/utils'
-import type { Projet } from '@/types'
-import { PrioriteProduction, StatutProduction } from '@/types'
+import { Projet, PrioriteProduction, StatutProduction, PRIORITE_PRODUCTION, STATUT_PRODUCTION } from '@/types'
 import {
   AlertCircle,
   Calendar,
@@ -31,8 +30,8 @@ const mockOrdresFabrication = [
   {
     id: '1',
     numero: 'OF-2025-0089',
-    statut: StatutProduction.TERMINE,
-    priorite: PrioriteProduction.NORMALE,
+    statut: STATUT_PRODUCTION.TERMINE,
+    priorite: PRIORITE_PRODUCTION.NORMALE,
     dateDebut: new Date('2025-06-20'),
     dateFin: new Date('2025-06-22'),
     progression: 100,
@@ -64,8 +63,8 @@ const mockOrdresFabrication = [
   {
     id: '2',
     numero: 'OF-2025-0090',
-    statut: StatutProduction.EN_COURS,
-    priorite: PrioriteProduction.HAUTE,
+    statut: STATUT_PRODUCTION.EN_COURS,
+    priorite: PRIORITE_PRODUCTION.HAUTE,
     dateDebut: new Date('2025-06-22'),
     progression: 45,
     operations: [
@@ -91,8 +90,8 @@ const mockOrdresFabrication = [
   {
     id: '3',
     numero: 'OF-2025-0091',
-    statut: StatutProduction.PLANIFIE,
-    priorite: PrioriteProduction.NORMALE,
+    statut: STATUT_PRODUCTION.PLANIFIE,
+    priorite: PRIORITE_PRODUCTION.NORMALE,
     dateDebut: new Date('2025-06-25'),
     progression: 0,
     operations: [
@@ -119,27 +118,27 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
 
   const getStatutBadge = (statut: StatutProduction) => {
     const statusConfig = {
-      [StatutProduction.PLANIFIE]: { 
+      [STATUT_PRODUCTION.PLANIFIE]: { 
         label: 'Planifié', 
         variant: 'outline' as const, 
         icon: Calendar 
       },
-      [StatutProduction.EN_COURS]: { 
+      [STATUT_PRODUCTION.EN_COURS]: { 
         label: 'En cours', 
         variant: 'default' as const, 
         icon: Play 
       },
-      [StatutProduction.PAUSE]: { 
+      [STATUT_PRODUCTION.PAUSE]: { 
         label: 'En pause', 
         variant: 'secondary' as const, 
         icon: Pause 
       },
-      [StatutProduction.TERMINE]: { 
+      [STATUT_PRODUCTION.TERMINE]: { 
         label: 'Terminé', 
         variant: 'secondary' as const, 
         icon: CheckCircle2 
       },
-      [StatutProduction.ANNULE]: { 
+      [STATUT_PRODUCTION.ANNULE]: { 
         label: 'Annulé', 
         variant: 'destructive' as const, 
         icon: AlertCircle 
@@ -159,10 +158,10 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
 
   const getPrioriteBadge = (priorite: PrioriteProduction) => {
     const prioriteConfig = {
-      [PrioriteProduction.BASSE]: { label: 'Basse', className: 'bg-gray-100 text-gray-800' },
-      [PrioriteProduction.NORMALE]: { label: 'Normale', className: 'bg-blue-100 text-blue-800' },
-      [PrioriteProduction.HAUTE]: { label: 'Haute', className: 'bg-orange-100 text-orange-800' },
-      [PrioriteProduction.URGENTE]: { label: 'Urgente', className: 'bg-red-100 text-red-800' },
+      [PRIORITE_PRODUCTION.BASSE]: { label: 'Basse', className: 'bg-gray-100 text-gray-800' },
+      [PRIORITE_PRODUCTION.NORMALE]: { label: 'Normale', className: 'bg-blue-100 text-blue-800' },
+      [PRIORITE_PRODUCTION.HAUTE]: { label: 'Haute', className: 'bg-orange-100 text-orange-800' },
+      [PRIORITE_PRODUCTION.URGENTE]: { label: 'Urgente', className: 'bg-red-100 text-red-800' },
     }
     
     const config = prioriteConfig[priorite]
@@ -200,7 +199,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {mockOrdresFabrication.filter(of => of.statut === StatutProduction.EN_COURS).length}
+              {mockOrdresFabrication.filter(of => of.statut === STATUT_PRODUCTION.EN_COURS).length}
             </div>
             <p className="text-xs text-muted-foreground">
               Sur {mockOrdresFabrication.length} au total
@@ -375,7 +374,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
               ))}
             </div>
 
-            {selectedOF.statut === StatutProduction.EN_COURS && (
+            {selectedOF.statut === STATUT_PRODUCTION.EN_COURS && (
               <div className="flex justify-end gap-2 mt-6 pt-6 border-t">
                 <Button variant="outline">
                   <Pause className="mr-2 h-4 w-4" />
@@ -393,3 +392,6 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     </div>
   )
 }
+
+
+

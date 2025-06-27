@@ -1,13 +1,13 @@
 'use client'
 
-import Projet3DTab from "@/components/projets/projet-3d-tab"
-import { ProjetDevisTab } from '@/components/projets/projet-devis-tab'
-import ProjetDocumentsTab from "@/components/projets/projet-documents-tab"
-import { ProjetInfoTab } from '@/components/projets/projet-info-tab'
-import { ProjetProductionTab } from '@/components/projets/projet-production-tab'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Projet3DTab } from "@/components/projets/projet-3d-tab";
+import { ProjetDevisTab } from '@/components/projets/projet-devis-tab';
+import ProjetDocumentsTab from "@/components/projets/projet-documents-tab";
+import { ProjetInfoTab } from '@/components/projets/projet-info-tab';
+import { ProjetProductionTab } from '@/components/projets/projet-production-tab';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +16,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useProjet } from '@/hooks/use-projets'
-import { cn, formatCurrency, formatDate, getDaysUntil } from '@/lib/utils'
-import { ProjetStatut } from '@/types'
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useProjet } from '@/hooks/use-projets';
+import { cn, formatCurrency, formatDate, getDaysUntil } from '@/lib/utils';
+import { ProjetStatut, PROJET_STATUT, DEVIS_STATUT } from '@/types'
 import {
   AlertCircle,
   ArrowLeft,
@@ -39,8 +39,8 @@ import {
   Send,
   Trash2
 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface ProjetDetailPageProps {
   params: {
@@ -81,12 +81,12 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
 
   const getStatusBadge = (statut: ProjetStatut) => {
     const statusConfig = {
-      [ProjetStatut.BROUILLON]: { label: 'Brouillon', variant: 'outline' as const, icon: Edit },
-      [ProjetStatut.DEVIS]: { label: 'Devis', variant: 'secondary' as const, icon: FileText },
-      [ProjetStatut.ACCEPTE]: { label: 'Accepté', variant: 'default' as const, icon: CheckCircle },
-      [ProjetStatut.EN_COURS]: { label: 'En cours', variant: 'default' as const, icon: Clock },
-      [ProjetStatut.TERMINE]: { label: 'Terminé', variant: 'secondary' as const, icon: CheckCircle },
-      [ProjetStatut.ANNULE]: { label: 'Annulé', variant: 'destructive' as const, icon: AlertCircle },
+      [DEVIS_STATUT.BROUILLON]: { label: 'Brouillon', variant: 'outline' as const, icon: Edit },
+      [DEVIS_STATUT.DEVIS]: { label: 'Devis', variant: 'secondary' as const, icon: FileText },
+      [DEVIS_STATUT.ACCEPTE]: { label: 'Accepté', variant: 'default' as const, icon: CheckCircle },
+      [PROJET_STATUT.EN_COURS]: { label: 'En cours', variant: 'default' as const, icon: Clock },
+      [PROJET_STATUT.TERMINE]: { label: 'Terminé', variant: 'secondary' as const, icon: CheckCircle },
+      [PROJET_STATUT.ANNULE]: { label: 'Annulé', variant: 'destructive' as const, icon: AlertCircle },
     }
     
     const config = statusConfig[statut]
@@ -255,25 +255,29 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
         </TabsList>
 
         <TabsContent value="general">
-          <ProjetInfoTab projet={projet} />
+          <ProjetInfoTab projet={} />
         </TabsContent>
 
         <TabsContent value="devis">
-          <ProjetDevisTab projet={projet} />
+          <ProjetDevisTab projet={} />
         </TabsContent>
 
         <TabsContent value="production">
-          <ProjetProductionTab projet={projet} />
+          <ProjetProductionTab projet={} />
         </TabsContent>
 
         <TabsContent value="3d">
-          <Projet3DTab projet={projet} />
+          <Projet3DTab projet={} />
         </TabsContent>
 
         <TabsContent value="documents">
-          <ProjetDocumentsTab projet={projet} />
+          <ProjetDocumentsTab projet={} />
         </TabsContent>
       </Tabs>
     </div>
   )
 }
+
+
+
+
