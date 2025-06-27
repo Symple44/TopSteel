@@ -1,28 +1,41 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { formatDate, getInitials } from '@/lib/utils'
-import { DEVIS_STATUT, PROJET_STATUT, STATUT_PRODUCTION } from '@erp/types/dist/constants'
-import { AlertCircle, Calendar, CheckCircle2, Clock, Factory, Pause, Play, Plus, User, Wrench } from 'lucide-react'
+import { formatDate } from '@/lib/utils'
+import type { Projet } from '@erp/types'
+import { PrioriteProduction, StatutProduction } from '@erp/types'
+import { AlertCircle, Calendar, CheckCircle2, Clock, Factory, Pause, Play, Plus, User } from 'lucide-react'
 import { useState } from 'react'
-import { DEVIS_STATUT, PROJET_STATUT, STATUT_PRODUCTION } from '@erp/types/dist/constants'
 
 interface ProjetProductionTabProps {
   projet: Projet
 }
 
-// Données mockées pour la démonstration
-const mockOrdresFabrication = [
+// Interface pour les ordres de fabrication mock
+interface MockOrdreFabrication {
+  id: string;
+  numero: string;
+  dateDebut: Date;
+  dateFin?: Date;
+  progression: number;
+  statut: StatutProduction;
+  priorite: PrioriteProduction;
+  operations: any[];
+}
+
+// Données mockées pour la démonstration - CORRIGÉES
+const mockOrdresFabrication: MockOrdreFabrication[] = [
   {
     id: '1',
     numero: 'OF-2025-0089',
     dateDebut: new Date('2025-06-20'),
     dateFin: new Date('2025-06-22'),
     progression: 100,
+    statut: StatutProduction.TERMINE,
+    priorite: PrioriteProduction.NORMALE,
     operations: [
       {
         id: '1',
@@ -53,6 +66,8 @@ const mockOrdresFabrication = [
     numero: 'OF-2025-0090',
     dateDebut: new Date('2025-06-22'),
     progression: 45,
+    statut: StatutProduction.EN_COURS,
+    priorite: PrioriteProduction.HAUTE,
     operations: [
       {
         id: '3',
@@ -78,6 +93,8 @@ const mockOrdresFabrication = [
     numero: 'OF-2025-0091',
     dateDebut: new Date('2025-06-25'),
     progression: 0,
+    statut: StatutProduction.PLANIFIE,
+    priorite: PrioriteProduction.BASSE,
     operations: [
       {
         id: '5',
@@ -127,9 +144,16 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
         variant: 'destructive' as const,
         icon: AlertCircle
       },
+      [StatutProduction.EN_ATTENTE]: {
+        label: 'En attente',
+        variant: 'outline' as const,
+        icon: Clock
+      },
     }
     
     const config = statusConfig[statut]
+    if (!config) return null
+    
     const Icon = config.icon
     
     return (
@@ -142,14 +166,31 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
 
   const getPrioriteBadge = (priorite: PrioriteProduction) => {
     const prioriteConfig = {
+      [PrioriteProduction.BASSE]: {
+        label: 'Basse',
+        variant: 'outline' as const,
+      },
+      [PrioriteProduction.NORMALE]: {
+        label: 'Normale',
+        variant: 'secondary' as const,
+      },
+      [PrioriteProduction.HAUTE]: {
+        label: 'Haute',
+        variant: 'default' as const,
+      },
+      [PrioriteProduction.URGENTE]: {
+        label: 'Urgente',
+        variant: 'destructive' as const,
+      },
     }
     
     const config = prioriteConfig[priorite]
+    if (!config) return null
     
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.className}`}>
+      <Badge variant={config.variant}>
         {config.label}
-      </span>
+      </Badge>
     )
   }
 
@@ -179,6 +220,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
+              {mockOrdresFabrication.filter(of => of.statut === StatutProduction.EN_COURS).length}
             </div>
             <p className="text-xs text-muted-foreground">
               Sur {mockOrdresFabrication.length} au total
@@ -257,7 +299,9 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
               <div
                 key={of.id}
                 className={`rounded-lg border p-4 cursor-pointer transition-colors ${
-                  selectedOF?.id === of.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
+                  selectedOF?.id === of.id
+                    ? 'border-primary bg-primary/5'
+                    : 'hover:bg-muted/50'
                 }`}
                 onClick={() => setSelectedOF(of)}
               >
@@ -300,82 +344,35 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {selectedOF.operations.map((operation, index) => (
-                <div key={operation.id} className="flex gap-4">
-                  <div className="relative flex flex-col items-center">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                      {getOperationStatusIcon(operation.statut)}
-                    </div>
-                    {index < selectedOF.operations.length - 1 && (
-                      <div className="absolute top-10 h-full w-px bg-border" />
-                    )}
-                  </div>
-                  <div className="flex-1 pb-8">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-semibold">{operation.nom}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {operation.description}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2 text-sm">
-                          <div className="flex items-center gap-1">
-                            <Wrench className="h-4 w-4 text-muted-foreground" />
-                            <span>Durée: {operation.dureeEstimee} min</span>
-                            {operation.dureeReelle && (
-                              <span className="text-muted-foreground">
-                                (réel: {operation.dureeReelle} min)
-                              </span>
-                            )}
-                          </div>
-                          {operation.dateDebut && (
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              <span>{formatDate(operation.dateDebut, 'time')}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+            <div className="space-y-4">
+              {selectedOF.operations.map((operation) => (
+                <div key={operation.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {getOperationStatusIcon(operation.statut)}
+                    <div>
+                      <h5 className="font-medium">{operation.nom}</h5>
+                      <p className="text-sm text-muted-foreground">{operation.description}</p>
                       {operation.technicien && (
-                        <div className="flex items-center gap-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={`/api/avatar/${operation.technicien.id}`} alt="Photo" />
-                            <AvatarFallback>
-                              {getInitials(operation.technicien.nom)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm">{operation.technicien.nom}</span>
-                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Technicien: {operation.technicien.nom}
+                        </p>
                       )}
                     </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">
+                      {operation.dureeReelle || operation.dureeEstimee}min
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {operation.dureeReelle ? 'Réalisé' : 'Estimé'}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
-
-              <div className="flex justify-end gap-2 mt-6 pt-6 border-t">
-                <Button variant="outline">
-                  <Pause className="mr-2 h-4 w-4" />
-                  Mettre en pause
-                </Button>
-                <Button>
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Terminer l'ordre
-                </Button>
-              </div>
-            )}
           </CardContent>
         </Card>
       )}
     </div>
   )
 }
-
-
-
-
-
-
-
-
-

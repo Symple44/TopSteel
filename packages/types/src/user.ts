@@ -9,13 +9,15 @@ export enum UserRole {
   COMPTABLE = 'COMPTABLE',
   EMPLOYE = 'EMPLOYE'
 }
-
 export interface User extends BaseEntity {
   email: string
   nom: string
   prenom: string
+  // Compatibilité avec l'ancien format
+  firstName?: string
+  lastName?: string
   avatar?: string
-  role: UserRole
+  role: UserRole | string // Support des anciens rôles string
   telephone?: string
   isActive: boolean
   lastLogin?: Date

@@ -1,13 +1,14 @@
-// apps/web/src/app/(dashboard)/projets/page.tsx
+// apps/web/src/app/(dashboard)/projets/page.tsx (avec asChild)
 'use client'
 
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { DataTable } from "@/components/ui/data-table"
 import { PageHeader } from "@/components/ui/page-header"
 import { ProjetCard } from "@/components/ui/projet-card"
 import { useProjets } from '@/hooks/use-projets'
+import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
-import { Badge, Button } from '@erp/ui'
-import { formatCurrency, formatDate } from '@erp/utils'
 import { Grid, List, Plus } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
@@ -25,7 +26,7 @@ export default function ProjetsPage() {
     {
       key: 'client',
       label: 'Client',
-      render: (_: any, projet: Projet) => projet.client.nom,
+      render: (_: any, projet: Projet) => projet.client?.nom || 'Client non défini',
       sortable: true,
     },
     {
@@ -57,7 +58,14 @@ export default function ProjetsPage() {
   ]
 
   if (isLoading) {
-    return <div className="p-6">Chargement...</div>
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          <p className="mt-4 text-gray-600">Chargement des projets...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -90,6 +98,7 @@ export default function ProjetsPage() {
               </Button>
             </div>
             
+            {/* ✅ asChild avec le nouveau composant Button */}
             <Button asChild>
               <Link href="/projets/nouveau">
                 <Plus className="h-4 w-4 mr-1" />
@@ -102,21 +111,29 @@ export default function ProjetsPage() {
 
       <div className="px-6">
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {projets.map((projet) => (
-              <ProjetCard
-                key={projet.id}
-                projet={projet}
-                onClick={() => console.log('Navigate to', projet.id)}
-              />
+              <ProjetCard key={projet.id} projet={projet} />
             ))}
+            {projets.length === 0 && (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">Aucun projet trouvé</p>
+                {/* ✅ asChild avec le nouveau composant Button */}
+                <Button asChild className="mt-4">
+                  <Link href="/projets/nouveau">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Créer le premier projet
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <DataTable
             data={projets}
             columns={columns}
+            searchKey="reference"
             searchPlaceholder="Rechercher un projet..."
-            onRowClick={(projet) => console.log('Navigate to', projet.id)}
           />
         )}
       </div>

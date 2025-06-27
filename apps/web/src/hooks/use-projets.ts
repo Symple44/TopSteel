@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { Projet } from '@/types'
+import type { Projet } from '@erp/types'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 // Mock service - à remplacer par le vrai service API
 const ProjetsService = {

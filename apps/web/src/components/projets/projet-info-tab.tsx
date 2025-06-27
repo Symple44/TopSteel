@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@/types'
-import { PROJET_STATUT } from '@erp/types'
+import { ProjetStatut } from '@erp/types'
 import {
   Building2,
   Edit,
@@ -70,7 +70,7 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div>
               <Label>Statut</Label>
               <div className="mt-1">
-                <Badge variant={projet.statut === PROJET_STATUT.EN_COURS ? 'default' : 'secondary'}>
+                <Badge variant={projet.statut === ProjetStatut.EN_COURS ? 'default' : 'secondary'}>
                   {projet.statut?.replace('_', ' ') || 'Nouveau'}
                 </Badge>
               </div>
@@ -98,7 +98,7 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div>
               <Label className="text-muted-foreground">Échéance prévue</Label>
               <p className="text-sm font-medium">
-                {projet.dateEcheance ? formatDate(projet.dateEcheance) : 'Non définie'}
+                {projet.dateFinPrevue  ? formatDate(projet.dateFinPrevue ) : 'Non définie'}
               </p>
             </div>
             <div>
