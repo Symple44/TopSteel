@@ -31,8 +31,9 @@
     "type-check": {
       "dependsOn": [
         "^build"
-      ]
-    , "cache": false},
+      ],
+     "cache": false
+    },
     "test": {
       "dependsOn": [
         "^build"
