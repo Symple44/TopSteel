@@ -25,7 +25,9 @@
     "test:unit": "echo 'UI package uses manual testing'",
     "build": "vite build",
     "build:watch": "vite build --watch",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "build:ci": "NODE_OPTIONS='--max-old-space-size=4096' vite build",
+    "build:cjs": "tsc && vite build --mode production"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
@@ -76,5 +78,6 @@
   },
   "publishConfig": {
     "access": "restricted"
-  }
+  },
+  "type": "module"
 }
