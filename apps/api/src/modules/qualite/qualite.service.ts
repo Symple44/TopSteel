@@ -18,12 +18,12 @@ export class QualiteService {
   }
 
   async findOne(id: string): Promise<ControleQualite> {
-    this.logger.log(Récupération qualite id: .\script.ps1{id});
+    this.logger.log(`Récupération qualite id: ${id}`);
     return this.repository.findOne({ where: { id, actif: true } });
   }
 
   async create(data: Partial<ControleQualite>, userId?: string): Promise<ControleQualite> {
-    this.logger.log(Création nouveau qualite par user: .\script.ps1{userId});
+    this.logger.log(`Création nouveau qualite par user: ${userId}`);
     const entity = this.repository.create({
       ...data,
       created_by: userId,
@@ -33,7 +33,7 @@ export class QualiteService {
   }
 
   async update(id: string, data: Partial<ControleQualite>, userId?: string): Promise<ControleQualite> {
-    this.logger.log(Mise à jour qualite id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(`Mise à jour qualite id: ${id} par user: ${userId}`);
     await this.repository.update(id, {
       ...data,
       updated_by: userId,
@@ -42,7 +42,7 @@ export class QualiteService {
   }
 
   async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log(Suppression logique qualite id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(`Suppression logique qualite id: ${id} par user: ${userId}`);
     await this.repository.update(id, { 
       actif: false, 
       updated_by: userId 

@@ -18,12 +18,12 @@ export class MaintenanceService {
   }
 
   async findOne(id: string): Promise<Maintenance> {
-    this.logger.log(Récupération maintenance id: .\script.ps1{id});
+    this.logger.log(`Récupération maintenance id: ${id}`);
     return this.repository.findOne({ where: { id, actif: true } });
   }
 
   async create(data: Partial<Maintenance>, userId?: string): Promise<Maintenance> {
-    this.logger.log(Création nouveau maintenance par user: .\script.ps1{userId});
+    this.logger.log(`Création nouveau maintenance par user: ${userId}`);
     const entity = this.repository.create({
       ...data,
       created_by: userId,
@@ -33,7 +33,7 @@ export class MaintenanceService {
   }
 
   async update(id: string, data: Partial<Maintenance>, userId?: string): Promise<Maintenance> {
-    this.logger.log(Mise à jour maintenance id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(`Mise à jour maintenance id: ${id} par user: ${userId}`);
     await this.repository.update(id, {
       ...data,
       updated_by: userId,
@@ -42,7 +42,7 @@ export class MaintenanceService {
   }
 
   async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log(Suppression logique maintenance id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(`Suppression logique maintenance id: ${id} par user: ${userId}`);
     await this.repository.update(id, { 
       actif: false, 
       updated_by: userId 

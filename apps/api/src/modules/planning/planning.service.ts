@@ -18,12 +18,12 @@ export class PlanningService {
   }
 
   async findOne(id: string): Promise<Planning> {
-    this.logger.log(Récupération planning id: .\script.ps1{id});
+    this.logger.log(`Récupération planning id: ${id}`);
     return this.repository.findOne({ where: { id, actif: true } });
   }
 
   async create(data: Partial<Planning>, userId?: string): Promise<Planning> {
-    this.logger.log(Création nouveau planning par user: .\script.ps1{userId});
+    this.logger.log(`Création nouveau planning par user: ${userId}`);
     const entity = this.repository.create({
       ...data,
       created_by: userId,
@@ -33,7 +33,7 @@ export class PlanningService {
   }
 
   async update(id: string, data: Partial<Planning>, userId?: string): Promise<Planning> {
-    this.logger.log(Mise à jour planning id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(`Mise à jour planning id: ${id} par user: ${userId}`);
     await this.repository.update(id, {
       ...data,
       updated_by: userId,
@@ -42,7 +42,7 @@ export class PlanningService {
   }
 
   async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log(Suppression logique planning id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(Suppression logique planning id: ${id} par user: ${userId});
     await this.repository.update(id, { 
       actif: false, 
       updated_by: userId 

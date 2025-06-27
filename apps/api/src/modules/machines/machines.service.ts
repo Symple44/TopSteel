@@ -18,12 +18,12 @@ export class MachinesService {
   }
 
   async findOne(id: string): Promise<Machine> {
-    this.logger.log(Récupération machines id: .\script.ps1{id});
+    this.logger.log(`Récupération machines id: ${id}`);
     return this.repository.findOne({ where: { id, actif: true } });
   }
 
   async create(data: Partial<Machine>, userId?: string): Promise<Machine> {
-    this.logger.log(Création nouveau machines par user: .\script.ps1{userId});
+    this.logger.log(`Création nouveau machines par user: ${userId}`);
     const entity = this.repository.create({
       ...data,
       created_by: userId,
@@ -33,7 +33,7 @@ export class MachinesService {
   }
 
   async update(id: string, data: Partial<Machine>, userId?: string): Promise<Machine> {
-    this.logger.log(Mise à jour machines id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(`Mise à jour machines id: ${id} par user: ${userId}`);
     await this.repository.update(id, {
       ...data,
       updated_by: userId,
@@ -42,7 +42,7 @@ export class MachinesService {
   }
 
   async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log(Suppression logique machines id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log`(Suppression logique machines id: ${id} par user: ${userId}`);
     await this.repository.update(id, { 
       actif: false, 
       updated_by: userId 

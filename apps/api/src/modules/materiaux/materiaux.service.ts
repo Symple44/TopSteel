@@ -18,12 +18,12 @@ export class MateriauxService {
   }
 
   async findOne(id: string): Promise<Materiau> {
-    this.logger.log(Récupération materiaux id: .\script.ps1{id});
+    this.logger.log(`Récupération materiaux id: ${id}`);
     return this.repository.findOne({ where: { id, actif: true } });
   }
 
   async create(data: Partial<Materiau>, userId?: string): Promise<Materiau> {
-    this.logger.log(Création nouveau materiaux par user: .\script.ps1{userId});
+    this.logger.log(`Création nouveau materiaux par user: ${userId}`);
     const entity = this.repository.create({
       ...data,
       created_by: userId,
@@ -33,7 +33,7 @@ export class MateriauxService {
   }
 
   async update(id: string, data: Partial<Materiau>, userId?: string): Promise<Materiau> {
-    this.logger.log(Mise à jour materiaux id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(`Mise à jour materiaux id: ${id} par user: ${userId}`);
     await this.repository.update(id, {
       ...data,
       updated_by: userId,
@@ -42,7 +42,7 @@ export class MateriauxService {
   }
 
   async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log(Suppression logique materiaux id: .\script.ps1{id} par user: .\script.ps1{userId});
+    this.logger.log(`Suppression logique materiaux id: ${id} par user: ${userId}`);
     await this.repository.update(id, { 
       actif: false, 
       updated_by: userId 
