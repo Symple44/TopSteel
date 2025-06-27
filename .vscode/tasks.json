@@ -1,160 +1,93 @@
 {
+  "version": "2.0.0",
   "tasks": [
     {
+      "presentation": {
+        "echo": true,
+        "panel": "new",
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🚀 ERP: Démarrer Serveurs",
+      "command": "pnpm",
+      "detail": "Démarre les serveurs API et Web en mode développement",
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "type": "shell",
-      "detail": "Installation complète du projet ERP TopSteel",
-      "problemMatcher": [],
-      "command": "pwsh",
-      "label": "🚀 ERP: Setup Complet",
-      "args": [
-        "scripts/setup-erp.ps1"
-      ],
-      "presentation": {
-        "panel": "new",
-        "echo": true,
-        "focus": false,
-        "reveal": "always"
-      }
-    },
-    {
-      "presentation": {
-        "panel": "new",
-        "echo": true,
-        "reveal": "always"
-      },
-      "command": "pwsh",
-      "type": "shell",
-      "detail": "Réinstallation forcée avec suppression des données existantes",
-      "args": [
-        "scripts/setup-erp.ps1",
-        "-Force"
-      ],
-      "group": "build",
-      "label": "🔄 ERP: Setup Force (Reset)"
-    },
-    {
-      "presentation": {
-        "panel": "new",
-        "echo": true,
-        "reveal": "always"
-      },
-      "command": "pnpm",
-      "type": "shell",
-      "detail": "Démarre les serveurs API et Web en mode développement",
       "args": [
         "dev"
-      ],
-      "group": "build",
-      "label": "▶️ ERP: Démarrer Serveurs"
+      ]
     },
     {
       "presentation": {
-        "reveal": "always",
-        "echo": true
-      },
-      "command": "pnpm",
-      "type": "shell",
-      "detail": "Construit les packages partagés (types, utils, config)",
-      "args": [
-        "build:packages"
-      ],
-      "group": "build",
-      "label": "🏗️ ERP: Build Packages"
-    },
-    {
-      "presentation": {
-        "panel": "new",
         "echo": true,
         "reveal": "always"
       },
-      "command": "pwsh",
       "type": "shell",
-      "detail": "Affiche l'état de la base de données",
+      "label": "🏗️ ERP: Build Packages",
+      "command": "pnpm",
+      "detail": "Construit tous les packages",
+      "group": "build",
       "args": [
-        "scripts/manage-db.ps1",
-        "status"
-      ],
+        "build"
+      ]
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🧪 ERP: Tests",
+      "command": "pnpm",
+      "detail": "Exécute tous les tests",
       "group": "test",
-      "label": "🗄️ DB: Status"
+      "args": [
+        "test"
+      ]
     },
     {
       "presentation": {
-        "panel": "new",
         "echo": true,
         "reveal": "always"
       },
-      "command": "pwsh",
       "type": "shell",
-      "detail": "Crée une sauvegarde de la base de données",
-      "args": [
-        "scripts/manage-db.ps1",
-        "backup"
-      ],
-      "group": "build",
-      "label": "💾 DB: Backup"
-    },
-    {
-      "presentation": {
-        "panel": "new",
-        "echo": true,
-        "reveal": "always"
-      },
-      "command": "pwsh",
-      "type": "shell",
-      "detail": "Remet à zéro la base de données (ATTENTION: destructif)",
-      "args": [
-        "scripts/manage-db.ps1",
-        "reset"
-      ],
-      "group": "build",
-      "label": "🔄 DB: Reset Database"
-    },
-    {
-      "presentation": {
-        "reveal": "always",
-        "echo": true
-      },
+      "label": "🔧 ERP: Type Check",
       "command": "pnpm",
+      "detail": "Vérification TypeScript",
+      "group": "build",
+      "args": [
+        "type-check"
+      ]
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "reveal": "always"
+      },
       "type": "shell",
-      "detail": "Vérifie la qualité du code",
+      "label": "🎨 ERP: Format Code",
+      "command": "pnpm",
+      "detail": "Formate le code avec Prettier",
+      "group": "build",
+      "args": [
+        "format"
+      ]
+    },
+    {
+      "presentation": {
+        "echo": true,
+        "reveal": "always"
+      },
+      "type": "shell",
+      "label": "🔍 ERP: Lint",
+      "command": "pnpm",
+      "detail": "Lint du code",
+      "group": "build",
       "args": [
         "lint"
-      ],
-      "group": "test",
-      "label": "🔍 ERP: Lint"
-    },
-    {
-      "presentation": {
-        "reveal": "always",
-        "echo": true
-      },
-      "command": "pnpm",
-      "type": "shell",
-      "detail": "Nettoie les fichiers de build et cache",
-      "args": [
-        "clean"
-      ],
-      "group": "build",
-      "label": "🧹 ERP: Clean"
-    },
-    {
-      "presentation": {
-        "reveal": "always",
-        "echo": true
-      },
-      "command": "pnpm",
-      "type": "shell",
-      "detail": "Vérifie les variables d'environnement",
-      "args": [
-        "check:env"
-      ],
-      "group": "test",
-      "label": "🔧 ERP: Check Environment"
+      ]
     }
-  ],
-  "version": "2.0.0"
+  ]
 }
