@@ -5,11 +5,11 @@ name: 📦 Dependencies & Security Monitor
 
 on:
   schedule:
-    - cron: "0 6 * * 1"  # Tous les lundis à 6h UTC
+    - cron: "0 6 * * 1" # Tous les lundis à 6h UTC
     - cron: "0 18 * * 5" # Tous les vendredis à 18h UTC
   push:
     branches: [main, develop]
-    paths: 
+    paths:
       - "**/package.json"
       - "pnpm-lock.yaml"
   pull_request:
@@ -20,10 +20,14 @@ on:
   workflow_dispatch:
     inputs:
       create_pr:
-        description: 'Create PR for updates'
+        description: "Create PR for updates"
         required: false
-        default: 'false'
+        default: "false"
         type: boolean
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 env:
   NODE_VERSION: "18.17.0"
@@ -57,7 +61,7 @@ jobs:
         run: |
           echo "🔍 Running pnpm security audit..."
           pnpm audit --audit-level moderate --json > pnpm-audit.json || true
-          
+
           # Afficher le résumé
           if [ -s pnpm-audit.json ]; then
             echo "⚠️ Vulnerabilities found in pnpm audit"
@@ -75,7 +79,7 @@ jobs:
         run: |
           echo "🔍 Checking for unused dependencies..."
           pnpm dlx depcheck --json > depcheck-results.json || true
-          
+
           # Analyser les résultats
           if [ -s depcheck-results.json ]; then
             echo "📊 Depcheck results:"
@@ -128,7 +132,7 @@ jobs:
         run: |
           echo "📊 Checking for outdated packages..."
           pnpm outdated --recursive --format list > outdated-packages.txt || true
-          
+
           if [ -s outdated-packages.txt ]; then
             echo "📦 Outdated packages found:"
             cat outdated-packages.txt
@@ -141,12 +145,12 @@ jobs:
       - name: 🔍 Detailed dependency analysis
         run: |
           echo "🔍 Running detailed dependency analysis..."
-          
+
           # Analyser les vulnérabilités par niveau de sévérité
           echo "## 📊 Dependency Analysis Report" > dependency-report.md
           echo "Generated on: $(date)" >> dependency-report.md
           echo "" >> dependency-report.md
-          
+
           # Packages outdated
           if [ -s outdated-packages.txt ]; then
             echo "### 📦 Outdated Packages" >> dependency-report.md
@@ -161,7 +165,7 @@ jobs:
         run: |
           echo "🎯 Running npm-check-updates analysis..."
           npx npm-check-updates --format group --target minor > ncu-analysis.txt || true
-          
+
           if [ -s ncu-analysis.txt ]; then
             echo "" >> dependency-report.md
             echo "### 🎯 NCU Analysis (Minor Updates)" >> dependency-report.md
@@ -186,10 +190,10 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
+
             let reportContent = "# 📦 Weekly Dependencies Report\n\n";
             reportContent += "Des dépendances obsolètes ont été détectées.\n\n";
-            
+
             try {
               const outdated = fs.readFileSync('outdated-packages.txt', 'utf8');
               reportContent += "## 📊 Packages obsolètes\n\n";
@@ -197,7 +201,7 @@ jobs:
             } catch (e) {
               console.log('No outdated packages file found');
             }
-            
+
             reportContent += "## 🎯 Actions recommandées\n\n";
             reportContent += "1. Vérifier les breaking changes des nouvelles versions\n";
             reportContent += "2. Exécuter `pnpm update --latest` pour les mises à jour mineures\n";
@@ -205,7 +209,7 @@ jobs:
             reportContent += "4. Planifier les mises à jour majeures\n\n";
             reportContent += "---\n";
             reportContent += "Généré automatiquement par GitHub Actions";
-            
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -219,7 +223,7 @@ jobs:
     name: 🔄 Auto Update Dependencies
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.create_pr == 'true' || (github.event_name == 'schedule' && github.ref == 'refs/heads/develop') }}
-    
+
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -243,13 +247,13 @@ jobs:
       - name: 🔄 Update patch and minor versions
         run: |
           echo "🔄 Updating patch and minor versions..."
-          
+
           # Sauvegarder l'état actuel
           cp pnpm-lock.yaml pnpm-lock.yaml.backup
-          
+
           # Mettre à jour les versions patch/minor
           pnpm update --latest
-          
+
           # Vérifier s'il y a des changements
           if ! git diff --quiet pnpm-lock.yaml; then
             echo "changes_detected=true" >> $GITHUB_ENV
@@ -263,12 +267,12 @@ jobs:
         if: env.changes_detected == 'true'
         run: |
           echo "🧪 Running quick validation after updates..."
-          
+
           # Tests rapides pour valider les mises à jour
           pnpm install
           pnpm type-check || exit 1
           pnpm audit --audit-level moderate || exit 1
-          
+
           echo "✅ Quick validation passed"
 
       - name: 📝 Create Pull Request
@@ -278,26 +282,26 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: |
             🔄 chore: auto-update dependencies
-            
+
             - Updated patch and minor versions
             - All security audits passing
             - Quick validation completed
           title: "🔄 Auto-update dependencies"
           body: |
             ## 📦 Automatic Dependencies Update
-            
+
             Cette PR contient les mises à jour automatiques des dépendances :
-            
+
             ### ✅ Validations effectuées
             - [x] Type checking
             - [x] Security audit
             - [x] Basic functionality tests
-            
+
             ### 🎯 Actions recommandées
             - [ ] Vérifier les changements manuellement
             - [ ] Exécuter la suite de tests complète
             - [ ] Tester en local si nécessaire
-            
+
             ---
             🤖 Générée automatiquement par GitHub Actions
           branch: auto-update/dependencies
@@ -325,14 +329,14 @@ jobs:
           echo "# 📊 Weekly Security & Dependencies Report" > weekly-report.md
           echo "Generated on: $(date)" >> weekly-report.md
           echo "" >> weekly-report.md
-          
+
           echo "## 🛡️ Security Status" >> weekly-report.md
           if [ -f pnpm-audit.json ] && [ -s pnpm-audit.json ]; then
             echo "⚠️ Some security issues detected" >> weekly-report.md
           else
             echo "✅ No security vulnerabilities found" >> weekly-report.md
           fi
-          
+
           echo "" >> weekly-report.md
           echo "## 📦 Dependencies Status" >> weekly-report.md
           if [ -f outdated-packages.txt ] && [ -s outdated-packages.txt ]; then
@@ -340,7 +344,7 @@ jobs:
           else
             echo "✅ All dependencies up to date" >> weekly-report.md
           fi
-          
+
           echo "" >> weekly-report.md
           echo "---" >> weekly-report.md
           echo "🤖 Automated report by TopSteel CI/CD" >> weekly-report.md
