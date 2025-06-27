@@ -19,3 +19,19 @@ export function formatCurrency(amount: number): string {
     currency: 'EUR',
   }).format(amount)
 }
+
+export function getDaysUntil(date: Date): number {
+  const today = new Date()
+  const targetDate = new Date(date)
+  const diffTime = targetDate.getTime() - today.getTime()
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+}
+
+export function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+}
