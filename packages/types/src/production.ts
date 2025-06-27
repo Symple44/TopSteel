@@ -1,68 +1,44 @@
 // packages/types/src/production.ts
 import type { BaseEntity } from './common'
 import type { Projet } from './projet'
-import type { ProjetPriorite } from './projet'
 import type { User } from './user'
 import type { Stock } from './stock'
 
 export enum StatutProduction {
-  EN_ATTENTE = 'en_attente',
-  PLANIFIE = 'planifie',
-  EN_COURS = 'en_cours',
-  EN_PAUSE = 'en_pause',
-  PAUSE = 'pause',
-  TERMINEE = 'terminee',
-  TERMINE = 'termine',
-  SUSPENDUE = 'suspendue',
-  ANNULE = 'annule'
+  EN_ATTENTE = 'EN_ATTENTE',
+  PLANIFIE = 'PLANIFIE',
+  EN_COURS = 'EN_COURS',
+  TERMINE = 'TERMINE',
+  ANNULE = 'ANNULE',
+  PAUSE = 'PAUSE'
 }
 
-export enum OrdreFabricationStatut {
-  EN_ATTENTE = 'EN_ATTENTE',
-  EN_COURS = 'EN_COURS',
-  EN_PAUSE = 'EN_PAUSE',
-  TERMINE = 'TERMINE',
-  ANNULE = 'ANNULE'
+export enum PrioriteProduction {
+  BASSE = 'BASSE',
+  NORMALE = 'NORMALE',
+  HAUTE = 'HAUTE',
+  URGENTE = 'URGENTE'
 }
 
 export interface OrdreFabrication extends BaseEntity {
   numero: string
   projetId: string
-  projet: Projet
-  statut: OrdreFabricationStatut
+  statut: StatutProduction
   description: string
-  priorite: ProjetPriorite
+  priorite: PrioriteProduction
   dateDebut?: Date
   dateFin?: Date
-  dateFinPrevue?: Date
   notes?: string
-  responsable?: User
   responsableId?: string
-  taches: TacheFabrication[]
-  materiaux: MateriauRequis[]
-  coutMain: number
-  coutMateriaux: number
-  coutTotal: number
-}
-
-export interface MateriauRequis {
-  stockId: string
-  stock: Stock
-  quantiteRequise: number
-  quantiteUtilisee: number
-  cout: number
 }
 
 export interface TacheFabrication extends BaseEntity {
   ordreFabricationId: string
   nom: string
   description?: string
-  statut: 'EN_ATTENTE' | 'EN_COURS' | 'TERMINEE'
+  statut: StatutProduction
   dureeEstimee: number
-  dureeRealise?: number
   dateDebut?: Date
   dateFin?: Date
-  responsable?: User
   responsableId?: string
-  notes?: string
 }

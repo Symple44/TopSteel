@@ -99,7 +99,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                         Viewer 3D - Modèle en cours de développement
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {projet.nom}
+                        {projet.reference}
                       </p>
                     </div>
                   )}
@@ -200,3 +200,5 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
     </div>
   )
 }
+
+

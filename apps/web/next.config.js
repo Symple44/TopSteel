@@ -12,6 +12,7 @@ try {
 }
 
 const nextConfig = {
+  experimental: { staticGenerationOptOut: true },
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: false },
   images: {
@@ -27,3 +28,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+

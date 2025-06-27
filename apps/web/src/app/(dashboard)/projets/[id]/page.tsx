@@ -20,7 +20,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProjet } from '@/hooks/use-projets';
 import { cn, formatCurrency, formatDate, getDaysUntil } from '@/lib/utils';
-import { ProjetStatut, PROJET_STATUT, DEVIS_STATUT } from '@/types'
+import { PROJET_STATUT, DEVIS_STATUT } from '@erp/types'
 import {
   AlertCircle,
   ArrowLeft,

@@ -1,12 +1,4 @@
-// packages/types/src/index.ts - Version finale et propre
-export * from "./client"
-export * from "./common" 
-export * from "./devis"
-export * from "./projet"
-export * from "./stock"
-export * from "./user"
-
-// === CONSTANTES EXPORTÉES ===
+// packages/types/src/constants.ts
 export const DEVIS_STATUT = {
   BROUILLON: 'BROUILLON',
   DEVIS: 'DEVIS',
@@ -26,7 +18,7 @@ export const PROJET_STATUT = {
 
 export const STATUT_PRODUCTION = {
   EN_ATTENTE: 'EN_ATTENTE',
-  PLANIFIE: 'PLANIFIE',
+  PLANIFIE: 'PLANIFIE', 
   EN_COURS: 'EN_COURS',
   TERMINE: 'TERMINE',
   ANNULE: 'ANNULE',
