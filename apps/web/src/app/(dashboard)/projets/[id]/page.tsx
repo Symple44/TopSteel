@@ -15,12 +15,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProjet } from '@/hooks/use-projets';
 import { cn, formatCurrency, formatDate, getDaysUntil } from '@/lib/utils';
-import { PROJET_STATUT, DEVIS_STATUT } from '@erp/types'
+import type { ProjetStatut } from '@erp/types';
 import {
   AlertCircle,
   ArrowLeft,
@@ -38,7 +38,7 @@ import {
   Paperclip,
   Send,
   Trash2
-} from 'lucide-react'
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -81,12 +81,12 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
 
   const getStatusBadge = (statut: ProjetStatut) => {
     const statusConfig = {
-      [DEVIS_STATUT.BROUILLON]: { label: 'Brouillon', variant: 'outline' as const, icon: Edit },
-      [DEVIS_STATUT.DEVIS]: { label: 'Devis', variant: 'secondary' as const, icon: FileText },
-      [DEVIS_STATUT.ACCEPTE]: { label: 'Accepté', variant: 'default' as const, icon: CheckCircle },
-      [PROJET_STATUT.EN_COURS]: { label: 'En cours', variant: 'default' as const, icon: Clock },
-      [PROJET_STATUT.TERMINE]: { label: 'Terminé', variant: 'secondary' as const, icon: CheckCircle },
-      [PROJET_STATUT.ANNULE]: { label: 'Annulé', variant: 'destructive' as const, icon: AlertCircle },
+      [ProjetStatut.BROUILLON]: { label: 'Brouillon', variant: 'outline' as const, icon: Edit },
+      [ProjetStatut.DEVIS]: { label: 'Devis', variant: 'secondary' as const, icon: FileText },
+      [ProjetStatut.ACCEPTE]: { label: 'Accepté', variant: 'default' as const, icon: CheckCircle },
+      [ProjetStatut.EN_COURS]: { label: 'En cours', variant: 'default' as const, icon: Clock },
+      [ProjetStatut.TERMINE]: { label: 'Terminé', variant: 'secondary' as const, icon: CheckCircle },
+      [ProjetStatut.ANNULE]: { label: 'Annulé', variant: 'destructive' as const, icon: AlertCircle },
     }
     
     const config = statusConfig[statut]

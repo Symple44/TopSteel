@@ -1,6 +1,6 @@
 // packages/types/src/projet.ts
-import type { BaseEntity, Address } from './common'
 import type { Client } from './client'
+import type { Address, BaseEntity } from './common'
 import type { User } from './user'
 
 export enum ProjetStatut {

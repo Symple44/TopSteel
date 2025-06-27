@@ -1,32 +1,25 @@
 'use client'
 
-import { useState } from 'react'
-import { DEVIS_STATUT, PROJET_STATUT, STATUT_PRODUCTION } from '@erp/types/dist/constants'
-import { 
-  Building2, 
-  Calendar, 
-  Euro, 
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Textarea } from '@/components/ui/textarea'
+import { formatCurrency, formatDate } from '@/lib/utils'
+import type { Projet } from '@/types'
+import { PROJET_STATUT } from '@erp/types'
+import {
+  Building2,
+  Edit,
+  Mail,
   MapPin,
   Phone,
-  Mail,
-  User,
-  FileText,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  Edit,
   Save,
   X
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { formatDate, formatCurrency, cn } from '@/lib/utils'
-import type { Projet } from '@/types'
+import { useState } from 'react'
 
 interface ProjetInfoTabProps {
   projet: Projet
@@ -77,7 +70,7 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div>
               <Label>Statut</Label>
               <div className="mt-1">
-                <Badge variant={projet.statut === ProjetStatut.EN_COURS ? 'default' : 'secondary'}>
+                <Badge variant={projet.statut === PROJET_STATUT.EN_COURS ? 'default' : 'secondary'}>
                   {projet.statut?.replace('_', ' ') || 'Nouveau'}
                 </Badge>
               </div>
