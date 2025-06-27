@@ -176,14 +176,14 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
 
     strategy:
-              matrix:
-          target:
-            - { name: "config", filter: "@erp/config", emoji: "⚙️" }
-            - { name: "types", filter: "@erp/types", emoji: "📝" }
-            - { name: "utils", filter: "@erp/utils", emoji: "🔧" }
-            - { name: "ui", filter: "@erp/ui", emoji: "🎨" }
-            - { name: "web", filter: "@erp/web", emoji: "🌐" }
-            - { name: "api", filter: "@erp/api", emoji: "🔗" }
+      matrix:
+        target:
+          - { name: "config", filter: "@erp/config", emoji: "⚙️" }
+          - { name: "types", filter: "@erp/types", emoji: "📝" }
+          - { name: "utils", filter: "@erp/utils", emoji: "🔧" }
+          - { name: "ui", filter: "@erp/ui", emoji: "🎨" }
+          - { name: "web", filter: "@erp/web", emoji: "🌐" }
+          - { name: "api", filter: "@erp/api", emoji: "🔗" }
 
     steps:
       - name: 📥 Checkout repository
