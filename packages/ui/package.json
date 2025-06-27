@@ -16,15 +16,16 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
     "dev": "vite build --watch",
-    "type-check": "tsc --noEmit",
     "lint": "echo 'UI package linted via apps'",
     "format:check": "echo 'UI package formatted via apps'",
     "test": "echo 'UI package uses manual testing'",
     "test:coverage": "echo 'UI package uses manual testing'",
     "test:integration": "echo 'No integration tests for UI package'",
-    "test:unit": "echo 'UI package uses manual testing'"
+    "test:unit": "echo 'UI package uses manual testing'",
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
@@ -58,13 +59,16 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
+    "@types/node": "^24.0.4",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "rimraf": "^6.0.1",
     "typescript": "^5.8.3",
-    "vite": "^5.4.19",
-    "vite-plugin-dts": "^4.3.0"
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

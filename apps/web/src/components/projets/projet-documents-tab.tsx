@@ -2,9 +2,7 @@
 
 import { Projet } from '@/types'
 
-interface ProjetDocumentsTabProps {
-  projet: Projet
-}
+interface ProjetDocumentsTabProps { projet?: any }
 
 
 import { Input } from "@/components/ui/input"
@@ -290,3 +288,4 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
     </div>
   )
 }
+

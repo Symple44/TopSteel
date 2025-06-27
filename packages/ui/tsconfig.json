@@ -4,29 +4,25 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
-    "emitDeclarationOnly": false,
-    "outDir": "dist",
-    "rootDir": "src",
-
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": false,
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": false,
+    "noEmit": true,
     "jsx": "react-jsx",
-
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/lib/utils": ["../utils/src/index.ts", "src/lib/utils.ts"]
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules", "**/*.stories.*", "**/*.test.*"]
+  "exclude": ["dist", "node_modules", "**/*.test.tsx", "**/*.stories.tsx"]
 }

@@ -2,7 +2,7 @@
 
 import { Projet3DTab } from "@/components/projets/projet-3d-tab";
 import { ProjetDevisTab } from '@/components/projets/projet-devis-tab';
-import ProjetDocumentsTab from "@/components/projets/projet-documents-tab";
+import { ProjetDocumentsTab } from "@/components/projets/projet-documents-tab";
 import { ProjetInfoTab } from '@/components/projets/projet-info-tab';
 import { ProjetProductionTab } from '@/components/projets/projet-production-tab';
 import { Badge } from '@/components/ui/badge';
@@ -255,23 +255,23 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
         </TabsList>
 
         <TabsContent value="general">
-          <ProjetInfoTab projet={} />
+          <ProjetInfoTab projet={projet} />
         </TabsContent>
 
         <TabsContent value="devis">
-          <ProjetDevisTab projet={} />
+          <ProjetDevisTab projet={projet} />
         </TabsContent>
 
         <TabsContent value="production">
-          <ProjetProductionTab projet={} />
+          <ProjetProductionTab projet={projet} />
         </TabsContent>
 
         <TabsContent value="3d">
-          <Projet3DTab projet={} />
+          <Projet3DTab projet={projet} />
         </TabsContent>
 
         <TabsContent value="documents">
-          <ProjetDocumentsTab projet={} />
+          <ProjetDocumentsTab />
         </TabsContent>
       </Tabs>
     </div>
