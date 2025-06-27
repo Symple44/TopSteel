@@ -1,100 +1,57 @@
-// apps/api/src/modules/auth/auth.service.ts
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
-import { User } from "../users/entities/user.entity";
-import { UsersService } from "../users/users.service";
-import { RegisterDto } from "./dto/register.dto";
+import { Injectable } from '@nestjs/common';
+import { LoginDto, RegisterDto } from './dto/login.dto';
+
+export interface User {
+  id: number;
+  email: string;
+  nom: string;
+  prenom: string;
+  role: string;
+  created_at: Date;
+  updated_at: Date;
+}
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-    private configService: ConfigService
-  ) {}
-
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user;
-      return result;
+    // TODO: Valider l'utilisateur avec la base de données
+    // Pour l'instant, simulation
+    if (email === 'test@test.com' && password === 'password') {
+      const user: Partial<User> = {
+        id: 1,
+        email: email,
+        nom: 'Test',
+        prenom: 'User',
+        role: 'user'
+      };
+      return user;
     }
     return null;
   }
 
-  async login(user: User) {
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
-
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get("jwt.refreshExpiresIn", "7d"),
-    });
-
-    // Sauvegarder le refresh token en base
-    await this.usersService.updateRefreshToken(user.id, refreshToken);
-
+  async login(loginDto: LoginDto): Promise<{ access_token: string; user: Partial<User> }> {
+    // Valider d'abord l'utilisateur
+    const user = await this.validateUser(loginDto.email, loginDto.password);
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+    
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        nom: user.nom,
-        prenom: user.prenom,
-        role: user.role,
-      },
-      accessToken,
-      refreshToken,
-      expiresIn: this.configService.get("jwt.expiresIn", "24h"),
+      access_token: 'fake-jwt-token', // TODO: Générer un vrai JWT
+      user
     };
   }
 
-  async register(registerDto: RegisterDto) {
-    // Vérifier si l'utilisateur existe déjà
-    const existingUser = await this.usersService.findByEmail(registerDto.email);
-    if (existingUser) {
-      throw new ConflictException("Cet email est déjà utilisé");
-    }
-
-    // Hasher le mot de passe
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-
-    // Créer l'utilisateur
-    const user = await this.usersService.create({
-      ...registerDto,
-      password: hashedPassword,
-    });
-
-    // Retourner les tokens
-    return this.login(user);
-  }
-
-  async refreshToken(refreshToken: string) {
-    try {
-      const payload = this.jwtService.verify(refreshToken);
-      const user = await this.usersService.findOne(payload.sub);
-
-      if (!user || user.refreshToken !== refreshToken) {
-        throw new UnauthorizedException("Token invalide");
-      }
-
-      return this.login(user);
-    } catch (error) {
-      throw new UnauthorizedException("Token invalide ou expiré");
-    }
-  }
-
-  async logout(userId: string) {
-    await this.usersService.updateRefreshToken(typeof userId === 'string' ? parseInt(userId, 10) : userId, null);
-    return { message: "Déconnexion réussie" };
+  async register(registerDto: RegisterDto): Promise<{ user: Partial<User> }> {
+    // TODO: Créer l'utilisateur en base
+    const user: Partial<User> = {
+      id: 2,
+      email: registerDto.email,
+      nom: registerDto.nom,
+      prenom: registerDto.prenom,
+      role: 'user'
+    };
+    
+    return { user };
   }
 }
-

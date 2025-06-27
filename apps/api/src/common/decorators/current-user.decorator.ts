@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction, Application } from 'express';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export const CurrentUser = createParamDecorator(

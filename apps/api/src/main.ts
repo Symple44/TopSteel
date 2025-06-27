@@ -3,7 +3,7 @@ import { ValidationPipe, VersioningType } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import * as compression from "compression";
+import compression from "compression";
 import helmet from 'helmet';
 import { WinstonModule } from "nest-winston";
 import * as winston from "winston";
@@ -43,47 +43,29 @@ async function bootstrap() {
   const port = configService.get<number>("app.port", 3001);
   const env = configService.get<string>("app.env", "development");
 
-  // Sécurité
-  // Sécurité renforcée avec Helmet 8+
+  // Sécurité renforcée avec Helmet
   app.use(
     helmet({
-      // Content Security Policy adapté pour un ERP
       contentSecurityPolicy: env === "production" ? {
         directives: {
           defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"], // Pour les styles inline nécessaires
+          styleSrc: ["'self'", "'unsafe-inline'"],
           scriptSrc: ["'self'"],
-          imgSrc: ["'self'", "data:", "blob:"], // Pour les uploads d'images
-          connectSrc: ["'self'"], // Pour les WebSockets et API calls
+          imgSrc: ["'self'", "data:", "blob:"],
+          connectSrc: ["'self'"],
           fontSrc: ["'self'"],
           objectSrc: ["'none'"],
           mediaSrc: ["'self'"],
           frameSrc: ["'none'"],
         },
       } : false,
-      
-      // Protection Cross-Origin pour les APIs
       crossOriginEmbedderPolicy: env === "production",
       crossOriginOpenerPolicy: { policy: "same-origin" },
       crossOriginResourcePolicy: { policy: "cross-origin" },
-      
-      // Headers de sécurité renforcés
       dnsPrefetchControl: { allow: false },
       frameguard: { action: "deny" },
       hidePoweredBy: true,
-      hsts: env === "production" ? {
-        maxAge: 31536000, // 1 an
-        includeSubDomains: true,
-        preload: true
-      } : false,
-      
-      // Protection contre les attaques
-      ieNoOpen: true,
-      noSniff: true,
-      originAgentCluster: true,
-      permittedCrossDomainPolicies: false,
-      referrerPolicy: { policy: "no-referrer" },
-      xssFilter: true,
+      hsts: env === "production",
     })
   );
 
@@ -92,21 +74,8 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: configService.get("app.cors.origin", ["http://localhost:3000"]),
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: configService.get("app.corsOrigin", "http://localhost:3000"),
     credentials: true,
-  });
-
-  // Prefix global pour l'API
-  app.setGlobalPrefix("api", {
-    exclude: ["/", "/health"],
-  });
-
-  // Versioning de l'API
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: "1",
   });
 
   // Validation globale
@@ -115,43 +84,33 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
     })
   );
 
-  // Filtres et intercepteurs globaux
+  // Interceptors globaux
+  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalInterceptors(new TransformInterceptor());
+
+  // Filtres globaux
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new TransformInterceptor()
-  );
+
+  // Versioning
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: "1",
+  });
 
   // Documentation Swagger
   if (env !== "production") {
     const config = new DocumentBuilder()
-      .setTitle("ERP TOPSTEEL API")
-      .setDescription("API pour l'ERP de gestion métallurgique TOPSTEEL")
+      .setTitle("TopSteel ERP API")
+      .setDescription("API complète pour la gestion ERP métallurgique")
       .setVersion("1.0")
-      .addBearerAuth(
-        {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          name: "JWT",
-          description: "Enter JWT token",
-          in: "header",
-        },
-        "JWT-auth"
-      )
+      .addBearerAuth()
       .addTag("Auth", "Authentification et autorisation")
       .addTag("Users", "Gestion des utilisateurs")
       .addTag("Clients", "Gestion des clients")
-      .addTag("Fournisseurs", "Gestion des fournisseurs")
       .addTag("Projets", "Gestion des projets")
-      .addTag("Devis", "Gestion des devis")
-      .addTag("Facturation", "Gestion de la facturation")
       .addTag("Stocks", "Gestion des stocks")
       .addTag("Production", "Gestion de la production")
       .addTag("Documents", "Gestion des documents")
@@ -191,6 +150,3 @@ bootstrap().catch((error) => {
   console.error("❌ Erreur lors du démarrage du serveur:", error);
   process.exit(1);
 });
-
-
-

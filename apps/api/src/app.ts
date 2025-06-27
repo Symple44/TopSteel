@@ -1,12 +1,12 @@
 // apps/api/src/app.ts
-import express from 'express'
+import express, { Application } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 // import projetsRoutes from './routes/projets.routes'
 // import { errorHandler } from './middleware/error.middleware'
 
-const app = express()
+const app: Application = express()
 
 // Middleware de sécurité
 app.use(helmet())
@@ -16,12 +16,14 @@ app.use(cors({
 }))
 
 // Rate limiting
-app.use(rateLimit({
+const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limite par IP
-}))
+  max: 100, // limit each IP to 100 requests per windowMs
+})
+app.use(limiter)
 
-app.use(express.json({ limit: '10mb' }))
+// Parsing middleware
+app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // Routes

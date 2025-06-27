@@ -1,6 +1,6 @@
 // apps/api/src/common/middleware/security.middleware.ts
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
 @Injectable()
 export class SecurityMiddleware implements NestMiddleware {

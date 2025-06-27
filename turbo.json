@@ -32,7 +32,7 @@
       "dependsOn": [
         "^build"
       ]
-    },
+    , "cache": false},
     "test": {
       "dependsOn": [
         "^build"
@@ -122,3 +122,4 @@
     "CI"
   ]
 }
+
