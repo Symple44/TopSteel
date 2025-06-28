@@ -35,7 +35,9 @@
     "test": "turbo test",
     "test:watch": "turbo test:watch",
     "test:unit": "turbo test:unit",
-    "test:integration": "jest --testNamePattern='integration'",
+    "test:integration": "jest --config=jest.config.cjs",
+    "test:integration:coverage": "jest --config=jest.config.cjs --coverage",
+    "test:integration:watch": "jest --config=jest.config.cjs --watch",
     "test:coverage": "turbo test:coverage",
     "test:cov": "turbo test:cov",
     "test:e2e": "turbo test:e2e",
@@ -77,7 +79,11 @@
     "check:all": "pnpm run lint && pnpm run type-check && pnpm run format:check && pnpm run test",
     "fix:all": "pnpm run lint:fix && pnpm run format:fix",
     "pre-commit": "pnpm run lint:fix && pnpm run format:fix && pnpm run type-check",
-    "postinstall": "pnpm build --filter=\"!@erp/web\" --filter=\"!@erp/api\""
+    "postinstall": "pnpm build --filter=\"!@erp/web\" --filter=\"!@erp/api\"",
+    "test:all": "turbo test",
+    "test:packages:safe": "turbo test --filter='packages/*' --continue",
+    "test:apps": "turbo test --filter='apps/*'",
+    "test:all:safe": "turbo test --continue"
   },
   "dependencies": {
     "dotenv": "^17.0.0"

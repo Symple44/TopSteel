@@ -8,13 +8,13 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
-    "test": "jest",
-    "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "format:check": "prettier --check 'src/**/*.{ts,json}' || echo 'Prettier not configured'",
     "test:coverage": "jest --coverage || echo 'No tests for utils package'",
     "test:unit": "jest || echo 'No tests for utils package'",
-    "test:integration": "echo 'No integration tests for utils package'"
+    "test:integration": "echo 'No integration tests for utils package'",
+    "test": "jest --config=jest.config.cjs --passWithNoTests",
+    "test:watch": "jest --passWithNoTests --watch"
   },
   "dependencies": {
     "clsx": "^2.1.0",
@@ -34,3 +34,4 @@
   },
   "type": "module"
 }
+

@@ -8,61 +8,126 @@
       "cache": false,
       "persistent": true
     },
+    "start:dev": {
+      "cache": false,
+      "persistent": true,
+      "env": ["NODE_ENV", "PORT", "DB_*", "REDIS_*", "JWT_*"]
+    },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "dist/**",
-        "build/**"
-      ]
-    },
-    "lint": {
-      "dependsOn": [
-        "^build"
-      ]
-    },
-    "lint:fix": {
-      "dependsOn": [
-        "^build"
-      ]
-    },
-    "type-check": {
-      "dependsOn": [
-        "^build"
-      ],
-     "cache": false
-    },
-    "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ]
-    },
-    "format": {
-      "outputs": []
-    },
-    "test:unit": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": [],
       "env": [
         "NODE_ENV",
-        "CI"
-      ],
+        "NEXT_PUBLIC_*",
+        "DB_*",
+        "REDIS_*",
+        "JWT_*",
+        "APP_*",
+        "CORS_*"
+      ]
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["NODE_ENV", "PORT"]
+    },
+    "start:prod": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["NODE_ENV", "PORT", "DB_*", "REDIS_*", "JWT_*"]
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "test/**/*.{ts,tsx}",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}"
+      ]
+    },
+    "test:unit": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "env": ["NODE_ENV", "CI"],
       "inputs": [
         "src/**/*.{ts,tsx}",
         "**/*.test.{ts,tsx}",
         "**/*.spec.{ts,tsx}",
-        "jest.config.{js,ts}",
+        "jest.config.{js,ts,cjs}",
         "package.json"
       ],
+      "cache": false
+    },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "env": ["NODE_ENV", "CI", "DB_*", "REDIS_*"],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "**/*.integration.test.{ts,tsx}",
+        "**/*.integration.spec.{ts,tsx}",
+        "jest.config.{js,ts,cjs}",
+        "package.json"
+      ],
+      "cache": false
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "env": ["NODE_ENV", "CI"],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "jest.config.{js,ts,cjs}",
+        "package.json"
+      ],
+      "cache": false
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:cov": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "env": ["NODE_ENV", "DB_*", "REDIS_*"]
+    },
+    "migration:run": {
+      "cache": false,
+      "env": ["DB_*"]
+    },
+    "migration:generate": {
+      "cache": false,
+      "env": ["DB_*"]
+    },
+    "migration:revert": {
+      "cache": false,
+      "env": ["DB_*"]
+    },
+    "seed:run": {
+      "cache": false,
+      "env": ["DB_*"]
+    },
+    "format": {
+      "outputs": [],
       "cache": false
     },
     "format:check": {
@@ -74,48 +139,6 @@
       ],
       "outputs": [],
       "cache": false
-    },
-    "test:integration": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ],
-      "env": [
-        "NODE_ENV",
-        "CI",
-        "DB_*",
-        "REDIS_*"
-      ],
-      "inputs": [
-        "src/**/*.{ts,tsx}",
-        "**/*.integration.test.{ts,tsx}",
-        "**/*.integration.spec.{ts,tsx}",
-        "jest.config.{js,ts}",
-        "package.json"
-      ],
-      "cache": false
-    },
-    "test:coverage": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ],
-      "env": [
-        "NODE_ENV",
-        "CI"
-      ],
-      "inputs": [
-        "src/**/*.{ts,tsx}",
-        "**/*.test.{ts,tsx}",
-        "**/*.spec.{ts,tsx}",
-        "jest.config.{js,ts}",
-        "package.json"
-      ],
-      "cache": false
     }
   },
   "globalEnv": [
@@ -123,4 +146,3 @@
     "CI"
   ]
 }
-

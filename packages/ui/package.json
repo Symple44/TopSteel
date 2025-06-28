@@ -19,7 +19,7 @@
     "dev": "vite build --watch",
     "lint": "echo 'UI package linted via apps'",
     "format:check": "echo 'UI package formatted via apps'",
-    "test": "echo 'UI package uses manual testing'",
+    "test": "echo 'UI package uses Storybook and manual testing' && exit 0",
     "test:coverage": "echo 'UI package uses manual testing'",
     "test:integration": "echo 'No integration tests for UI package'",
     "test:unit": "echo 'UI package uses manual testing'",

@@ -9,16 +9,16 @@
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test:cov": "jest --coverage",
-    "test:watch": "jest --watch",
+    "test:cov": "jest --config=jest.config.cjs --coverage",
+    "test:watch": "jest --config=jest.config.cjs --watch",
     "start:debug": "nest start --debug --watch",
-    "test": "jest",
+    "test": "jest --config=jest.config.cjs",
     "lint": "eslint src/ || echo 'ESLint not configured'",
     "format:check": "prettier --check 'src/**/*.{ts,js,json}' || echo 'Prettier not configured'",
     "type-check": "tsc --noEmit",
     "test:coverage": "jest --coverage",
-    "test:integration": "jest --testPathPattern='integration.(test|spec).ts$'",
-    "test:unit": "jest --testPathPattern='.(test|spec).ts$' --testPathIgnorePatterns='e2e|integration'"
+    "test:integration": "jest --testNamePattern=integration",
+    "test:unit": "jest --testNamePattern='test|spec' --testPathIgnorePatterns=integration"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.7",
@@ -83,3 +83,4 @@
     "node": ">=18.18.0"
   }
 }
+

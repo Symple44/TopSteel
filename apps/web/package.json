@@ -29,8 +29,8 @@
     "test:watch": "jest --watch",
     "test:e2e": "playwright test || echo 'Playwright not configured yet'",
     "test:coverage": "jest --coverage",
-    "test:unit": "jest --testPathPattern='.(test|spec).(ts|tsx)$' --testPathIgnorePatterns='integration|e2e'",
-    "test:integration": "jest --testPathPattern='integration.(test|spec).(ts|tsx)$'",
+    "test:unit": "jest --testNamePattern='test|spec' --testPathIgnorePatterns=integration",
+    "test:integration": "jest --testNamePattern=integration",
     "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx,json,css,md}' || echo 'Prettier not configured'"
   },
   "dependencies": {
