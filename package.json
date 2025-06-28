@@ -19,13 +19,11 @@
     "dev:web": "turbo dev --filter=@erp/web",
     "dev:api": "turbo start:dev --filter=@erp/api",
     "dev:all": "turbo dev",
-    
     "_comment_build": "--- Scripts de build ---",
     "build": "turbo build",
     "start": "turbo start",
     "start:web": "turbo start --filter=@erp/web",
     "start:api": "turbo start:prod --filter=@erp/api",
-    
     "_comment_quality": "--- Scripts qualité de code ---",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
@@ -33,7 +31,6 @@
     "format": "turbo format",
     "format:check": "turbo format:check",
     "format:fix": "turbo format --write",
-    
     "_comment_test": "--- Scripts de test ---",
     "test": "turbo test",
     "test:watch": "turbo test:watch",
@@ -42,13 +39,11 @@
     "test:coverage": "turbo test:coverage",
     "test:cov": "turbo test:cov",
     "test:e2e": "turbo test:e2e",
-    
     "_comment_db": "--- Scripts base de données ---",
     "db:migrate": "turbo migration:run --filter=@erp/api",
     "db:migrate:generate": "turbo migration:generate --filter=@erp/api",
     "db:migrate:revert": "turbo migration:revert --filter=@erp/api",
     "db:seed": "turbo seed:run --filter=@erp/api",
-    
     "_comment_tools": "--- Outils et maintenance ---",
     "audit": "audit-ci --config audit-ci.json",
     "deps:check": "pnpm audit && depcheck",
@@ -58,12 +53,10 @@
     "deps:full-check": "pnpm deps:check && pnpm deps:outdated && pnpm security:audit",
     "security:audit": "better-npm-audit audit",
     "security:snyk": "snyk test --all-projects",
-    
     "_comment_setup": "--- Installation et configuration ---",
     "setup": "pnpm install && pnpm build --filter=\"!@erp/web\" --filter=\"!@erp/api\"",
     "setup:env": "cp apps/web/.env.example apps/web/.env.local && cp apps/api/.env.example apps/api/.env.local",
     "setup:rimraf": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-rimraf.ps1",
-    
     "_comment_clean": "--- Scripts de nettoyage avec rimraf ---",
     "clean": "rimraf --glob node_modules/.cache .turbo .next dist apps/web/.next 'packages/*/dist' && pnpm install",
     "clean:cache": "rimraf node_modules/.cache .turbo",
@@ -72,7 +65,6 @@
     "clean:safe": "rimraf --verbose --glob node_modules/.cache .turbo .next dist apps/web/.next 'packages/*/dist' && pnpm install",
     "clean:explicit": "rimraf node_modules/.cache && rimraf .turbo && rimraf .next && rimraf dist && rimraf apps/web/.next && rimraf packages/ui/dist && rimraf packages/types/dist && rimraf packages/utils/dist && rimraf packages/config/dist && pnpm install",
     "reset": "pnpm clean:all",
-    
     "_comment_ci": "--- Scripts pour CI/CD ---",
     "ci:install": "pnpm install --frozen-lockfile",
     "ci:build": "pnpm run build",
@@ -81,24 +73,23 @@
     "ci:type-check": "pnpm run type-check",
     "ci:security": "pnpm run security:audit",
     "ci:full": "pnpm run ci:install && pnpm run ci:lint && pnpm run ci:type-check && pnpm run ci:build && pnpm run ci:test",
-    
     "_comment_utils": "--- Scripts utilitaires ---",
     "check:all": "pnpm run lint && pnpm run type-check && pnpm run format:check && pnpm run test",
     "fix:all": "pnpm run lint:fix && pnpm run format:fix",
     "pre-commit": "pnpm run lint:fix && pnpm run format:fix && pnpm run type-check",
-    "prepare": "pnpm run setup"
+    "postinstall": "pnpm build --filter=\"!@erp/web\" --filter=\"!@erp/api\""
   },
   "dependencies": {
-    "dotenv": "^16.5.0"
+    "dotenv": "^17.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.7",
-    "@types/jest": "^29.5.8",
-    "@types/node": "^24.0.4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.7",
     "audit-ci": "^7.0.1",
     "better-npm-audit": "^3.7.3",
     "depcheck": "^1.4.7",
-    "jest": "^29.7.0",
+    "jest": "^30.0.3",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.1.1",
     "turbo": "^2.5.4",
