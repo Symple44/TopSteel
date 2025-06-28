@@ -35,7 +35,7 @@
     "test": "turbo test",
     "test:watch": "turbo test:watch",
     "test:unit": "turbo test:unit",
-    "test:integration": "turbo test:integration",
+    "test:integration": "jest --testNamePattern='integration'",
     "test:coverage": "turbo test:coverage",
     "test:cov": "turbo test:cov",
     "test:e2e": "turbo test:e2e",
