@@ -91,7 +91,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     } catch (error) {
       // Log de l'erreur en développement
       if (this.configService.get('NODE_ENV') === 'development') {
-        console.log(`❌ JWT Validation Error:`, error.message);
+
       }
       
       throw new UnauthorizedException('Token invalide');

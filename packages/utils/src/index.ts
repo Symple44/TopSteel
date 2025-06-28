@@ -8,7 +8,7 @@ export { validateEmail, validatePhone, validateCNPJ } from './lib/validators';
 export type { DeepPartial, DeepRequired } from './types';
 
 // Função de debug sécurisée
-export function safeLog(...args: any[]) {
+export function safeLog(...args: unknown[]) {
   if (typeof console !== 'undefined' && console.info) {
     console.info(...args);
   }

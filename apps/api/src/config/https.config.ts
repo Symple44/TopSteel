@@ -24,7 +24,7 @@ export function getHttpsOptions(): HttpsOptions | null {
       ca: process.env.SSL_CA_PATH ? readFileSync(process.env.SSL_CA_PATH) : undefined,
     };
   } catch (error) {
-    console.warn('⚠️  Certificats SSL non trouvés, utilisation HTTP:', error.message);
+    console.warn('⚠️  Certificats SSL non trouvés, utilisation HTTP:', (error as Error).message);
     return null;
   }
 }
