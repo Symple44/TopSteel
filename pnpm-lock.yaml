@@ -154,6 +154,9 @@ importers:
         specifier: ^3.17.0
         version: 3.17.0
     devDependencies:
+      '@erp/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@nestjs/cli':
         specifier: ^11.0.7
         version: 11.0.7(@types/node@24.0.7)

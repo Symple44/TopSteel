@@ -1,7 +1,7 @@
 // packages/utils/src/helpers/array.ts
-export function groupBy<T, K extends keyof any>(
+export function groupBy<T, K extends string | number | symbol>(
   array: T[],
-  key: (item: T) => K
+  key: (item: T) => string | number | symbol
 ): Record<K, T[]> {
   return array.reduce((groups, item) => {
     const groupKey = key(item)
@@ -15,7 +15,7 @@ export function groupBy<T, K extends keyof any>(
 
 export function sortBy<T>(
   array: T[],
-  key: keyof T | ((item: T) => any),
+  key: keyof T | ((item: T) => string | number | Date),
   direction: 'asc' | 'desc' = 'asc'
 ): T[] {
   const keyFn = typeof key === 'function' ? key : (item: T) => item[key]
@@ -34,7 +34,7 @@ export function sortBy<T>(
 
 export function filterBy<T>(
   array: T[],
-  filters: Partial<Record<keyof T, any>>
+  filters: Partial<Record<keyof T, unknown>>
 ): T[] {
   return array.filter(item =>
     Object.entries(filters).every(([key, value]) =>
@@ -57,7 +57,7 @@ export function unique<T>(array: T[]): T[] {
 
 export function uniqueBy<T, K>(
   array: T[],
-  key: (item: T) => K
+  key: (item: T) => string | number | symbol
 ): T[] {
   const seen = new Set<K>()
   return array.filter(item => {

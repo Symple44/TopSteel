@@ -2,12 +2,12 @@
 
 // Types pour l'environnement runtime
 declare global {
-  function setTimeout(callback: (...args: any[]) => void, ms?: number): NodeJS.Timeout;
+  function setTimeout(callback: (...args: unknown[]) => void, ms?: number): NodeJS.Timeout;
   function clearTimeout(timeoutId: NodeJS.Timeout): void;
 }
 
 
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -26,7 +26,7 @@ export function debounce<T extends (...args: any[]) => any>(
   };
 }
 
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -44,4 +44,3 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
-

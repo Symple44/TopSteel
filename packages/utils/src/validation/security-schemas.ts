@@ -38,7 +38,7 @@ export const telephoneFrancaisSchema = z
   .refine((phone) => {
     return nettoyerTelephoneFrancais(phone) !== null;
   }, "Numéro de téléphone français invalide")
-  .transform((phone) => nettoyerTelephoneFrancais(phone)!);
+  .transform((phone) => nettoyerTelephoneFrancais(phone) as string);
 
 // Schéma pour la validation des codes postaux français
 export const codePostalFrancaisSchema = z
