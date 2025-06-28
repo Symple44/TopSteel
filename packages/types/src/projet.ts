@@ -1,7 +1,18 @@
 // packages/types/src/projet.ts
 import type { Client } from './client'
 import type { Address, BaseEntity } from './common'
+import type { Devis } from './devis'
 import type { User } from './user'
+
+export interface DocumentProjet {
+  id: string
+  nom: string
+  type: 'pdf' | 'image' | 'document' | 'plan'
+  url: string
+  dateAjout: Date
+  taille: number
+  description?: string
+}
 
 export enum ProjetStatut {
   BROUILLON = 'brouillon',
@@ -58,8 +69,8 @@ export interface Projet extends BaseEntity {
   alertes?: string[]
   responsable?: User
   responsableId?: string
-  devis?: any
-  documents?: any[]
+  devis?: Devis
+  documents?: DocumentProjet[]
   documentsIds: string[]
   ordresFabricationIds: string[]
 }
@@ -95,4 +106,3 @@ export interface ProjetFilters {
   clientId?: string;
   search?: string;
 }
-

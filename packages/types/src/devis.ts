@@ -17,3 +17,14 @@ export interface Devis extends BaseEntity {
   totalHT: number
   totalTTC: number
 }
+
+export interface DevisLigne extends BaseEntity {
+  designation: string
+  quantite: number
+  prixUnitaireHT: number
+  remise?: number
+  totalHT: number
+  devisId: string
+  unite: string
+  description?: string
+}

@@ -1,5 +1,5 @@
 // packages/types/src/api.ts
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   message?: string
@@ -16,7 +16,7 @@ export interface ApiError {
   status: number
   message: string
   code?: string
-  details?: any
+  details?: Record<string, unknown>
 }
 
 export interface PaginationParams {
@@ -41,5 +41,5 @@ export interface FilterParams {
   type?: string
   dateFrom?: string
   dateTo?: string
-  [key: string]: any
+  [key: string]: string | number | boolean | undefined
 }
