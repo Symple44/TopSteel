@@ -1,6 +1,6 @@
-// Types custom pour les middlewares
+﻿// Types custom pour les middlewares
 declare module 'compression' {
-  import { RequestHandler } from 'express';
-  function compression(options?: any): RequestHandler;
+  import type { RequestHandler } from 'express';
+  function compression(options?: unknown): RequestHandler;
   export = compression;
 }

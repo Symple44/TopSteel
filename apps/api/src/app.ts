@@ -1,5 +1,6 @@
 // apps/api/src/app.ts
-import express, { Application } from 'express'
+import type { Application } from 'express';
+import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+﻿import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -26,7 +26,7 @@ export class IntegrityService {
       }
       
       return results;
-    } catch (error) {
+    } catch (_error) {
       this.logger.error('Erreur lors du contrôle d\'intégrité', error);
       throw error;
     }
@@ -78,7 +78,7 @@ export class IntegrityService {
         WHERE state = 'active'
       `);
       return parseInt(result[0]?.connections || '0');
-    } catch (error) {
+    } catch (_error) {
       return 0;
     }
   }
@@ -87,7 +87,7 @@ export class IntegrityService {
     try {
       const result = await this.dataSource.query('SELECT COUNT(*) as count FROM projets');
       return parseInt(result[0]?.count || '0');
-    } catch (error) {
+    } catch (_error) {
       return 0;
     }
   }
@@ -96,7 +96,7 @@ export class IntegrityService {
     try {
       const result = await this.dataSource.query('SELECT COUNT(*) as count FROM clients');
       return parseInt(result[0]?.count || '0');
-    } catch (error) {
+    } catch (_error) {
       return 0;
     }
   }

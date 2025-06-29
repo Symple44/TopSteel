@@ -1,4 +1,4 @@
-// apps/api/src/common/filters/http-exception.filter.ts
+﻿// apps/api/src/common/filters/http-exception.filter.ts
 import {
     ArgumentsHost,
     Catch,
@@ -29,7 +29,7 @@ import { Request, Response } from "express";
       };
   
       // Log error for server errors (5xx)
-      if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      if (_status >= HttpStatus.INTERNAL_SERVER_ERROR) {
         this.logger.error(
           `${request.method} ${request.url}`,
           exception.stack,
@@ -38,13 +38,13 @@ import { Request, Response } from "express";
       }
   
       // Log warning for client errors (4xx)
-      if (status >= HttpStatus.BAD_REQUEST && status < HttpStatus.INTERNAL_SERVER_ERROR) {
+      if (_status >= HttpStatus.BAD_REQUEST && status < HttpStatus.INTERNAL_SERVER_ERROR) {
         this.logger.warn(
           `${request.method} ${request.url} - ${status} ${exception.message}`,
           "HttpExceptionFilter"
         );
       }
   
-      response.status(status).json(errorResponse);
+      response.status(_status).json(errorResponse);
     }
   }

@@ -1,4 +1,4 @@
-// Types Express explicites pour éviter les erreurs d'inférence
+﻿// Types Express explicites pour éviter les erreurs d'inférence
 import { Application, Request, Response, NextFunction } from 'express';
 
 declare global {
@@ -8,7 +8,7 @@ declare global {
     }
     
     interface Request {
-      user?: any;
+      user?: unknown;
       // Autres extensions
     }
   }

@@ -1,36 +1,71 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2022",
+    "esModuleInterop": true,
+    "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "resolveJsonModule": true,
+    "allowJs": false,
     "paths": {
       "@/*": ["src/*"],
+      "@erp/types": ["../../packages/types/src"],
       "@erp/types/*": ["../../packages/types/src/*"],
-      "@erp/utils/*": ["../../packages/utils/src/*"]
-    }
+      "@erp/utils": ["../../packages/utils/src"],
+      "@erp/utils/*": ["../../packages/utils/src/*"],
+      "@erp/config": ["../../packages/config/src"],
+      "@erp/config/*": ["../../packages/config/src/*"]
+    },
+    "typeRoots": [
+      "node_modules/@types",
+      "../../node_modules/@types",
+      "src/types"
+    ],
+    "types": [
+      "node",
+      "jest",
+      "express"
+    ],
+    "lib": [
+      "ES2022",
+      "ES2022.Array",
+      "ES2022.Object"
+    ]
   },
   "include": [
     "src/**/*",
-    "test/**/*"
+    "test/**/*",
+    "src/types/**/*"
   ],
   "exclude": [
     "node_modules",
-    "dist"
-  ]
+    "dist",
+    "coverage",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "transpileOnly": true,
+    "files": true
+  }
 }

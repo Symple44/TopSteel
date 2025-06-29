@@ -1,6 +1,6 @@
 // apps/api/src/database/seeds/1700000001-InitialData.ts
 import * as bcrypt from 'bcrypt';
-import { MigrationInterface, QueryRunner } from "typeorm";
+import type { MigrationInterface, QueryRunner } from "typeorm";
 
 export class InitialData1700000001 implements MigrationInterface {
     name = 'InitialData1700000001'

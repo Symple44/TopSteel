@@ -1,7 +1,8 @@
 // apps/api/src/database/data-source.ts
 import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
-import { DataSource, DataSourceOptions } from 'typeorm';
+import type { DataSourceOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 config();
 
