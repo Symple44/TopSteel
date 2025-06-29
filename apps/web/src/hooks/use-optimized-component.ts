@@ -8,11 +8,12 @@ export function useOptimizedSearch<T>(
   searchFields: (keyof T)[],
   delay = 300
 ) {
-  // ✅ FIX: Stockage du résultat filtré pour éviter les problèmes de type
+  // Stockage du résultat filtré pour éviter les problèmes de type
   const [filteredData, setFilteredData] = useState<T[]>(data)
 
-  // ✅ FIX: Fonction de recherche typée correctement
-  const searchFunction = useCallback((term: string, items: T[], fields: (keyof T)[]) => {
+  // Fonction de recherche typée correctement
+  const searchFunction = useCallback((...args: unknown[]) => {
+    const [term, items, fields] = args as [string, T[], (keyof T)[]]
     const filtered = items.filter(item =>
       fields.some(field =>
         String(item[field]).toLowerCase().includes(term.toLowerCase())
@@ -21,7 +22,7 @@ export function useOptimizedSearch<T>(
     setFilteredData(filtered)
   }, [])
 
-  // ✅ FIX: Création du debounce avec la fonction correcte
+  // Création du debounce avec la fonction correcte
   const debouncedSearch = useRef(debounce(searchFunction, delay)).current
 
   // Effet pour déclencher la recherche
@@ -44,10 +45,10 @@ export function useOptimizedCallback<T extends (...args: any[]) => any>(
   return useCallback(callback, deps)
 }
 
-// ✅ FIX: Hook pour optimiser les calculs coûteux avec deps non-undefined
+// Hook pour optimiser les calculs coûteux avec deps non-undefined
 export function useOptimizedMemo<T>(
   factory: () => T,
-  deps: React.DependencyList = [] // ✅ FIX: Valeur par défaut pour éviter undefined
+  deps: React.DependencyList = [] // Valeur par défaut pour éviter undefined
 ): T {
   return useMemo(factory, deps)
 }
