@@ -1,23 +1,24 @@
 'use client'
 
-import { Projet } from '@/types'
 
-interface ProjetDocumentsTabProps { projet?: any }
-
+interface ProjetDocumentsTabProps { 
+  projet?: any 
+  projetId?: string
+}
 
 import { Input } from "@/components/ui/input"
 import {
-    Badge,
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@erp/ui'
 import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
 import { useState } from 'react'
@@ -118,8 +119,9 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
     }
   }
 
+  // ✅ FIX: Mapping strict avec Record et fonction helper avec fallback
   const getCategorieBadge = (categorie: string) => {
-    const variants = {
+    const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
       'Plan': 'default',
       'Photo': 'secondary',
       'Facture': 'outline',
@@ -127,7 +129,10 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
       'Rapport': 'secondary',
       'Autre': 'outline'
     }
-    return <Badge variant={variants[categorie] as any}>{categorie}</Badge>
+    
+    // ✅ FIX: Utilisation sécurisée avec fallback
+    const variant = variants[categorie] || 'outline'
+    return <Badge variant={variant}>{categorie}</Badge>
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,7 +159,7 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
           <label htmlFor="file-upload">
             <Button disabled={isUploading} size="sm">
               <Upload className="h-4 w-4 mr-2" />
-              {isUploading ? 'Upload...' : 'Ajouter'}
+              {isUploading ? 'Upload en cours...' : 'Ajouter Document'}
             </Button>
           </label>
           <input
@@ -168,47 +173,45 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Rechercher un document..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+      <div className="flex gap-4 items-end">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher un document..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
         </div>
-        <div className="flex gap-2">
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-[130px]">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="tous">Tous types</SelectItem>
-              <SelectItem value="PDF">PDF</SelectItem>
-              <SelectItem value="Image">Image</SelectItem>
-              <SelectItem value="CAD">CAD</SelectItem>
-              <SelectItem value="Excel">Excel</SelectItem>
-              <SelectItem value="Word">Word</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={filterCategorie} onValueChange={setFilterCategorie}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Catégorie" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="toutes">Toutes catégories</SelectItem>
-              <SelectItem value="Plan">Plan</SelectItem>
-              <SelectItem value="Photo">Photo</SelectItem>
-              <SelectItem value="Facture">Facture</SelectItem>
-              <SelectItem value="Devis">Devis</SelectItem>
-              <SelectItem value="Rapport">Rapport</SelectItem>
-              <SelectItem value="Autre">Autre</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        
+        <Select value={filterType} onValueChange={setFilterType}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="tous">Tous types</SelectItem>
+            <SelectItem value="PDF">PDF</SelectItem>
+            <SelectItem value="Image">Images</SelectItem>
+            <SelectItem value="CAD">CAD</SelectItem>
+            <SelectItem value="Excel">Excel</SelectItem>
+            <SelectItem value="Word">Word</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={filterCategorie} onValueChange={setFilterCategorie}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Catégorie" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="toutes">Toutes</SelectItem>
+            <SelectItem value="Plan">Plan</SelectItem>
+            <SelectItem value="Photo">Photo</SelectItem>
+            <SelectItem value="Facture">Facture</SelectItem>
+            <SelectItem value="Devis">Devis</SelectItem>
+            <SelectItem value="Rapport">Rapport</SelectItem>
+            <SelectItem value="Autre">Autre</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Card>
@@ -236,6 +239,7 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
+                    {/* ✅ FIX: Utilisation de la fonction helper sécurisée */}
                     {getCategorieBadge(document.categorie)}
                     <Badge variant="outline">{document.type}</Badge>
                   </div>
@@ -288,4 +292,3 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
     </div>
   )
 }
-

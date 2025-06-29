@@ -1,83 +1,77 @@
 'use client'
 
-import { useState } from 'react'
-import { 
-  Package, 
-  AlertTriangle, 
-  TrendingDown,
-  TrendingUp,
-  Search,
-  Filter,
-  Plus,
-  Download,
-  BarChart3,
-  ArrowUpDown
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { formatNumber, formatCurrency, cn } from '@/lib/utils'
+import { formatCurrency } from '@/lib/utils'
+import { AlertTriangle, ArrowUpDown, BarChart3, Download, Package, Plus, Search, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
 
-// Données mockées pour la démonstration
-const mockStocks = [
+// Types pour les stocks
+interface StockProduit {
+  id: string
+  reference: string
+  designation: string
+  categorie: 'profile' | 'tube' | 'tole' | 'consommable' | 'accessoire' | 'quincaillerie'
+  unite: string
+  prixAchat: number
+  prixVente: number
+}
+
+interface Stock {
+  id: string
+  produit: StockProduit
+  quantiteDisponible: number
+  quantiteReservee: number
+  quantiteMinimale: number
+  emplacement: string
+}
+
+// Données mock
+const mockStocks: Stock[] = [
   {
     id: '1',
     produit: {
       id: '1',
-      reference: 'IPE200-6M',
-      designation: 'Poutre IPE 200 - 6m',
+      reference: 'IPE-200',
+      designation: 'Poutre IPE 200',
       categorie: 'profile',
-      unite: 'piece',
-      prixAchat: 245,
-      prixVente: 320,
+      unite: 'm',
+      prixAchat: 25,
+      prixVente: 35,
     },
-    quantiteDisponible: 12,
-    quantiteReservee: 8,
-    quantiteMinimale: 10,
-    emplacement: 'A-12-3',
+    quantiteDisponible: 150,
+    quantiteReservee: 25,
+    quantiteMinimale: 50,
+    emplacement: 'A-01-1',
   },
   {
     id: '2',
     produit: {
       id: '2',
-      reference: 'TUBE-40X40-3',
-      designation: 'Tube carré 40x40x3mm - 6m',
+      reference: 'TUBE-40x40',
+      designation: 'Tube carré 40x40x3',
       categorie: 'tube',
-      unite: 'piece',
-      prixAchat: 48,
-      prixVente: 65,
+      unite: 'm',
+      prixAchat: 8,
+      prixVente: 12,
     },
-    quantiteDisponible: 5,
-    quantiteReservee: 2,
-    quantiteMinimale: 20,
-    emplacement: 'B-05-2',
+    quantiteDisponible: 200,
+    quantiteReservee: 50,
+    quantiteMinimale: 100,
+    emplacement: 'B-02-1',
   },
   {
     id: '3',
     produit: {
       id: '3',
-      reference: 'TOLE-3MM',
-      designation: 'Tôle acier 3mm - 2000x1000',
+      reference: 'TOLE-5MM',
+      designation: 'Tôle acier 5mm',
       categorie: 'tole',
-      unite: 'm2',
+      unite: 'm²',
       prixAchat: 35,
       prixVente: 45,
     },
@@ -104,13 +98,24 @@ const mockStocks = [
   }
 ]
 
-const categorieColors = {
+// ✅ FIX: Définition stricte du mapping des catégories avec types explicites
+const categorieColors: Record<string, string> = {
   profile: '#3B82F6',
   tube: '#10B981', 
   tole: '#F59E0B',
   consommable: '#EF4444',
   accessoire: '#8B5CF6',
   quincaillerie: '#6B7280'
+}
+
+// ✅ FIX: Labels des catégories avec type strict
+const categorieLabels: Record<string, string> = {
+  profile: 'Profilé',
+  tube: 'Tube',
+  tole: 'Tôle',
+  consommable: 'Consommable',
+  accessoire: 'Accessoire',
+  quincaillerie: 'Quincaillerie'
 }
 
 export default function StockPage() {
@@ -127,10 +132,21 @@ export default function StockPage() {
     return matchesSearch && matchesCategory && matchesAlertes
   })
 
-  const getStockStatus = (stock) => {
+  // ✅ FIX: Type explicite pour le paramètre stock
+  const getStockStatus = (stock: Stock): { status: string; color: 'destructive' | 'secondary' | 'default' } => {
     if (stock.quantiteDisponible <= 0) return { status: 'rupture', color: 'destructive' }
     if (stock.quantiteDisponible <= stock.quantiteMinimale) return { status: 'alerte', color: 'secondary' }
     return { status: 'normal', color: 'default' }
+  }
+
+  // Fonction helper pour récupérer le label d'une catégorie avec fallback
+  const getCategorieLabel = (categorie: string): string => {
+    return categorieLabels[categorie] || categorie
+  }
+
+  // Fonction helper pour récupérer la couleur d'une catégorie avec fallback
+  const getCategorieColor = (categorie: string): string => {
+    return categorieColors[categorie] || '#6B7280'
   }
 
   return (
@@ -228,53 +244,57 @@ export default function StockPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
-                    variant={showAlertes ? "default" : "outline"}
+                    variant={showAlertes ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setShowAlertes(!showAlertes)}
                   >
                     <AlertTriangle className="h-4 w-4 mr-2" />
-                    Alertes uniquement
+                    {showAlertes ? 'Toutes' : 'Alertes'}
                   </Button>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-4">
-                <div className="flex-1">
+              
+              <div className="flex items-center gap-4">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Rechercher un produit..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-sm"
+                    className="pl-10"
                   />
                 </div>
-                <Select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Catégorie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="tous">Toutes catégories</SelectItem>
-                    <SelectItem value="profile">Profilé</SelectItem>
-                    <SelectItem value="tole">Tôle</SelectItem>
-                    <SelectItem value="tube">Tube</SelectItem>
-                    <SelectItem value="accessoire">Accessoire</SelectItem>
-                    <SelectItem value="consommable">Consommable</SelectItem>
-                    <SelectItem value="quincaillerie">Quincaillerie</SelectItem>
-                  </SelectContent>
-                </Select>
+                {/* ✅ FIX: Remplacement du Select par un select HTML natif pour éviter l'erreur TypeScript */}
+                <div className="w-[200px]">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="tous">Toutes catégories</option>
+                    <option value="profile">Profilés</option>
+                    <option value="tube">Tubes</option>
+                    <option value="tole">Tôles</option>
+                    <option value="consommable">Consommables</option>
+                    <option value="accessoire">Accessoires</option>
+                    <option value="quincaillerie">Quincaillerie</option>
+                  </select>
+                </div>
               </div>
-              
-              <div className="border rounded-md">
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Produit</TableHead>
+                      <TableHead>Référence</TableHead>
+                      <TableHead>Désignation</TableHead>
                       <TableHead>Catégorie</TableHead>
-                      <TableHead>Stock dispo</TableHead>
-                      <TableHead>Réservé</TableHead>
-                      <TableHead>Seuil min</TableHead>
+                      <TableHead>Stock disponible</TableHead>
+                      <TableHead>Stock réservé</TableHead>
+                      <TableHead>Stock minimal</TableHead>
                       <TableHead>Emplacement</TableHead>
-                      <TableHead>Valeur</TableHead>
+                      <TableHead>Valeur stock</TableHead>
                       <TableHead>Statut</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -284,22 +304,20 @@ export default function StockPage() {
                       return (
                         <TableRow key={stock.id}>
                           <TableCell className="font-medium">
-                            <div>
-                              <div className="font-semibold">{stock.produit.reference}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {stock.produit.designation}
-                              </div>
-                            </div>
+                            {stock.produit.reference}
                           </TableCell>
+                          <TableCell>{stock.produit.designation}</TableCell>
                           <TableCell>
                             <Badge 
-                              variant="outline"
+                              variant="outline" 
                               style={{ 
-                                borderColor: categorieColors[stock.produit.categorie],
-                                color: categorieColors[stock.produit.categorie]
+                                backgroundColor: `${getCategorieColor(stock.produit.categorie)}20`,
+                                borderColor: getCategorieColor(stock.produit.categorie),
+                                color: getCategorieColor(stock.produit.categorie)
                               }}
                             >
-                              {stock.produit.categorie}
+                              {/* ✅ FIX: Utilisation de la fonction helper avec fallback */}
+                              {getCategorieLabel(stock.produit.categorie)}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -387,4 +405,3 @@ export default function StockPage() {
     </div>
   )
 }
-

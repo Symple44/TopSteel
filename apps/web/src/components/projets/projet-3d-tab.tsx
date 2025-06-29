@@ -1,197 +1,231 @@
 'use client'
 
-import { useState } from 'react'
-import { 
-  Box,
-  Eye,
-  Download,
-  Maximize,
-  RefreshCw,
-  Grid3X3,
-  Layers,
-  Ruler,
-  Palette
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import type { Projet } from '@/types'
+import type { Projet } from '@erp/types'
+import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
+import { useState } from 'react'
 
 interface Projet3DTabProps {
   projet: Projet
 }
 
 export function Projet3DTab({ projet }: Projet3DTabProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [showGrid, setShowGrid] = useState(true)
+  const [is3DLoaded, setIs3DLoaded] = useState(false)
+  const [selectedView, setSelectedView] = useState('front')
 
-  const handleResetView = () => {
-    console.log('Reset view')
-  }
+  // Simulations de modèles 3D disponibles
+  const modeles3D = [
+    {
+      id: '1',
+      nom: 'Vue d\'ensemble structure',
+      type: 'global',
+      dateModification: new Date('2025-06-20'),
+      taille: '15.2 MB',
+      format: '.step'
+    },
+    {
+      id: '2', 
+      nom: 'Détails assemblage',
+      type: 'detail',
+      dateModification: new Date('2025-06-18'),
+      taille: '8.7 MB',
+      format: '.dwg'
+    },
+    {
+      id: '3',
+      nom: 'Plan d\'exécution',
+      type: 'plan',
+      dateModification: new Date('2025-06-15'),
+      taille: '4.1 MB',
+      format: '.pdf'
+    }
+  ]
 
-  const handleFullscreen = () => {
-    console.log('Fullscreen')
-  }
+  const vues = [
+    { id: 'front', label: 'Vue de face' },
+    { id: 'side', label: 'Vue de côté' },
+    { id: 'top', label: 'Vue de dessus' },
+    { id: 'iso', label: 'Vue isométrique' }
+  ]
 
   return (
     <div className="space-y-6">
-      {/* Contrôles de la vue 3D */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Vue 3D du projet</h2>
+          <h2 className="text-xl font-semibold">Visualisation 3D</h2>
           <p className="text-sm text-muted-foreground">
-            Visualisation tridimensionnelle et outils de mesure
+            Modèles 3D et plans techniques du projet
           </p>
         </div>
-        
-        <div className="flex space-x-2">
-          <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
-            <Grid3X3 className="h-4 w-4 mr-2" />
-            Grille
-          </Button>
-          <Button variant="outline" size="sm">
-            <Ruler className="h-4 w-4 mr-2" />
-            Mesures
-          </Button>
+        <div className="flex gap-2">
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
-            Exporter
+            Télécharger modèles
+          </Button>
+          <Button size="sm">
+            <Box className="h-4 w-4 mr-2" />
+            Nouvelle version
           </Button>
         </div>
       </div>
 
-      {/* Viewer 3D principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Viewer 3D */}
+        <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <Box className="h-5 w-5 mr-2" />
-                  Vue principale
+                <CardTitle className="flex items-center gap-2">
+                  <Box className="h-5 w-5" />
+                  Visualiseur 3D
                 </CardTitle>
-                <div className="flex space-x-1">
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <ZoomIn className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <ZoomOut className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <RotateCcw className="h-4 w-4" />
+                  </Button>
                   <Button variant="outline" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleResetView}>
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleFullscreen}>
-                    <Maximize className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <div className="relative bg-gray-100 dark:bg-gray-800 aspect-video rounded-b-lg overflow-hidden">
-                {/* Placeholder pour le viewer 3D */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {isLoading ? (
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                      <p className="text-sm text-muted-foreground">Chargement du modèle 3D...</p>
+            <CardContent>
+              <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                {!is3DLoaded ? (
+                  <div className="text-center">
+                    <Box className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-600 mb-4">Viewer 3D non encore implémenté</p>
+                    <Button 
+                      onClick={() => setIs3DLoaded(true)}
+                      size="sm"
+                    >
+                      Simuler chargement 3D
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-8">
+                      <Box className="h-12 w-12 mx-auto text-blue-600 mb-2" />
+                      <p className="text-blue-800 font-medium">Modèle 3D chargé</p>
+                      <p className="text-blue-600 text-sm">{projet.reference} - Structure métallique</p>
                     </div>
-                  ) : (
-                    <div className="text-center">
-                      <Box className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-sm text-muted-foreground">
-                        Viewer 3D - Modèle en cours de développement
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {projet.reference}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Informations overlay */}
-                {!isLoading && (
-                  <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded text-sm">
-                    <div>Vue: Perspective</div>
-                    <div>Zoom: 100%</div>
-                    <div>Position: 0, 0, 0</div>
                   </div>
                 )}
+              </div>
+              
+              {/* Contrôles de vue */}
+              <div className="flex gap-2 mt-4">
+                {vues.map((vue) => (
+                  <Button
+                    key={vue.id}
+                    variant={selectedView === vue.id ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedView(vue.id)}
+                  >
+                    {vue.label}
+                  </Button>
+                ))}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Panneau latéral */}
-        <div className="space-y-4">
+        {/* Liste des modèles */}
+        <div>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Couches</CardTitle>
+              <CardTitle>Modèles disponibles</CardTitle>
+              <CardDescription>
+                Fichiers 3D et plans techniques
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Structure</span>
-                <Badge variant="outline">Visible</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Bardage</span>
-                <Badge variant="outline">Visible</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Fondations</span>
-                <Badge variant="secondary">Masqué</Badge>
+            <CardContent>
+              <div className="space-y-3">
+                {modeles3D.map((modele) => (
+                  <div 
+                    key={modele.id}
+                    className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    onClick={() => setIs3DLoaded(true)}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="font-medium text-sm">{modele.nom}</p>
+                      <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                        {modele.format}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>{modele.taille}</span>
+                      <span>{modele.dateModification.toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* Informations du modèle */}
+          <Card className="mt-4">
             <CardHeader>
-              <CardTitle className="text-base">Propriétés</CardTitle>
+              <CardTitle>Propriétés</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div>
-                <span className="text-muted-foreground">Dimensions:</span>
-                <div>12m × 8m × 4m</div>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Surface:</span>
-                <div>96 m²</div>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Volume:</span>
-                <div>384 m³</div>
+            <CardContent>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Échelle:</span>
+                  <span>1:100</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Unités:</span>
+                  <span>Millimètres</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Matériau:</span>
+                  <span>Acier S355</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Poids total:</span>
+                  <span>2.4 tonnes</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Dernière modif:</span>
+                  <span>20/06/2025</span>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Instructions d'utilisation */}
+      {/* Instructions */}
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
+          <CardTitle>Instructions d'utilisation</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <h4 className="font-medium mb-2">Navigation</h4>
-              <ul className="space-y-1 text-muted-foreground">
+              <h4 className="font-medium mb-2">Navigation 3D:</h4>
+              <ul className="space-y-1 text-gray-600">
                 <li>• Clic gauche + glisser: Rotation</li>
-                <li>• Molette: Zoom</li>
+                <li>• Molette: Zoom avant/arrière</li>
                 <li>• Clic droit + glisser: Panoramique</li>
+                <li>• Double-clic: Centrer la vue</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-2">Raccourcis</h4>
-              <ul className="space-y-1 text-muted-foreground">
-                <li>• G: Afficher/masquer grille</li>
-                <li>• W: Mode wireframe</li>
-                <li>• M: Afficher mesures</li>
-                <li>• F: Plein écran</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">Export</h4>
-              <ul className="space-y-1 text-muted-foreground">
-                <li>• PNG: Image haute résolution</li>
-                <li>• GLB: Modèle 3D</li>
-                <li>• PDF: Vue avec annotations</li>
+              <h4 className="font-medium mb-2">Outils disponibles:</h4>
+              <ul className="space-y-1 text-gray-600">
+                <li>• Mesures et cotations</li>
+                <li>• Coupes et sections</li>
+                <li>• Vues explosées</li>
+                <li>• Export vers CAO</li>
               </ul>
             </div>
           </div>
@@ -200,5 +234,3 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
     </div>
   )
 }
-
-
