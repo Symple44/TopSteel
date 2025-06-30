@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Notifications } from './entities/notifications.entity';
+import { Notification, NotificationType } from './entities/notifications.entity';
 import { NotificationsGateway } from './notifications.gateway';
 
 // Interface pour typer le produit
@@ -14,7 +14,7 @@ interface StockProduit {
   quantiteMin?: number;
 }
 
-export interface Notification {
+export interface NotificationInterface {
   id?: string;
   type: NotificationType;
   title: string;
@@ -25,40 +25,30 @@ export interface Notification {
   createdAt?: Date;
 }
 
-export enum NotificationType {
-  INFO = 'info',
-  SUCCESS = 'success',
-  WARNING = 'warning',
-  ERROR = 'error',
-  PROJET_UPDATE = 'projet_update',
-  STOCK_ALERT = 'stock_alert',
-  TASK_ASSIGNED = 'task_assigned',
-}
-
 @Injectable()
 export class NotificationsService {
   constructor(
-    @InjectRepository(Notifications)
-    private notificationsRepository: Repository<Notifications>,
+    @InjectRepository(Notification) // ← Nom corrigé
+    private notificationsRepository: Repository<Notification>, // ← Type corrigé
     private gateway: NotificationsGateway
   ) {}
 
-  async findAll(): Promise<Notifications[]> {
+  async findAll(): Promise<Notification[]> {
     return this.notificationsRepository.find({
       order: { createdAt: 'DESC' }
     });
   }
 
-  async findOne(id: string): Promise<Notifications | null> {
+  async findOne(id: string): Promise<Notification | null> {
     return this.notificationsRepository.findOne({ where: { id } });
   }
 
-  async create(data: Partial<Notifications>): Promise<Notifications> {
+  async create(data: Partial<Notification>): Promise<Notification> {
     const entity = this.notificationsRepository.create(data);
     return this.notificationsRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Notifications>): Promise<Notifications | null> {
+  async update(id: string, data: Partial<Notification>): Promise<Notification | null> {
     await this.notificationsRepository.update(id, data);
     return this.findOne(id);
   }
@@ -68,7 +58,7 @@ export class NotificationsService {
   }
 
   // Notification à un utilisateur spécifique
-  async notifyUser(userId: string, notification: Notification) {
+  async notifyUser(userId: string, notification: NotificationInterface) {
     const savedNotification = await this.create({
       ...notification,
       userId,
@@ -82,7 +72,7 @@ export class NotificationsService {
   }
 
   // Notification à tous les membres d'un projet
-  async notifyProjet(projetId: string, notification: Notification) {
+  async notifyProjet(projetId: string, notification: NotificationInterface) {
     const savedNotification = await this.create({
       ...notification,
       projetId,
@@ -96,7 +86,7 @@ export class NotificationsService {
   }
 
   // Notification broadcast
-  async broadcast(notification: Notification) {
+  async broadcast(notification: NotificationInterface) {
     const savedNotification = await this.create({
       ...notification,
       createdAt: new Date(),
@@ -127,7 +117,7 @@ export class NotificationsService {
     });
   }
 
-  async markAsRead(id: string): Promise<Notifications | null> {
+  async markAsRead(id: string): Promise<Notification | null> {
     await this.notificationsRepository.update(id, {
       isRead: true,
       readAt: new Date(),
@@ -135,14 +125,14 @@ export class NotificationsService {
     return this.findOne(id);
   }
 
-  async findByUser(userId: string): Promise<Notifications[]> {
+  async findByUser(userId: string): Promise<Notification[]> {
     return this.notificationsRepository.find({
       where: { userId },
       order: { createdAt: 'DESC' }
     });
   }
 
-  async findUnreadByUser(userId: string): Promise<Notifications[]> {
+  async findUnreadByUser(userId: string): Promise<Notification[]> {
     return this.notificationsRepository.find({
       where: { userId, isRead: false },
       order: { createdAt: 'DESC' }
@@ -154,9 +144,9 @@ export class NotificationsService {
   }
 
   /**
-   * Convertit une entité Notifications en objet plain pour le gateway
+   * Convertit une entité Notification en objet plain pour le gateway
    */
-  private entityToPlainObject(entity: Notifications): Record<string, unknown> {
+  private entityToPlainObject(entity: Notification): Record<string, unknown> {
     return {
       id: entity.id,
       type: entity.type,

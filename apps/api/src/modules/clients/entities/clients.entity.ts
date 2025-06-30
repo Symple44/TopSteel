@@ -1,3 +1,4 @@
+// apps/api/src/modules/clients/entities/clients.entity.ts
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('clients')
@@ -23,6 +24,3 @@ export class Client {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
-
-export { Client as Clients };
-

@@ -1,15 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+// apps/api/src/modules/machines/entities/machine.entity.ts
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('machines')
-@Index(['created_at'])
+@Index(['createdAt']) // ← camelCase cohérent
 export class Machine {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
+
   @Column({ nullable: true })
   nom?: string;
 
   @Column({ nullable: true })
-  type_machine?: string;
+  typeMachine?: string; // ← camelCase cohérent
 
   @Column({ nullable: true })
   marque?: string;
@@ -21,34 +23,33 @@ export class Machine {
   puissance?: string;
 
   @Column({ nullable: true })
-  capacite_max?: string;
+  capaciteMax?: string; // ← camelCase cohérent
 
   @Column({ nullable: true })
   statut?: string;
 
-  @Column({ nullable: true })
-  date_mise_service?: string;
+  @Column({ type: 'date', nullable: true })
+  dateMiseService?: Date; // ← Type Date cohérent
 
-  @Column({ nullable: true })
-  prochaine_maintenance?: string;
+  @Column({ type: 'date', nullable: true })
+  prochaineMaintenance?: Date; // ← Type Date cohérent
 
   @Column({ default: true })
   actif!: boolean;
 
   @CreateDateColumn()
-  created_at!: Date;
+  createdAt!: Date; // ← camelCase cohérent
 
   @UpdateDateColumn()
-  updated_at!: Date;
+  updatedAt!: Date; // ← camelCase cohérent
 
   @Column({ nullable: true })
-  created_by?: string;
+  createdBy?: string; // ← camelCase cohérent
 
   @Column({ nullable: true })
-  updated_by?: string;
+  updatedBy?: string; // ← camelCase cohérent
 
   // Métadonnées pour l'audit
   @Column('jsonb', { nullable: true })
   metadata?: Record<string, unknown>;
 }
-

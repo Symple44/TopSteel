@@ -4,13 +4,29 @@ import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import compression from "compression";
+import { config } from 'dotenv';
+import { existsSync } from 'fs';
 import helmet from 'helmet';
 import { WinstonModule } from "nest-winston";
+import { join } from 'path';
 import * as winston from "winston";
 import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
+
+// ============================================================================
+// CHARGEMENT VARIABLES D'ENVIRONNEMENT MONOREPO
+// ============================================================================
+// Debug du chemin d'exécution
+console.log('🔧 __dirname:', __dirname);
+const rootDir = join(__dirname, '../../../'); // ← Corrigé: remonter 3 niveaux
+const envLocalPath = join(rootDir, '.env.local');
+console.log('🔧 Tentative de chargement .env.local depuis:', envLocalPath);
+console.log('🔧 Fichier .env.local existe?', existsSync(envLocalPath));
+
+config({ path: envLocalPath });
+config({ path: join(rootDir, '.env') });
 
 async function bootstrap() {
   // Configuration du logger
@@ -144,6 +160,13 @@ async function bootstrap() {
   logger.log(`🚀 Serveur NestJS démarré sur: http://localhost:${port}`);
   logger.log(`🌟 Environnement: ${env}`);
   logger.log(`📊 Health check: http://localhost:${port}/health`);
+  
+  // Log des variables d'environnement importantes (debugging)
+  if (env === 'development') {
+    logger.log(`🔧 DB_HOST: ${process.env.DB_HOST}`);
+    logger.log(`🔧 DB_NAME: ${process.env.DB_NAME}`);
+    logger.log(`🔧 NODE_ENV: ${process.env.NODE_ENV}`);
+  }
 }
 
 bootstrap().catch((error) => {

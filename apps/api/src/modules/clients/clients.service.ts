@@ -1,29 +1,30 @@
+// apps/api/src/modules/clients/clients.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Clients } from './entities/clients.entity';
+import { Client } from './entities/clients.entity';
 
 @Injectable()
 export class ClientsService {
   constructor(
-    @InjectRepository(Clients)
-    private clientsRepository: Repository<Clients>,
+    @InjectRepository(Client) 
+    private clientsRepository: Repository<Client>,
   ) {}
 
-  async findAll(): Promise<Clients[]> {
+  async findAll(): Promise<Client[]> {
     return this.clientsRepository.find();
   }
 
-  async findOne(id: number): Promise<Clients | null> {
+  async findOne(id: number): Promise<Client | null> {
     return this.clientsRepository.findOne({ where: { id } });
   }
 
-  async create(data: Partial<Clients>): Promise<Clients> {
+  async create(data: Partial<Client>): Promise<Client> {
     const entity = this.clientsRepository.create(data);
     return this.clientsRepository.save(entity);
   }
 
-  async update(id: number, data: Partial<Clients>): Promise<Clients | null> {
+  async update(id: number, data: Partial<Client>): Promise<Client | null> {
     await this.clientsRepository.update(id, data);
     return this.findOne(id);
   }
@@ -32,4 +33,3 @@ export class ClientsService {
     await this.clientsRepository.delete(id);
   }
 }
-

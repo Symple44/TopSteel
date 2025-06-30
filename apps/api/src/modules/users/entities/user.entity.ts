@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+// apps/api/src/modules/users/entities/user.entity.ts
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -40,5 +41,3 @@ export class User {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
-
-export { User as Users };

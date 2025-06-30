@@ -46,12 +46,12 @@ import { AppService } from "./app.service";
 
 @Module({
   imports: [
-    // Configuration globale
+    // Configuration globale - Variables déjà chargées dans main.ts
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, databaseConfig, jwtConfig, redisConfig],
-      envFilePath: [".env.local", ".env"],
       expandVariables: true,
+      // Pas besoin de spécifier envFilePath car variables déjà chargées
     }),
     // Module Redis
     RedisModule,
