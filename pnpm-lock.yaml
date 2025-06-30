@@ -126,6 +126,9 @@ importers:
       helmet:
         specifier: ^7.2.0
         version: 7.2.0
+      ioredis:
+        specifier: ^5.6.1
+        version: 5.6.1
       joi:
         specifier: ^17.13.3
         version: 17.13.3
@@ -164,7 +167,7 @@ importers:
         version: 4.8.1
       typeorm:
         specifier: ^0.3.25
-        version: 0.3.25(pg@8.16.3)(redis@4.7.1)(reflect-metadata@0.2.2)(ts-node@10.9.2)
+        version: 0.3.25(ioredis@5.6.1)(pg@8.16.3)(redis@4.7.1)(reflect-metadata@0.2.2)(ts-node@10.9.2)
       winston:
         specifier: ^3.17.0
         version: 3.17.0
@@ -202,6 +205,9 @@ importers:
       '@types/express':
         specifier: ^4.17.23
         version: 4.17.23
+      '@types/ioredis':
+        specifier: ^5.0.0
+        version: 5.0.0
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
@@ -3991,7 +3997,6 @@ packages:
 
   /@ioredis/commands@1.2.0:
     resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
-    dev: false
 
   /@isaacs/balanced-match@4.0.1:
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -4794,7 +4799,7 @@ packages:
       check-disk-space: 3.4.0
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.25(pg@8.16.3)(redis@4.7.1)(reflect-metadata@0.2.2)(ts-node@10.9.2)
+      typeorm: 0.3.25(ioredis@5.6.1)(pg@8.16.3)(redis@4.7.1)(reflect-metadata@0.2.2)(ts-node@10.9.2)
     dev: false
 
   /@nestjs/testing@11.1.3(@nestjs/common@11.1.3)(@nestjs/core@11.1.3)(@nestjs/platform-express@11.1.3):
@@ -4841,7 +4846,7 @@ packages:
       '@nestjs/core': 11.1.3(@nestjs/common@11.1.3)(@nestjs/platform-express@11.1.3)(@nestjs/websockets@11.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.25(pg@8.16.3)(redis@4.7.1)(reflect-metadata@0.2.2)(ts-node@10.9.2)
+      typeorm: 0.3.25(ioredis@5.6.1)(pg@8.16.3)(redis@4.7.1)(reflect-metadata@0.2.2)(ts-node@10.9.2)
     dev: false
 
   /@nestjs/websockets@11.1.3(@nestjs/common@11.1.3)(@nestjs/core@11.1.3)(@nestjs/platform-socket.io@11.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2):
@@ -7235,6 +7240,15 @@ packages:
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
     dev: true
 
+  /@types/ioredis@5.0.0:
+    resolution: {integrity: sha512-zJbJ3FVE17CNl5KXzdeSPtdltc4tMT3TzC6fxQS0sQngkbFZ6h+0uTafsRqu+eSLIugf6Yb0Ea0SUuRr42Nk9g==}
+    deprecated: This is a stub types definition. ioredis provides its own type definitions, so you do not need this installed.
+    dependencies:
+      ioredis: 5.6.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /@types/istanbul-lib-coverage@2.0.6:
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
     dev: true
@@ -9215,7 +9229,6 @@ packages:
   /cluster-key-slot@1.1.2:
     resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
@@ -9916,7 +9929,6 @@ packages:
   /denque@2.1.0:
     resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
     engines: {node: '>=0.10'}
-    dev: false
 
   /depcheck@1.4.7:
     resolution: {integrity: sha512-1lklS/bV5chOxwNKA/2XUUk/hPORp8zihZsXflr8x0kLwmcZ9Y9BsS6Hs3ssvA+2wUVbG0U2Ciqvm1SokNjPkA==}
@@ -11947,7 +11959,6 @@ packages:
       standard-as-callback: 2.1.0
     transitivePeerDependencies:
       - supports-color
-    dev: false
 
   /ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
@@ -13172,7 +13183,6 @@ packages:
 
   /lodash.defaults@4.2.0:
     resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
-    dev: false
 
   /lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
@@ -13185,7 +13195,6 @@ packages:
 
   /lodash.isarguments@3.1.0:
     resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
-    dev: false
 
   /lodash.isboolean@3.0.3:
     resolution: {integrity: sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==}
@@ -15028,14 +15037,12 @@ packages:
   /redis-errors@1.2.0:
     resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
     engines: {node: '>=4'}
-    dev: false
 
   /redis-parser@3.0.0:
     resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
     engines: {node: '>=4'}
     dependencies:
       redis-errors: 1.2.0
-    dev: false
 
   /redis@4.7.1:
     resolution: {integrity: sha512-S1bJDnqLftzHXHP8JsT5II/CtHWQrASX5K96REjWjlmWKrviSOLWmM7QnRLstAWsu1VBBV1ffV6DzCvxNP0UJQ==}
@@ -15767,7 +15774,6 @@ packages:
 
   /standard-as-callback@2.1.0:
     resolution: {integrity: sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A==}
-    dev: false
 
   /statuses@1.5.0:
     resolution: {integrity: sha512-OpZ3zP+jT1PI7I8nemJX4AKmAX070ZkYPVWV/AaKTJl+tXCTGyVdC1a4SL8RUQYEwk/f34ZX8UTykN68FwrqAA==}
@@ -16764,7 +16770,7 @@ packages:
   /typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
 
-  /typeorm@0.3.25(pg@8.16.3)(redis@4.7.1)(reflect-metadata@0.2.2)(ts-node@10.9.2):
+  /typeorm@0.3.25(ioredis@5.6.1)(pg@8.16.3)(redis@4.7.1)(reflect-metadata@0.2.2)(ts-node@10.9.2):
     resolution: {integrity: sha512-fTKDFzWXKwAaBdEMU4k661seZewbNYET4r1J/z3Jwf+eAvlzMVpTLKAVcAzg75WwQk7GDmtsmkZ5MfkmXCiFWg==}
     engines: {node: '>=16.13.0'}
     hasBin: true
@@ -16832,6 +16838,7 @@ packages:
       dedent: 1.6.0
       dotenv: 16.6.1
       glob: 10.4.5
+      ioredis: 5.6.1
       pg: 8.16.3
       redis: 4.7.1
       reflect-metadata: 0.2.2
