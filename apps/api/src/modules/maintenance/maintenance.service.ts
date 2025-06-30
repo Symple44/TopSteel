@@ -1,73 +1,149 @@
-import { Injectable, Logger } from '@nestjs/common';
+// apps/api/src/modules/maintenance/maintenance.service.ts
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThanOrEqual, Repository } from 'typeorm';
 import { Maintenance } from './entities/maintenance.entity';
 
 @Injectable()
 export class MaintenanceService {
-  private readonly logger = new Logger(MaintenanceService.name);
-
   constructor(
     @InjectRepository(Maintenance)
-    private readonly repository: Repository<Maintenance>,
+    private repository: Repository<Maintenance>
   ) {}
 
   async findAll(): Promise<Maintenance[]> {
-    this.logger.log('Récupération de tous les maintenance');
-    return this.repository.find({ 
-      where: { actif: true }, 
-      order: { created_at: "DESC" } 
+    return this.repository.find({
+      where: { actif: true },
+      order: { createdAt: "DESC" } // ✅ CORRIGÉ : camelCase cohérent
     });
   }
 
   async findOne(id: string): Promise<Maintenance | null> {
-    this.logger.log('Récupération maintenance id: ' + id);
-    return this.repository.findOne({ where: { id } });
+    return this.repository.findOne({ where: { id, actif: true } });
   }
 
   async create(data: Partial<Maintenance>, userId?: string): Promise<Maintenance> {
-    this.logger.log('Création nouveau maintenance par user: ' + userId);
     const entity = this.repository.create({
       ...data,
-      created_by: userId,
+      createdBy: userId, // ✅ CORRIGÉ : camelCase cohérent
       metadata: { created_from: 'api', version: '1.0' }
     });
-    return this.repository.save(entity);
+    return this.repository.save(entity); // ✅ CORRIGÉ : retourne Maintenance, pas Maintenance[]
   }
 
   async update(id: string, data: Partial<Maintenance>, userId?: string): Promise<Maintenance | null> {
-    this.logger.log('Mise à jour maintenance id: ' + id + ' par user: ' + userId);
-    // Omit 'metadata' from update payload to avoid type error
-    const { metadata: _metadata, ...updateData } = data;
+    const { metadata, ...updateData } = data;
+    
     await this.repository.update(id, {
       ...updateData,
-      updated_by: userId
+      updatedBy: userId // ✅ CORRIGÉ : camelCase cohérent
     });
     return this.findOne(id);
   }
 
-  async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log('Suppression logique maintenance id: ' + id + ' par user: ' + userId);
-    await this.repository.update(id, { 
+  async delete(id: string, userId?: string): Promise<void> {
+    await this.repository.update(id, {
       actif: false,
-      updated_by: userId 
-    });
-  }
-  async findByStatus(status: string): Promise<Maintenance[]> {
-    return this.repository.find({ 
-      where: { type_maintenance: status, actif: true } 
+      updatedBy: userId // ✅ CORRIGÉ : camelCase cohérent
     });
   }
 
-  async getStatistics(): Promise<{ total: number; recent: number; module: string }> {
+  async findByStatus(status: string): Promise<Maintenance[]> {
+    return this.repository.find({
+      where: { typeMaintenance: status, actif: true } // ✅ CORRIGÉ : camelCase cohérent
+    });
+  }
+
+  async findRecent(): Promise<Maintenance[]> {
+    return this.repository.find({
+      where: {
+        actif: true,
+        createdAt: MoreThanOrEqual(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // ✅ CORRIGÉ : camelCase cohérent
+      }
+    });
+  }
+
+  // ✅ AJOUTÉ : Méthodes manquantes pour le contrôleur
+  async getStatistics() {
     const total = await this.repository.count({ where: { actif: true } });
-    const recent = await this.repository.count({ 
+    const preventive = await this.repository.count({ 
+      where: { actif: true, typeMaintenance: 'PREVENTIVE' } 
+    });
+    const corrective = await this.repository.count({ 
+      where: { actif: true, typeMaintenance: 'CORRECTIVE' } 
+    });
+    const urgent = await this.repository.count({ 
+      where: { actif: true, typeMaintenance: 'URGENT' } 
+    });
+
+    // Calcul des moyennes de coût
+    const avgCost = await this.repository
+      .createQueryBuilder('maintenance')
+      .select('AVG(CAST(maintenance.cout AS DECIMAL))', 'avgCost')
+      .where('maintenance.actif = :actif', { actif: true })
+      .andWhere('maintenance.cout IS NOT NULL')
+      .getRawOne();
+
+    return {
+      total,
+      preventive,
+      corrective,
+      urgent,
+      repartition: {
+        preventive: total > 0 ? (preventive / total) * 100 : 0,
+        corrective: total > 0 ? (corrective / total) * 100 : 0,
+        urgent: total > 0 ? (urgent / total) * 100 : 0
+      },
+      coutMoyen: parseFloat(avgCost?.avgCost || '0')
+    };
+  }
+
+  async remove(id: string, userId?: string): Promise<void> {
+    // Soft delete - marquer comme inactif au lieu de supprimer
+    await this.repository.update(id, {
+      actif: false,
+      updatedBy: userId
+    });
+  }
+
+  // ✅ BONUS : Méthodes utiles supplémentaires
+  async getStats() {
+    return this.getStatistics(); // Alias pour compatibilité
+  }
+
+  async findByMachine(machineId: string): Promise<Maintenance[]> {
+    return this.repository.find({
+      where: { machineId, actif: true },
+      order: { createdAt: "DESC" }
+    });
+  }
+
+  async findByTechnician(technicienId: string): Promise<Maintenance[]> {
+    return this.repository.find({
+      where: { technicienId, actif: true },
+      order: { createdAt: "DESC" }
+    });
+  }
+
+  async findPlanned(): Promise<Maintenance[]> {
+    return this.repository.find({
       where: { 
         actif: true,
-        created_at: MoreThanOrEqual(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-      } 
+        dateProgrammee: MoreThanOrEqual(new Date())
+      },
+      order: { dateProgrammee: "ASC" }
     });
-    
-    return { total, recent, module: 'maintenance' };
+  }
+
+  async findOverdue(): Promise<Maintenance[]> {
+    const today = new Date();
+    return this.repository.find({
+      where: { 
+        actif: true,
+        dateProgrammee: MoreThanOrEqual(today),
+        dateRealisee: null
+      },
+      order: { dateProgrammee: "ASC" }
+    });
   }
 }

@@ -1,54 +1,55 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+// apps/api/src/modules/maintenance/entities/maintenance.entity.ts
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('maintenance')
-@Index(['created_at'])
+@Index(['createdAt']) // ✅ CORRIGÉ : camelCase cohérent
 export class Maintenance {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-  @Column({ nullable: true })
-  machine_id?: string;
 
   @Column({ nullable: true })
-  type_maintenance?: string;
+  machineId?: string; // ✅ CORRIGÉ : camelCase cohérent
+
+  @Column({ nullable: true })
+  typeMaintenance?: string; // ✅ CORRIGÉ : camelCase cohérent
 
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ nullable: true })
-  date_programmee?: string;
+  @Column({ type: 'timestamp', nullable: true })
+  dateProgrammee?: Date; // ✅ CORRIGÉ : camelCase + type Date cohérent
 
-  @Column({ nullable: true })
-  date_realisee?: string;
+  @Column({ type: 'timestamp', nullable: true })
+  dateRealisee?: Date; // ✅ CORRIGÉ : camelCase + type Date cohérent
 
   @Column({ nullable: true })
   duree?: string;
 
-  @Column({ nullable: true })
-  cout?: string;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  cout?: number; // ✅ AMÉLIORÉ : type decimal pour les coûts
 
   @Column({ nullable: true })
-  technicien_id?: string;
+  technicienId?: string; // ✅ CORRIGÉ : camelCase cohérent
 
-  @Column({ nullable: true })
-  pieces_changees?: string;
+  @Column({ type: 'text', nullable: true })
+  piecesChangees?: string; // ✅ CORRIGÉ : camelCase cohérent
 
   @Column({ default: true })
   actif!: boolean;
 
   @CreateDateColumn()
-  created_at!: Date;
+  createdAt!: Date; // ✅ CORRIGÉ : camelCase cohérent
 
   @UpdateDateColumn()
-  updated_at!: Date;
+  updatedAt!: Date; // ✅ CORRIGÉ : camelCase cohérent
 
   @Column({ nullable: true })
-  created_by?: string;
+  createdBy?: string; // ✅ CORRIGÉ : camelCase cohérent
 
   @Column({ nullable: true })
-  updated_by?: string;
+  updatedBy?: string; // ✅ CORRIGÉ : camelCase cohérent
 
   // Métadonnées pour l'audit
   @Column('jsonb', { nullable: true })
   metadata?: Record<string, unknown>;
 }
-
