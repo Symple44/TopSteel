@@ -7,7 +7,7 @@ export interface Notification {
   type: NotificationType;
   title: string;
   message: string;
-  data?: any;
+  data?: unknown;
   userId?: string;
   projetId?: string;
   createdAt?: Date;
@@ -65,7 +65,7 @@ export class NotificationsService {
     });
   }
 
-  async notifyStockAlert(produit: any, stockActuel: number, stockMinimal: number) {
+  async notifyStockAlert(produit: unknown, stockActuel: number, stockMinimal: number) {
     await this.broadcast({
       type: NotificationType.STOCK_ALERT,
       title: 'Alerte stock',

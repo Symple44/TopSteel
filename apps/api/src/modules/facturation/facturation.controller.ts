@@ -16,12 +16,12 @@ export class FacturationController {
   }
 
   @Post()
-  create(@Body() data: any) {
+  create(@Body() data: unknown) {
     return this.facturationService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() data: unknown) {
     return this.facturationService.update(id, data);
   }
 
@@ -30,3 +30,4 @@ export class FacturationController {
     return this.facturationService.remove(id);
   }
 }
+

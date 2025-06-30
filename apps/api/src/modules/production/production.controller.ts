@@ -16,12 +16,12 @@ export class ProductionController {
   }
 
   @Post()
-  create(@Body() data: any) {
+  create(@Body() data: unknown) {
     return this.productionService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() data: unknown) {
     return this.productionService.update(id, data);
   }
 
@@ -30,3 +30,4 @@ export class ProductionController {
     return this.productionService.remove(id);
   }
 }
+

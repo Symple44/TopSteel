@@ -42,5 +42,5 @@ export class ControleQualite {
   updated_by?: string;
 
   @Column('jsonb', { nullable: true })
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }

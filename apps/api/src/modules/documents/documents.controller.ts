@@ -16,12 +16,12 @@ export class DocumentsController {
   }
 
   @Post()
-  create(@Body() data: any) {
+  create(@Body() data: unknown) {
     return this.documentsService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() data: unknown) {
     return this.documentsService.update(+id, data);
   }
 
@@ -30,5 +30,6 @@ export class DocumentsController {
     return this.documentsService.remove(+id);
   }
 }
+
 
 

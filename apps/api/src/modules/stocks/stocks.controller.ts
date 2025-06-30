@@ -16,12 +16,12 @@ export class StocksController {
   }
 
   @Post()
-  create(@Body() data: any) {
+  create(@Body() data: unknown) {
     return this.stocksService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() data: unknown) {
     return this.stocksService.update(id, data);
   }
 
@@ -30,3 +30,4 @@ export class StocksController {
     return this.stocksService.remove(id);
   }
 }
+

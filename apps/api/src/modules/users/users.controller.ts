@@ -16,12 +16,12 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() data: any) {
+  create(@Body() data: unknown) {
     return this.usersService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() data: unknown) {
     return this.usersService.update(+id, data);
   }
 
@@ -30,4 +30,5 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 }
+
 

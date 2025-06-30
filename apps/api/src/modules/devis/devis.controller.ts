@@ -16,12 +16,12 @@ export class DevisController {
   }
 
   @Post()
-  create(@Body() data: any) {
+  create(@Body() data: unknown) {
     return this.devisService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() data: unknown) {
     return this.devisService.update(id, data);
   }
 
@@ -30,3 +30,4 @@ export class DevisController {
     return this.devisService.remove(id);
   }
 }
+

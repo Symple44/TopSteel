@@ -34,7 +34,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
+  handleRequest(err: boolean, user: boolean, info: boolean, context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     
     // Log des tentatives d'accès en développement

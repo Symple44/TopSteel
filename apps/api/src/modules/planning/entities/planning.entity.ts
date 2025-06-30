@@ -46,5 +46,5 @@ export class Planning {
 
   // Métadonnées pour l'audit
   @Column('jsonb', { nullable: true })
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
