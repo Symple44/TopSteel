@@ -16,7 +16,7 @@ export class PlanningController {
     return this.planningService.getStatistics();
   }
 
-  @Get('id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.planningService.findOne(id);
   }
@@ -26,12 +26,12 @@ export class PlanningController {
     return this.planningService.create(data);
   }
 
-  @Put('id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() data: Partial<Planning>) {
     return this.planningService.update(id, data);
   }
 
-  @Delete('id')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.planningService.remove(id);
   }

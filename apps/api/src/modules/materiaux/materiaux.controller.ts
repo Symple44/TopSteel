@@ -16,7 +16,7 @@ export class MateriauxController {
     return this.materiauxService.getStatistics();
   }
 
-  @Get('id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.materiauxService.findOne(id);
   }
@@ -26,12 +26,12 @@ export class MateriauxController {
     return this.materiauxService.create(data);
   }
 
-  @Put('id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() data: Partial<Materiau>) {
     return this.materiauxService.update(id, data);
   }
 
-  @Delete('id')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.materiauxService.remove(id);
   }

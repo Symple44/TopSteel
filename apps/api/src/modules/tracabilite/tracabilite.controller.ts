@@ -16,7 +16,7 @@ export class TracabiliteController {
     return this.tracabiliteService.getStatistics();
   }
 
-  @Get('id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tracabiliteService.findOne(id);
   }
@@ -26,12 +26,12 @@ export class TracabiliteController {
     return this.tracabiliteService.create(data);
   }
 
-  @Put('id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() data: Partial<Tracabilite>) {
     return this.tracabiliteService.update(id, data);
   }
 
-  @Delete('id')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.tracabiliteService.remove(id);
   }

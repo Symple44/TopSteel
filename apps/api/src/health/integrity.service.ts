@@ -26,9 +26,9 @@ export class IntegrityService {
       }
       
       return results;
-    } catch (__error) {
-      this.logger.error('Erreur lors du contrôle d\'intégrité', _error);
-      throw _error;
+    } catch (error) {
+      this.logger.error('Erreur lors du contrôle d\'intégrité', error);
+      throw error;
     }
   }
 
@@ -78,7 +78,7 @@ export class IntegrityService {
         WHERE state = 'active'
       `);
       return parseInt(result[0]?.connections || '0');
-    } catch (__error) {
+    } catch (error) {
       return 0;
     }
   }
@@ -87,7 +87,7 @@ export class IntegrityService {
     try {
       const result = await this.dataSource.query('SELECT COUNT(*) as count FROM projets');
       return parseInt(result[0]?.count || '0');
-    } catch (__error) {
+    } catch (error) {
       return 0;
     }
   }
@@ -96,8 +96,10 @@ export class IntegrityService {
     try {
       const result = await this.dataSource.query('SELECT COUNT(*) as count FROM clients');
       return parseInt(result[0]?.count || '0');
-    } catch (__error) {
+    } catch (error) {
       return 0;
     }
   }
 }
+
+

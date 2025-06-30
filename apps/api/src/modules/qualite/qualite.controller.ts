@@ -16,7 +16,7 @@ export class QualiteController {
     return this.qualiteService.getStatistics();
   }
 
-  @Get('id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.qualiteService.findOne(id);
   }
@@ -26,12 +26,12 @@ export class QualiteController {
     return this.qualiteService.create(data);
   }
 
-  @Put('id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() data: Partial<ControleQualite>) {
     return this.qualiteService.update(id, data);
   }
 
-  @Delete('id')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.qualiteService.remove(id);
   }

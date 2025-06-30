@@ -16,7 +16,7 @@ export class MachinesController {
     return this.machinesService.getStatistics();
   }
 
-  @Get('id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.machinesService.findOne(id);
   }
@@ -26,12 +26,12 @@ export class MachinesController {
     return this.machinesService.create(data);
   }
 
-  @Put('id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() data: Partial<Machine>) {
     return this.machinesService.update(id, data);
   }
 
-  @Delete('id')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.machinesService.remove(id);
   }

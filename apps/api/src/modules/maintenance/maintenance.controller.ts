@@ -16,7 +16,7 @@ export class MaintenanceController {
     return this.maintenanceService.getStatistics();
   }
 
-  @Get('id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.maintenanceService.findOne(id);
   }
@@ -26,12 +26,12 @@ export class MaintenanceController {
     return this.maintenanceService.create(data);
   }
 
-  @Put('id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() data: Partial<Maintenance>) {
     return this.maintenanceService.update(id, data);
   }
 
-  @Delete('id')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.maintenanceService.remove(id);
   }

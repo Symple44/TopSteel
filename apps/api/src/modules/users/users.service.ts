@@ -1,5 +1,6 @@
 // apps/api/src/modules/users/users.service.ts
 import { Injectable } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -30,7 +31,7 @@ export class UsersService {
     await this.usersRepository.update(id, updateUserDto);
     const user = await this.findOne(id);
     if (!user) {
-      throw new NotFoundException(User with ID ${id} not found);
+      throw new NotFoundException('User with ID ' + id + ' not found');
     }
     return user;
   }
@@ -47,3 +48,4 @@ export class UsersService {
     await this.usersRepository.delete(id);
   }
 }
+
