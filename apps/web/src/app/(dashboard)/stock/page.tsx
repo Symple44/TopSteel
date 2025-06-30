@@ -266,7 +266,11 @@ export default function StockPage() {
                 </div>
                 {/* ✅ FIX: Remplacement du Select par un select HTML natif pour éviter l'erreur TypeScript */}
                 <div className="w-[200px]">
+                  <label htmlFor="category-select" className="sr-only">
+                    Catégorie
+                  </label>
                   <select
+                    id="category-select"
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"

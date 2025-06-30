@@ -14,7 +14,7 @@ export class DocumentsService {
     return this.documentsRepository.find();
   }
 
-  async findOne(id: number): Promise<Document> {
+  async findOne(id: number): Promise<Document | null> {
     return this.documentsRepository.findOne({ where: { id } });
   }
 
@@ -23,7 +23,7 @@ export class DocumentsService {
     return this.documentsRepository.save(entity);
   }
 
-  async update(id: number, data: Partial<Document>): Promise<Document> {
+  async update(id: number, data: Partial<Document>): Promise<Document | null> {
     await this.documentsRepository.update(id, data);
     return this.findOne(id);
   }

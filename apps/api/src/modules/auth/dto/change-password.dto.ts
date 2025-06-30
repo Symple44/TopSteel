@@ -8,7 +8,7 @@ export class ChangePasswordDto {
     example: 'oldPassword123!',
   })
   @IsString()
-  oldPassword: string;
+  oldPassword!: string;
 
   @ApiProperty({
     description: 'Nouveau mot de passe (min 8 caractères, doit contenir maj, min, chiffre et caractère spécial)',
@@ -17,5 +17,5 @@ export class ChangePasswordDto {
   })
   @IsString()
   @MinLength(8, { message: 'Le nouveau mot de passe doit contenir au moins 8 caractères' })
-  newPassword: string;
+  newPassword!: string;
 }

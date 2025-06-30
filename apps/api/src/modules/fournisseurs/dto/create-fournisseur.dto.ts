@@ -5,7 +5,7 @@ export class CreateFournisseurDto {
   @ApiProperty({ description: 'Nom du fournisseur' })
   @IsString()
   @MaxLength(255)
-  nom: string;
+  nom!: string;
 
   @ApiPropertyOptional({ description: 'Email de contact' })
   @IsOptional()

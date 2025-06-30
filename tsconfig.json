@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@erp/ui/*": ["./packages/ui/src/*"],
       "@erp/types/*": ["./packages/types/src/*"],
@@ -24,7 +25,7 @@
       "@erp/config/*": ["./packages/config/src/*"]
     }
   },
-  "include": [],
+  "include": ["src/**/*", "packages/**/*"],
   "exclude": [
     "node_modules",
     "dist",

@@ -14,7 +14,7 @@ export class FacturationService {
     return this.facturationRepository.find();
   }
 
-  async findOne(id: string): Promise<Facturation> {
+  async findOne(id: string): Promise<Facturation | null> {
     return this.facturationRepository.findOne({ where: { id } });
   }
 
@@ -23,7 +23,7 @@ export class FacturationService {
     return this.facturationRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Facturation>): Promise<Facturation> {
+  async update(id: string, data: Partial<Facturation>): Promise<Facturation | null> {
     await this.facturationRepository.update(id, data);
     return this.findOne(id);
   }

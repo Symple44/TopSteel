@@ -4,7 +4,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreateProjetDto {
   @ApiProperty()
   @IsString()
-  nom: string;
+  nom!: string;
 
   @ApiPropertyOptional()
   @IsString()

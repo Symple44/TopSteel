@@ -14,7 +14,7 @@ export class NotificationsService {
     return this.notificationsRepository.find();
   }
 
-  async findOne(id: string): Promise<Notifications> {
+  async findOne(id: string): Promise<Notifications | null> {
     return this.notificationsRepository.findOne({ where: { id } });
   }
 
@@ -23,7 +23,7 @@ export class NotificationsService {
     return this.notificationsRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Notifications>): Promise<Notifications> {
+  async update(id: string, data: Partial<Notifications>): Promise<Notifications | null> {
     await this.notificationsRepository.update(id, data);
     return this.findOne(id);
   }

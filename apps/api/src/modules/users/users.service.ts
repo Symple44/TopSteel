@@ -26,13 +26,17 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
     await this.usersRepository.update(id, updateUserDto);
-    return this.findOne(id);
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new NotFoundException(User with ID ${id} not found);
+    }
+    return user;
   }
 
   async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
-    await this.usersRepository.update(userId, { refreshToken });
+    await this.usersRepository.update(userId, { refreshToken: refreshToken || undefined });
   }
 
   async findAll(): Promise<User[]> {

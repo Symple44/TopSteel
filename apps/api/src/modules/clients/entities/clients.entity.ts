@@ -1,15 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('clients')
 export class Client {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  nom: string;
+  nom!: string;
 
   @Column()
-  email: string;
+  email!: string;
 
   @Column({ nullable: true })
   telephone?: string;
@@ -18,10 +18,11 @@ export class Client {
   adresse?: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
 
 export { Client as Clients };
+

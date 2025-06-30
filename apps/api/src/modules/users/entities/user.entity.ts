@@ -10,19 +10,19 @@ export enum UserRole {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Column()
-  nom: string;
+  nom!: string;
 
   @Column()
-  prenom: string;
+  prenom!: string;
 
   @Column({ nullable: true })
   refreshToken?: string;
@@ -32,13 +32,13 @@ export class User {
     enum: UserRole,
     default: UserRole.USER
   })
-  role: UserRole;
+  role!: UserRole;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
 
 export { User as Users };

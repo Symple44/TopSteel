@@ -8,7 +8,7 @@ export class LoginDto {
     example: 'user@example.com',
   })
   @IsEmail({}, { message: 'Veuillez fournir une adresse email valide' })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: 'Mot de passe de l\'utilisateur',
@@ -17,7 +17,7 @@ export class LoginDto {
   })
   @IsString()
   @MinLength(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' })
-  password: string;
+  password!: string;
 }
 
 export class RegisterDto {
@@ -26,21 +26,21 @@ export class RegisterDto {
     example: 'Dupont',
   })
   @IsString()
-  nom: string;
+  nom!: string;
 
   @ApiProperty({
     description: 'Prénom',
     example: 'Jean',
   })
   @IsString()
-  prenom: string;
+  prenom!: string;
 
   @ApiProperty({
     description: 'Adresse email (doit être unique)',
     example: 'jean.dupont@example.com',
   })
   @IsEmail({}, { message: 'Veuillez fournir une adresse email valide' })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: 'Mot de passe (min 8 caractères, doit contenir maj, min, chiffre et caractère spécial)',
@@ -49,7 +49,7 @@ export class RegisterDto {
   })
   @IsString()
   @MinLength(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' })
-  password: string;
+  password!: string;
 }
 
 export class RefreshTokenDto {
@@ -58,5 +58,5 @@ export class RefreshTokenDto {
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   @IsString()
-  refreshToken: string;
+  refreshToken!: string;
 }

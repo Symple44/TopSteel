@@ -1,4 +1,4 @@
-﻿// apps/api/src/config/https.config.ts
+// apps/api/src/config/https.config.ts
 // Configuration HTTPS pour TopSteel ERP en production
 
 import { readFileSync } from 'fs';
@@ -16,7 +16,7 @@ export function getHttpsOptions(): HttpsOptions | null {
   }
 
   try {
-    const certPath = process.env.SSL_CERT_PATH || '/etc/ssl/certs/topsteel';
+    const certPath = process.env.SSL_CERT_PATH ?? '/etc/ssl/certs/topsteel';
     
     return {
       key: readFileSync(join(certPath, 'private.key')),
@@ -24,7 +24,7 @@ export function getHttpsOptions(): HttpsOptions | null {
       ca: process.env.SSL_CA_PATH ? readFileSync(process.env.SSL_CA_PATH) : undefined,
     };
   } catch (_error) {
-    console.warn('⚠️  Certificats SSL non trouvés, utilisation HTTP:', (error as Error).message);
+    console.warn('⚠️  Certificats SSL non trouvés, utilisation HTTP:', (_error as Error).message);
     return null;
   }
 }

@@ -3,20 +3,20 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Entity('commandes')
 export class Commande {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  numero: string;
+  numero!: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  montant: number;
+  montant!: number;
 
   @Column({ nullable: true })
   fournisseur?: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

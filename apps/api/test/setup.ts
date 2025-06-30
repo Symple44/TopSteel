@@ -26,7 +26,7 @@ process.env.JWT_SECRET = 'test-secret-key-for-topsteel';
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/topsteel_test';
 
 // Mock global pour les modules externes si nécessaire
-global.mockData = {
+(global as any).mockData = {
   user: {
     id: 1,
     email: 'test@topsteel.fr',

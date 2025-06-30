@@ -14,7 +14,7 @@ export class DevisService {
     return this.devisRepository.find();
   }
 
-  async findOne(id: string): Promise<Devis> {
+  async findOne(id: string): Promise<Devis | null> {
     return this.devisRepository.findOne({ where: { id } });
   }
 
@@ -23,7 +23,7 @@ export class DevisService {
     return this.devisRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Devis>): Promise<Devis> {
+  async update(id: string, data: Partial<Devis>): Promise<Devis | null> {
     await this.devisRepository.update(id, data);
     return this.findOne(id);
   }

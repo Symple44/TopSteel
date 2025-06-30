@@ -4,7 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Index(['created_at'])
 export class Tracabilite {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
   @Column({ nullable: true })
   numero_lot?: string;
 
@@ -27,13 +27,13 @@ export class Tracabilite {
   controles_effectues?: string;
 
   @Column({ default: true })
-  actif: boolean;
+  actif!: boolean;
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at!: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at!: Date;
 
   @Column({ nullable: true })
   created_by?: string;

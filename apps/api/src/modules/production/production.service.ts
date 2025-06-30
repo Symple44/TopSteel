@@ -14,7 +14,7 @@ export class ProductionService {
     return this.productionRepository.find();
   }
 
-  async findOne(id: string): Promise<Production> {
+  async findOne(id: string): Promise<Production | null> {
     return this.productionRepository.findOne({ where: { id } });
   }
 
@@ -23,7 +23,7 @@ export class ProductionService {
     return this.productionRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Production>): Promise<Production> {
+  async update(id: string, data: Partial<Production>): Promise<Production | null> {
     await this.productionRepository.update(id, data);
     return this.findOne(id);
   }

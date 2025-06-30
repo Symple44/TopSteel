@@ -1,7 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Client } from '../../clients/entities/client.entity';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Client } from '../../clients/entities/clients.entity';
 import { User } from '../../users/entities/user.entity';
-import { Devis } from '../../devis/entities/devis.entity';
 
 export enum ProjetStatut {
   BROUILLON = 'brouillon',
@@ -13,10 +12,10 @@ export enum ProjetStatut {
 @Entity('projets')
 export class Projet {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  nom: string;
+  nom!: string;
 
   @Column({ nullable: true })
   description?: string;
@@ -26,7 +25,7 @@ export class Projet {
     enum: ProjetStatut,
     default: ProjetStatut.BROUILLON
   })
-  statut: ProjetStatut;
+  statut!: ProjetStatut;
 
   @Column('decimal', { precision: 15, scale: 2, nullable: true })
   montantTotal?: number;
@@ -44,10 +43,10 @@ export class Projet {
   responsableId?: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   @ManyToOne(() => Client, { nullable: true })
   @JoinColumn({ name: 'clientId' })

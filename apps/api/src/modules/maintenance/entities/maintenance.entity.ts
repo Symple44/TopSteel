@@ -4,7 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Index(['created_at'])
 export class Maintenance {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
   @Column({ nullable: true })
   machine_id?: string;
 
@@ -33,13 +33,13 @@ export class Maintenance {
   pieces_changees?: string;
 
   @Column({ default: true })
-  actif: boolean;
+  actif!: boolean;
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at!: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at!: Date;
 
   @Column({ nullable: true })
   created_by?: string;

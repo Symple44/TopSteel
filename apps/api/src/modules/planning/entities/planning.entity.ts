@@ -4,7 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Index(['created_at'])
 export class Planning {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
   @Column({ nullable: true })
   date_debut?: string;
 
@@ -30,13 +30,13 @@ export class Planning {
   temps_reel?: string;
 
   @Column({ default: true })
-  actif: boolean;
+  actif!: boolean;
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at!: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at!: Date;
 
   @Column({ nullable: true })
   created_by?: string;

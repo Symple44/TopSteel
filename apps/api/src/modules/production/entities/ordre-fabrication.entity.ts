@@ -3,20 +3,20 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Entity('ordre_fabrication')
 export class OrdreFabrication {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  numero: string;
+  numero!: string;
 
   @Column()
-  statut: string;
+  statut!: string;
 
   @Column({ nullable: true })
   projet?: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

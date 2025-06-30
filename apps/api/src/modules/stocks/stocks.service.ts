@@ -14,7 +14,7 @@ export class StocksService {
     return this.stocksRepository.find();
   }
 
-  async findOne(id: string): Promise<Stocks> {
+  async findOne(id: string): Promise<Stocks | null> {
     return this.stocksRepository.findOne({ where: { id } });
   }
 
@@ -23,7 +23,7 @@ export class StocksService {
     return this.stocksRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Stocks>): Promise<Stocks> {
+  async update(id: string, data: Partial<Stocks>): Promise<Stocks | null> {
     await this.stocksRepository.update(id, data);
     return this.findOne(id);
   }

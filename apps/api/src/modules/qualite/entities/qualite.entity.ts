@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('qualite')
-@Index(['created_at'])
+@Entity('controle_qualite')
 export class ControleQualite {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
   @Column({ nullable: true })
   ordre_fabrication_id?: string;
 
@@ -27,13 +27,13 @@ export class ControleQualite {
   certificat_path?: string;
 
   @Column({ default: true })
-  actif: boolean;
+  actif!: boolean;
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at!: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at!: Date;
 
   @Column({ nullable: true })
   created_by?: string;
@@ -41,7 +41,6 @@ export class ControleQualite {
   @Column({ nullable: true })
   updated_by?: string;
 
-  // Métadonnées pour l'audit
   @Column('jsonb', { nullable: true })
   metadata?: Record<string, any>;
 }

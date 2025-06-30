@@ -14,19 +14,19 @@ export class MachinesService {
 
   async findAll(): Promise<Machine[]> {
     this.logger.log('Récupération de tous les machines');
-    return this.repository.find({ where: { actif: true }, order: { created_at: 'DESC' } });
+    return this.repository.find({ where: {}, order: {} });
   }
 
-  async findOne(id: string): Promise<Machine> {
+  async findOne(id: string): Promise | null<Machine | null> {
     this.logger.log(`Récupération machines id: ${id}`);
-    return this.repository.findOne({ where: { id, actif: true } });
+    return this.repository.findOne({ where: { id } });
   }
 
   async create(data: Partial<Machine>, userId?: string): Promise<Machine> {
     this.logger.log(`Création nouveau machines par user: ${userId}`);
     const entity = this.repository.create({
       ...data,
-      created_by: userId,
+      
       metadata: { created_from: 'api', version: '1.0' }
     });
     return this.repository.save(entity);
@@ -36,7 +36,7 @@ export class MachinesService {
     this.logger.log(`Mise à jour machines id: ${id} par user: ${userId}`);
     await this.repository.update(id, {
       ...data,
-      updated_by: userId,
+      
     });
     return this.findOne(id);
   }
@@ -44,7 +44,7 @@ export class MachinesService {
   async remove(id: string, userId?: string): Promise<void> {
     this.logger.log(`Suppression logique machines id: ${id} par user: ${userId}`);
     await this.repository.update(id, { 
-      actif: false, 
+       
       updated_by: userId 
     });
   }
@@ -55,7 +55,7 @@ export class MachinesService {
   }
 
   async getStatistics(): Promise<any> {
-    const total = await this.repository.count({ where: { actif: true } });
+    const total = await this.repository.count({ where: {} });
     const recent = await this.repository.count({ 
       where: { 
         actif: true,

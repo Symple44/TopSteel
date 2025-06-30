@@ -14,19 +14,19 @@ export class TracabiliteService {
 
   async findAll(): Promise<Tracabilite[]> {
     this.logger.log('Récupération de tous les tracabilite');
-    return this.repository.find({ where: { actif: true }, order: { created_at: 'DESC' } });
+    return this.repository.find({ where: {}, order: {} });
   }
 
-  async findOne(id: string): Promise<Tracabilite> {
+  async findOne(id: string): Promise | null<Tracabilite | null> {
     this.logger.log(`Récupération tracabilite id: ${id}`);
-    return this.repository.findOne({ where: { id, actif: true } });
+    return this.repository.findOne({ where: { id } });
   }
 
   async create(data: Partial<Tracabilite>, userId?: string): Promise<Tracabilite> {
     this.logger.log(`Création nouveau tracabilite par user: ${userId}`);
     const entity = this.repository.create({
       ...data,
-      created_by: userId,
+      
       metadata: { created_from: 'api', version: '1.0' }
     });
     return this.repository.save(entity);
@@ -36,7 +36,7 @@ export class TracabiliteService {
     this.logger.log(`Mise à jour tracabilite id: ${id} par user: ${userId}`);
     await this.repository.update(id, {
       ...data,
-      updated_by: userId,
+      
     });
     return this.findOne(id);
   }
@@ -44,18 +44,18 @@ export class TracabiliteService {
   async remove(id: string, userId?: string): Promise<void> {
     this.logger.log(`Suppression logique tracabilite id: ${id} par user: ${userId}`);
     await this.repository.update(id, { 
-      actif: false, 
+       
       updated_by: userId 
     });
   }
 
   // Méthodes métier spécifiques
   async findByStatus(status: string): Promise<Tracabilite[]> {
-    return this.repository.find({ where: { actif: true } });
+    return this.repository.find({ where: {} });
   }
 
   async getStatistics(): Promise<any> {
-    const total = await this.repository.count({ where: { actif: true } });
+    const total = await this.repository.count({ where: {} });
     const recent = await this.repository.count({ 
       where: { 
         actif: true,

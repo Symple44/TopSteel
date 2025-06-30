@@ -26,16 +26,16 @@ export default registerAs('jwt', () => {
 
   return {
     // Access Token Configuration
-    secret: secret || 'dev-access-secret-not-for-production',
-    expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+    secret: secret ?? 'dev-access-secret-not-for-production',
+    expiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
     
     // Refresh Token Configuration
-    refreshSecret: refreshSecret || 'dev-refresh-secret-not-for-production',
-    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+    refreshSecret: refreshSecret ?? 'dev-refresh-secret-not-for-production',
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '7d',
     
     // Token Settings
-    issuer: process.env.JWT_ISSUER || 'topsteel-erp',
-    audience: process.env.JWT_AUDIENCE || 'topsteel-users',
+    issuer: process.env.JWT_ISSUER ?? 'topsteel-erp',
+    audience: process.env.JWT_AUDIENCE ?? 'topsteel-users',
     
     // Security Options
     algorithm: 'HS256',
@@ -48,8 +48,8 @@ export default registerAs('jwt', () => {
     
     // Custom Claims
     customClaims: {
-      company: process.env.COMPANY_NAME || 'TopSteel',
-      version: process.env.APP_VERSION || '1.0.0',
+      company: process.env.COMPANY_NAME ?? 'TopSteel',
+      version: process.env.APP_VERSION ?? '1.0.0',
     },
   };
 });
