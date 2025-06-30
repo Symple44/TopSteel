@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Fournisseur } from './entities/fournisseur.entity';
 import { CreateFournisseurDto } from './dto/create-fournisseur.dto';
 import { UpdateFournisseurDto } from './dto/update-fournisseur.dto';
+import { Fournisseur } from './entities/fournisseur.entity';
 
 interface FindAllOptions {
   search?: string;
@@ -15,7 +15,7 @@ interface FindAllOptions {
 export class FournisseursService {
   constructor(
     @InjectRepository(Fournisseur)
-    private fournisseurRepository: Repository<Fournisseur>,
+    private readonly fournisseurRepository: Repository<Fournisseur>,
   ) {}
 
   async create(createFournisseurDto: CreateFournisseurDto): Promise<Fournisseur> {
@@ -43,7 +43,7 @@ export class FournisseursService {
     return queryBuilder.orderBy('fournisseur.nom', 'ASC').getMany();
   }
 
-  async getStats(): Promise<any> {
+  async getStats(): Promise<{ total: number; actifs: number; inactifs: number; nouveaux: number }> {
     const total = await this.fournisseurRepository.count();
     const actifs = await this.fournisseurRepository.count({ where: { actif: true } });
     
@@ -80,12 +80,12 @@ export class FournisseursService {
     await this.fournisseurRepository.save(fournisseur);
   }
 
-  async getProduits(id: number): Promise<any[]> {
+  async getProduits(id: number): Promise<[]> {
     await this.findOne(id);
     return [];
   }
 
-  async getCommandes(id: number): Promise<any[]> {
+  async getCommandes(id: number): Promise<unknown[]> {
     await this.findOne(id);
     return [];
   }
