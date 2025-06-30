@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "dev": "tsc --watch",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
@@ -31,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^8.35.0",
     "@typescript-eslint/parser": "^8.35.0",
     "eslint": "^9.30.0",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.3.3"
   },
   "type": "module",
@@ -38,4 +39,3 @@
     "tailwindcss": "4.1.11"
   }
 }
-
