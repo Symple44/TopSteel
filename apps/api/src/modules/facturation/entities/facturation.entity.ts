@@ -1,44 +1,27 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('facturation')
-@Index(['numero'])
-@Index(['clientId'])
-@Index(['projetId'])
-@Index(['statut'])
-export class Facturation {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+@Entity('facturations')
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Facturation extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
 
-  @Column({ unique: true })
-  numero!: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
-  @Column({ nullable: true })
-  projetId?: string;
+  @Column({ default: true })
+  @Index()
+  actif!: boolean;
 
-  @Column({ nullable: true })
-  clientId?: string;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+}
 
-  @Column({ type: 'timestamp', nullable: true })
-  dateFacturation?: Date;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true, default: 0 })
-  montantHT?: number;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true, default: 0 })
-  montantTTC?: number;
-
-  @Column({ enum: ['BROUILLON', 'ENVOYEE', 'PAYEE', 'ANNULEE'], default: 'BROUILLON' })
-  statut?: string;
-
-  @Column({ type: 'timestamp', nullable: true })
-  dateEcheance?: Date;
-
-  @Column({ nullable: true })
-  devisId?: string;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+export enum FacturationStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }

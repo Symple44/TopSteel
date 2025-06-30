@@ -1,48 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('tracabilite')
-@Index(['created_at'])
-export class Tracabilite {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column({ nullable: true })
-  numero_lot?: string;
+@Entity('tracabilites')
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Tracabilite extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
 
-  @Column({ nullable: true })
-  projet_id?: string;
-
-  @Column({ nullable: true })
-  materiau_id?: string;
-
-  @Column({ nullable: true })
-  date_reception?: string;
-
-  @Column({ nullable: true })
-  certificat_materiau?: string;
-
-  @Column({ nullable: true })
-  operations_realisees?: string;
-
-  @Column({ nullable: true })
-  controles_effectues?: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
   @Column({ default: true })
+  @Index()
   actif!: boolean;
 
-  @CreateDateColumn()
-  created_at!: Date;
-
-  @UpdateDateColumn()
-  updated_at!: Date;
-
-  @Column({ nullable: true })
-  created_by?: string;
-
-  @Column({ nullable: true })
-  updated_by?: string;
-
-  // Métadonnées pour l'audit
-  @Column('jsonb', { nullable: true })
-  metadata?: Record<string, unknown>;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
 }
 
+export enum TracabiliteStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
+}

@@ -1,47 +1,27 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('production')
-@Index(['numero'])
-@Index(['projetId'])
-@Index(['statut'])
-@Index(['priorite'])
-export class Production {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column({ unique: true })
-  numero!: string;
-
-  @Column({ nullable: true })
-  projetId?: string;
-
-  @Column({ enum: ['EN_ATTENTE', 'PLANIFIE', 'EN_COURS', 'TERMINE', 'ANNULE', 'PAUSE'], default: 'EN_ATTENTE' })
-  statut!: string;
+@Entity('productions')
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Production extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ enum: ['BASSE', 'NORMALE', 'HAUTE', 'URGENTE'], default: 'NORMALE' })
-  priorite!: string;
+  @Column({ default: true })
+  @Index()
+  actif!: boolean;
 
-  @Column({ type: 'timestamp', nullable: true })
-  dateDebut?: Date;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+}
 
-  @Column({ type: 'timestamp', nullable: true })
-  dateFin?: Date;
-
-  @Column({ type: 'timestamp', nullable: true })
-  datePlanifiee?: Date;
-
-  @Column({ nullable: true })
-  responsableId?: string;
-
-  @Column('decimal', { precision: 5, scale: 2, nullable: true })
-  progression?: number;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+export enum ProductionStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }

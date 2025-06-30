@@ -48,7 +48,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: ExtendedJwtPayload) {
     try {
       // Vérification des champs obligatoires
-      if (!payload.sub || !payload.email) {
+      if (!payload.sub.toString() || !payload.email) {
         throw new UnauthorizedException('Token payload invalide');
       }
 
@@ -59,7 +59,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       }
 
       // Récupération de l'utilisateur depuis la base
-      const user = await this.usersService.findOne(payload.sub);
+      const user = await this.usersService.findOne(payload.sub.toString());
       if (!user) {
         throw new UnauthorizedException('Utilisateur introuvable');
       }
@@ -98,6 +98,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       }
   }
 }
+
 
 
 

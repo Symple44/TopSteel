@@ -1,62 +1,63 @@
 // apps/api/src/database/database.module.ts
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 // Import explicite des entités pour debugging
-import { Client } from '../modules/clients/entities/clients.entity';
+import { Clients } from '../modules/clients/entities/clients.entity';
 import { Commande } from '../modules/commandes/entities/commande.entity';
 import { Machine } from '../modules/machines/entities/machine.entity';
-import { Notification } from '../modules/notifications/entities/notifications.entity'; // ← Après correction
+import { Notifications } from '../modules/notifications/entities/notifications.entity';
 import { OrdreFabrication } from '../modules/production/entities/ordre-fabrication.entity';
 import { Projet } from '../modules/projets/entities/projet.entity';
 import { Produit } from '../modules/stocks/entities/produit.entity';
 import { User } from '../modules/users/entities/user.entity';
-// import { Facturation } from '../modules/facturation/entities/facturation.entity'; // ← À créer si nécessaire
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        const dbConfig = configService.get('database');
-        
-        console.log('🔧 DatabaseModule - Configuration reçue du ConfigService:');
-        console.log('  host:', dbConfig?.host);
-        console.log('  port:', dbConfig?.port);
-        console.log('  username:', dbConfig?.username);
-        console.log('  password:', dbConfig?.password ? '***' : '(vide)');
-        console.log('  database:', dbConfig?.database);
-        console.log('  synchronize:', dbConfig?.synchronize);
+      useFactory: async (configService: ConfigService) => {
+        const host = configService.get<string>('DB_HOST');
+        const port = configService.get<number>('DB_PORT');
+        const username = configService.get<string>('DB_USERNAME');
+        const password = configService.get<string>('DB_PASSWORD');
+        const database = configService.get<string>('DB_NAME');
+        const synchronize = configService.get<boolean>('DB_SYNCHRONIZE');
+        const logging = configService.get<boolean>('DB_LOGGING');
+        const ssl = configService.get<boolean>('DB_SSL');
 
-        // Test : charger toutes les entités disponibles
+        console.log('🔧 DatabaseModule - Configuration reçue du ConfigService:');
+        console.log(`  host: ${host}`);
+        console.log(`  port: ${port}`);
+        console.log(`  username: ${username}`);
+        console.log(`  password: ${'*'.repeat(password?.length || 0)}`);
+        console.log(`  database: ${database}`);
+        console.log(`  synchronize: ${synchronize}`);
+
         const entities = [
-          User, 
-          Client, 
-          Projet, 
-          OrdreFabrication, 
-          Commande, 
-          Produit, 
+          User,
+          Clients,
+          Produit,
           Machine,
-          Notification // ← Après correction du nom
-          // Facturation // ← À ajouter si l'entité existe
+          Notifications,
+          Commande,
+          OrdreFabrication,
+          Projet
         ];
         console.log('🔧 Entités chargées:', entities.map(e => e.name));
 
         return {
           type: 'postgres',
-          host: dbConfig.host,
-          port: dbConfig.port,
-          username: dbConfig.username,
-          password: dbConfig.password,
-          database: dbConfig.database,
-          entities: entities, // ← Entities explicites plutôt que pattern globbing
-          synchronize: dbConfig.synchronize,
-          logging: false,
-          ssl: dbConfig.ssl ? { rejectUnauthorized: false } : false,
-          autoLoadEntities: false, // ← Désactivé car on charge manuellement
-          retryAttempts: 3,
-          retryDelay: 3000,
+          host,
+          port,
+          username,
+          password,
+          database,
+          entities,
+          synchronize,
+          logging,
+          ssl: ssl ? { rejectUnauthorized: false } : false,
         };
       },
       inject: [ConfigService],

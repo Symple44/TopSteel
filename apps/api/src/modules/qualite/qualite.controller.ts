@@ -1,39 +1,72 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  Body, Controller, Delete, Get, HttpCode, HttpStatus,
+  Param, ParseUUIDPipe, Patch, Post, Query, UseGuards
+} from '@nestjs/common';
+import {
+  ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
+} from '@nestjs/swagger';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { UserRole } from '../users/entities/user.entity';
 import { QualiteService } from './qualite.service';
-import { ControleQualite } from './entities/qualite.entity';
+import { CreateQualiteDto } from './dto/create-qualite.dto';
+import { UpdateQualiteDto } from './dto/update-qualite.dto';
+import { QualiteQueryDto } from './dto/qualite-query.dto';
 
 @Controller('qualite')
+@ApiTags('qualite')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class QualiteController {
   constructor(private readonly qualiteService: QualiteService) {}
 
+  @Post()
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Créer un nouveau qualite' })
+  @ApiResponse({ status: 201, description: 'Qualite créé avec succès' })
+  async create(@Body() createDto: CreateQualiteDto) {
+    return this.qualiteService.create(createDto);
+  }
+
   @Get()
-  findAll() {
-    return this.qualiteService.findAll();
+  @ApiOperation({ summary: 'Lister les qualite avec pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  async findAll(@Query() query: QualiteQueryDto) {
+    return this.qualiteService.findAll(query);
   }
 
   @Get('stats')
-  getStatistics() {
-    return this.qualiteService.getStatistics();
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Statistiques des qualite' })
+  async getStats() {
+    return this.qualiteService.getStats();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Récupérer un qualite par ID' })
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.qualiteService.findOne(id);
   }
 
-  @Post()
-  create(@Body() data: Partial<ControleQualite>) {
-    return this.qualiteService.create(data);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: string, @Body() data: Partial<ControleQualite>) {
-    return this.qualiteService.update(id, data);
+  @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Mettre à jour un qualite' })
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateDto: UpdateQualiteDto
+  ) {
+    return this.qualiteService.update(id, updateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Supprimer un qualite' })
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.qualiteService.remove(id);
   }
 }
-

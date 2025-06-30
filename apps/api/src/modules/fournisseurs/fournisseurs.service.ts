@@ -1,93 +1,85 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateFournisseurDto } from './dto/create-fournisseur.dto';
-import { UpdateFournisseurDto } from './dto/update-fournisseur.dto';
-import { Fournisseur } from './entities/fournisseur.entity';
-
-interface FindAllOptions {
-  search?: string;
-  categorie?: string;
-  actif?: boolean;
-}
+import { Fournisseurs } from './entities/fournisseurs.entity';
+import { CreateFournisseursDto } from './dto/create-fournisseurs.dto';
+import { UpdateFournisseursDto } from './dto/update-fournisseurs.dto';
+import { FournisseursQueryDto } from './dto/fournisseurs-query.dto';
+import { PaginationResultDto } from '../../common/dto/base.dto';
 
 @Injectable()
 export class FournisseursService {
   constructor(
-    @InjectRepository(Fournisseur)
-    private readonly fournisseurRepository: Repository<Fournisseur>,
+    @InjectRepository(Fournisseurs)
+    private readonly repository: Repository<Fournisseurs>,
   ) {}
 
-  async create(createFournisseurDto: CreateFournisseurDto): Promise<Fournisseur> {
-    const fournisseur = this.fournisseurRepository.create({
-      ...createFournisseurDto,
-      actif: true,
-    });
-    return this.fournisseurRepository.save(fournisseur);
+  async create(createDto: CreateFournisseursDto): Promise<Fournisseurs> {
+    const entity = this.repository.create(createDto);
+    return this.repository.save(entity);
   }
 
-  async findAll(options: FindAllOptions = {}): Promise<Fournisseur[]> {
-    const queryBuilder = this.fournisseurRepository.createQueryBuilder('fournisseur');
+  async findAll(query: FournisseursQueryDto): Promise<PaginationResultDto<Fournisseurs>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.repository.createQueryBuilder('entity');
     
-    if (options.actif !== undefined) {
-      queryBuilder.andWhere('fournisseur.actif = :actif', { actif: options.actif });
-    }
-    
-    if (options.search) {
+    if (search) {
       queryBuilder.andWhere(
-        '(fournisseur.nom ILIKE :search OR fournisseur.email ILIKE :search)',
-        { search: '%' + options.search + '%' }
+        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
+        { search: `%${search}%` }
       );
     }
-    
-    return queryBuilder.orderBy('fournisseur.nom', 'ASC').getMany();
-  }
 
-  async getStats(): Promise<{ total: number; actifs: number; inactifs: number; nouveaux: number }> {
-    const total = await this.fournisseurRepository.count();
-    const actifs = await this.fournisseurRepository.count({ where: { actif: true } });
-    
+    if (query.actif !== undefined) {
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    }
+
+    const [data, total] = await queryBuilder
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
     return {
-      total,
-      actifs,
-      inactifs: total - actifs,
-      nouveaux: 0
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
     };
   }
 
-  async findOne(id: number): Promise<Fournisseur> {
-    const fournisseur = await this.fournisseurRepository.findOne({ where: { id: +id } });
-    if (!fournisseur) {
-      throw new NotFoundException('Fournisseur introuvable');
+  async findOne(id: string): Promise<Fournisseurs> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`Fournisseurs with ID ${id} not found`);
     }
-    return fournisseur;
+    return entity;
   }
 
-  async update(id: number, updateFournisseurDto: UpdateFournisseurDto): Promise<Fournisseur> {
-    await this.fournisseurRepository.update(id, updateFournisseurDto);
+  async update(id: string, updateDto: UpdateFournisseursDto): Promise<Fournisseurs> {
+    await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
 
-  async toggleActif(id: number): Promise<Fournisseur> {
-    const fournisseur = await this.findOne(id);
-    fournisseur.actif = !fournisseur.actif;
-    return this.fournisseurRepository.save(fournisseur);
+  async remove(id: string): Promise<void> {
+    await this.repository.softDelete(id);
   }
 
-  async remove(id: number): Promise<void> {
-    const fournisseur = await this.findOne(id);
-    fournisseur.actif = false;
-    await this.fournisseurRepository.save(fournisseur);
-  }
-
-  async getProduits(id: number): Promise<[]> {
-    await this.findOne(id);
-    return [];
-  }
-
-  async getCommandes(id: number): Promise<unknown[]> {
-    await this.findOne(id);
-    return [];
+  async getStats(): Promise<any> {
+    const total = await this.repository.count();
+    const active = await this.repository.count({ where: { actif: true } });
+    
+    return {
+      total,
+      active,
+      inactive: total - active
+    };
   }
 }
-

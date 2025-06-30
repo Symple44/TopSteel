@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Client } from '../../clients/entities/clients.entity';
+import { Clients } from '../../clients/entities/clients.entity';
 import { User } from '../../users/entities/user.entity';
 
 export enum ProjetStatut {
@@ -48,11 +48,15 @@ export class Projet {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => Client, { nullable: true })
+  @ManyToOne(() => Clients, { nullable: true })
   @JoinColumn({ name: 'clientId' })
-  client?: Client;
+  client?: Clients;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'responsableId' })
   responsable?: User;
 }
+
+
+
+

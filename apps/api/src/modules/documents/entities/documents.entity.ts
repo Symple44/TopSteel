@@ -1,28 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('documents')
-export class Document {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
-  @Column()
+@Entity('documentss')
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Documents extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
   nom!: string;
 
-  @Column()
-  chemin!: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
-  @Column({ nullable: true })
-  type?: string;
+  @Column({ default: true })
+  @Index()
+  actif!: boolean;
 
-  @Column({ nullable: true })
-  taille?: number;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+}
 
-  @Column({ nullable: true })
-  projet?: number;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+export enum DocumentsStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }

@@ -1,33 +1,27 @@
-import { IsString, IsOptional, IsNumber, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreateDevisDto {
-  @ApiProperty({ description: 'Numéro du devis' })
+  @ApiProperty({ example: 'Nom du devis', minLength: 2, maxLength: 255 })
   @IsString()
-  numero!: string;
+  @MinLength(2)
+  @MaxLength(255)
+  @Transform(({ value }) => value?.trim())
+  nom!: string;
 
-  @ApiPropertyOptional({ description: 'ID du projet' })
+  @ApiPropertyOptional({ example: 'Description détaillée' })
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  projetId?: string;
+  @MaxLength(2000)
+  description?: string;
 
-  @ApiPropertyOptional({ description: 'ID du client' })
-  @IsString()
+  @ApiPropertyOptional({ example: true })
   @IsOptional()
-  clientId?: string;
+  @IsBoolean()
+  actif?: boolean = true;
 
-  @ApiPropertyOptional({ description: 'Date de validité' })
-  @IsDateString()
+  @ApiPropertyOptional()
   @IsOptional()
-  dateValidite?: string;
-
-  @ApiPropertyOptional({ description: 'Total HT' })
-  @IsNumber()
-  @IsOptional()
-  totalHT?: number;
-
-  @ApiPropertyOptional({ description: 'Total TTC' })
-  @IsNumber()
-  @IsOptional()
-  totalTTC?: number;
+  metadata?: Record<string, any>;
 }

@@ -1,49 +1,85 @@
-// apps/api/src/modules/facturation/facturation.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Facturation } from './entities/facturation.entity';
 import { CreateFacturationDto } from './dto/create-facturation.dto';
 import { UpdateFacturationDto } from './dto/update-facturation.dto';
-import { Facturation } from './entities/facturation.entity';
+import { FacturationQueryDto } from './dto/facturation-query.dto';
+import { PaginationResultDto } from '../../common/dto/base.dto';
 
 @Injectable()
 export class FacturationService {
   constructor(
     @InjectRepository(Facturation)
-    private facturationRepository: Repository<Facturation>,
+    private readonly repository: Repository<Facturation>,
   ) {}
 
-  async findAll(): Promise<Facturation[]> {
-    return this.facturationRepository.find();
+  async create(createDto: CreateFacturationDto): Promise<Facturation> {
+    const entity = this.repository.create(createDto);
+    return this.repository.save(entity);
   }
 
-  async findOne(id: string): Promise<Facturation | null> {
-    return this.facturationRepository.findOne({ where: { id } });
-  }
+  async findAll(query: FacturationQueryDto): Promise<PaginationResultDto<Facturation>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const skip = (page - 1) * limit;
 
-  async create(createFacturationDto: CreateFacturationDto): Promise<Facturation> {
-    // Transformation DTO -> Entity
-    const facturationData: Partial<Facturation> = {
-      ...createFacturationDto,
-      dateFacturation: createFacturationDto.dateFacturation ? new Date(createFacturationDto.dateFacturation) : undefined,
+    const queryBuilder = this.repository.createQueryBuilder('entity');
+    
+    if (search) {
+      queryBuilder.andWhere(
+        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    if (query.actif !== undefined) {
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    }
+
+    const [data, total] = await queryBuilder
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
     };
-
-    const entity = this.facturationRepository.create(facturationData);
-    return this.facturationRepository.save(entity);
   }
 
-  async update(id: string, updateFacturationDto: UpdateFacturationDto): Promise<Facturation | null> {
-    // Transformation DTO -> Entity
-    const updateData: Partial<Facturation> = {
-      ...updateFacturationDto,
-      dateFacturation: updateFacturationDto.dateFacturation ? new Date(updateFacturationDto.dateFacturation) : undefined,
-    };
+  async findOne(id: string): Promise<Facturation> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`Facturation with ID ${id} not found`);
+    }
+    return entity;
+  }
 
-    await this.facturationRepository.update(id, updateData);
+  async update(id: string, updateDto: UpdateFacturationDto): Promise<Facturation> {
+    await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
-    await this.facturationRepository.delete(id);
+    await this.repository.softDelete(id);
+  }
+
+  async getStats(): Promise<any> {
+    const total = await this.repository.count();
+    const active = await this.repository.count({ where: { actif: true } });
+    
+    return {
+      total,
+      active,
+      inactive: total - active
+    };
   }
 }

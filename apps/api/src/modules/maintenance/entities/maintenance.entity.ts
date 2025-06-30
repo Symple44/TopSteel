@@ -1,55 +1,27 @@
-// apps/api/src/modules/maintenance/entities/maintenance.entity.ts
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('maintenance')
-@Index(['createdAt']) // ✅ CORRIGÉ : camelCase cohérent
-export class Maintenance {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column({ nullable: true })
-  machineId?: string; // ✅ CORRIGÉ : camelCase cohérent
-
-  @Column({ nullable: true })
-  typeMaintenance?: string; // ✅ CORRIGÉ : camelCase cohérent
-
-  @Column({ nullable: true })
-  description?: string;
-
-  @Column({ type: 'timestamp', nullable: true })
-  dateProgrammee?: Date; // ✅ CORRIGÉ : camelCase + type Date cohérent
-
-  @Column({ type: 'timestamp', nullable: true })
-  dateRealisee?: Date; // ✅ CORRIGÉ : camelCase + type Date cohérent
-
-  @Column({ nullable: true })
-  duree?: string;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  cout?: number; // ✅ AMÉLIORÉ : type decimal pour les coûts
-
-  @Column({ nullable: true })
-  technicienId?: string; // ✅ CORRIGÉ : camelCase cohérent
+@Entity('maintenances')
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Maintenance extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
 
   @Column({ type: 'text', nullable: true })
-  piecesChangees?: string; // ✅ CORRIGÉ : camelCase cohérent
+  description?: string;
 
   @Column({ default: true })
+  @Index()
   actif!: boolean;
 
-  @CreateDateColumn()
-  createdAt!: Date; // ✅ CORRIGÉ : camelCase cohérent
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+}
 
-  @UpdateDateColumn()
-  updatedAt!: Date; // ✅ CORRIGÉ : camelCase cohérent
-
-  @Column({ nullable: true })
-  createdBy?: string; // ✅ CORRIGÉ : camelCase cohérent
-
-  @Column({ nullable: true })
-  updatedBy?: string; // ✅ CORRIGÉ : camelCase cohérent
-
-  // Métadonnées pour l'audit
-  @Column('jsonb', { nullable: true })
-  metadata?: Record<string, unknown>;
+export enum MaintenanceStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }

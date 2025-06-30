@@ -1,35 +1,85 @@
-// apps/api/src/modules/clients/clients.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Client } from './entities/clients.entity';
+import { Clients } from './entities/clients.entity';
+import { CreateClientsDto } from './dto/create-clients.dto';
+import { UpdateClientsDto } from './dto/update-clients.dto';
+import { ClientsQueryDto } from './dto/clients-query.dto';
+import { PaginationResultDto } from '../../common/dto/base.dto';
 
 @Injectable()
 export class ClientsService {
   constructor(
-    @InjectRepository(Client) 
-    private clientsRepository: Repository<Client>,
+    @InjectRepository(Clients)
+    private readonly repository: Repository<Clients>,
   ) {}
 
-  async findAll(): Promise<Client[]> {
-    return this.clientsRepository.find();
+  async create(createDto: CreateClientsDto): Promise<Clients> {
+    const entity = this.repository.create(createDto);
+    return this.repository.save(entity);
   }
 
-  async findOne(id: number): Promise<Client | null> {
-    return this.clientsRepository.findOne({ where: { id } });
+  async findAll(query: ClientsQueryDto): Promise<PaginationResultDto<Clients>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.repository.createQueryBuilder('entity');
+    
+    if (search) {
+      queryBuilder.andWhere(
+        '(entity.nom ILIKE :search OR entity.description ILIKE :search OR entity.email ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    if (query.actif !== undefined) {
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    }
+
+    const [data, total] = await queryBuilder
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
+    };
   }
 
-  async create(data: Partial<Client>): Promise<Client> {
-    const entity = this.clientsRepository.create(data);
-    return this.clientsRepository.save(entity);
+  async findOne(id: string): Promise<Clients> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`Clients with ID ${id} not found`);
+    }
+    return entity;
   }
 
-  async update(id: number, data: Partial<Client>): Promise<Client | null> {
-    await this.clientsRepository.update(id, data);
+  async update(id: string, updateDto: UpdateClientsDto): Promise<Clients> {
+    await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.clientsRepository.delete(id);
+  async remove(id: string): Promise<void> {
+    await this.repository.softDelete(id);
+  }
+
+  async getStats(): Promise<any> {
+    const total = await this.repository.count();
+    const active = await this.repository.count({ where: { actif: true } });
+    
+    return {
+      total,
+      active,
+      inactive: total - active
+    };
   }
 }

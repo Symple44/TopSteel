@@ -1,38 +1,27 @@
-import { IsString, IsOptional, IsNumber, IsDateString, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreateFacturationDto {
-  @ApiProperty({ description: 'Numéro de facture' })
+  @ApiProperty({ example: 'Nom du facturation', minLength: 2, maxLength: 255 })
   @IsString()
-  numero!: string;
+  @MinLength(2)
+  @MaxLength(255)
+  @Transform(({ value }) => value?.trim())
+  nom!: string;
 
-  @ApiPropertyOptional({ description: 'ID du projet' })
+  @ApiPropertyOptional({ example: 'Description détaillée' })
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  projetId?: string;
+  @MaxLength(2000)
+  description?: string;
 
-  @ApiPropertyOptional({ description: 'ID du client' })
-  @IsString()
+  @ApiPropertyOptional({ example: true })
   @IsOptional()
-  clientId?: string;
+  @IsBoolean()
+  actif?: boolean = true;
 
-  @ApiPropertyOptional({ description: 'Date de facturation' })
-  @IsDateString()
+  @ApiPropertyOptional()
   @IsOptional()
-  dateFacturation?: string;
-
-  @ApiPropertyOptional({ description: 'Montant HT' })
-  @IsNumber()
-  @IsOptional()
-  montantHT?: number;
-
-  @ApiPropertyOptional({ description: 'Montant TTC' })
-  @IsNumber()
-  @IsOptional()
-  montantTTC?: number;
-
-  @ApiPropertyOptional({ description: 'Statut de la facture' })
-  @IsEnum(['BROUILLON', 'ENVOYEE', 'PAYEE', 'ANNULEE'])
-  @IsOptional()
-  statut?: string;
+  metadata?: Record<string, any>;
 }

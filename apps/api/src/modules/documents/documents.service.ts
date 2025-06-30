@@ -1,37 +1,85 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Document } from './entities/document.entity';
+import { Documents } from './entities/documents.entity';
+import { CreateDocumentsDto } from './dto/create-documents.dto';
+import { UpdateDocumentsDto } from './dto/update-documents.dto';
+import { DocumentsQueryDto } from './dto/documents-query.dto';
+import { PaginationResultDto } from '../../common/dto/base.dto';
 
 @Injectable()
 export class DocumentsService {
   constructor(
-    @InjectRepository(Document)
-    private documentsRepository: Repository<Document>,
+    @InjectRepository(Documents)
+    private readonly repository: Repository<Documents>,
   ) {}
 
-  async findAll(): Promise<Document[]> {
-    return this.documentsRepository.find();
+  async create(createDto: CreateDocumentsDto): Promise<Documents> {
+    const entity = this.repository.create(createDto);
+    return this.repository.save(entity);
   }
 
-  async findOne(id: number): Promise<Document | null> {
-    return this.documentsRepository.findOne({ where: { id } });
+  async findAll(query: DocumentsQueryDto): Promise<PaginationResultDto<Documents>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.repository.createQueryBuilder('entity');
+    
+    if (search) {
+      queryBuilder.andWhere(
+        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    if (query.actif !== undefined) {
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    }
+
+    const [data, total] = await queryBuilder
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
+    };
   }
 
-  async create(data: Partial<Document>): Promise<Document> {
-    const entity = this.documentsRepository.create(data);
-    return this.documentsRepository.save(entity);
+  async findOne(id: string): Promise<Documents> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`Documents with ID ${id} not found`);
+    }
+    return entity;
   }
 
-  async update(id: number, data: Partial<Document>): Promise<Document | null> {
-    await this.documentsRepository.update(id, data);
+  async update(id: string, updateDto: UpdateDocumentsDto): Promise<Documents> {
+    await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.documentsRepository.delete(id);
+  async remove(id: string): Promise<void> {
+    await this.repository.softDelete(id);
+  }
+
+  async getStats(): Promise<any> {
+    const total = await this.repository.count();
+    const active = await this.repository.count({ where: { actif: true } });
+    
+    return {
+      total,
+      active,
+      inactive: total - active
+    };
   }
 }
-
-
-
