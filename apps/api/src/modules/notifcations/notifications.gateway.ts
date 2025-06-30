@@ -24,11 +24,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   private connectedClients = new Map<string, Socket>();
 
   handleConnection(client: Socket) {
-    console.log('Client connected:', client.id);
+    console.info('Client connected:', client.id);
   }
 
   handleDisconnect(client: Socket) {
-    console.log('Client disconnected:', client.id);
+    console.info('Client disconnected:', client.id);
     for (const [userId, socket] of this.connectedClients.entries()) {
       if (socket.id === client.id) {
         this.connectedClients.delete(userId);
@@ -59,7 +59,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
   private async getUserIdFromToken(client: Socket): Promise<string | null> {
     try {
-      const token = client.handshake.auth.token;
+      const _token = client.handshake.auth.token;
       return null;
     } catch {
       return null;

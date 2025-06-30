@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { QualiteService } from './qualite.service';
 import { ControleQualite } from './entities/qualite.entity';
 
@@ -36,3 +36,4 @@ export class QualiteController {
     return this.qualiteService.remove(id);
   }
 }
+

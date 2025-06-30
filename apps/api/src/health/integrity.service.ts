@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class IntegrityService {
@@ -9,7 +9,7 @@ export class IntegrityService {
 
   constructor(
     @InjectDataSource()
-    private dataSource: DataSource,
+    private readonly dataSource: DataSource,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -20,7 +20,7 @@ export class IntegrityService {
       const results = await this.performFullCheck();
       
       if (results.errors.length > 0) {
-        this.logger.error(`Erreurs d\'intégrité détectées: ${results.errors.length}`);
+        this.logger.error(`Erreurs d'intégrité détectées: ${results.errors.length}`);
       } else {
         this.logger.log('Contrôle d\'intégrité OK');
       }
@@ -77,8 +77,9 @@ export class IntegrityService {
         FROM pg_stat_activity 
         WHERE state = 'active'
       `);
-      return parseInt(result[0]?.connections || '0');
-    } catch (error) {
+      return parseInt(result[0]?.connections ?? '0');
+    } catch (_error) {
+      this.logger.error('Erreur lors de la récupération du nombre de clients', _error);
       return 0;
     }
   }
@@ -86,8 +87,8 @@ export class IntegrityService {
   private async getProjectCount() {
     try {
       const result = await this.dataSource.query('SELECT COUNT(*) as count FROM projets');
-      return parseInt(result[0]?.count || '0');
-    } catch (error) {
+      return parseInt(result[0]?.count ?? '0');
+    } catch (_error) {
       return 0;
     }
   }
@@ -95,8 +96,8 @@ export class IntegrityService {
   private async getClientCount() {
     try {
       const result = await this.dataSource.query('SELECT COUNT(*) as count FROM clients');
-      return parseInt(result[0]?.count || '0');
-    } catch (error) {
+      return parseInt(result[0]?.count ?? '0');
+    } catch (_error) {
       return 0;
     }
   }

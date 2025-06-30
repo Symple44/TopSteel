@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Projet, ProjetStatut } from './entities/projet.entity';
 import { CreateProjetDto } from './dto/create-projet.dto';
-import { UpdateProjetDto } from './dto/update-projet.dto';
 import { ProjetQueryDto } from './dto/projet-query.dto';
+import { UpdateProjetDto } from './dto/update-projet.dto';
+import { Projet, ProjetStatut } from './entities/projet.entity';
 
 @Injectable()
 export class ProjetsService {
   constructor(
     @InjectRepository(Projet)
-    private projetsRepository: Repository<Projet>,
+    private readonly projetsRepository: Repository<Projet>,
   ) {}
 
   async create(createProjetDto: CreateProjetDto): Promise<Projet> {
@@ -25,10 +25,10 @@ export class ProjetsService {
       statut,
       search,
       clientId,
-      dateDebut,
-      dateFin,
-      montantMin,
-      montantMax,
+      dateDebut: _dateDebut,
+      dateFin: _dateFin,
+      montantMin: _montantMin,
+      montantMax: _montantMax ,
     } = queryDto;
 
     const query = this.projetsRepository.createQueryBuilder('projet');
@@ -81,17 +81,20 @@ export class ProjetsService {
     return this.findOne(projetId);
   }
 
-  async addDocument(id: string | number, documentData: any): Promise<any> {
+  async addDocument(
+    id: string | number,
+    _documentData: unknown
+  ): Promise<{ message: string; projetId: number }> {
     const projetId = typeof id === 'string' ? parseInt(id, 10) : id;
     return { message: 'Fonctionnalité documents en cours de développement', projetId };
   }
 
-  async getTimeline(id: string | number): Promise<any> {
+  async getTimeline(id: string | number): Promise<{ message: string; projetId: number }> {
     const projetId = typeof id === 'string' ? parseInt(id, 10) : id;
     return { message: 'Timeline en cours de développement', projetId };
   }
 
-  async getStats(user: any): Promise<any> {
+  async getStats(_user: unknown): Promise<any> {
     const totalProjets = await this.projetsRepository.count();
     const projetsEnCours = await this.projetsRepository.count({ 
       where: { statut: ProjetStatut.EN_COURS } 
@@ -108,8 +111,12 @@ export class ProjetsService {
     };
   }
 
-  async updateAvancement(id: string | number, avancement: number): Promise<any> {
+  async updateAvancement(
+    id: string | number,
+    avancement: number
+  ): Promise<{ message: string; projetId: number; avancement: number }> {
     const projetId = typeof id === 'string' ? parseInt(id, 10) : id;
     return { message: 'Avancement mis à jour', projetId, avancement };
   }
 }
+

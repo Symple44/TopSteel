@@ -76,13 +76,13 @@ export class AuthService {
     const tokens = await this.generateTokens(user);
 
     // Sauvegarder le refresh token hashé
-    await this.updateRefreshTokenHash(user.id, tokens.refreshToken);
+    await this.updaterefreshTokenHash(user.id, tokens.refreshToken);
 
-    const { refreshToken: _, ...userWithoutRefreshToken } = user;
+    const { refreshToken: _, ...userWithoutrefreshToken } = user;
     
     return {
       ...tokens,
-      user: userWithoutRefreshToken,
+      user: userWithoutrefreshToken,
     };
   }
 
@@ -116,7 +116,7 @@ export class AuthService {
     const tokens = await this.generateTokens(newUser);
 
     // Sauvegarder le refresh token hashé
-    await this.updateRefreshTokenHash(newUser.id, tokens.refreshToken);
+    await this.updaterefreshTokenHash(newUser.id, tokens.refreshToken);
 
     const { password: _, refreshToken: __, ...userWithoutSensitiveData } = newUser;
 
@@ -140,7 +140,7 @@ export class AuthService {
 
       // Récupérer l'utilisateur
       const user = await this.usersService.findOne(payload.sub);
-      if (!user || !user.refreshToken) {
+      if (!user?.refreshToken) {
         throw new UnauthorizedException('Token invalide');
       }
 
@@ -154,10 +154,12 @@ export class AuthService {
       const tokens = await this.generateTokens(user);
 
       // Mettre à jour le refresh token en base
-      await this.updateRefreshTokenHash(user.id, tokens.refreshToken);
+      await this.updaterefreshTokenHash(user.id, tokens.refreshToken);
 
       return tokens;
-    } catch (error) {
+    } catch (_error) {
+      // Log the error for debugging purposes
+      console.error('Error during token refresh:', _error);
       throw new UnauthorizedException('Token invalide ou expiré');
     }
   }
@@ -178,8 +180,8 @@ export class AuthService {
       throw new UnauthorizedException('Utilisateur non trouvé');
     }
 
-    const { password, refreshToken, ...profile } = user;
-    return profile;
+    const { password: _password, refreshToken: _refreshToken, ...userWithoutSensitive } = user;
+    return userWithoutSensitive;
   }
 
   /**
@@ -247,16 +249,16 @@ export class AuthService {
   /**
    * Hasher le mot de passe
    */
-  private async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, this.saltRounds);
+  private async hashPassword(_password: string): Promise<string> {
+    return bcrypt.hash(_password, this.saltRounds);
   }
 
   /**
    * Mettre à jour le refresh token hashé en base
    */
-  private async updateRefreshTokenHash(userId: number, refreshToken: string): Promise<void> {
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, this.saltRounds);
-    await this.usersService.updateRefreshToken(userId, hashedRefreshToken);
+  private async updaterefreshTokenHash(userId: number, refreshToken: string): Promise<void> {
+    const hashedrefreshToken = await bcrypt.hash(refreshToken, this.saltRounds);
+    await this.usersService.updateRefreshToken(userId, hashedrefreshToken);
   }
 
   /**
@@ -290,3 +292,5 @@ export class AuthService {
     }
   }
 }
+
+

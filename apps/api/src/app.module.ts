@@ -1,18 +1,15 @@
 // apps/api/src/app.module.ts
-import { BullModule } from "@nestjs/bull";
-import { CacheModule } from "@nestjs/cache-manager";
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
-import { ThrottlerModule } from "@nestjs/throttler";
 import { TerminusModule } from "@nestjs/terminus";
-import * as redisStore from "cache-manager-redis-store";
 
 // Configuration
 import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import jwtConfig from "./config/jwt.config";
-import redisConfig from "./config/redis.config";
+import redisConfig from './config/redis.config';
+import { RedisModule } from './redis/redis.module';
 
 // Modules métier existants
 import { AuthModule } from "./modules/auth/auth.module";
@@ -28,11 +25,11 @@ import { StocksModule } from "./modules/stocks/stocks.module";
 import { UsersModule } from "./modules/users/users.module";
 
 // Nouveaux modules métallurgie
-import { MateriauxModule } from "./modules/materiaux/materiaux.module";
 import { MachinesModule } from "./modules/machines/machines.module";
+import { MaintenanceModule } from "./modules/maintenance/maintenance.module";
+import { MateriauxModule } from "./modules/materiaux/materiaux.module";
 import { PlanningModule } from "./modules/planning/planning.module";
 import { QualiteModule } from "./modules/qualite/qualite.module";
-import { MaintenanceModule } from "./modules/maintenance/maintenance.module";
 import { TracabiliteModule } from "./modules/tracabilite/tracabilite.module";
 
 // Modules système
@@ -56,7 +53,8 @@ import { AppService } from "./app.service";
       envFilePath: [".env.local", ".env"],
       expandVariables: true,
     }),
-
+    // Module Redis
+    RedisModule,
     // Base de données
     DatabaseModule,
 

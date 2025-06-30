@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { MachinesService } from './machines.service';
 import { Machine } from './entities/machine.entity';
 
@@ -36,3 +36,4 @@ export class MachinesController {
     return this.machinesService.remove(id);
   }
 }
+

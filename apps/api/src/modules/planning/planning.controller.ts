@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { PlanningService } from './planning.service';
 import { Planning } from './entities/planning.entity';
 
@@ -36,3 +36,4 @@ export class PlanningController {
     return this.planningService.remove(id);
   }
 }
+

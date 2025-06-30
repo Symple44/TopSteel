@@ -8,7 +8,7 @@ import { dataSourceOptions } from './data-source';
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (_configService: ConfigService) => ({
         ...dataSourceOptions,
         autoLoadEntities: true, // Charge automatiquement les entités
         retryAttempts: 3,

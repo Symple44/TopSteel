@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { TracabiliteService } from './tracabilite.service';
 import { Tracabilite } from './entities/tracabilite.entity';
 
@@ -36,3 +36,4 @@ export class TracabiliteController {
     return this.tracabiliteService.remove(id);
   }
 }
+

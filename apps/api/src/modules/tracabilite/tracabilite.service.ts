@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThanOrEqual } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 import { Tracabilite } from './entities/tracabilite.entity';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class TracabiliteService {
 
   constructor(
     @InjectRepository(Tracabilite)
-    private repository: Repository<Tracabilite>,
+    private readonly repository: Repository<Tracabilite>,
   ) {}
 
   async findAll(): Promise<Tracabilite[]> {
@@ -52,7 +52,7 @@ export class TracabiliteService {
     });
   }
 
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<{ total: number; recent: number; module: string }> {
     const total = await this.repository.count({ where: { actif: true } });
     const recent = await this.repository.count({ 
       where: { 

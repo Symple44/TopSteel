@@ -81,20 +81,24 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
       // Log de l'accès (optionnel)
       if (this.configService.get('NODE_ENV') === 'development') {
-        console.log(`✅ JWT: User ${user.email} authenticated successfully`);
+        console.info(`✅ JWT: User ${user.email} authenticated successfully`);
       }
 
       // Retourner l'utilisateur (sans le mot de passe)
-      const { password, refreshToken, ...userWithoutSensitiveData } = user;
+      const { password: _password, refreshToken: _refreshToken, ...userWithoutSensitiveData } = user;
       return userWithoutSensitiveData;
 
-    } catch (error) {
-      // Log de l'erreur en développement
-      if (this.configService.get('NODE_ENV') === 'development') {
-
+      } catch (_error) {
+        // Log de l'erreur en développement
+        if (this.configService.get('NODE_ENV') === 'development') {
+          console.error('JWT Strategy validation error:', _error);
+        }
+        
+        throw new UnauthorizedException('Token invalide');
       }
-      
-      throw new UnauthorizedException('Token invalide');
-    }
   }
 }
+
+
+
+

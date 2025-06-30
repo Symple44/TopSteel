@@ -44,7 +44,7 @@ export class ProjetsController {
   @ApiResponse({ status: 201, description: "Projet créé avec succès" })
   async create(
     @Body() createProjetDto: CreateProjetDto,
-    @CurrentUser() user: any
+    @CurrentUser() _user: unknown
   ) {
     return this.projetsService.create(createProjetDto);
   }
@@ -62,7 +62,7 @@ export class ProjetsController {
 
   @Get("stats")
   @ApiOperation({ summary: "Statistiques des projets" })
-  async getStats(@CurrentUser() user: any) {
+  async getStats(@CurrentUser() user: unknown) {
     return this.projetsService.getStats(user);
   }
 
@@ -78,7 +78,7 @@ export class ProjetsController {
   async update(
     @Param("id", ParseUUIDPipe) id: string,
     @Body() updateProjetDto: UpdateProjetDto,
-    @CurrentUser() user: any
+    @CurrentUser() _user: unknown
   ) {
     return this.projetsService.update(id, updateProjetDto);
   }
@@ -89,7 +89,7 @@ export class ProjetsController {
   async updateStatut(
     @Param("id", ParseUUIDPipe) id: string,
     @Body("statut") statut: ProjetStatut,
-    @CurrentUser() user: any
+    @CurrentUser() _user: unknown
   ) {
     return this.projetsService.updateStatut(id, statut);
   }
@@ -115,7 +115,7 @@ export class ProjetsController {
   @ApiOperation({ summary: "Ajouter un document au projet" })
   async addDocument(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() documentData: any
+    @Body() documentData: unknown
   ) {
     return this.projetsService.addDocument(id, documentData);
   }
@@ -126,4 +126,6 @@ export class ProjetsController {
     return this.projetsService.getTimeline(id);
   }
 }
+
+
 
