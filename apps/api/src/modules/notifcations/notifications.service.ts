@@ -2,6 +2,20 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationsGateway } from './notifications.gateway';
 
+// Interface pour typer le produit
+interface StockProduit {
+  id: string;
+  designation: string;
+  reference: string;
+}
+
+// Interface pour typer le produit
+interface StockProduit {
+  id: string;
+  designation: string;
+  reference: string;
+}
+
 export interface Notification {
   id?: string;
   type: NotificationType;
@@ -78,3 +92,6 @@ export class NotificationsService {
     return `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 }
+
+
+

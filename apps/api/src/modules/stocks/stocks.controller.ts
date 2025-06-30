@@ -1,4 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { CreateStockDto } from './dto/create-stock.dto';
+import { UpdateStockDto } from './dto/update-stock.dto';
 import { StocksService } from './stocks.service';
 
 @Controller('stocks')
@@ -16,12 +18,12 @@ export class StocksController {
   }
 
   @Post()
-  create(@Body() data: unknown) {
+  create(@Body() data: CreateStockDto) {
     return this.stocksService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: unknown) {
+  update(@Param('id') id: string, @Body() data: UpdateStockDto) {
     return this.stocksService.update(id, data);
   }
 
@@ -30,4 +32,6 @@ export class StocksController {
     return this.stocksService.remove(id);
   }
 }
+
+
 

@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
+import { CreateDocumentDto } from './dto/create-document.dto';
+import { UpdateDocumentDto } from './dto/update-document.dto';
 
 @Controller('documents')
 export class DocumentsController {
@@ -16,12 +18,12 @@ export class DocumentsController {
   }
 
   @Post()
-  create(@Body() data: unknown) {
+  create(@Body() data: CreateDocumentDto) {
     return this.documentsService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: unknown) {
+  update(@Param('id') id: string, @Body() data: UpdateDocumentDto) {
     return this.documentsService.update(+id, data);
   }
 
@@ -30,6 +32,8 @@ export class DocumentsController {
     return this.documentsService.remove(+id);
   }
 }
+
+
 
 
 

@@ -1,4 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { CreateFacturationDto } from './dto/create-facturation.dto';
+import { UpdateFacturationDto } from './dto/update-facturation.dto';
 import { FacturationService } from './facturation.service';
 
 @Controller('facturation')
@@ -16,12 +18,12 @@ export class FacturationController {
   }
 
   @Post()
-  create(@Body() data: unknown) {
+  create(@Body() data: CreateFacturationDto) {
     return this.facturationService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: unknown) {
+  update(@Param('id') id: string, @Body() data: UpdateFacturationDto) {
     return this.facturationService.update(id, data);
   }
 
@@ -30,4 +32,6 @@ export class FacturationController {
     return this.facturationService.remove(id);
   }
 }
+
+
 

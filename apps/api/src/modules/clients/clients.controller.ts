@@ -1,5 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ClientsService } from './clients.service';
+import { CreateClientDto } from './dto/create-client.dto';
+import { UpdateClientDto } from './dto/update-client.dto';
+// ✅ AJOUTER : Importer les DTOs
 
 @Controller('clients')
 export class ClientsController {
@@ -16,12 +19,12 @@ export class ClientsController {
   }
 
   @Post()
-  create(@Body() data: unknown) {
+  create(@Body() data: CreateClientDto) {
     return this.clientsService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: unknown) {
+  update(@Param('id') id: string, @Body() data: UpdateClientDto) {
     return this.clientsService.update(+id, data);
   }
 
@@ -30,6 +33,3 @@ export class ClientsController {
     return this.clientsService.remove(+id);
   }
 }
-
-
-

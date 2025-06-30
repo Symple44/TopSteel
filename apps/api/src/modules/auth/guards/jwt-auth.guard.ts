@@ -1,9 +1,9 @@
 // apps/api/src/modules/auth/guards/jwt-auth.guard.ts
 import {
-    ExecutionContext,
-    Injectable,
-    Logger,
-    UnauthorizedException,
+  ExecutionContext,
+  Injectable,
+  Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 export class JwtAuthGuard extends AuthGuard('jwt') {
   private readonly logger = new Logger(JwtAuthGuard.name);
 
-  constructor(private reflector: Reflector) {
+  constructor(private readonly reflector: Reflector) {
     super();
   }
 
@@ -34,7 +34,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: boolean, user: boolean, info: boolean, context: ExecutionContext) {
+  //  Signature avec types spécifiques
+  handleRequest<TUser = unknown>(
+    err: Error | null,
+    user: TUser,
+    info: { name?: string; message?: string } | undefined,
+    context: ExecutionContext,
+    _status?: unknown
+  ): TUser {
     const request = context.switchToHttp().getRequest();
     
     // Log des tentatives d'accès en développement
@@ -58,7 +65,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             errorMessage = 'Token pas encore valide';
             break;
           default:
-            errorMessage = info.message || errorMessage;
+            errorMessage = info.message ?? errorMessage;
         }
       }
 
@@ -72,7 +79,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     // Log des succès en développement
     if (process.env.NODE_ENV === 'development') {
-      this.logger.debug(`User ${user.email} authenticated successfully`);
+      this.logger.debug(`User ${user && typeof user === 'object' && 'email' in user ? (user as { email?: string }).email : ''} authenticated successfully`);
     }
 
     return user;
