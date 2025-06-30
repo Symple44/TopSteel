@@ -1,6 +1,5 @@
 {
   "name": "@erp/api",
-  "type": "module",
   "version": "1.0.0",
   "description": "API NestJS pour ERP TopSteel - Gestion métallurgique industrielle",
   "main": "dist/main.js",
@@ -9,6 +8,7 @@
     "build": "nest build",
     "postbuild": "echo 'Build API terminé avec succès'",
     "start": "nest start",
+    "dev": "nest start --watch",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",

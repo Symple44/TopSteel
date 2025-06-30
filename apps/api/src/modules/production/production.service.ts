@@ -1,6 +1,9 @@
+// apps/api/src/modules/production/production.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateProductionDto } from './dto/create-production.dto';
+import { UpdateProductionDto } from './dto/update-production.dto';
 import { Production } from './entities/production.entity';
 
 @Injectable()
@@ -18,13 +21,27 @@ export class ProductionService {
     return this.productionRepository.findOne({ where: { id } });
   }
 
-  async create(data: Partial<Production>): Promise<Production> {
-    const entity = this.productionRepository.create(data);
+  async create(createProductionDto: CreateProductionDto): Promise<Production> {
+    // Transformation DTO -> Entity
+    const productionData: Partial<Production> = {
+      ...createProductionDto,
+      dateDebut: createProductionDto.dateDebut ? new Date(createProductionDto.dateDebut) : undefined,
+      dateFin: createProductionDto.dateFin ? new Date(createProductionDto.dateFin) : undefined,
+    };
+
+    const entity = this.productionRepository.create(productionData);
     return this.productionRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Production>): Promise<Production | null> {
-    await this.productionRepository.update(id, data);
+  async update(id: string, updateProductionDto: UpdateProductionDto): Promise<Production | null> {
+    // Transformation DTO -> Entity
+    const updateData: Partial<Production> = {
+      ...updateProductionDto,
+      dateDebut: updateProductionDto.dateDebut ? new Date(updateProductionDto.dateDebut) : undefined,
+      dateFin: updateProductionDto.dateFin ? new Date(updateProductionDto.dateFin) : undefined,
+    };
+
+    await this.productionRepository.update(id, updateData);
     return this.findOne(id);
   }
 

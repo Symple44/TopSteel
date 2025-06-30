@@ -1,6 +1,9 @@
+// apps/api/src/modules/devis/devis.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateDevisDto } from './dto/create-devis.dto';
+import { UpdateDevisDto } from './dto/update-devis.dto';
 import { Devis } from './entities/devis.entity';
 
 @Injectable()
@@ -18,13 +21,25 @@ export class DevisService {
     return this.devisRepository.findOne({ where: { id } });
   }
 
-  async create(data: Partial<Devis>): Promise<Devis> {
-    const entity = this.devisRepository.create(data);
+  async create(createDevisDto: CreateDevisDto): Promise<Devis> {
+    // Transformation DTO -> Entity
+    const devisData: Partial<Devis> = {
+      ...createDevisDto,
+      dateValidite: createDevisDto.dateValidite ? new Date(createDevisDto.dateValidite) : undefined,
+    };
+
+    const entity = this.devisRepository.create(devisData);
     return this.devisRepository.save(entity);
   }
 
-  async update(id: string, data: Partial<Devis>): Promise<Devis | null> {
-    await this.devisRepository.update(id, data);
+  async update(id: string, updateDevisDto: UpdateDevisDto): Promise<Devis | null> {
+    // Transformation DTO -> Entity
+    const updateData: Partial<Devis> = {
+      ...updateDevisDto,
+      dateValidite: updateDevisDto.dateValidite ? new Date(updateDevisDto.dateValidite) : undefined,
+    };
+
+    await this.devisRepository.update(id, updateData);
     return this.findOne(id);
   }
 
