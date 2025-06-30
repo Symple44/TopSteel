@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThanOrEqual } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 import { Machine } from './entities/machine.entity';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class MachinesService {
 
   constructor(
     @InjectRepository(Machine)
-    private repository: Repository<Machine>,
+    private readonly repository: Repository<Machine>,
   ) {}
 
   async findAll(): Promise<Machine[]> {
@@ -37,8 +37,10 @@ export class MachinesService {
 
   async update(id: string, data: Partial<Machine>, userId?: string): Promise<Machine | null> {
     this.logger.log('Mise à jour machine id: ' + id + ' par user: ' + userId);
+    // Omit 'metadata' from the update payload to avoid type incompatibility
+    const { metadata: _metadata, ...updateData } = data;
     await this.repository.update(id, {
-      ...data,
+      ...updateData,
       updated_by: userId
     });
     return this.findOne(id);
@@ -57,7 +59,7 @@ export class MachinesService {
     });
   }
 
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<{ total: number; recent: number; module: string }> {
     const total = await this.repository.count({ where: { actif: true } });
     const recent = await this.repository.count({ 
       where: { 

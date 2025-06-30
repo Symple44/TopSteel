@@ -94,7 +94,7 @@ export class ProjetsService {
     return { message: 'Timeline en cours de développement', projetId };
   }
 
-  async getStats(_user: unknown): Promise<any> {
+  async getStats(_user: unknown): Promise<{ total: number; enCours: number; termines: number; brouillons: number }> {
     const totalProjets = await this.projetsRepository.count();
     const projetsEnCours = await this.projetsRepository.count({ 
       where: { statut: ProjetStatut.EN_COURS } 

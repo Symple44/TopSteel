@@ -37,8 +37,10 @@ export class TracabiliteService {
 
   async update(id: string, data: Partial<Tracabilite>, userId?: string): Promise<Tracabilite | null> {
     this.logger.log('Mise à jour tracabilite id: ' + id + ' par user: ' + userId);
+    // Omit 'metadata' property from update payload to avoid type incompatibility
+    const { metadata: _metadata, ...updateData } = data;
     await this.repository.update(id, {
-      ...data,
+      ...updateData,
       updated_by: userId
     });
     return this.findOne(id);
