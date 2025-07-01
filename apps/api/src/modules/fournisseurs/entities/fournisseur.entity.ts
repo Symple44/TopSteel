@@ -9,7 +9,6 @@ export class Fournisseur extends BaseAuditEntity {
   nom!: string;
 
   @Column({ unique: true })
-  @Index()
   email!: string;
 
   @Column({ length: 20, nullable: true })

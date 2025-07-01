@@ -1,5 +1,5 @@
-import { IsString, IsOptional, IsNumber, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateStockDto {
   @ApiProperty({ description: 'Référence du produit' })

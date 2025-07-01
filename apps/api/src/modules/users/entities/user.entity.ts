@@ -22,7 +22,6 @@ export class User extends BaseAuditEntity {
   prenom!: string;
 
   @Column({ unique: true })
-  @Index()
   email!: string;
 
   @Column()

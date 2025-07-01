@@ -1,19 +1,20 @@
 import {
-  Body, Controller, Delete, Get, HttpCode, HttpStatus,
-  Param, ParseUUIDPipe, Patch, Post, Query, UseGuards
+  Body, Controller, Delete, Get,
+  Param,
+  ParseIntPipe,
+  Patch, Post, Query, UseGuards
 } from '@nestjs/common';
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { ProjetsService } from './projets.service';
 import { CreateProjetsDto } from './dto/create-projets.dto';
-import { UpdateProjetsDto } from './dto/update-projets.dto';
 import { ProjetsQueryDto } from './dto/projets-query.dto';
+import { UpdateProjetsDto } from './dto/update-projets.dto';
+import { ProjetsService } from './projets.service';
 
 @Controller('projets')
 @ApiTags('projets')
@@ -47,26 +48,20 @@ export class ProjetsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer un projets par ID' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.projetsService.findOne(id);
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Mettre à jour un projets' })
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateProjetsDto
   ) {
     return this.projetsService.update(id, updateDto);
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un projets' })
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return this.projetsService.remove(id);
   }
 }

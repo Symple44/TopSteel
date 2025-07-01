@@ -1,19 +1,20 @@
 import {
-  Body, Controller, Delete, Get, HttpCode, HttpStatus,
-  Param, ParseUUIDPipe, Patch, Post, Query, UseGuards
+  Body, Controller, Delete, Get,
+  Param,
+  ParseIntPipe,
+  Patch, Post, Query, UseGuards
 } from '@nestjs/common';
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentsDto } from './dto/create-documents.dto';
-import { UpdateDocumentsDto } from './dto/update-documents.dto';
 import { DocumentsQueryDto } from './dto/documents-query.dto';
+import { UpdateDocumentsDto } from './dto/update-documents.dto';
 
 @Controller('documents')
 @ApiTags('documents')
@@ -47,26 +48,20 @@ export class DocumentsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer un documents par ID' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.documentsService.findOne(id);
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Mettre à jour un documents' })
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateDocumentsDto
   ) {
     return this.documentsService.update(id, updateDto);
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un documents' })
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return this.documentsService.remove(id);
   }
 }

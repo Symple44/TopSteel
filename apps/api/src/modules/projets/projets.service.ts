@@ -5,7 +5,7 @@ import { PaginationResultDto } from '../../common/dto/base.dto';
 import { CreateProjetsDto } from './dto/create-projets.dto';
 import { ProjetsQueryDto } from './dto/projets-query.dto';
 import { UpdateProjetsDto } from './dto/update-projets.dto';
-import { Projet } from './entities/projet.entity';
+import { Projet, ProjetStatut } from './entities/projet.entity';
 
 @Injectable()
 export class ProjetsService {
@@ -23,7 +23,9 @@ export class ProjetsService {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
     const skip = (page - 1) * limit;
 
-    const queryBuilder = this.repository.createQueryBuilder('entity');
+    const queryBuilder = this.repository.createQueryBuilder('entity')
+      .leftJoinAndSelect('entity.client', 'client')
+      .leftJoinAndSelect('entity.responsable', 'responsable');
     
     if (search) {
       queryBuilder.andWhere(
@@ -32,8 +34,10 @@ export class ProjetsService {
       );
     }
 
-    if (query.actif !== undefined) {
-      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    // Supprimé: entity.actif n'existe pas dans Projet
+    // Ajout: filter par statut si nécessaire
+    if (query.statut) {
+      queryBuilder.andWhere('entity.statut = :statut', { statut: query.statut });
     }
 
     const [data, total] = await queryBuilder
@@ -55,31 +59,52 @@ export class ProjetsService {
     };
   }
 
-  async findOne(id: string): Promise<Projet> {
-    const entity = await this.repository.findOne({ where: { id } });
+  // Changé: id de string vers number
+  async findOne(id: number): Promise<Projet> {
+    const entity = await this.repository.findOne({ 
+      where: { id },
+      relations: ['client', 'responsable']
+    });
     if (!entity) {
-      throw new NotFoundException(`Projets with ID ${id} not found`);
+      throw new NotFoundException(`Projet with ID ${id} not found`);
     }
     return entity;
   }
 
-  async update(id: string, updateDto: UpdateProjetsDto): Promise<Projet> {
+  // Changé: id de string vers number
+  async update(id: number, updateDto: UpdateProjetsDto): Promise<Projet> {
     await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.repository.softDelete(id);
+  // Changé: id de string vers number + supprimé softDelete
+  async remove(id: number): Promise<void> {
+    await this.repository.delete(id);
   }
 
   async getStats(): Promise<any> {
     const total = await this.repository.count();
-    const active = await this.repository.count({ where: { actif: true } });
+    
+    // Stats basées sur les vraies propriétés de Projet
+    const byStatut = await this.repository
+      .createQueryBuilder('projet')
+      .select('projet.statut, COUNT(*) as count')
+      .groupBy('projet.statut')
+      .getRawMany();
+
+    const enCours = await this.repository.count({ 
+      where: { statut: ProjetStatut.EN_COURS } 
+    });
     
     return {
       total,
-      active,
-      inactive: total - active
+      enCours,
+      byStatut,
+      montantTotalEstime: await this.repository
+        .createQueryBuilder('projet')
+        .select('SUM(projet.montantTotal)', 'sum')
+        .getRawOne()
+        .then(result => result.sum || 0)
     };
   }
 }

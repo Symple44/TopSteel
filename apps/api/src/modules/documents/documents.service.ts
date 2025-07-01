@@ -27,14 +27,15 @@ export class DocumentsService {
     
     if (search) {
       queryBuilder.andWhere(
-        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
+        '(entity.nom ILIKE :search OR entity.type ILIKE :search)',
         { search: `%${search}%` }
       );
     }
 
-    if (query.actif !== undefined) {
-      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
-    }
+    // Supprimé: entity.actif n'existe pas dans Document
+    // if (query.actif !== undefined) {
+    //   queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    // }
 
     const [data, total] = await queryBuilder
       .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
@@ -55,31 +56,38 @@ export class DocumentsService {
     };
   }
 
-  async findOne(id: string): Promise<Document> {
+  // Changé: id de string vers number
+  async findOne(id: number): Promise<Document> {
     const entity = await this.repository.findOne({ where: { id } });
     if (!entity) {
-      throw new NotFoundException(`Documents with ID ${id} not found`);
+      throw new NotFoundException(`Document with ID ${id} not found`);
     }
     return entity;
   }
 
-  async update(id: string, updateDto: UpdateDocumentsDto): Promise<Document> {
+  // Changé: id de string vers number
+  async update(id: number, updateDto: UpdateDocumentsDto): Promise<Document> {
     await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.repository.softDelete(id);
+  // Changé: id de string vers number + supprimé softDelete
+  async remove(id: number): Promise<void> {
+    await this.repository.delete(id);
   }
 
   async getStats(): Promise<any> {
     const total = await this.repository.count();
-    const active = await this.repository.count({ where: { actif: true } });
+    // Supprimé: actif n'existe pas dans Document
     
     return {
       total,
-      active,
-      inactive: total - active
+      // Peut ajouter d'autres stats basées sur les vraies propriétés :
+      byType: await this.repository
+        .createQueryBuilder('doc')
+        .select('doc.type, COUNT(*) as count')
+        .groupBy('doc.type')
+        .getRawMany()
     };
   }
 }

@@ -1,12 +1,10 @@
-import { IsOptional, IsBoolean } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 import { BaseQueryDto } from '../../../common/dto/base.dto';
 
 export class DocumentsQueryDto extends BaseQueryDto {
-  @ApiPropertyOptional({ example: true })
+  @ApiPropertyOptional({ example: 'pdf' })
   @IsOptional()
-  @Type(() => Boolean)
-  @IsBoolean()
-  actif?: boolean;
+  @IsString()
+  type?: string;
 }

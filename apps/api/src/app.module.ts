@@ -21,21 +21,22 @@ import { AuthModule } from "./modules/auth/auth.module";
 
 // Modules métier harmonisés
 import { ClientsModule } from "./modules/clients/clients.module";
+import { CommandesModule } from './modules/commandes/commandes.module';
 import { DevisModule } from "./modules/devis/devis.module";
 import { DocumentsModule } from "./modules/documents/documents.module";
 import { FacturationModule } from "./modules/facturation/facturation.module";
 import { FournisseursModule } from "./modules/fournisseurs/fournisseurs.module";
-import { NotificationsModule } from "./modules/notifications/notifications.module";
-import { ProductionModule } from "./modules/production/production.module";
-import { ProjetsModule } from "./modules/projets/projets.module";
-import { StocksModule } from "./modules/stocks/stocks.module";
-import { UsersModule } from "./modules/users/users.module";
 import { MachinesModule } from "./modules/machines/machines.module";
 import { MaintenanceModule } from "./modules/maintenance/maintenance.module";
 import { MateriauxModule } from "./modules/materiaux/materiaux.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { PlanningModule } from "./modules/planning/planning.module";
+import { ProductionModule } from "./modules/production/production.module";
+import { ProjetsModule } from "./modules/projets/projets.module";
 import { QualiteModule } from "./modules/qualite/qualite.module";
+import { StocksModule } from "./modules/stocks/stocks.module";
 import { TracabiliteModule } from "./modules/tracabilite/tracabilite.module";
+import { UsersModule } from "./modules/users/users.module";
 
 
 // Middleware
@@ -80,6 +81,7 @@ import { AppService } from "./app.service";
     PlanningModule,
     QualiteModule,
     TracabiliteModule,
+    CommandesModule,
 
   ],
   controllers: [AppController, HealthController],
