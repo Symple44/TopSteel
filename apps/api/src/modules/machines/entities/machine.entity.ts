@@ -1,8 +1,7 @@
 // apps/api/src/modules/machines/entities/machine.entity.ts
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('machines')
-@Index(['createdAt']) // ← camelCase cohérent
 export class Machine {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

@@ -1,9 +1,7 @@
-import { Entity, Column, Index } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { BaseAuditEntity } from '../../../common/base/base.entity';
 
 @Entity('tracabilites')
-@Index(['createdAt'])
-@Index(['updatedAt'])
 export class Tracabilite extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()

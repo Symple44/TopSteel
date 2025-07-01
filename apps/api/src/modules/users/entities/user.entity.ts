@@ -1,6 +1,6 @@
-import { Entity, Column, Index, BeforeInsert, BeforeUpdate } from 'typeorm';
-import { BaseAuditEntity } from '../../../common/base/base.entity';
 import * as bcrypt from 'bcrypt';
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -12,8 +12,7 @@ export enum UserRole {
 
 @Entity('users')
 @Index(['email'], { unique: true })
-@Index(['createdAt'])
-@Index(['updatedAt'])
+
 export class User extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()

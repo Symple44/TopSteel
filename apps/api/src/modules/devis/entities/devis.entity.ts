@@ -2,8 +2,6 @@ import { Entity, Column, Index } from 'typeorm';
 import { BaseAuditEntity } from '../../../common/base/base.entity';
 
 @Entity('deviss')
-@Index(['createdAt'])
-@Index(['updatedAt'])
 export class Devis extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()
@@ -25,3 +23,4 @@ export enum DevisStatut {
   INACTIF = 'INACTIF',
   ARCHIVE = 'ARCHIVE'
 }
+

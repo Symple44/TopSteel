@@ -1,25 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Documents } from './entities/documents.entity';
-import { CreateDocumentsDto } from './dto/create-documents.dto';
-import { UpdateDocumentsDto } from './dto/update-documents.dto';
-import { DocumentsQueryDto } from './dto/documents-query.dto';
 import { PaginationResultDto } from '../../common/dto/base.dto';
+import { CreateDocumentsDto } from './dto/create-documents.dto';
+import { DocumentsQueryDto } from './dto/documents-query.dto';
+import { UpdateDocumentsDto } from './dto/update-documents.dto';
+import { Document } from './entities/document.entity';
 
 @Injectable()
 export class DocumentsService {
   constructor(
-    @InjectRepository(Documents)
-    private readonly repository: Repository<Documents>,
+    @InjectRepository(Document)
+    private readonly repository: Repository<Document>,
   ) {}
 
-  async create(createDto: CreateDocumentsDto): Promise<Documents> {
+  async create(createDto: CreateDocumentsDto): Promise<Document> {
     const entity = this.repository.create(createDto);
     return this.repository.save(entity);
   }
 
-  async findAll(query: DocumentsQueryDto): Promise<PaginationResultDto<Documents>> {
+  async findAll(query: DocumentsQueryDto): Promise<PaginationResultDto<Document>> {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
     const skip = (page - 1) * limit;
 
@@ -55,7 +55,7 @@ export class DocumentsService {
     };
   }
 
-  async findOne(id: string): Promise<Documents> {
+  async findOne(id: string): Promise<Document> {
     const entity = await this.repository.findOne({ where: { id } });
     if (!entity) {
       throw new NotFoundException(`Documents with ID ${id} not found`);
@@ -63,7 +63,7 @@ export class DocumentsService {
     return entity;
   }
 
-  async update(id: string, updateDto: UpdateDocumentsDto): Promise<Documents> {
+  async update(id: string, updateDto: UpdateDocumentsDto): Promise<Document> {
     await this.repository.update(id, updateDto);
     return this.findOne(id);
   }

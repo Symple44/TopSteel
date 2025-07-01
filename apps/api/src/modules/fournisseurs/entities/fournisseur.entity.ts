@@ -3,8 +3,6 @@ import { Column, Entity, Index } from 'typeorm';
 import { BaseAuditEntity } from '../../../common/base/base.entity';
 
 @Entity('fournisseurs')
-@Index(['createdAt'])
-@Index(['updatedAt'])
 export class Fournisseur extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()

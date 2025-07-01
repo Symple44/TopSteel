@@ -1,8 +1,7 @@
-import { Entity, Column, Index } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('machiness')
-@Index(['createdAt'])
+@Entity('machines')
 @Index(['updatedAt'])
 export class Machines extends BaseAuditEntity {
   @Column({ length: 255 })

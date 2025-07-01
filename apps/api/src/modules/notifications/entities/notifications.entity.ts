@@ -1,4 +1,4 @@
-import { Entity, Column, Index } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { BaseAuditEntity } from '../../../common/base/base.entity';
 
 export enum NotificationType {
@@ -9,8 +9,6 @@ export enum NotificationType {
 }
 
 @Entity('notifications')
-@Index(['createdAt'])
-@Index(['updatedAt'])
 export class Notifications extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()

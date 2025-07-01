@@ -1,25 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Projets } from './entities/projets.entity';
-import { CreateProjetsDto } from './dto/create-projets.dto';
-import { UpdateProjetsDto } from './dto/update-projets.dto';
-import { ProjetsQueryDto } from './dto/projets-query.dto';
 import { PaginationResultDto } from '../../common/dto/base.dto';
+import { CreateProjetsDto } from './dto/create-projets.dto';
+import { ProjetsQueryDto } from './dto/projets-query.dto';
+import { UpdateProjetsDto } from './dto/update-projets.dto';
+import { Projet } from './entities/projet.entity';
 
 @Injectable()
 export class ProjetsService {
   constructor(
-    @InjectRepository(Projets)
-    private readonly repository: Repository<Projets>,
+    @InjectRepository(Projet)
+    private readonly repository: Repository<Projet>,
   ) {}
 
-  async create(createDto: CreateProjetsDto): Promise<Projets> {
+  async create(createDto: CreateProjetsDto): Promise<Projet> {
     const entity = this.repository.create(createDto);
     return this.repository.save(entity);
   }
 
-  async findAll(query: ProjetsQueryDto): Promise<PaginationResultDto<Projets>> {
+  async findAll(query: ProjetsQueryDto): Promise<PaginationResultDto<Projet>> {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
     const skip = (page - 1) * limit;
 
@@ -55,7 +55,7 @@ export class ProjetsService {
     };
   }
 
-  async findOne(id: string): Promise<Projets> {
+  async findOne(id: string): Promise<Projet> {
     const entity = await this.repository.findOne({ where: { id } });
     if (!entity) {
       throw new NotFoundException(`Projets with ID ${id} not found`);
@@ -63,7 +63,7 @@ export class ProjetsService {
     return entity;
   }
 
-  async update(id: string, updateDto: UpdateProjetsDto): Promise<Projets> {
+  async update(id: string, updateDto: UpdateProjetsDto): Promise<Projet> {
     await this.repository.update(id, updateDto);
     return this.findOne(id);
   }

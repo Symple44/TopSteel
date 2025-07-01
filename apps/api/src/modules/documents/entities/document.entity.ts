@@ -26,3 +26,4 @@ export class Document {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
+
