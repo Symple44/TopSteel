@@ -15,7 +15,7 @@ export class AppController {
 
   @Get('version')
   @ApiOperation({ summary: 'Version de l\'API' })
-  getVersion(): any {
+  getVersion(): unknown {
     return this.appService.getVersion();
   }
 }

@@ -26,7 +26,7 @@ export class CreateNotificationDto {
   @ApiPropertyOptional({ description: 'Données additionnelles' })
   @IsObject()
   @IsOptional()
-  data?: any;
+  data?: unknown;
 
   @ApiPropertyOptional({ description: 'ID de l\'utilisateur' })
   @IsString()

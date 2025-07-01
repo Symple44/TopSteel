@@ -88,7 +88,7 @@ export class CommandesService {
     });
   }
 
-  async getStats(): Promise<any> {
+  async getStats(): Promise<unknown> {
     const total = await this.repository.count();
     
     const montantTotal = await this.repository

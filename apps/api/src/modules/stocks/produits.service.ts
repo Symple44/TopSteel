@@ -126,7 +126,7 @@ export class ProduitsService {
     }
   }
 
-  async getStats(): Promise<any> {
+  async getStats(): Promise<unknown> {
     const total = await this.repository.count();
     
     const prixMoyen = await this.repository

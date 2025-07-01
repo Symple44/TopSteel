@@ -76,7 +76,7 @@ export class NotificationsService {
     await this.repository.softDelete(id);
   }
 
-  async getStats(): Promise<any> {
+  async getStats(): Promise<unknown> {
     const total = await this.repository.count();
     const active = await this.repository.count({ where: { actif: true } });
     
