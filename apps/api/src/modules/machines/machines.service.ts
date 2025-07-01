@@ -1,115 +1,85 @@
-// apps/api/src/modules/machines/machines.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual, Repository } from 'typeorm';
-import { Machine } from './entities/machine.entity';
+import { Repository } from 'typeorm';
+import { Machines } from './entities/machines.entity';
+import { CreateMachinesDto } from './dto/create-machines.dto';
+import { UpdateMachinesDto } from './dto/update-machines.dto';
+import { MachinesQueryDto } from './dto/machines-query.dto';
+import { PaginationResultDto } from '../../common/dto/base.dto';
 
 @Injectable()
 export class MachinesService {
   constructor(
-    @InjectRepository(Machine)
-    private repository: Repository<Machine>
+    @InjectRepository(Machines)
+    private readonly repository: Repository<Machines>,
   ) {}
 
-  async findAll(): Promise<Machine[]> {
-    return this.repository.find({
-      where: { actif: true },
-      order: { createdAt: "DESC" } // ✅ CORRIGÉ : camelCase cohérent
-    });
+  async create(createDto: CreateMachinesDto): Promise<Machines> {
+    const entity = this.repository.create(createDto);
+    return this.repository.save(entity);
   }
 
-  async findOne(id: string): Promise<Machine | null> {
-    return this.repository.findOne({ where: { id, actif: true } });
-  }
+  async findAll(query: MachinesQueryDto): Promise<PaginationResultDto<Machines>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const skip = (page - 1) * limit;
 
-  async create(data: Partial<Machine>, userId?: string): Promise<Machine> {
-    const entity = this.repository.create({
-      ...data,
-      createdBy: userId, // ✅ CORRIGÉ : camelCase cohérent
-      metadata: { created_from: 'api', version: '1.0' }
-    });
-    return this.repository.save(entity); // ✅ CORRIGÉ : retourne Machine, pas Machine[]
-  }
-
-  async update(id: string, data: Partial<Machine>, userId?: string): Promise<Machine | null> {
-    const { metadata, ...updateData } = data;
+    const queryBuilder = this.repository.createQueryBuilder('entity');
     
-    await this.repository.update(id, {
-      ...updateData,
-      updatedBy: userId // ✅ CORRIGÉ : camelCase cohérent
-    });
-    return this.findOne(id);
-  }
+    if (search) {
+      queryBuilder.andWhere(
+        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
 
-  async delete(id: string, userId?: string): Promise<void> {
-    await this.repository.update(id, {
-      actif: false,
-      updatedBy: userId // ✅ CORRIGÉ : camelCase cohérent
-    });
-  }
+    if (query.actif !== undefined) {
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    }
 
-  async findByStatus(status: string): Promise<Machine[]> {
-    return this.repository.find({
-      where: { statut: status, actif: true }
-    });
-  }
-
-  async findRecent(): Promise<Machine[]> {
-    return this.repository.find({
-      where: {
-        actif: true,
-        createdAt: MoreThanOrEqual(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // ✅ CORRIGÉ : camelCase cohérent
-      }
-    });
-  }
-
-  // ✅ AJOUTÉ : Méthodes manquantes pour le contrôleur
-  async getStatistics() {
-    const total = await this.repository.count({ where: { actif: true } });
-    const enService = await this.repository.count({ 
-      where: { actif: true, statut: 'EN_SERVICE' } 
-    });
-    const enMaintenance = await this.repository.count({ 
-      where: { actif: true, statut: 'EN_MAINTENANCE' } 
-    });
-    const horsService = await this.repository.count({ 
-      where: { actif: true, statut: 'HORS_SERVICE' } 
-    });
+    const [data, total] = await queryBuilder
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
 
     return {
-      total,
-      enService,
-      enMaintenance,
-      horsService,
-      disponibilite: total > 0 ? (enService / total) * 100 : 0,
-      tauxMaintenance: total > 0 ? (enMaintenance / total) * 100 : 0
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
     };
   }
 
-  async remove(id: string, userId?: string): Promise<void> {
-    // Soft delete - marquer comme inactif au lieu de supprimer
-    await this.repository.update(id, {
-      actif: false,
-      updatedBy: userId
-    });
+  async findOne(id: string): Promise<Machines> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`Machines with ID ${id} not found`);
+    }
+    return entity;
   }
 
-  // ✅ BONUS : Méthodes utiles supplémentaires
-  async getStats() {
-    return this.getStatistics(); // Alias pour compatibilité
+  async update(id: string, updateDto: UpdateMachinesDto): Promise<Machines> {
+    await this.repository.update(id, updateDto);
+    return this.findOne(id);
   }
 
-  async findByType(typeMachine: string): Promise<Machine[]> {
-    return this.repository.find({
-      where: { typeMachine, actif: true },
-      order: { createdAt: "DESC" }
-    });
+  async remove(id: string): Promise<void> {
+    await this.repository.softDelete(id);
   }
 
-  async findByMarque(marque: string): Promise<Machine[]> {
-    return this.repository.find({
-      where: { marque, actif: true },
-      order: { createdAt: "DESC" }
-    });
+  async getStats(): Promise<any> {
+    const total = await this.repository.count();
+    const active = await this.repository.count({ where: { actif: true } });
+    
+    return {
+      total,
+      active,
+      inactive: total - active
+    };
   }
 }

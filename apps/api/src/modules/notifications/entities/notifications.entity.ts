@@ -1,56 +1,41 @@
-// apps/api/src/modules/notifications/entities/notifications.entity.ts
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-// Enum TypeScript propre
 export enum NotificationType {
-  INFO = 'info',
-  SUCCESS = 'success',
-  WARNING = 'warning',
-  ERROR = 'error',
-  PROJET_UPDATE = 'projet_update',
-  STOCK_ALERT = 'stock_alert',
-  TASK_ASSIGNED = 'task_assigned',
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS'
 }
 
 @Entity('notifications')
-@Index(['userId'])
-@Index(['projetId'])
-@Index(['type'])
 @Index(['createdAt'])
-export class Notification { // ← Singulier pour la classe
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+@Index(['updatedAt'])
+export class Notifications extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
   @Column({
     type: 'enum',
-    enum: NotificationType, // ← Enum TypeScript correct
+    enum: NotificationType,
+    default: NotificationType.INFO
   })
   type!: NotificationType;
 
-  @Column()
-  title!: string;
+  @Column({ default: true })
+  @Index()
+  actif!: boolean;
 
-  @Column({ type: 'text' })
-  message!: string;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+}
 
-  @Column('jsonb', { nullable: true })
-  data?: any;
-
-  @Column({ nullable: true })
-  userId?: string;
-
-  @Column({ nullable: true })
-  projetId?: string;
-
-  @Column({ default: false })
-  isRead!: boolean;
-
-  @Column({ type: 'timestamp', nullable: true })
-  readAt?: Date;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+export enum NotificationsStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }

@@ -14,7 +14,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(email: string, password: string): Promise<Omit<User, 'password'>> {
+  async validate(email: string, password: string): Promise<Omit<User, 'password' | 'hashPassword'>> {
     const user = await this.authService.validateUser(email, password);
     if (!user) {
       throw new UnauthorizedException('Credentials invalides');
@@ -22,3 +22,5 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     return user;
   }
 }
+
+

@@ -1,12 +1,11 @@
-// apps/api/src/modules/fournisseurs/fournisseurs.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Fournisseur } from './entities/fournisseur.entity';
-import { FournisseursController } from './fournisseurs.controller';
 import { FournisseursService } from './fournisseurs.service';
+import { FournisseursController } from './fournisseurs.controller';
+import { Fournisseurs } from './entities/fournisseurs.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Fournisseur])],
+  imports: [TypeOrmModule.forFeature([Fournisseurs])],
   controllers: [FournisseursController],
   providers: [FournisseursService],
   exports: [FournisseursService],

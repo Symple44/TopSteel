@@ -1,39 +1,72 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  Body, Controller, Delete, Get, HttpCode, HttpStatus,
+  Param, ParseUUIDPipe, Patch, Post, Query, UseGuards
+} from '@nestjs/common';
+import {
+  ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
+} from '@nestjs/swagger';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { UserRole } from '../users/entities/user.entity';
 import { MateriauxService } from './materiaux.service';
-import { Materiau } from './entities/materiaux.entity';
+import { CreateMateriauxDto } from './dto/create-materiaux.dto';
+import { UpdateMateriauxDto } from './dto/update-materiaux.dto';
+import { MateriauxQueryDto } from './dto/materiaux-query.dto';
 
 @Controller('materiaux')
+@ApiTags('materiaux')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class MateriauxController {
   constructor(private readonly materiauxService: MateriauxService) {}
 
+  @Post()
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Créer un nouveau materiaux' })
+  @ApiResponse({ status: 201, description: 'Materiaux créé avec succès' })
+  async create(@Body() createDto: CreateMateriauxDto) {
+    return this.materiauxService.create(createDto);
+  }
+
   @Get()
-  findAll() {
-    return this.materiauxService.findAll();
+  @ApiOperation({ summary: 'Lister les materiaux avec pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  async findAll(@Query() query: MateriauxQueryDto) {
+    return this.materiauxService.findAll(query);
   }
 
   @Get('stats')
-  getStatistics() {
-    return this.materiauxService.getStatistics();
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Statistiques des materiaux' })
+  async getStats() {
+    return this.materiauxService.getStats();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Récupérer un materiaux par ID' })
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.materiauxService.findOne(id);
   }
 
-  @Post()
-  create(@Body() data: Partial<Materiau>) {
-    return this.materiauxService.create(data);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: string, @Body() data: Partial<Materiau>) {
-    return this.materiauxService.update(id, data);
+  @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Mettre à jour un materiaux' })
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateDto: UpdateMateriauxDto
+  ) {
+    return this.materiauxService.update(id, updateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Supprimer un materiaux' })
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.materiauxService.remove(id);
   }
 }
-

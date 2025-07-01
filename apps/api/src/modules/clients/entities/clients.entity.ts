@@ -1,26 +1,36 @@
-// apps/api/src/modules/clients/entities/clients.entity.ts
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
 @Entity('clients')
-export class Client {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
-  @Column()
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Clients extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
   nom!: string;
 
-  @Column()
-  email!: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
-  @Column({ nullable: true })
+  @Column({ default: true })
+  @Index()
+  actif!: boolean;
+
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+
+  @Column({ length: 255, nullable: true })
+  email?: string;
+
+  @Column({ length: 20, nullable: true })
   telephone?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   adresse?: string;
+}
 
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+export enum ClientsStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }

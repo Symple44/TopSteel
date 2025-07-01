@@ -1,51 +1,104 @@
-// apps/api/src/modules/users/users.service.ts
-import { Injectable } from '@nestjs/common';
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { UserQueryDto } from './dto/user-query.dto';
+import { PaginationResultDto } from '../../common/dto/base.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) 
-    private usersRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly repository: Repository<User>,
   ) {}
 
-  async findOne(id: number): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { id } });
+  async create(createDto: CreateUserDto): Promise<User> {
+    // Vérifier l'unicité de l'email
+    const existingUser = await this.findByEmail(createDto.email);
+    if (existingUser) {
+      throw new ConflictException('Un utilisateur avec cet email existe déjà');
+    }
+
+    const entity = this.repository.create(createDto);
+    return this.repository.save(entity);
+  }
+
+  async findAll(query: UserQueryDto): Promise<PaginationResultDto<User>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.repository.createQueryBuilder('entity');
+    
+    if (search) {
+      queryBuilder.andWhere(
+        '(entity.nom ILIKE :search OR entity.prenom ILIKE :search OR entity.email ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    if (query.actif !== undefined) {
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    }
+
+    if (query.role) {
+      queryBuilder.andWhere('entity.role = :role', { role: query.role });
+    }
+
+    const [data, total] = await queryBuilder
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
+    };
+  }
+
+  async findOne(id: string): Promise<User> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return entity;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email } });
+    return this.repository.findOne({ where: { email } });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.usersRepository.create(createUserDto);
-    return this.usersRepository.save(user);
+  async update(id: string, updateDto: UpdateUserDto): Promise<User> {
+    await this.repository.update(id, updateDto);
+    return this.findOne(id);
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
-    await this.usersRepository.update(id, updateUserDto);
-    const user = await this.findOne(id);
-    if (!user) {
-      throw new NotFoundException('User with ID ' + id + ' not found');
-    }
-    return user;
+  async remove(id: string): Promise<void> {
+    await this.repository.softDelete(id);
   }
 
-  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
-    await this.usersRepository.update(userId, { refreshToken: refreshToken || undefined });
+  async updateRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
+    await this.repository.update(userId, { refreshToken: refreshToken || undefined });
   }
 
-  async findAll(): Promise<User[]> {
-    return this.usersRepository.find();
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
+  async getStats(): Promise<any> {
+    const total = await this.repository.count();
+    const active = await this.repository.count({ where: { actif: true } });
+    
+    return {
+      total,
+      active,
+      inactive: total - active
+    };
   }
 }
-

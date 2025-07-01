@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Maintenance } from './entities/maintenance.entity';
-import { MaintenanceController } from './maintenance.controller';
 import { MaintenanceService } from './maintenance.service';
+import { MaintenanceController } from './maintenance.controller';
+import { Maintenance } from './entities/maintenance.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Maintenance])],

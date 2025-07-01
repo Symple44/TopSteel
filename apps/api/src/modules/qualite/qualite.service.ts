@@ -1,69 +1,85 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual, Repository } from 'typeorm';
-import { ControleQualite } from './entities/qualite.entity';
+import { Repository } from 'typeorm';
+import { Qualite } from './entities/qualite.entity';
+import { CreateQualiteDto } from './dto/create-qualite.dto';
+import { UpdateQualiteDto } from './dto/update-qualite.dto';
+import { QualiteQueryDto } from './dto/qualite-query.dto';
+import { PaginationResultDto } from '../../common/dto/base.dto';
 
 @Injectable()
 export class QualiteService {
-  private readonly logger = new Logger(QualiteService.name);
-
   constructor(
-    @InjectRepository(ControleQualite)
-    private readonly repository: Repository<ControleQualite>,
+    @InjectRepository(Qualite)
+    private readonly repository: Repository<Qualite>,
   ) {}
 
-  async findAll(): Promise<ControleQualite[]> {
-    this.logger.log('Récupération de tous les controlequalite');
-    return this.repository.find({ 
-      where: { actif: true }, 
-      order: { created_at: "DESC" } 
-    });
-  }
-
-  async findOne(id: string): Promise<ControleQualite | null> {
-    this.logger.log('Récupération controlequalite id: ' + id);
-    return this.repository.findOne({ where: { id } });
-  }
-
-  async create(data: Partial<ControleQualite>, userId?: string): Promise<ControleQualite> {
-    this.logger.log('Création nouveau controlequalite par user: ' + userId);
-    const entity = this.repository.create({
-      ...data,
-      created_by: userId,
-      metadata: { created_from: 'api', version: '1.0' }
-    });
+  async create(createDto: CreateQualiteDto): Promise<Qualite> {
+    const entity = this.repository.create(createDto);
     return this.repository.save(entity);
   }
 
-  async update(id: string, data: Partial<ControleQualite>, userId?: string): Promise<ControleQualite | null> {
-    this.logger.log('Mise à jour controlequalite id: ' + id + ' par user: ' + userId);
-    // Omit 'metadata' from update payload to avoid type incompatibility
-    const { metadata: _metadata, ...updateData } = data;
-    await this.repository.update(id, {
-      ...updateData,
-      updated_by: userId
-    });
+  async findAll(query: QualiteQueryDto): Promise<PaginationResultDto<Qualite>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.repository.createQueryBuilder('entity');
+    
+    if (search) {
+      queryBuilder.andWhere(
+        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    if (query.actif !== undefined) {
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    }
+
+    const [data, total] = await queryBuilder
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
+    };
+  }
+
+  async findOne(id: string): Promise<Qualite> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`Qualite with ID ${id} not found`);
+    }
+    return entity;
+  }
+
+  async update(id: string, updateDto: UpdateQualiteDto): Promise<Qualite> {
+    await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
 
-  async remove(id: string, userId?: string): Promise<void> {
-    this.logger.log('Suppression logique controlequalite id: ' + id + ' par user: ' + userId);
-    await this.repository.update(id, { 
-      actif: false,
-      updated_by: userId 
-    });
+  async remove(id: string): Promise<void> {
+    await this.repository.softDelete(id);
   }
 
-  async getStatistics(): Promise<{ total: number; recent: number; module: string }> {
-    const total = await this.repository.count({ where: { actif: true } });
-    const recent = await this.repository.count({ 
-      where: { 
-        actif: true,
-        created_at: MoreThanOrEqual(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-      } 
-    });
+  async getStats(): Promise<any> {
+    const total = await this.repository.count();
+    const active = await this.repository.count({ where: { actif: true } });
     
-    return { total, recent, module: 'controlequalite' };
+    return {
+      total,
+      active,
+      inactive: total - active
+    };
   }
 }
-

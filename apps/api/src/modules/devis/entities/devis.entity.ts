@@ -1,37 +1,27 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('devis')
-@Index(['numero'])
-@Index(['clientId'])
-@Index(['projetId'])
-export class Devis {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+@Entity('deviss')
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Devis extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
 
-  @Column({ unique: true })
-  numero!: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
-  @Column({ nullable: true })
-  projetId?: string;
+  @Column({ default: true })
+  @Index()
+  actif!: boolean;
 
-  @Column({ nullable: true })
-  clientId?: string;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+}
 
-  @Column({ type: 'timestamp', nullable: true })
-  dateValidite?: Date;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true, default: 0 })
-  totalHT?: number;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true, default: 0 })
-  totalTTC?: number;
-
-  @Column({ enum: ['BROUILLON', 'ENVOYE', 'ACCEPTE', 'REFUSE', 'EXPIRE'], default: 'BROUILLON' })
-  statut?: string;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+export enum DevisStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }

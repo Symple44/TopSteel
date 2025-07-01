@@ -1,36 +1,27 @@
-import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreateProductionDto {
-  @ApiProperty({ description: 'Numéro de l\'ordre' })
+  @ApiProperty({ example: 'Nom du production', minLength: 2, maxLength: 255 })
   @IsString()
-  numero!: string;
+  @MinLength(2)
+  @MaxLength(255)
+  @Transform(({ value }) => value?.trim())
+  nom!: string;
 
-  @ApiPropertyOptional({ description: 'ID du projet' })
-  @IsString()
+  @ApiPropertyOptional({ example: 'Description détaillée' })
   @IsOptional()
-  projetId?: string;
-
-  @ApiProperty({ description: 'Statut de production' })
-  @IsEnum(['EN_ATTENTE', 'PLANIFIE', 'EN_COURS', 'TERMINE', 'ANNULE', 'PAUSE'])
-  statut!: string;
-
-  @ApiPropertyOptional({ description: 'Description' })
   @IsString()
-  @IsOptional()
+  @MaxLength(2000)
   description?: string;
 
-  @ApiProperty({ description: 'Priorité' })
-  @IsEnum(['BASSE', 'NORMALE', 'HAUTE', 'URGENTE'])
-  priorite!: string;
-
-  @ApiPropertyOptional({ description: 'Date de début' })
-  @IsDateString()
+  @ApiPropertyOptional({ example: true })
   @IsOptional()
-  dateDebut?: string;
+  @IsBoolean()
+  actif?: boolean = true;
 
-  @ApiPropertyOptional({ description: 'Date de fin' })
-  @IsDateString()
+  @ApiPropertyOptional()
   @IsOptional()
-  dateFin?: string;
+  metadata?: Record<string, any>;
 }

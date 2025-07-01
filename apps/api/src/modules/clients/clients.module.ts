@@ -1,12 +1,11 @@
-// apps/api/src/modules/clients/clients.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ClientsController } from './clients.controller';
 import { ClientsService } from './clients.service';
-import { Client } from './entities/clients.entity';
+import { ClientsController } from './clients.controller';
+import { Clients } from './entities/clients.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Client])], 
+  imports: [TypeOrmModule.forFeature([Clients])],
   controllers: [ClientsController],
   providers: [ClientsService],
   exports: [ClientsService],

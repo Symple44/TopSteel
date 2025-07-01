@@ -1,43 +1,59 @@
-// apps/api/src/modules/users/entities/user.entity.ts
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
+import * as bcrypt from 'bcrypt';
 
 export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  MANAGER = 'manager',
-  COMMERCIAL = 'commercial'
+  ADMIN = 'ADMIN',
+  MANAGER = 'MANAGER',
+  COMMERCIAL = 'COMMERCIAL',
+  TECHNICIEN = 'TECHNICIEN',
+  OPERATEUR = 'OPERATEUR'
 }
 
 @Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id!: number;
+@Index(['email'], { unique: true })
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class User extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
+
+  @Column({ length: 255 })
+  prenom!: string;
 
   @Column({ unique: true })
+  @Index()
   email!: string;
 
   @Column()
   password!: string;
 
-  @Column()
-  nom!: string;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.OPERATEUR
+  })
+  role!: UserRole;
 
-  @Column()
-  prenom!: string;
+  @Column({ default: true })
+  @Index()
+  actif!: boolean;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
 
   @Column({ nullable: true })
   refreshToken?: string;
 
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.USER
-  })
-  role!: UserRole;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password && !this.password.startsWith('$2b$')) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+  }
 }

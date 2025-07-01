@@ -1,149 +1,85 @@
-// apps/api/src/modules/maintenance/maintenance.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Maintenance } from './entities/maintenance.entity';
+import { CreateMaintenanceDto } from './dto/create-maintenance.dto';
+import { UpdateMaintenanceDto } from './dto/update-maintenance.dto';
+import { MaintenanceQueryDto } from './dto/maintenance-query.dto';
+import { PaginationResultDto } from '../../common/dto/base.dto';
 
 @Injectable()
 export class MaintenanceService {
   constructor(
     @InjectRepository(Maintenance)
-    private repository: Repository<Maintenance>
+    private readonly repository: Repository<Maintenance>,
   ) {}
 
-  async findAll(): Promise<Maintenance[]> {
-    return this.repository.find({
-      where: { actif: true },
-      order: { createdAt: "DESC" } // ✅ CORRIGÉ : camelCase cohérent
-    });
+  async create(createDto: CreateMaintenanceDto): Promise<Maintenance> {
+    const entity = this.repository.create(createDto);
+    return this.repository.save(entity);
   }
 
-  async findOne(id: string): Promise<Maintenance | null> {
-    return this.repository.findOne({ where: { id, actif: true } });
-  }
+  async findAll(query: MaintenanceQueryDto): Promise<PaginationResultDto<Maintenance>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const skip = (page - 1) * limit;
 
-  async create(data: Partial<Maintenance>, userId?: string): Promise<Maintenance> {
-    const entity = this.repository.create({
-      ...data,
-      createdBy: userId, // ✅ CORRIGÉ : camelCase cohérent
-      metadata: { created_from: 'api', version: '1.0' }
-    });
-    return this.repository.save(entity); // ✅ CORRIGÉ : retourne Maintenance, pas Maintenance[]
-  }
-
-  async update(id: string, data: Partial<Maintenance>, userId?: string): Promise<Maintenance | null> {
-    const { metadata, ...updateData } = data;
+    const queryBuilder = this.repository.createQueryBuilder('entity');
     
-    await this.repository.update(id, {
-      ...updateData,
-      updatedBy: userId // ✅ CORRIGÉ : camelCase cohérent
-    });
-    return this.findOne(id);
-  }
+    if (search) {
+      queryBuilder.andWhere(
+        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
 
-  async delete(id: string, userId?: string): Promise<void> {
-    await this.repository.update(id, {
-      actif: false,
-      updatedBy: userId // ✅ CORRIGÉ : camelCase cohérent
-    });
-  }
+    if (query.actif !== undefined) {
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+    }
 
-  async findByStatus(status: string): Promise<Maintenance[]> {
-    return this.repository.find({
-      where: { typeMaintenance: status, actif: true } // ✅ CORRIGÉ : camelCase cohérent
-    });
-  }
-
-  async findRecent(): Promise<Maintenance[]> {
-    return this.repository.find({
-      where: {
-        actif: true,
-        createdAt: MoreThanOrEqual(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // ✅ CORRIGÉ : camelCase cohérent
-      }
-    });
-  }
-
-  // ✅ AJOUTÉ : Méthodes manquantes pour le contrôleur
-  async getStatistics() {
-    const total = await this.repository.count({ where: { actif: true } });
-    const preventive = await this.repository.count({ 
-      where: { actif: true, typeMaintenance: 'PREVENTIVE' } 
-    });
-    const corrective = await this.repository.count({ 
-      where: { actif: true, typeMaintenance: 'CORRECTIVE' } 
-    });
-    const urgent = await this.repository.count({ 
-      where: { actif: true, typeMaintenance: 'URGENT' } 
-    });
-
-    // Calcul des moyennes de coût
-    const avgCost = await this.repository
-      .createQueryBuilder('maintenance')
-      .select('AVG(CAST(maintenance.cout AS DECIMAL))', 'avgCost')
-      .where('maintenance.actif = :actif', { actif: true })
-      .andWhere('maintenance.cout IS NOT NULL')
-      .getRawOne();
+    const [data, total] = await queryBuilder
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
 
     return {
-      total,
-      preventive,
-      corrective,
-      urgent,
-      repartition: {
-        preventive: total > 0 ? (preventive / total) * 100 : 0,
-        corrective: total > 0 ? (corrective / total) * 100 : 0,
-        urgent: total > 0 ? (urgent / total) * 100 : 0
-      },
-      coutMoyen: parseFloat(avgCost?.avgCost || '0')
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
     };
   }
 
-  async remove(id: string, userId?: string): Promise<void> {
-    // Soft delete - marquer comme inactif au lieu de supprimer
-    await this.repository.update(id, {
-      actif: false,
-      updatedBy: userId
-    });
+  async findOne(id: string): Promise<Maintenance> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`Maintenance with ID ${id} not found`);
+    }
+    return entity;
   }
 
-  // ✅ BONUS : Méthodes utiles supplémentaires
-  async getStats() {
-    return this.getStatistics(); // Alias pour compatibilité
+  async update(id: string, updateDto: UpdateMaintenanceDto): Promise<Maintenance> {
+    await this.repository.update(id, updateDto);
+    return this.findOne(id);
   }
 
-  async findByMachine(machineId: string): Promise<Maintenance[]> {
-    return this.repository.find({
-      where: { machineId, actif: true },
-      order: { createdAt: "DESC" }
-    });
+  async remove(id: string): Promise<void> {
+    await this.repository.softDelete(id);
   }
 
-  async findByTechnician(technicienId: string): Promise<Maintenance[]> {
-    return this.repository.find({
-      where: { technicienId, actif: true },
-      order: { createdAt: "DESC" }
-    });
-  }
-
-  async findPlanned(): Promise<Maintenance[]> {
-    return this.repository.find({
-      where: { 
-        actif: true,
-        dateProgrammee: MoreThanOrEqual(new Date())
-      },
-      order: { dateProgrammee: "ASC" }
-    });
-  }
-
-  async findOverdue(): Promise<Maintenance[]> {
-    const today = new Date();
-    return this.repository.find({
-      where: { 
-        actif: true,
-        dateProgrammee: MoreThanOrEqual(today),
-        dateRealisee: null
-      },
-      order: { dateProgrammee: "ASC" }
-    });
+  async getStats(): Promise<any> {
+    const total = await this.repository.count();
+    const active = await this.repository.count({ where: { actif: true } });
+    
+    return {
+      total,
+      active,
+      inactive: total - active
+    };
   }
 }

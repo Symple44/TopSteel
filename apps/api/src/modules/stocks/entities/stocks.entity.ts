@@ -1,49 +1,27 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('stocks')
-@Index(['reference'])
-@Index(['designation'])
-@Index(['emplacement'])
-export class Stocks {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column({ unique: true })
-  reference!: string;
-
-  @Column()
-  designation!: string;
+@Entity('stockss')
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Stocks extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column('decimal', { precision: 10, scale: 3, default: 0 })
-  quantiteStock?: number;
-
-  @Column('decimal', { precision: 10, scale: 3, default: 0 })
-  quantiteMin?: number;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true })
-  prixAchat?: number;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true })
-  prixVente?: number;
-
-  @Column({ nullable: true })
-  emplacement?: string;
-
-  @Column({ nullable: true })
-  fournisseurId?: string;
-
-  @Column({ nullable: true })
-  categorieId?: string;
-
   @Column({ default: true })
+  @Index()
   actif!: boolean;
 
-  @CreateDateColumn()
-  createdAt!: Date;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+}
 
-  @UpdateDateColumn()
-  updatedAt!: Date;
+export enum StocksStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }

@@ -1,21 +1,50 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsEmail, IsOptional, IsBoolean, IsEnum, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { UserRole } from '../entities/user.entity';
 
 export class CreateUserDto {
-  @ApiProperty()
+  @ApiProperty({ example: 'Dupont', minLength: 2, maxLength: 255 })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(255)
+  @Transform(({ value }) => value?.trim())
+  nom!: string;
+
+  @ApiProperty({ example: 'Jean', minLength: 2, maxLength: 255 })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(255)
+  @Transform(({ value }) => value?.trim())
+  prenom!: string;
+
+  @ApiProperty({ example: 'jean.dupont@example.com' })
   @IsEmail()
+  @Transform(({ value }) => value?.toLowerCase().trim())
   email!: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'motdepasse123', minLength: 6 })
   @IsString()
   @MinLength(6)
   password!: string;
 
-  @ApiProperty()
-  @IsString()
-  nom!: string;
+  @ApiPropertyOptional({ enum: UserRole, default: UserRole.OPERATEUR })
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole = UserRole.OPERATEUR;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
+  @IsBoolean()
+  actif?: boolean = true;
+
+  @ApiPropertyOptional({ example: 'Description de l\'utilisateur' })
+  @IsOptional()
   @IsString()
-  prenom!: string;
+  @MaxLength(2000)
+  description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  metadata?: Record<string, any>;
 }

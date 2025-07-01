@@ -27,7 +27,7 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
-  user: Omit<User, 'password' | 'refreshToken'>;
+  user: Omit<User, 'password' | 'refreshToken' | 'hashPassword'>;
 }
 
 @Injectable()
@@ -45,7 +45,7 @@ export class AuthService {
   /**
    * Valide les credentials d'un utilisateur
    */
-  async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null> {
+  async validateUser(email: string, password: string): Promise<Omit<User, 'password' | 'hashPassword'> | null> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       return null;
@@ -167,14 +167,14 @@ export class AuthService {
   /**
    * Déconnexion utilisateur
    */
-  async logout(userId: number): Promise<void> {
+  async logout(userId: string): Promise<void> {
     await this.usersService.updateRefreshToken(userId, null);
   }
 
   /**
    * Récupérer le profil utilisateur depuis le token
    */
-  async getProfile(userId: number): Promise<Omit<User, 'password' | 'refreshToken'>> {
+  async getProfile(userId: string): Promise<Omit<User, 'password' | 'refreshToken' | 'hashPassword'>> {
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new UnauthorizedException('Utilisateur non trouvé');
@@ -187,7 +187,7 @@ export class AuthService {
   /**
    * Changer le mot de passe
    */
-  async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
+  async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<void> {
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new UnauthorizedException('Utilisateur non trouvé');
@@ -219,9 +219,9 @@ export class AuthService {
   /**
    * Générer access token et refresh token
    */
-  private async generateTokens(user: Omit<User, 'password'>): Promise<Pick<AuthResponse, 'accessToken' | 'refreshToken' | 'expiresIn'>> {
+  private async generateTokens(user: Omit<User, 'password' | 'hashPassword'>): Promise<Pick<AuthResponse, 'accessToken' | 'refreshToken' | 'expiresIn'>> {
     const payload: JwtPayload = {
-      sub: user.id,
+      sub: parseInt(user.id) || 0,
       email: user.email,
       role: user.role,
     };
@@ -256,7 +256,7 @@ export class AuthService {
   /**
    * Mettre à jour le refresh token hashé en base
    */
-  private async updaterefreshTokenHash(userId: number, refreshToken: string): Promise<void> {
+  private async updaterefreshTokenHash(userId: string, refreshToken: string): Promise<void> {
     const hashedrefreshToken = await bcrypt.hash(refreshToken, this.saltRounds);
     await this.usersService.updateRefreshToken(userId, hashedrefreshToken);
   }
@@ -292,5 +292,6 @@ export class AuthService {
     }
   }
 }
+
 
 

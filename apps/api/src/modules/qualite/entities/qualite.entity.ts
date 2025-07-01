@@ -1,46 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
-@Entity('controle_qualite')
-export class ControleQualite {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+@Entity('qualites')
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Qualite extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
+  nom!: string;
 
-  @Column({ nullable: true })
-  ordre_fabrication_id?: string;
-
-  @Column({ nullable: true })
-  type_controle?: string;
-
-  @Column({ nullable: true })
-  norme_reference?: string;
-
-  @Column({ nullable: true })
-  resultat?: string;
-
-  @Column({ nullable: true })
-  conforme?: string;
-
-  @Column({ nullable: true })
-  observateur_id?: string;
-
-  @Column({ nullable: true })
-  certificat_path?: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
   @Column({ default: true })
+  @Index()
   actif!: boolean;
 
-  @CreateDateColumn()
-  created_at!: Date;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+}
 
-  @UpdateDateColumn()
-  updated_at!: Date;
-
-  @Column({ nullable: true })
-  created_by?: string;
-
-  @Column({ nullable: true })
-  updated_by?: string;
-
-  @Column('jsonb', { nullable: true })
-  metadata?: Record<string, unknown>;
+export enum QualiteStatut {
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE'
 }
