@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { Injectable, Logger } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class IntegrityService {
@@ -14,20 +14,22 @@ export class IntegrityService {
 
   @Cron(CronExpression.EVERY_HOUR)
   async performAutomaticCheck() {
-    this.logger.log('Début du contrôle d\'intégrité automatique');
-    
+    this.logger.log("Début du contrôle d'intégrité automatique");
+
     try {
       const results = await this.performFullCheck();
-      
+
       if (results.errors.length > 0) {
-        this.logger.error(`Erreurs d'intégrité détectées: ${results.errors.length}`);
+        this.logger.error(
+          `Erreurs d'intégrité détectées: ${results.errors.length}`,
+        );
       } else {
-        this.logger.log('Contrôle d\'intégrité OK');
+        this.logger.log("Contrôle d'intégrité OK");
       }
-      
+
       return results;
     } catch (error) {
-      this.logger.error('Erreur lors du contrôle d\'intégrité', error);
+      this.logger.error("Erreur lors du contrôle d'intégrité", error);
       throw error;
     }
   }
@@ -41,7 +43,7 @@ export class IntegrityService {
       business: await this.checkBusinessRules(),
       errors: [],
       warnings: [],
-      recommendations: []
+      recommendations: [],
     };
 
     results.duration = Date.now() - startTime;
@@ -56,18 +58,18 @@ export class IntegrityService {
       business: {
         totalProjects: await this.getProjectCount(),
         totalClients: await this.getClientCount(),
-      }
+      },
     };
 
     return metrics;
   }
 
   private async checkDatabaseIntegrity() {
-    return { status: 'ok' };
+    return { status: "ok" };
   }
 
   private async checkBusinessRules() {
-    return { status: 'ok' };
+    return { status: "ok" };
   }
 
   private async getActiveConnections() {
@@ -77,17 +79,22 @@ export class IntegrityService {
         FROM pg_stat_activity 
         WHERE state = 'active'
       `);
-      return parseInt(result[0]?.connections ?? '0');
+      return parseInt(result[0]?.connections ?? "0");
     } catch (_error) {
-      this.logger.error('Erreur lors de la récupération du nombre de clients', _error);
+      this.logger.error(
+        "Erreur lors de la récupération du nombre de clients",
+        _error,
+      );
       return 0;
     }
   }
 
   private async getProjectCount() {
     try {
-      const result = await this.dataSource.query('SELECT COUNT(*) as count FROM projets');
-      return parseInt(result[0]?.count ?? '0');
+      const result = await this.dataSource.query(
+        "SELECT COUNT(*) as count FROM projets",
+      );
+      return parseInt(result[0]?.count ?? "0");
     } catch (_error) {
       return 0;
     }
@@ -95,12 +102,12 @@ export class IntegrityService {
 
   private async getClientCount() {
     try {
-      const result = await this.dataSource.query('SELECT COUNT(*) as count FROM clients');
-      return parseInt(result[0]?.count ?? '0');
+      const result = await this.dataSource.query(
+        "SELECT COUNT(*) as count FROM clients",
+      );
+      return parseInt(result[0]?.count ?? "0");
     } catch (_error) {
       return 0;
     }
   }
 }
-
-

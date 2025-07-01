@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Planning } from './entities/planning.entity';
-import { CreatePlanningDto } from './dto/create-planning.dto';
-import { UpdatePlanningDto } from './dto/update-planning.dto';
-import { PlanningQueryDto } from './dto/planning-query.dto';
-import { PaginationResultDto } from '../../common/dto/base.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Planning } from "./entities/planning.entity";
+import { CreatePlanningDto } from "./dto/create-planning.dto";
+import { UpdatePlanningDto } from "./dto/update-planning.dto";
+import { PlanningQueryDto } from "./dto/planning-query.dto";
+import { PaginationResultDto } from "../../common/dto/base.dto";
 
 @Injectable()
 export class PlanningService {
@@ -19,25 +19,33 @@ export class PlanningService {
     return this.repository.save(entity);
   }
 
-  async findAll(query: PlanningQueryDto): Promise<PaginationResultDto<Planning>> {
-    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+  async findAll(
+    query: PlanningQueryDto,
+  ): Promise<PaginationResultDto<Planning>> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = query;
     const skip = (page - 1) * limit;
 
-    const queryBuilder = this.repository.createQueryBuilder('entity');
-    
+    const queryBuilder = this.repository.createQueryBuilder("entity");
+
     if (search) {
       queryBuilder.andWhere(
-        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
-        { search: `%${search}%` }
+        "(entity.nom ILIKE :search OR entity.description ILIKE :search)",
+        { search: `%${search}%` },
       );
     }
 
     if (query.actif !== undefined) {
-      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+      queryBuilder.andWhere("entity.actif = :actif", { actif: query.actif });
     }
 
     const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
       .skip(skip)
       .take(limit)
       .getManyAndCount();
@@ -50,8 +58,8 @@ export class PlanningService {
         total,
         totalPages: Math.ceil(total / limit),
         hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     };
   }
 
@@ -75,11 +83,11 @@ export class PlanningService {
   async getStats(): Promise<unknown> {
     const total = await this.repository.count();
     const active = await this.repository.count({ where: { actif: true } });
-    
+
     return {
       total,
       active,
-      inactive: total - active
+      inactive: total - active,
     };
   }
 }

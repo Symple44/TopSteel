@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsNumber, IsDateString } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsNumber, IsDateString } from "class-validator";
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 
 export class ProjetQueryDto {
   @ApiPropertyOptional()

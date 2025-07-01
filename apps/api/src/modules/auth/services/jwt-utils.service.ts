@@ -1,9 +1,9 @@
 // apps/api/src/modules/auth/services/jwt-utils.service.ts
-import { Inject, Injectable } from '@nestjs/common'; // ← Ajouter Inject
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { Redis } from 'ioredis';
-import { JwtPayload } from '../auth.service';
+import { Inject, Injectable } from "@nestjs/common"; // ← Ajouter Inject
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import { Redis } from "ioredis";
+import { JwtPayload } from "../auth.service";
 
 export interface TokenInfo {
   isValid: boolean;
@@ -28,20 +28,23 @@ export class JwtUtilsService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @Inject('REDIS_CLIENT') private readonly redisClient: Redis, // ← Corriger l'injection
+    @Inject("REDIS_CLIENT") private readonly redisClient: Redis, // ← Corriger l'injection
   ) {}
 
   /**
    * Vérifie un token sans lever d'exception
    */
-  async verifyTokenSafely(token: string, isrefreshToken = false): Promise<TokenInfo> {
+  async verifyTokenSafely(
+    token: string,
+    isrefreshToken = false,
+  ): Promise<TokenInfo> {
     try {
       const secret = isrefreshToken
-        ? this.configService.get<string>('jwt.refreshSecret')
-        : this.configService.get<string>('jwt.secret');
+        ? this.configService.get<string>("jwt.refreshSecret")
+        : this.configService.get<string>("jwt.secret");
 
       const payload = await this.jwtService.verifyAsync(token, { secret });
-      
+
       return {
         isValid: true,
         isExpired: false,
@@ -57,7 +60,10 @@ export class JwtUtilsService {
   /**
    * Handles expired or invalid token cases for verifyTokenSafely
    */
-  private handleExpiredOrInvalidToken(token: string, error: unknown): TokenInfo {
+  private handleExpiredOrInvalidToken(
+    token: string,
+    error: unknown,
+  ): TokenInfo {
     const isExpired = this.isTokenExpiredError(error);
 
     if (isExpired) {
@@ -70,22 +76,36 @@ export class JwtUtilsService {
     return {
       isValid: false,
       isExpired,
-      error: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : 'Unknown error',
+      error:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Unknown error",
     };
   }
 
   private isTokenExpiredError(error: unknown): boolean {
-    return typeof error === 'object' && error !== null && 'name' in error && (error as { name: string }).name === 'TokenExpiredError';
+    return (
+      typeof error === "object" &&
+      error !== null &&
+      "name" in error &&
+      (error as { name: string }).name === "TokenExpiredError"
+    );
   }
 
-  private buildExpiredTokenInfo(decoded: ExtendedJwtPayload, error: unknown): TokenInfo {
+  private buildExpiredTokenInfo(
+    decoded: ExtendedJwtPayload,
+    error: unknown,
+  ): TokenInfo {
     return {
       isValid: false,
       isExpired: true,
       expiresAt: decoded.exp ? new Date(decoded.exp * 1000) : undefined,
       issuedAt: decoded.iat ? new Date(decoded.iat * 1000) : undefined,
       payload: decoded,
-      error: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : 'Unknown error',
+      error:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Unknown error",
     };
   }
 
@@ -109,7 +129,7 @@ export class JwtUtilsService {
       const exists = await this.redisClient.exists(`blacklist:${jti}`);
       return exists === 1;
     } catch (error) {
-      console.error('Error checking token blacklist:', error);
+      console.error("Error checking token blacklist:", error);
       return false; // En cas d'erreur Redis, on ne bloque pas
     }
   }
@@ -120,16 +140,19 @@ export class JwtUtilsService {
   async blacklistToken(jti: string, expiresAt?: Date): Promise<void> {
     try {
       const key = `blacklist:${jti}`;
-      
+
       if (expiresAt) {
-        const ttl = Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / 1000));
-        await this.redisClient.setex(key, ttl, '1');
+        const ttl = Math.max(
+          0,
+          Math.floor((expiresAt.getTime() - Date.now()) / 1000),
+        );
+        await this.redisClient.setex(key, ttl, "1");
       } else {
         // TTL par défaut de 24h si pas d'expiration fournie
-        await this.redisClient.setex(key, 86400, '1');
+        await this.redisClient.setex(key, 86400, "1");
       }
     } catch (error) {
-      console.error('Error blacklisting token:', error);
+      console.error("Error blacklisting token:", error);
       // Ne pas lever d'exception pour ne pas bloquer la déconnexion
     }
   }
@@ -141,7 +164,7 @@ export class JwtUtilsService {
     try {
       await this.redisClient.del(`blacklist:${jti}`);
     } catch (error) {
-      console.error('Error removing token from blacklist:', error);
+      console.error("Error removing token from blacklist:", error);
     }
   }
 

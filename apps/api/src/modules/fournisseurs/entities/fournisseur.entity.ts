@@ -1,8 +1,8 @@
 // fournisseur.entity.ts - Version corrigée
-import { Column, Entity, Index } from 'typeorm';
-import { BaseAuditEntity } from '../../../common/base/base.entity';
+import { Column, Entity, Index } from "typeorm";
+import { BaseAuditEntity } from "../../../common/base/base.entity";
 
-@Entity('fournisseurs')
+@Entity("fournisseurs")
 export class Fournisseur extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()
@@ -14,7 +14,7 @@ export class Fournisseur extends BaseAuditEntity {
   @Column({ length: 20, nullable: true })
   telephone?: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   adresse?: string;
 
   @Column({ length: 14, nullable: true })
@@ -24,5 +24,3 @@ export class Fournisseur extends BaseAuditEntity {
   @Index()
   actif!: boolean;
 }
-
-

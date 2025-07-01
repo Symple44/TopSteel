@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Devis } from './entities/devis.entity';
-import { CreateDevisDto } from './dto/create-devis.dto';
-import { UpdateDevisDto } from './dto/update-devis.dto';
-import { DevisQueryDto } from './dto/devis-query.dto';
-import { PaginationResultDto } from '../../common/dto/base.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Devis } from "./entities/devis.entity";
+import { CreateDevisDto } from "./dto/create-devis.dto";
+import { UpdateDevisDto } from "./dto/update-devis.dto";
+import { DevisQueryDto } from "./dto/devis-query.dto";
+import { PaginationResultDto } from "../../common/dto/base.dto";
 
 @Injectable()
 export class DevisService {
@@ -20,24 +20,30 @@ export class DevisService {
   }
 
   async findAll(query: DevisQueryDto): Promise<PaginationResultDto<Devis>> {
-    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = query;
     const skip = (page - 1) * limit;
 
-    const queryBuilder = this.repository.createQueryBuilder('entity');
-    
+    const queryBuilder = this.repository.createQueryBuilder("entity");
+
     if (search) {
       queryBuilder.andWhere(
-        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
-        { search: `%${search}%` }
+        "(entity.nom ILIKE :search OR entity.description ILIKE :search)",
+        { search: `%${search}%` },
       );
     }
 
     if (query.actif !== undefined) {
-      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+      queryBuilder.andWhere("entity.actif = :actif", { actif: query.actif });
     }
 
     const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
       .skip(skip)
       .take(limit)
       .getManyAndCount();
@@ -50,8 +56,8 @@ export class DevisService {
         total,
         totalPages: Math.ceil(total / limit),
         hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     };
   }
 
@@ -75,11 +81,11 @@ export class DevisService {
   async getStats(): Promise<unknown> {
     const total = await this.repository.count();
     const active = await this.repository.count({ where: { actif: true } });
-    
+
     return {
       total,
       active,
-      inactive: total - active
+      inactive: total - active,
     };
   }
 }

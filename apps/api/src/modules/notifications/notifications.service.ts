@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Notifications } from './entities/notifications.entity';
-import { CreateNotificationsDto } from './dto/create-notifications.dto';
-import { UpdateNotificationsDto } from './dto/update-notifications.dto';
-import { NotificationsQueryDto } from './dto/notifications-query.dto';
-import { PaginationResultDto } from '../../common/dto/base.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Notifications } from "./entities/notifications.entity";
+import { CreateNotificationsDto } from "./dto/create-notifications.dto";
+import { UpdateNotificationsDto } from "./dto/update-notifications.dto";
+import { NotificationsQueryDto } from "./dto/notifications-query.dto";
+import { PaginationResultDto } from "../../common/dto/base.dto";
 
 @Injectable()
 export class NotificationsService {
@@ -19,29 +19,37 @@ export class NotificationsService {
     return this.repository.save(entity);
   }
 
-  async findAll(query: NotificationsQueryDto): Promise<PaginationResultDto<Notifications>> {
-    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+  async findAll(
+    query: NotificationsQueryDto,
+  ): Promise<PaginationResultDto<Notifications>> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = query;
     const skip = (page - 1) * limit;
 
-    const queryBuilder = this.repository.createQueryBuilder('entity');
-    
+    const queryBuilder = this.repository.createQueryBuilder("entity");
+
     if (search) {
       queryBuilder.andWhere(
-        '(entity.nom ILIKE :search OR entity.description ILIKE :search)',
-        { search: `%${search}%` }
+        "(entity.nom ILIKE :search OR entity.description ILIKE :search)",
+        { search: `%${search}%` },
       );
     }
 
     if (query.actif !== undefined) {
-      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif });
+      queryBuilder.andWhere("entity.actif = :actif", { actif: query.actif });
     }
 
     if (query.type) {
-      queryBuilder.andWhere('entity.type = :type', { type: query.type });
+      queryBuilder.andWhere("entity.type = :type", { type: query.type });
     }
 
     const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
       .skip(skip)
       .take(limit)
       .getManyAndCount();
@@ -54,8 +62,8 @@ export class NotificationsService {
         total,
         totalPages: Math.ceil(total / limit),
         hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     };
   }
 
@@ -67,7 +75,10 @@ export class NotificationsService {
     return entity;
   }
 
-  async update(id: string, updateDto: UpdateNotificationsDto): Promise<Notifications> {
+  async update(
+    id: string,
+    updateDto: UpdateNotificationsDto,
+  ): Promise<Notifications> {
     await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
@@ -79,11 +90,11 @@ export class NotificationsService {
   async getStats(): Promise<unknown> {
     const total = await this.repository.count();
     const active = await this.repository.count({ where: { actif: true } });
-    
+
     return {
       total,
       active,
-      inactive: total - active
+      inactive: total - active,
     };
   }
 }

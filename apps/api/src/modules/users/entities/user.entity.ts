@@ -1,18 +1,17 @@
-import * as bcrypt from 'bcrypt';
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index } from 'typeorm';
-import { BaseAuditEntity } from '../../../common/base/base.entity';
+import * as bcrypt from "bcrypt";
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index } from "typeorm";
+import { BaseAuditEntity } from "../../../common/base/base.entity";
 
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  MANAGER = 'MANAGER',
-  COMMERCIAL = 'COMMERCIAL',
-  TECHNICIEN = 'TECHNICIEN',
-  OPERATEUR = 'OPERATEUR'
+  ADMIN = "ADMIN",
+  MANAGER = "MANAGER",
+  COMMERCIAL = "COMMERCIAL",
+  TECHNICIEN = "TECHNICIEN",
+  OPERATEUR = "OPERATEUR",
 }
 
-@Entity('users')
-@Index(['email'], { unique: true })
-
+@Entity("users")
+@Index(["email"], { unique: true })
 export class User extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()
@@ -28,9 +27,9 @@ export class User extends BaseAuditEntity {
   password!: string;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: UserRole,
-    default: UserRole.OPERATEUR
+    default: UserRole.OPERATEUR,
   })
   role!: UserRole;
 
@@ -38,10 +37,10 @@ export class User extends BaseAuditEntity {
   @Index()
   actif!: boolean;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   description?: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: "jsonb", nullable: true })
   metadata?: Record<string, unknown>;
 
   @Column({ nullable: true })
@@ -50,7 +49,7 @@ export class User extends BaseAuditEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    if (this.password && !this.password.startsWith('$2b$')) {
+    if (this.password && !this.password.startsWith("$2b$")) {
       this.password = await bcrypt.hash(this.password, 10);
     }
   }

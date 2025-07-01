@@ -4,13 +4,13 @@ import {
   ConflictException,
   Injectable,
   UnauthorizedException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { User, UserRole } from '../users/entities/user.entity';
-import { UsersService } from '../users/users.service';
-import { LoginDto, RefreshTokenDto, RegisterDto } from './dto/login.dto';
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
+import { User, UserRole } from "../users/entities/user.entity";
+import { UsersService } from "../users/users.service";
+import { LoginDto, RefreshTokenDto, RegisterDto } from "./dto/login.dto";
 
 export interface JwtPayload {
   sub: number;
@@ -27,14 +27,14 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
-  user: Omit<User, 'password' | 'refreshToken' | 'hashPassword'>;
+  user: Omit<User, "password" | "refreshToken" | "hashPassword">;
 }
 
 @Injectable()
 export class AuthService {
   private readonly saltRounds = 10;
-  private readonly accessTokenExpiry = '15m';
-  private readonly refreshTokenExpiry = '7d';
+  private readonly accessTokenExpiry = "15m";
+  private readonly refreshTokenExpiry = "7d";
 
   constructor(
     private readonly usersService: UsersService,
@@ -45,7 +45,10 @@ export class AuthService {
   /**
    * Valide les credentials d'un utilisateur
    */
-  async validateUser(email: string, password: string): Promise<Omit<User, 'password' | 'hashPassword'> | null> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<Omit<User, "password" | "hashPassword"> | null> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       return null;
@@ -69,7 +72,7 @@ export class AuthService {
     // Valider l'utilisateur
     const user = await this.validateUser(email, password);
     if (!user) {
-      throw new UnauthorizedException('Email ou mot de passe incorrect');
+      throw new UnauthorizedException("Email ou mot de passe incorrect");
     }
 
     // Générer les tokens
@@ -79,7 +82,7 @@ export class AuthService {
     await this.updaterefreshTokenHash(user.id, tokens.refreshToken);
 
     const { refreshToken: _, ...userWithoutrefreshToken } = user;
-    
+
     return {
       ...tokens,
       user: userWithoutrefreshToken,
@@ -95,7 +98,7 @@ export class AuthService {
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
-      throw new ConflictException('Un utilisateur avec cet email existe déjà');
+      throw new ConflictException("Un utilisateur avec cet email existe déjà");
     }
 
     // Valider la force du mot de passe
@@ -118,7 +121,11 @@ export class AuthService {
     // Sauvegarder le refresh token hashé
     await this.updaterefreshTokenHash(newUser.id, tokens.refreshToken);
 
-    const { password: _, refreshToken: __, ...userWithoutSensitiveData } = newUser;
+    const {
+      password: _,
+      refreshToken: __,
+      ...userWithoutSensitiveData
+    } = newUser;
 
     return {
       ...tokens,
@@ -129,25 +136,30 @@ export class AuthService {
   /**
    * Rafraîchir les tokens
    */
-  async refreshTokens(refreshTokenDto: RefreshTokenDto): Promise<Pick<AuthResponse, 'accessToken' | 'refreshToken' | 'expiresIn'>> {
+  async refreshTokens(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<Pick<AuthResponse, "accessToken" | "refreshToken" | "expiresIn">> {
     const { refreshToken } = refreshTokenDto;
 
     try {
       // Vérifier le refresh token
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get('jwt.refreshSecret'),
+        secret: this.configService.get("jwt.refreshSecret"),
       });
 
       // Récupérer l'utilisateur
       const user = await this.usersService.findOne(payload.sub);
       if (!user?.refreshToken) {
-        throw new UnauthorizedException('Token invalide');
+        throw new UnauthorizedException("Token invalide");
       }
 
       // Vérifier si le refresh token correspond
-      const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
+      const refreshTokenMatches = await bcrypt.compare(
+        refreshToken,
+        user.refreshToken,
+      );
       if (!refreshTokenMatches) {
-        throw new UnauthorizedException('Token invalide');
+        throw new UnauthorizedException("Token invalide");
       }
 
       // Générer de nouveaux tokens
@@ -159,8 +171,8 @@ export class AuthService {
       return tokens;
     } catch (_error) {
       // Log the error for debugging purposes
-      console.error('Error during token refresh:', _error);
-      throw new UnauthorizedException('Token invalide ou expiré');
+      console.error("Error during token refresh:", _error);
+      throw new UnauthorizedException("Token invalide ou expiré");
     }
   }
 
@@ -174,29 +186,39 @@ export class AuthService {
   /**
    * Récupérer le profil utilisateur depuis le token
    */
-  async getProfile(userId: string): Promise<Omit<User, 'password' | 'refreshToken' | 'hashPassword'>> {
+  async getProfile(
+    userId: string,
+  ): Promise<Omit<User, "password" | "refreshToken" | "hashPassword">> {
     const user = await this.usersService.findOne(userId);
     if (!user) {
-      throw new UnauthorizedException('Utilisateur non trouvé');
+      throw new UnauthorizedException("Utilisateur non trouvé");
     }
 
-    const { password: _password, refreshToken: _refreshToken, ...userWithoutSensitive } = user;
+    const {
+      password: _password,
+      refreshToken: _refreshToken,
+      ...userWithoutSensitive
+    } = user;
     return userWithoutSensitive;
   }
 
   /**
    * Changer le mot de passe
    */
-  async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<void> {
+  async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<void> {
     const user = await this.usersService.findOne(userId);
     if (!user) {
-      throw new UnauthorizedException('Utilisateur non trouvé');
+      throw new UnauthorizedException("Utilisateur non trouvé");
     }
 
     // Vérifier l'ancien mot de passe
     const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isOldPasswordValid) {
-      throw new UnauthorizedException('Ancien mot de passe incorrect');
+      throw new UnauthorizedException("Ancien mot de passe incorrect");
     }
 
     // Valider le nouveau mot de passe
@@ -219,7 +241,9 @@ export class AuthService {
   /**
    * Générer access token et refresh token
    */
-  private async generateTokens(user: Omit<User, 'password' | 'hashPassword'>): Promise<Pick<AuthResponse, 'accessToken' | 'refreshToken' | 'expiresIn'>> {
+  private async generateTokens(
+    user: Omit<User, "password" | "hashPassword">,
+  ): Promise<Pick<AuthResponse, "accessToken" | "refreshToken" | "expiresIn">> {
     const payload: JwtPayload = {
       sub: parseInt(user.id) || 0,
       email: user.email,
@@ -229,12 +253,12 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       // Access Token (courte durée)
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get('jwt.secret'),
+        secret: this.configService.get("jwt.secret"),
         expiresIn: this.accessTokenExpiry,
       }),
       // Refresh Token (longue durée)
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get('jwt.refreshSecret'),
+        secret: this.configService.get("jwt.refreshSecret"),
         expiresIn: this.refreshTokenExpiry,
       }),
     ]);
@@ -256,7 +280,10 @@ export class AuthService {
   /**
    * Mettre à jour le refresh token hashé en base
    */
-  private async updaterefreshTokenHash(userId: string, refreshToken: string): Promise<void> {
+  private async updaterefreshTokenHash(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
     const hashedrefreshToken = await bcrypt.hash(refreshToken, this.saltRounds);
     await this.usersService.updateRefreshToken(userId, hashedrefreshToken);
   }
@@ -272,26 +299,33 @@ export class AuthService {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
     if (password.length < minLength) {
-      throw new BadRequestException(`Le mot de passe doit contenir au moins ${minLength} caractères`);
+      throw new BadRequestException(
+        `Le mot de passe doit contenir au moins ${minLength} caractères`,
+      );
     }
 
     if (!hasUpperCase) {
-      throw new BadRequestException('Le mot de passe doit contenir au moins une lettre majuscule');
+      throw new BadRequestException(
+        "Le mot de passe doit contenir au moins une lettre majuscule",
+      );
     }
 
     if (!hasLowerCase) {
-      throw new BadRequestException('Le mot de passe doit contenir au moins une lettre minuscule');
+      throw new BadRequestException(
+        "Le mot de passe doit contenir au moins une lettre minuscule",
+      );
     }
 
     if (!hasNumbers) {
-      throw new BadRequestException('Le mot de passe doit contenir au moins un chiffre');
+      throw new BadRequestException(
+        "Le mot de passe doit contenir au moins un chiffre",
+      );
     }
 
     if (!hasSpecialChar) {
-      throw new BadRequestException('Le mot de passe doit contenir au moins un caractère spécial');
+      throw new BadRequestException(
+        "Le mot de passe doit contenir au moins un caractère spécial",
+      );
     }
   }
 }
-
-
-

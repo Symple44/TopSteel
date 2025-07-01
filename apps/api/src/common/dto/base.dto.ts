@@ -1,10 +1,17 @@
-import { IsOptional, IsString, IsNumber, Min, Max, IsEnum } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  Min,
+  Max,
+  IsEnum,
+} from "class-validator";
+import { Transform, Type } from "class-transformer";
+import { ApiPropertyOptional } from "@nestjs/swagger";
 
 export enum SortOrder {
-  ASC = 'ASC',
-  DESC = 'DESC'
+  ASC = "ASC",
+  DESC = "DESC",
 }
 
 export class BaseQueryDto {
@@ -29,10 +36,10 @@ export class BaseQueryDto {
   @Transform(({ value }) => value?.trim())
   search?: string;
 
-  @ApiPropertyOptional({ example: 'createdAt' })
+  @ApiPropertyOptional({ example: "createdAt" })
   @IsOptional()
   @IsString()
-  sortBy?: string = 'createdAt';
+  sortBy?: string = "createdAt";
 
   @ApiPropertyOptional({ enum: SortOrder })
   @IsOptional()

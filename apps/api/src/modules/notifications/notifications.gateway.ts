@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
@@ -7,28 +7,30 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+} from "@nestjs/websockets";
+import { Server, Socket } from "socket.io";
 
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL ?? "http://localhost:3000",
     credentials: true,
   },
 })
-export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class NotificationsGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server!: Server;
 
   private readonly connectedClients = new Map<string, Socket>();
 
   handleConnection(client: Socket) {
-    console.info('Client connected:', client.id);
+    console.info("Client connected:", client.id);
   }
 
   handleDisconnect(client: Socket) {
-    console.info('Client disconnected:', client.id);
+    console.info("Client disconnected:", client.id);
     for (const [userId, socket] of this.connectedClients.entries()) {
       if (socket.id === client.id) {
         this.connectedClients.delete(userId);
@@ -37,8 +39,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     }
   }
 
-  @SubscribeMessage('join')
-  handleJoin(@MessageBody() data: { userId: string }, @ConnectedSocket() client: Socket) {
+  @SubscribeMessage("join")
+  handleJoin(
+    @MessageBody() data: { userId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
     this.connectedClients.set(data.userId, client);
   }
 
@@ -62,7 +67,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
       const token = client.handshake.auth.token;
       if (!token) return null;
       // Example: decode JWT token to extract userId (replace with your actual logic)
-      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      const payload = JSON.parse(
+        Buffer.from(token.split(".")[1], "base64").toString(),
+      );
       return payload.userId ?? null;
     } catch {
       return null;
@@ -78,4 +85,3 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     return null;
   }
 }
-

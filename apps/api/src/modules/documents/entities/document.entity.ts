@@ -1,6 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity('documents')
+@Entity("documents")
 export class Document {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -26,4 +32,3 @@ export class Document {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
-

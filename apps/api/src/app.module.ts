@@ -8,8 +8,8 @@ import { TerminusModule } from "@nestjs/terminus";
 import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import jwtConfig from "./config/jwt.config";
-import redisConfig from './config/redis.config';
-import { RedisModule } from './redis/redis.module';
+import redisConfig from "./config/redis.config";
+import { RedisModule } from "./redis/redis.module";
 
 // Modules système
 import { DatabaseModule } from "./database/database.module";
@@ -21,7 +21,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 
 // Modules métier harmonisés
 import { ClientsModule } from "./modules/clients/clients.module";
-import { CommandesModule } from './modules/commandes/commandes.module';
+import { CommandesModule } from "./modules/commandes/commandes.module";
 import { DevisModule } from "./modules/devis/devis.module";
 import { DocumentsModule } from "./modules/documents/documents.module";
 import { FacturationModule } from "./modules/facturation/facturation.module";
@@ -38,7 +38,6 @@ import { StocksModule } from "./modules/stocks/stocks.module";
 import { TracabiliteModule } from "./modules/tracabilite/tracabilite.module";
 import { UsersModule } from "./modules/users/users.module";
 
-
 // Middleware
 import { LoggerMiddleware } from "./common/middleware/logger.middleware";
 
@@ -54,16 +53,16 @@ import { AppService } from "./app.service";
       load: [appConfig, databaseConfig, jwtConfig, redisConfig],
       expandVariables: true,
     }),
-    
+
     // Modules système
     DatabaseModule,
     ScheduleModule.forRoot(),
     TerminusModule,
     RedisModule,
-    
+
     // Authentification
     AuthModule,
-    
+
     // Modules métier
     ClientsModule,
     DevisModule,
@@ -82,13 +81,12 @@ import { AppService } from "./app.service";
     QualiteModule,
     TracabiliteModule,
     CommandesModule,
-
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, IntegrityService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(LoggerMiddleware).forRoutes("*");
   }
 }

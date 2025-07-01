@@ -1,9 +1,15 @@
 // apps/api/src/modules/machines/entities/machine.entity.ts
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity('machines')
+@Entity("machines")
 export class Machine {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column({ nullable: true })
@@ -27,10 +33,10 @@ export class Machine {
   @Column({ nullable: true })
   statut?: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: "date", nullable: true })
   dateMiseService?: Date; // ← Type Date cohérent
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: "date", nullable: true })
   prochaineMaintenance?: Date; // ← Type Date cohérent
 
   @Column({ default: true })
@@ -49,6 +55,6 @@ export class Machine {
   updatedBy?: string; // ← camelCase cohérent
 
   // Métadonnées pour l'audit
-  @Column('jsonb', { nullable: true })
+  @Column("jsonb", { nullable: true })
   metadata?: Record<string, unknown>;
 }

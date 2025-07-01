@@ -4,10 +4,10 @@ import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import compression from "compression";
-import { config } from 'dotenv';
-import { existsSync } from 'fs';
-import helmet from 'helmet';
-import { join } from 'path';
+import { config } from "dotenv";
+import { existsSync } from "fs";
+import helmet from "helmet";
+import { join } from "path";
 import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
@@ -16,47 +16,53 @@ import { TransformInterceptor } from "./common/interceptors/transform.intercepto
 // ============================================================================
 // CHARGEMENT VARIABLES D'ENVIRONNEMENT MONOREPO
 // ============================================================================
-console.info('🔧 __dirname:', __dirname);
-const rootDir = join(__dirname, '../../../');
-const envLocalPath = join(rootDir, '.env.local');
-console.info('🔧 Tentative de chargement .env.local depuis:', envLocalPath);
-console.info('🔧 Fichier .env.local existe?', existsSync(envLocalPath));
+console.info("🔧 __dirname:", __dirname);
+const rootDir = join(__dirname, "../../../");
+const envLocalPath = join(rootDir, ".env.local");
+console.info("🔧 Tentative de chargement .env.local depuis:", envLocalPath);
+console.info("🔧 Fichier .env.local existe?", existsSync(envLocalPath));
 
 config({ path: envLocalPath });
-config({ path: join(rootDir, '.env') });
+config({ path: join(rootDir, ".env") });
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
-  
+  const logger = new Logger("Bootstrap");
+
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    logger: ["error", "warn", "log", "debug", "verbose"],
   });
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>("app.port", 3001);
   const env = configService.get<string>("app.env", "development");
-  const corsOrigin = configService.get<string>("app.corsOrigin", "http://localhost:3000");
+  const corsOrigin = configService.get<string>(
+    "app.corsOrigin",
+    "http://localhost:3000",
+  );
 
   // ============================================================================
   // SÉCURITÉ ET MIDDLEWARE
   // ============================================================================
-  
+
   // Helmet pour la sécurité
   app.use(
     helmet({
-      contentSecurityPolicy: env === "production" ? {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          scriptSrc: ["'self'"],
-          imgSrc: ["'self'", "data:", "blob:"],
-          connectSrc: ["'self'"],
-          fontSrc: ["'self'"],
-          objectSrc: ["'none'"],
-          mediaSrc: ["'self'"],
-          frameSrc: ["'none'"],
-        },
-      } : false,
+      contentSecurityPolicy:
+        env === "production"
+          ? {
+              directives: {
+                defaultSrc: ["'self'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                scriptSrc: ["'self'"],
+                imgSrc: ["'self'", "data:", "blob:"],
+                connectSrc: ["'self'"],
+                fontSrc: ["'self'"],
+                objectSrc: ["'none'"],
+                mediaSrc: ["'self'"],
+                frameSrc: ["'none'"],
+              },
+            }
+          : false,
       crossOriginEmbedderPolicy: env === "production",
       crossOriginOpenerPolicy: { policy: "same-origin" },
       crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -64,7 +70,7 @@ async function bootstrap() {
       frameguard: { action: "deny" },
       hidePoweredBy: true,
       hsts: env === "production",
-    })
+    }),
   );
 
   // Compression pour les performances
@@ -74,26 +80,26 @@ async function bootstrap() {
   app.enableCors({
     origin: corsOrigin,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   });
 
   // Prefix global pour l'API
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix("api");
 
   // ============================================================================
   // CONFIGURATION VERSIONING V1/V2
   // ============================================================================
-  
+
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: '1', // V1 par défaut pour commencer
+    defaultVersion: "1", // V1 par défaut pour commencer
   });
 
   // ============================================================================
   // VALIDATION ET INTERCEPTORS GLOBAUX
   // ============================================================================
-  
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -106,7 +112,7 @@ async function bootstrap() {
         target: false,
         value: false,
       },
-    })
+    }),
   );
 
   // Interceptors globaux
@@ -119,12 +125,13 @@ async function bootstrap() {
   // ============================================================================
   // DOCUMENTATION SWAGGER COMPLÈTE V1/V2
   // ============================================================================
-  
+
   if (env !== "production") {
     // Documentation API V1 (Version par défaut actuelle)
     const configV1 = new DocumentBuilder()
-      .setTitle('🏭 TopSteel ERP API v1')
-      .setDescription(`
+      .setTitle("🏭 TopSteel ERP API v1")
+      .setDescription(
+        `
         **API de gestion métallurgique industrielle - Version 1**
         
         📍 **URLs disponibles:**
@@ -135,52 +142,54 @@ async function bootstrap() {
         🔐 **Authentification:**
         - Bearer Token JWT requis pour la plupart des endpoints
         - Utilisez \`/api/auth/login\` pour obtenir un token
-      `)
-      .setVersion('1.0.0')
+      `,
+      )
+      .setVersion("1.0.0")
       .setContact(
-        'Équipe TopSteel',
-        'https://oweo-consulting.fr',
-        'support@oweo-consulting.fr'
+        "Équipe TopSteel",
+        "https://oweo-consulting.fr",
+        "support@oweo-consulting.fr",
       )
       .addBearerAuth(
         {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          name: 'JWT',
-          description: 'Token JWT obtenu via /api/auth/login',
-          in: 'header',
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          name: "JWT",
+          description: "Token JWT obtenu via /api/auth/login",
+          in: "header",
         },
-        'JWT-auth'
+        "JWT-auth",
       )
-      .addTag('🔐 Auth', 'Authentification et autorisation')
-      .addTag('👤 Users', 'Gestion des utilisateurs et rôles')
-      .addTag('🏢 Clients', 'Gestion de la clientèle et CRM')
-      .addTag('🚚 Fournisseurs', 'Gestion des fournisseurs')
-      .addTag('📁 Projets', 'Gestion des projets métallurgiques')
-      .addTag('🛒 Commandes', 'Gestion des commandes fournisseurs')
-      .addTag('🏭 Production', 'Gestion de la production et fabrication')
-      .addTag('🏭 Ordre de fabrication', 'Gestion des ordres de fabrication')
-      .addTag('📦 Stocks', 'Gestion des stocks et inventaire')
-      .addTag('📦 Produits', 'Gestion des produits')
-      .addTag('🔧 Machines', 'Gestion du parc machines')
-      .addTag('⚙️ Maintenance', 'Planification et suivi maintenance')
-      .addTag('🧱 Matériaux', 'Catalogue des matériaux')
-      .addTag('📅 Planning', 'Planification et calendrier')
-      .addTag('✅ Qualité', 'Contrôle qualité et conformité')
-      .addTag('📋 Traçabilité', 'Traçabilité des produits')
-      .addTag('💰 Devis', 'Création et gestion des devis')
-      .addTag('🧾 Facturation', 'Facturation et comptabilité')
-      .addTag('📄 Documents', 'Gestion électronique de documents')
-      .addTag('🔔 Notifications', 'Système de notifications')
-      .addServer(`http://localhost:${port}/`, 'Serveur de développement')
-      .addServer(`http://localhost:${port}/v1`, 'API V1 explicite')
+      .addTag("🔐 Auth", "Authentification et autorisation")
+      .addTag("👤 Users", "Gestion des utilisateurs et rôles")
+      .addTag("🏢 Clients", "Gestion de la clientèle et CRM")
+      .addTag("🚚 Fournisseurs", "Gestion des fournisseurs")
+      .addTag("📁 Projets", "Gestion des projets métallurgiques")
+      .addTag("🛒 Commandes", "Gestion des commandes fournisseurs")
+      .addTag("🏭 Production", "Gestion de la production et fabrication")
+      .addTag("🏭 Ordre de fabrication", "Gestion des ordres de fabrication")
+      .addTag("📦 Stocks", "Gestion des stocks et inventaire")
+      .addTag("📦 Produits", "Gestion des produits")
+      .addTag("🔧 Machines", "Gestion du parc machines")
+      .addTag("⚙️ Maintenance", "Planification et suivi maintenance")
+      .addTag("🧱 Matériaux", "Catalogue des matériaux")
+      .addTag("📅 Planning", "Planification et calendrier")
+      .addTag("✅ Qualité", "Contrôle qualité et conformité")
+      .addTag("📋 Traçabilité", "Traçabilité des produits")
+      .addTag("💰 Devis", "Création et gestion des devis")
+      .addTag("🧾 Facturation", "Facturation et comptabilité")
+      .addTag("📄 Documents", "Gestion électronique de documents")
+      .addTag("🔔 Notifications", "Système de notifications")
+      .addServer(`http://localhost:${port}/`, "Serveur de développement")
+      .addServer(`http://localhost:${port}/v1`, "API V1 explicite")
       .build();
 
     // Documentation API V2 (Future - préparation)
     const configV2 = new DocumentBuilder()
-      .setTitle('🏭 TopSteel ERP API v2')
-      .setDescription(`
+      .setTitle("🏭 TopSteel ERP API v2")
+      .setDescription(
+        `
         **API de gestion métallurgique industrielle - Version 2 (Préparation)**
         
         🚀 **Nouvelles fonctionnalités V2:**
@@ -190,37 +199,40 @@ async function bootstrap() {
         - Nouveaux endpoints d'analytics
         
         ✨ **Améliorations:** Performances, sécurité et nouvelles fonctionnalités
-      `)
-      .setVersion('2.0.0-beta')
+      `,
+      )
+      .setVersion("2.0.0-beta")
       .setContact(
-        'Équipe TopSteel',
-        'https://topsteel.com',
-        'support@topsteel.com'
+        "Équipe TopSteel",
+        "https://topsteel.com",
+        "support@topsteel.com",
       )
       .addBearerAuth(
         {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          name: 'JWT',
-          description: 'Token JWT obtenu via /api/auth/login',
-          in: 'header',
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          name: "JWT",
+          description: "Token JWT obtenu via /api/auth/login",
+          in: "header",
         },
-        'JWT-auth'
+        "JWT-auth",
       )
-      .addTag('🔐 Auth V2', 'Authentification améliorée')
-      .addTag('👤 Users V2', 'Gestion utilisateurs avec analytics')
-      .addTag('📊 Analytics', 'Tableaux de bord et métriques (Nouveau)')
-      .addServer(`http://localhost:${port}/v2`, 'API V2 (Bêta)')
+      .addTag("🔐 Auth V2", "Authentification améliorée")
+      .addTag("👤 Users V2", "Gestion utilisateurs avec analytics")
+      .addTag("📊 Analytics", "Tableaux de bord et métriques (Nouveau)")
+      .addServer(`http://localhost:${port}/v2`, "API V2 (Bêta)")
       .build();
 
     // Génération des documents Swagger
     const documentV1 = SwaggerModule.createDocument(app, configV1, {
-      operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+      operationIdFactory: (controllerKey: string, methodKey: string) =>
+        methodKey,
     });
-    
+
     const documentV2 = SwaggerModule.createDocument(app, configV2, {
-      operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+      operationIdFactory: (controllerKey: string, methodKey: string) =>
+        methodKey,
     });
 
     // Configuration des endpoints de documentation
@@ -228,11 +240,11 @@ async function bootstrap() {
       swaggerOptions: {
         persistAuthorization: true,
         displayRequestDuration: true,
-        docExpansion: 'none',
+        docExpansion: "none",
         filter: true,
         showRequestHeaders: true,
         syntaxHighlight: {
-          theme: 'tomorrow-night'
+          theme: "tomorrow-night",
         },
         tryItOutEnabled: true,
       },
@@ -241,27 +253,33 @@ async function bootstrap() {
         .swagger-ui .info .title { color: #1976d2; }
         .swagger-ui .scheme-container { background: #f5f5f5; padding: 10px; }
       `,
-      customSiteTitle: 'TopSteel ERP API Documentation',
+      customSiteTitle: "TopSteel ERP API Documentation",
     };
 
     // Setup documentation V1 (défaut)
-    SwaggerModule.setup('api/docs', app, documentV1, swaggerOptions);
-    
+    SwaggerModule.setup("api/docs", app, documentV1, swaggerOptions);
+
     // Setup documentation V1 explicite
-    SwaggerModule.setup('api/v1/docs', app, documentV1, {
+    SwaggerModule.setup("api/v1/docs", app, documentV1, {
       ...swaggerOptions,
-      customSiteTitle: 'TopSteel ERP API v1 Documentation',
-    });
-    
-    // Setup documentation V2 (future)
-    SwaggerModule.setup('api/v2/docs', app, documentV2, {
-      ...swaggerOptions,
-      customSiteTitle: 'TopSteel ERP API v2 Documentation (Beta)',
+      customSiteTitle: "TopSteel ERP API v1 Documentation",
     });
 
-    logger.log(`📚 Documentation Swagger V1 (défaut): http://localhost:${port}/api/docs`);
-    logger.log(`📚 Documentation Swagger V1 explicite: http://localhost:${port}/api/v1/docs`);
-    logger.log(`📚 Documentation Swagger V2 (beta): http://localhost:${port}/api/v2/docs`);
+    // Setup documentation V2 (future)
+    SwaggerModule.setup("api/v2/docs", app, documentV2, {
+      ...swaggerOptions,
+      customSiteTitle: "TopSteel ERP API v2 Documentation (Beta)",
+    });
+
+    logger.log(
+      `📚 Documentation Swagger V1 (défaut): http://localhost:${port}/api/docs`,
+    );
+    logger.log(
+      `📚 Documentation Swagger V1 explicite: http://localhost:${port}/api/v1/docs`,
+    );
+    logger.log(
+      `📚 Documentation Swagger V2 (beta): http://localhost:${port}/api/v2/docs`,
+    );
   }
 
   // Graceful shutdown
@@ -281,30 +299,30 @@ async function bootstrap() {
   // ============================================================================
   // LOGS DE DÉMARRAGE INFORMATIFS
   // ============================================================================
-  
-  logger.log('');
-  logger.log('🏭 ===============================================');
-  logger.log('🏭           TOPSTEEL ERP API');
-  logger.log('🏭 ===============================================');
+
+  logger.log("");
+  logger.log("🏭 ===============================================");
+  logger.log("🏭           TOPSTEEL ERP API");
+  logger.log("🏭 ===============================================");
   logger.log(`🚀 Serveur démarré: http://localhost:${port}`);
   logger.log(`🌟 Environnement: ${env}`);
   logger.log(`🔗 CORS Origin: ${corsOrigin}`);
-  logger.log('');
-  logger.log('📍 URLs API disponibles:');
+  logger.log("");
+  logger.log("📍 URLs API disponibles:");
   logger.log(`   • /api/users           → V1 (défaut actuel)`);
   logger.log(`   • /api/v1/users        → V1 explicite`);
   logger.log(`   • /api/v2/users        → V2 (future)`);
-  logger.log('');
-  logger.log('📚 Documentation Swagger:');
+  logger.log("");
+  logger.log("📚 Documentation Swagger:");
   logger.log(`   • /api/docs           → V1 (défaut)`);
   logger.log(`   • /api/v1/docs        → V1 explicite`);
   logger.log(`   • /api/v2/docs        → V2 (beta)`);
-  logger.log('');
-  logger.log('📊 Monitoring:');
+  logger.log("");
+  logger.log("📊 Monitoring:");
   logger.log(`   • /health             → Health check`);
-  logger.log('');
-  logger.log('🏭 ===============================================');
-  logger.log('');
+  logger.log("");
+  logger.log("🏭 ===============================================");
+  logger.log("");
 }
 
 bootstrap().catch((error) => {

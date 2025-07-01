@@ -4,13 +4,13 @@ import {
   Injectable,
   Logger,
   UnauthorizedException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { AuthGuard } from "@nestjs/passport";
+import { Observable } from "rxjs";
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
+export class JwtAuthGuard extends AuthGuard("jwt") {
   private readonly logger = new Logger(JwtAuthGuard.name);
 
   constructor(private readonly reflector: Reflector) {
@@ -21,7 +21,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     // Vérifier si la route est marquée comme publique
-    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+    const isPublic = this.reflector.getAllAndOverride<boolean>("isPublic", [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -40,29 +40,29 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     user: TUser,
     info: { name?: string; message?: string } | undefined,
     context: ExecutionContext,
-    _status?: unknown
+    _status?: unknown,
   ): TUser {
     const request = context.switchToHttp().getRequest();
-    
+
     // Log des tentatives d'accès en développement
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       this.logger.debug(`Auth attempt: ${request.method} ${request.url}`);
     }
 
     // Gestion des erreurs spécifiques
     if (err || !user) {
-      let errorMessage = 'Accès non autorisé';
-      
+      let errorMessage = "Accès non autorisé";
+
       if (info) {
         switch (info.name) {
-          case 'JsonWebTokenError':
-            errorMessage = 'Token JWT malformé';
+          case "JsonWebTokenError":
+            errorMessage = "Token JWT malformé";
             break;
-          case 'TokenExpiredError':
-            errorMessage = 'Token expiré';
+          case "TokenExpiredError":
+            errorMessage = "Token expiré";
             break;
-          case 'NotBeforeError':
-            errorMessage = 'Token pas encore valide';
+          case "NotBeforeError":
+            errorMessage = "Token pas encore valide";
             break;
           default:
             errorMessage = info.message ?? errorMessage;
@@ -78,8 +78,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     // Log des succès en développement
-    if (process.env.NODE_ENV === 'development') {
-      this.logger.debug(`User ${user && typeof user === 'object' && 'email' in user ? (user as { email?: string }).email : ''} authenticated successfully`);
+    if (process.env.NODE_ENV === "development") {
+      this.logger.debug(
+        `User ${user && typeof user === "object" && "email" in user ? (user as { email?: string }).email : ""} authenticated successfully`,
+      );
     }
 
     return user;

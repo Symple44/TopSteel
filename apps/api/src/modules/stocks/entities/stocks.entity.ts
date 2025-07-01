@@ -1,25 +1,25 @@
-import { Column, Entity, Index } from 'typeorm';
-import { BaseAuditEntity } from '../../../common/base/base.entity';
+import { Column, Entity, Index } from "typeorm";
+import { BaseAuditEntity } from "../../../common/base/base.entity";
 
-@Entity('stocks')
+@Entity("stocks")
 export class Stocks extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()
   nom!: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   description?: string;
 
   @Column({ default: true })
   @Index()
   actif!: boolean;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: "jsonb", nullable: true })
   metadata?: Record<string, unknown>;
 }
 
 export enum StocksStatut {
-  ACTIF = 'ACTIF',
-  INACTIF = 'INACTIF',
-  ARCHIVE = 'ARCHIVE'
+  ACTIF = "ACTIF",
+  INACTIF = "INACTIF",
+  ARCHIVE = "ARCHIVE",
 }

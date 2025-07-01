@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
-import { PaginationResultDto } from '../../common/dto/base.dto';
-import { CommandesQueryDto } from './dto/commandes-query.dto';
-import { CreateCommandeDto } from './dto/create-commande.dto';
-import { UpdateCommandeDto } from './dto/update-commande.dto';
-import { Commande } from './entities/commande.entity';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Between, Repository } from "typeorm";
+import { PaginationResultDto } from "../../common/dto/base.dto";
+import { CommandesQueryDto } from "./dto/commandes-query.dto";
+import { CreateCommandeDto } from "./dto/create-commande.dto";
+import { UpdateCommandeDto } from "./dto/update-commande.dto";
+import { Commande } from "./entities/commande.entity";
 
 @Injectable()
 export class CommandesService {
@@ -19,31 +19,43 @@ export class CommandesService {
     return this.repository.save(entity);
   }
 
-  async findAll(query: CommandesQueryDto): Promise<PaginationResultDto<Commande>> {
-    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+  async findAll(
+    query: CommandesQueryDto,
+  ): Promise<PaginationResultDto<Commande>> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = query;
     const skip = (page - 1) * limit;
 
-    const queryBuilder = this.repository.createQueryBuilder('entity');
-    
+    const queryBuilder = this.repository.createQueryBuilder("entity");
+
     if (search) {
-      queryBuilder.andWhere(
-        '(entity.numero ILIKE :search)',
-        { search: `%${search}%` }
-      );
+      queryBuilder.andWhere("(entity.numero ILIKE :search)", {
+        search: `%${search}%`,
+      });
     }
 
     if (query.fournisseur) {
-      queryBuilder.andWhere('entity.fournisseur = :fournisseur', { fournisseur: query.fournisseur });
+      queryBuilder.andWhere("entity.fournisseur = :fournisseur", {
+        fournisseur: query.fournisseur,
+      });
     }
 
     if (query.montantMin !== undefined || query.montantMax !== undefined) {
       const min = query.montantMin || 0;
       const max = query.montantMax || Number.MAX_VALUE;
-      queryBuilder.andWhere('entity.montant BETWEEN :min AND :max', { min, max });
+      queryBuilder.andWhere("entity.montant BETWEEN :min AND :max", {
+        min,
+        max,
+      });
     }
 
     const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
       .skip(skip)
       .take(limit)
       .getManyAndCount();
@@ -56,8 +68,8 @@ export class CommandesService {
         total,
         totalPages: Math.ceil(total / limit),
         hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     };
   }
 
@@ -84,53 +96,55 @@ export class CommandesService {
   async findByFournisseur(fournisseurId: number): Promise<Commande[]> {
     return this.repository.find({
       where: { fournisseur: fournisseurId },
-      order: { createdAt: 'DESC' }
+      order: { createdAt: "DESC" },
     });
   }
 
   async getStats(): Promise<unknown> {
     const total = await this.repository.count();
-    
+
     const montantTotal = await this.repository
-      .createQueryBuilder('commande')
-      .select('SUM(commande.montant)', 'sum')
+      .createQueryBuilder("commande")
+      .select("SUM(commande.montant)", "sum")
       .getRawOne()
-      .then(result => parseFloat(result.sum) || 0);
+      .then((result) => parseFloat(result.sum) || 0);
 
     const montantMoyen = total > 0 ? montantTotal / total : 0;
 
     const parFournisseur = await this.repository
-      .createQueryBuilder('commande')
-      .select('commande.fournisseur, COUNT(*) as count, SUM(commande.montant) as total')
-      .groupBy('commande.fournisseur')
+      .createQueryBuilder("commande")
+      .select(
+        "commande.fournisseur, COUNT(*) as count, SUM(commande.montant) as total",
+      )
+      .groupBy("commande.fournisseur")
       .getRawMany();
 
     // Commandes récentes (30 derniers jours)
     const dateRecente = new Date();
     dateRecente.setDate(dateRecente.getDate() - 30);
-    
+
     const commandesRecentes = await this.repository.count({
       where: {
-        createdAt: Between(dateRecente, new Date())
-      }
+        createdAt: Between(dateRecente, new Date()),
+      },
     });
-    
+
     return {
       total,
       montantTotal,
       montantMoyen: Math.round(montantMoyen * 100) / 100,
       parFournisseur,
-      commandesRecentes
+      commandesRecentes,
     };
   }
 
   async generateNumero(): Promise<string> {
     const year = new Date().getFullYear();
     const count = await this.repository
-      .createQueryBuilder('commande')
-      .where('EXTRACT(YEAR FROM commande.createdAt) = :year', { year })
+      .createQueryBuilder("commande")
+      .where("EXTRACT(YEAR FROM commande.createdAt) = :year", { year })
       .getCount();
-    
-    return `CMD-${year}-${String(count + 1).padStart(4, '0')}`;
+
+    return `CMD-${year}-${String(count + 1).padStart(4, "0")}`;
   }
 }

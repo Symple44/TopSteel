@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { PaginationResultDto } from '../../common/dto/base.dto';
-import { CreateDocumentsDto } from './dto/create-documents.dto';
-import { DocumentsQueryDto } from './dto/documents-query.dto';
-import { UpdateDocumentsDto } from './dto/update-documents.dto';
-import { Document } from './entities/document.entity';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { PaginationResultDto } from "../../common/dto/base.dto";
+import { CreateDocumentsDto } from "./dto/create-documents.dto";
+import { DocumentsQueryDto } from "./dto/documents-query.dto";
+import { UpdateDocumentsDto } from "./dto/update-documents.dto";
+import { Document } from "./entities/document.entity";
 
 @Injectable()
 export class DocumentsService {
@@ -19,16 +19,24 @@ export class DocumentsService {
     return this.repository.save(entity);
   }
 
-  async findAll(query: DocumentsQueryDto): Promise<PaginationResultDto<Document>> {
-    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+  async findAll(
+    query: DocumentsQueryDto,
+  ): Promise<PaginationResultDto<Document>> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = query;
     const skip = (page - 1) * limit;
 
-    const queryBuilder = this.repository.createQueryBuilder('entity');
-    
+    const queryBuilder = this.repository.createQueryBuilder("entity");
+
     if (search) {
       queryBuilder.andWhere(
-        '(entity.nom ILIKE :search OR entity.type ILIKE :search)',
-        { search: `%${search}%` }
+        "(entity.nom ILIKE :search OR entity.type ILIKE :search)",
+        { search: `%${search}%` },
       );
     }
 
@@ -38,7 +46,7 @@ export class DocumentsService {
     // }
 
     const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
       .skip(skip)
       .take(limit)
       .getManyAndCount();
@@ -51,8 +59,8 @@ export class DocumentsService {
         total,
         totalPages: Math.ceil(total / limit),
         hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     };
   }
 
@@ -79,15 +87,15 @@ export class DocumentsService {
   async getStats(): Promise<unknown> {
     const total = await this.repository.count();
     // Supprimé: actif n'existe pas dans Document
-    
+
     return {
       total,
       // Peut ajouter d'autres stats basées sur les vraies propriétés :
       byType: await this.repository
-        .createQueryBuilder('doc')
-        .select('doc.type, COUNT(*) as count')
-        .groupBy('doc.type')
-        .getRawMany()
+        .createQueryBuilder("doc")
+        .select("doc.type, COUNT(*) as count")
+        .groupBy("doc.type")
+        .getRawMany(),
     };
   }
 }

@@ -1,6 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity('produits')
+@Entity("produits")
 export class Produit {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -11,7 +17,7 @@ export class Produit {
   @Column()
   reference!: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column("decimal", { precision: 10, scale: 2 })
   prix!: number;
 
   @Column({ nullable: true })

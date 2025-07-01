@@ -1,11 +1,15 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
-import { PaginationResultDto } from '../../common/dto/base.dto';
-import { CreateProduitDto } from './dto/create-produit.dto';
-import { ProduitsQueryDto } from './dto/produits-query.dto';
-import { UpdateProduitDto } from './dto/update-produit.dto';
-import { Produit } from './entities/produit.entity';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Like, Repository } from "typeorm";
+import { PaginationResultDto } from "../../common/dto/base.dto";
+import { CreateProduitDto } from "./dto/create-produit.dto";
+import { ProduitsQueryDto } from "./dto/produits-query.dto";
+import { UpdateProduitDto } from "./dto/update-produit.dto";
+import { Produit } from "./entities/produit.entity";
 
 @Injectable()
 export class ProduitsService {
@@ -17,44 +21,54 @@ export class ProduitsService {
   async create(createDto: CreateProduitDto): Promise<Produit> {
     // Vérifier l'unicité de la référence
     const existingProduit = await this.repository.findOne({
-      where: { reference: createDto.reference }
+      where: { reference: createDto.reference },
     });
-    
+
     if (existingProduit) {
-      throw new ConflictException(`Un produit avec la référence ${createDto.reference} existe déjà`);
+      throw new ConflictException(
+        `Un produit avec la référence ${createDto.reference} existe déjà`,
+      );
     }
 
     const entity = this.repository.create(createDto);
     return this.repository.save(entity);
   }
 
-  async findAll(query: ProduitsQueryDto): Promise<PaginationResultDto<Produit>> {
-    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+  async findAll(
+    query: ProduitsQueryDto,
+  ): Promise<PaginationResultDto<Produit>> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = query;
     const skip = (page - 1) * limit;
 
-    const queryBuilder = this.repository.createQueryBuilder('entity');
-    
+    const queryBuilder = this.repository.createQueryBuilder("entity");
+
     if (search) {
       queryBuilder.andWhere(
-        '(entity.nom ILIKE :search OR entity.reference ILIKE :search)',
-        { search: `%${search}%` }
+        "(entity.nom ILIKE :search OR entity.reference ILIKE :search)",
+        { search: `%${search}%` },
       );
     }
 
     if (query.fournisseurPrincipal) {
-      queryBuilder.andWhere('entity.fournisseurPrincipal = :fournisseur', { 
-        fournisseur: query.fournisseurPrincipal 
+      queryBuilder.andWhere("entity.fournisseurPrincipal = :fournisseur", {
+        fournisseur: query.fournisseurPrincipal,
       });
     }
 
     if (query.prixMin !== undefined || query.prixMax !== undefined) {
       const min = query.prixMin || 0;
       const max = query.prixMax || Number.MAX_VALUE;
-      queryBuilder.andWhere('entity.prix BETWEEN :min AND :max', { min, max });
+      queryBuilder.andWhere("entity.prix BETWEEN :min AND :max", { min, max });
     }
 
     const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
+      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
       .skip(skip)
       .take(limit)
       .getManyAndCount();
@@ -67,8 +81,8 @@ export class ProduitsService {
         total,
         totalPages: Math.ceil(total / limit),
         hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     };
   }
 
@@ -83,7 +97,9 @@ export class ProduitsService {
   async findByReference(reference: string): Promise<Produit> {
     const entity = await this.repository.findOne({ where: { reference } });
     if (!entity) {
-      throw new NotFoundException(`Produit avec la référence ${reference} non trouvé`);
+      throw new NotFoundException(
+        `Produit avec la référence ${reference} non trouvé`,
+      );
     }
     return entity;
   }
@@ -92,14 +108,14 @@ export class ProduitsService {
     return this.repository.find({
       where: { reference: Like(`%${searchTerm}%`) },
       take: 10,
-      order: { reference: 'ASC' }
+      order: { reference: "ASC" },
     });
   }
 
   async findByFournisseur(fournisseurId: number): Promise<Produit[]> {
     return this.repository.find({
       where: { fournisseurPrincipal: fournisseurId },
-      order: { nom: 'ASC' }
+      order: { nom: "ASC" },
     });
   }
 
@@ -107,11 +123,13 @@ export class ProduitsService {
     // Si la référence est modifiée, vérifier l'unicité
     if (updateDto.reference) {
       const existingProduit = await this.repository.findOne({
-        where: { reference: updateDto.reference }
+        where: { reference: updateDto.reference },
       });
-      
+
       if (existingProduit && existingProduit.id !== id) {
-        throw new ConflictException(`Un produit avec la référence ${updateDto.reference} existe déjà`);
+        throw new ConflictException(
+          `Un produit avec la référence ${updateDto.reference} existe déjà`,
+        );
       }
     }
 
@@ -128,42 +146,42 @@ export class ProduitsService {
 
   async getStats(): Promise<unknown> {
     const total = await this.repository.count();
-    
+
     const prixMoyen = await this.repository
-      .createQueryBuilder('produit')
-      .select('AVG(produit.prix)', 'moyenne')
+      .createQueryBuilder("produit")
+      .select("AVG(produit.prix)", "moyenne")
       .getRawOne()
-      .then(result => parseFloat(result.moyenne) || 0);
+      .then((result) => parseFloat(result.moyenne) || 0);
 
     const prixMax = await this.repository
-      .createQueryBuilder('produit')
-      .select('MAX(produit.prix)', 'max')
+      .createQueryBuilder("produit")
+      .select("MAX(produit.prix)", "max")
       .getRawOne()
-      .then(result => parseFloat(result.max) || 0);
+      .then((result) => parseFloat(result.max) || 0);
 
     const prixMin = await this.repository
-      .createQueryBuilder('produit')
-      .select('MIN(produit.prix)', 'min')
+      .createQueryBuilder("produit")
+      .select("MIN(produit.prix)", "min")
       .getRawOne()
-      .then(result => parseFloat(result.min) || 0);
+      .then((result) => parseFloat(result.min) || 0);
 
     const parFournisseur = await this.repository
-      .createQueryBuilder('produit')
-      .select('produit.fournisseurPrincipal, COUNT(*) as count')
-      .groupBy('produit.fournisseurPrincipal')
+      .createQueryBuilder("produit")
+      .select("produit.fournisseurPrincipal, COUNT(*) as count")
+      .groupBy("produit.fournisseurPrincipal")
       .getRawMany();
 
     const sansReference = await this.repository.count({
-      where: { reference: '' }
+      where: { reference: "" },
     });
-    
+
     return {
       total,
       prixMoyen: Math.round(prixMoyen * 100) / 100,
       prixMax,
       prixMin,
       parFournisseur,
-      sansReference
+      sansReference,
     };
   }
 

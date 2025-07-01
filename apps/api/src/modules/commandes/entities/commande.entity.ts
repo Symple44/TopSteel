@@ -1,6 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity('commandes')
+@Entity("commandes")
 export class Commande {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -8,7 +14,7 @@ export class Commande {
   @Column()
   numero!: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column("decimal", { precision: 10, scale: 2 })
   montant!: number;
 
   @Column({ nullable: true })
