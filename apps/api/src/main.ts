@@ -173,8 +173,8 @@ async function bootstrap() {
       .addTag('🧾 Facturation', 'Facturation et comptabilité')
       .addTag('📄 Documents', 'Gestion électronique de documents')
       .addTag('🔔 Notifications', 'Système de notifications')
-      .addServer(`http://localhost:${port}/api`, 'Serveur de développement')
-      .addServer(`http://localhost:${port}/api/v1`, 'API V1 explicite')
+      .addServer(`http://localhost:${port}/`, 'Serveur de développement')
+      .addServer(`http://localhost:${port}/v1`, 'API V1 explicite')
       .build();
 
     // Documentation API V2 (Future - préparation)
@@ -211,7 +211,7 @@ async function bootstrap() {
       .addTag('🔐 Auth V2', 'Authentification améliorée')
       .addTag('👤 Users V2', 'Gestion utilisateurs avec analytics')
       .addTag('📊 Analytics', 'Tableaux de bord et métriques (Nouveau)')
-      .addServer(`http://localhost:${port}/api/v2`, 'API V2 (Bêta)')
+      .addServer(`http://localhost:${port}/v2`, 'API V2 (Bêta)')
       .build();
 
     // Génération des documents Swagger
