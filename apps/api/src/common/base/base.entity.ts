@@ -24,3 +24,4 @@ export abstract class BaseAuditEntity extends BaseEntity {
   @Column({ name: 'updated_by_id', nullable: true })
   updatedById?: string;
 }
+

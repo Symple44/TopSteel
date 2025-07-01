@@ -18,14 +18,13 @@ import { User } from '../modules/users/entities/user.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const host = configService.get<string>('DB_HOST');
-        const port = configService.get<number>('DB_PORT');
-        const username = configService.get<string>('DB_USERNAME');
-        const password = configService.get<string>('DB_PASSWORD');
-        const database = configService.get<string>('DB_NAME');
-        const synchronize = configService.get<boolean>('DB_SYNCHRONIZE');
-        const logging = configService.get<boolean>('DB_LOGGING');
-        const ssl = configService.get<boolean>('DB_SSL');
+        const host = configService.get<string>('DB_HOST') || 'localhost';
+        const port = configService.get<number>('DB_PORT') || 5432;
+        const username = configService.get<string>('DB_USERNAME') || 'postgres';
+        const password = configService.get<string>('DB_PASSWORD') || 'postgres';
+        const database = configService.get<string>('DB_NAME') || 'erp_topsteel';
+        const synchronize = configService.get<boolean>('DB_SYNCHRONIZE') || false;
+        const logging = configService.get<boolean>('DB_LOGGING') || false;
 
         console.log('🔧 DatabaseModule - Configuration reçue du ConfigService:');
         console.log(`  host: ${host}`);
@@ -34,6 +33,7 @@ import { User } from '../modules/users/entities/user.entity';
         console.log(`  password: ${'*'.repeat(password?.length || 0)}`);
         console.log(`  database: ${database}`);
         console.log(`  synchronize: ${synchronize}`);
+        console.log(`  ssl: false (forcé pour développement local)`);
 
         const entities = [
           User,
@@ -57,7 +57,11 @@ import { User } from '../modules/users/entities/user.entity';
           entities,
           synchronize,
           logging,
-          ssl: ssl ? { rejectUnauthorized: false } : false,
+          ssl: false, // FORCE SSL = FALSE pour PostgreSQL local
+          extra: {
+            // Options supplémentaires pour PostgreSQL local
+            sslmode: 'disable',
+          },
         };
       },
       inject: [ConfigService],
