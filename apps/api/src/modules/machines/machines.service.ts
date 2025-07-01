@@ -1,25 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Machines } from './entities/machines.entity';
-import { CreateMachinesDto } from './dto/create-machines.dto';
-import { UpdateMachinesDto } from './dto/update-machines.dto';
-import { MachinesQueryDto } from './dto/machines-query.dto';
 import { PaginationResultDto } from '../../common/dto/base.dto';
+import { CreateMachinesDto } from './dto/create-machines.dto';
+import { MachinesQueryDto } from './dto/machines-query.dto';
+import { UpdateMachinesDto } from './dto/update-machines.dto';
+import { Machine } from './entities/machine.entity';
 
 @Injectable()
 export class MachinesService {
   constructor(
-    @InjectRepository(Machines)
-    private readonly repository: Repository<Machines>,
+    @InjectRepository(Machine)
+    private readonly repository: Repository<Machine>,
   ) {}
 
-  async create(createDto: CreateMachinesDto): Promise<Machines> {
+  async create(createDto: CreateMachinesDto): Promise<Machine> {
     const entity = this.repository.create(createDto);
     return this.repository.save(entity);
   }
 
-  async findAll(query: MachinesQueryDto): Promise<PaginationResultDto<Machines>> {
+  async findAll(query: MachinesQueryDto): Promise<PaginationResultDto<Machine>> {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
     const skip = (page - 1) * limit;
 
@@ -55,7 +55,7 @@ export class MachinesService {
     };
   }
 
-  async findOne(id: string): Promise<Machines> {
+  async findOne(id: string): Promise<Machine> {
     const entity = await this.repository.findOne({ where: { id } });
     if (!entity) {
       throw new NotFoundException(`Machines with ID ${id} not found`);
@@ -63,7 +63,7 @@ export class MachinesService {
     return entity;
   }
 
-  async update(id: string, updateDto: UpdateMachinesDto): Promise<Machines> {
+  async update(id: string, updateDto: UpdateMachinesDto): Promise<Machine> {
     await this.repository.update(id, updateDto);
     return this.findOne(id);
   }
