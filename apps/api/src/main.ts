@@ -84,16 +84,27 @@ async function bootstrap() {
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   });
 
-  // Prefix global pour l'API
+ 
+
+  // ============================================================================
+  // CONFIGURATION VERSIONING 
+  // ============================================================================
+
+  app.use((req: any, res: any, next: any) => {
+    if (req.originalUrl.startsWith('/api/') && !req.originalUrl.includes('/v1/')) {
+      const newUrl = req.originalUrl.replace('/api/', '/api/v1/');
+      return res.redirect(308, newUrl);
+    }
+    next();
+  });
+
+   // Prefix global pour l'API
   app.setGlobalPrefix("api");
 
-  // ============================================================================
-  // CONFIGURATION VERSIONING V1/V2
-  // ============================================================================
-
+  // Configuration versioning
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: "1", // V1 par défaut pour commencer
+    defaultVersion: "1",
   });
 
   // ============================================================================

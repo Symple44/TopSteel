@@ -93,7 +93,7 @@ export class AuthService {
    * Inscription utilisateur
    */
   async register(registerDto: RegisterDto): Promise<AuthResponse> {
-    const { email, password, nom, prenom } = registerDto;
+    const { email, password, nom, prenom, entreprise } = registerDto;
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await this.usersService.findByEmail(email);
@@ -113,6 +113,8 @@ export class AuthService {
       password: hashedPassword,
       nom,
       prenom,
+      role: UserRole.OPERATEUR,
+      ...(entreprise && { entreprise })
     });
 
     // Générer les tokens

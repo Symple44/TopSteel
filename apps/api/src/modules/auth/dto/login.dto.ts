@@ -1,6 +1,6 @@
 // apps/api/src/modules/auth/dto/login.dto.ts
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsString, MinLength } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsEmail, IsOptional, IsString, MinLength } from "class-validator";
 
 export class LoginDto {
   @ApiProperty({
@@ -55,6 +55,14 @@ export class RegisterDto {
     message: "Le mot de passe doit contenir au moins 8 caractères",
   })
   password!: string;
+
+  @ApiPropertyOptional({
+    description: "Nom de l'entreprise (optionnel)",
+    example: "TopSteel Métallerie",
+  })
+  @IsOptional()
+  @IsString()
+  entreprise?: string;
 }
 
 export class RefreshTokenDto {

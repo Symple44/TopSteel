@@ -1,6 +1,5 @@
-// apps/web/src/app/layout.tsx
-import { Providers } from '@/components/providers'
-import { Toaster } from "@/components/ui/toaster"
+import { AuthLoader, AuthProvider } from '@/components/auth/AuthProvider'
+import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -8,9 +7,17 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'TOPSTEEL - ERP métallurgie - Gestion d\'entreprise',
-  description: 'Solution ERP complète pour les entreprises de construction métallique et métallurgie',
-  keywords: 'ERP, construction métallique, métallerie, ferronnerie, gestion, production, stocks',
+  title: 'ERP TopSteel - Gestion métallerie',
+  description: 'Système ERP complet pour les entreprises de construction métallique et métallerie',
+  keywords: ['ERP', 'métallerie', 'construction métallique', 'gestion', 'TopSteel'],
+  authors: [{ name: 'TopSteel' }],
+  robots: 'index, follow',
+  openGraph: {
+    title: 'ERP TopSteel',
+    description: 'Système ERP complet pour les entreprises de métallerie',
+    type: 'website',
+    locale: 'fr_FR',
+  },
 }
 
 export default function RootLayout({
@@ -19,12 +26,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body className={inter.className}>
-        <Providers>
-          {children}
+    <html lang="fr" className="h-full">
+      <body className={`${inter.className} h-full antialiased`}>
+        <AuthProvider>
+          <AuthLoader>
+            <div className="min-h-full">
+              {children}
+            </div>
+          </AuthLoader>
           <Toaster />
-        </Providers>
+        </AuthProvider>
       </body>
     </html>
   )
