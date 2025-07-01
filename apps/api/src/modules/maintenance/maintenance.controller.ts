@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { MaintenanceService } from './maintenance.service';
 import { CreateMaintenanceDto } from './dto/create-maintenance.dto';
-import { UpdateMaintenanceDto } from './dto/update-maintenance.dto';
 import { MaintenanceQueryDto } from './dto/maintenance-query.dto';
+import { UpdateMaintenanceDto } from './dto/update-maintenance.dto';
+import { MaintenanceService } from './maintenance.service';
 
 @Controller('maintenance')
-@ApiTags('maintenance')
+@ApiTags('⚙️ Maintenance')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class MaintenanceController {
   constructor(private readonly maintenanceService: MaintenanceService) {}
 
@@ -70,3 +70,4 @@ export class MaintenanceController {
     return this.maintenanceService.remove(id);
   }
 }
+

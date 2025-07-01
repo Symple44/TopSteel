@@ -6,7 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,8 +23,9 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto, RefreshTokenDto, RegisterDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
-@ApiTags('Auth')
-@Controller({ path: 'auth', version: '1' }) 
+@ApiTags('🔐 Auth')
+@Controller('auth')
+
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -127,7 +128,7 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ 
     summary: 'Déconnexion utilisateur',
     description: 'Invalide le refresh token de l\'utilisateur'
@@ -141,7 +142,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ 
     summary: 'Profil utilisateur',
     description: 'Récupère les informations du profil utilisateur connecté'
@@ -170,7 +171,7 @@ export class AuthController {
   @Post('change-password')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ 
     summary: 'Changer mot de passe',
     description: 'Change le mot de passe de l\'utilisateur connecté'
@@ -193,7 +194,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ 
     summary: 'Informations utilisateur courantes (alias de profile)',
     description: 'Alias pour la route /profile'

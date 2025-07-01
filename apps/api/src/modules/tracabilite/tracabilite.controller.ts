@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { TracabiliteService } from './tracabilite.service';
 import { CreateTracabiliteDto } from './dto/create-tracabilite.dto';
-import { UpdateTracabiliteDto } from './dto/update-tracabilite.dto';
 import { TracabiliteQueryDto } from './dto/tracabilite-query.dto';
+import { UpdateTracabiliteDto } from './dto/update-tracabilite.dto';
+import { TracabiliteService } from './tracabilite.service';
 
 @Controller('tracabilite')
-@ApiTags('tracabilite')
+@ApiTags('📋 Traçabilité')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class TracabiliteController {
   constructor(private readonly tracabiliteService: TracabiliteService) {}
 
@@ -70,3 +70,4 @@ export class TracabiliteController {
     return this.tracabiliteService.remove(id);
   }
 }
+

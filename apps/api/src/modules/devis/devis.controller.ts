@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
 import { DevisService } from './devis.service';
 import { CreateDevisDto } from './dto/create-devis.dto';
-import { UpdateDevisDto } from './dto/update-devis.dto';
 import { DevisQueryDto } from './dto/devis-query.dto';
+import { UpdateDevisDto } from './dto/update-devis.dto';
 
 @Controller('devis')
-@ApiTags('devis')
+@ApiTags('💰 Devis')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class DevisController {
   constructor(private readonly devisService: DevisService) {}
 
@@ -70,3 +70,4 @@ export class DevisController {
     return this.devisService.remove(id);
   }
 }
+

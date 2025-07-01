@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { StocksService } from './stocks.service';
 import { CreateStocksDto } from './dto/create-stocks.dto';
-import { UpdateStocksDto } from './dto/update-stocks.dto';
 import { StocksQueryDto } from './dto/stocks-query.dto';
+import { UpdateStocksDto } from './dto/update-stocks.dto';
+import { StocksService } from './stocks.service';
 
 @Controller('stocks')
-@ApiTags('stocks')
+@ApiTags('📦 Stocks')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
 
@@ -70,3 +70,4 @@ export class StocksController {
     return this.stocksService.remove(id);
   }
 }
+

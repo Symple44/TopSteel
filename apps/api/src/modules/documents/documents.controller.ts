@@ -17,9 +17,10 @@ import { DocumentsQueryDto } from './dto/documents-query.dto';
 import { UpdateDocumentsDto } from './dto/update-documents.dto';
 
 @Controller('documents')
-@ApiTags('documents')
+@ApiTags('📄 Documents')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
@@ -65,3 +66,4 @@ export class DocumentsController {
     return this.documentsService.remove(id);
   }
 }
+

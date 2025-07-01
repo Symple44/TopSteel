@@ -15,9 +15,10 @@ import { CreateCommandeDto } from './dto/create-commande.dto';
 import { UpdateCommandeDto } from './dto/update-commande.dto';
 
 @Controller('commandes')
-@ApiTags('commandes')
+@ApiTags('🛒 Commandes')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class CommandesController {
   constructor(private readonly commandesService: CommandesService) {}
 

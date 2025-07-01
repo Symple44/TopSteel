@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { MachinesService } from './machines.service';
 import { CreateMachinesDto } from './dto/create-machines.dto';
-import { UpdateMachinesDto } from './dto/update-machines.dto';
 import { MachinesQueryDto } from './dto/machines-query.dto';
+import { UpdateMachinesDto } from './dto/update-machines.dto';
+import { MachinesService } from './machines.service';
 
 @Controller('machines')
-@ApiTags('machines')
+@ApiTags('🔧 Machines')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class MachinesController {
   constructor(private readonly machinesService: MachinesService) {}
 
@@ -70,3 +70,4 @@ export class MachinesController {
     return this.machinesService.remove(id);
   }
 }
+

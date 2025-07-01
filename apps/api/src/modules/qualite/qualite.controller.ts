@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { QualiteService } from './qualite.service';
 import { CreateQualiteDto } from './dto/create-qualite.dto';
-import { UpdateQualiteDto } from './dto/update-qualite.dto';
 import { QualiteQueryDto } from './dto/qualite-query.dto';
+import { UpdateQualiteDto } from './dto/update-qualite.dto';
+import { QualiteService } from './qualite.service';
 
 @Controller('qualite')
-@ApiTags('qualite')
+@ApiTags('✅ Qualité')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class QualiteController {
   constructor(private readonly qualiteService: QualiteService) {}
 
@@ -70,3 +70,4 @@ export class QualiteController {
     return this.qualiteService.remove(id);
   }
 }
+

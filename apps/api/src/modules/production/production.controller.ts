@@ -15,9 +15,10 @@ import { UpdateProductionDto } from './dto/update-production.dto';
 import { ProductionService } from './production.service';
 
 @Controller('production')
-@ApiTags('production')
+@ApiTags('🏭 Production')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class ProductionController {
   constructor(private readonly productionService: ProductionService) {}
 
@@ -69,3 +70,4 @@ export class ProductionController {
     return this.productionService.remove(id);
   }
 }
+

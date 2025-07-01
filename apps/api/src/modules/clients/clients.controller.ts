@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
 import { ClientsService } from './clients.service';
+import { ClientsQueryDto } from './dto/clients-query.dto';
 import { CreateClientsDto } from './dto/create-clients.dto';
 import { UpdateClientsDto } from './dto/update-clients.dto';
-import { ClientsQueryDto } from './dto/clients-query.dto';
 
 @Controller('clients')
-@ApiTags('clients')
+@ApiTags('🏢 Clients')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
@@ -70,3 +70,4 @@ export class ClientsController {
     return this.clientsService.remove(id);
   }
 }
+

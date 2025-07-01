@@ -15,9 +15,10 @@ import { UpdateProduitDto } from './dto/update-produit.dto';
 import { ProduitsService } from './produits.service';
 
 @Controller('produits')
-@ApiTags('produits')
+@ApiTags('📦 Produits')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class ProduitsController {
   constructor(private readonly produitsService: ProduitsService) {}
 

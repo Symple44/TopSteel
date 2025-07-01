@@ -15,9 +15,10 @@ import { UpdateOrdreFabricationDto } from './dto/update-ordre-fabrication.dto';
 import { OrdreFabricationService } from './ordre-fabrication.service';
 
 @Controller('ordre-fabrication')
-@ApiTags('ordre-fabrication')
+@ApiTags('🏭 Ordre de fabrication')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class OrdreFabricationController {
   constructor(private readonly ordreFabricationService: OrdreFabricationService) {}
 

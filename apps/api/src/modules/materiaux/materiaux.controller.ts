@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { MateriauxService } from './materiaux.service';
 import { CreateMateriauxDto } from './dto/create-materiaux.dto';
-import { UpdateMateriauxDto } from './dto/update-materiaux.dto';
 import { MateriauxQueryDto } from './dto/materiaux-query.dto';
+import { UpdateMateriauxDto } from './dto/update-materiaux.dto';
+import { MateriauxService } from './materiaux.service';
 
 @Controller('materiaux')
-@ApiTags('materiaux')
+@ApiTags('🧱 Matériaux')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class MateriauxController {
   constructor(private readonly materiauxService: MateriauxService) {}
 
@@ -70,3 +70,4 @@ export class MateriauxController {
     return this.materiauxService.remove(id);
   }
 }
+

@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { PlanningService } from './planning.service';
 import { CreatePlanningDto } from './dto/create-planning.dto';
-import { UpdatePlanningDto } from './dto/update-planning.dto';
 import { PlanningQueryDto } from './dto/planning-query.dto';
+import { UpdatePlanningDto } from './dto/update-planning.dto';
+import { PlanningService } from './planning.service';
 
 @Controller('planning')
-@ApiTags('planning')
+@ApiTags('📅 Planning')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class PlanningController {
   constructor(private readonly planningService: PlanningService) {}
 
@@ -70,3 +70,4 @@ export class PlanningController {
     return this.planningService.remove(id);
   }
 }
+

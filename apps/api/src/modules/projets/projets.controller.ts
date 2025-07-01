@@ -17,9 +17,10 @@ import { UpdateProjetsDto } from './dto/update-projets.dto';
 import { ProjetsService } from './projets.service';
 
 @Controller('projets')
-@ApiTags('projets')
+@ApiTags('📁 Projets')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class ProjetsController {
   constructor(private readonly projetsService: ProjetsService) {}
 
@@ -65,3 +66,4 @@ export class ProjetsController {
     return this.projetsService.remove(id);
   }
 }
+

@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { FournisseursService } from './fournisseurs.service';
 import { CreateFournisseursDto } from './dto/create-fournisseurs.dto';
-import { UpdateFournisseursDto } from './dto/update-fournisseurs.dto';
 import { FournisseursQueryDto } from './dto/fournisseurs-query.dto';
+import { UpdateFournisseursDto } from './dto/update-fournisseurs.dto';
+import { FournisseursService } from './fournisseurs.service';
 
 @Controller('fournisseurs')
-@ApiTags('fournisseurs')
+@ApiTags('🚚 Fournisseurs')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class FournisseursController {
   constructor(private readonly fournisseursService: FournisseursService) {}
 
@@ -70,3 +70,4 @@ export class FournisseursController {
     return this.fournisseursService.remove(id);
   }
 }
+

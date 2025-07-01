@@ -5,20 +5,20 @@ import {
 import {
   ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
-import { FacturationService } from './facturation.service';
 import { CreateFacturationDto } from './dto/create-facturation.dto';
-import { UpdateFacturationDto } from './dto/update-facturation.dto';
 import { FacturationQueryDto } from './dto/facturation-query.dto';
+import { UpdateFacturationDto } from './dto/update-facturation.dto';
+import { FacturationService } from './facturation.service';
 
 @Controller('facturation')
-@ApiTags('facturation')
+@ApiTags('🧾 Facturation')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
+
 export class FacturationController {
   constructor(private readonly facturationService: FacturationService) {}
 
@@ -70,3 +70,4 @@ export class FacturationController {
     return this.facturationService.remove(id);
   }
 }
+
