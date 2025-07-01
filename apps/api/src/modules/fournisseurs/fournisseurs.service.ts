@@ -1,25 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Fournisseurs } from './entities/fournisseurs.entity';
-import { CreateFournisseursDto } from './dto/create-fournisseurs.dto';
-import { UpdateFournisseursDto } from './dto/update-fournisseurs.dto';
-import { FournisseursQueryDto } from './dto/fournisseurs-query.dto';
 import { PaginationResultDto } from '../../common/dto/base.dto';
+import { CreateFournisseursDto } from './dto/create-fournisseurs.dto';
+import { FournisseursQueryDto } from './dto/fournisseurs-query.dto';
+import { UpdateFournisseursDto } from './dto/update-fournisseurs.dto';
+import { Fournisseur } from './entities/fournisseur.entity';
 
 @Injectable()
 export class FournisseursService {
   constructor(
-    @InjectRepository(Fournisseurs)
-    private readonly repository: Repository<Fournisseurs>,
+    @InjectRepository(Fournisseur)
+    private readonly repository: Repository<Fournisseur>,
   ) {}
 
-  async create(createDto: CreateFournisseursDto): Promise<Fournisseurs> {
+  async create(createDto: CreateFournisseursDto): Promise<Fournisseur> {
     const entity = this.repository.create(createDto);
     return this.repository.save(entity);
   }
 
-  async findAll(query: FournisseursQueryDto): Promise<PaginationResultDto<Fournisseurs>> {
+  async findAll(query: FournisseursQueryDto): Promise<PaginationResultDto<Fournisseur>> {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
     const skip = (page - 1) * limit;
 
@@ -55,7 +55,7 @@ export class FournisseursService {
     };
   }
 
-  async findOne(id: string): Promise<Fournisseurs> {
+  async findOne(id: string): Promise<Fournisseur> {
     const entity = await this.repository.findOne({ where: { id } });
     if (!entity) {
       throw new NotFoundException(`Fournisseurs with ID ${id} not found`);
@@ -63,7 +63,7 @@ export class FournisseursService {
     return entity;
   }
 
-  async update(id: string, updateDto: UpdateFournisseursDto): Promise<Fournisseurs> {
+  async update(id: string, updateDto: UpdateFournisseursDto): Promise<Fournisseur> {
     await this.repository.update(id, updateDto);
     return this.findOne(id);
   }

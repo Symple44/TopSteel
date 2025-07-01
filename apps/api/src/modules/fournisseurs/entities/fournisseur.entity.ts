@@ -1,31 +1,31 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+// fournisseur.entity.ts - Version corrigée
+import { Column, Entity, Index } from 'typeorm';
+import { BaseAuditEntity } from '../../../common/base/base.entity';
 
 @Entity('fournisseurs')
-export class Fournisseur {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
-  @Column()
+@Index(['createdAt'])
+@Index(['updatedAt'])
+export class Fournisseur extends BaseAuditEntity {
+  @Column({ length: 255 })
+  @Index()
   nom!: string;
 
   @Column({ unique: true })
+  @Index()
   email!: string;
 
-  @Column({ nullable: true })
+  @Column({ length: 20, nullable: true })
   telephone?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   adresse?: string;
 
-  @Column({ nullable: true })
+  @Column({ length: 14, nullable: true })
   siret?: string;
 
   @Column({ default: true })
+  @Index()
   actif!: boolean;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
 }
+
+

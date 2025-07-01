@@ -1,11 +1,12 @@
 // apps/api/src/database/database.module.ts
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 // Import explicite des entités pour debugging
 import { Clients } from '../modules/clients/entities/clients.entity';
 import { Commande } from '../modules/commandes/entities/commande.entity';
+import { Fournisseur } from '../modules/fournisseurs/entities/fournisseur.entity';
 import { Machine } from '../modules/machines/entities/machine.entity';
 import { Notifications } from '../modules/notifications/entities/notifications.entity';
 import { OrdreFabrication } from '../modules/production/entities/ordre-fabrication.entity';
@@ -25,6 +26,7 @@ import { User } from '../modules/users/entities/user.entity';
         const database = configService.get<string>('DB_NAME') || 'erp_topsteel';
         const synchronize = configService.get<boolean>('DB_SYNCHRONIZE') || false;
         const logging = configService.get<boolean>('DB_LOGGING') || false;
+        const ssl = configService.get<boolean>('DB_SSL');
 
         console.log('🔧 DatabaseModule - Configuration reçue du ConfigService:');
         console.log(`  host: ${host}`);
@@ -33,11 +35,12 @@ import { User } from '../modules/users/entities/user.entity';
         console.log(`  password: ${'*'.repeat(password?.length || 0)}`);
         console.log(`  database: ${database}`);
         console.log(`  synchronize: ${synchronize}`);
-        console.log(`  ssl: false (forcé pour développement local)`);
+        console.log(`  ssl: ${ssl}`);
 
         const entities = [
           User,
           Clients,
+          Fournisseur,
           Produit,
           Machine,
           Notifications,
@@ -57,7 +60,7 @@ import { User } from '../modules/users/entities/user.entity';
           entities,
           synchronize,
           logging,
-          ssl: false, // FORCE SSL = FALSE pour PostgreSQL local
+          ssl: false, // Désactivé pour le développement local
           extra: {
             // Options supplémentaires pour PostgreSQL local
             sslmode: 'disable',
