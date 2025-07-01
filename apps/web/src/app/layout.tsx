@@ -1,23 +1,26 @@
-import { AuthLoader, AuthProvider } from '@/components/auth/AuthProvider'
-import { Toaster } from '@/components/ui/toaster'
+import { Providers } from '@/components/providers'
+import { Toaster } from "@/components/ui/toaster"
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap'
+})
+
+const poppins = Poppins({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins',
+  display: 'swap'
+})
 
 export const metadata: Metadata = {
-  title: 'ERP TopSteel - Gestion métallerie',
-  description: 'Système ERP complet pour les entreprises de construction métallique et métallerie',
-  keywords: ['ERP', 'métallerie', 'construction métallique', 'gestion', 'TopSteel'],
-  authors: [{ name: 'TopSteel' }],
-  robots: 'index, follow',
-  openGraph: {
-    title: 'ERP TopSteel',
-    description: 'Système ERP complet pour les entreprises de métallerie',
-    type: 'website',
-    locale: 'fr_FR',
-  },
+  title: 'TopSteel - ERP Métallurgie Moderne',
+  description: 'Solution ERP nouvelle génération pour les entreprises de construction métallique et métallurgie',
+  keywords: 'ERP, construction métallique, métallerie, ferronnerie, gestion moderne, production digitale, stocks intelligents',
 }
 
 export default function RootLayout({
@@ -26,16 +29,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className="h-full">
-      <body className={`${inter.className} h-full antialiased`}>
-        <AuthProvider>
-          <AuthLoader>
-            <div className="min-h-full">
-              {children}
-            </div>
-          </AuthLoader>
+    <html lang="fr" suppressHydrationWarning className={`${inter.variable} ${poppins.variable}`}>
+      <body className={`${inter.className} bg-background text-foreground antialiased font-feature-settings-liga font-feature-settings-calt`}>
+        <Providers>
+          {children}
           <Toaster />
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   )

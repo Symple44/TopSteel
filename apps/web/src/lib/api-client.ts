@@ -1,7 +1,6 @@
-// apps/web/src/lib/api-client.ts
-import type { AxiosInstance, AxiosError } from 'axios';
-import axios from 'axios'
-import { useAuthStore } from '@/hooks/use-auth'
+import { useAuthStore } from '@/hooks/use-auth';
+import type { AxiosError, AxiosInstance } from 'axios';
+import axios from 'axios';
 
 class ApiClient {
   private client: AxiosInstance
@@ -35,15 +34,30 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
+        const originalRequest = error.config
+        
+        // ✅ NE PAS faire de retry pour les routes de logout ou login
+        if (originalRequest?.url?.includes('/auth/logout') || 
+            originalRequest?.url?.includes('/auth/login')) {
+          return Promise.reject(error)
+        }
+
         const { refreshToken, logout } = useAuthStore.getState()
 
-        if (error.response?.status === 401) {
+        if (error.response?.status === 401 && !originalRequest?._retry) {
+          originalRequest._retry = true
+          
           try {
             await refreshToken()
-            // Retry the original request
-            return this.client.request(error.config!)
+            // Retry the original request with new token
+            return this.client.request(originalRequest)
           } catch (refreshError) {
-            logout()
+            // ✅ Clear auth state sans appeler l'API logout (déjà échoué)
+            useAuthStore.setState({
+              user: null,
+              tokens: null,
+              isAuthenticated: false,
+            })
             window.location.href = '/login'
           }
         }

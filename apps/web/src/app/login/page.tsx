@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/use-auth'
 import type { FormattedError } from '@/lib/error-handler'
 import { ErrorHandler } from '@/lib/error-handler'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Building2, CheckCircle, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react'
+import { Building2, CheckCircle, Eye, EyeOff, Loader2, Lock, Mail, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -112,8 +112,10 @@ export default function LoginPage() {
                   type="button"
                   className="flex-shrink-0 text-green-400 hover:text-green-600 transition-colors"
                   onClick={() => setSuccess(null)}
+                  aria-label="Fermer le message de succès"
+                  title="Fermer"
                 >
-                  <Lock className="h-4 w-4" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             )}
@@ -171,6 +173,8 @@ export default function LoginPage() {
                   type="button"
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  title={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                 >
                   {showPassword ? <EyeOff /> : <Eye />}
                 </button>
@@ -242,6 +246,7 @@ export default function LoginPage() {
             <button
               type="button"
               className="w-full inline-flex justify-center py-3 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+              aria-label="Se connecter avec Google"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path
@@ -267,6 +272,7 @@ export default function LoginPage() {
             <button
               type="button"
               className="w-full inline-flex justify-center py-3 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+              aria-label="Se connecter avec Twitter"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>

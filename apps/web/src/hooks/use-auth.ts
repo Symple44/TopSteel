@@ -1,14 +1,14 @@
+import { authService } from '@/services/auth.service'
+import type { AuthTokens, User } from '@/types'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { authService } from '@/services/auth.service'
-import type { User, AuthTokens } from '@/types'
 
 interface AuthState {
   user: User | null
   tokens: AuthTokens | null
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
   refreshToken: () => Promise<void>
   setUser: (user: User) => void
 }
@@ -35,13 +35,22 @@ export const useAuthStore = create<AuthState>()(
         })
       },
 
-      logout: () => {
-        authService.logout().catch(console.error)
-        set({
-          user: null,
-          tokens: null,
-          isAuthenticated: false,
-        })
+      // ✅ CORRECTION: Ordre des opérations pour logout
+      logout: async () => {
+        try {
+          // 1. D'abord appeler l'API logout AVEC le token valide
+          await authService.logout()
+        } catch (error) {
+          // Si l'API logout échoue, on continue quand même (logout local)
+          console.warn('Logout API failed, proceeding with local logout:', error)
+        } finally {
+          // 2. Puis clear le state local dans tous les cas
+          set({
+            user: null,
+            tokens: null,
+            isAuthenticated: false,
+          })
+        }
       },
 
       refreshToken: async () => {
