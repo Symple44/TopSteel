@@ -29,5 +29,5 @@ export class CreateProductionDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, any>;
 }

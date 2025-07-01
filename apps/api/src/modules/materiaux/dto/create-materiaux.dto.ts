@@ -29,5 +29,5 @@ export class CreateMateriauxDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, any>;
 }

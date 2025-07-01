@@ -56,5 +56,6 @@ export class Machine {
 
   // Métadonnées pour l'audit
   @Column("jsonb", { nullable: true })
-  metadata?: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata?: Record<string, any>;
 }

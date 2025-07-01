@@ -41,7 +41,8 @@ export class User extends BaseAuditEntity {
   description?: string;
 
   @Column({ type: "jsonb", nullable: true })
-  metadata?: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata?: Record<string, any>;
 
   @Column({ nullable: true })
   refreshToken?: string;

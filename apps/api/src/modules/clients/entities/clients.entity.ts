@@ -15,7 +15,8 @@ export class Clients extends BaseAuditEntity {
   actif!: boolean;
 
   @Column({ type: "jsonb", nullable: true })
-  metadata?: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata?: Record<string, any>;
 
   @Column({ length: 255, nullable: true })
   email?: string;

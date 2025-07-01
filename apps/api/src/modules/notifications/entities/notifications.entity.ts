@@ -29,7 +29,8 @@ export class Notifications extends BaseAuditEntity {
   actif!: boolean;
 
   @Column({ type: "jsonb", nullable: true })
-  metadata?: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata?: Record<string, any>;
 }
 
 export enum NotificationsStatut {

@@ -47,5 +47,5 @@ export class CreateClientsDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, any>;
 }
