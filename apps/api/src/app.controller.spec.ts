@@ -20,7 +20,7 @@ describe('AppController', () => {
       expect(result).toBeDefined();
       expect(typeof result).toBe('string');
       // Vérifier que c'est le bon message TopSteel
-      expect(result).toBe('TopSteel ERP API v1.0 - Running!');
+      expect(result).toBe('TopSteel ERP API v1.0.0 - Système de gestion métallurgique');
     });
   });
 });
