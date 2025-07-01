@@ -16,11 +16,11 @@ import { TransformInterceptor } from "./common/interceptors/transform.intercepto
 // ============================================================================
 // CHARGEMENT VARIABLES D'ENVIRONNEMENT MONOREPO
 // ============================================================================
-console.log('🔧 __dirname:', __dirname);
+console.info('🔧 __dirname:', __dirname);
 const rootDir = join(__dirname, '../../../');
 const envLocalPath = join(rootDir, '.env.local');
-console.log('🔧 Tentative de chargement .env.local depuis:', envLocalPath);
-console.log('🔧 Fichier .env.local existe?', existsSync(envLocalPath));
+console.info('🔧 Tentative de chargement .env.local depuis:', envLocalPath);
+console.info('🔧 Fichier .env.local existe?', existsSync(envLocalPath));
 
 config({ path: envLocalPath });
 config({ path: join(rootDir, '.env') });

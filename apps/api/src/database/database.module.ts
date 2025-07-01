@@ -38,14 +38,14 @@ import { User } from '../modules/users/entities/user.entity';
         const logging = configService.get<boolean>('DB_LOGGING') || false;
         const ssl = configService.get<boolean>('DB_SSL');
 
-        console.log('🔧 DatabaseModule - Configuration reçue du ConfigService:');
-        console.log(`  host: ${host}`);
-        console.log(`  port: ${port}`);
-        console.log(`  username: ${username}`);
-        console.log(`  password: ${'*'.repeat(password?.length || 0)}`);
-        console.log(`  database: ${database}`);
-        console.log(`  synchronize: ${synchronize}`);
-        console.log(`  ssl: ${ssl}`);
+        console.info('🔧 DatabaseModule - Configuration reçue du ConfigService:');
+        console.info(`  host: ${host}`);
+        console.info(`  port: ${port}`);
+        console.info(`  username: ${username}`);
+        console.info(`  password: ${'*'.repeat(password?.length || 0)}`);
+        console.info(`  database: ${database}`);
+        console.info(`  synchronize: ${synchronize}`);
+        console.info(`  ssl: ${ssl}`);
 
         // TOUTES les entités du système
         const entities = [
@@ -73,8 +73,8 @@ import { User } from '../modules/users/entities/user.entity';
           Document
         ];
         
-        console.log('🔧 Entités chargées:', entities.map(e => e.name));
-        console.log(`🔧 Nombre total d'entités: ${entities.length}`);
+        console.info('🔧 Entités chargées:', entities.map(e => e.name));
+        console.info(`🔧 Nombre total d'entités: ${entities.length}`);
 
         return {
           type: 'postgres',

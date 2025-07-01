@@ -42,7 +42,7 @@ export class User extends BaseAuditEntity {
   description?: string;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 
   @Column({ nullable: true })
   refreshToken?: string;

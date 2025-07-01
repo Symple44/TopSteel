@@ -23,5 +23,5 @@ export class CreateFournisseursDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }

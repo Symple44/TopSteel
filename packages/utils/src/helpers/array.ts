@@ -56,7 +56,10 @@ export function groupByPartial<T, K extends string | number | symbol>(
     if (!groups[groupKey]) {
       groups[groupKey] = []
     }
-    groups[groupKey]!.push(item)
+    const existingGroup = groups[groupKey]
+    if (existingGroup) {
+      existingGroup.push(item)
+}
   }
   
   return groups

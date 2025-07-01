@@ -15,7 +15,7 @@ export class Clients extends BaseAuditEntity {
   actif!: boolean;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 
   @Column({ length: 255, nullable: true })
   email?: string;

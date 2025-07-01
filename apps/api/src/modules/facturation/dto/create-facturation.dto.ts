@@ -23,5 +23,5 @@ export class CreateFacturationDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }

@@ -42,14 +42,16 @@ export function useOptimizedCallback<T extends (...args: any[]) => any>(
   callback: T,
   deps: React.DependencyList
 ): T {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(callback, deps)
 }
 
 // Hook pour optimiser les calculs coûteux avec deps non-undefined
 export function useOptimizedMemo<T>(
   factory: () => T,
-  deps: React.DependencyList = [] // Valeur par défaut pour éviter undefined
+  deps: React.DependencyList = []
 ): T {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(factory, deps)
 }
 
