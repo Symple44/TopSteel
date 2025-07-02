@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
 import { Calculator, Download, Eye, Plus, Save, Send, Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface DevisEditPageProps {
   params: Promise<{ id: string }>
@@ -48,11 +48,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
     params.then(setResolvedParams)
   }, [params])
 
-  useEffect(() => {
-    calculateTotals()
-  }, [devis.lignes, devis.remiseGlobale])
-
-  const calculateTotals = () => {
+  const calculateTotals = useCallback(() => {
     const sousTotal = devis.lignes.reduce((sum, ligne) => {
       const montantLigne = ligne.quantite * ligne.prixUnitaire * (1 - ligne.remise / 100)
       return sum + montantLigne
@@ -74,9 +70,13 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
       totalTVA,
       totalTTC
     }))
-  }
+  }, [devis.lignes, devis.remiseGlobale])
 
-  const addLigne = () => {
+  useEffect(() => {
+    calculateTotals()
+  }, [calculateTotals])
+
+  const addLigne = useCallback(() => {
     const newLigne = {
       id: Date.now().toString(),
       designation: '',
@@ -90,25 +90,34 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
       ...prev,
       lignes: [...prev.lignes, newLigne]
     }))
-  }
+  }, [])
 
-  const removeLigne = (id: string) => {
+  const removeLigne = useCallback((id: string) => {
     setDevis(prev => ({
       ...prev,
       lignes: prev.lignes.filter(l => l.id !== id)
     }))
-  }
+  }, [])
 
-  const updateLigne = (id: string, field: string, value: any) => {
+  const updateLigne = useCallback((id: string, field: string, value: any) => {
     setDevis(prev => ({
       ...prev,
       lignes: prev.lignes.map(l => 
         l.id === id ? { ...l, [field]: value } : l
       )
     }))
-  }
+  }, [])
 
-  if (!resolvedParams) return <div>Chargement...</div>
+  if (!resolvedParams) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-2 border-current border-r-transparent" />
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -174,12 +183,14 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                   </Select>
                 </div>
               </div>
+
               <div>
-                <Label htmlFor="conditions">Conditions commerciales</Label>
+                <Label htmlFor="conditions">Conditions générales</Label>
                 <Textarea
                   id="conditions"
                   value={devis.conditions}
-                  onChange={(e) => setDevis(prev => ({ ...prev, conditions: (e.target as HTMLTextAreaElement).value }))}
+                  onChange={(e) => setDevis(prev => ({ ...prev, conditions: e.target.value }))}
+                  rows={3}
                 />
               </div>
             </CardContent>
@@ -190,7 +201,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Lignes du devis</CardTitle>
-                <Button size="sm" onClick={addLigne}>
+                <Button onClick={addLigne} size="sm">
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter ligne
                 </Button>
@@ -201,13 +212,13 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Désignation</TableHead>
-                    <TableHead className="w-20">Qté</TableHead>
-                    <TableHead className="w-20">Unité</TableHead>
-                    <TableHead className="w-32">P.U. HT</TableHead>
-                    <TableHead className="w-20">TVA</TableHead>
-                    <TableHead className="w-24">Remise</TableHead>
-                    <TableHead className="w-32">Total HT</TableHead>
-                    <TableHead className="w-12"></TableHead>
+                    <TableHead>Qté</TableHead>
+                    <TableHead>Unité</TableHead>
+                    <TableHead>Prix Unit.</TableHead>
+                    <TableHead>TVA %</TableHead>
+                    <TableHead>Remise %</TableHead>
+                    <TableHead>Total HT</TableHead>
+                    <TableHead></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -217,7 +228,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                         <Input
                           value={ligne.designation}
                           onChange={(e) => updateLigne(ligne.id, 'designation', e.target.value)}
-                          placeholder="Description du produit/service"
+                          placeholder="Description de la prestation"
                         />
                       </TableCell>
                       <TableCell>
@@ -225,23 +236,18 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                           type="number"
                           value={ligne.quantite}
                           onChange={(e) => updateLigne(ligne.id, 'quantite', parseFloat(e.target.value) || 0)}
-                          min="0"
-                          step="0.1"
+                          className="w-20"
                         />
                       </TableCell>
                       <TableCell>
-                        <Select 
-                          value={ligne.unite} 
-                          onValueChange={(value) => updateLigne(ligne.id, 'unite', value)}
-                        >
-                          <SelectTrigger>
+                        <Select value={ligne.unite} onValueChange={(value) => updateLigne(ligne.id, 'unite', value)}>
+                          <SelectTrigger className="w-20">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="u">u</SelectItem>
                             <SelectItem value="m">m</SelectItem>
                             <SelectItem value="m²">m²</SelectItem>
-                            <SelectItem value="kg">kg</SelectItem>
                             <SelectItem value="h">h</SelectItem>
                           </SelectContent>
                         </Select>
@@ -251,45 +257,33 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                           type="number"
                           value={ligne.prixUnitaire}
                           onChange={(e) => updateLigne(ligne.id, 'prixUnitaire', parseFloat(e.target.value) || 0)}
-                          min="0"
-                          step="0.01"
+                          className="w-24"
                         />
                       </TableCell>
                       <TableCell>
-                        <Select 
-                          value={ligne.taux_tva.toString()} 
-                          onValueChange={(value) => updateLigne(ligne.id, 'taux_tva', parseFloat(value))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="0">0%</SelectItem>
-                            <SelectItem value="5.5">5.5%</SelectItem>
-                            <SelectItem value="10">10%</SelectItem>
-                            <SelectItem value="20">20%</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Input
+                          type="number"
+                          value={ligne.taux_tva}
+                          onChange={(e) => updateLigne(ligne.id, 'taux_tva', parseFloat(e.target.value) || 0)}
+                          className="w-20"
+                        />
                       </TableCell>
                       <TableCell>
                         <Input
                           type="number"
                           value={ligne.remise}
                           onChange={(e) => updateLigne(ligne.id, 'remise', parseFloat(e.target.value) || 0)}
-                          min="0"
-                          max="100"
-                          step="0.1"
+                          className="w-20"
                         />
                       </TableCell>
-                      <TableCell className="text-right font-medium">
-                        €{(ligne.quantite * ligne.prixUnitaire * (1 - ligne.remise / 100)).toFixed(2)}
+                      <TableCell>
+                        {(ligne.quantite * ligne.prixUnitaire * (1 - ligne.remise / 100)).toFixed(2)} €
                       </TableCell>
                       <TableCell>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => removeLigne(ligne.id)}
-                          className="text-red-600"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -306,47 +300,48 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5" />
-                Récapitulatif
-              </CardTitle>
+              <CardTitle>Récapitulatif</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span>Sous-total HT</span>
-                <span className="font-medium">€{devis.sousTotal.toFixed(2)}</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span>Remise globale</span>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={devis.remiseGlobale}
-                    onChange={(e) => setDevis(prev => ({ ...prev, remiseGlobale: parseFloat(e.target.value) || 0 }))}
-                    className="w-16 h-8"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                  />
-                  <span className="text-sm">%</span>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Sous-total:</span>
+                  <span>{devis.sousTotal.toFixed(2)} €</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span>Remise globale:</span>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={devis.remiseGlobale}
+                      onChange={(e) => setDevis(prev => ({ ...prev, remiseGlobale: parseFloat(e.target.value) || 0 }))}
+                      className="w-16 text-right"
+                    />
+                    <span>%</span>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span>Total HT:</span>
+                  <span className="font-medium">{devis.totalHT.toFixed(2)} €</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span>Total TVA:</span>
+                  <span>{devis.totalTVA.toFixed(2)} €</span>
+                </div>
+                
+                <div className="flex justify-between text-lg font-bold border-t pt-2">
+                  <span>Total TTC:</span>
+                  <span>{devis.totalTTC.toFixed(2)} €</span>
                 </div>
               </div>
-              
-              <div className="flex justify-between border-t pt-2">
-                <span className="font-medium">Total HT</span>
-                <span className="font-medium">€{devis.totalHT.toFixed(2)}</span>
-              </div>
-              
-              <div className="flex justify-between">
-                <span>TVA</span>
-                <span>€{devis.totalTVA.toFixed(2)}</span>
-              </div>
-              
-              <div className="flex justify-between border-t pt-2 text-lg font-bold">
-                <span>Total TTC</span>
-                <span>€{devis.totalTTC.toFixed(2)}</span>
-              </div>
+
+              <Button className="w-full" onClick={calculateTotals}>
+                <Calculator className="h-4 w-4 mr-2" />
+                Recalculer
+              </Button>
             </CardContent>
           </Card>
 
@@ -361,13 +356,13 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
         </div>
       </div>
 
-      {/* Modal aperçu */}
+      {/* Modal d'aperçu */}
       {showPreview && (
         <DevisPreview
-        devisId={devis.reference}  // Utiliser reference au lieu de id
-        open={showPreview}
-        onOpenChange={setShowPreview}
-      />
+          devisId={devis.reference}
+          open={showPreview}
+          onOpenChange={setShowPreview}
+        />
       )}
     </div>
   )

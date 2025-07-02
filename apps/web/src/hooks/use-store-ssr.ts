@@ -1,27 +1,24 @@
-// apps/web/src/hooks/use-store-ssr.ts - VERSION FIXEE
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
-export function useHydrationSafe<T>(callback: () => T, fallback: T): T {
-  const [isHydrated, setIsHydrated] = useState(false)
-  
-  useEffect(() => {
-    setIsHydrated(true)
+interface UseStoreSsrOptions<T> {
+  fallback: T
+  serverValue?: T
+}
+
+export function useStoreSsr<T>(options: UseStoreSsrOptions<T>) {
+  const { fallback, serverValue } = options
+
+  const value = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return serverValue ?? fallback
+    }
+    return fallback
+  }, [fallback, serverValue])
+
+  const setValue = useCallback((newValue: T) => {
+    // Implémentation du setter si nécessaire
+    console.log('Setting value:', newValue)
   }, [])
 
-  // Mémoriser le fallback pour éviter les re-renders
-  const memoizedFallback = useMemo(() => fallback, [])
-  
-  // Utiliser callback stable
-  const stableCallback = useCallback(callback, [])
-
-  if (!isHydrated) {
-    return memoizedFallback
-  }
-
-  try {
-    return stableCallback()
-  } catch (error) {
-    console.warn('Store hydration error:', error)
-    return memoizedFallback
-  }
+  return [value, setValue] as const
 }
