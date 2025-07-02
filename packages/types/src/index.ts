@@ -19,7 +19,6 @@ export * from './ui'
 
 // Exports explicites pour les enums 
 export type { PaginationMetaDto, PaginationResultDto } from "./api"
-export type { Client as ClientType } from "./client"
 export { DevisStatut, FactureStatut, PaiementMethode } from "./facturation"
 export { NotificationCategory, NotificationType } from "./notifications"
 export { OperationStatut, OrdrePriorite, OrdreStatut } from "./production"

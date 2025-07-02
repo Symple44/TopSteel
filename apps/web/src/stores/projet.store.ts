@@ -1,7 +1,11 @@
 // apps/web/src/stores/projet.store.ts
-import { create } from 'zustand'
-import { createStoreWithPersist } from '@/lib/store-utils'
-import type { Projet, ProjetFilters } from '@erp/types'
+import { createStoreWithPersist } from '@/lib/store-utils';
+import { projetService } from '@/services/projet.service'; // 
+import type {
+  Projet,
+  ProjetFilters
+} from '@erp/types';
+import { create } from 'zustand';
 
 interface ProjetState {
   projets: Projet[]
@@ -28,31 +32,13 @@ export const useProjetStore = create<ProjetState>()(
       fetchProjets: async () => {
         set({ isLoading: true, error: null })
         try {
-          // TODO: Implémenter projetService.getAll
-          // Mock data pour le moment
-          const mockProjets: Projet[] = [
-            {
-              id: '1',
-              reference: 'PRJ-2024-001',
-              description: 'Portail en acier',
-              statut: 'en_cours',
-              type: 'PORTAIL',
-              priorite: 'NORMALE',
-              montantHT: 5000,
-              montantTTC: 6000,
-              tauxTVA: 20,
-              marge: 30,
-              avancement: 65,
-              dateCreation: new Date(),
-              clientId: '1',
-              client: { id: '1', nom: 'Client Test', email: 'test@test.com' },
-              adresseChantier: { ville: 'Paris', codePostal: '75001' },
-              documentsIds: [],
-              ordresFabricationIds: []
-            } as Projet
-          ]
+          const response = await projetService.getAll(get().filters)
           
-          set({ projets: mockProjets, isLoading: false })
+          // ✅ Les données du service sont déjà aux bons types, on les utilise directement
+          set({ 
+            projets: response.data, 
+            isLoading: false 
+          })
         } catch (error) {
           set({ 
             error: error instanceof Error ? error.message : 'Erreur de chargement',
@@ -64,9 +50,12 @@ export const useProjetStore = create<ProjetState>()(
       setSelectedProjet: (projet) => set({ selectedProjet: projet }),
       
       setFilters: (newFilters) => {
-        set((state) => {
-          state.filters = { ...state.filters, ...newFilters }
-        })
+        set((state) => ({
+          ...state,
+          filters: { ...state.filters, ...newFilters }
+        }))
+        // ✅ Recharger les projets quand les filtres changent
+        get().fetchProjets()
       },
       
       clearError: () => set({ error: null }),

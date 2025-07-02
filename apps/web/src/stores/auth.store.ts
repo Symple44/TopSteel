@@ -1,7 +1,8 @@
-// apps/web/src/stores/auth.store.ts
-import { create } from 'zustand'
+// apps/web/src/stores/auth.store.ts 
 import { createStoreWithPersist } from '@/lib/store-utils'
+import { authService } from '@/services/auth.service'
 import type { User } from '@erp/types'
+import { create } from 'zustand'
 
 interface AuthTokens {
   accessToken: string
@@ -36,18 +37,13 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         set({ isLoading: true, error: null })
         try {
-          // TODO: Implémenter authService.login
-          const mockResponse = {
-            user: { id: '1', email, nom: 'Test User' } as User,
-            accessToken: 'mock-access-token',
-            refreshToken: 'mock-refresh-token',
-          }
+          const response = await authService.login(email, password)
           
           set({
-            user: mockResponse.user,
+            user: response.user,
             tokens: {
-              accessToken: mockResponse.accessToken,
-              refreshToken: mockResponse.refreshToken,
+              accessToken: response.accessToken,
+              refreshToken: response.refreshToken,
             },
             isAuthenticated: true,
             isLoading: false,
@@ -62,8 +58,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
+        const { tokens } = get()
         try {
-          // TODO: Implémenter authService.logout
+          if (tokens?.refreshToken) {
+            await authService.logout(tokens.refreshToken)
+          }
+        } catch (error) {
+          // ⚠️ On continue même si logout API échoue
+          console.warn('Erreur logout API (ignorée):', error)
         } finally {
           get().clearAuth()
         }
@@ -75,18 +77,52 @@ export const useAuthStore = create<AuthState>()(
           get().clearAuth()
           return
         }
-        // TODO: Implémenter authService.refreshToken
+        
+        try {
+          const response = await authService.refreshToken(tokens.refreshToken)
+          
+          set((state) => ({
+            ...state,
+            tokens: {
+              accessToken: response.accessToken,
+              refreshToken: response.refreshToken,
+            }
+          }))
+        } catch (error) {
+          console.error('Erreur refresh token:', error)
+          get().clearAuth()
+        }
       },
 
       checkAuth: async () => {
-        // TODO: Implémenter authService.getMe
+        const { tokens } = get()
+        if (!tokens?.accessToken) {
+          get().clearAuth()
+          return
+        }
+
+        try {
+          const user = await authService.getMe()
+          
+          set({
+            user,
+            isAuthenticated: true,
+          })
+        } catch (error) {
+          console.error('Erreur checkAuth:', error)
+          get().clearAuth()
+        }
       },
 
       updateUser: (userData) => {
         set((state) => {
           if (state.user) {
-            state.user = { ...state.user, ...userData }
+            return {
+              ...state,
+              user: { ...state.user, ...userData }
+            }
           }
+          return state
         })
       },
 
