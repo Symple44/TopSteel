@@ -1,6 +1,6 @@
-// apps/web/src/stores/projet.store.ts
+// apps/web/src/stores/projet.store.ts - VERSION CORRIGÉE
 import { createStoreWithPersist } from '@/lib/store-utils';
-import { projetService } from '@/services/projet.service'; // 
+import { projetService } from '@/services/projet.service';
 import type {
   Projet,
   ProjetFilters
@@ -18,6 +18,7 @@ interface ProjetState {
   setSelectedProjet: (projet: Projet | null) => void
   setFilters: (filters: Partial<ProjetFilters>) => void
   clearError: () => void
+  refetchWithFilters: () => Promise<void> // ✅ Nouvelle méthode explicite
 }
 
 export const useProjetStore = create<ProjetState>()(
@@ -30,11 +31,13 @@ export const useProjetStore = create<ProjetState>()(
       error: null,
 
       fetchProjets: async () => {
+        const state = get()
+        if (state.isLoading) return // ✅ Éviter les appels simultanés
+        
         set({ isLoading: true, error: null })
         try {
-          const response = await projetService.getAll(get().filters)
+          const response = await projetService.getAll(state.filters)
           
-          // ✅ Les données du service sont déjà aux bons types, on les utilise directement
           set({ 
             projets: response.data, 
             isLoading: false 
@@ -49,18 +52,23 @@ export const useProjetStore = create<ProjetState>()(
 
       setSelectedProjet: (projet) => set({ selectedProjet: projet }),
       
+      // ✅ FIX CRITIQUE: Supprimer l'auto-fetch qui cause les boucles
       setFilters: (newFilters) => {
         set((state) => ({
           ...state,
           filters: { ...state.filters, ...newFilters }
         }))
-        // ✅ Recharger les projets quand les filtres changent
-        get().fetchProjets()
+        // ✅ NE PAS auto-fetch ici - laisser le composant décider
+      },
+
+      // ✅ Nouvelle méthode pour refetch explicite avec nouveaux filtres
+      refetchWithFilters: async () => {
+        await get().fetchProjets()
       },
       
       clearError: () => set({ error: null }),
     }),
     'projets',
-    ['filters']
+    ['filters'] // ✅ Persister seulement les filtres, pas les données
   )
 )

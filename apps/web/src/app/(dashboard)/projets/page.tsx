@@ -1,4 +1,4 @@
-// apps/web/src/app/(dashboard)/projets/page.tsx (avec asChild)
+// apps/web/src/app/(dashboard)/projets/page.tsx - VERSION CORRIGÉE
 'use client'
 
 import { Badge } from '@/components/ui/badge'
@@ -6,18 +6,28 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from "@/components/ui/data-table"
 import { PageHeader } from "@/components/ui/page-header"
 import { ProjetCard } from "@/components/ui/projet-card"
-import { useProjets, useUI } from '@/stores'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { useProjets, useUI } from '@/stores'
 import type { Projet } from '@erp/types'
 import { Grid, List, Plus } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import { useCallback, useMemo } from 'react'
 
 export default function ProjetsPage() {
-  const { projets, isLoading, fetchProjets } = useProjets()
+  const { projets, isLoading, fetchProjets, refetchWithFilters } = useProjets()
   const { dataView, setDataView } = useUI()
 
-  const columns = [
+  // ✅ FIX: Stabilisation des handlers avec useCallback
+  const handleViewChange = useCallback((view: 'grid' | 'table') => {
+    setDataView(view) // ✅ FIX CRITIQUE: Correction typo setdataView → setDataView
+  }, [setDataView])
+
+  const handleRefresh = useCallback(() => {
+    refetchWithFilters()
+  }, [refetchWithFilters])
+
+  // ✅ Mémorisation des colonnes pour éviter les re-renders
+  const columns = useMemo(() => [
     {
       key: 'reference',
       label: 'Référence',
@@ -55,8 +65,9 @@ export default function ProjetsPage() {
       render: (avancement: number) => `${avancement}%`,
       sortable: true,
     },
-  ]
+  ], [])
 
+  // ✅ Loading state stable
   if (isLoading) {
     return (
       <div className="flex h-96 items-center justify-center">
@@ -83,7 +94,7 @@ export default function ProjetsPage() {
               <Button
                 variant={dataView === 'grid' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setdataView('grid')}
+                onClick={() => handleViewChange('grid')} // ✅ Handler stable
                 className="rounded-r-none"
               >
                 <Grid className="h-4 w-4" />
@@ -91,17 +102,22 @@ export default function ProjetsPage() {
               <Button
                 variant={dataView === 'table' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setdataView('table')}
+                onClick={() => handleViewChange('table')} // ✅ Handler stable
                 className="rounded-l-none"
               >
                 <List className="h-4 w-4" />
               </Button>
             </div>
-            
-            {/* ✅ asChild avec le nouveau composant Button */}
+            <Button 
+              onClick={handleRefresh}
+              variant="outline" 
+              size="sm"
+            >
+              Actualiser
+            </Button>
             <Button asChild>
               <Link href="/projets/nouveau">
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus className="mr-2 h-4 w-4" />
                 Nouveau projet
               </Link>
             </Button>
@@ -109,34 +125,20 @@ export default function ProjetsPage() {
         }
       />
 
-      <div className="px-6">
-        {dataView === 'grid' ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {projets.map((projet) => (
-              <ProjetCard key={projet.id} projet={projet} />
-            ))}
-            {projets.length === 0 && (
-              <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground">Aucun projet trouvé</p>
-                {/* ✅ asChild avec le nouveau composant Button */}
-                <Button asChild className="mt-4">
-                  <Link href="/projets/nouveau">
-                    <Plus className="h-4 w-4 mr-1" />
-                    Créer le premier projet
-                  </Link>
-                </Button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <DataTable
-            data={projets}
-            columns={columns}
-            searchKey="reference"
-            searchPlaceholder="Rechercher un projet..."
-          />
-        )}
-      </div>
+      {dataView === 'grid' ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projets.map((projet) => (
+            <ProjetCard key={projet.id} projet={projet} />
+          ))}
+        </div>
+      ) : (
+        <DataTable
+          data={projets}
+          columns={columns}
+          searchable
+          sortable
+        />
+      )}
     </div>
   )
 }
