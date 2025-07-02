@@ -1,96 +1,118 @@
-// apps/web/src/components/facturation/create-devis-dialog.tsx
 'use client'
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus } from 'lucide-react'
+import { X } from 'lucide-react'
 
 interface CreateDevisDialogProps {
-  onDevisCreated?: (devis: any) => void
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function CreateDevisDialog({ onDevisCreated }: CreateDevisDialogProps) {
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
+export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps) {
+  const [formData, setFormData] = useState({
+    reference: '',
+    clientNom: '',
+    clientEmail: '',
+    description: '',
+    dateValidite: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 jours
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  if (!open) return null
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    
-    // Simulation création devis
-    setTimeout(() => {
-      const newDevis = {
-        id: `DEVIS-${Date.now()}`,
-        reference: `DEV-${Math.floor(Math.random() * 1000)}`,
-        clientId: 'client-1',
-        montantHT: 0,
-        statut: 'brouillon'
-      }
-      
-      onDevisCreated?.(newDevis)
-      setLoading(false)
-      setOpen(false)
-    }, 1000)
+    console.log('Nouveau devis:', formData)
+    onOpenChange(false)
+    setFormData({
+      reference: '',
+      clientNom: '',
+      clientEmail: '',
+      description: '',
+      dateValidite: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    })
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Nouveau Devis
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Créer un nouveau devis</DialogTitle>
-          <DialogDescription>
-            Saisissez les informations de base pour créer un nouveau devis.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="reference" className="text-right">
-              Référence
-            </Label>
-            <Input
-              id="reference"
-              placeholder="DEV-001"
-              className="col-span-3"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="client" className="text-right">
-              Client
-            </Label>
-            <Input
-              id="client"
-              placeholder="Nom du client"
-              className="col-span-3"
-              required
-            />
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-              Annuler
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Création...' : 'Créer'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <Card className="w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle>Créer un nouveau devis</CardTitle>
+          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+            <X className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="reference">Référence *</Label>
+                <Input
+                  id="reference"
+                  value={formData.reference}
+                  onChange={(e) => setFormData({...formData, reference: e.target.value})}
+                  placeholder="DEV-2025-001"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="dateValidite">Date de validité</Label>
+                <Input
+                  id="dateValidite"
+                  type="date"
+                  value={formData.dateValidite}
+                  onChange={(e) => setFormData({...formData, dateValidite: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="clientNom">Client *</Label>
+              <Input
+                id="clientNom"
+                value={formData.clientNom}
+                onChange={(e) => setFormData({...formData, clientNom: e.target.value})}
+                placeholder="Nom du client ou entreprise"
+                required
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="clientEmail">Email client</Label>
+              <Input
+                id="clientEmail"
+                type="email"
+                value={formData.clientEmail}
+                onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
+                placeholder="client@exemple.fr"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="description">Description du projet</Label>
+              <textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                placeholder="Description des travaux de métallerie..."
+                className="w-full p-2 border rounded-md min-h-[100px] resize-y"
+              />
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+                Annuler
+              </Button>
+              <Button type="submit" className="flex-1">
+                Créer le devis
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

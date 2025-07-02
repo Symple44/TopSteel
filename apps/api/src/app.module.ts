@@ -5,10 +5,10 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { TerminusModule } from "@nestjs/terminus";
 
 // Configuration
-import appConfig from "./config/app.config";
-import databaseConfig from "./config/database.config";
-import jwtConfig from "./config/jwt.config";
-import redisConfig from "./config/redis.config";
+import { appConfig } from "./config/app.config";
+import { databaseConfig } from "./config/database.config";
+import { jwtConfig } from "./config/jwt.config";
+import { redisConfig } from "./config/redis.config";
 import { RedisModule } from "./redis/redis.module";
 
 // Modules système
@@ -90,3 +90,4 @@ export class AppModule implements NestModule {
     consumer.apply(LoggerMiddleware).forRoutes("*");
   }
 }
+

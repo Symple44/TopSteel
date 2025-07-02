@@ -41,7 +41,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { formatCurrency, formatPercent } from '@/lib/utils'
+import { formatCurrency } from '@/lib/utils'
+import { formatPercent } from '@erp/utils'
 
 // Données mockées pour la démonstration
 const mockTemplates = [
@@ -425,3 +426,5 @@ export default function ChiffragePage() {
     </div>
   )
 }
+
+

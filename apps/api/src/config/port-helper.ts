@@ -55,8 +55,8 @@ export async function listenWithPortFallback(
   configService: any, 
   logger: any
 ): Promise<number> {
-  const preferredPort = configService.get<number>("app.port", 3001);
-  const host = configService.get<string>("app.host", "0.0.0.0");
+  const preferredPort = configService.get("app.port") || 3001;
+  const host = configService.get("app.host") || "0.0.0.0";
   
   const portConfig: PortConfig = {
     preferred: preferredPort,
@@ -75,7 +75,8 @@ export async function listenWithPortFallback(
     
     return availablePort;
   } catch (error) {
-    logger.error('❌ Erreur lors du démarrage du serveur:', error.message);
+    logger.error('❌ Erreur lors du démarrage du serveur:', (error as Error).message);
     throw error;
   }
 }
+
