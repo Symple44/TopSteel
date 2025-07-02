@@ -18,13 +18,13 @@ export class OrdreFabricationService {
     // ✅ Transformation correcte des types
     const entityData = {
       numero: createDto.numero,
-      statut: createDto.statut || OrdreFabricationStatut .EN_ATTENTE,
+      statut: createDto.statut ?? OrdreFabricationStatut .EN_ATTENTE,
       projet: createDto.projet,
       description: createDto.description,
       priorite: createDto.priorite,
       dateDebutPrevue: createDto.dateDebutPrevue ? new Date(createDto.dateDebutPrevue) : undefined,
       dateFinPrevue: createDto.dateFinPrevue ? new Date(createDto.dateFinPrevue) : undefined,
-      avancement: createDto.avancement || 0,
+      avancement: createDto.avancement ?? 0,
       responsableId: createDto.responsableId,
       notes: createDto.notes,
     };
@@ -106,7 +106,6 @@ export class OrdreFabricationService {
     id: number,
     updateDto: UpdateOrdreFabricationDto,
   ): Promise<OrdreFabrication> {
-    // ✅ Transformation correcte des dates
     const updateData: any = {
       ...updateDto,
     };
