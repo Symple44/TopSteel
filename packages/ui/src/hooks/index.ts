@@ -1,3 +1,5 @@
-// packages/ui/src/hooks/index.ts - Hooks robustes
-export * from './use-toast'
-export * from './use-theme'
+// packages/ui/src/hooks/index.ts - Exports hooks UI
+export * from './use-toast';
+
+// Hooks additionnels pour l'avenir
+export type { Toast } from './use-toast';

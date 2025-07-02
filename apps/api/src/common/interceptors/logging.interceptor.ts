@@ -5,35 +5,50 @@ import {
   Injectable,
   Logger,
   NestInterceptor,
-} from "@nestjs/common";
-import { Request, Response } from "express";
-import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInterceptor.name);
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const response = context.switchToHttp().getResponse<Response>();
-    const { method, url, ip, headers } = request;
-    const userAgent = headers["user-agent"] ?? "";
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const request = context.switchToHttp().getRequest();
+    const { method, url, headers, body } = request;
+    const startTime = Date.now();
+    const requestId = headers['x-request-id'] || `req_${Date.now()}`;
 
-    const now = Date.now();
-
-    this.logger.log(
-      `Incoming Request: ${method} ${url} - IP: ${ip} - User Agent: ${userAgent}`,
-    );
+    const logData = {
+      requestId,
+      method,
+      url,
+      userAgent: headers['user-agent'],
+      ip: request.ip,
+      userId: request.user?.id,
+      timestamp: new Date().toISOString(),
+    };
 
     return next.handle().pipe(
-      tap(() => {
-        const { statusCode } = response;
-        const delay = Date.now() - now;
-
-        this.logger.log(
-          `Outgoing Response: ${method} ${url} ${statusCode} - ${delay}ms`,
-        );
+      tap((data) => {
+        const responseTime = Date.now() - startTime;
+        this.logger.log({
+          ...logData,
+          responseTime,
+          status: 'success',
+          responseSize: JSON.stringify(data).length,
+        });
+      }),
+      catchError((error) => {
+        const responseTime = Date.now() - startTime;
+        this.logger.error({
+          ...logData,
+          responseTime,
+          status: 'error',
+          error: error.message,
+          errorType: error.constructor.name,
+        });
+        throw error;
       }),
     );
   }

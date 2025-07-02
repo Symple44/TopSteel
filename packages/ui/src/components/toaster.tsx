@@ -1,30 +1,28 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+// packages/ui/src/components/toaster.tsx
+import * as React from "react";
+import { cn } from "../lib/utils";
 
 interface ToasterProps extends React.HTMLAttributes<HTMLDivElement> {
-  position?: "top-left" | "top-right" | "bottom-left" | "bottom-right"
+  children?: React.ReactNode;
 }
 
 const Toaster = React.forwardRef<HTMLDivElement, ToasterProps>(
-  ({ className, position = "bottom-right", ...props }, ref) => {
+  ({ className, children, ...props }, ref) => {
     return (
       <div
         ref={ref}
         className={cn(
-          "fixed z-50 flex flex-col space-y-2 p-4",
-          {
-            "top-4 left-4": position === "top-left",
-            "top-4 right-4": position === "top-right", 
-            "bottom-4 left-4": position === "bottom-left",
-            "bottom-4 right-4": position === "bottom-right",
-          },
+          "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
           className
         )}
         {...props}
-      />
-    )
+      >
+        {children}
+      </div>
+    );
   }
-)
-Toaster.displayName = "Toaster"
+);
 
-export { Toaster }
+Toaster.displayName = "Toaster";
+
+export { Toaster };

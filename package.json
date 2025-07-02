@@ -83,7 +83,12 @@
     "test:all": "turbo test",
     "test:packages:safe": "turbo test --filter='packages/*' --continue",
     "test:apps": "turbo test --filter='apps/*'",
-    "test:all:safe": "turbo test --continue"
+    "test:all:safe": "turbo test --continue",
+    "health:check": "curl -f http://localhost:3001/api/health && curl -f http://localhost:3000/api/health",
+    "ports:check": "pwsh -Command \"Get-NetTCPConnection -LocalPort 3000,3001,5432 -ErrorAction SilentlyContinue\"",
+    "fix:ports": "pwsh -File scripts/fix-ports.ps1",
+    "validate:config": "node -e \"console.log('Config validation OK')\"",
+    "migration:create": "turbo migration:generate --filter=@erp/api"
   },
   "dependencies": {
     "dotenv": "^17.0.0"

@@ -12,6 +12,7 @@ import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
+import { listenWithPortFallback } from "./config/port-helper";
 
 // ============================================================================
 // CHARGEMENT VARIABLES D'ENVIRONNEMENT MONOREPO
@@ -83,8 +84,6 @@ async function bootstrap() {
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   });
-
- 
 
   // ============================================================================
   // CONFIGURATION VERSIONING 
@@ -305,7 +304,11 @@ async function bootstrap() {
   process.on("SIGTERM", gracefulShutdown);
   process.on("SIGINT", gracefulShutdown);
 
-  await app.listen(port);
+  // Gestion intelligente des ports avec fallback
+  const actualPort = await listenWithPortFallback(app, configService, logger);
+  
+  // Mise à jour des logs avec le port réel
+  const portForLogs = actualPort;
 
   // ============================================================================
   // LOGS DE DÉMARRAGE INFORMATIFS
@@ -315,7 +318,7 @@ async function bootstrap() {
   logger.log("🏭 ===============================================");
   logger.log("🏭           TOPSTEEL ERP API");
   logger.log("🏭 ===============================================");
-  logger.log(`🚀 Serveur démarré: http://localhost:${port}`);
+  logger.log(`🚀 Serveur démarré: http://localhost:${portForLogs}`);
   logger.log(`🌟 Environnement: ${env}`);
   logger.log(`🔗 CORS Origin: ${corsOrigin}`);
   logger.log("");

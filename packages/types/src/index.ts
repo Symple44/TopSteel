@@ -1,3 +1,4 @@
+// packages/types/src/index.ts - Exports corrigés sans conflits
 // Types
 export * from './api'
 export * from './auth'
@@ -10,18 +11,18 @@ export * from './admin'
 export * from './client'
 export * from './facturation'
 export * from './notifications'
-export * from './production'
+export * from './production'  // Export global de production
 export * from './projet'
 export * from './stocks'
 
 // Types UI séparés
 export * from './ui'
 
-// Exports explicites pour les enums 
+// Exports explicites pour les autres enums (pas production)
 export type { PaginationMetaDto, PaginationResultDto } from "./api"
 export { DevisStatut, FactureStatut, PaiementMethode } from "./facturation"
 export { NotificationCategory, NotificationType } from "./notifications"
-export { OperationStatut, OrdrePriorite, OrdreStatut } from "./production"
+// Production exports sont gérés par export * from './production'
 export { ProjetPriorite, ProjetStatut, ProjetType } from "./projet"
 export type { Projet as ProjectType } from "./projet"
 export { ChuteQualite, ChuteStatut, MouvementType } from "./stocks"

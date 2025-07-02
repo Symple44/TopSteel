@@ -1,32 +1,42 @@
-// packages/ui/src/types/index.ts - Types robustes
-import { type VariantProps } from 'class-variance-authority'
-import { type HTMLAttributes, type ReactNode } from 'react'
-
-// === TYPES DE BASE ===
-export interface BaseComponentProps extends HTMLAttributes<HTMLElement> {
-  children?: ReactNode
-  asChild?: boolean
+// packages/ui/src/types/index.ts
+// Types communs pour l'UI
+export interface BaseComponentProps {
+  className?: string;
+  children?: React.ReactNode;
 }
 
-// === TYPES DE VARIANTES ===
-export type ComponentVariants<T> = VariantProps<T>
+export type ComponentVariant = 
+  | 'default' 
+  | 'destructive' 
+  | 'outline' 
+  | 'secondary' 
+  | 'ghost' 
+  | 'link'
+  | 'success'
+  | 'warning';
 
-// === TYPES D'ÉVÉNEMENTS ===
-export interface ComponentEvent<T = any> {
-  type: string
-  data?: T
-  timestamp: number
+export type ComponentSize = 'sm' | 'md' | 'lg' | 'xl';
+
+export interface ComponentWithVariant {
+  variant?: ComponentVariant;
 }
 
-// === TYPES MÉTIER ===
-export interface ProjetData {
-  id: string
-  nom: string
-  statut: 'draft' | 'active' | 'completed' | 'archived'
-  description?: string
-  dateCreation: Date
-  dateModification: Date
+export interface ComponentWithSize {
+  size?: ComponentSize;
 }
 
-// === EXPORTS ===
-export type { ClassValue } from 'clsx'
+// Types pour les toasts
+export interface ToastProps extends BaseComponentProps {
+  variant?: ComponentVariant;
+  duration?: number;
+  title?: string;
+  description?: string;
+}
+
+// Types pour les formulaires
+export interface FormFieldProps extends BaseComponentProps {
+  error?: string;
+  label?: string;
+  required?: boolean;
+  disabled?: boolean;
+}
