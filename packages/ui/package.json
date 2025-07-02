@@ -1,34 +1,13 @@
 {
-  "name": "@erp/ui",
-  "version": "2.0.0",
-  "description": "UI components library for ERP TopSteel",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
+  "module": "./dist/index.mjs",
+  "description": "UI components library for ERP TopSteel - Architecture robuste",
+  "type": "module",
+  "version": "2.0.0",
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
-  "scripts": {
-    "dev": "vite build --watch",
-    "lint": "echo 'UI package linted via apps'",
-    "format:check": "echo 'UI package formatted via apps'",
-    "test": "echo 'UI package uses Storybook and manual testing' && exit 0",
-    "test:coverage": "echo 'UI package uses manual testing'",
-    "test:integration": "echo 'No integration tests for UI package'",
-    "test:unit": "echo 'UI package uses manual testing'",
-    "build": "vite build",
-    "build:watch": "vite build --watch",
-    "type-check": "tsc --noEmit",
-    "build:ci": "NODE_OPTIONS='--max-old-space-size=4096' vite build",
-    "build:cjs": "tsc && vite build --mode production"
-  },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-alert-dialog": "^1.1.2",
@@ -61,6 +40,33 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "4.1.11"
   },
+  "name": "@erp/ui",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    },
+    "./styles": {
+      "import": "./dist/styles.css",
+      "require": "./dist/styles.css"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "scripts": {
+    "dev:explicit": "npx vite build --watch",
+    "build": "pnpm exec vite build",
+    "test:vite": "pnpm exec vite --version",
+    "build:clean": "pnpm clean && pnpm build",
+    "dev": "npx vite build --watch",
+    "clean": "rimraf dist",
+    "build:fallback": "tsc && rollup -c",
+    "type-check": "pnpm exec tsc --noEmit"
+  },
+  "main": "./dist/index.js",
   "devDependencies": {
     "@types/node": "^24.0.7",
     "@types/react": "^19.1.8",
@@ -69,16 +75,12 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "rimraf": "^6.0.1",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.3",
     "vite": "^7.0.0",
     "vite-plugin-dts": "^4.5.4"
   },
-  "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
-  },
   "publishConfig": {
     "access": "restricted"
-  },
-  "type": "module"
+  }
 }

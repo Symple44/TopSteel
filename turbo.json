@@ -1,64 +1,128 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**", "build/**"],
-      "env": ["NODE_ENV", "NEXT_PUBLIC_*", "DB_*", "REDIS_*", "JWT_*"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "build/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "DB_*",
+        "REDIS_*",
+        "JWT_*"
+      ]
     },
     "start": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
-      "env": ["NODE_ENV", "PORT"]
+      "env": [
+        "NODE_ENV",
+        "PORT"
+      ]
     },
     "start:dev": {
       "cache": false,
       "persistent": true,
-      "env": ["NODE_ENV", "PORT", "DB_*", "REDIS_*", "JWT_*"]
+      "env": [
+        "NODE_ENV",
+        "PORT",
+        "DB_*",
+        "REDIS_*",
+        "JWT_*"
+      ]
     },
     "start:prod": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
-      "env": ["NODE_ENV", "PORT", "DB_*", "REDIS_*", "JWT_*"]
+      "env": [
+        "NODE_ENV",
+        "PORT",
+        "DB_*",
+        "REDIS_*",
+        "JWT_*"
+      ]
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "lint:fix": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "type-check": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
-      "inputs": ["src/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "**/*.test.{ts,tsx}"
+      ]
     },
     "test:unit": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
       "cache": false
     },
     "test:integration": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": [],
-      "env": ["NODE_ENV", "CI", "DB_*", "REDIS_*"],
+      "env": [
+        "NODE_ENV",
+        "CI",
+        "DB_*",
+        "REDIS_*"
+      ],
       "cache": false
     },
     "test:coverage": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": [],
-      "env": ["NODE_ENV", "CI"],
+      "env": [
+        "NODE_ENV",
+        "CI"
+      ],
       "cache": false
     },
     "test:watch": {
@@ -66,29 +130,45 @@
       "persistent": true
     },
     "test:cov": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "test:e2e": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": [],
-      "env": ["NODE_ENV", "DB_*", "REDIS_*"]
+      "env": [
+        "NODE_ENV",
+        "DB_*",
+        "REDIS_*"
+      ]
     },
     "migration:run": {
       "cache": false,
-      "env": ["DB_*"]
+      "env": [
+        "DB_*"
+      ]
     },
     "migration:generate": {
       "cache": false,
-      "env": ["DB_*"]
+      "env": [
+        "DB_*"
+      ]
     },
     "migration:revert": {
       "cache": false,
-      "env": ["DB_*"]
+      "env": [
+        "DB_*"
+      ]
     },
     "seed:run": {
       "cache": false,
-      "env": ["DB_*"]
+      "env": [
+        "DB_*"
+      ]
     },
     "format": {
       "outputs": [],
@@ -103,7 +183,23 @@
       ],
       "outputs": [],
       "cache": false
+    },
+    "build:types": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ],
+      "inputs": [
+        "src/**/*.ts",
+        "tsconfig.json"
+      ]
     }
   },
-  "globalEnv": ["TURBO_FORCE", "CI", "NODE_ENV"]
+  "globalEnv": [
+    "TURBO_FORCE",
+    "CI",
+    "NODE_ENV"
+  ]
 }

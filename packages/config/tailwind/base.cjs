@@ -202,5 +202,5 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [] // Plugins v4 à revoir,
 }
