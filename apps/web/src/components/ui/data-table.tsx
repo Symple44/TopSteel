@@ -1,13 +1,14 @@
 'use client'
 
-import { Button } from '@/components/ui/button';
+import * as React from 'react'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -15,161 +16,205 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import type {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState
-} from '@tanstack/react-table';
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable
-} from '@tanstack/react-table';
-import { ChevronDown, Download, Search } from 'lucide-react';
-import { useState } from 'react';
+} from '@/components/ui/table'
+import { ChevronDown, Search } from 'lucide-react'
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  searchKey?: string
-  searchPlaceholder?: string
-  showColumnToggle?: boolean
-  showExport?: boolean
-  onExport?: () => void
+interface Column {
+  key: string
+  label: string
+  render?: (value: any, item: any) => React.ReactNode
+  sortable?: boolean
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  searchKey = 'nom',
-  searchPlaceholder = 'Rechercher...',
-  showColumnToggle = true,
-  showExport = false,
-  onExport
-}: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [globalFilter, setGlobalFilter] = useState('')
+interface FilterOption {
+  id: string
+  title: string
+  options: Array<{
+    label: string
+    value: string
+  }>
+}
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onGlobalFilterChange: setGlobalFilter,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      globalFilter,
-    },
-  })
+interface DataTableProps {
+  data: any[]
+  columns: Column[]
+  searchableColumns?: string[]
+  filterableColumns?: FilterOption[]
+  loading?: boolean
+}
+
+export function DataTable({
+  data,
+  columns,
+  searchableColumns = [],
+  filterableColumns = [],
+  loading = false,
+}: DataTableProps) {
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const [columnFilters, setColumnFilters] = React.useState<Record<string, string[]>>({})
+  const [visibleColumns, setVisibleColumns] = React.useState<Record<string, boolean>>(
+    columns.reduce((acc, col) => ({ ...acc, [col.key]: true }), {})
+  )
+
+  // Filtrer les données
+  const filteredData = React.useMemo(() => {
+    let filtered = data
+
+    // Recherche textuelle
+    if (searchTerm && searchableColumns.length > 0) {
+      filtered = filtered.filter(item =>
+        searchableColumns.some(column =>
+          String(item[column] || '').toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      )
+    }
+
+    // Filtres par colonnes
+    Object.entries(columnFilters).forEach(([column, values]) => {
+      if (values.length > 0) {
+        filtered = filtered.filter(item =>
+          values.includes(String(item[column]))
+        )
+      }
+    })
+
+    return filtered
+  }, [data, searchTerm, columnFilters, searchableColumns])
+
+  const handleColumnFilterChange = (columnId: string, value: string, checked: boolean) => {
+    setColumnFilters(prev => {
+      const current = prev[columnId] || []
+      if (checked) {
+        return { ...prev, [columnId]: [...current, value] }
+      } else {
+        return { ...prev, [columnId]: current.filter(v => v !== value) }
+      }
+    })
+  }
+
+  const toggleColumnVisibility = (columnKey: string) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [columnKey]: !prev[columnKey]
+    }))
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="h-10 bg-gray-200 rounded animate-pulse" />
+        <div className="space-y-2">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
-      {/* Toolbar */}
+      {/* Barre d'outils */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={searchPlaceholder}
-              value={globalFilter ?? ''}
-              onChange={(e) => setGlobalFilter(String(e.target.value))}
-              className="pl-8 max-w-sm"
-            />
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          {showExport && (
-            <Button variant="outline" size="sm" onClick={onExport}>
-              <Download className="h-4 w-4 mr-2" />
-              Exporter
-            </Button>
+          {/* Recherche */}
+          {searchableColumns.length > 0 && (
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8"
+              />
+            </div>
           )}
-          
-          {showColumnToggle && (
-            <DropdownMenu>
+
+          {/* Filtres */}
+          {filterableColumns.map((filterColumn) => (
+            <DropdownMenu key={filterColumn.id}>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
-                  Colonnes <ChevronDown className="ml-2 h-4 w-4" />
+                  {filterColumn.title}
+                  <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => {
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={column.id}
-                        className="capitalize"
-                        checked={column.getIsVisible()}
-                        onCheckedChange={(value) =>
-                          column.toggleVisibility(!!value)
-                        }
-                      >
-                        {column.id}
-                      </DropdownMenuCheckboxItem>
-                    )
-                  })}
+              <DropdownMenuContent>
+                {filterColumn.options.map((option) => (
+                  <DropdownMenuCheckboxItem
+                    key={option.value}
+                    checked={(columnFilters[filterColumn.id] || []).includes(option.value)}
+                    onCheckedChange={(checked) =>
+                      handleColumnFilterChange(filterColumn.id, option.value, checked)
+                    }
+                  >
+                    {option.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
+          ))}
         </div>
+
+        {/* Colonnes visibles */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              Colonnes
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {columns.map((column) => (
+              <DropdownMenuCheckboxItem
+                key={column.key}
+                checked={visibleColumns[column.key]}
+                onCheckedChange={() => toggleColumnVisibility(column.key)}
+              >
+                {column.label}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* Table */}
+      {/* Tableau */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
+            <TableRow>
+              {columns
+                .filter(column => visibleColumns[column.key])
+                .map((column) => (
+                  <TableHead key={column.key}>
+                    {column.label}
+                  </TableHead>
+                ))}
+            </TableRow>
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+            {filteredData.length > 0 ? (
+              filteredData.map((item, index) => (
+                <TableRow key={item.id || index}>
+                  {columns
+                    .filter(column => visibleColumns[column.key])
+                    .map((column) => (
+                      <TableCell key={column.key}>
+                        {column.render 
+                          ? column.render(item[column.key], item)
+                          : item[column.key]
+                        }
+                      </TableCell>
+                    ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Aucun résultat.
+                <TableCell 
+                  colSpan={columns.filter(col => visibleColumns[col.key]).length}
+                  className="h-24 text-center"
+                >
+                  Aucun résultat trouvé
                 </TableCell>
               </TableRow>
             )}
@@ -177,31 +222,13 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between space-x-2 py-4">
+      {/* Info pagination */}
+      {filteredData.length > 0 && (
         <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
+          {filteredData.length} résultat(s) affiché(s)
+          {filteredData.length !== data.length && ` sur ${data.length} total`}
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Précédent
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Suivant
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   )
 }

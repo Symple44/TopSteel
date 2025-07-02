@@ -102,7 +102,7 @@ export interface ControleQualite extends BaseEntity {
 }
 
 // Requests
-export interface CreateOrdreRequest {
+export interface CreateOrdreFabricationRequest {
   projetId: string
   priorite?: OrdrePriorite
   dateFinPrevue?: Date
@@ -112,7 +112,7 @@ export interface CreateOrdreRequest {
   notes?: string
 }
 
-export interface UpdateOrdreRequest {
+export interface UpdateOrdreFabricationRequest {
   statut?: OrdreStatut
   priorite?: OrdrePriorite
   dateDebut?: Date
@@ -136,7 +136,7 @@ export interface PlanningItem {
   couleur?: string
 }
 
-export interface ProductionStats {
+export interface OrdreFabricationStats {
   total: number
   enCours: number
   planifies: number

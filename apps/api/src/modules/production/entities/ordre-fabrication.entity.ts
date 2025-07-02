@@ -1,87 +1,92 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
-import { BaseAuditEntity } from "../../../common/base/base.entity";
-import { Projet } from "../../projets/entities/projet.entity";
-import { User } from "../../users/entities/user.entity";
-import { Operation } from "./operation.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { Projet } from '../../projets/entities/projet.entity';
+import { Operation } from './operation.entity';
 
-export enum OrdreStatut {
-  PLANIFIE = "PLANIFIE",
-  EN_COURS = "EN_COURS",
-  PAUSE = "PAUSE",
-  TERMINE = "TERMINE",
-  ANNULE = "ANNULE"
+// ✅ Export des enums pour corriger les erreurs d'import
+export enum OrdreFabricationStatut {
+  EN_ATTENTE = 'EN_ATTENTE',
+  PLANIFIE = 'PLANIFIE',
+  EN_COURS = 'EN_COURS',
+  TERMINE = 'TERMINE',
+  ANNULE = 'ANNULE',
+  PAUSE = 'PAUSE'
 }
 
-export enum OrdrePriorite {
-  BASSE = "BASSE",
-  NORMALE = "NORMALE",
-  HAUTE = "HAUTE",
-  URGENTE = "URGENTE"
+export enum PrioriteProduction {
+  BASSE = 'BASSE',
+  NORMALE = 'NORMALE',
+  HAUTE = 'HAUTE',
+  URGENTE = 'URGENTE'
 }
 
 @Entity("ordre_fabrication")
-export class OrdreFabrication extends BaseAuditEntity {
-  @Column({ unique: true, length: 50 })
-  reference!: string;
+export class OrdreFabrication {
+  @PrimaryGeneratedColumn()
+  id!: number;
 
   @Column()
-  projetId!: string;
-
-  @ManyToOne(() => Projet)
-  @JoinColumn({ name: "projetId" })
-  projet!: Projet;
+  numero!: string;
 
   @Column({
-    type: "enum",
-    enum: OrdreStatut,
-    default: OrdreStatut.PLANIFIE
+    type: 'enum',
+    enum: OrdreFabricationStatut,
+    default: OrdreFabricationStatut.EN_ATTENTE,
   })
-  statut!: OrdreStatut;
+  statut!: OrdreFabricationStatut;
+
+  @Column({ name: 'projet_id', nullable: true })
+  projet?: number;
+
+  @ManyToOne(() => Projet, { nullable: true })
+  @JoinColumn({ name: 'projet_id' })
+  projetEntity?: Projet;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
   @Column({
-    type: "enum",
-    enum: OrdrePriorite,
-    default: OrdrePriorite.NORMALE
+    type: 'enum',
+    enum: PrioriteProduction,
+    default: PrioriteProduction.NORMALE,
   })
-  priorite!: OrdrePriorite;
+  priorite!: PrioriteProduction;
 
-  @Column({ type: "date", nullable: true })
-  dateDebut?: Date;
+  @Column({ type: 'timestamp', name: 'date_debut_prevue', nullable: true })
+  dateDebutPrevue?: Date;
 
-  @Column({ type: "date", nullable: true })
-  dateFin?: Date;
-
-  @Column({ type: "date", nullable: true })
+  @Column({ type: 'timestamp', name: 'date_fin_prevue', nullable: true })
   dateFinPrevue?: Date;
 
-  @Column({ type: "integer", default: 0 })
+  @Column({ type: 'timestamp', name: 'date_debut_reelle', nullable: true })
+  dateDebutReelle?: Date;
+
+  @Column({ type: 'timestamp', name: 'date_fin_reelle', nullable: true })
+  dateFinReelle?: Date;
+
+  @Column({ type: 'int', default: 0 })
   avancement!: number;
 
-  @Column({ nullable: true })
-  technicienId?: string;
+  @Column({ name: 'responsable_id', nullable: true })
+  responsableId?: number;
 
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: "technicienId" })
-  technicien?: User;
-
-  @Column({ nullable: true })
-  machineId?: string;
-
-  @Column({ type: "integer", nullable: true })
-  tempsEstime?: number; // en minutes
-
-  @Column({ type: "integer", nullable: true })
-  tempsReel?: number;
-
-  @Column("decimal", { precision: 10, scale: 2, nullable: true })
-  coutEstime?: number;
-
-  @Column("decimal", { precision: 10, scale: 2, nullable: true })
-  coutReel?: number;
-
-  @Column("text", { nullable: true })
+  @Column({ type: 'text', nullable: true })
   notes?: string;
 
   @OneToMany(() => Operation, operation => operation.ordre, { cascade: true })
   operations!: Operation[];
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }

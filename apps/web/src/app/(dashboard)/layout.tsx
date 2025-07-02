@@ -1,34 +1,32 @@
-// apps/web/src/app/(dashboard)/layout.tsx
 'use client'
 
 import { Header } from '@/components/layout/header'
 import { Sidebar } from '@/components/layout/sidebar'
-import { useState, type ReactNode } from 'react'
+import { ToastContainer } from '@/components/ui/toast-container'
+import { useSidebar } from '@/stores'
+import type { ReactNode } from 'react'
 
 interface DashboardLayoutProps {
   children: ReactNode
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed)
-  }
+  // 🎯 État global Zustand avec persistance automatique
+  const { collapsed, toggle } = useSidebar()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
-      {/* Header moderne avec état de la sidebar */}
+      {/* Header moderne */}
       <Header 
-        onToggleSidebar={toggleSidebar} 
-        isSidebarCollapsed={isSidebarCollapsed} 
+        onToggleSidebar={toggle}
+        isSidebarCollapsed={collapsed}
       />
       
       <div className="flex h-[calc(100vh-4rem)]">
-        {/* Sidebar moderne améliorée */}
+        {/* Sidebar moderne */}
         <Sidebar 
-          isCollapsed={isSidebarCollapsed} 
-          onToggle={toggleSidebar} 
+          isCollapsed={collapsed} 
+          onToggle={toggle} 
         />
         
         {/* Contenu principal avec effets modernes */}
@@ -45,6 +43,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
         </main>
       </div>
+
+      {/* 🎯 Système de toasts global */}
+      <ToastContainer />
     </div>
   )
 }

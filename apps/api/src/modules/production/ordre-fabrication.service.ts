@@ -5,7 +5,7 @@ import { PaginationResultDto } from "../../common/dto/base.dto";
 import { CreateOrdreFabricationDto } from "./dto/create-ordre-fabrication.dto";
 import { OrdreFabricationQueryDto } from "./dto/ordre-fabrication-query.dto";
 import { UpdateOrdreFabricationDto } from "./dto/update-ordre-fabrication.dto";
-import { OrdreFabrication } from "./entities/ordre-fabrication.entity";
+import { OrdreFabrication, OrdreFabricationStatut } from "./entities/ordre-fabrication.entity";
 
 @Injectable()
 export class OrdreFabricationService {
@@ -14,10 +14,22 @@ export class OrdreFabricationService {
     private readonly repository: Repository<OrdreFabrication>,
   ) {}
 
-  async create(
-    createDto: CreateOrdreFabricationDto,
-  ): Promise<OrdreFabrication> {
-    const entity = this.repository.create(createDto);
+  async create(createDto: CreateOrdreFabricationDto): Promise<OrdreFabrication> {
+    // ✅ Transformation correcte des types
+    const entityData = {
+      numero: createDto.numero,
+      statut: createDto.statut || OrdreFabricationStatut .EN_ATTENTE,
+      projet: createDto.projet,
+      description: createDto.description,
+      priorite: createDto.priorite,
+      dateDebutPrevue: createDto.dateDebutPrevue ? new Date(createDto.dateDebutPrevue) : undefined,
+      dateFinPrevue: createDto.dateFinPrevue ? new Date(createDto.dateFinPrevue) : undefined,
+      avancement: createDto.avancement || 0,
+      responsableId: createDto.responsableId,
+      notes: createDto.notes,
+    };
+
+    const entity = this.repository.create(entityData);
     return this.repository.save(entity);
   }
 
@@ -34,6 +46,10 @@ export class OrdreFabricationService {
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.repository.createQueryBuilder("entity");
+
+    // ✅ Relations ajoutées
+    queryBuilder.leftJoinAndSelect("entity.operations", "operations");
+    queryBuilder.leftJoinAndSelect("entity.projetEntity", "projetEntity");
 
     if (search) {
       queryBuilder.andWhere("(entity.numero ILIKE :search)", {
@@ -72,8 +88,12 @@ export class OrdreFabricationService {
     };
   }
 
+  // ✅ Correction type ID de string vers number
   async findOne(id: number): Promise<OrdreFabrication> {
-    const entity = await this.repository.findOne({ where: { id } });
+    const entity = await this.repository.findOne({ 
+      where: { id },
+      relations: ['operations', 'projetEntity'],
+    });
     if (!entity) {
       throw new NotFoundException(
         `Ordre de fabrication avec l'ID ${id} non trouvé`,
@@ -86,53 +106,75 @@ export class OrdreFabricationService {
     id: number,
     updateDto: UpdateOrdreFabricationDto,
   ): Promise<OrdreFabrication> {
-    await this.repository.update(id, updateDto);
+    // ✅ Transformation correcte des dates
+    const updateData: any = {
+      ...updateDto,
+    };
+
+    if (updateDto.dateDebutPrevue) {
+      updateData.dateDebutPrevue = new Date(updateDto.dateDebutPrevue);
+    }
+    
+    if (updateDto.dateFinPrevue) {
+      updateData.dateFinPrevue = new Date(updateDto.dateFinPrevue);
+    }
+    
+    if (updateDto.dateDebutReelle) {
+      updateData.dateDebutReelle = new Date(updateDto.dateDebutReelle);
+    }
+    
+    if (updateDto.dateFinReelle) {
+      updateData.dateFinReelle = new Date(updateDto.dateFinReelle);
+    }
+
+    await this.repository.update(id, updateData);
     return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
-    const result = await this.repository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(
-        `Ordre de fabrication avec l'ID ${id} non trouvé`,
-      );
-    }
+    const entity = await this.findOne(id);
+    await this.repository.remove(entity);
   }
 
   async changeStatut(id: number, statut: string): Promise<OrdreFabrication> {
-    await this.repository.update(id, { statut });
+    await this.repository.update(id, { statut: statut as OrdreFabricationStatut  });
     return this.findOne(id);
   }
 
-  async getStats(): Promise<unknown> {
+  async getStats(): Promise<{
+    total: number;
+    enCours: number;
+    termine: number;
+    enAttente: number;
+  }> {
     const total = await this.repository.count();
 
-    const byStatut = await this.repository
-      .createQueryBuilder("of")
-      .select("of.statut, COUNT(*) as count")
-      .groupBy("of.statut")
-      .getRawMany();
-
-    const enCours = await this.repository.count({
-      where: { statut: "EN_COURS" },
+    const enCours = await this.repository.countBy({
+      statut: OrdreFabricationStatut .EN_COURS,
     });
 
-    const termine = await this.repository.count({
-      where: { statut: "TERMINE" },
+    const termine = await this.repository.countBy({
+      statut: OrdreFabricationStatut .TERMINE,
+    });
+
+    const enAttente = await this.repository.countBy({
+      statut: OrdreFabricationStatut .EN_ATTENTE,
     });
 
     return {
       total,
       enCours,
       termine,
-      byStatut,
+      enAttente,
     };
   }
 
+  // ✅ Correction findByProjet pour utiliser 'projet' au lieu de 'projetId'
   async findByProjet(projetId: number): Promise<OrdreFabrication[]> {
     return this.repository.find({
       where: { projet: projetId },
-      order: { createdAt: "DESC" },
+      relations: ['operations', 'projetEntity'],
+      order: { createdAt: 'DESC' },
     });
   }
 }

@@ -26,6 +26,7 @@ import { UserRole } from "../users/entities/user.entity";
 import { CreateOrdreFabricationDto } from "./dto/create-ordre-fabrication.dto";
 import { OrdreFabricationQueryDto } from "./dto/ordre-fabrication-query.dto";
 import { UpdateOrdreFabricationDto } from "./dto/update-ordre-fabrication.dto";
+import { OrdreFabricationStatut } from "./entities/ordre-fabrication.entity";
 import { OrdreFabricationService } from "./ordre-fabrication.service";
 
 @Controller("ordre-fabrication")
@@ -95,8 +96,14 @@ export class OrdreFabricationController {
   @ApiOperation({ summary: "Changer le statut d'un ordre de fabrication" })
   async changeStatut(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: { statut: string },
+    @Body() body: { statut: OrdreFabricationStatut  },
   ) {
     return this.ordreFabricationService.changeStatut(id, body.statut);
+  }
+
+  @Get("projet/:projetId")
+  @ApiOperation({ summary: "Lister les ordres d'un projet" })
+  async findByProjet(@Param("projetId", ParseIntPipe) projetId: number) {
+    return this.ordreFabricationService.findByProjet(projetId);
   }
 }

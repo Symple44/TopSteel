@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from "@/components/ui/data-table"
 import { PageHeader } from "@/components/ui/page-header"
 import { ProjetCard } from "@/components/ui/projet-card"
-import { useProjets } from '@/hooks/use-projets'
+import { useProjets, useUI } from '@/stores'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
 import { Grid, List, Plus } from 'lucide-react'
@@ -14,8 +14,8 @@ import Link from 'next/link'
 import React from 'react'
 
 export default function ProjetsPage() {
-  const { data: projets = [], isLoading } = useProjets()
-  const [viewMode, setViewMode] = React.useState<'grid' | 'table'>('grid')
+  const { projets, isLoading, fetchProjets } = useProjets()
+  const { dataView, setDataView } = useUI()
 
   const columns = [
     {
@@ -81,17 +81,17 @@ export default function ProjetsPage() {
           <div className="flex items-center space-x-2">
             <div className="flex rounded-md border">
               <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                variant={dataView === 'grid' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode('grid')}
+                onClick={() => setdataView('grid')}
                 className="rounded-r-none"
               >
                 <Grid className="h-4 w-4" />
               </Button>
               <Button
-                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                variant={dataView === 'table' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode('table')}
+                onClick={() => setdataView('table')}
                 className="rounded-l-none"
               >
                 <List className="h-4 w-4" />
@@ -110,7 +110,7 @@ export default function ProjetsPage() {
       />
 
       <div className="px-6">
-        {viewMode === 'grid' ? (
+        {dataView === 'grid' ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {projets.map((projet) => (
               <ProjetCard key={projet.id} projet={projet} />

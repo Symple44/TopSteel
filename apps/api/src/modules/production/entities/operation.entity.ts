@@ -1,58 +1,91 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { BaseAuditEntity } from "../../../common/base/base.entity";
-import { User } from "../../users/entities/user.entity";
-import { OrdreFabrication } from "./ordre-fabrication.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { OrdreFabrication } from './ordre-fabrication.entity';
 
 export enum OperationStatut {
-  ATTENTE = "attente",
-  EN_COURS = "en_cours",
-  TERMINE = "termine"
+  EN_ATTENTE = 'EN_ATTENTE',
+  EN_COURS = 'EN_COURS',
+  TERMINE = 'TERMINE',
+  ANNULE = 'ANNULE',
 }
 
-@Entity("operations")
-export class Operation extends BaseAuditEntity {
+export enum OperationType {
+  DECOUPE = 'DECOUPE',
+  SOUDURE = 'SOUDURE',
+  PERCAGE = 'PERCAGE',
+  PLIAGE = 'PLIAGE',
+  USINAGE = 'USINAGE',
+  ASSEMBLAGE = 'ASSEMBLAGE',
+  FINITION = 'FINITION',
+  CONTROLE = 'CONTROLE',
+}
+
+@Entity('operations')
+export class Operation {
+  @PrimaryGeneratedColumn()
+  id!: number;
+
   @Column()
-  ordreId!: string;
-
-  @ManyToOne(() => OrdreFabrication, ordre => ordre.operations, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "ordreId" })
-  ordre!: OrdreFabrication;
-
-  @Column({ length: 255 })
   nom!: string;
 
-  @Column("text", { nullable: true })
+  @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ type: "integer" })
-  ordreExecution!: number;
+  @Column({
+    type: 'enum',
+    enum: OperationType,
+    default: OperationType.DECOUPE,
+  })
+  type!: OperationType;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: OperationStatut,
-    default: OperationStatut.ATTENTE
+    default: OperationStatut.EN_ATTENTE,
   })
   statut!: OperationStatut;
 
-  @Column({ type: "integer", nullable: true })
-  tempsEstime?: number;
+  @Column({ name: 'ordre_fabrication_id' })
+  ordreFabricationId!: number;
 
-  @Column({ type: "integer", nullable: true })
-  tempsReel?: number;
+  @ManyToOne(() => OrdreFabrication, ordre => ordre.operations, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'ordre_fabrication_id' })
+  ordre!: OrdreFabrication;
 
-  @Column({ nullable: true })
-  technicienId?: string;
+  @Column({ type: 'int', default: 1 })
+  ordreExecution!: number;
 
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: "technicienId" })
-  technicien?: User;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  dureeEstimee?: number;
 
-  @Column({ nullable: true })
-  machineId?: string;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  dureeReelle?: number;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ name: 'machine_id', nullable: true })
+  machineId?: number;
+
+  @Column({ name: 'technicien_id', nullable: true })
+  technicienId?: number;
+
+  @Column({ type: 'timestamp', name: 'date_debut', nullable: true })
   dateDebut?: Date;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ type: 'timestamp', name: 'date_fin', nullable: true })
   dateFin?: Date;
+
+  @Column({ type: 'text', nullable: true })
+  notes?: string;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }

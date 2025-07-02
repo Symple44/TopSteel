@@ -1,62 +1,65 @@
-import { apiClient } from '@/lib/api-client'
-import type { User, LoginResponse, RefreshTokenResponse } from '@/types'
+// apps/web/src/services/auth.service.ts
+import type { User } from '@erp/types'
 
-class AuthService {
-  async login(email: string, password: string): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/login', { email, password })
-    return response.data
-  }
-
-  async logout(): Promise<void> {
-    await apiClient.post('/auth/logout')
-  }
-
-  async register(data: {
-    email: string
-    password: string
-    nom: string
-    prenom: string
-    entreprise?: string
-  }): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/register', data)
-    return response.data
-  }
-
-  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
-    const response = await apiClient.post<RefreshTokenResponse>('/auth/refresh', { refreshToken })
-    return response.data
-  }
-
-  async getMe(): Promise<User> {
-    const response = await apiClient.get<User>('/auth/me')
-    return response.data
-  }
-
-  async updatePassword(currentPassword: string, newPassword: string): Promise<void> {
-    await apiClient.post('/auth/change-password', {
-      currentPassword,
-      newPassword,
-    })
-  }
-
-  async requestPasswordReset(email: string): Promise<void> {
-    await apiClient.post('/auth/forgot-password', { email })
-  }
-
-  async resetPassword(token: string, newPassword: string): Promise<void> {
-    await apiClient.post('/auth/reset-password', {
-      token,
-      newPassword,
-    })
-  }
-
-  async verifyEmail(token: string): Promise<void> {
-    await apiClient.post('/auth/verify-email', { token })
-  }
-
-  async resendVerificationEmail(): Promise<void> {
-    await apiClient.post('/auth/resend-verification')
-  }
+interface LoginResponse {
+  user: User
+  accessToken: string
+  refreshToken: string
 }
 
-export const authService = new AuthService()
+interface RegisterData {
+  email: string
+  password: string
+  nom: string
+  prenom: string
+}
+
+export const authService = {
+  async login(email: string, password: string): Promise<LoginResponse> {
+    // TODO: Remplacer par un vrai appel API
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          user: {
+            id: '1',
+            email,
+            nom: 'Test User',
+            prenom: 'John',
+            role: 'admin',
+          } as User,
+          accessToken: 'mock-access-token',
+          refreshToken: 'mock-refresh-token',
+        })
+      }, 1000)
+    })
+  },
+
+  async register(data: RegisterData): Promise<void> {
+    // TODO: Implémenter
+    return Promise.resolve()
+  },
+
+  async logout(refreshToken: string): Promise<void> {
+    // TODO: Implémenter
+    return Promise.resolve()
+  },
+
+  async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+    // TODO: Implémenter
+    return {
+      accessToken: 'new-access-token',
+      refreshToken: 'new-refresh-token',
+    }
+  },
+
+  async getMe(): Promise<User> {
+    // TODO: Implémenter
+    return {
+      id: '1',
+      email: 'test@test.com',
+      nom: 'Test User',
+      prenom: 'John',
+      role: 'admin',
+    } as User
+  },
+}

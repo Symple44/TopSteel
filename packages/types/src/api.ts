@@ -11,14 +11,12 @@ export interface ApiResponse<T = unknown> {
     totalPages: number
   }
 }
-
 export interface ApiError {
   status: number
   message: string
   code?: string
   details?: Record<string, unknown>
 }
-
 export interface PaginationParams {
   page?: number
   limit?: number
@@ -34,7 +32,19 @@ export interface PaginatedResponse<T> {
     totalPages: number
   }
 }
+export interface PaginationMetaDto {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
 
+export interface PaginationResultDto<T> {
+  data: T[];
+  meta: PaginationMetaDto;
+}
 export interface FilterParams {
   search?: string
   status?: string
