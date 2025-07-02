@@ -1,13 +1,12 @@
 // packages/utils/src/types/index.ts
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
 
-export type DeepPartial<T> = T extends object
-  ? {
-      [P in keyof T]?: DeepPartial<T[P]>;
-    }
-  : T;
+export type DeepRequired<T> = {
+  [P in keyof T]-?: T[P] extends object ? DeepRequired<T[P]> : T[P];
+};
 
-export type DeepRequired<T> = T extends object
-  ? {
-      [P in keyof T]-?: DeepRequired<T[P]>;
-    }
-  : T;
+export type Nullable<T> = T | null;
+
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

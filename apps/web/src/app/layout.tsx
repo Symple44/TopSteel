@@ -1,5 +1,4 @@
-// apps/web/src/app/layout.tsx - ARCHITECTURE COMPLEXE PRESERVEE
-import { HydrationProvider } from '@/components/providers/hydration-provider'
+// apps/web/src/app/layout.tsx - SANS SCRIPT LOCALSTORAGE (FIX HYDRATATION)
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -18,29 +17,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={inter.className} suppressHydrationWarning>
-      <head>
-        {/* Script thème initial pour éviter flash */}
-        <script 
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('erp-theme') || 'system';
-                  if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `
-          }}
-        />
-      </head>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
-        <HydrationProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
-        </HydrationProvider>
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

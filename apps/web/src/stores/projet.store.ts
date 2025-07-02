@@ -1,8 +1,8 @@
-// apps/web/src/stores/projet.store.ts - VERSION CORRIGÉE ANTI-BOUCLES
-import { createStoreWithPersist } from '@/lib/store-utils'
-import { projetService } from '@/services/projet.service'
-import type { Projet, ProjetFilters } from '@erp/types'
+// apps/web/src/stores/projet.store.ts - VERSION STABLE CORRIGÉE
 import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+import type { Projet, ProjetFilters } from '@erp/types'
+import { api } from '@/lib/api'
 
 interface ProjetState {
   projets: Projet[]
@@ -10,118 +10,78 @@ interface ProjetState {
   filters: ProjetFilters
   isLoading: boolean
   error: string | null
-  lastFetchTime: number | null // ✅ Ajout pour cache timing
+  lastFetch: number
   
+  // Actions
   fetchProjets: () => Promise<void>
   setSelectedProjet: (projet: Projet | null) => void
-  setFilters: (filters: Partial<ProjetFilters>) => void
+  setFilters: (filters: ProjetFilters) => void
   clearError: () => void
-  refreshProjets: () => Promise<void> // ✅ Méthode explicite pour refresh
-  reset: () => void // ✅ Méthode pour reset complet
+  resetState: () => void
+}
+
+// État initial stable
+const initialState = {
+  projets: [] as Projet[],
+  selectedProjet: null as Projet | null,
+  filters: {} as ProjetFilters,
+  isLoading: false,
+  error: null as string | null,
+  lastFetch: 0,
 }
 
 export const useProjetStore = create<ProjetState>()(
-  createStoreWithPersist(
+  devtools(
     (set, get) => ({
-      projets: [],
-      selectedProjet: null,
-      filters: {},
-      isLoading: false,
-      error: null,
-      lastFetchTime: null,
+      ...initialState,
 
-      // ✅ FIX CRITIQUE #1: FetchProjets avec protection anti-spam
       fetchProjets: async () => {
         const state = get()
-        
-        // ✅ Protection anti-appels simultanés
-        if (state.isLoading) {
-          console.warn('FetchProjets déjà en cours, ignoré')
-          return
-        }
-        
-        // ✅ Protection anti-spam (minimum 1 seconde entre appels)
         const now = Date.now()
-        if (state.lastFetchTime && (now - state.lastFetchTime) < 1000) {
-          console.warn('FetchProjets trop rapide, ignoré')
+        
+        // Cache simple de 30 secondes
+        if (state.lastFetch && (now - state.lastFetch) < 30000) {
           return
         }
-        
-        set((state) => ({ 
-          ...state, 
-          isLoading: true, 
-          error: null,
-          lastFetchTime: now
-        }))
-        
+
+        set({ isLoading: true, error: null })
+
         try {
-          const response = await projetService.getAll(state.filters)
+          const projets = await api.projets.getAll(state.filters)
           
-          set((state) => ({ 
-            ...state,
-            projets: response.data, 
-            isLoading: false 
-          }))
-          
+          set({ 
+            projets: projets || [],
+            isLoading: false,
+            lastFetch: now
+          })
         } catch (error) {
-          set((state) => ({ 
-            ...state,
-            error: error instanceof Error ? error.message : 'Erreur de chargement',
-            isLoading: false 
-          }))
+          set({ 
+            error: error instanceof Error ? error.message : 'Erreur inconnue',
+            isLoading: false,
+            projets: [] // S'assurer qu'on a toujours un tableau
+          })
         }
       },
 
       setSelectedProjet: (projet) => {
-        set((state) => ({ 
-          ...state, 
-          selectedProjet: projet 
-        }))
-      },
-      
-      // ✅ FIX CRITIQUE #2: setFilters SANS auto-fetch 
-      setFilters: (newFilters) => {
-        set((state) => ({
-          ...state,
-          filters: { ...state.filters, ...newFilters }
-        }))
-        // ✅ SUPPRESSION de l'auto-fetch - laisse le composant décider
+        set({ selectedProjet: projet })
       },
 
-      // ✅ FIX CRITIQUE #3: Méthode explicite pour refresh avec nouveaux filtres
-      refreshProjets: async () => {
-        const state = get()
-        
-        // ✅ Reset les projets existants pour forcer reload
-        set((state) => ({ 
-          ...state, 
-          projets: [],
-          lastFetchTime: null 
-        }))
-        
-        await state.fetchProjets()
+      setFilters: (filters) => {
+        set({ 
+          filters: filters,
+          lastFetch: 0 // Force refetch avec nouveaux filtres
+        })
       },
 
-      // ✅ FIX CRITIQUE #4: Reset complet du store
-      reset: () => {
-        set((state) => ({
-          ...state,
-          projets: [],
-          selectedProjet: null,
-          isLoading: false,
-          error: null,
-          lastFetchTime: null
-        }))
-      },
-      
       clearError: () => {
-        set((state) => ({ 
-          ...state, 
-          error: null 
-        }))
+        set({ error: null })
+      },
+
+      resetState: () => {
+        set(initialState)
       },
     }),
-    'projets',
-    ['filters'] // ✅ Persister SEULEMENT les filtres, pas les données
+    { name: 'projet-store' }
   )
 )

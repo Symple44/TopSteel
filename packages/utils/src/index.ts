@@ -1,60 +1,64 @@
-// packages/utils/src/index.ts
+// packages/utils/src/index.ts - Version corrigée
 export { cn } from './lib/cn';
 export { formatCurrency, formatDate, formatNumber } from './lib/formatters';
 export { debounce, throttle } from './lib/functions';
 export { validateCNPJ, validateEmail, validatePhone } from './lib/validators';
 
-// Export dos tipos utilitários
+// Export des types utilitaires
 export type { DeepPartial, DeepRequired } from './types';
 
-// Função de debug sécurisée
+// Fonction de debug sécurisée
 export function safeLog(...args: unknown[]) {
-  if (typeof console !== 'undefined' && console.info) {
-    console.info(...args);
+  if (typeof console !== 'undefined' && console.log) {
+    console.log('[DEBUG]', ...args);
   }
 }
 
-// Vérification de l'environnement
-export function isBrowser() {
-  return typeof globalThis !== 'undefined' && typeof globalThis.document !== 'undefined';
-}
-
-export function isNode() {
-  return typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
-}
-// Fonctions utilitaires manquantes (non dupliquées)
-export function formatPercent(value: number, decimals: number = 2): string {
-  return `${(value * 100).toFixed(decimals)}%`;
-}
-
-export function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase())
-    .join('')
-    .slice(0, 2);
-}
-
-export function getDaysUntil(date: Date | string): number {
-  const targetDate = typeof date === 'string' ? new Date(date) : date;
-  const today = new Date();
-  const diffTime = targetDate.getTime() - today.getTime();
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-}
-
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
+// Fonction pour générer un ID unique (browser/server safe)
 export function generateId(): string {
-  // ✅ Utiliser système enterprise
-  if (typeof window !== 'undefined') {
-    // Côté client: crypto sécurisé
-    return (window.crypto?.randomUUID?.()?.slice(0, 12)) || 
-           Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
+  // Tentative crypto.randomUUID (browser moderne)
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+    try {
+      return window.crypto.randomUUID().slice(0, 12);
+    } catch {
+      // Fallback si crypto.randomUUID échoue
+    }
   }
   
-  // ✅ Côté serveur: déterministe
-  return `srv-${Date.now().toString(36)}-${process.hrtime.bigint().toString(36).slice(-6)}`
+  // Tentative Node.js crypto
+  if (typeof globalThis !== 'undefined' && (globalThis as any).crypto) {
+    try {
+      return (globalThis as any).crypto.randomUUID().slice(0, 12);
+    } catch {
+      // Fallback si Node crypto échoue
+    }
+  }
+  
+  // Fallback universel
+  return Math.random().toString(36).substring(2, 14);
+}
+
+// Utilitaires browser-safe
+export function isBrowser(): boolean {
+  return typeof window !== 'undefined';
+}
+
+export function isServer(): boolean {
+  return typeof window === 'undefined';
+}
+
+// Fonction pour obtenir une valeur de window de manière sûre
+export function getWindowProperty<T = unknown>(key: string): T | undefined {
+  if (isBrowser() && window && typeof (window as any)[key] !== 'undefined') {
+    return (window as any)[key] as T;
+  }
+  return undefined;
+}
+
+// Fonction pour obtenir une valeur de globalThis de manière sûre
+export function getGlobalProperty<T = unknown>(key: string): T | undefined {
+  if (typeof globalThis !== 'undefined' && typeof (globalThis as any)[key] !== 'undefined') {
+    return (globalThis as any)[key] as T;
+  }
+  return undefined;
 }

@@ -17,10 +17,10 @@ export const emailSecuriseSchema = z
   .email("Format email invalide")
   .refine((email) => {
     const domain = email.split("@")[1];
-    return !estDomaineBlackliste(domain);
+    return domain ? !estDomaineBlackliste(domain) : false;
   }, "Domaine email non autorisé")
   .refine((email) => {
-    return !motDePasseCommun(email.split("@")[0]);
+    const emailPart = email.split("@")[0]; return emailPart ? !motDePasseCommun(emailPart) : false;
   }, "Nom d'utilisateur trop commun");
 
 // Schéma pour la validation des mots de passe sécurisés
@@ -78,4 +78,5 @@ export type TelephoneFrancais = z.infer<typeof telephoneFrancaisSchema>;
 export type CodePostalFrancais = z.infer<typeof codePostalFrancaisSchema>;
 export type UtilisateurSecurise = z.infer<typeof utilisateurSecuriseSchema>;
 export type EntrepriseSecurise = z.infer<typeof entrepriseSecuriseSchema>;
+
 

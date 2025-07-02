@@ -25,11 +25,13 @@ export function generateReference(prefix: string, number: number, length: number
 }
 
 export function parseReference(reference: string): { prefix: string; number: number } {
-  const match = reference.match(/^([A-Z]+)(\d+)$/)
-  if (!match) throw new Error('Format de référence invalide')
-  
+  const match = reference.match(/^([A-Z]+)-(\d+)$/);
+  if (!match || !match[1] || !match[2]) {
+    throw new Error('Format de référence invalide');
+  }
   return {
     prefix: match[1],
     number: parseInt(match[2], 10)
-  }
+  };
+}
 }

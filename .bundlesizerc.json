@@ -1,0 +1,12 @@
+[
+  {
+    "path": "./apps/web/.next/static/js/*.js",
+    "maxSize": "250kb",
+    "compression": "gzip"
+  },
+  {
+    "path": "./apps/web/.next/static/css/*.css",
+    "maxSize": "50kb",
+    "compression": "gzip"
+  }
+]

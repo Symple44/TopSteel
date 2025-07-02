@@ -1,133 +1,100 @@
-// apps/web/src/hooks/use-projets.ts - SANS ZUSTAND
-import { useState, useEffect, useCallback } from 'react'
+// apps/web/src/hooks/use-projets.ts - VERSION STABLE
+import { useProjetStore } from '@/stores/projet.store'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-// Mock data pour éviter les erreurs API
-const mockProjets = [
-  {
-    id: '1',
-    reference: 'PROJ-2024-001',
-    titre: 'Hangar Industriel A',
-    description: 'Construction hangar 1200m²',
-    statut: 'En cours',
-    montantHT: 150000,
-    dateDebut: new Date('2024-01-15'),
-    dateFin: new Date('2024-06-30'),
-    avancement: 65,
-    client: {
-      id: '1',
-      nom: 'Industrie Corp',
-      email: 'contact@industrie.com'
-    }
-  },
-  {
-    id: '2',
-    reference: 'PROJ-2024-002',
-    titre: 'Rénovation Usine B',
-    description: 'Rénovation structure métallique',
-    statut: 'Planifié',
-    montantHT: 89000,
-    dateDebut: new Date('2024-03-01'),
-    dateFin: new Date('2024-08-15'),
-    avancement: 25,
-    client: {
-      id: '2',
-      nom: 'Metal Works',
-      email: 'info@metalworks.com'
-    }
-  },
-  {
-    id: '3',
-    reference: 'PROJ-2024-003',
-    titre: 'Charpente Centre Commercial',
-    description: 'Charpente métallique 2500m²',
-    statut: 'Terminé',
-    montantHT: 320000,
-    dateDebut: new Date('2023-09-01'),
-    dateFin: new Date('2024-02-28'),
-    avancement: 100,
-    client: {
-      id: '3',
-      nom: 'Commercial Center SA',
-      email: 'projets@commercial-center.fr'
-    }
-  }
-]
+export const useProjets = (autoFetch = true) => {
+  const [mounted, setMounted] = useState(false)
+  const fetchInitiatedRef = useRef(false)
+  
+  // Sélecteur stable sans shallow (évite getSnapshot loop)
+  const projets = useProjetStore((state) => state.projets) || []
+  const isLoading = useProjetStore((state) => state.isLoading) || false
+  const error = useProjetStore((state) => state.error)
+  const filters = useProjetStore((state) => state.filters) || {}
+  const fetchProjets = useProjetStore((state) => state.fetchProjets)
+  const setFilters = useProjetStore((state) => state.setFilters)
+  const clearError = useProjetStore((state) => state.clearError)
 
-export const useProjets = () => {
-  const [projets, setProjets] = useState(mockProjets)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const stableFetch = useCallback(async () => {
+    if (fetchInitiatedRef.current || !mounted || isLoading) {
+      return
+    }
 
-  // Simulation fetch (pour éviter erreurs API)
-  const fetchProjets = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    
-    // Simuler délai API
-    await new Promise(resolve => setTimeout(resolve, 500))
+    fetchInitiatedRef.current = true
     
     try {
-      // Ici on pourrait appeler l'API réelle
-      // const response = await projetService.getAll()
-      // setProjets(response.data)
-      
-      setProjets(mockProjets)
-    } catch (err) {
-      setError('Erreur lors du chargement des projets')
-      console.error('Fetch projets error:', err)
+      await fetchProjets()
+    } catch (error) {
+      console.error('Erreur lors du chargement des projets:', error)
     } finally {
-      setIsLoading(false)
+      setTimeout(() => {
+        if (mounted) {
+          fetchInitiatedRef.current = false
+        }
+      }, 1000)
     }
+  }, [fetchProjets, isLoading, mounted])
+
+  const refetchWithFilters = useCallback(async () => {
+    fetchInitiatedRef.current = false
+    await stableFetch()
+  }, [stableFetch])
+
+  useEffect(() => {
+    setMounted(true)
+    return () => setMounted(false)
   }, [])
 
-  // Auto-fetch au montage
   useEffect(() => {
-    fetchProjets()
-  }, [fetchProjets])
-
-  const refetchWithFilters = useCallback(() => {
-    return fetchProjets()
-  }, [fetchProjets])
+    if (mounted && autoFetch && projets.length === 0 && !isLoading) {
+      stableFetch()
+    }
+  }, [mounted, autoFetch, projets.length, isLoading, stableFetch])
 
   return {
-    projets,
+    projets: projets || [], // Toujours un tableau
     isLoading,
     error,
-    fetchProjets,
+    filters,
+    fetchProjets: stableFetch,
+    setFilters,
+    clearError,
+    refetch: stableFetch,
     refetchWithFilters,
-    refetch: fetchProjets
   }
 }
 
 export const useProjet = (id?: string) => {
-  const [projet, setProjet] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const selectedProjet = useProjetStore((state) => state.selectedProjet)
+  const isLoading = useProjetStore((state) => state.isLoading) || false
+  const error = useProjetStore((state) => state.error)
+  const setSelectedProjet = useProjetStore((state) => state.setSelectedProjet)
+  const clearError = useProjetStore((state) => state.clearError)
 
-  useEffect(() => {
-    if (!id) {
-      setProjet(null)
+  const selectProjet = useCallback((targetId: string | undefined) => {
+    if (!targetId) {
+      setSelectedProjet(null)
       return
     }
 
-    setIsLoading(true)
-    
-    // Simuler fetch projet spécifique
-    setTimeout(() => {
-      const foundProjet = mockProjets.find(p => p.id === id)
-      setProjet(foundProjet || null)
-      setIsLoading(false)
-      
-      if (!foundProjet) {
-        setError('Projet non trouvé')
-      }
-    }, 300)
-  }, [id])
+    if (selectedProjet?.id === targetId) {
+      return
+    }
+
+    setSelectedProjet(null)
+  }, [selectedProjet?.id, setSelectedProjet])
+
+  useEffect(() => {
+    selectProjet(id)
+  }, [id, selectProjet])
 
   return {
-    projet,
-    data: projet,
+    selectedProjet,
     isLoading,
-    error
+    error,
+    setSelectedProjet,
+    clearError,
+    data: selectedProjet,
+    projet: selectedProjet,
   }
 }

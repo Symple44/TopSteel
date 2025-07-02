@@ -249,7 +249,7 @@ export function validerSIRET(siret: string): boolean {
   // Algorithme de Luhn modifié pour SIRET
   let sum = 0;
   for (let i = 0; i < 14; i++) {
-    const digit = parseInt(siret[i]);
+    const digit = parseInt(siret[i] || "0");
     if (i % 2 === 0) {
       sum += digit;
     } else {
@@ -260,3 +260,4 @@ export function validerSIRET(siret: string): boolean {
 
   return sum % 10 === 0;
 }
+

@@ -1,19 +1,22 @@
 {
-  "extends": "@erp/config/typescript/base.json",
+  "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
+    "moduleResolution": "node",
+    "module": "ESNext",
+    "target": "ES2022",
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "module": "ES2022",
-    "target": "ES2022",
-    "moduleResolution": "node"
+    "composite": false,
+    "incremental": false,
+    "emitDeclarationOnly": false
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*"],
-  "tsc-alias": {
-    "verbose": false,
-    "resolveFullPaths": true
-  }
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
