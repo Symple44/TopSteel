@@ -103,7 +103,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
               <label className="text-sm font-medium">Matériau *</label>
               <select
                 value={formData.materiauId}
-                onChange={(e) => setFormData({ ...formData, materiauId: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, materiauId: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 className="w-full p-2 border rounded-md"
                 required
               >
@@ -124,7 +124,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
                   min="0"
                   step="0.01"
                   value={formData.quantite}
-                  onChange={(e) => setFormData({ ...formData, quantite: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) => setFormData({ ...formData, quantite: parseFloat((e.target as HTMLInputElement | HTMLTextAreaElement).value) || 0 })}
                   placeholder="0.00"
                   required
                 />
@@ -138,7 +138,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
                   min="0"
                   step="0.01"
                   value={formData.prixUnitaire || ''}
-                  onChange={(e) => setFormData({ ...formData, prixUnitaire: parseFloat(e.target.value) || undefined })}
+                  onChange={(e) => setFormData({ ...formData, prixUnitaire: parseFloat((e.target as HTMLInputElement | HTMLTextAreaElement).value) || undefined })}
                   placeholder="0.00"
                 />
               </div>
@@ -149,7 +149,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
               <label className="text-sm font-medium">Motif *</label>
               <Input
                 value={formData.motif}
-                onChange={(e) => setFormData({ ...formData, motif: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, motif: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 placeholder="Raison du mouvement..."
                 required
               />
@@ -160,7 +160,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
               <label className="text-sm font-medium">Référence</label>
               <Input
                 value={formData.reference || ''}
-                onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, reference: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 placeholder="Numéro de commande, bon de livraison..."
               />
             </div>
@@ -172,7 +172,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
                   <label className="text-sm font-medium">Emplacement source</label>
                   <Input
                     value={formData.emplacementSource || ''}
-                    onChange={(e) => setFormData({ ...formData, emplacementSource: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, emplacementSource: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                     placeholder="Zone A1"
                   />
                 </div>
@@ -180,7 +180,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
                   <label className="text-sm font-medium">Emplacement destination</label>
                   <Input
                     value={formData.emplacementDestination || ''}
-                    onChange={(e) => setFormData({ ...formData, emplacementDestination: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, emplacementDestination: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                     placeholder="Zone B2"
                   />
                 </div>
@@ -192,7 +192,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
               <label className="text-sm font-medium">Notes</label>
               <textarea
                 value={formData.notes || ''}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, notes: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 placeholder="Informations complémentaires..."
                 className="w-full p-2 border rounded-md resize-none"
                 rows={3}
@@ -214,3 +214,4 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
     </div>
   );
 }
+

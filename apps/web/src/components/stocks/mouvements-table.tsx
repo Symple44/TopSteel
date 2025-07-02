@@ -104,7 +104,7 @@ export function MouvementsTable({ mouvements, onSearch, onFilter }: MouvementsTa
             {/* Filtre par type */}
             <select
               value={typeFilter}
-              onChange={(e) => handleTypeFilter(e.target.value)}
+              onChange={(e) => handleTypeFilter((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
               className="p-2 border rounded-md text-sm"
             >
               <option value="">Tous les types</option>
@@ -121,7 +121,7 @@ export function MouvementsTable({ mouvements, onSearch, onFilter }: MouvementsTa
                 placeholder="Rechercher..."
                 className="pl-10 w-64"
                 value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={(e) => handleSearch((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
               />
             </div>
           </div>
@@ -211,3 +211,4 @@ export function MouvementsTable({ mouvements, onSearch, onFilter }: MouvementsTa
     </Card>
   );
 }
+

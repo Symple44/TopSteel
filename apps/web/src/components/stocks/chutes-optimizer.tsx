@@ -92,8 +92,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    onSearch(e.target.value);
+                    setSearchQuery((e.target as HTMLInputElement | HTMLTextAreaElement).value);
+                    onSearch((e.target as HTMLInputElement | HTMLTextAreaElement).value);
                   }}
                 />
               </div>
@@ -262,3 +262,4 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
     </div>
   );
 }
+

@@ -124,7 +124,7 @@ export function DataTable({
               <Input
                 placeholder="Rechercher..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => setSearchTerm((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
                 className="pl-8"
               />
             </div>
@@ -232,3 +232,4 @@ export function DataTable({
     </div>
   )
 }
+

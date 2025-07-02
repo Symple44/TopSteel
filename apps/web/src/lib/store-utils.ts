@@ -27,7 +27,7 @@ export const createStoreWithPersist = <T>(
     // ✅ PARTIALISATION INTELLIGENTE
     partialize: persistedKeys 
       ? (state: T) => {
-          const result = {} as Partial<T>
+          const result = { /* TODO: Implémenter */ } as Partial<T>
           persistedKeys.forEach(key => {
             if (state[key] !== undefined) {
               result[key] = state[key]
@@ -65,7 +65,7 @@ export const createStoreWithPersist = <T>(
           // ✅ Nettoyage automatique des données corrompues
           try {
             localStorage.removeItem(name)
-          } catch {}
+          } catch { /* TODO: Implémenter */ }
           return null
         }
       },
@@ -95,7 +95,7 @@ export const createStoreWithPersist = <T>(
             try {
               // Nettoyer les anciens stores si nécessaire
               this.cleanup()
-            } catch {}
+            } catch { /* TODO: Implémenter */ }
           }
         }
       },
@@ -129,7 +129,7 @@ export const createStoreWithPersist = <T>(
                     keysToRemove.push(key)
                   }
                 }
-              } catch {}
+              } catch { /* TODO: Implémenter */ }
             }
           }
           

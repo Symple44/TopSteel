@@ -53,7 +53,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                 <Input
                   id="reference"
                   value={formData.reference}
-                  onChange={(e) => setFormData({...formData, reference: e.target.value})}
+                  onChange={(e) => setFormData({...formData, reference: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                   placeholder="DEV-2025-001"
                   required
                 />
@@ -64,7 +64,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                   id="dateValidite"
                   type="date"
                   value={formData.dateValidite}
-                  onChange={(e) => setFormData({...formData, dateValidite: e.target.value})}
+                  onChange={(e) => setFormData({...formData, dateValidite: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                 />
               </div>
             </div>
@@ -74,7 +74,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
               <Input
                 id="clientNom"
                 value={formData.clientNom}
-                onChange={(e) => setFormData({...formData, clientNom: e.target.value})}
+                onChange={(e) => setFormData({...formData, clientNom: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                 placeholder="Nom du client ou entreprise"
                 required
               />
@@ -86,7 +86,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                 id="clientEmail"
                 type="email"
                 value={formData.clientEmail}
-                onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
+                onChange={(e) => setFormData({...formData, clientEmail: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                 placeholder="client@exemple.fr"
               />
             </div>
@@ -96,7 +96,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
               <textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({...formData, description: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                 placeholder="Description des travaux de métallerie..."
                 className="w-full p-2 border rounded-md min-h-[100px] resize-y"
               />
@@ -116,3 +116,4 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
     </div>
   )
 }
+

@@ -41,7 +41,7 @@ export function StocksFilters() {
           <label className="text-sm font-medium">Catégorie</label>
           <select
             value={filters.categorie}
-            onChange={(e) => setFilters({...filters, categorie: e.target.value})}
+            onChange={(e) => setFilters({...filters, categorie: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Toutes les catégories</option>
@@ -57,7 +57,7 @@ export function StocksFilters() {
           <label className="text-sm font-medium">Emplacement</label>
           <select
             value={filters.emplacement}
-            onChange={(e) => setFilters({...filters, emplacement: e.target.value})}
+            onChange={(e) => setFilters({...filters, emplacement: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les emplacements</option>
@@ -72,7 +72,7 @@ export function StocksFilters() {
           <label className="text-sm font-medium">Fournisseur</label>
           <select
             value={filters.fournisseur}
-            onChange={(e) => setFilters({...filters, fournisseur: e.target.value})}
+            onChange={(e) => setFilters({...filters, fournisseur: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les fournisseurs</option>
@@ -90,7 +90,7 @@ export function StocksFilters() {
           <Input
             type="number"
             value={filters.stockMin}
-            onChange={(e) => setFilters({...filters, stockMin: e.target.value})}
+            onChange={(e) => setFilters({...filters, stockMin: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
             placeholder="0"
           />
         </div>
@@ -100,7 +100,7 @@ export function StocksFilters() {
           <Input
             type="number"
             value={filters.stockMax}
-            onChange={(e) => setFilters({...filters, stockMax: e.target.value})}
+            onChange={(e) => setFilters({...filters, stockMax: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
             placeholder="1000"
           />
         </div>
@@ -109,7 +109,7 @@ export function StocksFilters() {
           <label className="text-sm font-medium">Statut</label>
           <select
             value={filters.statut}
-            onChange={(e) => setFilters({...filters, statut: e.target.value})}
+            onChange={(e) => setFilters({...filters, statut: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les statuts</option>
@@ -123,3 +123,4 @@ export function StocksFilters() {
     </div>
   )
 }
+

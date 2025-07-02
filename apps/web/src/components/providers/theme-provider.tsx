@@ -127,7 +127,7 @@ export function ThemeProvider({
           appState.state.theme = newTheme
           localStorage.setItem('erp-app-state', JSON.stringify(appState))
         }
-      } catch (e) {}
+      } catch (e) { /* TODO: Implémenter */ }
       
       try {
         const uiStateStr = localStorage.getItem('topsteel-ui')
@@ -136,7 +136,7 @@ export function ThemeProvider({
           uiState.state.theme = newTheme
           localStorage.setItem('topsteel-ui', JSON.stringify(uiState))
         }
-      } catch (e) {}
+      } catch (e) { /* TODO: Implémenter */ }
       
     } catch (error) {
       console.warn('Theme: failed to write to localStorage', error)
@@ -171,3 +171,4 @@ export const useTheme = () => {
   
   return context
 }
+

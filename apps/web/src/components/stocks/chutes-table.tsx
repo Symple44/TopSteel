@@ -79,7 +79,7 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
                 placeholder="Rechercher..."
                 className="pl-10 w-64"
                 value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={(e) => handleSearch((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
               />
             </div>
           </div>
@@ -178,3 +178,4 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
     </Card>
   );
 }
+

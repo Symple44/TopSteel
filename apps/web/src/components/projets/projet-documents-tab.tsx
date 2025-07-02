@@ -179,7 +179,7 @@ export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
           <Input
             placeholder="Rechercher un document..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
             className="pl-10"
           />
         </div>

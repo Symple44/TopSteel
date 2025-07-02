@@ -52,7 +52,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
                 placeholder="Numéro, description..."
                 className="pl-10"
                 value={filters.search || ''}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
+                onChange={(e) => handleFilterChange('search', (e.target as HTMLInputElement | HTMLTextAreaElement).value)}
               />
             </div>
           </div>
@@ -63,7 +63,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <select
               className="w-full p-2 border rounded-md"
               value={filters.statut?.[0] || ''}
-              onChange={(e) => handleFilterChange('statut', e.target.value ? [e.target.value] : [])}
+              onChange={(e) => handleFilterChange('statut', (e.target as HTMLInputElement | HTMLTextAreaElement).value ? [(e.target as HTMLInputElement | HTMLTextAreaElement).value] : [])}
             >
               <option value="">Tous les statuts</option>
               <option value="EN_ATTENTE">En attente</option>
@@ -81,7 +81,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <select
               className="w-full p-2 border rounded-md"
               value={filters.priorite?.[0] || ''}
-              onChange={(e) => handleFilterChange('priorite', e.target.value ? [e.target.value] : [])}
+              onChange={(e) => handleFilterChange('priorite', (e.target as HTMLInputElement | HTMLTextAreaElement).value ? [(e.target as HTMLInputElement | HTMLTextAreaElement).value] : [])}
             >
               <option value="">Toutes les priorités</option>
               <option value="BASSE">Basse</option>
@@ -99,7 +99,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <Input
               type="date"
               value={filters.dateDebut || ''}
-              onChange={(e) => handleFilterChange('dateDebut', e.target.value)}
+              onChange={(e) => handleFilterChange('dateDebut', (e.target as HTMLInputElement | HTMLTextAreaElement).value)}
             />
           </div>
 
@@ -109,7 +109,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <Input
               type="date"
               value={filters.dateFin || ''}
-              onChange={(e) => handleFilterChange('dateFin', e.target.value)}
+              onChange={(e) => handleFilterChange('dateFin', (e.target as HTMLInputElement | HTMLTextAreaElement).value)}
             />
           </div>
 
@@ -119,7 +119,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <Input
               placeholder="Nom du responsable"
               value={filters.responsable || ''}
-              onChange={(e) => handleFilterChange('responsable', e.target.value)}
+              onChange={(e) => handleFilterChange('responsable', (e.target as HTMLInputElement | HTMLTextAreaElement).value)}
             />
           </div>
         </div>
@@ -134,3 +134,4 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
     </Card>
   );
 }
+

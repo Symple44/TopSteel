@@ -12,7 +12,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, onValueChange, onChange, ...props }, ref) => {
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       onChange?.(e)
-      onValueChange?.(e.target.value)
+      onValueChange?.((e.target as HTMLInputElement | HTMLTextAreaElement).value)
     }
 
     return (
@@ -39,3 +39,4 @@ const SelectItem = ({ value, children }: { value: string; children: React.ReactN
 )
 
 export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem }
+

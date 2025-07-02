@@ -58,7 +58,7 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
               type="text"
               placeholder="Rechercher..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
               className="pl-10"
             />
           </div>
@@ -84,3 +84,4 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
     </header>
   )
 }
+

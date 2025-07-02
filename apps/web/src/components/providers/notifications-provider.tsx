@@ -40,39 +40,39 @@ const initialState: NotificationsState = {
 
 function notificationsReducer(state: NotificationsState, action: NotificationsAction): NotificationsState {
   switch (action.type) {
-    case 'ADD_NOTIFICATION':
+    case 'ADD_NOTIFICATION': {
       const newNotifications = [action.payload, ...state.notifications]
       return {
         ...state,
         notifications: newNotifications,
         unreadCount: newNotifications.filter(n => !n.read).length
       }
+    }
     
-    case 'MARK_AS_READ':
-      const updatedNotifications = state.notifications.map(n =>
-        n.id === action.payload ? { ...n, read: true } : n
-      )
+    case 'MARK_AS_READ': {
+      const updatedNotifications = state.notifications.map(n => n.id === action.payload ? { ...n, read: true } : n)
       return {
         ...state,
         notifications: updatedNotifications,
         unreadCount: updatedNotifications.filter(n => !n.read).length
       }
-    
-    case 'MARK_ALL_AS_READ':
-      const allReadNotifications = state.notifications.map(n => ({ ...n, read: true }))
+    }
+    case 'MARK_ALL_AS_READ': {
+      const allReadNotifications = state.notifications.map(n => ({ ...n, read: true })) 
       return {
         ...state,
         notifications: allReadNotifications,
         unreadCount: 0
       }
-    
-    case 'REMOVE_NOTIFICATION':
+    }
+    case 'REMOVE_NOTIFICATION': {
       const filteredNotifications = state.notifications.filter(n => n.id !== action.payload)
       return {
         ...state,
         notifications: filteredNotifications,
         unreadCount: filteredNotifications.filter(n => !n.read).length
       }
+    }
     
     case 'CLEAR_ALL':
       return {
@@ -227,3 +227,4 @@ export function useNotifications() {
   }
   return context
 }
+

@@ -177,7 +177,7 @@ export default function ProjetsPage() {
           type="text"
           placeholder="Rechercher un projet..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
           className="flex-1 px-3 py-2 border rounded-md"
         />
       </div>
@@ -205,4 +205,5 @@ export default function ProjetsPage() {
     </div>
   )
 }
+
 

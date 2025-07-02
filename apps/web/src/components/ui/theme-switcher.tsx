@@ -14,7 +14,7 @@ export function ThemeSwitcher() {
 
   let themeContext
   try {
-    themeContext = useTheme()
+    themeContext = theme
   } catch (error) {
     themeContext = null
   }
@@ -95,3 +95,5 @@ export function ThemeSwitcher() {
     </div>
   )
 }
+
+

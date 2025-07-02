@@ -1,117 +1,108 @@
-// Stub types for UI components - TopSteel ERP
-// Temporary solution to fix TypeScript errors
-
+// Override pour @erp/ui - TopSteel ERP
 declare module "@erp/ui" {
-  import type * as React from "react";
+  import type { ReactNode, MouseEvent, ChangeEvent } from "react";
   
-  // Button props with asChild support
+  // Select components avec support className complet
+  export interface SelectTriggerProps {
+    children?: ReactNode;
+    className?: string;
+    disabled?: boolean;
+    asChild?: boolean;
+    id?: string;
+  }
+  
+  export interface SelectProps {
+    children?: ReactNode;
+    value?: string;
+    defaultValue?: string;
+    onValueChange?: (value: string) => void;
+    disabled?: boolean;
+    name?: string;
+    required?: boolean;
+  }
+
+  export const Select: React.ComponentType<SelectProps>;
+  export const SelectContent: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const SelectItem: React.ComponentType<{ children?: ReactNode; value: string; className?: string }>;
+  export const SelectTrigger: React.ComponentType<SelectTriggerProps>;
+  export const SelectValue: React.ComponentType<{ placeholder?: string; className?: string }>;
+  
+  // Button avec toutes les variantes
   export interface ButtonProps {
-    children?: React.ReactNode;
-    variant?: "default" | "outline" | "secondary" | "ghost" | "link";
+    children?: ReactNode;
+    variant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive";
     size?: "default" | "sm" | "lg" | "icon";
     asChild?: boolean;
     className?: string;
     disabled?: boolean;
-    onClick?: (e: React.MouseEvent) => void;
+    type?: "button" | "submit" | "reset";
+    onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   }
   
-  export const Button: React.FC<ButtonProps>;
+  export const Button: React.ComponentType<ButtonProps>;
   
-  // Select components
-  export interface SelectProps {
-    children?: React.ReactNode;
-    value?: string;
-    onValueChange?: (value: string) => void;
-    disabled?: boolean;
-  }
+  // Table components complets
+  export const Table: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const TableBody: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const TableCell: React.ComponentType<{ children?: ReactNode; className?: string; colSpan?: number }>;
+  export const TableHead: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const TableHeader: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const TableRow: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const TableCaption: React.ComponentType<{ children?: ReactNode; className?: string }>;
   
-  export const Select: React.FC<SelectProps>;
-  export const SelectContent: React.FC<{ children?: React.ReactNode }>;
-  export const SelectItem: React.FC<{ children?: React.ReactNode; value: string }>;
-  export const SelectTrigger: React.FC<{ children?: React.ReactNode; className?: string }>;
-  export const SelectValue: React.FC<{ placeholder?: string }>;
+  // Dropdown Menu
+  export const DropdownMenu: React.ComponentType<{ children?: ReactNode }>;
+  export const DropdownMenuContent: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const DropdownMenuItem: React.ComponentType<{ children?: ReactNode; className?: string; onClick?: () => void }>;
+  export const DropdownMenuLabel: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const DropdownMenuSeparator: React.ComponentType<{ className?: string }>;
+  export const DropdownMenuTrigger: React.ComponentType<{ children?: ReactNode; asChild?: boolean; className?: string }>;
   
-  // Dropdown Menu components
-  export const DropdownMenu: React.FC<{ children?: React.ReactNode }>;
-  export const DropdownMenuContent: React.FC<{ children?: React.ReactNode }>;
-  export const DropdownMenuItem: React.FC<{ children?: React.ReactNode }>;
-  export const DropdownMenuLabel: React.FC<{ children?: React.ReactNode }>;
-  export const DropdownMenuSeparator: React.FC<{}>;
-  export const DropdownMenuTrigger: React.FC<{ children?: React.ReactNode }>;
-  
-  // Switch component
+  // Switch
   export interface SwitchProps {
     id?: string;
     checked?: boolean;
+    defaultChecked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
     disabled?: boolean;
+    className?: string;
+    name?: string;
   }
   
-  export const Switch: React.FC<SwitchProps>;
+  export const Switch: React.ComponentType<SwitchProps>;
   
-  // Tooltip components  
-  export interface TooltipProps {
-    children?: React.ReactNode;
-    delayDuration?: number;
-    side?: string;
+  // Input et Label
+  export interface InputProps {
+    type?: string;
+    placeholder?: string;
+    value?: string;
+    defaultValue?: string;
+    onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+    className?: string;
+    disabled?: boolean;
+    required?: boolean;
+    name?: string;
+    id?: string;
   }
   
-  export const Tooltip: React.FC<TooltipProps>;
-  export const TooltipContent: React.FC<{ children?: React.ReactNode; side?: string }>;
-  export const TooltipProvider: React.FC<{ children?: React.ReactNode; delayDuration?: number }>;
-  export const TooltipTrigger: React.FC<{ children?: React.ReactNode }>;
+  export const Input: React.ComponentType<InputProps>;
   
-  // Alert components
-  export const Alert: React.FC<{ children?: React.ReactNode }>;
-  export const AlertDescription: React.FC<{ children?: React.ReactNode }>;
-  export const AlertTitle: React.FC<{ children?: React.ReactNode }>;
-  
-  // Table components
-  export const Table: React.FC<{ children?: React.ReactNode }>;
-  export const TableBody: React.FC<{ children?: React.ReactNode }>;
-  export const TableCell: React.FC<{ children?: React.ReactNode }>;
-  export const TableHead: React.FC<{ children?: React.ReactNode }>;
-  export const TableHeader: React.FC<{ children?: React.ReactNode }>;
-  export const TableRow: React.FC<{ children?: React.ReactNode }>;
-  export const TableCaption: React.FC<{ children?: React.ReactNode }>;
-  
-  // Card components
-  export const Card: React.FC<{ children?: React.ReactNode }>;
-  export const CardContent: React.FC<{ children?: React.ReactNode }>;
-  export const CardDescription: React.FC<{ children?: React.ReactNode }>;
-  export const CardFooter: React.FC<{ children?: React.ReactNode }>;
-  export const CardHeader: React.FC<{ children?: React.ReactNode }>;
-  export const CardTitle: React.FC<{ children?: React.ReactNode }>;
-  
-  // Badge component
-  export interface BadgeProps {
-    children?: React.ReactNode;
-    variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "primary" | "danger";
+  export interface LabelProps {
+    children?: ReactNode;
+    htmlFor?: string;
     className?: string;
   }
   
-  export const Badge: React.FC<BadgeProps>;
+  export const Label: React.ComponentType<LabelProps>;
   
-  // Avatar components
-  export const Avatar: React.FC<{ children?: React.ReactNode }>;
-  export const AvatarFallback: React.FC<{ children?: React.ReactNode }>;
-  export const AvatarImage: React.FC<{ src?: string; alt?: string }>;
+  // Tooltip
+  export const Tooltip: React.ComponentType<{ children?: ReactNode; delayDuration?: number }>;
+  export const TooltipContent: React.ComponentType<{ children?: ReactNode; side?: string; className?: string }>;
+  export const TooltipProvider: React.ComponentType<{ children?: ReactNode; delayDuration?: number }>;
+  export const TooltipTrigger: React.ComponentType<{ children?: ReactNode; asChild?: boolean }>;
+  
+  // Alert
+  export const Alert: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const AlertDescription: React.ComponentType<{ children?: ReactNode; className?: string }>;
+  export const AlertTitle: React.ComponentType<{ children?: ReactNode; className?: string }>;
 }
-
-// Types pour les composants locaux
-declare module "@/components/ui/tooltip" {
-  export const TooltipProvider: React.FC<{ children?: React.ReactNode; delayDuration?: number }>;
-  export const Tooltip: React.FC<{ children?: React.ReactNode }>;
-  export const TooltipContent: React.FC<{ children?: React.ReactNode; side?: string }>;
-  export const TooltipTrigger: React.FC<{ children?: React.ReactNode }>;
-}
-
-// Types pour les pages
-declare module "@/types" {
-  export * from "@erp/types";
-}
-
-declare module "@/lib/utils" {
-  export * from "@erp/utils";
-}
-

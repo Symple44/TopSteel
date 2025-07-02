@@ -48,7 +48,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
                 <label className="text-sm font-medium">Référence *</label>
                 <Input
                   value={formData.reference}
-                  onChange={(e) => setFormData({...formData, reference: e.target.value})}
+                  onChange={(e) => setFormData({...formData, reference: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                   placeholder="REF-001"
                   required
                 />
@@ -58,7 +58,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
                 <Input
                   type="number"
                   value={formData.quantite}
-                  onChange={(e) => setFormData({...formData, quantite: e.target.value})}
+                  onChange={(e) => setFormData({...formData, quantite: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                   placeholder="100"
                   required
                 />
@@ -68,7 +68,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
               <label className="text-sm font-medium">Désignation *</label>
               <Input
                 value={formData.designation}
-                onChange={(e) => setFormData({...formData, designation: e.target.value})}
+                onChange={(e) => setFormData({...formData, designation: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                 placeholder="Acier S235 - Tôle 2mm"
                 required
               />
@@ -80,7 +80,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
                   type="number"
                   step="0.01"
                   value={formData.prixUnitaire}
-                  onChange={(e) => setFormData({...formData, prixUnitaire: e.target.value})}
+                  onChange={(e) => setFormData({...formData, prixUnitaire: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                   placeholder="12.50"
                 />
               </div>
@@ -89,7 +89,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
                 <Input
                   type="number"
                   value={formData.seuil}
-                  onChange={(e) => setFormData({...formData, seuil: e.target.value})}
+                  onChange={(e) => setFormData({...formData, seuil: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                   placeholder="10"
                 />
               </div>
@@ -98,7 +98,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
               <label className="text-sm font-medium">Emplacement</label>
               <Input
                 value={formData.emplacement}
-                onChange={(e) => setFormData({...formData, emplacement: e.target.value})}
+                onChange={(e) => setFormData({...formData, emplacement: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
                 placeholder="A1-B2-C3"
               />
             </div>
@@ -114,3 +114,4 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
     </div>
   )
 }
+

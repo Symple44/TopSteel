@@ -1,7 +1,6 @@
 // apps/web/src/components/facturation/create-facture-dialog.tsx
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -21,8 +20,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Plus } from 'lucide-react'
+import { useState } from 'react'
 
 interface CreateFactureDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onFactureCreated?: (facture: any) => void
 }
 

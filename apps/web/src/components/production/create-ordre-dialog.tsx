@@ -49,7 +49,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
               <Input
                 type="text"
                 value={formData.numero}
-                onChange={(e) => setFormData({ ...formData, numero: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, numero: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 placeholder="OF-2025-001"
                 required
               />
@@ -60,7 +60,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
               <Input
                 type="text"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, description: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 placeholder="Description de l'ordre..."
                 required
               />
@@ -70,7 +70,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
               <label className="text-sm font-medium">Priorité</label>
               <select
                 value={formData.priorite}
-                onChange={(e) => setFormData({ ...formData, priorite: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, priorite: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 className="w-full p-2 border rounded-md"
               >
                 <option value="BASSE">Basse</option>
@@ -86,7 +86,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
                 <Input
                   type="date"
                   value={formData.dateDebutPrevue}
-                  onChange={(e) => setFormData({ ...formData, dateDebutPrevue: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, dateDebutPrevue: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 />
               </div>
               <div>
@@ -94,7 +94,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
                 <Input
                   type="date"
                   value={formData.dateFinPrevue}
-                  onChange={(e) => setFormData({ ...formData, dateFinPrevue: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, dateFinPrevue: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 />
               </div>
             </div>
@@ -104,7 +104,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
               <Input
                 type="text"
                 value={formData.projet}
-                onChange={(e) => setFormData({ ...formData, projet: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, projet: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
                 placeholder="Nom du projet (optionnel)"
               />
             </div>
@@ -123,3 +123,4 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
     </div>
   );
 }
+

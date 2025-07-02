@@ -179,8 +179,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                 <Textarea
                   id="conditions"
                   value={devis.conditions}
-                  onChange={(e) => setDevis(prev => ({ ...prev, conditions: e.target.value }))}
-                  rows={3}
+                  onChange={(e) => setDevis(prev => ({ ...prev, conditions: (e.target as HTMLTextAreaElement).value }))}
                 />
               </div>
             </CardContent>
@@ -365,10 +364,10 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
       {/* Modal aperçu */}
       {showPreview && (
         <DevisPreview
-          devis={devis}
-          open={showPreview}
-          onOpenChange={setShowPreview}
-        />
+        devisId={devis.reference}  // Utiliser reference au lieu de id
+        open={showPreview}
+        onOpenChange={setShowPreview}
+      />
       )}
     </div>
   )

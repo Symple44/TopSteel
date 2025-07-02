@@ -32,7 +32,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@erp/ui'
 import {
   Table,
   TableBody,
@@ -215,7 +215,7 @@ export default function ChiffragePage() {
                         </TableCell>
                         <TableCell>
                           <Select>
-                            <SelectTrigger className="w-24">
+                            <SelectTrigger className="w-24" {...({} as any)}>
                               <SelectValue placeholder="Unité" />
                             </SelectTrigger>
                             <SelectContent>
@@ -311,7 +311,7 @@ export default function ChiffragePage() {
                 <div className="flex gap-4">
                   <Input placeholder="Rechercher un chiffrage..." className="max-w-sm" />
                   <Select>
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[180px]" {...({} as any)}>
                       <SelectValue placeholder="Statut" />
                     </SelectTrigger>
                     <SelectContent>
@@ -426,5 +426,11 @@ export default function ChiffragePage() {
     </div>
   )
 }
+
+
+
+
+
+
 
 
