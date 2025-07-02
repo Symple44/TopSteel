@@ -1,38 +1,47 @@
-// apps/web/src/hooks/use-auth.ts
-import { useAuthStore } from '@/stores/auth.store'
-import { useEffect } from 'react'
-import { shallow } from 'zustand/shallow'
+// apps/web/src/hooks/use-auth.ts - SANS ZUSTAND
+import { useState, useCallback } from 'react'
+
+const mockUser = {
+  id: '1',
+  nom: 'Utilisateur',
+  email: 'user@topsteel.com',
+  role: 'admin'
+}
 
 export const useAuth = () => {
-  const auth = useAuthStore(
-    (state) => ({
-      user: state.user,
-      tokens: state.tokens,
-      isAuthenticated: state.isAuthenticated,
-      isLoading: state.isLoading,
-      error: state.error,
-      login: state.login,
-      logout: state.logout,
-      clearError: state.clearError,
-      updateUser: state.updateUser,
-    }),
-    shallow
-  )
+  const [user, setUser] = useState(mockUser)
+  const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    const checkAuth = useAuthStore.getState().checkAuth
-    if (auth.tokens?.accessToken && !auth.user) {
-      checkAuth().catch(console.error)
-    }
+  const login = useCallback(async (email: string, password: string) => {
+    setIsLoading(true)
+    // Simuler connexion
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    setUser(mockUser)
+    setIsLoading(false)
   }, [])
 
-  return auth
+  const logout = useCallback(async () => {
+    setIsLoading(true)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    setUser(null)
+    setIsLoading(false)
+  }, [])
+
+  return {
+    user,
+    isLoading,
+    isAuthenticated: !!user,
+    login,
+    logout
+  }
 }
 
 export const useCurrentUser = () => {
-  return useAuthStore((state) => state.user)
+  const { user } = useAuth()
+  return user
 }
 
 export const useIsAuthenticated = () => {
-  return useAuthStore((state) => state.isAuthenticated)
+  const { isAuthenticated } = useAuth()
+  return isAuthenticated
 }

@@ -1,55 +1,27 @@
-// apps/web/src/hooks/use-store-ssr.ts
-import { useEffect, useState } from 'react'
-import type { StoreApi, UseBoundStore } from 'zustand'
+// apps/web/src/hooks/use-store-ssr.ts - VERSION FIXEE
+import { useEffect, useState, useCallback, useMemo } from 'react'
 
-/**
- * ✅ SOLUTION CRITIQUE: Hook SSR-safe pour stores Zustand
- * Évite les erreurs getServerSnapshot et useSyncExternalStore
- */
-export function useStoreSSR<T, U>(
-  store: UseBoundStore<StoreApi<T>>,
-  selector: (state: T) => U,
-  fallback: U
-): U {
-  const [isHydrated, setIsHydrated] = useState(false)
-  const [fallbackState, setFallbackState] = useState(fallback)
-
-  // ✅ Marquer comme hydraté côté client
-  useEffect(() => {
-    setIsHydrated(true)
-  }, [])
-
-  // ✅ Utiliser le store seulement après hydratation
-  try {
-    if (isHydrated) {
-      return store(selector)
-    }
-    return fallbackState
-  } catch (error) {
-    // ✅ Fallback en cas d'erreur store
-    console.warn('Store SSR error:', error)
-    return fallbackState
-  }
-}
-
-/**
- * ✅ Version simplifiée sans imports dynamiques
- */
 export function useHydrationSafe<T>(callback: () => T, fallback: T): T {
   const [isHydrated, setIsHydrated] = useState(false)
-
+  
   useEffect(() => {
     setIsHydrated(true)
   }, [])
 
+  // Mémoriser le fallback pour éviter les re-renders
+  const memoizedFallback = useMemo(() => fallback, [])
+  
+  // Utiliser callback stable
+  const stableCallback = useCallback(callback, [])
+
   if (!isHydrated) {
-    return fallback
+    return memoizedFallback
   }
 
   try {
-    return callback()
+    return stableCallback()
   } catch (error) {
     console.warn('Store hydration error:', error)
-    return fallback
+    return memoizedFallback
   }
 }

@@ -1,143 +1,136 @@
-// apps/web/src/app/(dashboard)/projets/page.tsx - VERSION CORRIGÉE
 'use client'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { DataTable } from "@/components/ui/data-table"
-import { PageHeader } from "@/components/ui/page-header"
-import { ProjetCard } from "@/components/ui/projet-card"
+import { useProjets } from '@/hooks/use-projets'
+import { useUI } from '@/hooks/use-ui'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { useProjets, useUI } from '@/stores'
-import type { Projet } from '@erp/types'
-import { Grid, List, Plus } from 'lucide-react'
+import { Grid, List, Plus, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useMemo } from 'react'
 
 export default function ProjetsPage() {
-  const { projets, isLoading, fetchProjets, refetchWithFilters } = useProjets()
+  const { projets, isLoading, refetch } = useProjets()
   const { dataView, setDataView } = useUI()
 
-  // ✅ FIX: Stabilisation des handlers avec useCallback
-  const handleViewChange = useCallback((view: 'grid' | 'table') => {
-    setDataView(view) // ✅ FIX CRITIQUE: Correction typo setdataView → setDataView
-  }, [setDataView])
-
-  const handleRefresh = useCallback(() => {
-    refetchWithFilters()
-  }, [refetchWithFilters])
-
-  // ✅ Mémorisation des colonnes pour éviter les re-renders
-  const columns = useMemo(() => [
-    {
-      key: 'reference',
-      label: 'Référence',
-      sortable: true,
-    },
-    {
-      key: 'client',
-      label: 'Client',
-      render: (_: any, projet: Projet) => projet.client?.nom || 'Client non défini',
-      sortable: true,
-    },
-    {
-      key: 'statut',
-      label: 'Statut',
-      render: (statut: string) => (
-        <Badge variant="outline">{statut}</Badge>
-      ),
-      sortable: true,
-    },
-    {
-      key: 'montantHT',
-      label: 'Montant HT',
-      render: (montant: number) => formatCurrency(montant),
-      sortable: true,
-    },
-    {
-      key: 'dateDebut',
-      label: 'Date début',
-      render: (date: Date) => date ? formatDate(date) : '-',
-      sortable: true,
-    },
-    {
-      key: 'avancement',
-      label: 'Avancement',
-      render: (avancement: number) => `${avancement}%`,
-      sortable: true,
-    },
-  ], [])
-
-  // ✅ Loading state stable
   if (isLoading) {
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="text-center">
-          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-          <p className="mt-4 text-gray-600">Chargement des projets...</p>
+          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-current border-r-transparent" />
+          <p className="mt-4 text-muted-foreground">Chargement des projets...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Projets"
-        subtitle={`${projets.length} projet(s)`}
-        breadcrumbs={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Projets' },
-        ]}
-        actions={
-          <div className="flex items-center space-x-2">
-            <div className="flex rounded-md border">
-              <Button
-                variant={dataView === 'grid' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => handleViewChange('grid')} // ✅ Handler stable
-                className="rounded-r-none"
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={dataView === 'table' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => handleViewChange('table')} // ✅ Handler stable
-                className="rounded-l-none"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-            <Button 
-              onClick={handleRefresh}
-              variant="outline" 
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Projets</h1>
+          <p className="text-muted-foreground">{projets.length} projet(s)</p>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          {/* View toggle */}
+          <div className="flex rounded-md border">
+            <Button
+              variant={dataView === 'grid' ? 'default' : 'outline'}
               size="sm"
+              onClick={() => setDataView('grid')}
+              className="rounded-r-none"
             >
-              Actualiser
+              <Grid className="h-4 w-4" />
             </Button>
-            <Button asChild>
-              <Link href="/projets/nouveau">
-                <Plus className="mr-2 h-4 w-4" />
-                Nouveau projet
-              </Link>
+            <Button
+              variant={dataView === 'table' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setDataView('table')}
+              className="rounded-l-none"
+            >
+              <List className="h-4 w-4" />
             </Button>
           </div>
-        }
-      />
 
+          <Button onClick={refetch} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Actualiser
+          </Button>
+
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Nouveau projet
+          </Button>
+        </div>
+      </div>
+
+      {/* Content */}
       {dataView === 'grid' ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projets.map((projet) => (
-            <ProjetCard key={projet.id} projet={projet} />
+            <div key={projet.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">{projet.reference}</h3>
+                <Badge variant="outline">{projet.statut}</Badge>
+              </div>
+              
+              <h4 className="font-medium mb-2">{projet.titre}</h4>
+              <p className="text-sm text-muted-foreground mb-4">{projet.description}</p>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Client:</span>
+                  <span>{projet.client?.nom}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Montant:</span>
+                  <span>{formatCurrency(projet.montantHT)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Avancement:</span>
+                  <span>{projet.avancement}%</span>
+                </div>
+              </div>
+
+              <div className="mt-4 w-full bg-muted rounded-full h-2">
+                <div 
+                  className="bg-primary rounded-full h-2 transition-all"
+                  style={{ width: `${projet.avancement}%` }}
+                />
+              </div>
+            </div>
           ))}
         </div>
       ) : (
-        <DataTable
-          data={projets}
-          columns={columns}
-          searchable
-          sortable
-        />
+        <div className="border rounded-lg">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left p-4">Référence</th>
+                <th className="text-left p-4">Titre</th>
+                <th className="text-left p-4">Client</th>
+                <th className="text-left p-4">Statut</th>
+                <th className="text-left p-4">Montant HT</th>
+                <th className="text-left p-4">Avancement</th>
+              </tr>
+            </thead>
+            <tbody>
+              {projets.map((projet) => (
+                <tr key={projet.id} className="border-b hover:bg-muted/50">
+                  <td className="p-4 font-medium">{projet.reference}</td>
+                  <td className="p-4">{projet.titre}</td>
+                  <td className="p-4">{projet.client?.nom}</td>
+                  <td className="p-4">
+                    <Badge variant="outline">{projet.statut}</Badge>
+                  </td>
+                  <td className="p-4">{formatCurrency(projet.montantHT)}</td>
+                  <td className="p-4">{projet.avancement}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )

@@ -51,7 +51,7 @@ export function generateId(): string {
   // ✅ Utiliser système enterprise
   if (typeof window !== 'undefined') {
     // Côté client: crypto sécurisé
-    return crypto.randomUUID?.()?.slice(0, 12) || 
+    return (window.crypto?.randomUUID?.()?.slice(0, 12)) || 
            Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
   }
   
