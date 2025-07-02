@@ -1,8 +1,8 @@
 // packages/utils/src/index.ts
 export { cn } from './lib/cn';
-export { formatDate, formatCurrency, formatNumber } from './lib/formatters';
+export { formatCurrency, formatDate, formatNumber } from './lib/formatters';
 export { debounce, throttle } from './lib/functions';
-export { validateEmail, validatePhone, validateCNPJ } from './lib/validators';
+export { validateCNPJ, validateEmail, validatePhone } from './lib/validators';
 
 // Export dos tipos utilitários
 export type { DeepPartial, DeepRequired } from './types';
@@ -48,5 +48,13 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function generateId(): string {
-  return Math.random().toString(36).substr(2, 9);
+  // ✅ Utiliser système enterprise
+  if (typeof window !== 'undefined') {
+    // Côté client: crypto sécurisé
+    return crypto.randomUUID?.()?.slice(0, 12) || 
+           Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
+  }
+  
+  // ✅ Côté serveur: déterministe
+  return `srv-${Date.now().toString(36)}-${process.hrtime.bigint().toString(36).slice(-6)}`
 }

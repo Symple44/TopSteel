@@ -1,60 +1,184 @@
-// apps/web/src/lib/store-utils.ts - VERSION CORRIGÉE SSR
+// apps/web/src/lib/store-utils.ts - VERSION ENTERPRISE SSR-SAFE
 import type { StateCreator } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { ID } from './id-system'
 
 /**
- * Crée un store Zustand avec persistance et devtools (SSR safe)
+ * ✅ STORE ENTERPRISE AVEC PERSISTANCE SSR-SAFE
+ * 
+ * Améliorations:
+ * - Configuration SSR robuste
+ * - IDs crypto sécurisés
+ * - Monitoring et métriques
+ * - Gestion d'erreurs avancée
+ * - Versioning automatique
  */
 export const createStoreWithPersist = <T>(
   stateCreator: StateCreator<T, [['zustand/immer', never]], [], T>,
   name: string,
-  persistedKeys?: (keyof T)[]
+  persistedKeys?: (keyof T)[],
+  version = 1
 ) => {
   const persistConfig = {
     name: `topsteel-${name}`,
+    version,
+    
+    // ✅ PARTIALISATION INTELLIGENTE
     partialize: persistedKeys 
       ? (state: T) => {
           const result = {} as Partial<T>
           persistedKeys.forEach(key => {
-            result[key] = state[key]
+            if (state[key] !== undefined) {
+              result[key] = state[key]
+            }
           })
           return result
         }
       : undefined,
-    // ✅ FIX CRITIQUE: Configuration SSR pour éviter getServerSnapshot errors
-    skipHydration: true, // ✅ Évite les problèmes de synchronisation serveur/client
     
-    // ✅ Configuration robuste pour SSR
+    // ✅ CONFIGURATION SSR ENTERPRISE
+    skipHydration: true,
+    
+    // ✅ STORAGE WRAPPER ROBUSTE
     storage: {
       getItem: (name: string) => {
-        // ✅ Safe localStorage access pour SSR
         if (typeof window === 'undefined') return null
+        
         try {
-          return localStorage.getItem(name)
-        } catch {
+          const item = localStorage.getItem(name)
+          if (!item) return null
+          
+          // ✅ Validation JSON
+          const parsed = JSON.parse(item)
+          
+          // ✅ Vérification version
+          if (parsed.version !== version) {
+            console.info(`Store ${name}: version mismatch, clearing...`)
+            localStorage.removeItem(name)
+            return null
+          }
+          
+          return item
+        } catch (error) {
+          console.warn(`Store ${name}: failed to get item`, error)
+          // ✅ Nettoyage automatique des données corrompues
+          try {
+            localStorage.removeItem(name)
+          } catch {}
           return null
         }
       },
+      
       setItem: (name: string, value: string) => {
-        // ✅ Safe localStorage access pour SSR
         if (typeof window === 'undefined') return
+        
         try {
+          // ✅ Validation taille (localStorage limit ~5MB)
+          if (value.length > 4 * 1024 * 1024) { // 4MB limit
+            console.warn(`Store ${name}: data too large, skipping persist`)
+            return
+          }
+          
           localStorage.setItem(name, value)
-        } catch {
-          // Fail silently
+          
+          // ✅ Métriques de performance
+          if (process.env.NODE_ENV === 'development') {
+            const size = new Blob([value]).size
+            console.debug(`Store ${name}: persisted ${size} bytes`)
+          }
+        } catch (error) {
+          console.warn(`Store ${name}: failed to persist`, error)
+          
+          // ✅ Tentative de nettoyage en cas d'espace insuffisant
+          if (error instanceof Error && error.name === 'QuotaExceededError') {
+            try {
+              // Nettoyer les anciens stores si nécessaire
+              this.cleanup()
+            } catch {}
+          }
         }
       },
+      
       removeItem: (name: string) => {
-        // ✅ Safe localStorage access pour SSR
         if (typeof window === 'undefined') return
+        
         try {
           localStorage.removeItem(name)
-        } catch {
-          // Fail silently
+        } catch (error) {
+          console.warn(`Store ${name}: failed to remove`, error)
         }
       },
+      
+      // ✅ Méthode de nettoyage
+      cleanup: () => {
+        if (typeof window === 'undefined') return
+        
+        try {
+          // Identifier les clés TopSteel anciennes
+          const keysToRemove = []
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key?.startsWith('topsteel-') && key !== `topsteel-${name}`) {
+              try {
+                const item = localStorage.getItem(key)
+                if (item) {
+                  const parsed = JSON.parse(item)
+                  // Supprimer si version ancienne
+                  if (parsed.version < version) {
+                    keysToRemove.push(key)
+                  }
+                }
+              } catch {}
+            }
+          }
+          
+          keysToRemove.forEach(key => localStorage.removeItem(key))
+          console.info(`Cleaned ${keysToRemove.length} old store entries`)
+        } catch (error) {
+          console.warn('Store cleanup failed:', error)
+        }
+      }
     },
+    
+    // ✅ MIGRATION AUTOMATIQUE
+    migrate: (persistedState: any, version: number) => {
+      // Migration personnalisée par store si nécessaire
+      console.info(`Store ${name}: migrating from version ${version}`)
+      
+      // Exemple de migration
+      if (version === 0) {
+        // Migrer de l'ancienne structure
+        return {
+          ...persistedState,
+          version: 1,
+          migrated: true,
+          migratedAt: Date.now()
+        }
+      }
+      
+      return persistedState
+    },
+    
+    // ✅ CALLBACKS DE CYCLE DE VIE
+    onRehydrateStorage: (name: string) => {
+      console.debug(`Store ${name}: starting rehydration`)
+      
+      return (state: any, error: any) => {
+        if (error) {
+          console.error(`Store ${name}: rehydration failed`, error)
+          // Métriques d'erreur si configurées
+          if (typeof window !== 'undefined' && (window as any).analytics) {
+            (window as any).analytics.track('store_rehydration_error', {
+              store: name,
+              error: error.message
+            })
+          }
+        } else {
+          console.debug(`Store ${name}: rehydration completed`)
+        }
+      }
+    }
   }
   
   return devtools(
@@ -64,14 +188,28 @@ export const createStoreWithPersist = <T>(
     ),
     { 
       name: `TopSteel-${name}`,
-      // ✅ Disable devtools en production pour performance
-      enabled: process.env.NODE_ENV === 'development'
+      enabled: process.env.NODE_ENV === 'development',
+      
+      // ✅ CONFIGURATION DEVTOOLS AVANCÉE
+      serialize: process.env.NODE_ENV === 'development' ? {
+        date: true,
+        regex: true,
+        undefined: true,
+        error: true,
+        symbol: false,
+        map: false,
+        set: false
+      } : false,
+      
+      // ✅ ACTIONS TRACKING
+      trace: process.env.NODE_ENV === 'development',
+      traceLimit: 25
     }
   )
 }
 
 /**
- * Crée un store Zustand simple (sans persistance) - SSR safe
+ * ✅ STORE SIMPLE ENTERPRISE (sans persistance)
  */
 export const createSimpleStore = <T>(
   stateCreator: StateCreator<T, [['zustand/immer', never]], [], T>,
@@ -81,24 +219,90 @@ export const createSimpleStore = <T>(
     immer(stateCreator),
     { 
       name: `TopSteel-${name}`,
-      enabled: process.env.NODE_ENV === 'development'
+      enabled: process.env.NODE_ENV === 'development',
+      serialize: process.env.NODE_ENV === 'development'
     }
   )
 }
 
 /**
- * Hook pour hydratation manuelle des stores avec persistance
- * ✅ À utiliser dans _app.tsx ou layout.tsx pour SSR
+ * ✅ UTILITAIRES ID ENTERPRISE (compatibilité legacy)
  */
-export const useHydrateStores = () => {
-  // Cette fonction sera appelée côté client pour hydrater les stores
-  // après le montage initial pour éviter les mismatches SSR
+export const generateId = (): string => {
+  console.warn('generateId() is deprecated. Use ID.simple() from id-system.ts')
+  return ID.simple()
+}
+
+export const generateIdWithPrefix = (prefix: string): string => {
+  console.warn('generateIdWithPrefix() is deprecated. Use ID.business() from id-system.ts')
+  return `${prefix}-${ID.simple()}`
 }
 
 /**
- * Utilitaire pour générer des IDs uniques
+ * ✅ MONITORING ET MÉTRIQUES
  */
-export const generateId = () => {
-  return Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15)
+export const StoreMonitor = {
+  /**
+   * Mesurer performance d'une action store
+   */
+  measureAction: <T extends (...args: any[]) => any>(
+    storeName: string,
+    actionName: string,
+    action: T
+  ): T => {
+    return ((...args: any[]) => {
+      const start = performance.now()
+      const result = action(...args)
+      const duration = performance.now() - start
+      
+      if (duration > 16) { // > 1 frame
+        console.warn(`Store ${storeName}.${actionName} took ${duration.toFixed(2)}ms`)
+      }
+      
+      // Métriques vers analytics si configuré
+      if (typeof window !== 'undefined' && (window as any).analytics) {
+        (window as any).analytics.track('store_action_performance', {
+          store: storeName,
+          action: actionName,
+          duration: Math.round(duration),
+          args: args.length
+        })
+      }
+      
+      return result
+    }) as T
+  },
+
+  /**
+   * Diagnostics store
+   */
+  diagnose: (storeName: string) => {
+    if (typeof window === 'undefined') return null
+    
+    const storeKey = `topsteel-${storeName}`
+    const data = localStorage.getItem(storeKey)
+    
+    if (!data) {
+      return { exists: false }
+    }
+    
+    try {
+      const parsed = JSON.parse(data)
+      const size = new Blob([data]).size
+      
+      return {
+        exists: true,
+        size,
+        version: parsed.version,
+        state: parsed.state,
+        lastModified: new Date(parsed.state?.lastModified || Date.now())
+      }
+    } catch (error) {
+      return {
+        exists: true,
+        corrupted: true,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }
+  }
 }

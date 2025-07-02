@@ -1,11 +1,8 @@
-// apps/web/src/stores/projet.store.ts - VERSION CORRIGÉE
-import { createStoreWithPersist } from '@/lib/store-utils';
-import { projetService } from '@/services/projet.service';
-import type {
-  Projet,
-  ProjetFilters
-} from '@erp/types';
-import { create } from 'zustand';
+// apps/web/src/stores/projet.store.ts - VERSION CORRIGÉE ANTI-BOUCLES
+import { createStoreWithPersist } from '@/lib/store-utils'
+import { projetService } from '@/services/projet.service'
+import type { Projet, ProjetFilters } from '@erp/types'
+import { create } from 'zustand'
 
 interface ProjetState {
   projets: Projet[]
@@ -13,12 +10,14 @@ interface ProjetState {
   filters: ProjetFilters
   isLoading: boolean
   error: string | null
+  lastFetchTime: number | null // ✅ Ajout pour cache timing
   
   fetchProjets: () => Promise<void>
   setSelectedProjet: (projet: Projet | null) => void
   setFilters: (filters: Partial<ProjetFilters>) => void
   clearError: () => void
-  refetchWithFilters: () => Promise<void> // ✅ Nouvelle méthode explicite
+  refreshProjets: () => Promise<void> // ✅ Méthode explicite pour refresh
+  reset: () => void // ✅ Méthode pour reset complet
 }
 
 export const useProjetStore = create<ProjetState>()(
@@ -29,46 +28,100 @@ export const useProjetStore = create<ProjetState>()(
       filters: {},
       isLoading: false,
       error: null,
+      lastFetchTime: null,
 
+      // ✅ FIX CRITIQUE #1: FetchProjets avec protection anti-spam
       fetchProjets: async () => {
         const state = get()
-        if (state.isLoading) return // ✅ Éviter les appels simultanés
         
-        set({ isLoading: true, error: null })
+        // ✅ Protection anti-appels simultanés
+        if (state.isLoading) {
+          console.warn('FetchProjets déjà en cours, ignoré')
+          return
+        }
+        
+        // ✅ Protection anti-spam (minimum 1 seconde entre appels)
+        const now = Date.now()
+        if (state.lastFetchTime && (now - state.lastFetchTime) < 1000) {
+          console.warn('FetchProjets trop rapide, ignoré')
+          return
+        }
+        
+        set((state) => ({ 
+          ...state, 
+          isLoading: true, 
+          error: null,
+          lastFetchTime: now
+        }))
+        
         try {
           const response = await projetService.getAll(state.filters)
           
-          set({ 
+          set((state) => ({ 
+            ...state,
             projets: response.data, 
             isLoading: false 
-          })
+          }))
+          
         } catch (error) {
-          set({ 
+          set((state) => ({ 
+            ...state,
             error: error instanceof Error ? error.message : 'Erreur de chargement',
             isLoading: false 
-          })
+          }))
         }
       },
 
-      setSelectedProjet: (projet) => set({ selectedProjet: projet }),
+      setSelectedProjet: (projet) => {
+        set((state) => ({ 
+          ...state, 
+          selectedProjet: projet 
+        }))
+      },
       
-      // ✅ FIX CRITIQUE: Supprimer l'auto-fetch qui cause les boucles
+      // ✅ FIX CRITIQUE #2: setFilters SANS auto-fetch 
       setFilters: (newFilters) => {
         set((state) => ({
           ...state,
           filters: { ...state.filters, ...newFilters }
         }))
-        // ✅ NE PAS auto-fetch ici - laisser le composant décider
+        // ✅ SUPPRESSION de l'auto-fetch - laisse le composant décider
       },
 
-      // ✅ Nouvelle méthode pour refetch explicite avec nouveaux filtres
-      refetchWithFilters: async () => {
-        await get().fetchProjets()
+      // ✅ FIX CRITIQUE #3: Méthode explicite pour refresh avec nouveaux filtres
+      refreshProjets: async () => {
+        const state = get()
+        
+        // ✅ Reset les projets existants pour forcer reload
+        set((state) => ({ 
+          ...state, 
+          projets: [],
+          lastFetchTime: null 
+        }))
+        
+        await state.fetchProjets()
+      },
+
+      // ✅ FIX CRITIQUE #4: Reset complet du store
+      reset: () => {
+        set((state) => ({
+          ...state,
+          projets: [],
+          selectedProjet: null,
+          isLoading: false,
+          error: null,
+          lastFetchTime: null
+        }))
       },
       
-      clearError: () => set({ error: null }),
+      clearError: () => {
+        set((state) => ({ 
+          ...state, 
+          error: null 
+        }))
+      },
     }),
     'projets',
-    ['filters'] // ✅ Persister seulement les filtres, pas les données
+    ['filters'] // ✅ Persister SEULEMENT les filtres, pas les données
   )
 )

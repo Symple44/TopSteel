@@ -1,40 +1,46 @@
-import { Providers } from '@/components/providers'
-import { Toaster } from "@/components/ui/toaster"
-import type { Metadata } from 'next'
-import { Inter, Poppins } from 'next/font/google'
+// apps/web/src/app/layout.tsx - ROOT LAYOUT COMPLET
+import { HydrationProvider } from '@/components/providers/hydration-provider'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap'
-})
+const inter = Inter({ subsets: ['latin'] })
 
-const poppins = Poppins({ 
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-poppins',
-  display: 'swap'
-})
-
-export const metadata: Metadata = {
-  title: 'TopSteel - ERP Métallurgie Moderne',
-  description: 'Solution ERP nouvelle génération pour les entreprises de construction métallique et métallurgie',
-  keywords: 'ERP, construction métallique, métallerie, ferronnerie, gestion moderne, production digitale, stocks intelligents',
+export const metadata = {
+  title: 'TopSteel ERP',
+  description: 'Système de gestion intégré pour TopSteel',
 }
 
+/**
+ * ✅ Root Layout avec HydrationProvider pour éviter erreurs SSR
+ */
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning className={`${inter.variable} ${poppins.variable}`}>
-      <body className={`${inter.className} bg-background text-foreground antialiased font-feature-settings-liga font-feature-settings-calt`}>
-        <Providers>
+    <html lang="fr" className={inter.className}>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        {/* ✅ CRITIQUE: HydrationProvider doit wrapper tout le contenu */}
+        <HydrationProvider>
           {children}
-          <Toaster />
-        </Providers>
+        </HydrationProvider>
+        
+        {/* Scripts additionnels si nécessaire */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Éviter les flashes de thème
+              try {
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark')
+                } else {
+                  document.documentElement.classList.remove('dark')
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
       </body>
     </html>
   )
