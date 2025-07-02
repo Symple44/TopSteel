@@ -10,6 +10,21 @@ export class Materiaux extends BaseAuditEntity {
   @Column({ type: "text", nullable: true })
   description?: string;
 
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  stockMinimum?: number;
+
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  stockMaximum?: number;
+
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  seuilAlerte?: number;
+
+  @Column({ length: 100, nullable: true })
+  emplacement?: string;
+
+  @Column({ type: "date", nullable: true })
+  dateLastInventaire?: Date;
+
   @Column({ default: true })
   @Index()
   actif!: boolean;

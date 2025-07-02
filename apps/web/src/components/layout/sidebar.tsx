@@ -1,33 +1,26 @@
+// apps/web/src/components/layout/sidebar.tsx - VERSION AMÉLIORÉE
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import {
-  ArrowUpDown,
-  Award,
   BarChart3,
-  Building2,
-  Calculator,
-  Calendar,
   ChevronDown,
   ChevronRight,
-  Clock,
   CreditCard,
   Database,
   Factory,
   FileText,
   FolderOpen,
+  Home,
   LayoutDashboard,
   Package,
   Settings,
   Shield,
-  Target,
-  TrendingUp,
-  Truck,
   User,
-  Users
+  Users,
+  Wrench
 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -41,18 +34,18 @@ interface NavItem {
   title: string
   href?: string
   icon: React.ComponentType<{ className?: string }>
-  badge?: string | number
+  badge?: string
+  gradient?: string
   children?: NavItem[]
   roles?: string[]
-  gradient?: string
 }
 
 const navigation: NavItem[] = [
   {
-    title: 'Tableau de bord',
+    title: 'Dashboard',
     href: '/dashboard',
-    icon: LayoutDashboard,
-    gradient: 'from-blue-500 to-purple-600'
+    icon: Home,
+    gradient: 'from-blue-500 to-purple-600',
   },
   {
     title: 'Projets',
@@ -60,54 +53,34 @@ const navigation: NavItem[] = [
     gradient: 'from-emerald-500 to-teal-600',
     children: [
       { title: 'Tous les projets', href: '/projets', icon: FolderOpen },
-      { title: 'Nouveau projet', href: '/projets/nouveau', icon: Target },
-      { title: 'En cours', href: '/projets/en-cours', icon: TrendingUp, badge: '12' },
-      { title: 'Terminés', href: '/projets/termines', icon: Award },
-    ],
-  },
-  {
-    title: 'Clients',
-    href: '/clients',
-    icon: Users,
-    badge: '247',
-    gradient: 'from-indigo-500 to-blue-600',
-  },
-  {
-    title: 'Chiffrage & Devis',
-    icon: Calculator,
-    gradient: 'from-orange-500 to-red-500',
-    children: [
-      { title: 'Nouveau chiffrage', href: '/chiffrage', icon: Calculator },
-      { title: 'Devis en cours', href: '/devis/en-cours', icon: FileText, badge: '8' },
-      { title: 'Templates', href: '/chiffrage/templates', icon: FileText },
-      { title: 'Historique', href: '/chiffrage/historique', icon: FileText },
+      { title: 'Nouveau projet', href: '/projets/nouveau', icon: FolderOpen },
+      { title: 'Chiffrage', href: '/projets/chiffrage', icon: FileText },
     ],
   },
   {
     title: 'Production',
     icon: Factory,
-    gradient: 'from-purple-500 to-pink-600',
+    gradient: 'from-orange-500 to-red-600',
     children: [
-      { title: 'Ordres de fabrication', href: '/production/ordres', icon: Factory },
-      { title: 'Planning', href: '/production/planning', icon: Calendar },
-      { title: 'Suivi temps', href: '/production/temps', icon: Clock },
-      { title: 'Rapports', href: '/production/rapports', icon: FileText },
+      { title: 'Ordres de fabrication', href: '/production/ordres', icon: Wrench },
+      { title: 'Planning', href: '/production/planning', icon: BarChart3 },
+      { title: 'Suivi temps', href: '/production/temps', icon: BarChart3 },
     ],
   },
   {
-    title: 'Stock & Achats',
+    title: 'Stocks & Achats',
     icon: Package,
-    gradient: 'from-cyan-500 to-blue-500',
+    gradient: 'from-purple-500 to-pink-600',
+    badge: '12',
     children: [
-      { title: 'Stock', href: '/stock', icon: Package },
-      { title: 'Mouvements', href: '/stock/mouvements', icon: ArrowUpDown },
-      { title: 'Commandes', href: '/achats/commandes', icon: Truck },
-      { title: 'Fournisseurs', href: '/achats/fournisseurs', icon: Building2 },
+      { title: 'Inventaire', href: '/stocks/inventaire', icon: Package },
+      { title: 'Commandes', href: '/stocks/commandes', icon: Package },
+      { title: 'Fournisseurs', href: '/stocks/fournisseurs', icon: Users },
     ],
   },
   {
     title: 'Comptabilité',
-    icon: CreditCard,
+    icon: BarChart3,
     gradient: 'from-green-500 to-emerald-600',
     children: [
       { title: 'Factures', href: '/comptabilite/factures', icon: FileText },
@@ -131,7 +104,7 @@ const navigation: NavItem[] = [
 export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const [expandedItems, setExpandedItems] = useState<string[]>(['projets'])
+  const [expandedItems, setExpandedItems] = useState<string[]>(['Projets'])
 
   const toggleExpanded = (title: string) => {
     setExpandedItems(prev => 
@@ -235,11 +208,11 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
   return (
     <div className={cn(
-      "flex flex-col h-full bg-white/60 backdrop-blur-md border-r border-slate-200/60 transition-all duration-300",
+      "flex flex-col h-full bg-white/60 backdrop-blur-md border-r border-slate-200/60 transition-all duration-300 relative",
       isCollapsed ? "w-16" : "w-64"
     )}>
       
-      {/* Header simplifié - SANS DOUBLON */}
+      {/* Header avec bouton toggle toujours visible */}
       <div className="p-4 border-b border-slate-200/60">
         <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
           {!isCollapsed && (
@@ -259,19 +232,10 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               <LayoutDashboard className="h-4 w-4" />
             </div>
           )}
-          
-          {!isCollapsed && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggle}
-              className="h-8 w-8 p-0 hover:bg-slate-100"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          )}
         </div>
       </div>
+
+
 
       {/* Navigation */}
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
@@ -280,22 +244,23 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
       <Separator className="bg-slate-200/60" />
 
-      {/* Footer utilisateur simplifié */}
+      {/* Footer utilisateur simplifié avec effet hover */}
       <div className="p-4">
         <div className={cn(
-          "flex items-center rounded-xl bg-gradient-to-r from-slate-50 to-blue-50/50 p-3 border border-slate-200/60",
+          "flex items-center rounded-xl bg-gradient-to-r from-slate-50 to-blue-50/50 p-3 border border-slate-200/60 transition-all duration-200 cursor-pointer group",
+          "hover:from-blue-50 hover:to-purple-50/50 hover:border-blue-200/60 hover:shadow-md",
           isCollapsed && "justify-center"
         )}>
           <div className="relative">
-            <div className="h-8 w-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-              <User className="h-4 w-4" />
+            <div className="h-8 w-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm transition-all duration-200 group-hover:from-emerald-600 group-hover:to-teal-700 group-hover:shadow-lg group-hover:scale-105">
+              <User className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full"></div>
+            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full transition-all duration-200 group-hover:bg-emerald-600 group-hover:scale-110"></div>
           </div>
           {!isCollapsed && (
-            <div className="ml-3 flex-1">
-              <p className="text-sm font-medium text-slate-800 leading-none">Connecté</p>
-              <p className="text-xs text-slate-500 mt-1">ERP Actif</p>
+            <div className="ml-3 flex-1 transition-all duration-200">
+              <p className="text-sm font-medium text-slate-800 leading-none group-hover:text-slate-900 transition-colors duration-200">Connecté</p>
+              <p className="text-xs text-slate-500 mt-1 group-hover:text-slate-600 transition-colors duration-200">ERP Actif</p>
             </div>
           )}
         </div>

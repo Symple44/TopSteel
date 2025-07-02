@@ -4,9 +4,11 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 // Import explicite de TOUTES les entités pour debugging
+import { SystemSetting } from "../modules/admin/entitites/system-setting.entity";
 import { Clients } from "../modules/clients/entities/clients.entity";
 import { Commande } from "../modules/commandes/entities/commande.entity";
 import { Devis } from "../modules/devis/entities/devis.entity";
+import { LigneDevis } from "../modules/devis/entities/ligne-devis.entity";
 import { Document } from "../modules/documents/entities/document.entity";
 import { Facturation } from "../modules/facturation/entities/facturation.entity";
 import { Fournisseur } from "../modules/fournisseurs/entities/fournisseur.entity";
@@ -15,10 +17,12 @@ import { Maintenance } from "../modules/maintenance/entities/maintenance.entity"
 import { Materiaux } from "../modules/materiaux/entities/materiaux.entity";
 import { Notifications } from "../modules/notifications/entities/notifications.entity";
 import { Planning } from "../modules/planning/entities/planning.entity";
+import { Operation } from "../modules/production/entities/operation.entity";
 import { OrdreFabrication } from "../modules/production/entities/ordre-fabrication.entity";
 import { Production } from "../modules/production/entities/production.entity";
 import { Projet } from "../modules/projets/entities/projet.entity";
 import { Qualite } from "../modules/qualite/entities/qualite.entity";
+import { Chute } from "../modules/stocks/entities/chute.entity";
 import { Produit } from "../modules/stocks/entities/produit.entity";
 import { Stocks } from "../modules/stocks/entities/stocks.entity";
 import { Tracabilite } from "../modules/tracabilite/entities/tracabilite.entity";
@@ -54,24 +58,28 @@ import { User } from "../modules/users/entities/user.entity";
         const entities = [
           // Entités principales avec UUID (BaseAuditEntity)
           User,
+          SystemSetting,
           Clients,
           Fournisseur,
           Machine,
           Notifications,
           Production,
           Stocks,
+          Chute,
           Maintenance,
           Materiaux,
           Planning,
           Qualite,
           Tracabilite,
           Devis,
+          LigneDevis,
           Facturation,
 
           // Entités avec ID number (PrimaryGeneratedColumn)
           Produit,
           Commande,
           OrdreFabrication,
+          Operation,
           Projet,
           Document,
         ];

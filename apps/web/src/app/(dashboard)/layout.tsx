@@ -1,3 +1,4 @@
+// apps/web/src/app/(dashboard)/layout.tsx
 'use client'
 
 import { Header } from '@/components/layout/header'
@@ -17,11 +18,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
-      {/* Header moderne */}
-      <Header onToggleSidebar={toggleSidebar} />
+      {/* Header moderne avec état de la sidebar */}
+      <Header 
+        onToggleSidebar={toggleSidebar} 
+        isSidebarCollapsed={isSidebarCollapsed} 
+      />
       
       <div className="flex h-[calc(100vh-4rem)]">
-        {/* Sidebar moderne */}
+        {/* Sidebar moderne améliorée */}
         <Sidebar 
           isCollapsed={isSidebarCollapsed} 
           onToggle={toggleSidebar} 

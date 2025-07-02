@@ -1,4 +1,4 @@
-// apps/web/src/components/layout/header.tsx - VERSION AVEC DROPDOWNS FONCTIONNELS
+// apps/web/src/components/layout/header.tsx - VERSION AMÉLIORÉE
 'use client'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -10,18 +10,17 @@ import { cn } from '@/lib/utils'
 import {
   Bell,
   CheckCircle,
-  Clock,
-  Factory,
   FolderOpen,
   HelpCircle,
   LogOut,
   Menu,
   MessageSquare,
   Package,
+  PanelLeftClose,
+  PanelLeftOpen,
   Search,
   Settings,
   User,
-  X,
   Zap
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -29,6 +28,7 @@ import { useEffect, useRef, useState } from 'react'
 
 interface HeaderProps {
   onToggleSidebar?: () => void
+  isSidebarCollapsed?: boolean
 }
 
 interface Notification {
@@ -40,57 +40,49 @@ interface Notification {
   icon: React.ComponentType<{ className?: string }>
 }
 
-export function Header({ onToggleSidebar }: HeaderProps) {
+// Données de démonstration
+const mockNotifications: Notification[] = [
+  {
+    id: '1',
+    type: 'success',
+    title: 'Projet terminé',
+    description: 'Le projet "Hangar Industrial A" a été marqué comme terminé',
+    timestamp: '2 min',
+    icon: CheckCircle
+  },
+  {
+    id: '2',
+    type: 'warning',
+    title: 'Stock faible',
+    description: 'Profilé IPE 200 : seulement 5 unités restantes',
+    timestamp: '15 min',
+    icon: Package
+  },
+  {
+    id: '3',
+    type: 'info',
+    title: 'Nouveau devis',
+    description: 'Devis DEV-2024-156 en attente de validation',
+    timestamp: '1h',
+    icon: FolderOpen
+  }
+]
+
+export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderProps) {
   const router = useRouter()
+  const { logout } = useAuth()
+  
   const [searchQuery, setSearchQuery] = useState('')
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
-  const { user, logout } = useAuth()
-
-  // Refs pour gérer les clics à l'extérieur
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  
   const notificationsRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
 
-  // Notifications simulées
-  const notifications: Notification[] = [
-    {
-      id: '1',
-      type: 'success',
-      title: 'Nouveau projet créé',
-      description: 'PRJ-2025-001 assigné à votre équipe',
-      timestamp: 'Il y a 2 heures',
-      icon: FolderOpen
-    },
-    {
-      id: '2',
-      type: 'warning',
-      title: 'Stock faible',
-      description: 'Profilé IPE 200 - Réapprovisionnement nécessaire',
-      timestamp: 'Il y a 4 heures',
-      icon: Package
-    },
-    {
-      id: '3',
-      type: 'info',
-      title: 'Devis approuvé',
-      description: 'DEV-2025-045 validé par Entreprise Dupont',
-      timestamp: 'Il y a 6 heures',
-      icon: CheckCircle
-    },
-    {
-      id: '4',
-      type: 'error',
-      title: 'Ordre en retard',
-      description: 'OF-2025-023 dépasse la date prévue',
-      timestamp: 'Il y a 1 jour',
-      icon: Factory
-    }
-  ]
-
-  // Fermer les dropdowns au clic à l'extérieur
+  // Fermer les dropdowns au clic extérieur
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    const handleClickOutside = (event: MouseEvent) => {
       if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
         setShowNotifications(false)
       }
@@ -103,10 +95,10 @@ export function Header({ onToggleSidebar }: HeaderProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const getNotificationColor = (type: string) => {
+  const getNotificationBadgeColor = (type: string) => {
     switch (type) {
       case 'success': return 'bg-emerald-100 text-emerald-600'
-      case 'warning': return 'bg-orange-100 text-orange-600'
+      case 'warning': return 'bg-amber-100 text-amber-600'
       case 'error': return 'bg-red-100 text-red-600'
       case 'info': return 'bg-blue-100 text-blue-600'
       default: return 'bg-slate-100 text-slate-600'
@@ -138,125 +130,125 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60">
-      <div className="container flex h-16 items-center">
-        {/* Mobile menu button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mr-2 md:hidden hover:bg-slate-100"
-          onClick={onToggleSidebar}
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
+      <div className="flex h-16 items-center justify-between px-4 lg:px-6">
+        
+        {/* Section gauche : Boutons toggle + Logo */}
+        <div className="flex items-center space-x-4">
+          {/* Boutons de toggle sidebar */}
+          <div className="flex items-center">
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden hover:bg-slate-100"
+              onClick={onToggleSidebar}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
 
-        {/* Logo principal TopSteel */}
-        <div className="mr-6 flex items-center space-x-3">
-          <div className="relative">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white font-bold text-sm shadow-lg">
-              TS
-            </div>
-            <div className="absolute -top-1 -right-1 h-4 w-4 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center">
-              <Zap className="h-2.5 w-2.5 text-white" />
-            </div>
+            {/* Desktop toggle button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hidden md:flex hover:bg-slate-100"
+              onClick={onToggleSidebar}
+              title={isSidebarCollapsed ? "Ouvrir la sidebar" : "Fermer la sidebar"}
+            >
+              {isSidebarCollapsed ? (
+                <PanelLeftOpen className="h-5 w-5" />
+              ) : (
+                <PanelLeftClose className="h-5 w-5" />
+              )}
+            </Button>
           </div>
-          <div className="hidden md:block">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-              TopSteel
-            </h1>
-            <p className="text-xs text-slate-500 -mt-1">ERP Métallurgie</p>
+
+          {/* Logo principal TopSteel */}
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white font-bold text-sm shadow-lg">
+                TS
+              </div>
+              <div className="absolute -top-1 -right-1 h-4 w-4 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center">
+                <Zap className="h-2.5 w-2.5 text-white" />
+              </div>
+            </div>
+            <div className="hidden lg:block">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                TopSteel
+              </h1>
+              <p className="text-xs text-slate-500 -mt-1">ERP Métallurgie</p>
+            </div>
           </div>
         </div>
 
-        {/* Barre de recherche moderne */}
-        <div className="flex flex-1 items-center space-x-2">
-          <form onSubmit={handleSearch} className="relative max-w-md w-full">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+        {/* Section centre : Barre de recherche positionnée absolument */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 w-full max-w-2xl px-4">
+          <form onSubmit={handleSearch} className="relative w-full">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
             <Input
-              type="search"
-              placeholder="Rechercher projets, clients, commandes..."
+              placeholder="Rechercher projets, clients, commandes, stocks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 border-slate-200 bg-slate-50/50 backdrop-blur-sm focus:bg-white focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all"
+              className="w-full pl-12 pr-4 h-11 text-base bg-white/70 border-slate-200/60 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 rounded-xl"
             />
           </form>
         </div>
 
-        {/* Actions de droite */}
-        <div className="flex items-center space-x-2">
-          
-          {/* NOTIFICATIONS DROPDOWN MANUEL */}
+        {/* Section droite : Actions - maintenant complètement à droite */}
+        <div className="flex items-center space-x-3">
+          {/* Aide */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 rounded-full hover:bg-slate-100"
+            title="Aide et support"
+          >
+            <HelpCircle className="h-5 w-5 text-slate-600" />
+          </Button>
+
+          {/* Notifications */}
           <div className="relative" ref={notificationsRef}>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="relative hover:bg-slate-100 group"
-              onClick={() => {
-                setShowNotifications(!showNotifications)
-                setShowUserMenu(false)
-              }}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative h-10 w-10 rounded-full hover:bg-slate-100"
+              onClick={() => setShowNotifications(!showNotifications)}
             >
-              <Bell className="h-4 w-4 text-slate-600 group-hover:text-slate-800" />
-              {notifications.length > 0 && (
-                <div className="absolute -top-1 -right-1 h-5 w-5 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center animate-pulse">
-                  <span className="text-white text-xs font-bold">{notifications.length}</span>
-                </div>
+              <Bell className="h-5 w-5 text-slate-600" />
+              {mockNotifications.length > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-500 hover:bg-red-500">
+                  {mockNotifications.length}
+                </Badge>
               )}
             </Button>
 
-            {/* Dropdown Notifications */}
             {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-2xl z-50 animate-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg z-50 animate-in slide-in-from-top-2 duration-200">
                 <div className="p-4 border-b border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-slate-800">
-                      Notifications ({notifications.length})
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowNotifications(false)}
-                      className="h-6 w-6 p-0 hover:bg-slate-100"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <h3 className="font-semibold text-slate-900">Notifications</h3>
+                  <p className="text-sm text-slate-500">{mockNotifications.length} nouvelles</p>
                 </div>
-                
                 <div className="max-h-80 overflow-y-auto">
-                  {notifications.map((notification) => {
-                    const IconComponent = notification.icon
-                    return (
-                      <div 
-                        key={notification.id} 
-                        className="p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-b-0"
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className={cn(
-                            "h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0",
-                            getNotificationColor(notification.type)
-                          )}>
-                            <IconComponent className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1 space-y-1">
-                            <p className="text-sm font-medium text-slate-800 leading-tight">
-                              {notification.title}
-                            </p>
-                            <p className="text-xs text-slate-600 leading-relaxed">
-                              {notification.description}
-                            </p>
-                            <p className="text-xs text-slate-500 flex items-center">
-                              <Clock className="mr-1 h-3 w-3" />
-                              {notification.timestamp}
-                            </p>
-                          </div>
+                  {mockNotifications.map((notification) => (
+                    <div key={notification.id} className="p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <div className="flex items-start space-x-3">
+                        <div className={cn(
+                          "flex h-8 w-8 items-center justify-center rounded-full",
+                          getNotificationBadgeColor(notification.type)
+                        )}>
+                          <notification.icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-900">{notification.title}</p>
+                          <p className="text-sm text-slate-600 mt-1">{notification.description}</p>
+                          <p className="text-xs text-slate-400 mt-2">{notification.timestamp}</p>
                         </div>
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
                 </div>
-                
-                <div className="p-4 border-t border-slate-200">
-                  <Button variant="ghost" size="sm" className="w-full text-slate-600 hover:text-slate-800 hover:bg-slate-100">
+                <div className="p-3 border-t border-slate-200">
+                  <Button variant="ghost" size="sm" className="w-full text-blue-600 hover:text-blue-700">
                     Voir toutes les notifications
                   </Button>
                 </div>
@@ -264,98 +256,51 @@ export function Header({ onToggleSidebar }: HeaderProps) {
             )}
           </div>
 
-          {/* Messages */}
-          <Button variant="ghost" size="sm" className="hover:bg-slate-100 group">
-            <MessageSquare className="h-4 w-4 text-slate-600 group-hover:text-slate-800" />
-          </Button>
-
-          {/* Aide */}
-          <Button variant="ghost" size="sm" className="hover:bg-slate-100 group">
-            <HelpCircle className="h-4 w-4 text-slate-600 group-hover:text-slate-800" />
-          </Button>
-
-          {/* MENU UTILISATEUR DROPDOWN MANUEL */}
+          {/* Menu utilisateur avec effet hover */}
           <div className="relative" ref={userMenuRef}>
-            <Button 
-              variant="ghost" 
-              className="relative h-10 w-10 rounded-full p-0 hover:bg-slate-100"
-              onClick={() => {
-                setShowUserMenu(!showUserMenu)
-                setShowNotifications(false)
-              }}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-10 w-10 rounded-full hover:bg-slate-100 transition-all duration-200 group"
+              onClick={() => setShowUserMenu(!showUserMenu)}
             >
-              <Avatar className="h-10 w-10 border-2 border-white shadow-lg">
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
-                  {user?.prenom?.charAt(0) || 'U'}
-                  {user?.nom?.charAt(0) || 'S'}
+              <Avatar className="h-8 w-8 transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg">
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-bold transition-all duration-200 group-hover:from-blue-600 group-hover:to-purple-700 group-hover:shadow-inner">
+                  AD
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full"></div>
             </Button>
 
-            {/* Dropdown Menu Utilisateur */}
             {showUserMenu && (
-              <div className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-2xl z-50 animate-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-lg z-50 animate-in slide-in-from-top-2 duration-200">
                 <div className="p-4 border-b border-slate-200">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
-                        {user?.prenom?.charAt(0) || 'U'}
-                        {user?.nom?.charAt(0) || 'S'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900 leading-none">
-                        {user?.prenom || 'Utilisateur'} {user?.nom || 'Test'}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        {user?.email || 'user@topsteel.fr'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 mt-3">
-                    <Badge className="text-xs bg-emerald-100 text-emerald-700 border-emerald-200">
-                      En ligne
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      Admin
-                    </Badge>
-                  </div>
+                  <p className="font-semibold text-slate-900">Admin User</p>
+                  <p className="text-sm text-slate-500">admin@topsteel.com</p>
                 </div>
-
                 <div className="p-2">
-                  <button
-                    onClick={() => {
-                      setShowUserMenu(false)
-                      router.push('/profile')
-                    }}
-                    className="flex items-center w-full p-3 text-left hover:bg-slate-50 rounded-xl transition-colors"
-                  >
-                    <User className="mr-3 h-4 w-4 text-slate-600" />
-                    <span className="text-slate-700">Mon profil</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      setShowUserMenu(false)
-                      router.push('/settings')
-                    }}
-                    className="flex items-center w-full p-3 text-left hover:bg-slate-50 rounded-xl transition-colors"
-                  >
-                    <Settings className="mr-3 h-4 w-4 text-slate-600" />
-                    <span className="text-slate-700">Paramètres</span>
-                  </button>
-                  
-                  <hr className="my-2 border-slate-200" />
-                  
-                  <button
+                  <Button variant="ghost" size="sm" className="w-full justify-start text-slate-700 hover:bg-slate-100">
+                    <User className="h-4 w-4 mr-3" />
+                    Mon profil
+                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full justify-start text-slate-700 hover:bg-slate-100">
+                    <Settings className="h-4 w-4 mr-3" />
+                    Paramètres
+                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full justify-start text-slate-700 hover:bg-slate-100">
+                    <MessageSquare className="h-4 w-4 mr-3" />
+                    Support
+                  </Button>
+                  <div className="border-t border-slate-200 my-2" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="flex items-center w-full p-3 text-left text-red-600 hover:bg-red-50 rounded-xl transition-colors disabled:opacity-50"
                   >
-                    <LogOut className="mr-3 h-4 w-4" />
-                    <span>{isLoggingOut ? 'Déconnexion...' : 'Déconnexion'}</span>
-                  </button>
+                    <LogOut className="h-4 w-4 mr-3" />
+                    {isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}
+                  </Button>
                 </div>
               </div>
             )}

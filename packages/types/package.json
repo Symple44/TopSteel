@@ -36,6 +36,10 @@
   },
   "type": "module",
   "dependencies": {
-    "tailwindcss": "4.1.11"
+    "tailwindcss": "4.1.11",
+    "@types/react": "^19.1.8"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0"
   }
 }

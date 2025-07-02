@@ -40,6 +40,23 @@ export class User extends BaseAuditEntity {
   @Column({ type: "text", nullable: true })
   description?: string;
 
+  @Column({ type: "jsonb", nullable: true, default: {} })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  settings?: Record<string, any>;
+
+  @Column({ type: "jsonb", nullable: true, default: {} })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  preferences?: Record<string, any>;
+
+  @Column({ type: "timestamp", nullable: true })
+  lastLogin?: Date;
+
+  @Column({ type: "integer", default: 0 })
+  failedLoginAttempts?: number;
+
+  @Column({ type: "timestamp", nullable: true })
+  lockedUntil?: Date;
+
   @Column({ type: "jsonb", nullable: true })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: Record<string, any>;

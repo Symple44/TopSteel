@@ -1,7 +1,7 @@
 // packages/types/src/projet.ts
 import type { Client } from './client'
 import type { Address, BaseEntity } from './common'
-import type { Devis } from './devis'
+import type { Devis } from './facturation'
 import type { User } from './user'
 
 export interface DocumentProjet {
