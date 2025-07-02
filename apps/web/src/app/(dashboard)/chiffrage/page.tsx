@@ -32,7 +32,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@erp/ui'
+} from "@/components/ui/select"
 import {
   Table,
   TableBody,

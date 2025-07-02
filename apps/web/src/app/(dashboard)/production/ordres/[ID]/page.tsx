@@ -1,41 +1,62 @@
 'use client'
 
-import { OrdreInfoTab } from '@/components/production/ordre-info-tab'
-import { OrdreMateriauxTab } from '@/components/production/ordre-materiaux-tab'
-import { OrdreOperationsTab } from '@/components/production/ordre-operations-tab'
-import { OrdreQualiteTab } from '@/components/production/ordre-qualite-tab'
+import { useState, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { 
+  ArrowLeft, 
+  Calendar, 
+  CheckCircle, 
+  Clock, 
+  Pause, 
+  Play, 
+  User
+} from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowLeft, CheckCircle, Edit, Pause } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { OrdreInfoTab } from '@/components/production/ordre-info-tab'
+import { OrdreOperationsTab } from '@/components/production/ordre-operations-tab'
+import { OrdreMateriauxTab } from '@/components/production/ordre-materiaux-tab'
+import { OrdreQualiteTab } from '@/components/production/ordre-qualite-tab'
 
-interface OrdreDetailPageProps {
+interface OrdrePageProps {
   params: Promise<{ id: string }>
 }
 
-export default function OrdreDetailPage({ params }: OrdreDetailPageProps) {
-  const router = useRouter()
+export default function OrdrePage({ params }: OrdrePageProps) {
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
-  const [ordre, setOrdre] = useState(null) // À remplacer par useOrdre(id)
 
   useEffect(() => {
     params.then(setResolvedParams)
   }, [params])
 
-  if (!resolvedParams) return <div>Chargement...</div>
+  if (!resolvedParams) {
+    return <div>Chargement...</div>
+  }
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      'planifie': 'secondary',
-      'en_cours': 'default',
-      'pause': 'destructive',
+  const renderStatusBadge = (status: string) => {
+    const variants: Record<string, string> = {
+      'planifie': 'outline',
+      'en_cours': 'default', 
+      'pause': 'warning',
       'termine': 'success'
     }
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>
+  }
+
+  // Création objet ordre pour les composants (simulation)
+  const ordre = {
+    id: resolvedParams.id,
+    numero: `OF-${resolvedParams.id}`,
+    statut: 'en_cours',
+    priorite: 'normale',
+    avancement: 65,
+    description: 'Ordre de fabrication exemple',
+    dateDebutPrevue: new Date('2024-01-15'),
+    dateFinPrevue: new Date('2024-01-22'),
+    operations: [],
+    materiaux: [],
+    controles: []
   }
 
   return (
@@ -43,37 +64,26 @@ export default function OrdreDetailPage({ params }: OrdreDetailPageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="outline" size="sm">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">OF-2024-0001</h1>
-            <p className="text-muted-foreground">
-              Portail résidentiel - Projet P-123
-            </p>
+            <h1 className="text-2xl font-bold">Ordre OF-{resolvedParams.id}</h1>
+            <p className="text-muted-foreground">Structure métallique - Bâtiment industriel</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          {getStatusBadge('en_cours')}
-          <Button variant="outline" size="sm">
-            <Edit className="h-4 w-4 mr-2" />
-            Modifier
-          </Button>
-        </div>
+        {renderStatusBadge('en_cours')}
       </div>
 
-      {/* Status et actions */}
+      {/* Résumé */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium">Avancement:</span>
-                <Progress value={65} className="w-32" />
-                <span className="text-sm text-muted-foreground">65%</span>
-              </div>
-              <div className="flex gap-4 text-sm text-muted-foreground">
-                <span>Début: 15/01/2024</span>
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>Début prévu: 15/01/2024</span>
                 <span>Fin prévue: 22/01/2024</span>
                 <span>Technicien: Jean Dupont</span>
               </div>
@@ -102,19 +112,19 @@ export default function OrdreDetailPage({ params }: OrdreDetailPageProps) {
         </TabsList>
 
         <TabsContent value="general">
-          <OrdreInfoTab ordreId={resolvedParams.id} />
+          <OrdreInfoTab ordre={ordre} />
         </TabsContent>
 
         <TabsContent value="operations">
-          <OrdreOperationsTab ordreId={resolvedParams.id} />
+          <OrdreOperationsTab ordre={ordre} />
         </TabsContent>
 
         <TabsContent value="materiaux">
-          <OrdreMateriauxTab ordreId={resolvedParams.id} />
+          <OrdreMateriauxTab ordre={ordre} />
         </TabsContent>
 
         <TabsContent value="qualite">
-          <OrdreQualiteTab ordreId={resolvedParams.id} />
+          <OrdreQualiteTab ordre={ordre} />
         </TabsContent>
       </Tabs>
     </div>

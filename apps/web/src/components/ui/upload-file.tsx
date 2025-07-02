@@ -111,12 +111,7 @@ export function FileUpload({
     }
   }, [files, multiple, maxFiles, maxSize, onUpload])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-    if (disabled) return
-    processFiles(e.dataTransfer.files)
-  }, [processFiles, disabled])
+  const handleDrop = useCallback(/* existing code */, [validateFile]))
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {

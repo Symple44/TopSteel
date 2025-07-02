@@ -2,21 +2,19 @@
   "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
-    "moduleResolution": "node",
+    "rootDir": "./src", 
     "module": "ESNext",
     "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "declaration": true,
     "declarationMap": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": false,
     "composite": false,
-    "incremental": false,
-    "emitDeclarationOnly": false
+    "incremental": false
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

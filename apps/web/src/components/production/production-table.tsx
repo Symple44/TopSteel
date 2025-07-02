@@ -1,7 +1,7 @@
 // apps/web/src/components/production/production-table.tsx
 "use client";
 
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@erp/ui";
+import { Badge } from "@/components/ui/badge";`nimport { Button } from "@/components/ui/button";`nimport { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, Edit, Play, Pause, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 
 interface ProductionTableProps {

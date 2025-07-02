@@ -6,11 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, Plus, AlertTriangle } from 'lucide-react'
 
 interface OrdreMateriauxTabProps {
-  ordreId?: string
+  ordre: any; // Interface cohérente avec les autres composants
 }
 
-export function OrdreMateriauxTab({ ordreId }: OrdreMateriauxTabProps) {
-  const materiaux = [
+export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
+  const materiaux = ordre?.materiaux || [
     {
       id: 1,
       reference: 'ACIER-S235-02',
@@ -28,15 +28,6 @@ export function OrdreMateriauxTab({ ordreId }: OrdreMateriauxTabProps) {
       quantiteStock: 8,
       unite: 'ml',
       statut: 'INSUFFISANT'
-    },
-    {
-      id: 3,
-      reference: 'ALU-6060-PROF',
-      designation: 'Aluminium 6060 - Profilé',
-      quantiteRequise: 25,
-      quantiteStock: 30,
-      unite: 'ml',
-      statut: 'DISPONIBLE'
     }
   ]
 
@@ -51,10 +42,6 @@ export function OrdreMateriauxTab({ ordreId }: OrdreMateriauxTabProps) {
       default:
         return <Badge variant="outline">{statut}</Badge>
     }
-  }
-
-  const getStatutColor = (statut: string) => {
-    return statut === 'INSUFFISANT' ? 'text-red-600' : 'text-green-600'
   }
 
   return (
@@ -82,55 +69,27 @@ export function OrdreMateriauxTab({ ordreId }: OrdreMateriauxTabProps) {
                     <Package className={`h-5 w-5 ${materiau.statut === 'INSUFFISANT' ? 'text-red-600' : 'text-green-600'}`} />
                   </div>
                   <div>
-                    <div className="font-medium">{materiau.reference}</div>
-                    <div className="text-sm text-muted-foreground">{materiau.designation}</div>
+                    <h4 className="font-medium">{materiau.designation}</h4>
+                    <p className="text-sm text-muted-foreground">{materiau.reference}</p>
                   </div>
                 </div>
                 
-                <div className="text-right">
-                  <div className="font-medium">
-                    Requis: {materiau.quantiteRequise} {materiau.unite}
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className="text-sm font-medium">
+                      {materiau.quantiteRequise} {materiau.unite}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Stock: {materiau.quantiteStock} {materiau.unite}
+                    </p>
                   </div>
-                  <div className={`text-sm font-medium ${getStatutColor(materiau.statut)}`}>
-                    Stock: {materiau.quantiteStock} {materiau.unite}
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  {materiau.statut === 'INSUFFISANT' && (
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                  )}
                   {getStatutBadge(materiau.statut)}
                 </div>
               </div>
-              
-              {materiau.statut === 'INSUFFISANT' && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-800">
-                    <AlertTriangle className="h-4 w-4" />
-                    <span className="text-sm font-medium">
-                      Manque {materiau.quantiteRequise - materiau.quantiteStock} {materiau.unite}
-                    </span>
-                  </div>
-                  <div className="mt-2">
-                    <Button size="sm" variant="outline" className="text-red-700 border-red-300">
-                      Commander maintenant
-                    </Button>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         ))}
       </div>
-
-      {materiaux.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
-          <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p className="text-lg font-medium mb-2">Aucun matériau défini</p>
-          <p className="text-sm">Ajoutez des matériaux à cet ordre de fabrication</p>
-        </div>
-      )}
     </div>
   )
 }

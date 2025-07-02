@@ -1,38 +1,23 @@
 import React from "react"
+import { cn } from "@/lib/utils"
 
-interface TextareaProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode
-  value?: any
-  onValueChange?: any
-  asChild?: boolean
-  variant?: string
-  size?: string
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  className?: string
 }
 
-export const Textarea = React.forwardRef<HTMLDivElement, TextareaProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
-    if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as any, { ...props, ref })
-    }
-    
+export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...props }, ref) => {
     return (
-      <div className={className} ref={ref} {...props}>
-        {children}
-      </div>
+      <textarea
+        className={cn(
+          "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
     )
   }
 )
 
 Textarea.displayName = "Textarea"
-
-// Export des sous-composants courants si nécessaire
-export const TextareaContent = Textarea
-export const TextareaTrigger = Textarea  
-export const TextareaItem = Textarea
-export const TextareaValue = Textarea
-export const TextareaHeader = Textarea
-export const TextareaTitle = Textarea
-export const TextareaDescription = Textarea
-export const TextareaFooter = Textarea
-export const TextareaSeparator = Textarea
-export const TextareaList = Textarea
