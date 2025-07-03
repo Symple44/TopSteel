@@ -181,3 +181,182 @@ body {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
 }
+
+/* ✅ VARIABLES CSS MODERNES - Compatible avec Tailwind ^4.1.11 */
+
+:root {
+  /* Variables de base si manquantes */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+
+  /* ✅ NOUVELLES VARIABLES ÉTENDUES */
+  --success: 142.1 76.2% 36.3%;
+  --success-foreground: 355.7 100% 97.3%;
+  --warning: 32.9 94.6% 43.7%;
+  --warning-foreground: 355.7 100% 97.3%;
+  --info: 199.89 89.47% 49.41%;
+  --info-foreground: 355.7 100% 97.3%;
+  
+  /* Variables pour les graphiques */
+  --chart-1: 142.1 76.2% 36.3%;
+  --chart-2: 0 84.2% 60.2%;
+  --chart-3: 221.2 83.2% 53.3%;
+  --chart-4: 32.9 94.6% 43.7%;
+  --chart-5: 199.89 89.47% 49.41%;
+  
+  /* Variables pour les gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+  --gradient-success: linear-gradient(135deg, hsl(var(--success)) 0%, hsl(var(--success) / 0.8) 100%);
+  --gradient-warning: linear-gradient(135deg, hsl(var(--warning)) 0%, hsl(var(--warning) / 0.8) 100%);
+}
+
+.dark {
+  /* Variables de base mode sombre */
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
+
+  /* ✅ VARIABLES ÉTENDUES MODE SOMBRE */
+  --success: 142.1 70.6% 45.3%;
+  --warning: 32.9 75% 59%;
+  --info: 199.89 76% 65%;
+  
+  /* Charts en mode sombre */
+  --chart-1: 142.1 70.6% 45.3%;
+  --chart-2: 0 62.8% 30.6%;
+  --chart-3: 217.2 91.2% 59.8%;
+  --chart-4: 32.9 75% 59%;
+  --chart-5: 199.89 76% 65%;
+}
+
+/* ✅ CLASSES UTILITAIRES ESSENTIELLES */
+.bg-muted {
+  background-color: hsl(var(--muted));
+}
+
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground));
+}
+
+.bg-card {
+  background-color: hsl(var(--card));
+}
+
+.text-card-foreground {
+  color: hsl(var(--card-foreground));
+}
+
+.bg-popover {
+  background-color: hsl(var(--popover));
+}
+
+.border-border {
+  border-color: hsl(var(--border));
+}
+
+/* ✅ NOUVELLES CLASSES ÉTENDUES */
+.bg-success {
+  background-color: hsl(var(--success));
+}
+
+.text-success {
+  color: hsl(var(--success));
+}
+
+.bg-warning {
+  background-color: hsl(var(--warning));
+}
+
+.text-warning {
+  color: hsl(var(--warning));
+}
+
+.bg-info {
+  background-color: hsl(var(--info));
+}
+
+.text-info {
+  color: hsl(var(--info));
+}
+
+/* ✅ ANIMATIONS OPTIMISÉES */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.2s ease-out;
+}
+
+@keyframes pulse-gentle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ✅ CLASSES POUR GRAPHIQUES */
+.chart-container {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) + 2px);
+}
+
+.chart-legend {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+.chart-tooltip {
+  background: hsl(var(--popover));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}

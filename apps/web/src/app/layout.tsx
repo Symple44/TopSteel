@@ -1,4 +1,3 @@
-// apps/web/src/app/layout.tsx - SANS SCRIPT LOCALSTORAGE (FIX HYDRATATION)
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -19,10 +18,10 @@ export default function RootLayout({
     <html lang="fr" className={inter.className} suppressHydrationWarning>
       <body>
         <ThemeProvider
-          attribute="class"
           defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+          storageKey="topsteel-theme"
+          enableSystemWatch={true}
+          enableMetrics={true}
         >
           {children}
         </ThemeProvider>
@@ -30,4 +29,3 @@ export default function RootLayout({
     </html>
   )
 }
-

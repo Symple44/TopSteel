@@ -1,14 +1,23 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 
 type Theme = 'dark' | 'light' | 'system'
+type ResolvedTheme = 'dark' | 'light'
+
+interface ThemeMetrics {
+  changeCount: number
+  lastChange: number
+  errors: number
+}
 
 interface ThemeProviderContext {
   theme: Theme
   setTheme: (theme: Theme) => void
-  resolvedTheme: 'dark' | 'light'
+  resolvedTheme: ResolvedTheme
   isHydrated: boolean
+  isChanging: boolean
+  metrics: ThemeMetrics
 }
 
 const ThemeProviderContext = createContext<ThemeProviderContext | undefined>(undefined)
@@ -17,147 +26,214 @@ interface ThemeProviderProps {
   children: React.ReactNode
   defaultTheme?: Theme
   storageKey?: string
+  enableSystemWatch?: boolean
+  enableMetrics?: boolean
+  transitionDuration?: number
 }
 
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'erp-theme',
+  storageKey = 'topsteel-theme',
+  enableSystemWatch = true,
+  enableMetrics = true,
+  transitionDuration = 150
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(defaultTheme)
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light')
   const [isHydrated, setIsHydrated] = useState(false)
-  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('light')
+  const [isChanging, setIsChanging] = useState(false)
+  const [metrics, setMetrics] = useState<ThemeMetrics>({
+    changeCount: 0,
+    lastChange: 0,
+    errors: 0
+  })
 
-  // Hydratation avec synchronisation stores existants
-  useEffect(() => {
-    try {
-      // Vérifier localStorage
-      const storedTheme = localStorage.getItem(storageKey) as Theme
-      if (storedTheme && ['dark', 'light', 'system'].includes(storedTheme)) {
-        setThemeState(storedTheme)
-      }
-      
-      // Synchroniser avec stores existants si présents
-      try {
-        const appStateStr = localStorage.getItem('erp-app-state')
-        if (appStateStr) {
-          const appState = JSON.parse(appStateStr)
-          if (appState.state?.theme) {
-            setThemeState(appState.state.theme)
-          }
-        }
-      } catch (e) {
-        console.debug('Store sync: app state non disponible')
-      }
-      
-      try {
-        const uiStateStr = localStorage.getItem('topsteel-ui')
-        if (uiStateStr) {
-          const uiState = JSON.parse(uiStateStr)
-          if (uiState.state?.theme) {
-            setThemeState(uiState.state.theme)
-          }
-        }
-      } catch (e) {
-        console.debug('Store sync: ui state non disponible')
-      }
-      
-    } catch (error) {
-      console.warn('Theme: failed to read from localStorage', error)
-    }
-    
-    setIsHydrated(true)
-  }, [storageKey])
+  const mediaQueryRef = useRef<MediaQueryList | null>(null)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const retryCountRef = useRef(0)
 
-  // Résolution du thème avec système
-  useEffect(() => {
-    if (!isHydrated) return
-
-    const resolveTheme = () => {
-      if (theme === 'system') {
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      }
-      return theme
-    }
-
-    const updateResolvedTheme = () => {
-      const resolved = resolveTheme()
-      setResolvedTheme(resolved)
-      
-      // Manipulation DOM centralisée
-      if (resolved === 'dark') {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
-      
-      // Synchroniser avec stores existants
-      try {
-        // Déclencher événement custom pour synchronisation stores
-        window.dispatchEvent(new CustomEvent('theme-change', { 
-          detail: { theme, resolved } 
-        }))
-      } catch (e) {
-        console.debug('Theme sync event failed')
-      }
-    }
-
-    updateResolvedTheme()
-
-    // Écoute des changements système
+  const resolveTheme = useCallback((): ResolvedTheme => {
     if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-      mediaQuery.addEventListener('change', updateResolvedTheme)
-      return () => mediaQuery.removeEventListener('change', updateResolvedTheme)
+      return (typeof window !== 'undefined' && 
+              window.matchMedia('(prefers-color-scheme: dark)').matches) 
+        ? 'dark' : 'light'
     }
-  }, [theme, isHydrated])
+    return theme as ResolvedTheme
+  }, [theme])
 
-  // Fonction de changement avec synchronisation stores
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
-    
+  const updateDOM = useCallback((resolved: ResolvedTheme) => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const root = document.documentElement
+      const currentHasDark = root.classList.contains('dark')
+      const shouldHaveDark = resolved === 'dark'
+
+      if (currentHasDark !== shouldHaveDark) {
+        if (shouldHaveDark) {
+          root.classList.add('dark')
+        } else {
+          root.classList.remove('dark')
+        }
+
+        window.dispatchEvent(new CustomEvent('theme-changed', {
+          detail: { theme, resolved, timestamp: Date.now() }
+        }))
+      }
+    } catch (error) {
+      console.error('Theme DOM update failed:', error)
+      setMetrics(prev => ({ ...prev, errors: prev.errors + 1 }))
+    }
+  }, [theme])
+
+  const saveToStorage = useCallback(async (newTheme: Theme): Promise<boolean> => {
+    if (typeof window === 'undefined') return false
+
     try {
       localStorage.setItem(storageKey, newTheme)
       
-      // Synchroniser avec stores existants
-      try {
-        const appStateStr = localStorage.getItem('erp-app-state')
-        if (appStateStr) {
-          const appState = JSON.parse(appStateStr)
-          appState.state.theme = newTheme
-          localStorage.setItem('erp-app-state', JSON.stringify(appState))
-        }
-      } catch (e) { /* TODO: Implémenter */ }
+      const legacyStores = ['erp-theme', 'erp-app-state', 'topsteel-ui']
       
-      try {
-        const uiStateStr = localStorage.getItem('topsteel-ui')
-        if (uiStateStr) {
-          const uiState = JSON.parse(uiStateStr)
-          uiState.state.theme = newTheme
-          localStorage.setItem('topsteel-ui', JSON.stringify(uiState))
+      for (const storeKey of legacyStores) {
+        try {
+          const existingData = localStorage.getItem(storeKey)
+          if (existingData) {
+            const parsed = JSON.parse(existingData)
+            if (parsed.state) {
+              parsed.state.theme = newTheme
+              localStorage.setItem(storeKey, JSON.stringify(parsed))
+            }
+          }
+        } catch (e) {
+          console.debug(`Failed to migrate ${storeKey}:`, e)
         }
-      } catch (e) { /* TODO: Implémenter */ }
-      
+      }
+
+      retryCountRef.current = 0
+      return true
     } catch (error) {
-      console.warn('Theme: failed to write to localStorage', error)
+      console.error('Theme storage failed:', error)
+      
+      if (retryCountRef.current < 3) {
+        retryCountRef.current++
+        setTimeout(() => saveToStorage(newTheme), 1000 * retryCountRef.current)
+      }
+      
+      setMetrics(prev => ({ ...prev, errors: prev.errors + 1 }))
+      return false
     }
+  }, [storageKey])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const stored = localStorage.getItem(storageKey) as Theme | null
+      const validThemes: Theme[] = ['light', 'dark', 'system']
+      
+      if (stored && validThemes.includes(stored)) {
+        setThemeState(stored)
+      }
+
+      if (!stored) {
+        const legacyTheme = localStorage.getItem('erp-theme') as Theme
+        if (legacyTheme && validThemes.includes(legacyTheme)) {
+          setThemeState(legacyTheme)
+          saveToStorage(legacyTheme)
+        }
+      }
+
+    } catch (error) {
+      console.warn('Theme hydration failed:', error)
+      setMetrics(prev => ({ ...prev, errors: prev.errors + 1 }))
+    }
+
+    setIsHydrated(true)
+  }, [storageKey, saveToStorage])
+
+  useEffect(() => {
+    if (!isHydrated) return
+
+    const resolved = resolveTheme()
+    setResolvedTheme(resolved)
+    updateDOM(resolved)
+
+    if (enableSystemWatch && theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      mediaQueryRef.current = mediaQuery
+
+      const handleChange = () => {
+        const newResolved = resolveTheme()
+        setResolvedTheme(newResolved)
+        updateDOM(newResolved)
+      }
+
+      mediaQuery.addEventListener('change', handleChange)
+      
+      return () => {
+        mediaQuery.removeEventListener('change', handleChange)
+        mediaQueryRef.current = null
+      }
+    }
+  }, [theme, isHydrated, resolveTheme, updateDOM, enableSystemWatch])
+
+  const setTheme = useCallback((newTheme: Theme) => {
+    if (newTheme === theme) return
+
+    setIsChanging(true)
+    
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+
+    setThemeState(newTheme)
+    saveToStorage(newTheme)
+
+    if (enableMetrics) {
+      setMetrics(prev => ({
+        ...prev,
+        changeCount: prev.changeCount + 1,
+        lastChange: Date.now()
+      }))
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setIsChanging(false)
+    }, transitionDuration)
+
+  }, [theme, saveToStorage, enableMetrics, transitionDuration])
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
+  if (!isHydrated) {
+    return (
+      <div className="theme-loading" data-theme="loading">
+        {children}
+      </div>
+    )
   }
 
-  // Rendu conditionnel pour SSR
-  if (!isHydrated) {
-    return <div className="theme-loading">{children}</div>
+  const contextValue: ThemeProviderContext = {
+    theme,
+    setTheme,
+    resolvedTheme,
+    isHydrated,
+    isChanging,
+    metrics
   }
 
   return (
-    <ThemeProviderContext.Provider
-      value={{
-        theme,
-        setTheme,
-        resolvedTheme,
-        isHydrated,
-      }}
-    >
-      {children}
+    <ThemeProviderContext.Provider value={contextValue}>
+      <div data-theme={resolvedTheme} className={isChanging ? 'theme-changing' : ''}>
+        {children}
+      </div>
     </ThemeProviderContext.Provider>
   )
 }
@@ -172,3 +248,17 @@ export const useTheme = () => {
   return context
 }
 
+export const useThemeMetrics = () => {
+  const { metrics } = useTheme()
+  return metrics
+}
+
+export const useResolvedTheme = () => {
+  const { resolvedTheme } = useTheme()
+  return resolvedTheme
+}
+
+export const useThemeTransition = () => {
+  const { isChanging } = useTheme()
+  return isChanging
+}

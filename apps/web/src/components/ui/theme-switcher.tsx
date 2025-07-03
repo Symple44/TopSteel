@@ -1,99 +1,205 @@
 'use client'
 
 import { useTheme } from '@/components/providers/theme-provider'
-import { Monitor, Moon, Sun, ChevronDown } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Monitor, Moon, Sun } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { cn } from '@/lib/utils'
 
-export function ThemeSwitcher() {
+interface ThemeSwitcherProps {
+  variant?: 'icon' | 'dropdown' | 'toggle'
+  size?: 'sm' | 'md' | 'lg'
+  showLabel?: boolean
+  className?: string
+}
+
+export function ThemeSwitcher({ 
+  variant = 'icon',
+  size = 'md', 
+  showLabel = false,
+  className 
+}: ThemeSwitcherProps) {
   const [mounted, setMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  
+  const [error, setError] = useState<string | null>(null)
+
   useEffect(() => {
     setMounted(true)
   }, [])
 
   let themeContext
   try {
-    themeContext = theme
-  } catch (error) {
+    themeContext = useTheme()
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Theme context error')
     themeContext = null
   }
 
-  if (!themeContext || !mounted) {
+  if (!mounted || !themeContext || error) {
     return (
       <button 
         disabled
-        className="h-9 w-9 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground flex items-center justify-center"
+        className={cn(
+          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-colors",
+          "hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed",
+          getSizeClasses(size),
+          className
+        )}
+        title={error || "Chargement du thème..."}
       >
-        <Monitor className="h-4 w-4" />
+        <Monitor className={getIconSizeClasses(size)} />
+        {showLabel && <span className="ml-2 text-sm">Thème</span>}
       </button>
     )
   }
 
   const { theme, setTheme, resolvedTheme, isHydrated } = themeContext
 
-  const getIcon = () => {
-    if (!isHydrated) return <Monitor className="h-4 w-4" />
+  const handleThemeChange = useCallback((newTheme: 'light' | 'dark' | 'system') => {
+    try {
+      setTheme(newTheme)
+      setIsOpen(false)
+      setError(null)
+    } catch (err) {
+      setError('Erreur lors du changement de thème')
+      console.error('Theme change failed:', err)
+    }
+  }, [setTheme])
+
+  const toggleDropdown = useCallback(() => {
+    setIsOpen(prev => !prev)
+  }, [])
+
+  const getThemeIcon = useCallback(() => {
+    if (!isHydrated) return <Monitor className={getIconSizeClasses(size)} />
     
     switch (resolvedTheme) {
-      case 'dark': return <Moon className="h-4 w-4" />
-      case 'light': return <Sun className="h-4 w-4" />
-      default: return <Monitor className="h-4 w-4" />
+      case 'dark': 
+        return <Moon className={getIconSizeClasses(size)} />
+      case 'light': 
+        return <Sun className={getIconSizeClasses(size)} />
+      default: 
+        return <Monitor className={getIconSizeClasses(size)} />
     }
+  }, [resolvedTheme, isHydrated, size])
+
+  if (variant === 'toggle') {
+    return (
+      <button
+        onClick={() => handleThemeChange(resolvedTheme === 'dark' ? 'light' : 'dark')}
+        className={cn(
+          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-all duration-200",
+          "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+          getSizeClasses(size),
+          className
+        )}
+        aria-label={`Basculer vers le thème ${resolvedTheme === 'dark' ? 'clair' : 'sombre'}`}
+      >
+        {getThemeIcon()}
+        {showLabel && (
+          <span className="ml-2 text-sm">
+            {resolvedTheme === 'dark' ? 'Sombre' : 'Clair'}
+          </span>
+        )}
+      </button>
+    )
   }
 
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="h-9 w-9 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground flex items-center justify-center transition-colors"
+        onClick={toggleDropdown}
+        className={cn(
+          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-all duration-200",
+          "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+          getSizeClasses(size),
+          className
+        )}
+        aria-label="Sélectionner le thème"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
       >
-        {getIcon()}
+        {getThemeIcon()}
+        {showLabel && <span className="ml-2 text-sm">Thème</span>}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 w-36 bg-popover border border-border rounded-md shadow-md z-50">
-          <div className="p-1">
-            <button
-              onClick={() => {
-                setTheme('light')
-                setIsOpen(false)
-              }}
-              className="w-full px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
-            >
-              <Sun className="h-4 w-4" />
-              Clair
-              {theme === 'light' && <div className="ml-auto h-2 w-2 bg-primary rounded-full" />}
-            </button>
+        <>
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsOpen(false)}
+          />
+          
+          <div className="absolute right-0 top-full mt-2 w-40 z-50 bg-popover border border-border rounded-lg shadow-lg py-1">
+            <ThemeOption
+              theme="light"
+              currentTheme={theme}
+              icon={<Sun className="h-4 w-4" />}
+              label="Clair"
+              onClick={handleThemeChange}
+            />
             
-            <button
-              onClick={() => {
-                setTheme('dark')
-                setIsOpen(false)
-              }}
-              className="w-full px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
-            >
-              <Moon className="h-4 w-4" />
-              Sombre
-              {theme === 'dark' && <div className="ml-auto h-2 w-2 bg-primary rounded-full" />}
-            </button>
+            <ThemeOption
+              theme="dark"
+              currentTheme={theme}
+              icon={<Moon className="h-4 w-4" />}
+              label="Sombre"
+              onClick={handleThemeChange}
+            />
             
-            <button
-              onClick={() => {
-                setTheme('system')
-                setIsOpen(false)
-              }}
-              className="w-full px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
-            >
-              <Monitor className="h-4 w-4" />
-              Système
-              {theme === 'system' && <div className="ml-auto h-2 w-2 bg-primary rounded-full" />}
-            </button>
+            <ThemeOption
+              theme="system"
+              currentTheme={theme}
+              icon={<Monitor className="h-4 w-4" />}
+              label="Système"
+              onClick={handleThemeChange}
+            />
           </div>
-        </div>
+        </>
       )}
     </div>
   )
 }
 
+interface ThemeOptionProps {
+  theme: 'light' | 'dark' | 'system'
+  currentTheme: string
+  icon: React.ReactNode
+  label: string
+  onClick: (theme: 'light' | 'dark' | 'system') => void
+}
 
+function ThemeOption({ theme, currentTheme, icon, label, onClick }: ThemeOptionProps) {
+  return (
+    <button
+      onClick={() => onClick(theme)}
+      className={cn(
+        "w-full px-3 py-2 text-left text-sm transition-colors flex items-center gap-3",
+        "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none",
+        currentTheme === theme && "bg-accent/50"
+      )}
+      role="menuitem"
+    >
+      {icon}
+      <span className="flex-1">{label}</span>
+      {currentTheme === theme && (
+        <div className="h-2 w-2 bg-primary rounded-full" />
+      )}
+    </button>
+  )
+}
+
+function getSizeClasses(size: 'sm' | 'md' | 'lg'): string {
+  switch (size) {
+    case 'sm': return 'h-8 w-8 px-2'
+    case 'lg': return 'h-12 w-12 px-3'
+    default: return 'h-10 w-10 px-2.5'
+  }
+}
+
+function getIconSizeClasses(size: 'sm' | 'md' | 'lg'): string {
+  switch (size) {
+    case 'sm': return 'h-3.5 w-3.5'
+    case 'lg': return 'h-5 w-5'
+    default: return 'h-4 w-4'
+  }
+}

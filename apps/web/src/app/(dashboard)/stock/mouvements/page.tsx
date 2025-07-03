@@ -1,3 +1,4 @@
+import type { MouvementStats } from '@/types/stock'
 'use client'
 
 import { CreateMouvementDialog } from '@/components/stocks/create-mouvement-dialog'
@@ -9,26 +10,48 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Download, Plus, TrendingDown, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 
-    const mockChartData = [
-    { 
-      date: new Date('2025-01-01'), 
-      name: 'Jan', 
-      entrees: 120, 
-      sorties: 80,
-      transferts: 10,
-      valeurEntrees: 15000,
-      valeurSorties: 12000
-    },
-    { 
-      date: new Date('2025-02-01'), 
-      name: 'Fev', 
-      entrees: 150, 
-      sorties: 90,
-      transferts: 15,
-      valeurEntrees: 18000,
-      valeurSorties: 14000
-    }
-  ];
+    const mockChartData: MouvementStats[] = [
+  {
+    date: '2024-01-01',
+    name: 'Janvier 2024',
+    entrees: 1250,
+    sorties: 890,
+    transferts: 165,
+    valeurEntrees: 47500,
+    valeurSorties: 34200,
+    metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
+  },
+  {
+    date: '2024-02-01', 
+    name: 'Février 2024',
+    entrees: 1180,
+    sorties: 1020,
+    transferts: 220,
+    valeurEntrees: 44600,
+    valeurSorties: 39800,
+    metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
+  },
+  {
+    date: '2024-03-01',
+    name: 'Mars 2024', 
+    entrees: 1420,
+    sorties: 1150,
+    transferts: 190,
+    valeurEntrees: 53800,
+    valeurSorties: 44500,
+    metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
+  },
+  {
+    date: '2024-04-01',
+    name: 'Avril 2024', 
+    entrees: 1320,
+    sorties: 1080,
+    transferts: 210,
+    valeurEntrees: 49800,
+    valeurSorties: 43200,
+    metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
+  }
+];
   const [period, setPeriod] = useState('month');
   const handlePeriodChange = (newPeriod: string) => setPeriod(newPeriod);
 
@@ -128,5 +151,7 @@ export default function MouvementsPage() {
     </div>
   )
 }
+
+
 
 
