@@ -1,5 +1,5 @@
 // apps/api/src/modules/auth/services/jwt-utils.service.ts
-import { Inject, Injectable } from "@nestjs/common"; // ← Ajouter Inject
+import { Inject, Injectable, Optional } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Redis } from "ioredis";
@@ -28,7 +28,7 @@ export class JwtUtilsService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @Inject("REDIS_CLIENT") private readonly redisClient: Redis, // ← Corriger l'injection
+    @Optional() @Inject("REDIS_CLIENT") private readonly redisClient?: Redis,
   ) {}
 
   /**
@@ -125,12 +125,17 @@ export class JwtUtilsService {
    * Vérifie si un token est dans la blacklist Redis
    */
   async isTokenBlacklisted(jti: string): Promise<boolean> {
+    if (!this.redisClient) {
+      console.log('🚫 Redis non disponible - token blacklist ignorée');
+      return false;
+    }
+
     try {
       const exists = await this.redisClient.exists(`blacklist:${jti}`);
       return exists === 1;
     } catch (error) {
       console.error("Error checking token blacklist:", error);
-      return false; // En cas d'erreur Redis, on ne bloque pas
+      return false;
     }
   }
 
@@ -138,6 +143,11 @@ export class JwtUtilsService {
    * Ajoute un token à la blacklist Redis
    */
   async blacklistToken(jti: string, expiresAt?: Date): Promise<void> {
+    if (!this.redisClient) {
+      console.log('🚫 Redis non disponible - blacklist token ignorée');
+      return;
+    }
+
     try {
       const key = `blacklist:${jti}`;
 
@@ -161,6 +171,11 @@ export class JwtUtilsService {
    * Supprime un token de la blacklist (pour les tests)
    */
   async removeFromBlacklist(jti: string): Promise<void> {
+    if (!this.redisClient) {
+      console.log('🚫 Redis non disponible - removeFromBlacklist ignorée');
+      return;
+    }
+
     try {
       await this.redisClient.del(`blacklist:${jti}`);
     } catch (error) {
@@ -173,5 +188,12 @@ export class JwtUtilsService {
    */
   generateJti(): string {
     return `jwt_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+  }
+
+  /**
+   * Indique si Redis est disponible
+   */
+  get isRedisAvailable(): boolean {
+    return !!this.redisClient && this.redisClient.status === 'ready';
   }
 }

@@ -38,3 +38,4 @@ export {
   OrdreStatut as StatutProduction,
   OrdrePriorite as PrioriteProduction 
 } from './production'
+export * from './components';

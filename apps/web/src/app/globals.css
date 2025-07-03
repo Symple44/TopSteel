@@ -1,8 +1,13 @@
-/* =================================================================== */
-/* IMPORTS - DOIVENT ÊTRE EN PREMIER */
-/* =================================================================== */
+@layer fonts {
+  /* Google Fonts loaded via next/font or link tag in layout */
+  :root {
+    --font-inter: 'Inter', sans-serif;
+    --font-poppins: 'Poppins', sans-serif;
+  }
+}
+/* === IMPORTS === */
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap");
+
 
 /* =================================================================== */
 /* VARIABLES CSS THEME */
@@ -151,4 +156,28 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* === COMPONENTS LAYER === */
+@layer components {
+  /* Tabs components styles */
+  .tabs-root {
+    @apply w-full;
+  }
+  
+  .tabs-list {
+    @apply inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground;
+  }
+  
+  .tabs-trigger {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+    @apply data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm;
+  }
+  
+  .tabs-content {
+    @apply mt-2 ring-offset-background;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
 }

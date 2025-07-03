@@ -45,6 +45,7 @@ import { LoggerMiddleware } from "./common/middleware/logger.middleware";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
+
 @Module({
   imports: [
     // Configuration globale
@@ -58,7 +59,7 @@ import { AppService } from "./app.service";
     DatabaseModule,
     ScheduleModule.forRoot(),
     TerminusModule,
-    RedisModule,
+    RedisModule.forRoot(),
 
     // Authentification
     AuthModule,
@@ -90,4 +91,7 @@ export class AppModule implements NestModule {
     consumer.apply(LoggerMiddleware).forRoutes("*");
   }
 }
+
+
+
 

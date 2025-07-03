@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { Notification } from '@erp/types';
+import { type Notification } from '@erp/types';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 
@@ -227,4 +227,5 @@ export function useNotifications() {
   }
   return context
 }
+
 

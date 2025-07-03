@@ -4,7 +4,7 @@ export interface BaseComponentProps {
 }
 
 export interface MouvementStats {
-  readonly date: string;
+  readonly date: string; // FIX: était Date, maintenant string
   readonly name: string;
   readonly entrees: number;
   readonly sorties: number;
@@ -20,6 +20,7 @@ export interface MouvementsChartProps {
 
 export interface MouvementsTableProps {
   readonly data: MouvementStats[];
+  readonly type?: string; // Ajout de la propriété manquante
 }
 
 export interface CreateMouvementDialogProps extends BaseComponentProps {
