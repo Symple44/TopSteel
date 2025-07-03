@@ -1,10 +1,10 @@
 /**
- * 📝 LOGGER STRUCTURÉ BACKEND - TopSteel ERP
+ * 📝 LOGGER STRUCTURÉ BACKEND - TopSteel ERP (VERSION CORRIGÉE)
  */
 import { Injectable, Logger } from '@nestjs/common'
 import * as winston from 'winston'
 
-interface LogContext {
+export interface LogContext {
   userId?: string
   requestId?: string
   sessionId?: string
@@ -13,14 +13,15 @@ interface LogContext {
   metadata?: Record<string, any>
 }
 
-interface SecurityLogContext extends LogContext {
+export interface SecurityLogContext extends LogContext {
   ipAddress?: string
   userAgent?: string
   severity: 'low' | 'medium' | 'high' | 'critical'
+  activity?: string
 }
 
 @Injectable()
-export class StructuredLogger extends Logger {
+export class TopSteelLogger extends Logger {
   private winstonLogger: winston.Logger
 
   constructor() {
@@ -99,11 +100,11 @@ export class StructuredLogger extends Logger {
   
   logSecurityEvent(event: string, context: SecurityLogContext) {
     const logLevel = this.getSecurityLogLevel(context.severity)
+    const logMethod = this.winstonLogger[logLevel as keyof winston.Logger] as winston.LeveledLogMethod
     
-    this.winstonLogger[logLevel]('Security Event', {
+    logMethod('Security Event', {
       type: 'security_event',
       event,
-      severity: context.severity,
       ...context
     })
   }
@@ -127,7 +128,7 @@ export class StructuredLogger extends Logger {
     })
   }
 
-  logSuspiciousActivity(activity: string, context: SecurityLogContext) {
+  logSuspiciousActivity(activity: string, context: Omit<SecurityLogContext, 'activity' | 'severity'>) {
     this.logSecurityEvent('suspicious_activity', {
       severity: 'high',
       activity,
@@ -151,7 +152,7 @@ export class StructuredLogger extends Logger {
   logSlowQuery(query: string, duration: number, context: LogContext = {}) {
     this.winstonLogger.warn('Slow Query', {
       type: 'slow_query',
-      query: query.substring(0, 500), // Limiter la taille
+      query: query.substring(0, 500),
       duration,
       unit: 'ms',
       ...context
@@ -162,7 +163,7 @@ export class StructuredLogger extends Logger {
     this.winstonLogger.debug('Cache Event', {
       type: 'cache_event',
       event,
-      key: key.substring(0, 100), // Limiter la taille des clés
+      key: key.substring(0, 100),
       ...context
     })
   }
@@ -213,7 +214,6 @@ export class StructuredLogger extends Logger {
   }
 
   private getPerformanceThreshold(metric: string, value: number): 'good' | 'acceptable' | 'poor' {
-    // Seuils spécifiques à TopSteel
     const thresholds: Record<string, { good: number; acceptable: number }> = {
       'api_response_time': { good: 200, acceptable: 500 },
       'database_query_time': { good: 100, acceptable: 300 },
@@ -231,26 +231,21 @@ export class StructuredLogger extends Logger {
 
   private sanitizeValue(value: any): any {
     if (typeof value === 'string') {
-      // Masquer les données sensibles
       return value
         .replace(/password/gi, '***')
         .replace(/token/gi, '***')
         .replace(/secret/gi, '***')
-        .substring(0, 100) // Limiter la taille
+        .substring(0, 100)
     }
     return value
   }
 
-  // === MÉTRIQUES D'AUDIT ===
-  
   generateDailyReport(): Promise<{
     errorCount: number
     securityEvents: number
     performanceIssues: number
     topErrors: string[]
   }> {
-    // TODO: Implémenter l'agrégation des logs
-    // Ceci nécessiterait une base de données ou un service de logs externe
     return Promise.resolve({
       errorCount: 0,
       securityEvents: 0,
@@ -260,4 +255,4 @@ export class StructuredLogger extends Logger {
   }
 }
 
-export { StructuredLogger, LogContext, SecurityLogContext }
+export type { LogContext, SecurityLogContext }
