@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { shallow } from 'zustand/shallow'
 
 type Theme = 'light' | 'dark' | 'system'
 type Language = 'fr' | 'en' | 'es'
@@ -208,6 +209,16 @@ const storage = createJSONStorage(() => {
     }
   }
 })
+
+// 🚀 UTILISEZ LES SELECTORS OPTIMISÉS POUR LES PERFORMANCES
+// import { useTheme, useUser, useProjectFilters } from './selectors/app.selectors'
+// Au lieu de: useAppStore(state => state.theme)
+// Utilisez: useTheme()
+
+// 🚀 UTILISEZ LES SELECTORS OPTIMISÉS POUR LES PERFORMANCES
+// import { useTheme, useUser, useProjectFilters } from './selectors/app.selectors'
+// Au lieu de: useAppStore(state => state.theme)
+// Utilisez: useTheme()
 
 export const useAppStore = create<AppStore>()(
   devtools(

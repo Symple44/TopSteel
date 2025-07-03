@@ -92,8 +92,8 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0(@nestjs/common@11.1.3)(@nestjs/core@11.1.3)(@nestjs/typeorm@11.0.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.25)
       '@nestjs/throttler':
-        specifier: ^6.4.0
-        version: 6.4.0(@nestjs/common@11.1.3)(@nestjs/core@11.1.3)(reflect-metadata@0.2.2)
+        specifier: ^5.2.0
+        version: 5.2.0(@nestjs/common@11.1.3)(@nestjs/core@11.1.3)(reflect-metadata@0.2.2)
       '@nestjs/typeorm':
         specifier: ^11.0.0
         version: 11.0.0(@nestjs/common@11.1.3)(@nestjs/core@11.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.25)
@@ -371,6 +371,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.1.0)(react@19.1.0)
+      '@types/dompurify':
+        specifier: ^3.2.0
+        version: 3.2.0
       autoprefixer:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.6)
@@ -383,6 +386,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      dompurify:
+        specifier: ^3.2.6
+        version: 3.2.6
       dotenv:
         specifier: ^17.0.0
         version: 17.0.1
@@ -410,6 +416,9 @@ importers:
       react-dom:
         specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
+      react-error-boundary:
+        specifier: ^4.1.2
+        version: 4.1.2(react@19.1.0)
       react-hook-form:
         specifier: ^7.59.0
         version: 7.59.0(react@19.1.0)
@@ -422,6 +431,12 @@ importers:
       tailwindcss:
         specifier: ^4.1.11
         version: 4.1.11
+      use-debounce:
+        specifier: ^10.0.5
+        version: 10.0.5(react@19.1.0)
+      web-vitals:
+        specifier: ^3.5.2
+        version: 3.5.2
       zod:
         specifier: ^3.25.67
         version: 3.25.67
@@ -3055,7 +3070,6 @@ packages:
   /@babel/runtime@7.27.6:
     resolution: {integrity: sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==}
     engines: {node: '>=6.9.0'}
-    dev: true
 
   /@babel/template@7.27.2:
     resolution: {integrity: sha512-LPDZ85aEJyYSd18/DkjNh4/y1ntkE5KwUHWTiqgRxruuZL2F1yuHligVHLvcHY2vMHXttKFpJn6LwfI7cw7ODw==}
@@ -5070,11 +5084,11 @@ packages:
       tslib: 2.8.1
     dev: true
 
-  /@nestjs/throttler@6.4.0(@nestjs/common@11.1.3)(@nestjs/core@11.1.3)(reflect-metadata@0.2.2):
-    resolution: {integrity: sha512-osL67i0PUuwU5nqSuJjtUJZMkxAnYB4VldgYUMGzvYRJDCqGRFMWbsbzm/CkUtPLRL30I8T74Xgt/OQxnYokiA==}
+  /@nestjs/throttler@5.2.0(@nestjs/common@11.1.3)(@nestjs/core@11.1.3)(reflect-metadata@0.2.2):
+    resolution: {integrity: sha512-G/G/MV3xf6sy1DwmnJsgeL+d2tQ/xGRNa9ZhZjm9Kyxp+3+ylGzwJtcnhWlN82PMEp3TiDQpTt+9waOIg/bpPg==}
     peerDependencies:
-      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
-      '@nestjs/core': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
+      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+      '@nestjs/core': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
       reflect-metadata: ^0.1.13 || ^0.2.0
     dependencies:
       '@nestjs/common': 11.1.3(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -7462,6 +7476,13 @@ packages:
   /@types/doctrine@0.0.9:
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
     dev: true
+
+  /@types/dompurify@3.2.0:
+    resolution: {integrity: sha512-Fgg31wv9QbLDA0SpTOXO3MaxySc4DKGLi8sna4/Utjo4r3ZRPdCt4UQee8BWr+Q5z21yifghREPJGYaEOEIACg==}
+    deprecated: This is a stub types definition. dompurify provides its own type definitions, so you do not need this installed.
+    dependencies:
+      dompurify: 3.2.6
+    dev: false
 
   /@types/eslint-scope@3.7.7:
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
@@ -15621,6 +15642,15 @@ packages:
       react: 19.1.0
       scheduler: 0.26.0
 
+  /react-error-boundary@4.1.2(react@19.1.0):
+    resolution: {integrity: sha512-GQDxZ5Jd+Aq/qUxbCm1UtzmL/s++V7zKgE8yMktJiCQXCCFZnMZh9ng+6/Ne6PjNSXH0L9CjeOEREfRnq6Duag==}
+    peerDependencies:
+      react: '>=16.13.1'
+    dependencies:
+      '@babel/runtime': 7.27.6
+      react: 19.1.0
+    dev: false
+
   /react-hook-form@7.59.0(react@19.1.0):
     resolution: {integrity: sha512-kmkek2/8grqarTJExFNjy+RXDIP8yM+QTl3QL6m6Q8b2bih4ltmiXxH7T9n+yXNK477xPh5yZT/6vD8sYGzJTA==}
     engines: {node: '>=18.0.0'}
@@ -17875,6 +17905,15 @@ packages:
       tslib: 2.8.1
     dev: false
 
+  /use-debounce@10.0.5(react@19.1.0):
+    resolution: {integrity: sha512-Q76E3lnIV+4YT9AHcrHEHYmAd9LKwUAbPXDm7FlqVGDHiSOhX3RDjT8dm0AxbJup6WgOb1YEcKyCr11kBJR5KQ==}
+    engines: {node: '>= 16.0.0'}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: 19.1.0
+    dev: false
+
   /use-sidecar@1.1.3(@types/react@19.1.8)(react@19.1.0):
     resolution: {integrity: sha512-Fedw0aZvkhynoPYlA5WXrMCAMm+nSWdZt6lzJQ7Ok8S6Q+VsHmHpRWndVRJ8Be0ZbkfPc5LRYH+5XrzXcEeLRQ==}
     engines: {node: '>=10'}
@@ -18094,6 +18133,10 @@ packages:
     dependencies:
       defaults: 1.0.4
     dev: true
+
+  /web-vitals@3.5.2:
+    resolution: {integrity: sha512-c0rhqNcHXRkY/ogGDJQxZ9Im9D19hDihbzSQJrsioex+KnFgmMzBiy57Z1EjkhX/+OjyBpclDCzz2ITtjokFmg==}
+    dev: false
 
   /webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}

@@ -1,5 +1,6 @@
 // apps/web/src/services/projet.service.ts - Version corrigée
 import type {
+import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
   Client,
   CreateProjetRequest,
   PaginationResultDto,

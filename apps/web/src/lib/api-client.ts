@@ -12,6 +12,7 @@
  */
 
 import { SecurityUtils } from './security'
+import { SecurityUtils } from '@/lib/security/security-enhanced'
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'

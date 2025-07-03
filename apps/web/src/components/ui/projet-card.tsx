@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
 import { Calendar, Euro, Eye, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 
 interface ProjetCardProps {
   projet: Projet

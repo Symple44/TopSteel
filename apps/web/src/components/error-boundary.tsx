@@ -4,6 +4,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw, Home, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { businessMetrics } from '@/lib/monitoring/business-metrics'
 
 interface Props {
   children: ReactNode
@@ -80,9 +81,9 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
     // Console pour développement
     console.group('🚨 Error Boundary Triggered')
-    console.error('Error:', error)
-    console.error('Error Info:', errorInfo)
-    console.error('Error Data:', errorData)
+    businessMetrics.trackError(error); console.error('Error:', error)
+    businessMetrics.trackError(error); console.error('Error Info:', errorInfo)
+    businessMetrics.trackError(error); console.error('Error Data:', errorData)
     console.groupEnd()
 
     // Service de logging externe (Sentry, LogRocket, etc.)
@@ -283,7 +284,7 @@ export function withErrorBoundary<P extends object>(
 // ✅ HOOK POUR GESTION D'ERREURS
 export function useErrorHandler() {
   const handleError = React.useCallback((error: Error, context?: string) => {
-    console.error(`Error in ${context}:`, error)
+    businessMetrics.trackError(error); console.error(`Error in ${context}:`, error)
     
     // Tracker l'erreur
     if (typeof window !== 'undefined' && (window as any).analytics) {

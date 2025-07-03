@@ -1,6 +1,7 @@
 // apps/web/src/hooks/use-projets.ts - VERSION STABLE
 import { useProjetStore } from '@/stores/projet.store'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 
 export const useProjets = (autoFetch = true) => {
   const [mounted, setMounted] = useState(false)

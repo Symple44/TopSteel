@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { useTheme, useUser, useProjectFilters, useUISettings } from '@/stores/selectors/app.selectors'
 
 interface AppState {
   sidebarCollapsed: boolean

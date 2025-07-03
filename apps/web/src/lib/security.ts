@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod'
+import { SecurityUtils } from '@/lib/security/security-enhanced'
 
 // ✅ SANITISATION XSS - VERSION NATIVE
 export class SecurityUtils {
@@ -296,7 +297,7 @@ export const secureSchemas = {
     .regex(/^[a-zA-Z0-9._-]+$/, 'Nom de fichier invalide')
     .refine(name => !name.startsWith('.'), 'Nom de fichier invalide'),
   
-  html: z.string().transform(SecurityUtils.sanitizeHtml),
+  html: z.string().transform(SecurityUtils.sanitizeHtmlHtml),
   
-  userInput: z.string().max(1000).transform(SecurityUtils.sanitizeString)
+  userInput: z.string().max(1000).transform(SecurityUtils.sanitizeHtmlString)
 }

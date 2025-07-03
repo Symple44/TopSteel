@@ -11,6 +11,7 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@/types'
 import { ProjetStatut } from '@erp/types'
 import {
+import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
   Building2,
   Edit,
   Mail,

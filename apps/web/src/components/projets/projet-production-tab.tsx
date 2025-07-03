@@ -9,6 +9,7 @@ import type { Projet } from '@erp/types'
 import { PrioriteProduction, StatutProduction } from '@erp/types'
 import { AlertCircle, Calendar, CheckCircle2, Clock, Factory, Pause, Play, Plus, User } from 'lucide-react'
 import { useState } from 'react'
+import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 
 interface ProjetProductionTabProps {
   projet: Projet

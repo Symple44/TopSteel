@@ -1,6 +1,7 @@
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { useWebVitalsMonitoring } from '@/hooks/performance/use-performance'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -9,7 +10,8 @@ export const metadata = {
   description: 'Système de gestion intégré pour TopSteel',
 }
 
-export default function RootLayout({
+{
+  useWebVitalsMonitoring()
   children,
 }: {
   children: React.ReactNode

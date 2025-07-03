@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { Projet, ProjetFilters } from '@erp/types'
 import { api } from '@/lib/api'
+import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 
 interface ProjetState {
   projets: Projet[]

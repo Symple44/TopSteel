@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import type { Projet } from '@erp/types'
 import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
+import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 
 interface Projet3DTabProps {
   projet: Projet
