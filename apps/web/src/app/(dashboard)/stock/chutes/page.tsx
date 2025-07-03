@@ -9,6 +9,90 @@ import { Input } from '@/components/ui/input'
 import { Calculator, Recycle, Search } from 'lucide-react'
 import { useState } from 'react'
 
+  // Données mock pour les statistiques des chutes
+    // Données mock pour les statistiques des chutes - Interface complète
+  const mockStats = {
+    totalChutes: 245,
+    valeurTotale: 15420,           // Correction: valeurEstimee → valeurTotale
+    tauxReutilisation: 68,         // Ajout: propriété manquante
+    economiesRealisees: 8950,      // Conservé
+    chutesExcellentes: 85,         // Ajout: propriété manquante
+    chutesDegradees: 12,           // Ajout: propriété manquante
+    evolutionMois: 15              // Ajout: propriété manquante (évolution en %)
+  };
+
+  // Données mock pour les chutes
+    // Données mock pour les chutes - Interface Chute complète
+    // Données mock pour les chutes - Enums corrigés
+  const mockChutes = [
+    {
+      id: '1',
+      reference: 'CHT-2025-001',
+      materiau: 'Acier galvanisé',
+      dimensions: { longueur: 120, largeur: 80, epaisseur: 2 },
+      poids: 15.5,
+      quantite: 1,
+      unite: 'pièce',
+      qualite: 'EXCELLENTE' as const,           // Enum corrigé
+      emplacement: 'Zone A-12',
+      valeurEstimee: 85,
+      statut: 'DISPONIBLE' as const,            // Enum corrigé
+      origine: { type: 'production', reference: 'OF-2025-089' },
+      dateCreation: new Date('2025-01-15')
+    },
+    {
+      id: '2', 
+      reference: 'CHT-2025-002',
+      materiau: 'Aluminium 6061',
+      dimensions: { longueur: 200, largeur: 100, epaisseur: 3 },
+      poids: 12.8,
+      quantite: 2,
+      unite: 'pièce',
+      qualite: 'BONNE' as const,                // Enum corrigé
+      emplacement: 'Zone B-05',
+      valeurEstimee: 120,
+      statut: 'RESERVEE' as const,              // Enum corrigé
+      origine: { type: 'commande', reference: 'CMD-2025-045' },
+      dateCreation: new Date('2025-01-10')
+    },
+    {
+      id: '3',
+      reference: 'CHT-2025-003', 
+      materiau: 'Inox 316L',
+      dimensions: { longueur: 150, largeur: 50, epaisseur: 1.5 },
+      poids: 8.2,
+      quantite: 3,
+      unite: 'ml',
+      qualite: 'ACCEPTABLE' as const,           // Enum corrigé
+      emplacement: 'Zone C-08',
+      valeurEstimee: 95,
+      statut: 'DISPONIBLE' as const,            // Enum corrigé
+      origine: { type: 'chantier', reference: 'CHANT-2025-012' },
+      dateCreation: new Date('2025-01-08')
+    }
+  ];
+
+  // Handlers pour les actions du tableau
+  const handleView = (chute: any) => {
+    console.log('Voir chute:', chute);
+    // TODO: Ouvrir modal de détails
+  };
+
+  const handleEdit = (chute: any) => {
+    console.log('Éditer chute:', chute);
+    // TODO: Ouvrir modal d'édition
+  };
+
+  const handleDelete = (chute: any) => {
+    console.log('Supprimer chute:', chute);
+    // TODO: Confirmer et supprimer
+  };
+
+  const handleSearch = (searchTerm: string) => {
+    console.log('Recherche:', searchTerm);
+    // TODO: Filtrer les chutes
+  };
+
 export default function ChutesPage() {
   const [showOptimizer, setShowOptimizer] = useState(false)
 
@@ -95,7 +179,7 @@ export default function ChutesPage() {
       </div>
 
       {/* Statistiques détaillées */}
-      <ChutesStats />
+      <ChutesStats stats={mockStats} />
 
       {/* Table des chutes */}
       <Card>
@@ -103,17 +187,32 @@ export default function ChutesPage() {
           <CardTitle>Inventaire des Chutes</CardTitle>
         </CardHeader>
         <CardContent>
-          <ChutesTable />
+          <ChutesTable chutes={mockChutes} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} onSearch={handleSearch} />
         </CardContent>
       </Card>
 
-      {/* Optimiseur modal */}
-      {showOptimizer && (
-        <ChutesOptimizer 
-          open={showOptimizer} 
-          onOpenChange={setShowOptimizer} 
-        />
+      {/* Optimiseur modal */}      {showOptimizer && (
+        <div className="mt-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-blue-900 mb-2">Optimiseur de Chutes</h3>
+            <p className="text-blue-700 mb-4">
+              Fonctionnalité d'optimisation en cours de développement. 
+              Cette section permettra d'optimiser l'utilisation des chutes pour de nouveaux projets.
+            </p>
+            <button 
+              onClick={() => setShowOptimizer(false)}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
       )}
     </div>
   )
 }
+
+
+
+
+

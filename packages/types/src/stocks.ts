@@ -11,17 +11,17 @@ export enum StockType {
 }
 
 export enum ChuteQualite {
-  EXCELLENTE = 'excellente',
-  BONNE = 'bonne',
-  CORRECTE = 'correcte',
-  MEDIOCRE = 'mediocre'
+  EXCELLENTE = 'EXCELLENTE',
+  BONNE = 'BONNE', 
+  ACCEPTABLE = 'ACCEPTABLE',
+  DEGRADEE = 'DEGRADEE'
 }
 
 export enum ChuteStatut {
-  DISPONIBLE = 'disponible',
-  RESERVEE = 'reservee',
-  UTILISEE = 'utilisee',
-  REBUT = 'rebut'
+  DISPONIBLE = 'DISPONIBLE',
+  RESERVEE = 'RESERVEE',
+  UTILISEE = 'UTILISEE',
+  REBUT = 'REBUT'
 }
 
 export enum MouvementType {
@@ -179,3 +179,4 @@ export interface StocksStats {
   tauxReutilisation: number
   economiesChutes: number
 }
+

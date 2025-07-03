@@ -82,7 +82,7 @@ export default function ProjetsPage() {
   const { dataView, setDataView } = useDataView('grid')
   
   // Hook projets avec gestion d'erreur
-  const { data: projets = [], isLoading, error, refetch } = useProjets()
+  const { projets = [], isLoading, error, refetch } = useProjets()
 
   // Filtrage des projets
   const filteredProjets = useMemo(() => {
@@ -91,7 +91,7 @@ export default function ProjetsPage() {
     
     const term = searchTerm.toLowerCase()
     return projets.filter(projet => 
-      projet?.nom?.toLowerCase().includes(term) ||
+      projet?.reference?.toLowerCase().includes(term) ||
       projet?.client?.nom?.toLowerCase().includes(term) ||
       projet?.reference?.toLowerCase().includes(term) ||
       projet?.description?.toLowerCase().includes(term)
@@ -101,11 +101,11 @@ export default function ProjetsPage() {
   // Colonnes pour le tableau
   const columns = useMemo(() => [
     {
-      key: 'nom',
-      label: 'Projet',
-      render: (nom: string, projet: Projet) => (
+      key: 'reference',
+      label: 'Référence',
+      render: (reference: string, projet: Projet) => (
         <div>
-          <div className="font-medium">{nom || 'Sans nom'}</div>
+          <div className="font-medium">{reference || 'Sans référence'}</div>
           <div className="text-sm text-gray-500">{projet.reference || 'Sans référence'}</div>
         </div>
       ),
@@ -152,7 +152,7 @@ export default function ProjetsPage() {
             variant="ghost"
             size="sm"
             onClick={() => router.push(`/projets/${projet.id}`)}
-            aria-label={`Voir le projet ${projet.nom}`}
+            aria-label={`Voir le projet ${projet.reference}`}
           >
             <Eye className="h-4 w-4" />
           </Button>
@@ -160,7 +160,7 @@ export default function ProjetsPage() {
             variant="ghost"
             size="sm"
             onClick={() => router.push(`/projets/${projet.id}/edit`)}
-            aria-label={`Modifier le projet ${projet.nom}`}
+            aria-label={`Modifier le projet ${projet.reference}`}
           >
             <FolderOpen className="h-4 w-4" />
           </Button>
@@ -298,3 +298,9 @@ export default function ProjetsPage() {
     </div>
   )
 }
+
+
+
+
+
+

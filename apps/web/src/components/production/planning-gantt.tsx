@@ -19,6 +19,7 @@ interface GanttTask {
 
 interface PlanningGanttProps {
   tasks: GanttTask[];
+  currentWeek?: Date;
   onTaskClick: (task: GanttTask) => void;
   onTaskUpdate: (taskId: string, updates: Partial<GanttTask>) => void;
 }
@@ -222,3 +223,4 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     </Card>
   );
 }
+

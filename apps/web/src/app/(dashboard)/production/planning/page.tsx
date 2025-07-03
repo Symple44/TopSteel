@@ -8,13 +8,79 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Calendar, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
 import { useState } from 'react'
 
+interface GanttTask {
+  id: string;
+  name: string;
+  start: Date;
+  end: Date;
+  progress: number;
+  dependencies?: string[];
+  assignee?: string;
+  type: 'ordre' | 'operation' | 'maintenance';
+  status: 'planned' | 'in-progress' | 'completed' | 'delayed';
+}
+
+interface PlanningEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  type: 'ordre' | 'maintenance' | 'conge';
+  color: string;
+  ordreId?: number;
+}
+
 export default function PlanningPage() {
   const [currentWeek, setCurrentWeek] = useState(new Date())
   const [view, setView] = useState<'gantt' | 'calendar'>('gantt')
 
+  const mockTasks: GanttTask[] = [
+    {
+      id: '1',
+      name: 'Portail résidentiel - Découpe',
+      start: new Date(2025, 0, 15),
+      end: new Date(2025, 0, 17),
+      progress: 75,
+      assignee: 'Jean Dupont',
+      type: 'operation',
+      status: 'in-progress'
+    }
+  ];
+
+  const mockEvents: PlanningEvent[] = [
+    {
+      id: '1',
+      title: 'Portail résidentiel',
+      start: new Date(2025, 0, 15),
+      end: new Date(2025, 0, 17),
+      type: 'ordre',
+      color: '#3b82f6',
+      ordreId: 1
+    }
+  ];
+
+  const handleTaskClick = (task: GanttTask) => {
+    console.log('Tâche cliquée:', task);
+  };
+
+  const handleTaskUpdate = (taskId: string, updates: Partial<GanttTask>) => {
+    console.log('Mise à jour tâche:', taskId, updates);
+  };
+
+  const handleEventClick = (event: PlanningEvent) => {
+    console.log('Événement cliqué:', event);
+  };
+
+  const handleDateClick = (date: Date) => {
+    console.log('Date cliquée:', date);
+  };
+
+  const handleCreateEvent = () => {
+    console.log('Créer un nouvel événement');
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Planning Production</h1>
@@ -33,7 +99,6 @@ export default function PlanningPage() {
         </div>
       </div>
 
-      {/* Navigation semaine */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -67,11 +132,20 @@ export default function PlanningPage() {
             </TabsList>
             
             <TabsContent value="gantt" className="mt-6">
-              <PlanningGantt currentWeek={currentWeek} />
+              <PlanningGantt 
+                tasks={mockTasks}
+                onTaskClick={handleTaskClick}
+                onTaskUpdate={handleTaskUpdate}
+              />
             </TabsContent>
             
             <TabsContent value="calendar" className="mt-6">
-              <PlanningCalendar currentWeek={currentWeek} />
+              <PlanningCalendar 
+                events={mockEvents}
+                onEventClick={handleEventClick}
+                onDateClick={handleDateClick}
+                onCreateEvent={handleCreateEvent}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>
