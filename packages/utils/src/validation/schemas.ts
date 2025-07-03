@@ -73,3 +73,8 @@ export const stockSchema = z.object({
   message: "La quantité maximale doit être supérieure à la quantité minimale",
   path: ["quantiteMax"]
 })
+export const idSchema = z.union([
+  z.string().uuid('ID must be a valid UUID'),
+  z.number().int().positive('ID must be a positive integer'),
+  z.string().regex(/^\d+$/, 'ID must be numeric').transform(Number)
+])
