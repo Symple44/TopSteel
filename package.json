@@ -91,18 +91,18 @@
     "migration:create": "turbo migration:generate --filter=@erp/api"
   },
   "dependencies": {
-    "dotenv": "^17.0.0"
+    "dotenv": "^17.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.7",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.7",
-    "audit-ci": "^7.0.1",
-    "better-npm-audit": "^3.7.3",
+    "@types/node": "^24.0.10",
+    "audit-ci": "^7.1.0",
+    "better-npm-audit": "^3.11.0",
     "depcheck": "^1.4.7",
-    "jest": "^30.0.3",
+    "jest": "^30.0.4",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.1.1",
+    "ts-jest": "^29.4.0",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
