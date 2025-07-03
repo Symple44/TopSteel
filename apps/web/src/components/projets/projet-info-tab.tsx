@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@/types'
 import { ProjetStatut } from '@erp/types'
-import {
 import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
   Building2,
   Edit,
@@ -18,6 +17,14 @@ import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
   MapPin,
   Phone,
   Save,
+  X
+import {
+  FileText,
+  Download,
+  Send,
+  AlertCircle,
+  CheckCircle,
+  Clock,
   X
 } from 'lucide-react'
 import { useState } from 'react'
@@ -194,6 +201,5 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
     </div>
   )
 }
-
 
 

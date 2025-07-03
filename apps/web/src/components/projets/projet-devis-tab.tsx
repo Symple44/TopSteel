@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { 
 import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
   FileText, 
   Download, 
@@ -16,19 +15,25 @@ import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
   CheckCircle,
   Clock,
   X
+import {
+  FileText,
+  Download,
+  Send,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+  TableRow
 import { formatDate, formatCurrency } from '@/lib/utils'
 import type { Projet } from '@/types'
 

@@ -7,7 +7,6 @@ interface ProjetDocumentsTabProps {
 }
 
 import { Input } from "@/components/ui/input"
-import {
 import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
   Badge,
   Button,
@@ -15,6 +14,12 @@ import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
   CardContent,
   CardHeader,
   CardTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+import {
   Select,
   SelectContent,
   SelectItem,

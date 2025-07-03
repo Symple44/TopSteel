@@ -11,7 +11,6 @@
  * - Authentication automatique
  */
 
-import { SecurityUtils } from './security'
 import { SecurityUtils } from '@/lib/security/security-enhanced'
 
 interface RequestConfig {
@@ -444,4 +443,3 @@ export interface APIResponse<T> {
   message?: string
   timestamp: number
 }
-
