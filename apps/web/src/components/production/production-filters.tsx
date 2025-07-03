@@ -2,12 +2,14 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Input, Card, CardContent, CardHeader, CardTitle } from "@erp/ui";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, Filter, RotateCcw } from "lucide-react";
 
 interface ProductionFiltersProps {
-  onFiltersChange: (filters: ProductionFilters) => void;
-  onReset: () => void;
+  onFiltersChange?: (filters: ProductionFilters) => void; // Props optionnelles
+  onReset?: () => void; // Props optionnelles
 }
 
 interface ProductionFilters {
@@ -25,12 +27,12 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
   const handleFilterChange = (key: keyof ProductionFilters, value: any) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    onFiltersChange(newFilters);
+    onFiltersChange?.(newFilters); // Safe call avec ?
   };
 
   const handleReset = () => {
     setFilters({});
-    onReset();
+    onReset?.(); // Safe call avec ?
   };
 
   return (
@@ -52,7 +54,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
                 placeholder="Numéro, description..."
                 className="pl-10"
                 value={filters.search || ''}
-                onChange={(e) => handleFilterChange('search', (e.target as HTMLInputElement | HTMLTextAreaElement).value)}
+                onChange={(e) => handleFilterChange('search', (e.target as HTMLInputElement).value)}
               />
             </div>
           </div>
@@ -63,15 +65,14 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <select
               className="w-full p-2 border rounded-md"
               value={filters.statut?.[0] || ''}
-              onChange={(e) => handleFilterChange('statut', (e.target as HTMLInputElement | HTMLTextAreaElement).value ? [(e.target as HTMLInputElement | HTMLTextAreaElement).value] : [])}
+              onChange={(e) => handleFilterChange('statut', (e.target as HTMLSelectElement).value ? [(e.target as HTMLSelectElement).value] : [])}
             >
               <option value="">Tous les statuts</option>
               <option value="EN_ATTENTE">En attente</option>
               <option value="PLANIFIE">Planifié</option>
               <option value="EN_COURS">En cours</option>
               <option value="TERMINE">Terminé</option>
-              <option value="PAUSE">En pause</option>
-              <option value="ANNULE">Annulé</option>
+              <option value="PAUSE">Pause</option>
             </select>
           </div>
 
@@ -81,7 +82,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <select
               className="w-full p-2 border rounded-md"
               value={filters.priorite?.[0] || ''}
-              onChange={(e) => handleFilterChange('priorite', (e.target as HTMLInputElement | HTMLTextAreaElement).value ? [(e.target as HTMLInputElement | HTMLTextAreaElement).value] : [])}
+              onChange={(e) => handleFilterChange('priorite', (e.target as HTMLSelectElement).value ? [(e.target as HTMLSelectElement).value] : [])}
             >
               <option value="">Toutes les priorités</option>
               <option value="BASSE">Basse</option>
@@ -92,46 +93,37 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Date début */}
+        {/* Dates */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Date début</label>
             <Input
               type="date"
               value={filters.dateDebut || ''}
-              onChange={(e) => handleFilterChange('dateDebut', (e.target as HTMLInputElement | HTMLTextAreaElement).value)}
+              onChange={(e) => handleFilterChange('dateDebut', (e.target as HTMLInputElement).value)}
             />
           </div>
-
-          {/* Date fin */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Date fin</label>
             <Input
               type="date"
               value={filters.dateFin || ''}
-              onChange={(e) => handleFilterChange('dateFin', (e.target as HTMLInputElement | HTMLTextAreaElement).value)}
-            />
-          </div>
-
-          {/* Responsable */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Responsable</label>
-            <Input
-              placeholder="Nom du responsable"
-              value={filters.responsable || ''}
-              onChange={(e) => handleFilterChange('responsable', (e.target as HTMLInputElement | HTMLTextAreaElement).value)}
+              onChange={(e) => handleFilterChange('dateFin', (e.target as HTMLInputElement).value)}
             />
           </div>
         </div>
 
-        <div className="flex justify-end">
-          <Button variant="outline" onClick={handleReset} className="flex items-center gap-2">
-            <RotateCcw className="h-4 w-4" />
+        {/* Actions */}
+        <div className="flex justify-between items-center pt-4">
+          <Button variant="outline" onClick={handleReset}>
+            <RotateCcw className="h-4 w-4 mr-2" />
             Réinitialiser
           </Button>
+          <div className="text-sm text-muted-foreground">
+            {Object.keys(filters).length > 0 ? `${Object.keys(filters).length} filtre(s) actif(s)` : 'Aucun filtre'}
+          </div>
         </div>
       </CardContent>
     </Card>
   );
 }
-

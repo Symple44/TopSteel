@@ -5,13 +5,64 @@ import { ProductionFilters } from '@/components/production/production-filters'
 import { ProductionTable } from '@/components/production/production-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Calendar, Filter, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
 export default function ProductionPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
+
+  // Handlers pour les filtres
+  const handleFiltersChange = (filters: any) => {
+    console.log('Filtres mis à jour:', filters)
+    // TODO: Implémenter la logique de filtrage
+  }
+
+  const handleFiltersReset = () => {
+    console.log('Filtres réinitialisés')
+    // TODO: Implémenter la logique de reset
+  }
+
+  // Données mock pour la démonstration
+  const mockOrdres = [
+    {
+      id: 1,
+      numero: 'OF-2024-001',
+      description: 'Portail résidentiel',
+      statut: 'EN_COURS',
+      priorite: 'NORMALE',
+      avancement: 65,
+      dateDebutPrevue: new Date('2024-01-15'),
+      dateFinPrevue: new Date('2024-01-22'),
+      responsable: 'Jean Dupont'
+    },
+    {
+      id: 2,
+      numero: 'OF-2024-002', 
+      description: 'Garde-corps balcon',
+      statut: 'PLANIFIE',
+      priorite: 'HAUTE',
+      avancement: 0,
+      dateDebutPrevue: new Date('2024-01-25'),
+      dateFinPrevue: new Date('2024-01-30'),
+      responsable: 'Marie Martin'
+    }
+  ]
+
+  const handleView = (id: number) => {
+    console.log('Voir ordre:', id)
+    // TODO: Navigation vers détail
+  }
+
+  const handleEdit = (id: number) => {
+    console.log('Modifier ordre:', id)
+    // TODO: Navigation vers édition
+  }
+
+  const handleStatusChange = (id: number, status: string) => {
+    console.log('Changer statut:', id, status)
+    // TODO: Mise à jour statut
+  }
 
   return (
     <div className="space-y-6">
@@ -69,46 +120,42 @@ export default function ProductionPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Charge machine</CardTitle>
+            <CardTitle className="text-sm font-medium">Terminés</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">87%</div>
-            <p className="text-xs text-muted-foreground">Semaine courante</p>
+            <div className="text-2xl font-bold text-green-600">45</div>
+            <p className="text-xs text-muted-foreground">Ce mois</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Filtres */}
       {showFilters && (
-        <Card>
-          <CardContent className="pt-6">
-            <ProductionFilters />
-          </CardContent>
-        </Card>
+        <ProductionFilters 
+          onFiltersChange={handleFiltersChange} 
+          onReset={handleFiltersReset} 
+        />
       )}
 
-      {/* Search */}
-      <div className="flex gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher par référence, projet, client..."
-            className="pl-10"
+      {/* Table des ordres */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Ordres de fabrication</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProductionTable
+            ordres={mockOrdres}
+            onView={handleView}
+            onEdit={handleEdit}
+            onStatusChange={handleStatusChange}
           />
-        </div>
-        <Button variant="outline">
-          <Calendar className="h-4 w-4 mr-2" />
-          Planning
-        </Button>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Table */}
-      <ProductionTable />
-
-      {/* Modals */}
-      <CreateOrdreDialog 
-        open={showCreateModal} 
-        onOpenChange={setShowCreateModal} 
+      {/* Modal création ordre */}
+      <CreateOrdreDialog
+        open={showCreateModal}
+        onOpenChange={setShowCreateModal}
       />
     </div>
   )

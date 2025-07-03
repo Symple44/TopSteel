@@ -2,15 +2,18 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@erp/ui";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { X } from "lucide-react";
 
 interface CreateOrdreDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
+  open: boolean;  // ✅ Interface standardisée
+  onOpenChange: (open: boolean) => void;  // ✅ Interface standardisée
+  onSubmit?: (data: any) => void;
 }
 
-export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDialogProps) {
+export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreDialogProps) {
   const [formData, setFormData] = useState({
     numero: '',
     description: '',
@@ -20,12 +23,24 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
     projet: ''
   });
 
-  if (!isOpen) return null;
+  if (!open) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    onClose();
+    
+    const newOrdre = {
+      ...formData,
+      id: Date.now(),
+      statut: 'PLANIFIE',
+      avancement: 0,
+      createdAt: new Date()
+    };
+    
+    console.log('Nouvel ordre créé:', newOrdre);
+    onSubmit?.(newOrdre);
+    onOpenChange(false);
+    
+    // Reset form
     setFormData({
       numero: '',
       description: '',
@@ -38,9 +53,12 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardHeader>
+      <Card className="w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle>Nouvel ordre de fabrication</CardTitle>
+          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+            <X className="h-4 w-4" />
+          </Button>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -49,7 +67,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
               <Input
                 type="text"
                 value={formData.numero}
-                onChange={(e) => setFormData({ ...formData, numero: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                onChange={(e) => setFormData({ ...formData, numero: (e.target as HTMLInputElement).value })}
                 placeholder="OF-2025-001"
                 required
               />
@@ -60,7 +78,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
               <Input
                 type="text"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                onChange={(e) => setFormData({ ...formData, description: (e.target as HTMLInputElement).value })}
                 placeholder="Description de l'ordre..."
                 required
               />
@@ -70,7 +88,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
               <label className="text-sm font-medium">Priorité</label>
               <select
                 value={formData.priorite}
-                onChange={(e) => setFormData({ ...formData, priorite: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                onChange={(e) => setFormData({ ...formData, priorite: (e.target as HTMLSelectElement).value })}
                 className="w-full p-2 border rounded-md"
               >
                 <option value="BASSE">Basse</option>
@@ -86,7 +104,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
                 <Input
                   type="date"
                   value={formData.dateDebutPrevue}
-                  onChange={(e) => setFormData({ ...formData, dateDebutPrevue: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                  onChange={(e) => setFormData({ ...formData, dateDebutPrevue: (e.target as HTMLInputElement).value })}
                 />
               </div>
               <div>
@@ -94,7 +112,7 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
                 <Input
                   type="date"
                   value={formData.dateFinPrevue}
-                  onChange={(e) => setFormData({ ...formData, dateFinPrevue: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                  onChange={(e) => setFormData({ ...formData, dateFinPrevue: (e.target as HTMLInputElement).value })}
                 />
               </div>
             </div>
@@ -104,13 +122,13 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
               <Input
                 type="text"
                 value={formData.projet}
-                onChange={(e) => setFormData({ ...formData, projet: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                onChange={(e) => setFormData({ ...formData, projet: (e.target as HTMLInputElement).value })}
                 placeholder="Nom du projet (optionnel)"
               />
             </div>
             
             <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
               <Button type="submit">
@@ -123,4 +141,3 @@ export function CreateOrdreDialog({ isOpen, onClose, onSubmit }: CreateOrdreDial
     </div>
   );
 }
-

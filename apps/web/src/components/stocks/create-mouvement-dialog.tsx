@@ -2,7 +2,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@erp/ui";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Plus, X, Package, ArrowRight, ArrowLeft, RotateCcw } from "lucide-react";
 
 interface CreateMouvementDialogProps {
@@ -91,7 +93,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
                       }`}
                     >
                       <Icon className={`h-4 w-4 ${type.color}`} />
-                      <span className="font-medium">{type.label}</span>
+                      {type.label}
                     </button>
                   );
                 })}
@@ -100,79 +102,46 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
 
             {/* Matériau */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Matériau *</label>
-              <select
+              <label className="text-sm font-medium">Matériau</label>
+              <Input
                 value={formData.materiauId}
-                onChange={(e) => setFormData({ ...formData, materiauId: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
-                className="w-full p-2 border rounded-md"
+                onChange={(e) => setFormData({ ...formData, materiauId: (e.target as HTMLInputElement).value })}
+                placeholder="ID ou nom du matériau"
                 required
-              >
-                <option value="">Sélectionner un matériau</option>
-                <option value="acier-s235">Acier S235 - Tôle 2mm</option>
-                <option value="acier-s355">Acier S355 - Poutre IPE</option>
-                <option value="inox-304">Inox 304 - Tube rond</option>
-                <option value="alu-6060">Aluminium 6060 - Profilé</option>
-              </select>
+              />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {/* Quantité */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Quantité *</label>
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.quantite}
-                  onChange={(e) => setFormData({ ...formData, quantite: parseFloat((e.target as HTMLInputElement | HTMLTextAreaElement).value) || 0 })}
-                  placeholder="0.00"
-                  required
-                />
-              </div>
-
-              {/* Prix unitaire */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Prix unitaire (€)</label>
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.prixUnitaire || ''}
-                  onChange={(e) => setFormData({ ...formData, prixUnitaire: parseFloat((e.target as HTMLInputElement | HTMLTextAreaElement).value) || undefined })}
-                  placeholder="0.00"
-                />
-              </div>
+            {/* Quantité */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Quantité</label>
+              <Input
+                type="number"
+                value={formData.quantite}
+                onChange={(e) => setFormData({ ...formData, quantite: parseFloat((e.target as HTMLInputElement).value) || 0 })}
+                placeholder="0"
+                required
+              />
             </div>
 
             {/* Motif */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Motif *</label>
+              <label className="text-sm font-medium">Motif</label>
               <Input
                 value={formData.motif}
-                onChange={(e) => setFormData({ ...formData, motif: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
-                placeholder="Raison du mouvement..."
+                onChange={(e) => setFormData({ ...formData, motif: (e.target as HTMLInputElement).value })}
+                placeholder="Raison du mouvement"
                 required
               />
             </div>
 
-            {/* Référence */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Référence</label>
-              <Input
-                value={formData.reference || ''}
-                onChange={(e) => setFormData({ ...formData, reference: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
-                placeholder="Numéro de commande, bon de livraison..."
-              />
-            </div>
-
-            {/* Emplacements (pour transfert) */}
-            {formData.type === 'TRANSFERT' && (
+            {/* Champs conditionnels selon le type */}
+            {(formData.type === 'TRANSFERT' || formData.type === 'ENTREE') && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Emplacement source</label>
                   <Input
                     value={formData.emplacementSource || ''}
-                    onChange={(e) => setFormData({ ...formData, emplacementSource: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                    onChange={(e) => setFormData({ ...formData, emplacementSource: (e.target as HTMLInputElement).value })}
                     placeholder="Zone A1"
                   />
                 </div>
@@ -180,7 +149,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
                   <label className="text-sm font-medium">Emplacement destination</label>
                   <Input
                     value={formData.emplacementDestination || ''}
-                    onChange={(e) => setFormData({ ...formData, emplacementDestination: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                    onChange={(e) => setFormData({ ...formData, emplacementDestination: (e.target as HTMLInputElement).value })}
                     placeholder="Zone B2"
                   />
                 </div>
@@ -192,7 +161,7 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
               <label className="text-sm font-medium">Notes</label>
               <textarea
                 value={formData.notes || ''}
-                onChange={(e) => setFormData({ ...formData, notes: (e.target as HTMLInputElement | HTMLTextAreaElement).value })}
+                onChange={(e) => setFormData({ ...formData, notes: (e.target as HTMLTextAreaElement).value })}
                 placeholder="Informations complémentaires..."
                 className="w-full p-2 border rounded-md resize-none"
                 rows={3}
@@ -214,4 +183,3 @@ export function CreateMouvementDialog({ isOpen, onClose, onSubmit }: CreateMouve
     </div>
   );
 }
-

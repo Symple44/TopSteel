@@ -1,7 +1,9 @@
 // apps/web/src/components/production/production-table.tsx
 "use client";
 
-import { Badge } from "@/components/ui/badge";`nimport { Button } from "@/components/ui/button";`nimport { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, Edit, Play, Pause, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 
 interface ProductionTableProps {
@@ -55,102 +57,42 @@ const PrioriteBadge = ({ priorite }: { priorite: string }) => {
   const { label, className } = config[priorite as keyof typeof config] || config.NORMALE;
 
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${className}`}>
+    <span className={`px-2 py-1 rounded text-xs font-medium ${className}`}>
       {label}
     </span>
   );
 };
 
 export function ProductionTable({ ordres, onView, onEdit, onStatusChange }: ProductionTableProps) {
-  if (ordres.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <p className="text-muted-foreground">Aucun ordre de fabrication trouvé</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Ordres de fabrication ({ordres.length})</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left p-2">Numéro</th>
-                <th className="text-left p-2">Description</th>
-                <th className="text-left p-2">Statut</th>
-                <th className="text-left p-2">Priorité</th>
-                <th className="text-left p-2">Avancement</th>
-                <th className="text-left p-2">Date fin prévue</th>
-                <th className="text-left p-2">Responsable</th>
-                <th className="text-left p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ordres.map((ordre) => (
-                <tr key={ordre.id} className="border-b hover:bg-gray-50">
-                  <td className="p-2 font-medium">{ordre.numero}</td>
-                  <td className="p-2">
-                    <div>
-                      <div className="font-medium">{ordre.description || 'Sans description'}</div>
-                      {ordre.projet && (
-                        <div className="text-sm text-muted-foreground">{ordre.projet}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-2">
-                    <StatusBadge statut={ordre.statut} />
-                  </td>
-                  <td className="p-2">
-                    <PrioriteBadge priorite={ordre.priorite} />
-                  </td>
-                  <td className="p-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                          style={{ width: `${ordre.avancement}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium">{ordre.avancement}%</span>
-                    </div>
-                  </td>
-                  <td className="p-2">
-                    {ordre.dateFinPrevue ? new Date(ordre.dateFinPrevue).toLocaleDateString() : '-'}
-                  </td>
-                  <td className="p-2">{ordre.responsable || 'Non assigné'}</td>
-                  <td className="p-2">
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onView(ordre.id)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEdit(ordre.id)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      {ordres.map((ordre) => (
+        <Card key={ordre.id} className="hover:shadow-md transition-shadow">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div>
+                  <h3 className="font-medium">{ordre.numero}</h3>
+                  <p className="text-sm text-muted-foreground">{ordre.description}</p>
+                </div>
+                <StatusBadge statut={ordre.statut} />
+                <PrioriteBadge priorite={ordre.priorite} />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => onView(ordre.id)}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Voir
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => onEdit(ordre.id)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Modifier
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 }
