@@ -1,4 +1,3 @@
-// apps/api/src/common/cache/redis-optimized.service.ts
 import { Injectable, Logger } from '@nestjs/common'
 import { Redis } from 'ioredis'
 
@@ -13,7 +12,9 @@ export class OptimizedCacheService {
       port: parseInt(process.env.REDIS_PORT || '6379'),
       retryDelayOnFailover: 100,
       maxRetriesPerRequest: 3,
-      lazyConnect: true
+      lazyConnect: true,
+      connectTimeout: 10000,
+      commandTimeout: 5000
     })
   }
   

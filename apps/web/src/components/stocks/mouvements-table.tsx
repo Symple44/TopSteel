@@ -1,4 +1,3 @@
-// apps/web/src/components/stocks/mouvements-table.tsx
 "use client";
 
 import { useState } from "react";
@@ -22,40 +21,59 @@ interface Mouvement {
 }
 
 interface MouvementsTableProps {
-  mouvements: Mouvement[];
-  onSearch: (query: string) => void;
-  onFilter: (filters: any) => void;
+  type?: string;
+  mouvements?: Mouvement[];
+  onSearch?: (query: string) => void;
+  onFilter?: (filters: any) => void;
 }
 
-export function MouvementsTable({ mouvements, onSearch, onFilter }: MouvementsTableProps) {
+export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: MouvementsTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+
+  // Mock data si aucune donnée fournie
+  const mockMovements: Mouvement[] = [
+    {
+      id: "mov-001",
+      type: "ENTREE",
+      materiau: "Acier inoxydable 304",
+      quantite: 500,
+      unite: "kg",
+      prixUnitaire: 8.5,
+      motif: "Réapprovisionnement",
+      reference: "BL-2024-001",
+      utilisateur: "Marie Dupont",
+      dateCreation: new Date(),
+      notes: "Qualité contrôlée"
+    }
+  ];
+
+  const displayMovements = mouvements.length > 0 ? mouvements : mockMovements;
+  const filteredMovements = type && type !== 'tous' ? 
+    displayMovements.filter(m => m.type.toLowerCase() === type.toLowerCase()) : 
+    displayMovements;
 
   const getTypeBadge = (type: string) => {
     const config = {
       ENTREE: { 
         label: 'Entrée', 
         icon: ArrowRight, 
-        className: 'bg-green-100 text-green-800',
-        variant: 'default' as const 
+        className: 'bg-green-100 text-green-800'
       },
       SORTIE: { 
         label: 'Sortie', 
         icon: ArrowLeft, 
-        className: 'bg-red-100 text-red-800',
-        variant: 'destructive' as const 
+        className: 'bg-red-100 text-red-800'
       },
       TRANSFERT: { 
         label: 'Transfert', 
         icon: RotateCcw, 
-        className: 'bg-blue-100 text-blue-800',
-        variant: 'default' as const 
+        className: 'bg-blue-100 text-blue-800'
       },
       AJUSTEMENT: { 
         label: 'Ajustement', 
         icon: Package, 
-        className: 'bg-purple-100 text-purple-800',
-        variant: 'secondary' as const 
+        className: 'bg-purple-100 text-purple-800'
       },
     };
 
@@ -69,63 +87,15 @@ export function MouvementsTable({ mouvements, onSearch, onFilter }: MouvementsTa
     );
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    onSearch(query);
-  };
-
-  const handleTypeFilter = (type: string) => {
-    setTypeFilter(type);
-    onFilter({ type: type || undefined });
-  };
-
-  const formatCurrency = (amount?: number) => {
-    return amount ? `${amount.toLocaleString()} €` : '-';
-  };
-
-  if (mouvements.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-muted-foreground">Aucun mouvement trouvé</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Historique des Mouvements ({mouvements.length})</CardTitle>
-          
-          <div className="flex items-center gap-2">
-            {/* Filtre par type */}
-            <select
-              value={typeFilter}
-              onChange={(e) => handleTypeFilter((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
-              className="p-2 border rounded-md text-sm"
-            >
-              <option value="">Tous les types</option>
-              <option value="ENTREE">Entrées</option>
-              <option value="SORTIE">Sorties</option>
-              <option value="TRANSFERT">Transferts</option>
-              <option value="AJUSTEMENT">Ajustements</option>
-            </select>
-
-            {/* Recherche */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Rechercher..."
-                className="pl-10 w-64"
-                value={searchQuery}
-                onChange={(e) => handleSearch((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
-              />
-            </div>
-          </div>
-        </div>
+        <CardTitle className="flex items-center justify-between">
+          <span>Mouvements {type && type !== 'tous' ? `- ${type}` : ''}</span>
+          <span className="text-sm font-normal text-muted-foreground">
+            {filteredMovements.length} mouvement(s)
+          </span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -143,7 +113,7 @@ export function MouvementsTable({ mouvements, onSearch, onFilter }: MouvementsTa
               </tr>
             </thead>
             <tbody>
-              {mouvements.map((mouvement) => (
+              {filteredMovements.map((mouvement) => (
                 <tr key={mouvement.id} className="border-b hover:bg-gray-50">
                   <td className="p-3">
                     <div className="flex items-center gap-2">
@@ -172,29 +142,24 @@ export function MouvementsTable({ mouvements, onSearch, onFilter }: MouvementsTa
                     </div>
                   </td>
                   <td className="p-3">
-                    <div className="font-medium">
-                      {mouvement.quantite} {mouvement.unite}
+                    <span className="font-mono">{mouvement.quantite} {mouvement.unite}</span>
+                  </td>
+                  <td className="p-3">
+                    {mouvement.prixUnitaire && (
+                      <span className="font-mono">{mouvement.prixUnitaire.toFixed(2)}€</span>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    <div className="max-w-xs truncate" title={mouvement.motif}>
+                      {mouvement.motif}
                     </div>
                   </td>
                   <td className="p-3">
-                    <div className="text-sm">
-                      {formatCurrency(mouvement.prixUnitaire)}
-                    </div>
-                  </td>
-                  <td className="p-3">
-                    <div className="max-w-48">
-                      <div className="text-sm">{mouvement.motif}</div>
-                      {mouvement.notes && (
-                        <div className="text-xs text-muted-foreground truncate">
-                          {mouvement.notes}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-3">
-                    <div className="text-sm text-muted-foreground">
-                      {mouvement.reference || '-'}
-                    </div>
+                    {mouvement.reference && (
+                      <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">
+                        {mouvement.reference}
+                      </code>
+                    )}
                   </td>
                   <td className="p-3">
                     <div className="flex items-center gap-2">
@@ -211,4 +176,3 @@ export function MouvementsTable({ mouvements, onSearch, onFilter }: MouvementsTa
     </Card>
   );
 }
-

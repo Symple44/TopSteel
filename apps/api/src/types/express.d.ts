@@ -1,17 +1,17 @@
-// Types Express explicites pour éviter les erreurs d'inférence
-import { Application, Request, Response, NextFunction } from "express";
+import { Request } from 'express'
 
 declare global {
   namespace Express {
-    interface Application {
-      // Extensions personnalisées si nécessaire
-    }
-
     interface Request {
-      user?: unknown;
-      // Autres extensions
+      startTime?: number
+      requestId?: string
+      user?: {
+        id: string
+        email: string
+        role: string
+      }
     }
   }
 }
 
-export { Application, Request, Response, NextFunction };
+export {}

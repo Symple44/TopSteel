@@ -22,7 +22,7 @@ export abstract class BaseRepository<T extends ObjectLiteral> implements IBaseRe
   }
 
   async findById(id: string | number): Promise<T | null> {
-    const where = { id } as FindOptionsWhere<T>
+    const where: FindOptionsWhere<T> = { id } as unknown as FindOptionsWhere<T>
     return this.repository.findOne({ where })
   }
 
@@ -63,3 +63,4 @@ export abstract class BaseRepository<T extends ObjectLiteral> implements IBaseRe
     return this.repository
   }
 }
+

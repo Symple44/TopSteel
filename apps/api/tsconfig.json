@@ -27,13 +27,27 @@
     "resolveJsonModule": true,
     "allowJs": false,
     "paths": {
-      "@/*": ["src/*"],
-      "@erp/types": ["../../packages/types/src"],
-      "@erp/types/*": ["../../packages/types/src/*"],
-      "@erp/utils": ["../../packages/utils/src"],
-      "@erp/utils/*": ["../../packages/utils/src/*"],
-      "@erp/config": ["../../packages/config/src"],
-      "@erp/config/*": ["../../packages/config/src/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@erp/types": [
+        "../../packages/types/src"
+      ],
+      "@erp/types/*": [
+        "../../packages/types/src/*"
+      ],
+      "@erp/utils": [
+        "../../packages/utils/src"
+      ],
+      "@erp/utils/*": [
+        "../../packages/utils/src/*"
+      ],
+      "@erp/config": [
+        "../../packages/config/src"
+      ],
+      "@erp/config/*": [
+        "../../packages/config/src/*"
+      ]
     },
     "typeRoots": [
       "node_modules/@types",
@@ -64,7 +78,9 @@
     "**/*.test.ts"
   ],
   "ts-node": {
-    "require": ["tsconfig-paths/register"],
+    "require": [
+      "tsconfig-paths/register"
+    ],
     "transpileOnly": true,
     "files": true
   }

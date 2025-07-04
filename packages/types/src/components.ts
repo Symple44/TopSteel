@@ -19,8 +19,27 @@ export interface MouvementsChartProps {
 }
 
 export interface MouvementsTableProps {
-  readonly data: MouvementStats[];
-  readonly type?: string; // Ajout de la propriété manquante
+  readonly mouvements?: Mouvement[];
+  readonly data?: MouvementStats[];
+  readonly type?: string;
+  readonly onSearch?: (query: string) => void;
+  readonly onFilter?: (filters: any) => void;
+}
+
+export interface Mouvement {
+  readonly id: string;
+  readonly type: 'ENTREE' | 'SORTIE' | 'TRANSFERT' | 'AJUSTEMENT';
+  readonly materiau: string;
+  readonly quantite: number;
+  readonly unite: string;
+  readonly prixUnitaire?: number;
+  readonly motif: string;
+  readonly reference?: string;
+  readonly emplacementSource?: string;
+  readonly emplacementDestination?: string;
+  readonly utilisateur: string;
+  readonly dateCreation: Date;
+  readonly notes?: string;
 }
 
 export interface CreateMouvementDialogProps extends BaseComponentProps {
@@ -36,3 +55,5 @@ export interface CreateFactureDialogProps extends BaseComponentProps {
 export interface SelectProps extends BaseComponentProps {
   readonly required?: boolean;
 }
+
+

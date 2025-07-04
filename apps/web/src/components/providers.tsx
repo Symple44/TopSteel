@@ -22,10 +22,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         attribute="class"
         defaultTheme="light"
         enableSystem
-        disableTransitionOnChange
-      >
+        disableTransitionOnChange>
         {children}
-        <ReactQueryDevtools initialIsOpen={false} />
+        <ReactQueryDevtools initialIsOpen={false}/>
       </ThemeProvider>
     </QueryClientProvider>
   )

@@ -45,3 +45,4 @@ export interface IBaseEntity {
 export interface ILegacyEntity extends IBaseEntity {
   legacyId?: number; // Pour compatibilité descendante
 }
+

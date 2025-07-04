@@ -3,7 +3,7 @@
 
 import { Toaster } from '@/components/ui/toaster'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { DevToolsWrapper } from '@/components/devtools-wrapper'
 import { ThemeProvider } from 'next-themes'
 import { useState } from 'react'
 
@@ -22,7 +22,7 @@ export function Providers({ children }: ProvidersProps) {
             gcTime: 1000 * 60 * 30, // 30 minutes (remplace cacheTime)
             retry: (failureCount, error) => {
               // Ne pas retry sur les erreurs 4xx
-              if ((error as any)?.response?.status >= 400 && (error as any)?.response?.status < 500) {
+              if ((error as any)?.response?.status>= 400 && (error as any)?.response?.status < 500) {
                 return false
               }
               return failureCount < 3
@@ -44,21 +44,18 @@ export function Providers({ children }: ProvidersProps) {
         defaultTheme="light"
         enableSystem={false}
         storageKey="topsteel-theme"
-        disableTransitionOnChange
-      >
+        disableTransitionOnChange>
         {children}
         
         {/* Toast notifications */}
-        <Toaster />
+        <Toaster/>
         
         {/* React Query DevTools (développement seulement) */}
         {process.env.NODE_ENV === 'development' && (
-          <ReactQueryDevtools 
-            initialIsOpen={false}
-            position="bottom-right"
-          />
+          <DevToolsWrapper />
         )}
       </ThemeProvider>
     </QueryClientProvider>
   )
 }
+

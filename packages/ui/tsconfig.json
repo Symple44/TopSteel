@@ -1,49 +1,19 @@
 {
-  "extends": "../config/typescript/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "declaration": true,
-    "declarationMap": false,
-    "sourceMap": false,
-    "composite": false,
-    "incremental": false,
-    
-    // Module resolution moderne pour Vite
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    
-    // React
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    
-    // Type checking optimal pour Vite
-    "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "exactOptionalPropertyTypes": false,
-    
-    // Résolution des chemins
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    
-    // Performance et compatibilité Vite
+    "lib": ["dom", "dom.iterable", "es6"],
+    "allowJs": true,
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noEmit": true,
     "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "verbatimModuleSyntax": false,
-    
-    // Support des imports Vite
-    "allowImportingTsExtensions": false,
-    "moduleDetection": "force"
+    "jsx": "react-jsx",
+    "declaration": true,
+    "outDir": "dist"
   },
   "include": [
     "src/**/*"
@@ -51,8 +21,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.*",
-    "**/*.spec.*",
-    "**/*.stories.*"
+    "tsup.config.ts"
   ]
 }

@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Download, Plus, TrendingDown, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 
+type Period = 'week' | 'month' | 'quarter'
+
     const mockChartData: MouvementStats[] = [
   {
     date: '2024-01-01',
@@ -52,8 +54,8 @@ import { useState } from 'react'
     metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
   }
 ];
-  const [period, setPeriod] = useState('month');
-  const handlePeriodChange = (newPeriod: string) => setPeriod(newPeriod);
+  const [period, setPeriod] = useState<Period>('month');
+  const handlePeriodChange = (newPeriod: Period) => setPeriod(newPeriod);
 
 export default function MouvementsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -151,6 +153,8 @@ export default function MouvementsPage() {
     </div>
   )
 }
+
+
 
 
 

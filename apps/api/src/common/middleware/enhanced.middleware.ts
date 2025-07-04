@@ -1,22 +1,23 @@
-// apps/api/src/common/middleware/enhanced.middleware.ts
 import { Injectable, NestMiddleware } from '@nestjs/common'
 import { Request, Response, NextFunction } from 'express'
 import { performance } from 'perf_hooks'
 
+interface ExtendedRequest extends Request {
+  startTime?: number
+  requestId?: string
+}
+
 @Injectable()
 export class EnhancedMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
+  use(req: ExtendedRequest, res: Response, next: NextFunction) {
     const start = performance.now()
     
-    // Logging amélioré
-    req['startTime'] = start
-    req['requestId'] = this.generateRequestId()
+    req.startTime = start
+    req.requestId = this.generateRequestId()
     
-    // Headers sécurité
-    res.setHeader('X-Request-ID', req['requestId'])
+    res.setHeader('X-Request-ID', req.requestId)
     res.setHeader('X-Response-Time', '0ms')
     
-    // Cleanup response
     res.on('finish', () => {
       const duration = performance.now() - start
       res.setHeader('X-Response-Time', `${duration.toFixed(2)}ms`)
