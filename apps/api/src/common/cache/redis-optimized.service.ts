@@ -1,0 +1,48 @@
+// apps/api/src/common/cache/redis-optimized.service.ts
+import { Injectable, Logger } from '@nestjs/common'
+import { Redis } from 'ioredis'
+
+@Injectable()
+export class OptimizedCacheService {
+  private readonly logger = new Logger(OptimizedCacheService.name)
+  private redis: Redis
+  
+  constructor() {
+    this.redis = new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      retryDelayOnFailover: 100,
+      maxRetriesPerRequest: 3,
+      lazyConnect: true
+    })
+  }
+  
+  async get<T>(key: string): Promise<T | null> {
+    try {
+      const value = await this.redis.get(key)
+      return value ? JSON.parse(value) : null
+    } catch (error) {
+      this.logger.error(`Cache GET error for key ${key}:`, error)
+      return null
+    }
+  }
+  
+  async set(key: string, value: any, ttl = 3600): Promise<void> {
+    try {
+      await this.redis.setex(key, ttl, JSON.stringify(value))
+    } catch (error) {
+      this.logger.error(`Cache SET error for key ${key}:`, error)
+    }
+  }
+  
+  async invalidatePattern(pattern: string): Promise<void> {
+    try {
+      const keys = await this.redis.keys(pattern)
+      if (keys.length > 0) {
+        await this.redis.del(...keys)
+      }
+    } catch (error) {
+      this.logger.error(`Cache invalidation error for pattern ${pattern}:`, error)
+    }
+  }
+}
