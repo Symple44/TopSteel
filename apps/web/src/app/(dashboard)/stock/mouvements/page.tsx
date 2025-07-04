@@ -1,4 +1,3 @@
-import type { MouvementStats } from '@/types/stock'
 'use client'
 
 import { CreateMouvementDialog } from '@/components/stocks/create-mouvement-dialog'
@@ -8,11 +7,27 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Download, Plus, TrendingDown, TrendingUp } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 type Period = 'week' | 'month' | 'quarter'
 
-    const mockChartData: MouvementStats[] = [
+interface MouvementStats {
+  date: string
+  name: string
+  entrees: number
+  sorties: number
+  transferts: number
+  valeurEntrees: number
+  valeurSorties: number
+  metadata: { 
+    source: string
+    version: string
+    generatedAt: string 
+  }
+}
+
+// ✅ Données mockées déplacées dans le composant ou constante globale
+const MOCK_CHART_DATA: MouvementStats[] = [
   {
     date: '2024-01-01',
     name: 'Janvier 2024',
@@ -53,13 +68,47 @@ type Period = 'week' | 'month' | 'quarter'
     valeurSorties: 43200,
     metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
   }
-];
-  const [period, setPeriod] = useState<Period>('month');
-  const handlePeriodChange = (newPeriod: Period) => setPeriod(newPeriod);
+]
 
 export default function MouvementsPage() {
+  // ✅ Tous les hooks dans le composant, ordre cohérent
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [activeTab, setActiveTab] = useState('tous')
+  const [period, setPeriod] = useState<Period>('month')
+
+  // ✅ Handlers optimisés avec useCallback
+  const handlePeriodChange = useCallback((newPeriod: Period) => {
+    setPeriod(newPeriod)
+  }, [])
+
+  const handleShowCreateModal = useCallback(() => {
+    setShowCreateModal(true)
+  }, [])
+
+  const handleCloseCreateModal = useCallback(() => {
+    setShowCreateModal(false)
+  }, [])
+
+  const handleOpenChangeCreateModal = useCallback((open: boolean) => {
+    setShowCreateModal(open)
+  }, [])
+
+  const handleTabChange = useCallback((tab: string) => {
+    setActiveTab(tab)
+  }, [])
+
+  // ✅ Données calculées avec useMemo
+  const stats = useMemo(() => {
+    const todayEntrees = 8450
+    const todaySorties = 6230
+    const todayMovements = 12
+    const todayExits = 8
+
+    return {
+      entrees: { amount: todayEntrees, count: todayMovements },
+      sorties: { amount: todaySorties, count: todayExits }
+    }
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -76,7 +125,7 @@ export default function MouvementsPage() {
             <Download className="h-4 w-4 mr-2" />
             Exporter
           </Button>
-          <Button onClick={() => setShowCreateModal(true)}>
+          <Button onClick={handleShowCreateModal}>
             <Plus className="h-4 w-4 mr-2" />
             Nouveau mouvement
           </Button>
@@ -93,10 +142,15 @@ export default function MouvementsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">€8,450</div>
-            <p className="text-xs text-muted-foreground">12 mouvements</p>
+            <div className="text-2xl font-bold text-green-600">
+              €{stats.entrees.amount.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.entrees.count} mouvements
+            </p>
           </CardContent>
         </Card>
+        
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -105,57 +159,103 @@ export default function MouvementsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">€5,320</div>
-            <p className="text-xs text-muted-foreground">8 mouvements</p>
+            <div className="text-2xl font-bold text-red-600">
+              €{stats.sorties.amount.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.sorties.count} mouvements
+            </p>
           </CardContent>
         </Card>
+        
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Solde net</CardTitle>
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-blue-600" />
+              Balance
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">+€3,130</div>
-            <p className="text-xs text-muted-foreground">Variation du jour</p>
+            <div className="text-2xl font-bold text-blue-600">
+              €{(stats.entrees.amount - stats.sorties.amount).toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">Solde journalier</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Graphique d'évolution */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Évolution des mouvements</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MouvementsChart data={mockChartData} period={period} onPeriodChange={handlePeriodChange} />
-        </CardContent>
-      </Card>
-
-      {/* Onglets par type de mouvement */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      {/* Graphiques et données */}
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList>
-          <TabsTrigger value="tous">Tous</TabsTrigger>
+          <TabsTrigger value="tous">Tous les mouvements</TabsTrigger>
           <TabsTrigger value="entrees">Entrées</TabsTrigger>
           <TabsTrigger value="sorties">Sorties</TabsTrigger>
           <TabsTrigger value="transferts">Transferts</TabsTrigger>
-          <TabsTrigger value="ajustements">Ajustements</TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab} className="mt-6">
-          <MouvementsTable type={activeTab} />
+        <TabsContent value="tous" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Évolution des mouvements</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MouvementsChart 
+                data={MOCK_CHART_DATA}
+                period={period}
+                onPeriodChange={handlePeriodChange}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Historique des mouvements</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MouvementsTable />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="entrees">
+          <Card>
+            <CardHeader>
+              <CardTitle>Entrées de stock</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MouvementsTable type="entrees" />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sorties">
+          <Card>
+            <CardHeader>
+              <CardTitle>Sorties de stock</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MouvementsTable type="sorties" />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="transferts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Transferts internes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MouvementsTable type="transferts" />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 
-      {/* Modal création */}
-      <CreateMouvementDialog 
-        open={showCreateModal} 
-        onOpenChange={setShowCreateModal} 
+      {/* Modales */}
+      <CreateMouvementDialog
+        open={showCreateModal}
+        onOpenChange={handleOpenChangeCreateModal}
       />
     </div>
   )
 }
-
-
-
-
-
-

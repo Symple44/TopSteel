@@ -1,9 +1,8 @@
 'use client'
 
-import { useTheme } from '@/components/providers/theme-provider'
-import { Monitor, Moon, Sun } from 'lucide-react'
-import { useState, useEffect, useCallback } from 'react'
 import { cn } from '@/lib/utils'
+import { Monitor, Moon, Sun } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface ThemeSwitcherProps {
   variant?: 'icon' | 'dropdown' | 'toggle'
@@ -12,57 +11,94 @@ interface ThemeSwitcherProps {
   className?: string
 }
 
+// Hook pour gérer le thème de manière sécurisée
+function useThemeContext() {
+  const [themeState, setThemeState] = useState({
+    theme: 'system' as 'light' | 'dark' | 'system',
+    resolvedTheme: 'light' as 'light' | 'dark',
+    isHydrated: false,
+    error: null as string | null
+  })
+
+  useEffect(() => {
+    // Détection du thème système
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const systemTheme = mediaQuery.matches ? 'dark' : 'light'
+    
+    // Lecture du thème stocké
+    const storedTheme = localStorage.getItem('topsteel-theme') as 'light' | 'dark' | 'system' || 'system'
+    
+    const resolvedTheme = storedTheme === 'system' ? systemTheme : storedTheme
+    
+    setThemeState({
+      theme: storedTheme,
+      resolvedTheme,
+      isHydrated: true,
+      error: null
+    })
+
+    // Appliquer le thème au DOM
+    document.documentElement.classList.remove('light', 'dark')
+    document.documentElement.classList.add(resolvedTheme)
+
+    // Écouter les changements système
+    const handleSystemChange = (e: MediaQueryListEvent) => {
+      if (storedTheme === 'system') {
+        const newSystemTheme = e.matches ? 'dark' : 'light'
+        document.documentElement.classList.remove('light', 'dark')
+        document.documentElement.classList.add(newSystemTheme)
+        setThemeState(prev => ({ ...prev, resolvedTheme: newSystemTheme }))
+      }
+    }
+
+    mediaQuery.addEventListener('change', handleSystemChange)
+    return () => mediaQuery.removeEventListener('change', handleSystemChange)
+  }, [])
+
+  const setTheme = useCallback((newTheme: 'light' | 'dark' | 'system') => {
+    try {
+      localStorage.setItem('topsteel-theme', newTheme)
+      
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      const resolvedTheme = newTheme === 'system' ? systemTheme : newTheme
+      
+      document.documentElement.classList.remove('light', 'dark')
+      document.documentElement.classList.add(resolvedTheme)
+      
+      setThemeState(prev => ({
+        ...prev,
+        theme: newTheme,
+        resolvedTheme,
+        error: null
+      }))
+    } catch (error) {
+      setThemeState(prev => ({
+        ...prev,
+        error: 'Erreur lors du changement de thème'
+      }))
+    }
+  }, [])
+
+  return { ...themeState, setTheme }
+}
+
 export function ThemeSwitcher({ 
   variant = 'icon',
   size = 'md', 
   showLabel = false,
   className 
 }: ThemeSwitcherProps) {
+  // ✅ HOOK TOUJOURS APPELÉ EN PREMIER
+  const { theme, resolvedTheme, isHydrated, error, setTheme } = useThemeContext()
+  
+  // ✅ TOUS LES AUTRES HOOKS APRÈS
   const [mounted, setMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  let themeContext
-  try {
-    themeContext = useTheme()
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'Theme context error')
-    themeContext = null
-  }
-
-  if (!mounted || !themeContext || error) {
-    return (
-      <button 
-        disabled
-        className={cn(
-          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-colors",
-          "hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed",
-          getSizeClasses(size),
-          className
-        )}
-        title={error || "Chargement du thème..."}
-      >
-        <Monitor className={getIconSizeClasses(size)} />
-        {showLabel && <span className="ml-2 text-sm">Thème</span>}
-      </button>
-    )
-  }
-
-  const { theme, setTheme, resolvedTheme, isHydrated } = themeContext
-
+  // ✅ useCallback TOUJOURS APPELÉS
   const handleThemeChange = useCallback((newTheme: 'light' | 'dark' | 'system') => {
-    try {
-      setTheme(newTheme)
-      setIsOpen(false)
-      setError(null)
-    } catch (err) {
-      setError('Erreur lors du changement de thème')
-      console.error('Theme change failed:', err)
-    }
+    setTheme(newTheme)
+    setIsOpen(false)
   }, [setTheme])
 
   const toggleDropdown = useCallback(() => {
@@ -70,7 +106,9 @@ export function ThemeSwitcher({
   }, [])
 
   const getThemeIcon = useCallback(() => {
-    if (!isHydrated) return <Monitor className={getIconSizeClasses(size)} />
+    if (!isHydrated || !mounted) {
+      return <Monitor className={getIconSizeClasses(size)} />
+    }
     
     switch (resolvedTheme) {
       case 'dark': 
@@ -80,12 +118,59 @@ export function ThemeSwitcher({
       default: 
         return <Monitor className={getIconSizeClasses(size)} />
     }
-  }, [resolvedTheme, isHydrated, size])
+  }, [resolvedTheme, isHydrated, mounted, size])
+
+  const handleToggleTheme = useCallback(() => {
+    const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
+    handleThemeChange(newTheme)
+  }, [resolvedTheme, handleThemeChange])
+
+  // ✅ useEffect APRÈS tous les hooks
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // ✅ RENDU CONDITIONNEL BASÉ SUR L'ÉTAT, PAS LES HOOKS
+  if (!mounted || !isHydrated) {
+    return (
+      <button 
+        disabled
+        className={cn(
+          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-colors",
+          "hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed",
+          getSizeClasses(size),
+          className
+        )}
+        title="Chargement du thème..."
+      >
+        <Monitor className={getIconSizeClasses(size)} />
+        {showLabel && <span className="ml-2 text-sm">Thème</span>}
+      </button>
+    )
+  }
+
+  if (error) {
+    return (
+      <button 
+        disabled
+        className={cn(
+          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-colors",
+          "hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed",
+          getSizeClasses(size),
+          className
+        )}
+        title={error}
+      >
+        <Monitor className={getIconSizeClasses(size)} />
+        {showLabel && <span className="ml-2 text-sm">Erreur</span>}
+      </button>
+    )
+  }
 
   if (variant === 'toggle') {
     return (
       <button
-        onClick={() => handleThemeChange(resolvedTheme === 'dark' ? 'light' : 'dark')}
+        onClick={handleToggleTheme}
         className={cn(
           "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-all duration-200",
           "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",

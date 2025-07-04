@@ -1,9 +1,32 @@
-// apps/web/src/stores/index.ts - EXPORTS SIMPLIFIES
-export { useAuth, useCurrentUser, useIsAuthenticated } from '@/hooks/use-auth'
-export { useProjets, useProjet } from '@/hooks/use-projets'
-export { useUI, useToasts, useSidebar } from '@/hooks/use-ui'
+/**
+ * 📦 EXPORTS CENTRALISÉS DES STORES - TopSteel ERP
+ */
 
-// Mock exports pour compatibilité
-export const useAuthStore = () => ({ user: null })
-export const useProjetStore = () => ({ projets: [] })
-export const useUIStore = () => ({ dataView: 'table' })
+// ===== STORES ZUSTAND =====
+export { useAppStore } from './app.store'
+
+// ===== HOOKS D'AUTHENTIFICATION =====
+export {
+    useAuth,
+    useCurrentUser,
+    useIsAuthenticated
+} from '@/hooks/use-auth'
+
+// ===== HOOKS UI =====
+export {
+    useSidebar, useToasts,
+    useUI
+} from '@/hooks/use-ui'
+
+// ===== SELECTORS OPTIMISÉS =====
+export {
+    useActiveProjectsCount, useNotifications, useProjectFilters, useProjectsCount, useTheme, useUISettings, useUser, useUserPermissions
+} from './selectors/app.selectors'
+
+// ===== TYPES =====
+export type {
+    AppStore, FilterState, MetricsState, NotificationState, UIState
+} from './app.store'
+
+// ===== UTILITIES =====
+export { StoreMonitor } from '@/lib/store-utils'

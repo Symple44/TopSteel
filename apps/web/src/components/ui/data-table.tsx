@@ -1,6 +1,5 @@
 'use client'
 
-import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -18,6 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { ChevronDown, Search } from 'lucide-react'
+import * as React from 'react'
 
 interface Column {
   key: string
@@ -124,7 +124,7 @@ export function DataTable({
               <Input
                 placeholder="Rechercher..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-8"
               />
             </div>

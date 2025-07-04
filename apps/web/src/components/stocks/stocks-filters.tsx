@@ -5,8 +5,22 @@ import { Input } from '@/components/ui/input'
 import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
-export function StocksFilters() {
-  const [filters, setFilters] = useState({
+interface StocksFiltersProps {
+  onFiltersChange?: (filters: StocksFilters) => void
+  onReset?: () => void
+}
+
+interface StocksFilters {
+  categorie: string
+  emplacement: string
+  fournisseur: string
+  stockMin: string
+  stockMax: string
+  statut: string
+}
+
+export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps = {}) {
+  const [filters, setFilters] = useState<StocksFilters>({
     categorie: '',
     emplacement: '',
     fournisseur: '',
@@ -15,15 +29,24 @@ export function StocksFilters() {
     statut: ''
   })
 
+  const handleFilterChange = (key: keyof StocksFilters, value: string) => {
+    const newFilters = { ...filters, [key]: value }
+    setFilters(newFilters)
+    onFiltersChange?.(newFilters)
+  }
+
   const handleReset = () => {
-    setFilters({
+    const resetFilters: StocksFilters = {
       categorie: '',
       emplacement: '',
       fournisseur: '',
       stockMin: '',
       stockMax: '',
       statut: ''
-    })
+    }
+    setFilters(resetFilters)
+    onFiltersChange?.(resetFilters)
+    onReset?.()
   }
 
   return (
@@ -41,7 +64,7 @@ export function StocksFilters() {
           <label className="text-sm font-medium">Catégorie</label>
           <select
             value={filters.categorie}
-            onChange={(e) => setFilters({...filters, categorie: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+            onChange={(e) => handleFilterChange('categorie', (e.target as HTMLSelectElement).value)}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Toutes les catégories</option>
@@ -57,7 +80,7 @@ export function StocksFilters() {
           <label className="text-sm font-medium">Emplacement</label>
           <select
             value={filters.emplacement}
-            onChange={(e) => setFilters({...filters, emplacement: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+            onChange={(e) => handleFilterChange('emplacement', (e.target as HTMLSelectElement).value)}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les emplacements</option>
@@ -72,7 +95,7 @@ export function StocksFilters() {
           <label className="text-sm font-medium">Fournisseur</label>
           <select
             value={filters.fournisseur}
-            onChange={(e) => setFilters({...filters, fournisseur: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+            onChange={(e) => handleFilterChange('fournisseur', (e.target as HTMLSelectElement).value)}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les fournisseurs</option>
@@ -90,7 +113,7 @@ export function StocksFilters() {
           <Input
             type="number"
             value={filters.stockMin}
-            onChange={(e) => setFilters({...filters, stockMin: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+            onChange={(e) => handleFilterChange('stockMin', e.target.value)}
             placeholder="0"
           />
         </div>
@@ -100,7 +123,7 @@ export function StocksFilters() {
           <Input
             type="number"
             value={filters.stockMax}
-            onChange={(e) => setFilters({...filters, stockMax: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+            onChange={(e) => handleFilterChange('stockMax', e.target.value)}
             placeholder="1000"
           />
         </div>
@@ -109,7 +132,7 @@ export function StocksFilters() {
           <label className="text-sm font-medium">Statut</label>
           <select
             value={filters.statut}
-            onChange={(e) => setFilters({...filters, statut: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+            onChange={(e) => handleFilterChange('statut', (e.target as HTMLSelectElement).value)}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les statuts</option>
@@ -120,7 +143,14 @@ export function StocksFilters() {
           </select>
         </div>
       </div>
+
+      {/* Affichage du nombre de filtres actifs */}
+      <div className="text-sm text-muted-foreground">
+        {Object.values(filters).filter(Boolean).length > 0 
+          ? `${Object.values(filters).filter(Boolean).length} filtre(s) actif(s)` 
+          : 'Aucun filtre actif'
+        }
+      </div>
     </div>
   )
 }
-

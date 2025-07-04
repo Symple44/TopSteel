@@ -1,11 +1,11 @@
 // apps/web/src/components/production/production-filters.tsx
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Filter, RotateCcw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Filter, RotateCcw, Search } from "lucide-react";
+import { useState } from "react";
 
 interface ProductionFiltersProps {
   onFiltersChange?: (filters: ProductionFilters) => void; // Props optionnelles
@@ -65,7 +65,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <select
               className="w-full p-2 border rounded-md"
               value={filters.statut?.[0] || ''}
-              onChange={(e) => handleFilterChange('statut', (e.target as HTMLSelectElement).value ? [(e.target as HTMLSelectElement).value] : [])}
+              onChange={(e) => handleFilterChange('statut', e.target.value ? [e.target.value] : [])}
             >
               <option value="">Tous les statuts</option>
               <option value="EN_ATTENTE">En attente</option>

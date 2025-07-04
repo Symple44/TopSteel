@@ -1,9 +1,10 @@
 // apps/web/src/components/stocks/mouvements-chart.tsx
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Activity, BarChart3, TrendingDown, TrendingUp } from "lucide-react";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, Button } from "@erp/ui";
-import { BarChart3, TrendingUp, TrendingDown, Activity } from "lucide-react";
 
 interface MouvementStats {
   date: string;
@@ -38,6 +39,52 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
 
   return (
     <div className="space-y-6">
+      {/* Controls */}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2">
+          <Button
+            variant={activeTab === 'volume' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('volume')}
+          >
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Volume
+          </Button>
+          <Button
+            variant={activeTab === 'value' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('value')}
+          >
+            <Activity className="h-4 w-4 mr-2" />
+            Valeur
+          </Button>
+        </div>
+        
+        <div className="flex gap-2">
+          <Button
+            variant={period === 'week' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onPeriodChange('week')}
+          >
+            Semaine
+          </Button>
+          <Button
+            variant={period === 'month' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onPeriodChange('month')}
+          >
+            Mois
+          </Button>
+          <Button
+            variant={period === 'quarter' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onPeriodChange('quarter')}
+          >
+            Trimestre
+          </Button>
+        </div>
+      </div>
+
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -98,116 +145,90 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
                 <BarChart3 className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Rotation</p>
+                <p className="text-sm text-muted-foreground">Moyenne</p>
                 <p className="text-xl font-bold">
-                  {totalEntrees > 0 ? Math.round((totalSorties / totalEntrees) * 100) : 0}%
+                  {Math.round((totalEntrees + totalSorties) / data.length)}
                 </p>
-                <p className="text-xs text-purple-600">Taux moyen</p>
+                <p className="text-xs text-purple-600">
+                  par {period === 'week' ? 'semaine' : period === 'month' ? 'mois' : 'trimestre'}
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Graphique */}
+      {/* Chart Area */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Évolution des Mouvements
-            </CardTitle>
-            
-            <div className="flex items-center gap-2">
-              {/* Sélecteur type */}
-              <div className="flex border rounded-md">
-                <Button
-                  variant={activeTab === 'volume' ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setActiveTab('volume')}
-                  className="rounded-r-none"
-                >
-                  Volume
-                </Button>
-                <Button
-                  variant={activeTab === 'value' ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setActiveTab('value')}
-                  className="rounded-l-none"
-                >
-                  Valeur
-                </Button>
-              </div>
-
-              {/* Sélecteur période */}
-              <div className="flex border rounded-md">
-                {(['week', 'month', 'quarter'] as const).map((p) => (
-                  <Button
-                    key={p}
-                    variant={period === p ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => onPeriodChange(p)}
-                    className="rounded-none first:rounded-l-md last:rounded-r-md"
-                  >
-                    {p === 'week' ? 'Semaine' : p === 'month' ? 'Mois' : 'Trimestre'}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <CardTitle>
+            {activeTab === 'volume' ? 'Volume des mouvements' : 'Valeur des mouvements'}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-64 flex items-end justify-between gap-2 border-b border-l pl-12 pb-4">
-            {data.map((item, index) => {
-              const entreeHeight = activeTab === 'volume' 
-                ? getBarHeight(item.entrees, maxVolume)
-                : getBarHeight(item.valeurEntrees, maxValue);
-              
-              const sortieHeight = activeTab === 'volume'
-                ? getBarHeight(item.sorties, maxVolume) 
-                : getBarHeight(item.valeurSorties, maxValue);
-
-              return (
-                <div key={index} className="flex flex-col items-center gap-2 flex-1">
-                  {/* Barres */}
-                  <div className="flex items-end gap-1 h-52">
-                    <div
-                      className="bg-green-500 w-6 rounded-t transition-all duration-300 hover:bg-green-600"
-                      style={{ height: `${entreeHeight}px` }}
-                      title={`Entrées: ${activeTab === 'volume' ? item.entrees : item.valeurEntrees.toLocaleString() + ' €'}`}
-                    />
-                    <div
-                      className="bg-red-500 w-6 rounded-t transition-all duration-300 hover:bg-red-600"
-                      style={{ height: `${sortieHeight}px` }}
-                      title={`Sorties: ${activeTab === 'volume' ? item.sorties : item.valeurSorties.toLocaleString() + ' €'}`}
-                    />
-                  </div>
+          <div className="h-64">
+            {data.length > 0 ? (
+              <div className="flex items-end justify-between h-full gap-2">
+                {data.map((item, index) => {
+                  const maxVal = activeTab === 'volume' ? maxVolume : maxValue;
+                  const entreesVal = activeTab === 'volume' ? item.entrees : item.valeurEntrees;
+                  const sortiesVal = activeTab === 'volume' ? item.sorties : item.valeurSorties;
                   
-                  {/* Label date */}
-                  <div className="text-xs text-muted-foreground text-center">
-                    {new Date(item.date).toLocaleDateString('fr-FR', { 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}
-                  </div>
+                  return (
+                    <div key={index} className="flex flex-col items-center flex-1 max-w-20">
+                      <div className="flex items-end gap-1 mb-2 h-48">
+                        {/* Barre entrées */}
+                        <div
+                          className="bg-green-500 rounded-t"
+                          style={{ 
+                            height: `${getBarHeight(entreesVal, maxVal)}px`,
+                            width: '12px'
+                          }}
+                          title={`Entrées: ${entreesVal.toLocaleString()}`}
+                        />
+                        {/* Barre sorties */}
+                        <div
+                          className="bg-red-500 rounded-t"
+                          style={{ 
+                            height: `${getBarHeight(sortiesVal, maxVal)}px`,
+                            width: '12px'
+                          }}
+                          title={`Sorties: ${sortiesVal.toLocaleString()}`}
+                        />
+                      </div>
+                      <div className="text-xs text-center text-muted-foreground">
+                        {new Date(item.date).toLocaleDateString('fr-FR', { 
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <div className="text-center">
+                  <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Aucune donnée à afficher</p>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Légende */}
-          <div className="flex items-center justify-center gap-6 mt-4">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-sm">Entrées</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-500 rounded"></div>
-              <span className="text-sm">Sorties</span>
-            </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Legend */}
+      <div className="flex items-center justify-center gap-6">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-green-500 rounded"></div>
+          <span className="text-sm text-muted-foreground">Entrées</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-red-500 rounded"></div>
+          <span className="text-sm text-muted-foreground">Sorties</span>
+        </div>
+      </div>
     </div>
   );
 }

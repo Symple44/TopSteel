@@ -1,20 +1,20 @@
 'use client'
 
 import {
-    Area,
-    AreaChart,
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Cell,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
 } from 'recharts'
 
 interface ChartData {
@@ -100,7 +100,11 @@ export function SimplePieChart({
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          label={({ name, percent }) => {
+            // ✅ CORRECTION: Vérifier si percent existe et fournir une valeur par défaut
+            const safePercent = percent ?? 0
+            return `${name || 'Inconnu'} ${(safePercent * 100).toFixed(0)}%`
+          }}
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
@@ -145,4 +149,57 @@ export function SimpleAreaChart({
       </AreaChart>
     </ResponsiveContainer>
   )
+}
+
+// ✅ TYPES POUR UNE MEILLEURE SÉCURITÉ
+interface PieLabelProps {
+  name?: string
+  percent?: number
+  value?: number
+}
+
+// ✅ FONCTION HELPER POUR LES LABELS DE PIE CHART
+export const formatPieLabel = ({ name, percent }: PieLabelProps): string => {
+  const safeName = name || 'Inconnu'
+  const safePercent = percent ?? 0
+  return `${safeName} ${(safePercent * 100).toFixed(0)}%`
+}
+
+// ✅ VERSION ALTERNATIVE DU PIE CHART AVEC HELPER
+export function SafePieChart({ 
+  data, 
+  colors = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6'],
+  height = 300 
+}: PieChartProps) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <PieChart>
+        <Pie
+          data={data}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={formatPieLabel}
+          outerRadius={80}
+          fill="#8884d8"
+          dataKey="value"
+        >
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+          ))}
+        </Pie>
+        <Tooltip 
+          formatter={(value: number, name: string) => [
+            `${value.toLocaleString()}`,
+            name || 'Valeur'
+          ]}
+        />
+      </PieChart>
+    </ResponsiveContainer>
+  )
+}
+
+// ✅ EXPORTS POUR COMPATIBILITÉ
+export {
+  SimpleAreaChart as AreaChart, SimpleBarChart as BarChart, SimpleLineChart as LineChart, SimplePieChart as PieChart
 }
