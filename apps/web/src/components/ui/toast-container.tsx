@@ -1,39 +1,58 @@
 'use client'
 
-import { useToasts } from '@/stores'
 import { cn } from '@/lib/utils'
-import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react'
+import { useUIStore } from '@/stores/ui.store'
+import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
 
-const toastIcons = {
+// Types basés sur le store UI
+interface Toast {
+  id: string
+  type: 'success' | 'error' | 'warning' | 'info'
+  title: string
+  message: string
+  timestamp: number
+}
+
+type ToastType = Toast['type']
+
+const toastIcons: Record<ToastType, React.ComponentType<{ className?: string }>> = {
   success: CheckCircle,
   error: AlertCircle,
   warning: AlertTriangle,
   info: Info,
 }
 
-const toastStyles = {
+const toastStyles: Record<ToastType, string> = {
   success: 'bg-green-50 border-green-200 text-green-800',
   error: 'bg-red-50 border-red-200 text-red-800',
   warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
   info: 'bg-blue-50 border-blue-200 text-blue-800',
 }
 
+// Guard pour vérifier si le type est valide
+const isValidToastType = (type: any): type is ToastType => {
+  return ['success', 'error', 'warning', 'info'].includes(type)
+}
+
 export function ToastContainer() {
-  const { toasts, removeToast } = useToasts()
+  const toasts = useUIStore(state => state.toasts)
+  const removeToast = useUIStore(state => state.removeToast)
 
   if (toasts.length === 0) return null
 
   return (
     <div className="fixed top-4 right-4 z-50 space-y-2">
       {toasts.map((toast) => {
-        const Icon = toastIcons[toast.type]
+        // Vérification type-safe avec fallback
+        const toastType: ToastType = isValidToastType(toast.type) ? toast.type : 'info'
+        const Icon = toastIcons[toastType]
         
         return (
           <div
             key={toast.id}
             className={cn(
               "flex items-start gap-3 rounded-lg border p-4 shadow-lg animate-in slide-in-from-top-2",
-              toastStyles[toast.type],
+              toastStyles[toastType],
               "max-w-md"
             )}
           >
@@ -49,6 +68,7 @@ export function ToastContainer() {
             <button
               onClick={() => removeToast(toast.id)}
               className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+              aria-label="Fermer le toast"
             >
               <X className="h-4 w-4" />
             </button>

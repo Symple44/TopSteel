@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils"
 import React from "react"
 
 interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -12,7 +13,11 @@ interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as any, { ...props, ref })
+      return React.cloneElement(children as any, { 
+        ...props, 
+        ref: (children as any).ref || ref,
+        className: cn((children as any).props?.className, className)
+      })
     }
     
     return (
@@ -36,3 +41,4 @@ export const AccordionDescription = Accordion
 export const AccordionFooter = Accordion
 export const AccordionSeparator = Accordion
 export const AccordionList = Accordion
+

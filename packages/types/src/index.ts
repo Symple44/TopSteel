@@ -10,8 +10,9 @@ export * from './user'
 export * from './admin'
 export * from './client'
 export * from './facturation'
+export * from './guards'
 export * from './notifications'
-export * from './production'  // Export global de production
+export * from './production'; // Export global de production
 export * from './projet'
 export * from './stocks'
 
@@ -34,8 +35,8 @@ export type Timestamp = Date
 export type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue }
 
 // === TYPES PRODUCTION ALIASES ===
-export { 
-  OrdreStatut as StatutProduction,
-  OrdrePriorite as PrioriteProduction 
+export * from './components'
+export {
+  OrdrePriorite as PrioriteProduction, OrdreStatut as StatutProduction
 } from './production'
-export * from './components';
+

@@ -1,7 +1,7 @@
 'use client'
 
-import * as React from 'react'
 import { cn } from '@/lib/utils'
+import * as React from 'react'
 
 // Dialog principal avec support open/onOpenChange
 interface DialogProps {
@@ -21,7 +21,7 @@ const Dialog = ({ children, open, onOpenChange }: DialogProps) => {
 
 Dialog.displayName = "Dialog"
 
-// DialogTrigger avec asChild support
+// DialogTrigger avec asChild support CORRIGÉ
 interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean
   children?: React.ReactNode
@@ -31,7 +31,13 @@ interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
   ({ className, children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children, { ...props, ref })
+      // Correction pour éviter l'erreur de ref avec cloneElement (TypeScript safe)
+      const childProps = (children as any).props || {}
+      return React.cloneElement(children as any, { 
+        ...props, 
+        ref: (children as any).ref || ref,
+        className: cn(childProps.className, className)
+      })
     }
     
     return (
@@ -158,11 +164,7 @@ const DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
 DialogFooter.displayName = "DialogFooter"
 
 export {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
+  Dialog, DialogContent, DialogDescription,
+  DialogFooter, DialogHeader,
+  DialogTitle, DialogTrigger
 }

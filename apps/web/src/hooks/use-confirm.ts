@@ -12,13 +12,14 @@ interface ConfirmOptions {
 interface ConfirmState {
   isOpen: boolean
   options: ConfirmOptions
-  resolve?: (value: boolean) => void
+  resolve: ((value: boolean) => void) | null // Correction: null au lieu de undefined
 }
 
 export function useConfirm() {
   const [state, setState] = useState<ConfirmState>({
     isOpen: false,
     options: {},
+    resolve: null, // Correction: null au lieu de undefined
   })
 
   const confirm = (options: ConfirmOptions = {}): Promise<boolean> => {
@@ -40,12 +41,30 @@ export function useConfirm() {
 
   const handleConfirm = () => {
     state.resolve?.(true)
-    setState(prev => ({ ...prev, isOpen: false, resolve: undefined }))
+    setState(prev => ({ 
+      ...prev, 
+      isOpen: false, 
+      resolve: null // Correction: null au lieu de undefined
+    }))
   }
 
   const handleCancel = () => {
     state.resolve?.(false)
-    setState(prev => ({ ...prev, isOpen: false, resolve: undefined }))
+    setState(prev => ({ 
+      ...prev, 
+      isOpen: false, 
+      resolve: null // Correction: null au lieu de undefined
+    }))
+  }
+
+  const handleClose = () => {
+    // Méthode alternative pour fermer sans décision
+    state.resolve?.(false)
+    setState(prev => ({ 
+      ...prev, 
+      isOpen: false, 
+      resolve: null 
+    }))
   }
 
   return {
@@ -54,5 +73,6 @@ export function useConfirm() {
     options: state.options,
     onConfirm: handleConfirm,
     onCancel: handleCancel,
+    onClose: handleClose,
   }
 }

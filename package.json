@@ -91,7 +91,8 @@
     "migration:create": "turbo migration:generate --filter=@erp/api"
   },
   "dependencies": {
-    "dotenv": "^17.0.1"
+    "dotenv": "^17.0.1",
+    "react-day-picker": "^9.7.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.7",

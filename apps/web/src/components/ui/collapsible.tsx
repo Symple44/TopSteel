@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils"
 import React from "react"
 
 interface CollapsibleProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -12,7 +13,11 @@ interface CollapsibleProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Collapsible = React.forwardRef<HTMLDivElement, CollapsibleProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as any, { ...props, ref })
+      return React.cloneElement(children as any, { 
+        ...props, 
+        ref: (children as any).ref || ref,
+        className: cn((children as any).props?.className, className)
+      })
     }
     
     return (
@@ -36,3 +41,4 @@ export const CollapsibleDescription = Collapsible
 export const CollapsibleFooter = Collapsible
 export const CollapsibleSeparator = Collapsible
 export const CollapsibleList = Collapsible
+

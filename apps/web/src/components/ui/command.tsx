@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils"
 import React from "react"
 
 interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -12,7 +13,11 @@ interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Command = React.forwardRef<HTMLDivElement, CommandProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as any, { ...props, ref })
+      return React.cloneElement(children as any, { 
+        ...props, 
+        ref: (children as any).ref || ref,
+        className: cn((children as any).props?.className, className)
+      })
     }
     
     return (
@@ -36,3 +41,4 @@ export const CommandDescription = Command
 export const CommandFooter = Command
 export const CommandSeparator = Command
 export const CommandList = Command
+

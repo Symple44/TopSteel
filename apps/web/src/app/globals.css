@@ -1,3 +1,5 @@
+/* =================================================================== */
+/* Tailwind CSS Global Styles */
 @layer fonts {
   :root {
     --font-inter: "Inter", sans-serif;
