@@ -1,4 +1,4 @@
-// packages/config/tailwind/base.cjs - Configuration Tailwind 4 de base (CommonJS)
+// packages/config/tailwind/base.cjs - Configuration Tailwind harmonisée (CommonJS)
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [], // Sera surchargé par les apps
@@ -12,87 +12,145 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Couleurs de base utilisant les variables CSS
-        border: 'hsl(var(--color-border))',
-        input: 'hsl(var(--color-input))',
-        ring: 'hsl(var(--color-ring))',
-        background: 'hsl(var(--color-background))',
-        foreground: 'hsl(var(--color-foreground))',
+        // ===== VARIABLES SYSTÈME HARMONISÉES =====
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: 'hsl(var(--color-primary))',
-          foreground: 'hsl(var(--color-primary-foreground))',
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--color-secondary))',
-          foreground: 'hsl(var(--color-secondary-foreground))',
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
         },
         destructive: {
-          DEFAULT: 'hsl(var(--color-destructive))',
-          foreground: 'hsl(var(--color-destructive-foreground))',
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
         },
         muted: {
-          DEFAULT: 'hsl(var(--color-muted))',
-          foreground: 'hsl(var(--color-muted-foreground))',
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--color-accent))',
-          foreground: 'hsl(var(--color-accent-foreground))',
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
         },
         popover: {
-          DEFAULT: 'hsl(var(--color-popover))',
-          foreground: 'hsl(var(--color-popover-foreground))',
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
         },
         card: {
-          DEFAULT: 'hsl(var(--color-card))',
-          foreground: 'hsl(var(--color-card-foreground))',
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+
+        // ===== EXTENSIONS SYSTÈME =====
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(var(--warning-foreground))',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          foreground: 'hsl(var(--info-foreground))',
         },
         
-        // Design system ERP - Couleurs métier
+        // ===== DESIGN SYSTEM ERP - COULEURS MÉTIER =====
         metallurgy: {
-          50: 'hsl(var(--color-metallurgy-50))',
-          100: 'hsl(var(--color-metallurgy-100))',
-          200: 'hsl(var(--color-metallurgy-200))',
-          300: 'hsl(var(--color-metallurgy-300))',
-          400: 'hsl(var(--color-metallurgy-400))',
-          500: 'hsl(var(--color-metallurgy-500))',
-          600: 'hsl(var(--color-metallurgy-600))',
-          700: 'hsl(var(--color-metallurgy-700))',
-          800: 'hsl(var(--color-metallurgy-800))',
-          900: 'hsl(var(--color-metallurgy-900))',
-          950: 'hsl(var(--color-metallurgy-950))',
+          50: 'hsl(var(--metallurgy-50))',
+          100: 'hsl(var(--metallurgy-100))',
+          200: 'hsl(var(--metallurgy-200))',
+          300: 'hsl(var(--metallurgy-300))',
+          400: 'hsl(var(--metallurgy-400))',
+          500: 'hsl(var(--metallurgy-500))',
+          600: 'hsl(var(--metallurgy-600))',
+          700: 'hsl(var(--metallurgy-700))',
+          800: 'hsl(var(--metallurgy-800))',
+          900: 'hsl(var(--metallurgy-900))',
+          950: 'hsl(var(--metallurgy-950))',
         },
         steel: {
-          50: 'hsl(var(--color-steel-50))',
-          100: 'hsl(var(--color-steel-100))',
-          200: 'hsl(var(--color-steel-200))',
-          300: 'hsl(var(--color-steel-300))',
-          400: 'hsl(var(--color-steel-400))',
-          500: 'hsl(var(--color-steel-500))',
-          600: 'hsl(var(--color-steel-600))',
-          700: 'hsl(var(--color-steel-700))',
-          800: 'hsl(var(--color-steel-800))',
-          900: 'hsl(var(--color-steel-900))',
-          950: 'hsl(var(--color-steel-950))',
+          50: 'hsl(var(--steel-50))',
+          100: 'hsl(var(--steel-100))',
+          200: 'hsl(var(--steel-200))',
+          300: 'hsl(var(--steel-300))',
+          400: 'hsl(var(--steel-400))',
+          500: 'hsl(var(--steel-500))',
+          600: 'hsl(var(--steel-600))',
+          700: 'hsl(var(--steel-700))',
+          800: 'hsl(var(--steel-800))',
+          900: 'hsl(var(--steel-900))',
+          950: 'hsl(var(--steel-950))',
         },
         
-        // États métier ERP
+        // ===== ÉTATS MÉTIER ERP =====
         status: {
-          draft: 'hsl(var(--color-status-draft))',
-          pending: 'hsl(var(--color-status-pending))',
-          active: 'hsl(var(--color-status-active))',
-          completed: 'hsl(var(--color-status-completed))',
-          cancelled: 'hsl(var(--color-status-cancelled))',
-          paused: 'hsl(var(--color-status-paused))',
-          archived: 'hsl(var(--color-status-archived))',
+          draft: {
+            DEFAULT: 'hsl(var(--status-draft))',
+            foreground: 'hsl(var(--status-draft-foreground))',
+          },
+          pending: {
+            DEFAULT: 'hsl(var(--status-pending))',
+            foreground: 'hsl(var(--status-pending-foreground))',
+          },
+          active: {
+            DEFAULT: 'hsl(var(--status-active))',
+            foreground: 'hsl(var(--status-active-foreground))',
+          },
+          completed: {
+            DEFAULT: 'hsl(var(--status-completed))',
+            foreground: 'hsl(var(--status-completed-foreground))',
+          },
+          cancelled: {
+            DEFAULT: 'hsl(var(--status-cancelled))',
+            foreground: 'hsl(var(--status-cancelled-foreground))',
+          },
+          paused: {
+            DEFAULT: 'hsl(var(--status-paused))',
+            foreground: 'hsl(var(--status-paused-foreground))',
+          },
+          archived: {
+            DEFAULT: 'hsl(var(--status-archived))',
+            foreground: 'hsl(var(--status-archived-foreground))',
+          },
         },
         
-        // Priorités
+        // ===== PRIORITÉS =====
         priority: {
-          low: 'hsl(var(--color-priority-low))',
-          medium: 'hsl(var(--color-priority-medium))',
-          high: 'hsl(var(--color-priority-high))',
-          critical: 'hsl(var(--color-priority-critical))',
-        }
+          low: {
+            DEFAULT: 'hsl(var(--priority-low))',
+            foreground: 'hsl(var(--priority-low-foreground))',
+          },
+          medium: {
+            DEFAULT: 'hsl(var(--priority-medium))',
+            foreground: 'hsl(var(--priority-medium-foreground))',
+          },
+          high: {
+            DEFAULT: 'hsl(var(--priority-high))',
+            foreground: 'hsl(var(--priority-high-foreground))',
+          },
+          critical: {
+            DEFAULT: 'hsl(var(--priority-critical))',
+            foreground: 'hsl(var(--priority-critical-foreground))',
+          },
+        },
+
+        // ===== GRAPHIQUES & ANALYTICS =====
+        chart: {
+          1: 'hsl(var(--chart-1))',
+          2: 'hsl(var(--chart-2))',
+          3: 'hsl(var(--chart-3))',
+          4: 'hsl(var(--chart-4))',
+          5: 'hsl(var(--chart-5))',
+          background: 'hsl(var(--chart-background))',
+          border: 'hsl(var(--chart-border))',
+        },
       },
       
       borderRadius: {
@@ -100,107 +158,113 @@ module.exports = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
-      
+
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
-        display: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        inter: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        poppins: ['var(--font-poppins)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
-      
-      fontSize: {
-        'xs': ['0.75rem', { lineHeight: '1rem' }],
-        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-        'base': ['1rem', { lineHeight: '1.5rem' }],
-        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
-        '2xl': ['1.5rem', { lineHeight: '2rem' }],
-        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
-        '5xl': ['3rem', { lineHeight: '1' }],
+
+      backgroundImage: {
+        'gradient-metallurgy': 'var(--gradient-metallurgy)',
+        'gradient-steel': 'var(--gradient-steel)',
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-success': 'var(--gradient-success)',
+        'gradient-warning': 'var(--gradient-warning)',
       },
-      
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '128': '32rem',
-        '144': '36rem',
-      },
-      
-      screens: {
-        'xs': '475px',
-        '3xl': '1600px',
-        '4xl': '1920px',
-      },
-      
-      // Animations ERP
-      animation: {
-        // Animations de base
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'fade-out': 'fadeOut 0.3s ease-in-out',
-        'slide-in-right': 'slideInRight 0.3s ease-out',
-        'slide-in-left': 'slideInLeft 0.3s ease-out',
-        'slide-in-up': 'slideInUp 0.3s ease-out',
-        'slide-in-down': 'slideInDown 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
-        'scale-out': 'scaleOut 0.2s ease-in',
-        
-        // Animations d'accordéon
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
-      },
-      
+
+      // Animations de base pour le design system
       keyframes: {
-        // Keyframes de base
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        "fade-in": {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
         },
-        fadeOut: {
-          '0%': { opacity: '1' },
-          '100%': { opacity: '0' },
+        "slide-in": {
+          from: { 
+            opacity: '0', 
+            transform: 'translateY(-10px)' 
+          },
+          to: { 
+            opacity: '1', 
+            transform: 'translateY(0)' 
+          },
         },
-        slideInRight: {
-          '0%': { transform: 'translateX(100%)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
+        "pulse-gentle": {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.85' },
         },
-        slideInLeft: {
-          '0%': { transform: 'translateX(-100%)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
+        "status-change": {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
+          '100%': { transform: 'scale(1)' },
         },
-        slideInUp: {
-          '0%': { transform: 'translateY(100%)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideInDown: {
-          '0%': { transform: 'translateY(-100%)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        scaleIn: {
-          '0%': { transform: 'scale(0.9)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-        scaleOut: {
-          '0%': { transform: 'scale(1)', opacity: '1' },
-          '100%': { transform: 'scale(0.9)', opacity: '0' },
-        },
-        
-        // Keyframes d'accordéon
-        'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
+        "priority-pulse": {
+          '0%, 100%': { 
+            boxShadow: '0 0 0 0 hsl(var(--priority-high) / 0.7)' 
+          },
+          '70%': { 
+            boxShadow: '0 0 0 10px hsl(var(--priority-high) / 0)' 
+          },
         },
       },
-      
+
+      animation: {
+        "fade-in": "fade-in 0.5s ease-in-out",
+        "slide-in": "slide-in 0.2s ease-out",
+        "pulse-gentle": "pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "status-change": "status-change 0.3s ease-in-out",
+        "priority-pulse": "priority-pulse 1.5s ease-in-out infinite",
+      },
+
+      // Espacement spécialisé pour les interfaces ERP
+      spacing: {
+        '15': '3.75rem',
+        '18': '4.5rem',
+        '72': '18rem',
+        '84': '21rem',
+        '96': '24rem',
+      },
+
+      // Tailles spécialisées pour les dashboards
+      maxWidth: {
+        '8xl': '88rem',
+        '9xl': '96rem',
+      },
+
+      // Z-index pour les interfaces complexes
+      zIndex: {
+        '60': '60',
+        '70': '70',
+        '80': '80',
+        '90': '90',
+        '100': '100',
+      },
+
+      // Box shadow pour les cartes et composants métier
       boxShadow: {
-        'erp': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-        'erp-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-        'erp-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-      }
+        'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        'priority-critical': '0 0 0 2px hsl(var(--priority-critical) / 0.5)',
+        'status-active': '0 0 0 2px hsl(var(--status-active) / 0.3)',
+      },
+
+      // Backdrop blur pour les modales et overlays
+      backdropBlur: {
+        xs: '2px',
+      },
+
+      // Propriétés de transition pour les interactions ERP
+      transitionProperty: {
+        'height': 'height',
+        'spacing': 'margin, padding',
+        'colors': 'color, background-color, border-color, text-decoration-color, fill, stroke',
+      },
+
+      // Variables d'espacement pour les grilles de données
+      gridTemplateColumns: {
+        'table': 'repeat(auto-fit, minmax(150px, 1fr))',
+        'dashboard': 'repeat(auto-fit, minmax(300px, 1fr))',
+      },
     },
   },
-  plugins: [] // Plugins v4 à revoir,
+  plugins: [],
 }

@@ -25,7 +25,16 @@
         "NEXT_PUBLIC_*",
         "DB_*",
         "REDIS_*",
-        "JWT_*"
+        "JWT_*",
+        "SKIP_ENV_VALIDATION",
+        "ANALYZE"
+      ],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "public/**",
+        "next.config.*",
+        "tailwind.config.*",
+        "package.json"
       ]
     },
     "start": {
