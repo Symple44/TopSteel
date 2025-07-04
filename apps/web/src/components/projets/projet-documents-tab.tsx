@@ -1,33 +1,23 @@
 'use client'
 
-
-interface ProjetDocumentsTabProps { 
-  projet?: any 
-  projetId?: string
-}
-
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@erp/ui'
+} from '@/components/ui/select'
 import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
 import { useState } from 'react'
+
+interface ProjetDocumentsTabProps { 
+  projet?: any 
+  projetId?: string
+}
 
 interface Document {
   id: string
@@ -77,222 +67,255 @@ const mockDocuments: Document[] = [
     type: 'Word',
     taille: '1.2 MB',
     dateAjout: '2024-03-12',
-    auteur: 'Pierre Martin',
+    auteur: 'Alain Dubois',
     categorie: 'Rapport',
     url: '/documents/rapport_controle_qualite.docx'
-  },
-  {
-    id: '5',
-    nom: 'Structure_3D.dwg',
-    type: 'CAD',
-    taille: '5.1 MB',
-    dateAjout: '2024-03-11',
-    auteur: 'Jean Dupuis',
-    categorie: 'Plan',
-    url: '/documents/structure_3d.dwg'
   }
 ]
 
-export function ProjetDocumentsTab({ projet }: ProjetDocumentsTabProps) {
+export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState('tous')
-  const [filterCategorie, setFilterCategorie] = useState('toutes')
-  const [isUploading, setIsUploading] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string>('tous')
+  const [selectedType, setSelectedType] = useState<string>('tous')
 
-  const filteredDocuments = mockDocuments.filter(document => {
-    const matchesSearch = document.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         document.auteur.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = filterType === 'tous' || document.type === filterType
-    const matchesCategorie = filterCategorie === 'toutes' || document.categorie === filterCategorie
-    
-    return matchesSearch && matchesType && matchesCategorie
-  })
-
-  const getFileIcon = (type: string) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case 'PDF':
-        return <FileText className="h-5 w-5 text-red-500" />
+        return <FileText className="h-4 w-4 text-red-500" />
       case 'Image':
-        return <Image className="h-5 w-5 text-green-500" />
-      case 'CAD':
-        return <File className="h-5 w-5 text-blue-500" />
+        return <Image className="h-4 w-4 text-blue-500" />
       case 'Excel':
-        return <FileText className="h-5 w-5 text-green-600" />
+        return <File className="h-4 w-4 text-green-500" />
       case 'Word':
-        return <FileText className="h-5 w-5 text-blue-600" />
+        return <FileText className="h-4 w-4 text-blue-600" />
+      case 'CAD':
+        return <File className="h-4 w-4 text-orange-500" />
       default:
-        return <File className="h-5 w-5 text-gray-500" />
+        return <File className="h-4 w-4 text-gray-500" />
     }
   }
 
-  // ✅ FIX: Mapping strict avec Record et fonction helper avec fallback
-  const getCategorieBadge = (categorie: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
-      'Plan': 'default',
-      'Photo': 'secondary',
-      'Facture': 'outline',
-      'Devis': 'outline',
-      'Rapport': 'secondary',
-      'Autre': 'outline'
+  const getTypeBadge = (type: string) => {
+    const colors = {
+      PDF: 'bg-red-100 text-red-800',
+      Image: 'bg-blue-100 text-blue-800',
+      Excel: 'bg-green-100 text-green-800',
+      Word: 'bg-blue-100 text-blue-800',
+      CAD: 'bg-orange-100 text-orange-800'
     }
+    return (
+      <Badge className={`${colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800'}`}>
+        {type}
+      </Badge>
+    )
+  }
+
+  const filteredDocuments = mockDocuments.filter(doc => {
+    const matchesSearch = doc.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         doc.auteur.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === 'tous' || doc.categorie === selectedCategory
+    const matchesType = selectedType === 'tous' || doc.type === selectedType
     
-    // ✅ FIX: Utilisation sécurisée avec fallback
-    const variant = variants[categorie] || 'outline'
-    return <Badge variant={variant}>{categorie}</Badge>
+    return matchesSearch && matchesCategory && matchesType
+  })
+
+  const handleDownload = (document: Document) => {
+    // Simulation du téléchargement
+    console.log('Téléchargement:', document.nom)
   }
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (files && files.length > 0) {
-      setIsUploading(true)
-      // Simulation d'upload
-      setTimeout(() => {
-        setIsUploading(false)
-        console.log('Fichier(s) uploadé(s):', files)
-      }, 2000)
-    }
+  const handleView = (document: Document) => {
+    // Simulation de l'aperçu
+    console.log('Aperçu:', document.nom)
+  }
+
+  const handleEdit = (document: Document) => {
+    // Simulation de l'édition
+    console.log('Édition:', document.nom)
+  }
+
+  const handleDelete = (document: Document) => {
+    // Simulation de la suppression
+    console.log('Suppression:', document.nom)
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Documents du Projet</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Télécharger Tout
-          </Button>
-          <label htmlFor="file-upload">
-            <Button disabled={isUploading} size="sm">
-              <Upload className="h-4 w-4 mr-2" />
-              {isUploading ? 'Upload en cours...' : 'Ajouter Document'}
-            </Button>
-          </label>
-          <input
-            id="file-upload"
-            type="file"
-            multiple
-            className="hidden"
-            onChange={handleFileUpload}
-            accept=".pdf,.jpg,.jpeg,.png,.dwg,.xlsx,.docx"
-          />
+      {/* Header avec actions */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-medium">Documents du projet</h3>
+          <p className="text-sm text-muted-foreground">
+            Gérez tous les documents liés à ce projet
+          </p>
         </div>
+        <Button>
+          <Upload className="h-4 w-4 mr-2" />
+          Ajouter des fichiers
+        </Button>
       </div>
 
-      <div className="flex gap-4 items-end">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher un document..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
-            className="pl-10"
-          />
-        </div>
-        
-        <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="tous">Tous types</SelectItem>
-            <SelectItem value="PDF">PDF</SelectItem>
-            <SelectItem value="Image">Images</SelectItem>
-            <SelectItem value="CAD">CAD</SelectItem>
-            <SelectItem value="Excel">Excel</SelectItem>
-            <SelectItem value="Word">Word</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={filterCategorie} onValueChange={setFilterCategorie}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Catégorie" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="toutes">Toutes</SelectItem>
-            <SelectItem value="Plan">Plan</SelectItem>
-            <SelectItem value="Photo">Photo</SelectItem>
-            <SelectItem value="Facture">Facture</SelectItem>
-            <SelectItem value="Devis">Devis</SelectItem>
-            <SelectItem value="Rapport">Rapport</SelectItem>
-            <SelectItem value="Autre">Autre</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
+      {/* Filtres */}
       <Card>
-        <CardHeader>
-          <CardTitle>Documents ({filteredDocuments.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {filteredDocuments.map((document) => (
-              <div key={document.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    {getFileIcon(document.type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {document.nom}
-                    </p>
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
-                      <span>{document.taille}</span>
-                      <span>•</span>
-                      <span>Ajouté le {new Date(document.dateAjout).toLocaleDateString()}</span>
-                      <span>•</span>
-                      <span>Par {document.auteur}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {/* ✅ FIX: Utilisation de la fonction helper sécurisée */}
-                    {getCategorieBadge(document.categorie)}
-                    <Badge variant="outline">{document.type}</Badge>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Rechercher par nom ou auteur..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-            ))}
-          </div>
-          
-          {filteredDocuments.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>Aucun document trouvé</p>
-              <p className="text-sm">Essayez de modifier vos filtres</p>
             </div>
-          )}
+            
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tous">Toutes catégories</SelectItem>
+                <SelectItem value="Plan">Plans</SelectItem>
+                <SelectItem value="Photo">Photos</SelectItem>
+                <SelectItem value="Facture">Factures</SelectItem>
+                <SelectItem value="Devis">Devis</SelectItem>
+                <SelectItem value="Rapport">Rapports</SelectItem>
+                <SelectItem value="Autre">Autres</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tous">Tous types</SelectItem>
+                <SelectItem value="PDF">PDF</SelectItem>
+                <SelectItem value="Image">Images</SelectItem>
+                <SelectItem value="Excel">Excel</SelectItem>
+                <SelectItem value="Word">Word</SelectItem>
+                <SelectItem value="CAD">CAD</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
 
+      {/* Statistiques */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">{mockDocuments.length}</div>
+            <p className="text-xs text-muted-foreground">Documents total</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">
+              {mockDocuments.filter(d => d.type === 'PDF').length}
+            </div>
+            <p className="text-xs text-muted-foreground">Documents PDF</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">
+              {mockDocuments.filter(d => d.type === 'Image').length}
+            </div>
+            <p className="text-xs text-muted-foreground">Images</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">
+              {(mockDocuments.reduce((acc, doc) => {
+                const size = parseFloat(doc.taille.replace(/[^\d.]/g, ''))
+                return acc + size
+              }, 0)).toFixed(1)} MB
+            </div>
+            <p className="text-xs text-muted-foreground">Taille totale</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Liste des documents */}
       <Card>
         <CardHeader>
-          <CardTitle>Statistiques des Documents</CardTitle>
+          <CardTitle>
+            Documents ({filteredDocuments.length})
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {['PDF', 'Image', 'CAD', 'Excel', 'Word'].map((type) => (
-              <div key={type} className="text-center p-4 border rounded">
-                <div className="text-2xl font-bold">
-                  {mockDocuments.filter(doc => doc.type === type).length}
+          {filteredDocuments.length === 0 ? (
+            <div className="text-center py-8">
+              <File className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-500">Aucun document trouvé</p>
+              <p className="text-sm text-gray-400">
+                {searchTerm || selectedCategory !== 'tous' || selectedType !== 'tous' 
+                  ? 'Essayez de modifier vos filtres' 
+                  : 'Ajoutez des documents pour ce projet'}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredDocuments.map((document) => (
+                <div key={document.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    {getTypeIcon(document.type)}
+                    <div>
+                      <div className="font-medium">{document.nom}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Par {document.auteur} • {document.dateAjout} • {document.taille}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    {getTypeBadge(document.type)}
+                    <Badge variant="outline">{document.categorie}</Badge>
+                    
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleView(document)}
+                        title="Aperçu"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDownload(document)}
+                        title="Télécharger"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(document)}
+                        title="Modifier"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(document)}
+                        title="Supprimer"
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">{type}</div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

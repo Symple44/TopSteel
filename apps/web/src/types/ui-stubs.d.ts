@@ -18,7 +18,7 @@ declare module "@erp/ui" {
     onValueChange?: (value: string) => void;
     disabled?: boolean;
     name?: string;
-    required?: boolean;
+    
   }
 
   export const Select: React.ComponentType<SelectProps>;
@@ -80,7 +80,7 @@ declare module "@erp/ui" {
     onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
     className?: string;
     disabled?: boolean;
-    required?: boolean;
+    
     name?: string;
     id?: string;
   }
@@ -106,3 +106,4 @@ declare module "@erp/ui" {
   export const AlertDescription: React.ComponentType<{ children?: ReactNode; className?: string }>;
   export const AlertTitle: React.ComponentType<{ children?: ReactNode; className?: string }>;
 }
+

@@ -10,6 +10,29 @@ interface MonitoringProviderProps {
   children: React.ReactNode
 }
 
+// Type pour le retour de useMonitoring
+interface MonitoringHook {
+  trackClick: (element: string, context?: Record<string, any>) => void
+  trackPageView: (page: string, context?: Record<string, any>) => void
+  trackFormSubmit: (form: string, success: boolean, errors?: string[]) => void
+  trackSearch: (query: string, results: number, filters?: Record<string, any>) => void
+  track: (eventName: string, properties?: Record<string, any>) => void
+  setUserContext: (context: any) => void
+  trackProjectCreated: (projectData: any) => void
+  trackProjectStatusChanged: (projectId: string, oldStatus: string, newStatus: string) => void
+  trackProjectViewed: (projectId: string, viewDuration?: number) => void
+  trackProductionStarted: (orderId: string, projectId: string) => void
+  trackProductionCompleted: (orderId: string, duration: number, quality?: string) => void
+  trackUserAction: (action: string, context?: Record<string, any>) => void
+  trackFormSubmission: (formName: string, success: boolean, errors?: string[]) => void
+  trackSearchPerformed: (query: string, resultCount: number, filters?: Record<string, any>) => void
+  trackPerformanceMetric: (metric: string, value: number, context?: Record<string, any>) => void
+  trackError: (error: Error, context?: Record<string, any>) => void
+  getEvents: (filters?: any) => any[]
+  generateReport: () => any
+  exportData: () => string
+}
+
 function ErrorFallback({ error, resetErrorBoundary }: { 
   error: Error
   resetErrorBoundary: () => void 
@@ -119,44 +142,32 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
             }
           })
         })
-
-        // Observer les métriques disponibles
-        const supportedTypes = ['largest-contentful-paint', 'first-input', 'layout-shift']
-        supportedTypes.forEach(type => {
-          try {
-            perfObserver.observe({ entryTypes: [type] })
-          } catch (e) {
-            // Type non supporté par ce navigateur
-            console.warn(`Performance observer type ${type} not supported`)
-          }
-        })
-      } catch (error) {
-        console.warn('Performance Observer not fully supported:', error)
+        
+        perfObserver.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] })
+      } catch (e) {
+        console.warn('Performance Observer not supported:', e)
       }
     }
 
-    // Cleanup au unmount
+    // Cleanup function
     return () => {
       window.removeEventListener('error', handleError)
       window.removeEventListener('unhandledrejection', handleUnhandledRejection)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('focus', handleFocus)
       window.removeEventListener('blur', handleBlur)
-      
-      // Tracker la fermeture de session
-      metrics.track('session_ended', {
-        duration: Date.now() - performance.timing.navigationStart
-      })
     }
   }, [metrics])
 
-  // Log des Web Vitals quand ils changent
+  // Monitoring des Web Vitals si disponibles
   useEffect(() => {
-    if (Object.keys(webVitals).length > 0) {
-      console.log('📊 Web Vitals updated:', webVitals)
-      
-      // Tracker les métriques qui dépassent les seuils
+    if (webVitals) {
       Object.entries(webVitals).forEach(([metric, value]) => {
+        if (typeof value === 'number') {
+          metrics.trackPerformanceMetric(metric, value)
+        }
+        
+        // Alertes pour les métriques dégradées
         const thresholds: Record<string, number> = {
           LCP: 2500, // 2.5s
           FID: 100,  // 100ms
@@ -211,7 +222,7 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
 }
 
 // Hook pour accéder au monitoring dans les composants
-export function useMonitoring() {
+export function useMonitoring(): MonitoringHook {
   const metrics = useBusinessMetrics()
   
   return {

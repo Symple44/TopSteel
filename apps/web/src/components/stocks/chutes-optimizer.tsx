@@ -1,9 +1,11 @@
 // apps/web/src/components/stocks/chutes-optimizer.tsx
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from "lucide-react";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, Button, Input } from "@erp/ui";
-import { Search, Zap, TrendingUp, Recycle, Calculator, CheckCircle } from "lucide-react";
 
 interface Chute {
   id: string;
@@ -92,8 +94,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => {
-                    setSearchQuery((e.target as HTMLInputElement | HTMLTextAreaElement).value);
-                    onSearch((e.target as HTMLInputElement | HTMLTextAreaElement).value);
+                    setSearchQuery(e.target.value);
+                    onSearch(e.target.value);
                   }}
                 />
               </div>
@@ -127,7 +129,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Chutes utilisables</p>
-                  <p className="text-2xl font-bold text-blue-600">{totalChutesUtilisables}/{chutes.length}</p>
+                  <p className="text-2xl font-bold text-blue-600">{totalChutesUtilisables}</p>
                 </div>
               </div>
             </CardContent>
@@ -140,7 +142,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                   <Calculator className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Taux d'optimisation</p>
+                  <p className="text-sm text-muted-foreground">Taux utilisation</p>
                   <p className="text-2xl font-bold text-purple-600">
                     {Math.round((totalChutesUtilisables / chutes.length) * 100)}%
                   </p>
@@ -151,8 +153,9 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
         </div>
       )}
 
-      {/* Liste des chutes */}
+      {/* Liste des chutes avec opportunités */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Liste des chutes */}
         <Card>
           <CardHeader>
             <CardTitle>Chutes disponibles ({chutes.length})</CardTitle>
@@ -163,7 +166,9 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                 <div
                   key={chute.id}
                   className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                    selectedChute?.id === chute.id ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'
+                    selectedChute?.id === chute.id 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'hover:bg-gray-50'
                   }`}
                   onClick={() => setSelectedChute(chute)}
                 >
@@ -203,22 +208,26 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
             <CardContent>
               <div className="space-y-3">
                 {selectedChute.utilisationsProposees.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">
-                    Aucune utilisation optimale trouvée pour cette chute
-                  </p>
+                  <div className="text-center py-8">
+                    <Recycle className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                    <p className="text-gray-500">Aucune utilisation proposée</p>
+                    <p className="text-sm text-gray-400">
+                      Cette chute ne correspond à aucun besoin actuel
+                    </p>
+                  </div>
                 ) : (
                   selectedChute.utilisationsProposees.map((utilisation) => (
-                    <div key={utilisation.id} className="p-3 border rounded-lg">
+                    <div key={utilisation.id} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <div className="font-medium">{utilisation.projetNom}</div>
-                          <div className="text-sm text-gray-600">
-                            Quantité requise: {utilisation.quantiteRequise}
-                          </div>
+                          <h4 className="font-medium">{utilisation.projetNom}</h4>
+                          <p className="text-sm text-gray-600">
+                            Quantité: {utilisation.quantiteRequise} unité(s)
+                          </p>
                         </div>
                         <div className="text-right">
-                          <div className="text-green-600 font-medium">
-                            +{utilisation.economie.toLocaleString()} €
+                          <div className="text-sm font-medium text-green-600">
+                            +{utilisation.economie} €
                           </div>
                           <div className="text-xs text-gray-500">
                             {utilisation.compatibilite}% compatible
@@ -228,17 +237,12 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                       
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                          <div 
-                            className="w-full bg-gray-200 rounded-full h-2"
-                            style={{ width: '60px' }}
-                          >
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
-                              style={{ width: `${utilisation.priorite * 20}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-gray-500">
-                            Priorité {utilisation.priorite}/5
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            utilisation.priorite >= 8 ? 'bg-red-100 text-red-600' :
+                            utilisation.priorite >= 5 ? 'bg-yellow-100 text-yellow-600' :
+                            'bg-green-100 text-green-600'
+                          }`}>
+                            Priorité {utilisation.priorite}/10
                           </span>
                         </div>
                         
@@ -248,7 +252,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                           className="flex items-center gap-1"
                         >
                           <CheckCircle className="h-3 w-3" />
-                          Appliquer
+                          Utiliser
                         </Button>
                       </div>
                     </div>
@@ -259,8 +263,26 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
           </Card>
         )}
       </div>
+
+      {/* Algorithme d'optimisation en cours */}
+      {optimizationResults.length === 0 && (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <Calculator className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Optimiseur intelligent
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Cliquez sur "Optimiser" pour analyser vos chutes et trouver 
+              les meilleures opportunités d'utilisation.
+            </p>
+            <Button onClick={runOptimization} size="lg">
+              <Zap className="h-4 w-4 mr-2" />
+              Lancer l'optimisation
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
-
-

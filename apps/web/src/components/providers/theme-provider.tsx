@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 type Theme = 'dark' | 'light' | 'system'
 type ResolvedTheme = 'dark' | 'light'
@@ -125,6 +125,7 @@ export function ThemeProvider({
     }
   }, [storageKey])
 
+  // Hydration effect
   useEffect(() => {
     if (typeof window === 'undefined') return
 
@@ -152,6 +153,7 @@ export function ThemeProvider({
     setIsHydrated(true)
   }, [storageKey, saveToStorage])
 
+  // Theme resolution and system watch effect
   useEffect(() => {
     if (!isHydrated) return
 
@@ -159,6 +161,7 @@ export function ThemeProvider({
     setResolvedTheme(resolved)
     updateDOM(resolved)
 
+    // Always return a cleanup function, even if it's empty
     if (enableSystemWatch && theme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
       mediaQueryRef.current = mediaQuery
@@ -175,6 +178,11 @@ export function ThemeProvider({
         mediaQuery.removeEventListener('change', handleChange)
         mediaQueryRef.current = null
       }
+    }
+
+    // Return empty cleanup function for consistency
+    return () => {
+      // No cleanup needed when not watching system theme
     }
   }, [theme, isHydrated, resolveTheme, updateDOM, enableSystemWatch])
 
@@ -204,6 +212,7 @@ export function ThemeProvider({
 
   }, [theme, saveToStorage, enableMetrics, transitionDuration])
 
+  // Cleanup effect
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {

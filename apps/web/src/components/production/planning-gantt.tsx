@@ -1,9 +1,10 @@
 // apps/web/src/components/production/planning-gantt.tsx
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart3, Calendar, ZoomIn, ZoomOut } from "lucide-react";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, Button } from "@erp/ui";
-import { ZoomIn, ZoomOut, Calendar, BarChart3 } from "lucide-react";
 
 interface GanttTask {
   id: string;
@@ -86,6 +87,15 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     }
   };
 
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'ordre': return '📋';
+      case 'operation': return '⚙️';
+      case 'maintenance': return '🔧';
+      default: return '📝';
+    }
+  };
+
   const headers = generateTimelineHeaders();
 
   return (
@@ -149,7 +159,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
                   className={`p-2 text-center text-sm border-r min-w-[40px] ${
                     header.isWeekend ? 'bg-gray-100' : ''
                   }`}
-                  style={{ width: 40 * zoomLevel }}
+                  style={{ width: `${40 * zoomLevel}px` }}
                 >
                   {header.label}
                 </div>
@@ -158,48 +168,81 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
           </div>
 
           {/* Lignes des tâches */}
-          <div className="relative">
-            {tasks.map((task, index) => {
-              const position = calculateTaskPosition(task, headers);
-              
-              return (
-                <div key={task.id} className="flex border-b hover:bg-gray-50">
-                  {/* Nom de la tâche */}
-                  <div className="w-64 p-3 border-r">
-                    <div className="font-medium text-sm">{task.name}</div>
-                    <div className="text-xs text-gray-500">{task.assignee}</div>
-                  </div>
-
-                  {/* Barre de Gantt */}
-                  <div className="relative flex-1 h-16">
-                    <div
-                      className={`absolute top-2 h-12 rounded cursor-pointer ${getStatusColor(task.status)} opacity-80 hover:opacity-100 transition-opacity`}
-                      style={{
-                        left: position.left,
-                        width: position.width,
-                      }}
-                      onClick={() => onTaskClick(task)}
-                    >
-                      {/* Barre de progression */}
-                      <div
-                        className="h-full bg-white bg-opacity-30 rounded"
-                        style={{ width: `${task.progress}%` }}
-                      />
-                      
-                      {/* Texte de la tâche */}
-                      <div className="absolute inset-0 flex items-center px-2">
-                        <span className="text-white text-xs font-medium truncate">
-                          {task.name}
-                        </span>
+          <div className="space-y-1">
+            {tasks.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>Aucune tâche planifiée</p>
+                <p className="text-sm">Les tâches apparaîtront ici une fois créées</p>
+              </div>
+            ) : (
+              tasks.map((task) => {
+                const position = calculateTaskPosition(task, headers);
+                
+                return (
+                  <div key={task.id} className="flex border-b hover:bg-gray-50 transition-colors">
+                    {/* Colonne nom de tâche */}
+                    <div className="w-64 p-3 border-r flex items-center gap-2">
+                      <span className="text-lg">{getTypeIcon(task.type)}</span>
+                      <div>
+                        <div className="font-medium text-sm">{task.name}</div>
+                        {task.assignee && (
+                          <div className="text-xs text-gray-500">{task.assignee}</div>
+                        )}
                       </div>
                     </div>
+                    
+                    {/* Timeline */}
+                    <div className="relative flex-1 p-2" style={{ minWidth: `${headers.length * 40 * zoomLevel}px` }}>
+                      <div
+                        className={`absolute top-2 bottom-2 rounded cursor-pointer transition-all hover:opacity-80 ${getStatusColor(task.status)}`}
+                        style={{
+                          left: `${position.left}px`,
+                          width: `${position.width}px`,
+                        }}
+                        onClick={() => onTaskClick(task)}
+                        title={`${task.name} - ${task.progress}%`}
+                      >
+                        {/* Barre de progression */}
+                        <div
+                          className="h-full bg-white bg-opacity-30 rounded"
+                          style={{ width: `${task.progress}%` }}
+                        />
+                        
+                        {/* Texte dans la barre */}
+                        <div className="absolute inset-0 flex items-center px-2">
+                          <span className="text-white text-xs font-medium truncate">
+                            {task.progress}%
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Dépendances (lignes de connexion) */}
+                      {task.dependencies?.map((depId) => {
+                        const depTask = tasks.find(t => t.id === depId);
+                        if (!depTask) return null;
+                        
+                        const depPosition = calculateTaskPosition(depTask, headers);
+                        return (
+                          <div
+                            key={depId}
+                            className="absolute border-t-2 border-gray-400 border-dashed"
+                            style={{
+                              left: `${depPosition.left + depPosition.width}px`,
+                              width: `${position.left - (depPosition.left + depPosition.width)}px`,
+                              top: '50%',
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
-
+        
         {/* Légende */}
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
@@ -223,4 +266,3 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     </Card>
   );
 }
-

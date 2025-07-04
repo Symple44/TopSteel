@@ -1,8 +1,8 @@
 // apps/web/src/components/stocks/chutes-stats.tsx
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui";
-import { TrendingUp, Recycle, DollarSign, Package, AlertTriangle, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle, CheckCircle, DollarSign, Package, Recycle, TrendingUp } from "lucide-react";
 
 interface ChutesStatsProps {
   stats: {
@@ -88,14 +88,26 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-green-600">
-                {stats.chutesExcellentes}
-              </span>
-              <div className="text-right">
+              <div>
+                <div className="text-3xl font-bold text-green-600">
+                  {stats.chutesExcellentes}
+                </div>
                 <p className="text-sm text-muted-foreground">
-                  {Math.round((stats.chutesExcellentes / stats.totalChutes) * 100)}% du total
+                  Prêtes à réutiliser
                 </p>
-                <p className="text-xs text-green-600">Qualité optimale</p>
+              </div>
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                <span className="text-lg font-bold text-green-600">
+                  {Math.round((stats.chutesExcellentes / stats.totalChutes) * 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-green-600 h-2 rounded-full transition-all" 
+                  style={{ width: `${(stats.chutesExcellentes / stats.totalChutes) * 100}%` }}
+                />
               </div>
             </div>
           </CardContent>
@@ -110,19 +122,108 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-red-600">
-                {stats.chutesDegradees}
-              </span>
-              <div className="text-right">
+              <div>
+                <div className="text-3xl font-bold text-red-600">
+                  {stats.chutesDegradees}
+                </div>
                 <p className="text-sm text-muted-foreground">
-                  {Math.round((stats.chutesDegradees / stats.totalChutes) * 100)}% du total
+                  À traiter en priorité
                 </p>
-                <p className="text-xs text-red-600">À traiter rapidement</p>
+              </div>
+              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                <span className="text-lg font-bold text-red-600">
+                  {Math.round((stats.chutesDegradees / stats.totalChutes) * 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-red-600 h-2 rounded-full transition-all" 
+                  style={{ width: `${(stats.chutesDegradees / stats.totalChutes) * 100}%` }}
+                />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Analyse comparative */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-blue-600" />
+            Analyse de Performance
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">
+                {stats.tauxReutilisation}%
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Taux de réutilisation
+              </p>
+              <div className="mt-2">
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  stats.tauxReutilisation >= 70 ? 'bg-green-100 text-green-600' :
+                  stats.tauxReutilisation >= 50 ? 'bg-yellow-100 text-yellow-600' :
+                  'bg-red-100 text-red-600'
+                }`}>
+                  {stats.tauxReutilisation >= 70 ? 'Excellent' :
+                   stats.tauxReutilisation >= 50 ? 'Correct' : 'À améliorer'}
+                </span>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {stats.economiesRealisees.toLocaleString()} €
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Économies réalisées
+              </p>
+              <div className="mt-2">
+                <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600">
+                  +{stats.evolutionMois}% ce mois
+                </span>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                {((stats.valeurTotale - stats.economiesRealisees) / stats.valeurTotale * 100).toFixed(1)}%
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Potentiel restant
+              </p>
+              <div className="mt-2">
+                <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-600">
+                  {(stats.valeurTotale - stats.economiesRealisees).toLocaleString()} € disponible
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Barre de progression générale */}
+          <div className="mt-6">
+            <div className="flex justify-between text-sm text-muted-foreground mb-2">
+              <span>Progression vers l'objectif optimal (80%)</span>
+              <span>{stats.tauxReutilisation}/80%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div 
+                className={`h-3 rounded-full transition-all ${
+                  stats.tauxReutilisation >= 80 ? 'bg-green-500' :
+                  stats.tauxReutilisation >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                }`}
+                style={{ width: `${Math.min((stats.tauxReutilisation / 80) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

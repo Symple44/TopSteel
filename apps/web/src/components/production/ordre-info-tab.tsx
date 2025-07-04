@@ -1,5 +1,5 @@
 // apps/web/src/components/production/ordre-info-tab.tsx
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface OrdreInfoTabProps {
   ordre: any;

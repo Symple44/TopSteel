@@ -4,17 +4,16 @@ import { useNotifications } from '@/components/providers/notifications-provider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog'
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuHeader,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -63,7 +62,7 @@ export function NotificationCenter() {
       </DropdownMenuTrigger>
       
       <DropdownMenuContent align="end" className="w-80">
-        <DropdownMenuHeader>
+        <div className="p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Notifications</h3>
             <div className="flex gap-1">
@@ -93,14 +92,14 @@ export function NotificationCenter() {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
             <div className={cn(
               "h-2 w-2 rounded-full",
               state.connected ? "bg-green-500" : "bg-red-500"
             )} />
             {state.connected ? 'Connecté' : 'Déconnecté'}
           </div>
-        </DropdownMenuHeader>
+        </div>
 
         <Separator />
 
@@ -169,7 +168,16 @@ export function NotificationCenter() {
                       </span>
                       
                       {notification.actionUrl && notification.actionLabel && (
-                        <Button variant="outline" size="sm" className="h-6 text-xs">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 text-xs px-2"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            // Navigation vers l'URL d'action
+                            window.location.href = notification.actionUrl!
+                          }}
+                        >
                           {notification.actionLabel}
                         </Button>
                       )}
@@ -180,7 +188,7 @@ export function NotificationCenter() {
             </div>
           )}
         </ScrollArea>
-
+        
         {state.notifications.length > 0 && (
           <>
             <Separator />
@@ -188,11 +196,11 @@ export function NotificationCenter() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-center"
+                className="w-full text-muted-foreground"
                 onClick={actions.clearAll}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Tout effacer
+                Effacer tout
               </Button>
             </div>
           </>

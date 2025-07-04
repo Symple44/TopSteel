@@ -10,21 +10,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@/types'
 import { ProjetStatut } from '@erp/types'
-import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
+import {
   Building2,
+  Calendar,
+  Clock,
   Edit,
+  Euro,
   Mail,
   MapPin,
   Phone,
   Save,
-  X
-import {
-  FileText,
-  Download,
-  Send,
-  AlertCircle,
-  CheckCircle,
-  Clock,
   X
 } from 'lucide-react'
 import { useState } from 'react'
@@ -35,6 +30,29 @@ interface ProjetInfoTabProps {
 
 export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
   const [isEditing, setIsEditing] = useState(false)
+  const [formData, setFormData] = useState({
+    reference: projet.reference || '',
+    description: projet.description || '',
+    dateDebut: projet.dateDebut ? new Date(projet.dateDebut).toISOString().split('T')[0] : '',
+    dateFin: projet.dateFin ? new Date(projet.dateFin).toISOString().split('T')[0] : '',
+  })
+
+  const handleSave = () => {
+    // Ici, on sauvegarderait les modifications
+    console.log('Sauvegarde des modifications:', formData)
+    setIsEditing(false)
+  }
+
+  const handleCancel = () => {
+    // Réinitialiser le formulaire
+    setFormData({
+      reference: projet.reference || '',
+      description: projet.description || '',
+      dateDebut: projet.dateDebut ? new Date(projet.dateDebut).toISOString().split('T')[0] : '',
+      dateFin: projet.dateFin ? new Date(projet.dateFin).toISOString().split('T')[0] : '',
+    })
+    setIsEditing(false)
+  }
 
   return (
     <div className="space-y-6">
@@ -46,23 +64,36 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
               <CardTitle>Informations générales</CardTitle>
               <CardDescription>Détails du projet et paramètres</CardDescription>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(!isEditing)}
-            >
+            <div className="flex gap-2">
               {isEditing ? (
                 <>
-                  <X className="h-4 w-4 mr-2" />
-                  Annuler
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCancel}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Annuler
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleSave}
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Enregistrer
+                  </Button>
                 </>
               ) : (
-                <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   Modifier
-                </>
+                </Button>
               )}
-            </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -70,9 +101,13 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div>
               <Label>Nom du projet</Label>
               {isEditing ? (
-                <Input defaultValue={projet.reference} className="mt-1" />
+                <Input 
+                  value={formData.reference}
+                  onChange={(e) => setFormData({...formData, reference: e.target.value})}
+                  className="mt-1" 
+                />
               ) : (
-                <p className="text-sm font-medium mt-1">{projet.reference}</p>
+                <p className="text-sm font-medium mt-1">{projet.reference || 'Non défini'}</p>
               )}
             </div>
             <div>
@@ -88,51 +123,68 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
           <div>
             <Label>Description</Label>
             {isEditing ? (
-              <Textarea defaultValue={projet.description} className="mt-1" />
+              <Textarea 
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="mt-1"
+                rows={3}
+                placeholder="Description du projet..."
+              />
             ) : (
-              <p className="text-sm text-muted-foreground mt-1">{projet.description}</p>
+              <p className="text-sm mt-1 text-muted-foreground">
+                {projet.description || 'Aucune description disponible'}
+              </p>
             )}
           </div>
 
-          <Separator />
-
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-muted-foreground">Date de création</Label>
-              <p className="text-sm font-medium">
-                {projet.dateCreation ? formatDate(projet.dateCreation) : 'Non définie'}
-              </p>
+              <Label>Date de début</Label>
+              {isEditing ? (
+                <Input 
+                  type="date"
+                  value={formData.dateDebut}
+                  onChange={(e) => setFormData({...formData, dateDebut: e.target.value})}
+                  className="mt-1" 
+                />
+              ) : (
+                <div className="flex items-center gap-2 mt-1">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-sm">
+                    {projet.dateDebut ? formatDate(new Date(projet.dateDebut)) : 'Non définie'}
+                  </p>
+                </div>
+              )}
             </div>
             <div>
-              <Label className="text-muted-foreground">Échéance prévue</Label>
-              <p className="text-sm font-medium">
-                {projet.dateFinPrevue  ? formatDate(projet.dateFinPrevue ) : 'Non définie'}
-              </p>
-            </div>
-            <div>
-              <Label className="text-muted-foreground">Responsable</Label>
-              <p className="text-sm font-medium">John Doe</p>
+              <Label>Date de fin prévue</Label>
+              {isEditing ? (
+                <Input 
+                  type="date"
+                  value={formData.dateFin}
+                  onChange={(e) => setFormData({...formData, dateFin: e.target.value})}
+                  className="mt-1" 
+                />
+              ) : (
+                <div className="flex items-center gap-2 mt-1">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-sm">
+                    {projet.dateFin ? formatDate(new Date(projet.dateFin)) : 'Non définie'}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
-
-          {isEditing && (
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
-                Annuler
-              </Button>
-              <Button onClick={() => setIsEditing(false)}>
-                <Save className="h-4 w-4 mr-2" />
-                Enregistrer
-              </Button>
-            </div>
-          )}
         </CardContent>
       </Card>
 
       {/* Informations client */}
       <Card>
         <CardHeader>
-          <CardTitle>Informations client</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Informations client
+          </CardTitle>
           <CardDescription>Détails du client et contact</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -150,19 +202,30 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div className="flex items-center space-x-3">
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <div className="text-sm">
-                123 Rue de l'Industrie<br />
-                44800 Saint-Herblain
+                {projet.client?.adresse ? (
+                  <div>
+                    {projet.client.adresse.rue && <div>{projet.client.adresse.rue}</div>}
+                    {projet.client.adresse.ville && projet.client.adresse.codePostal && (
+                      <div>{projet.client.adresse.codePostal} {projet.client.adresse.ville}</div>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    123 Rue de l'Industrie<br />
+                    44800 Saint-Herblain
+                  </div>
+                )}
               </div>
             </div>
             
             <div className="flex items-center space-x-3">
               <Phone className="h-4 w-4 text-muted-foreground" />
-              <p className="text-sm">02 40 XX XX XX</p>
+              <p className="text-sm">{projet.client?.telephone || '02 40 XX XX XX'}</p>
             </div>
 
             <div className="flex items-center space-x-3">
               <Mail className="h-4 w-4 text-muted-foreground" />
-              <p className="text-sm">contact@client.fr</p>
+              <p className="text-sm">{projet.client?.email || 'contact@client.fr'}</p>
             </div>
           </div>
         </CardContent>
@@ -171,19 +234,22 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
       {/* Informations financières */}
       <Card>
         <CardHeader>
-          <CardTitle>Informations financières</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Euro className="h-5 w-5" />
+            Informations financières
+          </CardTitle>
           <CardDescription>Montants et détails financiers</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-sm text-muted-foreground mb-1">Montant HT</div>
-              <p className="text-lg font-semibold">{formatCurrency(projet.montantHT)}</p>
+              <p className="text-lg font-semibold">{formatCurrency(projet.montantHT || 0)}</p>
             </div>
             <div>
               <div className="text-sm text-muted-foreground mb-1">TVA (20%)</div>
               <p className="text-lg font-semibold">
-                {formatCurrency(projet.montantTTC - projet.montantHT)}
+                {formatCurrency((projet.montantTTC || 0) - (projet.montantHT || 0))}
               </p>
             </div>
           </div>
@@ -193,13 +259,31 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
           <div>
             <div className="text-sm text-muted-foreground mb-1">Montant TTC</div>
             <p className="text-2xl font-bold text-primary">
-              {formatCurrency(projet.montantTTC)}
+              {formatCurrency(projet.montantTTC || 0)}
             </p>
           </div>
+
+          {/* Progression financière */}
+          {(projet as any).montantPaye && projet.montantTTC && (
+            <div className="mt-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span>Progression des paiements</span>
+                <span>{Math.round(((projet as any).montantPaye / projet.montantTTC) * 100)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-green-600 h-2 rounded-full" 
+                  style={{ width: `${Math.min(((projet as any).montantPaye / projet.montantTTC) * 100, 100)}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>Payé: {formatCurrency((projet as any).montantPaye)}</span>
+                <span>Restant: {formatCurrency(projet.montantTTC - (projet as any).montantPaye)}</span>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
   )
 }
-
-

@@ -1,4 +1,3 @@
-// apps/web/src/components/facturation/create-facture-dialog.tsx
 'use client'
 
 import { Button } from '@/components/ui/button'
@@ -23,25 +22,46 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
 interface CreateFactureDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   onFactureCreated?: (facture: any) => void
 }
 
 export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    reference: '',
+    client: '',
+    type: ''
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validation côté client - maintient la robustesse
+    if (!formData.reference.trim()) {
+      alert('La référence est obligatoire')
+      return
+    }
+    if (!formData.client.trim()) {
+      alert('Le client est obligatoire') 
+      return
+    }
+    if (!formData.type) {
+      alert('Le type de facture est obligatoire')
+      return
+    }
+    
     setLoading(true)
     
     // Simulation création facture
     setTimeout(() => {
       const newFacture = {
         id: `FACTURE-${Date.now()}`,
-        reference: `FAC-${Math.floor(Math.random() * 1000)}`,
+        reference: formData.reference,
         clientId: 'client-1',
+        type: formData.type,
         montantHT: 0,
         statut: 'brouillon'
       }
@@ -49,6 +69,9 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
       onFactureCreated?.(newFacture)
       setLoading(false)
       setOpen(false)
+      
+      // Reset form
+      setFormData({ reference: '', client: '', type: '' })
     }, 1000)
   }
 
@@ -76,7 +99,8 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
               id="reference"
               placeholder="FAC-001"
               className="col-span-3"
-              required
+              value={formData.reference}
+              onChange={(e) => setFormData({...formData, reference: e.target.value})}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -87,14 +111,18 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
               id="client"
               placeholder="Nom du client"
               className="col-span-3"
-              required
+              value={formData.client}
+              onChange={(e) => setFormData({...formData, client: e.target.value})}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="type" className="text-right">
               Type
             </Label>
-            <Select required>
+            <Select 
+              value={formData.type} 
+              onValueChange={(value) => setFormData({...formData, type: value})}
+            >
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder="Type de facture" />
               </SelectTrigger>

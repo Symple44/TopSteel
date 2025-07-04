@@ -1,9 +1,10 @@
 // apps/web/src/components/production/planning-calendar.tsx
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, Button } from "@erp/ui";
-import { ChevronLeft, ChevronRight, Calendar, Plus } from "lucide-react";
 
 interface PlanningEvent {
   id: string;
@@ -144,7 +145,9 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
                       key={event.id}
                       className={`
                         text-xs p-1 rounded cursor-pointer truncate
-                        ${event.color || 'bg-blue-100 text-blue-800'}
+                        ${event.type === 'ordre' ? 'bg-blue-100 text-blue-800' : 
+                          event.type === 'maintenance' ? 'bg-orange-100 text-orange-800' : 
+                          'bg-green-100 text-green-800'}
                       `}
                       onClick={(e) => {
                         e.stopPropagation();

@@ -1,41 +1,32 @@
 'use client'
 
-import { useState } from 'react'
-import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
-  FileText, 
-  Download, 
-  Send, 
-  Eye,
-  Plus,
-  Edit,
-  Trash2,
-  Calculator,
-  Euro,
-  Calendar,
-  CheckCircle,
-  Clock,
-  X
-import {
-  FileText,
-  Download,
-  Send,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  X
-} from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow
-import { formatDate, formatCurrency } from '@/lib/utils'
-import type { Projet } from '@/types'
+} from '@/components/ui/table'
+import { formatCurrency, formatDate } from '@/lib/utils'
+import type { Projet } from '@erp/types'
+import {
+  Calculator,
+  CheckCircle,
+  Download,
+  Edit,
+  Euro,
+  Eye,
+  FileText,
+  Plus,
+  Send,
+  X
+} from 'lucide-react'
+import { useState } from 'react'
 
 interface ProjetDevisTabProps {
   projet: Projet
@@ -53,8 +44,8 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       dateCreation: new Date('2025-01-15'),
       dateValidite: new Date('2025-02-15'),
       statut: 'ENVOYE',
-      montantHT: projet.montantHT,
-      montantTTC: projet.montantTTC,
+      montantHT: projet.montantHT || 0,
+      montantTTC: projet.montantTTC || 0,
       accepte: false
     },
     {
@@ -64,8 +55,8 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       dateCreation: new Date('2025-01-20'),
       dateValidite: new Date('2025-02-20'),
       statut: 'ACCEPTE',
-      montantHT: projet.montantHT * 1.1,
-      montantTTC: projet.montantTTC * 1.1,
+      montantHT: (projet.montantHT || 0) * 1.1,
+      montantTTC: (projet.montantTTC || 0) * 1.1,
       accepte: true
     }
   ]
@@ -77,35 +68,96 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       case 'ENVOYE':
         return <Badge variant="outline">Envoyé</Badge>
       case 'ACCEPTE':
-        return <Badge variant="default">Accepté</Badge>
+        return <Badge variant="default" className="bg-green-500">Accepté</Badge>
       case 'REFUSE':
         return <Badge variant="destructive">Refusé</Badge>
+      case 'EXPIRE':
+        return <Badge variant="secondary">Expiré</Badge>
       default:
-        return <Badge variant="secondary">{statut}</Badge>
+        return <Badge variant="outline">{statut}</Badge>
     }
   }
 
+  const devisAccepte = devis.find(d => d.accepte)
+  const dernierDevis = devis[devis.length - 1]
+
   return (
     <div className="space-y-6">
-      {/* En-tête avec actions */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">Devis et chiffrages</h2>
-          <p className="text-sm text-muted-foreground">
-            Gestion des devis pour ce projet
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="outline" size="sm">
-            <Calculator className="h-4 w-4 mr-2" />
-            Nouveau chiffrage
-          </Button>
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Nouveau devis
-          </Button>
-        </div>
+      {/* Résumé des devis */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Devis total
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{devis.length}</div>
+            <p className="text-xs text-muted-foreground">
+              Version actuelle: {dernierDevis?.version}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <Euro className="h-4 w-4" />
+              Montant validé
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {devisAccepte ? formatCurrency(devisAccepte.montantHT) : '—'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {devisAccepte ? 'HT accepté' : 'Aucun devis accepté'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" />
+              Statut
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              {dernierDevis ? getStatutBadge(dernierDevis.statut) : '—'}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {dernierDevis ? formatDate(dernierDevis.dateCreation) : 'Aucun devis'}
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Actions rapides */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Actions</CardTitle>
+              <CardDescription>
+                Gestion des devis pour ce projet
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Nouveau devis
+              </Button>
+              <Button variant="outline" size="sm">
+                <Calculator className="h-4 w-4 mr-2" />
+                Calculer
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
       {/* Liste des devis */}
       <Card>
@@ -121,7 +173,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
               <TableRow>
                 <TableHead>Numéro</TableHead>
                 <TableHead>Version</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Date création</TableHead>
                 <TableHead>Validité</TableHead>
                 <TableHead>Montant HT</TableHead>
                 <TableHead>Statut</TableHead>
@@ -129,24 +181,44 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {devis.map((devis) => (
-                <TableRow key={devis.id}>
-                  <TableCell className="font-medium">{devis.numero}</TableCell>
-                  <TableCell>{devis.version}</TableCell>
-                  <TableCell>{formatDate(devis.dateCreation)}</TableCell>
-                  <TableCell>{formatDate(devis.dateValidite)}</TableCell>
-                  <TableCell>{formatCurrency(devis.montantHT)}</TableCell>
-                  <TableCell>{getStatutBadge(devis.statut)}</TableCell>
+              {devis.map((devisItem) => (
+                <TableRow key={devisItem.id}>
+                  <TableCell className="font-medium">{devisItem.numero}</TableCell>
+                  <TableCell>{devisItem.version}</TableCell>
+                  <TableCell>{formatDate(devisItem.dateCreation)}</TableCell>
+                  <TableCell>{formatDate(devisItem.dateValidite)}</TableCell>
+                  <TableCell>{formatCurrency(devisItem.montantHT)}</TableCell>
+                  <TableCell>{getStatutBadge(devisItem.statut)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setSelectedDevis(devisItem.id)}
+                        title="Voir les détails"
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        title="Télécharger PDF"
+                      >
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        title="Envoyer par email"
+                      >
                         <Send className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        title="Modifier"
+                      >
+                        <Edit className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -161,15 +233,80 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       {selectedDevis && (
         <Card>
           <CardHeader>
-            <CardTitle>Détails du devis</CardTitle>
-            <CardDescription>
-              Devis {selectedDevis} - Version actuelle
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Détails du devis</CardTitle>
+                <CardDescription>
+                  Devis {selectedDevis} - Version actuelle
+                </CardDescription>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setSelectedDevis(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">
-              Détails du devis sélectionné...
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium mb-3">Informations générales</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Numéro:</span>
+                    <span>{devis.find(d => d.id === selectedDevis)?.numero}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Version:</span>
+                    <span>{devis.find(d => d.id === selectedDevis)?.version}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Date création:</span>
+                    <span>{devis.find(d => d.id === selectedDevis)?.dateCreation ? formatDate(devis.find(d => d.id === selectedDevis)!.dateCreation) : '—'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Validité:</span>
+                    <span>{devis.find(d => d.id === selectedDevis)?.dateValidite ? formatDate(devis.find(d => d.id === selectedDevis)!.dateValidite) : '—'}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-3">Montants</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Montant HT:</span>
+                    <span className="font-medium">{devis.find(d => d.id === selectedDevis)?.montantHT ? formatCurrency(devis.find(d => d.id === selectedDevis)!.montantHT) : '—'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Montant TTC:</span>
+                    <span className="font-medium">{devis.find(d => d.id === selectedDevis)?.montantTTC ? formatCurrency(devis.find(d => d.id === selectedDevis)!.montantTTC) : '—'}</span>
+                  </div>
+                  <Separator className="my-2" />
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Statut:</span>
+                    <span>{devis.find(d => d.id === selectedDevis)?.statut ? getStatutBadge(devis.find(d => d.id === selectedDevis)!.statut) : '—'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex gap-2">
+              <Button size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Télécharger PDF
+              </Button>
+              <Button variant="outline" size="sm">
+                <Send className="h-4 w-4 mr-2" />
+                Envoyer par email
+              </Button>
+              <Button variant="outline" size="sm">
+                <Edit className="h-4 w-4 mr-2" />
+                Modifier
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}

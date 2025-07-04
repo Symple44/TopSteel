@@ -2,15 +2,26 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, Plus, AlertTriangle } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { AlertTriangle, Package, Plus } from 'lucide-react'
+
+// Interface pour les matériaux
+interface Materiau {
+  id: number
+  reference: string
+  designation: string
+  quantiteRequise: number
+  quantiteStock: number
+  unite: string
+  statut: string
+}
 
 interface OrdreMateriauxTabProps {
   ordre: any; // Interface cohérente avec les autres composants
 }
 
 export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
-  const materiaux = ordre?.materiaux || [
+  const materiaux: Materiau[] = ordre?.materiaux || [
     {
       id: 1,
       reference: 'ACIER-S235-02',
@@ -60,7 +71,7 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
       </div>
 
       <div className="space-y-4">
-        {materiaux.map((materiau) => (
+        {materiaux.map((materiau: Materiau) => (
           <Card key={materiau.id} className="transition-shadow hover:shadow-md">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -86,10 +97,44 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
                   {getStatutBadge(materiau.statut)}
                 </div>
               </div>
+              
+              {materiau.statut === 'INSUFFISANT' && (
+                <div className="mt-4 p-3 bg-red-50 rounded-lg flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-red-800">Stock insuffisant</p>
+                    <p className="text-xs text-red-600">
+                      Manque: {materiau.quantiteRequise - materiau.quantiteStock} {materiau.unite}
+                    </p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
+      
+      {materiaux.some(m => m.statut === 'INSUFFISANT') && (
+        <Card className="border-orange-200">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-orange-600">
+              <AlertTriangle className="h-5 w-5" />
+              <div>
+                <p className="font-medium">Action requise</p>
+                <p className="text-sm">Certains matériaux ne sont pas disponibles en quantité suffisante.</p>
+              </div>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Button variant="outline" size="sm">
+                Générer commande
+              </Button>
+              <Button variant="outline" size="sm">
+                Vérifier alternatives
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
