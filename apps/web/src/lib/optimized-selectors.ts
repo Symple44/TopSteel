@@ -15,7 +15,7 @@ export function createOptimizedSelectors<T>(useStore: (selector: StoreSelector<T
   return {
     // Sélecteur avec shallow comparison - TOUJOURS appelé
     useShallow: <R>(selector: StoreSelector<T, R>) => {
-      return useStore(selector, shallow)
+      return useStore(selector, useShallow)
     },
 
     // Sélecteur avec égalité profonde - TOUJOURS appelé

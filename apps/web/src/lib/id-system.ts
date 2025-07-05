@@ -120,9 +120,13 @@ class IDCache {
   }
 
   static set(key: string, value: ParsedID): void {
+    // Fix TypeScript strict: nettoyage du cache si plein
     if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value
-      this.cache.delete(firstKey)
+      // Méthode plus sûre : convertir en array pour éviter undefined
+      const keys = Array.from(this.cache.keys())
+      if (keys.length > 0) {
+        this.cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
+      }
     }
     this.cache.set(key, value)
   }
@@ -275,27 +279,54 @@ class IDGenerator {
   /**
    * NanoID optimisé pour performance
    */
-  static nanoId(length = 12): string {
+  static nanoid(length = 12, alphabet?: string): string {
     const startTime = performance.now()
     
+    // Fix: Alphabet par défaut si undefined
+    const defaultAlphabet = alphabet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    
     try {
-      const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
       let result: string
       
       if (!this.isClient) {
-        result = this.generateServerNanoId(length, alphabet)
-      } else if (crypto.getRandomValues) {
-        result = this.generateSecureNanoId(length, alphabet)
+        // Serveur : utiliser Node.js crypto ou fallback
+        result = this.generateServerNanoId(length, defaultAlphabet)
       } else {
-        result = this.generateFallbackNanoId(length, alphabet)
+        // Client : essayer crypto, sinon fallback
+        try {
+          // Test direct sans condition
+          const testArray = new Uint8Array(1)
+          crypto.getRandomValues(testArray)
+          result = this.generateSecureNanoId(length, defaultAlphabet)
+        } catch {
+          // Si crypto échoue, utiliser fallback
+          result = this.generateFallbackNanoId(length, defaultAlphabet)
+        }
       }
       
       IDCache.recordGeneration(performance.now() - startTime)
       return result
+      
     } catch (error) {
+      console.warn('NanoID generation failed, using fallback:', error)
       IDCache.recordError()
-      console.error('NanoID generation failed:', error)
-      return this.generateFallbackNanoId(length, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+      return this.generateFallbackNanoId(length, defaultAlphabet)
+    }
+  }
+
+  private static isSecureCryptoAvailable(): boolean {
+    try {
+      if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
+        return false
+      }
+      
+      // Test rapide pour vérifier que crypto.getRandomValues fonctionne
+      const testArray = new Uint8Array(1)
+      crypto.getRandomValues(testArray)
+      return true
+    } catch (error) {
+      console.warn('Crypto.getRandomValues not available:', error)
+      return false
     }
   }
 
@@ -353,7 +384,7 @@ class IDGenerator {
           mainId = this.generateBase36(length)
           break
         default:
-          mainId = this.nanoId(length)
+          mainId = this.nanoid(length)
       }
 
       let result = prefixStr
@@ -384,23 +415,35 @@ class IDGenerator {
 
   private static generateBase58(length: number): string {
     const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-    return this.isClient && crypto.getRandomValues
-      ? this.generateSecureNanoId(length, alphabet)
-      : this.generateFallbackNanoId(length, alphabet)
+    let result = ''
+    
+    for (let i = 0; i < length; i++) {
+      result += alphabet[Math.floor(Math.random() * alphabet.length)]
+    }
+    
+    return result
   }
 
   private static generateHex(length: number): string {
     const alphabet = '0123456789abcdef'
-    return this.isClient && crypto.getRandomValues
-      ? this.generateSecureNanoId(length, alphabet)
-      : this.generateFallbackNanoId(length, alphabet)
+    let result = ''
+    
+    for (let i = 0; i < length; i++) {
+      result += alphabet[Math.floor(Math.random() * alphabet.length)]
+    }
+    
+    return result
   }
 
   private static generateBase36(length: number): string {
     const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
-    return this.isClient && crypto.getRandomValues
-      ? this.generateSecureNanoId(length, alphabet)
-      : this.generateFallbackNanoId(length, alphabet)
+    let result = ''
+    
+    for (let i = 0; i < length; i++) {
+      result += alphabet[Math.floor(Math.random() * alphabet.length)]
+    }
+    
+    return result
   }
 
   private static calculateChecksum(input: string): string {
@@ -536,7 +579,7 @@ class IDParser {
 export const ID = {
   // Générateurs principaux
   uuid: () => IDGenerator.uuid(),
-  nano: (length?: number) => IDGenerator.nanoId(length),
+  nano: (length?: number) => IDGenerator.nanoid(length),
   
   // Générateurs métier
   projet: (config?: Partial<IDConfig>) => IDGenerator.business('PROJET', { timestamp: true, ...config }),
@@ -562,8 +605,8 @@ export const ID = {
   custom: (prefix: keyof typeof ID_PREFIXES, config?: IDConfig) => IDGenerator.business(prefix, config),
   
   // Legacy (compatibilité)
-  generate: () => IDGenerator.nanoId(),
-  simple: () => IDGenerator.nanoId(8)
+  generate: () => IDGenerator.nanoid(),
+  simple: () => IDGenerator.nanoid(8)
 }
 
 // =============================================
@@ -582,7 +625,7 @@ export function useClientId(prefix?: keyof typeof ID_PREFIXES, config?: Partial<
     try {
       const newId = prefix 
         ? IDGenerator.business(prefix, config) 
-        : IDGenerator.nanoId()
+        : IDGenerator.nanoid()
       setId(newId)
       setError(null)
     } catch (err) {

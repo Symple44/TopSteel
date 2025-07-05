@@ -96,6 +96,27 @@ export interface ClientsMetrics {
   retryAttempts: number
 }
 
+// Après les interfaces ClientsError, etc.
+function createClientsError(error: unknown): ClientsError {
+  if (error instanceof Error) {
+    return {
+      code: error.name || 'UNKNOWN_ERROR',
+      message: error.message,
+      details: {
+        stack: error.stack,
+        cause: error.cause
+      },
+      timestamp: new Date()
+    }
+  }
+  
+  return {
+    code: 'UNKNOWN_ERROR',
+    message: String(error),
+    timestamp: new Date()
+  }
+}
+
 // =============================================
 // CACHE ET PERFORMANCE
 // =============================================
@@ -141,9 +162,13 @@ class ClientsCache {
   }
 
   static set<T>(key: string, data: T, cache: Map<string, CacheEntry<T>>, ttl = this.defaultTTL): void {
+    // Fix TypeScript strict: nettoyage du cache si plein
     if (cache.size >= this.maxCacheSize) {
-      const oldestKey = cache.keys().next().value
-      cache.delete(oldestKey)
+      // Méthode plus sûre : convertir en array pour éviter undefined
+      const keys = Array.from(cache.keys())
+      if (keys.length > 0) {
+        cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
+      }
     }
     
     cache.set(key, {
@@ -667,7 +692,7 @@ export function useClients(
       
     } catch (err) {
       if (err instanceof Error && err.name !== 'AbortError') {
-        setError(err as ClientsError)
+        setError(createClientsError(err))
         console.error('Erreur lors du chargement des clients:', err)
       }
     } finally {

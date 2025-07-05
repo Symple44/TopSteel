@@ -1,4 +1,6 @@
-// packages/types/src/index.ts - Exports corrigés sans conflits
+// packages/types/src/index.ts - Version ultra-sûre
+// Exports existants conservés intacts
+
 // Types
 export * from './api'
 export * from './auth'
@@ -12,18 +14,17 @@ export * from './client'
 export * from './facturation'
 export * from './guards'
 export * from './notifications'
-export * from './production'; // Export global de production
+export * from './production'
 export * from './projet'
 export * from './stocks'
 
 // Types UI séparés
 export * from './ui'
 
-// Exports explicites pour les autres enums (pas production)
+// Exports explicites pour compatibilité
 export type { PaginationMetaDto, PaginationResultDto } from "./api"
 export { DevisStatut, FactureStatut, PaiementMethode } from "./facturation"
 export { NotificationCategory, NotificationType } from "./notifications"
-// Production exports sont gérés par export * from './production'
 export { ProjetPriorite, ProjetStatut, ProjetType } from "./projet"
 export type { Projet as ProjectType } from "./projet"
 export { ChuteQualite, ChuteStatut, MouvementType } from "./stocks"
@@ -34,9 +35,9 @@ export type ID = string
 export type Timestamp = Date
 export type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue }
 
-// === TYPES PRODUCTION ALIASES ===
+// Types production aliases
 export * from './components'
 export {
-  OrdrePriorite as PrioriteProduction, OrdreStatut as StatutProduction
+  OrdrePriorite as PrioriteProduction,
+  OrdreStatut as StatutProduction
 } from './production'
-
