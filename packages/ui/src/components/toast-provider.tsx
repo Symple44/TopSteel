@@ -1,14 +1,31 @@
-// packages/ui/src/components/toast-provider.tsx
 "use client";
 
 import * as React from 'react';
-import { useToast, Toast } from '../hooks/use-toast';
+import { useToast } from '../hooks/use-toast';
 
 interface ToastProviderProps {
   children: React.ReactNode;
 }
 
-const ToastContext = React.createContext<ReturnType<typeof useToast> | null>(null);
+// Définition explicite du type pour éviter les erreurs TS4058
+interface ToastContextValue {
+  toasts: Array<{
+    id: string;
+    title?: string;
+    description?: string;
+    variant?: 'default' | 'destructive' | 'success' | 'warning';
+    duration?: number;
+  }>;
+  toast: (props: {
+    title?: string;
+    description?: string;
+    variant?: 'default' | 'destructive' | 'success' | 'warning';
+    duration?: number;
+  }) => void;
+  dismiss: (id: string) => void;
+}
+
+const ToastContext = React.createContext<ToastContextValue | null>(null);
 
 export function ToastProvider({ children }: ToastProviderProps) {
   const toastApi = useToast();
@@ -27,7 +44,13 @@ export function ToastProvider({ children }: ToastProviderProps) {
 }
 
 interface ToastComponentProps {
-  toast: Toast;
+  toast: {
+    id: string;
+    title?: string;
+    description?: string;
+    variant?: 'default' | 'destructive' | 'success' | 'warning';
+    duration?: number;
+  };
   onDismiss: (id: string) => void;
 }
 
@@ -67,7 +90,8 @@ function ToastComponent({ toast, onDismiss }: ToastComponentProps) {
   );
 }
 
-export function useToastContext() {
+// Type de retour explicite pour éviter l'erreur TS4058
+export function useToastContext(): ToastContextValue {
   const context = React.useContext(ToastContext);
   if (!context) {
     throw new Error('useToastContext must be used within ToastProvider');

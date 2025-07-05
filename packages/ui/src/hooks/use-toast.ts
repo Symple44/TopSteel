@@ -1,5 +1,4 @@
-// packages/ui/src/hooks/use-toast.ts
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 export interface Toast {
   id: string;
@@ -9,7 +8,7 @@ export interface Toast {
   duration?: number;
 }
 
-interface ToastContextType {
+export interface ToastContextType {
   toasts: Toast[];
   toast: (props: Omit<Toast, 'id'>) => void;
   dismiss: (id: string) => void;

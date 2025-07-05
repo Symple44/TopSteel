@@ -1,25 +1,84 @@
 {
-  "types": "./dist/index.d.ts",
-  "module": "./dist/index.mjs",
-  "description": "UI components library for ERP TopSteel - Architecture robuste",
+  "name": "@erp/ui",
+  "version": "2.1.0",
+  "description": "UI components library for ERP TopSteel - Enterprise-grade design system",
   "type": "module",
-  "version": "2.0.0",
+  "private": true,
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss"
+  ],
   "files": [
     "dist",
-    "README.md"
+    "src",
+    "README.md",
+    "CHANGELOG.md"
   ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.mjs"
+    },
+    "./styles": {
+      "import": "./dist/styles.css",
+      "require": "./dist/styles.css"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.mjs",
+      "require": "./dist/components/index.js"
+    },
+    "./hooks": {
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.mjs",
+      "require": "./dist/hooks/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "pnpm run build:clean && pnpm run build:vite && pnpm run build:types",
+    "build:vite": "vite build",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist",
+    "build:clean": "rimraf dist",
+    "build:watch": "vite build --watch",
+    "dev": "vite build --watch --mode development",
+    "dev:storybook": "storybook dev -p 6006",
+    "build:storybook": "storybook build",
+    "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rimraf dist node_modules/.cache .turbo",
+    "size-check": "bundlesize",
+    "analyze": "vite-bundle-analyzer dist/stats.html",
+    "prepublishOnly": "pnpm run build && pnpm run test && pnpm run size-check",
+    "validate": "pnpm run type-check && pnpm run lint && pnpm run test"
+  },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.2",
-    "@radix-ui/react-collapsible": "^1.1.11",
+    "@radix-ui/react-collapsible": "^1.1.1",
     "@radix-ui/react-context-menu": "^2.2.2",
     "@radix-ui/react-dialog": "^1.1.2",
-    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-hover-card": "^1.1.2",
-    "@radix-ui/react-label": "^2.0.2",
-    "@radix-ui/react-menubar": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-menubar": "^1.1.2",
     "@radix-ui/react-navigation-menu": "^1.2.1",
     "@radix-ui/react-popover": "^1.1.2",
     "@radix-ui/react-progress": "^1.1.0",
@@ -28,59 +87,126 @@
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slider": "^1.2.1",
-    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
-    "@radix-ui/react-tabs": "^1.1.12",
+    "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.2",
     "@radix-ui/react-toggle": "^1.1.0",
-    "@radix-ui/react-tooltip": "^1.2.7",
+    "@radix-ui/react-tooltip": "^1.1.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.525.0",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss": "4.1.11"
-  },
-  "name": "@erp/ui",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
-    },
-    "./styles": {
-      "import": "./dist/styles.css",
-      "require": "./dist/styles.css"
-    }
+    "tailwindcss": "^4.1.11"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
+    "react-dom": ">=18.0.0",
+    "typescript": ">=5.0.0"
   },
-  "scripts": {
-    "dev:explicit": "npx vite build --watch",
-    "build": "pnpm exec vite build",
-    "test:vite": "pnpm exec vite --version",
-    "build:clean": "pnpm clean && pnpm build",
-    "dev": "npx vite build --watch",
-    "clean": "rimraf dist",
-    "build:fallback": "tsc && rollup -c",
-    "type-check": "pnpm exec tsc --noEmit"
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   },
-  "main": "./dist/index.js",
   "devDependencies": {
-    "@types/node": "^24.0.7",
+    "@chromatic-com/storybook": "^3.2.2",
+    "@erp/config": "workspace:*",
+    "@storybook/addon-essentials": "^8.4.7",
+    "@storybook/addon-interactions": "^8.4.7",
+    "@storybook/addon-links": "^8.4.7",
+    "@storybook/addon-onboarding": "^8.4.7",
+    "@storybook/blocks": "^8.4.7",
+    "@storybook/react": "^8.4.7",
+    "@storybook/react-vite": "^8.4.7",
+    "@storybook/test": "^8.4.7",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
+    "autoprefixer": "^10.4.20",
+    "bundlesize": "^0.18.2",
+    "eslint": "^9.18.0",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.5.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "rimraf": "^6.0.1",
-    "tsup": "^8.5.0",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "storybook": "^8.4.7",
     "typescript": "^5.8.3",
     "vite": "^7.0.0",
-    "vite-plugin-dts": "^4.5.4"
+    "vite-bundle-analyzer": "^0.11.0",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^2.1.8"
   },
+  "bundlesize": [
+    {
+      "path": "./dist/index.mjs",
+      "maxSize": "150kb",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/index.js",
+      "maxSize": "160kb",
+      "compression": "gzip"
+    }
+  ],
   "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.topsteel.internal"
+  },
+  "keywords": [
+    "ui",
+    "components",
+    "react",
+    "typescript",
+    "design-system",
+    "erp",
+    "topsteel",
+    "enterprise",
+    "radix-ui",
+    "tailwindcss"
+  ],
+  "author": {
+    "name": "TopSteel Engineering Team",
+    "email": "engineering@topsteel.com"
+  },
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/topsteel/erp-topsteel.git",
+    "directory": "packages/ui"
+  },
+  "bugs": {
+    "url": "https://github.com/topsteel/erp-topsteel/issues"
+  },
+  "homepage": "https://github.com/topsteel/erp-topsteel/tree/main/packages/ui#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "volta": {
+    "node": "20.18.0",
+    "pnpm": "8.15.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "config": {
     "access": "restricted"
+  },
+  "funding": {
+    "type": "corporate",
+    "url": "https://topsteel.com"
   }
 }
