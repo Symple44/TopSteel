@@ -1,17 +1,14 @@
 /**
- * ✅ API CLIENT ENTERPRISE - VERSION SÉCURISÉE
+ * ✅ API CLIENT ENTERPRISE - VERSION SÉCURISÉE ET CORRIGÉE
  * 
  * Fonctionnalités:
  * - Retry automatique avec backoff
  * - Cache intelligent multi-niveaux
  * - Gestion d'erreurs robuste
- * - Monitoring et métriques
  * - Types stricts
  * - Rate limiting client
  * - Authentication automatique
  */
-
-import { SecurityUtils } from '@/lib/security/security-enhanced'
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -46,11 +43,77 @@ interface APIMetrics {
   avgResponseTime: number
 }
 
-// ✅ SÉPARATION CLAIRE - Pas de fusion class/interface
-class APIClientBase {
+/**
+ * Rate limiter simple
+ */
+function createRateLimiter(maxRequests: number, windowMs: number) {
+  const requests: number[] = []
+  
+  return (operation: () => void) => () => {
+    const now = Date.now()
+    
+    // Nettoyer les requêtes anciennes
+    while (requests.length > 0 && requests[0] < now - windowMs) {
+      requests.shift()
+    }
+    
+    if (requests.length >= maxRequests) {
+      throw new Error('Rate limit exceeded')
+    }
+    
+    requests.push(now)
+    return operation()
+  }
+}
+
+/**
+ * Classe d'erreur API personnalisée
+ */
+export class APIError extends Error {
+  public readonly code: string
+  public readonly details: any
+  public readonly timestamp: number
+  public readonly requestId?: string
+
+  constructor(errorDetails: APIErrorDetails) {
+    super(errorDetails.message)
+    this.name = 'APIError'
+    this.code = errorDetails.code
+    this.details = errorDetails.details
+    this.timestamp = errorDetails.timestamp
+    this.requestId = errorDetails.requestId
+  }
+
+  /**
+   * Vérification si l'erreur est une erreur réseau
+   */
+  isNetworkError(): boolean {
+    return this.code.startsWith('HTTP_') || this.code === 'NETWORK_ERROR'
+  }
+
+  /**
+   * Vérification si l'erreur est une erreur d'authentification
+   */
+  isAuthError(): boolean {
+    return this.code === 'HTTP_401' || this.code === 'HTTP_403'
+  }
+
+  /**
+   * Vérification si l'erreur est récupérable
+   */
+  isRetryable(): boolean {
+    const retryableCodes = ['HTTP_500', 'HTTP_502', 'HTTP_503', 'HTTP_504', 'NETWORK_ERROR']
+    return retryableCodes.includes(this.code)
+  }
+}
+
+/**
+ * Client API principal
+ */
+export class APIClient {
   protected baseURL: string
   protected cache = new Map<string, CacheEntry>()
-  protected rateLimiter = SecurityUtils.createRateLimiter(100, 60000) // 100 req/min
+  protected rateLimiter = createRateLimiter(100, 60000) // 100 req/min
   protected metrics: APIMetrics = {
     requests: 0,
     errors: 0,
@@ -106,9 +169,9 @@ class APIClientBase {
   }
 
   /**
-   * Construction de la clé de cache
+   * Construction de la clé de cache - CHANGÉ EN PROTECTED pour accès par héritage
    */
-  private getCacheKey(endpoint: string, config: RequestConfig): string {
+  protected getCacheKey(endpoint: string, config: RequestConfig): string {
     const method = config.method || 'GET'
     const body = config.body ? JSON.stringify(config.body) : ''
     return `${method}:${endpoint}:${body}`
@@ -166,11 +229,11 @@ class APIClientBase {
       requestId: error.requestId || `req_${Date.now()}`
     }
 
-    // Log sécurisé
-    SecurityUtils.logSecurityEvent('api_error', {
-      endpoint,
-      error: errorDetails.code,
-      message: errorDetails.message
+    // Log simple (sans dépendance externe)
+    console.error(`🔴 API Error [${endpoint}]:`, {
+      code: errorDetails.code,
+      message: errorDetails.message,
+      timestamp: new Date(errorDetails.timestamp).toISOString()
     })
 
     throw new APIError(errorDetails)
@@ -211,10 +274,7 @@ class APIClientBase {
       )
     ])
   }
-}
 
-// ✅ CLASSE PRINCIPALE - Extension claire sans fusion d'interface
-export class APIClient extends APIClientBase {
   /**
    * Requête générique avec toutes les fonctionnalités
    */
@@ -340,104 +400,76 @@ export class APIClient extends APIClientBase {
   /**
    * Upload de fichier
    */
-  async upload<T>(endpoint: string, file: File, config: RequestConfig = {}): Promise<T> {
-    const formData = new FormData()
-    formData.append('file', file)
-
+  async upload<T>(endpoint: string, formData: FormData, config: RequestConfig = {}): Promise<T> {
     const uploadConfig = {
       ...config,
       method: 'POST' as const,
       headers: {
-        ...config.headers,
-        // Retirer Content-Type pour laisser le navigateur gérer multipart/form-data
-      },
-      body: formData,
-      cache: false,
-      timeout: 60000 // 1 minute pour uploads
+        // Ne pas définir Content-Type pour FormData (le navigateur le fera)
+        ...config.headers
+      }
     }
 
-    // Retirer Content-Type du header pour les uploads
-    const { 'Content-Type': _, ...headersWithoutContentType } = this.buildHeaders(uploadConfig)
-    uploadConfig.headers = headersWithoutContentType
+    // Supprimer Content-Type pour les uploads
+    if (uploadConfig.headers && 'Content-Type' in uploadConfig.headers) {
+      delete uploadConfig.headers['Content-Type']
+    }
 
-    return this.request<T>(endpoint, uploadConfig)
+    const url = `${this.baseURL}${endpoint}`
+    const headers = this.buildHeaders(uploadConfig)
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: Object.fromEntries(
+        Object.entries(headers).filter(([key]) => key !== 'Content-Type')
+      ),
+      body: formData
+    })
+
+    if (!response.ok) {
+      throw {
+        code: `HTTP_${response.status}`,
+        message: response.statusText,
+        details: { status: response.status, statusText: response.statusText }
+      }
+    }
+
+    return response.json()
   }
 
   /**
-   * Nettoyage manuel du cache
+   * Invalidation du cache
    */
-  clearCache(): void {
-    this.cache.clear()
+  invalidateCache(pattern?: string): void {
+    if (!pattern) {
+      this.cache.clear()
+      return
+    }
+
+    for (const key of this.cache.keys()) {
+      if (key.includes(pattern)) {
+        this.cache.delete(key)
+      }
+    }
   }
 
   /**
-   * Statistiques de performance
+   * Récupération des métriques
    */
   getMetrics(): APIMetrics {
     return { ...this.metrics }
   }
 
   /**
-   * Diagnostic de santé
+   * Reset des métriques
    */
-  async healthCheck(): Promise<{ status: 'ok' | 'error', latency: number, cache: number }> {
-    const start = Date.now()
-    
-    try {
-      await this.get('/health', { cache: false, timeout: 5000 })
-      const latency = Date.now() - start
-      
-      return {
-        status: 'ok',
-        latency,
-        cache: this.cache.size
-      }
-    } catch {
-      return {
-        status: 'error',
-        latency: Date.now() - start,
-        cache: this.cache.size
-      }
+  resetMetrics(): void {
+    this.metrics = {
+      requests: 0,
+      errors: 0,
+      cacheHits: 0,
+      avgResponseTime: 0
     }
-  }
-}
-
-// ✅ CLASSE D'ERREUR SPÉCIALISÉE - Pas de fusion
-export class APIError extends Error {
-  public readonly code: string
-  public readonly details?: any
-  public readonly timestamp: number
-  public readonly requestId?: string
-
-  constructor(errorDetails: APIErrorDetails) {
-    super(errorDetails.message)
-    this.name = 'APIError'
-    this.code = errorDetails.code
-    this.details = errorDetails.details
-    this.timestamp = errorDetails.timestamp
-    this.requestId = errorDetails.requestId
-  }
-
-  /**
-   * Vérification si l'erreur est une erreur réseau
-   */
-  isNetworkError(): boolean {
-    return this.code.startsWith('HTTP_') || this.code === 'NETWORK_ERROR'
-  }
-
-  /**
-   * Vérification si l'erreur est une erreur d'authentification
-   */
-  isAuthError(): boolean {
-    return this.code === 'HTTP_401' || this.code === 'HTTP_403'
-  }
-
-  /**
-   * Vérification si l'erreur est récupérable
-   */
-  isRetryable(): boolean {
-    const retryableCodes = ['HTTP_500', 'HTTP_502', 'HTTP_503', 'HTTP_504', 'NETWORK_ERROR']
-    return retryableCodes.includes(this.code)
   }
 }
 

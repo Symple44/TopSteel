@@ -1,29 +1,155 @@
 {
-  "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
+    /* ===== BASE CONFIGURATION ===== */
     "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "ES6"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable", 
+      "ES2022",
+      "WebWorker"
+    ],
     "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
     "noEmit": true,
-    "module": "esnext",
+    "esModuleInterop": true,
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [{"name": "next"}],
+
+    /* ===== STRICT TYPE CHECKING ===== */
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    /* ===== MODULES ET IMPORTS ===== */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@erp/ui": ["../../packages/ui/src"],
-      "@erp/types": ["../../packages/types/src"],
-      "@erp/utils": ["../../packages/utils/src"]
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/services/*": ["./src/services/*"],
+      "@/store/*": ["./src/store/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/app/*": ["./src/app/*"],
+      "@/styles/*": ["./src/styles/*"],
+      "@erp/types": ["../../packages/types/src/index"],
+      "@erp/ui": ["../../packages/ui/src/index"],
+      "@erp/utils": ["../../packages/utils/src/index"],
+      "@erp/config": ["../../packages/config/src/index"]
     },
-    "strict": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+
+    /* ===== NEXT.JS SPECIFIC ===== */
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "forceConsistentCasingInFileNames": true,
+
+    /* ===== PERFORMANCE ===== */
+    "assumeChangesOnlyAffectDirectDependencies": true,
+
+    /* ===== OUTPUT ===== */
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "outDir": "dist",
+    "removeComments": true,
+
+    /* ===== ADVANCED OPTIONS ===== */
+    "skipDefaultLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": false,
+
+    /* ===== EXPERIMENTAL ===== */
+    "experimentalDecorators": false,
+    "emitDecoratorMetadata": false,
+
+    /* ===== TYPE ACQUISITION ===== */
+    "typeRoots": [
+      "./node_modules/@types",
+      "../../node_modules/@types",
+      "./src/types"
+    ],
+    "types": [
+      "node",
+      "react",
+      "react-dom"
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", ".next", "dist", "coverage"]
+
+  /* ===== INCLUDED FILES ===== */
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    ".next/types/**/*.ts",
+    "src/**/*",
+    "components.json",
+    "tailwind.config.js",
+    "next.config.js",
+    "postcss.config.js",
+    "../../packages/types/src/**/*.ts",
+    "../../packages/ui/src/**/*.ts",
+    "../../packages/ui/src/**/*.tsx",
+    "../../packages/utils/src/**/*.ts",
+    "../../packages/config/src/**/*.ts"
+  ],
+
+  /* ===== EXCLUDED FILES ===== */
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build", 
+    ".next",
+    "out",
+    "coverage",
+    "cypress",
+    "e2e",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/.storybook/**/*",
+    "**/stories/**/*",
+    "storybook-static",
+    "**/*.stories.ts",
+    "**/*.stories.tsx"
+  ],
+
+  /* ===== TYPESCRIPT PROJECT REFERENCES ===== */
+  "references": [
+    {
+      "path": "../../packages/types"
+    },
+    {
+      "path": "../../packages/ui"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/config"
+    }
+  ],
+
+  /* ===== COMPILER DIAGNOSTICS ===== */
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }

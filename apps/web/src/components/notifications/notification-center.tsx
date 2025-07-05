@@ -18,7 +18,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { AlertTriangle, Bell, Check, CheckCheck, Clock, Settings, Trash2, X } from 'lucide-react'
+import { type Notification } from '@erp/types'
+import { AlertTriangle, Bell, CheckCheck, Clock, Settings, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import { NotificationSettings } from './notification-settings'
 
@@ -92,7 +93,7 @@ export function NotificationCenter() {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+          <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
             <div className={cn(
               "h-2 w-2 rounded-full",
               state.connected ? "bg-green-500" : "bg-red-500"
@@ -105,16 +106,16 @@ export function NotificationCenter() {
 
         <ScrollArea className="max-h-96">
           {state.notifications.length === 0 ? (
-            <div className="p-4 text-center text-sm text-muted-foreground">
+            <div className="p-4 text-center text-sm text-gray-500">
               Aucune notification
             </div>
           ) : (
             <div className="p-2 space-y-1">
-              {state.notifications.map((notification) => (
+              {state.notifications.map((notification: Notification) => (
                 <div
                   key={notification.id}
                   className={cn(
-                    "flex gap-3 p-3 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors",
+                    "flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors",
                     !notification.read && "bg-blue-50 border-l-2 border-l-blue-500"
                   )}
                   onClick={() => actions.markAsRead(notification.id)}
@@ -128,54 +129,41 @@ export function NotificationCenter() {
                       <h4 className="text-sm font-medium leading-tight">
                         {notification.title}
                       </h4>
-                      <div className="flex gap-1 flex-shrink-0">
-                        {!notification.read && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              actions.markAsRead(notification.id)
-                            }}
-                            title="Marquer comme lu"
-                          >
-                            <Check className="h-3 w-3" />
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            actions.removeNotification(notification.id)
-                          }}
-                          title="Supprimer"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
+                      <span className="text-xs text-gray-400 whitespace-nowrap">
+                        {formatTimeAgo(new Date(notification.createdAt || Date.now()))}
+                      </span>
                     </div>
                     
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                      {notification.message}
-                    </p>
+                    {notification.message && (
+                      <p className="text-sm text-gray-600 mt-1 leading-tight">
+                        {notification.message}
+                      </p>
+                    )}
                     
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-muted-foreground">
-                        {formatTimeAgo(notification.createdAt)}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {notification.category}
+                        </Badge>
+                        
+                        {notification.metadata?.priority && notification.metadata.priority !== 'normal' && (
+                          <Badge 
+                            variant={notification.metadata.priority === 'urgent' ? 'destructive' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {notification.metadata.priority}
+                          </Badge>
+                        )}
+                      </div>
                       
                       {notification.actionUrl && notification.actionLabel && (
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-6 text-xs px-2"
+                          className="text-xs h-6 px-2"
                           onClick={(e) => {
                             e.stopPropagation()
-                            // Navigation vers l'URL d'action
-                            window.location.href = notification.actionUrl!
+                            window.open(notification.actionUrl, '_blank')
                           }}
                         >
                           {notification.actionLabel}
@@ -183,6 +171,17 @@ export function NotificationCenter() {
                       )}
                     </div>
                   </div>
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      actions.removeNotification(notification.id)
+                    }}
+                    className="flex-shrink-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-gray-400 hover:text-gray-600 transition-opacity"
+                    title="Supprimer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -196,7 +195,7 @@ export function NotificationCenter() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full text-muted-foreground"
+                className="w-full text-gray-500 hover:text-red-600"
                 onClick={actions.clearAll}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
