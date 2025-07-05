@@ -1,435 +1,273 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-import { devtools } from 'zustand/middleware'
-import { immer } from 'zustand/middleware/immer'
-import { shallow } from 'zustand/shallow'
+/**
+ * 🏪 STORE PRINCIPAL - TopSteel ERP
+ * Store principal de l'application avec gestion robuste des états
+ * Fichier: apps/web/src/stores/app.store.ts
+ */
+import { StoreUtils, type BaseStoreState } from '@/lib/store-utils'
+import type { Projet, User } from '@erp/types'
 
-type Theme = 'light' | 'dark' | 'system'
-type Language = 'fr' | 'en' | 'es'
-type Currency = 'EUR' | 'USD' | 'GBP'
-type DateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD'
-
-interface NotificationSettings {
-  email: boolean
-  push: boolean
-  sound: boolean
-  desktop: boolean
-  frequency: 'immediate' | 'daily' | 'weekly'
-}
-
-interface UserPreferences {
-  dateFormat: DateFormat
-  currency: Currency
-  language: Language
-  timezone: string
-  notifications: NotificationSettings
-  accessibility: {
-    highContrast: boolean
-    fontSize: 'small' | 'medium' | 'large'
-    reducedMotion: boolean
-  }
+// ===== INTERFACES =====
+interface NotificationItem {
+  id: string
+  title: string
+  message: string
+  type: 'info' | 'success' | 'warning' | 'error'
+  read: boolean
+  timestamp: number
 }
 
 interface UIState {
   sidebarCollapsed: boolean
   sidebarPinned: boolean
-  layoutMode: 'comfortable' | 'compact' | 'spacious'
-  showBreadcrumbs: boolean
-  showTooltips: boolean
+  layoutMode: 'compact' | 'default' | 'wide'
   activeModule: string | null
+  showTooltips: boolean
 }
 
-interface FilterState {
-  projets: Record<string, any>
-  stocks: Record<string, any>
-  production: Record<string, any>
-  facturation: Record<string, any>
-  clients: Record<string, any>
-  fournisseurs: Record<string, any>
-}
-
-interface RecentActivity {
-  id: string
-  type: 'navigation' | 'action' | 'error'
-  module: string
-  action: string
-  timestamp: number
-  metadata?: Record<string, any>
-}
-
-interface AppMetrics {
-  sessionStart: number
+interface MetricsState {
   pageViews: number
   actionCount: number
-  errorCount: number
   lastActivity: number
-  performance: {
-    loadTime?: number
-    renderTime?: number
-    apiCalls: number
-  }
+  sessionStart: number
 }
 
-interface AppState {
-  theme: Theme
-  preferences: UserPreferences
+interface SessionState {
+  token: string | null
+  refreshToken: string | null
+  expiresAt: number | null
+}
+
+interface AppState extends BaseStoreState {
+  // État UI
+  theme: 'light' | 'dark' | 'auto'
   ui: UIState
-  filters: FilterState
   
-  session: {
-    id: string
-    isOnline: boolean
-    lastSync: number
+  // Données utilisateur
+  user: User | null
+  session: SessionState | null
+  
+  // Données métier
+  projets: Projet[]
+  notifications: NotificationItem[]
+  
+  // Filtres
+  filters: {
+    projets?: Record<string, any>
+    stocks?: Record<string, any>
+    production?: Record<string, any>
   }
-  metrics: AppMetrics
-  recentActivity: RecentActivity[]
   
-  errors: Array<{
-    id: string
-    message: string
-    timestamp: number
-    severity: 'low' | 'medium' | 'high'
-    resolved: boolean
-  }>
-}
+  // Métriques
+  metrics: MetricsState
 
-interface AppActions {
-  setTheme: (theme: Theme) => void
+  // ===== ACTIONS =====
+  // Actions UI
+  setTheme: (theme: AppState['theme']) => void
   setSidebarCollapsed: (collapsed: boolean) => void
   setSidebarPinned: (pinned: boolean) => void
   setLayoutMode: (mode: UIState['layoutMode']) => void
   setActiveModule: (module: string | null) => void
-  updatePreferences: (preferences: Partial<UserPreferences>) => void
-  updateNotificationSettings: (settings: Partial<NotificationSettings>) => void
-  updateAccessibilitySettings: (settings: Partial<UserPreferences['accessibility']>) => void
-  setFilters: (module: keyof FilterState, filters: Record<string, any>) => void
-  clearFilters: (module: keyof FilterState) => void
-  clearAllFilters: () => void
-  trackActivity: (activity: Omit<RecentActivity, 'id' | 'timestamp'>) => void
-  clearActivity: () => void
-  addError: (error: Omit<AppState['errors'][0], 'id' | 'timestamp'>) => void
-  resolveError: (errorId: string) => void
-  clearErrors: () => void
-  updateSession: (updates: Partial<AppState['session']>) => void
-  incrementMetric: (metric: keyof AppMetrics | keyof AppMetrics['performance']) => void
+  
+  // Actions utilisateur
+  setUser: (user: User | null) => void
+  setSession: (session: SessionState | null) => void
+  
+  // Actions données
+  setProjets: (projets: Projet[]) => void
+  addProjet: (projet: Projet) => void
+  updateProjet: (id: string, updates: Partial<Projet>) => void
+  removeProjet: (id: string) => void
+  
+  // Actions notifications
+  addNotification: (notification: Omit<NotificationItem, 'id' | 'timestamp'>) => void
+  removeNotification: (id: string) => void
+  clearNotifications: () => void
+  
+  // Actions filtres
+  setFilters: (module: keyof AppState['filters'], filters: Record<string, any>) => void
+  clearFilters: (module: keyof AppState['filters']) => void
+  
+  // Actions de base
+  setLoading: (loading: boolean) => void
+  setError: (error: string | null) => void
+  clearError: () => void
   reset: () => void
-  exportState: () => string
-  importState: (state: string) => boolean
 }
 
-type AppStore = AppState & AppActions
-
-const initialState: AppState = {
-  theme: 'system',
-  preferences: {
-    dateFormat: 'DD/MM/YYYY',
-    currency: 'EUR',
-    language: 'fr',
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    notifications: {
-      email: true,
-      push: true,
-      sound: true,
-      desktop: false,
-      frequency: 'immediate'
-    },
-    accessibility: {
-      highContrast: false,
-      fontSize: 'medium',
-      reducedMotion: false
-    }
-  },
+// ===== ÉTAT INITIAL =====
+const initialAppState: Omit<AppState, 'setTheme' | 'setSidebarCollapsed' | 'setSidebarPinned' | 'setLayoutMode' | 'setActiveModule' | 'setUser' | 'setSession' | 'setProjets' | 'addProjet' | 'updateProjet' | 'removeProjet' | 'addNotification' | 'removeNotification' | 'clearNotifications' | 'setFilters' | 'clearFilters' | 'setLoading' | 'setError' | 'clearError' | 'reset'> = {
+  // État de base
+  loading: false,
+  error: null,
+  lastUpdate: 0,
+  
+  // UI
+  theme: 'light',
   ui: {
     sidebarCollapsed: false,
     sidebarPinned: true,
-    layoutMode: 'comfortable',
-    showBreadcrumbs: true,
-    showTooltips: true,
-    activeModule: null
+    layoutMode: 'default',
+    activeModule: null,
+    showTooltips: true
   },
-  filters: {
-    projets: {},
-    stocks: {},
-    production: {},
-    facturation: {},
-    clients: {},
-    fournisseurs: {}
-  },
-  session: {
-    id: '',
-    isOnline: true,
-    lastSync: Date.now()
-  },
+  
+  // Utilisateur
+  user: null,
+  session: null,
+  
+  // Données
+  projets: [],
+  notifications: [],
+  filters: {},
+  
+  // Métriques
   metrics: {
-    sessionStart: Date.now(),
     pageViews: 0,
     actionCount: 0,
-    errorCount: 0,
     lastActivity: Date.now(),
-    performance: {
-      apiCalls: 0
-    }
-  },
-  recentActivity: [],
-  errors: []
+    sessionStart: Date.now()
+  }
 }
 
-const storage = createJSONStorage(() => {
-  if (typeof window === 'undefined') {
+// ===== CRÉATION DU STORE =====
+export const useAppStore = StoreUtils.createRobustStore<AppState>(
+  initialAppState as AppState,
+  (set, get) => {
+    const baseActions = StoreUtils.createBaseActions<AppState>()
+    
     return {
-      getItem: () => null,
-      setItem: () => {},
-      removeItem: () => {}
-    }
-  }
-
-  return {
-    getItem: (name: string) => {
-      try {
-        const item = localStorage.getItem(name)
-        return item ? JSON.parse(item) : null
-      } catch (error) {
-        console.warn(`Storage read error for ${name}:`, error)
-        return null
-      }
-    },
-    setItem: (name: string, value: any) => {
-      try {
-        localStorage.setItem(name, JSON.stringify(value))
-      } catch (error) {
-        console.warn(`Storage write error for ${name}:`, error)
-      }
-    },
-    removeItem: (name: string) => {
-      try {
-        localStorage.removeItem(name)
-      } catch (error) {
-        console.warn(`Storage remove error for ${name}:`, error)
-      }
-    }
-  }
-})
-
-// 🚀 UTILISEZ LES SELECTORS OPTIMISÉS POUR LES PERFORMANCES
-// import { useTheme, useUser, useProjectFilters } from './selectors/app.selectors'
-// Au lieu de: useAppStore(state => state.theme)
-// Utilisez: useTheme()
-
-// 🚀 UTILISEZ LES SELECTORS OPTIMISÉS POUR LES PERFORMANCES
-// import { useTheme, useUser, useProjectFilters } from './selectors/app.selectors'
-// Au lieu de: useAppStore(state => state.theme)
-// Utilisez: useTheme()
-
-export const useAppStore = create<AppStore>()(
-  devtools(
-    persist(
-      immer((set, get) => ({
-        ...initialState,
-
-        setTheme: (theme) => set((state) => {
-          state.theme = theme
-          state.metrics.actionCount++
-          state.metrics.lastActivity = Date.now()
-        }),
-
-        setSidebarCollapsed: (collapsed) => set((state) => {
-          state.ui.sidebarCollapsed = collapsed
-          state.metrics.actionCount++
-        }),
-
-        setSidebarPinned: (pinned) => set((state) => {
-          state.ui.sidebarPinned = pinned
-        }),
-
-        setLayoutMode: (mode) => set((state) => {
-          state.ui.layoutMode = mode
-        }),
-
-        setActiveModule: (module) => set((state) => {
-          state.ui.activeModule = module
-          if (module) {
-            state.metrics.pageViews++
-          }
-        }),
-
-        updatePreferences: (preferences) => set((state) => {
-          Object.assign(state.preferences, preferences)
-        }),
-
-        updateNotificationSettings: (settings) => set((state) => {
-          Object.assign(state.preferences.notifications, settings)
-        }),
-
-        updateAccessibilitySettings: (settings) => set((state) => {
-          Object.assign(state.preferences.accessibility, settings)
-        }),
-
-        setFilters: (module, filters) => set((state) => {
-          state.filters[module] = filters
-        }),
-
-        clearFilters: (module) => set((state) => {
-          state.filters[module] = {}
-        }),
-
-        clearAllFilters: () => set((state) => {
-          Object.keys(state.filters).forEach(key => {
-            state.filters[key as keyof FilterState] = {}
-          })
-        }),
-
-        trackActivity: (activity) => set((state) => {
-          const newActivity: RecentActivity = {
-            ...activity,
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            timestamp: Date.now()
-          }
-          
-          state.recentActivity.unshift(newActivity)
-          
-          if (state.recentActivity.length > 50) {
-            state.recentActivity = state.recentActivity.slice(0, 50)
-          }
-          
-          state.metrics.actionCount++
-          state.metrics.lastActivity = Date.now()
-        }),
-
-        clearActivity: () => set((state) => {
-          state.recentActivity = []
-        }),
-
-        addError: (error) => set((state) => {
-          const newError = {
-            ...error,
-            id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            timestamp: Date.now()
-          }
-          
-          state.errors.unshift(newError)
-          state.metrics.errorCount++
-          
-          if (state.errors.length > 20) {
-            state.errors = state.errors.slice(0, 20)
-          }
-        }),
-
-        resolveError: (errorId) => set((state) => {
-          const error = state.errors.find(e => e.id === errorId)
-          if (error) {
-            error.resolved = true
-          }
-        }),
-
-        clearErrors: () => set((state) => {
-          state.errors = []
-        }),
-
-        updateSession: (updates) => set((state) => {
-          Object.assign(state.session, updates)
-        }),
-
-        incrementMetric: (metric) => set((state) => {
-          if (metric in state.metrics) {
-            (state.metrics as any)[metric]++
-          } else if (metric in state.metrics.performance) {
-            (state.metrics.performance as any)[metric]++
-          }
-        }),
-
-        reset: () => set(() => ({ ...initialState })),
-
-        exportState: () => {
-          try {
-            return JSON.stringify(get(), null, 2)
-          } catch (error) {
-            console.error('Export failed:', error)
-            return '{}'
-          }
-        },
-
-        importState: (stateString) => {
-          try {
-            const importedState = JSON.parse(stateString)
-            set(() => ({ ...initialState, ...importedState }))
-            return true
-          } catch (error) {
-            console.error('Import failed:', error)
-            return false
-          }
+      ...initialAppState,
+      
+      // ===== ACTIONS UI =====
+      setTheme: (theme) => set((state: AppState) => {
+        state.theme = theme
+        state.metrics.actionCount++
+        state.lastUpdate = Date.now()
+      }),
+      
+      setSidebarCollapsed: (collapsed) => set((state: AppState) => {
+        state.ui.sidebarCollapsed = collapsed
+        state.metrics.actionCount++
+        state.lastUpdate = Date.now()
+      }),
+      
+      setSidebarPinned: (pinned) => set((state: AppState) => {
+        state.ui.sidebarPinned = pinned
+        state.metrics.actionCount++
+        state.lastUpdate = Date.now()
+      }),
+      
+      setLayoutMode: (mode) => set((state: AppState) => {
+        state.ui.layoutMode = mode
+        state.metrics.actionCount++
+        state.lastUpdate = Date.now()
+      }),
+      
+      setActiveModule: (module) => set((state: AppState) => {
+        state.ui.activeModule = module
+        if (module) {
+          state.metrics.pageViews++
         }
-      })),
-      {
-        name: 'topsteel-app-state',
-        version: 2,
-        storage,
-        
-        partialize: (state) => ({
-          theme: state.theme,
-          preferences: state.preferences,
-          ui: {
-            sidebarCollapsed: state.ui.sidebarCollapsed,
-            sidebarPinned: state.ui.sidebarPinned,
-            layoutMode: state.ui.layoutMode,
-            showBreadcrumbs: state.ui.showBreadcrumbs,
-            showTooltips: state.ui.showTooltips
-          },
-          filters: state.filters
-        }),
-        
-        migrate: (persistedState: any, version: number) => {
-          if (version < 2) {
-            return {
-              ...initialState,
-              ...persistedState,
-              session: {
-                ...initialState.session,
-                id: `migrated-${Date.now()}`
-              }
-            }
-          }
-          return persistedState
-        },
-
-        onRehydrateStorage: () => (state, error) => {
-          if (error) {
-            console.error('Store rehydration failed:', error)
-          } else if (state) {
-            state.session.id = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-            state.session.lastSync = Date.now()
-            state.metrics.sessionStart = Date.now()
-          }
+        state.metrics.lastActivity = Date.now()
+        state.lastUpdate = Date.now()
+      }),
+      
+      // ===== ACTIONS UTILISATEUR =====
+      setUser: (user) => set((state: AppState) => {
+        state.user = user
+        state.metrics.lastActivity = Date.now()
+        state.lastUpdate = Date.now()
+      }),
+      
+      setSession: (session) => set((state: AppState) => {
+        state.session = session
+        state.lastUpdate = Date.now()
+      }),
+      
+      // ===== ACTIONS DONNÉES =====
+      setProjets: (projets) => set((state: AppState) => {
+        state.projets = projets
+        state.lastUpdate = Date.now()
+      }),
+      
+      addProjet: (projet) => set((state: AppState) => {
+        state.projets.push(projet)
+        state.metrics.actionCount++
+        state.lastUpdate = Date.now()
+      }),
+      
+      updateProjet: (id, updates) => set((state: AppState) => {
+        const index = state.projets.findIndex(p => p.id === id)
+        if (index !== -1) {
+          Object.assign(state.projets[index], updates)
+          state.metrics.actionCount++
+          state.lastUpdate = Date.now()
         }
-      }
-    ),
-    {
-      name: 'TopSteel App Store',
-      enabled: process.env.NODE_ENV === 'development'
-    }
-  )
+      }),
+      
+      removeProjet: (id) => set((state: AppState) => {
+        state.projets = state.projets.filter(p => p.id !== id)
+        state.metrics.actionCount++
+        state.lastUpdate = Date.now()
+      }),
+      
+      // ===== ACTIONS NOTIFICATIONS =====
+      addNotification: (notification) => set((state: AppState) => {
+        state.notifications.push({
+          ...notification,
+          id: crypto.randomUUID(),
+          timestamp: Date.now()
+        })
+        state.lastUpdate = Date.now()
+      }),
+      
+      removeNotification: (id) => set((state: AppState) => {
+        state.notifications = state.notifications.filter(n => n.id !== id)
+        state.lastUpdate = Date.now()
+      }),
+      
+      clearNotifications: () => set((state: AppState) => {
+        state.notifications = []
+        state.lastUpdate = Date.now()
+      }),
+      
+      // ===== ACTIONS FILTRES =====
+      setFilters: (module, filters) => set((state: AppState) => {
+        state.filters[module] = filters
+        state.metrics.actionCount++
+        state.lastUpdate = Date.now()
+      }),
+      
+      clearFilters: (module) => set((state: AppState) => {
+        delete state.filters[module]
+        state.metrics.actionCount++
+        state.lastUpdate = Date.now()
+      }),
+      
+      // ===== ACTIONS DE BASE =====
+      setLoading: baseActions.setLoading,
+      setError: baseActions.setError,
+      clearError: baseActions.clearError,
+      reset: () => set((state: AppState) => {
+        Object.assign(state, {
+          ...initialAppState,
+          metrics: {
+            ...initialAppState.metrics,
+            sessionStart: Date.now()
+          }
+        })
+      })
+      
+    } as AppState
+  },
+  {
+    name: 'app-store',
+    persist: true,
+    devtools: true,
+    immer: true,
+    subscriptions: true
+  }
 )
 
-export const useTheme = () => useAppStore(state => state.theme)
-export const useUIState = () => useAppStore(state => state.ui)
-export const usePreferences = () => useAppStore(state => state.preferences)
-export const useFilters = () => useAppStore(state => state.filters)
-export const useMetrics = () => useAppStore(state => state.metrics)
-export const useErrors = () => useAppStore(state => state.errors)
-export const useSession = () => useAppStore(state => state.session)
-
-export const useSidebarState = () => useAppStore(
-  state => ({
-    collapsed: state.ui.sidebarCollapsed,
-    pinned: state.ui.sidebarPinned,
-    toggle: state.setSidebarCollapsed,
-    pin: state.setSidebarPinned
-  })
-)
-
-export const useModuleFilters = (module: keyof FilterState) => useAppStore(
-  state => ({
-    filters: state.filters[module],
-    setFilters: (filters: Record<string, any>) => state.setFilters(module, filters),
-    clearFilters: () => state.clearFilters(module)
-  })
-)
+// ===== TYPES EXPORTÉS =====
+export type { AppState, MetricsState, NotificationItem, SessionState, UIState }
