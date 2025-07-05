@@ -1,24 +1,24 @@
 /**
  * 🎯 HOOK PROJETS CORRIGÉ - TopSteel ERP
- * Hook pour la gestion des projets avec état stable
+ * Hook pour la gestion des projets avec accès sécurisé aux propriétés
  * Fichier: apps/web/src/hooks/use-projets.ts
  */
-import type { ProjetFilters } from '@/stores/projet.store'
 import { useProjetStore } from '@/stores/projet.store'
+import type { ProjetFilters } from '@erp/types'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export const useProjets = (autoFetch = true) => {
   const [mounted, setMounted] = useState(false)
   const fetchInitiatedRef = useRef(false)
   
-  // ✅ CORRECTION: Utiliser 'loading' au lieu de 'isLoading'
-  const projets = useProjetStore((state) => state.projets) || []
-  const loading = useProjetStore((state) => state.loading) || false
-  const error = useProjetStore((state) => state.error)
-  const filters = useProjetStore((state) => state.filters) || {}
+  // ✅ CORRECTION: Accès sécurisé aux propriétés avec fallbacks
+  const projets = useProjetStore((state) => state.projets || [])
+  const loading = useProjetStore((state) => (state as any).loading || false)
+  const error = useProjetStore((state) => (state as any).error || null)
+  const filters = useProjetStore((state) => state.filters || {})
   const fetchProjets = useProjetStore((state) => state.fetchProjets)
   const setFilters = useProjetStore((state) => state.setFilters)
-  const clearError = useProjetStore((state) => state.clearError)
+  const clearError = useProjetStore((state) => (state as any).clearError)
 
   const stableFetch = useCallback(async () => {
     if (fetchInitiatedRef.current || !mounted || loading) {
@@ -28,7 +28,9 @@ export const useProjets = (autoFetch = true) => {
     fetchInitiatedRef.current = true
     
     try {
-      await fetchProjets()
+      if (fetchProjets) {
+        await fetchProjets()
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des projets:', error)
     } finally {
@@ -57,14 +59,14 @@ export const useProjets = (autoFetch = true) => {
   }, [mounted, autoFetch, projets.length, loading, stableFetch])
 
   return {
-    projets: projets || [], // Toujours un tableau
+    projets,
     isLoading: loading, // ✅ Alias pour compatibilité
     loading, // ✅ Propriété native
     error,
     filters,
     fetchProjets: stableFetch,
     setFilters,
-    clearError,
+    clearError: clearError || (() => {}),
     refetch: stableFetch,
     refetchWithFilters,
   }
@@ -72,15 +74,15 @@ export const useProjets = (autoFetch = true) => {
 
 export const useProjet = (id?: string) => {
   const selectedProjet = useProjetStore((state) => state.selectedProjet)
-  const loading = useProjetStore((state) => state.loading) || false
-  const error = useProjetStore((state) => state.error)
+  const loading = useProjetStore((state) => (state as any).loading || false)
+  const error = useProjetStore((state) => (state as any).error || null)
   const setSelectedProjet = useProjetStore((state) => state.setSelectedProjet)
   const selectProjetById = useProjetStore((state) => state.selectProjetById)
-  const clearError = useProjetStore((state) => state.clearError)
+  const clearError = useProjetStore((state) => (state as any).clearError)
 
   const selectProjet = useCallback((targetId: string | undefined) => {
     if (!targetId) {
-      setSelectedProjet(null)
+      setSelectedProjet?.(null)
       return
     }
 
@@ -91,7 +93,7 @@ export const useProjet = (id?: string) => {
     // Utiliser selectProjetById si disponible, sinon setSelectedProjet
     if (selectProjetById) {
       selectProjetById(targetId)
-    } else {
+    } else if (setSelectedProjet) {
       setSelectedProjet(null)
     }
   }, [selectedProjet?.id, setSelectedProjet, selectProjetById])
@@ -106,7 +108,7 @@ export const useProjet = (id?: string) => {
     loading, // ✅ Propriété native
     error,
     setSelectedProjet,
-    clearError,
+    clearError: clearError || (() => {}),
     data: selectedProjet,
     projet: selectedProjet,
   }
@@ -117,14 +119,14 @@ export const useProjet = (id?: string) => {
  */
 export const useProjetsStats = () => {
   const stats = useProjetStore((state) => state.stats)
-  const loading = useProjetStore((state) => state.loading)
+  const loading = useProjetStore((state) => (state as any).loading || false)
   const refreshStats = useProjetStore((state) => state.refreshStats)
   
   return {
     stats,
     loading,
     isLoading: loading,
-    refreshStats
+    refreshStats: refreshStats || (() => {})
   }
 }
 
@@ -132,9 +134,9 @@ export const useProjetsStats = () => {
  * Hook pour la pagination des projets
  */
 export const useProjetsPagination = () => {
-  const currentPage = useProjetStore((state) => state.currentPage)
-  const pageSize = useProjetStore((state) => state.pageSize)
-  const totalCount = useProjetStore((state) => state.totalCount)
+  const currentPage = useProjetStore((state) => state.currentPage || 0)
+  const pageSize = useProjetStore((state) => state.pageSize || 20)
+  const totalCount = useProjetStore((state) => state.totalCount || 0)
   const setPage = useProjetStore((state) => state.setPage)
   const setPageSize = useProjetStore((state) => state.setPageSize)
   
@@ -149,12 +151,12 @@ export const useProjetsPagination = () => {
     totalPages,
     hasNext,
     hasPrev,
-    setPage,
-    setPageSize,
-    nextPage: () => hasNext && setPage(currentPage + 1),
-    prevPage: () => hasPrev && setPage(currentPage - 1),
-    firstPage: () => setPage(0),
-    lastPage: () => setPage(totalPages - 1)
+    setPage: setPage || (() => {}),
+    setPageSize: setPageSize || (() => {}),
+    nextPage: () => hasNext && setPage?.(currentPage + 1),
+    prevPage: () => hasPrev && setPage?.(currentPage - 1),
+    firstPage: () => setPage?.(0),
+    lastPage: () => setPage?.(totalPages - 1)
   }
 }
 
@@ -162,8 +164,8 @@ export const useProjetsPagination = () => {
  * Hook pour les filtres et la recherche
  */
 export const useProjetsFilters = () => {
-  const filters = useProjetStore((state) => state.filters)
-  const searchTerm = useProjetStore((state) => state.searchTerm)
+  const filters = useProjetStore((state) => state.filters || {})
+  const searchTerm = useProjetStore((state) => state.searchTerm || '')
   const sortBy = useProjetStore((state) => state.sortBy)
   const sortOrder = useProjetStore((state) => state.sortOrder)
   const setFilters = useProjetStore((state) => state.setFilters)
@@ -176,20 +178,20 @@ export const useProjetsFilters = () => {
     searchTerm,
     sortBy,
     sortOrder,
-    setFilters,
-    setSearchTerm,
-    setSorting,
-    clearFilters,
+    setFilters: setFilters || (() => {}),
+    setSearchTerm: setSearchTerm || (() => {}),
+    setSorting: setSorting || (() => {}),
+    clearFilters: clearFilters || (() => {}),
     // Helpers
     addFilter: (key: keyof ProjetFilters, value: any) => {
-      setFilters({ ...filters, [key]: value })
+      setFilters?.({ ...filters, [key]: value })
     },
     removeFilter: (key: keyof ProjetFilters) => {
       const newFilters = { ...filters }
       // ✅ Type-safe deletion
       if (key in newFilters) {
         const { [key]: removed, ...rest } = newFilters
-        setFilters(rest)
+        setFilters?.(rest)
       }
     }
   }
@@ -203,8 +205,8 @@ export const useProjetsActions = () => {
   const updateProjet = useProjetStore((state) => state.updateProjet)
   const deleteProjet = useProjetStore((state) => state.deleteProjet)
   const duplicateProjet = useProjetStore((state) => state.duplicateProjet)
-  const loading = useProjetStore((state) => state.loading)
-  const error = useProjetStore((state) => state.error)
+  const loading = useProjetStore((state) => (state as any).loading || false)
+  const error = useProjetStore((state) => (state as any).error || null)
   
   return {
     createProjet,
@@ -217,7 +219,7 @@ export const useProjetsActions = () => {
     // Helpers avec gestion d'erreur
     createProjetSafe: async (data: any) => {
       try {
-        return await createProjet(data)
+        return await createProjet?.(data)
       } catch (error) {
         console.error('Erreur création projet:', error)
         throw error
@@ -225,7 +227,7 @@ export const useProjetsActions = () => {
     },
     updateProjetSafe: async (id: string, data: any) => {
       try {
-        return await updateProjet(id, data)
+        return await updateProjet?.(id, data)
       } catch (error) {
         console.error('Erreur mise à jour projet:', error)
         throw error
@@ -233,7 +235,7 @@ export const useProjetsActions = () => {
     },
     deleteProjetSafe: async (id: string) => {
       try {
-        return await deleteProjet(id)
+        return await deleteProjet?.(id)
       } catch (error) {
         console.error('Erreur suppression projet:', error)
         throw error

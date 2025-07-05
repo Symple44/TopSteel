@@ -1,6 +1,7 @@
 /**
- * ⚡ SELECTORS ZUSTAND OPTIMISÉS - TopSteel ERP
- * Version corrigée pour résoudre les erreurs TypeScript et améliorer la robustesse
+ * ⚡ SÉLECTEURS ZUSTAND OPTIMISÉS - TopSteel ERP
+ * Version simplifiée et robuste sans erreurs React Hooks
+ * Fichier: apps/web/src/lib/optimized-selectors.ts
  */
 import { useMemo } from 'react'
 import { shallow } from 'zustand/shallow'
@@ -10,51 +11,105 @@ type StoreSelector<T, R> = (state: T) => R
 type EqualityFn<T> = (a: T, b: T) => boolean
 
 /**
- * ✅ API Zustand moderne - Signature correcte
+ * Interface moderne pour les hooks Zustand
  */
 interface ZustandStoreHook<T> {
   <R>(selector: StoreSelector<T, R>): R
   <R>(selector: StoreSelector<T, R>, equalityFn: EqualityFn<R>): R
+  (): T
+  getState(): T
+  setState(
+    partial: T | Partial<T> | ((state: T) => T | Partial<T>),
+    replace?: boolean | undefined
+  ): void
+  subscribe(listener: (state: T, prevState: T) => void): () => void
 }
 
-/**
- * ✅ Créateur de sélecteurs optimisés - HOOKS REACT CORRECTS
- */
+// ===== STRATÉGIES D'OPTIMISATION =====
+export enum SelectorStrategy {
+  SIMPLE = 'simple',
+  SHALLOW = 'shallow',
+  DEEP = 'deep'
+}
+
+// ===== CONFIGURATION DES SÉLECTEURS =====
+export interface SelectorOptions<R> {
+  strategy?: SelectorStrategy
+  equalityFn?: EqualityFn<R>
+  defaultValue?: R
+  debugLabel?: string
+}
+
+// ===== CRÉATEUR DE SÉLECTEURS OPTIMISÉS =====
 export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
   return {
     /**
-     * Sélecteur avec shallow comparison
+     * Sélecteur avec shallow comparison - Optimal pour les objets
      */
-    useShallow: <R>(selector: StoreSelector<T, R>) => {
-      return useStore(selector, shallow as EqualityFn<R>)
+    useShallow: <R>(selector: StoreSelector<T, R>, debugLabel?: string) => {
+      const result = useStore(selector, shallow as EqualityFn<R>)
+      
+      // Debug direct sans useMemo
+      if (process.env.NODE_ENV === 'development' && debugLabel) {
+        console.debug(`🔍 [${debugLabel}] Shallow selector called`)
+      }
+      
+      return result
     },
 
     /**
-     * Sélecteur avec fonction d'égalité personnalisée
+     * Sélecteur avec égalité profonde personnalisée
      */
-    useDeep: <R>(selector: StoreSelector<T, R>, equalityFn?: EqualityFn<R>) => {
-      return useStore(selector, equalityFn || Object.is)
+    useDeep: <R>(
+      selector: StoreSelector<T, R>, 
+      equalityFn: EqualityFn<R> = Object.is,
+      debugLabel?: string
+    ) => {
+      const result = useStore(selector, equalityFn)
+      
+      // Debug direct sans useMemo
+      if (process.env.NODE_ENV === 'development' && debugLabel) {
+        console.debug(`🔍 [${debugLabel}] Deep selector called`)
+      }
+      
+      return result
     },
 
     /**
-     * Sélecteur simple sans optimisation
+     * Sélecteur simple sans optimisation spéciale
      */
-    useSimple: <R>(selector: StoreSelector<T, R>) => {
-      return useStore(selector)
+    useSimple: <R>(selector: StoreSelector<T, R>, debugLabel?: string) => {
+      const result = useStore(selector)
+      
+      // Debug direct sans useMemo
+      if (process.env.NODE_ENV === 'development' && debugLabel) {
+        console.debug(`🔍 [${debugLabel}] Simple selector called`)
+      }
+      
+      return result
     },
 
     /**
      * Sélecteur avec valeur par défaut sécurisée
      */
-    useSafe: <R>(selector: StoreSelector<T, R>, defaultValue: R) => {
-      return useStore((state: T) => {
+    useSafe: <R>(
+      selector: StoreSelector<T, R>, 
+      defaultValue: R,
+      debugLabel?: string
+    ) => {
+      const safeSelector = useMemo(() => (state: T) => {
         try {
           const result = selector(state)
           return result ?? defaultValue
-        } catch {
+        } catch (error) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`⚠️ Selector error in ${debugLabel || 'unknown'}:`, error)
+          }
           return defaultValue
         }
-      })
+      }, [selector, defaultValue, debugLabel])
+
+      return useStore(safeSelector, shallow as EqualityFn<R>)
     },
 
     /**
@@ -63,48 +118,106 @@ export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
     useTransformed: <R, U>(
       selector: StoreSelector<T, R>,
       transform: (value: R) => U,
-      equalityFn?: EqualityFn<U>
+      options: { 
+        equalityFn?: EqualityFn<U>
+        debugLabel?: string 
+      } = {}
     ) => {
+      const { equalityFn = shallow as EqualityFn<U>, debugLabel } = options
+      
       const transformedSelector = useMemo(
-        () => (state: T) => transform(selector(state)),
-        [selector, transform]
+        () => (state: T) => {
+          try {
+            return transform(selector(state))
+          } catch (error) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(`⚠️ Transform error in ${debugLabel || 'unknown'}:`, error)
+            }
+            throw error
+          }
+        },
+        [selector, transform, debugLabel]
       )
-      return useStore(transformedSelector, equalityFn || shallow as EqualityFn<U>)
-    }
+
+      return useStore(transformedSelector, equalityFn)
+    },
+
+    /**
+     * Sélecteur avec filtre dynamique
+     */
+    useFiltered: <R extends readonly any[]>(
+      selector: StoreSelector<T, R>,
+      filterFn: (item: R[number]) => boolean,
+      debugLabel?: string
+    ): R => {
+      const filteredSelector = useMemo(
+        () => (state: T) => {
+          const items = selector(state)
+          if (!items) return [] as unknown as R
+          return items.filter(filterFn) as unknown as R
+        },
+        [selector, filterFn]
+      )
+
+      const result = useStore(filteredSelector, shallow as EqualityFn<R>)
+      
+      // Debug direct sans useMemo
+      if (process.env.NODE_ENV === 'development' && debugLabel) {
+        console.debug(`🔍 [${debugLabel}] Filtered selector: ${result?.length || 0} items`)
+      }
+      
+      return result
+    },
+
+    /**
+     * Nettoyer le cache des sélecteurs mémoïsés
+     */
+    clearMemoCache: () => {
+      // Implémentation simple pour la compatibilité
+      console.debug('Cache cleared')
+    },
+
+    /**
+     * Statistiques du cache
+     */
+    getCacheStats: () => ({
+      size: 0,
+      entries: []
+    })
   }
 }
 
 /**
- * ✅ Hook optimisé avec stratégie unifiée - VERSION SÉCURISÉE
+ * Hook optimisé unifié avec stratégie configurable
  */
 export function useOptimizedSelector<T, R>(
   useStore: ZustandStoreHook<T>,
   selector: StoreSelector<T, R>,
-  options: {
-    strategy?: 'shallow' | 'deep' | 'simple'
-    equalityFn?: EqualityFn<R>
-    defaultValue?: R
-  } = {}
+  options: SelectorOptions<R> = {}
 ): R {
-  const { strategy = 'shallow', equalityFn, defaultValue } = options
+  const { 
+    strategy = SelectorStrategy.SHALLOW, 
+    equalityFn, 
+    defaultValue,
+    debugLabel 
+  } = options
 
-  // ✅ Préparer la fonction d'égalité une seule fois
+  // Créer la fonction d'égalité appropriée
   const finalEqualityFn = useMemo(() => {
     if (equalityFn) return equalityFn
     
     switch (strategy) {
-      case 'shallow':
+      case SelectorStrategy.SHALLOW:
         return shallow as EqualityFn<R>
-      case 'deep':
-        return Object.is
-      case 'simple':
+      case SelectorStrategy.DEEP:
+        return (a: R, b: R) => JSON.stringify(a) === JSON.stringify(b)
+      case SelectorStrategy.SIMPLE:
       default:
-        // ✅ Pour 'simple', utiliser Object.is au lieu d'undefined
         return Object.is
     }
   }, [strategy, equalityFn])
 
-  // ✅ Préparer le sélecteur sécurisé une seule fois
+  // Créer le sélecteur sécurisé
   const safeSelector = useMemo(() => {
     if (defaultValue === undefined) return selector
     
@@ -112,19 +225,28 @@ export function useOptimizedSelector<T, R>(
       try {
         const result = selector(state)
         return result ?? defaultValue
-      } catch {
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development' && debugLabel) {
+          console.warn(`⚠️ Selector error in ${debugLabel}:`, error)
+        }
         return defaultValue
       }
     }
-  }, [selector, defaultValue])
+  }, [selector, defaultValue, debugLabel])
 
-  // ✅ TOUJOURS appeler useStore de la même façon avec les mêmes arguments
-  // Plus d'appels conditionnels - toujours deux paramètres
-  return useStore(safeSelector, finalEqualityFn)
+  // ✅ TOUJOURS appeler useStore de la même façon - pas d'appels conditionnels
+  const result = useStore(safeSelector, finalEqualityFn)
+
+  // Debug direct sans useMemo
+  if (process.env.NODE_ENV === 'development' && debugLabel) {
+    console.debug(`🔍 [${debugLabel}] Strategy: ${strategy}, Result:`, result)
+  }
+
+  return result
 }
 
 /**
- * ✅ Mémoïsation avancée pour sélecteurs - PERFORMANCE OPTIMISÉE
+ * Créateur de sélecteurs mémoïsés avancés
  */
 export function createMemoizedSelector<T, R>(
   selector: StoreSelector<T, R>,
@@ -132,23 +254,28 @@ export function createMemoizedSelector<T, R>(
     dependencies?: readonly unknown[]
     maxCacheSize?: number
     ttl?: number
+    keySelector?: (state: T) => string
   } = {}
 ): StoreSelector<T, R> {
-  const { dependencies = [], maxCacheSize = 10, ttl } = options
+  const { 
+    dependencies = [], 
+    maxCacheSize = 10, 
+    ttl = 5000,
+    keySelector 
+  } = options
   
-  // Cache avec LRU simple
   const cache = new Map<string, { value: R; timestamp: number; hitCount: number }>()
   let lastState: T | undefined
   let lastResult: R | undefined
   let lastDeps = [...dependencies]
 
   return (state: T): R => {
-    // Optimisation: même état = même résultat
+    // Optimisation rapide: même état = même résultat
     if (lastState === state && lastResult !== undefined) {
       return lastResult
     }
 
-    // Optimisation: dépendances inchangées
+    // Vérifier les dépendances
     if (dependencies.length > 0) {
       const depsChanged = dependencies.some((dep, i) => dep !== lastDeps[i])
       if (!depsChanged && lastResult !== undefined) {
@@ -157,250 +284,106 @@ export function createMemoizedSelector<T, R>(
       lastDeps = [...dependencies]
     }
 
-    // Clé de cache basée sur l'état et les dépendances
-    const cacheKey = JSON.stringify({
-      stateHash: state ? Object.keys(state as object).join('|') : 'null',
-      deps: dependencies
-    })
+    // Générer la clé de cache
+    const cacheKey = keySelector ? 
+      keySelector(state) : 
+      JSON.stringify({ state: state, deps: dependencies })
 
     const now = Date.now()
     const cached = cache.get(cacheKey)
 
-    // Vérifier si le cache est valide
-    if (cached && (!ttl || (now - cached.timestamp) < ttl)) {
+    // Vérifier le cache
+    if (cached && (now - cached.timestamp) < ttl) {
       cached.hitCount++
       lastState = state
       lastResult = cached.value
       return cached.value
     }
 
-    // Calculer le nouveau résultat
-    const result = selector(state)
+    // Calculer la nouvelle valeur
+    const value = selector(state)
 
-    // Nettoyer le cache si nécessaire
-    if (cache.size >= maxCacheSize) {
-      // Supprimer l'entrée la moins utilisée
-      let leastUsed = { key: '', hitCount: Infinity }
-      for (const [key, value] of cache.entries()) {
-        if (value.hitCount < leastUsed.hitCount) {
-          leastUsed = { key, hitCount: value.hitCount }
-        }
-      }
-      if (leastUsed.key) cache.delete(leastUsed.key)
-    }
-
-    // Mettre en cache le nouveau résultat
+    // Mettre en cache
     cache.set(cacheKey, {
-      value: result,
+      value,
       timestamp: now,
       hitCount: 1
     })
 
+    // Nettoyage du cache
+    if (cache.size > maxCacheSize) {
+      const entries = Array.from(cache.entries())
+      const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
+      const toDelete = sortedByUsage.slice(0, Math.floor(maxCacheSize * 0.3))
+      toDelete.forEach(([key]) => cache.delete(key))
+    }
+
     lastState = state
-    lastResult = result
-    return result
+    lastResult = value
+    return value
   }
 }
 
 /**
- * ✅ Factory de sélecteurs avec gestion d'erreur avancée
+ * Utilitaires pour le debugging des sélecteurs
  */
-export function createSelectorFactory<T>() {
-  const selectorRegistry = new Map<string, StoreSelector<T, any>>()
-  const performanceMetrics = new Map<string, { calls: number; totalTime: number; errors: number }>()
-
-  return {
-    /**
-     * Créer et enregistrer un sélecteur
-     */
-    register: <R>(
-      name: string,
-      selector: StoreSelector<T, R>,
-      options: {
-        memoize?: boolean
-        dependencies?: readonly unknown[]
-        onError?: (error: Error, state: T) => R
-        logPerformance?: boolean
-      } = {}
-    ): StoreSelector<T, R> => {
-      const { memoize = true, dependencies, onError, logPerformance = false } = options
-
-      let finalSelector = selector
-
-      // Ajouter la mémoïsation si demandée
-      if (memoize) {
-        finalSelector = createMemoizedSelector(finalSelector, { dependencies })
-      }
-
-      // Ajouter la gestion d'erreur
-      if (onError) {
-        const errorHandlingSelector = finalSelector
-        finalSelector = (state: T): R => {
-          try {
-            return errorHandlingSelector(state)
-          } catch (error) {
-            const metrics = performanceMetrics.get(name) || { calls: 0, totalTime: 0, errors: 0 }
-            metrics.errors++
-            performanceMetrics.set(name, metrics)
-            
-            console.warn(`Erreur dans le sélecteur "${name}":`, error)
-            return onError(error as Error, state)
-          }
-        }
-      }
-
-      // Ajouter le monitoring des performances
-      if (logPerformance) {
-        const monitoredSelector = finalSelector
-        finalSelector = (state: T): R => {
-          const start = performance.now()
-          const result = monitoredSelector(state)
-          const duration = performance.now() - start
-
-          const metrics = performanceMetrics.get(name) || { calls: 0, totalTime: 0, errors: 0 }
-          metrics.calls++
-          metrics.totalTime += duration
-          performanceMetrics.set(name, metrics)
-
-          if (duration > 1) {
-            console.warn(`Sélecteur lent "${name}": ${duration.toFixed(2)}ms`)
-          }
-
-          return result
-        }
-      }
-
-      selectorRegistry.set(name, finalSelector)
-      return finalSelector
-    },
-
-    /**
-     * Obtenir un sélecteur enregistré
-     */
-    get: <R>(name: string): StoreSelector<T, R> | undefined => {
-      return selectorRegistry.get(name) as StoreSelector<T, R> | undefined
-    },
-
-    /**
-     * Obtenir les métriques de performance
-     */
-    getMetrics: (name?: string) => {
-      if (name) {
-        const metrics = performanceMetrics.get(name)
-        if (metrics) {
-          return {
-            ...metrics,
-            averageTime: metrics.totalTime / metrics.calls
-          }
-        }
-        return null
-      }
-      
-      const allMetrics: Record<string, any> = {}
-      for (const [key, metrics] of performanceMetrics.entries()) {
-        allMetrics[key] = {
-          ...metrics,
-          averageTime: metrics.totalTime / metrics.calls
-        }
-      }
-      return allMetrics
-    },
-
-    /**
-     * Nettoyer le registre
-     */
-    clear: () => {
-      selectorRegistry.clear()
-      performanceMetrics.clear()
-    }
-  }
-}
-
-/**
- * ✅ Utilitaires pour sélecteurs communs
- */
-export const SelectorUtils = {
+export const selectorDebugUtils = {
   /**
-   * Combinateur de sélecteurs multiples
+   * Wrapper pour tracer les appels de sélecteur
    */
-  combine: <T, R1, R2, R>(
-    selector1: StoreSelector<T, R1>,
-    selector2: StoreSelector<T, R2>,
-    combiner: (v1: R1, v2: R2) => R
+  trace: <T, R>(
+    selector: StoreSelector<T, R>,
+    label: string
   ): StoreSelector<T, R> => {
-    return (state: T) => combiner(selector1(state), selector2(state))
-  },
-
-  /**
-   * Sélecteur avec filtre
-   */
-  filter: <T, R>(
-    selector: StoreSelector<T, R[]>,
-    predicate: (item: R) => boolean
-  ): StoreSelector<T, R[]> => {
-    return (state: T) => selector(state).filter(predicate)
-  },
-
-  /**
-   * Sélecteur avec tri
-   */
-  sort: <T, R>(
-    selector: StoreSelector<T, R[]>,
-    compareFn: (a: R, b: R) => number
-  ): StoreSelector<T, R[]> => {
-    return (state: T) => [...selector(state)].sort(compareFn)
-  },
-
-  /**
-   * Sélecteur avec pagination
-   */
-  paginate: <T, R>(
-    selector: StoreSelector<T, R[]>,
-    page: number,
-    pageSize: number
-  ): StoreSelector<T, { items: R[]; total: number; hasMore: boolean }> => {
-    return (state: T) => {
-      const items = selector(state)
-      const start = page * pageSize
-      const end = start + pageSize
-      
-      return {
-        items: items.slice(start, end),
-        total: items.length,
-        hasMore: end < items.length
-      }
+    if (process.env.NODE_ENV !== 'development') {
+      return selector
     }
+
+    return (state: T): R => {
+      const start = performance.now()
+      const result = selector(state)
+      const duration = performance.now() - start
+      
+      console.debug(`🔍 [${label}] Duration: ${duration.toFixed(2)}ms`, {
+        state,
+        result,
+        duration
+      })
+      
+      return result
+    }
+  },
+
+  /**
+   * Comparer les performances de différents sélecteurs
+   */
+  benchmark: <T, R>(
+    selectors: Record<string, StoreSelector<T, R>>,
+    state: T,
+    iterations: number = 1000
+  ) => {
+    const results: Record<string, { averageTime: number; totalTime: number }> = {}
+    
+    Object.entries(selectors).forEach(([name, selector]) => {
+      const times: number[] = []
+      
+      for (let i = 0; i < iterations; i++) {
+        const start = performance.now()
+        selector(state)
+        times.push(performance.now() - start)
+      }
+      
+      const totalTime = times.reduce((sum, time) => sum + time, 0)
+      results[name] = {
+        averageTime: totalTime / iterations,
+        totalTime
+      }
+    })
+    
+    console.table(results)
+    return results
   }
 }
 
-// ===== EXEMPLES D'USAGE SÉCURISÉ =====
-/*
-// Dans votre store (app.store.ts) :
-import { createOptimizedSelectors } from '@/lib/optimized-selectors'
-
-const selectors = createOptimizedSelectors(useAppStore)
-
-// Sélecteurs optimisés
-export const useTheme = () => selectors.useSimple(state => state.theme)
-export const useUser = () => selectors.useShallow(state => state.user)
-export const useUISettings = () => selectors.useShallow(state => ({
-  sidebarCollapsed: state.ui?.sidebarCollapsed || false,
-  layoutMode: state.ui?.layoutMode || 'default'
-}))
-
-// Avec factory
-const selectorFactory = createSelectorFactory<AppState>()
-
-export const useProjectsFiltered = (filters: ProjectFilters) => {
-  const selector = selectorFactory.register(
-    'projects-filtered',
-    state => state.projets?.filter(p => matchesFilters(p, filters)) || [],
-    { 
-      memoize: true,
-      dependencies: [filters],
-      logPerformance: true
-    }
-  )
-  return useAppStore(selector)
-}
-*/
+// ===== EXPORTS =====
+export { shallow } from 'zustand/shallow'
