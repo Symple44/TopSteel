@@ -1,417 +1,454 @@
 /**
  * 📋 STORE PROJETS CORRIGÉ - TopSteel ERP
- * Gestion robuste des projets avec types centralisés
+ * Exemple d'utilisation de la nouvelle architecture pour les stores
  * Fichier: apps/web/src/stores/projet.store.ts
  */
-import { StoreUtils } from '@/lib/store-utils';
-import type { Projet, ProjetFilters, ProjetStoreState } from '@erp/types';
+
+import { StoreUtils } from '@/lib/store-utils'
+import type {
+  InitialState,
+  ProjetFilters,
+  ProjetState,
+  ProjetStats,
+  ProjetStore,
+  ProjetStoreActions,
+  StoreCreator,
+  StoreProjet
+} from '@erp/types'
 
 // ===== ÉTAT INITIAL =====
-const initialProjetState: Omit<ProjetStoreState, 
-  | 'fetchProjets' | 'createProjet' | 'updateProjet' | 'deleteProjet' 
-  | 'duplicateProjet' | 'setSelectedProjet' | 'selectProjetById' 
-  | 'setFilters' | 'clearFilters' | 'setSearchTerm' | 'setSorting' 
-  | 'setPage' | 'setPageSize' | 'refreshStats' | 'invalidateCache' 
-  | 'syncWithServer' | 'setLoading' | 'setError' | 'clearError' 
-  | 'reset' | 'updateLastActivity'
-> = {
-  // État de base (de BaseStoreState)
+
+const initialProjetState: InitialState<ProjetState> = {
+  // État de base
   loading: false,
   error: null,
-  lastUpdate: 0,
-  version: '1.0.0',
+  lastUpdate: Date.now(),
   
   // Données
   projets: [],
   selectedProjet: null,
   
-  // Filtres
+  // Filtres et recherche
   filters: {},
   searchTerm: '',
-  sortBy: 'dateCreation',
+  sortBy: 'reference', // Utiliser une propriété qui existe dans StoreProjet
   sortOrder: 'desc',
   
   // Pagination
-  currentPage: 0,
+  currentPage: 1,
   pageSize: 20,
   totalCount: 0,
   
-  // Cache
+  // Cache et métadonnées
   lastFetch: 0,
   cacheTTL: 300000, // 5 minutes
   isSyncing: false,
   
-  // Stats
+  // Statistiques
   stats: null
 }
 
-// ===== API SIMULÉE (À REMPLACER PAR VOTRE API) =====
-const projetAPI = {
-  async fetchProjets(filters: ProjetFilters = {}): Promise<{ projets: Projet[]; total: number }> {
+// ===== CACHE ET UTILITAIRES =====
+
+const projetCache = StoreUtils.createCache<string, StoreProjet[]>(300000) // 5 minutes
+const statsCache = StoreUtils.createCache<string, ProjetStats>(60000) // 1 minute
+
+// ===== ACTIONS ASYNC =====
+
+/**
+ * Service de données simulé (remplacer par vraie API)
+ */
+const projetService = {
+  async fetchProjets(filters?: ProjetFilters): Promise<StoreProjet[]> {
+    // Simulation d'appel API
     await new Promise(resolve => setTimeout(resolve, 500))
     
-    // Données mockées
-    const mockProjets: Projet[] = Array.from({ length: 50 }, (_, i) => ({
-      id: `projet-${i + 1}`,
-      nom: `Projet ${i + 1}`,
-      description: `Description du projet ${i + 1}`,
-      statut: ['EN_COURS', 'TERMINE', 'EN_ATTENTE', 'ANNULE'][Math.floor(Math.random() * 4)] as any,
-      type: ['PORTAIL', 'CLOTURE', 'ESCALIER'][Math.floor(Math.random() * 3)] as any,
-      priorite: ['BASSE', 'NORMALE', 'HAUTE', 'URGENTE'][Math.floor(Math.random() * 4)] as any,
-      dateCreation: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
-      dateDebut: new Date(),
-      dateFinPrevue: new Date(Date.now() + Math.random() * 60 * 24 * 60 * 60 * 1000),
-      montantHT: Math.floor(Math.random() * 100000),
-      montantTTC: 0,
-      tauxTVA: 20,
-      marge: 0,
-      avancement: Math.floor(Math.random() * 100),
-      reference: `REF-${i + 1}`,
-      clientId: `client-${Math.floor(Math.random() * 10) + 1}`,
-      client: {
-        id: `client-${Math.floor(Math.random() * 10) + 1}`,
-        nom: `Client ${Math.floor(Math.random() * 10) + 1}`,
-        type: 'PARTICULIER' as any,
-        email: `client${i}@example.com`,
-        telephone: '0123456789',
-        dateCreation: new Date(),
-        dateModification: new Date(),
-        adressePrincipale: {
-          rue: '123 Rue Example',
-          ville: 'Paris',
-          codePostal: '75001',
-          pays: 'France'
-        }
-      },
-      adresseChantier: {
-        rue: '123 Rue Chantier',
-        ville: 'Paris',
-        codePostal: '75001',
-        pays: 'France'
-      },
-      documentsIds: [],
-      ordresFabricationIds: []
-    }))
-    
-    // Simulation de filtrage côté serveur
-    let filtered = mockProjets
-    if (filters.statut?.length) {
-      filtered = filtered.filter(p => filters.statut!.includes(p.statut))
-    }
-    if (filters.search) {
-      const search = filters.search.toLowerCase()
-      filtered = filtered.filter(p => 
-        p.nom.toLowerCase().includes(search) ||
-        p.description?.toLowerCase().includes(search) ||
-        p.reference.toLowerCase().includes(search)
-      )
-    }
-    
-    return { projets: filtered, total: filtered.length }
+    // Retourner des données mockées ou utiliser l'API réelle
+    return []
   },
-  
-  async createProjet(data: Omit<Projet, 'id' | 'dateCreation'>): Promise<Projet> {
+
+  async createProjet(data: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>): Promise<StoreProjet> {
     await new Promise(resolve => setTimeout(resolve, 300))
+    
+    const now = new Date()
+    
+    // Créer un client par défaut si non fourni
+    const defaultClient = data.client || {
+      id: 'default-client',
+      nom: 'Client par défaut',
+      email: 'client@example.com',
+      type: 'PARTICULIER' as const,
+      createdAt: now,
+      updatedAt: now
+    }
+    
+    // Créer une adresse par défaut si non fournie
+    const defaultAdresse = data.adresseChantier || {
+      rue: '123 Rue Exemple',
+      ville: 'Paris',
+      codePostal: '75001',
+      pays: 'France'
+    }
     
     return {
       ...data,
-      id: `projet-${Date.now()}`,
-      dateCreation: new Date(),
-      dateModification: new Date()
-    } as Projet
+      id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+      
+      // Propriétés obligatoires avec valeurs par défaut
+      client: defaultClient,
+      clientId: data.clientId || defaultClient.id,
+      adresseChantier: defaultAdresse,
+      montantHT: data.montantHT || 0,
+      montantTTC: data.montantTTC || 0,
+      tauxTVA: data.tauxTVA || 20,
+      marge: data.marge || 0,
+      avancement: data.avancement || 0,
+      documentsIds: data.documentsIds || [],
+      ordresFabricationIds: data.ordresFabricationIds || []
+    } as StoreProjet
   },
-  
-  async updateProjet(id: string, updates: Partial<Projet>): Promise<Projet | null> {
+
+  async updateProjet(id: string, updates: Partial<StoreProjet>): Promise<StoreProjet> {
     await new Promise(resolve => setTimeout(resolve, 200))
     
-    // Simulation de mise à jour
-    return {
-      id,
+    // Retourner le projet mis à jour
+    return { 
+      id, 
       ...updates,
-      dateModification: new Date()
-    } as Projet
+      updatedAt: new Date()
+    } as StoreProjet
   },
-  
+
   async deleteProjet(id: string): Promise<boolean> {
     await new Promise(resolve => setTimeout(resolve, 200))
     return true
-  }
-}
-
-// ===== CACHE INTELLIGENT =====
-const cache = {
-  data: new Map<string, { data: any; timestamp: number }>(),
-  
-  get(key: string, ttl: number = 300000) {
-    const cached = this.data.get(key)
-    if (!cached) return null
-    
-    if (Date.now() - cached.timestamp > ttl) {
-      this.data.delete(key)
-      return null
-    }
-    
-    return cached.data
   },
-  
-  set(key: string, data: any) {
-    this.data.set(key, { data, timestamp: Date.now() })
-  },
-  
-  invalidate(key?: string) {
-    if (key) {
-      this.data.delete(key)
-    } else {
-      this.data.clear()
+
+  async getStats(): Promise<ProjetStats> {
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
+    return {
+      total: 0,
+      parStatut: {},
+      parPriorite: {},
+      parType: {},
+      enRetard: 0,
+      terminesTemps: 0,
+      avancementMoyen: 0,
+      chiffreAffaireMensuel: 0,
+      chiffreAffaireAnnuel: 0,
+      margeGlobale: 0,
+      projetsActifs: 0,
+      nouveauxCeMois: 0
     }
   }
 }
 
-// ===== ACTIONS ASYNC AVEC CACHE =====
-const fetchProjets = async (
-  set: any, 
-  get: () => ProjetStoreState, 
-  options: { force?: boolean; filters?: ProjetFilters } = {}
-) => {
-  const { force = false, filters = {} } = options
-  const state = get()
-  
-  const cacheKey = `projets-${JSON.stringify(filters)}`
-  const cached = cache.get(cacheKey, state.cacheTTL)
-  
-  if (!force && cached && (Date.now() - state.lastFetch) < state.cacheTTL) {
-    return cached.projets
-  }
-  
-  set((state: ProjetStoreState) => { state.loading = true })
-  
-  try {
-    const result = await projetAPI.fetchProjets(filters)
-    
-    set((state: ProjetStoreState) => {
-      state.projets = result.projets
-      state.totalCount = result.total
-      state.lastFetch = Date.now()
-      state.loading = false
-      state.error = null
-    })
-    
-    cache.set(cacheKey, result)
-    return result.projets
-  } catch (error) {
-    set((state: ProjetStoreState) => {
-      state.loading = false
-      state.error = error instanceof Error ? error.message : 'Erreur lors du chargement'
-    })
-    throw error
-  }
-}
+// ===== DÉFINITION DU STORE =====
 
-const calculateStats = (projets: Projet[]) => {
-  const stats = {
-    total: projets.length,
-    parStatut: {} as Record<string, number>,
-    parPriorite: {} as Record<string, number>,
-    enRetard: 0,
-    terminesTemps: 0,
-    avancementMoyen: 0
-  }
-  
-  projets.forEach(projet => {
-    stats.parStatut[projet.statut] = (stats.parStatut[projet.statut] || 0) + 1
-    stats.parPriorite[projet.priorite] = (stats.parPriorite[projet.priorite] || 0) + 1
-    stats.avancementMoyen += projet.avancement || 0
-    
-    if (projet.dateFinPrevue && new Date(projet.dateFinPrevue) < new Date() && projet.statut !== 'TERMINE') {
-      stats.enRetard++
-    }
-    if (projet.statut === 'TERMINE') {
-      stats.terminesTemps++
-    }
-  })
-  
-  if (projets.length > 0) {
-    stats.avancementMoyen = stats.avancementMoyen / projets.length
-  }
-  
-  return stats
-}
+const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = (set, get) => {
+  const baseActions = StoreUtils.createBaseActions(initialProjetState)
 
-// ===== CRÉATION DU STORE =====
-export const useProjetStore = StoreUtils.createRobustStore<ProjetStoreState>(
-  initialProjetState,
-  (set, get) => ({
-    ...initialProjetState,
-    
+  return {
+    // Actions de base
+    ...baseActions,
+
     // ===== ACTIONS DE DONNÉES =====
-    fetchProjets: async (options = {}) => fetchProjets(set, get, options),
-    
-    createProjet: async (projetData) => {
-      set((state) => { state.loading = true })
-      try {
-        const newProjet = await projetAPI.createProjet(projetData)
+    fetchProjets: StoreUtils.createAsyncAction<ProjetState, [{ force?: boolean; filters?: ProjetFilters }?], StoreProjet[]>(
+      async (options = {}) => {
+        const { force = false, filters } = options
+        const cacheKey = JSON.stringify(filters || {})
         
-        set((state: ProjetStoreState) => {
-          state.projets.unshift(newProjet)
-          state.totalCount++
-          state.loading = false
-          state.error = null
-        })
-        
-        cache.invalidate() // Invalider le cache
-        return newProjet
-      } catch (error) {
-        set((state: ProjetStoreState) => {
-          state.loading = false
-          state.error = error instanceof Error ? error.message : 'Erreur lors de la création'
-        })
-        return null
-      }
-    },
-    
-    updateProjet: async (id, updates) => {
-      set((state) => { state.loading = true })
-      try {
-        const updatedProjet = await projetAPI.updateProjet(id, updates)
-        
-        if (updatedProjet) {
-          set((state: ProjetStoreState) => {
-            const index = state.projets.findIndex(p => p.id === id)
-            if (index !== -1) {
-              state.projets[index] = { ...state.projets[index], ...updatedProjet }
-            }
-            if (state.selectedProjet?.id === id) {
-              state.selectedProjet = { ...state.selectedProjet, ...updatedProjet }
-            }
-            state.loading = false
-            state.error = null
-          })
-          
-          cache.invalidate()
+        // Vérifier le cache si pas de force
+        if (!force) {
+          const cached = projetCache.get(cacheKey)
+          if (cached) {
+            return cached
+          }
         }
         
-        return updatedProjet
-      } catch (error) {
-        set((state: ProjetStoreState) => {
-          state.loading = false
-          state.error = error instanceof Error ? error.message : 'Erreur lors de la mise à jour'
-        })
-        return null
+        const projets = await projetService.fetchProjets(filters)
+        projetCache.set(cacheKey, projets)
+        return projets
+      },
+      {
+        onStart: (state) => {
+          state.isSyncing = true
+        },
+        onSuccess: (state, projets) => {
+          state.projets = projets
+          state.totalCount = projets.length
+          state.lastFetch = Date.now()
+          state.isSyncing = false
+        },
+        onError: (state, error) => {
+          state.isSyncing = false
+          console.error('Erreur fetch projets:', error)
+        }
       }
-    },
-    
-    deleteProjet: async (id) => {
-      set((state) => { state.loading = true })
-      try {
-        const success = await projetAPI.deleteProjet(id)
-        
-        if (success) {
-          set((state: ProjetStoreState) => {
+    ),
+
+    createProjet: StoreUtils.createAsyncAction<ProjetState, [Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>], StoreProjet>(
+      async (projetData) => {
+        const newProjet = await projetService.createProjet(projetData)
+        return newProjet
+      },
+      {
+        onSuccess: (state, newProjet) => {
+          state.projets.unshift(newProjet)
+          state.totalCount++
+          
+          // Invalider le cache
+          projetCache.delete()
+          statsCache.delete()
+        }
+      }
+    ),
+
+    updateProjet: StoreUtils.createAsyncAction<ProjetState, [string, Partial<StoreProjet>], StoreProjet>(
+      async (id, updates) => {
+        const updatedProjet = await projetService.updateProjet(id, updates)
+        return updatedProjet
+      },
+      {
+        onSuccess: (state, updatedProjet) => {
+          const index = state.projets.findIndex(p => p.id === updatedProjet.id)
+          if (index !== -1) {
+            state.projets[index] = { ...state.projets[index], ...updatedProjet }
+          }
+          
+          // Mettre à jour le projet sélectionné si nécessaire
+          if (state.selectedProjet?.id === updatedProjet.id) {
+            state.selectedProjet = { ...state.selectedProjet, ...updatedProjet }
+          }
+          
+          // Invalider les caches
+          projetCache.delete()
+          statsCache.delete()
+        }
+      }
+    ),
+
+    deleteProjet: StoreUtils.createAsyncAction<ProjetState, [string], boolean>(
+      async (id) => {
+        const success = await projetService.deleteProjet(id)
+        return success
+      },
+      {
+        onSuccess: (state, success, id) => {
+          if (success) {
             state.projets = state.projets.filter(p => p.id !== id)
+            state.totalCount--
+            
+            // Désélectionner si c'était le projet supprimé
             if (state.selectedProjet?.id === id) {
               state.selectedProjet = null
             }
-            state.totalCount--
-            state.loading = false
-            state.error = null
-          })
-          
-          cache.invalidate()
+            
+            // Invalider les caches
+            projetCache.delete()
+            statsCache.delete()
+          }
+        }
+      }
+    ),
+
+    duplicateProjet: StoreUtils.createAsyncAction<ProjetState, [string], StoreProjet>(
+      async (id) => {
+        const currentState = get()
+        const originalProjet = currentState.projets.find(p => p.id === id)
+        
+        if (!originalProjet) {
+          throw new Error('Projet non trouvé')
         }
         
-        return success
-      } catch (error) {
-        set((state: ProjetStoreState) => {
-          state.loading = false
-          state.error = error instanceof Error ? error.message : 'Erreur lors de la suppression'
+        const { id: _, createdAt: __, updatedAt: ___, ...projetData } = originalProjet
+        const duplicatedProjet = await projetService.createProjet({
+          ...projetData,
+          reference: `${projetData.reference}_COPIE`,
+          description: `Copie de ${projetData.description}`
         })
-        return false
+        
+        return duplicatedProjet
+      },
+      {
+        onSuccess: (state, duplicatedProjet) => {
+          state.projets.unshift(duplicatedProjet)
+          state.totalCount++
+          projetCache.delete()
+        }
       }
-    },
-    
-    duplicateProjet: async (id) => {
-      const projet = get().projets.find(p => p.id === id)
-      if (!projet) return null
-      
-      const { id: _, dateCreation: __, ...projetData } = projet
-      return await get().createProjet({
-        ...projetData,
-        nom: `${projet.nom} (copie)`
-      })
-    },
-    
+    ),
+
     // ===== ACTIONS DE SÉLECTION =====
-    setSelectedProjet: (projet) => set((state: ProjetStoreState) => {
+    setSelectedProjet: (projet: StoreProjet | null) => set((state) => {
       state.selectedProjet = projet
+      state.lastUpdate = Date.now()
     }),
-    
-    selectProjetById: (id) => set((state: ProjetStoreState) => {
+
+    selectProjetById: (id) => set((state) => {
       const projet = state.projets.find(p => p.id === id)
       state.selectedProjet = projet || null
+      state.lastUpdate = Date.now()
     }),
-    
+
     // ===== ACTIONS DE FILTRAGE =====
-    setFilters: (filters) => set((state: ProjetStoreState) => {
+    setFilters: (filters) => set((state) => {
       state.filters = { ...state.filters, ...filters }
-      state.currentPage = 0 // Reset pagination
+      state.currentPage = 1 // Reset pagination
+      state.lastUpdate = Date.now()
     }),
-    
-    clearFilters: () => set((state: ProjetStoreState) => {
+
+    clearFilters: () => set((state) => {
       state.filters = {}
       state.searchTerm = ''
-      state.currentPage = 0
+      state.currentPage = 1
+      state.lastUpdate = Date.now()
     }),
-    
-    setSearchTerm: (term) => set((state: ProjetStoreState) => {
+
+    setSearchTerm: StoreUtils.debounce((term: string) => set((state) => {
       state.searchTerm = term
-      state.currentPage = 0
-    }),
-    
+      state.currentPage = 1
+      state.lastUpdate = Date.now()
+    }), 300),
+
     // ===== ACTIONS DE TRI ET PAGINATION =====
-    setSorting: (sortBy, sortOrder) => set((state: ProjetStoreState) => {
+    setSorting: (sortBy, sortOrder = 'asc') => set((state) => {
       state.sortBy = sortBy
-      state.sortOrder = sortOrder || (state.sortOrder === 'asc' ? 'desc' : 'asc')
+      state.sortOrder = sortOrder
+      state.lastUpdate = Date.now()
     }),
-    
-    setPage: (page) => set((state: ProjetStoreState) => {
-      state.currentPage = Math.max(0, page)
+
+    setPage: (page) => set((state) => {
+      state.currentPage = page
+      state.lastUpdate = Date.now()
     }),
-    
-    setPageSize: (size) => set((state: ProjetStoreState) => {
-      state.pageSize = Math.max(1, size)
-      state.currentPage = 0 // Reset page
+
+    setPageSize: (size) => set((state) => {
+      state.pageSize = size
+      state.currentPage = 1 // Reset à la première page
+      state.lastUpdate = Date.now()
     }),
-    
-    // ===== ACTIONS UTILITAIRES =====
-    refreshStats: () => set((state: ProjetStoreState) => {
-      state.stats = calculateStats(state.projets)
-    }),
-    
-    invalidateCache: () => set((state: ProjetStoreState) => {
-      cache.invalidate()
+
+    // ===== ACTIONS DE CACHE =====
+    invalidateCache: () => set((state) => {
+      projetCache.delete()
+      statsCache.delete()
       state.lastFetch = 0
+      state.stats = null
+      state.lastUpdate = Date.now()
     }),
-    
-    syncWithServer: async () => {
-      set((state: ProjetStoreState) => { state.isSyncing = true })
-      try {
-        await fetchProjets(set, get, { force: true })
-      } finally {
-        set((state: ProjetStoreState) => { state.isSyncing = false })
+
+    refreshStats: StoreUtils.createAsyncAction<ProjetState, [], void>(
+      async () => {
+        // Vérifier le cache d'abord
+        const cached = statsCache.get('stats')
+        if (cached) {
+          return cached
+        }
+        
+        const stats = await projetService.getStats()
+        statsCache.set('stats', stats)
+        return stats
+      },
+      {
+        onSuccess: (state, stats) => {
+          state.stats = stats
+        }
       }
-    }
-    
-    // Les actions de base (setLoading, setError, etc.) sont automatiquement ajoutées par StoreUtils
-  }),
+    )
+  }
+}
+
+// ===== CRÉATION DU STORE =====
+
+export const useProjetStore = StoreUtils.createRobustStore<ProjetState, ProjetStoreActions>(
+  initialProjetState,
+  createProjetStoreActions,
   {
     name: 'projet-store',
-    persist: false, // Les données projet viennent du serveur
+    persist: false, // Pas de persistence pour ce store
     devtools: true,
     immer: true,
-    subscriptions: true,
-    version: '1.0.0'
+    subscriptions: true
   }
 )
 
-// ===== TYPES EXPORTÉS =====
-export type { ProjetFilters, ProjetStoreState as ProjetState };
+// ===== SELECTORS OPTIMISÉS =====
+
+export const projetSelectors = {
+  // Sélecteurs de base
+  getProjets: (state: ProjetStore) => state.projets,
+  getSelectedProjet: (state: ProjetStore) => state.selectedProjet,
+  getFilters: (state: ProjetStore) => state.filters,
+  getSearchTerm: (state: ProjetStore) => state.searchTerm,
+  
+  // Sélecteurs calculés
+  getFilteredProjets: StoreUtils.createSelector((state: ProjetStore) => {
+    let projets = [...state.projets]
+    
+    // Appliquer les filtres
+    if (Object.keys(state.filters).length > 0) {
+      projets = projets.filter(projet => {
+        // Logique de filtrage selon les filtres actifs
+        return true // Simplifiée pour l'exemple
+      })
+    }
+    
+    // Appliquer la recherche
+    if (state.searchTerm) {
+      const term = state.searchTerm.toLowerCase()
+      projets = projets.filter(projet => 
+        projet.reference.toLowerCase().includes(term) ||
+        projet.description.toLowerCase().includes(term)
+      )
+    }
+    
+    // Appliquer le tri
+    projets.sort((a, b) => {
+      const aValue = a[state.sortBy] as any
+      const bValue = b[state.sortBy] as any
+      
+      // Gestion des valeurs nulles/undefined
+      if (aValue == null && bValue == null) return 0
+      if (aValue == null) return state.sortOrder === 'asc' ? -1 : 1
+      if (bValue == null) return state.sortOrder === 'asc' ? 1 : -1
+      
+      if (aValue < bValue) return state.sortOrder === 'asc' ? -1 : 1
+      if (aValue > bValue) return state.sortOrder === 'asc' ? 1 : -1
+      return 0
+    })
+    
+    return projets
+  }),
+  
+  // Sélecteurs de pagination
+  getPaginatedProjets: (state: ProjetStore) => {
+    const filtered = projetSelectors.getFilteredProjets(state)
+    const start = (state.currentPage - 1) * state.pageSize
+    const end = start + state.pageSize
+    return filtered.slice(start, end)
+  },
+  
+  getTotalPages: (state: ProjetStore) => {
+    const filtered = projetSelectors.getFilteredProjets(state)
+    return Math.ceil(filtered.length / state.pageSize)
+  },
+  
+  // Sélecteurs de statut
+  getLoadingState: (state: ProjetStore) => state.loading,
+  getSyncingState: (state: ProjetStore) => state.isSyncing,
+  getErrorState: (state: ProjetStore) => state.error,
+  getStats: (state: ProjetStore) => state.stats
+}
+
+// ===== HOOKS PERSONNALISÉS =====
+
+export const useProjetSelector = <T>(selector: (state: ProjetStore) => T) => {
+  return useProjetStore(selector)
+}
+
+// ===== EXPORTS =====
+export type { ProjetState, ProjetStore, ProjetStoreActions }

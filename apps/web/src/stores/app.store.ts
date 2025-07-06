@@ -1,72 +1,41 @@
 /**
- * 🏪 STORE PRINCIPAL ROBUSTE - TopSteel ERP
- * Store principal de l'application avec gestion robuste des états et évolutivité
+ * 🏪 STORE PRINCIPAL CORRIGÉ - TopSteel ERP
+ * Store principal de l'application avec types robustes et architecture évolutive
  * Fichier: apps/web/src/stores/app.store.ts
  */
+
 import { StoreUtils } from '@/lib/store-utils'
 import type {
   AppState,
-  MetricsState,
-  NotificationItem,
-  NotificationState,
-  UIState
+  AppStore,
+  AppStoreActions,
+  InitialState,
+  StoreCreator,
+  StoreProjet,
+  StoreUser
 } from '@erp/types'
 
 // ===== ÉTAT INITIAL =====
-const initialUIState: UIState = {
-  sidebarCollapsed: false,
-  sidebarPinned: true,
-  layoutMode: 'default',
-  activeModule: null,
-  showTooltips: true,
+
+/**
+ * État initial de l'application (sans les actions)
+ * Type correct pour éviter l'erreur TypeScript
+ */
+const initialAppState: InitialState<AppState> = {
+  // État de base (BaseStoreState)
+  loading: false,
+  error: null,
+  lastUpdate: Date.now(),
+  
+  // Configuration UI
   theme: 'light',
-  language: 'fr',
-  timezone: 'Europe/Paris'
-}
-
-const initialMetricsState: MetricsState = {
-  pageViews: 0,
-  actionCount: 0,
-  lastActivity: Date.now(),
-  sessionStart: Date.now(),
-  errorCount: 0,
-  performanceMetrics: {
-    averageLoadTime: 0,
-    slowQueries: 0,
-    memoryUsage: 0
-  }
-}
-
-const initialNotificationState: NotificationState = {
-  notifications: [],
-  unreadCount: 0,
-  filters: {},
-  settings: {
-    enableSound: true,
-    enableToast: true,
-    enableBrowser: true,
-    enableEmail: false,
-    categories: {
-      system: true,
-      stock: true,
-      projet: true,
-      production: true,
-      maintenance: true,
-      qualite: true,
-      facturation: true
-    },
-    priority: {
-      low: true,
-      normal: true,
-      high: true,
-      urgent: true
-    }
-  }
-}
-
-const initialAppState = {
-  // État UI
-  ui: initialUIState,
+  ui: {
+    sidebarCollapsed: false,
+    sidebarPinned: true,
+    layoutMode: 'default',
+    activeModule: null,
+    showTooltips: true
+  },
   
   // Données utilisateur
   user: null,
@@ -76,369 +45,314 @@ const initialAppState = {
   // Données métier
   projets: [],
   selectedProjet: null,
+  notifications: [],
   
-  // Notifications
-  notifications: initialNotificationState,
-  
-  // Filtres
+  // Filtres et recherche
   filters: {},
   
   // Métriques
-  metrics: initialMetricsState,
+  metrics: {
+    pageViews: 0,
+    actionCount: 0,
+    lastActivity: Date.now(),
+    sessionStart: Date.now(),
+    userCount: 0,
+    projectCount: 0,
+    orderCount: 0,
+    revenue: 0,
+    performance: {
+      loadTime: 0,
+      errorRate: 0,
+      uptime: 100
+    }
+  },
   
-  // État de synchronisation
+  // Synchronisation
   sync: {
-    isOnline: navigator.onLine ?? true,
-    lastSync: 0,
+    isOnline: navigator?.onLine ?? true,
     pendingChanges: 0,
-    conflictResolution: 'client' as const
+    lastSync: Date.now(),
+    conflictCount: 0,
+    syncInProgress: false,
+    autoSyncEnabled: true
   }
 }
 
-// ===== CRÉATION DU STORE =====
-export const useAppStore = StoreUtils.createRobustStore<AppState>(
-  initialAppState,
-  (set, get) => ({
-    ...initialAppState,
-    
+// ===== DÉFINITION DU STORE =====
+
+/**
+ * Créateur d'actions pour le store principal
+ * Utilise la nouvelle signature TypeScript corrigée
+ */
+const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get) => {
+  // Actions de base communes
+  const baseActions = StoreUtils.createBaseActions(initialAppState)
+
+  return {
+    // ===== ACTIONS DE BASE =====
+    ...baseActions,
+
     // ===== ACTIONS UI =====
-    setTheme: (theme) => set((state: AppState) => {
-      state.ui.theme = theme
+    setTheme: (theme) => set((state) => {
+      state.theme = theme
       state.metrics.actionCount++
       state.lastUpdate = Date.now()
     }),
-    
-    setSidebarCollapsed: (collapsed) => set((state: AppState) => {
+
+    setSidebarCollapsed: (collapsed) => set((state) => {
       state.ui.sidebarCollapsed = collapsed
       state.metrics.actionCount++
       state.lastUpdate = Date.now()
     }),
-    
-    setSidebarPinned: (pinned) => set((state: AppState) => {
+
+    setSidebarPinned: (pinned) => set((state) => {
       state.ui.sidebarPinned = pinned
       state.metrics.actionCount++
       state.lastUpdate = Date.now()
     }),
-    
-    setLayoutMode: (mode) => set((state: AppState) => {
+
+    setLayoutMode: (mode) => set((state) => {
       state.ui.layoutMode = mode
       state.metrics.actionCount++
       state.lastUpdate = Date.now()
     }),
-    
-    setActiveModule: (module) => set((state: AppState) => {
+
+    setActiveModule: (module) => set((state) => {
       state.ui.activeModule = module
       state.metrics.actionCount++
       state.lastUpdate = Date.now()
     }),
 
-    setLanguage: (language) => set((state: AppState) => {
-      state.ui.language = language
-      state.lastUpdate = Date.now()
-    }),
-    
     // ===== ACTIONS UTILISATEUR =====
-    setUser: (user) => set((state: AppState) => {
+    setUser: (user: StoreUser | null) => set((state) => {
       state.user = user
       state.lastUpdate = Date.now()
       
-      // Auto-logout si user devient null
+      // Réinitialiser les permissions si pas d'utilisateur
       if (!user) {
-        state.session = null
         state.permissions = []
+        state.session = null
       }
     }),
-    
-    setSession: (session) => set((state: AppState) => {
+
+    setSession: (session) => set((state) => {
       state.session = session
       state.lastUpdate = Date.now()
       
-      // Vérifier la validité de la session
-      if (session && session.expiresAt && session.expiresAt < Date.now()) {
-        state.session = null
+      // Mettre à jour l'état de connexion
+      if (!session) {
         state.user = null
         state.permissions = []
       }
     }),
 
-    setPermissions: (permissions) => set((state: AppState) => {
+    setPermissions: (permissions) => set((state) => {
       state.permissions = permissions
       state.lastUpdate = Date.now()
     }),
 
-    updateUserPreferences: (preferences) => set((state: AppState) => {
-      if (state.user) {
-        state.user = { ...state.user, ...preferences }
+    logout: () => set((state) => {
+      state.user = null
+      state.session = null
+      state.permissions = []
+      state.selectedProjet = null
+      state.notifications = []
+      state.filters = {}
+      state.lastUpdate = Date.now()
+      
+      // Réinitialiser les métriques de session
+      state.metrics.sessionStart = Date.now()
+      state.metrics.actionCount = 0
+    }),
+
+    // ===== ACTIONS DONNÉES MÉTIER =====
+    setProjets: (projets: StoreProjet[]) => set((state) => {
+      state.projets = projets
+      state.lastUpdate = Date.now()
+      
+      // Vérifier si le projet sélectionné existe toujours
+      if (state.selectedProjet && !projets.find(p => p.id === state.selectedProjet?.id)) {
+        state.selectedProjet = null
+      }
+    }),
+
+    addProjet: (projet: StoreProjet) => set((state) => {
+      // Vérifier que le projet n'existe pas déjà
+      const existingIndex = state.projets.findIndex(p => p.id === projet.id)
+      if (existingIndex === -1) {
+        state.projets.push(projet)
         state.lastUpdate = Date.now()
       }
     }),
-    
-    // ===== ACTIONS DONNÉES =====
-    setProjets: (projets) => set((state: AppState) => {
-      state.projets = projets
-      state.lastUpdate = Date.now()
-    }),
-    
-    addProjet: (projet) => set((state: AppState) => {
-      // Vérifier la duplication
-      const exists = state.projets.some(p => p.id === projet.id)
-      if (!exists) {
-        state.projets.unshift(projet) // Ajouter au début
-        state.metrics.actionCount++
-      }
-      state.lastUpdate = Date.now()
-    }),
-    
-    updateProjet: (id, updates) => set((state: AppState) => {
-      const index = state.projets.findIndex(p => p.id === id)
-      if (index !== -1) {
-        state.projets[index] = { ...state.projets[index], ...updates }
+
+    updateProjet: (id: string, updates: Partial<StoreProjet>) => set((state) => {
+      const projetIndex = state.projets.findIndex(p => p.id === id)
+      if (projetIndex !== -1) {
+        state.projets[projetIndex] = { ...state.projets[projetIndex], ...updates }
+        state.lastUpdate = Date.now()
         
-        // Mettre à jour le projet sélectionné si c'est le même
+        // Mettre à jour le projet sélectionné si nécessaire
         if (state.selectedProjet?.id === id) {
-          state.selectedProjet = state.projets[index]
+          state.selectedProjet = { ...state.selectedProjet, ...updates }
         }
-        
-        state.metrics.actionCount++
       }
-      state.lastUpdate = Date.now()
-    }),
-    
-    removeProjet: (id) => set((state: AppState) => {
-      const index = state.projets.findIndex(p => p.id === id)
-      if (index !== -1) {
-        state.projets.splice(index, 1)
-        
-        // Désélectionner si c'est le projet supprimé
-        if (state.selectedProjet?.id === id) {
-          state.selectedProjet = null
-        }
-        
-        state.metrics.actionCount++
-      }
-      state.lastUpdate = Date.now()
     }),
 
-    setSelectedProjet: (projet) => set((state: AppState) => {
+    removeProjet: (id) => set((state) => {
+      state.projets = state.projets.filter(p => p.id !== id)
+      state.lastUpdate = Date.now()
+      
+      // Désélectionner si c'était le projet sélectionné
+      if (state.selectedProjet?.id === id) {
+        state.selectedProjet = null
+      }
+    }),
+
+    setSelectedProjet: (projet: StoreProjet | null) => set((state) => {
       state.selectedProjet = projet
       state.lastUpdate = Date.now()
     }),
-    
+
     // ===== ACTIONS NOTIFICATIONS =====
-    addNotification: (notification) => set((state: AppState) => {
-      const newNotification: NotificationItem = {
+    addNotification: (notification) => set((state) => {
+      const newNotification = {
         ...notification,
         id: crypto.randomUUID(),
-        timestamp: Date.now()
+        timestamp: new Date(),  // ✅ Utiliser Date au lieu de Date.now()
+        read: false
       }
       
-      state.notifications.notifications.unshift(newNotification)
-      state.notifications.unreadCount = state.notifications.notifications.filter(n => !n.read).length
+      state.notifications.unshift(newNotification)
       
-      // Limiter le nombre de notifications (garder les 100 plus récentes)
-      if (state.notifications.notifications.length > 100) {
-        state.notifications.notifications = state.notifications.notifications.slice(0, 100)
+      // Limiter à 50 notifications max
+      if (state.notifications.length > 50) {
+        state.notifications = state.notifications.slice(0, 50)
       }
-      
-      state.lastUpdate = Date.now()
-    }),
-    
-    removeNotification: (id) => set((state: AppState) => {
-      const notification = state.notifications.notifications.find(n => n.id === id)
-      state.notifications.notifications = state.notifications.notifications.filter(n => n.id !== id)
-      
-      // Recalculer le compteur de non-lus
-      state.notifications.unreadCount = state.notifications.notifications.filter(n => !n.read).length
       
       state.lastUpdate = Date.now()
     }),
 
-    markNotificationAsRead: (id) => set((state: AppState) => {
-      const notification = state.notifications.notifications.find(n => n.id === id)
-      if (notification && !notification.read) {
+    removeNotification: (id) => set((state) => {
+      state.notifications = state.notifications.filter(n => n.id !== id)
+      state.lastUpdate = Date.now()
+    }),
+
+    clearNotifications: () => set((state) => {
+      state.notifications = []
+      state.lastUpdate = Date.now()
+    }),
+
+    markNotificationAsRead: (id) => set((state) => {
+      const notification = state.notifications.find(n => n.id === id)
+      if (notification) {
         notification.read = true
-        state.notifications.unreadCount = Math.max(0, state.notifications.unreadCount - 1)
+        state.lastUpdate = Date.now()
       }
-      state.lastUpdate = Date.now()
     }),
-    
-    clearNotifications: () => set((state: AppState) => {
-      state.notifications.notifications = []
-      state.notifications.unreadCount = 0
+
+    markAllNotificationsAsRead: () => set((state) => {
+      state.notifications.forEach(n => n.read = true)
       state.lastUpdate = Date.now()
     }),
 
-    clearReadNotifications: () => set((state: AppState) => {
-      state.notifications.notifications = state.notifications.notifications.filter(n => !n.read)
-      // Le unreadCount ne change pas car on ne supprime que les lues
-      state.lastUpdate = Date.now()
-    }),
-
-    updateNotificationSettings: (settings) => set((state: AppState) => {
-      state.notifications.settings = { ...state.notifications.settings, ...settings }
-      state.lastUpdate = Date.now()
-    }),
-    
     // ===== ACTIONS FILTRES =====
-    setFilters: (module, filters) => set((state: AppState) => {
+    setFilters: (module, filters) => set((state) => {
       state.filters[module] = filters
       state.metrics.actionCount++
       state.lastUpdate = Date.now()
     }),
-    
-    clearFilters: (module) => set((state: AppState) => {
+
+    clearFilters: (module) => set((state) => {
       delete state.filters[module]
       state.metrics.actionCount++
       state.lastUpdate = Date.now()
     }),
 
-    resetAllFilters: () => set((state: AppState) => {
+    resetAllFilters: () => set((state) => {
       state.filters = {}
       state.metrics.actionCount++
       state.lastUpdate = Date.now()
     }),
 
-    setGlobalSearch: (search) => set((state: AppState) => {
-      if (!state.filters.global) {
-        state.filters.global = { activeFilters: [] }
-      }
-      state.filters.global.search = search
-      state.lastUpdate = Date.now()
-    }),
-
-    // ===== ACTIONS MÉTRIQUES =====
-    incrementPageView: () => set((state: AppState) => {
-      state.metrics.pageViews++
-      state.metrics.lastActivity = Date.now()
-      state.lastUpdate = Date.now()
-    }),
-
-    incrementActionCount: () => set((state: AppState) => {
-      state.metrics.actionCount++
-      state.metrics.lastActivity = Date.now()
-      state.lastUpdate = Date.now()
-    }),
-
-    recordError: () => set((state: AppState) => {
-      state.metrics.errorCount++
-      state.lastUpdate = Date.now()
-    }),
-
-    updatePerformanceMetric: (metric, value) => set((state: AppState) => {
-      state.metrics.performanceMetrics[metric] = value
-      state.lastUpdate = Date.now()
-    }),
-
     // ===== ACTIONS SYNCHRONISATION =====
-    setOnlineStatus: (isOnline) => set((state: AppState) => {
+    setOnlineStatus: (isOnline) => set((state) => {
       state.sync.isOnline = isOnline
       state.lastUpdate = Date.now()
       
-      // Si on revient en ligne, marquer pour sync
       if (isOnline && state.sync.pendingChanges > 0) {
-        // Trigger sync logic here
+        // Déclencher une sync automatique si on redevient en ligne
+        console.log('Connexion restaurée, synchronisation en attente...')
       }
     }),
 
-    markAsNeedingSync: () => set((state: AppState) => {
-      state.sync.pendingChanges++
+    setPendingChanges: (count) => set((state) => {
+      state.sync.pendingChanges = count
       state.lastUpdate = Date.now()
     }),
 
-    markAsSynced: () => set((state: AppState) => {
-      state.sync.lastSync = Date.now()
-      state.sync.pendingChanges = 0
-      state.lastUpdate = Date.now()
-    }),
+    triggerSync: async () => {
+      const currentState = get()
+      if (!currentState.sync.isOnline) {
+        console.warn('Synchronisation impossible: hors ligne')
+        return
+      }
 
-    handleSyncConflict: (resolution) => set((state: AppState) => {
-      state.sync.conflictResolution = resolution
-      state.lastUpdate = Date.now()
-    }),
+      set((state) => {
+        state.loading = true
+        state.error = null
+      })
 
-    // Les actions de base sont automatiquement ajoutées par StoreUtils.createBaseActions
-  }),
+      try {
+        // Ici, implémenter la logique de synchronisation
+        console.log('Synchronisation en cours...')
+        
+        // Simulation d'une sync
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        set((state) => {
+          state.sync.lastSync = Date.now()
+          state.sync.pendingChanges = 0
+          state.loading = false
+          state.lastUpdate = Date.now()
+        })
+        
+        console.log('Synchronisation terminée')
+      } catch (error) {
+        set((state) => {
+          state.loading = false
+          state.error = error instanceof Error ? error.message : 'Erreur de synchronisation'
+          state.lastUpdate = Date.now()
+        })
+        
+        console.error('Erreur de synchronisation:', error)
+      }
+    },
+
+    resolveConflict: (conflictId, resolution) => set((state) => {
+      // Ici, implémenter la résolution de conflits
+      state.sync.conflictCount = Math.max(0, state.sync.conflictCount - 1)
+      state.lastUpdate = Date.now()
+      console.log(`Conflit résolu: ${conflictId}`, resolution)
+    })
+  }
+}
+
+// ===== CRÉATION DU STORE =====
+
+/**
+ * Store principal de l'application avec signature corrigée
+ */
+export const useAppStore = StoreUtils.createRobustStore<AppState, AppStoreActions>(
+  initialAppState,
+  createAppStoreActions,
   {
     name: 'app-store',
     persist: true,
     devtools: true,
     immer: true,
-    subscriptions: true,
-    version: '2.0.0',
-    migrations: {
-      1: (state: any) => {
-        // Migration de la v1 vers v2
-        return {
-          ...state,
-          notifications: initialNotificationState,
-          sync: initialAppState.sync
-        }
-      }
-    }
+    subscriptions: true
   }
 )
 
-// ===== HOOKS DE CONVENANCE =====
-export const useAppUser = () => useAppStore(state => state.user)
-export const useAppSession = () => useAppStore(state => state.session)
-export const useAppTheme = () => useAppStore(state => state.ui.theme)
-export const useAppLoading = () => useAppStore(state => state.loading)
-export const useAppError = () => useAppStore(state => state.error)
-export const useAppOnlineStatus = () => useAppStore(state => state.sync.isOnline)
-
-// ===== SÉLECTEURS COMPLEXES =====
-export const appSelectors = {
-  // Sélecteur pour l'état d'authentification complet
-  authState: (state: AppState) => ({
-    user: state.user,
-    session: state.session,
-    isAuthenticated: !!(state.user && state.session),
-    permissions: state.permissions,
-    isSessionValid: !!(state.session && state.session.expiresAt && state.session.expiresAt > Date.now())
-  }),
-
-  // Sélecteur pour les projets avec filtres appliqués
-  filteredProjets: (state: AppState) => {
-    let projets = state.projets
-    const filters = state.filters.projets
-
-    if (!filters) return projets
-
-    if (filters.statut?.length) {
-      projets = projets.filter(p => filters.statut!.includes(p.statut))
-    }
-
-    if (filters.search) {
-      const search = filters.search.toLowerCase()
-      projets = projets.filter(p => 
-        p.nom?.toLowerCase().includes(search) ||
-        p.description?.toLowerCase().includes(search) ||
-        p.reference?.toLowerCase().includes(search)
-      )
-    }
-
-    return projets
-  },
-
-  // Sélecteur pour les notifications non lues par priorité
-  criticalNotifications: (state: AppState) => 
-    state.notifications.notifications.filter(n => 
-      !n.read && (n.priority === 'high' || n.priority === 'urgent')
-    ),
-
-  // Sélecteur pour les métriques de performance
-  performanceStatus: (state: AppState) => ({
-    ...state.metrics.performanceMetrics,
-    sessionDuration: Date.now() - state.metrics.sessionStart,
-    activityScore: state.metrics.actionCount / Math.max(1, state.metrics.pageViews),
-    errorRate: state.metrics.errorCount / Math.max(1, state.metrics.actionCount)
-  })
-}
-
-// ===== TYPES EXPORTÉS (réexports depuis @erp/types) =====
-export type {
-  AppState,
-  AppState as AppStore, FilterState, MetricsState, NotificationItem,
-  NotificationState, SessionState, // Alias pour compatibilité
-  UIState
-} from '@erp/types'
+// ===== EXPORTS =====
+export type { AppState, AppStore, AppStoreActions }

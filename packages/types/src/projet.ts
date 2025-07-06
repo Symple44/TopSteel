@@ -96,13 +96,3 @@ export interface UpdateProjetRequest {
   priorite?: Projet['priorite'];
   commentaires?: string;
 }
-
-export interface ProjetFilters {
-  statut?: Projet['statut'][];
-  responsable?: string;
-  priorite?: Projet['priorite'][];
-  dateDebut?: Date;
-  dateFin?: Date;
-  clientId?: string;
-  search?: string;
-}
