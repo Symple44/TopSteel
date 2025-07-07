@@ -17,7 +17,7 @@ interface ChutesStatsProps {
 }
 
 export function ChutesStats({ stats }: ChutesStatsProps) {
-  const statCards = [
+  const _statCards = [
     {
       title: "Total Chutes",
       value: stats.totalChutes.toLocaleString(),
@@ -57,10 +57,10 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
       {/* Statistiques principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat, index) => {
-          const Icon = stat.icon;
+          const _Icon = stat.icon;
 
           return (
-            <Card key={index}>
+            <Card key={\item-\\}>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>

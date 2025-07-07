@@ -61,7 +61,7 @@ export interface ClassVariants {
 // CONFIGURATIONS MÉTIER ERP
 // =============================================
 
-export const STATUS_CONFIGS = {
+export const _STATUS_CONFIGS = {
   // Projets
   EN_COURS: {
     color: 'blue-500',
@@ -162,7 +162,7 @@ export const STATUS_CONFIGS = {
   }
 } as const
 
-export const DENSITY_CONFIGS = {
+export const _DENSITY_CONFIGS = {
   compact: {
     padding: 'p-2',
     gap: 'gap-1',
@@ -183,7 +183,7 @@ export const DENSITY_CONFIGS = {
   }
 } as const
 
-export const ANIMATION_CONFIGS = {
+export const _ANIMATION_CONFIGS = {
   none: {
     transition: '',
     hover: '',
@@ -220,7 +220,7 @@ class DesignSystemCache {
   }
 
   static getClass(key: string): string | undefined {
-    const result = this.classCache.get(key)
+    const _result = this.classCache.get(key)
 
     if (result) {
       this.metrics.cacheHits++
@@ -231,7 +231,7 @@ class DesignSystemCache {
 
   static setClass(key: string, value: string): void {
     if (this.classCache.size >= this.maxCacheSize) {
-      const firstKey = this.classCache.keys().next().value
+      const _firstKey = this.classCache.keys().next().value
 
       if (firstKey) {
         this.classCache.delete(firstKey)
@@ -270,17 +270,17 @@ class DesignSystemCache {
 
 class ClassGenerator {
   static projectCard(config: DesignSystemConfig): string {
-    const cacheKey = `projectCard-${config.density}-${config.animations}-${config.borderRadius}`
-    const cached = DesignSystemCache.getClass(cacheKey)
+    const _cacheKey = `projectCard-${config.density}-${config.animations}-${config.borderRadius}`
+    const _cached = DesignSystemCache.getClass(cacheKey)
 
     if (cached) return cached
     
-    const startTime = performance.now()
+    const _startTime = performance.now()
     
-    const densityConfig = DENSITY_CONFIGS[config.density]
-    const animationConfig = ANIMATION_CONFIGS[config.animations]
+    const _densityConfig = DENSITY_CONFIGS[config.density]
+    const _animationConfig = ANIMATION_CONFIGS[config.animations]
     
-    const classes = cn(
+    const _classes = cn(
       // Base
       'bg-white rounded-lg shadow-sm border border-border',
       
@@ -309,17 +309,17 @@ class ClassGenerator {
   }
 
   static statusBadge(status: keyof typeof STATUS_CONFIGS, config: DesignSystemConfig): string {
-    const cacheKey = `statusBadge-${status}-${config.density}`
-    const cached = DesignSystemCache.getClass(cacheKey)
+    const _cacheKey = `statusBadge-${status}-${config.density}`
+    const _cached = DesignSystemCache.getClass(cacheKey)
 
     if (cached) return cached
     
-    const startTime = performance.now()
+    const _startTime = performance.now()
     
-    const statusConfig = STATUS_CONFIGS[status]
-    const densityConfig = DENSITY_CONFIGS[config.density]
+    const _statusConfig = STATUS_CONFIGS[status]
+    const _densityConfig = DENSITY_CONFIGS[config.density]
     
-    const classes = cn(
+    const _classes = cn(
       // Base
       'inline-flex items-center font-medium rounded-full',
       
@@ -344,16 +344,16 @@ class ClassGenerator {
     size: ClassVariants['size'] = 'md',
     config: DesignSystemConfig
   ): string {
-    const cacheKey = `metallurgyButton-${variant}-${size}-${config.animations}`
-    const cached = DesignSystemCache.getClass(cacheKey)
+    const _cacheKey = `metallurgyButton-${variant}-${size}-${config.animations}`
+    const _cached = DesignSystemCache.getClass(cacheKey)
 
     if (cached) return cached
     
-    const startTime = performance.now()
+    const _startTime = performance.now()
     
-    const animationConfig = ANIMATION_CONFIGS[config.animations]
+    const _animationConfig = ANIMATION_CONFIGS[config.animations]
     
-    const classes = cn(
+    const _classes = cn(
       // Base
       'inline-flex items-center justify-center rounded-md font-medium ring-offset-background',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -383,17 +383,17 @@ class ClassGenerator {
   }
 
   static dataTable(config: DesignSystemConfig): string {
-    const cacheKey = `dataTable-${config.density}-${config.animations}`
-    const cached = DesignSystemCache.getClass(cacheKey)
+    const _cacheKey = `dataTable-${config.density}-${config.animations}`
+    const _cached = DesignSystemCache.getClass(cacheKey)
 
     if (cached) return cached
     
-    const startTime = performance.now()
+    const _startTime = performance.now()
     
-    const densityConfig = DENSITY_CONFIGS[config.density]
-    const animationConfig = ANIMATION_CONFIGS[config.animations]
+    const _densityConfig = DENSITY_CONFIGS[config.density]
+    const _animationConfig = ANIMATION_CONFIGS[config.animations]
     
-    const classes = cn(
+    const _classes = cn(
       // Base
       'w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden',
       
@@ -451,7 +451,7 @@ export function useDesignSystem() {
     
     if (typeof window !== 'undefined') {
       try {
-        const stored = localStorage.getItem('topsteel-design-config')
+        const _stored = localStorage.getItem('topsteel-design-config')
 
         return stored ? { ...defaultConfig, ...JSON.parse(stored) } : defaultConfig
       } catch {
@@ -464,13 +464,13 @@ export function useDesignSystem() {
 
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light')
   const [isHydrated, setIsHydrated] = useState(false)
-  const previousConfigRef = useRef<DesignSystemConfig>(config)
+  const _previousConfigRef = useRef<DesignSystemConfig>(config)
 
   // Theme resolution
   useEffect(() => {
     if (typeof window === 'undefined') return
     
-    const resolveTheme = (): ResolvedTheme => {
+    const _resolveTheme = (): ResolvedTheme => {
       if (config.theme === 'system') {
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
       }
@@ -478,8 +478,8 @@ export function useDesignSystem() {
       return config.theme as ResolvedTheme
     }
     
-    const updateResolvedTheme = () => {
-      const newTheme = resolveTheme()
+    const _updateResolvedTheme = () => {
+      const _newTheme = resolveTheme()
 
       setResolvedTheme(newTheme)
       
@@ -491,8 +491,8 @@ export function useDesignSystem() {
     setIsHydrated(true)
     
     // Listen to system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = () => {
+    const _mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const _handleChange = () => {
       if (config.theme === 'system') {
         updateResolvedTheme()
       }
@@ -507,8 +507,8 @@ export function useDesignSystem() {
   useEffect(() => {
     if (typeof window === 'undefined') return
     
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const updateReducedMotion = () => {
+    const _mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const _updateReducedMotion = () => {
       setConfig(prev => ({
         ...prev,
         reducedMotion: mediaQuery.matches,
@@ -541,7 +541,7 @@ export function useDesignSystem() {
   }, [config, isHydrated])
 
   // FIX: Memoized class generators avec dépendances correctes
-  const classes = useMemo(() => ({
+  const _classes = useMemo(() => ({
     projectCard: () => ClassGenerator.projectCard(config),
     statusBadge: (status: keyof typeof STATUS_CONFIGS) => ClassGenerator.statusBadge(status, config),
     metallurgyButton: (variant: ClassVariants['variant'] = 'default', size: ClassVariants['size'] = 'md') => 
@@ -550,37 +550,37 @@ export function useDesignSystem() {
   }), [config]) // ✅ Ajout de la dépendance config pour être cohérent
 
   // Update functions avec optimisation
-  const updateConfig = useCallback((updates: Partial<DesignSystemConfig>) => {
+  const _updateConfig = useCallback((updates: Partial<DesignSystemConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }))
   }, [])
 
-  const setTheme = useCallback((theme: ThemeMode) => {
+  const _setTheme = useCallback((theme: ThemeMode) => {
     updateConfig({ theme })
   }, [updateConfig])
 
-  const setAnimations = useCallback((animations: AnimationLevel) => {
+  const _setAnimations = useCallback((animations: AnimationLevel) => {
     updateConfig({ animations })
   }, [updateConfig])
 
-  const setDensity = useCallback((density: Density) => {
+  const _setDensity = useCallback((density: Density) => {
     updateConfig({ density })
   }, [updateConfig])
 
   // Utility functions
-  const getStatusConfig = useCallback((status: keyof typeof STATUS_CONFIGS) => {
+  const _getStatusConfig = useCallback((status: keyof typeof STATUS_CONFIGS) => {
     return STATUS_CONFIGS[status]
   }, [])
 
-  const getStatusPriority = useCallback((status: keyof typeof STATUS_CONFIGS): number => {
+  const _getStatusPriority = useCallback((status: keyof typeof STATUS_CONFIGS): number => {
     return STATUS_CONFIGS[status]?.priority ?? 0
   }, [])
 
-  const sortByStatusPriority = useCallback(<T extends { status: keyof typeof STATUS_CONFIGS }>(items: T[]): T[] => {
+  const _sortByStatusPriority = useCallback(<T extends { status: keyof typeof STATUS_CONFIGS }>(items: T[]): T[] => {
     return [...items].sort((a, b) => getStatusPriority(b.status) - getStatusPriority(a.status))
   }, [getStatusPriority])
 
   // Performance monitoring - cache optimisé sans re-calculs inutiles
-  const metrics = useMemo(() => DesignSystemCache.getMetrics(), [])
+  const _metrics = useMemo(() => DesignSystemCache.getMetrics(), [])
 
   return {
     // Configuration

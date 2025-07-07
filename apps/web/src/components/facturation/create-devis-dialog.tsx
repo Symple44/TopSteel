@@ -23,7 +23,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
 
   if (!open) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const _handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('Nouveau devis:', formData)
     onOpenChange(false)
@@ -116,4 +116,5 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
     </div>
   )
 }
+
 

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Edit, Eye, MoreHorizontal, Package, Trash2 } from 'lucide-react'
 
 export function StocksTable() {
-  const stocks = [
+  const _stocks = [
     {
       id: 1,
       reference: 'ACIER-S235-02',
@@ -60,7 +60,7 @@ export function StocksTable() {
     }
   ]
 
-  const getStatutBadge = (statut: string) => {
+  const _getStatutBadge = (statut: string) => {
     switch (statut) {
       case 'critique':
         return <Badge variant="destructive">Critique</Badge>
@@ -152,3 +152,4 @@ export function StocksTable() {
     </div>
   )
 }
+

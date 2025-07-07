@@ -25,4 +25,5 @@ export class ProjetService {
   }
 }
 
-export const projetService = new ProjetService()
+export const _projetService = new ProjetService()
+

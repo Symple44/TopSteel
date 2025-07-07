@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-const loginSchema = z.object({
+const _loginSchema = z.object({
   email: z.string().email('Email invalide'),
   password: z.string().min(1, 'Le mot de passe est requis'),
 })
@@ -20,8 +20,8 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const _router = useRouter()
+  const _searchParams = useSearchParams()
   const [error, setError] = useState<FormattedError | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -39,7 +39,7 @@ export default function LoginPage() {
 
   // Vérifier les messages de succès depuis l'URL
   useEffect(() => {
-    const message = searchParams.get('message')
+    const _message = searchParams.get('message')
 
     if (message) {
       setSuccess(message)
@@ -53,7 +53,7 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, router])
 
-  const onSubmit = async (data: LoginFormData) => {
+  const _onSubmit = async (data: LoginFormData) => {
     setError(null)
     setSuccess(null)
     setIsLoading(true)
@@ -61,10 +61,10 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password)
       // La redirection sera gérée par l'useEffect
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erreur lors de la connexion:', err)
       
-      const formattedError = ErrorHandler.formatError(err)
+      const _formattedError = ErrorHandler.formatError(err)
 
       setError(formattedError)
       

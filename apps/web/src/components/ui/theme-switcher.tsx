@@ -22,13 +22,13 @@ function useThemeContext() {
 
   useEffect(() => {
     // Détection du thème système
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const systemTheme = mediaQuery.matches ? 'dark' : 'light'
+    const _mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const _systemTheme = mediaQuery.matches ? 'dark' : 'light'
     
     // Lecture du thème stocké
-    const storedTheme = localStorage.getItem('topsteel-theme') as 'light' | 'dark' | 'system' || 'system'
+    const _storedTheme = localStorage.getItem('topsteel-theme') as 'light' | 'dark' | 'system' || 'system'
     
-    const resolvedTheme = storedTheme === 'system' ? systemTheme : storedTheme
+    const _resolvedTheme = storedTheme === 'system' ? systemTheme : storedTheme
     
     setThemeState({
       theme: storedTheme,
@@ -42,9 +42,9 @@ function useThemeContext() {
     document.documentElement.classList.add(resolvedTheme)
 
     // Écouter les changements système
-    const handleSystemChange = (e: MediaQueryListEvent) => {
+    const _handleSystemChange = (e: MediaQueryListEvent) => {
       if (storedTheme === 'system') {
-        const newSystemTheme = e.matches ? 'dark' : 'light'
+        const _newSystemTheme = e.matches ? 'dark' : 'light'
 
         document.documentElement.classList.remove('light', 'dark')
         document.documentElement.classList.add(newSystemTheme)
@@ -57,12 +57,12 @@ function useThemeContext() {
     return () => mediaQuery.removeEventListener('change', handleSystemChange)
   }, [])
 
-  const setTheme = useCallback((newTheme: 'light' | 'dark' | 'system') => {
+  const _setTheme = useCallback((newTheme: 'light' | 'dark' | 'system') => {
     try {
       localStorage.setItem('topsteel-theme', newTheme)
       
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      const resolvedTheme = newTheme === 'system' ? systemTheme : newTheme
+      const _systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      const _resolvedTheme = newTheme === 'system' ? systemTheme : newTheme
       
       document.documentElement.classList.remove('light', 'dark')
       document.documentElement.classList.add(resolvedTheme)
@@ -98,16 +98,16 @@ export function ThemeSwitcher({
   const [isOpen, setIsOpen] = useState(false)
 
   // ✅ useCallback TOUJOURS APPELÉS
-  const handleThemeChange = useCallback((newTheme: 'light' | 'dark' | 'system') => {
+  const _handleThemeChange = useCallback((newTheme: 'light' | 'dark' | 'system') => {
     setTheme(newTheme)
     setIsOpen(false)
   }, [setTheme])
 
-  const toggleDropdown = useCallback(() => {
+  const _toggleDropdown = useCallback(() => {
     setIsOpen(prev => !prev)
   }, [])
 
-  const getThemeIcon = useCallback(() => {
+  const _getThemeIcon = useCallback(() => {
     if (!isHydrated || !mounted) {
       return <Monitor className={getIconSizeClasses(size)} />
     }
@@ -122,8 +122,8 @@ export function ThemeSwitcher({
     }
   }, [resolvedTheme, isHydrated, mounted, size])
 
-  const handleToggleTheme = useCallback(() => {
-    const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
+  const _handleToggleTheme = useCallback(() => {
+    const _newTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
 
     handleThemeChange(newTheme)
   }, [resolvedTheme, handleThemeChange])

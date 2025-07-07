@@ -3,14 +3,14 @@ import React from "react"
 
 interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
-  value?: any
-  onValueChange?: any
+  value?: unknown
+  onValueChange?: unknown
   asChild?: boolean
   variant?: string
   size?: string
 }
 
-export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
+export const _Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { 
@@ -31,14 +31,15 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
 Accordion.displayName = "Accordion"
 
 // Export des sous-composants courants si nécessaire
-export const AccordionContent = Accordion
-export const AccordionTrigger = Accordion  
-export const AccordionItem = Accordion
-export const AccordionValue = Accordion
-export const AccordionHeader = Accordion
-export const AccordionTitle = Accordion
-export const AccordionDescription = Accordion
-export const AccordionFooter = Accordion
-export const AccordionSeparator = Accordion
-export const AccordionList = Accordion
+export const _AccordionContent = Accordion
+export const _AccordionTrigger = Accordion  
+export const _AccordionItem = Accordion
+export const _AccordionValue = Accordion
+export const _AccordionHeader = Accordion
+export const _AccordionTitle = Accordion
+export const _AccordionDescription = Accordion
+export const _AccordionFooter = Accordion
+export const _AccordionSeparator = Accordion
+export const _AccordionList = Accordion
+
 

@@ -27,8 +27,8 @@ interface StoreEvent {
   timestamp: number
   store: string
   action: string
-  state: any
-  prevState?: any
+  state: unknown
+  prevState?: unknown
   duration?: number
 }
 
@@ -55,9 +55,9 @@ export class StoreUtils {
     } = config
 
     // Store creator compatible avec Zustand
-    const storeCreator = (set: any, get: any) => {
-      const customActions = storeDefinition(set, get)
-      const baseActions = this.createBaseActions(initialState)
+    const _storeCreator = (set: unknown, get: unknown) => {
+      const _customActions = storeDefinition(set, get)
+      const _baseActions = this.createBaseActions(initialState)
       
       return {
         ...initialState,
@@ -70,7 +70,7 @@ export class StoreUtils {
       } as TState & TActions
     }
 
-    let store = storeCreator
+    let _store = storeCreator
 
     // Middleware Immer pour mutations immutables
     if (enableImmer) {
@@ -84,7 +84,7 @@ export class StoreUtils {
         storage: {
           getItem: (key: string) => {
             try {
-              const item = localStorage.getItem(key)
+              const _item = localStorage.getItem(key)
 
               return item ? JSON.parse(item) : null
             } catch (error) {
@@ -93,7 +93,7 @@ export class StoreUtils {
               return null
             }
           },
-          setItem: (key: string, value: any) => {
+          setItem: (key: string, value: unknown) => {
             try {
               localStorage.setItem(key, JSON.stringify(value))
             } catch (error) {
@@ -108,7 +108,7 @@ export class StoreUtils {
             }
           }
         },
-        partialize: (state: any) => {
+        partialize: (state: unknown) => {
           // Ne persister que les données importantes
           const { loading, error, lastUpdate, ...persistedState } = state
 
@@ -134,7 +134,7 @@ export class StoreUtils {
       store = devtools(store, { name }) as any
     }
 
-    const zustandStore = create<TState & TActions>()(store)
+    const _zustandStore = create<TState & TActions>()(store)
 
     // Monitoring des changements d'état
     if (process.env.NODE_ENV === 'development') {
@@ -168,7 +168,7 @@ export class StoreUtils {
       },
       
       reset: () => (state: TState) => {
-        const preservedProps = {
+        const _preservedProps = {
           loading: false,
           error: null,
           lastUpdate: Date.now()
@@ -194,13 +194,13 @@ export class StoreUtils {
   ): Promise<TResult | null> {
     try {
       onStart?.()
-      const result = await action()
+      const _result = await action()
 
       onSuccess?.(result)
 
       return result
     } catch (error) {
-      const errorObj = error instanceof Error ? error : new Error(String(error))
+      const _errorObj = error instanceof Error ? error : new Error(String(error))
 
       onError?.(errorObj)
 
@@ -212,11 +212,11 @@ export class StoreUtils {
    * Cache simple et efficace avec TTL
    */
   static createCache<K, V>(ttlMs: number = 300000) {
-    const cache = new Map<K, CacheItem<V>>()
+    const _cache = new Map<K, CacheItem<V>>()
 
     return {
       get: (key: K): V | null => {
-        const item = cache.get(key)
+        const _item = cache.get(key)
 
         if (!item) return null
 
@@ -237,7 +237,7 @@ export class StoreUtils {
       },
 
       has: (key: K): boolean => {
-        const item = cache.get(key)
+        const _item = cache.get(key)
 
         if (!item) return false
 
@@ -261,8 +261,8 @@ export class StoreUtils {
       size: () => cache.size,
 
       cleanup: (): number => {
-        const now = Date.now()
-        let deletedCount = 0
+        const _now = Date.now()
+        let _deletedCount = 0
         
         for (const [key, item] of cache.entries()) {
           if (now - item.timestamp > ttlMs) {
@@ -281,12 +281,12 @@ export class StoreUtils {
    */
   static validateState<TState extends BaseStoreState>(
     state: Partial<TState>,
-    schema: Record<keyof TState, (value: any) => boolean>
+    schema: Record<keyof TState, (value: unknown) => boolean>
   ): { valid: boolean; errors: string[] } {
     const errors: string[] = []
 
     for (const [key, validator] of Object.entries(schema)) {
-      const value = state[key as keyof TState]
+      const _value = state[key as keyof TState]
 
       if (value !== undefined && !validator(value)) {
         errors.push(`Validation échouée pour ${String(key)}`)
@@ -302,7 +302,7 @@ export class StoreUtils {
   /**
    * Debounce pour actions
    */
-  static debounce<T extends (...args: any[]) => any>(
+  static debounce<T extends (...args: unknown[]) => any>(
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
@@ -322,14 +322,14 @@ export class StoreUtils {
   /**
    * Throttle pour actions
    */
-  static throttle<T extends (...args: any[]) => any>(
+  static throttle<T extends (...args: unknown[]) => any>(
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
-    let lastCall = 0
+    let _lastCall = 0
 
     return (...args: Parameters<T>) => {
-      const now = Date.now()
+      const _now = Date.now()
       
       if (now - lastCall >= delay) {
         lastCall = now
@@ -341,22 +341,22 @@ export class StoreUtils {
   /**
    * Monitoring et debugging des stores
    */
-  private static addMonitoring(store: any, name: string) {
-    const originalGetState = store.getState
-    const originalSetState = store.setState
+  private static addMonitoring(store: unknown, name: string) {
+    const _originalGetState = store.getState
+    const _originalSetState = store.setState
 
     store.getState = () => {
-      const state = originalGetState()
+      const _state = originalGetState()
 
       StoreMonitor.logAccess(name, state)
 
       return state
     }
 
-    store.setState = (updater: any) => {
-      const prevState = originalGetState()
-      const result = originalSetState(updater)
-      const newState = originalGetState()
+    store.setState = (updater: unknown) => {
+      const _prevState = originalGetState()
+      const _result = originalSetState(updater)
+      const _newState = originalGetState()
       
       StoreMonitor.logStateChange(name, 'setState', newState, prevState)
 
@@ -367,7 +367,7 @@ export class StoreUtils {
   /**
    * Utilitaires de sérialisation sécurisée
    */
-  static safeSerialize(data: any): string | null {
+  static safeSerialize(data: unknown): string | null {
     try {
       return JSON.stringify(data, (key, value) => {
         if (typeof value === 'function') return undefined
@@ -424,8 +424,8 @@ export class StoreMonitor {
   static logStateChange(
     storeName: string, 
     action: string, 
-    state: any, 
-    prevState?: any,
+    state: unknown, 
+    prevState?: unknown,
     startTime?: number
   ) {
     if (!this.isEnabled) return
@@ -462,11 +462,11 @@ export class StoreMonitor {
     })
   }
 
-  static logAccess(storeName: string, state: any) {
+  static logAccess(storeName: string, state: unknown) {
     if (!this.isEnabled) return
 
-    const key = `${storeName}-access`
-    const count = (this.accessLog.get(key) || 0) + 1
+    const _key = `${storeName}-access`
+    const _count = (this.accessLog.get(key) || 0) + 1
 
     this.accessLog.set(key, count)
 
@@ -476,7 +476,7 @@ export class StoreMonitor {
     }
   }
 
-  private static cloneState(state: any) {
+  private static cloneState(state: unknown) {
     try {
       return structuredClone ? structuredClone(state) : JSON.parse(JSON.stringify(state))
     } catch {

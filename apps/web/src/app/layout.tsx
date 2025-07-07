@@ -3,13 +3,13 @@ import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
 import { Providers } from './providers'
 
-const inter = Inter({ 
+const _inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap'
 })
 
-const poppins = Poppins({
+const _poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-poppins',
@@ -72,3 +72,4 @@ export default function RootLayout({
     </html>
   )
 }
+

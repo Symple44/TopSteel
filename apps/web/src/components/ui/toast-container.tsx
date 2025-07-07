@@ -30,13 +30,13 @@ const toastStyles: Record<ToastType, string> = {
 }
 
 // Guard pour vérifier si le type est valide
-const isValidToastType = (type: any): type is ToastType => {
+const _isValidToastType = (type: unknown): type is ToastType => {
   return ['success', 'error', 'warning', 'info'].includes(type)
 }
 
 export function ToastContainer() {
-  const toasts = useUIStore(state => state.toasts)
-  const removeToast = useUIStore(state => state.removeToast)
+  const _toasts = useUIStore(state => state.toasts)
+  const _removeToast = useUIStore(state => state.removeToast)
 
   if (toasts.length === 0) return null
 
@@ -45,7 +45,7 @@ export function ToastContainer() {
       {toasts.map((toast) => {
         // Vérification type-safe avec fallback
         const toastType: ToastType = isValidToastType(toast.type) ? toast.type : 'info'
-        const Icon = toastIcons[toastType]
+        const _Icon = toastIcons[toastType]
         
         return (
           <div

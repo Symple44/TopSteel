@@ -1,7 +1,7 @@
 import * as React from "react"
 
 interface UltraProps { 
-  [key: string]: any 
+  [key: string]: unknown 
 }
 
 export const Tooltip: React.FC<UltraProps> = (props) => <div {...props} />

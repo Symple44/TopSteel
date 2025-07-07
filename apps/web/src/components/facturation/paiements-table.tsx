@@ -14,7 +14,7 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import { Download, Edit, Eye } from 'lucide-react'
 
 // Données mock pour encaissements
-const mockEncaissements = [
+const _mockEncaissements = [
   {
     id: '1',
     reference: 'ENC-001',
@@ -38,7 +38,7 @@ const mockEncaissements = [
 ]
 
 // Données mock pour décaissements
-const mockDecaissements = [
+const _mockDecaissements = [
   {
     id: '1',
     reference: 'DEC-001',
@@ -61,15 +61,15 @@ const mockDecaissements = [
   }
 ]
 
-const getStatusBadge = (statut: string) => {
-  const config = {
+const _getStatusBadge = (statut: string) => {
+  const _config = {
     encaisse: { label: 'Encaissé', variant: 'default' as const },
     paye: { label: 'Payé', variant: 'default' as const },
     en_attente: { label: 'En attente', variant: 'secondary' as const },
     rejete: { label: 'Rejeté', variant: 'destructive' as const },
   }
   
-  const item = config[statut as keyof typeof config] || config.en_attente
+  const _item = config[statut as keyof typeof config] || config.en_attente
 
   return <Badge variant={item.variant}>{item.label}</Badge>
 }
@@ -90,7 +90,7 @@ interface PaiementsTableProps {
 
 export function PaiementsTable({ type, data }: PaiementsTableProps) {
   // Sélection des données selon le type
-  const paiements = data || (type === 'encaissement' ? mockEncaissements : mockDecaissements)
+  const _paiements = data || (type === 'encaissement' ? mockEncaissements : mockDecaissements)
   
   return (
     <div className="rounded-md border">
@@ -146,3 +146,4 @@ export function PaiementsTable({ type, data }: PaiementsTableProps) {
     </div>
   )
 }
+

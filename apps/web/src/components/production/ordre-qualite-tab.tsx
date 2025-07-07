@@ -2,11 +2,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface OrdreQualiteTabProps {
-  ordre: any;
+  ordre: unknown;
 }
 
 export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
-  const controles = ordre?.controles || [];
+  const _controles = ordre?.controles || [];
 
   return (
     <div className="space-y-6">
@@ -24,7 +24,7 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              {controles.map((controle: any, index: number) => (
+              {controles.map((controle: unknown, index: number) => (
                 <div key={controle.id || index} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium">{controle?.type || 'Contrôle qualité'}</h4>
@@ -87,3 +87,4 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
     </div>
   );
 }
+

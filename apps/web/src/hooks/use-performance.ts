@@ -1,28 +1,28 @@
 import { useCallback, useMemo, useRef } from 'react'
 
 export function usePerformance() {
-  const startTime = useRef<number>(Date.now())
-  const metrics = useRef<Record<string, number>>({})
+  const _startTime = useRef<number>(Date.now())
+  const _metrics = useRef<Record<string, number>>({})
 
-  const measureTime = useCallback((label: string) => {
-    const now = Date.now()
+  const _measureTime = useCallback((label: string) => {
+    const _now = Date.now()
 
     metrics.current[label] = now - startTime.current
 
     return metrics.current[label]
   }, [])
 
-  const getMetrics = useCallback(() => {
+  const _getMetrics = useCallback(() => {
     return { ...metrics.current }
   }, [])
 
-  const resetMetrics = useCallback(() => {
+  const _resetMetrics = useCallback(() => {
     metrics.current = {}
     startTime.current = Date.now()
   }, [])
 
-  const averageTime = useMemo(() => {
-    const times = Object.values(metrics.current)
+  const _averageTime = useMemo(() => {
+    const _times = Object.values(metrics.current)
 
     return times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0
   }, [])
@@ -35,3 +35,4 @@ export function usePerformance() {
     metrics: metrics.current
   }
 }
+

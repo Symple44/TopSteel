@@ -10,7 +10,7 @@ interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean
 }
 
-const Select = React.forwardRef<HTMLDivElement, SelectProps>(
+const _Select = React.forwardRef<HTMLDivElement, SelectProps>(
   ({ className, children, value, onValueChange, ...props }, ref) => {
     return (
       <div ref={ref} className={cn("relative", className)} {...props}>
@@ -28,7 +28,7 @@ interface SelectTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   children?: React.ReactNode
 }
 
-const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
+const _SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <button
@@ -55,7 +55,7 @@ interface SelectValueProps extends React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode
 }
 
-const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
+const _SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
   ({ className, placeholder, children, ...props }, ref) => {
     return (
       <span ref={ref} className={cn("block truncate", className)} {...props}>
@@ -73,7 +73,7 @@ interface SelectContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
 }
 
-const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
+const _SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <div
@@ -99,7 +99,7 @@ interface SelectItemProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
 }
 
-const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
+const _SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
   ({ className, children, value, ...props }, ref) => {
     return (
       <div

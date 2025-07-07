@@ -10,7 +10,7 @@ interface AuthProviderProps {
 }
 
 // Routes qui ne nécessitent pas d'authentification
-const PUBLIC_ROUTES = [
+const _PUBLIC_ROUTES = [
   '/login',
   '/register',
   '/forgot-password',
@@ -21,22 +21,22 @@ const PUBLIC_ROUTES = [
 ]
 
 // Routes qui redirigent automatiquement si déjà connecté
-const AUTH_ROUTES = ['/login', '/register']
+const _AUTH_ROUTES = ['/login', '/register']
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const { user, tokens, isAuthenticated, setUser, logout } = useAuth()
-  const router = useRouter()
-  const pathname = usePathname()
+  const _router = useRouter()
+  const _pathname = usePathname()
 
   // Vérification de l'authentification au chargement
   useEffect(() => {
-    let isMounted = true
+    let _isMounted = true
 
-    const checkAuth = async () => {
+    const _checkAuth = async () => {
       // Si on a des tokens en local storage, vérifier leur validité
       if (tokens?.accessToken && !user) {
         try {
-          const userData = await authService.getMe()
+          const _userData = await authService.getMe()
 
           if (isMounted) {
             setUser(userData)
@@ -59,10 +59,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Gestion des redirections basées sur l'état d'authentification
   useEffect(() => {
-    const isPublicRoute = PUBLIC_ROUTES.some(route => 
+    const _isPublicRoute = PUBLIC_ROUTES.some(route => 
       pathname.startsWith(route)
     )
-    const isAuthRoute = AUTH_ROUTES.some(route => 
+    const _isAuthRoute = AUTH_ROUTES.some(route => 
       pathname.startsWith(route)
     )
 
@@ -96,11 +96,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 // Hook pour protéger les pages privées
 export function useRequireAuth() {
   const { isAuthenticated } = useAuth()
-  const router = useRouter()
-  const pathname = usePathname()
+  const _router = useRouter()
+  const _pathname = usePathname()
 
   useEffect(() => {
-    const isPublicRoute = PUBLIC_ROUTES.some(route => 
+    const _isPublicRoute = PUBLIC_ROUTES.some(route => 
       pathname.startsWith(route)
     )
 
@@ -115,9 +115,9 @@ export function useRequireAuth() {
 // Composant de loading pendant la vérification auth
 export function AuthLoader({ children }: { children: React.ReactNode }) {
   const { user, tokens, isAuthenticated } = useAuth()
-  const pathname = usePathname()
+  const _pathname = usePathname()
 
-  const isPublicRoute = PUBLIC_ROUTES.some(route => 
+  const _isPublicRoute = PUBLIC_ROUTES.some(route => 
     pathname.startsWith(route)
   )
 

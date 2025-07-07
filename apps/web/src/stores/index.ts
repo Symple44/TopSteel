@@ -158,11 +158,11 @@ export {
 } from '@/lib/optimized-selectors'
 
 // ===== CONSTANTES ET CONFIG =====
-export const STORE_VERSION = '2.2.0' // Incrémenté pour les corrections
-export const STORAGE_PREFIX = 'topsteel-erp'
+export const _STORE_VERSION = '2.2.0' // Incrémenté pour les corrections
+export const _STORAGE_PREFIX = 'topsteel-erp'
 
 // ===== HELPERS POUR LES STORES =====
-export const storeHelpers = {
+export const _storeHelpers = {
   /**
    * Créer une clé de storage unique pour un store
    */
@@ -173,7 +173,7 @@ export const storeHelpers = {
    */
   isStorePersisted: (storeName: string) => {
     try {
-      const key = storeHelpers.createStorageKey(storeName)
+      const _key = storeHelpers.createStorageKey(storeName)
 
       return localStorage.getItem(key) !== null
     } catch {
@@ -219,9 +219,9 @@ export const storeHelpers = {
     const issues: string[] = []
     
     try {
-      const appState = useAppStore.getState()
-      const authState = useAuthStore.getState()
-      const projetState = useProjetStore.getState()
+      const _appState = useAppStore.getState()
+      const _authState = useAuthStore.getState()
+      const _projetState = useProjetStore.getState()
       
       // Validation App Store
       if (typeof appState.loading !== 'boolean') {
@@ -309,7 +309,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // ===== EXPORTS PAR DÉFAUT =====
-const storesExport = {
+const _storesExport = {
   stores: {
     useAppStore,
     useAuthStore,

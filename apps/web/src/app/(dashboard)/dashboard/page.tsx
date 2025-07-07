@@ -63,7 +63,7 @@ export default function Dashboard() {
 
   // Simulation des données (à remplacer par les appels API)
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const _fetchDashboardData = async () => {
       // Simulation d'appel API
       setTimeout(() => {
         setStats({
@@ -135,14 +135,14 @@ export default function Dashboard() {
     fetchDashboardData()
   }, [])
 
-  const formatCurrency = (amount: number) => {
+  const _formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
     }).format(amount)
   }
 
-  const getActivityIcon = (type: string) => {
+  const _getActivityIcon = (type: string) => {
     switch (type) {
       case 'projet': return <FolderOpen className="h-4 w-4" />
       case 'production': return <Factory className="h-4 w-4" />
@@ -152,7 +152,7 @@ export default function Dashboard() {
     }
   }
 
-  const getActivityBadgeVariant = (status: string) => {
+  const _getActivityBadgeVariant = (status: string) => {
     switch (status) {
       case 'success': return 'default'
       case 'warning': return 'secondary'

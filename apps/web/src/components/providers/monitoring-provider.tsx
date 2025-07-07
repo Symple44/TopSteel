@@ -12,23 +12,23 @@ interface MonitoringProviderProps {
 
 // Type pour le retour de useMonitoring
 interface MonitoringHook {
-  trackClick: (element: string, context?: Record<string, any>) => void
-  trackPageView: (page: string, context?: Record<string, any>) => void
+  trackClick: (element: string, context?: Record<string, unknown>) => void
+  trackPageView: (page: string, context?: Record<string, unknown>) => void
   trackFormSubmit: (form: string, success: boolean, errors?: string[]) => void
-  trackSearch: (query: string, results: number, filters?: Record<string, any>) => void
-  track: (eventName: string, properties?: Record<string, any>) => void
-  setUserContext: (context: any) => void
-  trackProjectCreated: (projectData: any) => void
+  trackSearch: (query: string, results: number, filters?: Record<string, unknown>) => void
+  track: (eventName: string, properties?: Record<string, unknown>) => void
+  setUserContext: (context: unknown) => void
+  trackProjectCreated: (projectData: unknown) => void
   trackProjectStatusChanged: (projectId: string, oldStatus: string, newStatus: string) => void
   trackProjectViewed: (projectId: string, viewDuration?: number) => void
   trackProductionStarted: (orderId: string, projectId: string) => void
   trackProductionCompleted: (orderId: string, duration: number, quality?: string) => void
-  trackUserAction: (action: string, context?: Record<string, any>) => void
+  trackUserAction: (action: string, context?: Record<string, unknown>) => void
   trackFormSubmission: (formName: string, success: boolean, errors?: string[]) => void
-  trackSearchPerformed: (query: string, resultCount: number, filters?: Record<string, any>) => void
-  trackPerformanceMetric: (metric: string, value: number, context?: Record<string, any>) => void
-  trackError: (error: Error, context?: Record<string, any>) => void
-  getEvents: (filters?: any) => any[]
+  trackSearchPerformed: (query: string, resultCount: number, filters?: Record<string, unknown>) => void
+  trackPerformanceMetric: (metric: string, value: number, context?: Record<string, unknown>) => void
+  trackError: (error: Error, context?: Record<string, unknown>) => void
+  getEvents: (filters?: unknown) => any[]
   generateReport: () => any
   exportData: () => string
 }
@@ -74,8 +74,8 @@ function ErrorFallback({ error, resetErrorBoundary }: {
 }
 
 function MonitoringCore({ children }: { children: React.ReactNode }) {
-  const metrics = useBusinessMetrics()
-  const webVitals = useWebVitals()
+  const _metrics = useBusinessMetrics()
+  const _webVitals = useWebVitals()
 
   useEffect(() => {
     // Initialiser le monitoring au chargement
@@ -93,7 +93,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
     })
 
     // Tracker les erreurs JavaScript globales
-    const handleError = (event: ErrorEvent) => {
+    const _handleError = (event: ErrorEvent) => {
       metrics.trackError(new Error(event.message), {
         filename: event.filename,
         lineno: event.lineno,
@@ -102,7 +102,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
       })
     }
 
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+    const _handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       metrics.trackError(new Error('Unhandled Promise Rejection'), {
         reason: event.reason?.toString() || 'Unknown',
         source: 'unhandled_promise_rejection'
@@ -110,7 +110,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
     }
 
     // Tracker les changements de visibilité (utilisateur quitte/revient)
-    const handleVisibilityChange = () => {
+    const _handleVisibilityChange = () => {
       if (document.hidden) {
         metrics.track('page_hidden')
       } else {
@@ -119,8 +119,8 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
     }
 
     // Tracker les changements de focus
-    const handleFocus = () => metrics.track('window_focus')
-    const handleBlur = () => metrics.track('window_blur')
+    const _handleFocus = () => metrics.track('window_focus')
+    const _handleBlur = () => metrics.track('window_blur')
 
     // Event listeners
     window.addEventListener('error', handleError)
@@ -133,7 +133,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
     if ('PerformanceObserver' in window) {
       try {
         // Observer pour les métriques de performance
-        const perfObserver = new PerformanceObserver((list) => {
+        const _perfObserver = new PerformanceObserver((list) => {
           list.getEntries().forEach((entry) => {
             if (entry.entryType === 'largest-contentful-paint') {
               metrics.trackPerformanceMetric('LCP', entry.startTime)
@@ -197,7 +197,7 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
         // Envoyer l'erreur au service de monitoring
         if (typeof window !== 'undefined') {
           try {
-            const metrics = (window as any).__businessMetrics
+            const _metrics = (window as any).__businessMetrics
 
             if (metrics) {
               metrics.trackError(error, {
@@ -224,15 +224,15 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
 
 // Hook pour accéder au monitoring dans les composants
 export function useMonitoring(): MonitoringHook {
-  const metrics = useBusinessMetrics()
+  const _metrics = useBusinessMetrics()
   
   return {
     // Méthodes rapides pour les cas d'usage courants
-    trackClick: (element: string, context?: Record<string, any>) => {
+    trackClick: (element: string, context?: Record<string, unknown>) => {
       metrics.trackUserAction('click', { element, ...context })
     },
     
-    trackPageView: (page: string, context?: Record<string, any>) => {
+    trackPageView: (page: string, context?: Record<string, unknown>) => {
       metrics.track('page_view', { page, ...context })
     },
     
@@ -240,7 +240,7 @@ export function useMonitoring(): MonitoringHook {
       metrics.trackFormSubmission(form, success, errors)
     },
     
-    trackSearch: (query: string, results: number, filters?: Record<string, any>) => {
+    trackSearch: (query: string, results: number, filters?: Record<string, unknown>) => {
       metrics.trackSearchPerformed(query, results, filters)
     },
     

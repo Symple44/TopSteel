@@ -23,7 +23,7 @@ export function PageHeader({ title, subtitle, breadcrumbs, actions }: PageHeader
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav className="flex items-center space-x-1 text-sm text-gray-500">
           {breadcrumbs.map((breadcrumb, index) => (
-            <div key={index} className="flex items-center">
+            <div key={\item-\\} className="flex items-center">
               {index > 0 && <ChevronRight className="h-4 w-4 mx-1" />}
               {breadcrumb.href ? (
                 <Link 
@@ -57,3 +57,4 @@ export function PageHeader({ title, subtitle, breadcrumbs, actions }: PageHeader
     </div>
   )
 }
+

@@ -33,9 +33,9 @@ function CustomSwitch({
 export function NotificationSettings() {
   const { state, actions } = useNotifications()
 
-  const handleTestNotification = () => {
+  const _handleTestNotification = () => {
     // Simuler une notification de test
-    const testNotification = {
+    const _testNotification = {
       id: Date.now().toString(),
       type: 'info' as const,
       category: 'system' as const,

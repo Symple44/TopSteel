@@ -129,19 +129,19 @@ export default function MouvementsLayout({ children }: MouvementsLayoutProps) {
 /**
  * Configuration pour le streaming et la génération statique
  */
-export const dynamic = 'force-dynamic' // Pages toujours dynamiques pour les données temps réel
-export const revalidate = 60 // Revalidation toutes les 60 secondes
-export const fetchCache = 'force-no-store' // Pas de cache pour les données fraîches
+export const _dynamic = 'force-dynamic' // Pages toujours dynamiques pour les données temps réel
+export const _revalidate = 60 // Revalidation toutes les 60 secondes
+export const _fetchCache = 'force-no-store' // Pas de cache pour les données fraîches
 
 /**
  * Configuration du runtime
  */
-export const runtime = 'nodejs' // Runtime par défaut pour la compatibilité maximale
+export const _runtime = 'nodejs' // Runtime par défaut pour la compatibilité maximale
 
 /**
  * Gestion des erreurs au niveau layout
  */
-export const errorBoundary = true
+export const _errorBoundary = true
 
 // ===== STYLES SPÉCIFIQUES =====
 
@@ -149,7 +149,7 @@ export const errorBoundary = true
  * Injection de styles CSS spécifiques à la section mouvements
  * (Optionnel - peut être géré via Tailwind ou CSS modules)
  */
-const styles = `
+const _styles = `
   .mouvements-layout {
     container-type: inline-size;
     min-height: calc(100vh - var(--header-height, 60px));
@@ -200,7 +200,7 @@ const styles = `
 /**
  * Configuration pour les pages enfants
  */
-export const generateStaticParams = async () => {
+export const _generateStaticParams = async () => {
   // Pas de params statiques pour cette section
   return []
 }

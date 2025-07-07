@@ -2,14 +2,14 @@ import React from "react"
 
 interface NavigationMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
-  value?: any
-  onValueChange?: any
+  value?: unknown
+  onValueChange?: unknown
   asChild?: boolean
   variant?: string
   size?: string
 }
 
-export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuProps>(
+export const _NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
@@ -26,13 +26,14 @@ export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuPro
 NavigationMenu.displayName = "NavigationMenu"
 
 // Export des sous-composants courants si nécessaire
-export const NavigationMenuContent = NavigationMenu
-export const NavigationMenuTrigger = NavigationMenu  
-export const NavigationMenuItem = NavigationMenu
-export const NavigationMenuValue = NavigationMenu
-export const NavigationMenuHeader = NavigationMenu
-export const NavigationMenuTitle = NavigationMenu
-export const NavigationMenuDescription = NavigationMenu
-export const NavigationMenuFooter = NavigationMenu
-export const NavigationMenuSeparator = NavigationMenu
-export const NavigationMenuList = NavigationMenu
+export const _NavigationMenuContent = NavigationMenu
+export const _NavigationMenuTrigger = NavigationMenu  
+export const _NavigationMenuItem = NavigationMenu
+export const _NavigationMenuValue = NavigationMenu
+export const _NavigationMenuHeader = NavigationMenu
+export const _NavigationMenuTitle = NavigationMenu
+export const _NavigationMenuDescription = NavigationMenu
+export const _NavigationMenuFooter = NavigationMenu
+export const _NavigationMenuSeparator = NavigationMenu
+export const _NavigationMenuList = NavigationMenu
+

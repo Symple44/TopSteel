@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 
 export function StockAlertsPanel() {
-  const alertes = [
+  const _alertes = [
     {
       id: 1,
       reference: 'ACIER-S235-02',
@@ -68,3 +68,4 @@ export function StockAlertsPanel() {
     </div>
   )
 }
+

@@ -24,7 +24,7 @@ import { useState } from 'react'
 interface CreateFactureDialogProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  onFactureCreated?: (facture: any) => void
+  onFactureCreated?: (facture: unknown) => void
 }
 
 export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogProps) {
@@ -36,7 +36,7 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
     type: ''
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const _handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     // Validation côté client - maintient la robustesse
@@ -60,7 +60,7 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
     
     // Simulation création facture
     setTimeout(() => {
-      const newFacture = {
+      const _newFacture = {
         id: `FACTURE-${Date.now()}`,
         reference: formData.reference,
         clientId: 'client-1',

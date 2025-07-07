@@ -78,7 +78,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private logError(error: Error, errorInfo: ErrorInfo) {
-    const errorData = {
+    const _errorData = {
       errorId: this.state.errorId,
       message: error.message,
       stack: error.stack,
@@ -119,7 +119,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  private async sendErrorToService(errorData: any) {
+  private async sendErrorToService(errorData: unknown) {
     try {
       await fetch('/api/errors', {
         method: 'POST',
@@ -133,19 +133,19 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private scheduleRetryIfApplicable(error: Error) {
     // Retry pour certains types d'erreurs résolvables
-    const retryableErrors = [
+    const _retryableErrors = [
       'ChunkLoadError',
       'Loading chunk',
       'NetworkError',
       'Failed to fetch'
     ]
 
-    const isRetryable = retryableErrors.some(pattern => 
+    const _isRetryable = retryableErrors.some(pattern => 
       error.message.includes(pattern) || error.name.includes(pattern)
     )
 
     if (isRetryable && this.state.retryCount < this.maxRetries) {
-      const timeout = setTimeout(() => {
+      const _timeout = setTimeout(() => {
         this.setState({
           hasError: false,
           retryCount: this.state.retryCount + 1,
@@ -172,8 +172,8 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private handleReportBug = () => {
-    const subject = `Bug Report - Error ${this.state.errorId}`
-    const body = `
+    const _subject = `Bug Report - Error ${this.state.errorId}`
+    const _body = `
 Error ID: ${this.state.errorId}
 Error: ${this.state.error?.message || 'Unknown error'}
 URL: ${typeof window !== 'undefined' ? window.location.href : 'SSR'}
@@ -186,7 +186,7 @@ Component stack:
 ${this.state.errorInfo?.componentStack || 'No component stack available'}
     `.trim()
 
-    const mailtoUrl = `mailto:support@topsteel.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    const _mailtoUrl = `mailto:support@topsteel.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     
     if (typeof window !== 'undefined') {
       window.location.href = mailtoUrl
@@ -297,7 +297,7 @@ export function withErrorBoundary<T extends object>(
   Component: React.ComponentType<T>,
   errorBoundaryProps?: Omit<Props, 'children'>
 ) {
-  const WrappedComponent = (props: T) => (
+  const _WrappedComponent = (props: T) => (
     <ErrorBoundary {...errorBoundaryProps}>
       <Component {...props} />
     </ErrorBoundary>

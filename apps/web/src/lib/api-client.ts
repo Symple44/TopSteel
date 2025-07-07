@@ -13,7 +13,7 @@
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   headers?: Record<string, string>
-  body?: any
+  body?: unknown
   cache?: boolean
   cacheTTL?: number
   retry?: boolean
@@ -23,7 +23,7 @@ interface RequestConfig {
 }
 
 interface CacheEntry {
-  data: any
+  data: unknown
   timestamp: number
   ttl: number
 }
@@ -31,7 +31,7 @@ interface CacheEntry {
 interface APIErrorDetails {
   code: string
   message: string
-  details?: any
+  details?: unknown
   timestamp: number
   requestId?: string
 }
@@ -50,7 +50,7 @@ function createRateLimiter(maxRequests: number, windowMs: number) {
   const requests: number[] = []
   
   return (operation: () => void) => () => {
-    const now = Date.now()
+    const _now = Date.now()
     
     // Nettoyer les requêtes anciennes
     while (requests.length > 0 && requests[0] < now - windowMs) {
@@ -72,7 +72,7 @@ function createRateLimiter(maxRequests: number, windowMs: number) {
  */
 export class APIError extends Error {
   public readonly code: string
-  public readonly details: any
+  public readonly details: unknown
   public readonly timestamp: number
   public readonly requestId?: string
 
@@ -103,7 +103,7 @@ export class APIError extends Error {
    * Vérification si l'erreur est récupérable
    */
   isRetryable(): boolean {
-    const retryableCodes = ['HTTP_500', 'HTTP_502', 'HTTP_503', 'HTTP_504', 'NETWORK_ERROR']
+    const _retryableCodes = ['HTTP_500', 'HTTP_502', 'HTTP_503', 'HTTP_504', 'NETWORK_ERROR']
 
     return retryableCodes.includes(this.code)
   }
@@ -133,7 +133,7 @@ export class APIClient {
    */
   private startCacheCleanup(): void {
     setInterval(() => {
-      const now = Date.now()
+      const _now = Date.now()
 
       for (const [key, entry] of this.cache.entries()) {
         if (now - entry.timestamp > entry.ttl) {
@@ -147,11 +147,11 @@ export class APIClient {
    * Vérification du cache
    */
   private getCachedData<T>(key: string): T | null {
-    const entry = this.cache.get(key)
+    const _entry = this.cache.get(key)
 
     if (!entry) return null
 
-    const now = Date.now()
+    const _now = Date.now()
 
     if (now - entry.timestamp > entry.ttl) {
       this.cache.delete(key)
@@ -167,7 +167,7 @@ export class APIClient {
   /**
    * Stockage en cache
    */
-  private setCachedData(key: string, data: any, ttl: number): void {
+  private setCachedData(key: string, data: unknown, ttl: number): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
@@ -179,8 +179,8 @@ export class APIClient {
    * Construction de la clé de cache - CHANGÉ EN PROTECTED pour accès par héritage
    */
   protected getCacheKey(endpoint: string, config: RequestConfig): string {
-    const method = config.method || 'GET'
-    const body = config.body ? JSON.stringify(config.body) : ''
+    const _method = config.method || 'GET'
+    const _body = config.body ? JSON.stringify(config.body) : ''
 
     return `${method}:${endpoint}:${body}`
   }
@@ -197,7 +197,7 @@ export class APIClient {
 
     // Authentification automatique
     if (config.requireAuth !== false) {
-      const token = this.getAuthToken()
+      const _token = this.getAuthToken()
 
       if (token) {
         headers.Authorization = `Bearer ${token}`
@@ -214,7 +214,7 @@ export class APIClient {
     if (typeof window === 'undefined') return null
     
     try {
-      const authData = localStorage.getItem('topsteel-tokens')
+      const _authData = localStorage.getItem('topsteel-tokens')
 
       if (!authData) return null
       
@@ -229,7 +229,7 @@ export class APIClient {
   /**
    * Gestion des erreurs
    */
-  private handleError(error: any, endpoint: string): never {
+  private handleError(error: unknown, endpoint: string): never {
     this.metrics.errors++
     
     const errorDetails: APIErrorDetails = {
@@ -257,14 +257,14 @@ export class APIClient {
     operation: () => Promise<T>,
     attempts: number = 3
   ): Promise<T> {
-    for (let i = 0; i < attempts; i++) {
+    for (let _i = 0; i < attempts; i++) {
       try {
         return await operation()
       } catch (error) {
         if (i === attempts - 1) throw error
         
         // Backoff exponentiel
-        const delay = Math.min(1000 * Math.pow(2, i), 10000)
+        const _delay = Math.min(1000 * Math.pow(2, i), 10000)
 
         await new Promise(resolve => setTimeout(resolve, delay))
       }
@@ -291,7 +291,7 @@ export class APIClient {
    * Requête générique avec toutes les fonctionnalités
    */
   async request<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
-    const startTime = Date.now()
+    const _startTime = Date.now()
 
     this.metrics.requests++
 
@@ -301,15 +301,15 @@ export class APIClient {
 
       // Vérification du cache pour les requêtes GET
       if ((config.method || 'GET') === 'GET' && config.cache !== false) {
-        const cacheKey = this.getCacheKey(endpoint, config)
-        const cachedData = this.getCachedData<T>(cacheKey)
+        const _cacheKey = this.getCacheKey(endpoint, config)
+        const _cachedData = this.getCachedData<T>(cacheKey)
 
         if (cachedData) return cachedData
       }
 
       // Préparation de la requête
-      const url = `${this.baseURL}${endpoint}`
-      const headers = this.buildHeaders(config)
+      const _url = `${this.baseURL}${endpoint}`
+      const _headers = this.buildHeaders(config)
       
       const fetchConfig: RequestInit = {
         method: config.method || 'GET',
@@ -318,8 +318,8 @@ export class APIClient {
       }
 
       // Exécution avec retry et timeout
-      const operation = async () => {
-        const response = await fetch(url, fetchConfig)
+      const _operation = async () => {
+        const _response = await fetch(url, fetchConfig)
         
         if (!response.ok) {
           throw {
@@ -332,7 +332,7 @@ export class APIClient {
         return response.json()
       }
 
-      const result = await this.executeWithTimeout(
+      const _result = await this.executeWithTimeout(
         config.retry !== false 
           ? () => this.executeWithRetry(operation, config.retryAttempts)
           : operation,
@@ -341,14 +341,14 @@ export class APIClient {
 
       // Mise en cache pour les requêtes GET
       if ((config.method || 'GET') === 'GET' && config.cache !== false) {
-        const cacheKey = this.getCacheKey(endpoint, config)
-        const cacheTTL = config.cacheTTL || 5 * 60 * 1000 // 5 minutes par défaut
+        const _cacheKey = this.getCacheKey(endpoint, config)
+        const _cacheTTL = config.cacheTTL || 5 * 60 * 1000 // 5 minutes par défaut
 
         this.setCachedData(cacheKey, result, cacheTTL)
       }
 
       // Métriques
-      const responseTime = Date.now() - startTime
+      const _responseTime = Date.now() - startTime
 
       this.metrics.avgResponseTime = (this.metrics.avgResponseTime + responseTime) / 2
 
@@ -369,7 +369,7 @@ export class APIClient {
   /**
    * Requête POST
    */
-  async post<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
     return this.request<T>(endpoint, { 
       ...config, 
       method: 'POST', 
@@ -381,7 +381,7 @@ export class APIClient {
   /**
    * Requête PUT
    */
-  async put<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
+  async put<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
     return this.request<T>(endpoint, { 
       ...config, 
       method: 'PUT', 
@@ -404,7 +404,7 @@ export class APIClient {
   /**
    * Requête PATCH
    */
-  async patch<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
+  async patch<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
     return this.request<T>(endpoint, { 
       ...config, 
       method: 'PATCH', 
@@ -417,7 +417,7 @@ export class APIClient {
    * Upload de fichier
    */
   async upload<T>(endpoint: string, formData: FormData, config: RequestConfig = {}): Promise<T> {
-    const uploadConfig = {
+    const _uploadConfig = {
       ...config,
       method: 'POST' as const,
       headers: {
@@ -431,10 +431,10 @@ export class APIClient {
       delete uploadConfig.headers['Content-Type']
     }
 
-    const url = `${this.baseURL}${endpoint}`
-    const headers = this.buildHeaders(uploadConfig)
+    const _url = `${this.baseURL}${endpoint}`
+    const _headers = this.buildHeaders(uploadConfig)
     
-    const response = await fetch(url, {
+    const _response = await fetch(url, {
       method: 'POST',
       headers: Object.fromEntries(
         Object.entries(headers).filter(([key]) => key !== 'Content-Type')
@@ -491,9 +491,10 @@ export class APIClient {
 }
 
 // ✅ INSTANCE GLOBALE EXPORTÉE
-export const apiClient = new APIClient(
+export const _apiClient = new APIClient(
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 )
 
 // ✅ TYPES EXPORTÉS
 export type { APIErrorDetails, APIMetrics, RequestConfig }
+

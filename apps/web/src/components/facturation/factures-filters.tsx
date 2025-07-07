@@ -13,7 +13,7 @@ import {
 import { Search, Filter, X } from 'lucide-react'
 
 interface FacturesFiltersProps {
-  onFiltersChange?: (filters: any) => void
+  onFiltersChange?: (filters: unknown) => void
 }
 
 export function FacturesFilters({ onFiltersChange }: FacturesFiltersProps) {
@@ -54,3 +54,4 @@ export function FacturesFilters({ onFiltersChange }: FacturesFiltersProps) {
     </div>
   )
 }
+

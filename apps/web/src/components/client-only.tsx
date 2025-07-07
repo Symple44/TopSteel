@@ -48,7 +48,7 @@ interface WithClientOnlyOptions {
   forceRemount?: boolean
 }
 
-interface SafeComponentProps<T extends Record<string, any> = Record<string, any>> {
+interface SafeComponentProps<T extends Record<string, unknown> = Record<string, unknown>> {
   isClient?: boolean
   isHydrated?: boolean
 }
@@ -78,7 +78,7 @@ class HydrationManager {
       this._isClient = true
       this._hydrationPromise = new Promise<void>((resolve) => {
         if (document.readyState === 'loading') {
-          const onReady = () => {
+          const _onReady = () => {
             this._isHydrated = true
             this._notifyListeners()
             resolve()
@@ -129,7 +129,7 @@ class HydrationManager {
   }
 }
 
-const hydrationManager = HydrationManager.getInstance()
+const _hydrationManager = HydrationManager.getInstance()
 
 // ===== COMPOSANT CLIENT-ONLY PRINCIPAL =====
 
@@ -149,13 +149,13 @@ export function ClientOnly({
   const [hasMounted, setHasMounted] = useState(false)
   const [showFallback, setShowFallback] = useState(fallbackDelay > 0)
   const [isHydrating, setIsHydrating] = useState(false)
-  const mountedRef = useRef(false)
-  const childrenKeyRef = useRef<string>('')
+  const _mountedRef = useRef(false)
+  const _childrenKeyRef = useRef<string>('')
 
   // Générer une clé pour les enfants si remountOnChange est activé
-  const childrenKey = remountOnChange ? JSON.stringify(children) : ''
+  const _childrenKey = remountOnChange ? JSON.stringify(children) : ''
 
-  const handleMount = useCallback(() => {
+  const _handleMount = useCallback(() => {
     if (mountedRef.current) return
     mountedRef.current = true
     
@@ -176,7 +176,7 @@ export function ClientOnly({
   // Gérer le délai du fallback
   useEffect(() => {
     if (fallbackDelay > 0) {
-      const timer = setTimeout(() => {
+      const _timer = setTimeout(() => {
         setShowFallback(false)
       }, fallbackDelay)
       
@@ -205,7 +205,7 @@ export function ClientOnly({
 
   // Listener pour l'hydratation globale
   useEffect(() => {
-    const removeListener = hydrationManager.addListener(() => {
+    const _removeListener = hydrationManager.addListener(() => {
       if (!hasMounted) {
         setHasMounted(true)
         setIsHydrating(false)
@@ -216,8 +216,8 @@ export function ClientOnly({
   }, [hasMounted])
 
   // États de rendu
-  const isClient = hydrationManager.isClient
-  const shouldShowFallback = !isClient || !hasMounted || showFallback || isHydrating
+  const _isClient = hydrationManager.isClient
+  const _shouldShowFallback = !isClient || !hasMounted || showFallback || isHydrating
 
   if (shouldShowFallback) {
     return (
@@ -264,7 +264,7 @@ export function useIsClient(): boolean {
  */
 export function useWindow(): Window | null {
   const [windowObj, setWindowObj] = useState<Window | null>(null)
-  const isClient = useIsClient()
+  const _isClient = useIsClient()
 
   useEffect(() => {
     if (isClient && typeof window !== 'undefined') {
@@ -288,7 +288,7 @@ export function useHydrated(): boolean {
       return
     }
 
-    const removeListener = hydrationManager.addListener(() => {
+    const _removeListener = hydrationManager.addListener(() => {
       setHydrated(true)
     })
 
@@ -329,7 +329,7 @@ export function useHydrationState(): {
       isHydrating: true
     }))
 
-    const removeListener = hydrationManager.addListener(() => {
+    const _removeListener = hydrationManager.addListener(() => {
       setState({
         isClient: true,
         isHydrated: true,
@@ -351,7 +351,7 @@ export function useBrowserAPI<T>(
   fallback: T
 ): T {
   const [value, setValue] = useState<T>(fallback)
-  const isClient = useIsClient()
+  const _isClient = useIsClient()
 
   useEffect(() => {
     if (isClient) {
@@ -372,7 +372,7 @@ export function useBrowserAPI<T>(
 /**
  * Composant wrapper pour rendre n'importe quel composant safe côté client
  */
-export function SafeComponent<T extends Record<string, any>>({
+export function SafeComponent<T extends Record<string, unknown>>({
   component: Component,
   fallback,
   ...props
@@ -392,16 +392,16 @@ export function SafeComponent<T extends Record<string, any>>({
 /**
  * HOC pour wrapper automatiquement un composant avec ClientOnly
  */
-export function withClientOnly<P extends Record<string, any>>(
+export function withClientOnly<P extends Record<string, unknown>>(
   Component: ComponentType<P>,
   options: WithClientOnlyOptions = {}
 ): ComponentType<P & { clientOnlyFallback?: ReactNode }> {
   const { fallback: FallbackComponent, displayName, forceRemount } = options
 
-  const WrappedComponent = (props: P & { clientOnlyFallback?: ReactNode }) => {
+  const _WrappedComponent = (props: P & { clientOnlyFallback?: ReactNode }) => {
     const { clientOnlyFallback, ...componentProps } = props
     
-    const fallbackElement = clientOnlyFallback || 
+    const _fallbackElement = clientOnlyFallback || 
       (FallbackComponent ? <FallbackComponent /> : null)
 
     return (
@@ -425,7 +425,7 @@ export function withClientOnly<P extends Record<string, any>>(
 /**
  * Alias pour ClientOnly avec un nom plus explicite
  */
-export const NoSSR = ClientOnly
+export const _NoSSR = ClientOnly
 
 /**
  * Composant pour empêcher le SSR sur une partie spécifique
@@ -483,3 +483,4 @@ export {
 export type {
     ClientOnlyProps, SafeComponentProps, WithClientOnlyOptions
 }
+

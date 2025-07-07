@@ -37,13 +37,13 @@ interface ChutesTableProps {
 export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: ChutesTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const _handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     onSearch(e.target.value);
   };
 
-  const getQualityBadge = (qualite: string) => {
-    const baseClasses = 'px-2 py-1 rounded-full text-xs font-medium';
+  const _getQualityBadge = (qualite: string) => {
+    const _baseClasses = 'px-2 py-1 rounded-full text-xs font-medium';
     
     switch (qualite) {
       case 'EXCELLENTE':
@@ -59,8 +59,8 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
     }
   };
 
-  const getStatusBadge = (statut: string) => {
-    const baseClasses = 'px-2 py-1 rounded-full text-xs font-medium';
+  const _getStatusBadge = (statut: string) => {
+    const _baseClasses = 'px-2 py-1 rounded-full text-xs font-medium';
     
     switch (statut) {
       case 'DISPONIBLE':
@@ -175,3 +175,4 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
     </div>
   )
 }
+

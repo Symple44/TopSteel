@@ -26,8 +26,8 @@ interface OrdreFabrication {
   projet?: string;
 }
 
-const StatusBadge = ({ statut }: { statut: string }) => {
-  const config = {
+const _StatusBadge = ({ statut }: { statut: string }) => {
+  const _config = {
     EN_ATTENTE: { label: 'En attente', variant: 'secondary' as const, icon: Clock },
     PLANIFIE: { label: 'Planifié', variant: 'default' as const, icon: Clock },
     EN_COURS: { label: 'En cours', variant: 'default' as const, icon: Play },
@@ -46,8 +46,8 @@ const StatusBadge = ({ statut }: { statut: string }) => {
   );
 };
 
-const PrioriteBadge = ({ priorite }: { priorite: string }) => {
-  const config = {
+const _PrioriteBadge = ({ priorite }: { priorite: string }) => {
+  const _config = {
     BASSE: { label: 'Basse', className: 'bg-gray-100 text-gray-800' },
     NORMALE: { label: 'Normale', className: 'bg-blue-100 text-blue-800' },
     HAUTE: { label: 'Haute', className: 'bg-orange-100 text-orange-800' },

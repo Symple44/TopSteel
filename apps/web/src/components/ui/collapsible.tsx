@@ -3,14 +3,14 @@ import React from "react"
 
 interface CollapsibleProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
-  value?: any
-  onValueChange?: any
+  value?: unknown
+  onValueChange?: unknown
   asChild?: boolean
   variant?: string
   size?: string
 }
 
-export const Collapsible = React.forwardRef<HTMLDivElement, CollapsibleProps>(
+export const _Collapsible = React.forwardRef<HTMLDivElement, CollapsibleProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { 
@@ -31,14 +31,15 @@ export const Collapsible = React.forwardRef<HTMLDivElement, CollapsibleProps>(
 Collapsible.displayName = "Collapsible"
 
 // Export des sous-composants courants si nécessaire
-export const CollapsibleContent = Collapsible
-export const CollapsibleTrigger = Collapsible  
-export const CollapsibleItem = Collapsible
-export const CollapsibleValue = Collapsible
-export const CollapsibleHeader = Collapsible
-export const CollapsibleTitle = Collapsible
-export const CollapsibleDescription = Collapsible
-export const CollapsibleFooter = Collapsible
-export const CollapsibleSeparator = Collapsible
-export const CollapsibleList = Collapsible
+export const _CollapsibleContent = Collapsible
+export const _CollapsibleTrigger = Collapsible  
+export const _CollapsibleItem = Collapsible
+export const _CollapsibleValue = Collapsible
+export const _CollapsibleHeader = Collapsible
+export const _CollapsibleTitle = Collapsible
+export const _CollapsibleDescription = Collapsible
+export const _CollapsibleFooter = Collapsible
+export const _CollapsibleSeparator = Collapsible
+export const _CollapsibleList = Collapsible
+
 

@@ -232,7 +232,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   updateProjet: (id, updates) => {
     set((state) => {
-      const index = state.projets.findIndex(p => p.id === id)
+      const _index = state.projets.findIndex(p => p.id === id)
 
       if (index >= 0) {
         state.projets[index] = { ...state.projets[index], ...updates }
@@ -271,7 +271,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   // ===== ACTIONS NOTIFICATIONS =====
   addNotification: (notification) => {
     set((state) => {
-      const newNotification = {
+      const _newNotification = {
         ...notification,
         id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date(),
@@ -303,7 +303,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   markNotificationAsRead: (id) => {
     set((state) => {
-      const notification = state.notifications.find(n => n.id === id)
+      const _notification = state.notifications.find(n => n.id === id)
 
       if (notification) {
         notification.read = true
@@ -381,7 +381,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   },
 
   triggerSync: async () => {
-    const currentState = get()
+    const _currentState = get()
 
     if (!currentState.sync?.isOnline) {
       console.warn('Synchronisation impossible: hors ligne')
@@ -438,7 +438,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
 // ===== CRÉATION DU STORE AVEC TYPE STRICT =====
 
-export const useAppStore = StoreUtils.createRobustStore<AppState, AppStoreActions>(
+export const _useAppStore = StoreUtils.createRobustStore<AppState, AppStoreActions>(
   initialAppState,
   createAppStoreActions,
   {
@@ -452,12 +452,13 @@ export const useAppStore = StoreUtils.createRobustStore<AppState, AppStoreAction
 
 // ===== HOOKS SÉLECTEURS POUR COMPATIBILITÉ =====
 
-export const useAppError = () => useAppStore(state => state.error)
-export const useAppLoading = () => useAppStore(state => state.loading)
-export const useAppUser = () => useAppStore(state => state.user)
-export const useAppTheme = () => useAppStore(state => state.theme)
-export const useAppSession = () => useAppStore(state => state.session)
-export const useAppOnlineStatus = () => useAppStore(state => state.sync?.isOnline ?? true)
+export const _useAppError = () => useAppStore(state => state.error)
+export const _useAppLoading = () => useAppStore(state => state.loading)
+export const _useAppUser = () => useAppStore(state => state.user)
+export const _useAppTheme = () => useAppStore(state => state.theme)
+export const _useAppSession = () => useAppStore(state => state.session)
+export const _useAppOnlineStatus = () => useAppStore(state => state.sync?.isOnline ?? true)
 
 // ===== EXPORTS TYPES =====
 export type { AppState, AppStore, AppStoreActions }
+

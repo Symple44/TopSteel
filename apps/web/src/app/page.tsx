@@ -4,9 +4,9 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
-  const router = useRouter()
+  const _router = useRouter()
   // Simulation d'authentification - à remplacer par votre logique d'auth
-  const isAuthenticated = false // ou true selon votre logique
+  const _isAuthenticated = false // ou true selon votre logique
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -25,3 +25,4 @@ export default function HomePage() {
     </div>
   )
 }
+

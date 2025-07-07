@@ -175,13 +175,13 @@ export default function RegisterLayout({ children }: RegisterLayoutProps) {
 // ===== CONFIGURATION =====
 
 // Force le rendu dynamique pour éviter les problèmes de prerendering
-export const dynamic = 'force-dynamic'
+export const _dynamic = 'force-dynamic'
 
 // Pas de cache pour cette page
-export const revalidate = 0
+export const _revalidate = 0
 
 // Configuration runtime pour optimiser les performances
-export const runtime = 'nodejs'
+export const _runtime = 'nodejs'
 
 // Segment config pour optimiser le bundle
-export const preferredRegion = 'auto'
+export const _preferredRegion = 'auto'

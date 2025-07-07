@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 // Données mock pour la démo
-const mockDevis = [
+const _mockDevis = [
   {
     id: '1',
     reference: 'DEV-2024-001',
@@ -54,15 +54,15 @@ const mockDevis = [
   },
 ]
 
-const getStatusBadge = (statut: string) => {
-  const statusConfig = {
+const _getStatusBadge = (statut: string) => {
+  const _statusConfig = {
     brouillon: { label: 'Brouillon', variant: 'outline' as const },
     envoye: { label: 'Envoyé', variant: 'secondary' as const },
     accepte: { label: 'Accepté', variant: 'default' as const },
     refuse: { label: 'Refusé', variant: 'destructive' as const },
   }
   
-  const config = statusConfig[statut as keyof typeof statusConfig] || statusConfig.brouillon
+  const _config = statusConfig[statut as keyof typeof statusConfig] || statusConfig.brouillon
   
   return (
     <Badge variant={config.variant}>
@@ -137,3 +137,4 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
     </div>
   )
 }
+

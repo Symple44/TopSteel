@@ -29,14 +29,14 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     statut: ''
   })
 
-  const handleFilterChange = (key: keyof StocksFilters, value: string) => {
-    const newFilters = { ...filters, [key]: value }
+  const _handleFilterChange = (key: keyof StocksFilters, value: string) => {
+    const _newFilters = { ...filters, [key]: value }
 
     setFilters(newFilters)
     onFiltersChange?.(newFilters)
   }
 
-  const handleReset = () => {
+  const _handleReset = () => {
     const resetFilters: StocksFilters = {
       categorie: '',
       emplacement: '',

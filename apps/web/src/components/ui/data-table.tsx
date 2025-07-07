@@ -23,7 +23,7 @@ import * as React from 'react'
 interface Column {
   key: string
   label: string
-  render?: (value: any, item: any) => React.ReactNode
+  render?: (value: unknown, item: unknown) => React.ReactNode
   sortable?: boolean
   required?: boolean
 }
@@ -38,26 +38,26 @@ interface FilterOption {
 }
 
 interface DataTableProps {
-  data: any[]
+  data: unknown[]
   columns: Column[]
   searchableColumns?: string[]
   filterableColumns?: FilterOption[]
   loading?: boolean
   emptyStateMessage?: string
   errorState?: string | null
-  onRowClick?: (item: any) => void
+  onRowClick?: (item: unknown) => void
 }
 
 // ===== GUARDS DE VALIDATION =====
-const isValidColumnState = (state: Record<string, boolean | undefined>, key: string): boolean => {
+const _isValidColumnState = (state: Record<string, boolean | undefined>, key: string): boolean => {
   return Boolean(state[key] ?? true) // Fallback explicite à true
 }
 
-const ensureBooleanValue = (value: boolean | undefined): boolean => {
+const _ensureBooleanValue = (value: boolean | undefined): boolean => {
   return value ?? true // Garantit un boolean pour exactOptionalPropertyTypes
 }
 
-const safeGetItemValue = (item: any, column: string): string => {
+const _safeGetItemValue = (item: unknown, column: string): string => {
   try {
     return String(item?.[column] ?? '')
   } catch {
@@ -66,7 +66,7 @@ const safeGetItemValue = (item: any, column: string): string => {
 }
 
 // ===== HOOKS DE GESTION D'ÉTAT ROBUSTES =====
-const useDataTableState = (columns: Column[]) => {
+const _useDataTableState = (columns: Column[]) => {
   // Initialisation garantie avec tous les états boolean
   const [visibleColumns, setVisibleColumns] = React.useState<Record<string, boolean>>(() => {
     const initialState: Record<string, boolean> = {}
@@ -81,20 +81,20 @@ const useDataTableState = (columns: Column[]) => {
   const [searchTerm, setSearchTerm] = React.useState<string>('')
   const [columnFilters, setColumnFilters] = React.useState<Record<string, string[]>>({})
 
-  const toggleColumnVisibility = React.useCallback((columnKey: string) => {
+  const _toggleColumnVisibility = React.useCallback((columnKey: string) => {
     setVisibleColumns(prev => ({
       ...prev,
       [columnKey]: !ensureBooleanValue(prev[columnKey])
     }))
   }, [])
 
-  const handleColumnFilterChange = React.useCallback((
+  const _handleColumnFilterChange = React.useCallback((
     columnId: string, 
     value: string, 
     checked: boolean
   ) => {
     setColumnFilters(prev => {
-      const current = prev[columnId] ?? []
+      const _current = prev[columnId] ?? []
 
       if (checked) {
         return { ...prev, [columnId]: [...current, value] }
@@ -115,23 +115,23 @@ const useDataTableState = (columns: Column[]) => {
 }
 
 // ===== LOGIQUE DE FILTRAGE OPTIMISÉE =====
-const useFilteredData = (
-  data: any[],
+const _useFilteredData = (
+  data: unknown[],
   searchTerm: string,
   columnFilters: Record<string, string[]>,
   searchableColumns: string[]
 ) => {
   return React.useMemo(() => {
     try {
-      let filtered = [...data] // Copie pour éviter les mutations
+      let _filtered = [...data] // Copie pour éviter les mutations
 
       // Recherche textuelle avec protection
       if (searchTerm.trim() && searchableColumns.length > 0) {
-        const normalizedSearch = searchTerm.toLowerCase().trim()
+        const _normalizedSearch = searchTerm.toLowerCase().trim()
 
         filtered = filtered.filter(item =>
           searchableColumns.some(column => {
-            const value = safeGetItemValue(item, column)
+            const _value = safeGetItemValue(item, column)
 
             return value.toLowerCase().includes(normalizedSearch)
           })
@@ -142,7 +142,7 @@ const useFilteredData = (
       Object.entries(columnFilters).forEach(([column, values]) => {
         if (Array.isArray(values) && values.length > 0) {
           filtered = filtered.filter(item => {
-            const itemValue = safeGetItemValue(item, column)
+            const _itemValue = safeGetItemValue(item, column)
 
             return values.includes(itemValue)
           })
@@ -178,7 +178,7 @@ export function DataTable({
     handleColumnFilterChange
   } = useDataTableState(columns)
 
-  const filteredData = useFilteredData(data, searchTerm, columnFilters, searchableColumns)
+  const _filteredData = useFilteredData(data, searchTerm, columnFilters, searchableColumns)
 
   // ===== GESTION DES ÉTATS D'ERREUR =====
   if (errorState) {
@@ -218,7 +218,7 @@ export function DataTable({
   }
 
   // Colonnes visibles avec protection
-  const visibleColumnsArray = columns.filter(column => 
+  const _visibleColumnsArray = columns.filter(column => 
     isValidColumnState(visibleColumns, column.key)
   )
 
@@ -251,8 +251,8 @@ export function DataTable({
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 {filterColumn.options.map((option) => {
-                  const currentFilters = columnFilters[filterColumn.id] ?? []
-                  const isChecked = currentFilters.includes(option.value)
+                  const _currentFilters = columnFilters[filterColumn.id] ?? []
+                  const _isChecked = currentFilters.includes(option.value)
                   
                   return (
                     <DropdownMenuCheckboxItem
@@ -282,7 +282,7 @@ export function DataTable({
           <DropdownMenuContent>
             {columns.map((column) => {
               // CORRECTION PRINCIPALE: Garantie que checked est toujours boolean
-              const isVisible = ensureBooleanValue(visibleColumns[column.key])
+              const _isVisible = ensureBooleanValue(visibleColumns[column.key])
               
               return (
                 <DropdownMenuCheckboxItem

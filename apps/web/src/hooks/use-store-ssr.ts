@@ -8,7 +8,7 @@ interface UseStoreSsrOptions<T> {
 export function useStoreSsr<T>(options: UseStoreSsrOptions<T>) {
   const { fallback, serverValue } = options
 
-  const value = useMemo(() => {
+  const _value = useMemo(() => {
     if (typeof window === 'undefined') {
       return serverValue ?? fallback
     }
@@ -16,10 +16,11 @@ export function useStoreSsr<T>(options: UseStoreSsrOptions<T>) {
     return fallback
   }, [fallback, serverValue])
 
-  const setValue = useCallback((newValue: T) => {
+  const _setValue = useCallback((newValue: T) => {
     // Implémentation du setter si nécessaire
     console.log('Setting value:', newValue)
   }, [])
 
   return [value, setValue] as const
 }
+

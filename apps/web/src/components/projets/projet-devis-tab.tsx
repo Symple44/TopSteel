@@ -36,7 +36,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
   const [selectedDevis, setSelectedDevis] = useState<string | null>(null)
 
   // Données mockées pour les devis
-  const devis = [
+  const _devis = [
     {
       id: '1',
       numero: 'DEV-2025-001',
@@ -61,7 +61,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
     }
   ]
 
-  const getStatutBadge = (statut: string) => {
+  const _getStatutBadge = (statut: string) => {
     switch (statut) {
       case 'BROUILLON':
         return <Badge variant="secondary">Brouillon</Badge>
@@ -78,8 +78,8 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
     }
   }
 
-  const devisAccepte = devis.find(d => d.accepte)
-  const dernierDevis = devis[devis.length - 1]
+  const _devisAccepte = devis.find(d => d.accepte)
+  const _dernierDevis = devis[devis.length - 1]
 
   return (
     <div className="space-y-6">

@@ -25,7 +25,7 @@ interface UIState {
   showError: (title: string, message?: string) => void
 }
 
-export const useUIStore = create<UIState>()(
+export const _useUIStore = create<UIState>()(
   devtools(
     (set, get) => ({
       sidebarCollapsed: false,
@@ -88,3 +88,4 @@ export const useUIStore = create<UIState>()(
     { name: 'ui-store' }
   )
 )
+

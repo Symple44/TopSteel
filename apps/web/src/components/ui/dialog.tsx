@@ -11,7 +11,7 @@ interface DialogProps {
   modal?: boolean
 }
 
-const Dialog = ({ children, open, onOpenChange }: DialogProps) => {
+const _Dialog = ({ children, open, onOpenChange }: DialogProps) => {
   return (
     <div data-state={open ? "open" : "closed"} className="relative z-50">
       {children}
@@ -28,11 +28,11 @@ interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   className?: string
 }
 
-const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
+const _DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
   ({ className, children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       // Correction pour éviter l'erreur de ref avec cloneElement (TypeScript safe)
-      const childProps = (children as any).props || {}
+      const _childProps = (children as any).props || {}
 
       return React.cloneElement(children as any, { 
         ...props, 
@@ -61,7 +61,7 @@ interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
 }
 
-const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
+const _DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
@@ -88,7 +88,7 @@ interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
 }
 
-const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
+const _DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <div
@@ -110,7 +110,7 @@ interface DialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   children?: React.ReactNode
 }
 
-const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
+const _DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <h2
@@ -132,7 +132,7 @@ interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphEleme
   children?: React.ReactNode
 }
 
-const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
+const _DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <p
@@ -154,7 +154,7 @@ interface DialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
 }
 
-const DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
+const _DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <div
@@ -175,3 +175,4 @@ export {
   DialogFooter, DialogHeader,
   DialogTitle, DialogTrigger
 }
+

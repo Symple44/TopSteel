@@ -167,29 +167,29 @@ export default function MouvementsPage() {
   const [period, setPeriod] = useState<Period>('month')
 
   // ✅ Handlers mémorisés avec useCallback
-  const handlePeriodChange = useCallback((newPeriod: Period) => {
+  const _handlePeriodChange = useCallback((newPeriod: Period) => {
     setPeriod(newPeriod)
   }, [])
 
-  const handleShowCreateModal = useCallback(() => {
+  const _handleShowCreateModal = useCallback(() => {
     setShowCreateModal(true)
   }, [])
 
-  const handleOpenChangeCreateModal = useCallback((open: boolean) => {
+  const _handleOpenChangeCreateModal = useCallback((open: boolean) => {
     setShowCreateModal(open)
   }, [])
 
-  const handleTabChange = useCallback((tab: string) => {
+  const _handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab)
   }, [])
 
   // ✅ Données calculées avec useMemo (évite recalculs)
-  const stats = useMemo(() => {
-    const todayEntrees = 8450
-    const todaySorties = 6230
-    const todayMovements = 12
-    const todayExits = 8
-    const variation = ((todayEntrees - todaySorties) / todaySorties * 100)
+  const _stats = useMemo(() => {
+    const _todayEntrees = 8450
+    const _todaySorties = 6230
+    const _todayMovements = 12
+    const _todayExits = 8
+    const _variation = ((todayEntrees - todaySorties) / todaySorties * 100)
 
     return {
       entrees: { 
@@ -206,7 +206,7 @@ export default function MouvementsPage() {
   }, [])
 
   // ✅ Formatage des nombres mémorisé
-  const formatCurrency = useCallback((amount: number) => {
+  const _formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR',
@@ -371,7 +371,7 @@ export default function MouvementsPage() {
 /**
  * Import dynamique du composant Chart
  */
-const MouvementsChart = dynamic(
+const _MouvementsChart = dynamic(
   () => import('@/components/stocks/mouvements-chart').then(mod => ({ default: mod.MouvementsChart })),
   {
     ssr: false,
@@ -389,7 +389,7 @@ const MouvementsChart = dynamic(
 /**
  * Import dynamique du composant Table
  */
-const MouvementsTable = dynamic(
+const _MouvementsTable = dynamic(
   () => import('@/components/stocks/mouvements-table').then(mod => ({ default: mod.MouvementsTable })),
   {
     ssr: false,
@@ -408,7 +408,7 @@ const MouvementsTable = dynamic(
 /**
  * Import dynamique du Dialog
  */
-const CreateMouvementDialog = dynamic(
+const _CreateMouvementDialog = dynamic(
   () => import('@/components/stocks/create-mouvement-dialog').then(mod => ({ default: mod.CreateMouvementDialog })),
   {
     ssr: false
@@ -417,3 +417,4 @@ const CreateMouvementDialog = dynamic(
 
 // Ne pas oublier l'import dynamic en haut du fichier
 import dynamic from 'next/dynamic'
+

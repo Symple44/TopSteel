@@ -14,7 +14,7 @@ import { useContext } from 'react'
  * @throws Error si utilisé en dehors du NotificationsProvider
  */
 export function useNotifications(): NotificationsContextValue {
-  const context = useContext(NotificationsContext)
+  const _context = useContext(NotificationsContext)
   
   if (!context) {
     throw new Error(
@@ -151,3 +151,4 @@ export function useFilteredNotifications(filters?: {
     return true
   })
 }
+

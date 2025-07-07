@@ -37,13 +37,13 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
     dateFin: projet.dateFin ? new Date(projet.dateFin).toISOString().split('T')[0] : '',
   })
 
-  const handleSave = () => {
+  const _handleSave = () => {
     // Ici, on sauvegarderait les modifications
     console.log('Sauvegarde des modifications:', formData)
     setIsEditing(false)
   }
 
-  const handleCancel = () => {
+  const _handleCancel = () => {
     // Réinitialiser le formulaire
     setFormData({
       reference: projet.reference || '',

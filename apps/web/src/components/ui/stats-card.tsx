@@ -27,14 +27,14 @@ export function StatsCard({
   className,
   variant = 'default'
 }: StatsCardProps) {
-  const variantStyles = {
+  const _variantStyles = {
     default: 'border-gray-200',
     success: 'border-green-200 bg-green-50',
     warning: 'border-yellow-200 bg-yellow-50',
     destructive: 'border-red-200 bg-red-50'
   }
 
-  const trendColor = trend?.isPositive ? 'text-green-600' : 'text-red-600'
+  const _trendColor = trend?.isPositive ? 'text-green-600' : 'text-red-600'
 
   return (
     <Card className={cn(variantStyles[variant], className)}>

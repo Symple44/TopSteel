@@ -22,7 +22,7 @@ export function useConfirm() {
     resolve: null, // Correction: null au lieu de undefined
   })
 
-  const confirm = (options: ConfirmOptions = {}): Promise<boolean> => {
+  const _confirm = (options: ConfirmOptions = {}): Promise<boolean> => {
     return new Promise((resolve) => {
       setState({
         isOpen: true,
@@ -39,7 +39,7 @@ export function useConfirm() {
     })
   }
 
-  const handleConfirm = () => {
+  const _handleConfirm = () => {
     state.resolve?.(true)
     setState(prev => ({ 
       ...prev, 
@@ -48,7 +48,7 @@ export function useConfirm() {
     }))
   }
 
-  const handleCancel = () => {
+  const _handleCancel = () => {
     state.resolve?.(false)
     setState(prev => ({ 
       ...prev, 
@@ -57,7 +57,7 @@ export function useConfirm() {
     }))
   }
 
-  const handleClose = () => {
+  const _handleClose = () => {
     // Méthode alternative pour fermer sans décision
     state.resolve?.(false)
     setState(prev => ({ 

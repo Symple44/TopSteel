@@ -7,7 +7,7 @@
 // ===== TYPES =====
 interface BusinessEvent {
   name: string
-  properties: Record<string, any>
+  properties: Record<string, unknown>
   timestamp: number
   userId?: string
   sessionId: string
@@ -94,8 +94,8 @@ class BusinessMetrics {
    * Générer un sessionId côté client
    */
   private generateSessionId(): string {
-    const timestamp = Date.now().toString(36)
-    const random = Math.random().toString(36).substring(2)
+    const _timestamp = Date.now().toString(36)
+    const _random = Math.random().toString(36).substring(2)
 
     return `${timestamp}-${random}`
   }
@@ -138,7 +138,7 @@ class BusinessMetrics {
   private async flushEvents(): Promise<void> {
     if (this.events.length === 0) return
 
-    const eventsToSend = this.events.slice(0, this.config.batchSize!)
+    const _eventsToSend = this.events.slice(0, this.config.batchSize!)
     
     try {
       await this.sendToBackend(eventsToSend)
@@ -169,7 +169,7 @@ class BusinessMetrics {
   /**
    * Méthode principale de tracking - SSR-Safe
    */
-  track(eventName: string, properties: Record<string, any> = {}): void {
+  track(eventName: string, properties: Record<string, unknown> = {}): void {
     const event: BusinessEvent = {
       name: eventName,
       properties: {
@@ -255,7 +255,7 @@ class BusinessMetrics {
     })
   }
 
-  trackUserAction(action: string, context: Record<string, any> = {}): void {
+  trackUserAction(action: string, context: Record<string, unknown> = {}): void {
     this.track('user_action', {
       action,
       page: this.isClient ? window.location.pathname : '',
@@ -272,7 +272,7 @@ class BusinessMetrics {
     })
   }
 
-  trackSearchPerformed(query: string, resultCount: number, filters?: Record<string, any>): void {
+  trackSearchPerformed(query: string, resultCount: number, filters?: Record<string, unknown>): void {
     this.track('search_performed', {
       query: query.substring(0, 100),
       resultCount,
@@ -280,7 +280,7 @@ class BusinessMetrics {
     })
   }
 
-  trackPerformanceMetric(metric: string, value: number, context?: Record<string, any>): void {
+  trackPerformanceMetric(metric: string, value: number, context?: Record<string, unknown>): void {
     this.track('performance_metric', {
       metric,
       value,
@@ -289,7 +289,7 @@ class BusinessMetrics {
     })
   }
 
-  trackError(error: Error, context: Record<string, any> = {}): void {
+  trackError(error: Error, context: Record<string, unknown> = {}): void {
     this.track('error_occurred', {
       message: error.message,
       stack: error.stack?.substring(0, 1000),
@@ -302,9 +302,9 @@ class BusinessMetrics {
   // ===== MÉTHODES UTILITAIRES =====
 
   private getTransitionType(oldStatus: string, newStatus: string): string {
-    const progressOrder = ['BROUILLON', 'DEVIS', 'ACCEPTE', 'EN_COURS', 'TERMINE', 'FACTURE']
-    const oldIndex = progressOrder.indexOf(oldStatus)
-    const newIndex = progressOrder.indexOf(newStatus)
+    const _progressOrder = ['BROUILLON', 'DEVIS', 'ACCEPTE', 'EN_COURS', 'TERMINE', 'FACTURE']
+    const _oldIndex = progressOrder.indexOf(oldStatus)
+    const _newIndex = progressOrder.indexOf(newStatus)
     
     if (oldIndex < newIndex) return 'progress'
     if (oldIndex > newIndex) return 'regression'
@@ -316,7 +316,7 @@ class BusinessMetrics {
     if (!this.isClient) return
 
     try {
-      const response = await fetch('/api/metrics', {
+      const _response = await fetch('/api/metrics', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -340,7 +340,7 @@ class BusinessMetrics {
     since?: number
     limit?: number
   }): BusinessEvent[] {
-    let filteredEvents = [...this.events]
+    let _filteredEvents = [...this.events]
     
     if (filters?.eventName) {
       filteredEvents = filteredEvents.filter(e => e.name === filters.eventName)
@@ -366,19 +366,19 @@ class BusinessMetrics {
     isClient: boolean
     initialized: boolean
   } {
-    const eventCounts = new Map<string, number>()
+    const _eventCounts = new Map<string, number>()
 
     this.events.forEach(event => {
       eventCounts.set(event.name, (eventCounts.get(event.name) || 0) + 1)
     })
 
-    const topEvents = Array.from(eventCounts.entries())
+    const _topEvents = Array.from(eventCounts.entries())
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10)
 
-    const sessionStart = this.events.find(e => e.name === 'session_started')?.timestamp || Date.now()
-    const sessionDuration = Date.now() - sessionStart
+    const _sessionStart = this.events.find(e => e.name === 'session_started')?.timestamp || Date.now()
+    const _sessionDuration = Date.now() - sessionStart
 
     return {
       sessionId: this.sessionId,
@@ -439,7 +439,7 @@ function getBusinessMetrics(): BusinessMetrics {
  * Hook React pour utiliser les métriques business
  */
 export function useBusinessMetrics() {
-  const metrics = getBusinessMetrics()
+  const _metrics = getBusinessMetrics()
   
   return {
     track: metrics.track.bind(metrics),

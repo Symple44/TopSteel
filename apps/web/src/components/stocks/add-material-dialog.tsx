@@ -23,7 +23,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
 
   if (!open) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const _handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onOpenChange(false)
     setFormData({ reference: '', designation: '', quantite: '', prixUnitaire: '', emplacement: '', seuil: '' })
@@ -114,4 +114,5 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
     </div>
   )
 }
+
 

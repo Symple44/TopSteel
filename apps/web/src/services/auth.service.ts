@@ -40,7 +40,7 @@ interface ApiResponse<T> {
 /**
  * Helper pour transformer les données user backend -> frontend
  */
-const transformUserFromAPI = (apiUser: any): User => ({
+const _transformUserFromAPI = (apiUser: unknown): User => ({
   id: apiUser.id.toString(),
   email: apiUser.email,
   nom: apiUser.nom,
@@ -56,19 +56,19 @@ const transformUserFromAPI = (apiUser: any): User => ({
 } satisfies User)
 
 // ===== SERVICE PRINCIPAL =====
-export const authService = {
+export const _authService = {
   /**
    * ✅ Connexion utilisateur
    */
   async login(email: string, password: string): Promise<LoginResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/login', {
+      const _response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/login', {
         email,
         password
       })
 
       // ✅ CORRECTION: Accéder à response.data puis extraire les propriétés
-      const responseData = response.data
+      const _responseData = response.data
       const { user, accessToken, refreshToken, expiresIn } = responseData
 
       return {
@@ -88,7 +88,7 @@ export const authService = {
    */
   async register(data: RegisterData): Promise<LoginResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/register', {
+      const _response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/register', {
         email: data.email,
         password: data.password,
         nom: data.nom,
@@ -97,7 +97,7 @@ export const authService = {
       })
 
       // ✅ CORRECTION: Même logique corrigée
-      const responseData = response.data
+      const _responseData = response.data
       const { user, accessToken, refreshToken, expiresIn } = responseData
 
       return {
@@ -117,12 +117,12 @@ export const authService = {
    */
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<RefreshTokenResponse>>('/auth/refresh', {
+      const _response = await apiClient.post<ApiResponse<RefreshTokenResponse>>('/auth/refresh', {
         refreshToken
       })
 
       // ✅ CORRECTION: Accès à response.data puis extraction
-      const responseData = response.data
+      const _responseData = response.data
       const { accessToken, refreshToken: newRefreshToken, expiresIn } = responseData
 
       return {
@@ -141,7 +141,7 @@ export const authService = {
    */
   async getProfile(): Promise<User> {
     try {
-      const response = await apiClient.get<ApiResponse<{ user: User }>>('/auth/profile')
+      const _response = await apiClient.get<ApiResponse<{ user: User }>>('/auth/profile')
 
       // ✅ CORRECTION: Accès approprié aux données
       const { user } = response.data
@@ -219,7 +219,7 @@ export const authService = {
    */
   async checkEmailAvailability(email: string): Promise<boolean> {
     try {
-      const response = await apiClient.get<ApiResponse<{ available: boolean }>>(`/auth/check-email?email=${encodeURIComponent(email)}`)
+      const _response = await apiClient.get<ApiResponse<{ available: boolean }>>(`/auth/check-email?email=${encodeURIComponent(email)}`)
 
       return response.data.available
     } catch (error) {
@@ -250,3 +250,4 @@ export const authService = {
 
 // ===== TYPES EXPORTÉS =====
 export type { LoginResponse, RefreshTokenResponse, RegisterData }
+

@@ -17,7 +17,7 @@ interface Materiau {
 }
 
 interface OrdreMateriauxTabProps {
-  ordre: any; // Interface cohérente avec les autres composants
+  ordre: unknown; // Interface cohérente avec les autres composants
 }
 
 export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
@@ -42,7 +42,7 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
     }
   ]
 
-  const getStatutBadge = (statut: string) => {
+  const _getStatutBadge = (statut: string) => {
     switch (statut) {
       case 'DISPONIBLE':
         return <Badge variant="outline" className="text-green-600 border-green-600">Disponible</Badge>

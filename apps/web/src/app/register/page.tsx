@@ -22,7 +22,7 @@ import * as z from 'zod'
 
 // ===== SCHÉMA DE VALIDATION =====
 
-const registerSchema = z.object({
+const _registerSchema = z.object({
   firstName: z.string()
     .min(2, 'Le prénom doit contenir au moins 2 caractères')
     .max(50, 'Le prénom ne peut pas dépasser 50 caractères')
@@ -76,7 +76,7 @@ interface RegisterState {
 
 export default function RegisterPage() {
   // ===== HOOKS =====
-  const router = useRouter()
+  const _router = useRouter()
   const [state, setState] = useState<RegisterState>({
     isLoading: false,
     error: null,
@@ -113,33 +113,33 @@ export default function RegisterPage() {
   })
 
   // Observer les changements de mot de passe pour validation en temps réel
-  const password = watch('password')
+  const _password = watch('password')
 
   // ===== GESTIONNAIRES D'ÉVÉNEMENTS =====
 
-  const setError = useCallback((error: RegisterError) => {
+  const _setError = useCallback((error: RegisterError) => {
     setState(prev => ({ ...prev, error, isLoading: false }))
   }, [])
 
-  const clearError = useCallback(() => {
+  const _clearError = useCallback(() => {
     setState(prev => ({ ...prev, error: null }))
   }, [])
 
-  const togglePasswordVisibility = useCallback(() => {
+  const _togglePasswordVisibility = useCallback(() => {
     setShowPassword(prev => !prev)
   }, [])
 
-  const toggleConfirmPasswordVisibility = useCallback(() => {
+  const _toggleConfirmPasswordVisibility = useCallback(() => {
     setShowConfirmPassword(prev => !prev)
   }, [])
 
-  const onSubmit = useCallback(async (data: RegisterFormData) => {
+  const _onSubmit = useCallback(async (data: RegisterFormData) => {
     clearError()
     setState(prev => ({ ...prev, isLoading: true }))
 
     try {
       // Simulation d'appel API - remplacer par votre logique
-      const response = await fetch('/api/auth/register', {
+      const _response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ export default function RegisterPage() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
+        const _errorData = await response.json().catch(() => ({}))
         
         if (response.status === 400) {
           if (errorData.field) {
@@ -187,7 +187,7 @@ export default function RegisterPage() {
         return
       }
 
-      const result = await response.json()
+      const _result = await response.json()
       
       setState(prev => ({ ...prev, success: true, isLoading: false }))
       
@@ -207,11 +207,11 @@ export default function RegisterPage() {
 
   // ===== FONCTION DE VALIDATION DE LA FORCE DU MOT DE PASSE =====
 
-  const getPasswordStrength = useCallback((password: string) => {
+  const _getPasswordStrength = useCallback((password: string) => {
     if (!password) return { score: 0, text: '', color: '' }
     
-    let score = 0
-    const checks = [
+    let _score = 0
+    const _checks = [
       password.length >= 8,
       /[a-z]/.test(password),
       /[A-Z]/.test(password),
@@ -228,7 +228,7 @@ export default function RegisterPage() {
     return { score, text: 'Fort', color: 'text-green-500' }
   }, [])
 
-  const passwordStrength = getPasswordStrength(password || '')
+  const _passwordStrength = getPasswordStrength(password || '')
 
   // ===== RENDU =====
 

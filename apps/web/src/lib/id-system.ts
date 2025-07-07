@@ -54,7 +54,7 @@ export interface IDMetrics {
 // CONSTANTES MÉTIER ERP
 // =============================================
 
-export const ID_PREFIXES = {
+export const _ID_PREFIXES = {
   // Gestion commerciale
   PROJET: 'PRJ',
   DEVIS: 'DEV', 
@@ -86,7 +86,7 @@ export const ID_PREFIXES = {
   AUDIT: 'AUD'
 } as const
 
-export const ID_FORMATS = {
+export const _ID_FORMATS = {
   uuid: { length: 36, pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i },
   nanoid: { length: 12, pattern: /^[A-Za-z0-9_-]+$/ },
   base58: { length: 10, pattern: /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/ },
@@ -110,7 +110,7 @@ class IDCache {
   }
 
   static get(key: string): ParsedID | undefined {
-    const result = this.cache.get(key)
+    const _result = this.cache.get(key)
 
     if (result) {
       this.metrics.cacheHits++
@@ -126,7 +126,7 @@ class IDCache {
     // Fix TypeScript strict: nettoyage du cache si plein
     if (this.cache.size >= this.maxSize) {
       // Méthode plus sûre : convertir en array pour éviter undefined
-      const keys = Array.from(this.cache.keys())
+      const _keys = Array.from(this.cache.keys())
 
       if (keys.length > 0) {
         this.cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
@@ -189,7 +189,7 @@ class IDGenerator {
 
   private static initializeClientNodeId(): string {
     try {
-      let nodeId = localStorage.getItem('topsteel_node_id')
+      let _nodeId = localStorage.getItem('topsteel_node_id')
 
       if (!nodeId || nodeId.length < 4) {
         nodeId = this.generateSecureNodeId()
@@ -206,7 +206,7 @@ class IDGenerator {
 
   private static initializeServerNodeId(): string {
     // Utiliser variables d'environnement pour l'ID serveur
-    const instanceId = process.env.INSTANCE_ID || process.env.HOSTNAME || 'server'
+    const _instanceId = process.env.INSTANCE_ID || process.env.HOSTNAME || 'server'
 
     return `${this.environment.slice(0, 3)}-${instanceId.slice(0, 4)}`
   }
@@ -217,7 +217,7 @@ class IDGenerator {
     }
     
     if (crypto.getRandomValues) {
-      const array = new Uint8Array(4)
+      const _array = new Uint8Array(4)
 
       crypto.getRandomValues(array)
 
@@ -235,7 +235,7 @@ class IDGenerator {
    * UUID V4 avec fallback robuste
    */
   static uuid(): string {
-    const startTime = performance.now()
+    const _startTime = performance.now()
     
     try {
       let result: string
@@ -261,19 +261,19 @@ class IDGenerator {
 
   private static generateServerUUID(): string {
     // UUID déterministe pour SSR
-    const timestamp = Date.now()
-    const counter = (++this.counter).toString(16).padStart(4, '0')
-    const nodeId = this.nodeId.padEnd(12, '0').slice(0, 12)
+    const _timestamp = Date.now()
+    const _counter = (++this.counter).toString(16).padStart(4, '0')
+    const _nodeId = this.nodeId.padEnd(12, '0').slice(0, 12)
     
     return `${timestamp.toString(16).padStart(8, '0')}-0000-4000-8000-${counter}${nodeId}`
   }
 
   private static generateFallbackUUID(): string {
     // RFC 4122 version 4 compliant fallback
-    const hexDigits = '0123456789abcdef'
-    let uuid = ''
+    const _hexDigits = '0123456789abcdef'
+    let _uuid = ''
     
-    for (let i = 0; i < 36; i++) {
+    for (let _i = 0; i < 36; i++) {
       if (i === 8 || i === 13 || i === 18 || i === 23) {
         uuid += '-'
       } else if (i === 14) {
@@ -292,10 +292,10 @@ class IDGenerator {
    * NanoID optimisé pour performance
    */
   static nanoid(length = 12, alphabet?: string): string {
-    const startTime = performance.now()
+    const _startTime = performance.now()
     
     // Fix: Alphabet par défaut si undefined
-    const defaultAlphabet = alphabet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const _defaultAlphabet = alphabet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     
     try {
       let result: string
@@ -307,7 +307,7 @@ class IDGenerator {
         // Client : essayer crypto, sinon fallback
         try {
           // Test direct sans condition
-          const testArray = new Uint8Array(1)
+          const _testArray = new Uint8Array(1)
 
           crypto.getRandomValues(testArray)
           result = this.generateSecureNanoId(length, defaultAlphabet)
@@ -336,7 +336,7 @@ class IDGenerator {
       }
       
       // Test rapide pour vérifier que crypto.getRandomValues fonctionne
-      const testArray = new Uint8Array(1)
+      const _testArray = new Uint8Array(1)
 
       crypto.getRandomValues(testArray)
 
@@ -349,15 +349,15 @@ class IDGenerator {
   }
 
   private static generateServerNanoId(length: number, alphabet: string): string {
-    const timestamp = Date.now().toString(36)
-    const counter = (++this.counter).toString(36).padStart(3, '0')
-    const combined = timestamp + counter + this.nodeId
+    const _timestamp = Date.now().toString(36)
+    const _counter = (++this.counter).toString(36).padStart(3, '0')
+    const _combined = timestamp + counter + this.nodeId
     
     return combined.slice(0, length)
   }
 
   private static generateSecureNanoId(length: number, alphabet: string): string {
-    const bytes = new Uint8Array(length)
+    const _bytes = new Uint8Array(length)
 
     crypto.getRandomValues(bytes)
 
@@ -365,9 +365,9 @@ class IDGenerator {
   }
 
   private static generateFallbackNanoId(length: number, alphabet: string): string {
-    let result = ''
+    let _result = ''
 
-    for (let i = 0; i < length; i++) {
+    for (let _i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
     }
 
@@ -378,10 +378,10 @@ class IDGenerator {
    * ID métier avec configuration avancée
    */
   static business(prefix: keyof typeof ID_PREFIXES, config: IDConfig = {}): string {
-    const startTime = performance.now()
+    const _startTime = performance.now()
     
     try {
-      const prefixStr = ID_PREFIXES[prefix]
+      const _prefixStr = ID_PREFIXES[prefix]
       const {
         timestamp = false,
         checksum = false,
@@ -409,7 +409,7 @@ class IDGenerator {
           mainId = this.nanoid(length)
       }
 
-      let result = prefixStr
+      let _result = prefixStr
       
       if (env !== 'production') {
         result += `-${env.slice(0, 3).toUpperCase()}`
@@ -422,7 +422,7 @@ class IDGenerator {
       result += `-${mainId}`
       
       if (checksum) {
-        const checksumValue = this.calculateChecksum(result)
+        const _checksumValue = this.calculateChecksum(result)
 
         result += `-${checksumValue}`
       }
@@ -439,10 +439,10 @@ class IDGenerator {
   }
 
   private static generateBase58(length: number): string {
-    const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-    let result = ''
+    const _alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    let _result = ''
     
-    for (let i = 0; i < length; i++) {
+    for (let _i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
     }
     
@@ -450,10 +450,10 @@ class IDGenerator {
   }
 
   private static generateHex(length: number): string {
-    const alphabet = '0123456789abcdef'
-    let result = ''
+    const _alphabet = '0123456789abcdef'
+    let _result = ''
     
-    for (let i = 0; i < length; i++) {
+    for (let _i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
     }
     
@@ -461,10 +461,10 @@ class IDGenerator {
   }
 
   private static generateBase36(length: number): string {
-    const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
-    let result = ''
+    const _alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
+    let _result = ''
     
-    for (let i = 0; i < length; i++) {
+    for (let _i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
     }
     
@@ -472,10 +472,10 @@ class IDGenerator {
   }
 
   private static calculateChecksum(input: string): string {
-    let hash = 0
+    let _hash = 0
 
-    for (let i = 0; i < input.length; i++) {
-      const char = input.charCodeAt(i)
+    for (let _i = 0; i < input.length; i++) {
+      const _char = input.charCodeAt(i)
 
       hash = ((hash << 5) - hash) + char
       hash = hash & hash // Convert to 32-bit integer
@@ -491,11 +491,11 @@ class IDGenerator {
 
 class IDParser {
   static parse(id: string): ParsedID {
-    const cached = IDCache.get(id)
+    const _cached = IDCache.get(id)
 
     if (cached) return cached
     
-    const startTime = performance.now()
+    const _startTime = performance.now()
     
     try {
       const result: ParsedID = {
@@ -516,12 +516,12 @@ class IDParser {
       }
 
       // Parse prefix
-      const parts = id.split('-')
+      const _parts = id.split('-')
 
       if (parts.length >= 2) {
-        const potentialPrefix = parts[0]
-        const prefixKeys = Object.keys(ID_PREFIXES) as Array<keyof typeof ID_PREFIXES>
-        const matchingPrefix = prefixKeys.find(key => ID_PREFIXES[key] === potentialPrefix)
+        const _potentialPrefix = parts[0]
+        const _prefixKeys = Object.keys(ID_PREFIXES) as Array<keyof typeof ID_PREFIXES>
+        const _matchingPrefix = prefixKeys.find(key => ID_PREFIXES[key] === potentialPrefix)
         
         if (matchingPrefix) {
           result.prefix = potentialPrefix
@@ -534,10 +534,10 @@ class IDParser {
           
           // Parse timestamp si présent
           if (parts.length >= 3) {
-            const timestampPart = parts[result.environment ? 2 : 1]
+            const _timestampPart = parts[result.environment ? 2 : 1]
 
             if (timestampPart && /^[0-9a-z]+$/.test(timestampPart)) {
-              const timestamp = parseInt(timestampPart, 36)
+              const _timestamp = parseInt(timestampPart, 36)
 
               if (!isNaN(timestamp) && timestamp > 1000000) {
                 result.timestamp = timestamp
@@ -546,7 +546,7 @@ class IDParser {
           }
           
           // Déterminer le format
-          const mainPart = parts[parts.length - (result.checksum ? 2 : 1)]
+          const _mainPart = parts[parts.length - (result.checksum ? 2 : 1)]
 
           if (mainPart) {
             for (const [format, config] of Object.entries(ID_FORMATS)) {
@@ -591,7 +591,7 @@ class IDParser {
 
   static validate(id: string, expectedPrefix?: keyof typeof ID_PREFIXES): boolean {
     try {
-      const parsed = this.parse(id)
+      const _parsed = this.parse(id)
       
       if (!parsed.isValid) return false
       
@@ -613,7 +613,7 @@ class IDParser {
 // API PUBLIQUE ENTERPRISE
 // =============================================
 
-export const ID = {
+export const _ID = {
   // Générateurs principaux
   uuid: () => IDGenerator.uuid(),
   nano: (length?: number) => IDGenerator.nanoid(length),
@@ -660,14 +660,14 @@ export function useClientId(prefix?: keyof typeof ID_PREFIXES, config?: Partial<
   
   useEffect(() => {
     try {
-      const newId = prefix 
+      const _newId = prefix 
         ? IDGenerator.business(prefix, config) 
         : IDGenerator.nanoid()
 
       setId(newId)
       setError(null)
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      const _errorMessage = err instanceof Error ? err.message : 'Unknown error'
 
       setError(errorMessage)
       console.error('useClientId failed:', errorMessage)
@@ -698,23 +698,23 @@ export function useIDMetrics(): IDMetrics & {
   const [metrics, setMetrics] = useState<IDMetrics>(() => IDCache.getMetrics())
   
   useEffect(() => {
-    const interval = setInterval(() => {
+    const _interval = setInterval(() => {
       setMetrics(IDCache.getMetrics())
     }, 5000) // Mise à jour toutes les 5 secondes
     
     return () => clearInterval(interval)
   }, [])
   
-  const averageGenerationTime = metrics.performanceMs.length > 0
+  const _averageGenerationTime = metrics.performanceMs.length > 0
     ? metrics.performanceMs.reduce((a, b) => a + b, 0) / metrics.performanceMs.length
     : 0
     
-  const errorRate = metrics.generated > 0 
+  const _errorRate = metrics.generated > 0 
     ? (metrics.errors / metrics.generated) * 100 
     : 0
     
-  const totalRequests = metrics.cacheHits + metrics.cacheMisses
-  const cacheHitRate = totalRequests > 0 
+  const _totalRequests = metrics.cacheHits + metrics.cacheMisses
+  const _cacheHitRate = totalRequests > 0 
     ? (metrics.cacheHits / totalRequests) * 100 
     : 0
   

@@ -2,14 +2,14 @@ import React from "react"
 
 interface ContextMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
-  value?: any
-  onValueChange?: any
+  value?: unknown
+  onValueChange?: unknown
   asChild?: boolean
   variant?: string
   size?: string
 }
 
-export const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
+export const _ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
@@ -26,13 +26,14 @@ export const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
 ContextMenu.displayName = "ContextMenu"
 
 // Export des sous-composants courants si nécessaire
-export const ContextMenuContent = ContextMenu
-export const ContextMenuTrigger = ContextMenu  
-export const ContextMenuItem = ContextMenu
-export const ContextMenuValue = ContextMenu
-export const ContextMenuHeader = ContextMenu
-export const ContextMenuTitle = ContextMenu
-export const ContextMenuDescription = ContextMenu
-export const ContextMenuFooter = ContextMenu
-export const ContextMenuSeparator = ContextMenu
-export const ContextMenuList = ContextMenu
+export const _ContextMenuContent = ContextMenu
+export const _ContextMenuTrigger = ContextMenu  
+export const _ContextMenuItem = ContextMenu
+export const _ContextMenuValue = ContextMenu
+export const _ContextMenuHeader = ContextMenu
+export const _ContextMenuTitle = ContextMenu
+export const _ContextMenuDescription = ContextMenu
+export const _ContextMenuFooter = ContextMenu
+export const _ContextMenuSeparator = ContextMenu
+export const _ContextMenuList = ContextMenu
+

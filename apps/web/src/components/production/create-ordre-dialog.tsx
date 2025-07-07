@@ -10,7 +10,7 @@ import { X } from "lucide-react";
 interface CreateOrdreDialogProps {
   open: boolean;  // ✅ Interface standardisée
   onOpenChange: (open: boolean) => void;  // ✅ Interface standardisée
-  onSubmit?: (data: any) => void;
+  onSubmit?: (data: unknown) => void;
 }
 
 export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreDialogProps) {
@@ -25,10 +25,10 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
 
   if (!open) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const _handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newOrdre = {
+    const _newOrdre = {
       ...formData,
       id: Date.now(),
       statut: 'PLANIFIE',

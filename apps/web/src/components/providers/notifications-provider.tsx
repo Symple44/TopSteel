@@ -61,7 +61,7 @@ export interface CreateNotificationRequest {
   category: 'system' | 'stock' | 'projet' | 'production' | 'maintenance'
   title: string
   message: string
-  data?: Record<string, any>
+  data?: Record<string, unknown>
   persistent?: boolean
   actionUrl?: string
   actionLabel?: string
@@ -108,7 +108,7 @@ function notificationsReducer(
 ): NotificationsState {
   switch (action.type) {
     case 'ADD_NOTIFICATION': {
-      const newNotifications = [action.payload, ...state.notifications]
+      const _newNotifications = [action.payload, ...state.notifications]
 
       return {
         ...state,
@@ -118,7 +118,7 @@ function notificationsReducer(
     }
     
     case 'MARK_AS_READ': {
-      const updatedNotifications = state.notifications.map(n => 
+      const _updatedNotifications = state.notifications.map(n => 
         n.id === action.payload ? { ...n, read: true } : n
       )
 
@@ -130,7 +130,7 @@ function notificationsReducer(
     }
     
     case 'MARK_ALL_AS_READ': {
-      const allReadNotifications = state.notifications.map(n => ({ ...n, read: true }))
+      const _allReadNotifications = state.notifications.map(n => ({ ...n, read: true }))
 
       return {
         ...state,
@@ -140,7 +140,7 @@ function notificationsReducer(
     }
     
     case 'REMOVE_NOTIFICATION': {
-      const filteredNotifications = state.notifications.filter(n => n.id !== action.payload)
+      const _filteredNotifications = state.notifications.filter(n => n.id !== action.payload)
 
       return {
         ...state,
@@ -196,7 +196,7 @@ function notificationsReducer(
 
 // ===== CONTEXTE =====
 
-export const NotificationsContext = createContext<NotificationsContextValue | null>(null)
+export const _NotificationsContext = createContext<NotificationsContextValue | null>(null)
 
 // ===== PROVIDER =====
 
@@ -208,13 +208,13 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   const [state, dispatch] = useReducer(notificationsReducer, initialState)
   const { user } = useAuth()
   const { toast } = useToast()
-  const wsRef = useRef<WebSocket | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const reconnectAttempts = useRef(0)
+  const _wsRef = useRef<WebSocket | null>(null)
+  const _reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const _reconnectAttempts = useRef(0)
 
   // ===== ACTIONS =====
 
-  const markAsRead = useCallback((id: string) => {
+  const _markAsRead = useCallback((id: string) => {
     dispatch({ type: 'MARK_AS_READ', payload: id })
     
     // Marquer comme lu côté serveur
@@ -222,7 +222,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       .catch(console.error)
   }, [])
 
-  const markAllAsRead = useCallback(() => {
+  const _markAllAsRead = useCallback(() => {
     dispatch({ type: 'MARK_ALL_AS_READ' })
     
     // Marquer toutes comme lues côté serveur
@@ -230,15 +230,15 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       .catch(console.error)
   }, [])
 
-  const removeNotification = useCallback((id: string) => {
+  const _removeNotification = useCallback((id: string) => {
     dispatch({ type: 'REMOVE_NOTIFICATION', payload: id })
   }, [])
 
-  const clearAll = useCallback(() => {
+  const _clearAll = useCallback(() => {
     dispatch({ type: 'CLEAR_ALL' })
   }, [])
 
-  const updateSettings = useCallback((settings: Partial<NotificationSettings>) => {
+  const _updateSettings = useCallback((settings: Partial<NotificationSettings>) => {
     dispatch({ type: 'UPDATE_SETTINGS', payload: settings })
     
     // Sauvegarder les paramètres côté serveur
@@ -249,9 +249,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     }).catch(console.error)
   }, [])
 
-  const createNotification = useCallback(async (notification: CreateNotificationRequest) => {
+  const _createNotification = useCallback(async (notification: CreateNotificationRequest) => {
     try {
-      const response = await fetch('/api/notifications', {
+      const _response = await fetch('/api/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(notification)
@@ -269,17 +269,17 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     }
   }, [])
 
-  const refreshNotifications = useCallback(async () => {
+  const _refreshNotifications = useCallback(async () => {
     if (!user) return
 
     try {
       dispatch({ type: 'SET_LOADING', payload: true })
       
-      const response = await fetch('/api/notifications')
+      const _response = await fetch('/api/notifications')
 
       if (!response.ok) throw new Error('Erreur lors du chargement')
       
-      const notifications = await response.json()
+      const _notifications = await response.json()
 
       dispatch({ type: 'SET_NOTIFICATIONS', payload: notifications })
     } catch (error) {
@@ -290,13 +290,13 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   // ===== WEBSOCKET CONNECTION =====
 
-  const connectWebSocket = useCallback(() => {
+  const _connectWebSocket = useCallback(() => {
     if (!user || wsRef.current?.readyState === WebSocket.OPEN) return
 
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001'}/notifications?userId=${user.id}`
+    const _wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001'}/notifications?userId=${user.id}`
     
     try {
-      const ws = new WebSocket(wsUrl)
+      const _ws = new WebSocket(wsUrl)
 
       wsRef.current = ws
 
@@ -313,7 +313,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         
         // Reconnexion automatique avec backoff exponentiel
         if (reconnectAttempts.current < 5) {
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000)
+          const _delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000)
 
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectAttempts.current++
@@ -348,7 +348,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
           // Son si activé
           if (state.settings.enableSound) {
-            const audio = new Audio('/sounds/notification.mp3')
+            const _audio = new Audio('/sounds/notification.mp3')
 
             audio.volume = 0.3
             audio.play().catch(() => {}) // Ignore les erreurs de lecture
@@ -400,9 +400,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   // Nettoyer notifications expirées
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date()
-      const validNotifications = state.notifications.filter(n => 
+    const _interval = setInterval(() => {
+      const _now = new Date()
+      const _validNotifications = state.notifications.filter(n => 
         !n.expiresAt || new Date(n.expiresAt) > now
       )
       
@@ -449,7 +449,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
  * Hook principal pour utiliser les notifications
  */
 export function useNotifications() {
-  const context = useContext(NotificationsContext)
+  const _context = useContext(NotificationsContext)
   
   if (!context) {
     throw new Error(
@@ -460,5 +460,6 @@ export function useNotifications() {
   
   return context
 }
+
 
 

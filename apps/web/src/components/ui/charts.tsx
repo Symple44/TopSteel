@@ -20,7 +20,7 @@ import {
 interface ChartData {
   name: string
   value: number
-  [key: string]: any
+  [key: string]: unknown
 }
 
 interface LineChartProps {
@@ -102,7 +102,7 @@ export function SimplePieChart({
           labelLine={false}
           label={({ name, percent }) => {
             // ✅ CORRECTION: Vérifier si percent existe et fournir une valeur par défaut
-            const safePercent = percent ?? 0
+            const _safePercent = percent ?? 0
 
             return `${name || 'Inconnu'} ${(safePercent * 100).toFixed(0)}%`
           }}
@@ -160,9 +160,9 @@ interface PieLabelProps {
 }
 
 // ✅ FONCTION HELPER POUR LES LABELS DE PIE CHART
-export const formatPieLabel = ({ name, percent }: PieLabelProps): string => {
-  const safeName = name || 'Inconnu'
-  const safePercent = percent ?? 0
+export const _formatPieLabel = ({ name, percent }: PieLabelProps): string => {
+  const _safeName = name || 'Inconnu'
+  const _safePercent = percent ?? 0
 
   return `${safeName} ${(safePercent * 100).toFixed(0)}%`
 }
@@ -205,3 +205,4 @@ export function SafePieChart({
 export {
   SimpleAreaChart as AreaChart, SimpleBarChart as BarChart, SimpleLineChart as LineChart, SimplePieChart as PieChart
 }
+
