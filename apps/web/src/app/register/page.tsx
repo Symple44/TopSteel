@@ -1,25 +1,56 @@
 'use client'
 
-import { ErrorAlert } from '@/components/ui/error-alert'
-import { useAuth } from '@/hooks/use-auth'
-import type { FormattedError } from '@/lib/error-handler'
-import { ErrorHandler } from '@/lib/error-handler'
-import { authService } from '@/services/auth.service'
+/**
+ * 🔐 PAGE REGISTER ROBUSTE - TopSteel ERP
+ * Page d'inscription avec gestion d'erreurs robuste et hydratation sécurisée
+ * Fichier: apps/web/src/app/register/page.tsx
+ */
+
+import { ClientOnly } from '@/components/client-only'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Building2, Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react'
+import { AlertCircle, Building2, CheckCircle, Eye, EyeOff, Loader2, Mail, User } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
+// ===== SCHÉMA DE VALIDATION =====
+
 const registerSchema = z.object({
-  prenom: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
-  nom: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  email: z.string().email('Email invalide'),
-  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+  firstName: z.string()
+    .min(2, 'Le prénom doit contenir au moins 2 caractères')
+    .max(50, 'Le prénom ne peut pas dépasser 50 caractères')
+    .regex(/^[a-zA-ZÀ-ÿ\s-']+$/, 'Le prénom ne peut contenir que des lettres'),
+  
+  lastName: z.string()
+    .min(2, 'Le nom doit contenir au moins 2 caractères')
+    .max(50, 'Le nom ne peut pas dépasser 50 caractères')
+    .regex(/^[a-zA-ZÀ-ÿ\s-']+$/, 'Le nom ne peut contenir que des lettres'),
+  
+  email: z.string()
+    .email('Email invalide')
+    .min(5, 'L\'email doit contenir au moins 5 caractères')
+    .max(255, 'L\'email ne peut pas dépasser 255 caractères'),
+  
+  password: z.string()
+    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+    .max(128, 'Le mot de passe ne peut pas dépasser 128 caractères')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre'),
+  
   confirmPassword: z.string(),
-  entreprise: z.string().optional()
+  
+  company: z.string()
+    .optional()
+    .refine(val => !val || val.length >= 2, 'Le nom d\'entreprise doit contenir au moins 2 caractères'),
+  
+  acceptTerms: z.boolean()
+    .refine(val => val === true, 'Vous devez accepter les conditions d\'utilisation')
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Les mots de passe ne correspondent pas",
   path: ["confirmPassword"],
@@ -27,276 +58,450 @@ const registerSchema = z.object({
 
 type RegisterFormData = z.infer<typeof registerSchema>
 
+// ===== TYPES =====
+
+interface RegisterError {
+  type: 'validation' | 'server' | 'network'
+  message: string
+  field?: keyof RegisterFormData
+}
+
+interface RegisterState {
+  isLoading: boolean
+  error: RegisterError | null
+  success: boolean
+}
+
+// ===== COMPOSANT PRINCIPAL =====
+
 export default function RegisterPage() {
+  // ===== HOOKS =====
   const router = useRouter()
-  const [error, setError] = useState<FormattedError | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [state, setState] = useState<RegisterState>({
+    isLoading: false,
+    error: null,
+    success: false
+  })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const { login } = useAuth()
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  // Hook pour l'hydratation sécurisée
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     setError: setFieldError,
+    reset,
+    watch
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    mode: 'onChange',
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      company: '',
+      acceptTerms: false
+    }
   })
 
-  const onSubmit = async (data: RegisterFormData) => {
-    setError(null)
-    setIsLoading(true)
+  // Observer les changements de mot de passe pour validation en temps réel
+  const password = watch('password')
+
+  // ===== GESTIONNAIRES D'ÉVÉNEMENTS =====
+
+  const setError = useCallback((error: RegisterError) => {
+    setState(prev => ({ ...prev, error, isLoading: false }))
+  }, [])
+
+  const clearError = useCallback(() => {
+    setState(prev => ({ ...prev, error: null }))
+  }, [])
+
+  const togglePasswordVisibility = useCallback(() => {
+    setShowPassword(prev => !prev)
+  }, [])
+
+  const toggleConfirmPasswordVisibility = useCallback(() => {
+    setShowConfirmPassword(prev => !prev)
+  }, [])
+
+  const onSubmit = useCallback(async (data: RegisterFormData) => {
+    clearError()
+    setState(prev => ({ ...prev, isLoading: true }))
 
     try {
-      const registerData = {
-        email: data.email,
-        password: data.password,
-        nom: data.nom,
-        prenom: data.prenom,
-        ...(data.entreprise && { entreprise: data.entreprise })
+      // Simulation d'appel API - remplacer par votre logique
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: data.firstName.trim(),
+          lastName: data.lastName.trim(),
+          email: data.email.toLowerCase().trim(),
+          password: data.password,
+          company: data.company?.trim() || null
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        
+        if (response.status === 400) {
+          if (errorData.field) {
+            setFieldError(errorData.field, { message: errorData.message })
+            setError({
+              type: 'validation',
+              message: errorData.message,
+              field: errorData.field
+            })
+          } else {
+            setError({
+              type: 'validation',
+              message: errorData.message || 'Données invalides'
+            })
+          }
+        } else if (response.status === 409) {
+          setError({
+            type: 'validation',
+            message: 'Cette adresse email est déjà utilisée',
+            field: 'email'
+          })
+          setFieldError('email', { message: 'Cette adresse email est déjà utilisée' })
+        } else {
+          setError({
+            type: 'server',
+            message: 'Erreur serveur. Veuillez réessayer plus tard.'
+          })
+        }
+        return
       }
 
-      await authService.register(registerData)
-      await login(data.email, data.password)
-      router.push('/dashboard')
+      const result = await response.json()
       
-    } catch (err: any) {
-      console.error('Erreur lors de l\'inscription:', err)
+      setState(prev => ({ ...prev, success: true, isLoading: false }))
       
-      const formattedError = ErrorHandler.formatError(err)
-      setError(formattedError)
-      
-      // Si l'erreur concerne un champ spécifique, l'afficher sur le champ
-      if (formattedError.field && formattedError.field in data) {
-        setFieldError(formattedError.field as keyof RegisterFormData, {
-          type: 'server',
-          message: formattedError.message
-        })
-      }
-    } finally {
-      setIsLoading(false)
+      // Redirection après succès
+      setTimeout(() => {
+        router.push('/login?message=Inscription réussie ! Vous pouvez maintenant vous connecter.')
+      }, 2000)
+
+    } catch (error) {
+      console.error('Erreur lors de l\'inscription:', error)
+      setError({
+        type: 'network',
+        message: 'Problème de connexion. Vérifiez votre connexion internet et réessayez.'
+      })
     }
+  }, [clearError, router, setFieldError, setError])
+
+  // ===== FONCTION DE VALIDATION DE LA FORCE DU MOT DE PASSE =====
+
+  const getPasswordStrength = useCallback((password: string) => {
+    if (!password) return { score: 0, text: '', color: '' }
+    
+    let score = 0
+    const checks = [
+      password.length >= 8,
+      /[a-z]/.test(password),
+      /[A-Z]/.test(password),
+      /\d/.test(password),
+      /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      password.length >= 12
+    ]
+    
+    score = checks.filter(Boolean).length
+    
+    if (score < 3) return { score, text: 'Faible', color: 'text-red-500' }
+    if (score < 5) return { score, text: 'Moyen', color: 'text-yellow-500' }
+    return { score, text: 'Fort', color: 'text-green-500' }
+  }, [])
+
+  const passwordStrength = getPasswordStrength(password || '')
+
+  // ===== RENDU =====
+
+  // Fallback pendant l'hydratation
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="animate-pulse">
+          <div className="w-80 h-96 bg-gray-200 rounded-lg"></div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg mb-6">
-            <Building2 className="h-8 w-8 text-white" />
+    <ClientOnly
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="animate-pulse">
+            <div className="w-80 h-96 bg-gray-200 rounded-lg"></div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Créer un compte
-          </h1>
-          <p className="text-gray-600">
-            Rejoignez TopSteel et gérez votre entreprise efficacement
-          </p>
         </div>
+      }
+    >
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">
+              Créer un compte
+            </CardTitle>
+            <CardDescription className="text-center">
+              Rejoignez TopSteel ERP pour gérer votre entreprise
+            </CardDescription>
+          </CardHeader>
 
-        {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Error Alert */}
-            <ErrorAlert error={error} onDismiss={() => setError(null)} />
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <CardContent className="space-y-4">
+              {/* Affichage des erreurs */}
+              {state.error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{state.error.message}</AlertDescription>
+                </Alert>
+              )}
 
-            {/* Nom & Prénom */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="prenom" className="block text-sm font-medium text-gray-700 mb-2">
-                  Prénom
-                </label>
+              {/* Message de succès */}
+              {state.success && (
+                <Alert className="border-green-200 bg-green-50">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <AlertDescription className="text-green-700">
+                    Inscription réussie ! Redirection en cours...
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Prénom */}
+              <div className="space-y-2">
+                <Label htmlFor="firstName">
+                  Prénom <span className="text-red-500">*</span>
+                </Label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    {...register('prenom')}
-                    id="prenom"
+                  <Input
+                    id="firstName"
                     type="text"
-                    placeholder="Jean"
-                    className={`w-full pl-12 pr-4 py-3 bg-gray-50 border rounded-xl text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 ${
-                      errors.prenom ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
-                    }`}
                     autoComplete="given-name"
+                    disabled={state.isLoading}
+                    className={errors.firstName ? 'border-red-500' : ''}
+                    {...register('firstName')}
                   />
+                  <User className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
                 </div>
-                {errors.prenom && (
-                  <p className="mt-1 text-sm text-red-600">{errors.prenom.message}</p>
+                {errors.firstName && (
+                  <p className="text-sm text-red-500">{errors.firstName.message}</p>
                 )}
               </div>
 
-              <div>
-                <label htmlFor="nom" className="block text-sm font-medium text-gray-700 mb-2">
-                  Nom
-                </label>
+              {/* Nom */}
+              <div className="space-y-2">
+                <Label htmlFor="lastName">
+                  Nom <span className="text-red-500">*</span>
+                </Label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    {...register('nom')}
-                    id="nom"
+                  <Input
+                    id="lastName"
                     type="text"
-                    placeholder="Dupont"
-                    className={`w-full pl-12 pr-4 py-3 bg-gray-50 border rounded-xl text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 ${
-                      errors.nom ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
-                    }`}
                     autoComplete="family-name"
+                    disabled={state.isLoading}
+                    className={errors.lastName ? 'border-red-500' : ''}
+                    {...register('lastName')}
                   />
+                  <User className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
                 </div>
-                {errors.nom && (
-                  <p className="mt-1 text-sm text-red-600">{errors.nom.message}</p>
+                {errors.lastName && (
+                  <p className="text-sm text-red-500">{errors.lastName.message}</p>
                 )}
               </div>
-            </div>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Adresse email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...register('email')}
-                  id="email"
-                  type="email"
-                  placeholder="jean.dupont@exemple.com"
-                  className={`w-full pl-12 pr-4 py-3 bg-gray-50 border rounded-xl text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 ${
-                    errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
-                  }`}
-                  autoComplete="email"
-                />
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Email <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    disabled={state.isLoading}
+                    className={errors.email ? 'border-red-500' : ''}
+                    {...register('email')}
+                  />
+                  <Mail className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                </div>
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                )}
               </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-              )}
-            </div>
 
-            {/* Entreprise */}
-            <div>
-              <label htmlFor="entreprise" className="block text-sm font-medium text-gray-700 mb-2">
-                Entreprise <span className="text-gray-400 text-xs">(optionnel)</span>
-              </label>
-              <div className="relative">
-                <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...register('entreprise')}
-                  id="entreprise"
-                  type="text"
-                  placeholder="TopSteel Métallerie"
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200"
-                  autoComplete="organization"
-                />
+              {/* Entreprise (optionnel) */}
+              <div className="space-y-2">
+                <Label htmlFor="company">Entreprise</Label>
+                <div className="relative">
+                  <Input
+                    id="company"
+                    type="text"
+                    autoComplete="organization"
+                    disabled={state.isLoading}
+                    className={errors.company ? 'border-red-500' : ''}
+                    {...register('company')}
+                  />
+                  <Building2 className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                </div>
+                {errors.company && (
+                  <p className="text-sm text-red-500">{errors.company.message}</p>
+                )}
               </div>
-              {errors.entreprise && (
-                <p className="mt-1 text-sm text-red-600">{errors.entreprise.message}</p>
-              )}
-            </div>
 
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Mot de passe
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...register('password')}
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  className={`w-full pl-12 pr-12 py-3 bg-gray-50 border rounded-xl text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 ${
-                    errors.password ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
-                  }`}
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff /> : <Eye />}
-                </button>
+              {/* Mot de passe */}
+              <div className="space-y-2">
+                <Label htmlFor="password">
+                  Mot de passe <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    disabled={state.isLoading}
+                    className={errors.password ? 'border-red-500' : ''}
+                    {...register('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors"
+                    disabled={state.isLoading}
+                  >
+                    {showPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
+                {password && (
+                  <div className="flex items-center space-x-2 text-sm">
+                    <div className={`flex-1 h-1 rounded ${
+                      passwordStrength.score < 3 ? 'bg-red-200' :
+                      passwordStrength.score < 5 ? 'bg-yellow-200' : 'bg-green-200'
+                    }`}>
+                      <div 
+                        className={`h-full rounded transition-all duration-300 ${
+                          passwordStrength.score < 3 ? 'bg-red-500' :
+                          passwordStrength.score < 5 ? 'bg-yellow-500' : 'bg-green-500'
+                        }`}
+                        style={{ width: `${(passwordStrength.score / 6) * 100}%` }}
+                      />
+                    </div>
+                    <span className={passwordStrength.color}>
+                      {passwordStrength.text}
+                    </span>
+                  </div>
+                )}
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-              )}
-            </div>
 
-            {/* Confirm Password */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirmer le mot de passe
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...register('confirmPassword')}
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  className={`w-full pl-12 pr-12 py-3 bg-gray-50 border rounded-xl text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 ${
-                    errors.confirmPassword ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
-                  }`}
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? <EyeOff /> : <Eye />}
-                </button>
+              {/* Confirmation mot de passe */}
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">
+                  Confirmer le mot de passe <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    disabled={state.isLoading}
+                    className={errors.confirmPassword ? 'border-red-500' : ''}
+                    {...register('confirmPassword')}
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleConfirmPasswordVisibility}
+                    className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors"
+                    disabled={state.isLoading}
+                  >
+                    {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+                )}
               </div>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-              )}
-            </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:transform-none disabled:hover:shadow-lg flex items-center justify-center space-x-2"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>Création du compte...</span>
-                </>
-              ) : (
-                <span>Créer mon compte</span>
+              {/* Acceptation des conditions */}
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="acceptTerms"
+                  disabled={state.isLoading}
+                  className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  {...register('acceptTerms')}
+                />
+                <Label htmlFor="acceptTerms" className="text-sm">
+                  J'accepte les{' '}
+                  <Link 
+                    href="/terms" 
+                    className="text-blue-600 hover:text-blue-500 underline"
+                    target="_blank"
+                  >
+                    conditions d'utilisation
+                  </Link>{' '}
+                  et la{' '}
+                  <Link 
+                    href="/privacy" 
+                    className="text-blue-600 hover:text-blue-500 underline"
+                    target="_blank"
+                  >
+                    politique de confidentialité
+                  </Link>
+                  <span className="text-red-500"> *</span>
+                </Label>
+              </div>
+              {errors.acceptTerms && (
+                <p className="text-sm text-red-500">{errors.acceptTerms.message}</p>
               )}
-            </button>
-          </form>
+            </CardContent>
 
-          {/* Login Link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Déjà un compte ?{' '}
-              <Link 
-                href="/login" 
-                className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={state.isLoading || !isValid}
               >
-                Se connecter
-              </Link>
-            </p>
-          </div>
-        </div>
+                {state.isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Création du compte...
+                  </>
+                ) : (
+                  'Créer mon compte'
+                )}
+              </Button>
 
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-xs text-gray-500">
-            En créant un compte, vous acceptez nos{' '}
-            <Link href="/terms" className="underline hover:text-gray-700 transition-colors">
-              conditions d'utilisation
-            </Link>{' '}
-            et notre{' '}
-            <Link href="/privacy" className="underline hover:text-gray-700 transition-colors">
-              politique de confidentialité
-            </Link>
-          </p>
-        </div>
+              <div className="text-center text-sm text-gray-600">
+                Vous avez déjà un compte ?{' '}
+                <Link 
+                  href="/login" 
+                  className="text-blue-600 hover:text-blue-500 underline font-medium"
+                >
+                  Se connecter
+                </Link>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
       </div>
-    </div>
+    </ClientOnly>
   )
 }

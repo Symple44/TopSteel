@@ -1,26 +1,29 @@
 {
+  /* ===== TYPESCRIPT CONFIGURATION ===== */
   "compilerOptions": {
-    /* ===== BASE CONFIGURATION ===== */
+    /* ===== LANGUAGE AND ENVIRONMENT ===== */
     "target": "ES2022",
+    "module": "ESNext",
     "lib": [
-      "DOM",
-      "DOM.Iterable", 
-      "ES2022",
-      "WebWorker"
+      "dom",
+      "dom.iterable",
+      "es6",
+      "ES2022"
     ],
     "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "ESNext",
+    "checkJs": false,
+    /* ===== MODULES ===== */
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-
-    /* ===== STRICT TYPE CHECKING ===== */
+    "noEmit": true,
+    "esModuleInterop": true,
+    /* ===== JAVASCRIPT SUPPORT ===== */
+    "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": false,
+    /* ===== TYPE CHECKING ===== */
+    "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "exactOptionalPropertyTypes": false,
@@ -30,53 +33,76 @@
     "noImplicitOverride": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
-
-    /* ===== MODULES ET IMPORTS ===== */
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/hooks/*": ["./src/hooks/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/store/*": ["./src/store/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/app/*": ["./src/app/*"],
-      "@/styles/*": ["./src/styles/*"],
-      "@erp/types": ["../../packages/types/src/index"],
-      "@erp/ui": ["../../packages/ui/src/index"],
-      "@erp/utils": ["../../packages/utils/src/index"],
-      "@erp/config": ["../../packages/config/src/index"]
-    },
-
-    /* ===== NEXT.JS SPECIFIC ===== */
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    /* ===== INTEROP CONSTRAINTS ===== */
     "forceConsistentCasingInFileNames": true,
-
     /* ===== PERFORMANCE ===== */
     "assumeChangesOnlyAffectDirectDependencies": true,
-
     /* ===== OUTPUT ===== */
     "declaration": false,
     "declarationMap": false,
     "sourceMap": false,
     "outDir": "dist",
     "removeComments": true,
-
     /* ===== ADVANCED OPTIONS ===== */
     "skipDefaultLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "verbatimModuleSyntax": false,
-
     /* ===== EXPERIMENTAL ===== */
     "experimentalDecorators": false,
     "emitDecoratorMetadata": false,
-
+    /* ===== JSX ===== */
+    "jsx": "preserve",
+    "incremental": true,
+    /* ===== PATHS ===== */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@/lib/*": [
+        "./src/lib/*"
+      ],
+      "@/services/*": [
+        "./src/services/*"
+      ],
+      "@/store/*": [
+        "./src/store/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
+      ],
+      "@/utils/*": [
+        "./src/utils/*"
+      ],
+      "@/app/*": [
+        "./src/app/*"
+      ],
+      "@/styles/*": [
+        "./src/styles/*"
+      ],
+      "@erp/types": [
+        "../../packages/types/src/index"
+      ],
+      "@erp/ui": [
+        "../../packages/ui/src/index"
+      ],
+      "@erp/utils": [
+        "../../packages/utils/src/index"
+      ],
+      "@erp/config": [
+        "../../packages/config/src/index"
+      ]
+    },
+    /* ===== NEXT.JS SPECIFIC ===== */
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     /* ===== TYPE ACQUISITION ===== */
     "typeRoots": [
       "./node_modules/@types",
@@ -87,9 +113,9 @@
       "node",
       "react",
       "react-dom"
-    ]
+    ],
+    "skipLibCheck": true
   },
-
   /* ===== INCLUDED FILES ===== */
   "include": [
     "next-env.d.ts",
@@ -109,12 +135,11 @@
     "../../packages/utils/src/**/*.ts",
     "../../packages/config/src/**/*.ts"
   ],
-
   /* ===== EXCLUDED FILES ===== */
   "exclude": [
     "node_modules",
     "dist",
-    "build", 
+    "build",
     ".next",
     "out",
     "coverage",
@@ -124,13 +149,15 @@
     "**/*.test.tsx",
     "**/*.spec.ts",
     "**/*.spec.tsx",
+    "**/__tests__/**/*",
+    "src/__tests__/**/*",
+    "src/components/__tests__/**/*",
     "**/.storybook/**/*",
     "**/stories/**/*",
     "storybook-static",
     "**/*.stories.ts",
     "**/*.stories.tsx"
   ],
-
   /* ===== TYPESCRIPT PROJECT REFERENCES ===== */
   "references": [
     {
@@ -146,7 +173,6 @@
       "path": "../../packages/config"
     }
   ],
-
   /* ===== COMPILER DIAGNOSTICS ===== */
   "ts-node": {
     "esm": true,

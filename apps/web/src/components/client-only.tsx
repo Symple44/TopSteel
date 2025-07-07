@@ -6,9 +6,17 @@
 
 'use client'
 
-import { useEffect, useState, type ComponentType, type ReactNode } from 'react'
+import {
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    type ComponentType,
+    type ReactNode
+} from 'react'
 
 // ===== TYPES =====
+
 interface ClientOnlyProps {
   children: ReactNode
   fallback?: ReactNode
@@ -24,12 +32,101 @@ interface ClientOnlyProps {
    * Callback appelé quand le composant est monté côté client
    */
   onMount?: () => void
+  /**
+   * Callback appelé pendant l'hydratation
+   */
+  onHydrating?: () => void
+  /**
+   * Force le remontage si les enfants changent
+   */
+  remountOnChange?: boolean
 }
 
 interface WithClientOnlyOptions {
   fallback?: ComponentType
   displayName?: string
+  forceRemount?: boolean
 }
+
+interface SafeComponentProps<T extends Record<string, any> = Record<string, any>> {
+  isClient?: boolean
+  isHydrated?: boolean
+}
+
+// ===== ÉTAT GLOBAL D'HYDRATATION =====
+
+/**
+ * État global pour éviter les re-calculs d'hydratation
+ */
+class HydrationManager {
+  private static instance: HydrationManager
+  private _isHydrated = false
+  private _isClient = false
+  private _hydrationPromise: Promise<void> | null = null
+  private _listeners = new Set<() => void>()
+
+  static getInstance(): HydrationManager {
+    if (!HydrationManager.instance) {
+      HydrationManager.instance = new HydrationManager()
+    }
+    return HydrationManager.instance
+  }
+
+  private constructor() {
+    if (typeof window !== 'undefined') {
+      this._isClient = true
+      this._hydrationPromise = new Promise<void>((resolve) => {
+        if (document.readyState === 'loading') {
+          const onReady = () => {
+            this._isHydrated = true
+            this._notifyListeners()
+            resolve()
+            document.removeEventListener('DOMContentLoaded', onReady)
+          }
+          document.addEventListener('DOMContentLoaded', onReady)
+        } else {
+          // DOM déjà prêt
+          setTimeout(() => {
+            this._isHydrated = true
+            this._notifyListeners()
+            resolve()
+          }, 0)
+        }
+      })
+    } else {
+      this._hydrationPromise = Promise.resolve()
+    }
+  }
+
+  private _notifyListeners() {
+    this._listeners.forEach(listener => {
+      try {
+        listener()
+      } catch (error) {
+        console.error('Erreur dans listener hydratation:', error)
+      }
+    })
+  }
+
+  get isClient(): boolean {
+    return this._isClient
+  }
+
+  get isHydrated(): boolean {
+    return this._isHydrated
+  }
+
+  addListener(listener: () => void): () => void {
+    this._listeners.add(listener)
+    return () => this._listeners.delete(listener)
+  }
+
+  waitForHydration(): Promise<void> {
+    return this._hydrationPromise || Promise.resolve()
+  }
+}
+
+const hydrationManager = HydrationManager.getInstance()
 
 // ===== COMPOSANT CLIENT-ONLY PRINCIPAL =====
 
@@ -42,13 +139,39 @@ export function ClientOnly({
   fallback = null, 
   fallbackDelay = 0,
   className,
-  onMount
+  onMount,
+  onHydrating,
+  remountOnChange = false
 }: ClientOnlyProps) {
   const [hasMounted, setHasMounted] = useState(false)
   const [showFallback, setShowFallback] = useState(fallbackDelay > 0)
+  const [isHydrating, setIsHydrating] = useState(false)
+  const mountedRef = useRef(false)
+  const childrenKeyRef = useRef<string>('')
 
+  // Générer une clé pour les enfants si remountOnChange est activé
+  const childrenKey = remountOnChange ? JSON.stringify(children) : ''
+
+  const handleMount = useCallback(() => {
+    if (mountedRef.current) return
+    mountedRef.current = true
+    
+    setIsHydrating(true)
+    onHydrating?.()
+
+    hydrationManager.waitForHydration().then(() => {
+      setHasMounted(true)
+      setIsHydrating(false)
+      onMount?.()
+    }).catch((error) => {
+      console.error('Erreur pendant l\'hydratation:', error)
+      setHasMounted(true)
+      setIsHydrating(false)
+    })
+  }, [onMount, onHydrating])
+
+  // Gérer le délai du fallback
   useEffect(() => {
-    // Gérer le délai du fallback
     if (fallbackDelay > 0) {
       const timer = setTimeout(() => {
         setShowFallback(false)
@@ -56,26 +179,61 @@ export function ClientOnly({
       
       return () => clearTimeout(timer)
     }
-    // Retourner undefined explicitement pour satisfaire TypeScript
     return undefined
   }, [fallbackDelay])
 
+  // Déclencher le montage
   useEffect(() => {
-    setHasMounted(true)
-    onMount?.()
-  }, [onMount])
+    handleMount()
+  }, [handleMount])
 
-  // Pendant le SSR ou avant le mounting
-  if (!hasMounted || showFallback) {
+  // Gérer le remontage si les enfants changent
+  useEffect(() => {
+    if (remountOnChange && childrenKey !== childrenKeyRef.current) {
+      childrenKeyRef.current = childrenKey
+      if (mountedRef.current) {
+        mountedRef.current = false
+        setHasMounted(false)
+        handleMount()
+      }
+    }
+  }, [childrenKey, remountOnChange, handleMount])
+
+  // Listener pour l'hydratation globale
+  useEffect(() => {
+    const removeListener = hydrationManager.addListener(() => {
+      if (!hasMounted) {
+        setHasMounted(true)
+        setIsHydrating(false)
+      }
+    })
+    return removeListener
+  }, [hasMounted])
+
+  // États de rendu
+  const isClient = hydrationManager.isClient
+  const shouldShowFallback = !isClient || !hasMounted || showFallback || isHydrating
+
+  if (shouldShowFallback) {
     return (
-      <div className={className} data-client-only="loading">
+      <div 
+        className={className} 
+        data-client-only="loading"
+        data-hydrating={isHydrating}
+        suppressHydrationWarning
+      >
         {fallback}
       </div>
     )
   }
 
   return (
-    <div className={className} data-client-only="mounted">
+    <div 
+      className={className} 
+      data-client-only="mounted"
+      data-hydrated="true"
+      suppressHydrationWarning
+    >
       {children}
     </div>
   )
@@ -87,7 +245,7 @@ export function ClientOnly({
  * Hook pour détecter si on est côté client
  */
 export function useIsClient(): boolean {
-  const [isClient, setIsClient] = useState(false)
+  const [isClient, setIsClient] = useState(hydrationManager.isClient)
 
   useEffect(() => {
     setIsClient(true)
@@ -101,10 +259,13 @@ export function useIsClient(): boolean {
  */
 export function useWindow(): Window | null {
   const [windowObj, setWindowObj] = useState<Window | null>(null)
+  const isClient = useIsClient()
 
   useEffect(() => {
-    setWindowObj(window)
-  }, [])
+    if (isClient && typeof window !== 'undefined') {
+      setWindowObj(window)
+    }
+  }, [isClient])
 
   return windowObj
 }
@@ -113,261 +274,205 @@ export function useWindow(): Window | null {
  * Hook pour détecter si l'hydratation est terminée
  */
 export function useHydrated(): boolean {
-  const [hydrated, setHydrated] = useState(false)
+  const [hydrated, setHydrated] = useState(hydrationManager.isHydrated)
 
   useEffect(() => {
-    setHydrated(true)
+    if (hydrationManager.isHydrated) {
+      setHydrated(true)
+      return
+    }
+
+    const removeListener = hydrationManager.addListener(() => {
+      setHydrated(true)
+    })
+
+    return removeListener
   }, [])
 
   return hydrated
 }
 
 /**
- * Hook pour accéder au navigator de manière sécurisée
+ * Hook pour détecter l'état d'hydratation complet
  */
-export function useNavigator(): Navigator | null {
-  const [nav, setNav] = useState<Navigator | null>(null)
+export function useHydrationState(): {
+  isClient: boolean
+  isHydrated: boolean
+  isHydrating: boolean
+} {
+  const [state, setState] = useState({
+    isClient: hydrationManager.isClient,
+    isHydrated: hydrationManager.isHydrated,
+    isHydrating: hydrationManager.isClient && !hydrationManager.isHydrated
+  })
 
   useEffect(() => {
-    setNav(navigator)
+    if (hydrationManager.isHydrated) {
+      setState({
+        isClient: true,
+        isHydrated: true,
+        isHydrating: false
+      })
+      return
+    }
+
+    setState(prev => ({
+      ...prev,
+      isClient: true,
+      isHydrating: true
+    }))
+
+    const removeListener = hydrationManager.addListener(() => {
+      setState({
+        isClient: true,
+        isHydrated: true,
+        isHydrating: false
+      })
+    })
+
+    return removeListener
   }, [])
 
-  return nav
+  return state
 }
 
 /**
- * Hook pour accéder au localStorage de manière sécurisée
+ * Hook pour accéder aux APIs browser de manière sécurisée
  */
-export function useLocalStorage<T>(
-  key: string,
-  defaultValue: T
-): [T, (value: T) => void, boolean] {
-  const [isClient, setIsClient] = useState(false)
-  const [storedValue, setStoredValue] = useState<T>(defaultValue)
-
-  useEffect(() => {
-    setIsClient(true)
-    try {
-      const item = window.localStorage.getItem(key)
-      if (item) {
-        setStoredValue(JSON.parse(item))
-      }
-    } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error)
-    }
-  }, [key])
-
-  const setValue = (value: T) => {
-    try {
-      setStoredValue(value)
-      if (isClient) {
-        window.localStorage.setItem(key, JSON.stringify(value))
-      }
-    } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error)
-    }
-  }
-
-  return [storedValue, setValue, isClient]
-}
-
-/**
- * Hook pour les media queries côté client
- */
-export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false)
+export function useBrowserAPI<T>(
+  getter: () => T,
+  fallback: T
+): T {
+  const [value, setValue] = useState<T>(fallback)
   const isClient = useIsClient()
 
   useEffect(() => {
-    if (!isClient) return
-
-    const mediaQuery = window.matchMedia(query)
-    setMatches(mediaQuery.matches)
-
-    const handler = (event: MediaQueryListEvent) => {
-      setMatches(event.matches)
+    if (isClient) {
+      try {
+        setValue(getter())
+      } catch (error) {
+        console.error('Erreur accès API browser:', error)
+        setValue(fallback)
+      }
     }
+  }, [isClient, getter, fallback])
 
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [query, isClient])
-
-  return matches
+  return value
 }
 
-// ===== HIGHER-ORDER COMPONENT =====
+// ===== COMPOSANT SAFE =====
 
 /**
- * HOC pour wraper automatiquement un composant avec ClientOnly
+ * Composant wrapper pour rendre n'importe quel composant safe côté client
  */
-export function withClientOnly<P extends object>(
-  Component: ComponentType<P>,
-  options: WithClientOnlyOptions = {}
-): ComponentType<P> {
-  const { fallback: FallbackComponent, displayName } = options
-
-  const ClientOnlyComponent = (props: P) => (
-    <ClientOnly 
-      fallback={FallbackComponent ? <FallbackComponent /> : null}
-    >
-      <Component {...props} />
+export function SafeComponent<T extends Record<string, any>>({
+  component: Component,
+  fallback,
+  ...props
+}: {
+  component: ComponentType<T>
+  fallback?: ReactNode
+} & T) {
+  return (
+    <ClientOnly fallback={fallback}>
+      <Component {...(props as unknown as T)} />
     </ClientOnly>
   )
-
-  ClientOnlyComponent.displayName = displayName || `withClientOnly(${Component.displayName || Component.name})`
-
-  return ClientOnlyComponent
 }
 
-// ===== UTILITAIRES D'ENVIRONNEMENT =====
+// ===== HOC AVEC CLIENT-ONLY =====
 
 /**
- * Vérifie si on est côté serveur
+ * HOC pour wrapper automatiquement un composant avec ClientOnly
  */
-export const isServer = typeof window === 'undefined'
+export function withClientOnly<P extends Record<string, any>>(
+  Component: ComponentType<P>,
+  options: WithClientOnlyOptions = {}
+): ComponentType<P & { clientOnlyFallback?: ReactNode }> {
+  const { fallback: FallbackComponent, displayName, forceRemount } = options
 
-/**
- * Vérifie si on est côté client
- */
-export const isClient = !isServer
+  const WrappedComponent = (props: P & { clientOnlyFallback?: ReactNode }) => {
+    const { clientOnlyFallback, ...componentProps } = props
+    
+    const fallbackElement = clientOnlyFallback || 
+      (FallbackComponent ? <FallbackComponent /> : null)
 
-/**
- * Exécute du code uniquement côté client
- */
-export function clientOnly<T>(clientCode: () => T, fallback?: T): T | undefined {
-  if (isClient) {
-    try {
-      return clientCode()
-    } catch (error) {
-      console.warn('Error in clientOnly code:', error)
-      return fallback
-    }
+    return (
+      <ClientOnly 
+        fallback={fallbackElement}
+        remountOnChange={forceRemount}
+      >
+        <Component {...(componentProps as P)} />
+      </ClientOnly>
+    )
   }
-  return fallback
+
+  WrappedComponent.displayName = displayName || 
+    `withClientOnly(${Component.displayName || Component.name || 'Component'})`
+
+  return WrappedComponent
 }
 
-/**
- * Exécute du code uniquement côté serveur
- */
-export function serverOnly<T>(serverCode: () => T, fallback?: T): T | undefined {
-  if (isServer) {
-    try {
-      return serverCode()
-    } catch (error) {
-      console.warn('Error in serverOnly code:', error)
-      return fallback
-    }
-  }
-  return fallback
-}
-
-// ===== COMPOSANTS DE FALLBACK PRÊTS À L'EMPLOI =====
+// ===== COMPOSANT NO-SSR (ALIAS) =====
 
 /**
- * Skeleton loader simple
+ * Alias pour ClientOnly avec un nom plus explicite
  */
-export function SkeletonLoader({ 
-  height = '20px', 
-  width = '100%',
-  className = ''
-}: {
-  height?: string
-  width?: string
-  className?: string
-}) {
+export const NoSSR = ClientOnly
+
+/**
+ * Composant pour empêcher le SSR sur une partie spécifique
+ */
+export function ServerSideRenderingBlocker({ children }: { children: ReactNode }) {
   return (
-    <div 
-      className={`animate-pulse bg-muted rounded ${className}`}
-      style={{ height, width }}
-      aria-label="Chargement..."
-    />
-  )
-}
-
-/**
- * Spinner de chargement
- */
-export function LoadingSpinner({ 
-  size = 24,
-  className = ''
-}: {
-  size?: number
-  className?: string
-}) {
-  return (
-    <div 
-      className={`animate-spin rounded-full border-2 border-muted border-t-primary ${className}`}
-      style={{ width: size, height: size }}
-      aria-label="Chargement..."
-    />
-  )
-}
-
-/**
- * Message de chargement avec spinner
- */
-export function LoadingMessage({ 
-  message = 'Chargement...',
-  showSpinner = true
-}: {
-  message?: string
-  showSpinner?: boolean
-}) {
-  return (
-    <div className="flex items-center justify-center space-x-2 py-4">
-      {showSpinner && <LoadingSpinner />}
-      <span className="text-muted-foreground">{message}</span>
-    </div>
-  )
-}
-
-/**
- * Fallback pour les graphiques
- */
-export function ChartFallback({ height = '300px' }: { height?: string }) {
-  return (
-    <div 
-      className="flex items-center justify-center border border-dashed border-muted rounded-lg"
-      style={{ height }}
+    <ClientOnly
+      fallback={
+        <div 
+          className="ssr-blocked" 
+          style={{ display: 'none' }}
+          suppressHydrationWarning
+        />
+      }
     >
-      <div className="text-center">
-        <div className="w-12 h-12 mx-auto mb-2 rounded bg-muted animate-pulse" />
-        <p className="text-sm text-muted-foreground">Chargement du graphique...</p>
-      </div>
-    </div>
+      {children}
+    </ClientOnly>
   )
 }
 
+// ===== UTILITAIRES DE DEBUG =====
+
 /**
- * Fallback pour les tableaux
+ * Composant de debug pour visualiser l'état d'hydratation
  */
-export function TableFallback({ rows = 5 }: { rows?: number }) {
+export function HydrationDebugger({ showInProduction = false }: { showInProduction?: boolean }) {
+  const { isClient, isHydrated, isHydrating } = useHydrationState()
+  
+  if (process.env.NODE_ENV === 'production' && !showInProduction) {
+    return null
+  }
+
   return (
-    <div className="space-y-3">
-      {/* Header */}
-      <div className="flex space-x-4">
-        {[...Array(4)].map((_, i) => (
-          <SkeletonLoader key={i} height="20px" width="120px" />
-        ))}
-      </div>
-      
-      {/* Rows */}
-      {[...Array(rows)].map((_, i) => (
-        <div key={i} className="flex space-x-4">
-          {[...Array(4)].map((_, j) => (
-            <SkeletonLoader key={j} height="40px" width="120px" />
-          ))}
-        </div>
-      ))}
+    <div 
+      className="fixed bottom-4 right-4 bg-black text-white p-2 rounded text-xs font-mono z-50"
+      style={{ 
+        backgroundColor: isHydrated ? 'green' : isHydrating ? 'orange' : 'red',
+        color: 'white'
+      }}
+    >
+      <div>Client: {isClient ? '✓' : '✗'}</div>
+      <div>Hydrated: {isHydrated ? '✓' : '✗'}</div>
+      <div>Hydrating: {isHydrating ? '✓' : '✗'}</div>
     </div>
   )
 }
 
 // ===== EXPORTS =====
-export default ClientOnly
 
-// Types pour la documentation
+export {
+    hydrationManager,
+    HydrationManager
+}
+
 export type {
-    ClientOnlyProps,
-    WithClientOnlyOptions
+    ClientOnlyProps, SafeComponentProps, WithClientOnlyOptions
 }

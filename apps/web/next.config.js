@@ -1,63 +1,58 @@
 /**
- * 🔧 CONFIGURATION NEXT.JS 15 COMPATIBLE - TopSteel ERP
- * Configuration corrigée pour Next.js 15 avec chargement env depuis la racine
+ * 🚀 NEXT.JS CONFIG CORRIGÉ - TopSteel ERP
+ * Configuration compatible Next.js 15.3.4
  * Fichier: apps/web/next.config.js
  */
 
 const path = require('path')
-const { config } = require('dotenv')
 
-// ===== CHARGEMENT VARIABLES D'ENVIRONNEMENT DEPUIS LA RACINE =====
-// Identique à la logique de l'API NestJS
-const rootDir = path.join(__dirname, '../..')
+// ===== GESTION DES VARIABLES D'ENVIRONNEMENT =====
+
+const rootDir = path.resolve(__dirname, '../..')
 const envLocalPath = path.join(rootDir, '.env.local')
 
-console.log('🔧 Loading .env from root:', envLocalPath)
+// Charger les variables d'environnement depuis la racine
+try {
+  require('dotenv').config({ path: envLocalPath })
+  console.log('✅ Variables d\'environnement chargées depuis la racine')
+} catch (error) {
+  console.warn('⚠️ Impossible de charger .env.local depuis la racine:', error.message)
+}
 
-// Charger les variables depuis la racine (comme l'API)
-config({ path: envLocalPath })
-config({ path: path.join(rootDir, '.env') })
+// ===== CONFIGURATION PRINCIPALE =====
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ===== CONFIGURATION DE BASE =====
+  // ===== CONFIGURATION MONOREPO =====
   
-  /**
-   * Mode strict pour React - Détecte les problèmes en développement
-   */
-  reactStrictMode: true,
-
-  /**
-   * Experimental features pour Next.js 15
-   */
-  experimental: {
-    // Server Actions pour les formulaires (objet requis en Next.js 15)
-    serverActions: {
-      allowedOrigins: ['localhost:3000', 'topsteel.fr']
-    },
-    
-    // Optimisation des polyfills
-    esmExternals: true,
-    
-    // Optimisations diverses
-    optimizePackageImports: ['lucide-react', 'date-fns'],
-    
-    // Streaming SSR amélioré
-    ppr: false // Partial Prerendering - expérimental
-  },
-
-  /**
-   * Packages externes côté serveur (nouvelle syntaxe Next.js 15)
-   */
-  serverExternalPackages: [
-    'sharp',
-    'canvas',
-    'jsdom'
+  transpilePackages: [
+    '@erp/types',
+    '@erp/config'
   ],
 
-  /**
-   * Configuration Turbopack (stable en Next.js 15)
-   */
+  // ===== PACKAGES EXTERNES SERVEUR (Next.js 15) =====
+  
+  serverExternalPackages: [
+    '@erp/ui',
+    '@erp/utils'
+  ],
+
+  // ===== CONFIGURATION EXPERIMENTAL =====
+  
+  experimental: {
+    // Optimisations pour éviter les erreurs de build
+    optimizeCss: true,
+    
+    // Optimisations bundle
+    optimizePackageImports: [
+      'lucide-react',
+      'date-fns',
+      'lodash'
+    ]
+  },
+
+  // ===== CONFIGURATION TURBOPACK (Stable dans Next.js 15) =====
+  
   turbopack: {
     rules: {
       '*.svg': {
@@ -67,58 +62,63 @@ const nextConfig = {
     }
   },
 
-  // ===== GESTION DES ERREURS SSR =====
-  
-  /**
-   * Configuration webpack pour éviter les erreurs "window is not defined"
-   */
-  webpack: (config, { dev, isServer, webpack }) => {
-    // Configuration pour les modules qui utilisent des APIs browser
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
-        stream: false,
-        url: false,
-        zlib: false,
-        http: false,
-        https: false,
-        assert: false,
-        os: false,
-        path: false,
-      }
+  // ===== CORRECTIONS COMPILATION =====
+
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
+    // Fix pour les erreurs de module resolution
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+      '@/components': path.resolve(__dirname, 'src/components'),
+      '@/lib': path.resolve(__dirname, 'src/lib'),
+      '@/hooks': path.resolve(__dirname, 'src/hooks'),
+      '@/stores': path.resolve(__dirname, 'src/stores'),
+      '@/types': path.resolve(__dirname, 'src/types'),
+      '@/styles': path.resolve(__dirname, 'src/styles'),
+      '@/app': path.resolve(__dirname, 'src/app'),
+      '@/services': path.resolve(__dirname, 'src/services'),
+      '@/utils': path.resolve(__dirname, 'src/utils')
     }
 
-    // Plugin pour ignorer les modules problématiques côté serveur
-    config.plugins.push(
-      new webpack.IgnorePlugin({
-        resourceRegExp: /^electron$/
-      })
-    )
+    // Configuration pour éviter les erreurs de module non trouvé
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+      crypto: false,
+      stream: false,
+      url: false,
+      zlib: false,
+      http: false,
+      https: false,
+      assert: false,
+      os: false,
+      path: false
+    }
 
-    // Optimisations pour la production
-    if (!dev) {
+    // Optimisations pour les builds
+    if (!dev && !isServer) {
       config.optimization = {
         ...config.optimization,
         splitChunks: {
-          ...config.optimization.splitChunks,
+          chunks: 'all',
           cacheGroups: {
-            ...config.optimization.splitChunks.cacheGroups,
-            
-            // Chunk séparé pour les bibliothèques
             vendor: {
               test: /[\\/]node_modules[\\/]/,
               name: 'vendors',
               chunks: 'all',
               priority: 10
             },
-            
-            // Chunk pour les composants UI
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              priority: 5,
+              reuseExistingChunk: true
+            },
             ui: {
-              test: /[\\/]src[\\/]components[\\/]ui[\\/]/,
+              test: /[\\/]packages[\\/]ui[\\/]/,
               name: 'ui',
               chunks: 'all',
               priority: 20
@@ -128,35 +128,44 @@ const nextConfig = {
       }
     }
 
-    // Alias pour simplifier les imports
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': path.resolve(__dirname, 'src'),
-      '@/components': path.resolve(__dirname, 'src/components'),
-      '@/lib': path.resolve(__dirname, 'src/lib'),
-      '@/hooks': path.resolve(__dirname, 'src/hooks'),
-      '@/stores': path.resolve(__dirname, 'src/stores'),
-      '@/types': path.resolve(__dirname, 'src/types'),
-      '@/styles': path.resolve(__dirname, 'src/styles')
+    // Configuration pour les SVG
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack']
+    })
+
+    // Suppression des warnings inutiles
+    config.infrastructureLogging = {
+      level: 'error'
     }
 
+    // Désactiver les warnings de chunks critiques
+    config.optimization.realContentHash = false
+
     return config
+  },
+
+  // ===== CONFIGURATION COMPILER =====
+  
+  compiler: {
+    // Supprimer console.log en production
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn']
+    } : false,
+    
+    // Optimisations React
+    reactRemoveProperties: process.env.NODE_ENV === 'production'
   },
 
   // ===== OPTIMISATIONS D'IMAGES =====
   
   images: {
-    // Formats d'images optimisés
     formats: ['image/avif', 'image/webp'],
-    
-    // Domaines autorisés pour les images externes
     domains: [
       'localhost',
       'topsteel.fr',
       'assets.topsteel.fr'
     ],
-    
-    // Patterns d'URLs autorisés
     remotePatterns: [
       {
         protocol: 'https',
@@ -165,25 +174,21 @@ const nextConfig = {
         pathname: '/images/**'
       }
     ],
-    
-    // Tailles d'images prédéfinies
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    
-    // Optimisations
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 jours
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;"
   },
 
-  // ===== HEADERS ET SÉCURITÉ =====
+  // ===== HEADERS DE SÉCURITÉ =====
   
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-          // Sécurité
+          // Sécurité de base
           {
             key: 'X-Frame-Options',
             value: 'DENY'
@@ -212,40 +217,25 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https:",
+              "font-src 'self' https://fonts.gstatic.com data:",
+              "img-src 'self' data: https: blob:",
               "connect-src 'self' " + (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'),
               "frame-src 'none'",
               "object-src 'none'"
             ].join('; ')
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
           }
         ]
       },
       
-      // Headers spécifiques pour les assets statiques
+      // Headers pour les assets statiques
       {
         source: '/static/(.*)',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable'
-          }
-        ]
-      },
-      
-      // Headers pour les API routes
-      {
-        source: '/api/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate'
           }
         ]
       }
@@ -256,30 +246,33 @@ const nextConfig = {
   
   async redirects() {
     return [
-      // Redirections legacy
+      // Redirection de la racine vers login si pas connecté
       {
-        source: '/old-stock',
-        destination: '/stock',
-        permanent: true
+        source: '/',
+        destination: '/login',
+        permanent: false
       },
       
-      // Redirections pour les URLs sans trailing slash
+      // Redirections pour éviter les URLs en double
       {
-        source: '/stock/mouvements/',
-        destination: '/stock/mouvements',
+        source: '/register/',
+        destination: '/register',
+        permanent: true
+      },
+      {
+        source: '/login/',
+        destination: '/login', 
         permanent: true
       }
     ]
   },
 
-  // ===== REWRITES CORRIGÉS =====
+  // ===== CONFIGURATION API =====
   
   async rewrites() {
-    // Vérifier que l'URL de l'API existe
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3001'
     
     return [
-      // Proxy vers l'API backend
       {
         source: '/api/:path*',
         destination: `${apiUrl}/:path*`
@@ -287,70 +280,72 @@ const nextConfig = {
     ]
   },
 
-  // ===== GESTION DES ENVIRONNEMENTS =====
+  // ===== VARIABLES D'ENVIRONNEMENT =====
   
   env: {
-    // Variables d'environnement personnalisées
     CUSTOM_BUILD_TIME: new Date().toISOString(),
     CUSTOM_NODE_ENV: process.env.NODE_ENV,
-    
-    // Exposer les variables chargées depuis la racine pour debugging
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME
+    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'TopSteel ERP'
   },
 
-  // ===== CONFIGURATION ESLint =====
+  // ===== CONFIGURATION BUILD =====
   
+  // Optimisations de build
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: true,
+  
+  // Configuration TypeScript
+  typescript: {
+    ignoreBuildErrors: false,
+    tsconfigPath: './tsconfig.json'
+  },
+
+  // Configuration ESLint
   eslint: {
-    // Répertoires à ignorer
     ignoreDuringBuilds: false,
     dirs: ['src', 'pages', 'components', 'lib', 'hooks']
   },
 
-  // ===== CONFIGURATION TypeScript =====
-  
-  typescript: {
-    // Ignorer les erreurs TypeScript en production (à éviter en général)
-    ignoreBuildErrors: false,
-    
-    // Chemin vers le fichier tsconfig
-    tsconfigPath: './tsconfig.json'
-  },
-
-  // ===== COMPRESSION ET OPTIMISATIONS =====
-  
-  compress: true,
-  
-  poweredByHeader: false,
-  
-  generateEtags: true,
-
-  // ===== OPTIMISATIONS DE BUNDLE =====
+  // ===== OPTIMISATIONS IMPORT =====
   
   modularizeImports: {
-    // Optimisation des imports de lodash
     'lodash': {
       transform: 'lodash/{{member}}'
     },
-    
-    // Optimisation des imports d'icônes
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}'
+    },
+    'date-fns': {
+      transform: 'date-fns/{{member}}'
     }
   },
 
-  // ===== CONFIGURATION OUTPUT =====
+  // ===== GESTION OUTPUT =====
   
   output: process.env.DOCKER ? 'standalone' : undefined,
-
-  // ===== LOGGING =====
   
+  // Configuration de tracing pour docker
+  outputFileTracingRoot: process.env.DOCKER ? path.join(__dirname, '../../') : undefined,
+
+  // ===== OPTIMISATIONS RUNTIME =====
+  
+  // Configuration logging
   logging: {
     fetches: {
       fullUrl: process.env.NODE_ENV === 'development'
     }
-  }
+  },
+
+  // ===== CONFIGURATION PAGES =====
+  
+  // Augmenter les timeouts pour éviter les erreurs de build
+  staticPageGenerationTimeout: 120,
+  
+  // Configuration des pages d'erreur
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js']
 }
 
 // ===== PLUGINS ET MIDDLEWARES =====
@@ -361,33 +356,18 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 // ===== CONFIGURATION CONDITIONNELLE =====
 
-/**
- * Configuration pour Vercel (si déployé sur Vercel)
- */
+// Configuration pour Vercel
 if (process.env.VERCEL) {
   nextConfig.experimental = {
     ...nextConfig.experimental,
-    
-    // Optimisations spécifiques Vercel
     isrMemoryCacheSize: 0
   }
 }
 
-/**
- * Configuration pour Docker
- */
-if (process.env.DOCKER) {
-  nextConfig.outputFileTracingRoot = path.join(__dirname, '../../')
-}
-
-/**
- * Configuration de développement avancée
- */
+// Configuration de développement
 if (process.env.NODE_ENV === 'development') {
   nextConfig.experimental = {
     ...nextConfig.experimental,
-    
-    // Debugging amélioré
     logging: {
       level: 'verbose'
     }
@@ -398,26 +378,25 @@ if (process.env.NODE_ENV === 'development') {
 
 module.exports = withBundleAnalyzer(nextConfig)
 
-// ===== VALIDATION DE LA CONFIGURATION =====
+// ===== VALIDATION ET LOGGING =====
 
-// Vérification des variables d'environnement essentielles
+// Validation des variables d'environnement
 const requiredEnvVars = ['NEXT_PUBLIC_API_URL']
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar])
 
 if (missingEnvVars.length > 0) {
   console.warn('⚠️  Variables d\'environnement manquantes:', missingEnvVars.join(', '))
-  console.warn('⚠️  Vérifiez le fichier .env.local à la racine du projet')
-  console.warn('⚠️  Chemin .env.local:', envLocalPath)
+  console.warn('⚠️  Certaines fonctionnalités peuvent ne pas fonctionner')
 } else {
-  console.log('✅ Variables d\'environnement chargées depuis la racine')
+  console.log('✅ Toutes les variables d\'environnement requises sont présentes')
 }
 
-// Log de la configuration en développement
+// Logging en développement
 if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 Next.js Config:', {
+  console.log('🔧 Next.js Config Debug:', {
     rootDir,
     envLocalPath,
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'NOT_FOUND',
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'NOT_CONFIGURED',
     nodeEnv: process.env.NODE_ENV,
     turbopack: !!nextConfig.turbopack
   })

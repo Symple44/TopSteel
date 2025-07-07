@@ -8,7 +8,7 @@
     "cssVariables": true,
     "baseColor": "slate",
     "prefix": "",
-    "css": "src/app/globals.css",
+    "css": "src/styles/globals.css",
     "config": "tailwind.config.js"
   },
   "style": "default",
