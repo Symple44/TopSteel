@@ -20,7 +20,7 @@
     "clsx": "^2.1.0",
     "date-fns": "^4.1.0",
     "tailwind-merge": "^3.3.1",
-    "zod": "^3.22.4",
+    "zod": "^3.25.75",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
