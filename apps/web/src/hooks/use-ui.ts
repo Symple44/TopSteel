@@ -10,7 +10,7 @@ interface Toast {
   duration?: number
 }
 
-export const _useUI = () => {
+export const useUI = () => {
   const [dataView, setDataView] = useState<'grid' | 'table'>('table')
 
   return {
@@ -19,12 +19,12 @@ export const _useUI = () => {
   }
 }
 
-export const _useToasts = () => {
+export const useToasts = () => {
   // Typage explicite du state toasts
   const [toasts, setToasts] = useState<Toast[]>([])
 
-  const _addToast = useCallback((toast: Omit<Toast, 'id'>) => {
-    const _id = Date.now().toString()
+  const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
+    const id = Date.now().toString()
     const newToast: Toast = { ...toast, id }
     
     setToasts(prev => [...prev, newToast])
@@ -35,27 +35,27 @@ export const _useToasts = () => {
     }, toast.duration || 5000)
   }, [])
 
-  const _removeToast = useCallback((id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id))
   }, [])
 
-  const _showSuccess = useCallback((title: string, message: string = '', duration?: number) => {
+  const showSuccess = useCallback((title: string, message: string = '', duration?: number) => {
     addToast({ type: 'success', title, message, duration })
   }, [addToast])
 
-  const _showError = useCallback((title: string, message: string = '', duration?: number) => {
+  const showError = useCallback((title: string, message: string = '', duration?: number) => {
     addToast({ type: 'error', title, message, duration })
   }, [addToast])
 
-  const _showWarning = useCallback((title: string, message: string = '', duration?: number) => {
+  const showWarning = useCallback((title: string, message: string = '', duration?: number) => {
     addToast({ type: 'warning', title, message, duration })
   }, [addToast])
 
-  const _showInfo = useCallback((title: string, message: string = '', duration?: number) => {
+  const showInfo = useCallback((title: string, message: string = '', duration?: number) => {
     addToast({ type: 'info', title, message, duration })
   }, [addToast])
 
-  const _clearAllToasts = useCallback(() => {
+  const clearAllToasts = useCallback(() => {
     setToasts([])
   }, [])
 
@@ -71,18 +71,18 @@ export const _useToasts = () => {
   }
 }
 
-export const _useSidebar = () => {
+export const useSidebar = () => {
   const [collapsed, setCollapsed] = useState(false)
 
-  const _toggle = useCallback(() => {
+  const toggle = useCallback(() => {
     setCollapsed(prev => !prev)
   }, [])
 
-  const _expand = useCallback(() => {
+  const expand = useCallback(() => {
     setCollapsed(false)
   }, [])
 
-  const _collapse = useCallback(() => {
+  const collapse = useCallback(() => {
     setCollapsed(true)
   }, [])
 
@@ -98,16 +98,16 @@ export const _useSidebar = () => {
 /**
  * Hook pour gérer l'état de chargement global
  */
-export const _useLoading = () => {
+export const useLoading = () => {
   const [loading, setLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState<string>('')
 
-  const _startLoading = useCallback((message: string = 'Chargement...') => {
+  const startLoading = useCallback((message: string = 'Chargement...') => {
     setLoading(true)
     setLoadingMessage(message)
   }, [])
 
-  const _stopLoading = useCallback(() => {
+  const stopLoading = useCallback(() => {
     setLoading(false)
     setLoadingMessage('')
   }, [])
@@ -123,21 +123,21 @@ export const _useLoading = () => {
 /**
  * Hook pour gérer les modales
  */
-export const _useModal = () => {
+export const useModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [modalData, setModalData] = useState<any>(null)
 
-  const _openModal = useCallback((data?: unknown) => {
+  const openModal = useCallback((data?: any) => {
     setModalData(data)
     setIsOpen(true)
   }, [])
 
-  const _closeModal = useCallback(() => {
+  const closeModal = useCallback(() => {
     setIsOpen(false)
     setModalData(null)
   }, [])
 
-  const _toggleModal = useCallback(() => {
+  const toggleModal = useCallback(() => {
     setIsOpen(prev => !prev)
   }, [])
 
@@ -154,4 +154,3 @@ export const _useModal = () => {
  * Export de types pour utilisation externe
  */
 export type { Toast }
-

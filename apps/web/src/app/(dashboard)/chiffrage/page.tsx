@@ -45,7 +45,7 @@ import { formatCurrency } from '@/lib/utils'
 import { formatPercent } from '@erp/utils'
 
 // Données mockées pour la démonstration
-const _mockTemplates = [
+const mockTemplates = [
   {
     id: '1',
     nom: 'Garde-corps standard',
@@ -72,7 +72,7 @@ const _mockTemplates = [
   },
 ]
 
-const _mockHistorique = [
+const mockHistorique = [
   {
     id: '1',
     date: new Date('2025-06-16'),
@@ -426,7 +426,6 @@ export default function ChiffragePage() {
     </div>
   )
 }
-
 
 
 

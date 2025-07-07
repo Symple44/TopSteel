@@ -23,7 +23,7 @@ export function useOptimizedQuery<T>({
     gcTime, // Utilise gcTime au lieu de cacheTime
     enabled,
     refetchOnWindowFocus: false,
-    retry: (failureCount, error: unknown) => {
+    retry: (failureCount, error: any) => {
       if (error?.response?.status === 404) return false
 
       return failureCount < 3
@@ -35,7 +35,7 @@ export function useOptimizedMutation<TData, TVariables>(
   mutationFn: (variables: TVariables) => Promise<TData>,
   invalidationKeys?: string[][]
 ) {
-  const _queryClient = useQueryClient()
+  const queryClient = useQueryClient()
   
   return useMutation({
     mutationFn,
@@ -74,7 +74,7 @@ export function useSmartQuery<T>(
     refetchInterval: options?.refetchInterval,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
-    retry: (failureCount, error: unknown) => {
+    retry: (failureCount, error: any) => {
       // Ne pas retry sur les erreurs 4xx
       if (error?.response?.status >= 400 && error?.response?.status < 500) {
         return false
@@ -93,10 +93,10 @@ export function useSmartMutation<TData, TVariables>(
   options?: {
     invalidateKeys?: string[][]
     onSuccess?: (data: TData) => void
-    onError?: (error: unknown) => void
+    onError?: (error: any) => void
   }
 ) {
-  const _queryClient = useQueryClient()
+  const queryClient = useQueryClient()
   
   return useMutation({
     mutationFn,
@@ -115,7 +115,7 @@ export function useSmartMutation<TData, TVariables>(
       console.error('Mutation error:', error)
       options?.onError?.(error)
     },
-    retry: (failureCount, error: unknown) => {
+    retry: (failureCount, error: any) => {
       // Ne pas retry sur les erreurs client (4xx)
       if (error?.response?.status >= 400 && error?.response?.status < 500) {
         return false

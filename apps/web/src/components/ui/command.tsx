@@ -3,14 +3,14 @@ import React from "react"
 
 interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
-  value?: unknown
-  onValueChange?: unknown
+  value?: any
+  onValueChange?: any
   asChild?: boolean
   variant?: string
   size?: string
 }
 
-export const _Command = React.forwardRef<HTMLDivElement, CommandProps>(
+export const Command = React.forwardRef<HTMLDivElement, CommandProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { 
@@ -31,15 +31,14 @@ export const _Command = React.forwardRef<HTMLDivElement, CommandProps>(
 Command.displayName = "Command"
 
 // Export des sous-composants courants si nécessaire
-export const _CommandContent = Command
-export const _CommandTrigger = Command  
-export const _CommandItem = Command
-export const _CommandValue = Command
-export const _CommandHeader = Command
-export const _CommandTitle = Command
-export const _CommandDescription = Command
-export const _CommandFooter = Command
-export const _CommandSeparator = Command
-export const _CommandList = Command
-
+export const CommandContent = Command
+export const CommandTrigger = Command  
+export const CommandItem = Command
+export const CommandValue = Command
+export const CommandHeader = Command
+export const CommandTitle = Command
+export const CommandDescription = Command
+export const CommandFooter = Command
+export const CommandSeparator = Command
+export const CommandList = Command
 

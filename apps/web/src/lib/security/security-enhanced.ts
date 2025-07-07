@@ -24,7 +24,7 @@ export class SecurityUtils {
    * Validation email renforcée
    */
   static validateEmailStrict(email: string): boolean {
-    const _emailSchema = z.string()
+    const emailSchema = z.string()
       .email()
       .max(254)
       .refine(email => !this.isDisposableEmail(email), 'Email temporaire non autorisé')
@@ -36,8 +36,8 @@ export class SecurityUtils {
    * Détection emails temporaires
    */
   static isDisposableEmail(email: string): boolean {
-    const _domain = email.split('@')[1]?.toLowerCase()
-    const _disposableDomains = [
+    const domain = email.split('@')[1]?.toLowerCase()
+    const disposableDomains = [
       'tempmail.org', '10minutemail.com', 'guerrillamail.com',
       'mailinator.com', 'yopmail.com', 'temp-mail.org'
     ]
@@ -51,10 +51,10 @@ export class SecurityUtils {
   static createRateLimiter(maxCalls: number, windowMs: number) {
     const calls: number[] = []
     
-    return function rateLimited<T extends (...args: unknown[]) => any>(fn: T): T {
-      return ((...args: unknown[]) => {
-        const _now = Date.now()
-        const _windowStart = now - windowMs
+    return function rateLimited<T extends (...args: any[]) => any>(fn: T): T {
+      return ((...args: any[]) => {
+        const now = Date.now()
+        const windowStart = now - windowMs
         
         // Nettoyer les anciens appels
         while (calls.length > 0 && calls[0] < windowStart) {
@@ -75,8 +75,8 @@ export class SecurityUtils {
   /**
    * Logger sécurisé
    */
-  static logSecurityEvent(event: string, details: Record<string, unknown> = {}) {
-    const _sanitizedDetails = Object.fromEntries(
+  static logSecurityEvent(event: string, details: Record<string, any> = {}) {
+    const sanitizedDetails = Object.fromEntries(
       Object.entries(details).map(([key, value]) => [
         key,
         typeof value === 'string' ? this.maskSensitiveData(value) : value
@@ -109,7 +109,11 @@ export class SecurityUtils {
     feedback: string[]
   } {
     const feedback: string[] = []
+<<<<<<< HEAD
     const _score = 0
+=======
+    let score = 0
+>>>>>>> parent of 35f6b21 (.)
 
     // Longueur
     if (password.length >= 8) score += 20
@@ -134,7 +138,7 @@ export class SecurityUtils {
     else feedback.push('Au moins un caractère spécial')
 
     // Variété de caractères
-    const _uniqueChars = new Set(password).size
+    const uniqueChars = new Set(password).size
 
     if (uniqueChars >= password.length * 0.7) score += 10
 
@@ -150,7 +154,7 @@ export class SecurityUtils {
    */
   static validateSecureUrl(url: string): boolean {
     try {
-      const _parsed = new URL(url)
+      const parsed = new URL(url)
       
       // Protocoles autorisés
       if (!['http:', 'https:'].includes(parsed.protocol)) {
@@ -158,7 +162,7 @@ export class SecurityUtils {
       }
       
       // Domaines dangereux
-      const _dangerousDomains = [
+      const dangerousDomains = [
         'malware.com', 'phishing.net', 'suspicious.org'
       ]
       
@@ -191,11 +195,11 @@ export class SecurityUtils {
     if (filename.startsWith('.')) return false
     
     // Extensions dangereuses
-    const _dangerousExtensions = [
+    const dangerousExtensions = [
       'exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js'
     ]
     
-    const _extension = filename.split('.').pop()?.toLowerCase()
+    const extension = filename.split('.').pop()?.toLowerCase()
 
     if (extension && dangerousExtensions.includes(extension)) {
       return false
@@ -222,7 +226,7 @@ export class SecurityUtils {
    */
   static validateFrenchPhone(phone: string): boolean {
     // Format français standard
-    const _patterns = [
+    const patterns = [
       /^(\+33|0)[1-9](\d{8})$/, // ✅ Format avec ou sans +33
       /^(\+33|0)\s?[1-9](\s?\d{2}){4}$/ // ✅ Avec espaces
     ]
@@ -243,7 +247,7 @@ export class SecurityUtils {
     }
     
     // Navigateur
-    const _array = new Uint8Array(length)
+    const array = new Uint8Array(length)
 
     crypto.getRandomValues(array)
 
@@ -259,10 +263,10 @@ export class SecurityUtils {
       return btoa(password + (salt || 'default-salt'))
     }
 
-    const _encoder = new TextEncoder()
-    const _data = encoder.encode(password + (salt || 'default-salt'))
-    const _hashBuffer = await crypto.subtle.digest('SHA-256', data)
-    const _hashArray = Array.from(new Uint8Array(hashBuffer))
+    const encoder = new TextEncoder()
+    const data = encoder.encode(password + (salt || 'default-salt'))
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
 
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
   }
@@ -274,10 +278,10 @@ export class SecurityUtils {
     if (!expectedHash) return true
     
     try {
-      const _arrayBuffer = await file.arrayBuffer()
-      const _hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer)
-      const _hashArray = Array.from(new Uint8Array(hashBuffer))
-      const _actualHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+      const arrayBuffer = await file.arrayBuffer()
+      const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      const actualHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
       
       return actualHash === expectedHash
     } catch {
@@ -287,7 +291,7 @@ export class SecurityUtils {
 }
 
 // ✅ SCHÉMAS ZOD RENFORCÉS
-export const _enhancedSecuritySchemas = {
+export const enhancedSecuritySchemas = {
   email: z.string()
     .email('Email invalide')
     .max(254)
@@ -359,7 +363,7 @@ export class SecurityAuditor {
       }
       
       // Vérification CSP
-      const _csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]')
+      const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]')
 
       if (csp) {
         passed.push('Content Security Policy détecté')
@@ -373,14 +377,14 @@ export class SecurityAuditor {
       }
     }
     
-    const _summary = {
+    const summary = {
       critical: issues.filter(i => i.severity === 'critical').length,
       high: issues.filter(i => i.severity === 'high').length,
       medium: issues.filter(i => i.severity === 'medium').length,
       low: issues.filter(i => i.severity === 'low').length
     }
     
-    const _score = Math.max(0, 100 - (summary.critical * 25) - (summary.high * 15) - (summary.medium * 10) - (summary.low * 5))
+    const score = Math.max(0, 100 - (summary.critical * 25) - (summary.high * 15) - (summary.medium * 10) - (summary.low * 5))
     
     return {
       timestamp: new Date().toISOString(),

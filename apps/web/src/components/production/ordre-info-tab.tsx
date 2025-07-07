@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface OrdreInfoTabProps {
-  ordre: unknown;
+  ordre: any;
 }
 
 export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {

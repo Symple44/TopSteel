@@ -144,7 +144,7 @@ class ClientsCache {
   }
 
   static get<T>(key: string, cache: Map<string, CacheEntry<T>>): T | null {
-    const _entry = cache.get(key)
+    const entry = cache.get(key)
     
     if (!entry) {
       this.metrics.cacheMisses++
@@ -168,7 +168,7 @@ class ClientsCache {
     // Fix TypeScript strict: nettoyage du cache si plein
     if (cache.size >= this.maxCacheSize) {
       // Méthode plus sûre : convertir en array pour éviter undefined
-      const _keys = Array.from(cache.keys())
+      const keys = Array.from(cache.keys())
 
       if (keys.length > 0) {
         cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
@@ -207,7 +207,7 @@ class ClientsCache {
       return
     }
     
-    const _regex = new RegExp(pattern)
+    const regex = new RegExp(pattern)
     
     for (const key of this.cache.keys()) {
       if (regex.test(key)) {
@@ -236,8 +236,8 @@ class ClientsCache {
     }
     
     // Calcul de la moyenne mobile
-    const _previousAvg = this.metrics.averageResponseTime
-    const _count = this.metrics.totalRequests
+    const previousAvg = this.metrics.averageResponseTime
+    const count = this.metrics.totalRequests
 
     this.metrics.averageResponseTime = (previousAvg * (count - 1) + responseTime) / count
   }
@@ -274,18 +274,18 @@ class ClientsService {
     pagination: PaginationConfig,
     signal?: AbortSignal
   ): Promise<ClientsResponse> {
-    const _startTime = performance.now()
-    const _cacheKey = this.generateCacheKey(filters, pagination)
+    const startTime = performance.now()
+    const cacheKey = this.generateCacheKey(filters, pagination)
     
     // Vérifier le cache
-    const _cached = ClientsCache.getClients(cacheKey)
+    const cached = ClientsCache.getClients(cacheKey)
 
     if (cached) {
       return cached
     }
     
     try {
-      const _queryParams = new URLSearchParams({
+      const queryParams = new URLSearchParams({
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
         sortBy: pagination.sortBy,
@@ -293,7 +293,7 @@ class ClientsService {
         ...this.serializeFilters(filters)
       })
       
-      const _response = await fetch(`${this.baseUrl}?${queryParams}`, {
+      const response = await fetch(`${this.baseUrl}?${queryParams}`, {
         signal,
         headers: {
           'Content-Type': 'application/json',
@@ -304,8 +304,8 @@ class ClientsService {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       
-      const _data = await response.json()
-      const _validatedData = this.validateClientsResponse(data)
+      const data = await response.json()
+      const validatedData = this.validateClientsResponse(data)
       
       // Mettre en cache
       ClientsCache.setClients(cacheKey, validatedData)
@@ -326,17 +326,17 @@ class ClientsService {
   }
 
   static async fetchClient(id: string, signal?: AbortSignal): Promise<Client> {
-    const _startTime = performance.now()
+    const startTime = performance.now()
     
     // Vérifier le cache
-    const _cached = ClientsCache.getClient(id)
+    const cached = ClientsCache.getClient(id)
 
     if (cached) {
       return cached
     }
     
     try {
-      const _response = await fetch(`${this.baseUrl}/${id}`, {
+      const response = await fetch(`${this.baseUrl}/${id}`, {
         signal,
         headers: {
           'Content-Type': 'application/json',
@@ -347,8 +347,8 @@ class ClientsService {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       
-      const _data = await response.json()
-      const _validatedClient = this.validateClient(data)
+      const data = await response.json()
+      const validatedClient = this.validateClient(data)
       
       ClientsCache.setClient(id, validatedClient)
       ClientsCache.recordRequest(true, performance.now() - startTime)
@@ -362,10 +362,10 @@ class ClientsService {
   }
 
   static async createClient(clientData: Partial<Client>, signal?: AbortSignal): Promise<Client> {
-    const _startTime = performance.now()
+    const startTime = performance.now()
     
     try {
-      const _response = await fetch(this.baseUrl, {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         signal,
         headers: {
@@ -378,8 +378,8 @@ class ClientsService {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       
-      const _data = await response.json()
-      const _validatedClient = this.validateClient(data)
+      const data = await response.json()
+      const validatedClient = this.validateClient(data)
       
       // Invalider le cache
       ClientsCache.invalidate('clients')
@@ -396,10 +396,10 @@ class ClientsService {
   }
 
   static async updateClient(id: string, updates: Partial<Client>, signal?: AbortSignal): Promise<Client> {
-    const _startTime = performance.now()
+    const startTime = performance.now()
     
     try {
-      const _response = await fetch(`${this.baseUrl}/${id}`, {
+      const response = await fetch(`${this.baseUrl}/${id}`, {
         method: 'PATCH',
         signal,
         headers: {
@@ -412,8 +412,8 @@ class ClientsService {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       
-      const _data = await response.json()
-      const _validatedClient = this.validateClient(data)
+      const data = await response.json()
+      const validatedClient = this.validateClient(data)
       
       // Invalider le cache
       ClientsCache.invalidate('clients')
@@ -430,10 +430,10 @@ class ClientsService {
   }
 
   static async deleteClient(id: string, signal?: AbortSignal): Promise<void> {
-    const _startTime = performance.now()
+    const startTime = performance.now()
     
     try {
-      const _response = await fetch(`${this.baseUrl}/${id}`, {
+      const response = await fetch(`${this.baseUrl}/${id}`, {
         method: 'DELETE',
         signal,
         headers: {
@@ -485,7 +485,7 @@ class ClientsService {
       throw new Error('Réponse invalide du serveur')
     }
     
-    const _response = data as Record<string, unknown>
+    const response = data as Record<string, unknown>
     
     if (!Array.isArray(response.clients)) {
       throw new Error('Format de réponse invalide: clients manquant')
@@ -506,7 +506,7 @@ class ClientsService {
       throw new Error('Données client invalides')
     }
     
-    const _client = data as Record<string, unknown>
+    const client = data as Record<string, unknown>
     
     if (!client.id || !client.nom || !client.email) {
       throw new Error('Champs obligatoires manquants')
@@ -537,7 +537,7 @@ class ClientsService {
       throw new Error('Adresse invalide')
     }
     
-    const _adresse = data as Record<string, unknown>
+    const adresse = data as Record<string, unknown>
     
     return {
       rue: String(adresse.rue || ''),
@@ -549,7 +549,7 @@ class ClientsService {
   }
 
   private static handleError(error: unknown): ClientsError {
-    const _timestamp = new Date()
+    const timestamp = new Date()
     
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
@@ -599,7 +599,7 @@ class ClientsService {
   }
 
   static cancelRequest(key: string): void {
-    const _controller = this.abortControllers.get(key)
+    const controller = this.abortControllers.get(key)
 
     if (controller) {
       controller.abort()
@@ -625,7 +625,7 @@ class RetryManager {
   ): Promise<T> {
     let lastError: unknown
     
-    for (let _attempt = 0; attempt <= maxRetries; attempt++) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await operation()
       } catch (error) {
@@ -636,7 +636,7 @@ class RetryManager {
         }
         
         // Exponential backoff with jitter
-        const _delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000
+        const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000
 
         await new Promise(resolve => setTimeout(resolve, delay))
         
@@ -675,11 +675,11 @@ export function useClients(
     ...initialPagination
   })
 
-  const _abortControllerRef = useRef<AbortController | null>(null)
-  const _retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Fonction de chargement principal
-  const _loadClients = useCallback(async (showLoading = true) => {
+  const loadClients = useCallback(async (showLoading = true) => {
     // Annuler les requêtes précédentes
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
@@ -696,7 +696,7 @@ export function useClients(
     setError(null)
     
     try {
-      const _response = await RetryManager.fetchWithRetry(() =>
+      const response = await RetryManager.fetchWithRetry(() =>
         ClientsService.fetchClients(filters, pagination, abortControllerRef.current?.signal)
       )
       
@@ -729,22 +729,22 @@ export function useClients(
   }, [loadClients])
 
   // Fonctions de manipulation
-  const _refreshClients = useCallback(() => {
+  const refreshClients = useCallback(() => {
     loadClients(false)
   }, [loadClients])
 
-  const _updateFilters = useCallback((newFilters: Partial<ClientFilters>) => {
+  const updateFilters = useCallback((newFilters: Partial<ClientFilters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }))
     setPagination(prev => ({ ...prev, page: 1 })) // Reset page
   }, [])
 
-  const _updatePagination = useCallback((newPagination: Partial<PaginationConfig>) => {
+  const updatePagination = useCallback((newPagination: Partial<PaginationConfig>) => {
     setPagination(prev => ({ ...prev, ...newPagination }))
   }, [])
 
-  const _createClient = useCallback(async (clientData: Partial<Client>): Promise<Client> => {
+  const createClient = useCallback(async (clientData: Partial<Client>): Promise<Client> => {
     try {
-      const _newClient = await ClientsService.createClient(clientData)
+      const newClient = await ClientsService.createClient(clientData)
       
       // Optimistic update
       setClients(prev => [newClient, ...prev])
@@ -757,14 +757,14 @@ export function useClients(
     }
   }, [])
 
-  const _updateClient = useCallback(async (id: string, updates: Partial<Client>): Promise<Client> => {
+  const updateClient = useCallback(async (id: string, updates: Partial<Client>): Promise<Client> => {
     try {
       // Optimistic update
       setClients(prev => prev.map(client => 
         client.id === id ? { ...client, ...updates } : client
       ))
       
-      const _updatedClient = await ClientsService.updateClient(id, updates)
+      const updatedClient = await ClientsService.updateClient(id, updates)
       
       // Mise à jour réelle
       setClients(prev => prev.map(client => 
@@ -780,10 +780,10 @@ export function useClients(
     }
   }, [refreshClients])
 
-  const _deleteClient = useCallback(async (id: string): Promise<void> => {
+  const deleteClient = useCallback(async (id: string): Promise<void> => {
     try {
       // Optimistic update
-      const _clientToDelete = clients.find(c => c.id === id)
+      const clientToDelete = clients.find(c => c.id === id)
 
       setClients(prev => prev.filter(client => client.id !== id))
       setTotalClients(prev => prev - 1)
@@ -799,7 +799,7 @@ export function useClients(
   }, [clients, refreshClients])
 
   // Retry en cas d'erreur
-  const _retry = useCallback(() => {
+  const retry = useCallback(() => {
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current)
     }
@@ -810,16 +810,16 @@ export function useClients(
   }, [loadClients])
 
   // Métriques et informations dérivées
-  const _metrics = useMemo(() => ClientsCache.getMetrics(), [])
+  const metrics = useMemo(() => ClientsCache.getMetrics(), [])
   
-  const _hasNextPage = useMemo(() => 
+  const hasNextPage = useMemo(() => 
     pagination.page * pagination.limit < totalClients,
     [pagination.page, pagination.limit, totalClients]
   )
   
-  const _hasPrevPage = useMemo(() => pagination.page > 1, [pagination.page])
+  const hasPrevPage = useMemo(() => pagination.page > 1, [pagination.page])
   
-  const _totalPages = useMemo(() => 
+  const totalPages = useMemo(() => 
     Math.ceil(totalClients / pagination.limit),
     [totalClients, pagination.limit]
   )

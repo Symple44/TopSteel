@@ -11,9 +11,9 @@ declare global {
     gtag?: (
       command: 'config' | 'event' | 'set',
       target: string,
-      config?: Record<string, unknown>
+      config?: Record<string, any>
     ) => void
-    dataLayer?: unknown[]
+    dataLayer?: any[]
   }
 }
 
@@ -77,18 +77,18 @@ export class PerformanceMonitor {
    * Décorateur pour mesurer les performances de rendu
    */
   static measureRender(componentName: string) {
-    return function(target: unknown, propertyName: string, descriptor: PropertyDescriptor) {
-      const _method = descriptor.value
+    return function(target: any, propertyName: string, descriptor: PropertyDescriptor) {
+      const method = descriptor.value
       
-      descriptor.value = function(...args: unknown[]) {
+      descriptor.value = function(...args: any[]) {
         if (typeof window === 'undefined') {
           return method.apply(this, args)
         }
 
-        const _start = performance.now()
-        const _result = method.apply(this, args)
-        const _end = performance.now()
-        const _duration = end - start
+        const start = performance.now()
+        const result = method.apply(this, args)
+        const end = performance.now()
+        const duration = end - start
         
         if (duration > 16) { // Plus de 1 frame à 60fps
           console.warn(`⚠️ ${componentName}.${propertyName} render took ${Math.round(duration)}ms`)
@@ -113,7 +113,7 @@ export class PerformanceMonitor {
     if (typeof window === 'undefined') return
 
     try {
-      const _timing = window.performance?.timing
+      const timing = window.performance?.timing
 
       if (!timing) return
 
@@ -125,7 +125,7 @@ export class PerformanceMonitor {
       }
 
       // Performance Paint Timing
-      const _paintEntries = performance.getEntriesByType('paint')
+      const paintEntries = performance.getEntriesByType('paint')
 
       paintEntries.forEach(entry => {
         if (entry.name === 'first-paint') {
@@ -169,12 +169,12 @@ export class PerformanceMonitor {
     }
 
     try {
-      const _observer = new PerformanceObserver((entryList) => {
-        const _entries = entryList.getEntries()
-        const _lastEntry = entries[entries.length - 1]
+      const observer = new PerformanceObserver((entryList) => {
+        const entries = entryList.getEntries()
+        const lastEntry = entries[entries.length - 1]
         
         if (lastEntry?.startTime) {
-          const _lcpTime = lastEntry.startTime
+          const lcpTime = lastEntry.startTime
 
           if (lcpTime > 2500) { // Seuil pour LCP lent
             console.warn(`🐌 Slow LCP: ${Math.round(lcpTime)}ms`)
@@ -212,11 +212,11 @@ export class PerformanceMonitor {
     }
 
     try {
-      const _observer = new PerformanceObserver((entryList) => {
-        const _entries = entryList.getEntries()
+      const observer = new PerformanceObserver((entryList) => {
+        const entries = entryList.getEntries()
         
         entries.forEach(entry => {
-          const _fid = (entry as any).processingStart - entry.startTime
+          const fid = (entry as any).processingStart - entry.startTime
 
           if (fid > 100) { // Seuil pour FID lent
             console.warn(`🐌 Slow FID: ${Math.round(fid)}ms`)
@@ -254,10 +254,14 @@ export class PerformanceMonitor {
     }
 
     try {
+<<<<<<< HEAD
       const _clsValue = 0
+=======
+      let clsValue = 0
+>>>>>>> parent of 35f6b21 (.)
 
-      const _observer = new PerformanceObserver((entryList) => {
-        const _entries = entryList.getEntries()
+      const observer = new PerformanceObserver((entryList) => {
+        const entries = entryList.getEntries()
         
         entries.forEach(entry => {
           if (!(entry as any).hadRecentInput) {
@@ -288,7 +292,7 @@ export class PerformanceMonitor {
   /**
    * Envoyer des métriques aux analytics (type-safe) - SSR-Safe
    */
-  private static sendToAnalytics(eventName: string, parameters: Record<string, unknown>): void {
+  private static sendToAnalytics(eventName: string, parameters: Record<string, any>): void {
     if (typeof window === 'undefined') return
 
     try {
@@ -336,7 +340,7 @@ export class PerformanceMonitor {
   /**
    * Enregistrer une métrique personnalisée - SSR-Safe
    */
-  recordMetric(name: string, data: Record<string, unknown>): void {
+  recordMetric(name: string, data: Record<string, any>): void {
     const metric: PerformanceMetric = {
       name,
       value: data.value || data.duration || 0,
@@ -349,7 +353,7 @@ export class PerformanceMonitor {
       this.metrics.set(name, [])
     }
 
-    const _metrics = this.metrics.get(name)!
+    const metrics = this.metrics.get(name)!
 
     metrics.push(metric)
 
@@ -392,13 +396,13 @@ export class PerformanceMonitor {
   /**
    * Obtenir un rapport de performance
    */
-  getPerformanceReport(): Record<string, unknown> {
-    const report: Record<string, unknown> = {}
+  getPerformanceReport(): Record<string, any> {
+    const report: Record<string, any> = {}
 
     for (const [name, metrics] of this.metrics.entries()) {
       if (metrics.length === 0) continue
 
-      const _values = metrics.map(m => m.value).filter(v => v > 0)
+      const values = metrics.map(m => m.value).filter(v => v > 0)
 
       if (values.length === 0) continue
 
@@ -427,7 +431,7 @@ export class PerformanceMonitor {
 
 // ===== HOOK POUR UTILISATION DANS REACT =====
 export function usePerformanceMonitor() {
-  const _monitor = PerformanceMonitor.getInstance()
+  const monitor = PerformanceMonitor.getInstance()
   
   return {
     recordMetric: monitor.recordMetric.bind(monitor),

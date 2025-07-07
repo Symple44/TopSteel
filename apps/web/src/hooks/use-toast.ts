@@ -31,7 +31,11 @@ interface ToastContextType {
 /**
  * Compteur global pour les IDs uniques
  */
+<<<<<<< HEAD
 const _toastCounter = 0
+=======
+let toastCounter = 0
+>>>>>>> parent of 35f6b21 (.)
 
 /**
  * Hook principal pour la gestion des toasts
@@ -44,22 +48,22 @@ export function useToast(): ToastContextType {
   /**
    * Ferme un toast spécifique
    */
-  const _dismiss = useCallback((id: string) => {
+  const dismiss = useCallback((id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id))
   }, [])
 
   /**
    * Ferme tous les toasts
    */
-  const _dismissAll = useCallback(() => {
+  const dismissAll = useCallback(() => {
     setToasts([])
   }, [])
 
   /**
    * Crée un nouveau toast
    */
-  const _toast = useCallback((options: ToastOptions) => {
-    const _id = `toast-${++toastCounter}-${Date.now()}`
+  const toast = useCallback((options: ToastOptions) => {
+    const id = `toast-${++toastCounter}-${Date.now()}`
     const newToast: Toast = {
       id,
       duration: 5000, // 5 secondes par défaut
@@ -197,10 +201,10 @@ export function useToastShortcuts() {
 export function useToastMetrics() {
   const { toasts } = useToast()
 
-  const _metrics = {
+  const metrics = {
     total: toasts.length,
     byVariant: toasts.reduce((acc, toast) => {
-      const _variant = toast.variant || 'default'
+      const variant = toast.variant || 'default'
 
       acc[variant] = (acc[variant] || 0) + 1
 
@@ -218,7 +222,7 @@ export function useToastMetrics() {
 export function useToastWithPromise() {
   const { toast } = useToast()
 
-  const _promiseToast = useCallback(async <T,>(
+  const promiseToast = useCallback(async <T,>(
     promise: Promise<T>,
     messages: {
       loading?: string
@@ -239,11 +243,11 @@ export function useToastWithPromise() {
     }
 
     try {
-      const _result = await promise
+      const result = await promise
 
       // Succès
       if (messages.success) {
-        const _successMessage = typeof messages.success === 'function' 
+        const successMessage = typeof messages.success === 'function' 
           ? messages.success(result) 
           : messages.success
         
@@ -258,7 +262,7 @@ export function useToastWithPromise() {
     } catch (error) {
       // Erreur
       if (messages.error) {
-        const _errorMessage = typeof messages.error === 'function' 
+        const errorMessage = typeof messages.error === 'function' 
           ? messages.error(error as Error) 
           : messages.error
         

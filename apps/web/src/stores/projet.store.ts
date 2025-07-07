@@ -54,12 +54,12 @@ const initialProjetState: InitialState<ProjetState> = {
 
 // ===== CACHE ET UTILITAIRES =====
 
-const _projetCache = StoreUtils.createCache<string, StoreProjet[]>(300000) // 5 minutes
-const _statsCache = StoreUtils.createCache<string, ProjetStats>(60000) // 1 minute
+const projetCache = StoreUtils.createCache<string, StoreProjet[]>(300000) // 5 minutes
+const statsCache = StoreUtils.createCache<string, ProjetStats>(60000) // 1 minute
 
 // ===== SERVICE API SIMULÉ =====
 
-const _projetService = {
+const projetService = {
   async fetchProjets(filters?: ProjetFilters): Promise<StoreProjet[]> {
     // Simulation d'appel API
     await new Promise(resolve => setTimeout(resolve, 500))
@@ -166,10 +166,10 @@ const _projetService = {
   async createProjet(data: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>): Promise<StoreProjet> {
     await new Promise(resolve => setTimeout(resolve, 300))
     
-    const _now = new Date()
+    const now = new Date()
     
     // Créer un client par défaut si non fourni
-    const _defaultClient = data.client || {
+    const defaultClient = data.client || {
       id: 'default-client',
       nom: 'Client par défaut',
       email: 'client@example.com',
@@ -179,7 +179,7 @@ const _projetService = {
     }
     
     // Créer une adresse par défaut si non fournie
-    const _defaultAdresse = data.adresseChantier || {
+    const defaultAdresse = data.adresseChantier || {
       rue: '123 Rue Exemple',
       ville: 'Paris',
       codePostal: '75001',
@@ -308,11 +308,11 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
 
       const { force = false, filters } = options
-      const _cacheKey = JSON.stringify(filters || {})
+      const cacheKey = JSON.stringify(filters || {})
       
       // Vérifier le cache si pas de force
       if (!force) {
-        const _cached = projetCache.get(cacheKey)
+        const cached = projetCache.get(cacheKey)
 
         if (cached) {
           set((state) => {
@@ -326,7 +326,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
         }
       }
       
-      const _projets = await projetService.fetchProjets(filters)
+      const projets = await projetService.fetchProjets(filters)
 
       projetCache.set(cacheKey, projets)
       
@@ -341,7 +341,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       
       return projets
     } catch (error) {
-      const _errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement des projets'
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement des projets'
       
       set((state) => {
         state.loading = false
@@ -363,7 +363,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
         state.error = null
       })
 
-      const _newProjet = await projetService.createProjet(projetData)
+      const newProjet = await projetService.createProjet(projetData)
       
       set((state) => {
         state.projets.unshift(newProjet)
@@ -378,7 +378,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       
       return newProjet
     } catch (error) {
-      const _errorMsg = error instanceof Error ? error.message : 'Erreur lors de la création du projet'
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la création du projet'
       
       set((state) => {
         state.loading = false
@@ -399,10 +399,10 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
         state.error = null
       })
 
-      const _updatedProjet = await projetService.updateProjet(id, updates)
+      const updatedProjet = await projetService.updateProjet(id, updates)
       
       set((state) => {
-        const _index = state.projets.findIndex(p => p.id === id)
+        const index = state.projets.findIndex(p => p.id === id)
 
         if (index !== -1) {
           state.projets[index] = { ...state.projets[index], ...updatedProjet }
@@ -423,7 +423,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       
       return updatedProjet
     } catch (error) {
-      const _errorMsg = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du projet'
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du projet'
       
       set((state) => {
         state.loading = false
@@ -444,7 +444,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
         state.error = null
       })
 
-      const _success = await projetService.deleteProjet(id)
+      const success = await projetService.deleteProjet(id)
       
       if (success) {
         set((state) => {
@@ -467,7 +467,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       
       return success
     } catch (error) {
-      const _errorMsg = error instanceof Error ? error.message : 'Erreur lors de la suppression du projet'
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la suppression du projet'
       
       set((state) => {
         state.loading = false
@@ -483,15 +483,15 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
 
   duplicateProjet: async (id) => {
     try {
-      const _currentState = get()
-      const _originalProjet = currentState.projets.find(p => p.id === id)
+      const currentState = get()
+      const originalProjet = currentState.projets.find(p => p.id === id)
       
       if (!originalProjet) {
         throw new Error('Projet non trouvé')
       }
       
       const { id: _, createdAt: __, updatedAt: ___, ...projetData } = originalProjet
-      const _duplicatedProjet = await get().createProjet({
+      const duplicatedProjet = await get().createProjet({
         ...projetData,
         reference: `${projetData.reference}_COPIE`,
         description: `Copie de ${projetData.description}`
@@ -515,7 +515,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
 
   selectProjetById: (id) => {
     set((state) => {
-      const _projet = state.projets.find(p => p.id === id)
+      const projet = state.projets.find(p => p.id === id)
 
       state.selectedProjet = projet || null
       state.lastUpdate = Date.now()
@@ -591,7 +591,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
 
       // Vérifier le cache d'abord
-      const _cached = statsCache.get('stats')
+      const cached = statsCache.get('stats')
 
       if (cached) {
         set((state) => {
@@ -602,7 +602,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
         return
       }
       
-      const _stats = await projetService.getStats()
+      const stats = await projetService.getStats()
 
       statsCache.set('stats', stats)
       
@@ -612,7 +612,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
         state.lastUpdate = Date.now()
       })
     } catch (error) {
-      const _errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement des statistiques'
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement des statistiques'
       
       set((state) => {
         state.loading = false
@@ -627,7 +627,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
 
 // ===== CRÉATION DU STORE =====
 
-export const _useProjetStore = create<ProjetStore>()(
+export const useProjetStore = create<ProjetStore>()(
   immer(
     devtools(
       (set, get) => ({
@@ -641,14 +641,13 @@ export const _useProjetStore = create<ProjetStore>()(
 
 // ===== HOOKS SÉLECTEURS =====
 
-export const _useProjetLoading = () => useProjetStore(state => state.loading)
-export const _useProjetError = () => useProjetStore(state => state.error)
-export const _useProjets = () => useProjetStore(state => state.projets)
-export const _useSelectedProjet = () => useProjetStore(state => state.selectedProjet)
-export const _useProjetFilters = () => useProjetStore(state => state.filters)
-export const _useProjetStats = () => useProjetStore(state => state.stats)
+export const useProjetLoading = () => useProjetStore(state => state.loading)
+export const useProjetError = () => useProjetStore(state => state.error)
+export const useProjets = () => useProjetStore(state => state.projets)
+export const useSelectedProjet = () => useProjetStore(state => state.selectedProjet)
+export const useProjetFilters = () => useProjetStore(state => state.filters)
+export const useProjetStats = () => useProjetStore(state => state.stats)
 
 // ===== EXPORTS =====
 export type { ProjetState, ProjetStore, ProjetStoreActions }
-
 

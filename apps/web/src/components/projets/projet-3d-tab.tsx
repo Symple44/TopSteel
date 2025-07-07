@@ -16,7 +16,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
   const [selectedView, setSelectedView] = useState('front')
 
   // Simulations de modèles 3D disponibles
-  const _modeles3D = [
+  const modeles3D = [
     {
       id: '1',
       nom: 'Vue d\'ensemble structure',
@@ -43,7 +43,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
     }
   ]
 
-  const _vues = [
+  const vues = [
     { id: 'front', label: 'Vue de face' },
     { id: 'side', label: 'Vue de côté' },
     { id: 'top', label: 'Vue de dessus' },

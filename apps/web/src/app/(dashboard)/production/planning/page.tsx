@@ -59,23 +59,23 @@ export default function PlanningPage() {
     }
   ];
 
-  const _handleTaskClick = (task: GanttTask) => {
+  const handleTaskClick = (task: GanttTask) => {
     console.log('Tâche cliquée:', task);
   };
 
-  const _handleTaskUpdate = (taskId: string, updates: Partial<GanttTask>) => {
+  const handleTaskUpdate = (taskId: string, updates: Partial<GanttTask>) => {
     console.log('Mise à jour tâche:', taskId, updates);
   };
 
-  const _handleEventClick = (event: PlanningEvent) => {
+  const handleEventClick = (event: PlanningEvent) => {
     console.log('Événement cliqué:', event);
   };
 
-  const _handleDateClick = (date: Date) => {
+  const handleDateClick = (date: Date) => {
     console.log('Date cliquée:', date);
   };
 
-  const _handleCreateEvent = () => {
+  const handleCreateEvent = () => {
     console.log('Créer un nouvel événement');
   };
 
@@ -153,4 +153,3 @@ export default function PlanningPage() {
     </div>
   )
 }
-

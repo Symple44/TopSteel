@@ -15,7 +15,7 @@ import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } fr
 import { useState } from 'react'
 
 interface ProjetDocumentsTabProps { 
-  projet?: unknown 
+  projet?: any 
   projetId?: string
 }
 
@@ -78,7 +78,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
   const [selectedCategory, setSelectedCategory] = useState<string>('tous')
   const [selectedType, setSelectedType] = useState<string>('tous')
 
-  const _getTypeIcon = (type: string) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case 'PDF':
         return <FileText className="h-4 w-4 text-red-500" />
@@ -95,8 +95,8 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
     }
   }
 
-  const _getTypeBadge = (type: string) => {
-    const _colors = {
+  const getTypeBadge = (type: string) => {
+    const colors = {
       PDF: 'bg-red-100 text-red-800',
       Image: 'bg-blue-100 text-blue-800',
       Excel: 'bg-green-100 text-green-800',
@@ -111,31 +111,31 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
     )
   }
 
-  const _filteredDocuments = mockDocuments.filter(doc => {
-    const _matchesSearch = doc.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredDocuments = mockDocuments.filter(doc => {
+    const matchesSearch = doc.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doc.auteur.toLowerCase().includes(searchTerm.toLowerCase())
-    const _matchesCategory = selectedCategory === 'tous' || doc.categorie === selectedCategory
-    const _matchesType = selectedType === 'tous' || doc.type === selectedType
+    const matchesCategory = selectedCategory === 'tous' || doc.categorie === selectedCategory
+    const matchesType = selectedType === 'tous' || doc.type === selectedType
     
     return matchesSearch && matchesCategory && matchesType
   })
 
-  const _handleDownload = (document: Document) => {
+  const handleDownload = (document: Document) => {
     // Simulation du téléchargement
     console.log('Téléchargement:', document.nom)
   }
 
-  const _handleView = (document: Document) => {
+  const handleView = (document: Document) => {
     // Simulation de l'aperçu
     console.log('Aperçu:', document.nom)
   }
 
-  const _handleEdit = (document: Document) => {
+  const handleEdit = (document: Document) => {
     // Simulation de l'édition
     console.log('Édition:', document.nom)
   }
 
-  const _handleDelete = (document: Document) => {
+  const handleDelete = (document: Document) => {
     // Simulation de la suppression
     console.log('Suppression:', document.nom)
   }
@@ -232,7 +232,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
               {(mockDocuments.reduce((acc, doc) => {
-                const _size = parseFloat(doc.taille.replace(/[^\d.]/g, ''))
+                const size = parseFloat(doc.taille.replace(/[^\d.]/g, ''))
 
                 return acc + size
               }, 0)).toFixed(1)} MB

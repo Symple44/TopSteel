@@ -1,8 +1,8 @@
 // apps/web/src/lib/cache.ts
 class CacheManager {
-  private cache = new Map<string, { data: unknown; timestamp: number; ttl: number }>()
+  private cache = new Map<string, { data: any; timestamp: number; ttl: number }>()
 
-  set(key: string, data: unknown, ttl = 5 * 60 * 1000) {
+  set(key: string, data: any, ttl = 5 * 60 * 1000) {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
@@ -11,7 +11,7 @@ class CacheManager {
   }
 
   get(key: string) {
-    const _item = this.cache.get(key)
+    const item = this.cache.get(key)
 
     if (!item) return null
 
@@ -39,4 +39,4 @@ class CacheManager {
   }
 }
 
-export const _cache = new CacheManager()
+export const cache = new CacheManager()

@@ -7,11 +7,11 @@ type DataView = 'grid' | 'table'
 export function useDataView(defaultView: DataView = 'grid') {
   const [dataView, setDataView] = useState<DataView>(defaultView)
 
-  const _toggleView = useCallback(() => {
+  const toggleView = useCallback(() => {
     setDataView(prev => prev === 'grid' ? 'table' : 'grid')
   }, [])
 
-  const _setView = useCallback((view: DataView) => {
+  const setView = useCallback((view: DataView) => {
     setDataView(view)
   }, [])
 
@@ -21,4 +21,3 @@ export function useDataView(defaultView: DataView = 'grid') {
     toggleView
   }
 }
-

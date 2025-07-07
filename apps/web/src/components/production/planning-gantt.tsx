@@ -29,13 +29,13 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
   const [zoomLevel, setZoomLevel] = useState(1);
   const [viewMode, setViewMode] = useState<'days' | 'weeks' | 'months'>('weeks');
 
-  const _generateTimelineHeaders = () => {
-    const _now = new Date();
-    const _startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const _endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0);
+  const generateTimelineHeaders = () => {
+    const now = new Date();
+    const startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0);
     
-    const _headers = [];
-    const _current = new Date(startDate);
+    const headers = [];
+    const current = new Date(startDate);
     
     while (current <= endDate) {
       if (viewMode === 'days') {
@@ -65,12 +65,12 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     return headers;
   };
 
-  const _calculateTaskPosition = (task: GanttTask, headers: unknown[]) => {
-    const _startDate = headers[0]?.date || new Date();
-    const _dayWidth = 40 * zoomLevel;
+  const calculateTaskPosition = (task: GanttTask, headers: any[]) => {
+    const startDate = headers[0]?.date || new Date();
+    const dayWidth = 40 * zoomLevel;
     
-    const _startDiff = Math.floor((task.start.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const _duration = Math.floor((task.end.getTime() - task.start.getTime()) / (1000 * 60 * 60 * 24));
+    const startDiff = Math.floor((task.start.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const duration = Math.floor((task.end.getTime() - task.start.getTime()) / (1000 * 60 * 60 * 24));
     
     return {
       left: Math.max(0, startDiff * dayWidth),
@@ -78,7 +78,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     };
   };
 
-  const _getStatusColor = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'bg-green-500';
       case 'in-progress': return 'bg-blue-500';
@@ -87,7 +87,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     }
   };
 
-  const _getTypeIcon = (type: string) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case 'ordre': return '📋';
       case 'operation': return '⚙️';
@@ -96,7 +96,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     }
   };
 
-  const _headers = generateTimelineHeaders();
+  const headers = generateTimelineHeaders();
 
   return (
     <Card>
@@ -155,7 +155,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
             <div className="flex">
               {headers.map((header, index) => (
                 <div
-                  key={\item-\\}
+                  key={index}
                   className={`p-2 text-center text-sm border-r min-w-[40px] ${
                     header.isWeekend ? 'bg-gray-100' : ''
                   }`}
@@ -177,7 +177,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
               </div>
             ) : (
               tasks.map((task) => {
-                const _position = calculateTaskPosition(task, headers);
+                const position = calculateTaskPosition(task, headers);
                 
                 return (
                   <div key={task.id} className="flex border-b hover:bg-gray-50 transition-colors">
@@ -219,11 +219,11 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
                       
                       {/* Dépendances (lignes de connexion) */}
                       {task.dependencies?.map((depId) => {
-                        const _depTask = tasks.find(t => t.id === depId);
+                        const depTask = tasks.find(t => t.id === depId);
 
                         if (!depTask) return null;
                         
-                        const _depPosition = calculateTaskPosition(depTask, headers);
+                        const depPosition = calculateTaskPosition(depTask, headers);
 
                         return (
                           <div

@@ -28,25 +28,25 @@ interface DropdownMenuSubTriggerProps
 }
 
 // ===== UTILITAIRES DE VALIDATION =====
-const _ensureBoolean = (value: boolean | undefined): boolean => {
+const ensureBoolean = (value: boolean | undefined): boolean => {
   return Boolean(value) // Conversion explicite pour exactOptionalPropertyTypes
 }
 
 // ===== COMPOSANTS DE BASE =====
-const _DropdownMenu = DropdownMenuPrimitive.Root
+const DropdownMenu = DropdownMenuPrimitive.Root
 
-const _DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
-const _DropdownMenuGroup = DropdownMenuPrimitive.Group
+const DropdownMenuGroup = DropdownMenuPrimitive.Group
 
-const _DropdownMenuPortal = DropdownMenuPrimitive.Portal
+const DropdownMenuPortal = DropdownMenuPrimitive.Portal
 
-const _DropdownMenuSub = DropdownMenuPrimitive.Sub
+const DropdownMenuSub = DropdownMenuPrimitive.Sub
 
-const _DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
+const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 
 // ===== COMPOSANTS STYLÉS =====
-const _DropdownMenuSubTrigger = React.forwardRef<
+const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
   DropdownMenuSubTriggerProps
 >(({ className, inset, children, ...props }, ref) => (
@@ -66,7 +66,7 @@ const _DropdownMenuSubTrigger = React.forwardRef<
 
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName
 
-const _DropdownMenuSubContent = React.forwardRef<
+const DropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
 >(({ className, ...props }, ref) => (
@@ -82,7 +82,7 @@ const _DropdownMenuSubContent = React.forwardRef<
 
 DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName
 
-const _DropdownMenuContent = React.forwardRef<
+const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
 >(({ className, sideOffset = 4, ...props }, ref) => (
@@ -102,7 +102,7 @@ const _DropdownMenuContent = React.forwardRef<
 
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
-const _DropdownMenuItem = React.forwardRef<
+const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   DropdownMenuItemProps
 >(({ className, inset, ...props }, ref) => (
@@ -120,15 +120,15 @@ const _DropdownMenuItem = React.forwardRef<
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
 // ===== CHECKBOX ITEM ROBUSTE (RÉSOUT L'ERREUR TYPESCRIPT) =====
-const _DropdownMenuCheckboxItem = React.forwardRef<
+const DropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
   DropdownMenuCheckboxItemProps
 >(({ className, children, checked, onCheckedChange, ...props }, ref) => {
   // Garantit un boolean strict pour exactOptionalPropertyTypes
-  const _safeChecked = ensureBoolean(checked)
+  const safeChecked = ensureBoolean(checked)
   
   // Wrapper pour onCheckedChange avec validation
-  const _handleCheckedChange = React.useCallback((newChecked: boolean) => {
+  const handleCheckedChange = React.useCallback((newChecked: boolean) => {
     try {
       onCheckedChange?.(newChecked)
     } catch (error) {
@@ -160,7 +160,7 @@ const _DropdownMenuCheckboxItem = React.forwardRef<
 DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName
 
 // ===== RADIO ITEM =====
-const _DropdownMenuRadioItem = React.forwardRef<
+const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
 >(({ className, children, ...props }, ref) => (
@@ -184,7 +184,7 @@ const _DropdownMenuRadioItem = React.forwardRef<
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 
 // ===== LABEL =====
-const _DropdownMenuLabel = React.forwardRef<
+const DropdownMenuLabel = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Label>,
   DropdownMenuLabelProps
 >(({ className, inset, ...props }, ref) => (
@@ -202,7 +202,7 @@ const _DropdownMenuLabel = React.forwardRef<
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
 
 // ===== SEPARATOR =====
-const _DropdownMenuSeparator = React.forwardRef<
+const DropdownMenuSeparator = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
 >(({ className, ...props }, ref) => (
@@ -216,7 +216,7 @@ const _DropdownMenuSeparator = React.forwardRef<
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
 // ===== SHORTCUT =====
-const _DropdownMenuShortcut = ({
+const DropdownMenuShortcut = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLSpanElement>) => {
@@ -246,4 +246,3 @@ export type {
   DropdownMenuLabelProps,
   DropdownMenuSubTriggerProps
 }
-

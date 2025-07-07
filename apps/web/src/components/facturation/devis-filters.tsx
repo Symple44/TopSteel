@@ -13,7 +13,7 @@ import {
 import { Search, Filter, X } from 'lucide-react'
 
 interface DevisFiltersProps {
-  onFiltersChange?: (filters: unknown) => void
+  onFiltersChange?: (filters: any) => void
 }
 
 export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
@@ -66,4 +66,3 @@ export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
     </div>
   )
 }
-

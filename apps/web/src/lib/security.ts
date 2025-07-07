@@ -35,7 +35,7 @@ export class SecurityUtils {
     }
     
     // Client: utiliser la méthode native du navigateur
-    const _temp = document.createElement('div')
+    const temp = document.createElement('div')
 
     temp.textContent = html
 
@@ -62,7 +62,7 @@ export class SecurityUtils {
    * Valide et nettoie un email
    */
   static sanitizeEmail(email: string): string | null {
-    const _emailSchema = z.string().email().max(254)
+    const emailSchema = z.string().email().max(254)
     
     try {
       return emailSchema.parse(email.toLowerCase().trim())
@@ -76,7 +76,7 @@ export class SecurityUtils {
    */
   static sanitizeUrl(url: string): string | null {
     try {
-      const _parsed = new URL(url)
+      const parsed = new URL(url)
       
       // Seulement HTTP/HTTPS
       if (!['http:', 'https:'].includes(parsed.protocol)) {
@@ -95,10 +95,10 @@ export class SecurityUtils {
   static createRateLimiter(maxRequests: number, windowMs: number) {
     const requests: number[] = []
     
-    return function rateLimited<T extends (...args: unknown[]) => any>(fn: T): T {
-      return ((...args: unknown[]) => {
-        const _now = Date.now()
-        const _windowStart = now - windowMs
+    return function rateLimited<T extends (...args: any[]) => any>(fn: T): T {
+      return ((...args: any[]) => {
+        const now = Date.now()
+        const windowStart = now - windowMs
         
         // Nettoyer les anciennes requêtes
         while (requests.length > 0 && requests[0] < windowStart) {
@@ -134,7 +134,7 @@ export class SecurityUtils {
              Math.random().toString(36).substring(2, 15)
     }
     
-    const _array = new Uint8Array(32)
+    const array = new Uint8Array(32)
 
     crypto.getRandomValues(array)
 
@@ -166,7 +166,7 @@ export class SecurityUtils {
       }
 
       // Mixed Content
-      const _insecureElements = document.querySelectorAll('[src^="http://"], [href^="http://"]')
+      const insecureElements = document.querySelectorAll('[src^="http://"], [href^="http://"]')
 
       if (insecureElements.length > 0) {
         warnings.push(`${insecureElements.length} éléments non sécurisés détectés`)
@@ -189,8 +189,8 @@ export class SecurityUtils {
   /**
    * Logger sécurisé
    */
-  static logSecurityEvent(event: string, details: Record<string, unknown> = {}) {
-    const _sanitizedDetails = Object.fromEntries(
+  static logSecurityEvent(event: string, details: Record<string, any> = {}) {
+    const sanitizedDetails = Object.fromEntries(
       Object.entries(details).map(([key, value]) => [
         key,
         typeof value === 'string' ? this.maskSensitiveData(value) : value
@@ -223,7 +223,7 @@ export interface SecurityAuditReport {
 }
 
 // ✅ SCHÉMAS ZOD SÉCURISÉS - REGEX CORRIGÉES
-export const _secureSchemas = {
+export const secureSchemas = {
   email: z.string().email().max(254).transform(val => val.toLowerCase().trim()),
   
   password: z.string()
@@ -236,7 +236,7 @@ export const _secureSchemas = {
   
   url: z.string().url().max(2048).refine(url => {
     try {
-      const _parsed = new URL(url)
+      const parsed = new URL(url)
 
       return ['http:', 'https:'].includes(parsed.protocol)
     } catch {
@@ -259,7 +259,7 @@ export const _secureSchemas = {
 }
 
 // ✅ CONSTANTES DE SÉCURITÉ
-export const _SECURITY_CONSTANTS = {
+export const SECURITY_CONSTANTS = {
   // Limites de rate limiting
   API_RATE_LIMIT: 100, // requêtes par minute
   LOGIN_RATE_LIMIT: 5, // tentatives par minute
@@ -298,7 +298,7 @@ export class FileSecurityUtils {
     }
     
     // Nom de fichier
-    const _filenameValidation = secureSchemas.filename.safeParse(file.name)
+    const filenameValidation = secureSchemas.filename.safeParse(file.name)
 
     if (!filenameValidation.success) {
       return { valid: false, error: 'Nom de fichier invalide' }
@@ -311,9 +311,9 @@ export class FileSecurityUtils {
    * Génère un nom de fichier sécurisé
    */
   static generateSecureFilename(originalName: string): string {
-    const _extension = originalName.split('.').pop() || ''
-    const _timestamp = Date.now()
-    const _random = Math.random().toString(36).substring(2, 8)
+    const extension = originalName.split('.').pop() || ''
+    const timestamp = Date.now()
+    const random = Math.random().toString(36).substring(2, 8)
     
     return `file_${timestamp}_${random}.${extension}`
   }
@@ -321,4 +321,3 @@ export class FileSecurityUtils {
 
 // ✅ EXPORT PRINCIPAL
 export { SecurityUtils as default }
-

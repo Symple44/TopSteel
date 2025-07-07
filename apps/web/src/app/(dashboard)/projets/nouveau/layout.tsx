@@ -29,4 +29,4 @@ export default function NouveauProjetLayout({ children }: NouveauProjetLayoutPro
   return <>{children}</>
 }
 
-export const _dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'

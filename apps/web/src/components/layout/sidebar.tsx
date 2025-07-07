@@ -102,11 +102,11 @@ const navigation: NavItem[] = [
 ]
 
 export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
-  const _pathname = usePathname()
-  const _router = useRouter()
+  const pathname = usePathname()
+  const router = useRouter()
   const [expandedItems, setExpandedItems] = useState<string[]>(['Projets'])
 
-  const _toggleExpanded = (title: string) => {
+  const toggleExpanded = (title: string) => {
     setExpandedItems(prev => 
       prev.includes(title) 
         ? prev.filter(item => item !== title)
@@ -114,26 +114,26 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     )
   }
 
-  const _isActive = (href?: string) => {
+  const isActive = (href?: string) => {
     if (!href) return false
     if (href === '/dashboard') return pathname === href
 
     return pathname.startsWith(href)
   }
 
-  const _isParentActive = (item: NavItem) => {
+  const isParentActive = (item: NavItem) => {
     if (isActive(item.href)) return true
 
     return item.children?.some(child => isActive(child.href)) || false
   }
 
-  const _renderNavItem = (item: NavItem, level = 0) => {
-    const _hasChildren = item.children && item.children.length > 0
-    const _isExpanded = expandedItems.includes(item.title)
-    const _itemIsActive = isActive(item.href)
-    const _parentIsActive = isParentActive(item)
+  const renderNavItem = (item: NavItem, level = 0) => {
+    const hasChildren = item.children && item.children.length > 0
+    const isExpanded = expandedItems.includes(item.title)
+    const itemIsActive = isActive(item.href)
+    const parentIsActive = isParentActive(item)
 
-    const _handleClick = () => {
+    const handleClick = () => {
       if (hasChildren) {
         toggleExpanded(item.title)
       } else if (item.href) {

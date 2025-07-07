@@ -8,7 +8,7 @@ interface TabsContextValue {
   onValueChange?: (value: string) => void
 }
 
-const _TabsContext = React.createContext<TabsContextValue>({})
+const TabsContext = React.createContext<TabsContextValue>({})
 
 interface TabsProps {
   children?: React.ReactNode
@@ -46,16 +46,16 @@ export const Tabs: React.FC<TabsProps> = ({
 }) => {
   const [internalValue, setInternalValue] = React.useState(defaultValue || "")
 
-  const _currentValue = value !== undefined ? value : internalValue
+  const currentValue = value !== undefined ? value : internalValue
 
-  const _handleValueChange = React.useCallback((newValue: string) => {
+  const handleValueChange = React.useCallback((newValue: string) => {
     if (value === undefined) {
       setInternalValue(newValue)
     }
     onValueChange?.(newValue)
   }, [value, onValueChange])
 
-  const _contextValue = React.useMemo(() => ({
+  const contextValue = React.useMemo(() => ({
     value: currentValue,
     onValueChange: handleValueChange
   }), [currentValue, handleValueChange])
@@ -120,9 +120,9 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({
   ...props 
 }) => {
   const { value: selectedValue, onValueChange } = React.useContext(TabsContext)
-  const _isSelected = selectedValue === value
+  const isSelected = selectedValue === value
 
-  const _handleClick = () => {
+  const handleClick = () => {
     if (!disabled && onValueChange) {
       onValueChange(value)
     }
@@ -146,4 +146,3 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({
     </button>
   )
 }
-

@@ -15,7 +15,7 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import { Eye, Edit, Download } from 'lucide-react'
 
 // Données mock
-const _mockFactures = [
+const mockFactures = [
   {
     id: '1',
     reference: 'FAC-2024-001',
@@ -38,15 +38,15 @@ const _mockFactures = [
   },
 ]
 
-const _getStatusBadge = (statut: string) => {
-  const _config = {
+const getStatusBadge = (statut: string) => {
+  const config = {
     brouillon: { label: 'Brouillon', variant: 'outline' as const },
     envoye: { label: 'Envoyée', variant: 'secondary' as const },
     payee: { label: 'Payée', variant: 'default' as const },
     en_retard: { label: 'En retard', variant: 'destructive' as const },
   }
   
-  const _item = config[statut as keyof typeof config] || config.brouillon
+  const item = config[statut as keyof typeof config] || config.brouillon
 
   return <Badge variant={item.variant}>{item.label}</Badge>
 }
@@ -101,4 +101,3 @@ export function FacturesTable({ data = mockFactures }: FacturesTableProps) {
     </div>
   )
 }
-

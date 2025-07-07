@@ -25,15 +25,15 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
   const [activeTab, setActiveTab] = useState<'volume' | 'value'>('volume');
 
   // Calculs de statistiques
-  const _totalEntrees = data.reduce((sum, item) => sum + item.entrees, 0);
-  const _totalSorties = data.reduce((sum, item) => sum + item.sorties, 0);
-  const _totalValeurEntrees = data.reduce((sum, item) => sum + item.valeurEntrees, 0);
-  const _totalValeurSorties = data.reduce((sum, item) => sum + item.valeurSorties, 0);
+  const totalEntrees = data.reduce((sum, item) => sum + item.entrees, 0);
+  const totalSorties = data.reduce((sum, item) => sum + item.sorties, 0);
+  const totalValeurEntrees = data.reduce((sum, item) => sum + item.valeurEntrees, 0);
+  const totalValeurSorties = data.reduce((sum, item) => sum + item.valeurSorties, 0);
 
-  const _maxVolume = Math.max(...data.map(item => Math.max(item.entrees, item.sorties)));
-  const _maxValue = Math.max(...data.map(item => Math.max(item.valeurEntrees, item.valeurSorties)));
+  const maxVolume = Math.max(...data.map(item => Math.max(item.entrees, item.sorties)));
+  const maxValue = Math.max(...data.map(item => Math.max(item.valeurEntrees, item.valeurSorties)));
 
-  const _getBarHeight = (value: number, max: number) => {
+  const getBarHeight = (value: number, max: number) => {
     return Math.max(2, (value / max) * 200); // Hauteur min 2px, max 200px
   };
 
@@ -170,12 +170,12 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
             {data.length > 0 ? (
               <div className="flex items-end justify-between h-full gap-2">
                 {data.map((item, index) => {
-                  const _maxVal = activeTab === 'volume' ? maxVolume : maxValue;
-                  const _entreesVal = activeTab === 'volume' ? item.entrees : item.valeurEntrees;
-                  const _sortiesVal = activeTab === 'volume' ? item.sorties : item.valeurSorties;
+                  const maxVal = activeTab === 'volume' ? maxVolume : maxValue;
+                  const entreesVal = activeTab === 'volume' ? item.entrees : item.valeurEntrees;
+                  const sortiesVal = activeTab === 'volume' ? item.sorties : item.valeurSorties;
                   
                   return (
-                    <div key={\item-\\} className="flex flex-col items-center flex-1 max-w-20">
+                    <div key={index} className="flex flex-col items-center flex-1 max-w-20">
                       <div className="flex items-end gap-1 mb-2 h-48">
                         {/* Barre entrées */}
                         <div

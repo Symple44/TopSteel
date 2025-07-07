@@ -12,7 +12,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-const _forgotPasswordSchema = z.object({
+const forgotPasswordSchema = z.object({
   email: z.string().email('Email invalide'),
 })
 
@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   })
 
-  const _onSubmit = async (data: ForgotPasswordFormData) => {
+  const onSubmit = async (data: ForgotPasswordFormData) => {
     setError(null)
     setIsLoading(true)
 
@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
       await new Promise(resolve => setTimeout(resolve, 2000))
       
       setIsSuccess(true)
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err.message || 'Erreur lors de l\'envoi de l\'email')
     } finally {
       setIsLoading(false)
@@ -179,4 +179,3 @@ export default function ForgotPasswordPage() {
     </div>
   )
 }
-

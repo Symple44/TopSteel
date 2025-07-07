@@ -21,10 +21,10 @@ export function DateRangePicker({
   className
 }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const _containerRef = useRef<HTMLDivElement>(null)
-  const _popoverRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const popoverRef = useRef<HTMLDivElement>(null)
 
-  const _formatRange = (range: DateRange | undefined) => {
+  const formatRange = (range: DateRange | undefined) => {
     if (!range?.from) return placeholder
     
     if (!range.to) {
@@ -36,7 +36,7 @@ export function DateRangePicker({
 
   // Gérer les clics extérieurs pour fermer le popover
   useEffect(() => {
-    const _handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
         containerRef.current && 
         !containerRef.current.contains(event.target as Node)
@@ -54,25 +54,25 @@ export function DateRangePicker({
     }
   }, [isOpen])
 
-  const _handleButtonClick = () => {
+  const handleButtonClick = () => {
     setIsOpen(!isOpen)
   }
 
-  const _handleDateSelect = (range: DateRange | undefined) => {
+  const handleDateSelect = (range: DateRange | undefined) => {
     onChange?.(range)
     if (range?.from && range?.to) {
       setIsOpen(false)
     }
   }
 
-  const _clearSelection = (e: React.MouseEvent) => {
+  const clearSelection = (e: React.MouseEvent) => {
     e.stopPropagation()
     onChange?.(undefined)
   }
 
   // Assurer des valeurs safe pour exactOptionalPropertyTypes
-  const _safeDefaultMonth = value?.from || new Date()
-  const _safeSelected = value || undefined
+  const safeDefaultMonth = value?.from || new Date()
+  const safeSelected = value || undefined
 
   return (
     <div ref={containerRef} className={cn("relative grid gap-2", className)}>

@@ -2,11 +2,11 @@ import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 // Import cn from lib utils (local to web app)
-function cn(...inputs: unknown[]) {
+function cn(...inputs: any[]) {
   return inputs.filter(Boolean).join(' ')
 }
 
-const _Avatar = React.forwardRef<
+const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
 >(({ className, ...props }, ref) => (
@@ -22,7 +22,7 @@ const _Avatar = React.forwardRef<
 
 Avatar.displayName = AvatarPrimitive.Root.displayName
 
-const _AvatarImage = React.forwardRef<
+const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image> & {
     src: string
@@ -40,7 +40,7 @@ const _AvatarImage = React.forwardRef<
 
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
-const _AvatarFallback = React.forwardRef<
+const AvatarFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
 >(({ className, ...props }, ref) => (
@@ -57,4 +57,3 @@ const _AvatarFallback = React.forwardRef<
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
 
 export { Avatar, AvatarImage, AvatarFallback }
-

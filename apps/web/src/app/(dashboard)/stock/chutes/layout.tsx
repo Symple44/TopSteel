@@ -60,4 +60,4 @@ export default function ChutesLayout({ children }: ChutesLayoutProps) {
   )
 }
 
-export const _dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'
