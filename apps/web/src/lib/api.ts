@@ -179,7 +179,7 @@ export const _api = {
         ]
 
         // Application des filtres si fournis
-        let _filteredProjets = mockProjets
+        const _filteredProjets = mockProjets
 
         if (filters) {
           if (filters.statut && filters.statut.length > 0) {

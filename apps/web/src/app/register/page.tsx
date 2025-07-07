@@ -210,7 +210,7 @@ export default function RegisterPage() {
   const _getPasswordStrength = useCallback((password: string) => {
     if (!password) return { score: 0, text: '', color: '' }
     
-    let _score = 0
+    const _score = 0
     const _checks = [
       password.length >= 8,
       /[a-z]/.test(password),

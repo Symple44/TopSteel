@@ -30,7 +30,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Vérification de l'authentification au chargement
   useEffect(() => {
-    let _isMounted = true
+    const _isMounted = true
 
     const _checkAuth = async () => {
       // Si on a des tokens en local storage, vérifier leur validité

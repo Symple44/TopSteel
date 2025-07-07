@@ -70,7 +70,7 @@ export class StoreUtils {
       } as TState & TActions
     }
 
-    let _store = storeCreator
+    const _store = storeCreator
 
     // Middleware Immer pour mutations immutables
     if (enableImmer) {
@@ -262,7 +262,7 @@ export class StoreUtils {
 
       cleanup: (): number => {
         const _now = Date.now()
-        let _deletedCount = 0
+        const _deletedCount = 0
         
         for (const [key, item] of cache.entries()) {
           if (now - item.timestamp > ttlMs) {
@@ -326,7 +326,7 @@ export class StoreUtils {
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
-    let _lastCall = 0
+    const _lastCall = 0
 
     return (...args: Parameters<T>) => {
       const _now = Date.now()

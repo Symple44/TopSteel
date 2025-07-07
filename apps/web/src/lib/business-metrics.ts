@@ -340,7 +340,7 @@ class BusinessMetrics {
     since?: number
     limit?: number
   }): BusinessEvent[] {
-    let _filteredEvents = [...this.events]
+    const _filteredEvents = [...this.events]
     
     if (filters?.eventName) {
       filteredEvents = filteredEvents.filter(e => e.name === filters.eventName)

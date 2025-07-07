@@ -556,7 +556,7 @@ if (typeof window !== 'undefined') {
   }, 60000) // Toutes les minutes
 
   // Écouter l'activité utilisateur avec throttle manuel
-  let _lastActivityUpdate = 0
+  const _lastActivityUpdate = 0
   const _activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart']
   
   const _handleActivity = () => {

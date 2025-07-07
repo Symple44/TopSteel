@@ -31,7 +31,7 @@ interface ToastContextType {
 /**
  * Compteur global pour les IDs uniques
  */
-let _toastCounter = 0
+const _toastCounter = 0
 
 /**
  * Hook principal pour la gestion des toasts

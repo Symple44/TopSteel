@@ -323,7 +323,7 @@ export function useIntelligentCache<K, V>(
     if (cache.size >= maxSize && !cache.has(key)) {
       // Éviction LRU (Least Recently Used)
       let lruKey: K | undefined
-      let _lruTime = Infinity
+      const _lruTime = Infinity
       
       for (const [k, entry] of cache.entries()) {
         if (entry.lastAccess < lruTime) {
@@ -383,8 +383,8 @@ export function useIntelligentCache<K, V>(
   const _getStats = useCallback(() => {
     const _cache = cacheRef.current
     const _now = Date.now()
-    let _totalHits = 0
-    let _expiredEntries = 0
+    const _totalHits = 0
+    const _expiredEntries = 0
     
     for (const entry of cache.values()) {
       totalHits += entry.hitCount

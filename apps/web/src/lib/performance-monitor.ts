@@ -254,7 +254,7 @@ export class PerformanceMonitor {
     }
 
     try {
-      let _clsValue = 0
+      const _clsValue = 0
 
       const _observer = new PerformanceObserver((entryList) => {
         const _entries = entryList.getEntries()

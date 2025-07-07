@@ -123,7 +123,7 @@ const _useFilteredData = (
 ) => {
   return React.useMemo(() => {
     try {
-      let _filtered = [...data] // Copie pour éviter les mutations
+      const _filtered = [...data] // Copie pour éviter les mutations
 
       // Recherche textuelle avec protection
       if (searchTerm.trim() && searchableColumns.length > 0) {

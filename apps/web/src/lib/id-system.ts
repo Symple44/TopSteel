@@ -189,7 +189,7 @@ class IDGenerator {
 
   private static initializeClientNodeId(): string {
     try {
-      let _nodeId = localStorage.getItem('topsteel_node_id')
+      const _nodeId = localStorage.getItem('topsteel_node_id')
 
       if (!nodeId || nodeId.length < 4) {
         nodeId = this.generateSecureNodeId()
@@ -271,7 +271,7 @@ class IDGenerator {
   private static generateFallbackUUID(): string {
     // RFC 4122 version 4 compliant fallback
     const _hexDigits = '0123456789abcdef'
-    let _uuid = ''
+    const _uuid = ''
     
     for (let _i = 0; i < 36; i++) {
       if (i === 8 || i === 13 || i === 18 || i === 23) {
@@ -365,7 +365,7 @@ class IDGenerator {
   }
 
   private static generateFallbackNanoId(length: number, alphabet: string): string {
-    let _result = ''
+    const _result = ''
 
     for (let _i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
@@ -409,7 +409,7 @@ class IDGenerator {
           mainId = this.nanoid(length)
       }
 
-      let _result = prefixStr
+      const _result = prefixStr
       
       if (env !== 'production') {
         result += `-${env.slice(0, 3).toUpperCase()}`
@@ -440,7 +440,7 @@ class IDGenerator {
 
   private static generateBase58(length: number): string {
     const _alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-    let _result = ''
+    const _result = ''
     
     for (let _i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
@@ -451,7 +451,7 @@ class IDGenerator {
 
   private static generateHex(length: number): string {
     const _alphabet = '0123456789abcdef'
-    let _result = ''
+    const _result = ''
     
     for (let _i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
@@ -462,7 +462,7 @@ class IDGenerator {
 
   private static generateBase36(length: number): string {
     const _alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
-    let _result = ''
+    const _result = ''
     
     for (let _i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
@@ -472,7 +472,7 @@ class IDGenerator {
   }
 
   private static calculateChecksum(input: string): string {
-    let _hash = 0
+    const _hash = 0
 
     for (let _i = 0; i < input.length; i++) {
       const _char = input.charCodeAt(i)
