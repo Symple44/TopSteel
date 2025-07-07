@@ -8,7 +8,7 @@ import { createContext, useCallback, useContext, useEffect, useReducer, useRef }
 
 // ===== TYPES ET INTERFACES =====
 
-interface NotificationsState {
+export interface NotificationsState {
   notifications: Notification[]
   unreadCount: number
   connected: boolean
@@ -17,7 +17,7 @@ interface NotificationsState {
   error: string | null
 }
 
-interface NotificationSettings {
+export interface NotificationSettings {
   enableSound: boolean
   enableToast: boolean
   enableBrowser: boolean
@@ -43,7 +43,7 @@ type NotificationsAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
 
-interface NotificationsContextValue {
+export interface NotificationsContextValue {
   state: NotificationsState
   actions: {
     markAsRead: (id: string) => void
@@ -56,7 +56,7 @@ interface NotificationsContextValue {
   }
 }
 
-interface CreateNotificationRequest {
+export interface CreateNotificationRequest {
   type: 'info' | 'success' | 'warning' | 'error'
   category: 'system' | 'stock' | 'projet' | 'production' | 'maintenance'
   title: string
@@ -451,3 +451,5 @@ export function useNotifications() {
   
   return context
 }
+
+

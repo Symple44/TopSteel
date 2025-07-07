@@ -1,75 +1,80 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    /* ===== COMPILATION TARGETS ===== */
     "module": "CommonJS",
     "moduleResolution": "node",
+    "target": "ES2022",
+    
+    /* ===== EMIT CONFIGURATION ===== */
     "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "removeComments": true,
+    "outDir": "./dist",
+    "incremental": true,
+    
+    /* ===== DECORATORS SUPPORT ===== */
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    
+    /* ===== HELPERS CONFIGURATION ===== */
+    "importHelpers": true,
+    "noEmitHelpers": false,
+    "downlevelIteration": true,
+    
+    /* ===== INTEROP ===== */
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "target": "ES2022",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
-    "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
+    
+    /* ===== TYPE CHECKING ===== */
     "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
     "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    
+    /* ===== OVERRIDE CONFIGURATION - Règles assouplies ===== */
+    "noImplicitOverride": false,
+    "exactOptionalPropertyTypes": false,
+    
+    /* ===== PERFORMANCE ===== */
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    
+    /* ===== PATHS ===== */
+    "baseUrl": "./",
     "resolveJsonModule": true,
     "allowJs": false,
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@erp/types": [
-        "../../packages/types/src"
-      ],
-      "@erp/types/*": [
-        "../../packages/types/src/*"
-      ],
-      "@erp/utils": [
-        "../../packages/utils/src"
-      ],
-      "@erp/utils/*": [
-        "../../packages/utils/src/*"
-      ],
-      "@erp/config": [
-        "../../packages/config/src"
-      ],
-      "@erp/config/*": [
-        "../../packages/config/src/*"
-      ]
+      "@/*": ["src/*"],
+      "@erp/types": ["../../packages/types/src"],
+      "@erp/types/*": ["../../packages/types/src/*"],
+      "@erp/utils": ["../../packages/utils/src"],
+      "@erp/utils/*": ["../../packages/utils/src/*"],
+      "@erp/config": ["../../packages/config/src"],
+      "@erp/config/*": ["../../packages/config/src/*"]
     },
-    "typeRoots": [
-      "node_modules/@types",
-      "../../node_modules/@types",
-      "src/types"
-    ],
-    "types": [
-      "node",
-      "jest",
-      "express"
-    ],
-    "lib": [
-      "ES2022",
-      "ES2022.Array",
-      "ES2022.Object"
-    ]
+    
+    /* ===== TYPES ===== */
+    "typeRoots": ["node_modules/@types", "../../node_modules/@types", "src/types"],
+    "types": ["node", "jest", "express"],
+    "lib": ["ES2022", "ES2022.Array", "ES2022.Object"]
   },
+  
+  /* ===== INCLUSION ===== */
   "include": [
     "src/**/*",
     "test/**/*",
     "src/types/**/*"
   ],
+  
+  /* ===== EXCLUSIONS ===== */
   "exclude": [
     "node_modules",
     "dist",
@@ -77,10 +82,10 @@
     "**/*.spec.ts",
     "**/*.test.ts"
   ],
+  
+  /* ===== TS-NODE CONFIGURATION ===== */
   "ts-node": {
-    "require": [
-      "tsconfig-paths/register"
-    ],
+    "require": ["tsconfig-paths/register"],
     "transpileOnly": true,
     "files": true
   }

@@ -6,8 +6,8 @@ module.exports = {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
+    // Inclure les composants UI du monorepo
     '../../packages/ui/src/**/*.{ts,tsx}',
-    '../../packages/*/src/**/*.{ts,tsx}',
   ],
   prefix: "",
   theme: {
@@ -20,13 +20,11 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Variables système standard
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -55,73 +53,25 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-
-        // Extensions système
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
-        info: {
-          DEFAULT: "hsl(var(--info))",
-          foreground: "hsl(var(--info-foreground))",
-        },
-
-        // Thème métallurgie
-        metallurgy: {
-          50: "hsl(var(--metallurgy-50))",
-          100: "hsl(var(--metallurgy-100))",
-          200: "hsl(var(--metallurgy-200))",
-          300: "hsl(var(--metallurgy-300))",
-          400: "hsl(var(--metallurgy-400))",
-          500: "hsl(var(--metallurgy-500))",
-          600: "hsl(var(--metallurgy-600))",
-          700: "hsl(var(--metallurgy-700))",
-          800: "hsl(var(--metallurgy-800))",
-          900: "hsl(var(--metallurgy-900))",
-          950: "hsl(var(--metallurgy-950))",
-        },
-
-        // Thème acier
+        // Couleurs spécifiques TopSteel ERP
         steel: {
-          50: "hsl(var(--steel-50))",
-          100: "hsl(var(--steel-100))",
-          200: "hsl(var(--steel-200))",
-          300: "hsl(var(--steel-300))",
-          400: "hsl(var(--steel-400))",
-          500: "hsl(var(--steel-500))",
-          600: "hsl(var(--steel-600))",
-          700: "hsl(var(--steel-700))",
-          800: "hsl(var(--steel-800))",
-          900: "hsl(var(--steel-900))",
-          950: "hsl(var(--steel-950))",
-        },
-
-        // Graphiques
-        chart: {
-          1: "hsl(var(--chart-1))",
-          2: "hsl(var(--chart-2))",
-          3: "hsl(var(--chart-3))",
-          4: "hsl(var(--chart-4))",
-          5: "hsl(var(--chart-5))",
-        },
+          50: "#f8fafc",
+          100: "#f1f5f9", 
+          200: "#e2e8f0",
+          300: "#cbd5e1",
+          400: "#94a3b8",
+          500: "#64748b",
+          600: "#475569",
+          700: "#334155",
+          800: "#1e293b",
+          900: "#0f172a",
+        }
       },
-
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-
-      fontFamily: {
-        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
-        inter: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
-        poppins: ["var(--font-poppins)", "ui-sans-serif", "system-ui", "sans-serif"],
-      },
-
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -131,49 +81,62 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "fade-in": {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
-        },
-        "slide-in-from-top": {
-          "0%": { transform: "translateY(-100%)" },
-          "100%": { transform: "translateY(0)" },
-        },
-        "slide-in-from-right": {
-          "0%": { transform: "translateX(100%)" },
-          "100%": { transform: "translateX(0)" },
-        },
-        "slide-out-to-right": {
-          "0%": { transform: "translateX(0)" },
-          "100%": { transform: "translateX(100%)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.2s ease-out",
-        "slide-in-from-top": "slide-in-from-top 0.3s ease-out",
-        "slide-in-from-right": "slide-in-from-right 0.3s ease-out",
-        "slide-out-to-right": "slide-out-to-right 0.3s ease-out",
       },
     },
   },
   plugins: [
-    function({ addUtilities }) {
-      const newUtilities = {
-        '.scrollbar-thin': {
-          'scrollbar-width': 'thin',
+    require("tailwindcss-animate"),
+    // Plugin pour les variables CSS automatiques
+    function({ addBase, theme }) {
+      addBase({
+        ':root': {
+          '--background': '0 0% 100%',
+          '--foreground': '222.2 84% 4.9%',
+          '--card': '0 0% 100%',
+          '--card-foreground': '222.2 84% 4.9%',
+          '--popover': '0 0% 100%',
+          '--popover-foreground': '222.2 84% 4.9%',
+          '--primary': '222.2 47.4% 11.2%',
+          '--primary-foreground': '210 40% 98%',
+          '--secondary': '210 40% 96%',
+          '--secondary-foreground': '222.2 84% 4.9%',
+          '--muted': '210 40% 96%',
+          '--muted-foreground': '215.4 16.3% 46.9%',
+          '--accent': '210 40% 96%',
+          '--accent-foreground': '222.2 84% 4.9%',
+          '--destructive': '0 84.2% 60.2%',
+          '--destructive-foreground': '210 40% 98%',
+          '--border': '214.3 31.8% 91.4%',
+          '--input': '214.3 31.8% 91.4%',
+          '--ring': '222.2 84% 4.9%',
+          '--radius': '0.5rem',
         },
-        '.scrollbar-none': {
-          'scrollbar-width': 'none',
-          '-ms-overflow-style': 'none',
-          '&::-webkit-scrollbar': {
-            display: 'none',
-          },
-        },
-      }
-      
-      addUtilities(newUtilities)
-    },
+        '.dark': {
+          '--background': '222.2 84% 4.9%',
+          '--foreground': '210 40% 98%',
+          '--card': '222.2 84% 4.9%',
+          '--card-foreground': '210 40% 98%',
+          '--popover': '222.2 84% 4.9%',
+          '--popover-foreground': '210 40% 98%',
+          '--primary': '210 40% 98%',
+          '--primary-foreground': '222.2 47.4% 11.2%',
+          '--secondary': '217.2 32.6% 17.5%',
+          '--secondary-foreground': '210 40% 98%',
+          '--muted': '217.2 32.6% 17.5%',
+          '--muted-foreground': '215 20.2% 65.1%',
+          '--accent': '217.2 32.6% 17.5%',
+          '--accent-foreground': '210 40% 98%',
+          '--destructive': '0 62.8% 30.6%',
+          '--destructive-foreground': '210 40% 98%',
+          '--border': '217.2 32.6% 17.5%',
+          '--input': '217.2 32.6% 17.5%',
+          '--ring': '212.7 26.8% 83.9%',
+        }
+      })
+    }
   ],
 }

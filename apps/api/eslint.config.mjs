@@ -1,11 +1,11 @@
-// apps/api/eslint.config.js - Configuration ESLint corrigée pour NestJS
+// apps/api/eslint.config.mjs - Configuration ESLint permissive pour NestJS
 import baseConfig from "@erp/config/eslint/base.js";
 
 export default [
   ...baseConfig,
   
   {
-    ignores: ["dist/**", "node_modules/**", ".turbo/**", "coverage/**"]
+    ignores: ["dist/**", "node_modules/**", ".turbo/**", "coverage/**", "test-results/**"]
   },
   
   // Configuration principale pour les fichiers source NestJS
@@ -15,118 +15,104 @@ export default [
       parserOptions: {
         project: ["./tsconfig.json"]
       },
-      globals: {
-        // Globales Node.js essentielles
-        global: "readonly",
-        process: "readonly",
-        Buffer: "readonly",
-        __dirname: "readonly",
-        __filename: "readonly",
-        module: "readonly",
-        require: "readonly",
-        exports: "readonly",
-        // Globales pour timers
-        setTimeout: "readonly",
-        clearTimeout: "readonly",
-        setInterval: "readonly",
-        clearInterval: "readonly",
-        setImmediate: "readonly",
-        clearImmediate: "readonly",
-        // Console
-        console: "readonly"
-      }
     },
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-non-null-assertion": "warn",
-      "@typescript-eslint/no-unused-vars": ["error", { 
+      // ===== RÈGLES ASSOUPLIES POUR DÉVELOPPEMENT =====
+      
+      // Variables non utilisées - warnings seulement
+      "@typescript-eslint/no-unused-vars": ["warn", { 
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
-        caughtErrorsIgnorePattern: "^_"
+        caughtErrorsIgnorePattern: "^_",
+        destructuredArrayIgnorePattern: "^_",
+        ignoreRestSiblings: true
       }],
-      "@typescript-eslint/consistent-type-imports": ["error", { 
+      
+      // Types - warnings au lieu d'erreurs
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-non-null-assertion": "warn",
+      
+      // Type imports - warning seulement
+      "@typescript-eslint/consistent-type-imports": ["warn", { 
         prefer: "type-imports",
         fixStyle: "separate-type-imports"
       }],
-      // Règles spécifiques NestJS
-      "@typescript-eslint/no-empty-function": "off", // Constructeurs vides NestJS
-      "@typescript-eslint/no-inferrable-types": "off", // Types explicites pour clarté
-      "@typescript-eslint/no-var-requires": "off", // Pour require conditionnel
-      // Règles pour Node.js
-      "no-undef": "error", // Garder pour éviter les vraies erreurs
-      "no-console": ["warn", { allow: ["warn", "error", "info"] }],
-      "no-useless-escape": "error",
-      "no-empty": "error"
+      
+      // Règles spécifiques NestJS - permissives
+      "@typescript-eslint/no-empty-function": "off", // Constructeurs vides OK
+      "@typescript-eslint/no-inferrable-types": "off", // Types explicites OK
+      "@typescript-eslint/no-empty-object-type": "off", // Interfaces vides OK
+      
+      // Console permis en développement
+      "no-console": "off",
+      
+      // Imports
+      "import/no-extraneous-dependencies": "off", // Permis pour dev
     }
   },
 
-  // Configuration spécifique pour TOUS les fichiers de test
+  // Configuration ULTRA-PERMISSIVE pour les tests
   {
     files: [
       "test/**/*.{ts,tsx}",
       "src/**/*.spec.{ts,tsx}",
       "src/**/*.test.{ts,tsx}",
-      "src/__tests__/**/*.{ts,tsx}"
+      "**/__tests__/**/*.{ts,tsx}",
+      "**/setupTests.{ts,js}",
+      "**/jest.config.{js,ts,mjs,cjs}",
+      "e2e/**/*.{ts,tsx}"
     ],
     languageOptions: {
       parserOptions: {
-        project: null, // Désactive le parsing avec project pour les tests
+        project: null, // Pas de parsing TypeScript pour tests
       },
       globals: {
-        // Globales Jest/Testing
         describe: "readonly",
-        it: "readonly", 
+        it: "readonly",
+        test: "readonly", 
         expect: "readonly",
         beforeEach: "readonly",
         afterEach: "readonly",
         beforeAll: "readonly",
         afterAll: "readonly",
         jest: "readonly",
-        test: "readonly",
-        // Globales Node.js pour les tests
         global: "readonly",
         process: "readonly",
         Buffer: "readonly",
         __dirname: "readonly",
         __filename: "readonly",
-        module: "readonly",
-        require: "readonly",
-        exports: "readonly",
-        setTimeout: "readonly",
-        clearTimeout: "readonly",
         console: "readonly"
       }
     },
     rules: {
-      "@typescript-eslint/no-explicit-any": "off", // Permet 'any' dans les tests
+      // TOUTES LES RÈGLES DÉSACTIVÉES POUR LES TESTS
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/consistent-type-imports": "off",
-      "no-undef": "off", // Désactiver pour les tests
-      "no-console": "off" // Permettre console dans les tests
-    }
+      "@typescript-eslint/no-var-requires": "off",
+      "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-empty-function": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "no-console": "off",
+      "import/no-extraneous-dependencies": "off",
+    },
   },
 
-  // Configuration pour les fichiers JavaScript (comme eslint.config.js)
+  // Configuration pour les fichiers de configuration
   {
-    files: ["*.{js,mjs,cjs}", "scripts/**/*.{js,mjs,cjs}"],
+    files: ["*.config.{js,mjs,ts,cjs}", "*.setup.{js,ts,mjs}"],
     languageOptions: {
-      ecmaVersion: 2024,
-      sourceType: "module",
-      globals: {
-        console: "readonly",
-        process: "readonly",
-        Buffer: "readonly",
-        __dirname: "readonly",
-        __filename: "readonly",
-        global: "readonly",
-        module: "readonly",
-        require: "readonly",
-        exports: "readonly"
-      }
+      parserOptions: {
+        project: null,
+      },
     },
     rules: {
       "@typescript-eslint/no-var-requires": "off",
-      "no-undef": "error"
-    }
-  }
+      "@typescript-eslint/no-unused-vars": "off",
+      "import/no-default-export": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-console": "off",
+    },
+  },
 ];

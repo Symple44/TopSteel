@@ -1,214 +1,88 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "ui": "tui",
   "tasks": {
-    "dev": {
-      "cache": false,
-      "persistent": true,
-      "dependsOn": [
-        "^build"
-      ]
-    },
     "build": {
-      "dependsOn": [
-        "^build"
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.test.{ts,tsx,js,jsx}",
+        "!**/*.spec.{ts,tsx,js,jsx}",
+        "!**/test/**",
+        "!**/__tests__/**",
+        "!**/coverage/**",
+        "!**/*.md",
+        "!**/.env.example"
       ],
       "outputs": [
         "dist/**",
         ".next/**",
-        "build/**"
+        "!.next/cache/**",
+        "storybook-static/**"
       ],
       "env": [
         "NODE_ENV",
         "NEXT_PUBLIC_*",
-        "DB_*",
-        "REDIS_*",
-        "JWT_*",
-        "SKIP_ENV_VALIDATION",
-        "ANALYZE"
-      ],
-      "inputs": [
-        "src/**/*.{ts,tsx,js,jsx}",
-        "public/**",
-        "next.config.*",
-        "tailwind.config.*",
-        "package.json"
+        "DATABASE_URL",
+        "REDIS_URL"
       ]
     },
-    "start": {
-      "dependsOn": [
-        "build"
-      ],
+    "dev": {
       "cache": false,
-      "env": [
-        "NODE_ENV",
-        "PORT"
-      ]
-    },
-    "start:dev": {
-      "cache": false,
-      "persistent": true,
-      "env": [
-        "NODE_ENV",
-        "PORT",
-        "DB_*",
-        "REDIS_*",
-        "JWT_*"
-      ]
-    },
-    "start:prod": {
-      "dependsOn": [
-        "build"
-      ],
-      "cache": false,
-      "env": [
-        "NODE_ENV",
-        "PORT",
-        "DB_*",
-        "REDIS_*",
-        "JWT_*"
-      ]
+      "persistent": true
     },
     "lint": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": []
-    },
-    "lint:fix": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": []
-    },
-    "type-check": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": []
-    },
-    "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ],
+      "dependsOn": ["^build"],
       "inputs": [
-        "src/**/*.{ts,tsx}",
-        "**/*.test.{ts,tsx}"
+        "$TURBO_DEFAULT$",
+        "!**/dist/**",
+        "!**/.next/**"
       ]
     },
-    "test:unit": {
-      "dependsOn": [
-        "^build"
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/dist/**",
+        "!**/.next/**"
+      ],
+      "cache": false
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.test.{ts,tsx,js,jsx}",
+        "!**/*.spec.{ts,tsx,js,jsx}",
+        "!**/test/**",
+        "!**/__tests__/**"
+      ]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/dist/**",
+        "!**/.next/**"
       ],
       "outputs": [
         "coverage/**"
-      ],
-      "cache": false
-    },
-    "test:integration": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [],
-      "env": [
-        "NODE_ENV",
-        "CI",
-        "DB_*",
-        "REDIS_*"
-      ],
-      "cache": false
-    },
-    "test:coverage": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [],
-      "env": [
-        "NODE_ENV",
-        "CI"
-      ],
-      "cache": false
+      ]
     },
     "test:watch": {
       "cache": false,
       "persistent": true
     },
-    "test:cov": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": []
-    },
-    "test:e2e": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [],
-      "env": [
-        "NODE_ENV",
-        "DB_*",
-        "REDIS_*"
-      ]
-    },
-    "migration:run": {
-      "cache": false,
-      "env": [
-        "DB_*"
-      ]
-    },
-    "migration:generate": {
-      "cache": false,
-      "env": [
-        "DB_*"
-      ]
-    },
-    "migration:revert": {
-      "cache": false,
-      "env": [
-        "DB_*"
-      ]
-    },
-    "seed:run": {
-      "cache": false,
-      "env": [
-        "DB_*"
-      ]
-    },
-    "format": {
-      "outputs": [],
+    "clean": {
       "cache": false
-    },
-    "format:check": {
-      "inputs": [
-        "src/**/*.{ts,tsx,js,jsx,json,md}",
-        ".prettierrc*",
-        ".prettierignore",
-        "package.json"
-      ],
-      "outputs": [],
-      "cache": false
-    },
-    "build:types": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**"
-      ],
-      "inputs": [
-        "src/**/*.ts",
-        "tsconfig.json"
-      ]
     }
   },
   "globalEnv": [
-    "TURBO_FORCE",
-    "CI",
-    "NODE_ENV"
+    "NODE_ENV",
+    "CI"
+  ],
+  "globalPassThroughEnv": [
+    "VERCEL_*",
+    "GITHUB_*"
   ]
 }

@@ -17,7 +17,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
     super();
   }
 
-  canActivate(
+  override canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     // Vérifier si la route est marquée comme publique
@@ -34,8 +34,8 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
     return super.canActivate(context);
   }
 
-  //  Signature avec types spécifiques
-  handleRequest<TUser = unknown>(
+  // Signature avec types spécifiques
+  override handleRequest<TUser = unknown>(
     err: Error | null,
     user: TUser,
     info: { name?: string; message?: string } | undefined,

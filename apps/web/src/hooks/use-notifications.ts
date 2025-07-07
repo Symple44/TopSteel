@@ -1,4 +1,10 @@
-import { NotificationsContext } from '@/components/providers/notifications-provider'
+import { 
+  NotificationsContext, 
+  type NotificationsContextValue,
+  type CreateNotificationRequest,
+  type NotificationSettings,
+  type NotificationsState
+} from '@/components/providers/notifications-provider'
 import { useContext } from 'react'
 
 /**
@@ -7,7 +13,7 @@ import { useContext } from 'react'
  * @returns Contexte des notifications avec état et actions
  * @throws Error si utilisé en dehors du NotificationsProvider
  */
-export function useNotifications() {
+export function useNotifications(): NotificationsContextValue {
   const context = useContext(NotificationsContext)
   
   if (!context) {
@@ -25,7 +31,7 @@ export function useNotifications() {
  * 
  * @returns Fonction pour créer une notification
  */
-export function useCreateNotification() {
+export function useCreateNotification(): (notification: CreateNotificationRequest) => Promise<void> {
   const { actions } = useNotifications()
   return actions.createNotification
 }
@@ -35,7 +41,7 @@ export function useCreateNotification() {
  * 
  * @returns État des notifications (lecture seule)
  */
-export function useNotificationsState() {
+export function useNotificationsState(): NotificationsState {
   const { state } = useNotifications()
   return state
 }
@@ -45,7 +51,7 @@ export function useNotificationsState() {
  * 
  * @returns Actions des notifications
  */
-export function useNotificationsActions() {
+export function useNotificationsActions(): NotificationsContextValue['actions'] {
   const { actions } = useNotifications()
   return actions
 }
@@ -55,7 +61,10 @@ export function useNotificationsActions() {
  * 
  * @returns Paramètres et fonction de mise à jour
  */
-export function useNotificationsSettings() {
+export function useNotificationsSettings(): {
+  settings: NotificationSettings;
+  updateSettings: (settings: Partial<NotificationSettings>) => void;
+} {
   const { state, actions } = useNotifications()
   
   return {
@@ -69,7 +78,11 @@ export function useNotificationsSettings() {
  * 
  * @returns Statut de connexion WebSocket
  */
-export function useNotificationsConnection() {
+export function useNotificationsConnection(): {
+  connected: boolean;
+  loading: boolean;
+  error: string | null;
+} {
   const { state } = useNotifications()
   
   return {
@@ -84,7 +97,13 @@ export function useNotificationsConnection() {
  * 
  * @returns Statistiques utiles
  */
-export function useNotificationsStats() {
+export function useNotificationsStats(): {
+  total: number;
+  unread: number;
+  read: number;
+  byCategory: Record<string, number>;
+  byType: Record<string, number>;
+} {
   const { state } = useNotifications()
   
   return {
@@ -113,33 +132,16 @@ export function useFilteredNotifications(filters?: {
   type?: string[]
   read?: boolean
   priority?: string[]
-}) {
+}): import('@erp/types').Notification[] {
   const { state } = useNotifications()
   
   if (!filters) return state.notifications
   
   return state.notifications.filter(notification => {
-    // Filtre par catégorie
-    if (filters.category && !filters.category.includes(notification.category)) {
-      return false
-    }
-    
-    // Filtre par type
-    if (filters.type && !filters.type.includes(notification.type)) {
-      return false
-    }
-    
-    // Filtre par statut de lecture
-    if (filters.read !== undefined && notification.read !== filters.read) {
-      return false
-    }
-    
-    // Filtre par priorité
-    if (filters.priority && notification.metadata?.priority) {
-      if (!filters.priority.includes(notification.metadata.priority)) {
-        return false
-      }
-    }
+    if (filters.category && !filters.category.includes(notification.category)) return false
+    if (filters.type && !filters.type.includes(notification.type)) return false
+    if (filters.read !== undefined && notification.read !== filters.read) return false
+    if (filters.priority && notification.metadata?.priority && !filters.priority.includes(notification.metadata.priority)) return false
     
     return true
   })

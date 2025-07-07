@@ -88,7 +88,10 @@
     "ports:check": "pwsh -Command \"Get-NetTCPConnection -LocalPort 3000,3001,5432 -ErrorAction SilentlyContinue\"",
     "fix:ports": "pwsh -File scripts/fix-ports.ps1",
     "validate:config": "node -e \"console.log('Config validation OK')\"",
-    "migration:create": "turbo migration:generate --filter=@erp/api"
+    "migration:create": "turbo migration:generate --filter=@erp/api",
+    "validate": "turbo type-check && turbo lint",
+    "build:clean": "turbo clean && turbo build",
+    "fix-all": "turbo lint:fix && turbo format"
   },
   "dependencies": {
     "dotenv": "^17.0.1",
