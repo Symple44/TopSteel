@@ -9,6 +9,7 @@ export interface Toast {
   description?: string
   variant?: 'default' | 'destructive' | 'success' | 'warning'
   duration?: number
+  action?: React.ReactNode  // ✅ Ajout de la propriété action manquante
   onDismiss?: () => void
 }
 
@@ -159,25 +160,21 @@ export function useToastShortcuts() {
     }, [toast]),
 
     /**
-     * Toast avec action (sera géré par le composant Toaster)
+     * Toast avec action personnalisée
      */
     withAction: useCallback((
       title: string,
       description: string,
-      actionLabel: string,
-      actionCallback: () => void,
-      variant: Toast['variant'] = 'default'
+      action: React.ReactNode,
+      variant: Toast['variant'] = 'default',
+      duration = 8000
     ) => {
-      // Pour l'instant, on créé juste le toast
-      // L'action sera gérée par le composant Toaster plus tard
       toast({
         title,
         description,
+        action,
         variant,
-        duration: 8000, // Plus long pour laisser le temps de voir le message
-        onDismiss: () => {
-          console.log(`Action disponible: ${actionLabel}`, actionCallback)
-        }
+        duration,
       })
     }, [toast]),
 
@@ -204,7 +201,9 @@ export function useToastMetrics() {
     total: toasts.length,
     byVariant: toasts.reduce((acc, toast) => {
       const variant = toast.variant || 'default'
+
       acc[variant] = (acc[variant] || 0) + 1
+
       return acc
     }, {} as Record<string, number>),
     persistent: toasts.filter(t => t.duration === 0).length,
@@ -224,27 +223,30 @@ export function useToastWithPromise() {
     messages: {
       loading?: string
       success?: string | ((data: T) => string)
-      error?: string | ((error: any) => string)
+      error?: string | ((error: Error) => string)
     }
   ): Promise<T> => {
+    let toastId: string | undefined
+
     // Toast de chargement
     if (messages.loading) {
+      toastId = `promise-${Date.now()}`
       toast({
         title: messages.loading,
         variant: 'default',
-        duration: 0, // Ne se ferme pas automatiquement
+        duration: 0, // Persistant pendant le chargement
       })
     }
 
     try {
       const result = await promise
 
-      // Afficher le succès
+      // Succès
       if (messages.success) {
-        const successMessage = typeof messages.success === 'function'
-          ? messages.success(result)
+        const successMessage = typeof messages.success === 'function' 
+          ? messages.success(result) 
           : messages.success
-
+        
         toast({
           title: successMessage,
           variant: 'success',
@@ -254,12 +256,12 @@ export function useToastWithPromise() {
 
       return result
     } catch (error) {
-      // Afficher l'erreur
+      // Erreur
       if (messages.error) {
-        const errorMessage = typeof messages.error === 'function'
-          ? messages.error(error)
+        const errorMessage = typeof messages.error === 'function' 
+          ? messages.error(error as Error) 
           : messages.error
-
+        
         toast({
           title: errorMessage,
           variant: 'destructive',
@@ -273,13 +275,3 @@ export function useToastWithPromise() {
 
   return { promiseToast }
 }
-
-/**
- * Export de compatibilité avec l'ancien système
- */
-export { useToast as useToastContext }
-
-/**
- * Export par défaut
- */
-export default useToast

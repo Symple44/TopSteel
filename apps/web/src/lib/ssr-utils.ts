@@ -69,6 +69,7 @@ export class BrowserAPIManager {
     if (!BrowserAPIManager.instance) {
       BrowserAPIManager.instance = new BrowserAPIManager(config)
     }
+
     return BrowserAPIManager.instance
   }
 
@@ -86,15 +87,16 @@ export class BrowserAPIManager {
 
     try {
       return {
-        window: window,
-        document: document,
-        navigator: navigator,
-        localStorage: localStorage,
-        sessionStorage: sessionStorage,
-        location: location
+        window,
+        document,
+        navigator,
+        localStorage,
+        sessionStorage,
+        location
       }
     } catch (error) {
       this.handleError(error as Error, 'initializeAPIs')
+
       return {
         window: null,
         document: null,
@@ -136,9 +138,11 @@ export class BrowserAPIManager {
   getFromStorage(key: string, storage: 'local' | 'session' = 'local'): string | null {
     try {
       const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+
       return storageAPI?.getItem(key) || null
     } catch (error) {
       this.handleError(error as Error, `getFromStorage(${key})`)
+
       return null
     }
   }
@@ -146,10 +150,13 @@ export class BrowserAPIManager {
   setToStorage(key: string, value: string, storage: 'local' | 'session' = 'local'): boolean {
     try {
       const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+
       storageAPI?.setItem(key, value)
+
       return true
     } catch (error) {
       this.handleError(error as Error, `setToStorage(${key})`)
+
       return false
     }
   }
@@ -157,10 +164,13 @@ export class BrowserAPIManager {
   removeFromStorage(key: string, storage: 'local' | 'session' = 'local'): boolean {
     try {
       const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+
       storageAPI?.removeItem(key)
+
       return true
     } catch (error) {
       this.handleError(error as Error, `removeFromStorage(${key})`)
+
       return false
     }
   }
@@ -183,6 +193,7 @@ export class BrowserAPIManager {
     if (!this.apis.window) {
       return { width: 1024, height: 768 } // Fallback
     }
+
     return {
       width: this.apis.window.innerWidth,
       height: this.apis.window.innerHeight
@@ -193,6 +204,7 @@ export class BrowserAPIManager {
     if (!this.apis.window?.screen) {
       return { width: 1920, height: 1080 } // Fallback
     }
+
     return {
       width: this.apis.window.screen.width,
       height: this.apis.window.screen.height
@@ -223,6 +235,7 @@ export class BrowserAPIManager {
  */
 export function useBrowserAPI(): BrowserAPIManager {
   const [api] = useState(() => BrowserAPIManager.getInstance())
+
   return api
 }
 
@@ -301,6 +314,7 @@ export function useSSRSafeLocalStorage<T>(
   useEffect(() => {
     try {
       const item = api.getFromStorage(key)
+
       if (item !== null) {
         setStoredValue(serializer.deserialize(item))
       }
@@ -343,6 +357,7 @@ export function clientSide<T>(
     if (isDev) {
       console.warn('Error in clientSide function:', error)
     }
+
     return fallback
   }
 }
@@ -364,6 +379,7 @@ export function serverSide<T>(
     if (isDev) {
       console.warn('Error in serverSide function:', error)
     }
+
     return fallback
   }
 }
@@ -382,6 +398,7 @@ export function safeExecute<T>(
     if (isDev) {
       console.warn(`Safe execute error${context ? ` in ${context}` : ''}:`, error)
     }
+
     return fallback
   }
 }
@@ -399,6 +416,7 @@ export function createSafeGlobal<T extends object>(
 
   try {
     const globalObj = (window as any)[globalName]
+
     return globalObj || fallback
   } catch {
     return fallback as T
@@ -433,6 +451,7 @@ export function hasFeature(feature: string): boolean {
         return 'Notification' in window
       case 'webgl': {
         const canvas = document.createElement('canvas')
+
         return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
       }
       default:

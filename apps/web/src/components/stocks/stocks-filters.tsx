@@ -31,6 +31,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
 
   const handleFilterChange = (key: keyof StocksFilters, value: string) => {
     const newFilters = { ...filters, [key]: value }
+
     setFilters(newFilters)
     onFiltersChange?.(newFilters)
   }
@@ -44,6 +45,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
       stockMax: '',
       statut: ''
     }
+
     setFilters(resetFilters)
     onFiltersChange?.(resetFilters)
     onReset?.()

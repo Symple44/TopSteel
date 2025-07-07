@@ -19,6 +19,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     )
   }
 )
+
 Select.displayName = 'Select'
 
 // SelectTrigger avec support className complet
@@ -44,6 +45,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
     )
   }
 )
+
 SelectTrigger.displayName = 'SelectTrigger'
 
 // SelectValue avec className
@@ -62,6 +64,7 @@ const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
     )
   }
 )
+
 SelectValue.displayName = 'SelectValue'
 
 // SelectContent avec className
@@ -86,6 +89,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
     )
   }
 )
+
 SelectContent.displayName = 'SelectContent'
 
 // SelectItem avec className
@@ -112,6 +116,7 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
     )
   }
 )
+
 SelectItem.displayName = 'SelectItem'
 
 export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem }

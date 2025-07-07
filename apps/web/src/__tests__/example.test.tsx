@@ -10,6 +10,7 @@ describe('Example Test', () => {
 
   it('should render text', () => {
     const { container } = render(<div>Hello Test</div>)
+
     expect(container).toBeInTheDocument()
   })
 })

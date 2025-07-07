@@ -69,6 +69,7 @@ class HydrationManager {
     if (!HydrationManager.instance) {
       HydrationManager.instance = new HydrationManager()
     }
+
     return HydrationManager.instance
   }
 
@@ -83,6 +84,7 @@ class HydrationManager {
             resolve()
             document.removeEventListener('DOMContentLoaded', onReady)
           }
+
           document.addEventListener('DOMContentLoaded', onReady)
         } else {
           // DOM déjà prêt
@@ -118,6 +120,7 @@ class HydrationManager {
 
   addListener(listener: () => void): () => void {
     this._listeners.add(listener)
+
     return () => this._listeners.delete(listener)
   }
 
@@ -179,6 +182,7 @@ export function ClientOnly({
       
       return () => clearTimeout(timer)
     }
+
     return undefined
   }, [fallbackDelay])
 
@@ -207,6 +211,7 @@ export function ClientOnly({
         setIsHydrating(false)
       }
     })
+
     return removeListener
   }, [hasMounted])
 
@@ -279,6 +284,7 @@ export function useHydrated(): boolean {
   useEffect(() => {
     if (hydrationManager.isHydrated) {
       setHydrated(true)
+
       return
     }
 
@@ -313,6 +319,7 @@ export function useHydrationState(): {
         isHydrated: true,
         isHydrating: false
       })
+
       return
     }
 

@@ -33,6 +33,7 @@ export function useNotifications(): NotificationsContextValue {
  */
 export function useCreateNotification(): (notification: CreateNotificationRequest) => Promise<void> {
   const { actions } = useNotifications()
+
   return actions.createNotification
 }
 
@@ -43,6 +44,7 @@ export function useCreateNotification(): (notification: CreateNotificationReques
  */
 export function useNotificationsState(): NotificationsState {
   const { state } = useNotifications()
+
   return state
 }
 
@@ -53,6 +55,7 @@ export function useNotificationsState(): NotificationsState {
  */
 export function useNotificationsActions(): NotificationsContextValue['actions'] {
   const { actions } = useNotifications()
+
   return actions
 }
 
@@ -112,10 +115,12 @@ export function useNotificationsStats(): {
     read: state.notifications.length - state.unreadCount,
     byCategory: state.notifications.reduce((acc, notification) => {
       acc[notification.category] = (acc[notification.category] || 0) + 1
+
       return acc
     }, {} as Record<string, number>),
     byType: state.notifications.reduce((acc, notification) => {
       acc[notification.type] = (acc[notification.type] || 0) + 1
+
       return acc
     }, {} as Record<string, number>)
   }

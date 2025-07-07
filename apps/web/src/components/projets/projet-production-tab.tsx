@@ -153,6 +153,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     }
     
     const config = statusConfig[statut]
+
     if (!config) return null
     
     const Icon = config.icon
@@ -186,6 +187,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     }
     
     const config = prioriteConfig[priorite]
+
     if (!config) return null
     
     return (

@@ -221,15 +221,18 @@ class DesignSystemCache {
 
   static getClass(key: string): string | undefined {
     const result = this.classCache.get(key)
+
     if (result) {
       this.metrics.cacheHits++
     }
+
     return result
   }
 
   static setClass(key: string, value: string): void {
     if (this.classCache.size >= this.maxCacheSize) {
       const firstKey = this.classCache.keys().next().value
+
       if (firstKey) {
         this.classCache.delete(firstKey)
       }
@@ -269,6 +272,7 @@ class ClassGenerator {
   static projectCard(config: DesignSystemConfig): string {
     const cacheKey = `projectCard-${config.density}-${config.animations}-${config.borderRadius}`
     const cached = DesignSystemCache.getClass(cacheKey)
+
     if (cached) return cached
     
     const startTime = performance.now()
@@ -300,12 +304,14 @@ class ClassGenerator {
     
     DesignSystemCache.recordClassGeneration(performance.now() - startTime)
     DesignSystemCache.setClass(cacheKey, classes)
+
     return classes
   }
 
   static statusBadge(status: keyof typeof STATUS_CONFIGS, config: DesignSystemConfig): string {
     const cacheKey = `statusBadge-${status}-${config.density}`
     const cached = DesignSystemCache.getClass(cacheKey)
+
     if (cached) return cached
     
     const startTime = performance.now()
@@ -329,6 +335,7 @@ class ClassGenerator {
     
     DesignSystemCache.recordClassGeneration(performance.now() - startTime)
     DesignSystemCache.setClass(cacheKey, classes)
+
     return classes
   }
 
@@ -339,6 +346,7 @@ class ClassGenerator {
   ): string {
     const cacheKey = `metallurgyButton-${variant}-${size}-${config.animations}`
     const cached = DesignSystemCache.getClass(cacheKey)
+
     if (cached) return cached
     
     const startTime = performance.now()
@@ -370,12 +378,14 @@ class ClassGenerator {
     
     DesignSystemCache.recordClassGeneration(performance.now() - startTime)
     DesignSystemCache.setClass(cacheKey, classes)
+
     return classes
   }
 
   static dataTable(config: DesignSystemConfig): string {
     const cacheKey = `dataTable-${config.density}-${config.animations}`
     const cached = DesignSystemCache.getClass(cacheKey)
+
     if (cached) return cached
     
     const startTime = performance.now()
@@ -391,13 +401,13 @@ class ClassGenerator {
       'border border-border',
       
       // Density
-      '[&_th]:' + densityConfig.padding,
-      '[&_td]:' + densityConfig.padding,
-      '[&_th]:' + densityConfig.text,
-      '[&_td]:' + densityConfig.text,
+      `[&_th]:${  densityConfig.padding}`,
+      `[&_td]:${  densityConfig.padding}`,
+      `[&_th]:${  densityConfig.text}`,
+      `[&_td]:${  densityConfig.text}`,
       
       // Hover effects
-      '[&_tbody_tr]:' + animationConfig.transition,
+      `[&_tbody_tr]:${  animationConfig.transition}`,
       config.animations !== 'none' && '[&_tbody_tr:hover]:bg-muted/50',
       
       // Striped rows
@@ -417,6 +427,7 @@ class ClassGenerator {
     
     DesignSystemCache.recordClassGeneration(performance.now() - startTime)
     DesignSystemCache.setClass(cacheKey, classes)
+
     return classes
   }
 }
@@ -441,6 +452,7 @@ export function useDesignSystem() {
     if (typeof window !== 'undefined') {
       try {
         const stored = localStorage.getItem('topsteel-design-config')
+
         return stored ? { ...defaultConfig, ...JSON.parse(stored) } : defaultConfig
       } catch {
         return defaultConfig
@@ -462,11 +474,13 @@ export function useDesignSystem() {
       if (config.theme === 'system') {
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
       }
+
       return config.theme as ResolvedTheme
     }
     
     const updateResolvedTheme = () => {
       const newTheme = resolveTheme()
+
       setResolvedTheme(newTheme)
       
       // Update document class
@@ -485,6 +499,7 @@ export function useDesignSystem() {
     }
     
     mediaQuery.addEventListener('change', handleChange)
+
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [config.theme])
 
@@ -503,6 +518,7 @@ export function useDesignSystem() {
     
     updateReducedMotion()
     mediaQuery.addEventListener('change', updateReducedMotion)
+
     return () => mediaQuery.removeEventListener('change', updateReducedMotion)
   }, [])
 

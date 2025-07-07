@@ -148,16 +148,19 @@ class ClientsCache {
     
     if (!entry) {
       this.metrics.cacheMisses++
+
       return null
     }
     
     if (Date.now() - entry.timestamp > entry.ttl) {
       cache.delete(key)
       this.metrics.cacheMisses++
+
       return null
     }
     
     this.metrics.cacheHits++
+
     return entry.data
   }
 
@@ -166,6 +169,7 @@ class ClientsCache {
     if (cache.size >= this.maxCacheSize) {
       // Méthode plus sûre : convertir en array pour éviter undefined
       const keys = Array.from(cache.keys())
+
       if (keys.length > 0) {
         cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
       }
@@ -199,6 +203,7 @@ class ClientsCache {
     if (!pattern) {
       this.cache.clear()
       this.clientCache.clear()
+
       return
     }
     
@@ -233,6 +238,7 @@ class ClientsCache {
     // Calcul de la moyenne mobile
     const previousAvg = this.metrics.averageResponseTime
     const count = this.metrics.totalRequests
+
     this.metrics.averageResponseTime = (previousAvg * (count - 1) + responseTime) / count
   }
 
@@ -273,6 +279,7 @@ class ClientsService {
     
     // Vérifier le cache
     const cached = ClientsCache.getClients(cacheKey)
+
     if (cached) {
       return cached
     }
@@ -309,6 +316,7 @@ class ClientsService {
       })
       
       ClientsCache.recordRequest(true, performance.now() - startTime)
+
       return validatedData
       
     } catch (error) {
@@ -322,6 +330,7 @@ class ClientsService {
     
     // Vérifier le cache
     const cached = ClientsCache.getClient(id)
+
     if (cached) {
       return cached
     }
@@ -377,6 +386,7 @@ class ClientsService {
       ClientsCache.setClient(validatedClient.id, validatedClient)
       
       ClientsCache.recordRequest(true, performance.now() - startTime)
+
       return validatedClient
       
     } catch (error) {
@@ -410,6 +420,7 @@ class ClientsService {
       ClientsCache.setClient(id, validatedClient)
       
       ClientsCache.recordRequest(true, performance.now() - startTime)
+
       return validatedClient
       
     } catch (error) {
@@ -589,6 +600,7 @@ class ClientsService {
 
   static cancelRequest(key: string): void {
     const controller = this.abortControllers.get(key)
+
     if (controller) {
       controller.abort()
       this.abortControllers.delete(key)
@@ -625,6 +637,7 @@ class RetryManager {
         
         // Exponential backoff with jitter
         const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000
+
         await new Promise(resolve => setTimeout(resolve, delay))
         
         ClientsCache.recordRequest(false, 0, true)
@@ -771,6 +784,7 @@ export function useClients(
     try {
       // Optimistic update
       const clientToDelete = clients.find(c => c.id === id)
+
       setClients(prev => prev.filter(client => client.id !== id))
       setTotalClients(prev => prev - 1)
       

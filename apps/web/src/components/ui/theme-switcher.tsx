@@ -45,6 +45,7 @@ function useThemeContext() {
     const handleSystemChange = (e: MediaQueryListEvent) => {
       if (storedTheme === 'system') {
         const newSystemTheme = e.matches ? 'dark' : 'light'
+
         document.documentElement.classList.remove('light', 'dark')
         document.documentElement.classList.add(newSystemTheme)
         setThemeState(prev => ({ ...prev, resolvedTheme: newSystemTheme }))
@@ -52,6 +53,7 @@ function useThemeContext() {
     }
 
     mediaQuery.addEventListener('change', handleSystemChange)
+
     return () => mediaQuery.removeEventListener('change', handleSystemChange)
   }, [])
 
@@ -122,6 +124,7 @@ export function ThemeSwitcher({
 
   const handleToggleTheme = useCallback(() => {
     const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
+
     handleThemeChange(newTheme)
   }, [resolvedTheme, handleThemeChange])
 

@@ -28,6 +28,7 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
+
     newDate.setMonth(currentDate.getMonth() + (direction === 'next' ? 1 : -1));
     setCurrentDate(newDate);
   };
@@ -45,6 +46,7 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
     // Jours du mois précédent
     for (let i = startDay - 1; i >= 0; i--) {
       const prevDate = new Date(year, month, -i);
+
       days.push({ date: prevDate, isCurrentMonth: false });
     }
 
@@ -55,6 +57,7 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
 
     // Jours du mois suivant pour compléter la grille
     const remainingDays = 42 - days.length;
+
     for (let day = 1; day <= remainingDays; day++) {
       days.push({ date: new Date(year, month + 1, day), isCurrentMonth: false });
     }
@@ -65,6 +68,7 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
   const getEventsForDate = (date: Date) => {
     return events.filter(event => {
       const eventDate = new Date(event.start);
+
       return eventDate.toDateString() === date.toDateString();
     });
   };

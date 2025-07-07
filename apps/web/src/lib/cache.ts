@@ -12,10 +12,12 @@ class CacheManager {
 
   get(key: string) {
     const item = this.cache.get(key)
+
     if (!item) return null
 
     if (Date.now() - item.timestamp > item.ttl) {
       this.cache.delete(key)
+
       return null
     }
 
@@ -25,6 +27,7 @@ class CacheManager {
   invalidate(pattern?: string) {
     if (!pattern) {
       this.cache.clear()
+
       return
     }
 

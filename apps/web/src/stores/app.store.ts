@@ -233,6 +233,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   updateProjet: (id, updates) => {
     set((state) => {
       const index = state.projets.findIndex(p => p.id === id)
+
       if (index >= 0) {
         state.projets[index] = { ...state.projets[index], ...updates }
         if (state.metrics) {
@@ -276,6 +277,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         timestamp: new Date(),
         read: false
       }
+
       state.notifications.unshift(newNotification)
       // Garder seulement les 100 dernières notifications
       if (state.notifications.length > 100) {
@@ -302,6 +304,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   markNotificationAsRead: (id) => {
     set((state) => {
       const notification = state.notifications.find(n => n.id === id)
+
       if (notification) {
         notification.read = true
       }
@@ -379,8 +382,10 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   triggerSync: async () => {
     const currentState = get()
+
     if (!currentState.sync?.isOnline) {
       console.warn('Synchronisation impossible: hors ligne')
+
       return
     }
 

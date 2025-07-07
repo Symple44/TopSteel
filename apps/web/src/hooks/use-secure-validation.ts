@@ -116,6 +116,7 @@ export function useSecureValidation(rules: ValidationRules) {
         // Custom validation
         if (rule.custom) {
           const customError = rule.custom(value)
+
           if (customError) {
             fieldErrors.push(customError)
           }
@@ -128,6 +129,7 @@ export function useSecureValidation(rules: ValidationRules) {
     })
 
     setErrors(newErrors)
+
     return Object.keys(newErrors).length === 0
   }, [rules])
 
@@ -150,7 +152,9 @@ export function useSecureValidation(rules: ValidationRules) {
     clearFieldError: (field: string) => {
       setErrors(prev => {
         const newErrors = { ...prev }
+
         delete newErrors[field]
+
         return newErrors
       })
     }
@@ -196,6 +200,7 @@ export function useFormSecureValidation() {
         if (value && !value.match(/^(\+33|0)[1-9](\d{8})$/)) {
           return 'Format de téléphone français invalide'
         }
+
         return null
       }
     }

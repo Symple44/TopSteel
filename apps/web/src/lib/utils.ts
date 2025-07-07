@@ -15,6 +15,7 @@ export function formatCurrency(amount: number): string {
 
 export function formatDate(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
+
   return new Intl.DateTimeFormat('fr-FR').format(d)
 }
 
@@ -32,5 +33,6 @@ export function getDaysUntil(date: Date | string): number {
   const targetDate = typeof date === 'string' ? new Date(date) : date
   const today = new Date()
   const diffTime = targetDate.getTime() - today.getTime()
+
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }

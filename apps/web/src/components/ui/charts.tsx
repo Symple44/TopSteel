@@ -103,6 +103,7 @@ export function SimplePieChart({
           label={({ name, percent }) => {
             // ✅ CORRECTION: Vérifier si percent existe et fournir une valeur par défaut
             const safePercent = percent ?? 0
+
             return `${name || 'Inconnu'} ${(safePercent * 100).toFixed(0)}%`
           }}
           outerRadius={80}
@@ -162,6 +163,7 @@ interface PieLabelProps {
 export const formatPieLabel = ({ name, percent }: PieLabelProps): string => {
   const safeName = name || 'Inconnu'
   const safePercent = percent ?? 0
+
   return `${safeName} ${(safePercent * 100).toFixed(0)}%`
 }
 

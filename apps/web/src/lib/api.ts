@@ -214,6 +214,7 @@ export const api = {
 
           if (filters.search) {
             const searchLower = filters.search.toLowerCase()
+
             filteredProjets = filteredProjets.filter(p => 
               p.reference.toLowerCase().includes(searchLower) ||
               p.description?.toLowerCase().includes(searchLower) ||
@@ -235,6 +236,7 @@ export const api = {
         await new Promise(resolve => setTimeout(resolve, 50))
         
         const projets = await this.getAll()
+
         return projets.find(p => p.id === id) || null
       } catch (error) {
         console.error('Erreur lors de la récupération du projet:', error)
@@ -290,6 +292,7 @@ export const api = {
         await new Promise(resolve => setTimeout(resolve, 150))
         
         const existingProjet = await this.getById(id)
+
         if (!existingProjet) {
           throw new Error('Projet non trouvé')
         }

@@ -41,6 +41,7 @@ export class SecurityUtils {
       'tempmail.org', '10minutemail.com', 'guerrillamail.com',
       'mailinator.com', 'yopmail.com', 'temp-mail.org'
     ]
+
     return disposableDomains.includes(domain)
   }
 
@@ -65,6 +66,7 @@ export class SecurityUtils {
         }
         
         calls.push(now)
+
         return fn(...args)
       }) as T
     }
@@ -133,6 +135,7 @@ export class SecurityUtils {
 
     // Variété de caractères
     const uniqueChars = new Set(password).size
+
     if (uniqueChars >= password.length * 0.7) score += 10
 
     return {
@@ -193,6 +196,7 @@ export class SecurityUtils {
     ]
     
     const extension = filename.split('.').pop()?.toLowerCase()
+
     if (extension && dangerousExtensions.includes(extension)) {
       return false
     }
@@ -240,7 +244,9 @@ export class SecurityUtils {
     
     // Navigateur
     const array = new Uint8Array(length)
+
     crypto.getRandomValues(array)
+
     return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
   }
 
@@ -257,6 +263,7 @@ export class SecurityUtils {
     const data = encoder.encode(password + (salt || 'default-salt'))
     const hashBuffer = await crypto.subtle.digest('SHA-256', data)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
+
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
   }
 
@@ -353,6 +360,7 @@ export class SecurityAuditor {
       
       // Vérification CSP
       const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]')
+
       if (csp) {
         passed.push('Content Security Policy détecté')
       } else {

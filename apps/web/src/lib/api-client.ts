@@ -62,6 +62,7 @@ function createRateLimiter(maxRequests: number, windowMs: number) {
     }
     
     requests.push(now)
+
     return operation()
   }
 }
@@ -103,6 +104,7 @@ export class APIError extends Error {
    */
   isRetryable(): boolean {
     const retryableCodes = ['HTTP_500', 'HTTP_502', 'HTTP_503', 'HTTP_504', 'NETWORK_ERROR']
+
     return retryableCodes.includes(this.code)
   }
 }
@@ -132,6 +134,7 @@ export class APIClient {
   private startCacheCleanup(): void {
     setInterval(() => {
       const now = Date.now()
+
       for (const [key, entry] of this.cache.entries()) {
         if (now - entry.timestamp > entry.ttl) {
           this.cache.delete(key)
@@ -145,15 +148,19 @@ export class APIClient {
    */
   private getCachedData<T>(key: string): T | null {
     const entry = this.cache.get(key)
+
     if (!entry) return null
 
     const now = Date.now()
+
     if (now - entry.timestamp > entry.ttl) {
       this.cache.delete(key)
+
       return null
     }
 
     this.metrics.cacheHits++
+
     return entry.data
   }
 
@@ -174,6 +181,7 @@ export class APIClient {
   protected getCacheKey(endpoint: string, config: RequestConfig): string {
     const method = config.method || 'GET'
     const body = config.body ? JSON.stringify(config.body) : ''
+
     return `${method}:${endpoint}:${body}`
   }
 
@@ -190,6 +198,7 @@ export class APIClient {
     // Authentification automatique
     if (config.requireAuth !== false) {
       const token = this.getAuthToken()
+
       if (token) {
         headers.Authorization = `Bearer ${token}`
       }
@@ -206,9 +215,11 @@ export class APIClient {
     
     try {
       const authData = localStorage.getItem('topsteel-tokens')
+
       if (!authData) return null
       
       const { accessToken } = JSON.parse(authData)
+
       return accessToken || null
     } catch {
       return null
@@ -254,6 +265,7 @@ export class APIClient {
         
         // Backoff exponentiel
         const delay = Math.min(1000 * Math.pow(2, i), 10000)
+
         await new Promise(resolve => setTimeout(resolve, delay))
       }
     }
@@ -280,6 +292,7 @@ export class APIClient {
    */
   async request<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
     const startTime = Date.now()
+
     this.metrics.requests++
 
     try {
@@ -290,6 +303,7 @@ export class APIClient {
       if ((config.method || 'GET') === 'GET' && config.cache !== false) {
         const cacheKey = this.getCacheKey(endpoint, config)
         const cachedData = this.getCachedData<T>(cacheKey)
+
         if (cachedData) return cachedData
       }
 
@@ -329,11 +343,13 @@ export class APIClient {
       if ((config.method || 'GET') === 'GET' && config.cache !== false) {
         const cacheKey = this.getCacheKey(endpoint, config)
         const cacheTTL = config.cacheTTL || 5 * 60 * 1000 // 5 minutes par défaut
+
         this.setCachedData(cacheKey, result, cacheTTL)
       }
 
       // Métriques
       const responseTime = Date.now() - startTime
+
       this.metrics.avgResponseTime = (this.metrics.avgResponseTime + responseTime) / 2
 
       return result
@@ -443,6 +459,7 @@ export class APIClient {
   invalidateCache(pattern?: string): void {
     if (!pattern) {
       this.cache.clear()
+
       return
     }
 

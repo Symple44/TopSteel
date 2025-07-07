@@ -220,9 +220,11 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
                       {/* Dépendances (lignes de connexion) */}
                       {task.dependencies?.map((depId) => {
                         const depTask = tasks.find(t => t.id === depId);
+
                         if (!depTask) return null;
                         
                         const depPosition = calculateTaskPosition(depTask, headers);
+
                         return (
                           <div
                             key={depId}

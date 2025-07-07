@@ -174,6 +174,7 @@ export const storeHelpers = {
   isStorePersisted: (storeName: string) => {
     try {
       const key = storeHelpers.createStorageKey(storeName)
+
       return localStorage.getItem(key) !== null
     } catch {
       return false
@@ -206,6 +207,7 @@ export const storeHelpers = {
       }
     } catch (error) {
       console.error('Erreur lors de la récupération des stats:', error)
+
       return null
     }
   },

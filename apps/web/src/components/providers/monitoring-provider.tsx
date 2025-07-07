@@ -198,6 +198,7 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
         if (typeof window !== 'undefined') {
           try {
             const metrics = (window as any).__businessMetrics
+
             if (metrics) {
               metrics.trackError(error, {
                 componentStack: errorInfo.componentStack,

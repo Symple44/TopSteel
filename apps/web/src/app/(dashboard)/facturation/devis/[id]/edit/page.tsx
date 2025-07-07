@@ -50,6 +50,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
   const calculateTotals = useCallback(() => {
     const sousTotal = devis.lignes.reduce((sum, ligne) => {
       const montantLigne = ligne.quantite * ligne.prixUnitaire * (1 - ligne.remise / 100)
+
       return sum + montantLigne
     }, 0)
 
@@ -57,6 +58,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
     const totalTVA = devis.lignes.reduce((sum, ligne) => {
       const montantLigne = ligne.quantite * ligne.prixUnitaire * (1 - ligne.remise / 100)
       const montantTVA = montantLigne * ligne.taux_tva / 100
+
       return sum + montantTVA
     }, 0) * (1 - devis.remiseGlobale / 100)
 
@@ -85,6 +87,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
       taux_tva: 20,
       remise: 0
     }
+
     setDevis(prev => ({
       ...prev,
       lignes: [...prev.lignes, newLigne]

@@ -224,6 +224,7 @@ const projetService = {
 
   async deleteProjet(id: string): Promise<boolean> {
     await new Promise(resolve => setTimeout(resolve, 200))
+
     return true
   },
 
@@ -312,6 +313,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       // Vérifier le cache si pas de force
       if (!force) {
         const cached = projetCache.get(cacheKey)
+
         if (cached) {
           set((state) => {
             state.projets = cached
@@ -319,11 +321,13 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
             state.loading = false
             state.isSyncing = false
           })
+
           return cached
         }
       }
       
       const projets = await projetService.fetchProjets(filters)
+
       projetCache.set(cacheKey, projets)
       
       set((state) => {
@@ -347,6 +351,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
       
       console.error('Erreur fetch projets:', error)
+
       return []
     }
   },
@@ -382,6 +387,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
       
       console.error('Erreur création projet:', error)
+
       return null
     }
   },
@@ -397,6 +403,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       
       set((state) => {
         const index = state.projets.findIndex(p => p.id === id)
+
         if (index !== -1) {
           state.projets[index] = { ...state.projets[index], ...updatedProjet }
         }
@@ -425,6 +432,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
       
       console.error('Erreur mise à jour projet:', error)
+
       return null
     }
   },
@@ -468,6 +476,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
       
       console.error('Erreur suppression projet:', error)
+
       return false
     }
   },
@@ -491,6 +500,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       return duplicatedProjet
     } catch (error) {
       console.error('Erreur duplication projet:', error)
+
       return null
     }
   },
@@ -506,6 +516,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
   selectProjetById: (id) => {
     set((state) => {
       const projet = state.projets.find(p => p.id === id)
+
       state.selectedProjet = projet || null
       state.lastUpdate = Date.now()
     })
@@ -581,15 +592,18 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
 
       // Vérifier le cache d'abord
       const cached = statsCache.get('stats')
+
       if (cached) {
         set((state) => {
           state.stats = cached
           state.loading = false
         })
+
         return
       }
       
       const stats = await projetService.getStats()
+
       statsCache.set('stats', stats)
       
       set((state) => {

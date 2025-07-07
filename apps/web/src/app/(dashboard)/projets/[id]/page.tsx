@@ -114,6 +114,7 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
     }
     
     const config = statusConfig[statut]
+
     if (!config) {
       // Fallback pour statuts non mappés
       return (
@@ -137,6 +138,7 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
   const getProgressColor = (avancement: number) => {
     if (avancement < 30) return 'bg-red-500'
     if (avancement < 70) return 'bg-yellow-500'
+
     return 'bg-green-500'
   }
 

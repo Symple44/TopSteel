@@ -103,6 +103,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
       Word: 'bg-blue-100 text-blue-800',
       CAD: 'bg-orange-100 text-orange-800'
     }
+
     return (
       <Badge className={`${colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800'}`}>
         {type}
@@ -232,6 +233,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
             <div className="text-2xl font-bold">
               {(mockDocuments.reduce((acc, doc) => {
                 const size = parseFloat(doc.taille.replace(/[^\d.]/g, ''))
+
                 return acc + size
               }, 0)).toFixed(1)} MB
             </div>

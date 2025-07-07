@@ -219,9 +219,11 @@ export const useFilteredProjets = () => {
         }
         if (currentFilters.search) {
           const searchTerm = currentFilters.search.toLowerCase()
+
           return projet.reference?.toLowerCase().includes(searchTerm) ||
                  projet.description?.toLowerCase().includes(searchTerm)
         }
+
         return true
       })
     },
@@ -290,6 +292,7 @@ export const useBasicMetrics = () => selectors.useShallow(
 export const usePerformanceMetrics = () => selectors.useShallow(
   (state: AppState) => {
     const metrics = state.metrics
+
     if (!metrics) {
       return {
         loadTime: 0,

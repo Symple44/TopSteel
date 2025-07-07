@@ -42,14 +42,17 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
     // Validation côté client - maintient la robustesse
     if (!formData.reference.trim()) {
       alert('La référence est obligatoire')
+
       return
     }
     if (!formData.client.trim()) {
-      alert('Le client est obligatoire') 
+      alert('Le client est obligatoire')
+ 
       return
     }
     if (!formData.type) {
       alert('Le type de facture est obligatoire')
+
       return
     }
     

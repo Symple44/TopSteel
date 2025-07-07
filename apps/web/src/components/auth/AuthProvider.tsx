@@ -37,6 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (tokens?.accessToken && !user) {
         try {
           const userData = await authService.getMe()
+
           if (isMounted) {
             setUser(userData)
           }
@@ -68,12 +69,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Si l'utilisateur est connecté et sur une page d'auth, rediriger vers dashboard
     if (isAuthenticated && isAuthRoute) {
       router.replace('/dashboard')
+
       return
     }
 
     // Si l'utilisateur n'est pas connecté et sur une page privée, rediriger vers login
     if (!isAuthenticated && !isPublicRoute && pathname !== '/') {
       router.replace('/login')
+
       return
     }
 

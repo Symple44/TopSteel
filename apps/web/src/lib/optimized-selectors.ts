@@ -55,20 +55,25 @@ class SelectorMemoCache {
 
   static get<R>(key: string, ttl: number = this.defaultTTL): R | undefined {
     const entry = this.cache.get(key)
+
     if (!entry) return undefined
 
     const now = Date.now()
+
     if (now - entry.timestamp > ttl) {
       this.cache.delete(key)
+
       return undefined
     }
 
     entry.hitCount++
+
     return entry.value
   }
 
   static set<R>(key: string, value: R): void {
     const now = Date.now()
+
     this.cache.set(key, {
       value,
       timestamp: now,
@@ -80,6 +85,7 @@ class SelectorMemoCache {
       const entries = Array.from(this.cache.entries())
       const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
       const toDelete = sortedByUsage.slice(0, Math.floor(this.maxSize * 0.3))
+
       toDelete.forEach(([key]) => this.cache.delete(key))
     }
   }
@@ -150,11 +156,13 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       const safeSelector = useMemo(() => (state: T) => {
         try {
           const result = selector(state)
+
           return result ?? defaultValue
         } catch (error) {
           if (process.env.NODE_ENV === 'development') {
             console.warn(`⚠️ Selector error in ${debugLabel || 'unknown'}:`, error)
           }
+
           return defaultValue
         }
       }, [selector, defaultValue, debugLabel])
@@ -203,7 +211,9 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       const filteredSelector = useMemo(
         () => (state: T) => {
           const items = selector(state)
+
           if (!items || !Array.isArray(items)) return [] as unknown as R
+
           return items.filter(filterFn) as unknown as R
         },
         [selector, filterFn]
@@ -238,13 +248,16 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
           
           // Vérifier le cache
           const cached = SelectorMemoCache.get<R>(key, ttl)
+
           if (cached !== undefined) {
             return cached
           }
 
           // Calculer et mettre en cache
           const result = selector(state)
+
           SelectorMemoCache.set(key, result)
+
           return result
         }
       }, [selector, ttl, cacheKey, debugLabel])
@@ -267,6 +280,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
      */
     getCacheStats: () => {
       const entries = SelectorMemoCache.getEntries()
+
       return {
         size: entries.length,
         entries: entries.map(([key, value]) => ({
@@ -317,11 +331,13 @@ export function useOptimizedSelector<T, R>(
     return (state: T): R => {
       try {
         const result = selector(state)
+
         return result ?? defaultValue
       } catch (error) {
         if (process.env.NODE_ENV === 'development' && debugLabel) {
           console.warn(`⚠️ Selector error in ${debugLabel}:`, error)
         }
+
         return defaultValue
       }
     }
@@ -377,6 +393,7 @@ export function createMemoizedSelector<T, R>(
       cached.hitCount++
       lastState = state
       lastResult = cached.value
+
       return cached.value
     }
 
@@ -395,11 +412,13 @@ export function createMemoizedSelector<T, R>(
       const entries = Array.from(cache.entries())
       const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
       const toDelete = sortedByUsage.slice(0, Math.floor(maxCacheSize * 0.3))
+
       toDelete.forEach(([key]) => cache.delete(key))
     }
 
     lastState = state
     lastResult = value
+
     return value
   }
 }
@@ -449,11 +468,13 @@ export const selectorDebugUtils = {
       
       for (let i = 0; i < iterations; i++) {
         const start = performance.now()
+
         selector(state)
         times.push(performance.now() - start)
       }
       
       const totalTime = times.reduce((sum, time) => sum + time, 0)
+
       results[name] = {
         averageTime: totalTime / iterations,
         totalTime
@@ -461,6 +482,7 @@ export const selectorDebugUtils = {
     })
     
     console.table(results)
+
     return results
   }
 }

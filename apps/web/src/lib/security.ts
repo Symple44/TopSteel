@@ -36,7 +36,9 @@ export class SecurityUtils {
     
     // Client: utiliser la méthode native du navigateur
     const temp = document.createElement('div')
+
     temp.textContent = html
+
     return temp.innerHTML
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       .replace(/javascript:/gi, '')
@@ -108,6 +110,7 @@ export class SecurityUtils {
         }
         
         requests.push(now)
+
         return fn(...args)
       }) as T
     }
@@ -118,6 +121,7 @@ export class SecurityUtils {
    */
   static getNextAvailableSlot(requests: number[], windowMs: number): number {
     if (requests.length === 0) return Date.now()
+
     return requests[0] + windowMs
   }
 
@@ -131,7 +135,9 @@ export class SecurityUtils {
     }
     
     const array = new Uint8Array(32)
+
     crypto.getRandomValues(array)
+
     return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
   }
 
@@ -161,6 +167,7 @@ export class SecurityUtils {
 
       // Mixed Content
       const insecureElements = document.querySelectorAll('[src^="http://"], [href^="http://"]')
+
       if (insecureElements.length > 0) {
         warnings.push(`${insecureElements.length} éléments non sécurisés détectés`)
       }
@@ -230,6 +237,7 @@ export const secureSchemas = {
   url: z.string().url().max(2048).refine(url => {
     try {
       const parsed = new URL(url)
+
       return ['http:', 'https:'].includes(parsed.protocol)
     } catch {
       return false
@@ -291,6 +299,7 @@ export class FileSecurityUtils {
     
     // Nom de fichier
     const filenameValidation = secureSchemas.filename.safeParse(file.name)
+
     if (!filenameValidation.success) {
       return { valid: false, error: 'Nom de fichier invalide' }
     }

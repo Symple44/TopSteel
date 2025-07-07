@@ -33,6 +33,7 @@ const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
     if (asChild && React.isValidElement(children)) {
       // Correction pour éviter l'erreur de ref avec cloneElement (TypeScript safe)
       const childProps = (children as any).props || {}
+
       return React.cloneElement(children as any, { 
         ...props, 
         ref: (children as any).ref || ref,
@@ -51,6 +52,7 @@ const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
     )
   }
 )
+
 DialogTrigger.displayName = "DialogTrigger"
 
 // DialogContent avec overlay
@@ -77,6 +79,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
     )
   }
 )
+
 DialogContent.displayName = "DialogContent"
 
 // DialogHeader
@@ -98,6 +101,7 @@ const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
     )
   }
 )
+
 DialogHeader.displayName = "DialogHeader"
 
 // DialogTitle
@@ -119,6 +123,7 @@ const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
     )
   }
 )
+
 DialogTitle.displayName = "DialogTitle"
 
 // DialogDescription
@@ -140,6 +145,7 @@ const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescripti
     )
   }
 )
+
 DialogDescription.displayName = "DialogDescription"
 
 // DialogFooter
@@ -161,6 +167,7 @@ const DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
     )
   }
 )
+
 DialogFooter.displayName = "DialogFooter"
 
 export {

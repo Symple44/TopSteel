@@ -224,22 +224,26 @@ class AuthService {
 class AuthUtils {
   static isSessionExpired(session: SessionInfo | null): boolean {
     if (!session) return true
+
     return Date.now() >= session.expiresAt
   }
 
   static shouldRefreshToken(session: SessionInfo | null): boolean {
     if (!session) return false
     const timeLeft = session.expiresAt - Date.now()
+
     return timeLeft <= AUTH_CONFIG.tokenRefreshThreshold && timeLeft > 0
   }
 
   static calculateSessionTimeLeft(session: SessionInfo | null): number {
     if (!session) return 0
+
     return Math.max(0, session.expiresAt - Date.now())
   }
 
   static isAccountLocked(state: Pick<AuthState, 'isLocked' | 'lockoutEndTime'>): boolean {
     if (!state.isLocked || !state.lockoutEndTime) return false
+
     return Date.now() < state.lockoutEndTime
   }
 }
@@ -258,6 +262,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
       
       if (AuthUtils.isAccountLocked(state)) {
         const timeLeft = Math.ceil((state.lockoutEndTime! - Date.now()) / 1000 / 60)
+
         throw new Error(`Compte verrouillé. Réessayez dans ${timeLeft} minutes.`)
       }
       
@@ -324,6 +329,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
       })
 
       const state = get()
+
       if (state.session) {
         await AuthService.logout()
       }
@@ -529,6 +535,7 @@ export const useAuthPermissions = () => useAuthStore(state => state.user?.permis
 export const useAuthRole = () => useAuthStore(state => state.user?.role)
 export const useAuthCanAccess = (permission: string) => useAuthStore(state => {
   if (!state.user) return false
+
   return state.user.permissions.includes('*') || state.user.permissions.includes(permission)
 })
 
@@ -554,9 +561,11 @@ if (typeof window !== 'undefined') {
   
   const handleActivity = () => {
     const now = Date.now()
+
     if (now - lastActivityUpdate >= 30000) { // Max 1 fois par 30 secondes
       lastActivityUpdate = now
       const state = useAuthStore.getState()
+
       if (state.isAuthenticated) {
         state.updateActivity()
       }

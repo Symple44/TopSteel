@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { Metadata, Viewport } from 'next'
+import type { ReactNode } from 'react'
+import type { Metadata, Viewport } from 'next'
 
 // ===== MÉTADONNÉES =====
 export const metadata: Metadata = {

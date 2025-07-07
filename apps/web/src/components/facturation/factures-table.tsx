@@ -47,6 +47,7 @@ const getStatusBadge = (statut: string) => {
   }
   
   const item = config[statut as keyof typeof config] || config.brouillon
+
   return <Badge variant={item.variant}>{item.label}</Badge>
 }
 

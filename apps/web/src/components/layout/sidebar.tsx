@@ -117,11 +117,13 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const isActive = (href?: string) => {
     if (!href) return false
     if (href === '/dashboard') return pathname === href
+
     return pathname.startsWith(href)
   }
 
   const isParentActive = (item: NavItem) => {
     if (isActive(item.href)) return true
+
     return item.children?.some(child => isActive(child.href)) || false
   }
 

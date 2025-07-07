@@ -15,6 +15,7 @@ describe('TopSteel Web Integration', () => {
         module: 'web',
         status: 'integration-ready'
       });
+
       expect(mockData.status).toContain('integration');
     });
   });

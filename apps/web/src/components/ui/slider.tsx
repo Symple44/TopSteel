@@ -14,6 +14,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
         value={stringValue}
         onChange={(e) => {
           const newValue = Number((e.target as HTMLInputElement | HTMLTextAreaElement).value);
+
           if (onValueChange) {
             onValueChange([newValue]); // Retourne array pour compatibilité
           }
@@ -24,6 +25,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
     )
   }
 )
+
 Slider.displayName = "Slider"
 
 export { Slider }

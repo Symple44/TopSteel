@@ -25,6 +25,7 @@ export function useOptimizedQuery<T>({
     refetchOnWindowFocus: false,
     retry: (failureCount, error: any) => {
       if (error?.response?.status === 404) return false
+
       return failureCount < 3
     }
   })
@@ -78,6 +79,7 @@ export function useSmartQuery<T>(
       if (error?.response?.status >= 400 && error?.response?.status < 500) {
         return false
       }
+
       return failureCount < 3
     }
   })
@@ -118,6 +120,7 @@ export function useSmartMutation<TData, TVariables>(
       if (error?.response?.status >= 400 && error?.response?.status < 500) {
         return false
       }
+
       return failureCount < 1 // Un seul retry pour les erreurs serveur
     }
   })

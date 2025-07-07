@@ -12,6 +12,7 @@ export function useStoreSsr<T>(options: UseStoreSsrOptions<T>) {
     if (typeof window === 'undefined') {
       return serverValue ?? fallback
     }
+
     return fallback
   }, [fallback, serverValue])
 

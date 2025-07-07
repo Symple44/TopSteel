@@ -17,6 +17,7 @@ describe('Performance Monitoring', () => {
     rerender()
     
     const metrics = performanceMonitor.getMetrics()
+
     expect(metrics.length).toBeGreaterThan(0)
     expect(metrics[0].componentName).toBe('TestComponent')
   })
@@ -36,6 +37,7 @@ describe('Performance Monitoring', () => {
     })
 
     const average = performanceMonitor.getAverageRenderTime('TestComponent')
+
     expect(average).toBe(15)
   })
 

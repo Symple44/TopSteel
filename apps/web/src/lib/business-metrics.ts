@@ -96,6 +96,7 @@ class BusinessMetrics {
   private generateSessionId(): string {
     const timestamp = Date.now().toString(36)
     const random = Math.random().toString(36).substring(2)
+
     return `${timestamp}-${random}`
   }
 
@@ -307,6 +308,7 @@ class BusinessMetrics {
     
     if (oldIndex < newIndex) return 'progress'
     if (oldIndex > newIndex) return 'regression'
+
     return 'lateral'
   }
 
@@ -365,6 +367,7 @@ class BusinessMetrics {
     initialized: boolean
   } {
     const eventCounts = new Map<string, number>()
+
     this.events.forEach(event => {
       eventCounts.set(event.name, (eventCounts.get(event.name) || 0) + 1)
     })
@@ -428,6 +431,7 @@ function getBusinessMetrics(): BusinessMetrics {
       enableDebugLogs: process.env.NODE_ENV === 'development'
     })
   }
+
   return businessMetricsInstance
 }
 

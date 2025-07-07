@@ -6,7 +6,9 @@ export function usePerformance() {
 
   const measureTime = useCallback((label: string) => {
     const now = Date.now()
+
     metrics.current[label] = now - startTime.current
+
     return metrics.current[label]
   }, [])
 
@@ -21,6 +23,7 @@ export function usePerformance() {
 
   const averageTime = useMemo(() => {
     const times = Object.values(metrics.current)
+
     return times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0
   }, [])
 

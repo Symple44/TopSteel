@@ -41,6 +41,7 @@ export default function OrdrePage({ params }: OrdrePageProps) {
       'pause': 'warning',
       'termine': 'success'
     }
+
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>
   }
 

@@ -26,6 +26,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
 
   const handleFilterChange = (key: keyof ProductionFilters, value: any) => {
     const newFilters = { ...filters, [key]: value };
+
     setFilters(newFilters);
     onFiltersChange?.(newFilters); // Safe call avec ?
   };

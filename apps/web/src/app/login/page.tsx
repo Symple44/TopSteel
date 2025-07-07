@@ -40,6 +40,7 @@ export default function LoginPage() {
   // Vérifier les messages de succès depuis l'URL
   useEffect(() => {
     const message = searchParams.get('message')
+
     if (message) {
       setSuccess(message)
     }
@@ -64,6 +65,7 @@ export default function LoginPage() {
       console.error('Erreur lors de la connexion:', err)
       
       const formattedError = ErrorHandler.formatError(err)
+
       setError(formattedError)
       
       // Si l'erreur concerne un champ spécifique, l'afficher sur le champ

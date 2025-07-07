@@ -158,9 +158,11 @@ class ThemeStorage {
   static get(): Theme | null {
     try {
       if (typeof window === 'undefined') return null
+
       return (localStorage.getItem(DEFAULT_STORAGE_KEY) as Theme) || null
     } catch (error) {
       console.warn('Theme storage get error:', error)
+
       return null
     }
   }
@@ -169,9 +171,11 @@ class ThemeStorage {
     try {
       if (typeof window === 'undefined') return false
       localStorage.setItem(DEFAULT_STORAGE_KEY, theme)
+
       return true
     } catch (error) {
       console.warn('Theme storage set error:', error)
+
       return false
     }
   }
@@ -180,9 +184,11 @@ class ThemeStorage {
     try {
       if (typeof window === 'undefined') return false
       localStorage.removeItem(DEFAULT_STORAGE_KEY)
+
       return true
     } catch (error) {
       console.warn('Theme storage remove error:', error)
+
       return false
     }
   }
@@ -191,6 +197,7 @@ class ThemeStorage {
 class ThemeApplicator {
   static getSystemTheme(): ResolvedTheme {
     if (typeof window === 'undefined') return 'light'
+
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
@@ -215,6 +222,7 @@ class ThemeApplicator {
       // Appliquer les variables CSS
       Object.entries(colors).forEach(([key, value]) => {
         const cssVar = `--${key.replace(/[A-Z]/g, '-$&').toLowerCase()}`
+
         root.style.setProperty(cssVar, value)
       })
 
@@ -310,6 +318,7 @@ export function ThemeProvider({
       return enableSystem ? 
         ThemeApplicator.getSystemTheme() : fallbackTheme
     }
+
     return currentTheme as ResolvedTheme
   }, [enableSystem, fallbackTheme])
 
@@ -337,6 +346,7 @@ export function ThemeProvider({
   const setTheme = useCallback((newTheme: Theme) => {
     if (!['light', 'dark', 'system'].includes(newTheme)) {
       console.warn(`Invalid theme: ${newTheme}`)
+
       return
     }
 
@@ -353,6 +363,7 @@ export function ThemeProvider({
       
       // Sauvegarder dans le storage
       const saved = ThemeStorage.set(newTheme)
+
       if (!saved && enableMetrics) {
         ThemeMetricsCollector.recordStorageError()
       }
@@ -387,6 +398,7 @@ export function ThemeProvider({
       updateResolvedTheme(initialTheme)
       
       const hydrationTime = Date.now() - hydrationStart
+
       if (enableMetrics) {
         ThemeMetricsCollector.recordHydration(hydrationTime)
       }
@@ -412,6 +424,7 @@ export function ThemeProvider({
     }
 
     mediaQuery.addEventListener('change', handleChange)
+
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme, enableSystem, updateResolvedTheme])
 
@@ -422,6 +435,7 @@ export function ThemeProvider({
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === storageKey && e.newValue) {
         const newTheme = e.newValue as Theme
+
         if (newTheme !== theme) {
           setThemeState(newTheme)
           updateResolvedTheme(newTheme)
@@ -430,6 +444,7 @@ export function ThemeProvider({
     }
 
     window.addEventListener('storage', handleStorageChange)
+
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [theme, storageKey, enableSync, updateResolvedTheme])
 
@@ -517,6 +532,7 @@ export function useTheme(): ThemeProviderContext {
 
 export function useThemeMetrics(): ThemeMetrics {
   const { metrics } = useTheme()
+
   return metrics
 }
 
@@ -530,6 +546,7 @@ export function useThemeDebug(): {
 
   const logMetrics = useCallback(() => {
     const metrics = ThemeMetricsCollector.getMetrics()
+
     console.table(metrics)
   }, [])
 

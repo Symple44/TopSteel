@@ -70,9 +70,11 @@ const useDataTableState = (columns: Column[]) => {
   // Initialisation garantie avec tous les états boolean
   const [visibleColumns, setVisibleColumns] = React.useState<Record<string, boolean>>(() => {
     const initialState: Record<string, boolean> = {}
+
     columns.forEach(col => {
       initialState[col.key] = true // Valeur explicite, pas undefined
     })
+
     return initialState
   })
 
@@ -93,6 +95,7 @@ const useDataTableState = (columns: Column[]) => {
   ) => {
     setColumnFilters(prev => {
       const current = prev[columnId] ?? []
+
       if (checked) {
         return { ...prev, [columnId]: [...current, value] }
       } else {
@@ -125,9 +128,11 @@ const useFilteredData = (
       // Recherche textuelle avec protection
       if (searchTerm.trim() && searchableColumns.length > 0) {
         const normalizedSearch = searchTerm.toLowerCase().trim()
+
         filtered = filtered.filter(item =>
           searchableColumns.some(column => {
             const value = safeGetItemValue(item, column)
+
             return value.toLowerCase().includes(normalizedSearch)
           })
         )
@@ -138,6 +143,7 @@ const useFilteredData = (
         if (Array.isArray(values) && values.length > 0) {
           filtered = filtered.filter(item => {
             const itemValue = safeGetItemValue(item, column)
+
             return values.includes(itemValue)
           })
         }
@@ -146,6 +152,7 @@ const useFilteredData = (
       return filtered
     } catch (error) {
       console.error('[DataTable] Erreur lors du filtrage:', error)
+
       return data // Fallback sur les données originales
     }
   }, [data, searchTerm, columnFilters, searchableColumns])
@@ -200,11 +207,13 @@ export function DataTable({
   // ===== VALIDATION DES PROPS =====
   if (!Array.isArray(data)) {
     console.warn('[DataTable] prop "data" doit être un array')
+
     return null
   }
 
   if (!Array.isArray(columns) || columns.length === 0) {
     console.warn('[DataTable] prop "columns" doit être un array non vide')
+
     return null
   }
 

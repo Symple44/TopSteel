@@ -100,6 +100,7 @@ export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: M
       };
       
       const targetType = typeMapping[type.toLowerCase()] || type.toUpperCase();
+
       return m.type === targetType;
     }) : 
     displayMovements;

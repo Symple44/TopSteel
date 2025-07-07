@@ -220,9 +220,11 @@ export const authService = {
   async checkEmailAvailability(email: string): Promise<boolean> {
     try {
       const response = await apiClient.get<ApiResponse<{ available: boolean }>>(`/auth/check-email?email=${encodeURIComponent(email)}`)
+
       return response.data.available
     } catch (error) {
       console.error('Erreur lors de la vérification de l\'email:', error)
+
       // En cas d'erreur, considérer l'email comme non disponible par sécurité
       return false
     }
@@ -238,6 +240,7 @@ export const authService = {
           Authorization: `Bearer ${token}`
         }
       })
+
       return true
     } catch (error) {
       return false

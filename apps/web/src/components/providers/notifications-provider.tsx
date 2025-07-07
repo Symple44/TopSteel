@@ -109,6 +109,7 @@ function notificationsReducer(
   switch (action.type) {
     case 'ADD_NOTIFICATION': {
       const newNotifications = [action.payload, ...state.notifications]
+
       return {
         ...state,
         notifications: newNotifications,
@@ -120,6 +121,7 @@ function notificationsReducer(
       const updatedNotifications = state.notifications.map(n => 
         n.id === action.payload ? { ...n, read: true } : n
       )
+
       return {
         ...state,
         notifications: updatedNotifications,
@@ -129,6 +131,7 @@ function notificationsReducer(
     
     case 'MARK_ALL_AS_READ': {
       const allReadNotifications = state.notifications.map(n => ({ ...n, read: true }))
+
       return {
         ...state,
         notifications: allReadNotifications,
@@ -138,6 +141,7 @@ function notificationsReducer(
     
     case 'REMOVE_NOTIFICATION': {
       const filteredNotifications = state.notifications.filter(n => n.id !== action.payload)
+
       return {
         ...state,
         notifications: filteredNotifications,
@@ -272,9 +276,11 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       dispatch({ type: 'SET_LOADING', payload: true })
       
       const response = await fetch('/api/notifications')
+
       if (!response.ok) throw new Error('Erreur lors du chargement')
       
       const notifications = await response.json()
+
       dispatch({ type: 'SET_NOTIFICATIONS', payload: notifications })
     } catch (error) {
       console.error('Erreur refresh notifications:', error)
@@ -291,6 +297,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     
     try {
       const ws = new WebSocket(wsUrl)
+
       wsRef.current = ws
 
       ws.onopen = () => {
@@ -307,6 +314,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         // Reconnexion automatique avec backoff exponentiel
         if (reconnectAttempts.current < 5) {
           const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000)
+
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectAttempts.current++
             connectWebSocket()
@@ -341,6 +349,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
           // Son si activé
           if (state.settings.enableSound) {
             const audio = new Audio('/sounds/notification.mp3')
+
             audio.volume = 0.3
             audio.play().catch(() => {}) // Ignore les erreurs de lecture
           }

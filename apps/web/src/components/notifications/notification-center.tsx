@@ -30,6 +30,7 @@ export function NotificationCenter() {
   const getNotificationIcon = (type: string, category: string) => {
     if (type === 'error') return <AlertTriangle className="h-4 w-4 text-red-500" />
     if (category === 'stock') return <Clock className="h-4 w-4 text-orange-500" />
+
     return <Bell className="h-4 w-4 text-blue-500" />
   }
 
@@ -43,6 +44,7 @@ export function NotificationCenter() {
     if (minutes < 1) return 'À l\'instant'
     if (minutes < 60) return `Il y a ${minutes}min`
     if (hours < 24) return `Il y a ${hours}h`
+
     return `Il y a ${days}j`
   }
 

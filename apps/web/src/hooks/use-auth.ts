@@ -37,8 +37,8 @@ const mockUser: User = {
 }
 
 const mockTokens: Tokens = {
-  accessToken: 'mock-access-token-' + Date.now(),
-  refreshToken: 'mock-refresh-token-' + Date.now(),
+  accessToken: `mock-access-token-${  Date.now()}`,
+  refreshToken: `mock-refresh-token-${  Date.now()}`,
   expiresIn: 3600,
   tokenType: 'Bearer'
 }
@@ -53,6 +53,7 @@ const storage = {
     if (typeof window === 'undefined') return null
     try {
       const item = localStorage.getItem(key)
+
       return item ? JSON.parse(item) : null
     } catch {
       return null
@@ -104,6 +105,7 @@ export const useAuth = () => {
       return response.ok
     } catch (error) {
       console.warn('Token validation failed:', error)
+
       return false
     }
   }, [])
@@ -129,6 +131,7 @@ export const useAuth = () => {
           isLoading: false,
           isAuthenticated: true
         })
+
         return
       }
 
@@ -326,10 +329,12 @@ export const useAuth = () => {
 // ✅ EXPORTS SUPPLÉMENTAIRES POUR COMPATIBILITÉ
 export const useCurrentUser = () => {
   const { user } = useAuth()
+
   return user
 }
 
 export const useIsAuthenticated = () => {
   const { isAuthenticated } = useAuth()
+
   return isAuthenticated
 }

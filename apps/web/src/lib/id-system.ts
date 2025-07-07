@@ -111,11 +111,14 @@ class IDCache {
 
   static get(key: string): ParsedID | undefined {
     const result = this.cache.get(key)
+
     if (result) {
       this.metrics.cacheHits++
+
       return result
     }
     this.metrics.cacheMisses++
+
     return undefined
   }
 
@@ -124,6 +127,7 @@ class IDCache {
     if (this.cache.size >= this.maxSize) {
       // Méthode plus sûre : convertir en array pour éviter undefined
       const keys = Array.from(this.cache.keys())
+
       if (keys.length > 0) {
         this.cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
       }
@@ -186,13 +190,16 @@ class IDGenerator {
   private static initializeClientNodeId(): string {
     try {
       let nodeId = localStorage.getItem('topsteel_node_id')
+
       if (!nodeId || nodeId.length < 4) {
         nodeId = this.generateSecureNodeId()
         localStorage.setItem('topsteel_node_id', nodeId)
       }
+
       return nodeId
     } catch (error) {
       console.warn('Cannot access localStorage, using fallback nodeId')
+
       return this.generateFallbackNodeId()
     }
   }
@@ -200,6 +207,7 @@ class IDGenerator {
   private static initializeServerNodeId(): string {
     // Utiliser variables d'environnement pour l'ID serveur
     const instanceId = process.env.INSTANCE_ID || process.env.HOSTNAME || 'server'
+
     return `${this.environment.slice(0, 3)}-${instanceId.slice(0, 4)}`
   }
 
@@ -210,7 +218,9 @@ class IDGenerator {
     
     if (crypto.getRandomValues) {
       const array = new Uint8Array(4)
+
       crypto.getRandomValues(array)
+
       return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
     }
     
@@ -239,10 +249,12 @@ class IDGenerator {
       }
       
       IDCache.recordGeneration(performance.now() - startTime)
+
       return result
     } catch (error) {
       IDCache.recordError()
       console.error('UUID generation failed:', error)
+
       return this.generateFallbackUUID()
     }
   }
@@ -296,6 +308,7 @@ class IDGenerator {
         try {
           // Test direct sans condition
           const testArray = new Uint8Array(1)
+
           crypto.getRandomValues(testArray)
           result = this.generateSecureNanoId(length, defaultAlphabet)
         } catch {
@@ -305,11 +318,13 @@ class IDGenerator {
       }
       
       IDCache.recordGeneration(performance.now() - startTime)
+
       return result
       
     } catch (error) {
       console.warn('NanoID generation failed, using fallback:', error)
       IDCache.recordError()
+
       return this.generateFallbackNanoId(length, defaultAlphabet)
     }
   }
@@ -322,10 +337,13 @@ class IDGenerator {
       
       // Test rapide pour vérifier que crypto.getRandomValues fonctionne
       const testArray = new Uint8Array(1)
+
       crypto.getRandomValues(testArray)
+
       return true
     } catch (error) {
       console.warn('Crypto.getRandomValues not available:', error)
+
       return false
     }
   }
@@ -340,15 +358,19 @@ class IDGenerator {
 
   private static generateSecureNanoId(length: number, alphabet: string): string {
     const bytes = new Uint8Array(length)
+
     crypto.getRandomValues(bytes)
+
     return Array.from(bytes, byte => alphabet[byte % alphabet.length]).join('')
   }
 
   private static generateFallbackNanoId(length: number, alphabet: string): string {
     let result = ''
+
     for (let i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
     }
+
     return result
   }
 
@@ -401,14 +423,17 @@ class IDGenerator {
       
       if (checksum) {
         const checksumValue = this.calculateChecksum(result)
+
         result += `-${checksumValue}`
       }
       
       IDCache.recordGeneration(performance.now() - startTime)
+
       return result
     } catch (error) {
       IDCache.recordError()
       console.error('Business ID generation failed:', error)
+
       return `${ID_PREFIXES[prefix]}-FALLBACK-${Date.now()}`
     }
   }
@@ -448,11 +473,14 @@ class IDGenerator {
 
   private static calculateChecksum(input: string): string {
     let hash = 0
+
     for (let i = 0; i < input.length; i++) {
       const char = input.charCodeAt(i)
+
       hash = ((hash << 5) - hash) + char
       hash = hash & hash // Convert to 32-bit integer
     }
+
     return Math.abs(hash).toString(36).slice(0, 4)
   }
 }
@@ -464,6 +492,7 @@ class IDGenerator {
 class IDParser {
   static parse(id: string): ParsedID {
     const cached = IDCache.get(id)
+
     if (cached) return cached
     
     const startTime = performance.now()
@@ -482,11 +511,13 @@ class IDParser {
       // Validation format basique
       if (!id || typeof id !== 'string' || id.length < 3) {
         IDCache.set(id, result)
+
         return result
       }
 
       // Parse prefix
       const parts = id.split('-')
+
       if (parts.length >= 2) {
         const potentialPrefix = parts[0]
         const prefixKeys = Object.keys(ID_PREFIXES) as Array<keyof typeof ID_PREFIXES>
@@ -504,8 +535,10 @@ class IDParser {
           // Parse timestamp si présent
           if (parts.length >= 3) {
             const timestampPart = parts[result.environment ? 2 : 1]
+
             if (timestampPart && /^[0-9a-z]+$/.test(timestampPart)) {
               const timestamp = parseInt(timestampPart, 36)
+
               if (!isNaN(timestamp) && timestamp > 1000000) {
                 result.timestamp = timestamp
               }
@@ -514,6 +547,7 @@ class IDParser {
           
           // Déterminer le format
           const mainPart = parts[parts.length - (result.checksum ? 2 : 1)]
+
           if (mainPart) {
             for (const [format, config] of Object.entries(ID_FORMATS)) {
               if (config.pattern.test(mainPart)) {
@@ -533,6 +567,7 @@ class IDParser {
 
       IDCache.recordGeneration(performance.now() - startTime)
       IDCache.set(id, result)
+
       return result
     } catch (error) {
       IDCache.recordError()
@@ -549,6 +584,7 @@ class IDParser {
       }
       
       IDCache.set(id, fallbackResult)
+
       return fallbackResult
     }
   }
@@ -567,6 +603,7 @@ class IDParser {
     } catch (error) {
       IDCache.recordError()
       console.error('ID validation failed:', error)
+
       return false
     }
   }
@@ -626,10 +663,12 @@ export function useClientId(prefix?: keyof typeof ID_PREFIXES, config?: Partial<
       const newId = prefix 
         ? IDGenerator.business(prefix, config) 
         : IDGenerator.nanoid()
+
       setId(newId)
       setError(null)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+
       setError(errorMessage)
       console.error('useClientId failed:', errorMessage)
       

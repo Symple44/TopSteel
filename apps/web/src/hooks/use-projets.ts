@@ -49,6 +49,7 @@ export const useProjets = (autoFetch = true) => {
 
   useEffect(() => {
     setMounted(true)
+
     return () => setMounted(false)
   }, [])
 
@@ -83,6 +84,7 @@ export const useProjet = (id?: string) => {
   const selectProjet = useCallback((targetId: string | undefined) => {
     if (!targetId) {
       setSelectedProjet?.(null)
+
       return
     }
 
@@ -188,9 +190,11 @@ export const useProjetsFilters = () => {
     },
     removeFilter: (key: keyof ProjetFilters) => {
       const newFilters = { ...filters }
+
       // ✅ Type-safe deletion
       if (key in newFilters) {
         const { [key]: removed, ...rest } = newFilters
+
         setFilters?.(rest)
       }
     }

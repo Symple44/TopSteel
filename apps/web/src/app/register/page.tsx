@@ -183,6 +183,7 @@ export default function RegisterPage() {
             message: 'Erreur serveur. Veuillez réessayer plus tard.'
           })
         }
+
         return
       }
 
@@ -223,6 +224,7 @@ export default function RegisterPage() {
     
     if (score < 3) return { score, text: 'Faible', color: 'text-red-500' }
     if (score < 5) return { score, text: 'Moyen', color: 'text-yellow-500' }
+
     return { score, text: 'Fort', color: 'text-green-500' }
   }, [])
 

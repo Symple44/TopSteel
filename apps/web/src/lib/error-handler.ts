@@ -82,7 +82,7 @@ export class ErrorHandler {
 
     return {
       title: titles[status] || 'Erreur',
-      message: message
+      message
     }
   }
 

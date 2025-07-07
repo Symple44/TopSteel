@@ -90,6 +90,7 @@ export default function ProjetsPage() {
     if (!searchTerm.trim()) return projets
     
     const term = searchTerm.toLowerCase()
+
     return projets.filter(projet => 
       projet?.reference?.toLowerCase().includes(term) ||
       projet?.client?.nom?.toLowerCase().includes(term) ||

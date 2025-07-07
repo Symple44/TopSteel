@@ -126,6 +126,7 @@ export function useRenderOptimization<T>(
         timestamp: Date.now(),
         reason: `Value changed in ${name}`
       }
+
       changesRef.current.push(changeInfo)
       
       // Garder seulement les 50 derniers changements
@@ -192,6 +193,7 @@ export function useOptimizedDebounce<T>(
     }
 
     const now = Date.now()
+
     lastCallTimeRef.current = now
     lastValueRef.current = value
 
@@ -295,6 +297,7 @@ export function useIntelligentCache<K, V>(
     if (ttl && (now - entry.timestamp) > ttl) {
       cache.delete(key)
       setCacheSize(cache.size)
+
       return undefined
     }
     
@@ -311,6 +314,7 @@ export function useIntelligentCache<K, V>(
     
     // Supprimer l'ancienne entrée si elle existe
     const existingEntry = cache.get(key)
+
     if (existingEntry && onEvict) {
       onEvict(key, existingEntry.value)
     }
@@ -330,6 +334,7 @@ export function useIntelligentCache<K, V>(
       
       if (lruKey !== undefined) {
         const evictedEntry = cache.get(lruKey)
+
         cache.delete(lruKey)
         if (evictedEntry && onEvict) {
           onEvict(lruKey, evictedEntry.value)
@@ -358,6 +363,7 @@ export function useIntelligentCache<K, V>(
     }
     
     setCacheSize(cache.size)
+
     return deleted
   }, [onEvict])
 
@@ -413,6 +419,7 @@ export function useIntelligentCache<K, V>(
       
       for (const key of keysToDelete) {
         const entry = cache.get(key)
+
         cache.delete(key)
         if (entry && onEvict) {
           onEvict(key, entry.value)
@@ -541,6 +548,7 @@ export function useMemoryLeakDetector(componentName: string) {
         
         // Garder seulement les mesures des 5 dernières minutes
         const fiveMinutesAgo = Date.now() - 300000
+
         memorySnapshotsRef.current = memorySnapshotsRef.current.filter(
           snapshot => snapshot.timestamp > fiveMinutesAgo
         )

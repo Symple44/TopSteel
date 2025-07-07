@@ -70,6 +70,7 @@ const getStatusBadge = (statut: string) => {
   }
   
   const item = config[statut as keyof typeof config] || config.en_attente
+
   return <Badge variant={item.variant}>{item.label}</Badge>
 }
 

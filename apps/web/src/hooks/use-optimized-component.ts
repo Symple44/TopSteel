@@ -19,6 +19,7 @@ export function useOptimizedSearch<T>(
         String(item[field]).toLowerCase().includes(term.toLowerCase())
       )
     )
+
     setFilteredData(filtered)
   }, [])
 

@@ -85,9 +85,11 @@ export class StoreUtils {
           getItem: (key: string) => {
             try {
               const item = localStorage.getItem(key)
+
               return item ? JSON.parse(item) : null
             } catch (error) {
               console.warn(`Erreur lecture storage pour ${key}:`, error)
+
               return null
             }
           },
@@ -109,6 +111,7 @@ export class StoreUtils {
         partialize: (state: any) => {
           // Ne persister que les données importantes
           const { loading, error, lastUpdate, ...persistedState } = state
+
           return persistedState
         },
         onRehydrateStorage: () => (state, error) => {
@@ -192,11 +195,15 @@ export class StoreUtils {
     try {
       onStart?.()
       const result = await action()
+
       onSuccess?.(result)
+
       return result
     } catch (error) {
       const errorObj = error instanceof Error ? error : new Error(String(error))
+
       onError?.(errorObj)
+
       return null
     }
   }
@@ -210,10 +217,12 @@ export class StoreUtils {
     return {
       get: (key: K): V | null => {
         const item = cache.get(key)
+
         if (!item) return null
 
         if (Date.now() - item.timestamp > ttlMs) {
           cache.delete(key)
+
           return null
         }
 
@@ -229,10 +238,12 @@ export class StoreUtils {
 
       has: (key: K): boolean => {
         const item = cache.get(key)
+
         if (!item) return false
 
         if (Date.now() - item.timestamp > ttlMs) {
           cache.delete(key)
+
           return false
         }
 
@@ -276,6 +287,7 @@ export class StoreUtils {
 
     for (const [key, validator] of Object.entries(schema)) {
       const value = state[key as keyof TState]
+
       if (value !== undefined && !validator(value)) {
         errors.push(`Validation échouée pour ${String(key)}`)
       }
@@ -335,7 +347,9 @@ export class StoreUtils {
 
     store.getState = () => {
       const state = originalGetState()
+
       StoreMonitor.logAccess(name, state)
+
       return state
     }
 
@@ -345,6 +359,7 @@ export class StoreUtils {
       const newState = originalGetState()
       
       StoreMonitor.logStateChange(name, 'setState', newState, prevState)
+
       return result
     }
   }
@@ -358,10 +373,12 @@ export class StoreUtils {
         if (typeof value === 'function') return undefined
         if (value instanceof Date) return value.toISOString()
         if (value instanceof Error) return { name: value.name, message: value.message }
+
         return value
       })
     } catch (error) {
       console.warn('Erreur lors de la sérialisation:', error)
+
       return null
     }
   }
@@ -376,10 +393,12 @@ export class StoreUtils {
         if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
           return new Date(value)
         }
+
         return value
       })
     } catch (error) {
       console.warn('Erreur lors de la désérialisation:', error)
+
       return null
     }
   }
@@ -398,6 +417,7 @@ export class StoreMonitor {
 
   static subscribe(callback: (event: StoreEvent) => void) {
     this.subscribers.add(callback)
+
     return () => this.subscribers.delete(callback)
   }
 
@@ -447,6 +467,7 @@ export class StoreMonitor {
 
     const key = `${storeName}-access`
     const count = (this.accessLog.get(key) || 0) + 1
+
     this.accessLog.set(key, count)
 
     // Log périodique des accès

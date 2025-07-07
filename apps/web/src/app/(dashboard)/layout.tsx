@@ -4,7 +4,7 @@
  * CORRIGÉ - Ne redéfinit plus HTML/BODY
  */
 
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 

@@ -85,7 +85,8 @@ describe('SecurityUtils', () => {
     })
 
     it('should reject emails that are too long', () => {
-      const longEmail = 'a'.repeat(250) + '@domain.com'
+      const longEmail = `${'a'.repeat(250)  }@domain.com`
+
       expect(SecurityUtils.validateEmailSecure(longEmail)).toBe(false)
     })
   })
@@ -148,6 +149,7 @@ describe('SecurityUtils', () => {
       
       strongPasswords.forEach(password => {
         const result = SecurityUtils.validatePasswordStrength(password)
+
         expect(result.isValid).toBe(true)
         expect(result.score).toBeGreaterThanOrEqual(4)
         expect(result.issues).toHaveLength(0)
@@ -165,6 +167,7 @@ describe('SecurityUtils', () => {
       
       weakPasswords.forEach(password => {
         const result = SecurityUtils.validatePasswordStrength(password)
+
         expect(result.isValid).toBe(false)
         expect(result.issues.length).toBeGreaterThan(0)
       })

@@ -54,6 +54,7 @@ export class PerformanceMonitor {
     if (!PerformanceMonitor.instance) {
       PerformanceMonitor.instance = new PerformanceMonitor()
     }
+
     return PerformanceMonitor.instance
   }
 
@@ -65,8 +66,10 @@ export class PerformanceMonitor {
       if (process.env.NODE_ENV === 'development') {
         console.warn('PerformanceMonitor: Attempted to use browser API on server')
       }
+
       return false
     }
+
     return true
   }
 
@@ -111,6 +114,7 @@ export class PerformanceMonitor {
 
     try {
       const timing = window.performance?.timing
+
       if (!timing) return
 
       const metrics: PageLoadMetrics = {
@@ -122,6 +126,7 @@ export class PerformanceMonitor {
 
       // Performance Paint Timing
       const paintEntries = performance.getEntriesByType('paint')
+
       paintEntries.forEach(entry => {
         if (entry.name === 'first-paint') {
           metrics.firstPaint = entry.startTime
@@ -345,6 +350,7 @@ export class PerformanceMonitor {
     }
 
     const metrics = this.metrics.get(name)!
+
     metrics.push(metric)
 
     // Limiter à 1000 métriques par type
@@ -360,6 +366,7 @@ export class PerformanceMonitor {
     if (name) {
       return this.metrics.get(name) || []
     }
+
     return this.metrics
   }
 
@@ -392,6 +399,7 @@ export class PerformanceMonitor {
       if (metrics.length === 0) continue
 
       const values = metrics.map(m => m.value).filter(v => v > 0)
+
       if (values.length === 0) continue
 
       report[name] = {

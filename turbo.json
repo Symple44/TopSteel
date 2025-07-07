@@ -6,64 +6,190 @@
       "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "!**/*.test.{ts,tsx,js,jsx}",
-        "!**/*.spec.{ts,tsx,js,jsx}",
-        "!**/test/**",
-        "!**/__tests__/**",
-        "!**/coverage/**",
-        "!**/*.md",
-        "!**/.env.example"
+        ".env*",
+        "next.config.*",
+        "tailwind.config.*",
+        "tsconfig.json"
       ],
       "outputs": [
-        "dist/**",
         ".next/**",
         "!.next/cache/**",
-        "storybook-static/**"
+        "dist/**",
+        "build/**"
       ],
       "env": [
         "NODE_ENV",
         "NEXT_PUBLIC_*",
-        "DATABASE_URL",
-        "REDIS_URL"
+        "DATABASE_URL"
       ]
     },
     "dev": {
       "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "PORT",
+        "NEXT_PUBLIC_*",
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "REDIS_URL"
+      ]
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
       "persistent": true
     },
+    "start:dev": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "PORT",
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "REDIS_URL"
+      ]
+    },
+    "start:prod": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "PORT",
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "REDIS_URL"
+      ]
+    },
     "lint": {
-      "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "!**/dist/**",
-        "!**/.next/**"
+        ".eslintrc*",
+        "eslint.config.*",
+        "tsconfig.json"
+      ],
+      "outputs": [
+        ".eslintcache"
       ]
     },
     "lint:fix": {
-      "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "!**/dist/**",
-        "!**/.next/**"
+        ".eslintrc*", 
+        "eslint.config.*",
+        "tsconfig.json"
       ],
-      "cache": false
+      "outputs": []
+    },
+    "lint:fix": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".eslintrc*",
+        "eslint.config.*",
+        "tsconfig.json"
+      ],
+      "outputs": []
     },
     "type-check": {
       "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "!**/*.test.{ts,tsx,js,jsx}",
-        "!**/*.spec.{ts,tsx,js,jsx}",
-        "!**/test/**",
-        "!**/__tests__/**"
+        "tsconfig.json",
+        "tsconfig.*.json"
+      ],
+      "outputs": [
+        "*.tsbuildinfo",
+        ".tsbuildinfo"
+      ]
+    },
+    "format": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".prettierrc*",
+        "prettier.config.*"
+      ],
+      "outputs": []
+    },
+    "format:check": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".prettierrc*",
+        "prettier.config.*"
+      ],
+      "outputs": [
+        ".prettiercache"
       ]
     },
     "test": {
       "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "!**/dist/**",
-        "!**/.next/**"
+        "jest.config.*",
+        "vitest.config.*",
+        "**/*.test.*",
+        "**/*.spec.*"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "env": [
+        "NODE_ENV"
+      ]
+    },
+    "test:unit": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "jest.config.*",
+        "**/*.test.*",
+        "**/*.spec.*"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
+    },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "jest.config.*",
+        "**/*.integration.*",
+        "**/*.e2e.*"
+      ],
+      "outputs": [
+        "coverage/**",
+        "test-results/**"
+      ],
+      "env": [
+        "DATABASE_URL",
+        "TEST_DATABASE_URL"
+      ]
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "playwright.config.*",
+        "**/*.e2e.*"
+      ],
+      "outputs": [
+        "test-results/**",
+        "playwright-report/**"
+      ],
+      "env": [
+        "NEXT_PUBLIC_API_URL",
+        "TEST_DATABASE_URL"
+      ]
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "jest.config.*",
+        "**/*.test.*",
+        "**/*.spec.*"
       ],
       "outputs": [
         "coverage/**"
@@ -74,15 +200,55 @@
       "persistent": true
     },
     "clean": {
-      "cache": false
+      "cache": false,
+      "outputs": []
+    },
+    "migration:generate": {
+      "cache": false,
+      "inputs": [
+        "src/database/**",
+        "src/**/*.entity.ts"
+      ],
+      "env": [
+        "DATABASE_URL"
+      ]
+    },
+    "migration:run": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL"
+      ]
+    },
+    "migration:revert": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL"
+      ]
+    },
+    "seed:run": {
+      "dependsOn": ["migration:run"],
+      "cache": false,
+      "env": [
+        "DATABASE_URL"
+      ]
     }
   },
+  "globalDependencies": [
+    "package.json",
+    "pnpm-lock.yaml",
+    "turbo.json",
+    ".env",
+    ".env.local",
+    ".env.development",
+    ".env.production"
+  ],
   "globalEnv": [
     "NODE_ENV",
-    "CI"
+    "CI",
+    "VERCEL",
+    "NETLIFY"
   ],
-  "globalPassThroughEnv": [
-    "VERCEL_*",
-    "GITHUB_*"
-  ]
+  "remoteCache": {
+    "enabled": true
+  }
 }
