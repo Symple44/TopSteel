@@ -1,6 +1,10 @@
 /**
- * 📈 MÉTRIQUES BUSINESS - TopSteel ERP
+ * 📈 BUSINESS METRICS SSR-SAFE - TopSteel ERP
+ * Version corrigée pour éviter les erreurs SSR
+ * Fichier: apps/web/src/lib/business-metrics.ts
  */
+
+// ===== TYPES =====
 interface BusinessEvent {
   name: string
   properties: Record<string, any>
@@ -15,72 +19,202 @@ interface UserContext {
   permissions?: string[]
 }
 
+interface BusinessMetricsConfig {
+  maxEvents?: number
+  batchSize?: number
+  batchTimeout?: number
+  enableDebugLogs?: boolean
+}
+
+// ===== CLASSE PRINCIPALE SSR-SAFE =====
 class BusinessMetrics {
   private events: BusinessEvent[] = []
-  private readonly sessionId: string
+  private sessionId: string = ''
   private userContext: UserContext = {}
-  private readonly maxEvents = 5000
+  private readonly maxEvents: number
+  private isClient: boolean = false
+  private initialized: boolean = false
+  private pendingEvents: BusinessEvent[] = []
+  private batchTimeout: NodeJS.Timeout | null = null
+  private readonly config: BusinessMetricsConfig
 
-  constructor() {
-    this.sessionId = this.generateSessionId()
-    this.initializeSession()
-  }
-
-  private generateSessionId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2)
-  }
-
-  private initializeSession() {
-    this.track('session_started', {
-      userAgent: navigator?.userAgent || 'unknown',
-      timestamp: Date.now(),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-    })
-  }
-
-  setUserContext(context: UserContext) {
-    this.userContext = { ...context }
-    this.track('user_context_updated', context)
-  }
-
-  track(eventName: string, properties: Record<string, any> = {}) {
-    const event: BusinessEvent = {
-      name: eventName,
-      properties: {
-        ...properties,
-        url: window?.location?.href || '',
-        timestamp: Date.now()
-      },
-      timestamp: Date.now(),
-      userId: this.userContext.userId,
-      sessionId: this.sessionId
+  constructor(config: BusinessMetricsConfig = {}) {
+    this.config = {
+      maxEvents: 5000,
+      batchSize: 50,
+      batchTimeout: 5000,
+      enableDebugLogs: false,
+      ...config
     }
     
+    this.maxEvents = this.config.maxEvents!
+    this.isClient = typeof window !== 'undefined'
+    
+    // ✅ Initialisation différée pour éviter les erreurs SSR
+    if (this.isClient) {
+      this.initializeClient()
+    } else {
+      // Générer un sessionId même côté serveur (pour les logs)
+      this.sessionId = this.generateFallbackSessionId()
+    }
+  }
+
+  /**
+   * Initialisation côté client uniquement
+   */
+  private initializeClient(): void {
+    if (!this.isClient || this.initialized) return
+
+    this.sessionId = this.generateSessionId()
+    this.initialized = true
+
+    // Démarrer la session côté client
+    this.track('session_started', {
+      userAgent: navigator.userAgent,
+      timestamp: Date.now(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      screen: {
+        width: window.screen.width,
+        height: window.screen.height
+      },
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      }
+    })
+
+    // Traiter les événements en attente
+    this.processPendingEvents()
+
+    // Configurer le batching automatique
+    this.setupBatching()
+  }
+
+  /**
+   * Générer un sessionId côté client
+   */
+  private generateSessionId(): string {
+    const timestamp = Date.now().toString(36)
+    const random = Math.random().toString(36).substring(2)
+    return `${timestamp}-${random}`
+  }
+
+  /**
+   * Générer un sessionId de fallback côté serveur
+   */
+  private generateFallbackSessionId(): string {
+    return `server-${Date.now().toString(36)}`
+  }
+
+  /**
+   * Traiter les événements en attente
+   */
+  private processPendingEvents(): void {
+    if (this.pendingEvents.length > 0) {
+      this.pendingEvents.forEach(event => {
+        this.addEvent(event)
+      })
+      this.pendingEvents = []
+    }
+  }
+
+  /**
+   * Configurer le système de batching
+   */
+  private setupBatching(): void {
+    if (!this.isClient) return
+
+    // Envoyer les événements par batch
+    this.batchTimeout = setTimeout(() => {
+      this.flushEvents()
+      this.setupBatching() // Reconfigurer pour le prochain batch
+    }, this.config.batchTimeout!)
+  }
+
+  /**
+   * Envoyer les événements au backend
+   */
+  private async flushEvents(): Promise<void> {
+    if (this.events.length === 0) return
+
+    const eventsToSend = this.events.slice(0, this.config.batchSize!)
+    
+    try {
+      await this.sendToBackend(eventsToSend)
+      
+      // Retirer les événements envoyés
+      this.events = this.events.slice(this.config.batchSize!)
+      
+      if (this.config.enableDebugLogs) {
+        console.log(`📊 Business Metrics: ${eventsToSend.length} événements envoyés`)
+      }
+    } catch (error) {
+      console.warn('Erreur envoi batch métrique:', error)
+    }
+  }
+
+  /**
+   * Ajouter un événement (interne)
+   */
+  private addEvent(event: BusinessEvent): void {
     this.events.push(event)
     
     // Limiter le nombre d'événements en mémoire
     if (this.events.length > this.maxEvents) {
       this.events = this.events.slice(-this.maxEvents)
     }
-    
-    // Log en développement
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📊 Métrique Business:', event)
-    }
-    
-    // Envoyer au backend (si configuré)
-    this.sendToBackend(event)
   }
 
-  // === MÉTRIQUES SPÉCIFIQUES TOPSTEEL ===
+  /**
+   * Méthode principale de tracking - SSR-Safe
+   */
+  track(eventName: string, properties: Record<string, any> = {}): void {
+    const event: BusinessEvent = {
+      name: eventName,
+      properties: {
+        ...properties,
+        url: this.isClient ? window.location.href : '',
+        timestamp: Date.now()
+      },
+      timestamp: Date.now(),
+      userId: this.userContext.userId,
+      sessionId: this.sessionId
+    }
 
-  // Projets
+    if (this.initialized) {
+      this.addEvent(event)
+    } else if (this.isClient) {
+      // Stocker en attente jusqu'à l'initialisation
+      this.pendingEvents.push(event)
+    } else {
+      // Côté serveur : log uniquement en dev
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📊 Server-side metric (not tracked):', eventName, properties)
+      }
+    }
+
+    // Log immédiat en développement
+    if (this.config.enableDebugLogs && process.env.NODE_ENV === 'development') {
+      console.log('📊 Métrique Business:', event)
+    }
+  }
+
+  /**
+   * Définir le contexte utilisateur
+   */
+  setUserContext(context: UserContext): void {
+    this.userContext = { ...context }
+    this.track('user_context_updated', context)
+  }
+
+  // ===== MÉTRIQUES SPÉCIFIQUES TOPSTEEL =====
+
   trackProjectCreated(projectData: {
     type?: string
     clientId?: string
     estimatedValue?: number
     complexity?: 'simple' | 'medium' | 'complex'
-  }) {
+  }): void {
     this.track('project_created', {
       projectType: projectData.type,
       clientId: projectData.clientId,
@@ -89,7 +223,7 @@ class BusinessMetrics {
     })
   }
 
-  trackProjectStatusChanged(projectId: string, oldStatus: string, newStatus: string) {
+  trackProjectStatusChanged(projectId: string, oldStatus: string, newStatus: string): void {
     this.track('project_status_changed', {
       projectId,
       oldStatus,
@@ -98,22 +232,21 @@ class BusinessMetrics {
     })
   }
 
-  trackProjectViewed(projectId: string, viewDuration?: number) {
+  trackProjectViewed(projectId: string, viewDuration?: number): void {
     this.track('project_viewed', {
       projectId,
       viewDuration
     })
   }
 
-  // Production
-  trackProductionStarted(orderId: string, projectId: string) {
+  trackProductionStarted(orderId: string, projectId: string): void {
     this.track('production_started', {
       orderId,
       projectId
     })
   }
 
-  trackProductionCompleted(orderId: string, duration: number, quality?: string) {
+  trackProductionCompleted(orderId: string, duration: number, quality?: string): void {
     this.track('production_completed', {
       orderId,
       duration,
@@ -121,34 +254,32 @@ class BusinessMetrics {
     })
   }
 
-  // Interface utilisateur
-  trackUserAction(action: string, context: Record<string, any> = {}) {
+  trackUserAction(action: string, context: Record<string, any> = {}): void {
     this.track('user_action', {
       action,
-      page: window?.location?.pathname || '',
+      page: this.isClient ? window.location.pathname : '',
       ...context
     })
   }
 
-  trackFormSubmission(formName: string, success: boolean, errors?: string[]) {
+  trackFormSubmission(formName: string, success: boolean, errors?: string[]): void {
     this.track('form_submission', {
       formName,
       success,
       errorCount: errors?.length || 0,
-      errors: errors?.slice(0, 5) // Limiter les erreurs logguées
+      errors: errors?.slice(0, 5)
     })
   }
 
-  trackSearchPerformed(query: string, resultCount: number, filters?: Record<string, any>) {
+  trackSearchPerformed(query: string, resultCount: number, filters?: Record<string, any>): void {
     this.track('search_performed', {
-      query: query.substring(0, 100), // Limiter la taille
+      query: query.substring(0, 100),
       resultCount,
       filters
     })
   }
 
-  // Performance
-  trackPerformanceMetric(metric: string, value: number, context?: Record<string, any>) {
+  trackPerformanceMetric(metric: string, value: number, context?: Record<string, any>): void {
     this.track('performance_metric', {
       metric,
       value,
@@ -157,18 +288,17 @@ class BusinessMetrics {
     })
   }
 
-  // Erreurs
-  trackError(error: Error, context: Record<string, any> = {}) {
+  trackError(error: Error, context: Record<string, any> = {}): void {
     this.track('error_occurred', {
       message: error.message,
-      stack: error.stack?.substring(0, 1000), // Limiter la stack trace
+      stack: error.stack?.substring(0, 1000),
       name: error.name,
-      page: window?.location?.pathname || '',
+      page: this.isClient ? window.location.pathname : '',
       ...context
     })
   }
 
-  // === MÉTHODES UTILITAIRES ===
+  // ===== MÉTHODES UTILITAIRES =====
 
   private getTransitionType(oldStatus: string, newStatus: string): string {
     const progressOrder = ['BROUILLON', 'DEVIS', 'ACCEPTE', 'EN_COURS', 'TERMINE', 'FACTURE']
@@ -180,20 +310,28 @@ class BusinessMetrics {
     return 'lateral'
   }
 
-  private async sendToBackend(event: BusinessEvent) {
+  private async sendToBackend(events: BusinessEvent[]): Promise<void> {
+    if (!this.isClient) return
+
     try {
-      // TODO: Implémenter l'envoi vers votre API de métriques
-      // fetch('/api/metrics', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(event)
-      // })
+      const response = await fetch('/api/metrics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ events })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
     } catch (error) {
-      console.warn('Erreur envoi métrique:', error)
+      console.warn('Erreur envoi métrique au backend:', error)
+      throw error
     }
   }
 
-  // === MÉTHODES D'EXPORT ===
+  // ===== MÉTHODES D'EXPORT ET DEBUG =====
 
   getEvents(filters?: {
     eventName?: string
@@ -223,6 +361,8 @@ class BusinessMetrics {
     uniqueEvents: string[]
     topEvents: Array<{ name: string; count: number }>
     sessionDuration: number
+    isClient: boolean
+    initialized: boolean
   } {
     const eventCounts = new Map<string, number>()
     this.events.forEach(event => {
@@ -242,7 +382,9 @@ class BusinessMetrics {
       eventCount: this.events.length,
       uniqueEvents: Array.from(eventCounts.keys()),
       topEvents,
-      sessionDuration
+      sessionDuration,
+      isClient: this.isClient,
+      initialized: this.initialized
     }
   }
 
@@ -251,37 +393,74 @@ class BusinessMetrics {
       events: this.events,
       userContext: this.userContext,
       sessionId: this.sessionId,
+      isClient: this.isClient,
+      initialized: this.initialized,
       exportedAt: Date.now()
     }, null, 2)
   }
-}
 
-// Instance globale
-export const businessMetrics = new BusinessMetrics()
-
-// Hook React pour faciliter l'usage
-export function useBusinessMetrics() {
-  return {
-    track: businessMetrics.track.bind(businessMetrics),
-    setUserContext: businessMetrics.setUserContext.bind(businessMetrics),
+  /**
+   * Nettoyage des ressources
+   */
+  cleanup(): void {
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout)
+      this.batchTimeout = null
+    }
     
-    // Métriques spécifiques
-    trackProjectCreated: businessMetrics.trackProjectCreated.bind(businessMetrics),
-    trackProjectStatusChanged: businessMetrics.trackProjectStatusChanged.bind(businessMetrics),
-    trackProjectViewed: businessMetrics.trackProjectViewed.bind(businessMetrics),
-    trackProductionStarted: businessMetrics.trackProductionStarted.bind(businessMetrics),
-    trackProductionCompleted: businessMetrics.trackProductionCompleted.bind(businessMetrics),
-    trackUserAction: businessMetrics.trackUserAction.bind(businessMetrics),
-    trackFormSubmission: businessMetrics.trackFormSubmission.bind(businessMetrics),
-    trackSearchPerformed: businessMetrics.trackSearchPerformed.bind(businessMetrics),
-    trackPerformanceMetric: businessMetrics.trackPerformanceMetric.bind(businessMetrics),
-    trackError: businessMetrics.trackError.bind(businessMetrics),
-    
-    // Utilitaires
-    getEvents: businessMetrics.getEvents.bind(businessMetrics),
-    generateReport: businessMetrics.generateReport.bind(businessMetrics),
-    exportData: businessMetrics.exportData.bind(businessMetrics)
+    // Envoyer les derniers événements
+    if (this.events.length > 0) {
+      this.flushEvents().catch(console.warn)
+    }
   }
 }
 
-export default businessMetrics
+// ===== INSTANCE LAZY ET HOOK REACT =====
+
+let businessMetricsInstance: BusinessMetrics | null = null
+
+/**
+ * Obtenir l'instance (lazy loading)
+ */
+function getBusinessMetrics(): BusinessMetrics {
+  if (!businessMetricsInstance) {
+    businessMetricsInstance = new BusinessMetrics({
+      enableDebugLogs: process.env.NODE_ENV === 'development'
+    })
+  }
+  return businessMetricsInstance
+}
+
+/**
+ * Hook React pour utiliser les métriques business
+ */
+export function useBusinessMetrics() {
+  const metrics = getBusinessMetrics()
+  
+  return {
+    track: metrics.track.bind(metrics),
+    setUserContext: metrics.setUserContext.bind(metrics),
+    
+    // Métriques spécifiques
+    trackProjectCreated: metrics.trackProjectCreated.bind(metrics),
+    trackProjectStatusChanged: metrics.trackProjectStatusChanged.bind(metrics),
+    trackProjectViewed: metrics.trackProjectViewed.bind(metrics),
+    trackProductionStarted: metrics.trackProductionStarted.bind(metrics),
+    trackProductionCompleted: metrics.trackProductionCompleted.bind(metrics),
+    trackUserAction: metrics.trackUserAction.bind(metrics),
+    trackFormSubmission: metrics.trackFormSubmission.bind(metrics),
+    trackSearchPerformed: metrics.trackSearchPerformed.bind(metrics),
+    trackPerformanceMetric: metrics.trackPerformanceMetric.bind(metrics),
+    trackError: metrics.trackError.bind(metrics),
+    
+    // Utilitaires
+    getEvents: metrics.getEvents.bind(metrics),
+    generateReport: metrics.generateReport.bind(metrics),
+    exportData: metrics.exportData.bind(metrics),
+    cleanup: metrics.cleanup.bind(metrics)
+  }
+}
+
+// ===== EXPORTS =====
+export { BusinessMetrics, getBusinessMetrics }
+export default getBusinessMetrics

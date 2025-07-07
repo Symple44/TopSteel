@@ -1,38 +1,100 @@
-'use client'
+/**
+ * Layout Racine Corrigé - TopSteel ERP
+ * Fichier: apps/web/src/app/layout.tsx
+ */
 
-import { Header } from '@/components/layout/header'
-import { Sidebar } from '@/components/layout/sidebar'
-import { ToastContainer } from '@/components/ui/toast-container'
-import { useState } from 'react'
+import { MonitoringProvider } from '@/components/providers/monitoring-provider'
+import type { Metadata, Viewport } from 'next'
+import { Inter, Poppins } from 'next/font/google'
+import '../globals.css'
+import { Providers } from '../providers'
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap'
+})
 
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed)
-  }
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-poppins',
+  display: 'swap'
+})
 
+export const metadata: Metadata = {
+  title: {
+    default: 'TopSteel ERP - Gestion Métallurgique',
+    template: '%s | TopSteel ERP'
+  },
+  description: 'Système ERP pour la gestion métallurgique industrielle - TopSteel',
+  keywords: ['ERP', 'Métallurgie', 'Gestion', 'Production', 'Projets'],
+  authors: [{ name: 'TopSteel' }],
+  creator: 'TopSteel',
+  publisher: 'TopSteel',
+  robots: {
+    index: false,
+    follow: false,
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest'
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
-      <Header 
-        onToggleSidebar={toggleSidebar}
-        isSidebarCollapsed={sidebarCollapsed}
-      />
-      
-      <div className="flex h-[calc(100vh-4rem)]">
-        <Sidebar 
-          isCollapsed={sidebarCollapsed} 
-          onToggle={toggleSidebar} 
+    <html lang="fr" className={`${inter.variable} ${poppins.variable}`}>
+      <head>
+        <meta charSet="utf-8" />
+        
+        {/* Préchargement des polices critiques */}
+        <link
+          rel="preload"
+          href="/fonts/inter-var.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
         />
         
-        <main className="flex-1 overflow-auto relative">
-          <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none"></div>
-          <div className="relative z-10">{children}</div>
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
-        </main>
-      </div>
-
-      <ToastContainer />
-    </div>
+        {/* PWA Meta Tags */}
+        <meta name="application-name" content="TopSteel ERP" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="TopSteel ERP" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#2563eb" />
+        
+        {/* Security Headers */}
+        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+        <meta httpEquiv="X-Frame-Options" content="DENY" />
+        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+        <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+      </head>
+      <body className="font-inter antialiased bg-background text-foreground">
+        <Providers>
+          <MonitoringProvider>
+            <div id="root-app" className="relative">
+              <main className="min-h-screen">
+                {children}
+              </main>
+            </div>
+          </MonitoringProvider>
+        </Providers>
+      </body>
+    </html>
   )
 }
