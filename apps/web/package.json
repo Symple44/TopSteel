@@ -95,7 +95,7 @@
     "caniuse-lite": "^1.0.30001726",
     "eslint": "^9.30.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^30.0.3",
+    "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.2",
     "jest-html-reporters": "^3.1.5",
     "jest-junit": "^16.0.0",
