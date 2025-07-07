@@ -383,9 +383,6 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.7
         version: 1.2.7(@types/react-dom@19.1.6)(@types/react@19.1.8)(react-dom@19.1.0)(react@19.1.0)
-      '@tailwindcss/postcss':
-        specifier: ^4.1.11
-        version: 4.1.11
       '@tanstack/react-query':
         specifier: ^5.81.5
         version: 5.81.5(react@19.1.0)
@@ -398,9 +395,6 @@ importers:
       '@types/dompurify':
         specifier: ^3.2.0
         version: 3.2.0
-      autoprefixer:
-        specifier: ^10.4.21
-        version: 10.4.21(postcss@8.5.6)
       axios:
         specifier: ^1.7.2
         version: 1.10.0
@@ -454,13 +448,13 @@ importers:
         version: 7.60.0(react@19.1.0)
       recharts:
         specifier: ^3.0.2
-        version: 3.0.2(@types/react@19.1.8)(react-dom@19.1.0)(react-is@19.1.0)(react@19.1.0)(redux@5.0.1)
+        version: 3.0.2(@types/react@19.1.8)(react-dom@19.1.0)(react-is@18.3.1)(react@19.1.0)(redux@5.0.1)
+      sonner:
+        specifier: ^2.0.6
+        version: 2.0.6(react-dom@19.1.0)(react@19.1.0)
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
-      tailwindcss:
-        specifier: ^4.1.11
-        version: 4.1.11
       use-debounce:
         specifier: ^10.0.5
         version: 10.0.5(react@19.1.0)
@@ -489,6 +483,9 @@ importers:
       '@storybook/react':
         specifier: ^9.0.14
         version: 9.0.15(react-dom@19.1.0)(react@19.1.0)(storybook@9.0.15)(typescript@5.8.3)
+      '@tailwindcss/postcss':
+        specifier: ^4.1.11
+        version: 4.1.11
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.3
@@ -510,6 +507,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.1.6
         version: 19.1.6(@types/react@19.1.8)
+      autoprefixer:
+        specifier: ^10.4.21
+        version: 10.4.21(postcss@8.5.6)
       browserslist:
         specifier: ^4.24.0
         version: 4.25.1
@@ -534,6 +534,12 @@ importers:
       jest-junit:
         specifier: ^16.0.0
         version: 16.0.0
+      tailwindcss:
+        specifier: ^4.1.11
+        version: 4.1.11
+      tailwindcss-animate:
+        specifier: ^1.0.7
+        version: 1.0.7(tailwindcss@4.1.11)
       ts-jest:
         specifier: ^29.1.1
         version: 29.4.0(@babel/core@7.28.0)(esbuild@0.25.5)(jest@30.0.4)(typescript@5.8.3)
@@ -873,7 +879,7 @@ packages:
   /@alloc/quick-lru@5.2.0:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
-    dev: false
+    dev: true
 
   /@ampproject/remapping@2.3.0:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -4126,7 +4132,7 @@ packages:
     engines: {node: '>=18.0.0'}
     dependencies:
       minipass: 7.1.2
-    dev: false
+    dev: true
 
   /@istanbuljs/load-nyc-config@1.1.0:
     resolution: {integrity: sha512-VjeHSlIzpv/NyD3N0YuHfXOPDIixcA1q2ZV98wsMqcYlPmv2n3Yb2lYP9XMElnaFVXg5A7YLTeLu6V84uQDjmQ==}
@@ -7382,7 +7388,7 @@ packages:
       magic-string: 0.30.17
       source-map-js: 1.2.1
       tailwindcss: 4.1.11
-    dev: false
+    dev: true
 
   /@tailwindcss/oxide-android-arm64@4.1.11:
     resolution: {integrity: sha512-3IfFuATVRUMZZprEIx9OGDjG3Ou3jG4xQzNTvjDoKmU9JdmoCohQJ83MYd0GPnQIu89YoJqvMM0G3uqLRFtetg==}
@@ -7390,7 +7396,7 @@ packages:
     cpu: [arm64]
     os: [android]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-darwin-arm64@4.1.11:
@@ -7399,7 +7405,7 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-darwin-x64@4.1.11:
@@ -7408,7 +7414,7 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-freebsd-x64@4.1.11:
@@ -7417,7 +7423,7 @@ packages:
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-linux-arm-gnueabihf@4.1.11:
@@ -7426,7 +7432,7 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-linux-arm64-gnu@4.1.11:
@@ -7435,7 +7441,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-linux-arm64-musl@4.1.11:
@@ -7444,7 +7450,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-linux-x64-gnu@4.1.11:
@@ -7453,7 +7459,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-linux-x64-musl@4.1.11:
@@ -7462,7 +7468,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-wasm32-wasi@4.1.11:
@@ -7470,7 +7476,7 @@ packages:
     engines: {node: '>=14.0.0'}
     cpu: [wasm32]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
     bundledDependencies:
       - '@napi-rs/wasm-runtime'
@@ -7486,7 +7492,7 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide-win32-x64-msvc@4.1.11:
@@ -7495,7 +7501,7 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@tailwindcss/oxide@4.1.11:
@@ -7518,7 +7524,7 @@ packages:
       '@tailwindcss/oxide-wasm32-wasi': 4.1.11
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.11
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.11
-    dev: false
+    dev: true
 
   /@tailwindcss/postcss@4.1.11:
     resolution: {integrity: sha512-q/EAIIpF6WpLhKEuQSEVMZNMIY8KhWoAemZ9eylNAih9jxMGAYPPWBn3I9QL/2jZ+e7OEz/tZkX5HwbBR4HohA==}
@@ -7528,7 +7534,7 @@ packages:
       '@tailwindcss/oxide': 4.1.11
       postcss: 8.5.6
       tailwindcss: 4.1.11
-    dev: false
+    dev: true
 
   /@tanstack/query-core@5.81.5:
     resolution: {integrity: sha512-ZJOgCy/z2qpZXWaj/oxvodDx07XcQa9BF92c0oINjHkoqUPsmm3uG08HpTaviviZ/N9eP1f9CM7mKSEkIo7O1Q==}
@@ -8117,6 +8123,7 @@ packages:
 
   /@types/trusted-types@2.0.7:
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
+    requiresBuild: true
     dev: false
 
   /@types/use-sync-external-store@0.0.6:
@@ -9287,6 +9294,7 @@ packages:
       picocolors: 1.1.1
       postcss: 8.5.6
       postcss-value-parser: 4.2.0
+    dev: true
 
   /available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -10021,7 +10029,7 @@ packages:
   /chownr@3.0.0:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
-    dev: false
+    dev: true
 
   /chromatic@11.29.0:
     resolution: {integrity: sha512-yisBlntp9hHVj19lIQdpTlcYIXuU9H/DbFuu6tyWHmj6hWT2EtukCCcxYXL78XdQt1vm2GfIrtgtKpj/Rzmo4A==}
@@ -10200,6 +10208,7 @@ packages:
 
   /color-string@1.9.1:
     resolution: {integrity: sha512-shrVawQFojnZv6xM40anx4CkoDP+fZsw/ZerEMsW/pyzsRbElpsL/DBVW7q3ExxwusdNXI3lXpuhEZkzs8p5Eg==}
+    requiresBuild: true
     dependencies:
       color-name: 1.1.4
       simple-swizzle: 0.2.2
@@ -10989,6 +10998,7 @@ packages:
   /detect-libc@2.0.4:
     resolution: {integrity: sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA==}
     engines: {node: '>=8'}
+    requiresBuild: true
 
   /detect-newline@3.1.0:
     resolution: {integrity: sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==}
@@ -12292,6 +12302,7 @@ packages:
 
   /fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
+    dev: true
 
   /fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
@@ -13961,7 +13972,7 @@ packages:
   /jiti@2.4.2:
     resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
     hasBin: true
-    dev: false
+    dev: true
 
   /jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
@@ -14242,7 +14253,7 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-darwin-x64@1.30.1:
@@ -14251,7 +14262,7 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-freebsd-x64@1.30.1:
@@ -14260,7 +14271,7 @@ packages:
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-linux-arm-gnueabihf@1.30.1:
@@ -14269,7 +14280,7 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-linux-arm64-gnu@1.30.1:
@@ -14278,7 +14289,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-linux-arm64-musl@1.30.1:
@@ -14287,7 +14298,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-linux-x64-gnu@1.30.1:
@@ -14296,7 +14307,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-linux-x64-musl@1.30.1:
@@ -14305,7 +14316,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-win32-arm64-msvc@1.30.1:
@@ -14314,7 +14325,7 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss-win32-x64-msvc@1.30.1:
@@ -14323,7 +14334,7 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /lightningcss@1.30.1:
@@ -14342,7 +14353,7 @@ packages:
       lightningcss-linux-x64-musl: 1.30.1
       lightningcss-win32-arm64-msvc: 1.30.1
       lightningcss-win32-x64-msvc: 1.30.1
-    dev: false
+    dev: true
 
   /lilconfig@3.1.3:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
@@ -14807,7 +14818,7 @@ packages:
     engines: {node: '>= 18'}
     dependencies:
       minipass: 7.1.2
-    dev: false
+    dev: true
 
   /mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
@@ -14828,7 +14839,7 @@ packages:
     resolution: {integrity: sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==}
     engines: {node: '>=10'}
     hasBin: true
-    dev: false
+    dev: true
 
   /mlly@1.7.4:
     resolution: {integrity: sha512-qmdSIPC4bDJXgZTCR7XosJiNKySV7O215tsPtDN9iEO/7q/76b/ijtgRu/+epFXSJhijtTCCGp3DWS549P3xKw==}
@@ -15171,6 +15182,7 @@ packages:
   /normalize-range@0.1.2:
     resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
+    dev: true
 
   /npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
@@ -15912,6 +15924,7 @@ packages:
 
   /postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
+    dev: true
 
   /postcss@8.4.31:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
@@ -16286,11 +16299,6 @@ packages:
 
   /react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
-    dev: true
-
-  /react-is@19.1.0:
-    resolution: {integrity: sha512-Oe56aUPnkHyyDxxkvqtd7KkdQP5uIUfHxd5XTb3wE9d/kRnZLmKbDB0GWk919tdQ+mxxPtG6EAs6RMT6i1qtHg==}
-    dev: false
 
   /react-redux@9.2.0(@types/react@19.1.8)(react@19.1.0)(redux@5.0.1):
     resolution: {integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==}
@@ -16435,7 +16443,7 @@ packages:
       tslib: 2.8.1
     dev: true
 
-  /recharts@3.0.2(@types/react@19.1.8)(react-dom@19.1.0)(react-is@19.1.0)(react@19.1.0)(redux@5.0.1):
+  /recharts@3.0.2(@types/react@19.1.8)(react-dom@19.1.0)(react-is@18.3.1)(react@19.1.0)(redux@5.0.1):
     resolution: {integrity: sha512-eDc3ile9qJU9Dp/EekSthQPhAVPG48/uM47jk+PF7VBQngxeW3cwQpPHb/GHC1uqwyCRWXcIrDzuHRVrnRryoQ==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -16451,7 +16459,7 @@ packages:
       immer: 10.1.1
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      react-is: 19.1.0
+      react-is: 18.3.1
       react-redux: 9.2.0(@types/react@19.1.8)(react@19.1.0)(redux@5.0.1)
       reselect: 5.1.1
       tiny-invariant: 1.3.3
@@ -17157,6 +17165,7 @@ packages:
 
   /simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
+    requiresBuild: true
     dependencies:
       is-arrayish: 0.3.2
 
@@ -17225,6 +17234,16 @@ packages:
       - bufferutil
       - supports-color
       - utf-8-validate
+
+  /sonner@2.0.6(react-dom@19.1.0)(react@19.1.0):
+    resolution: {integrity: sha512-yHFhk8T/DK3YxjFQXIrcHT1rGEeTLliVzWbO0xN8GberVun2RiBnxAjXAYpZrqwEVHBG9asI/Li8TAAhN9m59Q==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+    dev: false
 
   /source-list-map@2.0.1:
     resolution: {integrity: sha512-qnQ7gVMxGNxsiL4lEuJwe/To8UnK7fAnmbGEEH8RpLouuKbeEm0lhbQVFIrNSuB+G7tVrAlVsZgETT5nljf+Iw==}
@@ -17754,9 +17773,16 @@ packages:
     resolution: {integrity: sha512-gBXpgUm/3rp1lMZZrM/w7D8GKqshif0zAymAhbCyIt8KMe+0v9DQ7cdYLR4FHH/cKpdTXb+A/tKKU3eolfsI+g==}
     dev: false
 
+  /tailwindcss-animate@1.0.7(tailwindcss@4.1.11):
+    resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
+    peerDependencies:
+      tailwindcss: ^4.1.11
+    dependencies:
+      tailwindcss: 4.1.11
+    dev: true
+
   /tailwindcss@4.1.11:
     resolution: {integrity: sha512-2E9TBm6MDD/xKYe+dvJZAmg3yxIEDNRc0jwlNyDg/4Fil2QcSLjFKGVff0lAf1jjeaArlG/M75Ey/EYr/OJtBA==}
-    dev: false
 
   /tapable@2.2.2:
     resolution: {integrity: sha512-Re10+NauLTMCudc7T5WLFLAwDhQ0JWdrMK+9B2M8zR5hRExKmsRDCBA7/aV/pNJFltmBFO5BAMlQFi/vq3nKOg==}
@@ -17804,7 +17830,7 @@ packages:
       minizlib: 3.0.2
       mkdirp: 3.0.1
       yallist: 5.0.0
-    dev: false
+    dev: true
 
   /temp-dir@2.0.0:
     resolution: {integrity: sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==}
@@ -19804,7 +19830,7 @@ packages:
   /yallist@5.0.0:
     resolution: {integrity: sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==}
     engines: {node: '>=18'}
-    dev: false
+    dev: true
 
   /yaml@1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}

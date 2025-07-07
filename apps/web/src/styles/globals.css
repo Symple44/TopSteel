@@ -1,625 +1,327 @@
 /* =================================================================== */
-/* TOPSTEEL ERP - STYLES GLOBAUX OPTIMISÉS */
-/* Architecture CSS robuste et évolutive */
+/* TOPSTEEL ERP - STYLES GLOBAUX HYBRIDES */
+/* Approche compatible v3/v4 pour garantir le fonctionnement */
 /* =================================================================== */
 
-/* ===== IMPORTS TAILWIND CSS ===== */
+/* Import Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Fallback directives v3 au cas où */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== VARIABLES DE POLICES ===== */
-@layer base {
-  :root {
-    --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
-    --font-poppins: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  }
+/* =================================================================== */
+/* VARIABLES CSS FORCÉES - DÉFINITION EXPLICITE */
+/* =================================================================== */
+
+:root {
+  /* Variables de base FORCÉES */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+}
+
+/* Mode sombre */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
 }
 
 /* =================================================================== */
-/* SYSTÈME DE THÈME HARMONISÉ - VARIABLES CSS CUSTOM */
-/* Compatible avec shadcn/ui et extensions métier TopSteel */
+/* CLASSES FORCÉES AU CAS OÙ TAILWIND NE GÉNÈRE PAS */
 /* =================================================================== */
 
-@layer base {
-  :root {
-    /* ===== VARIABLES DE BASE SHADCN/UI ===== */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+/* Classes de base essentielles */
+.bg-background {
+  background-color: hsl(var(--background)) !important;
+}
 
-    /* ===== EXTENSIONS SYSTÈME (SUCCESS, WARNING, INFO) ===== */
-    --success: 142.1 76.2% 36.3%;
-    --success-foreground: 210 40% 98%;
-    --success-50: 142 76% 98%;
-    --success-100: 142 76% 95%;
-    --success-600: 142 76% 30%;
-    --success-900: 142 76% 15%;
+.bg-foreground {
+  background-color: hsl(var(--foreground)) !important;
+}
 
-    --warning: 32.9 94.6% 43.7%;
-    --warning-foreground: 210 40% 98%;
-    --warning-50: 33 95% 98%;
-    --warning-100: 33 95% 95%;
-    --warning-600: 33 95% 35%;
-    --warning-900: 33 95% 20%;
+.bg-muted {
+  background-color: hsl(var(--muted)) !important;
+}
 
-    --info: 199.89 89.47% 49.41%;
-    --info-foreground: 210 40% 98%;
-    --info-50: 200 89% 98%;
-    --info-100: 200 89% 95%;
-    --info-600: 200 89% 40%;
-    --info-900: 200 89% 20%;
+.text-foreground {
+  color: hsl(var(--foreground)) !important;
+}
 
-    /* ===== THÈME MÉTALLURGIE TOPSTEEL ===== */
-    --metallurgy-50: 220 20% 98%;
-    --metallurgy-100: 220 15% 95%;
-    --metallurgy-200: 220 13% 88%;
-    --metallurgy-300: 220 12% 78%;
-    --metallurgy-400: 220 10% 68%;
-    --metallurgy-500: 220 8% 58%;
-    --metallurgy-600: 220 10% 48%;
-    --metallurgy-700: 220 12% 38%;
-    --metallurgy-800: 220 15% 28%;
-    --metallurgy-900: 220 18% 18%;
-    --metallurgy-950: 220 20% 10%;
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground)) !important;
+}
 
-    /* ===== THÈME ACIER SPÉCIALISÉ ===== */
-    --steel-50: 210 25% 98%;
-    --steel-100: 210 20% 95%;
-    --steel-200: 210 18% 88%;
-    --steel-300: 210 15% 78%;
-    --steel-400: 210 12% 68%;
-    --steel-500: 210 10% 58%;
-    --steel-600: 210 12% 48%;
-    --steel-700: 210 15% 38%;
-    --steel-800: 210 18% 28%;
-    --steel-900: 210 20% 18%;
-    --steel-950: 210 22% 10%;
+.bg-primary {
+  background-color: hsl(var(--primary)) !important;
+}
 
-    /* ===== ÉTATS DES PROJETS ===== */
-    --status-planifie: 211 100% 50%;
-    --status-en-cours: 32 95% 44%;
-    --status-termine: 142 76% 36%;
-    --status-en-retard: 0 84% 60%;
-    --status-annule: 0 62% 50%;
+.text-primary-foreground {
+  color: hsl(var(--primary-foreground)) !important;
+}
 
-    /* ===== PRIORITÉS ===== */
-    --priority-low: 142 76% 36%;
-    --priority-low-foreground: 210 40% 98%;
-    --priority-medium: 32 95% 44%;
-    --priority-medium-foreground: 210 40% 98%;
-    --priority-high: 0 84% 60%;
-    --priority-high-foreground: 210 40% 98%;
-    --priority-critical: 0 100% 50%;
-    --priority-critical-foreground: 210 40% 98%;
+.bg-secondary {
+  background-color: hsl(var(--secondary)) !important;
+}
 
-    /* ===== GRAPHIQUES & ANALYTICS ===== */
-    --chart-1: 221 83% 53%;
-    --chart-2: 142 76% 36%;
-    --chart-3: 32 95% 44%;
-    --chart-4: 0 84% 60%;
-    --chart-5: 271 91% 65%;
-    --chart-background: 0 0% 100%;
-    --chart-border: 214 32% 91%;
+.text-secondary-foreground {
+  color: hsl(var(--secondary-foreground)) !important;
+}
 
-    /* ===== GRADIENTS ===== */
-    --gradient-metallurgy: linear-gradient(
-      135deg,
-      hsl(var(--metallurgy-600)),
-      hsl(var(--metallurgy-800))
-    );
-    --gradient-steel: linear-gradient(
-      135deg,
-      hsl(var(--steel-600)),
-      hsl(var(--steel-800))
-    );
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary)) / 0.8
-    );
-    --gradient-success: linear-gradient(
-      135deg,
-      hsl(var(--success)),
-      hsl(var(--success-600))
-    );
-    --gradient-warning: linear-gradient(
-      135deg,
-      hsl(var(--warning)),
-      hsl(var(--warning-600))
-    );
+.bg-accent {
+  background-color: hsl(var(--accent)) !important;
+}
 
-    /* ===== ANIMATIONS ===== */
-    --animation-duration-fast: 150ms;
-    --animation-duration-normal: 300ms;
-    --animation-duration-slow: 500ms;
-    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+.text-accent-foreground {
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.bg-card {
+  background-color: hsl(var(--card)) !important;
+}
+
+.text-card-foreground {
+  color: hsl(var(--card-foreground)) !important;
+}
+
+.bg-destructive {
+  background-color: hsl(var(--destructive)) !important;
+}
+
+.text-destructive-foreground {
+  color: hsl(var(--destructive-foreground)) !important;
+}
+
+.border-border {
+  border-color: hsl(var(--border)) !important;
+}
+
+.border-input {
+  border-color: hsl(var(--input)) !important;
+}
+
+/* Classes de focus ring forcées */
+.focus-visible\:ring-ring:focus-visible {
+  --tw-ring-color: hsl(var(--ring)) !important;
+  box-shadow: 0 0 0 2px var(--tw-ring-color) !important;
+}
+
+.focus-visible\:ring-2:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px hsl(var(--ring)) !important;
+}
+
+.focus-visible\:ring-offset-2:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring)) !important;
+}
+
+.focus-visible\:outline-none:focus-visible {
+  outline: none !important;
+}
+
+/* Classes utilitaires essentielles */
+.border {
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem !important;
+}
+
+.rounded-md {
+  border-radius: 0.375rem !important;
+}
+
+.p-4 {
+  padding: 1rem !important;
+}
+
+.p-6 {
+  padding: 1.5rem !important;
+}
+
+.px-4 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.py-2 {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.text-sm {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+}
+
+.text-lg {
+  font-size: 1.125rem !important;
+  line-height: 1.75rem !important;
+}
+
+.text-xl {
+  font-size: 1.25rem !important;
+  line-height: 1.75rem !important;
+}
+
+.text-2xl {
+  font-size: 1.5rem !important;
+  line-height: 2rem !important;
+}
+
+.text-3xl {
+  font-size: 1.875rem !important;
+  line-height: 2.25rem !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+.font-semibold {
+  font-weight: 600 !important;
+}
+
+.font-medium {
+  font-weight: 500 !important;
+}
+
+.min-h-screen {
+  min-height: 100vh !important;
+}
+
+.max-w-2xl {
+  max-width: 42rem !important;
+}
+
+.mx-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem !important;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem !important;
+}
+
+.w-full {
+  width: 100% !important;
+}
+
+.grid {
+  display: grid !important;
+}
+
+.flex {
+  display: flex !important;
+}
+
+.items-center {
+  align-items: center !important;
+}
+
+.justify-center {
+  justify-content: center !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.transition-colors {
+  transition-property: color, background-color, border-color !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-duration: 150ms !important;
+}
+
+.hover\:bg-accent:hover {
+  background-color: hsl(var(--accent)) !important;
+}
+
+.hover\:text-accent-foreground:hover {
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
-
-  /* ===== THÈME SOMBRE ===== */
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-
-    /* Adaptations thème sombre pour métallurgie */
-    --metallurgy-50: 220 20% 8%;
-    --metallurgy-900: 220 18% 88%;
-    --steel-50: 210 25% 8%;
-    --steel-900: 210 20% 88%;
-
-    /* Charts en mode sombre */
-    --chart-background: 222.2 84% 4.9%;
-    --chart-border: 217.2 32.6% 17.5%;
+  
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }
 
-/* =================================================================== */
-/* STYLES DE BASE OPTIMISÉS */
-/* =================================================================== */
-
-@layer base {
-  * {
-    box-sizing: border-box;
-  }
-
-  html {
-    scroll-behavior: smooth;
-    /* Prévention du zoom sur iOS */
-    -webkit-text-size-adjust: 100%;
-    /* Amélioration du rendu des polices */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-    /* Prévention des débordements horizontaux */
-    overflow-x: hidden;
-    /* Support des gestes tactiles */
-    touch-action: manipulation;
-  }
-
-  /* ===== TYPOGRAPHIE HARMONISÉE ===== */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.025em;
-  }
-
-  h1 {
-    font-size: 2.25rem;
-    line-height: 2.5rem;
-  }
-
-  @media (min-width: 1024px) {
-    h1 {
-      font-size: 3rem;
-      line-height: 1;
-    }
-  }
-
-  h2 {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-
-  @media (min-width: 1024px) {
-    h2 {
-      font-size: 2.25rem;
-      line-height: 2.5rem;
-    }
-  }
-
-  h3 {
-    font-size: 1.5rem;
-    line-height: 2rem;
-  }
-
-  @media (min-width: 1024px) {
-    h3 {
-      font-size: 1.875rem;
-      line-height: 2.25rem;
-    }
-  }
-
-  h4 {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-  }
-
-  @media (min-width: 1024px) {
-    h4 {
-      font-size: 1.5rem;
-      line-height: 2rem;
-    }
-  }
-
-  h5 {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-  }
-
-  @media (min-width: 1024px) {
-    h5 {
-      font-size: 1.25rem;
-      line-height: 1.75rem;
-    }
-  }
-
-  h6 {
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
-
-  @media (min-width: 1024px) {
-    h6 {
-      font-size: 1.125rem;
-      line-height: 1.75rem;
-    }
-  }
-
-  /* ===== LIENS ET FOCUS ===== */
-  a {
-    transition: color 0.2s ease-in-out;
-  }
-
-  /* Focus visible amélioré pour l'accessibilité */
-  :focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px hsl(var(--ring));
-    border-radius: 0.25rem;
-  }
-
-  /* ===== SÉLECTION DE TEXTE ===== */
-  ::selection {
-    background-color: hsl(var(--primary) / 0.2);
-    color: hsl(var(--primary-foreground));
-  }
-
-  ::-moz-selection {
-    background-color: hsl(var(--primary) / 0.2);
-    color: hsl(var(--primary-foreground));
-  }
+.gap-4 {
+  gap: 1rem !important;
 }
 
-/* =================================================================== */
-/* COMPOSANTS PERSONNALISÉS */
-/* =================================================================== */
-
-@layer components {
-  /* ===== SCROLLBARS PERSONNALISÉES ===== */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted));
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-muted rounded-full;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground rounded-full;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    @apply bg-foreground/60;
-  }
-
-  /* ===== BOUTONS AVEC ÉTATS DE CHARGEMENT ===== */
-  .btn-loading {
-    @apply relative text-transparent transition-none pointer-events-none;
-  }
-
-  .btn-loading::after {
-    content: "";
-    @apply absolute inset-0 m-auto w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
-  }
-
-  /* ===== CARTES AVEC EFFETS ===== */
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
-  }
-
-  .card-interactive {
-    @apply card-hover cursor-pointer active:scale-95;
-  }
-
-  /* ===== BADGES DE STATUT ===== */
-  .badge-status {
-    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium;
-  }
-
-  .badge-planifie {
-    @apply badge-status bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200;
-  }
-
-  .badge-en-cours {
-    @apply badge-status bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200;
-  }
-
-  .badge-termine {
-    @apply badge-status bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200;
-  }
-
-  .badge-en-retard {
-    @apply badge-status bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200;
-  }
-
-  .badge-annule {
-    @apply badge-status bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-200;
-  }
-
-  /* ===== BADGES DE PRIORITÉ ===== */
-  .badge-priority-low {
-    @apply badge-status bg-priority-low/10 text-priority-low;
-  }
-
-  .badge-priority-medium {
-    @apply badge-status bg-priority-medium/10 text-priority-medium;
-  }
-
-  .badge-priority-high {
-    @apply badge-status bg-priority-high/10 text-priority-high;
-  }
-
-  .badge-priority-critical {
-    @apply badge-status bg-priority-critical/10 text-priority-critical animate-pulse;
-  }
-
-  /* ===== NOTIFICATIONS ===== */
-  .notification-enter {
-    @apply animate-notification-in;
-  }
-
-  .notification-exit {
-    @apply animate-notification-out;
-  }
-
-  /* ===== SKELETON LOADING ===== */
-  .skeleton {
-    @apply animate-pulse bg-muted rounded;
-  }
-
-  /* ===== GLASS MORPHISM ===== */
-  .glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
-  }
-
-  .glass-dark {
-    @apply bg-black/10 backdrop-blur-md border border-white/10;
-  }
-
-  /* ===== GRADIENTS PRÉDÉFINIS ===== */
-  .gradient-metallurgy {
-    background: var(--gradient-metallurgy);
-  }
-
-  .gradient-steel {
-    background: var(--gradient-steel);
-  }
-
-  .gradient-primary {
-    background: var(--gradient-primary);
-  }
-
-  /* ===== TEXT GRADIENTS ===== */
-  .text-gradient {
-    @apply bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent;
-  }
-
-  .text-gradient-metallurgy {
-    @apply bg-gradient-to-r from-metallurgy-600 to-metallurgy-800 bg-clip-text text-transparent;
-  }
+.gap-6 {
+  gap: 1.5rem !important;
 }
 
-/* =================================================================== */
-/* UTILITAIRES AVANCÉS */
-/* =================================================================== */
-
-@layer utilities {
-  /* ===== MASQUAGE DE CONTENU ACCESSIBLE ===== */
-  .sr-only {
-    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
-    clip: rect(0, 0, 0, 0);
-  }
-
-  /* ===== CENTRAGE ABSOLU ===== */
-  .center-absolute {
-    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
-  }
-
-  /* ===== ASPECT RATIOS PERSONNALISÉS ===== */
-  .aspect-golden {
-    aspect-ratio: 1.618;
-  }
-
-  .aspect-a4 {
-    aspect-ratio: 1.414;
-  }
-
-  /* ===== SAFE AREAS (PWA/Mobile) ===== */
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .safe-left {
-    padding-left: env(safe-area-inset-left);
-  }
-
-  .safe-right {
-    padding-right: env(safe-area-inset-right);
-  }
-
-  /* ===== TRANSITIONS SPÉCIALISÉES ===== */
-  .transition-smooth {
-    transition: all var(--animation-duration-normal) var(--animation-easing);
-  }
-
-  .transition-fast {
-    transition: all var(--animation-duration-fast) var(--animation-easing);
-  }
-
-  .transition-slow {
-    transition: all var(--animation-duration-slow) var(--animation-easing);
-  }
-
-  /* ===== ÉTATS DE DISABLED AMÉLIORÉS ===== */
-  .disabled\:opacity-50:disabled {
-    @apply opacity-50 cursor-not-allowed pointer-events-none;
-  }
-
-  /* ===== PRINT STYLES ===== */
-  @media print {
-    .print\:hidden {
-      display: none !important;
-    }
-
-    .print\:text-black {
-      color: black !important;
-    }
-
-    .print\:bg-white {
-      background-color: white !important;
-    }
-  }
+/* Styles de base pour le body */
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-/* =================================================================== */
-/* ANIMATIONS PERSONNALISÉES */
-/* =================================================================== */
-
-@layer base {
-  /* ===== THEMES TRANSITIONS ===== */
-  .theme-changing * {
-    @apply transition-colors duration-300;
-  }
-
-  /* ===== LOADING STATES ===== */
-  @keyframes shimmer {
-    0% {
-      background-position: -200px 0;
-    }
-    100% {
-      background-position: calc(200px + 100%) 0;
-    }
-  }
-
-  .shimmer {
-    animation: shimmer 2s infinite linear;
-    background: linear-gradient(
-      90deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--muted-foreground) / 0.1) 50%,
-      hsl(var(--muted)) 100%
-    );
-    background-size: 200px 100%;
-  }
-
-  /* ===== MICRO-INTERACTIONS ===== */
-  .micro-bounce {
-    @apply transition-transform duration-150 active:scale-95;
-  }
-
-  .micro-glow:hover {
-    @apply shadow-glow;
-  }
+/* Classes de debug pour vérifier que ce CSS est chargé */
+.debug-css-loaded {
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: lime;
+  color: black;
+  padding: 4px 8px;
+  font-size: 12px;
+  z-index: 9999;
 }
 
-/* =================================================================== */
-/* RESPONSIVE DESIGN AVANCÉ */
-/* =================================================================== */
-
-/* Breakpoint personnalisé pour les très grands écrans */
-@media (min-width: 1920px) {
-  .container {
-    max-width: 1600px;
-  }
-}
-
-/* Optimisations pour les appareils tactiles */
-@media (pointer: coarse) {
-  .touch\:min-h-12 {
-    min-height: 3rem;
-  }
-
-  .touch\:p-4 {
-    padding: 1rem;
-  }
-}
-
-/* Réduction des animations pour les utilisateurs sensibles */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Mode haute contraste */
-@media (prefers-contrast: high) {
-  :root {
-    --border: 0 0% 0%;
-    --input: 0 0% 0%;
-    --ring: 0 0% 0%;
-  }
-
-  .dark {
-    --border: 0 0% 100%;
-    --input: 0 0% 100%;
-    --ring: 0 0% 100%;
-  }
+.debug-css-loaded::after {
+  content: "CSS CHARGÉ ✅";
 }

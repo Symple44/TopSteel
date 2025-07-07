@@ -1,26 +1,28 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
 import { Providers } from './providers'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap'
+})
 
-// ===== MÉTADONNÉES =====
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-poppins',
+  display: 'swap'
+})
+
 export const metadata: Metadata = {
   title: {
     default: 'TopSteel ERP - Gestion Métallurgique',
     template: '%s | TopSteel ERP'
   },
   description: 'Système ERP spécialisé pour la métallurgie - Gestion complète de production, stock, clients et facturation',
-  keywords: [
-    'ERP',
-    'métallurgie', 
-    'gestion production',
-    'TopSteel',
-    'acier',
-    'fabrication',
-    'industrie'
-  ],
+  keywords: ['ERP', 'métallurgie', 'gestion production', 'TopSteel', 'acier', 'fabrication', 'industrie'],
   authors: [{ name: 'TopSteel' }],
   creator: 'TopSteel',
   publisher: 'TopSteel',
@@ -30,27 +32,12 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  openGraph: {
-    type: 'website',
-    locale: 'fr_FR',
-    url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    siteName: 'TopSteel ERP',
-    title: 'TopSteel ERP - Gestion Métallurgique',
-    description: 'Système ERP spécialisé pour la métallurgie',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'TopSteel ERP',
-    description: 'Système ERP spécialisé pour la métallurgie',
-    creator: '@topsteel_erp',
-  },
   robots: {
     index: false,
     follow: false,
   },
 }
 
-// ===== VIEWPORT SÉPARÉ (Next.js 15+) =====
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -69,8 +56,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+    <html 
+      lang="fr" 
+      className={`${inter.variable} ${poppins.variable}`}
+      suppressHydrationWarning
+    >
+      <body 
+        className="font-inter antialiased bg-background text-foreground"
+        suppressHydrationWarning
+      >
         <Providers>
           {children}
         </Providers>

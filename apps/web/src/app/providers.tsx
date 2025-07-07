@@ -23,9 +23,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider
         attribute="class"
         defaultTheme="light"
-        enableSystem={true}
-        disableTransitionOnChange={false}
+        enableSystem={false}
+        disableTransitionOnChange={true}
         storageKey="topsteel-theme"
+        forcedTheme="light"
       >
         {children}
         <Toaster />

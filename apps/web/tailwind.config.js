@@ -1,142 +1,120 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-    // Inclure les composants UI du monorepo
-    '../../packages/ui/src/**/*.{ts,tsx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    '../../packages/ui/src/**/*.{js,ts,jsx,tsx}',
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: '2rem',
       screens: {
-        "2xl": "1400px",
+        '2xl': '1400px',
       },
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
         },
-        // Couleurs spécifiques TopSteel ERP
+        // Extensions TopSteel ERP
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(var(--warning-foreground))',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          foreground: 'hsl(var(--info-foreground))',
+        },
+        // Couleurs spécifiques TopSteel
         steel: {
-          50: "#f8fafc",
-          100: "#f1f5f9", 
-          200: "#e2e8f0",
-          300: "#cbd5e1",
-          400: "#94a3b8",
-          500: "#64748b",
-          600: "#475569",
-          700: "#334155",
-          800: "#1e293b",
-          900: "#0f172a",
-        }
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+          700: '#334155',
+          800: '#1e293b',
+          900: '#0f172a',
+        },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
+      fontFamily: {
+        sans: ['var(--font-inter)', 'Inter', 'ui-sans-serif', 'system-ui'],
+        display: ['var(--font-poppins)', 'Poppins', 'ui-sans-serif', 'system-ui'],
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        'slide-in': {
+          '0%': { opacity: '0', transform: 'translateY(-10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { boxShadow: '0 0 5px hsl(var(--primary))' },
+          '50%': { boxShadow: '0 0 20px hsl(var(--primary)), 0 0 30px hsl(var(--primary))' },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in': 'fade-in 0.3s ease-in-out',
+        'slide-in': 'slide-in 0.3s ease-out',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
       },
     },
   },
   plugins: [
-    require("tailwindcss-animate"),
-    // Plugin pour les variables CSS automatiques
-    function({ addBase, theme }) {
-      addBase({
-        ':root': {
-          '--background': '0 0% 100%',
-          '--foreground': '222.2 84% 4.9%',
-          '--card': '0 0% 100%',
-          '--card-foreground': '222.2 84% 4.9%',
-          '--popover': '0 0% 100%',
-          '--popover-foreground': '222.2 84% 4.9%',
-          '--primary': '222.2 47.4% 11.2%',
-          '--primary-foreground': '210 40% 98%',
-          '--secondary': '210 40% 96%',
-          '--secondary-foreground': '222.2 84% 4.9%',
-          '--muted': '210 40% 96%',
-          '--muted-foreground': '215.4 16.3% 46.9%',
-          '--accent': '210 40% 96%',
-          '--accent-foreground': '222.2 84% 4.9%',
-          '--destructive': '0 84.2% 60.2%',
-          '--destructive-foreground': '210 40% 98%',
-          '--border': '214.3 31.8% 91.4%',
-          '--input': '214.3 31.8% 91.4%',
-          '--ring': '222.2 84% 4.9%',
-          '--radius': '0.5rem',
-        },
-        '.dark': {
-          '--background': '222.2 84% 4.9%',
-          '--foreground': '210 40% 98%',
-          '--card': '222.2 84% 4.9%',
-          '--card-foreground': '210 40% 98%',
-          '--popover': '222.2 84% 4.9%',
-          '--popover-foreground': '210 40% 98%',
-          '--primary': '210 40% 98%',
-          '--primary-foreground': '222.2 47.4% 11.2%',
-          '--secondary': '217.2 32.6% 17.5%',
-          '--secondary-foreground': '210 40% 98%',
-          '--muted': '217.2 32.6% 17.5%',
-          '--muted-foreground': '215 20.2% 65.1%',
-          '--accent': '217.2 32.6% 17.5%',
-          '--accent-foreground': '210 40% 98%',
-          '--destructive': '0 62.8% 30.6%',
-          '--destructive-foreground': '210 40% 98%',
-          '--border': '217.2 32.6% 17.5%',
-          '--input': '217.2 32.6% 17.5%',
-          '--ring': '212.7 26.8% 83.9%',
-        }
-      })
-    }
+    require('tailwindcss-animate'),
   ],
 }
