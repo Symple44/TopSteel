@@ -78,6 +78,3 @@ export function validateConfig(env: Record<string, string | undefined>): AppConf
     }
   })
 }
-
-export * from './cache'
-export * from './performance'

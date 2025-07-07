@@ -27,6 +27,9 @@ importers:
       vite-plugin-dts:
         specifier: 4.5.4
         version: 4.5.4(@types/node@24.0.10)(typescript@5.8.3)(vite@7.0.2)
+      zod:
+        specifier: ^3.25.75
+        version: 3.25.75
     devDependencies:
       '@nestjs/cli':
         specifier: ^11.0.7
@@ -20336,6 +20339,10 @@ packages:
 
   /zod@3.25.67:
     resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
+    dev: false
+
+  /zod@3.25.75:
+    resolution: {integrity: sha512-OhpzAmVzabPOL6C3A3gpAifqr9MqihV/Msx3gor2b2kviCgcb+HM9SEOpMWwwNp9MRunWnhtAKUoo0AHhjyPPg==}
     dev: false
 
   /zustand@5.0.6(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0):

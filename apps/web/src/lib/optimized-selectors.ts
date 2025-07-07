@@ -1,26 +1,26 @@
 /**
- * ⚡ SÉLECTEURS ZUSTAND OPTIMISÉS - TopSteel ERP
- * Version simplifiée et robuste sans erreurs React Hooks
+ * ⚡ SÉLECTEURS ZUSTAND OPTIMISÉS FINAUX - TopSteel ERP
+ * Version robuste avec typage strict et sans warnings ESLint/React
  * Fichier: apps/web/src/lib/optimized-selectors.ts
  */
 import { useMemo } from 'react'
 import { shallow } from 'zustand/shallow'
 
-// ===== TYPES FONDAMENTAUX =====
+// ===== TYPES FONDAMENTAUX STRICTS =====
 type StoreSelector<T, R> = (state: T) => R
 type EqualityFn<T> = (a: T, b: T) => boolean
 
 /**
- * Interface moderne pour les hooks Zustand
+ * Interface Zustand typée strictement
  */
-interface ZustandStoreHook<T> {
+interface TypedZustandStore<T> {
   <R>(selector: StoreSelector<T, R>): R
   <R>(selector: StoreSelector<T, R>, equalityFn: EqualityFn<R>): R
   (): T
   getState(): T
   setState(
     partial: T | Partial<T> | ((state: T) => T | Partial<T>),
-    replace?: boolean | undefined
+    replace?: boolean
   ): void
   subscribe(listener: (state: T, prevState: T) => void): () => void
 }
@@ -29,7 +29,8 @@ interface ZustandStoreHook<T> {
 export enum SelectorStrategy {
   SIMPLE = 'simple',
   SHALLOW = 'shallow',
-  DEEP = 'deep'
+  DEEP = 'deep',
+  SAFE = 'safe'
 }
 
 // ===== CONFIGURATION DES SÉLECTEURS =====
@@ -40,8 +41,60 @@ export interface SelectorOptions<R> {
   debugLabel?: string
 }
 
-// ===== CRÉATEUR DE SÉLECTEURS OPTIMISÉS =====
-export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
+// ===== CACHE MÉMOÏSÉ POUR PERFORMANCES =====
+interface MemoCache<R> {
+  value: R
+  timestamp: number
+  hitCount: number
+}
+
+class SelectorMemoCache {
+  private static cache = new Map<string, MemoCache<any>>()
+  private static maxSize = 100
+  private static defaultTTL = 5000
+
+  static get<R>(key: string, ttl: number = this.defaultTTL): R | undefined {
+    const entry = this.cache.get(key)
+    if (!entry) return undefined
+
+    const now = Date.now()
+    if (now - entry.timestamp > ttl) {
+      this.cache.delete(key)
+      return undefined
+    }
+
+    entry.hitCount++
+    return entry.value
+  }
+
+  static set<R>(key: string, value: R): void {
+    const now = Date.now()
+    this.cache.set(key, {
+      value,
+      timestamp: now,
+      hitCount: 1
+    })
+
+    // Nettoyage du cache si trop grand
+    if (this.cache.size > this.maxSize) {
+      const entries = Array.from(this.cache.entries())
+      const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
+      const toDelete = sortedByUsage.slice(0, Math.floor(this.maxSize * 0.3))
+      toDelete.forEach(([key]) => this.cache.delete(key))
+    }
+  }
+
+  static clear(): void {
+    this.cache.clear()
+  }
+
+  static getEntries(): Array<[string, MemoCache<any>]> {
+    return Array.from(this.cache.entries())
+  }
+}
+
+// ===== CRÉATEUR DE SÉLECTEURS OPTIMISÉS TYPÉ =====
+export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
   return {
     /**
      * Sélecteur avec shallow comparison - Optimal pour les objets
@@ -49,7 +102,6 @@ export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
     useShallow: <R>(selector: StoreSelector<T, R>, debugLabel?: string) => {
       const result = useStore(selector, shallow as EqualityFn<R>)
       
-      // Debug direct sans useMemo
       if (process.env.NODE_ENV === 'development' && debugLabel) {
         console.debug(`🔍 [${debugLabel}] Shallow selector called`)
       }
@@ -67,7 +119,6 @@ export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
     ) => {
       const result = useStore(selector, equalityFn)
       
-      // Debug direct sans useMemo
       if (process.env.NODE_ENV === 'development' && debugLabel) {
         console.debug(`🔍 [${debugLabel}] Deep selector called`)
       }
@@ -81,7 +132,6 @@ export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
     useSimple: <R>(selector: StoreSelector<T, R>, debugLabel?: string) => {
       const result = useStore(selector)
       
-      // Debug direct sans useMemo
       if (process.env.NODE_ENV === 'development' && debugLabel) {
         console.debug(`🔍 [${debugLabel}] Simple selector called`)
       }
@@ -153,7 +203,7 @@ export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
       const filteredSelector = useMemo(
         () => (state: T) => {
           const items = selector(state)
-          if (!items) return [] as unknown as R
+          if (!items || !Array.isArray(items)) return [] as unknown as R
           return items.filter(filterFn) as unknown as R
         },
         [selector, filterFn]
@@ -161,29 +211,71 @@ export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
 
       const result = useStore(filteredSelector, shallow as EqualityFn<R>)
       
-      // Debug direct sans useMemo
       if (process.env.NODE_ENV === 'development' && debugLabel) {
-        console.debug(`🔍 [${debugLabel}] Filtered selector: ${result?.length || 0} items`)
+        console.debug(`🔍 [${debugLabel}] Filtered selector: ${(result as any)?.length || 0} items`)
       }
       
       return result
     },
 
     /**
+     * Sélecteur mémoïsé avec cache persistant (version simplifiée)
+     */
+    useMemoized: <R>(
+      selector: StoreSelector<T, R>,
+      options: {
+        ttl?: number
+        cacheKey?: string
+        debugLabel?: string
+      } = {}
+    ) => {
+      const { ttl = 5000, cacheKey, debugLabel } = options
+      
+      const memoizedSelector = useMemo(() => {
+        return (state: T): R => {
+          // Générer clé de cache simple
+          const key = cacheKey || `${debugLabel || 'memo'}-${Date.now()}`
+          
+          // Vérifier le cache
+          const cached = SelectorMemoCache.get<R>(key, ttl)
+          if (cached !== undefined) {
+            return cached
+          }
+
+          // Calculer et mettre en cache
+          const result = selector(state)
+          SelectorMemoCache.set(key, result)
+          return result
+        }
+      }, [selector, ttl, cacheKey, debugLabel])
+
+      return useStore(memoizedSelector, shallow as EqualityFn<R>)
+    },
+
+    /**
      * Nettoyer le cache des sélecteurs mémoïsés
      */
     clearMemoCache: () => {
-      // Implémentation simple pour la compatibilité
-      console.debug('Cache cleared')
+      SelectorMemoCache.clear()
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('🧹 Memo cache cleared')
+      }
     },
 
     /**
      * Statistiques du cache
      */
-    getCacheStats: () => ({
-      size: 0,
-      entries: []
-    })
+    getCacheStats: () => {
+      const entries = SelectorMemoCache.getEntries()
+      return {
+        size: entries.length,
+        entries: entries.map(([key, value]) => ({
+          key,
+          hitCount: value.hitCount,
+          age: Date.now() - value.timestamp
+        }))
+      }
+    }
   }
 }
 
@@ -191,7 +283,7 @@ export function createOptimizedSelectors<T>(useStore: ZustandStoreHook<T>) {
  * Hook optimisé unifié avec stratégie configurable
  */
 export function useOptimizedSelector<T, R>(
-  useStore: ZustandStoreHook<T>,
+  useStore: TypedZustandStore<T>,
   selector: StoreSelector<T, R>,
   options: SelectorOptions<R> = {}
 ): R {
@@ -211,6 +303,7 @@ export function useOptimizedSelector<T, R>(
         return shallow as EqualityFn<R>
       case SelectorStrategy.DEEP:
         return (a: R, b: R) => JSON.stringify(a) === JSON.stringify(b)
+      case SelectorStrategy.SAFE:
       case SelectorStrategy.SIMPLE:
       default:
         return Object.is
@@ -234,10 +327,9 @@ export function useOptimizedSelector<T, R>(
     }
   }, [selector, defaultValue, debugLabel])
 
-  // ✅ TOUJOURS appeler useStore de la même façon - pas d'appels conditionnels
+  // Toujours appeler useStore de la même façon
   const result = useStore(safeSelector, finalEqualityFn)
 
-  // Debug direct sans useMemo
   if (process.env.NODE_ENV === 'development' && debugLabel) {
     console.debug(`🔍 [${debugLabel}] Strategy: ${strategy}, Result:`, result)
   }
@@ -251,23 +343,20 @@ export function useOptimizedSelector<T, R>(
 export function createMemoizedSelector<T, R>(
   selector: StoreSelector<T, R>,
   options: {
-    dependencies?: readonly unknown[]
     maxCacheSize?: number
     ttl?: number
     keySelector?: (state: T) => string
   } = {}
 ): StoreSelector<T, R> {
   const { 
-    dependencies = [], 
     maxCacheSize = 10, 
     ttl = 5000,
     keySelector 
   } = options
   
-  const cache = new Map<string, { value: R; timestamp: number; hitCount: number }>()
+  const cache = new Map<string, MemoCache<R>>()
   let lastState: T | undefined
   let lastResult: R | undefined
-  let lastDeps = [...dependencies]
 
   return (state: T): R => {
     // Optimisation rapide: même état = même résultat
@@ -275,19 +364,10 @@ export function createMemoizedSelector<T, R>(
       return lastResult
     }
 
-    // Vérifier les dépendances
-    if (dependencies.length > 0) {
-      const depsChanged = dependencies.some((dep, i) => dep !== lastDeps[i])
-      if (!depsChanged && lastResult !== undefined) {
-        return lastResult
-      }
-      lastDeps = [...dependencies]
-    }
-
     // Générer la clé de cache
     const cacheKey = keySelector ? 
       keySelector(state) : 
-      JSON.stringify({ state: state, deps: dependencies })
+      JSON.stringify(state)
 
     const now = Date.now()
     const cached = cache.get(cacheKey)

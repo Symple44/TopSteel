@@ -1,6 +1,7 @@
 /**
- * 🎨 THEME PROVIDER ENTERPRISE - TOPSTEEL ERP
+ * 🎨 THEME PROVIDER ENTERPRISE CORRIGÉ - TOPSTEEL ERP
  * Provider de thème optimisé pour performance et robustesse
+ * Version complète et corrigée sans troncature
  * 
  * Fonctionnalités:
  * - Transitions fluides sans flash
@@ -15,8 +16,15 @@
 
 'use client'
 
-import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 
 // =============================================
 // TYPES ET INTERFACES
@@ -81,176 +89,142 @@ export interface ThemeProviderProps {
   enableSync?: boolean
   transitionDuration?: number
   fallbackTheme?: ResolvedTheme
-  customColors?: Partial<Record<ResolvedTheme, Partial<ThemeColors>>>
+  customColors?: {
+    light: Partial<ThemeColors>
+    dark: Partial<ThemeColors>
+  }
 }
 
 // =============================================
 // CONSTANTES ET CONFIGURATIONS
 // =============================================
 
+const DEFAULT_THEME: Theme = 'system'
+const DEFAULT_STORAGE_KEY = 'topsteel-theme'
+const DEFAULT_ATTRIBUTE = 'class'
+const DEFAULT_TRANSITION_DURATION = 300
+const DEFAULT_FALLBACK_THEME: ResolvedTheme = 'light'
+
 const DEFAULT_COLORS: Record<ResolvedTheme, ThemeColors> = {
   light: {
     background: 'hsl(0 0% 100%)',
-    foreground: 'hsl(222.2 84% 4.9%)',
+    foreground: 'hsl(240 10% 3.9%)',
     card: 'hsl(0 0% 100%)',
-    cardForeground: 'hsl(222.2 84% 4.9%)',
+    cardForeground: 'hsl(240 10% 3.9%)',
     popover: 'hsl(0 0% 100%)',
-    popoverForeground: 'hsl(222.2 84% 4.9%)',
-    primary: 'hsl(221.2 83.2% 53.3%)',
-    primaryForeground: 'hsl(210 40% 98%)',
-    secondary: 'hsl(210 40% 96%)',
-    secondaryForeground: 'hsl(222.2 84% 4.9%)',
-    muted: 'hsl(210 40% 96%)',
-    mutedForeground: 'hsl(215.4 16.3% 46.9%)',
-    accent: 'hsl(210 40% 96%)',
-    accentForeground: 'hsl(222.2 84% 4.9%)',
+    popoverForeground: 'hsl(240 10% 3.9%)',
+    primary: 'hsl(240 5.9% 10%)',
+    primaryForeground: 'hsl(0 0% 98%)',
+    secondary: 'hsl(240 4.8% 95.9%)',
+    secondaryForeground: 'hsl(240 5.9% 10%)',
+    muted: 'hsl(240 4.8% 95.9%)',
+    mutedForeground: 'hsl(240 3.8% 46.1%)',
+    accent: 'hsl(240 4.8% 95.9%)',
+    accentForeground: 'hsl(240 5.9% 10%)',
     destructive: 'hsl(0 84.2% 60.2%)',
-    destructiveForeground: 'hsl(210 40% 98%)',
-    border: 'hsl(214.3 31.8% 91.4%)',
-    input: 'hsl(214.3 31.8% 91.4%)',
-    ring: 'hsl(221.2 83.2% 53.3%)',
+    destructiveForeground: 'hsl(0 0% 98%)',
+    border: 'hsl(240 5.9% 90%)',
+    input: 'hsl(240 5.9% 90%)',
+    ring: 'hsl(240 5.9% 10%)'
   },
   dark: {
-    background: 'hsl(222.2 84% 4.9%)',
-    foreground: 'hsl(210 40% 98%)',
-    card: 'hsl(222.2 84% 4.9%)',
-    cardForeground: 'hsl(210 40% 98%)',
-    popover: 'hsl(222.2 84% 4.9%)',
-    popoverForeground: 'hsl(210 40% 98%)',
-    primary: 'hsl(217.2 91.2% 59.8%)',
-    primaryForeground: 'hsl(222.2 84% 4.9%)',
-    secondary: 'hsl(217.2 32.6% 17.5%)',
-    secondaryForeground: 'hsl(210 40% 98%)',
-    muted: 'hsl(217.2 32.6% 17.5%)',
-    mutedForeground: 'hsl(215 20.2% 65.1%)',
-    accent: 'hsl(217.2 32.6% 17.5%)',
-    accentForeground: 'hsl(210 40% 98%)',
+    background: 'hsl(240 10% 3.9%)',
+    foreground: 'hsl(0 0% 98%)',
+    card: 'hsl(240 10% 3.9%)',
+    cardForeground: 'hsl(0 0% 98%)',
+    popover: 'hsl(240 10% 3.9%)',
+    popoverForeground: 'hsl(0 0% 98%)',
+    primary: 'hsl(0 0% 98%)',
+    primaryForeground: 'hsl(240 5.9% 10%)',
+    secondary: 'hsl(240 3.7% 15.9%)',
+    secondaryForeground: 'hsl(0 0% 98%)',
+    muted: 'hsl(240 3.7% 15.9%)',
+    mutedForeground: 'hsl(240 5% 64.9%)',
+    accent: 'hsl(240 3.7% 15.9%)',
+    accentForeground: 'hsl(0 0% 98%)',
     destructive: 'hsl(0 62.8% 30.6%)',
-    destructiveForeground: 'hsl(210 40% 98%)',
-    border: 'hsl(217.2 32.6% 17.5%)',
-    input: 'hsl(217.2 32.6% 17.5%)',
-    ring: 'hsl(224.3 76.3% 94.1%)',
+    destructiveForeground: 'hsl(0 0% 98%)',
+    border: 'hsl(240 3.7% 15.9%)',
+    input: 'hsl(240 3.7% 15.9%)',
+    ring: 'hsl(240 4.9% 83.9%)'
   }
 }
 
 // =============================================
-// UTILITIES ET HELPERS
+// UTILITAIRES THEME
 // =============================================
 
 class ThemeStorage {
-  private static key: string = 'topsteel-theme'
-  private static fallback: Theme = 'system'
-
-  static setKey(key: string): void {
-    this.key = key
-  }
-
-  static get(): Theme {
-    if (typeof window === 'undefined') return this.fallback
-
+  static get(): Theme | null {
     try {
-      const stored = localStorage.getItem(this.key) as Theme
-      if (stored && ['light', 'dark', 'system'].includes(stored)) {
-        return stored
-      }
-      return this.fallback
+      if (typeof window === 'undefined') return null
+      return (localStorage.getItem(DEFAULT_STORAGE_KEY) as Theme) || null
     } catch (error) {
-      console.warn('Failed to read theme from localStorage:', error)
-      return this.fallback
+      console.warn('Theme storage get error:', error)
+      return null
     }
   }
 
   static set(theme: Theme): boolean {
-    if (typeof window === 'undefined') return false
-
     try {
-      localStorage.setItem(this.key, theme)
-      
-      // Dispatch custom event for cross-tab sync
-      window.dispatchEvent(new CustomEvent('theme-changed', { 
-        detail: { theme } 
-      }))
-      
+      if (typeof window === 'undefined') return false
+      localStorage.setItem(DEFAULT_STORAGE_KEY, theme)
       return true
     } catch (error) {
-      console.warn('Failed to save theme to localStorage:', error)
+      console.warn('Theme storage set error:', error)
       return false
     }
   }
 
   static remove(): boolean {
-    if (typeof window === 'undefined') return false
-
     try {
-      localStorage.removeItem(this.key)
+      if (typeof window === 'undefined') return false
+      localStorage.removeItem(DEFAULT_STORAGE_KEY)
       return true
     } catch (error) {
-      console.warn('Failed to remove theme from localStorage:', error)
+      console.warn('Theme storage remove error:', error)
       return false
     }
   }
 }
 
 class ThemeApplicator {
-  private static transitionStyle: HTMLStyleElement | null = null
-
-  static setupTransitions(duration: number): void {
-    if (typeof document === 'undefined') return
-
-    if (!this.transitionStyle) {
-      this.transitionStyle = document.createElement('style')
-      this.transitionStyle.type = 'text/css'
-      document.head.appendChild(this.transitionStyle)
-    }
-
-    this.transitionStyle.textContent = `
-      *, *::before, *::after {
-        transition: background-color ${duration}ms ease-in-out,
-                   border-color ${duration}ms ease-in-out,
-                   color ${duration}ms ease-in-out,
-                   fill ${duration}ms ease-in-out,
-                   stroke ${duration}ms ease-in-out;
-      }
-    `
-  }
-
-  static removeTransitions(): void {
-    if (this.transitionStyle) {
-      this.transitionStyle.remove()
-      this.transitionStyle = null
-    }
+  static getSystemTheme(): ResolvedTheme {
+    if (typeof window === 'undefined') return 'light'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
   static applyTheme(
     theme: ResolvedTheme, 
-    attribute: 'class' | 'data-theme' = 'class',
-    colors?: ThemeColors
+    attribute: string = DEFAULT_ATTRIBUTE,
+    colors: ThemeColors
   ): void {
     if (typeof document === 'undefined') return
 
-    const root = document.documentElement
+    try {
+      const root = document.documentElement
 
-    // Apply theme attribute
-    if (attribute === 'class') {
-      root.classList.toggle('dark', theme === 'dark')
-      root.classList.toggle('light', theme === 'light')
-    } else {
-      root.setAttribute('data-theme', theme)
-    }
+      // Appliquer l'attribut de thème
+      if (attribute === 'class') {
+        root.classList.remove('light', 'dark')
+        root.classList.add(theme)
+      } else {
+        root.setAttribute('data-theme', theme)
+      }
 
-    // Apply CSS custom properties
-    if (colors) {
+      // Appliquer les variables CSS
       Object.entries(colors).forEach(([key, value]) => {
-        const cssVar = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`
+        const cssVar = `--${key.replace(/[A-Z]/g, '-$&').toLowerCase()}`
         root.style.setProperty(cssVar, value)
       })
-    }
-  }
 
-  static getSystemTheme(): ResolvedTheme {
-    if (typeof window === 'undefined') return 'light'
-    
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      // Dispatch custom event pour les listeners externes
+      window.dispatchEvent(new CustomEvent('theme-changed', { 
+        detail: { theme, colors } 
+      }))
+    } catch (error) {
+      console.error('Theme application error:', error)
+    }
   }
 }
 
@@ -269,20 +243,20 @@ class ThemeMetricsCollector {
     this.metrics.lastChange = Date.now()
   }
 
-  static recordError(): void {
-    this.metrics.errors++
-  }
-
-  static recordHydration(time: number): void {
-    this.metrics.hydrationTime = time
-  }
-
   static recordTransition(): void {
     this.metrics.transitionCount++
   }
 
+  static recordError(): void {
+    this.metrics.errors++
+  }
+
   static recordStorageError(): void {
     this.metrics.storageErrors++
+  }
+
+  static recordHydration(time: number): void {
+    this.metrics.hydrationTime = time
   }
 
   static getMetrics(): ThemeMetrics {
@@ -302,76 +276,56 @@ class ThemeMetricsCollector {
 }
 
 // =============================================
-// CONTEXT
+// CONTEXT ET PROVIDER
 // =============================================
 
 const ThemeProviderContext = createContext<ThemeProviderContext | undefined>(undefined)
 
-// =============================================
-// PROVIDER COMPONENT
-// =============================================
-
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
-  storageKey = 'topsteel-theme',
-  attribute = 'class',
+  defaultTheme = DEFAULT_THEME,
+  storageKey = DEFAULT_STORAGE_KEY,
+  attribute = DEFAULT_ATTRIBUTE,
   enableSystem = true,
   enableTransitions = true,
   enableMetrics = true,
   enableSync = true,
-  transitionDuration = 150,
-  fallbackTheme = 'light',
-  customColors = {}
+  transitionDuration = DEFAULT_TRANSITION_DURATION,
+  fallbackTheme = DEFAULT_FALLBACK_THEME,
+  customColors = { light: {}, dark: {} }
 }: ThemeProviderProps) {
+  // ===== ÉTATS =====
   const [theme, setThemeState] = useState<Theme>(defaultTheme)
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(fallbackTheme)
   const [isHydrated, setIsHydrated] = useState(false)
   const [isChanging, setIsChanging] = useState(false)
 
-  const mediaQueryRef = useRef<MediaQueryList | null>(null)
+  // ===== REFS =====
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const hydrationStartRef = useRef<number>(Date.now())
+  const hydrationStartRef = useRef(Date.now())
 
-  // Initialize storage key
-  useEffect(() => {
-    ThemeStorage.setKey(storageKey)
-  }, [storageKey])
-
-  // Setup transitions
-  useEffect(() => {
-    if (enableTransitions) {
-      ThemeApplicator.setupTransitions(transitionDuration)
-    }
-    
-    return () => {
-      if (enableTransitions) {
-        ThemeApplicator.removeTransitions()
-      }
-    }
-  }, [enableTransitions, transitionDuration])
-
-  // Resolve theme function
+  // ===== RÉSOLUTION DU THÈME =====
   const resolveTheme = useCallback((currentTheme: Theme): ResolvedTheme => {
     if (currentTheme === 'system') {
-      return enableSystem ? ThemeApplicator.getSystemTheme() : fallbackTheme
+      return enableSystem ? 
+        ThemeApplicator.getSystemTheme() : fallbackTheme
     }
     return currentTheme as ResolvedTheme
   }, [enableSystem, fallbackTheme])
 
-  // Update resolved theme and apply
+  // ===== MISE À JOUR DU THÈME RÉSOLU =====
   const updateResolvedTheme = useCallback((newTheme: Theme) => {
     const resolved = resolveTheme(newTheme)
     
     setResolvedTheme(resolved)
     
-    // Get colors (merge defaults with custom colors)
+    // Obtenir les couleurs (fusion defaults + customs)
     const colors = {
       ...DEFAULT_COLORS[resolved],
       ...customColors[resolved]
     }
     
-    // Apply theme
+    // Appliquer le thème
     ThemeApplicator.applyTheme(resolved, attribute, colors)
     
     if (enableMetrics) {
@@ -379,7 +333,7 @@ export function ThemeProvider({
     }
   }, [resolveTheme, attribute, customColors, enableMetrics])
 
-  // Set theme with validation and side effects
+  // ===== SETTER PRINCIPAL =====
   const setTheme = useCallback((newTheme: Theme) => {
     if (!['light', 'dark', 'system'].includes(newTheme)) {
       console.warn(`Invalid theme: ${newTheme}`)
@@ -397,7 +351,7 @@ export function ThemeProvider({
       setThemeState(newTheme)
       updateResolvedTheme(newTheme)
       
-      // Save to storage
+      // Sauvegarder dans le storage
       const saved = ThemeStorage.set(newTheme)
       if (!saved && enableMetrics) {
         ThemeMetricsCollector.recordStorageError()
@@ -414,113 +368,79 @@ export function ThemeProvider({
       }
     }
 
-    // Reset changing state after transition
+    // Reset changing state après transition
     timeoutRef.current = setTimeout(() => {
       setIsChanging(false)
     }, transitionDuration + 50)
   }, [updateResolvedTheme, enableMetrics, transitionDuration])
 
-  // Initial hydration
+  // ===== HYDRATATION INITIALE =====
   useEffect(() => {
     const hydrationStart = hydrationStartRef.current
     
     try {
-      // Get initial theme from storage or use default
+      // Obtenir le thème initial depuis le storage ou utiliser le défaut
       const storedTheme = ThemeStorage.get()
       const initialTheme = storedTheme || defaultTheme
       
       setThemeState(initialTheme)
       updateResolvedTheme(initialTheme)
       
-      setIsHydrated(true)
-      
+      const hydrationTime = Date.now() - hydrationStart
       if (enableMetrics) {
-        ThemeMetricsCollector.recordHydration(Date.now() - hydrationStart)
+        ThemeMetricsCollector.recordHydration(hydrationTime)
       }
       
-    } catch (error) {
-      console.error('Theme hydration failed:', error)
-      
-      // Fallback to default theme
-      setThemeState(defaultTheme)
-      updateResolvedTheme(defaultTheme)
       setIsHydrated(true)
-      
+    } catch (error) {
+      console.error('Theme hydration error:', error)
       if (enableMetrics) {
         ThemeMetricsCollector.recordError()
       }
+      setIsHydrated(true) // Set hydrated même en cas d'erreur
     }
   }, [defaultTheme, updateResolvedTheme, enableMetrics])
 
-  // System theme change listener
+  // ===== LISTENER SYSTÈME =====
   useEffect(() => {
-    if (!enableSystem || typeof window === 'undefined') return
+    if (!enableSystem || theme !== 'system') return
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    mediaQueryRef.current = mediaQuery
     
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      if (theme === 'system') {
-        updateResolvedTheme('system')
-      }
+    const handleChange = () => {
+      updateResolvedTheme('system')
     }
-    
-    mediaQuery.addEventListener('change', handleSystemThemeChange)
-    
-    return () => {
-      mediaQuery.removeEventListener('change', handleSystemThemeChange)
-    }
+
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme, enableSystem, updateResolvedTheme])
 
-  // Cross-tab synchronization
+  // ===== SYNCHRONISATION MULTI-ONGLETS =====
   useEffect(() => {
-    if (!enableSync || typeof window === 'undefined') return
+    if (!enableSync) return
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === storageKey && e.newValue) {
         const newTheme = e.newValue as Theme
-        if (['light', 'dark', 'system'].includes(newTheme)) {
+        if (newTheme !== theme) {
           setThemeState(newTheme)
           updateResolvedTheme(newTheme)
         }
       }
     }
 
-    const handleCustomThemeChange = (e: CustomEvent) => {
-      const newTheme = e.detail?.theme as Theme
-      if (newTheme && ['light', 'dark', 'system'].includes(newTheme)) {
-        setThemeState(newTheme)
-        updateResolvedTheme(newTheme)
-      }
-    }
-
     window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('theme-changed', handleCustomThemeChange as EventListener)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [theme, storageKey, enableSync, updateResolvedTheme])
 
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('theme-changed', handleCustomThemeChange as EventListener)
-    }
-  }, [storageKey, enableSync, updateResolvedTheme])
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [])
-
-  // Utility functions
+  // ===== MÉTHODES UTILITAIRES =====
   const toggleTheme = useCallback(() => {
     if (theme === 'system') {
-      const systemTheme = ThemeApplicator.getSystemTheme()
-      setTheme(systemTheme === 'dark' ? 'light' : 'dark')
+      setTheme(resolvedTheme === 'light' ? 'dark' : 'light')
     } else {
       setTheme(theme === 'light' ? 'dark' : 'light')
     }
-  }, [theme, setTheme])
+  }, [theme, resolvedTheme, setTheme])
 
   const setSystemTheme = useCallback(() => {
     setTheme('system')
@@ -531,7 +451,7 @@ export function ThemeProvider({
     setTheme(defaultTheme)
   }, [setTheme, defaultTheme])
 
-  // Derived values
+  // ===== VALEURS DÉRIVÉES =====
   const isSystemTheme = theme === 'system'
   const colors = {
     ...DEFAULT_COLORS[resolvedTheme],
@@ -546,7 +466,7 @@ export function ThemeProvider({
     storageErrors: 0
   }
 
-  // Context value
+  // ===== CONTEXT VALUE =====
   const contextValue: ThemeProviderContext = {
     theme,
     setTheme,
@@ -561,6 +481,15 @@ export function ThemeProvider({
     clearTheme
   }
 
+  // ===== NETTOYAGE =====
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
   return (
     <ThemeProviderContext.Provider value={contextValue}>
       {children}
@@ -569,7 +498,7 @@ export function ThemeProvider({
 }
 
 // =============================================
-// HOOK
+// HOOK PRINCIPAL
 // =============================================
 
 export function useTheme(): ThemeProviderContext {
@@ -583,7 +512,7 @@ export function useTheme(): ThemeProviderContext {
 }
 
 // =============================================
-// UTILITIES POUR DEBUG ET MONITORING
+// HOOKS UTILITAIRES
 // =============================================
 
 export function useThemeMetrics(): ThemeMetrics {
@@ -628,3 +557,16 @@ export function useThemeDebug(): {
     testThemeSwitch
   }
 }
+
+// =============================================
+// UTILITAIRES D'EXPORT
+// =============================================
+
+export const themeUtils = {
+  storage: ThemeStorage,
+  applicator: ThemeApplicator,
+  metrics: ThemeMetricsCollector,
+  colors: DEFAULT_COLORS
+}
+
+export default ThemeProvider

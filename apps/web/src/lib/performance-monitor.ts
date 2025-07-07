@@ -1,6 +1,7 @@
 /**
- * 📊 PERFORMANCE MONITOR - TopSteel ERP
+ * 📊 PERFORMANCE MONITOR SSR-SAFE - TopSteel ERP
  * Monitoring et mesure des performances de l'application
+ * Version corrigée pour éviter les erreurs SSR
  * Fichier: apps/web/src/lib/performance-monitor.ts
  */
 
@@ -35,14 +36,18 @@ interface PageLoadMetrics {
   firstInputDelay?: number
 }
 
-// ===== CLASSE PRINCIPALE =====
+// ===== CLASSE PRINCIPALE SSR-SAFE =====
 export class PerformanceMonitor {
-  private static instance: PerformanceMonitor
+  private static instance: PerformanceMonitor | null = null
   private metrics: Map<string, PerformanceMetric[]> = new Map()
   private observers: PerformanceObserver[] = []
+  private isClient: boolean
 
   private constructor() {
-    this.initializeObservers()
+    this.isClient = typeof window !== 'undefined'
+    if (this.isClient) {
+      this.initializeObservers()
+    }
   }
 
   static getInstance(): PerformanceMonitor {
@@ -53,6 +58,19 @@ export class PerformanceMonitor {
   }
 
   /**
+   * Vérification SSR-safe avant toute opération
+   */
+  private ensureClient(): boolean {
+    if (!this.isClient) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('PerformanceMonitor: Attempted to use browser API on server')
+      }
+      return false
+    }
+    return true
+  }
+
+  /**
    * Décorateur pour mesurer les performances de rendu
    */
   static measureRender(componentName: string) {
@@ -60,6 +78,10 @@ export class PerformanceMonitor {
       const method = descriptor.value
       
       descriptor.value = function(...args: any[]) {
+        if (typeof window === 'undefined') {
+          return method.apply(this, args)
+        }
+
         const start = performance.now()
         const result = method.apply(this, args)
         const end = performance.now()
@@ -82,7 +104,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * Tracker le temps de chargement de page
+   * Tracker le temps de chargement de page - SSR-Safe
    */
   static trackPageLoad(pageName: string): void {
     if (typeof window === 'undefined') return
@@ -134,7 +156,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * Tracker le Largest Contentful Paint (LCP)
+   * Tracker le Largest Contentful Paint (LCP) - SSR-Safe
    */
   static trackLCP(): void {
     if (typeof window === 'undefined' || !('PerformanceObserver' in window)) {
@@ -177,7 +199,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * Tracker le First Input Delay (FID)
+   * Tracker le First Input Delay (FID) - SSR-Safe
    */
   static trackFID(): void {
     if (typeof window === 'undefined' || !('PerformanceObserver' in window)) {
@@ -219,7 +241,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * Tracker le Cumulative Layout Shift (CLS)
+   * Tracker le Cumulative Layout Shift (CLS) - SSR-Safe
    */
   static trackCLS(): void {
     if (typeof window === 'undefined' || !('PerformanceObserver' in window)) {
@@ -259,7 +281,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * Envoyer des métriques aux analytics (type-safe)
+   * Envoyer des métriques aux analytics (type-safe) - SSR-Safe
    */
   private static sendToAnalytics(eventName: string, parameters: Record<string, any>): void {
     if (typeof window === 'undefined') return
@@ -281,11 +303,25 @@ export class PerformanceMonitor {
   }
 
   /**
-   * Initialiser les observers de performance
+   * Initialiser les observers de performance - SSR-Safe
    */
   private initializeObservers(): void {
-    if (typeof window === 'undefined') return
+    if (!this.ensureClient()) return
 
+    // Attendre que le DOM soit prêt
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        this.setupObservers()
+      })
+    } else {
+      this.setupObservers()
+    }
+  }
+
+  /**
+   * Configurer les observers (appelé uniquement côté client)
+   */
+  private setupObservers(): void {
     // Initialiser tous les trackers Core Web Vitals
     PerformanceMonitor.trackLCP()
     PerformanceMonitor.trackFID()
@@ -293,15 +329,15 @@ export class PerformanceMonitor {
   }
 
   /**
-   * Enregistrer une métrique personnalisée
+   * Enregistrer une métrique personnalisée - SSR-Safe
    */
   recordMetric(name: string, data: Record<string, any>): void {
     const metric: PerformanceMetric = {
       name,
       value: data.value || data.duration || 0,
       timestamp: Date.now(),
-      url: typeof window !== 'undefined' ? window.location.href : undefined,
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined
+      url: this.isClient ? window.location.href : undefined,
+      userAgent: this.isClient ? window.navigator.userAgent : undefined
     }
 
     if (!this.metrics.has(name)) {
@@ -328,17 +364,21 @@ export class PerformanceMonitor {
   }
 
   /**
-   * Nettoyer les métriques et observers
+   * Nettoyer les métriques et observers - SSR-Safe
    */
   cleanup(): void {
     this.metrics.clear()
-    this.observers.forEach(observer => {
-      try {
-        observer.disconnect()
-      } catch (error) {
-        console.error('Error disconnecting observer:', error)
-      }
-    })
+    
+    if (this.isClient) {
+      this.observers.forEach(observer => {
+        try {
+          observer.disconnect()
+        } catch (error) {
+          console.error('Error disconnecting observer:', error)
+        }
+      })
+    }
+    
     this.observers = []
   }
 
@@ -366,19 +406,31 @@ export class PerformanceMonitor {
 
     return report
   }
+
+  /**
+   * Initialisation côté client uniquement
+   */
+  static initializeClient(): void {
+    if (typeof window !== 'undefined') {
+      PerformanceMonitor.getInstance()
+    }
+  }
+}
+
+// ===== HOOK POUR UTILISATION DANS REACT =====
+export function usePerformanceMonitor() {
+  const monitor = PerformanceMonitor.getInstance()
+  
+  return {
+    recordMetric: monitor.recordMetric.bind(monitor),
+    getMetrics: monitor.getMetrics.bind(monitor),
+    getReport: monitor.getPerformanceReport.bind(monitor),
+    cleanup: monitor.cleanup.bind(monitor)
+  }
 }
 
 // ===== EXPORTATIONS =====
 export default PerformanceMonitor
 
-// Initialiser automatiquement si dans le navigateur
-if (typeof window !== 'undefined') {
-  // Attendre que le DOM soit prêt
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      PerformanceMonitor.getInstance()
-    })
-  } else {
-    PerformanceMonitor.getInstance()
-  }
-}
+// ✅ SUPPRESSION DE L'INITIALISATION AUTOMATIQUE
+// L'initialisation doit être faite manuellement côté client pour éviter les erreurs SSR

@@ -1,6 +1,7 @@
 /**
  * 🏪 STORE PRINCIPAL CORRIGÉ - TopSteel ERP
  * Store principal de l'application avec hooks et architecture évolutive
+ * Typé strictement pour éviter les erreurs TypeScript
  * Fichier: apps/web/src/stores/app.store.ts
  */
 
@@ -14,7 +15,7 @@ import type {
   StoreUser
 } from '@erp/types'
 
-// ===== ÉTAT INITIAL =====
+// ===== ÉTAT INITIAL STRICTEMENT TYPÉ =====
 
 const initialAppState: InitialState<AppState> = {
   // État de base (BaseStoreState)
@@ -64,7 +65,7 @@ const initialAppState: InitialState<AppState> = {
   
   // Synchronisation
   sync: {
-    isOnline: navigator?.onLine ?? true,
+    isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
     pendingChanges: 0,
     lastSync: Date.now(),
     conflictCount: 0,
@@ -73,7 +74,7 @@ const initialAppState: InitialState<AppState> = {
   }
 }
 
-// ===== DÉFINITION DU STORE =====
+// ===== DÉFINITION DU STORE AVEC ACTIONS TYPÉES =====
 
 const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get) => ({
   // ===== ACTIONS DE BASE =====
@@ -114,39 +115,57 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   setTheme: (theme) => {
     set((state) => {
       state.theme = theme
-      state.metrics.actionCount++
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
 
   setSidebarCollapsed: (collapsed) => {
     set((state) => {
-      state.ui.sidebarCollapsed = collapsed
-      state.metrics.actionCount++
+      if (state.ui) {
+        state.ui.sidebarCollapsed = collapsed
+      }
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
 
   setSidebarPinned: (pinned) => {
     set((state) => {
-      state.ui.sidebarPinned = pinned
-      state.metrics.actionCount++
+      if (state.ui) {
+        state.ui.sidebarPinned = pinned
+      }
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
 
   setLayoutMode: (mode) => {
     set((state) => {
-      state.ui.layoutMode = mode
-      state.metrics.actionCount++
+      if (state.ui) {
+        state.ui.layoutMode = mode
+      }
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
 
   setActiveModule: (module) => {
     set((state) => {
-      state.ui.activeModule = module
-      state.metrics.actionCount++
+      if (state.ui) {
+        state.ui.activeModule = module
+      }
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -155,12 +174,10 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   setUser: (user: StoreUser | null) => {
     set((state) => {
       state.user = user
-      state.lastUpdate = Date.now()
-      
-      if (!user) {
-        state.permissions = []
-        state.session = null
+      if (state.metrics) {
+        state.metrics.actionCount++
       }
+      state.lastUpdate = Date.now()
     })
   },
 
@@ -183,6 +200,9 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
       state.user = null
       state.session = null
       state.permissions = []
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -191,7 +211,10 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   setProjets: (projets) => {
     set((state) => {
       state.projets = projets
-      state.metrics.projectCount = projets.length
+      if (state.metrics) {
+        state.metrics.projectCount = projets.length
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -199,7 +222,10 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   addProjet: (projet) => {
     set((state) => {
       state.projets.push(projet)
-      state.metrics.projectCount = state.projets.length
+      if (state.metrics) {
+        state.metrics.projectCount = state.projets.length
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -207,29 +233,26 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   updateProjet: (id, updates) => {
     set((state) => {
       const index = state.projets.findIndex(p => p.id === id)
-      if (index !== -1) {
+      if (index >= 0) {
         state.projets[index] = { ...state.projets[index], ...updates }
-        
-        // Mettre à jour le projet sélectionné si c'est le même
-        if (state.selectedProjet?.id === id) {
-          state.selectedProjet = state.projets[index]
+        if (state.metrics) {
+          state.metrics.actionCount++
         }
-        
-        state.lastUpdate = Date.now()
       }
+      state.lastUpdate = Date.now()
     })
   },
 
   removeProjet: (id) => {
     set((state) => {
       state.projets = state.projets.filter(p => p.id !== id)
-      
-      // Désélectionner si c'était le projet sélectionné
       if (state.selectedProjet?.id === id) {
         state.selectedProjet = null
       }
-      
-      state.metrics.projectCount = state.projets.length
+      if (state.metrics) {
+        state.metrics.projectCount = state.projets.length
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -237,6 +260,9 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   setSelectedProjet: (projet) => {
     set((state) => {
       state.selectedProjet = projet
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -246,10 +272,15 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
     set((state) => {
       const newNotification = {
         ...notification,
-        id: crypto.randomUUID(),
-        timestamp: new Date()
+        id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: new Date(),
+        read: false
       }
       state.notifications.unshift(newNotification)
+      // Garder seulement les 100 dernières notifications
+      if (state.notifications.length > 100) {
+        state.notifications = state.notifications.slice(0, 100)
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -273,14 +304,16 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
       const notification = state.notifications.find(n => n.id === id)
       if (notification) {
         notification.read = true
-        state.lastUpdate = Date.now()
       }
+      state.lastUpdate = Date.now()
     })
   },
 
   markAllNotificationsAsRead: () => {
     set((state) => {
-      state.notifications.forEach(n => n.read = true)
+      state.notifications.forEach(n => {
+        n.read = true
+      })
       state.lastUpdate = Date.now()
     })
   },
@@ -288,16 +321,25 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   // ===== ACTIONS FILTRES =====
   setFilters: (module, filters) => {
     set((state) => {
+      if (!state.filters) {
+        state.filters = {}
+      }
       state.filters[module] = filters
-      state.metrics.actionCount++
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
 
   clearFilters: (module) => {
     set((state) => {
-      delete state.filters[module]
-      state.metrics.actionCount++
+      if (state.filters) {
+        delete state.filters[module]
+      }
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -305,7 +347,9 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   resetAllFilters: () => {
     set((state) => {
       state.filters = {}
-      state.metrics.actionCount++
+      if (state.metrics) {
+        state.metrics.actionCount++
+      }
       state.lastUpdate = Date.now()
     })
   },
@@ -355,6 +399,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         if (state.sync) {
           state.sync.lastSync = Date.now()
           state.sync.pendingChanges = 0
+          state.sync.syncInProgress = false
         }
         state.loading = false
         state.lastUpdate = Date.now()
@@ -365,6 +410,9 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
       set((state) => {
         state.loading = false
         state.error = error instanceof Error ? error.message : 'Erreur de synchronisation'
+        if (state.sync) {
+          state.sync.syncInProgress = false
+        }
         state.lastUpdate = Date.now()
       })
       
@@ -383,7 +431,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   }
 })
 
-// ===== CRÉATION DU STORE =====
+// ===== CRÉATION DU STORE AVEC TYPE STRICT =====
 
 export const useAppStore = StoreUtils.createRobustStore<AppState, AppStoreActions>(
   initialAppState,
@@ -406,5 +454,5 @@ export const useAppTheme = () => useAppStore(state => state.theme)
 export const useAppSession = () => useAppStore(state => state.session)
 export const useAppOnlineStatus = () => useAppStore(state => state.sync?.isOnline ?? true)
 
-// ===== EXPORTS =====
+// ===== EXPORTS TYPES =====
 export type { AppState, AppStore, AppStoreActions }

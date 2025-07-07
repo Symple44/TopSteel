@@ -26,7 +26,7 @@ interface MouvementStats {
   }
 }
 
-// ✅ Données mockées déplacées dans le composant ou constante globale
+// ✅ Données mockées constantes
 const MOCK_CHART_DATA: MouvementStats[] = [
   {
     date: '2024-01-01',
@@ -36,7 +36,7 @@ const MOCK_CHART_DATA: MouvementStats[] = [
     transferts: 165,
     valeurEntrees: 47500,
     valeurSorties: 34200,
-    metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-01-01T00:00:00.000Z' }
   },
   {
     date: '2024-02-01', 
@@ -46,7 +46,7 @@ const MOCK_CHART_DATA: MouvementStats[] = [
     transferts: 220,
     valeurEntrees: 44600,
     valeurSorties: 39800,
-    metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-02-01T00:00:00.000Z' }
   },
   {
     date: '2024-03-01',
@@ -56,7 +56,7 @@ const MOCK_CHART_DATA: MouvementStats[] = [
     transferts: 190,
     valeurEntrees: 53800,
     valeurSorties: 44500,
-    metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-03-01T00:00:00.000Z' }
   },
   {
     date: '2024-04-01',
@@ -66,7 +66,7 @@ const MOCK_CHART_DATA: MouvementStats[] = [
     transferts: 210,
     valeurEntrees: 49800,
     valeurSorties: 43200,
-    metadata: { source: 'mock', version: '2.1', generatedAt: new Date().toISOString() }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-04-01T00:00:00.000Z' }
   }
 ]
 
@@ -135,59 +135,51 @@ export default function MouvementsPage() {
       {/* Stats rapides */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              Entrées aujourd'hui
-            </CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Entrées aujourd&apos;hui</CardTitle>
+            <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              €{stats.entrees.amount.toLocaleString()}
-            </div>
+            <div className="text-2xl font-bold">{stats.entrees.amount.toLocaleString('fr-FR')} €</div>
             <p className="text-xs text-muted-foreground">
               {stats.entrees.count} mouvements
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingDown className="h-4 w-4 text-red-600" />
-              Sorties aujourd'hui
-            </CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Sorties aujourd&apos;hui</CardTitle>
+            <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              €{stats.sorties.amount.toLocaleString()}
-            </div>
+            <div className="text-2xl font-bold">{stats.sorties.amount.toLocaleString('fr-FR')} €</div>
             <p className="text-xs text-muted-foreground">
               {stats.sorties.count} mouvements
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-blue-600" />
-              Balance
-            </CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Solde net</CardTitle>
+            <TrendingUp className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              €{(stats.entrees.amount - stats.sorties.amount).toLocaleString()}
+            <div className="text-2xl font-bold">
+              {(stats.entrees.amount - stats.sorties.amount).toLocaleString('fr-FR')} €
             </div>
-            <p className="text-xs text-muted-foreground">Solde journalier</p>
+            <p className="text-xs text-muted-foreground">
+              +{((stats.entrees.amount - stats.sorties.amount) / stats.sorties.amount * 100).toFixed(1)}% vs hier
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Graphiques et données */}
-      <Tabs value={activeTab} onValueChange={handleTabChange}>
+      {/* Onglets */}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="tous">Tous les mouvements</TabsTrigger>
+          <TabsTrigger value="tous">Tous</TabsTrigger>
           <TabsTrigger value="entrees">Entrées</TabsTrigger>
           <TabsTrigger value="sorties">Sorties</TabsTrigger>
           <TabsTrigger value="transferts">Transferts</TabsTrigger>

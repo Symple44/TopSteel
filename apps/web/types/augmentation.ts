@@ -15,12 +15,15 @@
 import './augmentations'
 
 import type {
-    DeepPartial,
-    User
+  DeepPartial,
+  User
 } from '@erp/types'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactNode } from 'react'
+
+// Import du type DevToolsConfig depuis index.ts
+import type { DevToolsConfig } from './index'
 
 // =============================================
 // TYPES NEXT.JS ÉTENDUS
@@ -334,7 +337,7 @@ export interface ChartWidgetProps {
 // =============================================
 
 export interface DevToolsWrapperProps {
-  config?: Partial<TopSteelDevtools.DevToolsConfig>
+  config?: Partial<DevToolsConfig>
   fallback?: React.ComponentType
   onError?: (error: Error) => void
 }
