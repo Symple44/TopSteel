@@ -1,4 +1,3 @@
-// apps/api/src/modules/auth/auth.controller.ts
 import {
   Body,
   Controller,
@@ -28,7 +27,7 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public() // ✅ Route publique
+  @Public()
   @Post("login")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -38,105 +37,48 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: "Connexion réussie",
-    schema: {
-      type: "object",
-      properties: {
-        accessToken: { type: "string" },
-        refreshToken: { type: "string" },
-        expiresIn: { type: "number" },
-        user: {
-          type: "object",
-          properties: {
-            id: { type: "number" },
-            email: { type: "string" },
-            nom: { type: "string" },
-            prenom: { type: "string" },
-            role: { type: "string" },
-          },
-        },
-      },
-    },
   })
-  @ApiResponse({ status: 401, description: "Credentials invalides" })
-  @ApiBody({ type: LoginDto })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
-  @Public() // ✅ Route publique
+  @Public()
   @Post("register")
-  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: "Inscription utilisateur",
-    description: "Crée un nouveau compte utilisateur",
+    description: "Créer un nouveau compte utilisateur",
   })
   @ApiResponse({
     status: 201,
-    description: "Inscription réussie",
-    schema: {
-      type: "object",
-      properties: {
-        accessToken: { type: "string" },
-        refreshToken: { type: "string" },
-        expiresIn: { type: "number" },
-        user: {
-          type: "object",
-          properties: {
-            id: { type: "number" },
-            email: { type: "string" },
-            nom: { type: "string" },
-            prenom: { type: "string" },
-            role: { type: "string" },
-          },
-        },
-      },
-    },
+    description: "Utilisateur créé avec succès",
   })
-  @ApiResponse({ status: 409, description: "Email déjà utilisé" })
-  @ApiResponse({ status: 400, description: "Données invalides" })
-  @ApiBody({ type: RegisterDto })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
-  @Public() // ✅ Route publique
+  @Public()
   @Post("refresh")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: "Rafraîchir les tokens",
-    description: "Génère de nouveaux tokens avec un refresh token valide",
+    summary: "Rafraîchir le token",
+    description: "Obtenir un nouveau token d'accès",
   })
-  @ApiResponse({
-    status: 200,
-    description: "Tokens rafraîchis",
-    schema: {
-      type: "object",
-      properties: {
-        accessToken: { type: "string" },
-        refreshToken: { type: "string" },
-        expiresIn: { type: "number" },
-      },
-    },
-  })
-  @ApiResponse({ status: 401, description: "Refresh token invalide" })
   @ApiBody({ type: RefreshTokenDto })
-  async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshTokens(refreshTokenDto);
+  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authService.refreshToken(refreshTokenDto.refreshToken);
   }
 
   @Post("logout")
   @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @ApiBearerAuth("JWT-auth")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    summary: "Déconnexion utilisateur",
-    description: "Invalide le refresh token de l'utilisateur",
+    summary: "Déconnexion",
+    description: "Invalider le token de l'utilisateur",
   })
-  @ApiResponse({ status: 200, description: "Déconnexion réussie" })
-  @ApiResponse({ status: 401, description: "Token invalide" })
   async logout(@CurrentUser() user: User) {
     await this.authService.logout(user.id);
-    return { message: "Déconnexion réussie" };
+    return { message: "Logout successful" };
   }
 
   @Get("profile")
@@ -144,63 +86,40 @@ export class AuthController {
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Profil utilisateur",
-    description: "Récupère les informations du profil utilisateur connecté",
+    description: "Récupérer les informations du profil",
   })
-  @ApiResponse({
-    status: 200,
-    description: "Profil récupéré",
-    schema: {
-      type: "object",
-      properties: {
-        id: { type: "number" },
-        email: { type: "string" },
-        nom: { type: "string" },
-        prenom: { type: "string" },
-        role: { type: "string" },
-        createdAt: { type: "string" },
-        updatedAt: { type: "string" },
-      },
-    },
-  })
-  @ApiResponse({ status: 401, description: "Token invalide" })
   async getProfile(@CurrentUser() user: User) {
     return this.authService.getProfile(user.id);
   }
 
   @Post("change-password")
   @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @ApiBearerAuth("JWT-auth")
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: "Changer mot de passe",
-    description: "Change le mot de passe de l'utilisateur connecté",
+    summary: "Changer le mot de passe",
+    description: "Modifier le mot de passe de l'utilisateur connecté",
   })
-  @ApiResponse({ status: 200, description: "Mot de passe changé avec succès" })
-  @ApiResponse({ status: 401, description: "Ancien mot de passe incorrect" })
-  @ApiResponse({ status: 400, description: "Nouveau mot de passe invalide" })
-  @ApiBody({ type: ChangePasswordDto })
   async changePassword(
     @CurrentUser() user: User,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     await this.authService.changePassword(
       user.id,
-      changePasswordDto.oldPassword,
+      changePasswordDto.currentPassword,
       changePasswordDto.newPassword,
     );
-    return { message: "Mot de passe changé avec succès" };
+    return { message: "Password changed successfully" };
   }
 
-  @Get("me")
+  @Get("verify")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
-    summary: "Informations utilisateur courantes (alias de profile)",
-    description: "Alias pour la route /profile",
+    summary: "Vérifier le token",
+    description: "Vérifier la validité du token et retourner le profil",
   })
-  @ApiResponse({ status: 200, description: "Informations utilisateur" })
-  @ApiResponse({ status: 401, description: "Token invalide" })
-  async getCurrentUser(@CurrentUser() user: User) {
+  async verify(@CurrentUser() user: User) {
     return this.authService.getProfile(user.id);
   }
 }

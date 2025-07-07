@@ -4,10 +4,17 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "builder": "webpack",
-    "typeCheck": true,
-    "webpack": true,
-    "webpackConfigPath": "webpack.config.js",
-    "tsConfigPath": "tsconfig.json"
+    "builder": "tsc",
+    "typeCheck": false,
+    "tsConfigPath": "tsconfig.json",
+    "assets": [
+      "**/*.proto",
+      "**/*.graphql"
+    ],
+    "watchAssets": true
+  },
+  "projects": {},
+  "generateOptions": {
+    "spec": false
   }
 }

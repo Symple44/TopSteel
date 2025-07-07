@@ -1,42 +1,49 @@
-// apps/api/src/modules/auth/auth.module.ts
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
-import { UsersModule } from "../users/users.module";
+import { TypeOrmModule } from "@nestjs/typeorm";
+
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { JwtUtilsService } from "./services/jwt-utils.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
+import { JwtUtilsService } from "./services/jwt-utils.service";
+
+import { User } from "../users/entities/user.entity";
+import { UsersModule } from "../users/users.module";
 
 @Module({
   imports: [
-    // Import du module Users pour utiliser UsersService
-    UsersModule,
-
-    // Configuration Passport
-    PassportModule.register({
-      defaultStrategy: "jwt",
-      session: false,
-    }),
-
-    // Configuration JWT
+    ConfigModule,
+    PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>("jwt.secret"),
-        signOptions: {
-          expiresIn: configService.get<string>("jwt.expiresIn", "15m"),
-          issuer: configService.get<string>("jwt.issuer"),
-          audience: configService.get<string>("jwt.audience"),
-        },
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>("jwt.secret");
+        const issuer = configService.get<string>("jwt.issuer");
+        const audience = configService.get<string>("jwt.audience");
+        
+        if (!secret) {
+          throw new Error("JWT secret is required");
+        }
+
+        return {
+          secret,
+          signOptions: {
+            expiresIn: "24h",
+            ...(issuer && { issuer }),
+            ...(audience && { audience }),
+          },
+        };
+      },
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([User]),
+    UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtUtilsService, LocalStrategy, JwtStrategy],
-  exports: [AuthService, JwtModule, JwtUtilsService],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtUtilsService],
+  exports: [AuthService, JwtUtilsService],
 })
 export class AuthModule {}

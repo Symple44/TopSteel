@@ -1,111 +1,110 @@
 /** @type {import('next').NextConfig} */
-
 const nextConfig = {
-  // Mode strict pour production
-  reactStrictMode: process.env.NODE_ENV === 'production',
+  // ===== CONFIGURATION DE BASE =====
+  reactStrictMode: true,
+  swcMinify: true,
+  compress: true,
   
-  // Configuration Turbopack pour Next.js 15
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js'
-      }
-    }
+  // ===== CORRECTION WINDOWS - DÉSACTIVER STANDALONE =====
+  output: undefined, // Supprime les problèmes de symlinks sur Windows
+  
+  // ===== OPTIMISATIONS PERFORMANCE =====
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   
-  // Experimental features
+  // ===== CONFIGURATION EXPERIMENTALE =====
   experimental: {
-    optimizeCss: false, // Désactivé pour éviter critters
-    workerThreads: false, // Éviter les crashes workers
-    cpus: Math.max(1, require('os').cpus().length - 1)
+    optimizePackageImports: [
+      '@erp/ui',
+      '@erp/types', 
+      '@erp/utils',
+      'lucide-react',
+      '@radix-ui/react-icons'
+    ],
+    // Désactivé pour éviter les problèmes Windows
+    // turbo: false,
   },
   
-  // TypeScript permissif en développement
-  typescript: {
-    ignoreBuildErrors: process.env.NODE_ENV === 'development'
-  },
-  
-  // ESLint permissif en développement  
-  eslint: {
-    ignoreDuringBuilds: process.env.NODE_ENV === 'development'
-  },
-  
-  // Configuration Webpack optimisée
-  webpack: (config, { dev, isServer }) => {
-    // Optimisation mémoire
-    config.optimization = config.optimization || {}
-    config.optimization.splitChunks = {
-      chunks: 'all',
-      cacheGroups: {
-        default: {
-          minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true
+  // ===== WEBPACK CONFIGURATION =====
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Optimisation pour éviter les crashes
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+      crypto: false,
+    };
+    
+    // Gestion gracieuse des erreurs de build
+    config.optimization = {
+      ...config.optimization,
+      minimize: !dev,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          default: false,
+          vendors: false,
+          vendor: {
+            chunks: 'all',
+            test: /node_modules/,
+            name: 'vendor',
+            enforce: true,
+          },
         },
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors', 
-          priority: -10,
-          chunks: 'all'
-        }
-      }
+      },
+    };
+    
+    // Configuration pour Windows
+    if (process.platform === 'win32') {
+      config.resolve.symlinks = false;
     }
     
-    // Fallbacks pour modules
-    if (!isServer) {
-      config.resolve = config.resolve || {}
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false
-      }
-    }
-    
-    return config
+    return config;
   },
   
-  // Images
+  // ===== TRANSPILATION =====
+  transpilePackages: [
+    '@erp/ui',
+    '@erp/types',
+    '@erp/utils'
+  ],
+  
+  // ===== GESTION DES IMAGES =====
   images: {
-    domains: ['localhost'],
-    formats: ['image/webp', 'image/avif']
+    formats: ['image/webp', 'image/avif'],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  // Headers sécurisés
-  async headers() {
+  // ===== ENVIRONNEMENT =====
+  env: {
+    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'ERP TopSteel',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  },
+  
+  // ===== GESTION DES ERREURS BUILD =====
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+  
+  // ===== POWEREDBYHEADER =====
+  poweredByHeader: false,
+  
+  // ===== REDIRECTS =====
+  async redirects() {
     return [
       {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY'
-          },
-          {
-            key: 'X-Content-Type-Options', 
-            value: 'nosniff'
-          }
-        ]
-      }
-    ]
+        source: '/register',
+        destination: '/auth/register',
+        permanent: true,
+      },
+    ];
   },
-  
-  // Configuration par environnement
-  compiler: process.env.NODE_ENV === 'production' ? {
-    removeConsole: {
-      exclude: ['error', 'warn']
-    }
-  } : {},
-  
-  // Sortie standalone
-  output: 'standalone',
-  
-  // Pas de trailing slashes
-  trailingSlash: false,
-  
-  // Désactiver X-Powered-By
-  poweredByHeader: false
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

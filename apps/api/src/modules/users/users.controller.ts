@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -61,7 +60,7 @@ export class UsersController {
 
   @Get(":id")
   @ApiOperation({ summary: "Récupérer un utilisateur par ID" })
-  async findOne(@Param("id", ParseUUIDPipe) id: string) {
+  async findOne(@Param("id") id: string) {
     return this.usersService.findOne(id);
   }
 
@@ -69,7 +68,7 @@ export class UsersController {
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: "Mettre à jour un utilisateur" })
   async update(
-    @Param("id", ParseUUIDPipe) id: string,
+    @Param("id") id: string,
     @Body() updateDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateDto);
@@ -79,7 +78,7 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Supprimer un utilisateur" })
-  async remove(@Param("id", ParseUUIDPipe) id: string) {
+  async remove(@Param("id") id: string) {
     return this.usersService.remove(id);
   }
 }

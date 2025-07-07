@@ -1,10 +1,9 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../packages/config/typescript/next.json",
   "compilerOptions": {
-    /* ===== NEXT.JS OPTIMIZATIONS ===== */
     "target": "ES2022",
     "module": "ESNext", 
-    "lib": ["dom", "dom.iterable", "es6", "ES2022"],
+    "lib": ["dom", "dom.iterable", "ES6", "ES2022"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -15,8 +14,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    
-    /* ===== TYPE CHECKING ROBUSTE ===== */
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
@@ -24,8 +21,6 @@
     "noImplicitOverride": true,
     "forceConsistentCasingInFileNames": true,
     "allowUnreachableCode": false,
-    
-    /* ===== PATH MAPPING OPTIMISÉ ===== */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
@@ -36,21 +31,12 @@
       "@/utils/*": ["./src/utils/*"],
       "@/styles/*": ["./src/styles/*"],
       "@/app/*": ["./src/app/*"],
-      "@/pages/*": ["./src/pages/*"],
       "@erp/types": ["../../packages/types/src"],
-      "@erp/types/*": ["../../packages/types/src/*"],
       "@erp/ui": ["../../packages/ui/src"],
-      "@erp/ui/*": ["../../packages/ui/src/*"],
       "@erp/utils": ["../../packages/utils/src"],
-      "@erp/utils/*": ["../../packages/utils/src/*"],
-      "@erp/config": ["../../packages/config/src"],
-      "@erp/config/*": ["../../packages/config/src/*"]
+      "@erp/config": ["../../packages/config/src"]
     },
-    
-    /* ===== PERFORMANCE ===== */
     "assumeChangesOnlyAffectDirectDependencies": true,
-    
-    /* ===== NEXT.JS PLUGINS ===== */
     "plugins": [
       {
         "name": "next"
@@ -58,18 +44,13 @@
     ],
     "types": ["jest", "@testing-library/jest-dom", "node"]
   },
-  
-  /* ===== INCLUSION OPTIMISÉE ===== */
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/**/*",
-    "src/types/**/*"
+    "src/**/*"
   ],
-  
-  /* ===== EXCLUSIONS STRICTES ===== */
   "exclude": [
     "node_modules",
     ".next",

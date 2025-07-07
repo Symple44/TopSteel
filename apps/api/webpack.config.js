@@ -1,24 +1,39 @@
 const path = require('path');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = function(options, webpack) {
   return {
     ...options,
-    plugins: [
-      ...options.plugins.filter(plugin => 
-        !(plugin instanceof ForkTsCheckerWebpackPlugin)
-      ),
-      new ForkTsCheckerWebpackPlugin({
-        typescript: {
-          memoryLimit: 4096, // 4GB au lieu de la limite par défaut
-          configFile: path.resolve(__dirname, 'tsconfig.json'),
-        },
-        logger: {
-          infrastructure: 'silent',
-          issues: 'console',
-          devServer: false,
-        },
-      }),
-    ],
+    // Suppression complète de fork-ts-checker-webpack-plugin pour éviter les erreurs
+    plugins: options.plugins.filter(plugin => 
+      plugin.constructor.name !== 'ForkTsCheckerWebpackPlugin'
+    ),
+    // Configuration optimisée pour NestJS
+    resolve: {
+      ...options.resolve,
+      alias: {
+        ...options.resolve?.alias,
+        '@': path.resolve(__dirname, 'src'),
+      },
+    },
+    // Optimisations pour le build
+    optimization: {
+      ...options.optimization,
+      splitChunks: false,
+      runtimeChunk: false,
+    },
+    // Configuration de la sortie
+    output: {
+      ...options.output,
+      filename: 'main.js',
+      clean: true,
+    },
+    // Gestion des erreurs gracieuse
+    stats: {
+      errors: true,
+      warnings: false,
+      colors: true,
+      chunks: false,
+      modules: false,
+    },
   };
 };

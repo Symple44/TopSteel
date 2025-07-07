@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { PaginationResultDto } from "../../common/dto/base.dto";
-import { CreateOrdreFabricationDto } from "./dto/create-ordre-fabrication.dto";
-import { OrdreFabricationQueryDto } from "./dto/ordre-fabrication-query.dto";
-import { UpdateOrdreFabricationDto } from "./dto/update-ordre-fabrication.dto";
+
 import { OrdreFabrication, OrdreFabricationStatut } from "./entities/ordre-fabrication.entity";
+import { CreateOrdreFabricationDto } from "./dto/create-ordre-fabrication.dto";
+import { UpdateOrdreFabricationDto } from "./dto/update-ordre-fabrication.dto";
+import { OrdreFabricationQueryDto } from "./dto/ordre-fabrication-query.dto";
 
 @Injectable()
 export class OrdreFabricationService {
@@ -15,90 +15,54 @@ export class OrdreFabricationService {
   ) {}
 
   async create(createDto: CreateOrdreFabricationDto): Promise<OrdreFabrication> {
-    // ✅ Transformation correcte des types
-    const entityData = {
+    const entity = this.repository.create({
       numero: createDto.numero,
-      statut: createDto.statut ?? OrdreFabricationStatut .EN_ATTENTE,
-      projet: createDto.projet,
+      statut: createDto.statut,
       description: createDto.description,
       priorite: createDto.priorite,
-      dateDebutPrevue: createDto.dateDebutPrevue ? new Date(createDto.dateDebutPrevue) : undefined,
-      dateFinPrevue: createDto.dateFinPrevue ? new Date(createDto.dateFinPrevue) : undefined,
-      avancement: createDto.avancement ?? 0,
-      responsableId: createDto.responsableId,
+      dateDebut: createDto.dateDebut,
+      dateFin: createDto.dateFin,
       notes: createDto.notes,
-    };
+      projet: createDto.projet,
+    });
 
-    const entity = this.repository.create(entityData);
     return this.repository.save(entity);
   }
 
-  async findAll(
-    query: OrdreFabricationQueryDto,
-  ): Promise<PaginationResultDto<OrdreFabrication>> {
-    const {
-      page = 1,
-      limit = 10,
-      search,
-      sortBy = "createdAt",
-      sortOrder = "DESC",
-    } = query;
-    const skip = (page - 1) * limit;
+  async findAll(query?: OrdreFabricationQueryDto): Promise<OrdreFabrication[]> {
+    const queryBuilder = this.repository.createQueryBuilder("ordre")
+      .orderBy("ordre.createdAt", "DESC");
 
-    const queryBuilder = this.repository.createQueryBuilder("entity");
-
-    // ✅ Relations ajoutées
-    queryBuilder.leftJoinAndSelect("entity.operations", "operations");
-    queryBuilder.leftJoinAndSelect("entity.projetEntity", "projetEntity");
-
-    if (search) {
-      queryBuilder.andWhere("(entity.numero ILIKE :search)", {
-        search: `%${search}%`,
-      });
+    if (query?.statut) {
+      queryBuilder.andWhere("ordre.statut = :statut", { statut: query.statut });
     }
 
-    if (query.statut) {
-      queryBuilder.andWhere("entity.statut = :statut", {
-        statut: query.statut,
-      });
+    if (query?.projet) {
+      queryBuilder.andWhere("ordre.projet = :projet", { projet: query.projet });
     }
 
-    if (query.projet) {
-      queryBuilder.andWhere("entity.projet = :projet", {
-        projet: query.projet,
-      });
-    }
-
-    const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
-      .skip(skip)
-      .take(limit)
-      .getManyAndCount();
-
-    return {
-      data,
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1,
-      },
-    };
-  }
-
-  // ✅ Correction type ID de string vers number
-  async findOne(id: number): Promise<OrdreFabrication> {
-    const entity = await this.repository.findOne({ 
-      where: { id },
-      relations: ['operations', 'projetEntity'],
-    });
-    if (!entity) {
-      throw new NotFoundException(
-        `Ordre de fabrication avec l'ID ${id} non trouvé`,
+    if (query?.search) {
+      queryBuilder.andWhere(
+        "(ordre.numero ILIKE :search OR ordre.description ILIKE :search)",
+        { search: `%${query.search}%` }
       );
     }
+
+    if (query?.page && query?.limit) {
+      const skip = (query.page - 1) * query.limit;
+      queryBuilder.skip(skip).take(query.limit);
+    }
+
+    return queryBuilder.getMany();
+  }
+
+  async findOne(id: number): Promise<OrdreFabrication> {
+    const entity = await this.repository.findOne({ where: { id } });
+
+    if (!entity) {
+      throw new NotFoundException(`Ordre de fabrication ${id} not found`);
+    }
+
     return entity;
   }
 
@@ -106,28 +70,16 @@ export class OrdreFabricationService {
     id: number,
     updateDto: UpdateOrdreFabricationDto,
   ): Promise<OrdreFabrication> {
-    const updateData: any = {
-      ...updateDto,
-    };
+    const entity = await this.findOne(id);
 
-    if (updateDto.dateDebutPrevue) {
-      updateData.dateDebutPrevue = new Date(updateDto.dateDebutPrevue);
-    }
-    
-    if (updateDto.dateFinPrevue) {
-      updateData.dateFinPrevue = new Date(updateDto.dateFinPrevue);
-    }
-    
-    if (updateDto.dateDebutReelle) {
-      updateData.dateDebutReelle = new Date(updateDto.dateDebutReelle);
-    }
-    
-    if (updateDto.dateFinReelle) {
-      updateData.dateFinReelle = new Date(updateDto.dateFinReelle);
-    }
+    Object.keys(updateDto).forEach((key) => {
+      const value = updateDto[key as keyof UpdateOrdreFabricationDto];
+      if (value !== undefined) {
+        (entity as any)[key] = value;
+      }
+    });
 
-    await this.repository.update(id, updateData);
-    return this.findOne(id);
+    return this.repository.save(entity);
   }
 
   async remove(id: number): Promise<void> {
@@ -135,45 +87,42 @@ export class OrdreFabricationService {
     await this.repository.remove(entity);
   }
 
-  async changeStatut(id: number, statut: string): Promise<OrdreFabrication> {
-    await this.repository.update(id, { statut: statut as OrdreFabricationStatut  });
-    return this.findOne(id);
-  }
-
-  async getStats(): Promise<{
-    total: number;
-    enCours: number;
-    termine: number;
-    enAttente: number;
-  }> {
-    const total = await this.repository.count();
-
-    const enCours = await this.repository.countBy({
-      statut: OrdreFabricationStatut .EN_COURS,
-    });
-
-    const termine = await this.repository.countBy({
-      statut: OrdreFabricationStatut .TERMINE,
-    });
-
-    const enAttente = await this.repository.countBy({
-      statut: OrdreFabricationStatut .EN_ATTENTE,
-    });
-
-    return {
-      total,
-      enCours,
-      termine,
-      enAttente,
-    };
-  }
-
-  // ✅ Correction findByProjet pour utiliser 'projet' au lieu de 'projetId'
   async findByProjet(projetId: number): Promise<OrdreFabrication[]> {
     return this.repository.find({
       where: { projet: projetId },
-      relations: ['operations', 'projetEntity'],
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
     });
+  }
+
+  async changeStatut(id: number, statut: OrdreFabricationStatut): Promise<OrdreFabrication> {
+    const entity = await this.findOne(id);
+    entity.statut = statut;
+    return this.repository.save(entity);
+  }
+
+  async getStats() {
+    const [
+      total,
+      enAttente,
+      enCours,
+      termine,
+      annule,
+    ] = await Promise.all([
+      this.repository.count(),
+      this.repository.count({ where: { statut: OrdreFabricationStatut.EN_ATTENTE } }),
+      this.repository.count({ where: { statut: OrdreFabricationStatut.EN_COURS } }),
+      this.repository.count({ where: { statut: OrdreFabricationStatut.TERMINE } }),
+      this.repository.count({ where: { statut: OrdreFabricationStatut.ANNULE } }),
+    ]);
+
+    return {
+      total,
+      byStatut: {
+        enAttente,
+        enCours,
+        termine,
+        annule,
+      },
+    };
   }
 }

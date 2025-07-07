@@ -96,14 +96,8 @@ export class OrdreFabricationController {
   @ApiOperation({ summary: "Changer le statut d'un ordre de fabrication" })
   async changeStatut(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: { statut: OrdreFabricationStatut  },
+    @Body() body: { statut: OrdreFabricationStatut },
   ) {
     return this.ordreFabricationService.changeStatut(id, body.statut);
-  }
-
-  @Get("projet/:projetId")
-  @ApiOperation({ summary: "Lister les ordres d'un projet" })
-  async findByProjet(@Param("projetId", ParseIntPipe) projetId: number) {
-    return this.ordreFabricationService.findByProjet(projetId);
   }
 }

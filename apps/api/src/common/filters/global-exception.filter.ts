@@ -1,75 +1,47 @@
-// apps/api/src/common/filters/global-exception.filter.ts
 import {
-  ArgumentsHost,
-  Catch,
   ExceptionFilter,
+  Catch,
+  ArgumentsHost,
   HttpException,
   HttpStatus,
   Logger,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
-
-interface ErrorResponse {
-  statusCode: number;
-  timestamp: string;
-  path: string;
-  method: string;
-  message: string | object;
-  requestId: string;
-  userId?: string;
-  stack?: string;
-}
+} from "@nestjs/common";
+import { Response } from "express";
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionFilter.name);
 
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
 
-    const status = exception instanceof HttpException 
-      ? exception.getStatus() 
-      : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message = exception instanceof HttpException
-      ? exception.getResponse()
-      : 'Erreur interne du serveur';
+    const message =
+      exception instanceof HttpException
+        ? exception.getResponse()
+        : "Internal server error";
 
-    const errorResponse: ErrorResponse = {
+    // Log de l'erreur
+    this.logger.error(
+      `HTTP Status: ${status} Error Message: ${JSON.stringify(message)}`,
+      exception?.stack || "No stack trace",
+    );
+
+    // Réponse d'erreur sécurisée
+    const errorResponse: any = {
       statusCode: status,
       timestamp: new Date().toISOString(),
-      path: request.url,
-      method: request.method,
-      message,
-      requestId: request.headers['x-request-id'] as string || `req_${Date.now()}`,
-      userId: (request as any).user?.id,
+      message: typeof message === "object" ? message : { message },
     };
 
-    // Stack trace pour erreurs 500
-    if (status >= 500 && exception instanceof Error) {
+    // Ajout du stack uniquement en développement
+    if (process.env.NODE_ENV === "development" && exception?.stack) {
       errorResponse.stack = exception.stack;
-    }
-
-    // Logging structuré
-    const logContext = {
-      ...errorResponse,
-      userAgent: request.headers['user-agent'],
-      ip: request.ip,
-      body: status >= 500 ? request.body : undefined,
-    };
-
-    if (status >= 500) {
-      this.logger.error('Erreur serveur', logContext);
-    } else if (status >= 400) {
-      this.logger.warn('Erreur client', logContext);
-    }
-
-    // Réponse nettoyée en production
-    if (process.env.NODE_ENV === 'production' && status >= 500) {
-      delete errorResponse.stack;
-      errorResponse.message = 'Erreur interne du serveur';
     }
 
     response.status(status).json(errorResponse);

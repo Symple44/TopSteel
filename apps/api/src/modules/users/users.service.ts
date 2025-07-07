@@ -1,15 +1,15 @@
 import {
-  ConflictException,
   Injectable,
   NotFoundException,
+  ConflictException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { PaginationResultDto } from "../../common/dto/base.dto";
+
+import { User, UserRole } from "./entities/user.entity";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserQueryDto } from "./dto/user-query.dto";
-import { User } from "./entities/user.entity";
 
 @Injectable()
 export class UsersService {
@@ -18,101 +18,125 @@ export class UsersService {
     private readonly repository: Repository<User>,
   ) {}
 
-  async create(createDto: CreateUserDto): Promise<User> {
-    // Vérifier l'unicité de l'email
-    const existingUser = await this.findByEmail(createDto.email);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const existingUser = await this.findByEmail(createUserDto.email);
     if (existingUser) {
-      throw new ConflictException("Un utilisateur avec cet email existe déjà");
+      throw new ConflictException("Email already exists");
     }
 
-    const entity = this.repository.create(createDto);
-    return this.repository.save(entity);
+    const user = this.repository.create(createUserDto);
+    return this.repository.save(user);
   }
 
-  async findAll(query: UserQueryDto): Promise<PaginationResultDto<User>> {
-    const {
-      page = 1,
-      limit = 10,
-      search,
-      sortBy = "createdAt",
-      sortOrder = "DESC",
-    } = query;
-    const skip = (page - 1) * limit;
+  async findAll(query?: UserQueryDto): Promise<User[]> {
+    const queryBuilder = this.repository.createQueryBuilder("user")
+      .select([
+        "user.id",
+        "user.email", 
+        "user.nom",
+        "user.prenom",
+        "user.role",
+        "user.actif",
+        "user.createdAt"
+      ])
+      .orderBy("user.createdAt", "DESC");
 
-    const queryBuilder = this.repository.createQueryBuilder("entity");
+    if (query?.actif !== undefined) {
+      queryBuilder.andWhere("user.actif = :actif", { actif: query.actif });
+    }
 
-    if (search) {
+    if (query?.role) {
+      queryBuilder.andWhere("user.role = :role", { role: query.role });
+    }
+
+    if (query?.search) {
       queryBuilder.andWhere(
-        "(entity.nom ILIKE :search OR entity.prenom ILIKE :search OR entity.email ILIKE :search)",
-        { search: `%${search}%` },
+        "(user.nom ILIKE :search OR user.prenom ILIKE :search OR user.email ILIKE :search)",
+        { search: `%${query.search}%` }
       );
     }
 
-    if (query.actif !== undefined) {
-      queryBuilder.andWhere("entity.actif = :actif", { actif: query.actif });
+    if (query?.page && query?.limit) {
+      const skip = (query.page - 1) * query.limit;
+      queryBuilder.skip(skip).take(query.limit);
     }
 
-    if (query.role) {
-      queryBuilder.andWhere("entity.role = :role", { role: query.role });
-    }
-
-    const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
-      .skip(skip)
-      .take(limit)
-      .getManyAndCount();
-
-    return {
-      data,
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        hasNext: page < Math.ceil(total / limit),
-        hasPrev: page > 1,
-      },
-    };
+    return queryBuilder.getMany();
   }
 
   async findOne(id: string): Promise<User> {
-    const entity = await this.repository.findOne({ where: { id } });
-    if (!entity) {
+    const user = await this.repository.findOne({
+      where: { id },
+      select: ["id", "email", "nom", "prenom", "role", "actif", "createdAt"],
+    });
+
+    if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return entity;
+
+    return user;
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.repository.findOne({ where: { id } });
   }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.repository.findOne({ where: { email } });
   }
 
-  async update(id: string, updateDto: UpdateUserDto): Promise<User> {
-    await this.repository.update(id, updateDto);
-    return this.findOne(id);
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id);
+
+    if (updateUserDto.email && updateUserDto.email !== user.email) {
+      const existingUser = await this.findByEmail(updateUserDto.email);
+      if (existingUser) {
+        throw new ConflictException("Email already exists");
+      }
+    }
+
+    Object.assign(user, updateUserDto);
+    return this.repository.save(user);
   }
 
   async remove(id: string): Promise<void> {
-    await this.repository.softDelete(id);
+    const user = await this.findOne(id);
+    await this.repository.remove(user);
   }
 
-  async updateRefreshToken(
-    userId: string,
-    refreshToken: string | null,
-  ): Promise<void> {
-    await this.repository.update(userId, {
-      refreshToken: refreshToken || undefined,
+  async updateRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
+    await this.repository.update(userId, { 
+      refreshToken: refreshToken || undefined
     });
   }
 
-  async getStats(): Promise<unknown> {
-    const total = await this.repository.count();
-    const active = await this.repository.count({ where: { actif: true } });
+  async activate(id: string): Promise<User> {
+    return this.update(id, { actif: true });
+  }
+
+  async deactivate(id: string): Promise<User> {
+    return this.update(id, { actif: false });
+  }
+
+  async getStats() {
+    const [total, active, inactive, admins, managers, operators] = await Promise.all([
+      this.repository.count(),
+      this.repository.count({ where: { actif: true } }),
+      this.repository.count({ where: { actif: false } }),
+      this.repository.count({ where: { role: UserRole.ADMIN } }),
+      this.repository.count({ where: { role: UserRole.MANAGER } }),
+      this.repository.count({ where: { role: UserRole.OPERATEUR } }),
+    ]);
 
     return {
       total,
       active,
-      inactive: total - active,
+      inactive,
+      byRole: {
+        admins,
+        managers,
+        operators,
+      },
     };
   }
 }
