@@ -60,4 +60,4 @@ export default function FacturesLayout({ children }: FacturesLayoutProps) {
   )
 }
 
-export const _dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'

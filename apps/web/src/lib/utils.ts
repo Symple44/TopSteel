@@ -14,7 +14,7 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatDate(date: Date | string): string {
-  const _d = typeof date === 'string' ? new Date(date) : date
+  const d = typeof date === 'string' ? new Date(date) : date
 
   return new Intl.DateTimeFormat('fr-FR').format(d)
 }
@@ -30,10 +30,9 @@ export function formatPercent(value: number, decimals: number = 2): string {
  * Calcule les jours jusqu'à une date
  */
 export function getDaysUntil(date: Date | string): number {
-  const _targetDate = typeof date === 'string' ? new Date(date) : date
-  const _today = new Date()
-  const _diffTime = targetDate.getTime() - today.getTime()
+  const targetDate = typeof date === 'string' ? new Date(date) : date
+  const today = new Date()
+  const diffTime = targetDate.getTime() - today.getTime()
 
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }
-

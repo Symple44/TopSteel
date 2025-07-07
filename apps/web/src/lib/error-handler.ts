@@ -6,7 +6,7 @@ export interface ApiError {
   statusCode: number
   errors?: Array<{
     property: string
-    value: unknown
+    value: any
     constraints: Record<string, string>
   }>
 }
@@ -23,7 +23,7 @@ export class ErrorHandler {
    */
   static formatError(error: unknown): FormattedError {
     if (error instanceof AxiosError) {
-      const _apiError = error.response?.data as ApiError
+      const apiError = error.response?.data as ApiError
       
       // Erreur de validation (400) avec détails
       if (error.response?.status === 400 && apiError?.errors?.length) {
@@ -51,13 +51,13 @@ export class ErrorHandler {
    */
   private static formatValidationError(validationError: {
     property: string
-    value: unknown
+    value: any
     constraints: Record<string, string>
   }): FormattedError {
     const { property, constraints } = validationError
     
     // Prendre le premier message de contrainte
-    const _constraintMessage = Object.values(constraints)[0]
+    const constraintMessage = Object.values(constraints)[0]
     
     return {
       title: 'Données invalides',
@@ -144,7 +144,7 @@ export class ErrorHandler {
    */
   static getAllValidationErrors(error: unknown): string[] {
     if (error instanceof AxiosError) {
-      const _apiError = error.response?.data as ApiError
+      const apiError = error.response?.data as ApiError
       
       if (error.response?.status === 400 && apiError?.errors?.length) {
         return apiError.errors.flatMap(err => Object.values(err.constraints))

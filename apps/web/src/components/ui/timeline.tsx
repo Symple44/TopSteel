@@ -26,8 +26,8 @@ export function Timeline({ items, className }: TimelineProps) {
       
       <div className="space-y-6">
         {items.map((item, index) => {
-          const _isLast = index === items.length - 1
-          const _statusStyles = {
+          const isLast = index === items.length - 1
+          const statusStyles = {
             completed: 'bg-green-500 border-green-500',
             current: 'bg-blue-500 border-blue-500',
             upcoming: 'bg-gray-300 border-gray-300'

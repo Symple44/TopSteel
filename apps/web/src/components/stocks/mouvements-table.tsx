@@ -25,7 +25,7 @@ interface MouvementsTableProps {
   type?: string;
   mouvements?: Mouvement[];
   onSearch?: (query: string) => void;
-  onFilter?: (filters: unknown) => void;
+  onFilter?: (filters: any) => void;
 }
 
 export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: MouvementsTableProps) {
@@ -87,9 +87,9 @@ export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: M
     }
   ];
 
-  const _displayMovements = mouvements.length > 0 ? mouvements : mockMovements;
+  const displayMovements = mouvements.length > 0 ? mouvements : mockMovements;
   
-  const _filteredMovements = type && type !== 'tous' ? 
+  const filteredMovements = type && type !== 'tous' ? 
     displayMovements.filter(m => {
       // Normaliser la comparaison pour les types
       const typeMapping: Record<string, string> = {
@@ -99,14 +99,14 @@ export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: M
         'ajustements': 'AJUSTEMENT'
       };
       
-      const _targetType = typeMapping[type.toLowerCase()] || type.toUpperCase();
+      const targetType = typeMapping[type.toLowerCase()] || type.toUpperCase();
 
       return m.type === targetType;
     }) : 
     displayMovements;
 
-  const _getTypeBadge = (type: string) => {
-    const _config = {
+  const getTypeBadge = (type: string) => {
+    const config = {
       ENTREE: { 
         label: 'Entrée', 
         icon: ArrowRight, 
@@ -139,7 +139,7 @@ export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: M
     );
   };
 
-  const _handleSearch = (value: string) => {
+  const handleSearch = (value: string) => {
     setSearchQuery(value);
     onSearch?.(value);
   };

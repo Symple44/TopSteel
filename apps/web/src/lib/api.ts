@@ -3,10 +3,10 @@ import type { Client, ClientType, Projet, ProjetFilters } from '@erp/types'
 import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
 
 // Configuration API
-const _API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
 // Client API simple pour développement
-export const _api = {
+export const api = {
   projets: {
     async getAll(filters?: ProjetFilters): Promise<Projet[]> {
       try {
@@ -179,18 +179,19 @@ export const _api = {
         ]
 
         // Application des filtres si fournis
-        const _filteredProjets = mockProjets
+
+        let filteredProjets = mockProjets
 
         if (filters) {
           if (filters.statut && filters.statut.length > 0) {
             filteredProjets = filteredProjets.filter(p => 
-              filters.statut?.includes(p.statut)
+              filters.statut!.includes(p.statut)
             )
           }
 
           if (filters.priorite && filters.priorite.length > 0) {
             filteredProjets = filteredProjets.filter(p => 
-              filters.priorite?.includes(p.priorite)
+              filters.priorite!.includes(p.priorite)
             )
           }
 
@@ -213,7 +214,7 @@ export const _api = {
           }
 
           if (filters.search) {
-            const _searchLower = filters.search.toLowerCase()
+            const searchLower = filters.search.toLowerCase()
 
             filteredProjets = filteredProjets.filter(p => 
               p.reference.toLowerCase().includes(searchLower) ||
@@ -235,7 +236,7 @@ export const _api = {
         // Simulation d'appel API
         await new Promise(resolve => setTimeout(resolve, 50))
         
-        const _projets = await this.getAll()
+        const projets = await this.getAll()
 
         return projets.find(p => p.id === id) || null
       } catch (error) {
@@ -291,7 +292,7 @@ export const _api = {
         // Simulation d'appel API
         await new Promise(resolve => setTimeout(resolve, 150))
         
-        const _existingProjet = await this.getById(id)
+        const existingProjet = await this.getById(id)
 
         if (!existingProjet) {
           throw new Error('Projet non trouvé')

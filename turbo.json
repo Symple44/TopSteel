@@ -3,7 +3,9 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         ".env*",
@@ -15,7 +17,10 @@
         ".next/**",
         "!.next/cache/**",
         "dist/**",
-        "build/**"
+        "build/**",
+        "**/*.d.ts",
+        "types/**",
+        "lib/**"
       ],
       "env": [
         "NODE_ENV",
@@ -36,7 +41,9 @@
       ]
     },
     "start": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
       "persistent": true
     },
@@ -52,7 +59,9 @@
       ]
     },
     "start:prod": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
       "persistent": true,
       "env": [
@@ -77,15 +86,6 @@
     "lint:fix": {
       "inputs": [
         "$TURBO_DEFAULT$",
-        ".eslintrc*", 
-        "eslint.config.*",
-        "tsconfig.json"
-      ],
-      "outputs": []
-    },
-    "lint:fix": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
         ".eslintrc*",
         "eslint.config.*",
         "tsconfig.json"
@@ -93,7 +93,9 @@
       "outputs": []
     },
     "type-check": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         "tsconfig.json",
@@ -123,7 +125,9 @@
       ]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         "jest.config.*",
@@ -139,7 +143,9 @@
       ]
     },
     "test:unit": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         "jest.config.*",
@@ -151,7 +157,9 @@
       ]
     },
     "test:integration": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         "jest.config.*",
@@ -168,7 +176,9 @@
       ]
     },
     "test:e2e": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         "playwright.config.*",
@@ -184,7 +194,9 @@
       ]
     },
     "test:coverage": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         "jest.config.*",
@@ -226,7 +238,9 @@
       ]
     },
     "seed:run": {
-      "dependsOn": ["migration:run"],
+      "dependsOn": [
+        "migration:run"
+      ],
       "cache": false,
       "env": [
         "DATABASE_URL"

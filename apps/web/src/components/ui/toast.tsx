@@ -7,9 +7,9 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const _ToastProvider = ToastPrimitives.Provider
+const ToastProvider = ToastPrimitives.Provider
 
-const _ToastViewport = React.forwardRef<
+const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
 >(({ className, ...props }, ref) => (
@@ -25,7 +25,7 @@ const _ToastViewport = React.forwardRef<
 
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
-const _toastVariants = cva(
+const toastVariants = cva(
   "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
   {
     variants: {
@@ -43,7 +43,7 @@ const _toastVariants = cva(
   }
 )
 
-const _Toast = React.forwardRef<
+const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
     VariantProps<typeof toastVariants>
@@ -59,7 +59,7 @@ const _Toast = React.forwardRef<
 
 Toast.displayName = ToastPrimitives.Root.displayName
 
-const _ToastAction = React.forwardRef<
+const ToastAction = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Action>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Action>
 >(({ className, ...props }, ref) => (
@@ -75,7 +75,7 @@ const _ToastAction = React.forwardRef<
 
 ToastAction.displayName = ToastPrimitives.Action.displayName
 
-const _ToastClose = React.forwardRef<
+const ToastClose = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Close>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Close>
 >(({ className, ...props }, ref) => (
@@ -94,7 +94,7 @@ const _ToastClose = React.forwardRef<
 
 ToastClose.displayName = ToastPrimitives.Close.displayName
 
-const _ToastTitle = React.forwardRef<
+const ToastTitle = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Title>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Title>
 >(({ className, ...props }, ref) => (
@@ -107,7 +107,7 @@ const _ToastTitle = React.forwardRef<
 
 ToastTitle.displayName = ToastPrimitives.Title.displayName
 
-const _ToastDescription = React.forwardRef<
+const ToastDescription = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Description>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Description>
 >(({ className, ...props }, ref) => (
@@ -135,4 +135,3 @@ export {
   ToastClose,
   ToastAction,
 }
-

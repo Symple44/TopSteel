@@ -24,14 +24,14 @@ interface ProductionFilters {
 export function ProductionFilters({ onFiltersChange, onReset }: ProductionFiltersProps) {
   const [filters, setFilters] = useState<ProductionFilters>({});
 
-  const _handleFilterChange = (key: keyof ProductionFilters, value: unknown) => {
-    const _newFilters = { ...filters, [key]: value };
+  const handleFilterChange = (key: keyof ProductionFilters, value: any) => {
+    const newFilters = { ...filters, [key]: value };
 
     setFilters(newFilters);
     onFiltersChange?.(newFilters); // Safe call avec ?
   };
 
-  const _handleReset = () => {
+  const handleReset = () => {
     setFilters({});
     onReset?.(); // Safe call avec ?
   };

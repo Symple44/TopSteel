@@ -29,7 +29,7 @@ class SimpleSecurityUtils {
    */
   static validateEmailSecure(email: string): boolean {
     // Pattern email basique mais robuste
-    const _emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     
     if (!emailPattern.test(email)) {
       return false
@@ -41,8 +41,8 @@ class SimpleSecurityUtils {
     }
 
     // Vérifier les domaines suspects
-    const _suspiciousDomains = ['tempmail.org', '10minutemail.com', 'guerrillamail.com']
-    const _domain = email.split('@')[1]?.toLowerCase()
+    const suspiciousDomains = ['tempmail.org', '10minutemail.com', 'guerrillamail.com']
+    const domain = email.split('@')[1]?.toLowerCase()
     
     if (domain && suspiciousDomains.includes(domain)) {
       return false
@@ -80,11 +80,11 @@ class SimpleSecurityUtils {
 export function useSecureValidation(rules: ValidationRules) {
   const [errors, setErrors] = useState<ValidationErrors>({})
 
-  const _validate = useCallback((data: Record<string, string>): boolean => {
+  const validate = useCallback((data: Record<string, string>): boolean => {
     const newErrors: ValidationErrors = {}
 
     Object.entries(rules).forEach(([field, rule]) => {
-      const _value = data[field] || ''
+      const value = data[field] || ''
       const fieldErrors: string[] = []
 
       // Required
@@ -115,7 +115,7 @@ export function useSecureValidation(rules: ValidationRules) {
 
         // Custom validation
         if (rule.custom) {
-          const _customError = rule.custom(value)
+          const customError = rule.custom(value)
 
           if (customError) {
             fieldErrors.push(customError)
@@ -133,11 +133,11 @@ export function useSecureValidation(rules: ValidationRules) {
     return Object.keys(newErrors).length === 0
   }, [rules])
 
-  const _sanitizeInput = useCallback((value: string): string => {
+  const sanitizeInput = useCallback((value: string): string => {
     return SimpleSecurityUtils.sanitizeString(value)
   }, [])
 
-  const _sanitizeHtml = useCallback((value: string): string => {
+  const sanitizeHtml = useCallback((value: string): string => {
     return SimpleSecurityUtils.sanitizeHtml(value)
   }, [])
 
@@ -151,7 +151,7 @@ export function useSecureValidation(rules: ValidationRules) {
     clearErrors: () => setErrors({}),
     clearFieldError: (field: string) => {
       setErrors(prev => {
-        const _newErrors = { ...prev }
+        const newErrors = { ...prev }
 
         delete newErrors[field]
 
@@ -176,10 +176,10 @@ export function useFormSecureValidation() {
       minLength: 8,
       maxLength: 128,
       custom: (value: string) => {
-        const _hasLower = /[a-z]/.test(value)
-        const _hasUpper = /[A-Z]/.test(value)
-        const _hasNumber = /\d/.test(value)
-        const _hasSpecial = /[^a-zA-Z\d]/.test(value)
+        const hasLower = /[a-z]/.test(value)
+        const hasUpper = /[A-Z]/.test(value)
+        const hasNumber = /\d/.test(value)
+        const hasSpecial = /[^a-zA-Z\d]/.test(value)
         
         if (!hasLower) return 'Doit contenir une minuscule'
         if (!hasUpper) return 'Doit contenir une majuscule'

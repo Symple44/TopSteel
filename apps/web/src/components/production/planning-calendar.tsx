@@ -26,55 +26,55 @@ interface PlanningCalendarProps {
 export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEvent }: PlanningCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const _navigateMonth = (direction: 'prev' | 'next') => {
-    const _newDate = new Date(currentDate);
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
 
     newDate.setMonth(currentDate.getMonth() + (direction === 'next' ? 1 : -1));
     setCurrentDate(newDate);
   };
 
-  const _getDaysInMonth = (date: Date) => {
-    const _year = date.getFullYear();
-    const _month = date.getMonth();
-    const _firstDay = new Date(year, month, 1);
-    const _lastDay = new Date(year, month + 1, 0);
-    const _daysInMonth = lastDay.getDate();
-    const _startDay = firstDay.getDay();
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDay = firstDay.getDay();
 
-    const _days = [];
+    const days = [];
     
     // Jours du mois précédent
-    for (let _i = startDay - 1; i >= 0; i--) {
-      const _prevDate = new Date(year, month, -i);
+    for (let i = startDay - 1; i >= 0; i--) {
+      const prevDate = new Date(year, month, -i);
 
       days.push({ date: prevDate, isCurrentMonth: false });
     }
 
     // Jours du mois actuel
-    for (let _day = 1; day <= daysInMonth; day++) {
+    for (let day = 1; day <= daysInMonth; day++) {
       days.push({ date: new Date(year, month, day), isCurrentMonth: true });
     }
 
     // Jours du mois suivant pour compléter la grille
-    const _remainingDays = 42 - days.length;
+    const remainingDays = 42 - days.length;
 
-    for (let _day = 1; day <= remainingDays; day++) {
+    for (let day = 1; day <= remainingDays; day++) {
       days.push({ date: new Date(year, month + 1, day), isCurrentMonth: false });
     }
 
     return days;
   };
 
-  const _getEventsForDate = (date: Date) => {
+  const getEventsForDate = (date: Date) => {
     return events.filter(event => {
-      const _eventDate = new Date(event.start);
+      const eventDate = new Date(event.start);
 
       return eventDate.toDateString() === date.toDateString();
     });
   };
 
-  const _days = getDaysInMonth(currentDate);
-  const _monthName = currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  const days = getDaysInMonth(currentDate);
+  const monthName = currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 
   return (
     <Card>
@@ -125,12 +125,12 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
 
           {/* Jours du mois */}
           {days.map((day, index) => {
-            const _dayEvents = getEventsForDate(day.date);
-            const _isToday = day.date.toDateString() === new Date().toDateString();
+            const dayEvents = getEventsForDate(day.date);
+            const isToday = day.date.toDateString() === new Date().toDateString();
 
             return (
               <div
-                key={\item-\\}
+                key={index}
                 className={`
                   min-h-[100px] p-1 border border-gray-200 cursor-pointer hover:bg-gray-50
                   ${!day.isCurrentMonth ? 'bg-gray-50 text-gray-400' : ''}

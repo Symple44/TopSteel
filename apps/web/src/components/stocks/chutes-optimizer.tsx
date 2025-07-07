@@ -43,7 +43,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
   const [selectedChute, setSelectedChute] = useState<Chute | null>(null);
   const [optimizationResults, setOptimizationResults] = useState<any[]>([]);
 
-  const _getQualityColor = (qualite: string) => {
+  const getQualityColor = (qualite: string) => {
     switch (qualite) {
       case 'EXCELLENTE': return 'text-green-600 bg-green-50';
       case 'BONNE': return 'text-blue-600 bg-blue-50';
@@ -53,9 +53,9 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
     }
   };
 
-  const _runOptimization = () => {
+  const runOptimization = () => {
     // Simulation algorithme d'optimisation
-    const _results = chutes.map(chute => ({
+    const results = chutes.map(chute => ({
       chuteId: chute.id,
       economie: chute.utilisationsProposees.reduce((sum, u) => sum + u.economie, 0),
       utilisations: chute.utilisationsProposees.length,
@@ -65,8 +65,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
     setOptimizationResults(results);
   };
 
-  const _totalEconomie = optimizationResults.reduce((sum, r) => sum + r.economie, 0);
-  const _totalChutesUtilisables = optimizationResults.filter(r => r.utilisations > 0).length;
+  const totalEconomie = optimizationResults.reduce((sum, r) => sum + r.economie, 0);
+  const totalChutesUtilisables = optimizationResults.filter(r => r.utilisations > 0).length;
 
   return (
     <div className="space-y-6">

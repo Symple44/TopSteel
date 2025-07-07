@@ -13,18 +13,18 @@ export default function ProductionPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
 
   // Handlers pour les filtres
-  const _handleFiltersChange = (filters: unknown) => {
+  const handleFiltersChange = (filters: any) => {
     console.log('Filtres mis à jour:', filters)
     // TODO: Implémenter la logique de filtrage
   }
 
-  const _handleFiltersReset = () => {
+  const handleFiltersReset = () => {
     console.log('Filtres réinitialisés')
     // TODO: Implémenter la logique de reset
   }
 
   // Données mock pour la démonstration
-  const _mockOrdres = [
+  const mockOrdres = [
     {
       id: 1,
       numero: 'OF-2024-001',
@@ -49,17 +49,17 @@ export default function ProductionPage() {
     }
   ]
 
-  const _handleView = (id: number) => {
+  const handleView = (id: number) => {
     console.log('Voir ordre:', id)
     // TODO: Navigation vers détail
   }
 
-  const _handleEdit = (id: number) => {
+  const handleEdit = (id: number) => {
     console.log('Modifier ordre:', id)
     // TODO: Navigation vers édition
   }
 
-  const _handleStatusChange = (id: number, status: string) => {
+  const handleStatusChange = (id: number, status: string) => {
     console.log('Changer statut:', id, status)
     // TODO: Mise à jour statut
   }

@@ -8,13 +8,13 @@ import type { AppState, StoreProjet } from '@erp/types'
 import { useAppStore } from '../app.store'
 
 // ===== CRÉATION DES SÉLECTEURS OPTIMISÉS TYPÉS =====
-const _selectors = createOptimizedSelectors<AppState>(useAppStore)
+const selectors = createOptimizedSelectors<AppState>(useAppStore)
 
 // ===== SÉLECTEURS DE BASE =====
 /**
  * Sélecteur pour le thème actuel
  */
-export const _useTheme = () => selectors.useSimple(
+export const useTheme = () => selectors.useSimple(
   (state: AppState) => state.theme,
   'theme'
 )
@@ -22,7 +22,7 @@ export const _useTheme = () => selectors.useSimple(
 /**
  * Sélecteur pour l'utilisateur connecté
  */
-export const _useUser = () => selectors.useSafe(
+export const useUser = () => selectors.useSafe(
   (state: AppState) => state.user,
   null,
   'user'
@@ -31,7 +31,7 @@ export const _useUser = () => selectors.useSafe(
 /**
  * Sélecteur pour l'état de chargement global
  */
-export const _useLoading = () => selectors.useSimple(
+export const useLoading = () => selectors.useSimple(
   (state: AppState) => state.loading,
   'loading'
 )
@@ -39,7 +39,7 @@ export const _useLoading = () => selectors.useSimple(
 /**
  * Sélecteur pour l'erreur globale
  */
-export const _useError = () => selectors.useSafe(
+export const useError = () => selectors.useSafe(
   (state: AppState) => state.error,
   null,
   'error'
@@ -50,7 +50,7 @@ export const _useError = () => selectors.useSafe(
  * Sélecteur optimisé pour les paramètres UI
  * Utilise shallow comparison pour éviter les re-renders inutiles
  */
-export const _useUISettings = () => selectors.useShallow(
+export const useUISettings = () => selectors.useShallow(
   (state: AppState) => ({
     sidebarCollapsed: state.ui?.sidebarCollapsed ?? false,
     sidebarPinned: state.ui?.sidebarPinned ?? true,
@@ -65,7 +65,7 @@ export const _useUISettings = () => selectors.useShallow(
 /**
  * Sélecteur pour la barre latérale uniquement
  */
-export const _useSidebarSettings = () => selectors.useShallow(
+export const useSidebarSettings = () => selectors.useShallow(
   (state: AppState) => ({
     collapsed: state.ui?.sidebarCollapsed ?? false,
     pinned: state.ui?.sidebarPinned ?? true
@@ -76,7 +76,7 @@ export const _useSidebarSettings = () => selectors.useShallow(
 /**
  * Sélecteur pour le module actif et le mode layout
  */
-export const _useLayoutSettings = () => selectors.useShallow(
+export const useLayoutSettings = () => selectors.useShallow(
   (state: AppState) => ({
     activeModule: state.ui?.activeModule ?? null,
     layoutMode: state.ui?.layoutMode ?? 'default'
@@ -88,7 +88,7 @@ export const _useLayoutSettings = () => selectors.useShallow(
 /**
  * Sélecteur pour l'état d'authentification complet
  */
-export const _useAuthState = () => selectors.useShallow(
+export const useAuthState = () => selectors.useShallow(
   (state: AppState) => ({
     user: state.user,
     session: state.session,
@@ -106,7 +106,7 @@ export const _useAuthState = () => selectors.useShallow(
 /**
  * Sélecteur simple pour l'état d'authentification
  */
-export const _useIsAuthenticated = () => selectors.useSimple(
+export const useIsAuthenticated = () => selectors.useSimple(
   (state: AppState) => !!(state.user && state.session),
   'is-authenticated'
 )
@@ -114,7 +114,7 @@ export const _useIsAuthenticated = () => selectors.useSimple(
 /**
  * Sélecteur pour les permissions utilisateur
  */
-export const _useUserPermissions = () => selectors.useSafe(
+export const useUserPermissions = () => selectors.useSafe(
   (state: AppState) => state.permissions,
   [],
   'user-permissions'
@@ -124,7 +124,7 @@ export const _useUserPermissions = () => selectors.useSafe(
 /**
  * Sélecteur pour la liste des projets avec valeur par défaut
  */
-export const _useProjets = () => selectors.useSafe(
+export const useProjets = () => selectors.useSafe(
   (state: AppState) => state.projets,
   [],
   'projets'
@@ -133,7 +133,7 @@ export const _useProjets = () => selectors.useSafe(
 /**
  * Sélecteur pour le projet sélectionné
  */
-export const _useSelectedProjet = () => selectors.useSafe(
+export const useSelectedProjet = () => selectors.useSafe(
   (state: AppState) => state.selectedProjet,
   null,
   'selected-projet'
@@ -142,14 +142,14 @@ export const _useSelectedProjet = () => selectors.useSafe(
 /**
  * Sélecteur mémoïsé pour les projets actifs
  */
-const _activeProjetsSelector = createMemoizedSelector(
+const activeProjetsSelector = createMemoizedSelector(
   (state: AppState) => state.projets?.filter(p => 
     p.statut === 'en_cours' || p.statut === 'accepte'
   ) || [],
   { ttl: 2000 }
 )
 
-export const _useActiveProjets = () => selectors.useShallow(
+export const useActiveProjets = () => selectors.useShallow(
   activeProjetsSelector,
   'active-projets'
 )
@@ -157,7 +157,7 @@ export const _useActiveProjets = () => selectors.useShallow(
 /**
  * Sélecteur pour les projets terminés
  */
-export const _useCompletedProjets = () => selectors.useFiltered(
+export const useCompletedProjets = () => selectors.useFiltered(
   (state: AppState) => state.projets || [],
   (projet: StoreProjet) => projet.statut === 'termine',
   'completed-projets'
@@ -166,7 +166,7 @@ export const _useCompletedProjets = () => selectors.useFiltered(
 /**
  * Sélecteur pour les projets en attente
  */
-export const _usePendingProjets = () => selectors.useFiltered(
+export const usePendingProjets = () => selectors.useFiltered(
   (state: AppState) => state.projets || [],
   (projet: StoreProjet) => projet.statut === 'en_attente' || projet.statut === 'devis',
   'pending-projets'
@@ -175,7 +175,7 @@ export const _usePendingProjets = () => selectors.useFiltered(
 /**
  * Sélecteur pour le nombre de projets actifs
  */
-export const _useActiveProjectsCount = () => selectors.useTransformed(
+export const useActiveProjectsCount = () => selectors.useTransformed(
   activeProjetsSelector,
   projets => projets.length,
   { debugLabel: 'active-projects-count' }
@@ -184,7 +184,7 @@ export const _useActiveProjectsCount = () => selectors.useTransformed(
 /**
  * Sélecteur pour le nombre total de projets
  */
-export const _useProjectsCount = () => selectors.useTransformed(
+export const useProjectsCount = () => selectors.useTransformed(
   (state: AppState) => state.projets || [],
   projets => projets.length,
   { debugLabel: 'projects-count' }
@@ -193,14 +193,14 @@ export const _useProjectsCount = () => selectors.useTransformed(
 /**
  * Sélecteur pour les projets avec filtres appliqués
  */
-export const _useFilteredProjets = () => {
-  const _projets = useProjets()
-  const _filters = useProjectFilters()
+export const useFilteredProjets = () => {
+  const projets = useProjets()
+  const filters = useProjectFilters()
   
   return selectors.useMemoized(
     (state: AppState) => {
-      const _allProjets = state.projets || []
-      const _currentFilters = state.filters?.projets || {}
+      const allProjets = state.projets || []
+      const currentFilters = state.filters?.projets || {}
       
       if (Object.keys(currentFilters).length === 0) {
         return allProjets
@@ -218,7 +218,7 @@ export const _useFilteredProjets = () => {
           return false
         }
         if (currentFilters.search) {
-          const _searchTerm = currentFilters.search.toLowerCase()
+          const searchTerm = currentFilters.search.toLowerCase()
 
           return projet.reference?.toLowerCase().includes(searchTerm) ||
                  projet.description?.toLowerCase().includes(searchTerm)
@@ -238,7 +238,7 @@ export const _useFilteredProjets = () => {
 /**
  * Sélecteur pour le nombre de notifications non lues
  */
-export const _useUnreadNotificationsCount = () => selectors.useTransformed(
+export const useUnreadNotificationsCount = () => selectors.useTransformed(
   (state: AppState) => state.notifications || [],
   notifications => notifications.filter(n => !n.read).length,
   { debugLabel: 'unread-notifications-count' }
@@ -247,7 +247,7 @@ export const _useUnreadNotificationsCount = () => selectors.useTransformed(
 /**
  * Sélecteur pour les notifications critiques
  */
-export const _useCriticalNotifications = () => selectors.useFiltered(
+export const useCriticalNotifications = () => selectors.useFiltered(
   (state: AppState) => state.notifications || [],
   notification => !notification.read && notification.type === 'error',
   'critical-notifications'
@@ -257,7 +257,7 @@ export const _useCriticalNotifications = () => selectors.useFiltered(
 /**
  * Sélecteur pour les filtres de projets
  */
-export const _useProjectFilters = () => selectors.useSafe(
+export const useProjectFilters = () => selectors.useSafe(
   (state: AppState) => state.filters?.projets || {},
   {},
   'project-filters'
@@ -266,7 +266,7 @@ export const _useProjectFilters = () => selectors.useSafe(
 /**
  * Sélecteur pour les filtres globaux
  */
-export const _useGlobalFilters = () => selectors.useSafe(
+export const useGlobalFilters = () => selectors.useSafe(
   (state: AppState) => state.filters || {},
   {},
   'global-filters'
@@ -276,7 +276,7 @@ export const _useGlobalFilters = () => selectors.useSafe(
 /**
  * Sélecteur pour les métriques de base
  */
-export const _useBasicMetrics = () => selectors.useShallow(
+export const useBasicMetrics = () => selectors.useShallow(
   (state: AppState) => ({
     pageViews: state.metrics?.pageViews || 0,
     actionCount: state.metrics?.actionCount || 0,
@@ -289,9 +289,9 @@ export const _useBasicMetrics = () => selectors.useShallow(
 /**
  * Sélecteur pour les métriques de performance
  */
-export const _usePerformanceMetrics = () => selectors.useShallow(
+export const usePerformanceMetrics = () => selectors.useShallow(
   (state: AppState) => {
-    const _metrics = state.metrics
+    const metrics = state.metrics
 
     if (!metrics) {
       return {
@@ -318,7 +318,7 @@ export const _usePerformanceMetrics = () => selectors.useShallow(
 /**
  * Sélecteur pour l'état de synchronisation
  */
-export const _useSyncState = () => selectors.useShallow(
+export const useSyncState = () => selectors.useShallow(
   (state: AppState) => state.sync || {
     isOnline: navigator?.onLine ?? true,
     pendingChanges: 0,
@@ -333,7 +333,7 @@ export const _useSyncState = () => selectors.useShallow(
 /**
  * Sélecteur pour l'état en ligne
  */
-export const _useOnlineStatus = () => selectors.useSimple(
+export const useOnlineStatus = () => selectors.useSimple(
   (state: AppState) => state.sync?.isOnline ?? navigator?.onLine ?? true,
   'online-status'
 )
@@ -341,7 +341,7 @@ export const _useOnlineStatus = () => selectors.useSimple(
 /**
  * Sélecteur pour les changements en attente
  */
-export const _usePendingChanges = () => selectors.useSimple(
+export const usePendingChanges = () => selectors.useSimple(
   (state: AppState) => state.sync?.pendingChanges || 0,
   'pending-changes'
 )
@@ -350,15 +350,15 @@ export const _usePendingChanges = () => selectors.useSimple(
 /**
  * Sélecteur pour le tableau de bord principal
  */
-export const _useDashboardData = () => selectors.useShallow(
+export const useDashboardData = () => selectors.useShallow(
   (state: AppState) => {
-    const _projets = state.projets || []
-    const _notifications = state.notifications || []
+    const projets = state.projets || []
+    const notifications = state.notifications || []
     
-    const _activeProjets = projets.filter(p => 
+    const activeProjets = projets.filter(p => 
       p.statut === 'en_cours' || p.statut === 'accepte'
     )
-    const _criticalNotifications = notifications.filter(n => 
+    const criticalNotifications = notifications.filter(n => 
       !n.read && n.type === 'error'
     )
 
@@ -381,11 +381,11 @@ export const _useDashboardData = () => selectors.useShallow(
 /**
  * Sélecteur pour les statistiques des projets
  */
-export const _useProjectsStats = () => selectors.useMemoized(
+export const useProjectsStats = () => selectors.useMemoized(
   (state: AppState) => {
-    const _projets = state.projets || []
+    const projets = state.projets || []
     
-    const _stats = {
+    const stats = {
       total: projets.length,
       parStatut: {} as Record<string, number>,
       parPriorite: {} as Record<string, number>,
@@ -425,7 +425,7 @@ export const _useProjectsStats = () => selectors.useMemoized(
 )
 
 // ===== EXPORTS COLLECTIFS =====
-export const _appSelectors = {
+export const appSelectors = {
   // Base
   useTheme,
   useUser,

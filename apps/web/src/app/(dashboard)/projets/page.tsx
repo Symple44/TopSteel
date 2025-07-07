@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState, memo } from 'react'
 
 // Composant PageActions avec displayName
-const _PageActions = memo(function PageActions({
+const PageActions = memo(function PageActions({
   view,
   onViewChange,
   onRefresh,
@@ -72,12 +72,12 @@ const _PageActions = memo(function PageActions({
 })
 
 // Composant ProjetCard mémorisé
-const _MemoProjetCard = memo(function MemoProjetCard({ projet }: { projet: Projet }) {
+const MemoProjetCard = memo(function MemoProjetCard({ projet }: { projet: Projet }) {
   return <ProjetCard projet={projet} />
 })
 
 export default function ProjetsPage() {
-  const _router = useRouter()
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const { dataView, setDataView } = useDataView('grid')
   
@@ -85,11 +85,11 @@ export default function ProjetsPage() {
   const { projets = [], isLoading, error, refetch } = useProjets()
 
   // Filtrage des projets
-  const _filteredProjets = useMemo(() => {
+  const filteredProjets = useMemo(() => {
     if (!Array.isArray(projets)) return []
     if (!searchTerm.trim()) return projets
     
-    const _term = searchTerm.toLowerCase()
+    const term = searchTerm.toLowerCase()
 
     return projets.filter(projet => 
       projet?.reference?.toLowerCase().includes(term) ||
@@ -100,7 +100,7 @@ export default function ProjetsPage() {
   }, [projets, searchTerm])
 
   // Colonnes pour le tableau
-  const _columns = useMemo(() => [
+  const columns = useMemo(() => [
     {
       key: 'reference',
       label: 'Référence',
@@ -115,7 +115,7 @@ export default function ProjetsPage() {
     {
       key: 'client',
       label: 'Client',
-      render: (client: unknown) => client?.nom || '-',
+      render: (client: any) => client?.nom || '-',
       sortable: true,
     },
     {
@@ -147,7 +147,7 @@ export default function ProjetsPage() {
     {
       key: 'actions',
       label: 'Actions',
-      render: (value: unknown, projet: Projet) => (
+      render: (value: any, projet: Projet) => (
         <div className="flex gap-1">
           <Button
             variant="ghost"
@@ -171,15 +171,15 @@ export default function ProjetsPage() {
   ], [router])
 
   // Handlers avec dépendances correctes
-  const _handleViewChange = useCallback((view: 'grid' | 'table') => {
+  const handleViewChange = useCallback((view: 'grid' | 'table') => {
     setDataView(view)
   }, [setDataView])
 
-  const _handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback(() => {
     refetch()
   }, [refetch])
 
-  const _handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
   }, [])
 
@@ -299,7 +299,6 @@ export default function ProjetsPage() {
     </div>
   )
 }
-
 
 
 

@@ -44,22 +44,22 @@ const mockTokens: Tokens = {
 }
 
 // Stockage local sécurisé
-const _AUTH_STORAGE_KEY = 'topsteel-auth'
-const _TOKEN_STORAGE_KEY = 'topsteel-tokens'
+const AUTH_STORAGE_KEY = 'topsteel-auth'
+const TOKEN_STORAGE_KEY = 'topsteel-tokens'
 
 // Utilitaires de stockage avec gestion d'erreur
-const _storage = {
+const storage = {
   get: (key: string) => {
     if (typeof window === 'undefined') return null
     try {
-      const _item = localStorage.getItem(key)
+      const item = localStorage.getItem(key)
 
       return item ? JSON.parse(item) : null
     } catch {
       return null
     }
   },
-  set: (key: string, value: unknown) => {
+  set: (key: string, value: any) => {
     if (typeof window === 'undefined') return
     try {
       localStorage.setItem(key, JSON.stringify(value))
@@ -77,7 +77,7 @@ const _storage = {
   }
 }
 
-export const _useAuth = () => {
+export const useAuth = () => {
   // État principal
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
@@ -87,14 +87,14 @@ export const _useAuth = () => {
   })
 
   // ✅ Validation des tokens - fonction stable avec useCallback
-  const _validateTokens = useCallback(async (tokens: Tokens): Promise<boolean> => {
+  const validateTokens = useCallback(async (tokens: Tokens): Promise<boolean> => {
     // En mode développement, toujours valide
     if (process.env.NODE_ENV === 'development') {
       return true
     }
 
     try {
-      const _response = await fetch('/api/auth/validate', {
+      const response = await fetch('/api/auth/validate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export const _useAuth = () => {
   }, [])
 
   // ✅ Fonction de login - stable avec useCallback
-  const _login = useCallback(async (email: string, password: string): Promise<void> => {
+  const login = useCallback(async (email: string, password: string): Promise<void> => {
     setAuthState(prev => ({ ...prev, isLoading: true }))
 
     try {
@@ -119,8 +119,8 @@ export const _useAuth = () => {
       if (process.env.NODE_ENV === 'development') {
         await new Promise(resolve => setTimeout(resolve, 500)) // Simulation
 
-        const _userData = { ...mockUser, email }
-        const _tokenData = mockTokens
+        const userData = { ...mockUser, email }
+        const tokenData = mockTokens
 
         storage.set(AUTH_STORAGE_KEY, userData)
         storage.set(TOKEN_STORAGE_KEY, tokenData)
@@ -136,7 +136,7 @@ export const _useAuth = () => {
       }
 
       // Production - appel API réel
-      const _response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -165,7 +165,7 @@ export const _useAuth = () => {
   }, [])
 
   // ✅ Fonction de logout - stable avec useCallback
-  const _logout = useCallback(async (): Promise<void> => {
+  const logout = useCallback(async (): Promise<void> => {
     setAuthState(prev => ({ ...prev, isLoading: true }))
 
     try {
@@ -195,7 +195,7 @@ export const _useAuth = () => {
   }, [authState.tokens])
 
   // ✅ Mise à jour utilisateur - stable avec useCallback
-  const _setUser = useCallback((user: User | null) => {
+  const setUser = useCallback((user: User | null) => {
     if (user) {
       storage.set(AUTH_STORAGE_KEY, user)
       setAuthState(prev => ({
@@ -214,13 +214,13 @@ export const _useAuth = () => {
   }, [])
 
   // ✅ Rafraîchir les tokens - stable avec useCallback
-  const _refreshTokens = useCallback(async (): Promise<void> => {
+  const refreshTokens = useCallback(async (): Promise<void> => {
     if (!authState.tokens?.refreshToken) {
       throw new Error('No refresh token available')
     }
 
     try {
-      const _response = await fetch('/api/auth/refresh', {
+      const response = await fetch('/api/auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -257,14 +257,14 @@ export const _useAuth = () => {
 
   // ✅ Initialisation depuis le stockage local - TOUTES LES DÉPENDANCES INCLUSES
   useEffect(() => {
-    const _initializeAuth = async () => {
+    const initializeAuth = async () => {
       try {
-        const _storedUser = storage.get(AUTH_STORAGE_KEY)
-        const _storedTokens = storage.get(TOKEN_STORAGE_KEY)
+        const storedUser = storage.get(AUTH_STORAGE_KEY)
+        const storedTokens = storage.get(TOKEN_STORAGE_KEY)
 
         if (storedUser && storedTokens) {
           // Vérifier la validité des tokens
-          const _isTokenValid = await validateTokens(storedTokens)
+          const isTokenValid = await validateTokens(storedTokens)
           
           if (isTokenValid) {
             setAuthState({
@@ -301,7 +301,7 @@ export const _useAuth = () => {
       return
     }
 
-    const _refreshInterval = setInterval(async () => {
+    const refreshInterval = setInterval(async () => {
       try {
         await refreshTokens()
       } catch (error) {
@@ -327,13 +327,13 @@ export const _useAuth = () => {
 }
 
 // ✅ EXPORTS SUPPLÉMENTAIRES POUR COMPATIBILITÉ
-export const _useCurrentUser = () => {
+export const useCurrentUser = () => {
   const { user } = useAuth()
 
   return user
 }
 
-export const _useIsAuthenticated = () => {
+export const useIsAuthenticated = () => {
   const { isAuthenticated } = useAuth()
 
   return isAuthenticated

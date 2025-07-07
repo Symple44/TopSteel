@@ -3,14 +3,14 @@ import React from "react"
 
 interface CheckboxProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
-  value?: unknown
-  onValueChange?: unknown
+  value?: any
+  onValueChange?: any
   asChild?: boolean
   variant?: string
   size?: string
 }
 
-export const _Checkbox = React.forwardRef<HTMLDivElement, CheckboxProps>(
+export const Checkbox = React.forwardRef<HTMLDivElement, CheckboxProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { 
@@ -31,15 +31,14 @@ export const _Checkbox = React.forwardRef<HTMLDivElement, CheckboxProps>(
 Checkbox.displayName = "Checkbox"
 
 // Export des sous-composants courants si nécessaire
-export const _CheckboxContent = Checkbox
-export const _CheckboxTrigger = Checkbox  
-export const _CheckboxItem = Checkbox
-export const _CheckboxValue = Checkbox
-export const _CheckboxHeader = Checkbox
-export const _CheckboxTitle = Checkbox
-export const _CheckboxDescription = Checkbox
-export const _CheckboxFooter = Checkbox
-export const _CheckboxSeparator = Checkbox
-export const _CheckboxList = Checkbox
-
+export const CheckboxContent = Checkbox
+export const CheckboxTrigger = Checkbox  
+export const CheckboxItem = Checkbox
+export const CheckboxValue = Checkbox
+export const CheckboxHeader = Checkbox
+export const CheckboxTitle = Checkbox
+export const CheckboxDescription = Checkbox
+export const CheckboxFooter = Checkbox
+export const CheckboxSeparator = Checkbox
+export const CheckboxList = Checkbox
 

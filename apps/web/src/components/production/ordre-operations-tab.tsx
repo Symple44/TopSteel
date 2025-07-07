@@ -2,11 +2,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface OrdreOperationsTabProps {
-  ordre: unknown;
+  ordre: any;
 }
 
 export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
-  const _operations = ordre?.operations || [];
+  const operations = ordre?.operations || [];
 
   return (
     <div className="space-y-6">
@@ -19,7 +19,7 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
             <p className="text-sm text-muted-foreground">Aucune opération définie pour cet ordre</p>
           ) : (
             <div className="space-y-4">
-              {operations.map((operation: unknown, index: number) => (
+              {operations.map((operation: any, index: number) => (
                 <div key={operation.id || index} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium">{operation?.nom || `Opération ${index + 1}`}</h4>
@@ -62,4 +62,3 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
     </div>
   );
 }
-

@@ -11,9 +11,9 @@ import type {
   InitialState,
   StoreCreator
 } from '@erp/types'; // ✅ IMPORT CORRECT depuis @erp/types au lieu de @/lib/store-utils
-import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
-import { immer } from 'zustand/middleware/immer'
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 
 // ===== INTERFACES LOCALES =====
 
@@ -109,7 +109,7 @@ export interface AuthActions extends BaseStoreActions {
 export type AuthStore = AuthState & AuthActions
 
 // ===== CONFIGURATION =====
-const _AUTH_CONFIG = {
+const AUTH_CONFIG = {
   sessionTimeout: 8 * 60 * 60 * 1000, // 8 heures
   maxFailedAttempts: 5,
   lockoutDuration: 15 * 60 * 1000, // 15 minutes
@@ -176,7 +176,7 @@ class AuthService {
   static async login(credentials: LoginCredentials): Promise<{ user: User; session: SessionInfo }> {
     await new Promise(resolve => setTimeout(resolve, 800))
     
-    const _mockUser = this.MOCK_USERS.find(u => 
+    const mockUser = this.MOCK_USERS.find(u => 
       u.email === credentials.email && u.password === credentials.password
     )
     
@@ -230,7 +230,7 @@ class AuthUtils {
 
   static shouldRefreshToken(session: SessionInfo | null): boolean {
     if (!session) return false
-    const _timeLeft = session.expiresAt - Date.now()
+    const timeLeft = session.expiresAt - Date.now()
 
     return timeLeft <= AUTH_CONFIG.tokenRefreshThreshold && timeLeft > 0
   }
@@ -258,10 +258,10 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         state.error = null
       })
 
-      const _state = get()
+      const state = get()
       
       if (AuthUtils.isAccountLocked(state)) {
-        const _timeLeft = Math.ceil((state.lockoutEndTime! - Date.now()) / 1000 / 60)
+        const timeLeft = Math.ceil((state.lockoutEndTime! - Date.now()) / 1000 / 60)
 
         throw new Error(`Compte verrouillé. Réessayez dans ${timeLeft} minutes.`)
       }
@@ -309,7 +309,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         throw error
       }
     } catch (error) {
-      const _errorObj = error instanceof Error ? error : new Error(String(error))
+      const errorObj = error instanceof Error ? error : new Error(String(error))
       
       set((state) => {
         state.loading = false
@@ -328,7 +328,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         state.error = null
       })
 
-      const _state = get()
+      const state = get()
 
       if (state.session) {
         await AuthService.logout()
@@ -342,7 +342,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         })
       })
     } catch (error) {
-      const _errorObj = error instanceof Error ? error : new Error(String(error))
+      const errorObj = error instanceof Error ? error : new Error(String(error))
       
       set((state) => {
         state.loading = false
@@ -358,13 +358,13 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         state.error = null
       })
 
-      const _state = get()
+      const state = get()
       
       if (!state.session?.refreshToken) {
         throw new Error('Aucun refresh token disponible')
       }
       
-      const _newSession = await AuthService.refreshToken(state.session.refreshToken)
+      const newSession = await AuthService.refreshToken(state.session.refreshToken)
       
       set((state) => {
         state.session = newSession
@@ -389,8 +389,8 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
   },
 
   checkSession: () => {
-    const _state = get()
-    const _isValid = !AuthUtils.isSessionExpired(state.session) && !!state.user
+    const state = get()
+    const isValid = !AuthUtils.isSessionExpired(state.session) && !!state.user
     
     set((state) => {
       state.isSessionValid = isValid
@@ -510,7 +510,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
 })
 
 // ===== CRÉATION DU STORE =====
-export const _useAuthStore = create<AuthStore>()(
+export const useAuthStore = create<AuthStore>()(
   immer(
     devtools(
       (set, get) => ({
@@ -523,17 +523,17 @@ export const _useAuthStore = create<AuthStore>()(
 )
 
 // ===== HOOKS SÉLECTEURS =====
-export const _useAuthUser = () => useAuthStore(state => state.user)
-export const _useAuthIsAuthenticated = () => useAuthStore(state => state.isAuthenticated)
-export const _useAuthLoading = () => useAuthStore(state => state.loading)
-export const _useAuthError = () => useAuthStore(state => state.error)
-export const _useAuthUserDisplayName = () => useAuthStore(state => 
+export const useAuthUser = () => useAuthStore(state => state.user)
+export const useAuthIsAuthenticated = () => useAuthStore(state => state.isAuthenticated)
+export const useAuthLoading = () => useAuthStore(state => state.loading)
+export const useAuthError = () => useAuthStore(state => state.error)
+export const useAuthUserDisplayName = () => useAuthStore(state => 
   state.user ? `${state.user.prenom} ${state.user.nom}` : null
 )
-export const _useAuthSessionTimeLeft = () => useAuthStore(state => state.sessionTimeLeft)
-export const _useAuthPermissions = () => useAuthStore(state => state.user?.permissions || [])
-export const _useAuthRole = () => useAuthStore(state => state.user?.role)
-export const _useAuthCanAccess = (permission: string) => useAuthStore(state => {
+export const useAuthSessionTimeLeft = () => useAuthStore(state => state.sessionTimeLeft)
+export const useAuthPermissions = () => useAuthStore(state => state.user?.permissions || [])
+export const useAuthRole = () => useAuthStore(state => state.user?.role)
+export const useAuthCanAccess = (permission: string) => useAuthStore(state => {
   if (!state.user) return false
 
   return state.user.permissions.includes('*') || state.user.permissions.includes(permission)
@@ -542,7 +542,7 @@ export const _useAuthCanAccess = (permission: string) => useAuthStore(state => {
 // ===== SESSION AUTO-REFRESH =====
 if (typeof window !== 'undefined') {
   setInterval(() => {
-    const _state = useAuthStore.getState()
+    const state = useAuthStore.getState()
     
     if (state.isAuthenticated) {
       state.checkSession()
@@ -556,15 +556,17 @@ if (typeof window !== 'undefined') {
   }, 60000) // Toutes les minutes
 
   // Écouter l'activité utilisateur avec throttle manuel
-  const _lastActivityUpdate = 0
-  const _activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart']
+
+  let lastActivityUpdate = 0
+  const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart']
+
   
-  const _handleActivity = () => {
-    const _now = Date.now()
+  const handleActivity = () => {
+    const now = Date.now()
 
     if (now - lastActivityUpdate >= 30000) { // Max 1 fois par 30 secondes
       lastActivityUpdate = now
-      const _state = useAuthStore.getState()
+      const state = useAuthStore.getState()
 
       if (state.isAuthenticated) {
         state.updateActivity()

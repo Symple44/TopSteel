@@ -2,14 +2,14 @@ import React from "react"
 
 interface ScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
-  value?: unknown
-  onValueChange?: unknown
+  value?: any
+  onValueChange?: any
   asChild?: boolean
   variant?: string
   size?: string
 }
 
-export const _ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
+export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
   ({ className = "", children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
@@ -26,14 +26,13 @@ export const _ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
 ScrollArea.displayName = "ScrollArea"
 
 // Export des sous-composants courants si nécessaire
-export const _ScrollAreaContent = ScrollArea
-export const _ScrollAreaTrigger = ScrollArea  
-export const _ScrollAreaItem = ScrollArea
-export const _ScrollAreaValue = ScrollArea
-export const _ScrollAreaHeader = ScrollArea
-export const _ScrollAreaTitle = ScrollArea
-export const _ScrollAreaDescription = ScrollArea
-export const _ScrollAreaFooter = ScrollArea
-export const _ScrollAreaSeparator = ScrollArea
-export const _ScrollAreaList = ScrollArea
-
+export const ScrollAreaContent = ScrollArea
+export const ScrollAreaTrigger = ScrollArea  
+export const ScrollAreaItem = ScrollArea
+export const ScrollAreaValue = ScrollArea
+export const ScrollAreaHeader = ScrollArea
+export const ScrollAreaTitle = ScrollArea
+export const ScrollAreaDescription = ScrollArea
+export const ScrollAreaFooter = ScrollArea
+export const ScrollAreaSeparator = ScrollArea
+export const ScrollAreaList = ScrollArea

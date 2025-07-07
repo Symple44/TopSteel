@@ -12,9 +12,9 @@ export function useOptimizedSearch<T>(
   const [filteredData, setFilteredData] = useState<T[]>(data)
 
   // Fonction de recherche typée correctement
-  const _searchFunction = useCallback((...args: unknown[]) => {
+  const searchFunction = useCallback((...args: unknown[]) => {
     const [term, items, fields] = args as [string, T[], (keyof T)[]]
-    const _filtered = items.filter(item =>
+    const filtered = items.filter(item =>
       fields.some(field =>
         String(item[field]).toLowerCase().includes(term.toLowerCase())
       )
@@ -24,7 +24,7 @@ export function useOptimizedSearch<T>(
   }, [])
 
   // Création du debounce avec la fonction correcte
-  const _debouncedSearch = useRef(debounce(searchFunction, delay)).current
+  const debouncedSearch = useRef(debounce(searchFunction, delay)).current
 
   // Effet pour déclencher la recherche
   useEffect(() => {
@@ -39,7 +39,7 @@ export function useOptimizedSearch<T>(
 }
 
 // Fonction d'optimisation pour les composants lourds
-export function useOptimizedCallback<T extends (...args: unknown[]) => any>(
+export function useOptimizedCallback<T extends (...args: any[]) => any>(
   callback: T,
   deps: React.DependencyList
 ): T {
@@ -61,7 +61,7 @@ export function useDebounceValue<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState(value)
 
   useEffect(() => {
-    const _handler = setTimeout(() => {
+    const handler = setTimeout(() => {
       setDebouncedValue(value)
     }, delay)
 

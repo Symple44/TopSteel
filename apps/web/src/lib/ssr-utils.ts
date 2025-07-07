@@ -19,7 +19,7 @@ interface BrowserAPI {
 
 interface SSRSafeConfig {
   enableDebugLogs?: boolean
-  fallbackValues?: Record<string, unknown>
+  fallbackValues?: Record<string, any>
   errorCallback?: (error: Error, context: string) => void
 }
 
@@ -28,22 +28,22 @@ interface SSRSafeConfig {
 /**
  * Vérifie si on est côté serveur
  */
-export const _isServer = typeof window === 'undefined'
+export const isServer = typeof window === 'undefined'
 
 /**
  * Vérifie si on est côté client
  */
-export const _isClient = !isServer
+export const isClient = !isServer
 
 /**
  * Vérifie si on est en mode développement
  */
-export const _isDev = process.env.NODE_ENV === 'development'
+export const isDev = process.env.NODE_ENV === 'development'
 
 /**
  * Vérifie si on est en mode production
  */
-export const _isProd = process.env.NODE_ENV === 'production'
+export const isProd = process.env.NODE_ENV === 'production'
 
 // ===== ACCÈS SÉCURISÉ AUX APIS BROWSER =====
 
@@ -137,7 +137,7 @@ export class BrowserAPIManager {
 
   getFromStorage(key: string, storage: 'local' | 'session' = 'local'): string | null {
     try {
-      const _storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+      const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
 
       return storageAPI?.getItem(key) || null
     } catch (error) {
@@ -149,7 +149,7 @@ export class BrowserAPIManager {
 
   setToStorage(key: string, value: string, storage: 'local' | 'session' = 'local'): boolean {
     try {
-      const _storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+      const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
 
       storageAPI?.setItem(key, value)
 
@@ -163,7 +163,7 @@ export class BrowserAPIManager {
 
   removeFromStorage(key: string, storage: 'local' | 'session' = 'local'): boolean {
     try {
-      const _storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
+      const storageAPI = storage === 'local' ? this.apis.localStorage : this.apis.sessionStorage
 
       storageAPI?.removeItem(key)
 
@@ -261,7 +261,7 @@ export function useHydrationSafe<T>(
   deps?: React.DependencyList
 ): T {
   const [value, setValue] = useState<T>(serverValue)
-  const _mounted = useMounted()
+  const mounted = useMounted()
 
   useEffect(() => {
     if (mounted) {
@@ -301,10 +301,10 @@ export function useSSRSafeLocalStorage<T>(
     }
   } = {}
 ): [T, (value: T) => void, boolean] {
-  const _api = useBrowserAPI()
+  const api = useBrowserAPI()
   const [isLoaded, setIsLoaded] = useState(false)
   
-  const _serializer = options.serializer || {
+  const serializer = options.serializer || {
     serialize: JSON.stringify,
     deserialize: JSON.parse
   }
@@ -313,7 +313,7 @@ export function useSSRSafeLocalStorage<T>(
 
   useEffect(() => {
     try {
-      const _item = api.getFromStorage(key)
+      const item = api.getFromStorage(key)
 
       if (item !== null) {
         setStoredValue(serializer.deserialize(item))
@@ -326,7 +326,7 @@ export function useSSRSafeLocalStorage<T>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, api])
 
-  const _setValue = (value: T) => {
+  const setValue = (value: T) => {
     try {
       setStoredValue(value)
       api.setToStorage(key, serializer.serialize(value))
@@ -415,7 +415,7 @@ export function createSafeGlobal<T extends object>(
   }
 
   try {
-    const _globalObj = (window as any)[globalName]
+    const globalObj = (window as any)[globalName]
 
     return globalObj || fallback
   } catch {
@@ -450,7 +450,7 @@ export function hasFeature(feature: string): boolean {
       case 'notification':
         return 'Notification' in window
       case 'webgl': {
-        const _canvas = document.createElement('canvas')
+        const canvas = document.createElement('canvas')
 
         return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
       }
@@ -472,9 +472,9 @@ export function useFeatureDetection(feature: string): boolean {
 // ===== EXPORTS =====
 
 // Instance globale pour faciliter l'utilisation
-export const _browserAPI = () => BrowserAPIManager.getInstance()
+export const browserAPI = () => BrowserAPIManager.getInstance()
 
-const _ssrUtils = {
+const ssrUtils = {
   isServer,
   isClient,
   isDev,

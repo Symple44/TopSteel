@@ -13,9 +13,9 @@ interface ProjetCardProps {
 }
 
 export function ProjetCard({ projet }: ProjetCardProps) {
-  const _router = useRouter()
+  const router = useRouter()
 
-  const _getStatusVariant = (statut: string) => {
+  const getStatusVariant = (statut: string) => {
     switch (statut?.toLowerCase()) {
       case 'en_cours': return 'default'
       case 'termine': return 'default'
@@ -25,7 +25,7 @@ export function ProjetCard({ projet }: ProjetCardProps) {
     }
   }
 
-  const _getStatusLabel = (statut: string) => {
+  const getStatusLabel = (statut: string) => {
     switch (statut?.toLowerCase()) {
       case 'en_cours': return 'En cours'
       case 'termine': return 'Terminé'

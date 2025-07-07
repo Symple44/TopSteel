@@ -10,7 +10,7 @@ interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean;
 }
 
-export const _Select = React.forwardRef<HTMLDivElement, SelectProps>(
+export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
   ({ className, children, placeholder, value, onValueChange, ...props }, ref) => (
     <div ref={ref} className={cn("relative", className)} {...props}>
       {placeholder && !value && (
@@ -24,7 +24,7 @@ export const _Select = React.forwardRef<HTMLDivElement, SelectProps>(
 )
 Select.displayName = "Select"
 
-export const _SelectTrigger = React.forwardRef<
+export const SelectTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
 >(({ className, children, ...props }, ref) => (
@@ -42,7 +42,7 @@ export const _SelectTrigger = React.forwardRef<
 ))
 SelectTrigger.displayName = "SelectTrigger"
 
-export const _SelectValue = React.forwardRef<
+export const SelectValue = React.forwardRef<
   HTMLSpanElement,
   React.HTMLAttributes<HTMLSpanElement> & { placeholder?: string }
 >(({ className, placeholder, children, ...props }, ref) => (
@@ -56,7 +56,7 @@ export const _SelectValue = React.forwardRef<
 ))
 SelectValue.displayName = "SelectValue"
 
-export const _SelectContent = React.forwardRef<
+export const SelectContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => (
@@ -73,7 +73,7 @@ export const _SelectContent = React.forwardRef<
 ))
 SelectContent.displayName = "SelectContent"
 
-export const _SelectItem = React.forwardRef<
+export const SelectItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { value?: string }
 >(({ className, children, value, ...props }, ref) => (
@@ -90,4 +90,3 @@ export const _SelectItem = React.forwardRef<
   </div>
 ))
 SelectItem.displayName = "SelectItem"
-

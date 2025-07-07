@@ -3,7 +3,7 @@
  */
 interface BusinessEvent {
   name: string
-  properties: Record<string, unknown>
+  properties: Record<string, any>
   timestamp: number
   userId?: string
   sessionId?: string
@@ -13,7 +13,7 @@ class BusinessMetrics {
   private events: BusinessEvent[] = []
   private sessionId: string = Math.random().toString(36).substring(7)
   
-  track(eventName: string, properties: Record<string, unknown> = {}) {
+  track(eventName: string, properties: Record<string, any> = {}) {
     const event: BusinessEvent = {
       name: eventName,
       properties: {
@@ -43,7 +43,7 @@ class BusinessMetrics {
   }
   
   // Métriques spécifiques TopSteel
-  trackProjectCreated(projectData: unknown) {
+  trackProjectCreated(projectData: any) {
     this.track('project_created', {
       projectType: projectData.type,
       clientId: projectData.clientId,
@@ -60,7 +60,7 @@ class BusinessMetrics {
     })
   }
   
-  trackUserAction(action: string, context: Record<string, unknown> = {}) {
+  trackUserAction(action: string, context: Record<string, any> = {}) {
     this.track('user_action', {
       action,
       ...context
@@ -75,7 +75,7 @@ class BusinessMetrics {
     })
   }
   
-  trackError(error: Error, context: Record<string, unknown> = {}) {
+  trackError(error: Error, context: Record<string, any> = {}) {
     this.track('error_occurred', {
       message: error.message,
       stack: error.stack?.substring(0, 500),
@@ -107,7 +107,7 @@ class BusinessMetrics {
   }
 }
 
-export const _businessMetrics = new BusinessMetrics()
+export const businessMetrics = new BusinessMetrics()
 
 // Hook React pour faciliter l'usage
 export function useBusinessMetrics() {
@@ -120,4 +120,3 @@ export function useBusinessMetrics() {
     trackError: businessMetrics.trackError.bind(businessMetrics)
   }
 }
-

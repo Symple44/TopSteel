@@ -27,19 +27,19 @@ export function NotificationCenter() {
   const { state, actions } = useNotifications()
   const [showSettings, setShowSettings] = useState(false)
 
-  const _getNotificationIcon = (type: string, category: string) => {
+  const getNotificationIcon = (type: string, category: string) => {
     if (type === 'error') return <AlertTriangle className="h-4 w-4 text-red-500" />
     if (category === 'stock') return <Clock className="h-4 w-4 text-orange-500" />
 
     return <Bell className="h-4 w-4 text-blue-500" />
   }
 
-  const _formatTimeAgo = (date: Date) => {
-    const _now = new Date()
-    const _diff = now.getTime() - new Date(date).getTime()
-    const _minutes = Math.floor(diff / 60000)
-    const _hours = Math.floor(minutes / 60)
-    const _days = Math.floor(hours / 24)
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date()
+    const diff = now.getTime() - new Date(date).getTime()
+    const minutes = Math.floor(diff / 60000)
+    const hours = Math.floor(minutes / 60)
+    const days = Math.floor(hours / 24)
 
     if (minutes < 1) return 'À l\'instant'
     if (minutes < 60) return `Il y a ${minutes}min`

@@ -24,7 +24,7 @@ interface MockOrdreFabrication {
   progression: number;
   statut: StatutProduction;
   priorite: PrioriteProduction;
-  operations: unknown[];
+  operations: any[];
 }
 
 // Données mockées pour la démonstration - CORRIGÉES
@@ -118,8 +118,8 @@ const mockOrdresFabrication: MockOrdreFabrication[] = [
 export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
   const [selectedOF, setSelectedOF] = useState(mockOrdresFabrication[0])
 
-  const _getStatutBadge = (statut: StatutProduction) => {
-    const _statusConfig = {
+  const getStatutBadge = (statut: StatutProduction) => {
+    const statusConfig = {
       [StatutProduction.PLANIFIE]: {
         label: 'Planifié',
         variant: 'outline' as const,
@@ -152,11 +152,11 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
       },
     }
     
-    const _config = statusConfig[statut]
+    const config = statusConfig[statut]
 
     if (!config) return null
     
-    const _Icon = config.icon
+    const Icon = config.icon
     
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
@@ -166,8 +166,8 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     )
   }
 
-  const _getPrioriteBadge = (priorite: PrioriteProduction) => {
-    const _prioriteConfig = {
+  const getPrioriteBadge = (priorite: PrioriteProduction) => {
+    const prioriteConfig = {
       [PrioriteProduction.BASSE]: {
         label: 'Basse',
         variant: 'outline' as const,
@@ -186,7 +186,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
       },
     }
     
-    const _config = prioriteConfig[priorite]
+    const config = prioriteConfig[priorite]
 
     if (!config) return null
     
@@ -197,7 +197,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     )
   }
 
-  const _getOperationStatusIcon = (statut: string) => {
+  const getOperationStatusIcon = (statut: string) => {
     switch (statut) {
       case 'TERMINEE':
         return <CheckCircle2 className="h-4 w-4 text-green-600" />

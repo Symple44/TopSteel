@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label'
 interface CreatePaiementDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onPaiementCreated?: (paiement: unknown) => void
+  onPaiementCreated?: (paiement: any) => void
 }
 
 export function CreatePaiementDialog({ 
@@ -32,13 +32,13 @@ export function CreatePaiementDialog({
     dateReception: new Date().toISOString().split('T')[0]
   })
 
-  const _handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     
     // Simulation création paiement
     setTimeout(() => {
-      const _newPaiement = {
+      const newPaiement = {
         id: `PAIEMENT-${Date.now()}`,
         montant: parseFloat(formData.montant),
         methode: formData.methode,
