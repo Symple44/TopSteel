@@ -109,7 +109,7 @@
     "@types/react-dom": "^19.1.6",
     "autoprefixer": "^10.4.21",
     "browserslist": "^4.25.1",
-    "caniuse-lite": "^1.0.30001726",
+    "caniuse-lite": "^1.0.30001727",
     "eslint": "^9.30.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.0.3",
