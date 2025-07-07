@@ -96,7 +96,7 @@
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
-    "@next/bundle-analyzer": "^15.3.4",
+    "@next/bundle-analyzer": "^15.3.5",
     "@playwright/test": "^1.40.0",
     "@storybook/nextjs": "^9.0.14",
     "@storybook/react": "^9.0.14",
