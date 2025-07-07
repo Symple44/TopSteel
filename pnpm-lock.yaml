@@ -790,8 +790,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0(@types/node@22.16.0)
       vite-bundle-analyzer:
-        specifier: ^0.11.0
-        version: 0.11.1
+        specifier: ^1.0.0
+        version: 1.0.0
       vite-plugin-dts:
         specifier: ^4.5.4
         version: 4.5.4(@types/node@22.16.0)(typescript@5.8.3)(vite@7.0.0)
@@ -19486,8 +19486,9 @@ packages:
       propagating-hammerjs: 1.5.0
     dev: true
 
-  /vite-bundle-analyzer@0.11.1:
-    resolution: {integrity: sha512-0GptL3zHh36t5Gp+W1PAU3CiRU7tA0NS0XJhS2YFX6RtIs7oltdMDqLBKjSXCUJRWa3zki+oASfbE6ssAsf1PA==}
+  /vite-bundle-analyzer@1.0.0:
+    resolution: {integrity: sha512-Y9u467LqvDyvvd7+6BVm9drgIUGrRbZHcV//GUsziTvIKm+cQcREDrZFBiLzShvUokmUCA9BVeLGuIiNhkxGUQ==}
+    hasBin: true
     dev: true
 
   /vite-node@2.1.9(@types/node@22.16.0):
