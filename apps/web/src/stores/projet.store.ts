@@ -1,6 +1,6 @@
 /**
  * 📋 STORE PROJETS CORRIGÉ - TopSteel ERP
- * Exemple d'utilisation de la nouvelle architecture pour les stores
+ * Store projets avec actions async directes (sans createAsyncAction)
  * Fichier: apps/web/src/stores/projet.store.ts
  */
 
@@ -15,6 +15,10 @@ import type {
   StoreCreator,
   StoreProjet
 } from '@erp/types'
+import { ClientType, ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
 
 // ===== ÉTAT INITIAL =====
 
@@ -31,7 +35,7 @@ const initialProjetState: InitialState<ProjetState> = {
   // Filtres et recherche
   filters: {},
   searchTerm: '',
-  sortBy: 'reference', // Utiliser une propriété qui existe dans StoreProjet
+  sortBy: 'reference',
   sortOrder: 'desc',
   
   // Pagination
@@ -53,18 +57,110 @@ const initialProjetState: InitialState<ProjetState> = {
 const projetCache = StoreUtils.createCache<string, StoreProjet[]>(300000) // 5 minutes
 const statsCache = StoreUtils.createCache<string, ProjetStats>(60000) // 1 minute
 
-// ===== ACTIONS ASYNC =====
+// ===== SERVICE API SIMULÉ =====
 
-/**
- * Service de données simulé (remplacer par vraie API)
- */
 const projetService = {
   async fetchProjets(filters?: ProjetFilters): Promise<StoreProjet[]> {
     // Simulation d'appel API
     await new Promise(resolve => setTimeout(resolve, 500))
     
-    // Retourner des données mockées ou utiliser l'API réelle
-    return []
+    // Retourner des données mockées
+    return [
+      {
+        id: 'proj_001',
+        reference: 'PRJ-2024-001',
+        description: 'Portail résidentiel en acier',
+        type: ProjetType.PORTAIL,
+        statut: ProjetStatut.EN_COURS,
+        priorite: ProjetPriorite.NORMALE,
+        dateCreation: new Date('2024-01-15'),
+        dateDebut: new Date('2024-01-20'),
+        dateFinPrevue: new Date('2024-02-15'),
+        clientId: 'client_001',
+        client: {
+          id: 'client_001',
+          nom: 'Dupont',
+          email: 'dupont@example.com',
+          type: ClientType.PARTICULIER,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isActif: true,
+          adresse: {
+            rue: '123 Rue de la Paix',
+            ville: 'Paris',
+            codePostal: '75001',
+            pays: 'France'
+          },
+          contact: {
+            nom: 'Jean Dupont',
+            telephone: '0102030405',
+            email: 'dupont@example.com'
+          },
+          telephone: '0102030405'
+        },
+        montantHT: 5000,
+        montantTTC: 6000,
+        tauxTVA: 20,
+        marge: 1000,
+        avancement: 45,
+        adresseChantier: {
+          rue: '123 Rue de la Paix',
+          ville: 'Paris',
+          codePostal: '75001'
+        },
+        documentsIds: [],
+        ordresFabricationIds: [],
+        createdAt: new Date('2024-01-15'),
+        updatedAt: new Date()
+      },
+      {
+        id: 'proj_002',
+        reference: 'PRJ-2024-002',
+        description: 'Escalier métallique industriel',
+        type: ProjetType.ESCALIER,
+        statut: ProjetStatut.DEVIS,
+        priorite: ProjetPriorite.HAUTE,
+        dateCreation: new Date('2024-01-20'),
+        dateDebut: new Date('2024-02-01'),
+        dateFinPrevue: new Date('2024-03-01'),
+        clientId: 'client_002',
+        client: {
+          id: 'client_002',
+          nom: 'SARL Industrielle',
+          email: 'contact@sarl-industrielle.com',
+          type: ClientType.PROFESSIONNEL,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isActif: true,
+          adresse: {
+            rue: '456 Zone Industrielle',
+            ville: 'Lyon',
+            codePostal: '69000',
+            pays: 'France'
+          },
+          contact: {
+            nom: 'Responsable SARL',
+            telephone: '0405060708',
+            email: 'contact@sarl-industrielle.com'
+          },
+          telephone: '0405060708'
+        },
+        montantHT: 12000,
+        montantTTC: 14400,
+        tauxTVA: 20,
+        marge: 2500,
+        avancement: 0,
+        adresseChantier: {
+          rue: '456 Zone Industrielle',
+          ville: 'Lyon',
+          codePostal: '69000'
+        },
+        documentsIds: [],
+        ordresFabricationIds: [],
+        createdAt: new Date('2024-01-20'),
+        updatedAt: new Date()
+      }
+    ]
   },
 
   async createProjet(data: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>): Promise<StoreProjet> {
@@ -106,14 +202,19 @@ const projetService = {
       marge: data.marge || 0,
       avancement: data.avancement || 0,
       documentsIds: data.documentsIds || [],
-      ordresFabricationIds: data.ordresFabricationIds || []
+      ordresFabricationIds: data.ordresFabricationIds || [],
+      
+      // Valeurs par défaut avec les bons types d'enum
+      type: data.type || 'AUTRE',
+      statut: data.statut || 'brouillon',
+      priorite: data.priorite || 'NORMALE',
+      dateCreation: data.dateCreation || now
     } as StoreProjet
   },
 
   async updateProjet(id: string, updates: Partial<StoreProjet>): Promise<StoreProjet> {
     await new Promise(resolve => setTimeout(resolve, 200))
     
-    // Retourner le projet mis à jour
     return { 
       id, 
       ...updates,
@@ -130,325 +231,409 @@ const projetService = {
     await new Promise(resolve => setTimeout(resolve, 300))
     
     return {
-      total: 0,
-      parStatut: {},
-      parPriorite: {},
-      parType: {},
-      enRetard: 0,
-      terminesTemps: 0,
-      avancementMoyen: 0,
-      chiffreAffaireMensuel: 0,
-      chiffreAffaireAnnuel: 0,
-      margeGlobale: 0,
-      projetsActifs: 0,
-      nouveauxCeMois: 0
+      total: 15,
+      parStatut: { 
+        'en_cours': 8, 
+        'termine': 5, 
+        'devis': 2 
+      },
+      parPriorite: { 
+        'NORMALE': 10, 
+        'HAUTE': 4, 
+        'URGENTE': 1 
+      },
+      parType: { 
+        'PORTAIL': 6,
+        'ESCALIER': 4, 
+        'CLOTURE': 3,
+        'STRUCTURE': 2 
+      },
+      enRetard: 2,
+      terminesTemps: 5,
+      avancementMoyen: 65,
+      chiffreAffaireMensuel: 85000,
+      chiffreAffaireAnnuel: 950000,
+      margeGlobale: 18.5,
+      projetsActifs: 8,
+      nouveauxCeMois: 3
     }
   }
 }
 
 // ===== DÉFINITION DU STORE =====
 
-const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = (set, get) => {
-  const baseActions = StoreUtils.createBaseActions(initialProjetState)
+const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = (set, get) => ({
+  // ===== ACTIONS DE BASE =====
+  setLoading: (loading: boolean) => {
+    set((state) => {
+      state.loading = loading
+      state.lastUpdate = Date.now()
+    })
+  },
 
-  return {
-    // Actions de base
-    ...baseActions,
+  setError: (error: string | null) => {
+    set((state) => {
+      state.error = error
+      state.loading = false
+      state.lastUpdate = Date.now()
+    })
+  },
 
-    // ===== ACTIONS DE DONNÉES =====
-    fetchProjets: StoreUtils.createAsyncAction<ProjetState, [{ force?: boolean; filters?: ProjetFilters }?], StoreProjet[]>(
-      async (options = {}) => {
-        const { force = false, filters } = options
-        const cacheKey = JSON.stringify(filters || {})
-        
-        // Vérifier le cache si pas de force
-        if (!force) {
-          const cached = projetCache.get(cacheKey)
-          if (cached) {
-            return cached
-          }
-        }
-        
-        const projets = await projetService.fetchProjets(filters)
-        projetCache.set(cacheKey, projets)
-        return projets
-      },
-      {
-        onStart: (state) => {
-          state.isSyncing = true
-        },
-        onSuccess: (state, projets) => {
-          state.projets = projets
-          state.totalCount = projets.length
-          state.lastFetch = Date.now()
-          state.isSyncing = false
-        },
-        onError: (state, error) => {
-          state.isSyncing = false
-          console.error('Erreur fetch projets:', error)
+  clearError: () => {
+    set((state) => {
+      state.error = null
+      state.lastUpdate = Date.now()
+    })
+  },
+
+  reset: () => {
+    set((state) => {
+      Object.assign(state, {
+        ...initialProjetState,
+        loading: false,
+        error: null,
+        lastUpdate: Date.now()
+      })
+    })
+  },
+
+  // ===== ACTIONS DE DONNÉES =====
+  fetchProjets: async (options = {}) => {
+    try {
+      set((state) => {
+        state.loading = true
+        state.error = null
+        state.isSyncing = true
+      })
+
+      const { force = false, filters } = options
+      const cacheKey = JSON.stringify(filters || {})
+      
+      // Vérifier le cache si pas de force
+      if (!force) {
+        const cached = projetCache.get(cacheKey)
+        if (cached) {
+          set((state) => {
+            state.projets = cached
+            state.totalCount = cached.length
+            state.loading = false
+            state.isSyncing = false
+          })
+          return cached
         }
       }
-    ),
+      
+      const projets = await projetService.fetchProjets(filters)
+      projetCache.set(cacheKey, projets)
+      
+      set((state) => {
+        state.projets = projets
+        state.totalCount = projets.length
+        state.lastFetch = Date.now()
+        state.loading = false
+        state.isSyncing = false
+        state.lastUpdate = Date.now()
+      })
+      
+      return projets
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement des projets'
+      
+      set((state) => {
+        state.loading = false
+        state.error = errorMsg
+        state.isSyncing = false
+        state.lastUpdate = Date.now()
+      })
+      
+      console.error('Erreur fetch projets:', error)
+      return []
+    }
+  },
 
-    createProjet: StoreUtils.createAsyncAction<ProjetState, [Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>], StoreProjet>(
-      async (projetData) => {
-        const newProjet = await projetService.createProjet(projetData)
-        return newProjet
-      },
-      {
-        onSuccess: (state, newProjet) => {
-          state.projets.unshift(newProjet)
-          state.totalCount++
+  createProjet: async (projetData) => {
+    try {
+      set((state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      const newProjet = await projetService.createProjet(projetData)
+      
+      set((state) => {
+        state.projets.unshift(newProjet)
+        state.totalCount++
+        state.loading = false
+        state.lastUpdate = Date.now()
+      })
+      
+      // Invalider le cache
+      projetCache.delete()
+      statsCache.delete()
+      
+      return newProjet
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la création du projet'
+      
+      set((state) => {
+        state.loading = false
+        state.error = errorMsg
+        state.lastUpdate = Date.now()
+      })
+      
+      console.error('Erreur création projet:', error)
+      return null
+    }
+  },
+
+  updateProjet: async (id, updates) => {
+    try {
+      set((state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      const updatedProjet = await projetService.updateProjet(id, updates)
+      
+      set((state) => {
+        const index = state.projets.findIndex(p => p.id === id)
+        if (index !== -1) {
+          state.projets[index] = { ...state.projets[index], ...updatedProjet }
+        }
+        
+        // Mettre à jour le projet sélectionné si nécessaire
+        if (state.selectedProjet?.id === id) {
+          state.selectedProjet = { ...state.selectedProjet, ...updatedProjet }
+        }
+        
+        state.loading = false
+        state.lastUpdate = Date.now()
+      })
+      
+      // Invalider les caches
+      projetCache.delete()
+      statsCache.delete()
+      
+      return updatedProjet
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du projet'
+      
+      set((state) => {
+        state.loading = false
+        state.error = errorMsg
+        state.lastUpdate = Date.now()
+      })
+      
+      console.error('Erreur mise à jour projet:', error)
+      return null
+    }
+  },
+
+  deleteProjet: async (id) => {
+    try {
+      set((state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      const success = await projetService.deleteProjet(id)
+      
+      if (success) {
+        set((state) => {
+          state.projets = state.projets.filter(p => p.id !== id)
+          state.totalCount--
           
-          // Invalider le cache
-          projetCache.delete()
-          statsCache.delete()
-        }
-      }
-    ),
-
-    updateProjet: StoreUtils.createAsyncAction<ProjetState, [string, Partial<StoreProjet>], StoreProjet>(
-      async (id, updates) => {
-        const updatedProjet = await projetService.updateProjet(id, updates)
-        return updatedProjet
-      },
-      {
-        onSuccess: (state, updatedProjet) => {
-          const index = state.projets.findIndex(p => p.id === updatedProjet.id)
-          if (index !== -1) {
-            state.projets[index] = { ...state.projets[index], ...updatedProjet }
+          // Désélectionner si c'était le projet supprimé
+          if (state.selectedProjet?.id === id) {
+            state.selectedProjet = null
           }
           
-          // Mettre à jour le projet sélectionné si nécessaire
-          if (state.selectedProjet?.id === updatedProjet.id) {
-            state.selectedProjet = { ...state.selectedProjet, ...updatedProjet }
-          }
-          
-          // Invalider les caches
-          projetCache.delete()
-          statsCache.delete()
-        }
-      }
-    ),
-
-    deleteProjet: StoreUtils.createAsyncAction<ProjetState, [string], boolean>(
-      async (id) => {
-        const success = await projetService.deleteProjet(id)
-        return success
-      },
-      {
-        onSuccess: (state, success, id) => {
-          if (success) {
-            state.projets = state.projets.filter(p => p.id !== id)
-            state.totalCount--
-            
-            // Désélectionner si c'était le projet supprimé
-            if (state.selectedProjet?.id === id) {
-              state.selectedProjet = null
-            }
-            
-            // Invalider les caches
-            projetCache.delete()
-            statsCache.delete()
-          }
-        }
-      }
-    ),
-
-    duplicateProjet: StoreUtils.createAsyncAction<ProjetState, [string], StoreProjet>(
-      async (id) => {
-        const currentState = get()
-        const originalProjet = currentState.projets.find(p => p.id === id)
-        
-        if (!originalProjet) {
-          throw new Error('Projet non trouvé')
-        }
-        
-        const { id: _, createdAt: __, updatedAt: ___, ...projetData } = originalProjet
-        const duplicatedProjet = await projetService.createProjet({
-          ...projetData,
-          reference: `${projetData.reference}_COPIE`,
-          description: `Copie de ${projetData.description}`
+          state.loading = false
+          state.lastUpdate = Date.now()
         })
         
-        return duplicatedProjet
-      },
-      {
-        onSuccess: (state, duplicatedProjet) => {
-          state.projets.unshift(duplicatedProjet)
-          state.totalCount++
-          projetCache.delete()
-        }
+        // Invalider les caches
+        projetCache.delete()
+        statsCache.delete()
       }
-    ),
+      
+      return success
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la suppression du projet'
+      
+      set((state) => {
+        state.loading = false
+        state.error = errorMsg
+        state.lastUpdate = Date.now()
+      })
+      
+      console.error('Erreur suppression projet:', error)
+      return false
+    }
+  },
 
-    // ===== ACTIONS DE SÉLECTION =====
-    setSelectedProjet: (projet: StoreProjet | null) => set((state) => {
+  duplicateProjet: async (id) => {
+    try {
+      const currentState = get()
+      const originalProjet = currentState.projets.find(p => p.id === id)
+      
+      if (!originalProjet) {
+        throw new Error('Projet non trouvé')
+      }
+      
+      const { id: _, createdAt: __, updatedAt: ___, ...projetData } = originalProjet
+      const duplicatedProjet = await get().createProjet({
+        ...projetData,
+        reference: `${projetData.reference}_COPIE`,
+        description: `Copie de ${projetData.description}`
+      })
+      
+      return duplicatedProjet
+    } catch (error) {
+      console.error('Erreur duplication projet:', error)
+      return null
+    }
+  },
+
+  // ===== ACTIONS DE SÉLECTION =====
+  setSelectedProjet: (projet) => {
+    set((state) => {
       state.selectedProjet = projet
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    selectProjetById: (id) => set((state) => {
+  selectProjetById: (id) => {
+    set((state) => {
       const projet = state.projets.find(p => p.id === id)
       state.selectedProjet = projet || null
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    // ===== ACTIONS DE FILTRAGE =====
-    setFilters: (filters) => set((state) => {
+  // ===== ACTIONS DE FILTRAGE =====
+  setFilters: (filters) => {
+    set((state) => {
       state.filters = { ...state.filters, ...filters }
       state.currentPage = 1 // Reset pagination
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    clearFilters: () => set((state) => {
+  clearFilters: () => {
+    set((state) => {
       state.filters = {}
       state.searchTerm = ''
       state.currentPage = 1
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    setSearchTerm: StoreUtils.debounce((term: string) => set((state) => {
+  setSearchTerm: (term) => {
+    set((state) => {
       state.searchTerm = term
       state.currentPage = 1
       state.lastUpdate = Date.now()
-    }), 300),
+    })
+  },
 
-    // ===== ACTIONS DE TRI ET PAGINATION =====
-    setSorting: (sortBy, sortOrder = 'asc') => set((state) => {
+  // ===== ACTIONS DE TRI ET PAGINATION =====
+  setSorting: (sortBy, sortOrder = 'asc') => {
+    set((state) => {
       state.sortBy = sortBy
       state.sortOrder = sortOrder
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    setPage: (page) => set((state) => {
+  setPage: (page) => {
+    set((state) => {
       state.currentPage = page
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    setPageSize: (size) => set((state) => {
+  setPageSize: (size) => {
+    set((state) => {
       state.pageSize = size
       state.currentPage = 1 // Reset à la première page
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    // ===== ACTIONS DE CACHE =====
-    invalidateCache: () => set((state) => {
+  // ===== ACTIONS DE CACHE =====
+  invalidateCache: () => {
+    set((state) => {
       projetCache.delete()
       statsCache.delete()
       state.lastFetch = 0
       state.stats = null
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    refreshStats: StoreUtils.createAsyncAction<ProjetState, [], void>(
-      async () => {
-        // Vérifier le cache d'abord
-        const cached = statsCache.get('stats')
-        if (cached) {
-          return cached
-        }
-        
-        const stats = await projetService.getStats()
-        statsCache.set('stats', stats)
-        return stats
-      },
-      {
-        onSuccess: (state, stats) => {
-          state.stats = stats
-        }
+  refreshStats: async () => {
+    try {
+      set((state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      // Vérifier le cache d'abord
+      const cached = statsCache.get('stats')
+      if (cached) {
+        set((state) => {
+          state.stats = cached
+          state.loading = false
+        })
+        return
       }
-    )
+      
+      const stats = await projetService.getStats()
+      statsCache.set('stats', stats)
+      
+      set((state) => {
+        state.stats = stats
+        state.loading = false
+        state.lastUpdate = Date.now()
+      })
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement des statistiques'
+      
+      set((state) => {
+        state.loading = false
+        state.error = errorMsg
+        state.lastUpdate = Date.now()
+      })
+      
+      console.error('Erreur refresh stats:', error)
+    }
   }
-}
+})
 
 // ===== CRÉATION DU STORE =====
 
-export const useProjetStore = StoreUtils.createRobustStore<ProjetState, ProjetStoreActions>(
-  initialProjetState,
-  createProjetStoreActions,
-  {
-    name: 'projet-store',
-    persist: false, // Pas de persistence pour ce store
-    devtools: true,
-    immer: true,
-    subscriptions: true
-  }
+export const useProjetStore = create<ProjetStore>()(
+  immer(
+    devtools(
+      (set, get) => ({
+        ...initialProjetState,
+        ...createProjetStoreActions(set, get)
+      }),
+      { name: 'projet-store' }
+    )
+  )
 )
 
-// ===== SELECTORS OPTIMISÉS =====
+// ===== HOOKS SÉLECTEURS =====
 
-export const projetSelectors = {
-  // Sélecteurs de base
-  getProjets: (state: ProjetStore) => state.projets,
-  getSelectedProjet: (state: ProjetStore) => state.selectedProjet,
-  getFilters: (state: ProjetStore) => state.filters,
-  getSearchTerm: (state: ProjetStore) => state.searchTerm,
-  
-  // Sélecteurs calculés
-  getFilteredProjets: StoreUtils.createSelector((state: ProjetStore) => {
-    let projets = [...state.projets]
-    
-    // Appliquer les filtres
-    if (Object.keys(state.filters).length > 0) {
-      projets = projets.filter(projet => {
-        // Logique de filtrage selon les filtres actifs
-        return true // Simplifiée pour l'exemple
-      })
-    }
-    
-    // Appliquer la recherche
-    if (state.searchTerm) {
-      const term = state.searchTerm.toLowerCase()
-      projets = projets.filter(projet => 
-        projet.reference.toLowerCase().includes(term) ||
-        projet.description.toLowerCase().includes(term)
-      )
-    }
-    
-    // Appliquer le tri
-    projets.sort((a, b) => {
-      const aValue = a[state.sortBy] as any
-      const bValue = b[state.sortBy] as any
-      
-      // Gestion des valeurs nulles/undefined
-      if (aValue == null && bValue == null) return 0
-      if (aValue == null) return state.sortOrder === 'asc' ? -1 : 1
-      if (bValue == null) return state.sortOrder === 'asc' ? 1 : -1
-      
-      if (aValue < bValue) return state.sortOrder === 'asc' ? -1 : 1
-      if (aValue > bValue) return state.sortOrder === 'asc' ? 1 : -1
-      return 0
-    })
-    
-    return projets
-  }),
-  
-  // Sélecteurs de pagination
-  getPaginatedProjets: (state: ProjetStore) => {
-    const filtered = projetSelectors.getFilteredProjets(state)
-    const start = (state.currentPage - 1) * state.pageSize
-    const end = start + state.pageSize
-    return filtered.slice(start, end)
-  },
-  
-  getTotalPages: (state: ProjetStore) => {
-    const filtered = projetSelectors.getFilteredProjets(state)
-    return Math.ceil(filtered.length / state.pageSize)
-  },
-  
-  // Sélecteurs de statut
-  getLoadingState: (state: ProjetStore) => state.loading,
-  getSyncingState: (state: ProjetStore) => state.isSyncing,
-  getErrorState: (state: ProjetStore) => state.error,
-  getStats: (state: ProjetStore) => state.stats
-}
-
-// ===== HOOKS PERSONNALISÉS =====
-
-export const useProjetSelector = <T>(selector: (state: ProjetStore) => T) => {
-  return useProjetStore(selector)
-}
+export const useProjetLoading = () => useProjetStore(state => state.loading)
+export const useProjetError = () => useProjetStore(state => state.error)
+export const useProjets = () => useProjetStore(state => state.projets)
+export const useSelectedProjet = () => useProjetStore(state => state.selectedProjet)
+export const useProjetFilters = () => useProjetStore(state => state.filters)
+export const useProjetStats = () => useProjetStore(state => state.stats)
 
 // ===== EXPORTS =====
 export type { ProjetState, ProjetStore, ProjetStoreActions }
+

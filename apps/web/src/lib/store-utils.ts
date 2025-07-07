@@ -1,6 +1,7 @@
 /**
  * 🛠️ STORE UTILITIES ROBUSTES - TopSteel ERP
  * Utilitaires pour création et gestion des stores Zustand avec types stricts
+ * Version corrigée - N'exporte QUE les utilitaires, types depuis @erp/types
  * Fichier: apps/web/src/lib/store-utils.ts
  */
 
@@ -10,17 +11,32 @@ import type {
   InitialState,
   StoreConfig,
   StoreCreator
-} from '@erp/types'
+} from '@erp/types'; // ✅ Import UNIQUEMENT depuis @erp/types
 import { create } from 'zustand'
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+
+// ===== TYPES LOCAUX UNIQUEMENT =====
+
+interface CacheItem<T> {
+  data: T
+  timestamp: number
+}
+
+interface StoreEvent {
+  timestamp: number
+  store: string
+  action: string
+  state: any
+  prevState?: any
+  duration?: number
+}
 
 // ===== CLASSE PRINCIPALE STORE UTILS =====
 
 export class StoreUtils {
   /**
    * Créateur de store robuste avec middleware intégrés
-   * Signature corrigée pour compatibilité TypeScript/Zustand
    */
   static createRobustStore<
     TState extends BaseStoreState,
@@ -40,10 +56,17 @@ export class StoreUtils {
 
     // Store creator compatible avec Zustand
     const storeCreator = (set: any, get: any) => {
-      const actions = storeDefinition(set, get)
+      const customActions = storeDefinition(set, get)
+      const baseActions = this.createBaseActions(initialState)
+      
       return {
         ...initialState,
-        ...actions
+        ...customActions,
+        // Mélanger les actions de base de manière sûre
+        setLoading: baseActions.setLoading,
+        setError: baseActions.setError,
+        clearError: baseActions.clearError,
+        reset: baseActions.reset
       } as TState & TActions
     }
 
@@ -84,7 +107,7 @@ export class StoreUtils {
           }
         },
         partialize: (state: any) => {
-          // Ne persister que les données importantes, pas les erreurs/loading
+          // Ne persister que les données importantes
           const { loading, error, lastUpdate, ...persistedState } = state
           return persistedState
         },
@@ -104,16 +127,22 @@ export class StoreUtils {
     }
 
     // Middleware DevTools
-    if (enableDevtools) {
+    if (enableDevtools && process.env.NODE_ENV === 'development') {
       store = devtools(store, { name }) as any
     }
 
-    return create<TState & TActions>()(store)
+    const zustandStore = create<TState & TActions>()(store)
+
+    // Monitoring des changements d'état
+    if (process.env.NODE_ENV === 'development') {
+      this.addMonitoring(zustandStore, name)
+    }
+
+    return zustandStore
   }
 
   /**
    * Actions de base communes à tous les stores
-   * Version améliorée avec meilleur typage
    */
   static createBaseActions<TState extends BaseStoreState>(
     initialState: InitialState<TState>
@@ -136,102 +165,47 @@ export class StoreUtils {
       },
       
       reset: () => (state: TState) => {
-        Object.assign(state, {
-          ...initialState,
+        const preservedProps = {
           loading: false,
           error: null,
           lastUpdate: Date.now()
-        })
-      }
-    }
-  }
-
-  /**
-   * Wrapper pour actions async avec gestion d'erreur robuste
-   */
-  static createAsyncAction<
-    TState extends BaseStoreState,
-    TArgs extends any[],
-    TResult
-  >(
-    action: (...args: TArgs) => Promise<TResult>,
-    options: {
-      onStart?: (state: TState) => void
-      onSuccess?: (state: TState, result: TResult) => void
-      onError?: (state: TState, error: Error) => void
-    } = {}
-  ) {
-    const { onStart, onSuccess, onError } = options
-
-    return async (
-      set: (fn: (state: TState) => void) => void,
-      get: () => TState,
-      ...args: TArgs
-    ): Promise<TResult | null> => {
-      try {
-        set((state) => {
-          state.loading = true
-          state.error = null
-          onStart?.(state)
-        })
-
-        const result = await action(...args)
-
-        set((state) => {
-          state.loading = false
-          state.lastUpdate = Date.now()
-          onSuccess?.(state, result)
-        })
-
-        return result
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue'
-        
-        set((state) => {
-          state.loading = false
-          state.error = errorMessage
-          state.lastUpdate = Date.now()
-          onError?.(state, error as Error)
-        })
-
-        console.error('Erreur dans action async:', error)
-        return null
-      }
-    }
-  }
-
-  /**
-   * Sélecteur optimisé avec mémoization
-   */
-  static createSelector<TState, TResult>(
-    selector: (state: TState) => TResult,
-    equalityFn?: (a: TResult, b: TResult) => boolean
-  ) {
-    let lastResult: TResult
-    let lastState: TState
-
-    return (state: TState): TResult => {
-      if (state !== lastState) {
-        const newResult = selector(state)
-        
-        if (!equalityFn) {
-          lastResult = newResult
-        } else if (!equalityFn(lastResult, newResult)) {
-          lastResult = newResult
         }
         
-        lastState = state
+        Object.assign(state, {
+          ...initialState,
+          ...preservedProps
+        })
       }
-      
-      return lastResult
     }
   }
 
   /**
-   * Cache simple pour stores avec TTL
+   * Wrapper simplifié pour actions async - Version corrigée
+   * Utilisation: à appeler directement dans les actions, pas dans la définition
    */
-  static createCache<K extends string | number, V>(ttlMs = 300000) { // 5 minutes par défaut
-    const cache = new Map<K, { value: V; timestamp: number }>()
+  static async wrapAsyncAction<TResult>(
+    action: () => Promise<TResult>,
+    onStart?: () => void,
+    onSuccess?: (result: TResult) => void,
+    onError?: (error: Error) => void
+  ): Promise<TResult | null> {
+    try {
+      onStart?.()
+      const result = await action()
+      onSuccess?.(result)
+      return result
+    } catch (error) {
+      const errorObj = error instanceof Error ? error : new Error(String(error))
+      onError?.(errorObj)
+      return null
+    }
+  }
+
+  /**
+   * Cache simple et efficace avec TTL
+   */
+  static createCache<K, V>(ttlMs: number = 300000) {
+    const cache = new Map<K, CacheItem<V>>()
 
     return {
       get: (key: K): V | null => {
@@ -243,14 +217,26 @@ export class StoreUtils {
           return null
         }
 
-        return item.value
+        return item.data
       },
 
       set: (key: K, value: V): void => {
         cache.set(key, {
-          value,
+          data: value,
           timestamp: Date.now()
         })
+      },
+
+      has: (key: K): boolean => {
+        const item = cache.get(key)
+        if (!item) return false
+
+        if (Date.now() - item.timestamp > ttlMs) {
+          cache.delete(key)
+          return false
+        }
+
+        return true
       },
 
       delete: (key?: K): void => {
@@ -291,7 +277,7 @@ export class StoreUtils {
     for (const [key, validator] of Object.entries(schema)) {
       const value = state[key as keyof TState]
       if (value !== undefined && !validator(value)) {
-        errors.push(`Validation échouée pour ${key}`)
+        errors.push(`Validation échouée pour ${String(key)}`)
       }
     }
 
@@ -339,22 +325,72 @@ export class StoreUtils {
       }
     }
   }
+
+  /**
+   * Monitoring et debugging des stores
+   */
+  private static addMonitoring(store: any, name: string) {
+    const originalGetState = store.getState
+    const originalSetState = store.setState
+
+    store.getState = () => {
+      const state = originalGetState()
+      StoreMonitor.logAccess(name, state)
+      return state
+    }
+
+    store.setState = (updater: any) => {
+      const prevState = originalGetState()
+      const result = originalSetState(updater)
+      const newState = originalGetState()
+      
+      StoreMonitor.logStateChange(name, 'setState', newState, prevState)
+      return result
+    }
+  }
+
+  /**
+   * Utilitaires de sérialisation sécurisée
+   */
+  static safeSerialize(data: any): string | null {
+    try {
+      return JSON.stringify(data, (key, value) => {
+        if (typeof value === 'function') return undefined
+        if (value instanceof Date) return value.toISOString()
+        if (value instanceof Error) return { name: value.name, message: value.message }
+        return value
+      })
+    } catch (error) {
+      console.warn('Erreur lors de la sérialisation:', error)
+      return null
+    }
+  }
+
+  /**
+   * Utilitaires de désérialisation sécurisée
+   */
+  static safeDeserialize<T>(data: string): T | null {
+    try {
+      return JSON.parse(data, (key, value) => {
+        // Reconstituer les dates
+        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+          return new Date(value)
+        }
+        return value
+      })
+    } catch (error) {
+      console.warn('Erreur lors de la désérialisation:', error)
+      return null
+    }
+  }
 }
 
-//===== MONITORING ET DEBUG =====
-
-interface StoreEvent {
-  timestamp: number
-  store: string
-  action: string
-  state: any
-  prevState?: any
-  duration?: number
-}
+// ===== MONITORING ET DEBUG =====
 
 export class StoreMonitor {
   private static subscribers = new Set<(event: StoreEvent) => void>()
   private static isEnabled = process.env.NODE_ENV === 'development'
+  private static accessLog = new Map<string, number>()
 
   static enable(enabled = true) {
     this.isEnabled = enabled
@@ -406,60 +442,41 @@ export class StoreMonitor {
     })
   }
 
+  static logAccess(storeName: string, state: any) {
+    if (!this.isEnabled) return
+
+    const key = `${storeName}-access`
+    const count = (this.accessLog.get(key) || 0) + 1
+    this.accessLog.set(key, count)
+
+    // Log périodique des accès
+    if (count % 100 === 0) {
+      console.log(`📊 Store ${storeName} accédé ${count} fois`)
+    }
+  }
+
   private static cloneState(state: any) {
     try {
-      return structuredClone(state)
+      return structuredClone ? structuredClone(state) : JSON.parse(JSON.stringify(state))
     } catch {
-      // Fallback pour les objets non clonables
-      return JSON.parse(JSON.stringify(state))
+      return { ...state }
     }
   }
 
-  static createStoreExporter(stores: Record<string, any>) {
+  static getStats() {
     return {
-      export: () => {
-        const data: Record<string, any> = {}
-        Object.entries(stores).forEach(([name, store]) => {
-          try {
-            data[name] = store.getState()
-          } catch (error) {
-            console.warn(`Impossible d'exporter le store ${name}:`, error)
-          }
-        })
-        return {
-          ...data,
-          timestamp: Date.now(),
-          version: '1.0.0'
-        }
-      },
-
-      import: (data: any) => {
-        try {
-          Object.entries(stores).forEach(([name, store]) => {
-            if (data[name] && typeof store.setState === 'function') {
-              store.setState(data[name])
-            }
-          })
-          console.log('État des stores importé avec succès')
-          return true
-        } catch (error) {
-          console.error('Erreur lors de l\'import des stores:', error)
-          return false
-        }
-      }
-    }
-  }
-
-  static getPerformanceStats() {
-    const performance = {
-      storeCount: this.subscribers.size,
-      memoryUsage: process.memoryUsage?.() || null,
+      subscribers: this.subscribers.size,
+      accessCount: Array.from(this.accessLog.entries()),
+      isEnabled: this.isEnabled,
       timestamp: Date.now()
     }
-    
-    return performance
+  }
+
+  static reset() {
+    this.accessLog.clear()
+    this.subscribers.clear()
   }
 }
 
-// ===== EXPORTS =====
+// ===== EXPORTS UNIQUEMENT DES CLASSES UTILITAIRES =====
 export default StoreUtils

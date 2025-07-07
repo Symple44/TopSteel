@@ -1,70 +1,124 @@
 /**
  * 🔐 STORE AUTHENTIFICATION - TopSteel ERP
  * Gestion robuste de l'authentification et des sessions utilisateur
+ * Version corrigée avec import correct depuis @erp/types
  * Fichier: apps/web/src/stores/auth.store.ts
  */
-import { StoreUtils } from '@/lib/store-utils'
-import type { BaseStoreActions, BaseStoreState, InitialState, StoreCreator } from '@erp/types'
 
-// ===== INTERFACES =====
-interface User {
+import type {
+  BaseStoreActions,
+  BaseStoreState,
+  InitialState,
+  StoreCreator
+} from '@erp/types'; // ✅ IMPORT CORRECT depuis @erp/types au lieu de @/lib/store-utils
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
+
+// ===== INTERFACES LOCALES =====
+
+export interface User {
   id: string
   nom: string
   prenom: string
   email: string
-  role: string
+  role: 'admin' | 'manager' | 'user' | 'viewer'
   permissions: string[]
   avatar?: string
   lastLogin?: number
+  preferences?: {
+    theme?: 'light' | 'dark' | 'auto'
+    language?: string
+    notifications?: boolean
+  }
 }
 
-interface SessionInfo {
+export interface SessionInfo {
   token: string
   refreshToken: string
   expiresAt: number
   issuedAt: number
+  ipAddress?: string
+  userAgent?: string
 }
 
-interface LoginCredentials {
+export interface LoginCredentials {
   email: string
   password: string
   rememberMe?: boolean
 }
 
-interface AuthState extends BaseStoreState {
-  // État utilisateur
+export interface LoginAttempt {
+  timestamp: number
+  email: string
+  ip?: string
+  userAgent?: string
+  success: boolean
+  failureReason?: string
+}
+
+// ===== ÉTAT DU STORE =====
+
+export interface AuthState extends BaseStoreState {
+  // État utilisateur et session
   user: User | null
   session: SessionInfo | null
   isAuthenticated: boolean
   
-  // État de session
+  // Validation de session
   isSessionValid: boolean
   tokenRefreshInProgress: boolean
+  sessionTimeLeft: number
   
-  // Historique
-  loginHistory: Array<{
-    timestamp: number
-    ip?: string
-    userAgent?: string
-    success: boolean
-  }>
+  // Sécurité et monitoring
+  loginHistory: LoginAttempt[]
+  failedAttempts: number
+  isLocked: boolean
+  lockoutEndTime: number | null
+  
+  // État UI
+  showWelcome: boolean
+  lastActivity: number
 }
 
-interface AuthActions extends BaseStoreActions {
+// ===== ACTIONS DU STORE =====
+
+export interface AuthActions extends BaseStoreActions {
+  // Actions principales
   login: (credentials: LoginCredentials) => Promise<boolean>
   logout: () => Promise<void>
   refreshToken: () => Promise<boolean>
+  
+  // Gestion de session
   checkSession: () => boolean
+  extendSession: () => void
+  
+  // Gestion utilisateur
   setUser: (user: User | null) => void
-  setSession: (session: SessionInfo | null) => void
+  
+  // Actions de sécurité
+  recordLoginAttempt: (attempt: Omit<LoginAttempt, 'timestamp'>) => void
+  clearFailedAttempts: () => void
+  
+  // Utilitaires
   clearAuthData: () => void
+  updateActivity: () => void
+  dismissWelcome: () => void
 }
 
-type AuthStore = AuthState & AuthActions
+export type AuthStore = AuthState & AuthActions
+
+// ===== CONFIGURATION =====
+const AUTH_CONFIG = {
+  sessionTimeout: 8 * 60 * 60 * 1000, // 8 heures
+  maxFailedAttempts: 5,
+  lockoutDuration: 15 * 60 * 1000, // 15 minutes
+  tokenRefreshThreshold: 5 * 60 * 1000, // 5 minutes
+} as const
 
 // ===== ÉTAT INITIAL =====
 const initialAuthState: InitialState<AuthState> = {
-  // État de base
+  // État de base (BaseStoreState)
   loading: false,
   error: null,
   lastUpdate: 0,
@@ -75,208 +129,391 @@ const initialAuthState: InitialState<AuthState> = {
   isAuthenticated: false,
   isSessionValid: false,
   tokenRefreshInProgress: false,
+  sessionTimeLeft: 0,
   
-  // Historique
-  loginHistory: []
+  // Sécurité
+  loginHistory: [],
+  failedAttempts: 0,
+  isLocked: false,
+  lockoutEndTime: null,
+  
+  // État UI
+  showWelcome: false,
+  lastActivity: Date.now()
 }
 
-// ===== API SIMULÉE =====
-const authAPI = {
-  async login(credentials: LoginCredentials): Promise<{ user: User; session: SessionInfo }> {
+// ===== SERVICE D'AUTHENTIFICATION SIMULÉ =====
+class AuthService {
+  private static readonly MOCK_USERS = [
+    {
+      email: 'admin@topsteel.fr',
+      password: 'admin123',
+      user: {
+        id: 'usr_001',
+        nom: 'Admin',
+        prenom: 'System',
+        email: 'admin@topsteel.fr',
+        role: 'admin' as const,
+        permissions: ['*'],
+        preferences: { theme: 'dark' as const, notifications: true }
+      }
+    },
+    {
+      email: 'manager@topsteel.fr',
+      password: 'manager123',
+      user: {
+        id: 'usr_002',
+        nom: 'Dupont',
+        prenom: 'Jean',
+        email: 'manager@topsteel.fr',
+        role: 'manager' as const,
+        permissions: ['projets:read', 'projets:write', 'stocks:read'],
+        preferences: { theme: 'light' as const, notifications: true }
+      }
+    }
+  ]
+
+  static async login(credentials: LoginCredentials): Promise<{ user: User; session: SessionInfo }> {
     await new Promise(resolve => setTimeout(resolve, 800))
     
-    if (credentials.email === 'error@test.com') {
+    const mockUser = this.MOCK_USERS.find(u => 
+      u.email === credentials.email && u.password === credentials.password
+    )
+    
+    if (!mockUser) {
       throw new Error('Identifiants invalides')
     }
     
-    const mockUser: User = {
-      id: crypto.randomUUID(),
-      nom: 'Dupont',
-      prenom: 'Jean',
-      email: credentials.email,
-      role: 'admin',
-      permissions: ['projets:read', 'projets:write', 'stocks:read'],
-      lastLogin: Date.now()
+    const session: SessionInfo = {
+      token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
+      refreshToken: `refresh_${Date.now()}_${Math.random().toString(36)}`,
+      expiresAt: Date.now() + (credentials.rememberMe ? 
+        30 * 24 * 60 * 60 * 1000 : AUTH_CONFIG.sessionTimeout),
+      issuedAt: Date.now(),
+      ipAddress: '127.0.0.1',
+      userAgent: navigator?.userAgent
     }
-    
-    const mockSession: SessionInfo = {
-      token: 'mock_jwt_token_' + Math.random().toString(36),
-      refreshToken: 'mock_refresh_token_' + Math.random().toString(36),
-      expiresAt: Date.now() + (credentials.rememberMe ? 30 * 24 * 60 * 60 * 1000 : 8 * 60 * 60 * 1000),
-      issuedAt: Date.now()
-    }
-    
-    return { user: mockUser, session: mockSession }
-  },
-
-  async logout(): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 200))
-  },
-
-  async refreshToken(refreshToken: string): Promise<SessionInfo> {
-    await new Promise(resolve => setTimeout(resolve, 300))
     
     return {
-      token: 'new_mock_jwt_token_' + Math.random().toString(36),
+      user: { ...mockUser.user, lastLogin: Date.now() },
+      session
+    }
+  }
+
+  static async refreshToken(refreshToken: string): Promise<SessionInfo> {
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
+    if (!refreshToken.startsWith('refresh_')) {
+      throw new Error('Refresh token invalide')
+    }
+    
+    return {
+      token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
       refreshToken,
-      expiresAt: Date.now() + 8 * 60 * 60 * 1000,
+      expiresAt: Date.now() + AUTH_CONFIG.sessionTimeout,
       issuedAt: Date.now()
     }
   }
+
+  static async logout(): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 200))
+  }
 }
 
-// ===== CRÉATEUR D'ACTIONS =====
-const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => {
-  const baseActions = StoreUtils.createBaseActions(initialAuthState)
+// ===== UTILITAIRES =====
+class AuthUtils {
+  static isSessionExpired(session: SessionInfo | null): boolean {
+    if (!session) return true
+    return Date.now() >= session.expiresAt
+  }
 
-  return {
-    ...baseActions,
+  static shouldRefreshToken(session: SessionInfo | null): boolean {
+    if (!session) return false
+    const timeLeft = session.expiresAt - Date.now()
+    return timeLeft <= AUTH_CONFIG.tokenRefreshThreshold && timeLeft > 0
+  }
 
-    login: async (credentials: LoginCredentials) => {
+  static calculateSessionTimeLeft(session: SessionInfo | null): number {
+    if (!session) return 0
+    return Math.max(0, session.expiresAt - Date.now())
+  }
+
+  static isAccountLocked(state: Pick<AuthState, 'isLocked' | 'lockoutEndTime'>): boolean {
+    if (!state.isLocked || !state.lockoutEndTime) return false
+    return Date.now() < state.lockoutEndTime
+  }
+}
+
+// ===== ACTIONS ASYNC =====
+const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
+  login: async (credentials: LoginCredentials): Promise<boolean> => {
+    try {
+      // Phase de démarrage
+      set((state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      const state = get()
+      
+      if (AuthUtils.isAccountLocked(state)) {
+        const timeLeft = Math.ceil((state.lockoutEndTime! - Date.now()) / 1000 / 60)
+        throw new Error(`Compte verrouillé. Réessayez dans ${timeLeft} minutes.`)
+      }
+      
       try {
-        set((state) => {
-          state.loading = true
-          state.error = null
-        })
-
-        const { user, session } = await authAPI.login(credentials)
-
+        const { user, session } = await AuthService.login(credentials)
+        
         set((state) => {
           state.user = user
           state.session = session
           state.isAuthenticated = true
           state.isSessionValid = true
+          state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(session)
+          state.showWelcome = true
+          state.failedAttempts = 0
+          state.isLocked = false
+          state.lockoutEndTime = null
+          state.lastActivity = Date.now()
           state.loading = false
-          state.loginHistory.unshift({
-            timestamp: Date.now(),
-            success: true
-          })
-          state.lastUpdate = Date.now()
         })
-
+        
+        get().recordLoginAttempt({
+          email: credentials.email,
+          success: true
+        })
+        
         return true
+        
       } catch (error) {
-        set((state) => {
-          state.loading = false
-          state.error = error instanceof Error ? error.message : 'Erreur de connexion'
-          state.loginHistory.unshift({
-            timestamp: Date.now(),
-            success: false
-          })
-          state.lastUpdate = Date.now()
+        get().recordLoginAttempt({
+          email: credentials.email,
+          success: false,
+          failureReason: error instanceof Error ? error.message : 'Erreur inconnue'
         })
-        return false
+        
+        set((state) => {
+          state.failedAttempts += 1
+          
+          if (state.failedAttempts >= AUTH_CONFIG.maxFailedAttempts) {
+            state.isLocked = true
+            state.lockoutEndTime = Date.now() + AUTH_CONFIG.lockoutDuration
+          }
+        })
+        
+        throw error
       }
-    },
-
-    logout: async () => {
-      try {
-        set((state) => {
-          state.loading = true
-        })
-
-        await authAPI.logout()
-
-        set((state) => {
-          state.user = null
-          state.session = null
-          state.isAuthenticated = false
-          state.isSessionValid = false
-          state.loading = false
-          state.error = null
-          state.lastUpdate = Date.now()
-        })
-      } catch (error) {
-        set((state) => {
-          state.loading = false
-          state.error = 'Erreur lors de la déconnexion'
-          state.lastUpdate = Date.now()
-        })
-      }
-    },
-
-    refreshToken: async () => {
-      const currentState = get()
-      if (!currentState.session?.refreshToken || currentState.tokenRefreshInProgress) {
-        return false
-      }
-
-      try {
-        set((state) => {
-          state.tokenRefreshInProgress = true
-          state.error = null
-        })
-
-        const newSession = await authAPI.refreshToken(currentState.session.refreshToken)
-
-        set((state) => {
-          state.session = newSession
-          state.isSessionValid = true
-          state.tokenRefreshInProgress = false
-          state.lastUpdate = Date.now()
-        })
-
-        return true
-      } catch (error) {
-        set((state) => {
-          state.session = null
-          state.isAuthenticated = false
-          state.isSessionValid = false
-          state.tokenRefreshInProgress = false
-          state.error = 'Session expirée'
-          state.lastUpdate = Date.now()
-        })
-        return false
-      }
-    },
-
-    checkSession: () => {
-      const state = get()
-      const isValid = state.session && Date.now() < state.session.expiresAt
+    } catch (error) {
+      const errorObj = error instanceof Error ? error : new Error(String(error))
       
       set((state) => {
-        state.isSessionValid = !!isValid
-        state.isAuthenticated = !!isValid && !!state.user
+        state.loading = false
+        state.error = errorObj.message
+        state.lastUpdate = Date.now()
+      })
+      
+      return false
+    }
+  },
+
+  logout: async (): Promise<void> => {
+    try {
+      set((state) => {
+        state.loading = true
+        state.error = null
       })
 
-      return !!isValid
-    },
+      const state = get()
+      if (state.session) {
+        await AuthService.logout()
+      }
 
-    setUser: (user) => set((state) => {
+      set((state) => {
+        Object.assign(state, {
+          ...initialAuthState,
+          lastUpdate: Date.now(),
+          loading: false
+        })
+      })
+    } catch (error) {
+      const errorObj = error instanceof Error ? error : new Error(String(error))
+      
+      set((state) => {
+        state.loading = false
+        state.error = errorObj.message
+      })
+    }
+  },
+
+  refreshToken: async (): Promise<boolean> => {
+    try {
+      set((state) => {
+        state.tokenRefreshInProgress = true
+        state.error = null
+      })
+
+      const state = get()
+      
+      if (!state.session?.refreshToken) {
+        throw new Error('Aucun refresh token disponible')
+      }
+      
+      const newSession = await AuthService.refreshToken(state.session.refreshToken)
+      
+      set((state) => {
+        state.session = newSession
+        state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(newSession)
+        state.lastActivity = Date.now()
+        state.tokenRefreshInProgress = false
+      })
+      
+      return true
+    } catch (error) {
+      set((state) => {
+        state.tokenRefreshInProgress = false
+        state.user = null
+        state.session = null
+        state.isAuthenticated = false
+        state.isSessionValid = false
+        state.error = error instanceof Error ? error.message : String(error)
+      })
+      
+      return false
+    }
+  },
+
+  checkSession: () => {
+    const state = get()
+    const isValid = !AuthUtils.isSessionExpired(state.session) && !!state.user
+    
+    set((state) => {
+      state.isSessionValid = isValid
+      state.isAuthenticated = isValid
+      state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(state.session)
+      
+      if (!isValid) {
+        state.user = null
+        state.session = null
+      }
+      state.lastUpdate = Date.now()
+    })
+    
+    return isValid
+  },
+
+  extendSession: () => {
+    set((state) => {
+      if (state.session) {
+        state.session.expiresAt = Date.now() + AUTH_CONFIG.sessionTimeout
+        state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(state.session)
+      }
+      state.lastActivity = Date.now()
+      state.lastUpdate = Date.now()
+    })
+  },
+
+  setUser: (user) => {
+    set((state) => {
       state.user = user
       state.isAuthenticated = !!user
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    setSession: (session) => set((state) => {
-      state.session = session
-      state.isSessionValid = session ? Date.now() < session.expiresAt : false
+  recordLoginAttempt: (attempt) => {
+    set((state) => {
+      const loginAttempt: LoginAttempt = {
+        ...attempt,
+        timestamp: Date.now()
+      }
+      
+      state.loginHistory.unshift(loginAttempt)
+      
+      if (state.loginHistory.length > 50) {
+        state.loginHistory = state.loginHistory.slice(0, 50)
+      }
       state.lastUpdate = Date.now()
-    }),
+    })
+  },
 
-    clearAuthData: () => set((state) => {
-      state.user = null
-      state.session = null
-      state.isAuthenticated = false
-      state.isSessionValid = false
-      state.tokenRefreshInProgress = false
+  clearFailedAttempts: () => {
+    set((state) => {
+      state.failedAttempts = 0
+      state.isLocked = false
+      state.lockoutEndTime = null
+      state.lastUpdate = Date.now()
+    })
+  },
+
+  clearAuthData: () => {
+    set((state) => {
+      Object.assign(state, {
+        ...initialAuthState,
+        lastUpdate: Date.now()
+      })
+    })
+  },
+
+  updateActivity: () => {
+    set((state) => {
+      state.lastActivity = Date.now()
+      state.lastUpdate = Date.now()
+    })
+  },
+
+  dismissWelcome: () => {
+    set((state) => {
+      state.showWelcome = false
+      state.lastUpdate = Date.now()
+    })
+  },
+
+  // Actions de base (BaseStoreActions)
+  setLoading: (loading: boolean) => {
+    set((state) => {
+      state.loading = loading
+      state.lastUpdate = Date.now()
+    })
+  },
+
+  setError: (error: string | null) => {
+    set((state) => {
+      state.error = error
+      state.loading = false
+      state.lastUpdate = Date.now()
+    })
+  },
+
+  clearError: () => {
+    set((state) => {
       state.error = null
       state.lastUpdate = Date.now()
     })
+  },
+
+  reset: () => {
+    set((state) => {
+      Object.assign(state, {
+        ...initialAuthState,
+        loading: false,
+        error: null,
+        lastUpdate: Date.now()
+      })
+    })
   }
-}
+})
 
 // ===== CRÉATION DU STORE =====
-export const useAuthStore = StoreUtils.createRobustStore<AuthState, AuthActions>(
-  initialAuthState,
-  createAuthActions,
-  {
-    name: 'auth-store',
-    persist: false,
-    devtools: true,
-    immer: true,
-    subscriptions: false
-  }
+export const useAuthStore = create<AuthStore>()(
+  immer(
+    devtools(
+      (set, get) => ({
+        ...initialAuthState,
+        ...createAuthActions(set, get)
+      }),
+      { name: 'auth-store' }
+    )
+  )
 )
 
 // ===== HOOKS SÉLECTEURS =====
@@ -287,9 +524,46 @@ export const useAuthError = () => useAuthStore(state => state.error)
 export const useAuthUserDisplayName = () => useAuthStore(state => 
   state.user ? `${state.user.prenom} ${state.user.nom}` : null
 )
-export const useAuthSessionTimeLeft = () => useAuthStore(state => 
-  state.session ? Math.max(0, state.session.expiresAt - Date.now()) : 0
-)
+export const useAuthSessionTimeLeft = () => useAuthStore(state => state.sessionTimeLeft)
+export const useAuthPermissions = () => useAuthStore(state => state.user?.permissions || [])
+export const useAuthRole = () => useAuthStore(state => state.user?.role)
+export const useAuthCanAccess = (permission: string) => useAuthStore(state => {
+  if (!state.user) return false
+  return state.user.permissions.includes('*') || state.user.permissions.includes(permission)
+})
 
-// ===== EXPORTS =====
-export type { AuthActions, AuthState, AuthStore, LoginCredentials, SessionInfo, User }
+// ===== SESSION AUTO-REFRESH =====
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    const state = useAuthStore.getState()
+    
+    if (state.isAuthenticated) {
+      state.checkSession()
+      
+      if (AuthUtils.shouldRefreshToken(state.session) && !state.tokenRefreshInProgress) {
+        state.refreshToken().catch((error) => {
+          console.error('Erreur lors du refresh automatique:', error)
+        })
+      }
+    }
+  }, 60000) // Toutes les minutes
+
+  // Écouter l'activité utilisateur avec throttle manuel
+  let lastActivityUpdate = 0
+  const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart']
+  
+  const handleActivity = () => {
+    const now = Date.now()
+    if (now - lastActivityUpdate >= 30000) { // Max 1 fois par 30 secondes
+      lastActivityUpdate = now
+      const state = useAuthStore.getState()
+      if (state.isAuthenticated) {
+        state.updateActivity()
+      }
+    }
+  }
+
+  activityEvents.forEach(event => {
+    document.addEventListener(event, handleActivity, true)
+  })
+}
