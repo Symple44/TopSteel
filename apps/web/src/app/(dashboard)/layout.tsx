@@ -4,9 +4,9 @@
  */
 
 import { MonitoringProvider } from '@/components/providers/monitoring-provider'
+import '@/styles/globals.css'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Poppins } from 'next/font/google'
-import '../../styles/globals.css'
 import { Providers } from '../providers'
 
 const inter = Inter({ 

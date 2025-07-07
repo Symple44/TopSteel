@@ -2,7 +2,6 @@
 const nextConfig = {
   // ===== CONFIGURATION DE BASE =====
   reactStrictMode: true,
-  swcMinify: true,
   compress: true,
   
   // ===== CORRECTION WINDOWS - DÉSACTIVER STANDALONE =====
