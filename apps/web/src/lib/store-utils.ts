@@ -73,6 +73,7 @@ export class StoreUtils {
 
     let store = storeCreator
 
+
     // Middleware Immer pour mutations immutables
     if (enableImmer) {
       store = immer(store) as any
@@ -330,6 +331,7 @@ export class StoreUtils {
   ): (...args: Parameters<T>) => void {
 
     let lastCall = 0
+
 
     return (...args: Parameters<T>) => {
       const now = Date.now()

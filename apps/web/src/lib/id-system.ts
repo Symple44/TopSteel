@@ -275,6 +275,7 @@ class IDGenerator {
 
     const hexDigits = '0123456789abcdef'
     let uuid = ''
+
     
     for (let i = 0; i < 36; i++) {
       if (i === 8 || i === 13 || i === 18 || i === 23) {
@@ -370,7 +371,6 @@ class IDGenerator {
   private static generateFallbackNanoId(length: number, alphabet: string): string {
 
     let result = ''
-
 
     for (let i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]
@@ -475,6 +475,7 @@ class IDGenerator {
 
     const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
     let result = ''
+
     
     for (let i = 0; i < length; i++) {
       result += alphabet[Math.floor(Math.random() * alphabet.length)]

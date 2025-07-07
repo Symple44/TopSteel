@@ -182,6 +182,7 @@ export const api = {
 
         let filteredProjets = mockProjets
 
+
         if (filters) {
           if (filters.statut && filters.statut.length > 0) {
             filteredProjets = filteredProjets.filter(p => 

@@ -212,6 +212,7 @@ export default function RegisterPage() {
     
     let score = 0
     const checks = [
+
       password.length >= 8,
 
       /[a-z]/.test(password),

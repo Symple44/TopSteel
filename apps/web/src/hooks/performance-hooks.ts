@@ -382,11 +382,14 @@ export function useIntelligentCache<K, V>(
     setCacheSize(0)
   }, [onEvict])
 
-    const getStats = useCallback(() => {
+
+  const getStats = useCallback(() => {
     const cache = cacheRef.current
     const now = Date.now()
     let totalHits = 0
     let expiredEntries = 0
+
+
 
     
     for (const entry of cache.values()) {

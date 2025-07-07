@@ -127,6 +127,7 @@ const useFilteredData = (
       let filtered = [...data] // Copie pour éviter les mutations
 
 
+
       // Recherche textuelle avec protection
       if (searchTerm.trim() && searchableColumns.length > 0) {
         const normalizedSearch = searchTerm.toLowerCase().trim()

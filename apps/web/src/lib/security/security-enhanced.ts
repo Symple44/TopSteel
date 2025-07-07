@@ -109,7 +109,9 @@ export class SecurityUtils {
     feedback: string[]
   } {
     const feedback: string[] = []
+
     let score = 0
+
 
     // Longueur
     if (password.length >= 8) score += 20
