@@ -1,13 +1,49 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "root": "."
+  },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": true,
+    "maxSize": 1048576
+  },
+  "organizeImports": {
+    "enabled": true
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100
+    "lineWidth": 100,
+    "lineEnding": "lf",
+    "formatWithErrors": false,
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.next/**",
+      "**/.turbo/**",
+      "**/coverage/**",
+      "**/storybook-static/**",
+      "**/*.min.js",
+      "**/*.bundle.js",
+      "**/pnpm-lock.yaml",
+      "**/yarn.lock",
+      "**/package-lock.json",
+      "**/*.backup",
+      "**/*.bak",
+      "**/*.log",
+      "**/*.md",
+      "**/*.json",
+      "**/public/**",
+      "**/static/**",
+      "**/.vscode/**",
+      "**/.idea/**",
+      "**/tmp/**",
+      "**/temp/**"
+    ]
   },
   "linter": {
     "enabled": true,
@@ -15,22 +51,149 @@
       "recommended": true,
       "style": {
         "noNegationElse": "error",
-        "useCollapsedElseIf": "error"
+        "useCollapsedElseIf": "error",
+        "useConst": "error",
+        "useShorthandFunctionType": "error"
       },
       "suspicious": {
         "noArrayIndexKey": "warn",
-        "noExplicitAny": "warn"
+        "noExplicitAny": "warn",
+        "noDebugger": "error",
+        "noConsoleLog": "warn"
       },
       "performance": {
         "noDelete": "error"
+      },
+      "complexity": {
+        "noExtraBooleanCast": "error",
+        "noMultipleSpacesInRegularExpressionLiterals": "error",
+        "useLiteralKeys": "error"
+      },
+      "correctness": {
+        "noConstAssign": "error",
+        "noEmptyCharacterClassInRegex": "error",
+        "noEmptyPattern": "error",
+        "noGlobalObjectCalls": "error",
+        "noInvalidConstructorSuper": "error",
+        "noInvalidNewBuiltin": "error",
+        "noNonoctalDecimalEscape": "error",
+        "noPrecisionLoss": "error",
+        "noSetterReturn": "error",
+        "noStringCaseMismatch": "error",
+        "noSwitchDeclarations": "error",
+        "noUndeclaredVariables": "error",
+        "noUnreachable": "error",
+        "noUnreachableSuper": "error",
+        "useIsNan": "error",
+        "useValidForDirection": "error"
       }
-    }
+    },
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.next/**",
+      "**/.turbo/**",
+      "**/coverage/**",
+      "**/storybook-static/**",
+      "**/*.min.js",
+      "**/*.bundle.js",
+      "**/pnpm-lock.yaml",
+      "**/yarn.lock",
+      "**/package-lock.json",
+      "**/*.backup",
+      "**/*.bak",
+      "**/*.config.js",
+      "**/*.config.mjs",
+      "**/*.config.ts",
+      "**/next.config.js",
+      "**/tailwind.config.js",
+      "**/postcss.config.js",
+      "**/jest.config.js",
+      "**/turbo.json",
+      "**/.storybook/**",
+      "**/public/**",
+      "**/static/**",
+      "**/.vscode/**",
+      "**/.idea/**",
+      "**/tmp/**",
+      "**/temp/**",
+      "**/*.d.ts"
+    ]
   },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
       "trailingCommas": "es5",
-      "semicolons": "asNeeded"
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteProperties": "asNeeded",
+      "attributePosition": "auto"
+    },
+    "globals": ["console", "process", "Buffer", "window", "document", "React", "JSX"]
+  },
+  "json": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 100
     }
-  }
+  },
+  "css": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 100
+    }
+  },
+  "overrides": [
+    {
+      "include": ["apps/web/src/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "warn"
+          },
+          "style": {
+            "useConst": "error"
+          }
+        }
+      }
+    },
+    {
+      "include": ["apps/api/src/**/*.{ts}"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noConsoleLog": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["packages/*/src/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "warn"
+          }
+        }
+      }
+    },
+    {
+      "include": ["**/*.{test,spec}.{ts,tsx,js,jsx}"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noConsoleLog": "off"
+          }
+        }
+      }
+    }
+  ]
 }
