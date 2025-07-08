@@ -70,3 +70,4 @@ export function useSimpleToast() {
     info: (message: string) => toast({ description: message, variant: 'default' }),
   }
 }
+

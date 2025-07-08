@@ -1,7 +1,7 @@
 import type { VariantProps } from 'class-variance-authority'
 import * as React from 'react'
-import { alertVariants } from '../../lib/design-system'
-import { cn } from '../../lib/utils'
+import { alertVariants } from '@/lib/design-system'
+import { cn } from '@/lib/utils'
 
 const Alert = React.forwardRef<
   HTMLDivElement,
@@ -31,3 +31,6 @@ const AlertDescription = React.forwardRef<
 AlertDescription.displayName = 'AlertDescription'
 
 export { Alert, AlertTitle, AlertDescription }
+
+
+

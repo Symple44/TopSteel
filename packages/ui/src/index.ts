@@ -1,4 +1,4 @@
-// Primitives
+// === PRIMITIVES ===
 export * from './components/primitives/button'
 export * from './components/primitives/input'
 export * from './components/primitives/textarea'
@@ -7,29 +7,45 @@ export * from './components/primitives/radio-group'
 export * from './components/primitives/switch'
 export * from './components/primitives/select'
 
-// Layout
+// === LAYOUT ===
 export * from './components/layout/card'
 export * from './components/layout/separator'
 
-// Navigation
+// === NAVIGATION ===
 export * from './components/navigation/tabs'
 export * from './components/navigation/dropdown-menu'
 
-// Data Display
+// === DATA DISPLAY ===
 export * from './components/data-display/badge'
 export * from './components/data-display/avatar'
 export * from './components/data-display/progress'
 export * from './components/data-display/table'
 
-// Feedback
+// === FEEDBACK ===
 export * from './components/feedback/alert'
 export * from './components/feedback/dialog'
 export * from './components/feedback/tooltip'
 
-// Forms
+// === FORMS ===
 export * from './components/forms/label'
 
-// Utils
+// === UTILS & VARIANTS ===
 export { cn } from './lib/utils'
-export { buttonVariants, badgeVariants, alertVariants } from './lib/design-system'
-export type { ButtonVariants, BadgeVariants, AlertVariants } from './lib/design-system'
+export { 
+  buttonVariants, 
+  badgeVariants, 
+  alertVariants 
+} from './lib/design-system'
+
+// === TYPES ===
+export type { 
+  ButtonVariants, 
+  BadgeVariants, 
+  AlertVariants 
+} from './lib/design-system'
+
+// === RE-EXPORTS EXTERNES ===
+export { cva, type VariantProps } from 'class-variance-authority'
+export { clsx, type ClassValue } from 'clsx'
+
+

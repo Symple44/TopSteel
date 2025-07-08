@@ -31,3 +31,6 @@ export const BodyText = () => (
     <p className="text-xs text-muted-foreground">Petits textes pour les détails et métadonnées.</p>
   </div>
 )
+
+
+

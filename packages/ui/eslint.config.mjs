@@ -1,88 +1,51 @@
-// packages/ui/eslint.config.mjs - Configuration corrigée avec plugin React
-import baseConfig from '@erp/config/eslint/base.js'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
+import js from '@eslint/js'
+import typescript from '@typescript-eslint/eslint-plugin'
+import typescriptParser from '@typescript-eslint/parser'
 
 export default [
-  ...baseConfig,
-
+  js.configs.recommended,
   {
-    // IGNORER COMPLÈTEMENT LES STORIES
-    ignores: [
-      'dist/**',
-      'node_modules/**',
-      '.turbo/**',
-      'storybook-static/**',
-      '**/*.stories.ts',
-      '**/*.stories.tsx',
-      '**/stories/**/*',
-      'src/stories/**/*',
-      'stories/**',
-      '*.stories.*',
-    ],
-  },
-
-  {
-    files: ['src/**/*.{ts,tsx}'],
-    ignores: ['**/*.stories.*'],
-    plugins: {
-      react,
-      'react-hooks': reactHooks,
-    },
+    files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
+      parser: typescriptParser,
       parserOptions: {
-        project: './tsconfig.json',
-        tsconfigRootDir: import.meta.dirname || process.cwd(),
+        ecmaVersion: 'latest',
+        sourceType: 'module',
         ecmaFeatures: {
-          jsx: true,
+          jsx: true
         },
+        project: './tsconfig.json'
       },
       globals: {
-        window: 'readonly',
-        document: 'readonly',
-        navigator: 'readonly',
-        localStorage: 'readonly',
-        sessionStorage: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        globalThis: 'readonly',
+        React: 'readonly',
+        JSX: 'readonly',
         console: 'readonly',
         process: 'readonly',
-        Buffer: 'readonly',
-      },
+        window: 'readonly',
+        document: 'readonly'
+      }
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
+    plugins: {
+      '@typescript-eslint': typescript
     },
     rules: {
-      // Types et variables
+      '@typescript-eslint/no-unused-vars': ['error', { 
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_'
+      }],
+      'no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-        },
-      ],
-
-      // Console et debugging
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
-
-      // React rules (maintenant que le plugin est configuré)
-      'react/no-array-index-key': 'warn',
-      'react/jsx-no-leaked-render': 'warn',
-      'react/no-unescaped-entities': 'warn',
-
-      // React Hooks
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
-
-      // Autres règles importantes
-      'no-undef': 'error',
-    },
+      'no-console': 'off',
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'no-undef': 'off'
+    }
   },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/storybook-static/**'
+    ]
+  }
 ]

@@ -14,14 +14,14 @@
 
     "baseUrl": ".",
     "paths": {
-      "@erp/types": ["./packages/types/src"],
-      "@erp/types/*": ["./packages/types/src/*"],
-      "@erp/ui": ["./packages/ui/src"],
-      "@erp/ui/*": ["./packages/ui/src/*"],
-      "@erp/utils": ["./packages/utils/src"],
-      "@erp/utils/*": ["./packages/utils/src/*"],
-      "@erp/config": ["./packages/config/src"],
-      "@erp/config/*": ["./packages/config/src/*"]
+      "@erp/types": ["./packages/types/dist"],
+      "@erp/types/*": ["./packages/types/dist/*"],
+      "@erp/ui": ["./packages/ui/dist"],
+      "@erp/ui/*": ["./packages/ui/dist/*"],
+      "@erp/utils": ["./packages/utils/dist"],
+      "@erp/utils/*": ["./packages/utils/dist/*"],
+      "@erp/config": ["./packages/config/dist"],
+      "@erp/config/*": ["./packages/config/dist/*"]
     }
   },
   "exclude": [
