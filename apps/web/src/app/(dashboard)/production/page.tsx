@@ -3,8 +3,8 @@
 import { CreateOrdreDialog } from '@/components/production/create-ordre-dialog'
 import { ProductionFilters } from '@/components/production/production-filters'
 import { ProductionTable } from '@/components/production/production-table'
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { Calendar, Filter, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
@@ -149,6 +149,3 @@ export default function ProductionPage() {
     </div>
   )
 }
-
-
-

@@ -14,7 +14,3 @@ declare global {
     }
   }
 }
-
-
-
-

@@ -4,7 +4,3 @@ describe('TopSteel Web Integration', () => {
     expect(true).toBe(true)
   })
 })
-
-
-
-

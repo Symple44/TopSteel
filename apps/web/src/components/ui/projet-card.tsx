@@ -1,10 +1,10 @@
 'use client'
 
-import { Badge } from "@erp/ui"
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { Calendar, Euro, Eye, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -152,7 +152,3 @@ export function ProjetCard({ projet }: ProjetCardProps) {
     </Card>
   )
 }
-
-
-
-

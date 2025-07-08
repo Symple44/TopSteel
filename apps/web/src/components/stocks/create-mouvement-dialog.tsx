@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from "@erp/ui"
+import { Button } from '@erp/ui'
 import { useState } from 'react'
 
 interface CreateMouvementDialogProps {
@@ -25,7 +25,3 @@ export function CreateMouvementDialog({ open, onOpenChange }: CreateMouvementDia
     </div>
   )
 }
-
-
-
-

@@ -36,7 +36,3 @@ export const SwitchDescription = Switch
 export const SwitchFooter = Switch
 export const SwitchSeparator = Switch
 export const SwitchList = Switch
-
-
-
-

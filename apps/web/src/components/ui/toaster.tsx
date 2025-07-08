@@ -1,5 +1,6 @@
 'use client'
 
+import { useToast } from '@/hooks/use-toast'
 import {
   Toast,
   ToastClose,
@@ -7,8 +8,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "@erp/ui"
-import { useToast } from '@/hooks/use-toast'
+} from '@erp/ui'
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -29,7 +29,3 @@ export function Toaster() {
     </ToastProvider>
   )
 }
-
-
-
-

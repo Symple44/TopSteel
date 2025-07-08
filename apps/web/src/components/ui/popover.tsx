@@ -36,7 +36,3 @@ export const PopoverDescription = Popover
 export const PopoverFooter = Popover
 export const PopoverSeparator = Popover
 export const PopoverList = Popover
-
-
-
-

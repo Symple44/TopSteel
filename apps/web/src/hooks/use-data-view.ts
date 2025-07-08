@@ -21,7 +21,3 @@ export function useDataView(defaultView: DataView = 'grid') {
     toggleView,
   }
 }
-
-
-
-

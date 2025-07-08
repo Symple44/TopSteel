@@ -1,7 +1,7 @@
 'use client'
 
-import { Toaster as SonnerToaster } from "@erp/ui"
-import { Toaster } from "@erp/ui"
+import { Toaster as SonnerToaster } from '@erp/ui'
+import { Toaster } from '@erp/ui'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider } from 'next-themes'
@@ -36,7 +36,3 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </QueryClientProvider>
   )
 }
-
-
-
-

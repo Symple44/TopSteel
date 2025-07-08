@@ -1,17 +1,10 @@
 // apps/web/src/components/facturation/factures-table.tsx
 'use client'
 
-import { Badge } from "@erp/ui"
-import { Button } from "@erp/ui"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp/ui'
 import { Download, Edit, Eye } from 'lucide-react'
 
 // Données mock
@@ -101,7 +94,3 @@ export function FacturesTable({ data = mockFactures }: FacturesTableProps) {
     </div>
   )
 }
-
-
-
-

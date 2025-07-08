@@ -1,28 +1,15 @@
 'use client'
 
-import { Badge } from "@erp/ui"
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@erp/ui"
-import { Input } from "@erp/ui"
-import { Label } from "@erp/ui"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@erp/ui"
-import { Separator } from "@erp/ui"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@erp/ui"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@erp/ui"
 import { formatCurrency } from '@/lib/utils'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui'
+import { Label } from '@erp/ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui'
+import { Separator } from '@erp/ui'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp/ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import {
   Calculator,
   Clock,
@@ -419,7 +406,3 @@ export default function ChiffragePage() {
     </div>
   )
 }
-
-
-
-

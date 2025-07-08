@@ -26,7 +26,3 @@ export class ProjetService {
 }
 
 export const projetService = new ProjetService()
-
-
-
-

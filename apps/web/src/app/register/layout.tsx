@@ -196,7 +196,3 @@ export const runtime = 'nodejs'
 
 // Segment config pour optimiser le bundle
 export const preferredRegion = 'auto'
-
-
-
-

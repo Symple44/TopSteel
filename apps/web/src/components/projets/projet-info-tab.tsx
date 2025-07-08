@@ -1,15 +1,15 @@
 'use client'
 
-import { Badge } from "@erp/ui"
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@erp/ui"
-import { Input } from "@erp/ui"
-import { Label } from "@erp/ui"
-import { Separator } from "@erp/ui"
-import { Textarea } from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@/types'
 import { ProjetStatut } from '@erp/types'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui'
+import { Label } from '@erp/ui'
+import { Separator } from '@erp/ui'
+import { Textarea } from '@erp/ui'
 import { Building2, Calendar, Clock, Edit, Euro, Mail, MapPin, Phone, Save, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -272,7 +272,3 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
     </div>
   )
 }
-
-
-
-

@@ -326,7 +326,3 @@ export const api = {
 
 // Export par défaut
 export default api
-
-
-
-

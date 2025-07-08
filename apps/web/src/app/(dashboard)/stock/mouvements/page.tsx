@@ -7,9 +7,9 @@
 'use client'
 
 import { ClientOnly } from '@/components/client-only'
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { Download, Plus, TrendingDown, TrendingUp } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -407,6 +407,3 @@ const CreateMouvementDialog = dynamic(
 
 // Ne pas oublier l'import dynamic en haut du fichier
 import dynamic from 'next/dynamic'
-
-
-

@@ -1,9 +1,9 @@
 // apps/web/src/components/production/create-ordre-dialog.tsx
 'use client'
 
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
-import { Input } from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -157,7 +157,3 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
     </div>
   )
 }
-
-
-
-

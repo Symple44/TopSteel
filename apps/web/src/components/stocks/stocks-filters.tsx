@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from "@erp/ui"
-import { Input } from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Input } from '@erp/ui'
 import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
@@ -159,7 +159,3 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     </div>
   )
 }
-
-
-
-

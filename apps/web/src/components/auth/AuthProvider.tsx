@@ -132,7 +132,3 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>
 }
-
-
-
-

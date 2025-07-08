@@ -1,16 +1,9 @@
 'use client'
 
-import { Badge } from "@erp/ui"
-import { Button } from "@erp/ui"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp/ui'
 import { Download, Edit, Eye } from 'lucide-react'
 
 // Données mock pour encaissements
@@ -146,7 +139,3 @@ export function PaiementsTable({ type, data }: PaiementsTableProps) {
     </div>
   )
 }
-
-
-
-

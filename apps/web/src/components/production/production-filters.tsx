@@ -1,9 +1,9 @@
 // apps/web/src/components/production/production-filters.tsx
 'use client'
 
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
-import { Input } from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui'
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import { useState } from 'react'
 
@@ -139,7 +139,3 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
     </Card>
   )
 }
-
-
-
-

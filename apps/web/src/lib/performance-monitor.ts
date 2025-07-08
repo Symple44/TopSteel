@@ -441,7 +441,3 @@ export default PerformanceMonitor
 
 // ✅ SUPPRESSION DE L'INITIALISATION AUTOMATIQUE
 // L'initialisation doit être faite manuellement côté client pour éviter les erreurs SSR
-
-
-
-

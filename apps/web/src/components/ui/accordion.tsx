@@ -41,7 +41,3 @@ export const AccordionDescription = Accordion
 export const AccordionFooter = Accordion
 export const AccordionSeparator = Accordion
 export const AccordionList = Accordion
-
-
-
-

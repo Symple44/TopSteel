@@ -1,9 +1,9 @@
 'use client'
 
 import { useNotifications } from '@/components/providers/notifications-provider'
-import { Button } from "@erp/ui"
-import { Label } from "@erp/ui"
 import { cn } from '@/lib/utils'
+import { Button } from '@erp/ui'
+import { Label } from '@erp/ui'
 import { Mail, Monitor, Volume2 } from 'lucide-react'
 
 // Composant Switch inline pour éviter les problèmes de props
@@ -120,7 +120,3 @@ export function NotificationSettings() {
     </div>
   )
 }
-
-
-
-

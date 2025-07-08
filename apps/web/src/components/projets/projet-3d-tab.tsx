@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@erp/ui"
 import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 import type { Projet } from '@erp/types'
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
 import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
 
@@ -228,7 +228,3 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
     </div>
   )
 }
-
-
-
-

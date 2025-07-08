@@ -131,7 +131,3 @@ declare module '@erp/ui' {
   export const AlertDescription: React.ComponentType<{ children?: ReactNode; className?: string }>
   export const AlertTitle: React.ComponentType<{ children?: ReactNode; className?: string }>
 }
-
-
-
-

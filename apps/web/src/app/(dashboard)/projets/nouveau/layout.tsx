@@ -30,6 +30,3 @@ export default function NouveauProjetLayout({ children }: NouveauProjetLayoutPro
 }
 
 export const dynamic = 'force-dynamic'
-
-
-

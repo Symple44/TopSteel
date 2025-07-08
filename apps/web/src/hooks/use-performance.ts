@@ -35,7 +35,3 @@ export function usePerformance() {
     metrics: metrics.current,
   }
 }
-
-
-
-

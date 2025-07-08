@@ -3,9 +3,9 @@
 import { CreateDevisDialog } from '@/components/facturation/create-devis-dialog'
 import { DevisFilters } from '@/components/facturation/devis-filters'
 import { DevisTable } from '@/components/facturation/devis-table'
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
-import { Input } from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui'
 import { Clock, FileText, Filter, Plus, Search, Send } from 'lucide-react'
 import { useState } from 'react'
 
@@ -108,6 +108,3 @@ export default function DevisPage() {
     </div>
   )
 }
-
-
-

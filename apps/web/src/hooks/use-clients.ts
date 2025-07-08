@@ -867,7 +867,3 @@ export function useClients(
     metrics,
   }
 }
-
-
-
-

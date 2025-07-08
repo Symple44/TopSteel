@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
-import { Input } from "@erp/ui"
-import { Label } from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui'
+import { Label } from '@erp/ui'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -146,7 +146,3 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
     </div>
   )
 }
-
-
-
-

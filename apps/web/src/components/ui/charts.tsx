@@ -202,7 +202,3 @@ export {
   SimpleLineChart as LineChart,
   SimplePieChart as PieChart,
 }
-
-
-
-

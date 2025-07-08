@@ -1,19 +1,12 @@
 'use client'
 
-import { Badge } from "@erp/ui"
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@erp/ui"
-import { Separator } from "@erp/ui"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import { Separator } from '@erp/ui'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp/ui'
 import {
   Calculator,
   CheckCircle,
@@ -315,7 +308,3 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
     </div>
   )
 }
-
-
-
-

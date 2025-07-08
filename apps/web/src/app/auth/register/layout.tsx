@@ -49,7 +49,3 @@ interface RegisterLayoutProps {
 export default function RegisterLayout({ children }: RegisterLayoutProps) {
   return <div className="register-layout min-h-screen bg-gray-50">{children}</div>
 }
-
-
-
-

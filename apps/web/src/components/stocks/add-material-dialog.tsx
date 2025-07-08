@@ -1,8 +1,8 @@
 'use client'
 
-import { Button } from "@erp/ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
-import { Input } from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui'
 import { Package, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -128,7 +128,3 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
     </div>
   )
 }
-
-
-
-

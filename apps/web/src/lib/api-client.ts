@@ -493,7 +493,3 @@ export const apiClient = new APIClient(
 
 // ✅ TYPES EXPORTÉS
 export type { APIErrorDetails, APIMetrics, RequestConfig }
-
-
-
-

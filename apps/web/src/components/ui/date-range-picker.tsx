@@ -1,8 +1,8 @@
 'use client'
 
-import { Button } from "@erp/ui"
-import { Calendar } from "@erp/ui"
 import { cn } from '@/lib/utils'
+import { Button } from '@erp/ui'
+import { Calendar } from '@erp/ui'
 import { Calendar as CalendarIcon, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
@@ -104,7 +104,3 @@ export function DateRangePicker({
     </div>
   )
 }
-
-
-
-

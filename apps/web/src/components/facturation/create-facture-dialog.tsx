@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from "@erp/ui"
+import { Button } from '@erp/ui'
 import {
   Dialog,
   DialogContent,
@@ -8,16 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@erp/ui"
-import { Input } from "@erp/ui"
-import { Label } from "@erp/ui"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@erp/ui"
+} from '@erp/ui'
+import { Input } from '@erp/ui'
+import { Label } from '@erp/ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
@@ -149,7 +143,3 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
     </Dialog>
   )
 }
-
-
-
-

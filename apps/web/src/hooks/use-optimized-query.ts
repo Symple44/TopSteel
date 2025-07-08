@@ -125,7 +125,3 @@ export function useSmartMutation<TData, TVariables>(
     },
   })
 }
-
-
-
-

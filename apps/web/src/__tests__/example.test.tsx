@@ -14,7 +14,3 @@ describe('Example Test', () => {
     expect(container).toBeInTheDocument()
   })
 })
-
-
-
-

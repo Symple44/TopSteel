@@ -1,7 +1,7 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 import { cn } from '@/lib/utils'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import type { LucideIcon } from 'lucide-react'
 
 interface StatsCardProps {
@@ -59,7 +59,3 @@ export function StatsCard({
     </Card>
   )
 }
-
-
-
-

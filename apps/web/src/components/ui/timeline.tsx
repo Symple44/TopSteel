@@ -76,7 +76,3 @@ export function Timeline({ items, className }: TimelineProps) {
     </div>
   )
 }
-
-
-
-

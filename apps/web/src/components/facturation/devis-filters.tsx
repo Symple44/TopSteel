@@ -1,15 +1,9 @@
 // apps/web/src/components/facturation/devis-filters.tsx
 'use client'
 
-import { Button } from "@erp/ui"
-import { Input } from "@erp/ui"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@erp/ui"
+import { Button } from '@erp/ui'
+import { Input } from '@erp/ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui'
 import { Filter, Search, X } from 'lucide-react'
 
 interface DevisFiltersProps {
@@ -63,7 +57,3 @@ export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
     </div>
   )
 }
-
-
-
-

@@ -657,7 +657,3 @@ export const useProjetStats = () => useProjetStore((state) => state.stats)
 
 // ===== EXPORTS =====
 export type { ProjetState, ProjetStore, ProjetStoreActions }
-
-
-
-

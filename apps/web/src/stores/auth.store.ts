@@ -573,7 +573,3 @@ if (typeof window !== 'undefined') {
     document.addEventListener(event, handleActivity, true)
   })
 }
-
-
-
-

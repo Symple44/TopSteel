@@ -106,7 +106,3 @@ export interface Stock {
     updatedAt: string
   }
 }
-
-
-
-

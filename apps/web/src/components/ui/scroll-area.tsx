@@ -36,7 +36,3 @@ export const ScrollAreaDescription = ScrollArea
 export const ScrollAreaFooter = ScrollArea
 export const ScrollAreaSeparator = ScrollArea
 export const ScrollAreaList = ScrollArea
-
-
-
-
