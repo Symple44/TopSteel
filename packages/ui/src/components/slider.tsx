@@ -193,8 +193,7 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
     return (
       <div className="space-y-2">
         {/* Label */}
-        {label && (
-          <label
+        {label ? <label
             htmlFor={sliderId}
             className={cn(
               'text-sm font-medium leading-none',
@@ -203,9 +202,8 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
             )}
           >
             {label}
-            {props.required && <span className="text-destructive ml-1">*</span>}
-          </label>
-        )}
+            {props.required ? <span className="text-destructive ml-1">*</span> : null}
+          </label> : null}
 
         {/* Slider */}
         <SliderPrimitive.Root
@@ -234,8 +232,7 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
         </SliderPrimitive.Root>
 
         {/* Affichage des valeurs */}
-        {showValue && (
-          <div className="flex justify-between text-xs text-muted-foreground">
+        {showValue ? <div className="flex justify-between text-xs text-muted-foreground">
             <span>{formatValue(min)}</span>
             <div className="flex gap-2">
               {currentValue.map((val, index) => (
@@ -245,18 +242,15 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
               ))}
             </div>
             <span>{formatValue(max)}</span>
-          </div>
-        )}
+          </div> : null}
 
         {/* Description */}
-        {description && (
-          <p id={descriptionId} className="text-xs text-muted-foreground">
+        {description ? <p id={descriptionId} className="text-xs text-muted-foreground">
             {description}
-          </p>
-        )}
+          </p> : null}
 
         {/* Message d'erreur */}
-        {!isValid && errorMessage && <p className="text-xs text-destructive">{errorMessage}</p>}
+        {!isValid && errorMessage ? <p className="text-xs text-destructive">{errorMessage}</p> : null}
       </div>
     )
   }
@@ -310,11 +304,9 @@ export const SteppedSlider = React.forwardRef<
                 style={{ left: `${percentage}%` }}
               >
                 <div className="w-1 h-1 bg-muted-foreground rounded-full" />
-                {mark.label && (
-                  <span className="text-xs text-muted-foreground block text-center mt-1 whitespace-nowrap">
+                {mark.label ? <span className="text-xs text-muted-foreground block text-center mt-1 whitespace-nowrap">
                     {mark.label}
-                  </span>
-                )}
+                  </span> : null}
               </div>
             )
           })}

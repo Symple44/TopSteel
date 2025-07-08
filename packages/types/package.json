@@ -23,7 +23,6 @@
     "test:coverage": "jest --coverage || echo 'No tests for types package'",
     "test:unit": "jest || echo 'No tests for types package'",
     "test:integration": "echo 'No integration tests for types package'",
-    "test": "jest --config=jest.config.cjs --passWithNoTests",
     "test:watch": "jest --passWithNoTests --watch",
     "clean": "rimraf dist"
   },

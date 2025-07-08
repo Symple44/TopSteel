@@ -252,11 +252,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         </div>
 
         {/* Description cachée pour l'accessibilité */}
-        {description && (
-          <div id={`${props.id || 'card'}-description`} className="sr-only">
+        {description ? <div id={`${props.id || 'card'}-description`} className="sr-only">
             {description}
-          </div>
-        )}
+          </div> : null}
       </>
     )
   }
@@ -276,22 +274,22 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             {/* Avatar */}
-            {avatar && <div className="flex-shrink-0">{avatar}</div>}
+            {avatar ? <div className="flex-shrink-0">{avatar}</div> : null}
 
             {/* Titre et badge */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2">
                 <div className="truncate">{children}</div>
-                {badge && <div className="flex-shrink-0">{badge}</div>}
+                {badge ? <div className="flex-shrink-0">{badge}</div> : null}
               </div>
 
               {/* Sous-titre */}
-              {subtitle && <div className="text-sm text-muted-foreground mt-1">{subtitle}</div>}
+              {subtitle ? <div className="text-sm text-muted-foreground mt-1">{subtitle}</div> : null}
             </div>
           </div>
 
           {/* Actions */}
-          {actions && <div className="flex-shrink-0 ml-3">{actions}</div>}
+          {actions ? <div className="flex-shrink-0 ml-3">{actions}</div> : null}
         </div>
       </div>
     )
@@ -391,13 +389,13 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
       >
         {/* Métadonnées */}
         <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-          {author && <span>Par {author}</span>}
-          {timestamp && <span>{formatDate(timestamp)}</span>}
+          {author ? <span>Par {author}</span> : null}
+          {timestamp ? <span>{formatDate(timestamp)}</span> : null}
           {children}
         </div>
 
         {/* Actions */}
-        {actions && <div className="flex items-center space-x-2">{actions}</div>}
+        {actions ? <div className="flex items-center space-x-2">{actions}</div> : null}
       </div>
     )
   }
@@ -427,7 +425,7 @@ export const ProjectCard = React.forwardRef<
     <Card ref={ref} entityType="project" {...props}>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
+        {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
 
       <CardContent>
@@ -446,10 +444,10 @@ export const ProjectCard = React.forwardRef<
           </div>
         )}
 
-        {client && <p className="text-sm text-muted-foreground mt-2">Client: {client}</p>}
+        {client ? <p className="text-sm text-muted-foreground mt-2">Client: {client}</p> : null}
       </CardContent>
 
-      {dueDate && <CardFooter timestamp={dueDate} />}
+      {dueDate ? <CardFooter timestamp={dueDate} /> : null}
     </Card>
   )
 })
@@ -479,8 +477,7 @@ export const StatsCard = React.forwardRef<
           <div className="space-y-1">
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
             <p className="text-2xl font-bold">{value}</p>
-            {change && (
-              <p
+            {change ? <p
                 className={cn(
                   'text-xs flex items-center',
                   change.type === 'increase' ? 'text-green-600' : 'text-red-600'
@@ -496,11 +493,10 @@ export const StatsCard = React.forwardRef<
                 >
                   <path d="M10 3l7 7H3l7-7z" />
                 </svg>
-                {Math.abs(change.value)}% {change.period && `vs ${change.period}`}
-              </p>
-            )}
+                {Math.abs(change.value)}% {change.period ? `vs ${change.period}` : null}
+              </p> : null}
           </div>
-          {icon && <div className="text-muted-foreground">{icon}</div>}
+          {icon ? <div className="text-muted-foreground">{icon}</div> : null}
         </div>
       </CardContent>
     </Card>

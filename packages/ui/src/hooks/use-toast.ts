@@ -19,6 +19,10 @@ let toastCounter = 0
 export function useToast(): ToastContextType {
   const [toasts, setToasts] = useState<Toast[]>([])
 
+  const dismiss = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
+  }, [])
+
   const toast = useCallback((props: Omit<Toast, 'id'>) => {
     const id = `toast-${++toastCounter}`
     const newToast: Toast = {
@@ -30,17 +34,20 @@ export function useToast(): ToastContextType {
 
     setToasts((prev) => [...prev, newToast])
 
-    // Auto-dismiss après duration
+    // Auto-dismiss avec globalThis pour compatibilité universelle
     if (newToast.duration && newToast.duration > 0) {
-      setTimeout(() => {
+      const timeoutId = globalThis.setTimeout(() => {
         dismiss(id)
       }, newToast.duration)
+      
+      // Retourner une fonction de nettoyage
+      return () => {
+        if (typeof globalThis.clearTimeout !== 'undefined') {
+          globalThis.clearTimeout(timeoutId)
+        }
+      }
     }
-  }, [])
-
-  const dismiss = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id))
-  }, [])
+  }, [dismiss])
 
   return {
     toasts,
@@ -49,7 +56,7 @@ export function useToast(): ToastContextType {
   }
 }
 
-// Hook pour les toasts simples
+// Hook pour les toasts simples avec types stricts
 export function useSimpleToast() {
   const { toast } = useToast()
 
@@ -60,6 +67,3 @@ export function useSimpleToast() {
     info: (message: string) => toast({ description: message, variant: 'default' }),
   }
 }
-
-// Export pour compatibilité
-export { useToast as toast }

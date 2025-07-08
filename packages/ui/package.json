@@ -66,7 +66,10 @@
     "analyze": "vite-bundle-analyzer dist/stats.html",
     "prepublishOnly": "pnpm run build && pnpm run test && pnpm run size-check",
     "validate": "pnpm run type-check && pnpm run lint && pnpm run test",
-    "bundle:analyze": "vite-bundle-analyzer"
+    "bundle:analyze": "vite-bundle-analyzer",
+    "lint:check": "node scripts/check-eslint.mjs",
+    "lint:fix-auto": "node scripts/check-eslint.mjs --fix",
+    "pre-commit": "pnpm lint:check && pnpm type-check"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
@@ -197,3 +200,5 @@
     "url": "https://topsteel.com"
   }
 }
+
+

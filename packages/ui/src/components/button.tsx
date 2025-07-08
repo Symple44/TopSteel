@@ -284,11 +284,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         if (confirmAction && !isConfirming) {
           e.preventDefault()
-          if (window.confirm(confirmMessage)) {
+          if (typeof window !== "undefined" && typeof window !== "undefined" && globalThis.window?.confirm(confirmMessage)) {
             setIsConfirming(true)
             onClick?.(e)
             // Reset confirming state after action
-            setTimeout(() => setIsConfirming(false), 100)
+            globalThis.setTimeout(() => setIsConfirming(false), 100)
           }
 
           return
@@ -303,27 +303,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const content = (
       <>
         {/* Icône de début ou spinner de chargement */}
-        {finalIcon && iconPosition === 'start' && !loading && (
-          <span className={cn('flex-shrink-0', children ? 'mr-2' : '')}>{finalIcon}</span>
-        )}
+        {finalIcon && iconPosition === 'start' && !loading ? <span className={cn('flex-shrink-0', children ? 'mr-2' : '')}>{finalIcon}</span> : null}
 
-        {loading && (
-          <span className={cn('flex-shrink-0', children || loadingText ? 'mr-2' : '')}>
+        {loading ? <span className={cn('flex-shrink-0', children || loadingText ? 'mr-2' : '')}>
             <LoadingSpinner
               size={size === 'sm' ? 'sm' : size === 'lg' || size === 'xl' ? 'lg' : 'md'}
             />
-          </span>
-        )}
+          </span> : null}
 
         {/* Texte principal */}
-        {(children || loadingText) && (
-          <span className="truncate">{loading && loadingText ? loadingText : children}</span>
-        )}
+        {(children || loadingText) ? <span className="truncate">{loading && loadingText ? loadingText : children}</span> : null}
 
         {/* Icône de fin */}
-        {finalIcon && iconPosition === 'end' && !loading && (
-          <span className={cn('flex-shrink-0', children ? 'ml-2' : '')}>{finalIcon}</span>
-        )}
+        {finalIcon && iconPosition === 'end' && !loading ? <span className={cn('flex-shrink-0', children ? 'ml-2' : '')}>{finalIcon}</span> : null}
       </>
     )
 
@@ -369,11 +361,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </button>
 
         {/* Description en tooltip ou aide */}
-        {description && (
-          <div id={`${props.id || 'button'}-description`} className="sr-only">
+        {description ? <div id={`${props.id || 'button'}-description`} className="sr-only">
             {description}
-          </div>
-        )}
+          </div> : null}
       </>
     )
   }
@@ -448,6 +438,10 @@ IconButton.displayName = 'IconButton'
 // =============================================
 
 export { Button, buttonVariants }
+
+
+
+
 
 
 

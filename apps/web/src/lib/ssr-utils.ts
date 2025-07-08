@@ -273,7 +273,7 @@ export function useHydrationSafe<T>(
           setValue(serverValue)
         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
     },
     deps ? [mounted, serverValue, clientValue, ...deps] : [mounted, serverValue, clientValue]
   )

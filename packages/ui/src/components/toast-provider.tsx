@@ -72,8 +72,8 @@ function ToastComponent({ toast, onDismiss }: ToastComponentProps) {
     >
       <div className="flex justify-between items-start">
         <div className="flex-1">
-          {toast.title && <h4 className="font-semibold text-sm">{toast.title}</h4>}
-          {toast.description && <p className="text-sm mt-1">{toast.description}</p>}
+          {toast.title ? <h4 className="font-semibold text-sm">{toast.title}</h4> : null}
+          {toast.description ? <p className="text-sm mt-1">{toast.description}</p> : null}
         </div>
         <button
           onClick={() => onDismiss(toast.id)}

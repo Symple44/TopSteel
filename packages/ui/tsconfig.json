@@ -62,7 +62,9 @@
     "src/**/*",
     "src/**/*.json",
     "**/*.d.ts",
-    "src/stories/**/*"
+    "src/stories/**/*",
+    "src/**/*.stories.ts",
+    "src/**/*.stories.tsx"
   ],
   "exclude": [
     "node_modules",
@@ -80,7 +82,8 @@
     "**/*.stories.tsx",
     "**/stories/**/*",
     ".storybook",
-    "storybook-static"
+    "storybook-static",
+    "src/stories/**/*"
   ],
   "references": []
 }
