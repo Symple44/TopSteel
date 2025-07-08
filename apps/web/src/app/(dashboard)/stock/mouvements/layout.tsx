@@ -12,19 +12,20 @@ import type { ReactNode } from 'react'
 export const metadata: Metadata = {
   title: {
     default: 'Mouvements de Stock',
-    template: '%s | Mouvements de Stock | TopSteel ERP'
+    template: '%s | Mouvements de Stock | TopSteel ERP',
   },
-  description: 'Historique et suivi des entrées/sorties de stock - Gestion des mouvements d\'inventaire TopSteel',
+  description:
+    "Historique et suivi des entrées/sorties de stock - Gestion des mouvements d'inventaire TopSteel",
   keywords: [
-    'stock', 
-    'mouvement', 
-    'entrée', 
-    'sortie', 
-    'transfert', 
+    'stock',
+    'mouvement',
+    'entrée',
+    'sortie',
+    'transfert',
     'inventaire',
     'TopSteel',
     'ERP',
-    'gestion'
+    'gestion',
   ],
   authors: [{ name: 'TopSteel' }],
   creator: 'TopSteel ERP',
@@ -35,16 +36,16 @@ export const metadata: Metadata = {
     follow: false,
     googleBot: {
       index: false,
-      follow: false
-    }
+      follow: false,
+    },
   },
   openGraph: {
     type: 'website',
     siteName: 'TopSteel ERP',
     title: 'Mouvements de Stock',
     description: 'Gestion des mouvements de stock et inventaire',
-    locale: 'fr_FR'
-  }
+    locale: 'fr_FR',
+  },
 }
 
 // ===== VIEWPORT SÉPARÉ (Next.js 15) =====
@@ -56,9 +57,9 @@ export const viewport: Viewport = {
   userScalable: false, // Empêche le zoom sur mobile pour une expérience app-like
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' }
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
   ],
-  colorScheme: 'light dark'
+  colorScheme: 'light dark',
 }
 
 // ===== TYPES =====
@@ -110,14 +111,14 @@ export default function MouvementsLayout({ children }: MouvementsLayoutProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "TopSteel ERP - Mouvements de Stock",
-            "description": "Module de gestion des mouvements de stock",
-            "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Web",
-            "applicationSubCategory": "ERP"
-          })
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: 'TopSteel ERP - Mouvements de Stock',
+            description: 'Module de gestion des mouvements de stock',
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'Web',
+            applicationSubCategory: 'ERP',
+          }),
         }}
       />
     </div>

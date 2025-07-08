@@ -14,7 +14,7 @@ interface UIState {
   sidebarCollapsed: boolean
   dataView: 'grid' | 'table'
   toasts: Toast[]
-  
+
   // Actions
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
@@ -33,8 +33,8 @@ export const useUIStore = create<UIState>()(
       toasts: [],
 
       toggleSidebar: () => {
-        set(state => ({ 
-          sidebarCollapsed: !state.sidebarCollapsed 
+        set((state) => ({
+          sidebarCollapsed: !state.sidebarCollapsed,
         }))
       },
 
@@ -50,13 +50,13 @@ export const useUIStore = create<UIState>()(
         const newToast: Toast = {
           ...toast,
           id: Date.now().toString(),
-          timestamp: Date.now()
+          timestamp: Date.now(),
         }
-        
-        set(state => ({
-          toasts: [...state.toasts, newToast]
+
+        set((state) => ({
+          toasts: [...state.toasts, newToast],
         }))
-        
+
         // Auto-remove après 5 secondes
         setTimeout(() => {
           get().removeToast(newToast.id)
@@ -64,8 +64,8 @@ export const useUIStore = create<UIState>()(
       },
 
       removeToast: (id) => {
-        set(state => ({
-          toasts: state.toasts.filter(toast => toast.id !== id)
+        set((state) => ({
+          toasts: state.toasts.filter((toast) => toast.id !== id),
         }))
       },
 
@@ -73,7 +73,7 @@ export const useUIStore = create<UIState>()(
         get().addToast({
           type: 'success',
           title,
-          message: message || ''
+          message: message || '',
         })
       },
 
@@ -81,7 +81,7 @@ export const useUIStore = create<UIState>()(
         get().addToast({
           type: 'error',
           title,
-          message: message || ''
+          message: message || '',
         })
       },
     }),

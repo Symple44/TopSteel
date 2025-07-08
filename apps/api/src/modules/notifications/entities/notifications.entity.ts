@@ -1,40 +1,40 @@
-import { Column, Entity, Index } from "typeorm";
-import { BaseAuditEntity } from "../../../common/base/base.entity";
+import { Column, Entity, Index } from 'typeorm'
+import { BaseAuditEntity } from '../../../common/base/base.entity'
 
 export enum NotificationType {
-  INFO = "INFO",
-  WARNING = "WARNING",
-  ERROR = "ERROR",
-  SUCCESS = "SUCCESS",
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS',
 }
 
-@Entity("notifications")
+@Entity('notifications')
 export class Notifications extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()
-  nom!: string;
+  nom!: string
 
-  @Column({ type: "text", nullable: true })
-  description?: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: NotificationType,
     default: NotificationType.INFO,
   })
-  type!: NotificationType;
+  type!: NotificationType
 
   @Column({ default: true })
   @Index()
-  actif!: boolean;
+  actif!: boolean
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any>
 }
 
 export enum NotificationsStatut {
-  ACTIF = "ACTIF",
-  INACTIF = "INACTIF",
-  ARCHIVE = "ARCHIVE",
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE',
 }

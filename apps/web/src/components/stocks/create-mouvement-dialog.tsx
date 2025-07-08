@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -15,9 +15,7 @@ export function CreateMouvementDialog({ open, onOpenChange }: CreateMouvementDia
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
         <h2 className="text-lg font-semibold mb-4">Nouveau Mouvement</h2>
-        <p className="text-muted-foreground mb-4">
-          Fonctionnalité en cours de développement
-        </p>
+        <p className="text-muted-foreground mb-4">Fonctionnalité en cours de développement</p>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange?.(false)}>
             Fermer

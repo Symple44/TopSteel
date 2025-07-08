@@ -60,7 +60,7 @@ module.exports = {
           DEFAULT: 'hsl(var(--info))',
           foreground: 'hsl(var(--info-foreground))',
         },
-        
+
         // ===== DESIGN SYSTEM ERP - COULEURS MÉTIER =====
         metallurgy: {
           50: 'hsl(var(--metallurgy-50))',
@@ -88,7 +88,7 @@ module.exports = {
           900: 'hsl(var(--steel-900))',
           950: 'hsl(var(--steel-950))',
         },
-        
+
         // ===== ÉTATS MÉTIER ERP =====
         status: {
           draft: {
@@ -120,7 +120,7 @@ module.exports = {
             foreground: 'hsl(var(--status-archived-foreground))',
           },
         },
-        
+
         // ===== PRIORITÉS =====
         priority: {
           low: {
@@ -152,7 +152,7 @@ module.exports = {
           border: 'hsl(var(--chart-border))',
         },
       },
-      
+
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -174,54 +174,54 @@ module.exports = {
 
       // Animations de base pour le design system
       keyframes: {
-        "fade-in": {
+        'fade-in': {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
-        "slide-in": {
-          from: { 
-            opacity: '0', 
-            transform: 'translateY(-10px)' 
+        'slide-in': {
+          from: {
+            opacity: '0',
+            transform: 'translateY(-10px)',
           },
-          to: { 
-            opacity: '1', 
-            transform: 'translateY(0)' 
+          to: {
+            opacity: '1',
+            transform: 'translateY(0)',
           },
         },
-        "pulse-gentle": {
+        'pulse-gentle': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.85' },
         },
-        "status-change": {
+        'status-change': {
           '0%': { transform: 'scale(1)' },
           '50%': { transform: 'scale(1.05)' },
           '100%': { transform: 'scale(1)' },
         },
-        "priority-pulse": {
-          '0%, 100%': { 
-            boxShadow: '0 0 0 0 hsl(var(--priority-high) / 0.7)' 
+        'priority-pulse': {
+          '0%, 100%': {
+            boxShadow: '0 0 0 0 hsl(var(--priority-high) / 0.7)',
           },
-          '70%': { 
-            boxShadow: '0 0 0 10px hsl(var(--priority-high) / 0)' 
+          '70%': {
+            boxShadow: '0 0 0 10px hsl(var(--priority-high) / 0)',
           },
         },
       },
 
       animation: {
-        "fade-in": "fade-in 0.5s ease-in-out",
-        "slide-in": "slide-in 0.2s ease-out",
-        "pulse-gentle": "pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "status-change": "status-change 0.3s ease-in-out",
-        "priority-pulse": "priority-pulse 1.5s ease-in-out infinite",
+        'fade-in': 'fade-in 0.5s ease-in-out',
+        'slide-in': 'slide-in 0.2s ease-out',
+        'pulse-gentle': 'pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'status-change': 'status-change 0.3s ease-in-out',
+        'priority-pulse': 'priority-pulse 1.5s ease-in-out infinite',
       },
 
       // Espacement spécialisé pour les interfaces ERP
       spacing: {
-        '15': '3.75rem',
-        '18': '4.5rem',
-        '72': '18rem',
-        '84': '21rem',
-        '96': '24rem',
+        15: '3.75rem',
+        18: '4.5rem',
+        72: '18rem',
+        84: '21rem',
+        96: '24rem',
       },
 
       // Tailles spécialisées pour les dashboards
@@ -232,16 +232,16 @@ module.exports = {
 
       // Z-index pour les interfaces complexes
       zIndex: {
-        '60': '60',
-        '70': '70',
-        '80': '80',
-        '90': '90',
-        '100': '100',
+        60: '60',
+        70: '70',
+        80: '80',
+        90: '90',
+        100: '100',
       },
 
       // Box shadow pour les cartes et composants métier
       boxShadow: {
-        'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        card: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
         'priority-critical': '0 0 0 2px hsl(var(--priority-critical) / 0.5)',
         'status-active': '0 0 0 2px hsl(var(--status-active) / 0.3)',
@@ -254,15 +254,15 @@ module.exports = {
 
       // Propriétés de transition pour les interactions ERP
       transitionProperty: {
-        'height': 'height',
-        'spacing': 'margin, padding',
-        'colors': 'color, background-color, border-color, text-decoration-color, fill, stroke',
+        height: 'height',
+        spacing: 'margin, padding',
+        colors: 'color, background-color, border-color, text-decoration-color, fill, stroke',
       },
 
       // Variables d'espacement pour les grilles de données
       gridTemplateColumns: {
-        'table': 'repeat(auto-fit, minmax(150px, 1fr))',
-        'dashboard': 'repeat(auto-fit, minmax(300px, 1fr))',
+        table: 'repeat(auto-fit, minmax(150px, 1fr))',
+        dashboard: 'repeat(auto-fit, minmax(300px, 1fr))',
       },
     },
   },

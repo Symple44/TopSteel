@@ -1,5 +1,7 @@
 'use client'
 
+import { Calendar, Filter, Plus, Search, TrendingDown, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
 import { CreatePaiementDialog } from '@/components/facturation/create-paiement-dialog'
 import { PaiementsChart } from '@/components/facturation/paiements-chart'
 import { PaiementsTable } from '@/components/facturation/paiements-table'
@@ -8,8 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Calendar, Filter, Plus, Search, TrendingDown, TrendingUp } from 'lucide-react'
-import { useState } from 'react'
 
 export default function PaiementsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -21,9 +21,7 @@ export default function PaiementsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Gestion des Paiements</h1>
-          <p className="text-muted-foreground">
-            Encaissements, décaissements et rapprochements
-          </p>
+          <p className="text-muted-foreground">Encaissements, décaissements et rapprochements</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
@@ -105,10 +103,7 @@ export default function PaiementsPage() {
           <div className="flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher par client, facture..."
-                className="pl-10"
-              />
+              <Input placeholder="Rechercher par client, facture..." className="pl-10" />
             </div>
             <Button variant="outline">
               <Filter className="h-4 w-4 mr-2" />
@@ -122,10 +117,7 @@ export default function PaiementsPage() {
           <div className="flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher par fournisseur, facture..."
-                className="pl-10"
-              />
+              <Input placeholder="Rechercher par fournisseur, facture..." className="pl-10" />
             </div>
             <Button variant="outline">
               <Filter className="h-4 w-4 mr-2" />
@@ -141,10 +133,7 @@ export default function PaiementsPage() {
       </Tabs>
 
       {/* Modal */}
-      <CreatePaiementDialog 
-        open={showCreateModal} 
-        onOpenChange={setShowCreateModal} 
-      />
+      <CreatePaiementDialog open={showCreateModal} onOpenChange={setShowCreateModal} />
     </div>
   )
 }

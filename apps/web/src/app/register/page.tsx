@@ -6,12 +6,6 @@
  * Fichier: apps/web/src/app/register/page.tsx
  */
 
-import { ClientOnly } from '@/components/client-only'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Building2, CheckCircle, Eye, EyeOff, Loader2, Mail, User } from 'lucide-react'
 import Link from 'next/link'
@@ -19,42 +13,69 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { ClientOnly } from '@/components/client-only'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 // ===== SCHÉMA DE VALIDATION =====
 
-const registerSchema = z.object({
-  firstName: z.string()
-    .min(2, 'Le prénom doit contenir au moins 2 caractères')
-    .max(50, 'Le prénom ne peut pas dépasser 50 caractères')
-    .regex(/^[a-zA-ZÀ-ÿ\s-']+$/, 'Le prénom ne peut contenir que des lettres'),
-  
-  lastName: z.string()
-    .min(2, 'Le nom doit contenir au moins 2 caractères')
-    .max(50, 'Le nom ne peut pas dépasser 50 caractères')
-    .regex(/^[a-zA-ZÀ-ÿ\s-']+$/, 'Le nom ne peut contenir que des lettres'),
-  
-  email: z.string()
-    .email('Email invalide')
-    .min(5, 'L\'email doit contenir au moins 5 caractères')
-    .max(255, 'L\'email ne peut pas dépasser 255 caractères'),
-  
-  password: z.string()
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-    .max(128, 'Le mot de passe ne peut pas dépasser 128 caractères')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre'),
-  
-  confirmPassword: z.string(),
-  
-  company: z.string()
-    .optional()
-    .refine(val => !val || val.length >= 2, 'Le nom d\'entreprise doit contenir au moins 2 caractères'),
-  
-  acceptTerms: z.boolean()
-    .refine(val => val === true, 'Vous devez accepter les conditions d\'utilisation')
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
-  path: ["confirmPassword"],
-})
+const registerSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, 'Le prénom doit contenir au moins 2 caractères')
+      .max(50, 'Le prénom ne peut pas dépasser 50 caractères')
+      .regex(/^[a-zA-ZÀ-ÿ\s-']+$/, 'Le prénom ne peut contenir que des lettres'),
+
+    lastName: z
+      .string()
+      .min(2, 'Le nom doit contenir au moins 2 caractères')
+      .max(50, 'Le nom ne peut pas dépasser 50 caractères')
+      .regex(/^[a-zA-ZÀ-ÿ\s-']+$/, 'Le nom ne peut contenir que des lettres'),
+
+    email: z
+      .string()
+      .email('Email invalide')
+      .min(5, "L'email doit contenir au moins 5 caractères")
+      .max(255, "L'email ne peut pas dépasser 255 caractères"),
+
+    password: z
+      .string()
+      .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+      .max(128, 'Le mot de passe ne peut pas dépasser 128 caractères')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        'Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre'
+      ),
+
+    confirmPassword: z.string(),
+
+    company: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || val.length >= 2,
+        "Le nom d'entreprise doit contenir au moins 2 caractères"
+      ),
+
+    acceptTerms: z
+      .boolean()
+      .refine((val) => val === true, "Vous devez accepter les conditions d'utilisation"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Les mots de passe ne correspondent pas',
+    path: ['confirmPassword'],
+  })
 
 type RegisterFormData = z.infer<typeof registerSchema>
 
@@ -80,7 +101,7 @@ export default function RegisterPage() {
   const [state, setState] = useState<RegisterState>({
     isLoading: false,
     error: null,
-    success: false
+    success: false,
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -97,7 +118,7 @@ export default function RegisterPage() {
     formState: { errors, isValid },
     setError: setFieldError,
     reset,
-    watch
+    watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     mode: 'onChange',
@@ -108,8 +129,8 @@ export default function RegisterPage() {
       password: '',
       confirmPassword: '',
       company: '',
-      acceptTerms: false
-    }
+      acceptTerms: false,
+    },
   })
 
   // Observer les changements de mot de passe pour validation en temps réel
@@ -118,112 +139,113 @@ export default function RegisterPage() {
   // ===== GESTIONNAIRES D'ÉVÉNEMENTS =====
 
   const setError = useCallback((error: RegisterError) => {
-    setState(prev => ({ ...prev, error, isLoading: false }))
+    setState((prev) => ({ ...prev, error, isLoading: false }))
   }, [])
 
   const clearError = useCallback(() => {
-    setState(prev => ({ ...prev, error: null }))
+    setState((prev) => ({ ...prev, error: null }))
   }, [])
 
   const togglePasswordVisibility = useCallback(() => {
-    setShowPassword(prev => !prev)
+    setShowPassword((prev) => !prev)
   }, [])
 
   const toggleConfirmPasswordVisibility = useCallback(() => {
-    setShowConfirmPassword(prev => !prev)
+    setShowConfirmPassword((prev) => !prev)
   }, [])
 
-  const onSubmit = useCallback(async (data: RegisterFormData) => {
-    clearError()
-    setState(prev => ({ ...prev, isLoading: true }))
+  const onSubmit = useCallback(
+    async (data: RegisterFormData) => {
+      clearError()
+      setState((prev) => ({ ...prev, isLoading: true }))
 
-    try {
-      // Simulation d'appel API - remplacer par votre logique
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: data.firstName.trim(),
-          lastName: data.lastName.trim(),
-          email: data.email.toLowerCase().trim(),
-          password: data.password,
-          company: data.company?.trim() || null
+      try {
+        // Simulation d'appel API - remplacer par votre logique
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: data.firstName.trim(),
+            lastName: data.lastName.trim(),
+            email: data.email.toLowerCase().trim(),
+            password: data.password,
+            company: data.company?.trim() || null,
+          }),
         })
-      })
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        
-        if (response.status === 400) {
-          if (errorData.field) {
-            setFieldError(errorData.field, { message: errorData.message })
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+
+          if (response.status === 400) {
+            if (errorData.field) {
+              setFieldError(errorData.field, { message: errorData.message })
+              setError({
+                type: 'validation',
+                message: errorData.message,
+                field: errorData.field,
+              })
+            } else {
+              setError({
+                type: 'validation',
+                message: errorData.message || 'Données invalides',
+              })
+            }
+          } else if (response.status === 409) {
             setError({
               type: 'validation',
-              message: errorData.message,
-              field: errorData.field
+              message: 'Cette adresse email est déjà utilisée',
+              field: 'email',
             })
+            setFieldError('email', { message: 'Cette adresse email est déjà utilisée' })
           } else {
             setError({
-              type: 'validation',
-              message: errorData.message || 'Données invalides'
+              type: 'server',
+              message: 'Erreur serveur. Veuillez réessayer plus tard.',
             })
           }
-        } else if (response.status === 409) {
-          setError({
-            type: 'validation',
-            message: 'Cette adresse email est déjà utilisée',
-            field: 'email'
-          })
-          setFieldError('email', { message: 'Cette adresse email est déjà utilisée' })
-        } else {
-          setError({
-            type: 'server',
-            message: 'Erreur serveur. Veuillez réessayer plus tard.'
-          })
+
+          return
         }
 
-        return
+        const result = await response.json()
+
+        setState((prev) => ({ ...prev, success: true, isLoading: false }))
+
+        // Redirection après succès
+        setTimeout(() => {
+          router.push('/login?message=Inscription réussie ! Vous pouvez maintenant vous connecter.')
+        }, 2000)
+      } catch (error) {
+        console.error("Erreur lors de l'inscription:", error)
+        setError({
+          type: 'network',
+          message: 'Problème de connexion. Vérifiez votre connexion internet et réessayez.',
+        })
       }
-
-      const result = await response.json()
-      
-      setState(prev => ({ ...prev, success: true, isLoading: false }))
-      
-      // Redirection après succès
-      setTimeout(() => {
-        router.push('/login?message=Inscription réussie ! Vous pouvez maintenant vous connecter.')
-      }, 2000)
-
-    } catch (error) {
-      console.error('Erreur lors de l\'inscription:', error)
-      setError({
-        type: 'network',
-        message: 'Problème de connexion. Vérifiez votre connexion internet et réessayez.'
-      })
-    }
-  }, [clearError, router, setFieldError, setError])
+    },
+    [clearError, router, setFieldError, setError]
+  )
 
   // ===== FONCTION DE VALIDATION DE LA FORCE DU MOT DE PASSE =====
 
   const getPasswordStrength = useCallback((password: string) => {
     if (!password) return { score: 0, text: '', color: '' }
-    
+
     let score = 0
     const checks = [
-
       password.length >= 8,
 
       /[a-z]/.test(password),
       /[A-Z]/.test(password),
       /\d/.test(password),
       /[!@#$%^&*(),.?":{}|<>]/.test(password),
-      password.length >= 12
+      password.length >= 12,
     ]
-    
+
     score = checks.filter(Boolean).length
-    
+
     if (score < 3) return { score, text: 'Faible', color: 'text-red-500' }
     if (score < 5) return { score, text: 'Moyen', color: 'text-yellow-500' }
 
@@ -258,9 +280,7 @@ export default function RegisterPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">
-              Créer un compte
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Créer un compte</CardTitle>
             <CardDescription className="text-center">
               Rejoignez TopSteel ERP pour gérer votre entreprise
             </CardDescription>
@@ -344,9 +364,7 @@ export default function RegisterPage() {
                   />
                   <Mail className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
                 </div>
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
-                )}
+                {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
               </div>
 
               {/* Entreprise (optionnel) */}
@@ -363,9 +381,7 @@ export default function RegisterPage() {
                   />
                   <Building2 className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
                 </div>
-                {errors.company && (
-                  <p className="text-sm text-red-500">{errors.company.message}</p>
-                )}
+                {errors.company && <p className="text-sm text-red-500">{errors.company.message}</p>}
               </div>
 
               {/* Mot de passe */}
@@ -393,21 +409,27 @@ export default function RegisterPage() {
                 </div>
                 {password && (
                   <div className="flex items-center space-x-2 text-sm">
-                    <div className={`flex-1 h-1 rounded ${
-                      passwordStrength.score < 3 ? 'bg-red-200' :
-                      passwordStrength.score < 5 ? 'bg-yellow-200' : 'bg-green-200'
-                    }`}>
-                      <div 
+                    <div
+                      className={`flex-1 h-1 rounded ${
+                        passwordStrength.score < 3
+                          ? 'bg-red-200'
+                          : passwordStrength.score < 5
+                            ? 'bg-yellow-200'
+                            : 'bg-green-200'
+                      }`}
+                    >
+                      <div
                         className={`h-full rounded transition-all duration-300 ${
-                          passwordStrength.score < 3 ? 'bg-red-500' :
-                          passwordStrength.score < 5 ? 'bg-yellow-500' : 'bg-green-500'
+                          passwordStrength.score < 3
+                            ? 'bg-red-500'
+                            : passwordStrength.score < 5
+                              ? 'bg-yellow-500'
+                              : 'bg-green-500'
                         }`}
                         style={{ width: `${(passwordStrength.score / 6) * 100}%` }}
                       />
                     </div>
-                    <span className={passwordStrength.color}>
-                      {passwordStrength.text}
-                    </span>
+                    <span className={passwordStrength.color}>{passwordStrength.text}</span>
                   </div>
                 )}
                 {errors.password && (
@@ -454,16 +476,16 @@ export default function RegisterPage() {
                 />
                 <Label htmlFor="acceptTerms" className="text-sm">
                   J'accepte les{' '}
-                  <Link 
-                    href="/terms" 
+                  <Link
+                    href="/terms"
                     className="text-blue-600 hover:text-blue-500 underline"
                     target="_blank"
                   >
                     conditions d'utilisation
                   </Link>{' '}
                   et la{' '}
-                  <Link 
-                    href="/privacy" 
+                  <Link
+                    href="/privacy"
                     className="text-blue-600 hover:text-blue-500 underline"
                     target="_blank"
                   >
@@ -478,11 +500,7 @@ export default function RegisterPage() {
             </CardContent>
 
             <CardFooter className="flex flex-col space-y-4">
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={state.isLoading || !isValid}
-              >
+              <Button type="submit" className="w-full" disabled={state.isLoading || !isValid}>
                 {state.isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -495,8 +513,8 @@ export default function RegisterPage() {
 
               <div className="text-center text-sm text-gray-600">
                 Vous avez déjà un compte ?{' '}
-                <Link 
-                  href="/login" 
+                <Link
+                  href="/login"
                   className="text-blue-600 hover:text-blue-500 underline font-medium"
                 >
                   Se connecter

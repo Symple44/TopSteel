@@ -1,5 +1,7 @@
 'use client'
 
+import { AlertTriangle, ChevronDown, Search } from 'lucide-react'
+import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -16,8 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { AlertTriangle, ChevronDown, Search } from 'lucide-react'
-import * as React from 'react'
 
 // ===== TYPES ROBUSTES =====
 interface Column {
@@ -71,7 +71,7 @@ const useDataTableState = (columns: Column[]) => {
   const [visibleColumns, setVisibleColumns] = React.useState<Record<string, boolean>>(() => {
     const initialState: Record<string, boolean> = {}
 
-    columns.forEach(col => {
+    columns.forEach((col) => {
       initialState[col.key] = true // Valeur explicite, pas undefined
     })
 
@@ -82,27 +82,26 @@ const useDataTableState = (columns: Column[]) => {
   const [columnFilters, setColumnFilters] = React.useState<Record<string, string[]>>({})
 
   const toggleColumnVisibility = React.useCallback((columnKey: string) => {
-    setVisibleColumns(prev => ({
+    setVisibleColumns((prev) => ({
       ...prev,
-      [columnKey]: !ensureBooleanValue(prev[columnKey])
+      [columnKey]: !ensureBooleanValue(prev[columnKey]),
     }))
   }, [])
 
-  const handleColumnFilterChange = React.useCallback((
-    columnId: string, 
-    value: string, 
-    checked: boolean
-  ) => {
-    setColumnFilters(prev => {
-      const current = prev[columnId] ?? []
+  const handleColumnFilterChange = React.useCallback(
+    (columnId: string, value: string, checked: boolean) => {
+      setColumnFilters((prev) => {
+        const current = prev[columnId] ?? []
 
-      if (checked) {
-        return { ...prev, [columnId]: [...current, value] }
-      } else {
-        return { ...prev, [columnId]: current.filter(v => v !== value) }
-      }
-    })
-  }, [])
+        if (checked) {
+          return { ...prev, [columnId]: [...current, value] }
+        } else {
+          return { ...prev, [columnId]: current.filter((v) => v !== value) }
+        }
+      })
+    },
+    []
+  )
 
   return {
     visibleColumns,
@@ -110,7 +109,7 @@ const useDataTableState = (columns: Column[]) => {
     columnFilters,
     setSearchTerm,
     toggleColumnVisibility,
-    handleColumnFilterChange
+    handleColumnFilterChange,
   }
 }
 
@@ -123,17 +122,14 @@ const useFilteredData = (
 ) => {
   return React.useMemo(() => {
     try {
-
       let filtered = [...data] // Copie pour éviter les mutations
-
-
 
       // Recherche textuelle avec protection
       if (searchTerm.trim() && searchableColumns.length > 0) {
         const normalizedSearch = searchTerm.toLowerCase().trim()
 
-        filtered = filtered.filter(item =>
-          searchableColumns.some(column => {
+        filtered = filtered.filter((item) =>
+          searchableColumns.some((column) => {
             const value = safeGetItemValue(item, column)
 
             return value.toLowerCase().includes(normalizedSearch)
@@ -144,7 +140,7 @@ const useFilteredData = (
       // Filtres par colonnes avec protection
       Object.entries(columnFilters).forEach(([column, values]) => {
         if (Array.isArray(values) && values.length > 0) {
-          filtered = filtered.filter(item => {
+          filtered = filtered.filter((item) => {
             const itemValue = safeGetItemValue(item, column)
 
             return values.includes(itemValue)
@@ -168,9 +164,9 @@ export function DataTable({
   searchableColumns = [],
   filterableColumns = [],
   loading = false,
-  emptyStateMessage = "Aucun résultat trouvé",
+  emptyStateMessage = 'Aucun résultat trouvé',
   errorState = null,
-  onRowClick
+  onRowClick,
 }: DataTableProps) {
   const {
     visibleColumns,
@@ -178,7 +174,7 @@ export function DataTable({
     columnFilters,
     setSearchTerm,
     toggleColumnVisibility,
-    handleColumnFilterChange
+    handleColumnFilterChange,
   } = useDataTableState(columns)
 
   const filteredData = useFilteredData(data, searchTerm, columnFilters, searchableColumns)
@@ -221,7 +217,7 @@ export function DataTable({
   }
 
   // Colonnes visibles avec protection
-  const visibleColumnsArray = columns.filter(column => 
+  const visibleColumnsArray = columns.filter((column) =>
     isValidColumnState(visibleColumns, column.key)
   )
 
@@ -256,7 +252,7 @@ export function DataTable({
                 {filterColumn.options.map((option) => {
                   const currentFilters = columnFilters[filterColumn.id] ?? []
                   const isChecked = currentFilters.includes(option.value)
-                  
+
                   return (
                     <DropdownMenuCheckboxItem
                       key={option.value}
@@ -286,7 +282,7 @@ export function DataTable({
             {columns.map((column) => {
               // CORRECTION PRINCIPALE: Garantie que checked est toujours boolean
               const isVisible = ensureBooleanValue(visibleColumns[column.key])
-              
+
               return (
                 <DropdownMenuCheckboxItem
                   key={column.key}
@@ -318,24 +314,23 @@ export function DataTable({
           <TableBody>
             {filteredData.length > 0 ? (
               filteredData.map((item, index) => (
-                <TableRow 
+                <TableRow
                   key={item.id ?? `row-${index}`}
-                  className={onRowClick ? "cursor-pointer hover:bg-muted/50" : undefined}
+                  className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : undefined}
                   onClick={() => onRowClick?.(item)}
                 >
                   {visibleColumnsArray.map((column) => (
                     <TableCell key={`${column.key}-${index}`}>
-                      {column.render 
+                      {column.render
                         ? column.render(item[column.key], item)
-                        : safeGetItemValue(item, column.key) || '-'
-                      }
+                        : safeGetItemValue(item, column.key) || '-'}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell 
+                <TableCell
                   colSpan={visibleColumnsArray.length}
                   className="h-24 text-center text-muted-foreground"
                 >
@@ -351,12 +346,13 @@ export function DataTable({
       {filteredData.length > 0 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>
-            {filteredData.length} résultat{filteredData.length > 1 ? 's' : ''} affiché{filteredData.length > 1 ? 's' : ''}
+            {filteredData.length} résultat{filteredData.length > 1 ? 's' : ''} affiché
+            {filteredData.length > 1 ? 's' : ''}
             {filteredData.length !== data.length && ` sur ${data.length} total`}
           </span>
-          
+
           {/* Indicateurs de filtres actifs */}
-          {(searchTerm || Object.values(columnFilters).some(f => f.length > 0)) && (
+          {(searchTerm || Object.values(columnFilters).some((f) => f.length > 0)) && (
             <div className="flex items-center gap-2">
               <span className="text-xs">Filtres actifs:</span>
               {searchTerm && (
@@ -364,12 +360,16 @@ export function DataTable({
                   Recherche: "{searchTerm}"
                 </span>
               )}
-              {Object.entries(columnFilters).map(([column, values]) => 
-                values.length > 0 && (
-                  <span key={column} className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs">
-                    {column}: {values.length}
-                  </span>
-                )
+              {Object.entries(columnFilters).map(
+                ([column, values]) =>
+                  values.length > 0 && (
+                    <span
+                      key={column}
+                      className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs"
+                    >
+                      {column}: {values.length}
+                    </span>
+                  )
               )}
             </div>
           )}

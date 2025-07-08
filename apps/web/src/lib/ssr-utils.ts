@@ -59,7 +59,7 @@ export class BrowserAPIManager {
     this.config = {
       enableDebugLogs: isDev,
       fallbackValues: {},
-      ...config
+      ...config,
     }
 
     this.apis = this.initializeAPIs()
@@ -81,7 +81,7 @@ export class BrowserAPIManager {
         navigator: null,
         localStorage: null,
         sessionStorage: null,
-        location: null
+        location: null,
       }
     }
 
@@ -92,7 +92,7 @@ export class BrowserAPIManager {
         navigator,
         localStorage,
         sessionStorage,
-        location
+        location,
       }
     } catch (error) {
       this.handleError(error as Error, 'initializeAPIs')
@@ -103,7 +103,7 @@ export class BrowserAPIManager {
         navigator: null,
         localStorage: null,
         sessionStorage: null,
-        location: null
+        location: null,
       }
     }
   }
@@ -196,7 +196,7 @@ export class BrowserAPIManager {
 
     return {
       width: this.apis.window.innerWidth,
-      height: this.apis.window.innerHeight
+      height: this.apis.window.innerHeight,
     }
   }
 
@@ -207,7 +207,7 @@ export class BrowserAPIManager {
 
     return {
       width: this.apis.window.screen.width,
-      height: this.apis.window.screen.height
+      height: this.apis.window.screen.height,
     }
   }
 
@@ -263,17 +263,20 @@ export function useHydrationSafe<T>(
   const [value, setValue] = useState<T>(serverValue)
   const mounted = useMounted()
 
-  useEffect(() => {
-    if (mounted) {
-      try {
-        setValue(clientValue())
-      } catch (error) {
-        console.warn('Error in useHydrationSafe:', error)
-        setValue(serverValue)
+  useEffect(
+    () => {
+      if (mounted) {
+        try {
+          setValue(clientValue())
+        } catch (error) {
+          console.warn('Error in useHydrationSafe:', error)
+          setValue(serverValue)
+        }
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps ? [mounted, serverValue, clientValue, ...deps] : [mounted, serverValue, clientValue])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    deps ? [mounted, serverValue, clientValue, ...deps] : [mounted, serverValue, clientValue]
+  )
 
   return value
 }
@@ -281,10 +284,7 @@ export function useHydrationSafe<T>(
 /**
  * Hook pour les valeurs d'environnement sécurisées
  */
-export function useEnvironmentValue<T>(
-  clientValue: T,
-  serverValue: T
-): T {
+export function useEnvironmentValue<T>(clientValue: T, serverValue: T): T {
   return useHydrationSafe(() => clientValue, serverValue)
 }
 
@@ -303,10 +303,10 @@ export function useSSRSafeLocalStorage<T>(
 ): [T, (value: T) => void, boolean] {
   const api = useBrowserAPI()
   const [isLoaded, setIsLoaded] = useState(false)
-  
+
   const serializer = options.serializer || {
     serialize: JSON.stringify,
-    deserialize: JSON.parse
+    deserialize: JSON.parse,
   }
 
   const [storedValue, setStoredValue] = useState<T>(defaultValue)
@@ -387,11 +387,7 @@ export function serverSide<T>(
 /**
  * Wrapper pour les fonctions potentiellement problématiques
  */
-export function safeExecute<T>(
-  fn: () => T,
-  fallback: T,
-  context?: string
-): T {
+export function safeExecute<T>(fn: () => T, fallback: T, context?: string): T {
   try {
     return fn()
   } catch (error) {
@@ -406,10 +402,7 @@ export function safeExecute<T>(
 /**
  * Créer un proxy pour les objets globaux avec fallbacks
  */
-export function createSafeGlobal<T extends object>(
-  globalName: string,
-  fallback: Partial<T>
-): T {
+export function createSafeGlobal<T extends object>(globalName: string, fallback: Partial<T>): T {
   if (isServer) {
     return fallback as T
   }
@@ -491,7 +484,7 @@ const ssrUtils = {
   safeExecute,
   createSafeGlobal,
   hasFeature,
-  useFeatureDetection
+  useFeatureDetection,
 }
 
 export default ssrUtils

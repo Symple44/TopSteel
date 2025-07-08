@@ -6,12 +6,12 @@
 
 'use client'
 
+import { Download, Plus, TrendingDown, TrendingUp } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
 import { ClientOnly } from '@/components/client-only'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Download, Plus, TrendingDown, TrendingUp } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
 
 // ===== TYPES =====
 type Period = 'week' | 'month' | 'quarter'
@@ -24,10 +24,10 @@ interface MouvementStats {
   transferts: number
   valeurEntrees: number
   valeurSorties: number
-  metadata: { 
+  metadata: {
     source: string
     version: string
-    generatedAt: string 
+    generatedAt: string
   }
 }
 
@@ -41,37 +41,37 @@ const MOCK_CHART_DATA: MouvementStats[] = [
     transferts: 165,
     valeurEntrees: 47500,
     valeurSorties: 34200,
-    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-01-01T00:00:00.000Z' }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-01-01T00:00:00.000Z' },
   },
   {
-    date: '2024-02-01', 
+    date: '2024-02-01',
     name: 'Février 2024',
     entrees: 1180,
     sorties: 1020,
     transferts: 220,
     valeurEntrees: 44600,
     valeurSorties: 39800,
-    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-02-01T00:00:00.000Z' }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-02-01T00:00:00.000Z' },
   },
   {
     date: '2024-03-01',
-    name: 'Mars 2024', 
+    name: 'Mars 2024',
     entrees: 1420,
     sorties: 1150,
     transferts: 190,
     valeurEntrees: 53800,
     valeurSorties: 44500,
-    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-03-01T00:00:00.000Z' }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-03-01T00:00:00.000Z' },
   },
   {
     date: '2024-04-01',
-    name: 'Avril 2024', 
+    name: 'Avril 2024',
     entrees: 1320,
     sorties: 1080,
     transferts: 210,
     valeurEntrees: 49800,
     valeurSorties: 43200,
-    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-04-01T00:00:00.000Z' }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-04-01T00:00:00.000Z' },
   },
   {
     date: '2024-05-01',
@@ -81,7 +81,7 @@ const MOCK_CHART_DATA: MouvementStats[] = [
     transferts: 185,
     valeurEntrees: 58900,
     valeurSorties: 47600,
-    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-05-01T00:00:00.000Z' }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-05-01T00:00:00.000Z' },
   },
   {
     date: '2024-06-01',
@@ -91,8 +91,8 @@ const MOCK_CHART_DATA: MouvementStats[] = [
     transferts: 205,
     valeurEntrees: 52200,
     valeurSorties: 45800,
-    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-06-01T00:00:00.000Z' }
-  }
+    metadata: { source: 'mock', version: '2.1', generatedAt: '2024-06-01T00:00:00.000Z' },
+  },
 ]
 
 // ===== COMPOSANTS LAZY AVEC SSR-SAFETY =====
@@ -100,26 +100,24 @@ const MOCK_CHART_DATA: MouvementStats[] = [
 /**
  * Composant Chart avec lazy loading pour éviter les erreurs SSR
  */
-function MouvementsChartWrapper({ 
-  data, 
-  period, 
-  onPeriodChange 
+function MouvementsChartWrapper({
+  data,
+  period,
+  onPeriodChange,
 }: {
   data: MouvementStats[]
   period: Period
   onPeriodChange: (period: Period) => void
 }) {
   return (
-    <ClientOnly fallback={
-      <div className="h-[300px] flex items-center justify-center">
-        <div className="text-muted-foreground">Chargement du graphique...</div>
-      </div>
-    }>
-      <MouvementsChart 
-        data={data}
-        period={period}
-        onPeriodChange={onPeriodChange}
-      />
+    <ClientOnly
+      fallback={
+        <div className="h-[300px] flex items-center justify-center">
+          <div className="text-muted-foreground">Chargement du graphique...</div>
+        </div>
+      }
+    >
+      <MouvementsChart data={data} period={period} onPeriodChange={onPeriodChange} />
     </ClientOnly>
   )
 }
@@ -129,11 +127,13 @@ function MouvementsChartWrapper({
  */
 function MouvementsTableWrapper({ type }: { type?: string }) {
   return (
-    <ClientOnly fallback={
-      <div className="h-[200px] flex items-center justify-center">
-        <div className="text-muted-foreground">Chargement du tableau...</div>
-      </div>
-    }>
+    <ClientOnly
+      fallback={
+        <div className="h-[200px] flex items-center justify-center">
+          <div className="text-muted-foreground">Chargement du tableau...</div>
+        </div>
+      }
+    >
       <MouvementsTable type={type} />
     </ClientOnly>
   )
@@ -142,19 +142,16 @@ function MouvementsTableWrapper({ type }: { type?: string }) {
 /**
  * Dialog de création avec lazy loading
  */
-function CreateMouvementDialogWrapper({ 
-  open, 
-  onOpenChange 
-}: { 
+function CreateMouvementDialogWrapper({
+  open,
+  onOpenChange,
+}: {
   open: boolean
-  onOpenChange: (open: boolean) => void 
+  onOpenChange: (open: boolean) => void
 }) {
   return (
     <ClientOnly>
-      <CreateMouvementDialog
-        open={open}
-        onOpenChange={onOpenChange}
-      />
+      <CreateMouvementDialog open={open} onOpenChange={onOpenChange} />
     </ClientOnly>
   )
 }
@@ -189,19 +186,19 @@ export default function MouvementsPage() {
     const todaySorties = 6230
     const todayMovements = 12
     const todayExits = 8
-    const variation = ((todayEntrees - todaySorties) / todaySorties * 100)
+    const variation = ((todayEntrees - todaySorties) / todaySorties) * 100
 
     return {
-      entrees: { 
-        amount: todayEntrees, 
+      entrees: {
+        amount: todayEntrees,
         count: todayMovements,
-        variation: variation > 0 ? variation : 0
+        variation: variation > 0 ? variation : 0,
       },
-      sorties: { 
-        amount: todaySorties, 
+      sorties: {
+        amount: todaySorties,
         count: todayExits,
-        variation: Math.abs(variation)
-      }
+        variation: Math.abs(variation),
+      },
     }
   }, [])
 
@@ -211,7 +208,7 @@ export default function MouvementsPage() {
       style: 'currency',
       currency: 'EUR',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount)
   }, [])
 
@@ -221,9 +218,7 @@ export default function MouvementsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Mouvements de Stock</h1>
-          <p className="text-muted-foreground">
-            Historique et suivi des entrées/sorties
-          </p>
+          <p className="text-muted-foreground">Historique et suivi des entrées/sorties</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
@@ -241,15 +236,11 @@ export default function MouvementsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Entrées aujourd'hui
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Entrées aujourd'hui</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(stats.entrees.amount)}
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(stats.entrees.amount)}</div>
             <p className="text-xs text-muted-foreground">
               {stats.entrees.count} mouvements (+{stats.entrees.variation.toFixed(1)}%)
             </p>
@@ -258,34 +249,24 @@ export default function MouvementsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Sorties aujourd'hui
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Sorties aujourd'hui</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(stats.sorties.amount)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {stats.sorties.count} mouvements
-            </p>
+            <div className="text-2xl font-bold">{formatCurrency(stats.sorties.amount)}</div>
+            <p className="text-xs text-muted-foreground">{stats.sorties.count} mouvements</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Solde net
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Solde net</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(stats.entrees.amount - stats.sorties.amount)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Différence entrées/sorties
-            </p>
+            <p className="text-xs text-muted-foreground">Différence entrées/sorties</p>
           </CardContent>
         </Card>
       </div>
@@ -305,7 +286,7 @@ export default function MouvementsPage() {
               <CardTitle>Évolution des mouvements</CardTitle>
             </CardHeader>
             <CardContent>
-              <MouvementsChartWrapper 
+              <MouvementsChartWrapper
                 data={MOCK_CHART_DATA}
                 period={period}
                 onPeriodChange={handlePeriodChange}
@@ -372,7 +353,10 @@ export default function MouvementsPage() {
  * Import dynamique du composant Chart
  */
 const MouvementsChart = dynamic(
-  () => import('@/components/stocks/mouvements-chart').then(mod => ({ default: mod.MouvementsChart })),
+  () =>
+    import('@/components/stocks/mouvements-chart').then((mod) => ({
+      default: mod.MouvementsChart,
+    })),
   {
     ssr: false,
     loading: () => (
@@ -382,7 +366,7 @@ const MouvementsChart = dynamic(
           <div className="h-48 bg-muted rounded"></div>
         </div>
       </div>
-    )
+    ),
   }
 )
 
@@ -390,7 +374,10 @@ const MouvementsChart = dynamic(
  * Import dynamique du composant Table
  */
 const MouvementsTable = dynamic(
-  () => import('@/components/stocks/mouvements-table').then(mod => ({ default: mod.MouvementsTable })),
+  () =>
+    import('@/components/stocks/mouvements-table').then((mod) => ({
+      default: mod.MouvementsTable,
+    })),
   {
     ssr: false,
     loading: () => (
@@ -401,7 +388,7 @@ const MouvementsTable = dynamic(
           </div>
         ))}
       </div>
-    )
+    ),
   }
 )
 
@@ -409,9 +396,12 @@ const MouvementsTable = dynamic(
  * Import dynamique du Dialog
  */
 const CreateMouvementDialog = dynamic(
-  () => import('@/components/stocks/create-mouvement-dialog').then(mod => ({ default: mod.CreateMouvementDialog })),
+  () =>
+    import('@/components/stocks/create-mouvement-dialog').then((mod) => ({
+      default: mod.CreateMouvementDialog,
+    })),
   {
-    ssr: false
+    ssr: false,
   }
 )
 

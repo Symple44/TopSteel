@@ -13,7 +13,7 @@ interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
 const Select = React.forwardRef<HTMLDivElement, SelectProps>(
   ({ className, children, value, onValueChange, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn("relative", className)} {...props}>
+      <div ref={ref} className={cn('relative', className)} {...props}>
         {children}
       </div>
     )
@@ -58,7 +58,7 @@ interface SelectValueProps extends React.HTMLAttributes<HTMLSpanElement> {
 const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
   ({ className, placeholder, children, ...props }, ref) => {
     return (
-      <span ref={ref} className={cn("block truncate", className)} {...props}>
+      <span ref={ref} className={cn('block truncate', className)} {...props}>
         {children || placeholder}
       </span>
     )

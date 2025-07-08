@@ -1,45 +1,45 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get } from '@nestjs/common'
 import {
-  HealthCheckService,
+  type DiskHealthIndicator,
   HealthCheck,
-  TypeOrmHealthIndicator,
-  MemoryHealthIndicator,
-  DiskHealthIndicator,
-} from "@nestjs/terminus";
-import { IntegrityService } from "./integrity.service";
+  type HealthCheckService,
+  type MemoryHealthIndicator,
+  type TypeOrmHealthIndicator,
+} from '@nestjs/terminus'
+import type { IntegrityService } from './integrity.service'
 
-@Controller("health")
+@Controller('health')
 export class HealthController {
   constructor(
     private health: HealthCheckService,
     private db: TypeOrmHealthIndicator,
     private memory: MemoryHealthIndicator,
     private disk: DiskHealthIndicator,
-    private integrity: IntegrityService,
+    private integrity: IntegrityService
   ) {}
 
   @Get()
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.db.pingCheck("database"),
-      () => this.memory.checkHeap("memory_heap", 150 * 1024 * 1024),
-      () => this.memory.checkRSS("memory_rss", 150 * 1024 * 1024),
+      () => this.db.pingCheck('database'),
+      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
+      () => this.memory.checkRSS('memory_rss', 150 * 1024 * 1024),
       () =>
-        this.disk.checkStorage("storage", {
-          path: "/",
+        this.disk.checkStorage('storage', {
+          path: '/',
           threshold: 250 * 1024 * 1024 * 1024,
         }),
-    ]);
+    ])
   }
 
-  @Get("integrity")
+  @Get('integrity')
   async checkIntegrity() {
-    return this.integrity.performFullCheck();
+    return this.integrity.performFullCheck()
   }
 
-  @Get("metrics")
+  @Get('metrics')
   async getMetrics() {
-    return this.integrity.getSystemMetrics();
+    return this.integrity.getSystemMetrics()
   }
 }

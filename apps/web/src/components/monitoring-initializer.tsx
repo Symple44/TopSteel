@@ -6,8 +6,8 @@
 
 'use client'
 
-import PerformanceMonitor from '@/lib/performance-monitor'
 import { useEffect } from 'react'
+import PerformanceMonitor from '@/lib/performance-monitor'
 
 interface MonitoringInitializerProps {
   enableAnalytics?: boolean
@@ -15,12 +15,11 @@ interface MonitoringInitializerProps {
   enableErrorTracking?: boolean
 }
 
-export function MonitoringInitializer({ 
+export function MonitoringInitializer({
   enableAnalytics = true,
   enablePerformanceTracking = true,
-  enableErrorTracking = true
+  enableErrorTracking = true,
 }: MonitoringInitializerProps) {
-  
   useEffect(() => {
     // Initialiser le monitoring côté client uniquement
     if (typeof window !== 'undefined') {
@@ -37,14 +36,14 @@ export function MonitoringInitializer({
               message: event.error?.message || 'Unknown error',
               filename: event.filename,
               lineno: event.lineno,
-              colno: event.colno
+              colno: event.colno,
             })
           })
 
           window.addEventListener('unhandledrejection', (event) => {
             console.error('Unhandled promise rejection:', event.reason)
             PerformanceMonitor.getInstance().recordMetric('unhandled_rejection', {
-              reason: event.reason?.toString() || 'Unknown reason'
+              reason: event.reason?.toString() || 'Unknown reason',
             })
           })
         }
@@ -53,7 +52,6 @@ export function MonitoringInitializer({
           // Initialiser analytics si nécessaire
           console.log('📊 Monitoring initialized')
         }
-
       } catch (error) {
         console.error('Failed to initialize monitoring:', error)
       }

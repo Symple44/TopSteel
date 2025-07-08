@@ -1,7 +1,7 @@
 // Générateur de fichiers pour @erp/ui - Version corrigée
-const fs = require('fs');
+const fs = require('fs')
 
-console.log('🔨 Generating @erp/ui files...');
+console.log('🔨 Generating @erp/ui files...')
 
 // Index.js - Implémentations complètes
 const indexJs = `import React from 'react';
@@ -105,7 +105,7 @@ export const AvatarFallback = ({ children, ...props }) =>
   React.createElement('div', { ...props }, children);
 export const AvatarImage = ({ src, alt, ...props }) => 
   React.createElement('img', { src, alt, ...props });
-`;
+`
 
 // Index.d.ts - Déclarations TypeScript complètes
 const indexDts = `import React from 'react';
@@ -228,17 +228,17 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
 export declare const Avatar: React.FC<AvatarProps>;
 export declare const AvatarFallback: React.FC<{ children?: React.ReactNode }>;
 export declare const AvatarImage: React.FC<{ src: string; alt: string }>;
-`;
+`
 
 // Écrire les fichiers
-fs.writeFileSync('dist/index.js', indexJs);
-fs.writeFileSync('dist/index.mjs', indexJs);
-fs.writeFileSync('dist/index.d.ts', indexDts);
-fs.writeFileSync('dist/index.d.mts', indexDts);
+fs.writeFileSync('dist/index.js', indexJs)
+fs.writeFileSync('dist/index.mjs', indexJs)
+fs.writeFileSync('dist/index.d.ts', indexDts)
+fs.writeFileSync('dist/index.d.mts', indexDts)
 
-console.log('✅ Successfully generated:');
-console.log('  - dist/index.js');
-console.log('  - dist/index.mjs');
-console.log('  - dist/index.d.ts');
-console.log('  - dist/index.d.mts');
-console.log('🎉 @erp/ui build completed!');
+console.log('✅ Successfully generated:')
+console.log('  - dist/index.js')
+console.log('  - dist/index.mjs')
+console.log('  - dist/index.d.ts')
+console.log('  - dist/index.d.mts')
+console.log('🎉 @erp/ui build completed!')

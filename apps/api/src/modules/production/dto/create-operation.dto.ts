@@ -1,42 +1,42 @@
-import { IsString, IsOptional, IsEnum, IsInt, IsNumber, Min } from 'class-validator';
-import { OperationType, OperationStatut } from '../entities/operation.entity';
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator'
+import { OperationStatut, OperationType } from '../entities/operation.entity'
 
 export class CreateOperationDto {
   @IsString()
-  nom!: string;
+  nom!: string
 
   @IsOptional()
   @IsString()
-  description?: string;
+  description?: string
 
   @IsEnum(OperationType)
-  type!: OperationType;
+  type!: OperationType
 
   @IsOptional()
   @IsEnum(OperationStatut)
-  statut?: OperationStatut;
+  statut?: OperationStatut
 
   @IsInt()
-  ordreFabricationId!: number;
+  ordreFabricationId!: number
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  ordreExecution?: number;
+  ordreExecution?: number
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
-  dureeEstimee?: number;
+  dureeEstimee?: number
 
   @IsOptional()
   @IsInt()
-  machineId?: number;
+  machineId?: number
 
   @IsOptional()
   @IsInt()
-  technicienId?: number;
+  technicienId?: number
 
   @IsOptional()
   @IsString()
-  notes?: string;
+  notes?: string
 }

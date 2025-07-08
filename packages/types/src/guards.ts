@@ -89,7 +89,7 @@ export const hasRequiredProps = <T extends Record<string, any>>(
   requiredKeys: (keyof T)[]
 ): obj is T => {
   if (!obj || typeof obj !== 'object') return false
-  return requiredKeys.every(key => key in obj)
+  return requiredKeys.every((key) => key in obj)
 }
 
 // ===== CONVERTISSEURS SÉCURISÉS =====
@@ -138,7 +138,7 @@ export const createColumnVisibilityState = (
   defaultVisible = true
 ): GuardColumnState => {
   const state: GuardColumnState = {}
-  columns.forEach(column => {
+  columns.forEach((column) => {
     if (isNonEmptyString(column.key)) {
       state[column.key] = toStrictBoolean(defaultVisible, true)
     }
@@ -164,7 +164,7 @@ export const updateColumnVisibility = (
 
   return {
     ...currentState,
-    [columnKey]: newValue
+    [columnKey]: newValue,
   }
 }
 
@@ -173,12 +173,9 @@ export const updateColumnVisibility = (
  */
 export const validateGuardDataColumn = (column: unknown): column is GuardDataColumn => {
   if (!column || typeof column !== 'object') return false
-  
+
   const col = column as any
-  return (
-    isNonEmptyString(col.key) &&
-    isNonEmptyString(col.label)
-  )
+  return isNonEmptyString(col.key) && isNonEmptyString(col.label)
 }
 
 // ===== HELPERS POUR FORMULAIRES =====
@@ -205,9 +202,7 @@ export const createFormChangeHandler = <T>(
 /**
  * Créée un handler pour les checkboxes robuste
  */
-export const createCheckboxHandler = (
-  setter: (checked: boolean) => void
-) => {
+export const createCheckboxHandler = (setter: (checked: boolean) => void) => {
   return (checked: boolean | undefined) => {
     setter(toStrictBoolean(checked, false))
   }
@@ -218,10 +213,7 @@ export const createCheckboxHandler = (
 /**
  * Filtre les données de manière sécurisée
  */
-export const safeFilterData = <T>(
-  data: T[],
-  predicate: (item: T) => boolean
-): T[] => {
+export const safeFilterData = <T>(data: T[], predicate: (item: T) => boolean): T[] => {
   try {
     if (!isValidArray(data)) return []
     return data.filter(predicate)
@@ -244,8 +236,8 @@ export const safeTextSearch = <T>(
 
   const normalizedSearch = searchTerm.toLowerCase().trim()
 
-  return safeFilterData(data, item => {
-    return searchableFields.some(field => {
+  return safeFilterData(data, (item) => {
+    return searchableFields.some((field) => {
       const value = toSafeString(item[field])
       return value.toLowerCase().includes(normalizedSearch)
     })
@@ -259,7 +251,7 @@ export const safeTextSearch = <T>(
  */
 export const combineClassNames = (...classes: (string | undefined | null | false)[]): string => {
   return classes
-    .filter(cls => isNonEmptyString(cls))
+    .filter((cls) => isNonEmptyString(cls))
     .join(' ')
     .trim()
 }

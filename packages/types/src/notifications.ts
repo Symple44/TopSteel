@@ -6,7 +6,7 @@ export enum NotificationType {
   INFO = 'info',
   SUCCESS = 'success',
   WARNING = 'warning',
-  ERROR = 'error'
+  ERROR = 'error',
 }
 
 export enum NotificationCategory {
@@ -16,13 +16,13 @@ export enum NotificationCategory {
   PRODUCTION = 'production',
   MAINTENANCE = 'maintenance',
   QUALITE = 'qualite',
-  FACTURATION = 'facturation'
+  FACTURATION = 'facturation',
 }
 
 export enum NotificationStatut {
   ACTIVE = 'active',
   TRAITEE = 'traitee',
-  IGNOREE = 'ignoree'
+  IGNOREE = 'ignoree',
 }
 
 export interface Notification extends BaseEntity {

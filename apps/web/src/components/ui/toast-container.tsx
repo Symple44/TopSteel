@@ -1,8 +1,8 @@
 'use client'
 
+import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui.store'
-import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
 
 // Types basés sur le store UI
 interface Toast {
@@ -35,8 +35,8 @@ const isValidToastType = (type: any): type is ToastType => {
 }
 
 export function ToastContainer() {
-  const toasts = useUIStore(state => state.toasts)
-  const removeToast = useUIStore(state => state.removeToast)
+  const toasts = useUIStore((state) => state.toasts)
+  const removeToast = useUIStore((state) => state.removeToast)
 
   if (toasts.length === 0) return null
 
@@ -46,25 +46,23 @@ export function ToastContainer() {
         // Vérification type-safe avec fallback
         const toastType: ToastType = isValidToastType(toast.type) ? toast.type : 'info'
         const Icon = toastIcons[toastType]
-        
+
         return (
           <div
             key={toast.id}
             className={cn(
-              "flex items-start gap-3 rounded-lg border p-4 shadow-lg animate-in slide-in-from-top-2",
+              'flex items-start gap-3 rounded-lg border p-4 shadow-lg animate-in slide-in-from-top-2',
               toastStyles[toastType],
-              "max-w-md"
+              'max-w-md'
             )}
           >
             <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" />
-            
+
             <div className="flex-1">
               <div className="font-medium">{toast.title}</div>
-              {toast.message && (
-                <div className="text-sm opacity-90 mt-1">{toast.message}</div>
-              )}
+              {toast.message && <div className="text-sm opacity-90 mt-1">{toast.message}</div>}
             </div>
-            
+
             <button
               onClick={() => removeToast(toast.id)}
               className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"

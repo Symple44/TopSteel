@@ -1,41 +1,41 @@
 // apps/web/src/components/stocks/mouvements-chart.tsx
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, BarChart3, TrendingDown, TrendingUp } from "lucide-react";
-import { useState } from "react";
+import { Activity, BarChart3, TrendingDown, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface MouvementStats {
-  date: string;
-  entrees: number;
-  sorties: number;
-  transferts: number;
-  valeurEntrees: number;
-  valeurSorties: number;
+  date: string
+  entrees: number
+  sorties: number
+  transferts: number
+  valeurEntrees: number
+  valeurSorties: number
 }
 
 interface MouvementsChartProps {
-  data: MouvementStats[];
-  period: 'week' | 'month' | 'quarter';
-  onPeriodChange: (period: 'week' | 'month' | 'quarter') => void;
+  data: MouvementStats[]
+  period: 'week' | 'month' | 'quarter'
+  onPeriodChange: (period: 'week' | 'month' | 'quarter') => void
 }
 
 export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChartProps) {
-  const [activeTab, setActiveTab] = useState<'volume' | 'value'>('volume');
+  const [activeTab, setActiveTab] = useState<'volume' | 'value'>('volume')
 
   // Calculs de statistiques
-  const totalEntrees = data.reduce((sum, item) => sum + item.entrees, 0);
-  const totalSorties = data.reduce((sum, item) => sum + item.sorties, 0);
-  const totalValeurEntrees = data.reduce((sum, item) => sum + item.valeurEntrees, 0);
-  const totalValeurSorties = data.reduce((sum, item) => sum + item.valeurSorties, 0);
+  const totalEntrees = data.reduce((sum, item) => sum + item.entrees, 0)
+  const totalSorties = data.reduce((sum, item) => sum + item.sorties, 0)
+  const totalValeurEntrees = data.reduce((sum, item) => sum + item.valeurEntrees, 0)
+  const totalValeurSorties = data.reduce((sum, item) => sum + item.valeurSorties, 0)
 
-  const maxVolume = Math.max(...data.map(item => Math.max(item.entrees, item.sorties)));
-  const maxValue = Math.max(...data.map(item => Math.max(item.valeurEntrees, item.valeurSorties)));
+  const maxVolume = Math.max(...data.map((item) => Math.max(item.entrees, item.sorties)))
+  const maxValue = Math.max(...data.map((item) => Math.max(item.valeurEntrees, item.valeurSorties)))
 
   const getBarHeight = (value: number, max: number) => {
-    return Math.max(2, (value / max) * 200); // Hauteur min 2px, max 200px
-  };
+    return Math.max(2, (value / max) * 200) // Hauteur min 2px, max 200px
+  }
 
   return (
     <div className="space-y-6">
@@ -59,7 +59,7 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
             Valeur
           </Button>
         </div>
-        
+
         <div className="flex gap-2">
           <Button
             variant={period === 'week' ? 'default' : 'outline'}
@@ -96,9 +96,7 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
               <div>
                 <p className="text-sm text-muted-foreground">Entrées</p>
                 <p className="text-xl font-bold">{totalEntrees}</p>
-                <p className="text-xs text-green-600">
-                  {totalValeurEntrees.toLocaleString()} €
-                </p>
+                <p className="text-xs text-green-600">{totalValeurEntrees.toLocaleString()} €</p>
               </div>
             </div>
           </CardContent>
@@ -113,9 +111,7 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
               <div>
                 <p className="text-sm text-muted-foreground">Sorties</p>
                 <p className="text-xl font-bold">{totalSorties}</p>
-                <p className="text-xs text-red-600">
-                  {totalValeurSorties.toLocaleString()} €
-                </p>
+                <p className="text-xs text-red-600">{totalValeurSorties.toLocaleString()} €</p>
               </div>
             </div>
           </CardContent>
@@ -170,40 +166,40 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
             {data.length > 0 ? (
               <div className="flex items-end justify-between h-full gap-2">
                 {data.map((item, index) => {
-                  const maxVal = activeTab === 'volume' ? maxVolume : maxValue;
-                  const entreesVal = activeTab === 'volume' ? item.entrees : item.valeurEntrees;
-                  const sortiesVal = activeTab === 'volume' ? item.sorties : item.valeurSorties;
-                  
+                  const maxVal = activeTab === 'volume' ? maxVolume : maxValue
+                  const entreesVal = activeTab === 'volume' ? item.entrees : item.valeurEntrees
+                  const sortiesVal = activeTab === 'volume' ? item.sorties : item.valeurSorties
+
                   return (
                     <div key={index} className="flex flex-col items-center flex-1 max-w-20">
                       <div className="flex items-end gap-1 mb-2 h-48">
                         {/* Barre entrées */}
                         <div
                           className="bg-green-500 rounded-t"
-                          style={{ 
+                          style={{
                             height: `${getBarHeight(entreesVal, maxVal)}px`,
-                            width: '12px'
+                            width: '12px',
                           }}
                           title={`Entrées: ${entreesVal.toLocaleString()}`}
                         />
                         {/* Barre sorties */}
                         <div
                           className="bg-red-500 rounded-t"
-                          style={{ 
+                          style={{
                             height: `${getBarHeight(sortiesVal, maxVal)}px`,
-                            width: '12px'
+                            width: '12px',
                           }}
                           title={`Sorties: ${sortiesVal.toLocaleString()}`}
                         />
                       </div>
                       <div className="text-xs text-center text-muted-foreground">
-                        {new Date(item.date).toLocaleDateString('fr-FR', { 
+                        {new Date(item.date).toLocaleDateString('fr-FR', {
                           month: 'short',
-                          day: 'numeric'
+                          day: 'numeric',
                         })}
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </div>
             ) : (
@@ -230,5 +226,5 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
         </div>
       </div>
     </div>
-  );
+  )
 }

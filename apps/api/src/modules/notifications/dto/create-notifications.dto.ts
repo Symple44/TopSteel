@@ -1,18 +1,11 @@
-import {
-  IsString,
-  IsOptional,
-  IsBoolean,
-  IsEnum,
-  MaxLength,
-  MinLength,
-} from "class-validator";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
-import { NotificationType } from "../entities/notifications.entity";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import { IsBoolean, IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
+import { NotificationType } from '../entities/notifications.entity'
 
 export class CreateNotificationsDto {
   @ApiProperty({
-    example: "Nom de la notification",
+    example: 'Nom de la notification',
     minLength: 2,
     maxLength: 255,
   })
@@ -20,13 +13,13 @@ export class CreateNotificationsDto {
   @MinLength(2)
   @MaxLength(255)
   @Transform(({ value }) => value?.trim())
-  nom!: string;
+  nom!: string
 
-  @ApiPropertyOptional({ example: "Description détaillée" })
+  @ApiPropertyOptional({ example: 'Description détaillée' })
   @IsOptional()
   @IsString()
   @MaxLength(2000)
-  description?: string;
+  description?: string
 
   @ApiPropertyOptional({
     enum: NotificationType,
@@ -34,14 +27,14 @@ export class CreateNotificationsDto {
   })
   @IsOptional()
   @IsEnum(NotificationType)
-  type?: NotificationType = NotificationType.INFO;
+  type?: NotificationType = NotificationType.INFO
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()
   @IsBoolean()
-  actif?: boolean = true;
+  actif?: boolean = true
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any>
 }

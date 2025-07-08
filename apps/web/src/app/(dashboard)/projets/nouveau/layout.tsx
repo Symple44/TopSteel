@@ -8,17 +8,17 @@ import type { ReactNode } from 'react'
 
 export const metadata: Metadata = {
   title: 'Nouveau Projet - TopSteel ERP',
-  description: 'Création d\'un nouveau projet',
+  description: "Création d'un nouveau projet",
   robots: {
     index: false,
-    follow: false
-  }
+    follow: false,
+  },
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1
+  maximumScale: 1,
 }
 
 interface NouveauProjetLayoutProps {

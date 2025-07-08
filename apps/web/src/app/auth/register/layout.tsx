@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
 import type { Metadata, Viewport } from 'next'
+import type { ReactNode } from 'react'
 
 // ===== MÉTADONNÉES =====
 export const metadata: Metadata = {
@@ -13,7 +13,9 @@ export const metadata: Metadata = {
     title: 'Inscription - TopSteel ERP',
     description: 'Créez votre compte TopSteel ERP gratuitement',
     type: 'website',
-    url: process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/register` : undefined,
+    url: process.env.NEXT_PUBLIC_APP_URL
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/register`
+      : undefined,
   },
   twitter: {
     card: 'summary',
@@ -21,7 +23,9 @@ export const metadata: Metadata = {
     description: 'Créez votre compte TopSteel ERP gratuitement',
   },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/register` : undefined,
+    canonical: process.env.NEXT_PUBLIC_APP_URL
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/register`
+      : undefined,
   },
 }
 
@@ -33,9 +37,9 @@ export const viewport: Viewport = {
   userScalable: false,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' }
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
   ],
-  colorScheme: 'light dark'
+  colorScheme: 'light dark',
 }
 
 interface RegisterLayoutProps {
@@ -43,9 +47,5 @@ interface RegisterLayoutProps {
 }
 
 export default function RegisterLayout({ children }: RegisterLayoutProps) {
-  return (
-    <div className="register-layout min-h-screen bg-gray-50">
-      {children}
-    </div>
-  )
+  return <div className="register-layout min-h-screen bg-gray-50">{children}</div>
 }

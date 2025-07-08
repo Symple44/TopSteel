@@ -4,11 +4,11 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Repository } from "typeorm";
-import { PaginationResultDto } from "../../common/dto/base.dto";
-import { CreateProduitDto } from "./dto/create-produit.dto";
-import { ProduitsQueryDto } from "./dto/produits-query.dto";
-import { UpdateProduitDto } from "./dto/update-produit.dto";
+import { Like, type Repository } from "typeorm";
+import type { PaginationResultDto } from "../../common/dto/base.dto";
+import type { CreateProduitDto } from "./dto/create-produit.dto";
+import type { ProduitsQueryDto } from "./dto/produits-query.dto";
+import type { UpdateProduitDto } from "./dto/update-produit.dto";
 import { Produit } from "./entities/produit.entity";
 
 @Injectable()

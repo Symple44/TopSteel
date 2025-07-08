@@ -1,21 +1,21 @@
 'use client'
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select'
-import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
-import { useState } from 'react'
 
-interface ProjetDocumentsTabProps { 
-  projet?: any 
+interface ProjetDocumentsTabProps {
+  projet?: any
   projetId?: string
 }
 
@@ -39,7 +39,7 @@ const mockDocuments: Document[] = [
     dateAjout: '2024-03-15',
     auteur: 'Pierre Martin',
     categorie: 'Plan',
-    url: '/documents/plan_hangar_a_v2.pdf'
+    url: '/documents/plan_hangar_a_v2.pdf',
   },
   {
     id: '2',
@@ -49,7 +49,7 @@ const mockDocuments: Document[] = [
     dateAjout: '2024-03-14',
     auteur: 'Jean Dupuis',
     categorie: 'Photo',
-    url: '/documents/photo_chantier_001.jpg'
+    url: '/documents/photo_chantier_001.jpg',
   },
   {
     id: '3',
@@ -59,7 +59,7 @@ const mockDocuments: Document[] = [
     dateAjout: '2024-03-13',
     auteur: 'Marie Claire',
     categorie: 'Devis',
-    url: '/documents/devis_materiaux.xlsx'
+    url: '/documents/devis_materiaux.xlsx',
   },
   {
     id: '4',
@@ -69,8 +69,8 @@ const mockDocuments: Document[] = [
     dateAjout: '2024-03-12',
     auteur: 'Alain Dubois',
     categorie: 'Rapport',
-    url: '/documents/rapport_controle_qualite.docx'
-  }
+    url: '/documents/rapport_controle_qualite.docx',
+  },
 ]
 
 export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps) {
@@ -101,7 +101,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
       Image: 'bg-blue-100 text-blue-800',
       Excel: 'bg-green-100 text-green-800',
       Word: 'bg-blue-100 text-blue-800',
-      CAD: 'bg-orange-100 text-orange-800'
+      CAD: 'bg-orange-100 text-orange-800',
     }
 
     return (
@@ -111,12 +111,13 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
     )
   }
 
-  const filteredDocuments = mockDocuments.filter(doc => {
-    const matchesSearch = doc.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         doc.auteur.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDocuments = mockDocuments.filter((doc) => {
+    const matchesSearch =
+      doc.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.auteur.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === 'tous' || doc.categorie === selectedCategory
     const matchesType = selectedType === 'tous' || doc.type === selectedType
-    
+
     return matchesSearch && matchesCategory && matchesType
   })
 
@@ -146,9 +147,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-medium">Documents du projet</h3>
-          <p className="text-sm text-muted-foreground">
-            Gérez tous les documents liés à ce projet
-          </p>
+          <p className="text-sm text-muted-foreground">Gérez tous les documents liés à ce projet</p>
         </div>
         <Button>
           <Upload className="h-4 w-4 mr-2" />
@@ -171,7 +170,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
                 />
               </div>
             </div>
-            
+
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Catégorie" />
@@ -186,7 +185,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
                 <SelectItem value="Autre">Autres</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedType} onValueChange={setSelectedType}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Type" />
@@ -215,7 +214,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockDocuments.filter(d => d.type === 'PDF').length}
+              {mockDocuments.filter((d) => d.type === 'PDF').length}
             </div>
             <p className="text-xs text-muted-foreground">Documents PDF</p>
           </CardContent>
@@ -223,7 +222,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {mockDocuments.filter(d => d.type === 'Image').length}
+              {mockDocuments.filter((d) => d.type === 'Image').length}
             </div>
             <p className="text-xs text-muted-foreground">Images</p>
           </CardContent>
@@ -231,11 +230,14 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {(mockDocuments.reduce((acc, doc) => {
-                const size = parseFloat(doc.taille.replace(/[^\d.]/g, ''))
+              {mockDocuments
+                .reduce((acc, doc) => {
+                  const size = parseFloat(doc.taille.replace(/[^\d.]/g, ''))
 
-                return acc + size
-              }, 0)).toFixed(1)} MB
+                  return acc + size
+                }, 0)
+                .toFixed(1)}{' '}
+              MB
             </div>
             <p className="text-xs text-muted-foreground">Taille totale</p>
           </CardContent>
@@ -245,9 +247,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
       {/* Liste des documents */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            Documents ({filteredDocuments.length})
-          </CardTitle>
+          <CardTitle>Documents ({filteredDocuments.length})</CardTitle>
         </CardHeader>
         <CardContent>
           {filteredDocuments.length === 0 ? (
@@ -255,15 +255,18 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
               <File className="h-12 w-12 mx-auto text-gray-300 mb-4" />
               <p className="text-gray-500">Aucun document trouvé</p>
               <p className="text-sm text-gray-400">
-                {searchTerm || selectedCategory !== 'tous' || selectedType !== 'tous' 
-                  ? 'Essayez de modifier vos filtres' 
+                {searchTerm || selectedCategory !== 'tous' || selectedType !== 'tous'
+                  ? 'Essayez de modifier vos filtres'
                   : 'Ajoutez des documents pour ce projet'}
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               {filteredDocuments.map((document) => (
-                <div key={document.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div
+                  key={document.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   <div className="flex items-center gap-3">
                     {getTypeIcon(document.type)}
                     <div>
@@ -273,11 +276,11 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3">
                     {getTypeBadge(document.type)}
                     <Badge variant="outline">{document.categorie}</Badge>
-                    
+
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"

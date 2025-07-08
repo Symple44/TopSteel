@@ -1,35 +1,35 @@
-import { Column, Entity, Index } from "typeorm";
-import { BaseAuditEntity } from "../../../common/base/base.entity";
+import { Column, Entity, Index } from 'typeorm'
+import { BaseAuditEntity } from '../../../common/base/base.entity'
 
-@Entity("clients")
+@Entity('clients')
 export class Clients extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()
-  nom!: string;
+  nom!: string
 
-  @Column({ type: "text", nullable: true })
-  description?: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string
 
   @Column({ default: true })
   @Index()
-  actif!: boolean;
+  actif!: boolean
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any>
 
   @Column({ length: 255, nullable: true })
-  email?: string;
+  email?: string
 
   @Column({ length: 20, nullable: true })
-  telephone?: string;
+  telephone?: string
 
-  @Column({ type: "text", nullable: true })
-  adresse?: string;
+  @Column({ type: 'text', nullable: true })
+  adresse?: string
 }
 
 export enum ClientsStatut {
-  ACTIF = "ACTIF",
-  INACTIF = "INACTIF",
-  ARCHIVE = "ARCHIVE",
+  ACTIF = 'ACTIF',
+  INACTIF = 'INACTIF',
+  ARCHIVE = 'ARCHIVE',
 }

@@ -1,17 +1,11 @@
 'use client'
 
+import { Bell, PanelLeftClose, PanelLeftOpen, Search, Zap } from 'lucide-react'
+import { useState } from 'react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ThemeSwitcher } from '@/components/ui/theme-switcher'
-import {
-  Bell,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Search,
-  Zap
-} from 'lucide-react'
-import { useState } from 'react'
 
 interface HeaderProps {
   onToggleSidebar?: () => void
@@ -58,7 +52,9 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
               type="text"
               placeholder="Rechercher..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery((e.target as HTMLInputElement | HTMLTextAreaElement).value)}
+              onChange={(e) =>
+                setSearchQuery((e.target as HTMLInputElement | HTMLTextAreaElement).value)
+              }
               className="pl-10"
             />
           </div>
@@ -70,7 +66,9 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
 
           <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">2</span>
+            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">
+              2
+            </span>
           </Button>
 
           <Button variant="ghost" size="sm" className="flex items-center space-x-2">
@@ -84,4 +82,3 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
     </header>
   )
 }
-

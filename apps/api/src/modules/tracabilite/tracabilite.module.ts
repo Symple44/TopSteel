@@ -1,8 +1,8 @@
-import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { TracabiliteService } from "./tracabilite.service";
-import { TracabiliteController } from "./tracabilite.controller";
-import { Tracabilite } from "./entities/tracabilite.entity";
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Tracabilite } from './entities/tracabilite.entity'
+import { TracabiliteController } from './tracabilite.controller'
+import { TracabiliteService } from './tracabilite.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tracabilite])],

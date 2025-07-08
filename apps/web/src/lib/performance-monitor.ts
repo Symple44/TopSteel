@@ -77,10 +77,10 @@ export class PerformanceMonitor {
    * Décorateur pour mesurer les performances de rendu
    */
   static measureRender(componentName: string) {
-    return function(target: any, propertyName: string, descriptor: PropertyDescriptor) {
+    return (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
       const method = descriptor.value
-      
-      descriptor.value = function(...args: any[]) {
+
+      descriptor.value = function (...args: any[]) {
         if (typeof window === 'undefined') {
           return method.apply(this, args)
         }
@@ -89,8 +89,9 @@ export class PerformanceMonitor {
         const result = method.apply(this, args)
         const end = performance.now()
         const duration = end - start
-        
-        if (duration > 16) { // Plus de 1 frame à 60fps
+
+        if (duration > 16) {
+          // Plus de 1 frame à 60fps
           console.warn(`⚠️ ${componentName}.${propertyName} render took ${Math.round(duration)}ms`)
         }
 
@@ -98,9 +99,9 @@ export class PerformanceMonitor {
         PerformanceMonitor.getInstance().recordMetric('component_render', {
           component: componentName,
           method: propertyName,
-          duration
+          duration,
         })
-        
+
         return result
       }
     }
@@ -121,13 +122,13 @@ export class PerformanceMonitor {
         domContentLoaded: timing.domContentLoadedEventEnd - timing.navigationStart,
         loadComplete: timing.loadEventEnd - timing.navigationStart,
         firstPaint: 0,
-        firstContentfulPaint: 0
+        firstContentfulPaint: 0,
       }
 
       // Performance Paint Timing
       const paintEntries = performance.getEntriesByType('paint')
 
-      paintEntries.forEach(entry => {
+      paintEntries.forEach((entry) => {
         if (entry.name === 'first-paint') {
           metrics.firstPaint = entry.startTime
         } else if (entry.name === 'first-contentful-paint') {
@@ -146,15 +147,14 @@ export class PerformanceMonitor {
         load_time: metrics.loadComplete,
         dom_content_loaded: metrics.domContentLoaded,
         first_paint: metrics.firstPaint,
-        first_contentful_paint: metrics.firstContentfulPaint
+        first_contentful_paint: metrics.firstContentfulPaint,
       })
 
       // Enregistrer dans les métriques internes
       PerformanceMonitor.getInstance().recordMetric('page_load', {
         pageName,
-        ...metrics
+        ...metrics,
       })
-
     } catch (error) {
       console.error('Error tracking page load:', error)
     }
@@ -172,11 +172,12 @@ export class PerformanceMonitor {
       const observer = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries()
         const lastEntry = entries[entries.length - 1]
-        
+
         if (lastEntry?.startTime) {
           const lcpTime = lastEntry.startTime
 
-          if (lcpTime > 2500) { // Seuil pour LCP lent
+          if (lcpTime > 2500) {
+            // Seuil pour LCP lent
             console.warn(`🐌 Slow LCP: ${Math.round(lcpTime)}ms`)
           }
 
@@ -184,20 +185,19 @@ export class PerformanceMonitor {
           PerformanceMonitor.sendToAnalytics('web_vitals', {
             metric_name: 'LCP',
             value: Math.round(lcpTime),
-            rating: lcpTime <= 2500 ? 'good' : lcpTime <= 4000 ? 'needs_improvement' : 'poor'
+            rating: lcpTime <= 2500 ? 'good' : lcpTime <= 4000 ? 'needs_improvement' : 'poor',
           })
 
           // Enregistrer
           PerformanceMonitor.getInstance().recordMetric('lcp', {
             value: lcpTime,
-            rating: lcpTime <= 2500 ? 'good' : 'poor'
+            rating: lcpTime <= 2500 ? 'good' : 'poor',
           })
         }
       })
-      
+
       observer.observe({ type: 'largest-contentful-paint', buffered: true })
       PerformanceMonitor.getInstance().observers.push(observer)
-
     } catch (error) {
       console.error('Error setting up LCP observer:', error)
     }
@@ -214,11 +214,12 @@ export class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries()
-        
-        entries.forEach(entry => {
+
+        entries.forEach((entry) => {
           const fid = (entry as any).processingStart - entry.startTime
 
-          if (fid > 100) { // Seuil pour FID lent
+          if (fid > 100) {
+            // Seuil pour FID lent
             console.warn(`🐌 Slow FID: ${Math.round(fid)}ms`)
           }
 
@@ -226,20 +227,19 @@ export class PerformanceMonitor {
           PerformanceMonitor.sendToAnalytics('web_vitals', {
             metric_name: 'FID',
             value: Math.round(fid),
-            rating: fid <= 100 ? 'good' : fid <= 300 ? 'needs_improvement' : 'poor'
+            rating: fid <= 100 ? 'good' : fid <= 300 ? 'needs_improvement' : 'poor',
           })
 
           // Enregistrer
           PerformanceMonitor.getInstance().recordMetric('fid', {
             value: fid,
-            rating: fid <= 100 ? 'good' : 'poor'
+            rating: fid <= 100 ? 'good' : 'poor',
           })
         })
       })
-      
+
       observer.observe({ type: 'first-input', buffered: true })
       PerformanceMonitor.getInstance().observers.push(observer)
-
     } catch (error) {
       console.error('Error setting up FID observer:', error)
     }
@@ -254,19 +254,19 @@ export class PerformanceMonitor {
     }
 
     try {
-
       let clsValue = 0
 
       const observer = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries()
-        
-        entries.forEach(entry => {
+
+        entries.forEach((entry) => {
           if (!(entry as any).hadRecentInput) {
             clsValue += (entry as any).value
           }
         })
 
-        if (clsValue > 0.1) { // Seuil pour CLS problématique
+        if (clsValue > 0.1) {
+          // Seuil pour CLS problématique
           console.warn(`🐌 High CLS: ${clsValue.toFixed(3)}`)
         }
 
@@ -274,13 +274,12 @@ export class PerformanceMonitor {
         PerformanceMonitor.sendToAnalytics('web_vitals', {
           metric_name: 'CLS',
           value: parseFloat(clsValue.toFixed(3)),
-          rating: clsValue <= 0.1 ? 'good' : clsValue <= 0.25 ? 'needs_improvement' : 'poor'
+          rating: clsValue <= 0.1 ? 'good' : clsValue <= 0.25 ? 'needs_improvement' : 'poor',
         })
       })
-      
+
       observer.observe({ type: 'layout-shift', buffered: true })
       PerformanceMonitor.getInstance().observers.push(observer)
-
     } catch (error) {
       console.error('Error setting up CLS observer:', error)
     }
@@ -302,7 +301,6 @@ export class PerformanceMonitor {
       if (process.env.NODE_ENV === 'development') {
         console.log(`📊 Analytics: ${eventName}`, parameters)
       }
-
     } catch (error) {
       console.error('Error sending analytics:', error)
     }
@@ -343,7 +341,7 @@ export class PerformanceMonitor {
       value: data.value || data.duration || 0,
       timestamp: Date.now(),
       url: this.isClient ? window.location.href : undefined,
-      userAgent: this.isClient ? window.navigator.userAgent : undefined
+      userAgent: this.isClient ? window.navigator.userAgent : undefined,
     }
 
     if (!this.metrics.has(name)) {
@@ -376,9 +374,9 @@ export class PerformanceMonitor {
    */
   cleanup(): void {
     this.metrics.clear()
-    
+
     if (this.isClient) {
-      this.observers.forEach(observer => {
+      this.observers.forEach((observer) => {
         try {
           observer.disconnect()
         } catch (error) {
@@ -386,7 +384,7 @@ export class PerformanceMonitor {
         }
       })
     }
-    
+
     this.observers = []
   }
 
@@ -399,7 +397,7 @@ export class PerformanceMonitor {
     for (const [name, metrics] of this.metrics.entries()) {
       if (metrics.length === 0) continue
 
-      const values = metrics.map(m => m.value).filter(v => v > 0)
+      const values = metrics.map((m) => m.value).filter((v) => v > 0)
 
       if (values.length === 0) continue
 
@@ -409,7 +407,7 @@ export class PerformanceMonitor {
         min: Math.min(...values),
         max: Math.max(...values),
         latest: values[values.length - 1],
-        timestamp: metrics[metrics.length - 1].timestamp
+        timestamp: metrics[metrics.length - 1].timestamp,
       }
     }
 
@@ -429,12 +427,12 @@ export class PerformanceMonitor {
 // ===== HOOK POUR UTILISATION DANS REACT =====
 export function usePerformanceMonitor() {
   const monitor = PerformanceMonitor.getInstance()
-  
+
   return {
     recordMetric: monitor.recordMetric.bind(monitor),
     getMetrics: monitor.getMetrics.bind(monitor),
     getReport: monitor.getPerformanceReport.bind(monitor),
-    cleanup: monitor.cleanup.bind(monitor)
+    cleanup: monitor.cleanup.bind(monitor),
   }
 }
 

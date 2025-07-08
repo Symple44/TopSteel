@@ -14,15 +14,15 @@ export default defineConfig({
   outDir: 'dist',
   target: 'es2020',
   platform: 'neutral',
-  
+
   // Banner pour compatibilité client React
   banner: {
     js: '"use client";',
   },
-  
+
   // Gestion des erreurs gracieuse
   skipNodeModulesBundle: true,
-  
+
   // Pas de validation stricte au build
   onSuccess: 'echo "✅ Build UI réussi"',
 })

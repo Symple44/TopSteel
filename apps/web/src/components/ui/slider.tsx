@@ -1,22 +1,24 @@
-import * as React from "react"
+import * as React from 'react'
 
 interface SliderProps {
-  [key: string]: any; // Accepte toutes les props
+  [key: string]: any // Accepte toutes les props
 }
 
 const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
   ({ value, onValueChange, ...props }, ref) => {
-    const stringValue = Array.isArray(value) ? value[0]?.toString() || '0' : value?.toString() || '0';
-    
+    const stringValue = Array.isArray(value)
+      ? value[0]?.toString() || '0'
+      : value?.toString() || '0'
+
     return (
       <input
         type="range"
         value={stringValue}
         onChange={(e) => {
-          const newValue = Number((e.target as HTMLInputElement | HTMLTextAreaElement).value);
+          const newValue = Number((e.target as HTMLInputElement | HTMLTextAreaElement).value)
 
           if (onValueChange) {
-            onValueChange([newValue]); // Retourne array pour compatibilité
+            onValueChange([newValue]) // Retourne array pour compatibilité
           }
         }}
         ref={ref}
@@ -26,7 +28,6 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
   }
 )
 
-Slider.displayName = "Slider"
+Slider.displayName = 'Slider'
 
 export { Slider }
-

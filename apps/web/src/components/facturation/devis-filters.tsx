@@ -1,6 +1,7 @@
 // apps/web/src/components/facturation/devis-filters.tsx
 'use client'
 
+import { Filter, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -10,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Search, Filter, X } from 'lucide-react'
 
 interface DevisFiltersProps {
   onFiltersChange?: (filters: any) => void
@@ -22,13 +22,10 @@ export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
       <div className="flex-1">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="Rechercher par référence, client..."
-            className="pl-10"
-          />
+          <Input placeholder="Rechercher par référence, client..." className="pl-10" />
         </div>
       </div>
-      
+
       <Select>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Statut" />
@@ -41,7 +38,7 @@ export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
           <SelectItem value="refuse">Refusé</SelectItem>
         </SelectContent>
       </Select>
-      
+
       <Select>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Période" />
@@ -53,12 +50,12 @@ export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
           <SelectItem value="3m">3 derniers mois</SelectItem>
         </SelectContent>
       </Select>
-      
+
       <Button variant="outline" size="sm">
         <Filter className="h-4 w-4 mr-2" />
         Filtres
       </Button>
-      
+
       <Button variant="outline" size="sm">
         <X className="h-4 w-4 mr-2" />
         Effacer

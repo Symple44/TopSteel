@@ -23,10 +23,10 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "../users/entities/user.entity";
-import { DevisService } from "./devis.service";
-import { CreateDevisDto } from "./dto/create-devis.dto";
-import { DevisQueryDto } from "./dto/devis-query.dto";
-import { UpdateDevisDto } from "./dto/update-devis.dto";
+import type { DevisService } from "./devis.service";
+import type { CreateDevisDto } from "./dto/create-devis.dto";
+import type { DevisQueryDto } from "./dto/devis-query.dto";
+import type { UpdateDevisDto } from "./dto/update-devis.dto";
 
 @Controller("devis")
 @ApiTags("💰 Devis")

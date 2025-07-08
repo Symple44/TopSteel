@@ -1,51 +1,17 @@
 {
   "compilerOptions": {
-    /* ===== COMPILATION TARGETS ===== */
     "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2022", "ES2022.Array", "ES2022.Object"],
-    
-    /* ===== MODULE RESOLUTION ===== */
+    "lib": ["ES2022"],
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    
-    /* ===== TYPE CHECKING ROBUSTE ===== */
     "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": false,
-    "noImplicitOverride": true,
-    "allowUnusedLabels": false,
-    "allowUnreachableCode": false,
-    
-    /* ===== EMIT ===== */
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "removeComments": false,
-    "importHelpers": true,
-    "downlevelIteration": true,
-    
-    /* ===== PERFORMANCE ===== */
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "assumeChangesOnlyAffectDirectDependencies": true,
     "forceConsistentCasingInFileNames": true,
     
-    /* ===== DECORATORS SUPPORT ===== */
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    
-    /* ===== PATHS ===== */
     "baseUrl": ".",
     "paths": {
       "@erp/types": ["./packages/types/src"],
@@ -58,30 +24,6 @@
       "@erp/config/*": ["./packages/config/src/*"]
     }
   },
-  
-  /* ===== GLOBAL REFERENCES ===== */
-  "references": [
-    {
-      "path": "./packages/types"
-    },
-    {
-      "path": "./packages/utils"
-    },
-    {
-      "path": "./packages/ui"
-    },
-    {
-      "path": "./packages/config"
-    },
-    {
-      "path": "./apps/api"
-    },
-    {
-      "path": "./apps/web"
-    }
-  ],
-  
-  /* ===== EXCLUSIONS GLOBALES ===== */
   "exclude": [
     "node_modules",
     "dist",
@@ -90,12 +32,7 @@
     "out",
     "coverage",
     ".turbo",
-    "storybook-static",
     "**/*.test.ts",
-    "**/*.spec.ts",
-    "**/*.test.tsx",
-    "**/*.spec.tsx",
-    "test",
-    "__tests__"
+    "**/*.spec.ts"
   ]
 }

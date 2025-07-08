@@ -33,14 +33,14 @@ const mockUser: User = {
   email: 'jean.dubois@topsteel.com',
   role: 'admin',
   avatar: '/images/avatars/default.png',
-  permissions: ['read', 'write', 'admin']
+  permissions: ['read', 'write', 'admin'],
 }
 
 const mockTokens: Tokens = {
-  accessToken: `mock-access-token-${  Date.now()}`,
-  refreshToken: `mock-refresh-token-${  Date.now()}`,
+  accessToken: `mock-access-token-${Date.now()}`,
+  refreshToken: `mock-refresh-token-${Date.now()}`,
   expiresIn: 3600,
-  tokenType: 'Bearer'
+  tokenType: 'Bearer',
 }
 
 // Stockage local sécurisé
@@ -74,7 +74,7 @@ const storage = {
     } catch (error) {
       console.warn('Failed to remove from localStorage:', error)
     }
-  }
+  },
 }
 
 export const useAuth = () => {
@@ -83,7 +83,7 @@ export const useAuth = () => {
     user: null,
     tokens: null,
     isLoading: true,
-    isAuthenticated: false
+    isAuthenticated: false,
   })
 
   // ✅ Validation des tokens - fonction stable avec useCallback
@@ -98,8 +98,8 @@ export const useAuth = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `${tokens.tokenType || 'Bearer'} ${tokens.accessToken}`
-        }
+          Authorization: `${tokens.tokenType || 'Bearer'} ${tokens.accessToken}`,
+        },
       })
 
       return response.ok
@@ -112,12 +112,12 @@ export const useAuth = () => {
 
   // ✅ Fonction de login - stable avec useCallback
   const login = useCallback(async (email: string, password: string): Promise<void> => {
-    setAuthState(prev => ({ ...prev, isLoading: true }))
+    setAuthState((prev) => ({ ...prev, isLoading: true }))
 
     try {
       // En développement, utiliser les données mock
       if (process.env.NODE_ENV === 'development') {
-        await new Promise(resolve => setTimeout(resolve, 500)) // Simulation
+        await new Promise((resolve) => setTimeout(resolve, 500)) // Simulation
 
         const userData = { ...mockUser, email }
         const tokenData = mockTokens
@@ -129,7 +129,7 @@ export const useAuth = () => {
           user: userData,
           tokens: tokenData,
           isLoading: false,
-          isAuthenticated: true
+          isAuthenticated: true,
         })
 
         return
@@ -139,7 +139,7 @@ export const useAuth = () => {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       })
 
       if (!response.ok) {
@@ -156,17 +156,17 @@ export const useAuth = () => {
         user,
         tokens,
         isLoading: false,
-        isAuthenticated: true
+        isAuthenticated: true,
       })
     } catch (error) {
-      setAuthState(prev => ({ ...prev, isLoading: false }))
+      setAuthState((prev) => ({ ...prev, isLoading: false }))
       throw error
     }
   }, [])
 
   // ✅ Fonction de logout - stable avec useCallback
   const logout = useCallback(async (): Promise<void> => {
-    setAuthState(prev => ({ ...prev, isLoading: true }))
+    setAuthState((prev) => ({ ...prev, isLoading: true }))
 
     try {
       // Appel API pour invalider les tokens côté serveur
@@ -174,8 +174,8 @@ export const useAuth = () => {
         await fetch('/api/auth/logout', {
           method: 'POST',
           headers: {
-            'Authorization': `${authState.tokens.tokenType} ${authState.tokens.accessToken}`
-          }
+            Authorization: `${authState.tokens.tokenType} ${authState.tokens.accessToken}`,
+          },
         })
       }
     } catch (error) {
@@ -189,7 +189,7 @@ export const useAuth = () => {
         user: null,
         tokens: null,
         isLoading: false,
-        isAuthenticated: false
+        isAuthenticated: false,
       })
     }
   }, [authState.tokens])
@@ -198,17 +198,17 @@ export const useAuth = () => {
   const setUser = useCallback((user: User | null) => {
     if (user) {
       storage.set(AUTH_STORAGE_KEY, user)
-      setAuthState(prev => ({
+      setAuthState((prev) => ({
         ...prev,
         user,
-        isAuthenticated: true
+        isAuthenticated: true,
       }))
     } else {
       storage.remove(AUTH_STORAGE_KEY)
-      setAuthState(prev => ({
+      setAuthState((prev) => ({
         ...prev,
         user: null,
-        isAuthenticated: false
+        isAuthenticated: false,
       }))
     }
   }, [])
@@ -223,11 +223,11 @@ export const useAuth = () => {
       const response = await fetch('/api/auth/refresh', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          refreshToken: authState.tokens.refreshToken
-        })
+          refreshToken: authState.tokens.refreshToken,
+        }),
       })
 
       if (!response.ok) {
@@ -239,14 +239,14 @@ export const useAuth = () => {
         accessToken,
         refreshToken,
         expiresIn,
-        tokenType: 'Bearer'
+        tokenType: 'Bearer',
       }
 
       storage.set(TOKEN_STORAGE_KEY, newTokens)
 
-      setAuthState(prev => ({
+      setAuthState((prev) => ({
         ...prev,
-        tokens: newTokens
+        tokens: newTokens,
       }))
     } catch (error) {
       console.error('Token refresh failed:', error)
@@ -265,29 +265,29 @@ export const useAuth = () => {
         if (storedUser && storedTokens) {
           // Vérifier la validité des tokens
           const isTokenValid = await validateTokens(storedTokens)
-          
+
           if (isTokenValid) {
             setAuthState({
               user: storedUser,
               tokens: storedTokens,
               isLoading: false,
-              isAuthenticated: true
+              isAuthenticated: true,
             })
           } else {
             // Tokens invalides, nettoyer le stockage
             await logout()
           }
         } else {
-          setAuthState(prev => ({
+          setAuthState((prev) => ({
             ...prev,
-            isLoading: false
+            isLoading: false,
           }))
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
-        setAuthState(prev => ({
+        setAuthState((prev) => ({
           ...prev,
-          isLoading: false
+          isLoading: false,
         }))
       }
     }
@@ -301,14 +301,17 @@ export const useAuth = () => {
       return
     }
 
-    const refreshInterval = setInterval(async () => {
-      try {
-        await refreshTokens()
-      } catch (error) {
-        console.error('Auto refresh failed:', error)
-        clearInterval(refreshInterval)
-      }
-    }, 50 * 60 * 1000) // 50 minutes
+    const refreshInterval = setInterval(
+      async () => {
+        try {
+          await refreshTokens()
+        } catch (error) {
+          console.error('Auto refresh failed:', error)
+          clearInterval(refreshInterval)
+        }
+      },
+      50 * 60 * 1000
+    ) // 50 minutes
 
     return () => clearInterval(refreshInterval)
   }, [authState.tokens?.accessToken, authState.isAuthenticated, refreshTokens])
@@ -322,7 +325,7 @@ export const useAuth = () => {
     logout,
     setUser,
     refreshTokens,
-    validateTokens
+    validateTokens,
   }
 }
 

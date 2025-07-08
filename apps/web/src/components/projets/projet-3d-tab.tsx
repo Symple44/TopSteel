@@ -1,10 +1,10 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Projet } from '@erp/types'
 import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 
 interface Projet3DTabProps {
@@ -19,35 +19,35 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
   const modeles3D = [
     {
       id: '1',
-      nom: 'Vue d\'ensemble structure',
+      nom: "Vue d'ensemble structure",
       type: 'global',
       dateModification: new Date('2025-06-20'),
       taille: '15.2 MB',
-      format: '.step'
+      format: '.step',
     },
     {
-      id: '2', 
+      id: '2',
       nom: 'Détails assemblage',
       type: 'detail',
       dateModification: new Date('2025-06-18'),
       taille: '8.7 MB',
-      format: '.dwg'
+      format: '.dwg',
     },
     {
       id: '3',
-      nom: 'Plan d\'exécution',
+      nom: "Plan d'exécution",
       type: 'plan',
       dateModification: new Date('2025-06-15'),
       taille: '4.1 MB',
-      format: '.pdf'
-    }
+      format: '.pdf',
+    },
   ]
 
   const vues = [
     { id: 'front', label: 'Vue de face' },
     { id: 'side', label: 'Vue de côté' },
     { id: 'top', label: 'Vue de dessus' },
-    { id: 'iso', label: 'Vue isométrique' }
+    { id: 'iso', label: 'Vue isométrique' },
   ]
 
   return (
@@ -55,9 +55,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">Visualisation 3D</h2>
-          <p className="text-sm text-muted-foreground">
-            Modèles 3D et plans techniques du projet
-          </p>
+          <p className="text-sm text-muted-foreground">Modèles 3D et plans techniques du projet</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
@@ -99,28 +97,27 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
             </CardHeader>
             <CardContent>
               <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                {!is3DLoaded ? (
-                  <div className="text-center">
-                    <Box className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-600 mb-4">Viewer 3D non encore implémenté</p>
-                    <Button 
-                      onClick={() => setIs3DLoaded(true)}
-                      size="sm"
-                    >
-                      Simuler chargement 3D
-                    </Button>
-                  </div>
-                ) : (
+                {is3DLoaded ? (
                   <div className="text-center">
                     <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-8">
                       <Box className="h-12 w-12 mx-auto text-blue-600 mb-2" />
                       <p className="text-blue-800 font-medium">Modèle 3D chargé</p>
-                      <p className="text-blue-600 text-sm">{projet.reference} - Structure métallique</p>
+                      <p className="text-blue-600 text-sm">
+                        {projet.reference} - Structure métallique
+                      </p>
                     </div>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <Box className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-600 mb-4">Viewer 3D non encore implémenté</p>
+                    <Button onClick={() => setIs3DLoaded(true)} size="sm">
+                      Simuler chargement 3D
+                    </Button>
                   </div>
                 )}
               </div>
-              
+
               {/* Contrôles de vue */}
               <div className="flex gap-2 mt-4">
                 {vues.map((vue) => (
@@ -143,23 +140,19 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
           <Card>
             <CardHeader>
               <CardTitle>Modèles disponibles</CardTitle>
-              <CardDescription>
-                Fichiers 3D et plans techniques
-              </CardDescription>
+              <CardDescription>Fichiers 3D et plans techniques</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {modeles3D.map((modele) => (
-                  <div 
+                  <div
                     key={modele.id}
                     className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
                     onClick={() => setIs3DLoaded(true)}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <p className="font-medium text-sm">{modele.nom}</p>
-                      <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                        {modele.format}
-                      </span>
+                      <span className="text-xs bg-gray-100 px-2 py-1 rounded">{modele.format}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-500">
                       <span>{modele.taille}</span>

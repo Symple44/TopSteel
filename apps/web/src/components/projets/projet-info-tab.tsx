@@ -1,5 +1,8 @@
 'use client'
 
+import { ProjetStatut } from '@erp/types'
+import { Building2, Calendar, Clock, Edit, Euro, Mail, MapPin, Phone, Save, X } from 'lucide-react'
+import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,20 +12,6 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@/types'
-import { ProjetStatut } from '@erp/types'
-import {
-  Building2,
-  Calendar,
-  Clock,
-  Edit,
-  Euro,
-  Mail,
-  MapPin,
-  Phone,
-  Save,
-  X
-} from 'lucide-react'
-import { useState } from 'react'
 
 interface ProjetInfoTabProps {
   projet: Projet
@@ -67,28 +56,17 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div className="flex gap-2">
               {isEditing ? (
                 <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCancel}
-                  >
+                  <Button variant="outline" size="sm" onClick={handleCancel}>
                     <X className="h-4 w-4 mr-2" />
                     Annuler
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleSave}
-                  >
+                  <Button size="sm" onClick={handleSave}>
                     <Save className="h-4 w-4 mr-2" />
                     Enregistrer
                   </Button>
                 </>
               ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                >
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                   <Edit className="h-4 w-4 mr-2" />
                   Modifier
                 </Button>
@@ -101,10 +79,10 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div>
               <Label>Nom du projet</Label>
               {isEditing ? (
-                <Input 
+                <Input
                   value={formData.reference}
-                  onChange={(e) => setFormData({...formData, reference: e.target.value})}
-                  className="mt-1" 
+                  onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                  className="mt-1"
                 />
               ) : (
                 <p className="text-sm font-medium mt-1">{projet.reference || 'Non défini'}</p>
@@ -123,9 +101,9 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
           <div>
             <Label>Description</Label>
             {isEditing ? (
-              <Textarea 
+              <Textarea
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="mt-1"
                 rows={3}
                 placeholder="Description du projet..."
@@ -141,11 +119,11 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div>
               <Label>Date de début</Label>
               {isEditing ? (
-                <Input 
+                <Input
                   type="date"
                   value={formData.dateDebut}
-                  onChange={(e) => setFormData({...formData, dateDebut: e.target.value})}
-                  className="mt-1" 
+                  onChange={(e) => setFormData({ ...formData, dateDebut: e.target.value })}
+                  className="mt-1"
                 />
               ) : (
                 <div className="flex items-center gap-2 mt-1">
@@ -159,11 +137,11 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
             <div>
               <Label>Date de fin prévue</Label>
               {isEditing ? (
-                <Input 
+                <Input
                   type="date"
                   value={formData.dateFin}
-                  onChange={(e) => setFormData({...formData, dateFin: e.target.value})}
-                  className="mt-1" 
+                  onChange={(e) => setFormData({ ...formData, dateFin: e.target.value })}
+                  className="mt-1"
                 />
               ) : (
                 <div className="flex items-center gap-2 mt-1">
@@ -206,18 +184,21 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
                   <div>
                     {projet.client.adresse.rue && <div>{projet.client.adresse.rue}</div>}
                     {projet.client.adresse.ville && projet.client.adresse.codePostal && (
-                      <div>{projet.client.adresse.codePostal} {projet.client.adresse.ville}</div>
+                      <div>
+                        {projet.client.adresse.codePostal} {projet.client.adresse.ville}
+                      </div>
                     )}
                   </div>
                 ) : (
                   <div>
-                    123 Rue de l'Industrie<br />
+                    123 Rue de l'Industrie
+                    <br />
                     44800 Saint-Herblain
                   </div>
                 )}
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-3">
               <Phone className="h-4 w-4 text-muted-foreground" />
               <p className="text-sm">{projet.client?.telephone || '02 40 XX XX XX'}</p>
@@ -271,14 +252,18 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
                 <span>{Math.round(((projet as any).montantPaye / projet.montantTTC) * 100)}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-green-600 h-2 rounded-full" 
-                  style={{ width: `${Math.min(((projet as any).montantPaye / projet.montantTTC) * 100, 100)}%` }}
+                <div
+                  className="bg-green-600 h-2 rounded-full"
+                  style={{
+                    width: `${Math.min(((projet as any).montantPaye / projet.montantTTC) * 100, 100)}%`,
+                  }}
                 ></div>
               </div>
               <div className="flex justify-between text-xs text-muted-foreground mt-1">
                 <span>Payé: {formatCurrency((projet as any).montantPaye)}</span>
-                <span>Restant: {formatCurrency(projet.montantTTC - (projet as any).montantPaye)}</span>
+                <span>
+                  Restant: {formatCurrency(projet.montantTTC - (projet as any).montantPaye)}
+                </span>
               </div>
             </div>
           )}

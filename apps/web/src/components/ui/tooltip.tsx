@@ -1,7 +1,7 @@
-import * as React from "react"
+import type * as React from 'react'
 
-interface UltraProps { 
-  [key: string]: any 
+interface UltraProps {
+  [key: string]: any
 }
 
 export const Tooltip: React.FC<UltraProps> = (props) => <div {...props} />

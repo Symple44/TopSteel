@@ -9,7 +9,7 @@ export enum DevisStatut {
   ENVOYE = 'envoye',
   ACCEPTE = 'accepte',
   REFUSE = 'refuse',
-  EXPIRE = 'expire'
+  EXPIRE = 'expire',
 }
 
 export enum FactureStatut {
@@ -18,19 +18,19 @@ export enum FactureStatut {
   PAYEE = 'payee',
   PARTIELLE = 'partielle',
   EN_RETARD = 'en_retard',
-  ANNULEE = 'annulee'
+  ANNULEE = 'annulee',
 }
 
 export enum FactureType {
   FACTURE = 'facture',
   AVOIR = 'avoir',
   ACOMPTE = 'acompte',
-  SOLDE = 'solde'
+  SOLDE = 'solde',
 }
 
 export enum PaiementType {
   ENCAISSEMENT = 'encaissement',
-  DECAISSEMENT = 'decaissement'
+  DECAISSEMENT = 'decaissement',
 }
 
 export enum PaiementMethode {
@@ -38,13 +38,13 @@ export enum PaiementMethode {
   CHEQUE = 'cheque',
   ESPECES = 'especes',
   CARTE = 'carte',
-  PRELEVEMENT = 'prelevement'
+  PRELEVEMENT = 'prelevement',
 }
 
 export enum PaiementStatut {
   ATTENTE = 'attente',
   VALIDE = 'valide',
-  ANNULE = 'annule'
+  ANNULE = 'annule',
 }
 
 export interface Devis extends BaseEntity {

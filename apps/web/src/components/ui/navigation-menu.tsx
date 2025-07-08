@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 interface NavigationMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
@@ -10,11 +10,11 @@ interface NavigationMenuProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
+  ({ className = '', children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
     }
-    
+
     return (
       <div className={className} ref={ref} {...props}>
         {children}
@@ -23,11 +23,11 @@ export const NavigationMenu = React.forwardRef<HTMLDivElement, NavigationMenuPro
   }
 )
 
-NavigationMenu.displayName = "NavigationMenu"
+NavigationMenu.displayName = 'NavigationMenu'
 
 // Export des sous-composants courants si nécessaire
 export const NavigationMenuContent = NavigationMenu
-export const NavigationMenuTrigger = NavigationMenu  
+export const NavigationMenuTrigger = NavigationMenu
 export const NavigationMenuItem = NavigationMenu
 export const NavigationMenuValue = NavigationMenu
 export const NavigationMenuHeader = NavigationMenu

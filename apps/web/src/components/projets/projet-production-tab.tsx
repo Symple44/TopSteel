@@ -1,15 +1,25 @@
 'use client'
 
+import type { Projet } from '@erp/types'
+import { PrioriteProduction, StatutProduction } from '@erp/types'
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Factory,
+  Pause,
+  Play,
+  Plus,
+  User,
+} from 'lucide-react'
+import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { formatDate } from '@/lib/utils'
-import type { Projet } from '@erp/types'
-import { PrioriteProduction, StatutProduction } from '@erp/types'
-import { AlertCircle, Calendar, CheckCircle2, Clock, Factory, Pause, Play, Plus, User } from 'lucide-react'
-import { useState } from 'react'
 import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
+import { formatDate } from '@/lib/utils'
 
 interface ProjetProductionTabProps {
   projet: Projet
@@ -17,14 +27,14 @@ interface ProjetProductionTabProps {
 
 // Interface pour les ordres de fabrication mock
 interface MockOrdreFabrication {
-  id: string;
-  numero: string;
-  dateDebut: Date;
-  dateFin?: Date;
-  progression: number;
-  statut: StatutProduction;
-  priorite: PrioriteProduction;
-  operations: any[];
+  id: string
+  numero: string
+  dateDebut: Date
+  dateFin?: Date
+  progression: number
+  statut: StatutProduction
+  priorite: PrioriteProduction
+  operations: any[]
 }
 
 // Données mockées pour la démonstration - CORRIGÉES
@@ -123,41 +133,41 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
       [StatutProduction.PLANIFIE]: {
         label: 'Planifié',
         variant: 'outline' as const,
-        icon: Calendar
+        icon: Calendar,
       },
       [StatutProduction.EN_COURS]: {
         label: 'En cours',
         variant: 'default' as const,
-        icon: Play
+        icon: Play,
       },
       [StatutProduction.PAUSE]: {
         label: 'En pause',
         variant: 'secondary' as const,
-        icon: Pause
+        icon: Pause,
       },
       [StatutProduction.TERMINE]: {
         label: 'Terminé',
         variant: 'secondary' as const,
-        icon: CheckCircle2
+        icon: CheckCircle2,
       },
       [StatutProduction.ANNULE]: {
         label: 'Annulé',
         variant: 'destructive' as const,
-        icon: AlertCircle
+        icon: AlertCircle,
       },
       [StatutProduction.EN_ATTENTE]: {
         label: 'En attente',
         variant: 'outline' as const,
-        icon: Clock
+        icon: Clock,
       },
     }
-    
+
     const config = statusConfig[statut]
 
     if (!config) return null
-    
+
     const Icon = config.icon
-    
+
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
@@ -185,16 +195,12 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
         variant: 'destructive' as const,
       },
     }
-    
+
     const config = prioriteConfig[priorite]
 
     if (!config) return null
-    
-    return (
-      <Badge variant={config.variant}>
-        {config.label}
-      </Badge>
-    )
+
+    return <Badge variant={config.variant}>{config.label}</Badge>
   }
 
   const getOperationStatusIcon = (statut: string) => {
@@ -223,7 +229,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {mockOrdresFabrication.filter(of => of.statut === StatutProduction.EN_COURS).length}
+              {mockOrdresFabrication.filter((of) => of.statut === StatutProduction.EN_COURS).length}
             </div>
             <p className="text-xs text-muted-foreground">
               Sur {mockOrdresFabrication.length} au total
@@ -239,16 +245,17 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
           <CardContent>
             <div className="text-2xl font-bold">
               {Math.round(
-                mockOrdresFabrication.reduce((acc, of) => acc + of.progression, 0) / 
-                mockOrdresFabrication.length
-              )}%
+                mockOrdresFabrication.reduce((acc, of) => acc + of.progression, 0) /
+                  mockOrdresFabrication.length
+              )}
+              %
             </div>
-            <Progress 
+            <Progress
               value={
-                mockOrdresFabrication.reduce((acc, of) => acc + of.progression, 0) / 
+                mockOrdresFabrication.reduce((acc, of) => acc + of.progression, 0) /
                 mockOrdresFabrication.length
-              } 
-              className="mt-2 h-2" 
+              }
+              className="mt-2 h-2"
             />
           </CardContent>
         </Card>
@@ -260,9 +267,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">48h</div>
-            <p className="text-xs text-muted-foreground">
-              Pour tous les ordres
-            </p>
+            <p className="text-xs text-muted-foreground">Pour tous les ordres</p>
           </CardContent>
         </Card>
 
@@ -273,9 +278,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">
-              Sur ce projet
-            </p>
+            <p className="text-xs text-muted-foreground">Sur ce projet</p>
           </CardContent>
         </Card>
       </div>
@@ -286,9 +289,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Ordres de fabrication</CardTitle>
-              <CardDescription>
-                Suivi de la production et des opérations
-              </CardDescription>
+              <CardDescription>Suivi de la production et des opérations</CardDescription>
             </div>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -302,9 +303,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
               <div
                 key={of.id}
                 className={`rounded-lg border p-4 cursor-pointer transition-colors ${
-                  selectedOF?.id === of.id
-                    ? 'border-primary bg-primary/5'
-                    : 'hover:bg-muted/50'
+                  selectedOF?.id === of.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
                 }`}
                 onClick={() => setSelectedOF(of)}
               >
@@ -339,9 +338,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>{selectedOF.numero}</CardTitle>
-                <CardDescription>
-                  Détail des opérations de production
-                </CardDescription>
+                <CardDescription>Détail des opérations de production</CardDescription>
               </div>
               {getStatutBadge(selectedOF.statut)}
             </div>
@@ -349,7 +346,10 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
           <CardContent>
             <div className="space-y-4">
               {selectedOF.operations.map((operation) => (
-                <div key={operation.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                <div
+                  key={operation.id}
+                  className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                >
                   <div className="flex items-center gap-3">
                     {getOperationStatusIcon(operation.statut)}
                     <div>

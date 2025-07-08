@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from 'recharts'
 
 interface ChartData {
@@ -30,11 +30,11 @@ interface LineChartProps {
   height?: number
 }
 
-export function SimpleLineChart({ 
-  data, 
-  dataKey = 'value', 
+export function SimpleLineChart({
+  data,
+  dataKey = 'value',
   color = '#3b82f6',
-  height = 300 
+  height = 300,
 }: LineChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -43,10 +43,10 @@ export function SimpleLineChart({
         <XAxis dataKey="name" />
         <YAxis />
         <Tooltip />
-        <Line 
-          type="monotone" 
-          dataKey={dataKey} 
-          stroke={color} 
+        <Line
+          type="monotone"
+          dataKey={dataKey}
+          stroke={color}
           strokeWidth={2}
           dot={{ fill: color }}
         />
@@ -62,11 +62,11 @@ interface BarChartProps {
   height?: number
 }
 
-export function SimpleBarChart({ 
-  data, 
-  dataKey = 'value', 
+export function SimpleBarChart({
+  data,
+  dataKey = 'value',
   color = '#3b82f6',
-  height = 300 
+  height = 300,
 }: BarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -87,10 +87,10 @@ interface PieChartProps {
   height?: number
 }
 
-export function SimplePieChart({ 
-  data, 
+export function SimplePieChart({
+  data,
   colors = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6'],
-  height = 300 
+  height = 300,
 }: PieChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -127,11 +127,11 @@ interface AreaChartProps {
   height?: number
 }
 
-export function SimpleAreaChart({ 
-  data, 
-  dataKey = 'value', 
+export function SimpleAreaChart({
+  data,
+  dataKey = 'value',
   color = '#3b82f6',
-  height = 300 
+  height = 300,
 }: AreaChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -140,13 +140,7 @@ export function SimpleAreaChart({
         <XAxis dataKey="name" />
         <YAxis />
         <Tooltip />
-        <Area 
-          type="monotone" 
-          dataKey={dataKey} 
-          stroke={color} 
-          fill={color}
-          fillOpacity={0.3}
-        />
+        <Area type="monotone" dataKey={dataKey} stroke={color} fill={color} fillOpacity={0.3} />
       </AreaChart>
     </ResponsiveContainer>
   )
@@ -168,10 +162,10 @@ export const formatPieLabel = ({ name, percent }: PieLabelProps): string => {
 }
 
 // ✅ VERSION ALTERNATIVE DU PIE CHART AVEC HELPER
-export function SafePieChart({ 
-  data, 
+export function SafePieChart({
+  data,
   colors = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6'],
-  height = 300 
+  height = 300,
 }: PieChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -190,10 +184,10 @@ export function SafePieChart({
             <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
           ))}
         </Pie>
-        <Tooltip 
+        <Tooltip
           formatter={(value: number, name: string) => [
             `${value.toLocaleString()}`,
-            name || 'Valeur'
+            name || 'Valeur',
           ]}
         />
       </PieChart>
@@ -203,5 +197,8 @@ export function SafePieChart({
 
 // ✅ EXPORTS POUR COMPATIBILITÉ
 export {
-  SimpleAreaChart as AreaChart, SimpleBarChart as BarChart, SimpleLineChart as LineChart, SimplePieChart as PieChart
+  SimpleAreaChart as AreaChart,
+  SimpleBarChart as BarChart,
+  SimpleLineChart as LineChart,
+  SimplePieChart as PieChart,
 }

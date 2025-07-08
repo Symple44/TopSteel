@@ -14,7 +14,7 @@ export function useOptimizedQuery<T>({
   fetcher,
   staleTime = 5 * 60 * 1000, // 5 minutes
   gcTime = 30 * 60 * 1000, // 30 minutes (remplace cacheTime)
-  enabled = true
+  enabled = true,
 }: OptimizedQueryOptions<T>) {
   return useQuery({
     queryKey: key,
@@ -27,7 +27,7 @@ export function useOptimizedQuery<T>({
       if (error?.response?.status === 404) return false
 
       return failureCount < 3
-    }
+    },
   })
 }
 
@@ -36,19 +36,19 @@ export function useOptimizedMutation<TData, TVariables>(
   invalidationKeys?: string[][]
 ) {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn,
     onSuccess: () => {
       if (invalidationKeys) {
-        invalidationKeys.forEach(key => {
+        invalidationKeys.forEach((key) => {
           queryClient.invalidateQueries({ queryKey: key })
         })
       }
     },
     onError: (error) => {
       console.error('Mutation error:', error)
-    }
+    },
   })
 }
 
@@ -81,7 +81,7 @@ export function useSmartQuery<T>(
       }
 
       return failureCount < 3
-    }
+    },
   })
 }
 
@@ -97,17 +97,17 @@ export function useSmartMutation<TData, TVariables>(
   }
 ) {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn,
     onSuccess: (data) => {
       // Invalider les clés spécifiées
       if (options?.invalidateKeys) {
-        options.invalidateKeys.forEach(key => {
+        options.invalidateKeys.forEach((key) => {
           queryClient.invalidateQueries({ queryKey: key })
         })
       }
-      
+
       // Callback de succès personnalisé
       options?.onSuccess?.(data)
     },
@@ -122,6 +122,6 @@ export function useSmartMutation<TData, TVariables>(
       }
 
       return failureCount < 1 // Un seul retry pour les erreurs serveur
-    }
+    },
   })
 }

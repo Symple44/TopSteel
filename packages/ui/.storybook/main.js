@@ -33,8 +33,8 @@ const config = {
           '@': require('path').resolve(__dirname, '../src'),
         },
       },
-    };
+    }
   },
-};
+}
 
-export default config;
+export default config

@@ -1,7 +1,7 @@
 'use client'
 
+import { Filter, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
-import { Plus, Search, Filter } from 'lucide-react'
 
 export default function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -66,4 +66,3 @@ export default function ClientsPage() {
     </div>
   )
 }
-

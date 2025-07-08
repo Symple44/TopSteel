@@ -1,4 +1,2 @@
-export type * from '@erp/types';
-export interface WebAppConfig {
-  // types spécifiques au web...
-}
+export type * from '@erp/types'
+export type WebAppConfig = {}

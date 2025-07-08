@@ -23,10 +23,10 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "../users/entities/user.entity";
-import { CreateFacturationDto } from "./dto/create-facturation.dto";
-import { FacturationQueryDto } from "./dto/facturation-query.dto";
-import { UpdateFacturationDto } from "./dto/update-facturation.dto";
-import { FacturationService } from "./facturation.service";
+import type { CreateFacturationDto } from "./dto/create-facturation.dto";
+import type { FacturationQueryDto } from "./dto/facturation-query.dto";
+import type { UpdateFacturationDto } from "./dto/update-facturation.dto";
+import type { FacturationService } from "./facturation.service";
 
 @Controller("facturation")
 @ApiTags("🧾 Facturation")

@@ -1,56 +1,56 @@
-import { IsString, IsOptional, IsEmail, MaxLength } from "class-validator";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsEmail, IsOptional, IsString, MaxLength } from 'class-validator'
 
 export class CreateClientDto {
-  @ApiProperty({ description: "Nom du client" })
+  @ApiProperty({ description: 'Nom du client' })
   @IsString()
   @MaxLength(255)
-  nom!: string;
+  nom!: string
 
-  @ApiPropertyOptional({ description: "Prénom du client" })
+  @ApiPropertyOptional({ description: 'Prénom du client' })
   @IsString()
   @IsOptional()
   @MaxLength(255)
-  prenom?: string;
+  prenom?: string
 
-  @ApiPropertyOptional({ description: "Email du client" })
+  @ApiPropertyOptional({ description: 'Email du client' })
   @IsEmail()
   @IsOptional()
-  email?: string;
+  email?: string
 
-  @ApiPropertyOptional({ description: "Numéro de téléphone" })
+  @ApiPropertyOptional({ description: 'Numéro de téléphone' })
   @IsString()
   @IsOptional()
   @MaxLength(20)
-  telephone?: string;
+  telephone?: string
 
-  @ApiPropertyOptional({ description: "Adresse complète" })
+  @ApiPropertyOptional({ description: 'Adresse complète' })
   @IsString()
   @IsOptional()
   @MaxLength(500)
-  adresse?: string;
+  adresse?: string
 
-  @ApiPropertyOptional({ description: "Code postal" })
+  @ApiPropertyOptional({ description: 'Code postal' })
   @IsString()
   @IsOptional()
   @MaxLength(10)
-  codePostal?: string;
+  codePostal?: string
 
-  @ApiPropertyOptional({ description: "Ville" })
+  @ApiPropertyOptional({ description: 'Ville' })
   @IsString()
   @IsOptional()
   @MaxLength(255)
-  ville?: string;
+  ville?: string
 
-  @ApiPropertyOptional({ description: "Numéro SIRET" })
+  @ApiPropertyOptional({ description: 'Numéro SIRET' })
   @IsString()
   @IsOptional()
   @MaxLength(14)
-  siret?: string;
+  siret?: string
 
-  @ApiPropertyOptional({ description: "Notes additionnelles" })
+  @ApiPropertyOptional({ description: 'Notes additionnelles' })
   @IsString()
   @IsOptional()
   @MaxLength(1000)
-  notes?: string;
+  notes?: string
 }

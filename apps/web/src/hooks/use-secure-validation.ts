@@ -30,7 +30,7 @@ class SimpleSecurityUtils {
   static validateEmailSecure(email: string): boolean {
     // Pattern email basique mais robuste
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    
+
     if (!emailPattern.test(email)) {
       return false
     }
@@ -43,7 +43,7 @@ class SimpleSecurityUtils {
     // Vérifier les domaines suspects
     const suspiciousDomains = ['tempmail.org', '10minutemail.com', 'guerrillamail.com']
     const domain = email.split('@')[1]?.toLowerCase()
-    
+
     if (domain && suspiciousDomains.includes(domain)) {
       return false
     }
@@ -80,58 +80,61 @@ class SimpleSecurityUtils {
 export function useSecureValidation(rules: ValidationRules) {
   const [errors, setErrors] = useState<ValidationErrors>({})
 
-  const validate = useCallback((data: Record<string, string>): boolean => {
-    const newErrors: ValidationErrors = {}
+  const validate = useCallback(
+    (data: Record<string, string>): boolean => {
+      const newErrors: ValidationErrors = {}
 
-    Object.entries(rules).forEach(([field, rule]) => {
-      const value = data[field] || ''
-      const fieldErrors: string[] = []
+      Object.entries(rules).forEach(([field, rule]) => {
+        const value = data[field] || ''
+        const fieldErrors: string[] = []
 
-      // Required
-      if (rule.required && !value.trim()) {
-        fieldErrors.push('Ce champ est requis')
-      }
+        // Required
+        if (rule.required && !value.trim()) {
+          fieldErrors.push('Ce champ est requis')
+        }
 
-      if (value) {
-        // Email
-        if (rule.email) {
-          if (!SimpleSecurityUtils.validateEmailSecure(value)) {
-            fieldErrors.push('Email invalide ou non autorisé')
+        if (value) {
+          // Email
+          if (rule.email) {
+            if (!SimpleSecurityUtils.validateEmailSecure(value)) {
+              fieldErrors.push('Email invalide ou non autorisé')
+            }
+          }
+
+          // Length
+          if (rule.minLength && value.length < rule.minLength) {
+            fieldErrors.push(`Minimum ${rule.minLength} caractères`)
+          }
+          if (rule.maxLength && value.length > rule.maxLength) {
+            fieldErrors.push(`Maximum ${rule.maxLength} caractères`)
+          }
+
+          // Pattern
+          if (rule.pattern && !rule.pattern.test(value)) {
+            fieldErrors.push('Format invalide')
+          }
+
+          // Custom validation
+          if (rule.custom) {
+            const customError = rule.custom(value)
+
+            if (customError) {
+              fieldErrors.push(customError)
+            }
           }
         }
 
-        // Length
-        if (rule.minLength && value.length < rule.minLength) {
-          fieldErrors.push(`Minimum ${rule.minLength} caractères`)
+        if (fieldErrors.length > 0) {
+          newErrors[field] = fieldErrors
         }
-        if (rule.maxLength && value.length > rule.maxLength) {
-          fieldErrors.push(`Maximum ${rule.maxLength} caractères`)
-        }
+      })
 
-        // Pattern
-        if (rule.pattern && !rule.pattern.test(value)) {
-          fieldErrors.push('Format invalide')
-        }
+      setErrors(newErrors)
 
-        // Custom validation
-        if (rule.custom) {
-          const customError = rule.custom(value)
-
-          if (customError) {
-            fieldErrors.push(customError)
-          }
-        }
-      }
-
-      if (fieldErrors.length > 0) {
-        newErrors[field] = fieldErrors
-      }
-    })
-
-    setErrors(newErrors)
-
-    return Object.keys(newErrors).length === 0
-  }, [rules])
+      return Object.keys(newErrors).length === 0
+    },
+    [rules]
+  )
 
   const sanitizeInput = useCallback((value: string): string => {
     return SimpleSecurityUtils.sanitizeString(value)
@@ -150,14 +153,14 @@ export function useSecureValidation(rules: ValidationRules) {
     getFieldErrors: (field: string) => errors[field] || [],
     clearErrors: () => setErrors({}),
     clearFieldError: (field: string) => {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev }
 
         delete newErrors[field]
 
         return newErrors
       })
-    }
+    },
   }
 }
 
@@ -169,7 +172,7 @@ export function useFormSecureValidation() {
     email: {
       required: true,
       email: true,
-      maxLength: 254
+      maxLength: 254,
     },
     password: {
       required: true,
@@ -180,19 +183,19 @@ export function useFormSecureValidation() {
         const hasUpper = /[A-Z]/.test(value)
         const hasNumber = /\d/.test(value)
         const hasSpecial = /[^a-zA-Z\d]/.test(value)
-        
+
         if (!hasLower) return 'Doit contenir une minuscule'
         if (!hasUpper) return 'Doit contenir une majuscule'
         if (!hasNumber) return 'Doit contenir un chiffre'
         if (!hasSpecial) return 'Doit contenir un caractère spécial'
-        
+
         return null
-      }
+      },
     },
     name: {
       required: true,
       minLength: 2,
-      maxLength: 100
+      maxLength: 100,
     },
     phone: {
       pattern: /^(\+33|0)[1-9](\d{8})$/,
@@ -202,7 +205,7 @@ export function useFormSecureValidation() {
         }
 
         return null
-      }
-    }
+      },
+    },
   })
 }

@@ -6,14 +6,7 @@
 
 'use client'
 
-import {
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-    type ComponentType,
-    type ReactNode
-} from 'react'
+import { type ComponentType, type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 
 // ===== TYPES =====
 
@@ -101,7 +94,7 @@ class HydrationManager {
   }
 
   private _notifyListeners() {
-    this._listeners.forEach(listener => {
+    this._listeners.forEach((listener) => {
       try {
         listener()
       } catch (error) {
@@ -137,14 +130,14 @@ const hydrationManager = HydrationManager.getInstance()
  * Composant qui rend ses enfants uniquement côté client
  * Évite les erreurs d'hydratation pour les composants utilisant des APIs browser
  */
-export function ClientOnly({ 
-  children, 
-  fallback = null, 
+export function ClientOnly({
+  children,
+  fallback = null,
   fallbackDelay = 0,
   className,
   onMount,
   onHydrating,
-  remountOnChange = false
+  remountOnChange = false,
 }: ClientOnlyProps) {
   const [hasMounted, setHasMounted] = useState(false)
   const [showFallback, setShowFallback] = useState(fallbackDelay > 0)
@@ -158,19 +151,22 @@ export function ClientOnly({
   const handleMount = useCallback(() => {
     if (mountedRef.current) return
     mountedRef.current = true
-    
+
     setIsHydrating(true)
     onHydrating?.()
 
-    hydrationManager.waitForHydration().then(() => {
-      setHasMounted(true)
-      setIsHydrating(false)
-      onMount?.()
-    }).catch((error) => {
-      console.error('Erreur pendant l\'hydratation:', error)
-      setHasMounted(true)
-      setIsHydrating(false)
-    })
+    hydrationManager
+      .waitForHydration()
+      .then(() => {
+        setHasMounted(true)
+        setIsHydrating(false)
+        onMount?.()
+      })
+      .catch((error) => {
+        console.error("Erreur pendant l'hydratation:", error)
+        setHasMounted(true)
+        setIsHydrating(false)
+      })
   }, [onMount, onHydrating])
 
   // Gérer le délai du fallback
@@ -179,7 +175,7 @@ export function ClientOnly({
       const timer = setTimeout(() => {
         setShowFallback(false)
       }, fallbackDelay)
-      
+
       return () => clearTimeout(timer)
     }
 
@@ -221,8 +217,8 @@ export function ClientOnly({
 
   if (shouldShowFallback) {
     return (
-      <div 
-        className={className} 
+      <div
+        className={className}
         data-client-only="loading"
         data-hydrating={isHydrating}
         suppressHydrationWarning
@@ -233,8 +229,8 @@ export function ClientOnly({
   }
 
   return (
-    <div 
-      className={className} 
+    <div
+      className={className}
       data-client-only="mounted"
       data-hydrated="true"
       suppressHydrationWarning
@@ -309,7 +305,7 @@ export function useHydrationState(): {
   const [state, setState] = useState({
     isClient: hydrationManager.isClient,
     isHydrated: hydrationManager.isHydrated,
-    isHydrating: hydrationManager.isClient && !hydrationManager.isHydrated
+    isHydrating: hydrationManager.isClient && !hydrationManager.isHydrated,
   })
 
   useEffect(() => {
@@ -317,23 +313,23 @@ export function useHydrationState(): {
       setState({
         isClient: true,
         isHydrated: true,
-        isHydrating: false
+        isHydrating: false,
       })
 
       return
     }
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       isClient: true,
-      isHydrating: true
+      isHydrating: true,
     }))
 
     const removeListener = hydrationManager.addListener(() => {
       setState({
         isClient: true,
         isHydrated: true,
-        isHydrating: false
+        isHydrating: false,
       })
     })
 
@@ -346,10 +342,7 @@ export function useHydrationState(): {
 /**
  * Hook pour accéder aux APIs browser de manière sécurisée
  */
-export function useBrowserAPI<T>(
-  getter: () => T,
-  fallback: T
-): T {
+export function useBrowserAPI<T>(getter: () => T, fallback: T): T {
   const [value, setValue] = useState<T>(fallback)
   const isClient = useIsClient()
 
@@ -400,22 +393,18 @@ export function withClientOnly<P extends Record<string, any>>(
 
   const WrappedComponent = (props: P & { clientOnlyFallback?: ReactNode }) => {
     const { clientOnlyFallback, ...componentProps } = props
-    
-    const fallbackElement = clientOnlyFallback || 
-      (FallbackComponent ? <FallbackComponent /> : null)
+
+    const fallbackElement = clientOnlyFallback || (FallbackComponent ? <FallbackComponent /> : null)
 
     return (
-      <ClientOnly 
-        fallback={fallbackElement}
-        remountOnChange={forceRemount}
-      >
+      <ClientOnly fallback={fallbackElement} remountOnChange={forceRemount}>
         <Component {...(componentProps as P)} />
       </ClientOnly>
     )
   }
 
-  WrappedComponent.displayName = displayName || 
-    `withClientOnly(${Component.displayName || Component.name || 'Component'})`
+  WrappedComponent.displayName =
+    displayName || `withClientOnly(${Component.displayName || Component.name || 'Component'})`
 
   return WrappedComponent
 }
@@ -434,11 +423,7 @@ export function ServerSideRenderingBlocker({ children }: { children: ReactNode }
   return (
     <ClientOnly
       fallback={
-        <div 
-          className="ssr-blocked" 
-          style={{ display: 'none' }}
-          suppressHydrationWarning
-        />
+        <div className="ssr-blocked" style={{ display: 'none' }} suppressHydrationWarning />
       }
     >
       {children}
@@ -453,17 +438,17 @@ export function ServerSideRenderingBlocker({ children }: { children: ReactNode }
  */
 export function HydrationDebugger({ showInProduction = false }: { showInProduction?: boolean }) {
   const { isClient, isHydrated, isHydrating } = useHydrationState()
-  
+
   if (process.env.NODE_ENV === 'production' && !showInProduction) {
     return null
   }
 
   return (
-    <div 
+    <div
       className="fixed bottom-4 right-4 bg-black text-white p-2 rounded text-xs font-mono z-50"
-      style={{ 
+      style={{
         backgroundColor: isHydrated ? 'green' : isHydrating ? 'orange' : 'red',
-        color: 'white'
+        color: 'white',
       }}
     >
       <div>Client: {isClient ? '✓' : '✗'}</div>
@@ -475,11 +460,6 @@ export function HydrationDebugger({ showInProduction = false }: { showInProducti
 
 // ===== EXPORTS =====
 
-export {
-    hydrationManager,
-    HydrationManager
-}
+export { hydrationManager, HydrationManager }
 
-export type {
-    ClientOnlyProps, SafeComponentProps, WithClientOnlyOptions
-}
+export type { ClientOnlyProps, SafeComponentProps, WithClientOnlyOptions }

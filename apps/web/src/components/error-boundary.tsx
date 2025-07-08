@@ -1,8 +1,8 @@
 'use client'
 
-import { AlertTriangle, Bug, Home, RefreshCw } from 'lucide-react';
-import type { ErrorInfo, ReactNode } from 'react';
-import React, { Component } from 'react';
+import { AlertTriangle, Bug, Home, RefreshCw } from 'lucide-react'
+import type { ErrorInfo, ReactNode } from 'react'
+import React, { Component } from 'react'
 
 interface Props {
   children: ReactNode
@@ -34,11 +34,11 @@ export class ErrorBoundary extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
-    
+
     this.state = {
       hasError: false,
       errorId: this.generateErrorId(),
-      retryCount: 0
+      retryCount: 0,
     }
   }
 
@@ -46,7 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return {
       hasError: true,
       error,
-      errorId: Date.now().toString(36) + Math.random().toString(36).substr(2)
+      errorId: Date.now().toString(36) + Math.random().toString(36).substr(2),
     }
   }
 
@@ -70,7 +70,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   override componentWillUnmount() {
     // Nettoyer les timeouts
-    this.retryTimeouts.forEach(timeout => clearTimeout(timeout))
+    this.retryTimeouts.forEach((timeout) => clearTimeout(timeout))
   }
 
   private generateErrorId(): string {
@@ -111,10 +111,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
     // Analytics/monitoring
     if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'exception', {
+      ;(window as any).gtag('event', 'exception', {
         description: error.message,
         fatal: true,
-        custom_map: { error_id: this.state.errorId }
+        custom_map: { error_id: this.state.errorId },
       })
     }
   }
@@ -124,7 +124,7 @@ export class ErrorBoundary extends Component<Props, State> {
       await fetch('/api/errors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(errorData)
+        body: JSON.stringify(errorData),
       })
     } catch (logError) {
       console.error('Failed to send error to logging service:', logError)
@@ -133,25 +133,23 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private scheduleRetryIfApplicable(error: Error) {
     // Retry pour certains types d'erreurs résolvables
-    const retryableErrors = [
-      'ChunkLoadError',
-      'Loading chunk',
-      'NetworkError',
-      'Failed to fetch'
-    ]
+    const retryableErrors = ['ChunkLoadError', 'Loading chunk', 'NetworkError', 'Failed to fetch']
 
-    const isRetryable = retryableErrors.some(pattern => 
-      error.message.includes(pattern) || error.name.includes(pattern)
+    const isRetryable = retryableErrors.some(
+      (pattern) => error.message.includes(pattern) || error.name.includes(pattern)
     )
 
     if (isRetryable && this.state.retryCount < this.maxRetries) {
-      const timeout = setTimeout(() => {
-        this.setState({
-          hasError: false,
-          retryCount: this.state.retryCount + 1,
-          errorId: this.generateErrorId(),
-        })
-      }, this.retryDelay * Math.pow(2, this.state.retryCount)) // Backoff exponentiel
+      const timeout = setTimeout(
+        () => {
+          this.setState({
+            hasError: false,
+            retryCount: this.state.retryCount + 1,
+            errorId: this.generateErrorId(),
+          })
+        },
+        this.retryDelay * 2 ** this.state.retryCount
+      ) // Backoff exponentiel
 
       this.retryTimeouts.push(timeout)
     }
@@ -161,7 +159,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({
       hasError: false,
       errorId: this.generateErrorId(),
-      retryCount: 0
+      retryCount: 0,
     })
   }
 
@@ -187,7 +185,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
     `.trim()
 
     const mailtoUrl = `mailto:support@topsteel.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    
+
     if (typeof window !== 'undefined') {
       window.location.href = mailtoUrl
     }
@@ -257,7 +255,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                 <RefreshCw className="w-4 h-4" />
                 Réessayer
               </button>
-              
+
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={this.handleGoHome}
@@ -266,7 +264,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                   <Home className="w-4 h-4" />
                   Accueil
                 </button>
-                
+
                 <button
                   onClick={this.handleReportBug}
                   className="flex items-center justify-center gap-2 bg-muted text-muted-foreground px-3 py-2 rounded-md hover:bg-muted/80 transition-colors text-sm"
@@ -304,7 +302,7 @@ export function withErrorBoundary<T extends object>(
   )
 
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`
-  
+
   return WrappedComponent
 }
 

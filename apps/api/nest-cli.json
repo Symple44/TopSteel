@@ -7,10 +7,7 @@
     "builder": "tsc",
     "typeCheck": false,
     "tsConfigPath": "tsconfig.json",
-    "assets": [
-      "**/*.proto",
-      "**/*.graphql"
-    ],
+    "assets": ["**/*.proto", "**/*.graphql"],
     "watchAssets": true
   },
   "projects": {},

@@ -1,5 +1,10 @@
 'use client'
 
+import type { Projet } from '@erp/types'
+import { Eye, FolderOpen, Grid, List, Plus, RefreshCw, Search } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,18 +15,13 @@ import { ProjetCard } from '@/components/ui/projet-card'
 import { useDataView } from '@/hooks/use-data-view'
 import { useProjets } from '@/hooks/use-projets'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import type { Projet } from '@erp/types'
-import { Eye, FolderOpen, Grid, List, Plus, RefreshCw, Search } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useCallback, useMemo, useState, memo } from 'react'
 
 // Composant PageActions avec displayName
 const PageActions = memo(function PageActions({
   view,
   onViewChange,
   onRefresh,
-  isLoading
+  isLoading,
 }: {
   view: 'grid' | 'table'
   onViewChange: (view: 'grid' | 'table') => void
@@ -59,12 +59,7 @@ const PageActions = memo(function PageActions({
       </div>
 
       {/* Bouton Actualiser */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onRefresh}
-        disabled={isLoading}
-      >
+      <Button variant="outline" size="sm" onClick={onRefresh} disabled={isLoading}>
         <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
       </Button>
     </div>
@@ -80,7 +75,7 @@ export default function ProjetsPage() {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const { dataView, setDataView } = useDataView('grid')
-  
+
   // Hook projets avec gestion d'erreur
   const { projets = [], isLoading, error, refetch } = useProjets()
 
@@ -88,92 +83,97 @@ export default function ProjetsPage() {
   const filteredProjets = useMemo(() => {
     if (!Array.isArray(projets)) return []
     if (!searchTerm.trim()) return projets
-    
+
     const term = searchTerm.toLowerCase()
 
-    return projets.filter(projet => 
-      projet?.reference?.toLowerCase().includes(term) ||
-      projet?.client?.nom?.toLowerCase().includes(term) ||
-      projet?.reference?.toLowerCase().includes(term) ||
-      projet?.description?.toLowerCase().includes(term)
+    return projets.filter(
+      (projet) =>
+        projet?.reference?.toLowerCase().includes(term) ||
+        projet?.client?.nom?.toLowerCase().includes(term) ||
+        projet?.reference?.toLowerCase().includes(term) ||
+        projet?.description?.toLowerCase().includes(term)
     )
   }, [projets, searchTerm])
 
   // Colonnes pour le tableau
-  const columns = useMemo(() => [
-    {
-      key: 'reference',
-      label: 'Référence',
-      render: (reference: string, projet: Projet) => (
-        <div>
-          <div className="font-medium">{reference || 'Sans référence'}</div>
-          <div className="text-sm text-gray-500">{projet.reference || 'Sans référence'}</div>
-        </div>
-      ),
-      sortable: true,
-    },
-    {
-      key: 'client',
-      label: 'Client',
-      render: (client: any) => client?.nom || '-',
-      sortable: true,
-    },
-    {
-      key: 'statut',
-      label: 'Statut',
-      render: (statut: string) => (
-        <Badge variant="outline">{statut || 'Non défini'}</Badge>
-      ),
-      sortable: true,
-    },
-    {
-      key: 'montantHT',
-      label: 'Montant HT',
-      render: (montant: number) => montant ? formatCurrency(montant) : '-',
-      sortable: true,
-    },
-    {
-      key: 'dateDebut',
-      label: 'Date début',
-      render: (date: string) => date ? formatDate(date) : '-',
-      sortable: true,
-    },
-    {
-      key: 'avancement',
-      label: 'Avancement',
-      render: (avancement: number) => `${avancement || 0}%`,
-      sortable: true,
-    },
-    {
-      key: 'actions',
-      label: 'Actions',
-      render: (value: any, projet: Projet) => (
-        <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push(`/projets/${projet.id}`)}
-            aria-label={`Voir le projet ${projet.reference}`}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push(`/projets/${projet.id}/edit`)}
-            aria-label={`Modifier le projet ${projet.reference}`}
-          >
-            <FolderOpen className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
-    },
-  ], [router])
+  const columns = useMemo(
+    () => [
+      {
+        key: 'reference',
+        label: 'Référence',
+        render: (reference: string, projet: Projet) => (
+          <div>
+            <div className="font-medium">{reference || 'Sans référence'}</div>
+            <div className="text-sm text-gray-500">{projet.reference || 'Sans référence'}</div>
+          </div>
+        ),
+        sortable: true,
+      },
+      {
+        key: 'client',
+        label: 'Client',
+        render: (client: any) => client?.nom || '-',
+        sortable: true,
+      },
+      {
+        key: 'statut',
+        label: 'Statut',
+        render: (statut: string) => <Badge variant="outline">{statut || 'Non défini'}</Badge>,
+        sortable: true,
+      },
+      {
+        key: 'montantHT',
+        label: 'Montant HT',
+        render: (montant: number) => (montant ? formatCurrency(montant) : '-'),
+        sortable: true,
+      },
+      {
+        key: 'dateDebut',
+        label: 'Date début',
+        render: (date: string) => (date ? formatDate(date) : '-'),
+        sortable: true,
+      },
+      {
+        key: 'avancement',
+        label: 'Avancement',
+        render: (avancement: number) => `${avancement || 0}%`,
+        sortable: true,
+      },
+      {
+        key: 'actions',
+        label: 'Actions',
+        render: (value: any, projet: Projet) => (
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push(`/projets/${projet.id}`)}
+              aria-label={`Voir le projet ${projet.reference}`}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push(`/projets/${projet.id}/edit`)}
+              aria-label={`Modifier le projet ${projet.reference}`}
+            >
+              <FolderOpen className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [router]
+  )
 
   // Handlers avec dépendances correctes
-  const handleViewChange = useCallback((view: 'grid' | 'table') => {
-    setDataView(view)
-  }, [setDataView])
+  const handleViewChange = useCallback(
+    (view: 'grid' | 'table') => {
+      setDataView(view)
+    },
+    [setDataView]
+  )
 
   const handleRefresh = useCallback(() => {
     refetch()
@@ -202,10 +202,7 @@ export default function ProjetsPage() {
         <div className="text-center">
           <p className="text-lg font-medium text-red-600">Erreur lors du chargement</p>
           <p className="text-gray-600">Impossible de charger les projets</p>
-          <Button 
-            onClick={handleRefresh}
-            className="mt-4"
-          >
+          <Button onClick={handleRefresh} className="mt-4">
             Réessayer
           </Button>
         </div>
@@ -218,10 +215,7 @@ export default function ProjetsPage() {
       <PageHeader
         title="Projets"
         subtitle={`${filteredProjets.length} projet(s)`}
-        breadcrumbs={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Projets' },
-        ]}
+        breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Projets' }]}
         actions={
           <PageActions
             view={dataView}
@@ -252,11 +246,9 @@ export default function ProjetsPage() {
       {dataView === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjets.length > 0 ? (
-            filteredProjets.map((projet) => (
-              projet && projet.id ? (
-                <MemoProjetCard key={projet.id} projet={projet} />
-              ) : null
-            ))
+            filteredProjets.map((projet) =>
+              projet && projet.id ? <MemoProjetCard key={projet.id} projet={projet} /> : null
+            )
           ) : (
             <div className="col-span-full">
               <Card>
@@ -266,10 +258,9 @@ export default function ProjetsPage() {
                     {searchTerm ? 'Aucun projet trouvé' : 'Aucun projet'}
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    {searchTerm 
-                      ? 'Aucun projet ne correspond à votre recherche' 
-                      : 'Commencez par créer votre premier projet'
-                    }
+                    {searchTerm
+                      ? 'Aucun projet ne correspond à votre recherche'
+                      : 'Commencez par créer votre premier projet'}
                   </p>
                   {!searchTerm && (
                     <Link href="/projets/nouveau">
@@ -299,9 +290,3 @@ export default function ProjetsPage() {
     </div>
   )
 }
-
-
-
-
-
-

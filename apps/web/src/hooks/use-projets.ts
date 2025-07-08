@@ -3,14 +3,15 @@
  * Hook pour la gestion des projets avec accès sécurisé aux propriétés
  * Fichier: apps/web/src/hooks/use-projets.ts
  */
-import { useProjetStore } from '@/stores/projet.store'
+
 import type { ProjetFilters } from '@erp/types'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useProjetStore } from '@/stores/projet.store'
 
 export const useProjets = (autoFetch = true) => {
   const [mounted, setMounted] = useState(false)
   const fetchInitiatedRef = useRef(false)
-  
+
   // ✅ CORRECTION: Accès sécurisé aux propriétés avec fallbacks
   const projets = useProjetStore((state) => state.projets || [])
   const loading = useProjetStore((state) => (state as any).loading || false)
@@ -26,7 +27,7 @@ export const useProjets = (autoFetch = true) => {
     }
 
     fetchInitiatedRef.current = true
-    
+
     try {
       if (fetchProjets) {
         await fetchProjets()
@@ -81,24 +82,27 @@ export const useProjet = (id?: string) => {
   const selectProjetById = useProjetStore((state) => state.selectProjetById)
   const clearError = useProjetStore((state) => (state as any).clearError)
 
-  const selectProjet = useCallback((targetId: string | undefined) => {
-    if (!targetId) {
-      setSelectedProjet?.(null)
+  const selectProjet = useCallback(
+    (targetId: string | undefined) => {
+      if (!targetId) {
+        setSelectedProjet?.(null)
 
-      return
-    }
+        return
+      }
 
-    if (selectedProjet?.id === targetId) {
-      return
-    }
+      if (selectedProjet?.id === targetId) {
+        return
+      }
 
-    // Utiliser selectProjetById si disponible, sinon setSelectedProjet
-    if (selectProjetById) {
-      selectProjetById(targetId)
-    } else if (setSelectedProjet) {
-      setSelectedProjet(null)
-    }
-  }, [selectedProjet?.id, setSelectedProjet, selectProjetById])
+      // Utiliser selectProjetById si disponible, sinon setSelectedProjet
+      if (selectProjetById) {
+        selectProjetById(targetId)
+      } else if (setSelectedProjet) {
+        setSelectedProjet(null)
+      }
+    },
+    [selectedProjet?.id, setSelectedProjet, selectProjetById]
+  )
 
   useEffect(() => {
     selectProjet(id)
@@ -123,12 +127,12 @@ export const useProjetsStats = () => {
   const stats = useProjetStore((state) => state.stats)
   const loading = useProjetStore((state) => (state as any).loading || false)
   const refreshStats = useProjetStore((state) => state.refreshStats)
-  
+
   return {
     stats,
     loading,
     isLoading: loading,
-    refreshStats: refreshStats || (() => {})
+    refreshStats: refreshStats || (() => {}),
   }
 }
 
@@ -141,11 +145,11 @@ export const useProjetsPagination = () => {
   const totalCount = useProjetStore((state) => state.totalCount || 0)
   const setPage = useProjetStore((state) => state.setPage)
   const setPageSize = useProjetStore((state) => state.setPageSize)
-  
+
   const totalPages = Math.ceil(totalCount / pageSize)
   const hasNext = currentPage < totalPages - 1
   const hasPrev = currentPage > 0
-  
+
   return {
     currentPage,
     pageSize,
@@ -158,7 +162,7 @@ export const useProjetsPagination = () => {
     nextPage: () => hasNext && setPage?.(currentPage + 1),
     prevPage: () => hasPrev && setPage?.(currentPage - 1),
     firstPage: () => setPage?.(0),
-    lastPage: () => setPage?.(totalPages - 1)
+    lastPage: () => setPage?.(totalPages - 1),
   }
 }
 
@@ -174,7 +178,7 @@ export const useProjetsFilters = () => {
   const setSearchTerm = useProjetStore((state) => state.setSearchTerm)
   const setSorting = useProjetStore((state) => state.setSorting)
   const clearFilters = useProjetStore((state) => state.clearFilters)
-  
+
   return {
     filters,
     searchTerm,
@@ -197,7 +201,7 @@ export const useProjetsFilters = () => {
 
         setFilters?.(rest)
       }
-    }
+    },
   }
 }
 
@@ -211,7 +215,7 @@ export const useProjetsActions = () => {
   const duplicateProjet = useProjetStore((state) => state.duplicateProjet)
   const loading = useProjetStore((state) => (state as any).loading || false)
   const error = useProjetStore((state) => (state as any).error || null)
-  
+
   return {
     createProjet,
     updateProjet,
@@ -244,6 +248,6 @@ export const useProjetsActions = () => {
         console.error('Erreur suppression projet:', error)
         throw error
       }
-    }
+    },
   }
 }

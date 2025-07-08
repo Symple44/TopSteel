@@ -24,15 +24,15 @@ export default function GlobalError({
                 Une erreur inattendue s'est produite. Veuillez réessayer.
               </p>
             </div>
-            
+
             <div className="space-y-4">
-              <button 
+              <button
                 onClick={reset}
                 className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Réessayer
               </button>
-              
+
               <div className="text-sm text-muted-foreground">
                 <a href="/dashboard" className="hover:text-foreground transition-colors">
                   Retour au tableau de bord

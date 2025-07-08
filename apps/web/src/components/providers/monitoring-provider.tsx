@@ -1,10 +1,10 @@
 // apps/web/src/components/providers/monitoring-provider.tsx
 'use client'
 
-import { useWebVitals } from '@/hooks/use-web-vitals'
-import { useBusinessMetrics } from '@/lib/business-metrics'
 import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useWebVitals } from '@/hooks/use-web-vitals'
+import { useBusinessMetrics } from '@/lib/business-metrics'
 
 interface MonitoringProviderProps {
   children: React.ReactNode
@@ -33,26 +33,24 @@ interface MonitoringHook {
   exportData: () => string
 }
 
-function ErrorFallback({ error, resetErrorBoundary }: { 
+function ErrorFallback({
+  error,
+  resetErrorBoundary,
+}: {
   error: Error
-  resetErrorBoundary: () => void 
+  resetErrorBoundary: () => void
 }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center p-8 max-w-md">
         <div className="text-red-500 text-6xl mb-4">⚠️</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Oops! Une erreur s'est produite
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Oops! Une erreur s'est produite</h2>
         <p className="text-gray-600 mb-6">
-          Une erreur inattendue s'est produite dans l'application. 
-          Nos équipes ont été notifiées.
+          Une erreur inattendue s'est produite dans l'application. Nos équipes ont été notifiées.
         </p>
         <details className="text-left bg-gray-100 p-4 rounded mb-6 text-sm">
           <summary className="cursor-pointer font-medium">Détails techniques</summary>
-          <pre className="mt-2 text-red-600 overflow-auto">
-            {error.message}
-          </pre>
+          <pre className="mt-2 text-red-600 overflow-auto">{error.message}</pre>
         </details>
         <div className="space-x-4">
           <button
@@ -89,7 +87,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
         width: window.innerWidth,
         height: window.innerHeight,
       },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     })
 
     // Tracker les erreurs JavaScript globales
@@ -98,14 +96,14 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
-        source: 'global_error_handler'
+        source: 'global_error_handler',
       })
     }
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       metrics.trackError(new Error('Unhandled Promise Rejection'), {
         reason: event.reason?.toString() || 'Unknown',
-        source: 'unhandled_promise_rejection'
+        source: 'unhandled_promise_rejection',
       })
     }
 
@@ -138,11 +136,14 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
             if (entry.entryType === 'largest-contentful-paint') {
               metrics.trackPerformanceMetric('LCP', entry.startTime)
             } else if (entry.entryType === 'first-input') {
-              metrics.trackPerformanceMetric('FID', (entry as any).processingStart - entry.startTime)
+              metrics.trackPerformanceMetric(
+                'FID',
+                (entry as any).processingStart - entry.startTime
+              )
             }
           })
         })
-        
+
         perfObserver.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] })
       } catch (e) {
         console.warn('Performance Observer not supported:', e)
@@ -166,18 +167,18 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
         if (typeof value === 'number') {
           metrics.trackPerformanceMetric(metric, value)
         }
-        
+
         // Alertes pour les métriques dégradées
         const thresholds: Record<string, number> = {
           LCP: 2500, // 2.5s
-          FID: 100,  // 100ms
-          CLS: 0.1   // 0.1
+          FID: 100, // 100ms
+          CLS: 0.1, // 0.1
         }
-        
+
         if (thresholds[metric] && value > thresholds[metric]) {
           metrics.trackPerformanceMetric(`${metric}_slow`, value, {
             threshold: thresholds[metric],
-            severity: 'warning'
+            severity: 'warning',
           })
         }
       })
@@ -193,7 +194,7 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
       FallbackComponent={ErrorFallback}
       onError={(error, errorInfo) => {
         console.error('React Error Boundary:', error, errorInfo)
-        
+
         // Envoyer l'erreur au service de monitoring
         if (typeof window !== 'undefined') {
           try {
@@ -202,7 +203,7 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
             if (metrics) {
               metrics.trackError(error, {
                 componentStack: errorInfo.componentStack,
-                source: 'error_boundary'
+                source: 'error_boundary',
               })
             }
           } catch (e) {
@@ -215,9 +216,7 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
         console.log('Error boundary reset')
       }}
     >
-      <MonitoringCore>
-        {children}
-      </MonitoringCore>
+      <MonitoringCore>{children}</MonitoringCore>
     </ErrorBoundary>
   )
 }
@@ -225,26 +224,26 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
 // Hook pour accéder au monitoring dans les composants
 export function useMonitoring(): MonitoringHook {
   const metrics = useBusinessMetrics()
-  
+
   return {
     // Méthodes rapides pour les cas d'usage courants
     trackClick: (element: string, context?: Record<string, any>) => {
       metrics.trackUserAction('click', { element, ...context })
     },
-    
+
     trackPageView: (page: string, context?: Record<string, any>) => {
       metrics.track('page_view', { page, ...context })
     },
-    
+
     trackFormSubmit: (form: string, success: boolean, errors?: string[]) => {
       metrics.trackFormSubmission(form, success, errors)
     },
-    
+
     trackSearch: (query: string, results: number, filters?: Record<string, any>) => {
       metrics.trackSearchPerformed(query, results, filters)
     },
-    
+
     // Accès direct aux métriques
-    ...metrics
+    ...metrics,
   }
 }

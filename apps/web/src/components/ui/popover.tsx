@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 interface PopoverProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
@@ -10,11 +10,11 @@ interface PopoverProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
+  ({ className = '', children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
     }
-    
+
     return (
       <div className={className} ref={ref} {...props}>
         {children}
@@ -23,11 +23,11 @@ export const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
   }
 )
 
-Popover.displayName = "Popover"
+Popover.displayName = 'Popover'
 
 // Export des sous-composants courants si nécessaire
 export const PopoverContent = Popover
-export const PopoverTrigger = Popover  
+export const PopoverTrigger = Popover
 export const PopoverItem = Popover
 export const PopoverValue = Popover
 export const PopoverHeader = Popover

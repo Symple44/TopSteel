@@ -1,24 +1,24 @@
 'use client'
 
+import { Mail, Monitor, Volume2 } from 'lucide-react'
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { Mail, Monitor, Volume2 } from 'lucide-react'
 
 // Composant Switch inline pour éviter les problèmes de props
-function CustomSwitch({ 
-  checked, 
-  onChange, 
+function CustomSwitch({
+  checked,
+  onChange,
   className = '',
-  ...props 
+  ...props
 }: {
   checked: boolean
   onChange: (checked: boolean) => void
   className?: string
 }) {
   return (
-    <label className={cn("relative inline-flex cursor-pointer items-center", className)} {...props}>
+    <label className={cn('relative inline-flex cursor-pointer items-center', className)} {...props}>
       <input
         type="checkbox"
         checked={checked}
@@ -43,15 +43,17 @@ export function NotificationSettings() {
       message: 'Ceci est une notification de test pour vérifier vos paramètres.',
       read: false,
       persistent: false,
-      createdAt: new Date()
+      createdAt: new Date(),
     }
 
     // Ajouter directement via le WebSocket simulé
     if (state.settings.enableToast) {
       // Simuler réception WebSocket
-      window.dispatchEvent(new MessageEvent('message', {
-        data: JSON.stringify(testNotification)
-      }))
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: JSON.stringify(testNotification),
+        })
+      )
     }
   }
 
@@ -70,9 +72,7 @@ export function NotificationSettings() {
           </div>
           <CustomSwitch
             checked={state.settings.enableSound}
-            onChange={(checked) => 
-              actions.updateSettings({ enableSound: checked })
-            }
+            onChange={(checked) => actions.updateSettings({ enableSound: checked })}
           />
         </div>
 
@@ -81,16 +81,12 @@ export function NotificationSettings() {
             <Mail className="h-4 w-4" />
             <div>
               <Label>Notifications toast</Label>
-              <p className="text-sm text-muted-foreground">
-                Afficher les notifications en popup
-              </p>
+              <p className="text-sm text-muted-foreground">Afficher les notifications en popup</p>
             </div>
           </div>
           <CustomSwitch
             checked={state.settings.enableToast}
-            onChange={(checked) => 
-              actions.updateSettings({ enableToast: checked })
-            }
+            onChange={(checked) => actions.updateSettings({ enableToast: checked })}
           />
         </div>
 
@@ -99,32 +95,26 @@ export function NotificationSettings() {
             <Monitor className="h-4 w-4" />
             <div>
               <Label>Notifications navigateur</Label>
-              <p className="text-sm text-muted-foreground">
-                Notifications système du navigateur
-              </p>
+              <p className="text-sm text-muted-foreground">Notifications système du navigateur</p>
             </div>
           </div>
           <CustomSwitch
             checked={state.settings.enableBrowser}
-            onChange={(checked) => 
-              actions.updateSettings({ enableBrowser: checked })
-            }
+            onChange={(checked) => actions.updateSettings({ enableBrowser: checked })}
           />
         </div>
       </div>
 
       <div className="pt-4 border-t">
-        <Button 
-          variant="outline" 
-          className="w-full"
-          onClick={handleTestNotification}
-        >
+        <Button variant="outline" className="w-full" onClick={handleTestNotification}>
           Tester les notifications
         </Button>
       </div>
 
       <div className="text-xs text-muted-foreground space-y-1">
-        <p><strong>Note:</strong> Les notifications navigateur nécessitent votre autorisation.</p>
+        <p>
+          <strong>Note:</strong> Les notifications navigateur nécessitent votre autorisation.
+        </p>
         <p>Les paramètres sont sauvegardés localement pour votre compte.</p>
       </div>
     </div>

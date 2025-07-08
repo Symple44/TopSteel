@@ -1,6 +1,6 @@
 // packages/utils/src/format/currency.ts
 export function formatCurrency(
-  amount: number, 
+  amount: number,
   currency: 'EUR' | 'USD' | 'GBP' = 'EUR',
   locale: string = 'fr-FR'
 ): string {

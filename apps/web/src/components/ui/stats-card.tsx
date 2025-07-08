@@ -1,8 +1,8 @@
 'use client'
 
+import type { LucideIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import type { LucideIcon } from 'lucide-react'
 
 interface StatsCardProps {
   title: string
@@ -25,13 +25,13 @@ export function StatsCard({
   icon: Icon,
   trend,
   className,
-  variant = 'default'
+  variant = 'default',
 }: StatsCardProps) {
   const variantStyles = {
     default: 'border-gray-200',
     success: 'border-green-200 bg-green-50',
     warning: 'border-yellow-200 bg-yellow-50',
-    destructive: 'border-red-200 bg-red-50'
+    destructive: 'border-red-200 bg-red-50',
   }
 
   const trendColor = trend?.isPositive ? 'text-green-600' : 'text-red-600'
@@ -46,12 +46,11 @@ export function StatsCard({
         <div className="text-2xl font-bold">{value}</div>
         {(description || trend) && (
           <div className="flex items-center justify-between mt-1">
-            {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
-            )}
+            {description && <p className="text-xs text-muted-foreground">{description}</p>}
             {trend && (
-              <p className={cn("text-xs font-medium", trendColor)}>
-                {trend.isPositive ? '+' : ''}{trend.value}% {trend.label}
+              <p className={cn('text-xs font-medium', trendColor)}>
+                {trend.isPositive ? '+' : ''}
+                {trend.value}% {trend.label}
               </p>
             )}
           </div>

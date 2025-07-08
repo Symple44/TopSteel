@@ -23,10 +23,10 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "../users/entities/user.entity";
-import { CommandesService } from "./commandes.service";
-import { CommandesQueryDto } from "./dto/commandes-query.dto";
-import { CreateCommandeDto } from "./dto/create-commande.dto";
-import { UpdateCommandeDto } from "./dto/update-commande.dto";
+import type { CommandesService } from "./commandes.service";
+import type { CommandesQueryDto } from "./dto/commandes-query.dto";
+import type { CreateCommandeDto } from "./dto/create-commande.dto";
+import type { UpdateCommandeDto } from "./dto/update-commande.dto";
 
 @Controller("commandes")
 @ApiTags("🛒 Commandes")

@@ -6,16 +6,19 @@
  */
 export function groupBy<T, K extends string | number | symbol>(
   array: T[],
-  key: (item: T) => K  // ✅ Cohérence: retourne exactement K
+  key: (item: T) => K // ✅ Cohérence: retourne exactement K
 ): Record<K, T[]> {
-  return array.reduce((groups, item) => {
-    const groupKey = key(item) as K  // ✅ Assertion de type explicite
-    if (!groups[groupKey]) {
-      groups[groupKey] = []
-    }
-    groups[groupKey].push(item)
-    return groups
-  }, {} as Record<K, T[]>)
+  return array.reduce(
+    (groups, item) => {
+      const groupKey = key(item) as K // ✅ Assertion de type explicite
+      if (!groups[groupKey]) {
+        groups[groupKey] = []
+      }
+      groups[groupKey].push(item)
+      return groups
+    },
+    {} as Record<K, T[]>
+  )
 }
 
 /**
@@ -26,18 +29,18 @@ export function groupByMap<T, K extends string | number | symbol>(
   key: (item: T) => K
 ): Map<K, T[]> {
   const groups = new Map<K, T[]>()
-  
+
   for (const item of array) {
     const groupKey = key(item)
     const existing = groups.get(groupKey)
-    
+
     if (existing) {
       existing.push(item)
     } else {
       groups.set(groupKey, [item])
     }
   }
-  
+
   return groups
 }
 
@@ -49,19 +52,19 @@ export function groupByPartial<T, K extends string | number | symbol>(
   key: (item: T) => K
 ): Partial<Record<K, T[]>> {
   const groups: Partial<Record<K, T[]>> = {}
-  
+
   for (const item of array) {
     const groupKey = key(item)
-    
+
     if (!groups[groupKey]) {
       groups[groupKey] = []
     }
     const existingGroup = groups[groupKey]
     if (existingGroup) {
       existingGroup.push(item)
-}
+    }
   }
-  
+
   return groups
 }
 
@@ -71,26 +74,23 @@ export function sortBy<T>(
   direction: 'asc' | 'desc' = 'asc'
 ): T[] {
   const keyFn = typeof key === 'function' ? key : (item: T) => item[key]
-  
+
   return [...array].sort((a, b) => {
     const aVal = keyFn(a)
     const bVal = keyFn(b)
-    
+
     let comparison = 0
     if (aVal > bVal) comparison = 1
     if (aVal < bVal) comparison = -1
-    
+
     return direction === 'desc' ? -comparison : comparison
   })
 }
 
-export function filterBy<T>(
-  array: T[],
-  filters: Partial<Record<keyof T, unknown>>
-): T[] {
-  return array.filter(item =>
-    Object.entries(filters).every(([key, value]) =>
-      value === undefined || item[key as keyof T] === value
+export function filterBy<T>(array: T[], filters: Partial<Record<keyof T, unknown>>): T[] {
+  return array.filter((item) =>
+    Object.entries(filters).every(
+      ([key, value]) => value === undefined || item[key as keyof T] === value
     )
   )
 }
@@ -112,11 +112,11 @@ export function unique<T>(array: T[]): T[] {
  */
 export function uniqueBy<T, K extends string | number | symbol>(
   array: T[],
-  key: (item: T) => K  // ✅ Cohérence: retourne exactement K
+  key: (item: T) => K // ✅ Cohérence: retourne exactement K
 ): T[] {
   const seen = new Set<K>()
-  return array.filter(item => {
-    const k = key(item) as K  // ✅ Assertion de type explicite
+  return array.filter((item) => {
+    const k = key(item) as K // ✅ Assertion de type explicite
     if (seen.has(k)) return false
     seen.add(k)
     return true
@@ -131,7 +131,7 @@ export function uniqueByMap<T, K extends string | number | symbol>(
   key: (item: T) => K
 ): T[] {
   const seen = new Map<K, boolean>()
-  return array.filter(item => {
+  return array.filter((item) => {
     const k = key(item)
     if (seen.has(k)) return false
     seen.set(k, true)
@@ -144,36 +144,30 @@ export function uniqueByMap<T, K extends string | number | symbol>(
 /**
  * Groupe par plusieurs clés (utile pour données métallurgiques)
  */
-export function groupByMultiple<T>(
-  array: T[],
-  keys: (keyof T)[]
-): Map<string, T[]> {
+export function groupByMultiple<T>(array: T[], keys: (keyof T)[]): Map<string, T[]> {
   const groups = new Map<string, T[]>()
-  
+
   for (const item of array) {
-    const compositeKey = keys.map(key => String(item[key])).join('|')
+    const compositeKey = keys.map((key) => String(item[key])).join('|')
     const existing = groups.get(compositeKey)
-    
+
     if (existing) {
       existing.push(item)
     } else {
       groups.set(compositeKey, [item])
     }
   }
-  
+
   return groups
 }
 
 /**
  * Partition en fonction d'un prédicat (utile pour séparer production/commandes)
  */
-export function partition<T>(
-  array: T[],
-  predicate: (item: T) => boolean
-): [T[], T[]] {
+export function partition<T>(array: T[], predicate: (item: T) => boolean): [T[], T[]] {
   const truthy: T[] = []
   const falsy: T[] = []
-  
+
   for (const item of array) {
     if (predicate(item)) {
       truthy.push(item)
@@ -181,6 +175,6 @@ export function partition<T>(
       falsy.push(item)
     }
   }
-  
+
   return [truthy, falsy]
 }

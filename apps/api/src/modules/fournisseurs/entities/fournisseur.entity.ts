@@ -1,26 +1,26 @@
 // fournisseur.entity.ts - Version corrigée
-import { Column, Entity, Index } from "typeorm";
-import { BaseAuditEntity } from "../../../common/base/base.entity";
+import { Column, Entity, Index } from 'typeorm'
+import { BaseAuditEntity } from '../../../common/base/base.entity'
 
-@Entity("fournisseurs")
+@Entity('fournisseurs')
 export class Fournisseur extends BaseAuditEntity {
   @Column({ length: 255 })
   @Index()
-  nom!: string;
+  nom!: string
 
   @Column({ unique: true })
-  email!: string;
+  email!: string
 
   @Column({ length: 20, nullable: true })
-  telephone?: string;
+  telephone?: string
 
-  @Column({ type: "text", nullable: true })
-  adresse?: string;
+  @Column({ type: 'text', nullable: true })
+  adresse?: string
 
   @Column({ length: 14, nullable: true })
-  siret?: string;
+  siret?: string
 
   @Column({ default: true })
   @Index()
-  actif!: boolean;
+  actif!: boolean
 }

@@ -1,80 +1,85 @@
 // apps/web/src/components/production/planning-calendar.tsx
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { useState } from "react";
+import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface PlanningEvent {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  type: 'ordre' | 'maintenance' | 'conge';
-  color: string;
-  ordreId?: number;
+  id: string
+  title: string
+  start: Date
+  end: Date
+  type: 'ordre' | 'maintenance' | 'conge'
+  color: string
+  ordreId?: number
 }
 
 interface PlanningCalendarProps {
-  events: PlanningEvent[];
-  onEventClick: (event: PlanningEvent) => void;
-  onDateClick: (date: Date) => void;
-  onCreateEvent: () => void;
+  events: PlanningEvent[]
+  onEventClick: (event: PlanningEvent) => void
+  onDateClick: (date: Date) => void
+  onCreateEvent: () => void
 }
 
-export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEvent }: PlanningCalendarProps) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+export function PlanningCalendar({
+  events,
+  onEventClick,
+  onDateClick,
+  onCreateEvent,
+}: PlanningCalendarProps) {
+  const [currentDate, setCurrentDate] = useState(new Date())
 
   const navigateMonth = (direction: 'prev' | 'next') => {
-    const newDate = new Date(currentDate);
+    const newDate = new Date(currentDate)
 
-    newDate.setMonth(currentDate.getMonth() + (direction === 'next' ? 1 : -1));
-    setCurrentDate(newDate);
-  };
+    newDate.setMonth(currentDate.getMonth() + (direction === 'next' ? 1 : -1))
+    setCurrentDate(newDate)
+  }
 
   const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startDay = firstDay.getDay();
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+    const daysInMonth = lastDay.getDate()
+    const startDay = firstDay.getDay()
 
-    const days = [];
-    
+    const days = []
+
     // Jours du mois précédent
     for (let i = startDay - 1; i >= 0; i--) {
-      const prevDate = new Date(year, month, -i);
+      const prevDate = new Date(year, month, -i)
 
-      days.push({ date: prevDate, isCurrentMonth: false });
+      days.push({ date: prevDate, isCurrentMonth: false })
     }
 
     // Jours du mois actuel
     for (let day = 1; day <= daysInMonth; day++) {
-      days.push({ date: new Date(year, month, day), isCurrentMonth: true });
+      days.push({ date: new Date(year, month, day), isCurrentMonth: true })
     }
 
     // Jours du mois suivant pour compléter la grille
-    const remainingDays = 42 - days.length;
+    const remainingDays = 42 - days.length
 
     for (let day = 1; day <= remainingDays; day++) {
-      days.push({ date: new Date(year, month + 1, day), isCurrentMonth: false });
+      days.push({ date: new Date(year, month + 1, day), isCurrentMonth: false })
     }
 
-    return days;
-  };
+    return days
+  }
 
   const getEventsForDate = (date: Date) => {
-    return events.filter(event => {
-      const eventDate = new Date(event.start);
+    return events.filter((event) => {
+      const eventDate = new Date(event.start)
 
-      return eventDate.toDateString() === date.toDateString();
-    });
-  };
+      return eventDate.toDateString() === date.toDateString()
+    })
+  }
 
-  const days = getDaysInMonth(currentDate);
-  const monthName = currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  const days = getDaysInMonth(currentDate)
+  const monthName = currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
 
   return (
     <Card>
@@ -117,7 +122,7 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
         {/* Calendrier */}
         <div className="grid grid-cols-7 gap-1">
           {/* En-têtes des jours */}
-          {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => (
+          {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
             <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
               {day}
             </div>
@@ -125,15 +130,15 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
 
           {/* Jours du mois */}
           {days.map((day, index) => {
-            const dayEvents = getEventsForDate(day.date);
-            const isToday = day.date.toDateString() === new Date().toDateString();
+            const dayEvents = getEventsForDate(day.date)
+            const isToday = day.date.toDateString() === new Date().toDateString()
 
             return (
               <div
                 key={index}
                 className={`
                   min-h-[100px] p-1 border border-gray-200 cursor-pointer hover:bg-gray-50
-                  ${!day.isCurrentMonth ? 'bg-gray-50 text-gray-400' : ''}
+                  ${day.isCurrentMonth ? '' : 'bg-gray-50 text-gray-400'}
                   ${isToday ? 'bg-blue-50 border-blue-200' : ''}
                 `}
                 onClick={() => onDateClick(day.date)}
@@ -141,34 +146,36 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
                 <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : ''}`}>
                   {day.date.getDate()}
                 </div>
-                
+
                 {/* Événements */}
                 <div className="space-y-1">
-                  {dayEvents.slice(0, 3).map(event => (
+                  {dayEvents.slice(0, 3).map((event) => (
                     <div
                       key={event.id}
                       className={`
                         text-xs p-1 rounded cursor-pointer truncate
-                        ${event.type === 'ordre' ? 'bg-blue-100 text-blue-800' : 
-                          event.type === 'maintenance' ? 'bg-orange-100 text-orange-800' : 
-                          'bg-green-100 text-green-800'}
+                        ${
+                          event.type === 'ordre'
+                            ? 'bg-blue-100 text-blue-800'
+                            : event.type === 'maintenance'
+                              ? 'bg-orange-100 text-orange-800'
+                              : 'bg-green-100 text-green-800'
+                        }
                       `}
                       onClick={(e) => {
-                        e.stopPropagation();
-                        onEventClick(event);
+                        e.stopPropagation()
+                        onEventClick(event)
                       }}
                     >
                       {event.title}
                     </div>
                   ))}
                   {dayEvents.length > 3 && (
-                    <div className="text-xs text-gray-500">
-                      +{dayEvents.length - 3} autres
-                    </div>
+                    <div className="text-xs text-gray-500">+{dayEvents.length - 3} autres</div>
                   )}
                 </div>
               </div>
-            );
+            )
           })}
         </div>
 
@@ -189,5 +196,5 @@ export function PlanningCalendar({ events, onEventClick, onDateClick, onCreateEv
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

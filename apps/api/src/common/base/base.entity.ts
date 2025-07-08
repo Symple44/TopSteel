@@ -1,33 +1,33 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
-  Column,
-} from "typeorm";
+} from 'typeorm'
 
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string
 
-  @CreateDateColumn({ name: "created_at" })
-  createdAt!: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt!: Date
 
-  @UpdateDateColumn({ name: "updated_at" })
-  updatedAt!: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date
 
-  @DeleteDateColumn({ name: "deleted_at", nullable: true })
-  deletedAt?: Date;
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  deletedAt?: Date
 
   @VersionColumn({ default: 1 })
-  version!: number;
+  version!: number
 }
 
 export abstract class BaseAuditEntity extends BaseEntity {
-  @Column({ name: "created_by_id", nullable: true })
-  createdById?: string;
+  @Column({ name: 'created_by_id', nullable: true })
+  createdById?: string
 
-  @Column({ name: "updated_by_id", nullable: true })
-  updatedById?: string;
+  @Column({ name: 'updated_by_id', nullable: true })
+  updatedById?: string
 }

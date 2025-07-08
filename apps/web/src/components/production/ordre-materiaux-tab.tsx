@@ -1,9 +1,9 @@
 'use client'
 
+import { AlertTriangle, Package, Plus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { AlertTriangle, Package, Plus } from 'lucide-react'
 
 // Interface pour les matériaux
 interface Materiau {
@@ -17,7 +17,7 @@ interface Materiau {
 }
 
 interface OrdreMateriauxTabProps {
-  ordre: any; // Interface cohérente avec les autres composants
+  ordre: any // Interface cohérente avec les autres composants
 }
 
 export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
@@ -29,7 +29,7 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
       quantiteRequise: 50,
       quantiteStock: 45,
       unite: 'kg',
-      statut: 'DISPONIBLE'
+      statut: 'DISPONIBLE',
     },
     {
       id: 2,
@@ -38,14 +38,18 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
       quantiteRequise: 12,
       quantiteStock: 8,
       unite: 'ml',
-      statut: 'INSUFFISANT'
-    }
+      statut: 'INSUFFISANT',
+    },
   ]
 
   const getStatutBadge = (statut: string) => {
     switch (statut) {
       case 'DISPONIBLE':
-        return <Badge variant="outline" className="text-green-600 border-green-600">Disponible</Badge>
+        return (
+          <Badge variant="outline" className="text-green-600 border-green-600">
+            Disponible
+          </Badge>
+        )
       case 'INSUFFISANT':
         return <Badge variant="destructive">Insuffisant</Badge>
       case 'COMMANDE':
@@ -76,15 +80,19 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${materiau.statut === 'INSUFFISANT' ? 'bg-red-100' : 'bg-green-100'}`}>
-                    <Package className={`h-5 w-5 ${materiau.statut === 'INSUFFISANT' ? 'text-red-600' : 'text-green-600'}`} />
+                  <div
+                    className={`p-2 rounded-lg ${materiau.statut === 'INSUFFISANT' ? 'bg-red-100' : 'bg-green-100'}`}
+                  >
+                    <Package
+                      className={`h-5 w-5 ${materiau.statut === 'INSUFFISANT' ? 'text-red-600' : 'text-green-600'}`}
+                    />
                   </div>
                   <div>
                     <h4 className="font-medium">{materiau.designation}</h4>
                     <p className="text-sm text-muted-foreground">{materiau.reference}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                   <div className="text-right">
                     <p className="text-sm font-medium">
@@ -97,7 +105,7 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
                   {getStatutBadge(materiau.statut)}
                 </div>
               </div>
-              
+
               {materiau.statut === 'INSUFFISANT' && (
                 <div className="mt-4 p-3 bg-red-50 rounded-lg flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
@@ -113,15 +121,17 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
           </Card>
         ))}
       </div>
-      
-      {materiaux.some(m => m.statut === 'INSUFFISANT') && (
+
+      {materiaux.some((m) => m.statut === 'INSUFFISANT') && (
         <Card className="border-orange-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-orange-600">
               <AlertTriangle className="h-5 w-5" />
               <div>
                 <p className="font-medium">Action requise</p>
-                <p className="text-sm">Certains matériaux ne sont pas disponibles en quantité suffisante.</p>
+                <p className="text-sm">
+                  Certains matériaux ne sont pas disponibles en quantité suffisante.
+                </p>
               </div>
             </div>
             <div className="mt-4 flex gap-2">

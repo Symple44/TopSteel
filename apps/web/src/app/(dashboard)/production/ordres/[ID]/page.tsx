@@ -1,23 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { ArrowLeft, Calendar, CheckCircle, Clock, Pause, Play, User } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { OrdreInfoTab } from '@/components/production/ordre-info-tab'
+import { OrdreMateriauxTab } from '@/components/production/ordre-materiaux-tab'
+import { OrdreOperationsTab } from '@/components/production/ordre-operations-tab'
+import { OrdreQualiteTab } from '@/components/production/ordre-qualite-tab'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { 
-  ArrowLeft, 
-  Calendar, 
-  CheckCircle, 
-  Clock, 
-  Pause, 
-  Play, 
-  User
-} from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { OrdreInfoTab } from '@/components/production/ordre-info-tab'
-import { OrdreOperationsTab } from '@/components/production/ordre-operations-tab'
-import { OrdreMateriauxTab } from '@/components/production/ordre-materiaux-tab'
-import { OrdreQualiteTab } from '@/components/production/ordre-qualite-tab'
 
 interface OrdrePageProps {
   params: Promise<{ id: string }>
@@ -36,10 +28,10 @@ export default function OrdrePage({ params }: OrdrePageProps) {
 
   const renderStatusBadge = (status: string) => {
     const variants: Record<string, string> = {
-      'planifie': 'outline',
-      'en_cours': 'default', 
-      'pause': 'warning',
-      'termine': 'success'
+      planifie: 'outline',
+      en_cours: 'default',
+      pause: 'warning',
+      termine: 'success',
     }
 
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>
@@ -57,7 +49,7 @@ export default function OrdrePage({ params }: OrdrePageProps) {
     dateFinPrevue: new Date('2024-01-22'),
     operations: [],
     materiaux: [],
-    controles: []
+    controles: [],
   }
 
   return (

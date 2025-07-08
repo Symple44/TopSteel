@@ -1,7 +1,5 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Activity,
   AlertTriangle,
@@ -15,9 +13,11 @@ import {
   Package,
   Shield,
   Target,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 // Types pour les données du dashboard
 interface DashboardStats {
@@ -71,26 +71,26 @@ export default function Dashboard() {
             total: 47,
             enCours: 12,
             termines: 32,
-            enRetard: 3
+            enRetard: 3,
           },
           chiffreAffaires: {
             mensuel: 285000,
             annuel: 2340000,
             objectif: 3000000,
-            progression: 78
+            progression: 78,
           },
           production: {
             ordresEnCours: 8,
             ordresEnRetard: 2,
             tauxOccupation: 85,
-            efficacite: 92
+            efficacite: 92,
           },
           stocks: {
             alertes: 5,
             ruptures: 2,
             valeurTotale: 145000,
-            mouvements: 23
-          }
+            mouvements: 23,
+          },
         })
 
         setActivities([
@@ -100,7 +100,7 @@ export default function Dashboard() {
             title: 'Nouveau projet créé',
             description: 'PRJ-2025-007 - Hangar agricole Dupont',
             timestamp: 'Il y a 2 heures',
-            status: 'success'
+            status: 'success',
           },
           {
             id: '2',
@@ -108,7 +108,7 @@ export default function Dashboard() {
             title: 'Ordre de fabrication terminé',
             description: 'OF-2025-023 - Portail coulissant',
             timestamp: 'Il y a 4 heures',
-            status: 'success'
+            status: 'success',
           },
           {
             id: '3',
@@ -116,7 +116,7 @@ export default function Dashboard() {
             title: 'Stock faible détecté',
             description: 'Profilé IPE 200 - 5 unités restantes',
             timestamp: 'Il y a 6 heures',
-            status: 'warning'
+            status: 'warning',
           },
           {
             id: '4',
@@ -124,8 +124,8 @@ export default function Dashboard() {
             title: 'Facture impayée',
             description: 'FACT-2024-156 - Client Martin (30j)',
             timestamp: 'Il y a 1 jour',
-            status: 'error'
-          }
+            status: 'error',
+          },
         ])
 
         setLoading(false)
@@ -138,27 +138,37 @@ export default function Dashboard() {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'EUR',
     }).format(amount)
   }
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case 'projet': return <FolderOpen className="h-4 w-4" />
-      case 'production': return <Factory className="h-4 w-4" />
-      case 'stock': return <Package className="h-4 w-4" />
-      case 'facture': return <Euro className="h-4 w-4" />
-      default: return <AlertTriangle className="h-4 w-4" />
+      case 'projet':
+        return <FolderOpen className="h-4 w-4" />
+      case 'production':
+        return <Factory className="h-4 w-4" />
+      case 'stock':
+        return <Package className="h-4 w-4" />
+      case 'facture':
+        return <Euro className="h-4 w-4" />
+      default:
+        return <AlertTriangle className="h-4 w-4" />
     }
   }
 
   const getActivityBadgeVariant = (status: string) => {
     switch (status) {
-      case 'success': return 'default'
-      case 'warning': return 'secondary'
-      case 'error': return 'destructive'
-      case 'info': return 'outline'
-      default: return 'outline'
+      case 'success':
+        return 'default'
+      case 'warning':
+        return 'secondary'
+      case 'error':
+        return 'destructive'
+      case 'info':
+        return 'outline'
+      default:
+        return 'outline'
     }
   }
 
@@ -173,7 +183,10 @@ export default function Dashboard() {
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
-              <Card key={i} className="animate-pulse border-0 bg-white/80 backdrop-blur-sm shadow-xl">
+              <Card
+                key={i}
+                className="animate-pulse border-0 bg-white/80 backdrop-blur-sm shadow-xl"
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <div className="h-4 bg-slate-200 rounded w-24"></div>
                   <div className="h-8 w-8 bg-slate-200 rounded-lg"></div>
@@ -199,12 +212,14 @@ export default function Dashboard() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
               Tableau de bord
             </h1>
-            <p className="text-slate-600 mt-1">
-              Vue d'ensemble de votre activité TopSteel
-            </p>
+            <p className="text-slate-600 mt-1">Vue d'ensemble de votre activité TopSteel</p>
           </div>
           <div className="flex items-center space-x-3">
-            <Button variant="outline" size="sm" className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white"
+            >
               <Calendar className="mr-2 h-4 w-4 text-slate-600" />
               Cette semaine
             </Button>
@@ -273,7 +288,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-3xl font-bold mb-2">{stats.production.tauxOccupation}%</div>
               <div className="bg-white/20 rounded-full h-2 overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-white rounded-full transition-all duration-500"
                   style={{ width: `${stats.production.tauxOccupation}%` }}
                 />
@@ -306,8 +321,12 @@ export default function Dashboard() {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-xl font-semibold text-slate-800">Progression annuelle</CardTitle>
-                  <p className="text-slate-600 text-sm mt-1">Évolution du chiffre d'affaires 2025</p>
+                  <CardTitle className="text-xl font-semibold text-slate-800">
+                    Progression annuelle
+                  </CardTitle>
+                  <p className="text-slate-600 text-sm mt-1">
+                    Évolution du chiffre d'affaires 2025
+                  </p>
                 </div>
                 <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
                   <Target className="h-5 w-5 text-white" />
@@ -323,7 +342,7 @@ export default function Dashboard() {
                   </span>
                 </div>
                 <div className="bg-slate-100 rounded-full h-3 overflow-hidden">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-700"
                     style={{ width: `${stats.chiffreAffaires.progression}%` }}
                   />
@@ -337,7 +356,7 @@ export default function Dashboard() {
                   </span>
                 </div>
               </div>
-              
+
               {/* Graphique moderne avec barres colorées */}
               <div className="mt-8 h-40 bg-gradient-to-br from-slate-50 to-blue-50/50 rounded-2xl flex items-end justify-center p-6 overflow-hidden relative">
                 <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
@@ -346,10 +365,10 @@ export default function Dashboard() {
                     <div
                       key={i}
                       className="rounded-t-lg transition-all duration-700 hover:scale-110 cursor-pointer"
-                      style={{ 
-                        height: `${height}%`, 
+                      style={{
+                        height: `${height}%`,
                         width: '20px',
-                        background: `linear-gradient(to top, hsl(${220 + i * 15}, 70%, ${50 + height * 0.3}%), hsl(${240 + i * 10}, 80%, ${60 + height * 0.2}%))`
+                        background: `linear-gradient(to top, hsl(${220 + i * 15}, 70%, ${50 + height * 0.3}%), hsl(${240 + i * 10}, 80%, ${60 + height * 0.2}%))`,
                       }}
                     />
                   ))}
@@ -363,7 +382,9 @@ export default function Dashboard() {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-xl font-semibold text-slate-800">Activité récente</CardTitle>
+                  <CardTitle className="text-xl font-semibold text-slate-800">
+                    Activité récente
+                  </CardTitle>
                   <p className="text-slate-600 text-sm mt-1">Dernières actions</p>
                 </div>
                 <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
@@ -376,12 +397,17 @@ export default function Dashboard() {
                 {activities.map((activity, index) => (
                   <div key={activity.id} className="flex items-start space-x-3 group">
                     <div className="flex-shrink-0 mt-1">
-                      <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r ${
-                        activity.status === 'success' ? 'from-emerald-500 to-teal-500' :
-                        activity.status === 'warning' ? 'from-orange-500 to-yellow-500' :
-                        activity.status === 'error' ? 'from-red-500 to-pink-500' :
-                        'from-blue-500 to-indigo-500'
-                      } text-white`}>
+                      <div
+                        className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r ${
+                          activity.status === 'success'
+                            ? 'from-emerald-500 to-teal-500'
+                            : activity.status === 'warning'
+                              ? 'from-orange-500 to-yellow-500'
+                              : activity.status === 'error'
+                                ? 'from-red-500 to-pink-500'
+                                : 'from-blue-500 to-indigo-500'
+                        } text-white`}
+                      >
                         {getActivityIcon(activity.type)}
                       </div>
                     </div>
@@ -389,9 +415,7 @@ export default function Dashboard() {
                       <h4 className="text-sm font-medium text-slate-800 group-hover:text-slate-900">
                         {activity.title}
                       </h4>
-                      <p className="text-sm text-slate-600">
-                        {activity.description}
-                      </p>
+                      <p className="text-sm text-slate-600">{activity.description}</p>
                       <p className="text-xs text-slate-500 flex items-center">
                         <Clock className="mr-1 h-3 w-3" />
                         {activity.timestamp}
@@ -401,7 +425,11 @@ export default function Dashboard() {
                 ))}
               </div>
               <div className="mt-6">
-                <Button variant="outline" size="sm" className="w-full border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white group">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white group"
+                >
                   Voir toute l'activité
                   <ArrowUpRight className="ml-2 h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Button>

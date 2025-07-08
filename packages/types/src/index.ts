@@ -4,30 +4,27 @@
  * Fichier: packages/types/src/index.ts
  */
 
+// ===== TYPES MÉTIER =====
+export * from './admin'
 // ===== TYPES DE BASE =====
 export * from './api'
 export * from './auth'
-export * from './common'
-export * from './forms'
-export * from './user'
-
-// ===== TYPES MÉTIER =====
-export * from './admin'
 export * from './client'
+export * from './common'
+// ===== TYPES UI ET COMPOSANTS =====
+export * from './components'
 export * from './facturation'
+export * from './forms'
 export * from './guards'
 export * from './notifications'
 export * from './production'
 export * from './projet'
 export * from './stocks'
-
-// ===== TYPES UI ET COMPOSANTS =====
-export * from './components'
-export * from './ui'
-
 // ===== TYPES STORES (NOUVEAU) =====
 export * from './store-entities'
 export * from './stores'
+export * from './ui'
+export * from './user'
 
 // ===== EXPORTS EXPLICITES POUR COMPATIBILITÉ =====
 
@@ -39,22 +36,18 @@ export { DevisStatut, FactureStatut, PaiementMethode } from './facturation'
 
 // Types notifications
 export { NotificationCategory, NotificationType } from './notifications'
-
-// Types projet
-export { ProjetPriorite, ProjetStatut, ProjetType } from './projet'
-export type { Projet as ProjectType } from './projet'
-
-// Types stocks
-export { ChuteQualite, ChuteStatut, MouvementType } from './stocks'
-
-// Types utilisateur
-export type { User as UserType } from './user'
-
 // Types production (aliases)
 export {
   OrdrePriorite as PrioriteProduction,
-  OrdreStatut as StatutProduction
+  OrdreStatut as StatutProduction,
 } from './production'
+export type { Projet as ProjectType } from './projet'
+// Types projet
+export { ProjetPriorite, ProjetStatut, ProjetType } from './projet'
+// Types stocks
+export { ChuteQualite, ChuteStatut, MouvementType } from './stocks'
+// Types utilisateur
+export type { User as UserType } from './user'
 
 // ===== TYPES TECHNIQUES GLOBAUX =====
 
@@ -63,7 +56,13 @@ export {
  */
 export type ID = string
 export type Timestamp = Date
-export type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue }
+export type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JSONValue[]
+  | { [key: string]: JSONValue }
 
 /**
  * Types pour les états asynchrones
@@ -182,12 +181,15 @@ export type Metric = {
  */
 export type ConfigValue = string | number | boolean | object | null
 
-export type ConfigSchema = Record<string, {
-  type: 'string' | 'number' | 'boolean' | 'object'
-  required?: boolean
-  default?: ConfigValue
-  description?: string
-}>
+export type ConfigSchema = Record<
+  string,
+  {
+    type: 'string' | 'number' | 'boolean' | 'object'
+    required?: boolean
+    default?: ConfigValue
+    description?: string
+  }
+>
 
 // ===== TYPES UTILITAIRES AVANCÉS =====
 

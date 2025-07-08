@@ -11,22 +11,22 @@ import type { ReactNode } from 'react'
 export const metadata: Metadata = {
   title: {
     default: 'Gestion des Paiements',
-    template: '%s | Paiements | TopSteel ERP'
+    template: '%s | Paiements | TopSteel ERP',
   },
   description: 'Gestion et suivi des paiements clients - Facturation TopSteel ERP',
   keywords: [
-    'paiements', 
-    'facturation', 
-    'encaissements', 
+    'paiements',
+    'facturation',
+    'encaissements',
     'trésorerie',
     'comptabilité',
     'TopSteel',
-    'ERP'
+    'ERP',
   ],
   robots: {
     index: false,
-    follow: false
-  }
+    follow: false,
+  },
 }
 
 // ===== VIEWPORT SÉPARÉ (Next.js 15) =====
@@ -35,7 +35,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false
+  userScalable: false,
 }
 
 // ===== TYPES =====

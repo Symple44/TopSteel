@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-
+import type { Repository } from "typeorm";
+import type { CreateOrdreFabricationDto } from "./dto/create-ordre-fabrication.dto";
+import type { OrdreFabricationQueryDto } from "./dto/ordre-fabrication-query.dto";
+import type { UpdateOrdreFabricationDto } from "./dto/update-ordre-fabrication.dto";
 import { OrdreFabrication, OrdreFabricationStatut } from "./entities/ordre-fabrication.entity";
-import { CreateOrdreFabricationDto } from "./dto/create-ordre-fabrication.dto";
-import { UpdateOrdreFabricationDto } from "./dto/update-ordre-fabrication.dto";
-import { OrdreFabricationQueryDto } from "./dto/ordre-fabrication-query.dto";
 
 @Injectable()
 export class OrdreFabricationService {

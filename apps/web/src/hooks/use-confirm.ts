@@ -41,29 +41,29 @@ export function useConfirm() {
 
   const handleConfirm = () => {
     state.resolve?.(true)
-    setState(prev => ({ 
-      ...prev, 
-      isOpen: false, 
-      resolve: null // Correction: null au lieu de undefined
+    setState((prev) => ({
+      ...prev,
+      isOpen: false,
+      resolve: null, // Correction: null au lieu de undefined
     }))
   }
 
   const handleCancel = () => {
     state.resolve?.(false)
-    setState(prev => ({ 
-      ...prev, 
-      isOpen: false, 
-      resolve: null // Correction: null au lieu de undefined
+    setState((prev) => ({
+      ...prev,
+      isOpen: false,
+      resolve: null, // Correction: null au lieu de undefined
     }))
   }
 
   const handleClose = () => {
     // Méthode alternative pour fermer sans décision
     state.resolve?.(false)
-    setState(prev => ({ 
-      ...prev, 
-      isOpen: false, 
-      resolve: null 
+    setState((prev) => ({
+      ...prev,
+      isOpen: false,
+      resolve: null,
     }))
   }
 

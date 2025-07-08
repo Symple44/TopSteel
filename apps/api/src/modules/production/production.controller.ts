@@ -23,10 +23,10 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "../users/entities/user.entity";
-import { CreateProductionDto } from "./dto/create-production.dto";
-import { ProductionQueryDto } from "./dto/production-query.dto";
-import { UpdateProductionDto } from "./dto/update-production.dto";
-import { ProductionService } from "./production.service";
+import type { CreateProductionDto } from "./dto/create-production.dto";
+import type { ProductionQueryDto } from "./dto/production-query.dto";
+import type { UpdateProductionDto } from "./dto/update-production.dto";
+import type { ProductionService } from "./production.service";
 
 @Controller("production")
 @ApiTags("🏭 Production")

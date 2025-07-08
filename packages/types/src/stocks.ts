@@ -7,21 +7,21 @@ export enum StockType {
   PRODUIT_FINI = 'produit_fini',
   COMPOSANT = 'composant',
   CONSOMMABLE = 'consommable',
-  OUTILLAGE = 'outillage'
+  OUTILLAGE = 'outillage',
 }
 
 export enum ChuteQualite {
   EXCELLENTE = 'EXCELLENTE',
-  BONNE = 'BONNE', 
+  BONNE = 'BONNE',
   ACCEPTABLE = 'ACCEPTABLE',
-  DEGRADEE = 'DEGRADEE'
+  DEGRADEE = 'DEGRADEE',
 }
 
 export enum ChuteStatut {
   DISPONIBLE = 'DISPONIBLE',
   RESERVEE = 'RESERVEE',
   UTILISEE = 'UTILISEE',
-  REBUT = 'REBUT'
+  REBUT = 'REBUT',
 }
 
 export enum MouvementType {
@@ -29,13 +29,13 @@ export enum MouvementType {
   SORTIE = 'sortie',
   TRANSFERT = 'transfert',
   AJUSTEMENT = 'ajustement',
-  INVENTAIRE = 'inventaire'
+  INVENTAIRE = 'inventaire',
 }
 
 export enum AlerteNiveau {
   INFO = 'info',
   WARNING = 'warning',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 export interface Materiau extends BaseEntity {
@@ -179,4 +179,3 @@ export interface StocksStats {
   tauxReutilisation: number
   economiesChutes: number
 }
-

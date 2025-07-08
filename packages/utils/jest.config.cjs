@@ -3,5 +3,5 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: ['<rootDir>/src/**/*.{test,spec}.ts'],
   passWithNoTests: true,
-  verbose: false
-};
+  verbose: false,
+}

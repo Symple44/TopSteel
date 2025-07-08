@@ -1,16 +1,16 @@
 // apps/web/src/components/production/create-ordre-dialog.tsx
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { X } from "lucide-react";
+import { X } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 
 interface CreateOrdreDialogProps {
-  open: boolean;  // ✅ Interface standardisée
-  onOpenChange: (open: boolean) => void;  // ✅ Interface standardisée
-  onSubmit?: (data: any) => void;
+  open: boolean // ✅ Interface standardisée
+  onOpenChange: (open: boolean) => void // ✅ Interface standardisée
+  onSubmit?: (data: any) => void
 }
 
 export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreDialogProps) {
@@ -20,26 +20,26 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
     priorite: 'NORMALE',
     dateDebutPrevue: '',
     dateFinPrevue: '',
-    projet: ''
-  });
+    projet: '',
+  })
 
-  if (!open) return null;
+  if (!open) return null
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+    e.preventDefault()
+
     const newOrdre = {
       ...formData,
       id: Date.now(),
       statut: 'PLANIFIE',
       avancement: 0,
-      createdAt: new Date()
-    };
-    
-    console.log('Nouvel ordre créé:', newOrdre);
-    onSubmit?.(newOrdre);
-    onOpenChange(false);
-    
+      createdAt: new Date(),
+    }
+
+    console.log('Nouvel ordre créé:', newOrdre)
+    onSubmit?.(newOrdre)
+    onOpenChange(false)
+
     // Reset form
     setFormData({
       numero: '',
@@ -47,9 +47,9 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
       priorite: 'NORMALE',
       dateDebutPrevue: '',
       dateFinPrevue: '',
-      projet: ''
-    });
-  };
+      projet: '',
+    })
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -67,28 +67,34 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
               <Input
                 type="text"
                 value={formData.numero}
-                onChange={(e) => setFormData({ ...formData, numero: (e.target as HTMLInputElement).value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, numero: (e.target as HTMLInputElement).value })
+                }
                 placeholder="OF-2025-001"
                 required
               />
             </div>
-            
+
             <div>
               <label className="text-sm font-medium">Description</label>
               <Input
                 type="text"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: (e.target as HTMLInputElement).value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: (e.target as HTMLInputElement).value })
+                }
                 placeholder="Description de l'ordre..."
                 required
               />
             </div>
-            
+
             <div>
               <label className="text-sm font-medium">Priorité</label>
               <select
                 value={formData.priorite}
-                onChange={(e) => setFormData({ ...formData, priorite: (e.target as HTMLSelectElement).value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, priorite: (e.target as HTMLSelectElement).value })
+                }
                 className="w-full p-2 border rounded-md"
               >
                 <option value="BASSE">Basse</option>
@@ -97,14 +103,19 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
                 <option value="URGENTE">Urgente</option>
               </select>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Date début</label>
                 <Input
                   type="date"
                   value={formData.dateDebutPrevue}
-                  onChange={(e) => setFormData({ ...formData, dateDebutPrevue: (e.target as HTMLInputElement).value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      dateDebutPrevue: (e.target as HTMLInputElement).value,
+                    })
+                  }
                 />
               </div>
               <div>
@@ -112,32 +123,37 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
                 <Input
                   type="date"
                   value={formData.dateFinPrevue}
-                  onChange={(e) => setFormData({ ...formData, dateFinPrevue: (e.target as HTMLInputElement).value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      dateFinPrevue: (e.target as HTMLInputElement).value,
+                    })
+                  }
                 />
               </div>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium">Projet associé</label>
               <Input
                 type="text"
                 value={formData.projet}
-                onChange={(e) => setFormData({ ...formData, projet: (e.target as HTMLInputElement).value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, projet: (e.target as HTMLInputElement).value })
+                }
                 placeholder="Nom du projet (optionnel)"
               />
             </div>
-            
+
             <div className="flex justify-end space-x-2 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
-              <Button type="submit">
-                Créer l'ordre
-              </Button>
+              <Button type="submit">Créer l'ordre</Button>
             </div>
           </form>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

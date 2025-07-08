@@ -64,58 +64,58 @@ export interface StoreProjet extends BaseStoreEntity {
   // Identifiants et références
   reference: string
   numero?: string
-  
+
   // Informations de base
   description: string
   type: ProjetType
   statut: ProjetStatut
   priorite: ProjetPriorite
-  
+
   // Dates
   dateCreation: Date
   dateDebut?: Date
   dateFin?: Date
   dateFinPrevue?: Date
   dateEcheance?: Date
-  
+
   // Relations - COMPATIBLE avec Projet
   clientId: string
-  client: Client  // ✅ Obligatoire comme dans Projet
+  client: Client // ✅ Obligatoire comme dans Projet
   responsableId?: string
   responsable?: User
-  
+
   // Finances
-  montantHT: number      // ✅ Obligatoire comme dans Projet
-  montantTTC: number     // ✅ Obligatoire comme dans Projet
-  tauxTVA: number        // ✅ Obligatoire comme dans Projet
-  marge: number          // ✅ Obligatoire comme dans Projet
+  montantHT: number // ✅ Obligatoire comme dans Projet
+  montantTTC: number // ✅ Obligatoire comme dans Projet
+  tauxTVA: number // ✅ Obligatoire comme dans Projet
+  marge: number // ✅ Obligatoire comme dans Projet
   budget?: number
-  
+
   // Progression
-  avancement: number     // ✅ Obligatoire comme dans Projet
+  avancement: number // ✅ Obligatoire comme dans Projet
   progression?: number
-  
+
   // Adresse - COMPATIBLE avec Projet
-  adresseChantier: Address       // ✅ Utilise le type Address existant
-  
+  adresseChantier: Address // ✅ Utilise le type Address existant
+
   // Métadonnées
   notes?: string
   commentaires?: string
   alertes?: string[]
   tags?: string[]
-  
+
   // Relations avec autres entités - COMPATIBLE avec Projet
-  devis?: Devis          // ✅ Compatible avec Projet.devis
+  devis?: Devis // ✅ Compatible avec Projet.devis
   documents?: StoreDocument[]
   documentsIds: string[] // ✅ Obligatoire comme dans Projet
   ordresFabricationIds: string[] // ✅ Obligatoire comme dans Projet
-  
+
   // Champs calculés/dérivés
   enRetard?: boolean
   pourcentageAvancement?: number
   tempsEcoule?: number
   tempsRestant?: number
-  
+
   // Champs métier spécifiques
   finition?: string
   materiauPrincipal?: string
@@ -126,7 +126,7 @@ export interface StoreProjet extends BaseStoreEntity {
     surface?: number
     poids?: number
   }
-  
+
   // Champs de workflow
   etapeActuelle?: string
   prochainActions?: string[]
@@ -213,13 +213,13 @@ export interface StoreProjetFilters {
   statut?: ProjetStatut[]
   priorite?: ProjetPriorite[]
   type?: ProjetType[]
-  dateDebut?: Date               // ✅ Compatible avec ProjetFilters existant
-  dateFin?: Date                 // ✅ Compatible avec ProjetFilters existant
+  dateDebut?: Date // ✅ Compatible avec ProjetFilters existant
+  dateFin?: Date // ✅ Compatible avec ProjetFilters existant
   dateEcheance?: { from?: string; to?: string }
   responsable?: string[]
-  client?: string[]              // ✅ Array de noms de clients pour recherche
-  clientId?: string              // ✅ ID unique d'un client spécifique
-  search?: string                // ✅ Compatible avec ProjetFilters existant
+  client?: string[] // ✅ Array de noms de clients pour recherche
+  clientId?: string // ✅ ID unique d'un client spécifique
+  search?: string // ✅ Compatible avec ProjetFilters existant
   tags?: string[]
   montantMin?: number
   montantMax?: number

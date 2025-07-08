@@ -33,17 +33,17 @@ export interface PaginatedResponse<T> {
   }
 }
 export interface PaginationMetaDto {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNext: boolean
+  hasPrev: boolean
 }
 
 export interface PaginationResultDto<T> {
-  data: T[];
-  meta: PaginationMetaDto;
+  data: T[]
+  meta: PaginationMetaDto
 }
 export interface FilterParams {
   search?: string

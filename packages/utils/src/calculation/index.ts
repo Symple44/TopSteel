@@ -12,5 +12,5 @@ export function calculateMargin(sellPrice: number, costPrice: number): number {
 }
 
 export function roundToDecimals(value: number, decimals: number): number {
-  return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals)
+  return Math.round(value * 10 ** decimals) / 10 ** decimals
 }

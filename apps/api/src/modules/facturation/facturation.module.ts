@@ -1,8 +1,8 @@
-import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { FacturationService } from "./facturation.service";
-import { FacturationController } from "./facturation.controller";
-import { Facturation } from "./entities/facturation.entity";
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Facturation } from './entities/facturation.entity'
+import { FacturationController } from './facturation.controller'
+import { FacturationService } from './facturation.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Facturation])],

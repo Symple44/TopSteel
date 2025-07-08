@@ -1,38 +1,32 @@
 'use client'
 
-import { useState } from 'react'
-import { 
-  Calculator, 
-  Plus, 
-  Save, 
-  FileText,
-  Settings,
-  TrendingUp,
-  Euro,
-  Percent,
-  Package,
-  Users,
+import {
+  Calculator,
   Clock,
   Copy,
+  Euro,
+  Eye,
+  FileText,
   History,
-  Download,
+  Plus,
+  Save,
+  TrendingUp,
   X,
-  Eye
 } from 'lucide-react'
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import {
   Table,
   TableBody,
@@ -41,8 +35,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatCurrency } from '@/lib/utils'
-import { formatPercent } from '@erp/utils'
 
 // Données mockées pour la démonstration
 const mockTemplates = [
@@ -95,7 +89,7 @@ const mockHistorique = [
 
 export default function ChiffragePage() {
   const [activeTab, setActiveTab] = useState('nouveau')
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -104,9 +98,7 @@ export default function ChiffragePage() {
             <Calculator className="h-8 w-8" />
             Chiffrage
           </h1>
-          <p className="text-muted-foreground">
-            Création et gestion des devis et chiffrages
-          </p>
+          <p className="text-muted-foreground">Création et gestion des devis et chiffrages</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
@@ -132,9 +124,7 @@ export default function ChiffragePage() {
           <Card>
             <CardHeader>
               <CardTitle>Nouveau chiffrage</CardTitle>
-              <CardDescription>
-                Créer un nouveau devis ou chiffrage pour un projet
-              </CardDescription>
+              <CardDescription>Créer un nouveau devis ou chiffrage pour un projet</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -152,29 +142,29 @@ export default function ChiffragePage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="projet">Projet</Label>
                     <Input placeholder="Nom du projet" />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="description">Description</Label>
                     <Input placeholder="Description du chiffrage" />
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="dateValidite">Date de validité</Label>
                     <Input type="date" />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="delaiLivraison">Délai de livraison</Label>
                     <Input placeholder="Ex: 4 semaines" />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="marge">Marge commerciale (%)</Label>
                     <Input type="number" placeholder="35" />
@@ -192,7 +182,7 @@ export default function ChiffragePage() {
                     Ajouter un élément
                   </Button>
                 </div>
-                
+
                 <div className="border rounded-md">
                   <Table>
                     <TableHeader>
@@ -274,7 +264,10 @@ export default function ChiffragePage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {mockTemplates.map((template) => (
-                  <Card key={template.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <Card
+                    key={template.id}
+                    className="cursor-pointer hover:shadow-md transition-shadow"
+                  >
                     <CardContent className="p-4">
                       <div className="space-y-2">
                         <h4 className="font-semibold">{template.nom}</h4>
@@ -302,9 +295,7 @@ export default function ChiffragePage() {
           <Card>
             <CardHeader>
               <CardTitle>Historique des chiffrages</CardTitle>
-              <CardDescription>
-                Consultez et gérez vos chiffrages précédents
-              </CardDescription>
+              <CardDescription>Consultez et gérez vos chiffrages précédents</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -322,7 +313,7 @@ export default function ChiffragePage() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="border rounded-md">
                   <Table>
                     <TableHeader>
@@ -345,11 +336,13 @@ export default function ChiffragePage() {
                           <TableCell>{chiffrage.projet}</TableCell>
                           <TableCell>{formatCurrency(chiffrage.montantHT)}</TableCell>
                           <TableCell>
-                            <Badge 
+                            <Badge
                               variant={
-                                chiffrage.statut === 'Accepté' ? 'default' :
-                                chiffrage.statut === 'En attente' ? 'secondary' :
-                                'destructive'
+                                chiffrage.statut === 'Accepté'
+                                  ? 'default'
+                                  : chiffrage.statut === 'En attente'
+                                    ? 'secondary'
+                                    : 'destructive'
                               }
                             >
                               {chiffrage.statut}
@@ -387,7 +380,7 @@ export default function ChiffragePage() {
                 <div className="text-xs text-muted-foreground">+12% vs mois dernier</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-2">
@@ -398,7 +391,7 @@ export default function ChiffragePage() {
                 <div className="text-xs text-muted-foreground">+8% vs mois dernier</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-2">
@@ -409,7 +402,7 @@ export default function ChiffragePage() {
                 <div className="text-xs text-muted-foreground">+3% vs mois dernier</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-2">
@@ -426,11 +419,3 @@ export default function ChiffragePage() {
     </div>
   )
 }
-
-
-
-
-
-
-
-

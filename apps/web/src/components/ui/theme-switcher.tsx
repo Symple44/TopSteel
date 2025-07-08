@@ -1,8 +1,8 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
 
 interface ThemeSwitcherProps {
   variant?: 'icon' | 'dropdown' | 'toggle'
@@ -17,24 +17,25 @@ function useThemeContext() {
     theme: 'system' as 'light' | 'dark' | 'system',
     resolvedTheme: 'light' as 'light' | 'dark',
     isHydrated: false,
-    error: null as string | null
+    error: null as string | null,
   })
 
   useEffect(() => {
     // Détection du thème système
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const systemTheme = mediaQuery.matches ? 'dark' : 'light'
-    
+
     // Lecture du thème stocké
-    const storedTheme = localStorage.getItem('topsteel-theme') as 'light' | 'dark' | 'system' || 'system'
-    
+    const storedTheme =
+      (localStorage.getItem('topsteel-theme') as 'light' | 'dark' | 'system') || 'system'
+
     const resolvedTheme = storedTheme === 'system' ? systemTheme : storedTheme
-    
+
     setThemeState({
       theme: storedTheme,
       resolvedTheme,
       isHydrated: true,
-      error: null
+      error: null,
     })
 
     // Appliquer le thème au DOM
@@ -48,7 +49,7 @@ function useThemeContext() {
 
         document.documentElement.classList.remove('light', 'dark')
         document.documentElement.classList.add(newSystemTheme)
-        setThemeState(prev => ({ ...prev, resolvedTheme: newSystemTheme }))
+        setThemeState((prev) => ({ ...prev, resolvedTheme: newSystemTheme }))
       }
     }
 
@@ -60,23 +61,25 @@ function useThemeContext() {
   const setTheme = useCallback((newTheme: 'light' | 'dark' | 'system') => {
     try {
       localStorage.setItem('topsteel-theme', newTheme)
-      
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
       const resolvedTheme = newTheme === 'system' ? systemTheme : newTheme
-      
+
       document.documentElement.classList.remove('light', 'dark')
       document.documentElement.classList.add(resolvedTheme)
-      
-      setThemeState(prev => ({
+
+      setThemeState((prev) => ({
         ...prev,
         theme: newTheme,
         resolvedTheme,
-        error: null
+        error: null,
       }))
     } catch (error) {
-      setThemeState(prev => ({
+      setThemeState((prev) => ({
         ...prev,
-        error: 'Erreur lors du changement de thème'
+        error: 'Erreur lors du changement de thème',
       }))
     }
   }, [])
@@ -84,40 +87,43 @@ function useThemeContext() {
   return { ...themeState, setTheme }
 }
 
-export function ThemeSwitcher({ 
+export function ThemeSwitcher({
   variant = 'icon',
-  size = 'md', 
+  size = 'md',
   showLabel = false,
-  className 
+  className,
 }: ThemeSwitcherProps) {
   // ✅ HOOK TOUJOURS APPELÉ EN PREMIER
   const { theme, resolvedTheme, isHydrated, error, setTheme } = useThemeContext()
-  
+
   // ✅ TOUS LES AUTRES HOOKS APRÈS
   const [mounted, setMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
   // ✅ useCallback TOUJOURS APPELÉS
-  const handleThemeChange = useCallback((newTheme: 'light' | 'dark' | 'system') => {
-    setTheme(newTheme)
-    setIsOpen(false)
-  }, [setTheme])
+  const handleThemeChange = useCallback(
+    (newTheme: 'light' | 'dark' | 'system') => {
+      setTheme(newTheme)
+      setIsOpen(false)
+    },
+    [setTheme]
+  )
 
   const toggleDropdown = useCallback(() => {
-    setIsOpen(prev => !prev)
+    setIsOpen((prev) => !prev)
   }, [])
 
   const getThemeIcon = useCallback(() => {
     if (!isHydrated || !mounted) {
       return <Monitor className={getIconSizeClasses(size)} />
     }
-    
+
     switch (resolvedTheme) {
-      case 'dark': 
+      case 'dark':
         return <Moon className={getIconSizeClasses(size)} />
-      case 'light': 
+      case 'light':
         return <Sun className={getIconSizeClasses(size)} />
-      default: 
+      default:
         return <Monitor className={getIconSizeClasses(size)} />
     }
   }, [resolvedTheme, isHydrated, mounted, size])
@@ -136,11 +142,11 @@ export function ThemeSwitcher({
   // ✅ RENDU CONDITIONNEL BASÉ SUR L'ÉTAT, PAS LES HOOKS
   if (!mounted || !isHydrated) {
     return (
-      <button 
+      <button
         disabled
         className={cn(
-          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-colors",
-          "hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed",
+          'inline-flex items-center justify-center rounded-lg border border-input bg-background transition-colors',
+          'hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed',
           getSizeClasses(size),
           className
         )}
@@ -154,11 +160,11 @@ export function ThemeSwitcher({
 
   if (error) {
     return (
-      <button 
+      <button
         disabled
         className={cn(
-          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-colors",
-          "hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed",
+          'inline-flex items-center justify-center rounded-lg border border-input bg-background transition-colors',
+          'hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed',
           getSizeClasses(size),
           className
         )}
@@ -175,8 +181,8 @@ export function ThemeSwitcher({
       <button
         onClick={handleToggleTheme}
         className={cn(
-          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-all duration-200",
-          "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+          'inline-flex items-center justify-center rounded-lg border border-input bg-background transition-all duration-200',
+          'hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
           getSizeClasses(size),
           className
         )}
@@ -184,9 +190,7 @@ export function ThemeSwitcher({
       >
         {getThemeIcon()}
         {showLabel && (
-          <span className="ml-2 text-sm">
-            {resolvedTheme === 'dark' ? 'Sombre' : 'Clair'}
-          </span>
+          <span className="ml-2 text-sm">{resolvedTheme === 'dark' ? 'Sombre' : 'Clair'}</span>
         )}
       </button>
     )
@@ -197,8 +201,8 @@ export function ThemeSwitcher({
       <button
         onClick={toggleDropdown}
         className={cn(
-          "inline-flex items-center justify-center rounded-lg border border-input bg-background transition-all duration-200",
-          "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+          'inline-flex items-center justify-center rounded-lg border border-input bg-background transition-all duration-200',
+          'hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
           getSizeClasses(size),
           className
         )}
@@ -212,11 +216,8 @@ export function ThemeSwitcher({
 
       {isOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setIsOpen(false)}
-          />
-          
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+
           <div className="absolute right-0 top-full mt-2 w-40 z-50 bg-popover border border-border rounded-lg shadow-lg py-1">
             <ThemeOption
               theme="light"
@@ -225,7 +226,7 @@ export function ThemeSwitcher({
               label="Clair"
               onClick={handleThemeChange}
             />
-            
+
             <ThemeOption
               theme="dark"
               currentTheme={theme}
@@ -233,7 +234,7 @@ export function ThemeSwitcher({
               label="Sombre"
               onClick={handleThemeChange}
             />
-            
+
             <ThemeOption
               theme="system"
               currentTheme={theme}
@@ -261,33 +262,37 @@ function ThemeOption({ theme, currentTheme, icon, label, onClick }: ThemeOptionP
     <button
       onClick={() => onClick(theme)}
       className={cn(
-        "w-full px-3 py-2 text-left text-sm transition-colors flex items-center gap-3",
-        "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none",
-        currentTheme === theme && "bg-accent/50"
+        'w-full px-3 py-2 text-left text-sm transition-colors flex items-center gap-3',
+        'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none',
+        currentTheme === theme && 'bg-accent/50'
       )}
       role="menuitem"
     >
       {icon}
       <span className="flex-1">{label}</span>
-      {currentTheme === theme && (
-        <div className="h-2 w-2 bg-primary rounded-full" />
-      )}
+      {currentTheme === theme && <div className="h-2 w-2 bg-primary rounded-full" />}
     </button>
   )
 }
 
 function getSizeClasses(size: 'sm' | 'md' | 'lg'): string {
   switch (size) {
-    case 'sm': return 'h-8 w-8 px-2'
-    case 'lg': return 'h-12 w-12 px-3'
-    default: return 'h-10 w-10 px-2.5'
+    case 'sm':
+      return 'h-8 w-8 px-2'
+    case 'lg':
+      return 'h-12 w-12 px-3'
+    default:
+      return 'h-10 w-10 px-2.5'
   }
 }
 
 function getIconSizeClasses(size: 'sm' | 'md' | 'lg'): string {
   switch (size) {
-    case 'sm': return 'h-3.5 w-3.5'
-    case 'lg': return 'h-5 w-5'
-    default: return 'h-4 w-4'
+    case 'sm':
+      return 'h-3.5 w-3.5'
+    case 'lg':
+      return 'h-5 w-5'
+    default:
+      return 'h-4 w-4'
   }
 }

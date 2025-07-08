@@ -23,10 +23,10 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "../users/entities/user.entity";
-import { ClientsService } from "./clients.service";
-import { ClientsQueryDto } from "./dto/clients-query.dto";
-import { CreateClientsDto } from "./dto/create-clients.dto";
-import { UpdateClientsDto } from "./dto/update-clients.dto";
+import type { ClientsService } from "./clients.service";
+import type { ClientsQueryDto } from "./dto/clients-query.dto";
+import type { CreateClientsDto } from "./dto/create-clients.dto";
+import type { UpdateClientsDto } from "./dto/update-clients.dto";
 
 @Controller("clients")
 @ApiTags("🏢 Clients")

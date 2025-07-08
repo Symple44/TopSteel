@@ -1,17 +1,10 @@
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  Min,
-  Max,
-  IsEnum,
-} from "class-validator";
-import { Transform, Type } from "class-transformer";
-import { ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
+import { IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 
 export enum SortOrder {
-  ASC = "ASC",
-  DESC = "DESC",
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
 export class BaseQueryDto {
@@ -20,7 +13,7 @@ export class BaseQueryDto {
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  page?: number = 1;
+  page?: number = 1
 
   @ApiPropertyOptional({ example: 10, minimum: 1, maximum: 100 })
   @IsOptional()
@@ -28,35 +21,35 @@ export class BaseQueryDto {
   @IsNumber()
   @Min(1)
   @Max(100)
-  limit?: number = 10;
+  limit?: number = 10
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  search?: string;
+  search?: string
 
-  @ApiPropertyOptional({ example: "createdAt" })
+  @ApiPropertyOptional({ example: 'createdAt' })
   @IsOptional()
   @IsString()
-  sortBy?: string = "createdAt";
+  sortBy?: string = 'createdAt'
 
   @ApiPropertyOptional({ enum: SortOrder })
   @IsOptional()
   @IsEnum(SortOrder)
-  sortOrder?: SortOrder = SortOrder.DESC;
+  sortOrder?: SortOrder = SortOrder.DESC
 }
 
 export class PaginationMetaDto {
-  page!: number;
-  limit!: number;
-  total!: number;
-  totalPages!: number;
-  hasNext!: boolean;
-  hasPrev!: boolean;
+  page!: number
+  limit!: number
+  total!: number
+  totalPages!: number
+  hasNext!: boolean
+  hasPrev!: boolean
 }
 
 export class PaginationResultDto<T> {
-  data!: T[];
-  meta!: PaginationMetaDto;
+  data!: T[]
+  meta!: PaginationMetaDto
 }

@@ -2,13 +2,13 @@ import { Injectable } from "@nestjs/common";
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
+  type OnGatewayConnection,
+  type OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
+import type { Server, Socket } from "socket.io";
 
 @Injectable()
 @WebSocketGateway({

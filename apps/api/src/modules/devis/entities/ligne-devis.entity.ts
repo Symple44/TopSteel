@@ -1,47 +1,51 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { BaseAuditEntity } from "../../../common/base/base.entity";
-import { Devis } from "./devis.entity";
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
+import { BaseAuditEntity } from '../../../common/base/base.entity'
+import { Devis } from './devis.entity'
 
-@Entity("lignes_devis")
+@Entity('lignes_devis')
 export class LigneDevis extends BaseAuditEntity {
   @Column()
-  devisId!: string;
+  devisId!: string
 
-  @ManyToOne(() => Devis, devis => devis.lignes, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "devisId" })
-  devis!: Devis;
+  @ManyToOne(
+    () => Devis,
+    (devis) => devis.lignes,
+    { onDelete: 'CASCADE' }
+  )
+  @JoinColumn({ name: 'devisId' })
+  devis!: Devis
 
   @Column({ length: 500 })
-  designation!: string;
+  designation!: string
 
-  @Column("text", { nullable: true })
-  description?: string;
+  @Column('text', { nullable: true })
+  description?: string
 
-  @Column("decimal", { precision: 8, scale: 2 })
-  quantite!: number;
+  @Column('decimal', { precision: 8, scale: 2 })
+  quantite!: number
 
   @Column({ length: 10 })
-  unite!: string;
+  unite!: string
 
-  @Column("decimal", { precision: 8, scale: 2 })
-  prixUnitaire!: number;
+  @Column('decimal', { precision: 8, scale: 2 })
+  prixUnitaire!: number
 
-  @Column("decimal", { precision: 5, scale: 2, default: 20 })
-  tauxTVA!: number;
+  @Column('decimal', { precision: 5, scale: 2, default: 20 })
+  tauxTVA!: number
 
-  @Column("decimal", { precision: 5, scale: 2, default: 0 })
-  remise!: number;
+  @Column('decimal', { precision: 5, scale: 2, default: 0 })
+  remise!: number
 
-  @Column("decimal", { precision: 10, scale: 2 })
-  totalHT!: number;
+  @Column('decimal', { precision: 10, scale: 2 })
+  totalHT!: number
 
   @Column({ nullable: true })
-  produitId?: string;
+  produitId?: string
 
-  @Column({ type: "integer" })
-  ordreLigne!: number;
+  @Column({ type: 'integer' })
+  ordreLigne!: number
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any>
 }

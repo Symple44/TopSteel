@@ -1,6 +1,6 @@
 /**
  * ✅ SECURITY UTILITIES ENTERPRISE - VERSION COMPATIBLE
- * 
+ *
  * Fonctionnalités:
  * - Validation et sanitisation des données
  * - Protection XSS et injection (sans DOMPurify)
@@ -33,7 +33,7 @@ export class SecurityUtils {
         .replace(/onclick=/gi, '')
         .replace(/onmouseover=/gi, '')
     }
-    
+
     // Client: utiliser la méthode native du navigateur
     const temp = document.createElement('div')
 
@@ -63,7 +63,7 @@ export class SecurityUtils {
    */
   static sanitizeEmail(email: string): string | null {
     const emailSchema = z.string().email().max(254)
-    
+
     try {
       return emailSchema.parse(email.toLowerCase().trim())
     } catch {
@@ -77,12 +77,12 @@ export class SecurityUtils {
   static sanitizeUrl(url: string): string | null {
     try {
       const parsed = new URL(url)
-      
+
       // Seulement HTTP/HTTPS
       if (!['http:', 'https:'].includes(parsed.protocol)) {
         return null
       }
-      
+
       return parsed.toString()
     } catch {
       return null
@@ -94,21 +94,21 @@ export class SecurityUtils {
    */
   static createRateLimiter(maxRequests: number, windowMs: number) {
     const requests: number[] = []
-    
+
     return function rateLimited<T extends (...args: any[]) => any>(fn: T): T {
       return ((...args: any[]) => {
         const now = Date.now()
         const windowStart = now - windowMs
-        
+
         // Nettoyer les anciennes requêtes
         while (requests.length > 0 && requests[0] < windowStart) {
           requests.shift()
         }
-        
+
         if (requests.length >= maxRequests) {
           throw new Error('Trop de requêtes. Veuillez patienter.')
         }
-        
+
         requests.push(now)
 
         return fn(...args)
@@ -130,15 +130,16 @@ export class SecurityUtils {
    */
   static generateCSRFToken(): string {
     if (typeof window === 'undefined') {
-      return Math.random().toString(36).substring(2, 15) + 
-             Math.random().toString(36).substring(2, 15)
+      return (
+        Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+      )
     }
-    
+
     const array = new Uint8Array(32)
 
     crypto.getRandomValues(array)
 
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
   }
 
   /**
@@ -181,8 +182,8 @@ export class SecurityUtils {
     return {
       issues,
       warnings,
-      score: Math.max(0, 100 - (issues.length * 20) - (warnings.length * 5)),
-      timestamp: new Date().toISOString()
+      score: Math.max(0, 100 - issues.length * 20 - warnings.length * 5),
+      timestamp: new Date().toISOString(),
     }
   }
 
@@ -193,14 +194,14 @@ export class SecurityUtils {
     const sanitizedDetails = Object.fromEntries(
       Object.entries(details).map(([key, value]) => [
         key,
-        typeof value === 'string' ? this.maskSensitiveData(value) : value
+        typeof value === 'string' ? SecurityUtils.maskSensitiveData(value) : value,
       ])
     )
 
     console.warn('🔐 Security Event:', {
       event,
       timestamp: new Date().toISOString(),
-      details: sanitizedDetails
+      details: sanitizedDetails,
     })
   }
 
@@ -224,38 +225,51 @@ export interface SecurityAuditReport {
 
 // ✅ SCHÉMAS ZOD SÉCURISÉS - REGEX CORRIGÉES
 export const secureSchemas = {
-  email: z.string().email().max(254).transform(val => val.toLowerCase().trim()),
-  
-  password: z.string()
+  email: z
+    .string()
+    .email()
+    .max(254)
+    .transform((val) => val.toLowerCase().trim()),
+
+  password: z
+    .string()
     .min(8, 'Mot de passe trop court')
     .max(128, 'Mot de passe trop long')
     .regex(/(?=.*[a-z])/, 'Doit contenir une minuscule')
     .regex(/(?=.*[A-Z])/, 'Doit contenir une majuscule')
     .regex(/(?=.*\d)/, 'Doit contenir un chiffre')
     .regex(/(?=.*[^a-zA-Z\d])/, 'Doit contenir un caractère spécial'), // ✅ CORRIGÉ: Sans échappement inutile
-  
-  url: z.string().url().max(2048).refine(url => {
-    try {
-      const parsed = new URL(url)
 
-      return ['http:', 'https:'].includes(parsed.protocol)
-    } catch {
-      return false
-    }
-  }, 'URL non sécurisée'),
-  
+  url: z
+    .string()
+    .url()
+    .max(2048)
+    .refine((url) => {
+      try {
+        const parsed = new URL(url)
+
+        return ['http:', 'https:'].includes(parsed.protocol)
+      } catch {
+        return false
+      }
+    }, 'URL non sécurisée'),
+
   phoneNumber: z.string().regex(/^\+33[1-9]\d{8}$/, 'Numéro de téléphone français invalide'),
-  
-  siret: z.string().length(14).regex(/^\d{14}$/, 'SIRET invalide'),
-  
-  filename: z.string()
+
+  siret: z
+    .string()
+    .length(14)
+    .regex(/^\d{14}$/, 'SIRET invalide'),
+
+  filename: z
+    .string()
     .max(255)
     .regex(/^[a-zA-Z0-9._-]+$/, 'Nom de fichier invalide')
-    .refine(name => !name.startsWith('.'), 'Nom de fichier invalide'),
-  
+    .refine((name) => !name.startsWith('.'), 'Nom de fichier invalide'),
+
   html: z.string().transform(SecurityUtils.sanitizeHtml),
-  
-  userInput: z.string().max(1000).transform(SecurityUtils.sanitizeString)
+
+  userInput: z.string().max(1000).transform(SecurityUtils.sanitizeString),
 }
 
 // ✅ CONSTANTES DE SÉCURITÉ
@@ -263,22 +277,22 @@ export const SECURITY_CONSTANTS = {
   // Limites de rate limiting
   API_RATE_LIMIT: 100, // requêtes par minute
   LOGIN_RATE_LIMIT: 5, // tentatives par minute
-  
+
   // Timeouts
   SESSION_TIMEOUT: 24 * 60 * 60 * 1000, // 24 heures
   TOKEN_REFRESH_INTERVAL: 50 * 60 * 1000, // 50 minutes
-  
+
   // Validation
   MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
   ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
-  
+
   // Headers de sécurité
   SECURITY_HEADERS: {
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'X-XSS-Protection': '1; mode=block',
-    'Referrer-Policy': 'strict-origin-when-cross-origin'
-  }
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+  },
 }
 
 // ✅ HELPER POUR VALIDATION DE FICHIERS
@@ -291,19 +305,19 @@ export class FileSecurityUtils {
     if (file.size > SECURITY_CONSTANTS.MAX_FILE_SIZE) {
       return { valid: false, error: 'Fichier trop volumineux' }
     }
-    
+
     // Type MIME
     if (!SECURITY_CONSTANTS.ALLOWED_FILE_TYPES.includes(file.type)) {
       return { valid: false, error: 'Type de fichier non autorisé' }
     }
-    
+
     // Nom de fichier
     const filenameValidation = secureSchemas.filename.safeParse(file.name)
 
     if (!filenameValidation.success) {
       return { valid: false, error: 'Nom de fichier invalide' }
     }
-    
+
     return { valid: true }
   }
 
@@ -314,7 +328,7 @@ export class FileSecurityUtils {
     const extension = originalName.split('.').pop() || ''
     const timestamp = Date.now()
     const random = Math.random().toString(36).substring(2, 8)
-    
+
     return `file_${timestamp}_${random}.${extension}`
   }
 }

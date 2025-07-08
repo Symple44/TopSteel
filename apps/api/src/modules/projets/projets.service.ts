@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { PaginationResultDto } from "../../common/dto/base.dto";
-import { CreateProjetsDto } from "./dto/create-projets.dto";
-import { ProjetsQueryDto } from "./dto/projets-query.dto";
-import { UpdateProjetsDto } from "./dto/update-projets.dto";
+import type { Repository } from "typeorm";
+import type { PaginationResultDto } from "../../common/dto/base.dto";
+import type { CreateProjetsDto } from "./dto/create-projets.dto";
+import type { ProjetsQueryDto } from "./dto/projets-query.dto";
+import type { UpdateProjetsDto } from "./dto/update-projets.dto";
 import { Projet, ProjetStatut } from "./entities/projet.entity";
 
 @Injectable()

@@ -26,10 +26,7 @@ export function PageHeader({ title, subtitle, breadcrumbs, actions }: PageHeader
             <div key={index} className="flex items-center">
               {index > 0 && <ChevronRight className="h-4 w-4 mx-1" />}
               {breadcrumb.href ? (
-                <Link 
-                  href={breadcrumb.href}
-                  className="hover:text-gray-700 transition-colors"
-                >
+                <Link href={breadcrumb.href} className="hover:text-gray-700 transition-colors">
                   {breadcrumb.label}
                 </Link>
               ) : (
@@ -44,15 +41,9 @@ export function PageHeader({ title, subtitle, breadcrumbs, actions }: PageHeader
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-          {subtitle && (
-            <p className="text-gray-600 mt-1">{subtitle}</p>
-          )}
+          {subtitle && <p className="text-gray-600 mt-1">{subtitle}</p>}
         </div>
-        {actions && (
-          <div className="flex items-center gap-2">
-            {actions}
-          </div>
-        )}
+        {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
     </div>
   )

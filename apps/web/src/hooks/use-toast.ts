@@ -9,7 +9,7 @@ export interface Toast {
   description?: string
   variant?: 'default' | 'destructive' | 'success' | 'warning'
   duration?: number
-  action?: React.ReactNode  // ✅ Ajout de la propriété action manquante
+  action?: React.ReactNode // ✅ Ajout de la propriété action manquante
   onDismiss?: () => void
 }
 
@@ -34,10 +34,9 @@ interface ToastContextType {
 
 let toastCounter = 0
 
-
 /**
  * Hook principal pour la gestion des toasts
- * 
+ *
  * @returns Contexte des toasts avec toutes les actions
  */
 export function useToast(): ToastContextType {
@@ -47,7 +46,7 @@ export function useToast(): ToastContextType {
    * Ferme un toast spécifique
    */
   const dismiss = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id))
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
   }, [])
 
   /**
@@ -60,31 +59,34 @@ export function useToast(): ToastContextType {
   /**
    * Crée un nouveau toast
    */
-  const toast = useCallback((options: ToastOptions) => {
-    const id = `toast-${++toastCounter}-${Date.now()}`
-    const newToast: Toast = {
-      id,
-      duration: 5000, // 5 secondes par défaut
-      variant: 'default',
-      ...options,
-    }
+  const toast = useCallback(
+    (options: ToastOptions) => {
+      const id = `toast-${++toastCounter}-${Date.now()}`
+      const newToast: Toast = {
+        id,
+        duration: 5000, // 5 secondes par défaut
+        variant: 'default',
+        ...options,
+      }
 
-    setToasts(prev => [...prev, newToast])
+      setToasts((prev) => [...prev, newToast])
 
-    // Auto-dismiss après la durée spécifiée
-    if (newToast.duration && newToast.duration > 0) {
-      setTimeout(() => {
-        dismiss(id)
-      }, newToast.duration)
-    }
+      // Auto-dismiss après la durée spécifiée
+      if (newToast.duration && newToast.duration > 0) {
+        setTimeout(() => {
+          dismiss(id)
+        }, newToast.duration)
+      }
 
-    // Appeler le callback onDismiss si fourni
-    if (newToast.onDismiss) {
-      setTimeout(() => {
-        newToast.onDismiss?.()
-      }, newToast.duration || 5000)
-    }
-  }, [dismiss])
+      // Appeler le callback onDismiss si fourni
+      if (newToast.onDismiss) {
+        setTimeout(() => {
+          newToast.onDismiss?.()
+        }, newToast.duration || 5000)
+      }
+    },
+    [dismiss]
+  )
 
   return {
     toasts,
@@ -104,81 +106,99 @@ export function useToastShortcuts() {
     /**
      * Toast de succès avec style vert
      */
-    success: useCallback((title: string, description?: string, duration = 4000) => {
-      toast({
-        title,
-        description,
-        variant: 'success',
-        duration,
-      })
-    }, [toast]),
+    success: useCallback(
+      (title: string, description?: string, duration = 4000) => {
+        toast({
+          title,
+          description,
+          variant: 'success',
+          duration,
+        })
+      },
+      [toast]
+    ),
 
     /**
      * Toast d'erreur avec style rouge
      */
-    error: useCallback((title: string, description?: string, duration = 6000) => {
-      toast({
-        title,
-        description,
-        variant: 'destructive',
-        duration,
-      })
-    }, [toast]),
+    error: useCallback(
+      (title: string, description?: string, duration = 6000) => {
+        toast({
+          title,
+          description,
+          variant: 'destructive',
+          duration,
+        })
+      },
+      [toast]
+    ),
 
     /**
      * Toast d'avertissement avec style orange
      */
-    warning: useCallback((title: string, description?: string, duration = 5000) => {
-      toast({
-        title,
-        description,
-        variant: 'warning',
-        duration,
-      })
-    }, [toast]),
+    warning: useCallback(
+      (title: string, description?: string, duration = 5000) => {
+        toast({
+          title,
+          description,
+          variant: 'warning',
+          duration,
+        })
+      },
+      [toast]
+    ),
 
     /**
      * Toast d'information avec style bleu
      */
-    info: useCallback((title: string, description?: string, duration = 4000) => {
-      toast({
-        title,
-        description,
-        variant: 'default',
-        duration,
-      })
-    }, [toast]),
+    info: useCallback(
+      (title: string, description?: string, duration = 4000) => {
+        toast({
+          title,
+          description,
+          variant: 'default',
+          duration,
+        })
+      },
+      [toast]
+    ),
 
     /**
      * Toast persistant (ne se ferme pas automatiquement)
      */
-    persistent: useCallback((title: string, description?: string, variant: Toast['variant'] = 'default') => {
-      toast({
-        title,
-        description,
-        variant,
-        duration: 0, // Pas de fermeture automatique
-      })
-    }, [toast]),
+    persistent: useCallback(
+      (title: string, description?: string, variant: Toast['variant'] = 'default') => {
+        toast({
+          title,
+          description,
+          variant,
+          duration: 0, // Pas de fermeture automatique
+        })
+      },
+      [toast]
+    ),
 
     /**
      * Toast avec action personnalisée
      */
-    withAction: useCallback((
-      title: string,
-      description: string,
-      action: React.ReactNode,
-      variant: Toast['variant'] = 'default',
-      duration = 8000
-    ) => {
-      toast({
-        title,
-        description,
-        action,
-        variant,
-        duration,
-      })
-    }, [toast]),
+    withAction: useCallback(
+      (
+        title: string,
+        description: string,
+        action: React.ReactNode,
+        variant: Toast['variant'] = 'default',
+        duration = 8000
+      ) => {
+        toast({
+          title,
+          description,
+          action,
+          variant,
+          duration,
+        })
+      },
+      [toast]
+    ),
 
     /**
      * Méthodes de gestion
@@ -201,14 +221,17 @@ export function useToastMetrics() {
 
   const metrics = {
     total: toasts.length,
-    byVariant: toasts.reduce((acc, toast) => {
-      const variant = toast.variant || 'default'
+    byVariant: toasts.reduce(
+      (acc, toast) => {
+        const variant = toast.variant || 'default'
 
-      acc[variant] = (acc[variant] || 0) + 1
+        acc[variant] = (acc[variant] || 0) + 1
 
-      return acc
-    }, {} as Record<string, number>),
-    persistent: toasts.filter(t => t.duration === 0).length,
+        return acc
+      },
+      {} as Record<string, number>
+    ),
+    persistent: toasts.filter((t) => t.duration === 0).length,
   }
 
   return metrics
@@ -220,60 +243,61 @@ export function useToastMetrics() {
 export function useToastWithPromise() {
   const { toast } = useToast()
 
-  const promiseToast = useCallback(async <T,>(
-    promise: Promise<T>,
-    messages: {
-      loading?: string
-      success?: string | ((data: T) => string)
-      error?: string | ((error: Error) => string)
-    }
-  ): Promise<T> => {
-    let toastId: string | undefined
+  const promiseToast = useCallback(
+    async <T>(
+      promise: Promise<T>,
+      messages: {
+        loading?: string
+        success?: string | ((data: T) => string)
+        error?: string | ((error: Error) => string)
+      }
+    ): Promise<T> => {
+      let toastId: string | undefined
 
-    // Toast de chargement
-    if (messages.loading) {
-      toastId = `promise-${Date.now()}`
-      toast({
-        title: messages.loading,
-        variant: 'default',
-        duration: 0, // Persistant pendant le chargement
-      })
-    }
-
-    try {
-      const result = await promise
-
-      // Succès
-      if (messages.success) {
-        const successMessage = typeof messages.success === 'function' 
-          ? messages.success(result) 
-          : messages.success
-        
+      // Toast de chargement
+      if (messages.loading) {
+        toastId = `promise-${Date.now()}`
         toast({
-          title: successMessage,
-          variant: 'success',
-          duration: 4000,
+          title: messages.loading,
+          variant: 'default',
+          duration: 0, // Persistant pendant le chargement
         })
       }
 
-      return result
-    } catch (error) {
-      // Erreur
-      if (messages.error) {
-        const errorMessage = typeof messages.error === 'function' 
-          ? messages.error(error as Error) 
-          : messages.error
-        
-        toast({
-          title: errorMessage,
-          variant: 'destructive',
-          duration: 6000,
-        })
-      }
+      try {
+        const result = await promise
 
-      throw error
-    }
-  }, [toast])
+        // Succès
+        if (messages.success) {
+          const successMessage =
+            typeof messages.success === 'function' ? messages.success(result) : messages.success
+
+          toast({
+            title: successMessage,
+            variant: 'success',
+            duration: 4000,
+          })
+        }
+
+        return result
+      } catch (error) {
+        // Erreur
+        if (messages.error) {
+          const errorMessage =
+            typeof messages.error === 'function' ? messages.error(error as Error) : messages.error
+
+          toast({
+            title: errorMessage,
+            variant: 'destructive',
+            duration: 6000,
+          })
+        }
+
+        throw error
+      }
+    },
+    [toast]
+  )
 
   return { promiseToast }
 }

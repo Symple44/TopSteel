@@ -2,21 +2,21 @@
 describe('TopSteel Web Integration', () => {
   describe('integration test suite', () => {
     it('should pass basic integration test', () => {
-      expect(true).toBe(true);
-    });
-    
+      expect(true).toBe(true)
+    })
+
     it('should validate browser environment', () => {
       // Test simple sans dépendances DOM
-      expect(typeof global).toBe('object');
-    });
-    
+      expect(typeof global).toBe('object')
+    })
+
     it('should test integration data flow', async () => {
       const mockData = await Promise.resolve({
         module: 'web',
-        status: 'integration-ready'
-      });
+        status: 'integration-ready',
+      })
 
-      expect(mockData.status).toContain('integration');
-    });
-  });
-});
+      expect(mockData.status).toContain('integration')
+    })
+  })
+})

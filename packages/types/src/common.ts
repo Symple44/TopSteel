@@ -24,4 +24,19 @@ export interface Contact {
 }
 
 export type Currency = 'EUR' | 'USD' | 'GBP'
-export type Unit = 'ml' | 'mm' | 'cm' | 'dm' | 'km' | 'g' | 'kg' | 't' | 'piece' | 'mm2' | 'cm2' | 'm2' | 'm3' | 'heure' | 'jours'
+export type Unit =
+  | 'ml'
+  | 'mm'
+  | 'cm'
+  | 'dm'
+  | 'km'
+  | 'g'
+  | 'kg'
+  | 't'
+  | 'piece'
+  | 'mm2'
+  | 'cm2'
+  | 'm2'
+  | 'm3'
+  | 'heure'
+  | 'jours'

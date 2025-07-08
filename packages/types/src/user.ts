@@ -7,7 +7,7 @@ export enum UserRole {
   COMMERCIAL = 'COMMERCIAL',
   PRODUCTION = 'PRODUCTION',
   COMPTABLE = 'COMPTABLE',
-  EMPLOYE = 'EMPLOYE'
+  EMPLOYE = 'EMPLOYE',
 }
 export interface User extends BaseEntity {
   email: string

@@ -5,15 +5,15 @@
  * Fichier: apps/web/src/stores/app.store.ts
  */
 
-import { StoreUtils } from '@/lib/store-utils'
 import type {
   AppState,
   AppStore,
   AppStoreActions,
   InitialState,
   StoreCreator,
-  StoreUser
+  StoreUser,
 } from '@erp/types'
+import { StoreUtils } from '@/lib/store-utils'
 
 // ===== ÉTAT INITIAL STRICTEMENT TYPÉ =====
 
@@ -22,7 +22,7 @@ const initialAppState: InitialState<AppState> = {
   loading: false,
   error: null,
   lastUpdate: Date.now(),
-  
+
   // Configuration UI
   theme: 'light',
   ui: {
@@ -30,22 +30,22 @@ const initialAppState: InitialState<AppState> = {
     sidebarPinned: true,
     layoutMode: 'default',
     activeModule: null,
-    showTooltips: true
+    showTooltips: true,
   },
-  
+
   // Données utilisateur
   user: null,
   session: null,
   permissions: [],
-  
+
   // Données métier
   projets: [],
   selectedProjet: null,
   notifications: [],
-  
+
   // Filtres et recherche
   filters: {},
-  
+
   // Métriques
   metrics: {
     pageViews: 0,
@@ -59,10 +59,10 @@ const initialAppState: InitialState<AppState> = {
     performance: {
       loadTime: 0,
       errorRate: 0,
-      uptime: 100
-    }
+      uptime: 100,
+    },
   },
-  
+
   // Synchronisation
   sync: {
     isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
@@ -70,8 +70,8 @@ const initialAppState: InitialState<AppState> = {
     lastSync: Date.now(),
     conflictCount: 0,
     syncInProgress: false,
-    autoSyncEnabled: true
-  }
+    autoSyncEnabled: true,
+  },
 }
 
 // ===== DÉFINITION DU STORE AVEC ACTIONS TYPÉES =====
@@ -106,7 +106,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         ...initialAppState,
         loading: false,
         error: null,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       })
     })
   },
@@ -232,7 +232,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   updateProjet: (id, updates) => {
     set((state) => {
-      const index = state.projets.findIndex(p => p.id === id)
+      const index = state.projets.findIndex((p) => p.id === id)
 
       if (index >= 0) {
         state.projets[index] = { ...state.projets[index], ...updates }
@@ -246,7 +246,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   removeProjet: (id) => {
     set((state) => {
-      state.projets = state.projets.filter(p => p.id !== id)
+      state.projets = state.projets.filter((p) => p.id !== id)
       if (state.selectedProjet?.id === id) {
         state.selectedProjet = null
       }
@@ -275,7 +275,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         ...notification,
         id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date(),
-        read: false
+        read: false,
       }
 
       state.notifications.unshift(newNotification)
@@ -289,7 +289,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   removeNotification: (id) => {
     set((state) => {
-      state.notifications = state.notifications.filter(n => n.id !== id)
+      state.notifications = state.notifications.filter((n) => n.id !== id)
       state.lastUpdate = Date.now()
     })
   },
@@ -303,7 +303,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   markNotificationAsRead: (id) => {
     set((state) => {
-      const notification = state.notifications.find(n => n.id === id)
+      const notification = state.notifications.find((n) => n.id === id)
 
       if (notification) {
         notification.read = true
@@ -314,7 +314,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   markAllNotificationsAsRead: () => {
     set((state) => {
-      state.notifications.forEach(n => {
+      state.notifications.forEach((n) => {
         n.read = true
       })
       state.lastUpdate = Date.now()
@@ -364,7 +364,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         state.sync.isOnline = isOnline
       }
       state.lastUpdate = Date.now()
-      
+
       if (isOnline && state.sync && state.sync.pendingChanges > 0) {
         console.log('Connexion restaurée, synchronisation en attente...')
       }
@@ -396,10 +396,10 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
     try {
       console.log('Synchronisation en cours...')
-      
+
       // Simulation d'une sync
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
       set((state) => {
         if (state.sync) {
           state.sync.lastSync = Date.now()
@@ -409,7 +409,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         state.loading = false
         state.lastUpdate = Date.now()
       })
-      
+
       console.log('Synchronisation terminée')
     } catch (error) {
       set((state) => {
@@ -420,7 +420,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         }
         state.lastUpdate = Date.now()
       })
-      
+
       console.error('Erreur de synchronisation:', error)
     }
   },
@@ -433,7 +433,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
       state.lastUpdate = Date.now()
       console.log(`Conflit résolu: ${conflictId}`, resolution)
     })
-  }
+  },
 })
 
 // ===== CRÉATION DU STORE AVEC TYPE STRICT =====
@@ -446,18 +446,18 @@ export const useAppStore = StoreUtils.createRobustStore<AppState, AppStoreAction
     persist: true,
     devtools: true,
     immer: true,
-    subscriptions: true
+    subscriptions: true,
   }
 )
 
 // ===== HOOKS SÉLECTEURS POUR COMPATIBILITÉ =====
 
-export const useAppError = () => useAppStore(state => state.error)
-export const useAppLoading = () => useAppStore(state => state.loading)
-export const useAppUser = () => useAppStore(state => state.user)
-export const useAppTheme = () => useAppStore(state => state.theme)
-export const useAppSession = () => useAppStore(state => state.session)
-export const useAppOnlineStatus = () => useAppStore(state => state.sync?.isOnline ?? true)
+export const useAppError = () => useAppStore((state) => state.error)
+export const useAppLoading = () => useAppStore((state) => state.loading)
+export const useAppUser = () => useAppStore((state) => state.user)
+export const useAppTheme = () => useAppStore((state) => state.theme)
+export const useAppSession = () => useAppStore((state) => state.session)
+export const useAppOnlineStatus = () => useAppStore((state) => state.sync?.isOnline ?? true)
 
 // ===== EXPORTS TYPES =====
 export type { AppState, AppStore, AppStoreActions }

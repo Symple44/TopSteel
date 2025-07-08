@@ -1,5 +1,6 @@
 'use client'
 
+import { Download, Edit, Eye } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,7 +12,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Download, Edit, Eye } from 'lucide-react'
 
 // Données mock pour encaissements
 const mockEncaissements = [
@@ -23,7 +23,7 @@ const mockEncaissements = [
     montant: 18000,
     date: new Date('2024-01-20'),
     mode: 'Virement',
-    statut: 'encaisse'
+    statut: 'encaisse',
   },
   {
     id: '2',
@@ -33,8 +33,8 @@ const mockEncaissements = [
     montant: 7500,
     date: new Date('2024-01-22'),
     mode: 'Chèque',
-    statut: 'encaisse'
-  }
+    statut: 'encaisse',
+  },
 ]
 
 // Données mock pour décaissements
@@ -47,7 +47,7 @@ const mockDecaissements = [
     montant: -5400,
     date: new Date('2024-01-18'),
     mode: 'Virement',
-    statut: 'paye'
+    statut: 'paye',
   },
   {
     id: '2',
@@ -57,8 +57,8 @@ const mockDecaissements = [
     montant: -850,
     date: new Date('2024-01-19'),
     mode: 'Prélèvement',
-    statut: 'paye'
-  }
+    statut: 'paye',
+  },
 ]
 
 const getStatusBadge = (statut: string) => {
@@ -68,7 +68,7 @@ const getStatusBadge = (statut: string) => {
     en_attente: { label: 'En attente', variant: 'secondary' as const },
     rejete: { label: 'Rejeté', variant: 'destructive' as const },
   }
-  
+
   const item = config[statut as keyof typeof config] || config.en_attente
 
   return <Badge variant={item.variant}>{item.label}</Badge>
@@ -91,7 +91,7 @@ interface PaiementsTableProps {
 export function PaiementsTable({ type, data }: PaiementsTableProps) {
   // Sélection des données selon le type
   const paiements = data || (type === 'encaissement' ? mockEncaissements : mockDecaissements)
-  
+
   return (
     <div className="rounded-md border">
       <Table>

@@ -3,9 +3,10 @@
  * Service pour gérer l'authentification et les tokens
  * Fichier: apps/web/src/services/auth.service.ts
  */
+
+import type { User, UserRole } from '@erp/types'
 import { apiClient } from '@/lib/api-client'
 import { ErrorHandler } from '@/lib/error-handler'
-import type { User, UserRole } from '@erp/types'
 
 // ===== INTERFACES =====
 interface LoginResponse {
@@ -40,20 +41,21 @@ interface ApiResponse<T> {
 /**
  * Helper pour transformer les données user backend -> frontend
  */
-const transformUserFromAPI = (apiUser: any): User => ({
-  id: apiUser.id.toString(),
-  email: apiUser.email,
-  nom: apiUser.nom,
-  prenom: apiUser.prenom,
-  role: apiUser.role as UserRole,
-  isActive: apiUser.isActive ?? true,
-  permissions: apiUser.permissions ?? [],
-  telephone: apiUser.telephone,
-  avatar: apiUser.avatar,
-  lastLogin: apiUser.lastLogin ? new Date(apiUser.lastLogin) : undefined,
-  createdAt: new Date(apiUser.createdAt),
-  updatedAt: new Date(apiUser.updatedAt),
-} satisfies User)
+const transformUserFromAPI = (apiUser: any): User =>
+  ({
+    id: apiUser.id.toString(),
+    email: apiUser.email,
+    nom: apiUser.nom,
+    prenom: apiUser.prenom,
+    role: apiUser.role as UserRole,
+    isActive: apiUser.isActive ?? true,
+    permissions: apiUser.permissions ?? [],
+    telephone: apiUser.telephone,
+    avatar: apiUser.avatar,
+    lastLogin: apiUser.lastLogin ? new Date(apiUser.lastLogin) : undefined,
+    createdAt: new Date(apiUser.createdAt),
+    updatedAt: new Date(apiUser.updatedAt),
+  }) satisfies User
 
 // ===== SERVICE PRINCIPAL =====
 export const authService = {
@@ -64,7 +66,7 @@ export const authService = {
     try {
       const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/login', {
         email,
-        password
+        password,
       })
 
       // ✅ CORRECTION: Accéder à response.data puis extraire les propriétés
@@ -75,7 +77,7 @@ export const authService = {
         user: transformUserFromAPI(user),
         accessToken,
         refreshToken,
-        expiresIn
+        expiresIn,
       }
     } catch (error) {
       console.error('Erreur lors de la connexion:', error)
@@ -93,7 +95,7 @@ export const authService = {
         password: data.password,
         nom: data.nom,
         prenom: data.prenom,
-        ...(data.entreprise && { entreprise: data.entreprise })
+        ...(data.entreprise && { entreprise: data.entreprise }),
       })
 
       // ✅ CORRECTION: Même logique corrigée
@@ -104,10 +106,10 @@ export const authService = {
         user: transformUserFromAPI(user),
         accessToken,
         refreshToken,
-        expiresIn
+        expiresIn,
       }
     } catch (error) {
-      console.error('Erreur lors de l\'inscription:', error)
+      console.error("Erreur lors de l'inscription:", error)
       throw ErrorHandler.formatError(error)
     }
   },
@@ -118,7 +120,7 @@ export const authService = {
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
     try {
       const response = await apiClient.post<ApiResponse<RefreshTokenResponse>>('/auth/refresh', {
-        refreshToken
+        refreshToken,
       })
 
       // ✅ CORRECTION: Accès à response.data puis extraction
@@ -128,7 +130,7 @@ export const authService = {
       return {
         accessToken,
         refreshToken: newRefreshToken,
-        expiresIn
+        expiresIn,
       }
     } catch (error) {
       console.error('Erreur lors du rafraîchissement du token:', error)
@@ -179,7 +181,7 @@ export const authService = {
     try {
       await apiClient.post('/auth/change-password', {
         oldPassword,
-        newPassword
+        newPassword,
       })
     } catch (error) {
       console.error('Erreur lors du changement de mot de passe:', error)
@@ -206,7 +208,7 @@ export const authService = {
     try {
       await apiClient.post('/auth/reset-password', {
         token,
-        newPassword
+        newPassword,
       })
     } catch (error) {
       console.error('Erreur lors de la réinitialisation du mot de passe:', error)
@@ -219,11 +221,13 @@ export const authService = {
    */
   async checkEmailAvailability(email: string): Promise<boolean> {
     try {
-      const response = await apiClient.get<ApiResponse<{ available: boolean }>>(`/auth/check-email?email=${encodeURIComponent(email)}`)
+      const response = await apiClient.get<ApiResponse<{ available: boolean }>>(
+        `/auth/check-email?email=${encodeURIComponent(email)}`
+      )
 
       return response.data.available
     } catch (error) {
-      console.error('Erreur lors de la vérification de l\'email:', error)
+      console.error("Erreur lors de la vérification de l'email:", error)
 
       // En cas d'erreur, considérer l'email comme non disponible par sécurité
       return false
@@ -237,15 +241,15 @@ export const authService = {
     try {
       await apiClient.get('/auth/validate', {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       })
 
       return true
     } catch (error) {
       return false
     }
-  }
+  },
 }
 
 // ===== TYPES EXPORTÉS =====

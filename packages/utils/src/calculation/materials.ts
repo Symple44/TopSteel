@@ -10,18 +10,11 @@ export interface MaterialCalculation {
   volume?: number
 }
 
-export function calculateSurface(
-  longueur: number, 
-  largeur: number
-): number {
+export function calculateSurface(longueur: number, largeur: number): number {
   return longueur * largeur
 }
 
-export function calculateVolume(
-  longueur: number, 
-  largeur: number, 
-  hauteur: number
-): number {
+export function calculateVolume(longueur: number, largeur: number, hauteur: number): number {
   return longueur * largeur * hauteur
 }
 
@@ -47,16 +40,16 @@ export function calculateChutesOptimisation(
   const barresUtilisees = Math.ceil(
     longueursPieces.reduce((total, piece) => total + piece, 0) / longueurBarres
   )
-  
+
   const totalUtilise = longueursPieces.reduce((total, piece) => total + piece, 0)
   const totalAchete = barresUtilisees * longueurBarres
   const chutesTotales = totalAchete - totalUtilise
-  
+
   const optimisation = (totalUtilise / totalAchete) * 100
-  
+
   return {
     barresUtilisees,
     chutes: [chutesTotales],
-    optimisation
+    optimisation,
   }
 }

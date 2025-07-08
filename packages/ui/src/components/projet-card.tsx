@@ -1,9 +1,9 @@
 // packages/ui/src/components/projet-card.tsx
-import * as React from "react";
-import { cn } from "../lib/utils";
+import * as React from 'react'
+import { cn } from '../lib/utils'
 
 interface ProjetCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
 
 const ProjetCard = React.forwardRef<HTMLDivElement, ProjetCardProps>(
@@ -11,18 +11,15 @@ const ProjetCard = React.forwardRef<HTMLDivElement, ProjetCardProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          "rounded-lg border bg-card text-card-foreground shadow-sm p-4",
-          className
-        )}
+        className={cn('rounded-lg border bg-card text-card-foreground shadow-sm p-4', className)}
         {...props}
       >
         {children}
       </div>
-    );
+    )
   }
-);
+)
 
-ProjetCard.displayName = "ProjetCard";
+ProjetCard.displayName = 'ProjetCard'
 
-export { ProjetCard };
+export { ProjetCard }

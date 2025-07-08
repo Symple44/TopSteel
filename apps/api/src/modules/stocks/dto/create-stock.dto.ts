@@ -1,37 +1,37 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class CreateStockDto {
-  @ApiProperty({ description: "Référence du produit" })
+  @ApiProperty({ description: 'Référence du produit' })
   @IsString()
-  reference!: string;
+  reference!: string
 
-  @ApiProperty({ description: "Désignation du produit" })
+  @ApiProperty({ description: 'Désignation du produit' })
   @IsString()
-  designation!: string;
+  designation!: string
 
-  @ApiPropertyOptional({ description: "Description" })
+  @ApiPropertyOptional({ description: 'Description' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string
 
-  @ApiPropertyOptional({ description: "Quantité en stock" })
+  @ApiPropertyOptional({ description: 'Quantité en stock' })
   @IsNumber()
   @IsOptional()
-  quantiteStock?: number;
+  quantiteStock?: number
 
-  @ApiPropertyOptional({ description: "Quantité minimum" })
+  @ApiPropertyOptional({ description: 'Quantité minimum' })
   @IsNumber()
   @IsOptional()
-  quantiteMin?: number;
+  quantiteMin?: number
 
   @ApiPropertyOptional({ description: "Prix d'achat" })
   @IsNumber()
   @IsOptional()
-  prixAchat?: number;
+  prixAchat?: number
 
-  @ApiPropertyOptional({ description: "Emplacement" })
+  @ApiPropertyOptional({ description: 'Emplacement' })
   @IsString()
   @IsOptional()
-  emplacement?: string;
+  emplacement?: string
 }

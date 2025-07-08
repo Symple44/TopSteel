@@ -1,84 +1,84 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { BaseAuditEntity } from "../../../common/base/base.entity";
-import { Materiaux } from "../../materiaux/entities/materiaux.entity";
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
+import { BaseAuditEntity } from '../../../common/base/base.entity'
+import { Materiaux } from '../../materiaux/entities/materiaux.entity'
 
 export enum ChuteQualite {
-  EXCELLENTE = "EXCELLENTE",
-  BONNE = "BONNE",
-  CORRECTE = "CORRECTE",
-  MEDIOCRE = "MEDIOCRE"
+  EXCELLENTE = 'EXCELLENTE',
+  BONNE = 'BONNE',
+  CORRECTE = 'CORRECTE',
+  MEDIOCRE = 'MEDIOCRE',
 }
 
 export enum ChuteStatut {
-  DISPONIBLE = "DISPONIBLE",
-  RESERVEE = "RESERVEE",
-  UTILISEE = "UTILISEE",
-  REBUT = "REBUT"
+  DISPONIBLE = 'DISPONIBLE',
+  RESERVEE = 'RESERVEE',
+  UTILISEE = 'UTILISEE',
+  REBUT = 'REBUT',
 }
 
 export enum OrigineType {
-  PRODUCTION = "PRODUCTION",
-  COMMANDE = "COMMANDE",
-  CHANTIER = "CHANTIER"
+  PRODUCTION = 'PRODUCTION',
+  COMMANDE = 'COMMANDE',
+  CHANTIER = 'CHANTIER',
 }
 
-@Entity("chutes")
+@Entity('chutes')
 export class Chute extends BaseAuditEntity {
   @Column()
-  materiauId!: string;
+  materiauId!: string
 
   @ManyToOne(() => Materiaux)
-  @JoinColumn({ name: "materiauId" })
-  materiau!: Materiaux;
+  @JoinColumn({ name: 'materiauId' })
+  materiau!: Materiaux
 
   @Column({ length: 100 })
-  reference!: string;
+  reference!: string
 
-  @Column("decimal", { precision: 8, scale: 2, nullable: true })
-  longueur?: number;
+  @Column('decimal', { precision: 8, scale: 2, nullable: true })
+  longueur?: number
 
-  @Column("decimal", { precision: 8, scale: 2, nullable: true })
-  largeur?: number;
+  @Column('decimal', { precision: 8, scale: 2, nullable: true })
+  largeur?: number
 
-  @Column("decimal", { precision: 8, scale: 2, nullable: true })
-  epaisseur?: number;
+  @Column('decimal', { precision: 8, scale: 2, nullable: true })
+  epaisseur?: number
 
-  @Column("decimal", { precision: 8, scale: 2, nullable: true })
-  diametre?: number;
+  @Column('decimal', { precision: 8, scale: 2, nullable: true })
+  diametre?: number
 
-  @Column("decimal", { precision: 8, scale: 2, nullable: true })
-  poids?: number;
+  @Column('decimal', { precision: 8, scale: 2, nullable: true })
+  poids?: number
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: ChuteQualite,
-    default: ChuteQualite.BONNE
+    default: ChuteQualite.BONNE,
   })
-  qualite!: ChuteQualite;
+  qualite!: ChuteQualite
 
   @Column({ length: 100, nullable: true })
-  emplacement?: string;
+  emplacement?: string
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: OrigineType,
-    nullable: true
+    nullable: true,
   })
-  origineType?: OrigineType;
+  origineType?: OrigineType
 
   @Column({ length: 100, nullable: true })
-  origineReference?: string;
+  origineReference?: string
 
-  @Column("decimal", { precision: 8, scale: 2, nullable: true })
-  valeurEstimee?: number;
+  @Column('decimal', { precision: 8, scale: 2, nullable: true })
+  valeurEstimee?: number
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: ChuteStatut,
-    default: ChuteStatut.DISPONIBLE
+    default: ChuteStatut.DISPONIBLE,
   })
-  statut!: ChuteStatut;
+  statut!: ChuteStatut
 
-  @Column("text", { nullable: true })
-  notes?: string;
+  @Column('text', { nullable: true })
+  notes?: string
 }

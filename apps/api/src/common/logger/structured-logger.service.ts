@@ -23,7 +23,7 @@ export class TopSteelLogger extends Logger {
 
   constructor() {
     super('TopSteel')
-    
+
     this.winstonLogger = winston.createLogger({
       level: process.env.LOG_LEVEL || 'info',
       format: winston.format.combine(
@@ -34,8 +34,8 @@ export class TopSteelLogger extends Logger {
       transports: [
         new winston.transports.Console(),
         new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'logs/combined.log' })
-      ]
+        new winston.transports.File({ filename: 'logs/combined.log' }),
+      ],
     })
   }
 
@@ -43,7 +43,7 @@ export class TopSteelLogger extends Logger {
     this.winstonLogger.info('Business Event', {
       type: 'business_event',
       event,
-      ...context
+      ...context,
     })
   }
 
@@ -51,7 +51,7 @@ export class TopSteelLogger extends Logger {
     this.winstonLogger.error('Security Event', {
       type: 'security_event',
       event,
-      ...context
+      ...context,
     })
   }
 
@@ -61,7 +61,7 @@ export class TopSteelLogger extends Logger {
       message: error.message,
       stack: error.stack,
       name: error.name,
-      ...context
+      ...context,
     })
   }
 }

@@ -1,7 +1,7 @@
 /**
  * 🔧 VITE CONFIG - TOPSTEEL ERP UI PACKAGE
  * Configuration optimisée pour le build du package UI
- * 
+ *
  * Fonctionnalités:
  * - Build optimisé pour library
  * - Tree-shaking et code splitting
@@ -20,7 +20,7 @@ import dts from 'vite-plugin-dts'
 export default defineConfig({
   plugins: [
     react(),
-    
+
     // Génération des types TypeScript
     dts({
       insertTypesEntry: true,
@@ -35,33 +35,37 @@ export default defineConfig({
         '**/*.stories.tsx',
         '**/tests/**/*',
         '**/__tests__/**/*',
-        '**/node_modules/**/*'
+        '**/node_modules/**/*',
       ],
       compilerOptions: {
         declaration: true,
         declarationMap: true,
-        emitDeclarationOnly: false
-      }
+        emitDeclarationOnly: false,
+      },
     }),
-    
+
     // Analyse du bundle (en mode production uniquement)
-    ...(process.env.ANALYZE ? [visualizer({
-      filename: 'dist/stats.html',
-      open: true,
-      gzipSize: true,
-      brotliSize: true
-    })] : [])
+    ...(process.env.ANALYZE
+      ? [
+          visualizer({
+            filename: 'dist/stats.html',
+            open: true,
+            gzipSize: true,
+            brotliSize: true,
+          }),
+        ]
+      : []),
   ],
-  
+
   // Configuration du build
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'TopSteelUI',
       formats: ['es', 'cjs'],
-      fileName: (format) => format === 'es' ? 'index.mjs' : 'index.js'
+      fileName: (format) => (format === 'es' ? 'index.mjs' : 'index.js'),
     },
-    
+
     rollupOptions: {
       // Dépendances externes (ne pas les bundler)
       external: [
@@ -92,35 +96,39 @@ export default defineConfig({
         '@radix-ui/react-tabs',
         '@radix-ui/react-toast',
         '@radix-ui/react-toggle',
-        '@radix-ui/react-tooltip'
+        '@radix-ui/react-tooltip',
       ],
-      
+
       output: {
         // Configuration pour les globals (UMD)
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
-          'react/jsx-runtime': 'ReactJSXRuntime'
+          'react/jsx-runtime': 'ReactJSXRuntime',
         },
-        
+
         // Préservation des modules pour le tree-shaking
         preserveModules: false,
-        
+
         // Configuration des exports
         exports: 'named',
-        
+
         // Chunking intelligent (seulement pour les modules non-externes)
         manualChunks: (id) => {
           // Regrouper les utilitaires CSS
-          if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
+          if (
+            id.includes('clsx') ||
+            id.includes('tailwind-merge') ||
+            id.includes('class-variance-authority')
+          ) {
             return 'utils'
           }
-          
+
           // Regrouper les hooks React
           if (id.includes('src/hooks/')) {
             return 'hooks'
           }
-          
+
           // Regrouper les composants par catégorie
           if (id.includes('src/components/')) {
             if (id.includes('button') || id.includes('badge')) {
@@ -131,33 +139,33 @@ export default defineConfig({
             }
             return 'components'
           }
-          
+
           // Chunk par défaut pour les autres modules
           return undefined
-        }
-      }
+        },
+      },
     },
-    
+
     // Optimisations
     minify: 'esbuild',
     sourcemap: true,
     target: 'esnext',
-    
+
     // Configuration CSS
     cssCodeSplit: true,
-    
+
     // Nettoyage du répertoire de sortie
     emptyOutDir: true,
-    
+
     // Configuration des chunks
     chunkSizeWarningLimit: 500,
-    
+
     // Optimisations des dependencies
     commonjsOptions: {
-      esmExternals: true
-    }
+      esmExternals: true,
+    },
   },
-  
+
   // Résolution des modules
   resolve: {
     alias: {
@@ -166,81 +174,73 @@ export default defineConfig({
       '@/lib': resolve(__dirname, 'src/lib'),
       '@/hooks': resolve(__dirname, 'src/hooks'),
       '@/utils': resolve(__dirname, 'src/utils'),
-      '@/types': resolve(__dirname, 'src/types')
+      '@/types': resolve(__dirname, 'src/types'),
     },
-    
+
     // Extensions de fichiers
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
   },
-  
+
   // Configuration CSS
   css: {
     modules: {
-      localsConvention: 'camelCase'
+      localsConvention: 'camelCase',
     },
-    
+
     postcss: {
-      plugins: []
-    }
+      plugins: [],
+    },
   },
-  
+
   // Optimisation des dépendances (seulement pour le dev)
   optimizeDeps: {
-    include: [
-      'clsx',
-      'tailwind-merge',
-      'class-variance-authority'
-    ],
-    
+    include: ['clsx', 'tailwind-merge', 'class-variance-authority'],
+
     // Exclure toutes les dépendances externes
-    exclude: [
-      'react',
-      'react-dom',
-      'react/jsx-runtime'
-    ]
+    exclude: ['react', 'react-dom', 'react/jsx-runtime'],
   },
-  
+
   // Configuration du serveur de développement
   server: {
     port: 5173,
     open: false,
-    cors: true
+    cors: true,
   },
-  
+
   // Configuration de preview
   preview: {
     port: 4173,
     open: false,
-    cors: true
+    cors: true,
   },
-  
+
   // Variables d'environnement
   define: {
     __UI_PACKAGE_VERSION__: JSON.stringify(process.env.npm_package_version || '2.1.0'),
-    __BUILD_TIME__: JSON.stringify(new Date().toISOString())
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   },
-  
+
   // Configuration des workers
   worker: {
-    format: 'es'
+    format: 'es',
   },
-  
+
   // Configuration de l'analyse
   esbuild: {
     // Optimisations pour la production
     drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
-    
+
     // Support des decorators
     target: 'esnext',
-    
+
     // JSX
     jsxFactory: 'React.createElement',
-    jsxFragment: 'React.Fragment'
+    jsxFragment: 'React.Fragment',
   },
-  
+
   // Configuration du JSON
   json: {
     namedExports: true,
-    stringify: false
-  }
+    stringify: false,
+  },
 })

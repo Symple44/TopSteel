@@ -10,11 +10,11 @@ import type {
   BaseStoreState,
   InitialState,
   StoreConfig,
-  StoreCreator
-} from '@erp/types'; // ✅ Import UNIQUEMENT depuis @erp/types
-import { create } from 'zustand';
-import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
+  StoreCreator,
+} from '@erp/types' // ✅ Import UNIQUEMENT depuis @erp/types
+import { create } from 'zustand'
+import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
 
 // ===== TYPES LOCAUX UNIQUEMENT =====
 
@@ -40,25 +40,25 @@ export class StoreUtils {
    */
   static createRobustStore<
     TState extends BaseStoreState,
-    TActions extends BaseStoreActions = BaseStoreActions
+    TActions extends BaseStoreActions = BaseStoreActions,
   >(
     initialState: InitialState<TState>,
     storeDefinition: StoreCreator<TState, TActions>,
     config: StoreConfig
   ) {
-    const { 
-      name, 
-      persist: enablePersist = false, 
-      devtools: enableDevtools = true, 
-      immer: enableImmer = true, 
-      subscriptions = false 
+    const {
+      name,
+      persist: enablePersist = false,
+      devtools: enableDevtools = true,
+      immer: enableImmer = true,
+      subscriptions = false,
     } = config
 
     // Store creator compatible avec Zustand
     const storeCreator = (set: any, get: any) => {
       const customActions = storeDefinition(set, get)
-      const baseActions = this.createBaseActions(initialState)
-      
+      const baseActions = StoreUtils.createBaseActions(initialState)
+
       return {
         ...initialState,
         ...customActions,
@@ -66,13 +66,11 @@ export class StoreUtils {
         setLoading: baseActions.setLoading,
         setError: baseActions.setError,
         clearError: baseActions.clearError,
-        reset: baseActions.reset
+        reset: baseActions.reset,
       } as TState & TActions
     }
 
-
     let store = storeCreator
-
 
     // Middleware Immer pour mutations immutables
     if (enableImmer) {
@@ -108,7 +106,7 @@ export class StoreUtils {
             } catch (error) {
               console.warn(`Erreur suppression storage pour ${key}:`, error)
             }
-          }
+          },
         },
         partialize: (state: any) => {
           // Ne persister que les données importantes
@@ -122,7 +120,7 @@ export class StoreUtils {
           } else {
             console.log(`Store ${name} réhydraté avec succès`)
           }
-        }
+        },
       }) as any
     }
 
@@ -140,7 +138,7 @@ export class StoreUtils {
 
     // Monitoring des changements d'état
     if (process.env.NODE_ENV === 'development') {
-      this.addMonitoring(zustandStore, name)
+      StoreUtils.addMonitoring(zustandStore, name)
     }
 
     return zustandStore
@@ -157,30 +155,30 @@ export class StoreUtils {
         state.loading = loading
         state.lastUpdate = Date.now()
       },
-      
+
       setError: (error: string | null) => (state: TState) => {
         state.error = error
         state.loading = false
         state.lastUpdate = Date.now()
       },
-      
+
       clearError: () => (state: TState) => {
         state.error = null
         state.lastUpdate = Date.now()
       },
-      
+
       reset: () => (state: TState) => {
         const preservedProps = {
           loading: false,
           error: null,
-          lastUpdate: Date.now()
+          lastUpdate: Date.now(),
         }
-        
+
         Object.assign(state, {
           ...initialState,
-          ...preservedProps
+          ...preservedProps,
         })
-      }
+      },
     }
   }
 
@@ -234,7 +232,7 @@ export class StoreUtils {
       set: (key: K, value: V): void => {
         cache.set(key, {
           data: value,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         })
       },
 
@@ -263,7 +261,6 @@ export class StoreUtils {
       size: () => cache.size,
 
       cleanup: (): number => {
-
         const now = Date.now()
         let deletedCount = 0
 
@@ -273,9 +270,9 @@ export class StoreUtils {
             deletedCount++
           }
         }
-        
+
         return deletedCount
-      }
+      },
     }
   }
 
@@ -298,7 +295,7 @@ export class StoreUtils {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     }
   }
 
@@ -315,7 +312,7 @@ export class StoreUtils {
       if (timeoutId) {
         clearTimeout(timeoutId)
       }
-      
+
       timeoutId = setTimeout(() => {
         fn(...args)
       }, delay)
@@ -329,13 +326,11 @@ export class StoreUtils {
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
-
     let lastCall = 0
-
 
     return (...args: Parameters<T>) => {
       const now = Date.now()
-      
+
       if (now - lastCall >= delay) {
         lastCall = now
         fn(...args)
@@ -362,7 +357,7 @@ export class StoreUtils {
       const prevState = originalGetState()
       const result = originalSetState(updater)
       const newState = originalGetState()
-      
+
       StoreMonitor.logStateChange(name, 'setState', newState, prevState)
 
       return result
@@ -417,31 +412,31 @@ export class StoreMonitor {
   private static accessLog = new Map<string, number>()
 
   static enable(enabled = true) {
-    this.isEnabled = enabled
+    StoreMonitor.isEnabled = enabled
   }
 
   static subscribe(callback: (event: StoreEvent) => void) {
-    this.subscribers.add(callback)
+    StoreMonitor.subscribers.add(callback)
 
-    return () => this.subscribers.delete(callback)
+    return () => StoreMonitor.subscribers.delete(callback)
   }
 
   static logStateChange(
-    storeName: string, 
-    action: string, 
-    state: any, 
+    storeName: string,
+    action: string,
+    state: any,
     prevState?: any,
     startTime?: number
   ) {
-    if (!this.isEnabled) return
+    if (!StoreMonitor.isEnabled) return
 
     const event: StoreEvent = {
       timestamp: Date.now(),
       store: storeName,
       action,
-      state: this.cloneState(state),
-      prevState: prevState ? this.cloneState(prevState) : undefined,
-      duration: startTime ? Date.now() - startTime : undefined
+      state: StoreMonitor.cloneState(state),
+      prevState: prevState ? StoreMonitor.cloneState(prevState) : undefined,
+      duration: startTime ? Date.now() - startTime : undefined,
     }
 
     // Log console en développement
@@ -458,7 +453,7 @@ export class StoreMonitor {
     }
 
     // Notifier les subscribers
-    this.subscribers.forEach(callback => {
+    StoreMonitor.subscribers.forEach((callback) => {
       try {
         callback(event)
       } catch (error) {
@@ -468,12 +463,12 @@ export class StoreMonitor {
   }
 
   static logAccess(storeName: string, state: any) {
-    if (!this.isEnabled) return
+    if (!StoreMonitor.isEnabled) return
 
     const key = `${storeName}-access`
-    const count = (this.accessLog.get(key) || 0) + 1
+    const count = (StoreMonitor.accessLog.get(key) || 0) + 1
 
-    this.accessLog.set(key, count)
+    StoreMonitor.accessLog.set(key, count)
 
     // Log périodique des accès
     if (count % 100 === 0) {
@@ -491,16 +486,16 @@ export class StoreMonitor {
 
   static getStats() {
     return {
-      subscribers: this.subscribers.size,
-      accessCount: Array.from(this.accessLog.entries()),
-      isEnabled: this.isEnabled,
-      timestamp: Date.now()
+      subscribers: StoreMonitor.subscribers.size,
+      accessCount: Array.from(StoreMonitor.accessLog.entries()),
+      isEnabled: StoreMonitor.isEnabled,
+      timestamp: Date.now(),
     }
   }
 
   static reset() {
-    this.accessLog.clear()
-    this.subscribers.clear()
+    StoreMonitor.accessLog.clear()
+    StoreMonitor.subscribers.clear()
   }
 }
 

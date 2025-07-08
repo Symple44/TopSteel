@@ -1,9 +1,9 @@
 'use client'
 
-import { useAuth } from '@/hooks/use-auth'
-import { authService } from '@/services/auth.service'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useAuth } from '@/hooks/use-auth'
+import { authService } from '@/services/auth.service'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -17,7 +17,7 @@ const PUBLIC_ROUTES = [
   '/reset-password',
   '/terms',
   '/privacy',
-  '/support'
+  '/support',
 ]
 
 // Routes qui redirigent automatiquement si déjà connecté
@@ -30,9 +30,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Vérification de l'authentification au chargement
   useEffect(() => {
-
     let isMounted = true
-
 
     const checkAuth = async () => {
       // Si on a des tokens en local storage, vérifier leur validité
@@ -44,7 +42,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setUser(userData)
           }
         } catch (error) {
-          console.error('Erreur lors de la vérification de l\'auth:', error)
+          console.error("Erreur lors de la vérification de l'auth:", error)
           if (isMounted) {
             logout()
           }
@@ -61,12 +59,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Gestion des redirections basées sur l'état d'authentification
   useEffect(() => {
-    const isPublicRoute = PUBLIC_ROUTES.some(route => 
-      pathname.startsWith(route)
-    )
-    const isAuthRoute = AUTH_ROUTES.some(route => 
-      pathname.startsWith(route)
-    )
+    const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
+    const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
 
     // Si l'utilisateur est connecté et sur une page d'auth, rediriger vers dashboard
     if (isAuthenticated && isAuthRoute) {
@@ -102,9 +96,7 @@ export function useRequireAuth() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const isPublicRoute = PUBLIC_ROUTES.some(route => 
-      pathname.startsWith(route)
-    )
+    const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
 
     if (!isAuthenticated && !isPublicRoute) {
       router.replace('/login')
@@ -119,9 +111,7 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
   const { user, tokens, isAuthenticated } = useAuth()
   const pathname = usePathname()
 
-  const isPublicRoute = PUBLIC_ROUTES.some(route => 
-    pathname.startsWith(route)
-  )
+  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
 
   // Si on est sur une route publique, afficher directement
   if (isPublicRoute) {

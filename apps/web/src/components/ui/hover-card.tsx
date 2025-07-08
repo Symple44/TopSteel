@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 interface HoverCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
@@ -10,11 +10,11 @@ interface HoverCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
+  ({ className = '', children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
     }
-    
+
     return (
       <div className={className} ref={ref} {...props}>
         {children}
@@ -23,11 +23,11 @@ export const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
   }
 )
 
-HoverCard.displayName = "HoverCard"
+HoverCard.displayName = 'HoverCard'
 
 // Export des sous-composants courants si nécessaire
 export const HoverCardContent = HoverCard
-export const HoverCardTrigger = HoverCard  
+export const HoverCardTrigger = HoverCard
 export const HoverCardItem = HoverCard
 export const HoverCardValue = HoverCard
 export const HoverCardHeader = HoverCard

@@ -19,9 +19,5 @@
     "jest.config.{js,ts,mjs,cjs}",
     "setupTests.{ts,js}"
   ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    "dist"
-  ]
+  "exclude": ["node_modules", ".next", "dist"]
 }

@@ -1,5 +1,5 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common'
-import { Request, Response, NextFunction } from 'express'
+import { Injectable, Logger, type NestMiddleware } from '@nestjs/common'
+import type { NextFunction, Request, Response } from 'express'
 import * as helmet from 'helmet'
 
 @Injectable()
@@ -30,7 +30,7 @@ export class EnhancedSecurityMiddleware implements NestMiddleware {
         ip: req.ip,
         userAgent: req.get('User-Agent'),
         path: req.path,
-        method: req.method
+        method: req.method,
       })
     }
 
@@ -42,10 +42,10 @@ export class EnhancedSecurityMiddleware implements NestMiddleware {
       /\.\.\//, // Path traversal
       /<script/i, // XSS attempt
       /union.*select/i, // SQL injection
-      /javascript:/i // Protocol injection
+      /javascript:/i, // Protocol injection
     ]
 
     const checkString = `${req.path}${req.query}${JSON.stringify(req.body || {})}`
-    return suspiciousPatterns.some(pattern => pattern.test(checkString))
+    return suspiciousPatterns.some((pattern) => pattern.test(checkString))
   }
 }

@@ -1,11 +1,11 @@
 'use client'
 
+import { X } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { X } from 'lucide-react'
 
 interface CreateDevisDialogProps {
   open: boolean
@@ -53,7 +53,12 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                 <Input
                   id="reference"
                   value={formData.reference}
-                  onChange={(e) => setFormData({...formData, reference: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      reference: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                    })
+                  }
                   placeholder="DEV-2025-001"
                   required
                 />
@@ -64,46 +69,71 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                   id="dateValidite"
                   type="date"
                   value={formData.dateValidite}
-                  onChange={(e) => setFormData({...formData, dateValidite: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      dateValidite: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                    })
+                  }
                 />
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="clientNom">Client *</Label>
               <Input
                 id="clientNom"
                 value={formData.clientNom}
-                onChange={(e) => setFormData({...formData, clientNom: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    clientNom: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                  })
+                }
                 placeholder="Nom du client ou entreprise"
                 required
               />
             </div>
-            
+
             <div>
               <Label htmlFor="clientEmail">Email client</Label>
               <Input
                 id="clientEmail"
                 type="email"
                 value={formData.clientEmail}
-                onChange={(e) => setFormData({...formData, clientEmail: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    clientEmail: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                  })
+                }
                 placeholder="client@exemple.fr"
               />
             </div>
-            
+
             <div>
               <Label htmlFor="description">Description du projet</Label>
               <textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: (e.target as HTMLInputElement | HTMLTextAreaElement).value})}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    description: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                  })
+                }
                 placeholder="Description des travaux de métallerie..."
                 className="w-full p-2 border rounded-md min-h-[100px] resize-y"
               />
             </div>
-            
+
             <div className="flex gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="flex-1"
+              >
                 Annuler
               </Button>
               <Button type="submit" className="flex-1">
@@ -116,4 +146,3 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
     </div>
   )
 }
-

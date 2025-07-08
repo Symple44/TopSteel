@@ -3,11 +3,7 @@ import { existsSync, statSync } from 'fs'
 import { join } from 'path'
 
 const distPath = './dist'
-const requiredFiles = [
-  'index.js',
-  'index.mjs', 
-  'index.d.ts'
-]
+const requiredFiles = ['index.js', 'index.mjs', 'index.d.ts']
 
 console.log('🔍 Validation du build...')
 
@@ -24,7 +20,7 @@ for (const file of requiredFiles) {
     console.error(`❌ Fichier manquant: ${file}`)
     process.exit(1)
   }
-  
+
   const stats = statSync(filePath)
   if (stats.size === 0) {
     console.error(`❌ Fichier vide: ${file}`)

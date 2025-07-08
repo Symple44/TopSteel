@@ -1,156 +1,166 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, ArrowRight, Calendar, Package, RotateCcw, Search, User } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, ArrowRight, Calendar, Package, RotateCcw, Search, User } from 'lucide-react'
+import { useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 
 interface Mouvement {
-  id: string;
-  type: 'ENTREE' | 'SORTIE' | 'TRANSFERT' | 'AJUSTEMENT';
-  materiau: string;
-  quantite: number;
-  unite: string;
-  prixUnitaire?: number;
-  motif: string;
-  reference?: string;
-  emplacementSource?: string;
-  emplacementDestination?: string;
-  utilisateur: string;
-  dateCreation: Date;
-  notes?: string;
+  id: string
+  type: 'ENTREE' | 'SORTIE' | 'TRANSFERT' | 'AJUSTEMENT'
+  materiau: string
+  quantite: number
+  unite: string
+  prixUnitaire?: number
+  motif: string
+  reference?: string
+  emplacementSource?: string
+  emplacementDestination?: string
+  utilisateur: string
+  dateCreation: Date
+  notes?: string
 }
 
 interface MouvementsTableProps {
-  type?: string;
-  mouvements?: Mouvement[];
-  onSearch?: (query: string) => void;
-  onFilter?: (filters: any) => void;
+  type?: string
+  mouvements?: Mouvement[]
+  onSearch?: (query: string) => void
+  onFilter?: (filters: any) => void
 }
 
-export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: MouvementsTableProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
+export function MouvementsTable({
+  type,
+  mouvements = [],
+  onSearch,
+  onFilter,
+}: MouvementsTableProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState('')
 
   // Mock data si aucune donnée fournie
   const mockMovements: Mouvement[] = [
     {
-      id: "mov-001",
-      type: "ENTREE",
-      materiau: "Acier inoxydable 304",
+      id: 'mov-001',
+      type: 'ENTREE',
+      materiau: 'Acier inoxydable 304',
       quantite: 500,
-      unite: "kg",
+      unite: 'kg',
       prixUnitaire: 8.5,
-      motif: "Réapprovisionnement",
-      reference: "BL-2024-001",
-      utilisateur: "Marie Dupont",
+      motif: 'Réapprovisionnement',
+      reference: 'BL-2024-001',
+      utilisateur: 'Marie Dupont',
       dateCreation: new Date('2024-06-15'),
-      notes: "Qualité contrôlée"
+      notes: 'Qualité contrôlée',
     },
     {
-      id: "mov-002",
-      type: "SORTIE",
-      materiau: "Tubes acier Ø50",
+      id: 'mov-002',
+      type: 'SORTIE',
+      materiau: 'Tubes acier Ø50',
       quantite: 25,
-      unite: "ml",
+      unite: 'ml',
       prixUnitaire: 12.3,
-      motif: "Production projet ABC",
-      reference: "PRO-2024-001",
-      utilisateur: "Jean Martin",
+      motif: 'Production projet ABC',
+      reference: 'PRO-2024-001',
+      utilisateur: 'Jean Martin',
       dateCreation: new Date('2024-06-14'),
-      notes: "Découpe précise"
+      notes: 'Découpe précise',
     },
     {
-      id: "mov-003",
-      type: "TRANSFERT",
-      materiau: "Plaque aluminium 2mm",
+      id: 'mov-003',
+      type: 'TRANSFERT',
+      materiau: 'Plaque aluminium 2mm',
       quantite: 10,
-      unite: "m²",
-      motif: "Réorganisation stock",
-      emplacementSource: "Zone A-01",
-      emplacementDestination: "Zone B-03",
-      utilisateur: "Sophie Durand",
+      unite: 'm²',
+      motif: 'Réorganisation stock',
+      emplacementSource: 'Zone A-01',
+      emplacementDestination: 'Zone B-03',
+      utilisateur: 'Sophie Durand',
       dateCreation: new Date('2024-06-13'),
-      notes: "Optimisation espace"
+      notes: 'Optimisation espace',
     },
     {
-      id: "mov-004",
-      type: "AJUSTEMENT",
-      materiau: "Cornières 40x40",
+      id: 'mov-004',
+      type: 'AJUSTEMENT',
+      materiau: 'Cornières 40x40',
       quantite: -2,
-      unite: "pièce",
-      motif: "Correction inventaire",
-      reference: "INV-2024-06",
-      utilisateur: "Marc Rousseau",
+      unite: 'pièce',
+      motif: 'Correction inventaire',
+      reference: 'INV-2024-06',
+      utilisateur: 'Marc Rousseau',
       dateCreation: new Date('2024-06-12'),
-      notes: "Écart détecté"
-    }
-  ];
+      notes: 'Écart détecté',
+    },
+  ]
 
-  const displayMovements = mouvements.length > 0 ? mouvements : mockMovements;
-  
-  const filteredMovements = type && type !== 'tous' ? 
-    displayMovements.filter(m => {
-      // Normaliser la comparaison pour les types
-      const typeMapping: Record<string, string> = {
-        'entrees': 'ENTREE',
-        'sorties': 'SORTIE', 
-        'transferts': 'TRANSFERT',
-        'ajustements': 'AJUSTEMENT'
-      };
-      
-      const targetType = typeMapping[type.toLowerCase()] || type.toUpperCase();
+  const displayMovements = mouvements.length > 0 ? mouvements : mockMovements
 
-      return m.type === targetType;
-    }) : 
-    displayMovements;
+  const filteredMovements =
+    type && type !== 'tous'
+      ? displayMovements.filter((m) => {
+          // Normaliser la comparaison pour les types
+          const typeMapping: Record<string, string> = {
+            entrees: 'ENTREE',
+            sorties: 'SORTIE',
+            transferts: 'TRANSFERT',
+            ajustements: 'AJUSTEMENT',
+          }
+
+          const targetType = typeMapping[type.toLowerCase()] || type.toUpperCase()
+
+          return m.type === targetType
+        })
+      : displayMovements
 
   const getTypeBadge = (type: string) => {
     const config = {
-      ENTREE: { 
-        label: 'Entrée', 
-        icon: ArrowRight, 
-        className: 'bg-green-100 text-green-800'
+      ENTREE: {
+        label: 'Entrée',
+        icon: ArrowRight,
+        className: 'bg-green-100 text-green-800',
       },
-      SORTIE: { 
-        label: 'Sortie', 
-        icon: ArrowLeft, 
-        className: 'bg-red-100 text-red-800'
+      SORTIE: {
+        label: 'Sortie',
+        icon: ArrowLeft,
+        className: 'bg-red-100 text-red-800',
       },
-      TRANSFERT: { 
-        label: 'Transfert', 
-        icon: RotateCcw, 
-        className: 'bg-blue-100 text-blue-800'
+      TRANSFERT: {
+        label: 'Transfert',
+        icon: RotateCcw,
+        className: 'bg-blue-100 text-blue-800',
       },
-      AJUSTEMENT: { 
-        label: 'Ajustement', 
-        icon: Package, 
-        className: 'bg-purple-100 text-purple-800'
+      AJUSTEMENT: {
+        label: 'Ajustement',
+        icon: Package,
+        className: 'bg-purple-100 text-purple-800',
       },
-    };
+    }
 
-    const { label, icon: Icon, className } = config[type as keyof typeof config] || config.AJUSTEMENT;
+    const {
+      label,
+      icon: Icon,
+      className,
+    } = config[type as keyof typeof config] || config.AJUSTEMENT
 
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${className}`}>
+      <span
+        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${className}`}
+      >
         <Icon className="h-3 w-3" />
         {label}
       </span>
-    );
-  };
+    )
+  }
 
   const handleSearch = (value: string) => {
-    setSearchQuery(value);
-    onSearch?.(value);
-  };
+    setSearchQuery(value)
+    onSearch?.(value)
+  }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>
-            Mouvements{type && type !== 'tous' ? ` - ${type}` : ''}
-          </span>
+          <span>Mouvements{type && type !== 'tous' ? ` - ${type}` : ''}</span>
           <span className="text-sm font-normal text-muted-foreground">
             {filteredMovements.length} mouvement(s)
           </span>
@@ -199,33 +209,39 @@ export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: M
                           <div className="text-xs text-muted-foreground">
                             {new Date(mouvement.dateCreation).toLocaleTimeString('fr-FR', {
                               hour: '2-digit',
-                              minute: '2-digit'
+                              minute: '2-digit',
                             })}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="p-3">
-                      {getTypeBadge(mouvement.type)}
-                    </td>
+                    <td className="p-3">{getTypeBadge(mouvement.type)}</td>
                     <td className="p-3">
                       <div>
                         <div className="font-medium">{mouvement.materiau}</div>
-                        {mouvement.type === 'TRANSFERT' && mouvement.emplacementSource && mouvement.emplacementDestination && (
-                          <div className="text-xs text-muted-foreground">
-                            {mouvement.emplacementSource} → {mouvement.emplacementDestination}
-                          </div>
-                        )}
+                        {mouvement.type === 'TRANSFERT' &&
+                          mouvement.emplacementSource &&
+                          mouvement.emplacementDestination && (
+                            <div className="text-xs text-muted-foreground">
+                              {mouvement.emplacementSource} → {mouvement.emplacementDestination}
+                            </div>
+                          )}
                         {mouvement.notes && (
-                          <div className="text-xs text-muted-foreground mt-1" title={mouvement.notes}>
-                            {mouvement.notes.length > 30 ? `${mouvement.notes.substring(0, 30)}...` : mouvement.notes}
+                          <div
+                            className="text-xs text-muted-foreground mt-1"
+                            title={mouvement.notes}
+                          >
+                            {mouvement.notes.length > 30
+                              ? `${mouvement.notes.substring(0, 30)}...`
+                              : mouvement.notes}
                           </div>
                         )}
                       </div>
                     </td>
                     <td className="p-3">
                       <span className={`font-mono ${mouvement.quantite < 0 ? 'text-red-600' : ''}`}>
-                        {mouvement.quantite > 0 ? '+' : ''}{mouvement.quantite} {mouvement.unite}
+                        {mouvement.quantite > 0 ? '+' : ''}
+                        {mouvement.quantite} {mouvement.unite}
                       </span>
                     </td>
                     <td className="p-3">
@@ -269,5 +285,5 @@ export function MouvementsTable({ type, mouvements = [], onSearch, onFilter }: M
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

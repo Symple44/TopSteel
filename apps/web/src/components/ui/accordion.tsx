@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils"
-import React from "react"
+import React from 'react'
+import { cn } from '@/lib/utils'
 
 interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
@@ -11,15 +11,15 @@ interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
+  ({ className = '', children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as any, { 
-        ...props, 
+      return React.cloneElement(children as any, {
+        ...props,
         ref: (children as any).ref || ref,
-        className: cn((children as any).props?.className, className)
+        className: cn((children as any).props?.className, className),
       })
     }
-    
+
     return (
       <div className={className} ref={ref} {...props}>
         {children}
@@ -28,11 +28,11 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
   }
 )
 
-Accordion.displayName = "Accordion"
+Accordion.displayName = 'Accordion'
 
 // Export des sous-composants courants si nécessaire
 export const AccordionContent = Accordion
-export const AccordionTrigger = Accordion  
+export const AccordionTrigger = Accordion
 export const AccordionItem = Accordion
 export const AccordionValue = Accordion
 export const AccordionHeader = Accordion
@@ -41,4 +41,3 @@ export const AccordionDescription = Accordion
 export const AccordionFooter = Accordion
 export const AccordionSeparator = Accordion
 export const AccordionList = Accordion
-

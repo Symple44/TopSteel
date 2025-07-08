@@ -1,5 +1,7 @@
 'use client'
 
+import { AlertTriangle, Filter, Package, Plus, Search, TrendingDown } from 'lucide-react'
+import { useState } from 'react'
 import { AddMaterialDialog } from '@/components/stocks/add-material-dialog'
 import { StockAlertsPanel } from '@/components/stocks/stock-alerts-panel'
 import { StocksFilters } from '@/components/stocks/stocks-filters'
@@ -9,8 +11,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { AlertTriangle, Filter, Package, Plus, Search, TrendingDown } from 'lucide-react'
-import { useState } from 'react'
 
 export default function StocksPage() {
   const [showFilters, setShowFilters] = useState(false)
@@ -28,24 +28,17 @@ export default function StocksPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowAlerts(!showAlerts)}
-            className="relative"
-          >
+          <Button variant="outline" onClick={() => setShowAlerts(!showAlerts)} className="relative">
             <AlertTriangle className="h-4 w-4 mr-2" />
             Alertes
-            <Badge 
-              variant="destructive" 
+            <Badge
+              variant="destructive"
               className="absolute -top-2 -right-2 h-5 w-5 rounded-full text-xs"
             >
               3
             </Badge>
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => setShowFilters(!showFilters)}
-          >
+          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
@@ -132,10 +125,7 @@ export default function StocksPage() {
       <div className="flex gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher par référence, nom, fournisseur..."
-            className="pl-10"
-          />
+          <Input placeholder="Rechercher par référence, nom, fournisseur..." className="pl-10" />
         </div>
         <Button variant="outline">
           <TrendingDown className="h-4 w-4 mr-2" />
@@ -147,10 +137,7 @@ export default function StocksPage() {
       <StocksTable />
 
       {/* Modals */}
-      <AddMaterialDialog 
-        open={showAddModal} 
-        onOpenChange={setShowAddModal} 
-      />
+      <AddMaterialDialog open={showAddModal} onOpenChange={setShowAddModal} />
     </div>
   )
 }

@@ -5,7 +5,7 @@ import { Redis } from 'ioredis'
 export class OptimizedCacheService {
   private readonly logger = new Logger(OptimizedCacheService.name)
   private redis: Redis
-  
+
   constructor() {
     this.redis = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
@@ -15,10 +15,10 @@ export class OptimizedCacheService {
       commandTimeout: 5000,
       enableOfflineQueue: false,
       maxRetriesPerRequest: 3,
-      family: 4
+      family: 4,
     })
   }
-  
+
   async get<T>(key: string): Promise<T | null> {
     try {
       const value = await this.redis.get(key)
@@ -28,7 +28,7 @@ export class OptimizedCacheService {
       return null
     }
   }
-  
+
   async set(key: string, value: any, ttl = 3600): Promise<void> {
     try {
       await this.redis.setex(key, ttl, JSON.stringify(value))
@@ -36,7 +36,7 @@ export class OptimizedCacheService {
       this.logger.error(`Cache SET error for key ${key}:`, error)
     }
   }
-  
+
   async invalidatePattern(pattern: string): Promise<void> {
     try {
       const keys = await this.redis.keys(pattern)

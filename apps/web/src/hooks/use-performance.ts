@@ -32,6 +32,6 @@ export function usePerformance() {
     getMetrics,
     resetMetrics,
     averageTime,
-    metrics: metrics.current
+    metrics: metrics.current,
   }
 }

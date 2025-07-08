@@ -1,33 +1,33 @@
 'use client'
 
+import { Calendar, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
+import { useState } from 'react'
 import { PlanningCalendar } from '@/components/production/planning-calendar'
 import { PlanningGantt } from '@/components/production/planning-gantt'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Calendar, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
-import { useState } from 'react'
 
 interface GanttTask {
-  id: string;
-  name: string;
-  start: Date;
-  end: Date;
-  progress: number;
-  dependencies?: string[];
-  assignee?: string;
-  type: 'ordre' | 'operation' | 'maintenance';
-  status: 'planned' | 'in-progress' | 'completed' | 'delayed';
+  id: string
+  name: string
+  start: Date
+  end: Date
+  progress: number
+  dependencies?: string[]
+  assignee?: string
+  type: 'ordre' | 'operation' | 'maintenance'
+  status: 'planned' | 'in-progress' | 'completed' | 'delayed'
 }
 
 interface PlanningEvent {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  type: 'ordre' | 'maintenance' | 'conge';
-  color: string;
-  ordreId?: number;
+  id: string
+  title: string
+  start: Date
+  end: Date
+  type: 'ordre' | 'maintenance' | 'conge'
+  color: string
+  ordreId?: number
 }
 
 export default function PlanningPage() {
@@ -43,9 +43,9 @@ export default function PlanningPage() {
       progress: 75,
       assignee: 'Jean Dupont',
       type: 'operation',
-      status: 'in-progress'
-    }
-  ];
+      status: 'in-progress',
+    },
+  ]
 
   const mockEvents: PlanningEvent[] = [
     {
@@ -55,29 +55,29 @@ export default function PlanningPage() {
       end: new Date(2025, 0, 17),
       type: 'ordre',
       color: '#3b82f6',
-      ordreId: 1
-    }
-  ];
+      ordreId: 1,
+    },
+  ]
 
   const handleTaskClick = (task: GanttTask) => {
-    console.log('Tâche cliquée:', task);
-  };
+    console.log('Tâche cliquée:', task)
+  }
 
   const handleTaskUpdate = (taskId: string, updates: Partial<GanttTask>) => {
-    console.log('Mise à jour tâche:', taskId, updates);
-  };
+    console.log('Mise à jour tâche:', taskId, updates)
+  }
 
   const handleEventClick = (event: PlanningEvent) => {
-    console.log('Événement cliqué:', event);
-  };
+    console.log('Événement cliqué:', event)
+  }
 
   const handleDateClick = (date: Date) => {
-    console.log('Date cliquée:', date);
-  };
+    console.log('Date cliquée:', date)
+  }
 
   const handleCreateEvent = () => {
-    console.log('Créer un nouvel événement');
-  };
+    console.log('Créer un nouvel événement')
+  }
 
   return (
     <div className="space-y-6">
@@ -107,17 +107,21 @@ export default function PlanningPage() {
               Semaine du {currentWeek.toLocaleDateString()}
             </CardTitle>
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
-                onClick={() => setCurrentWeek(new Date(currentWeek.getTime() - 7 * 24 * 60 * 60 * 1000))}
+                onClick={() =>
+                  setCurrentWeek(new Date(currentWeek.getTime() - 7 * 24 * 60 * 60 * 1000))
+                }
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
-                onClick={() => setCurrentWeek(new Date(currentWeek.getTime() + 7 * 24 * 60 * 60 * 1000))}
+                onClick={() =>
+                  setCurrentWeek(new Date(currentWeek.getTime() + 7 * 24 * 60 * 60 * 1000))
+                }
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -130,17 +134,17 @@ export default function PlanningPage() {
               <TabsTrigger value="gantt">Vue Gantt</TabsTrigger>
               <TabsTrigger value="calendar">Vue Calendrier</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="gantt" className="mt-6">
-              <PlanningGantt 
+              <PlanningGantt
                 tasks={mockTasks}
                 onTaskClick={handleTaskClick}
                 onTaskUpdate={handleTaskUpdate}
               />
             </TabsContent>
-            
+
             <TabsContent value="calendar" className="mt-6">
-              <PlanningCalendar 
+              <PlanningCalendar
                 events={mockEvents}
                 onEventClick={handleEventClick}
                 onDateClick={handleDateClick}

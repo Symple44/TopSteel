@@ -6,61 +6,61 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { Clients } from "../../clients/entities/clients.entity";
-import { User } from "../../users/entities/user.entity";
+} from 'typeorm'
+import { Clients } from '../../clients/entities/clients.entity'
+import { User } from '../../users/entities/user.entity'
 
 export enum ProjetStatut {
-  BROUILLON = "brouillon",
-  EN_COURS = "en_cours",
-  TERMINE = "termine",
-  ANNULE = "annule",
+  BROUILLON = 'brouillon',
+  EN_COURS = 'en_cours',
+  TERMINE = 'termine',
+  ANNULE = 'annule',
 }
 
-@Entity("projets")
+@Entity('projets')
 export class Projet {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
   @Column()
-  nom!: string;
+  nom!: string
 
   @Column({ nullable: true })
-  description?: string;
+  description?: string
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: ProjetStatut,
     default: ProjetStatut.BROUILLON,
   })
-  statut!: ProjetStatut;
+  statut!: ProjetStatut
 
-  @Column("decimal", { precision: 15, scale: 2, nullable: true })
-  montantTotal?: number;
-
-  @Column({ nullable: true })
-  dateDebut?: Date;
+  @Column('decimal', { precision: 15, scale: 2, nullable: true })
+  montantTotal?: number
 
   @Column({ nullable: true })
-  dateFin?: Date;
+  dateDebut?: Date
 
   @Column({ nullable: true })
-  clientId?: number;
+  dateFin?: Date
 
   @Column({ nullable: true })
-  responsableId?: number;
+  clientId?: number
+
+  @Column({ nullable: true })
+  responsableId?: number
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt!: Date
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedAt!: Date
 
   @ManyToOne(() => Clients, { nullable: true })
-  @JoinColumn({ name: "clientId" })
-  client?: Clients;
+  @JoinColumn({ name: 'clientId' })
+  client?: Clients
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: "responsableId" })
-  responsable?: User;
+  @JoinColumn({ name: 'responsableId' })
+  responsable?: User
 }

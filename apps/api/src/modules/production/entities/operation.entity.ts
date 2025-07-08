@@ -1,13 +1,13 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from 'typeorm';
-import { OrdreFabrication } from './ordre-fabrication.entity';
+} from 'typeorm'
+import { OrdreFabrication } from './ordre-fabrication.entity'
 
 export enum OperationStatut {
   EN_ATTENTE = 'EN_ATTENTE',
@@ -30,62 +30,66 @@ export enum OperationType {
 @Entity('operations')
 export class Operation {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
   @Column()
-  nom!: string;
+  nom!: string
 
   @Column({ type: 'text', nullable: true })
-  description?: string;
+  description?: string
 
   @Column({
     type: 'enum',
     enum: OperationType,
     default: OperationType.DECOUPE,
   })
-  type!: OperationType;
+  type!: OperationType
 
   @Column({
     type: 'enum',
     enum: OperationStatut,
     default: OperationStatut.EN_ATTENTE,
   })
-  statut!: OperationStatut;
+  statut!: OperationStatut
 
   @Column({ name: 'ordre_fabrication_id' })
-  ordreFabricationId!: number;
+  ordreFabricationId!: number
 
-  @ManyToOne(() => OrdreFabrication, ordre => ordre.operations, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => OrdreFabrication,
+    (ordre) => ordre.operations,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'ordre_fabrication_id' })
-  ordre!: OrdreFabrication;
+  ordre!: OrdreFabrication
 
   @Column({ type: 'int', default: 1 })
-  ordreExecution!: number;
+  ordreExecution!: number
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  dureeEstimee?: number;
+  dureeEstimee?: number
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  dureeReelle?: number;
+  dureeReelle?: number
 
   @Column({ name: 'machine_id', nullable: true })
-  machineId?: number;
+  machineId?: number
 
   @Column({ name: 'technicien_id', nullable: true })
-  technicienId?: number;
+  technicienId?: number
 
   @Column({ type: 'timestamp', name: 'date_debut', nullable: true })
-  dateDebut?: Date;
+  dateDebut?: Date
 
   @Column({ type: 'timestamp', name: 'date_fin', nullable: true })
-  dateFin?: Date;
+  dateFin?: Date
 
   @Column({ type: 'text', nullable: true })
-  notes?: string;
+  notes?: string
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt!: Date
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedAt!: Date
 }

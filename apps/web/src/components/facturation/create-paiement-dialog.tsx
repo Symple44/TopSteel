@@ -19,23 +19,23 @@ interface CreatePaiementDialogProps {
   onPaiementCreated?: (paiement: any) => void
 }
 
-export function CreatePaiementDialog({ 
-  open, 
-  onOpenChange, 
-  onPaiementCreated 
+export function CreatePaiementDialog({
+  open,
+  onOpenChange,
+  onPaiementCreated,
 }: CreatePaiementDialogProps) {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     montant: '',
     methode: 'virement',
     reference: '',
-    dateReception: new Date().toISOString().split('T')[0]
+    dateReception: new Date().toISOString().split('T')[0],
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
+
     // Simulation création paiement
     setTimeout(() => {
       const newPaiement = {
@@ -44,19 +44,19 @@ export function CreatePaiementDialog({
         methode: formData.methode,
         reference: formData.reference,
         dateReception: formData.dateReception,
-        statut: 'valide'
+        statut: 'valide',
       }
-      
+
       onPaiementCreated?.(newPaiement)
       setLoading(false)
       onOpenChange(false)
-      
+
       // Reset form
       setFormData({
         montant: '',
         methode: 'virement',
         reference: '',
-        dateReception: new Date().toISOString().split('T')[0]
+        dateReception: new Date().toISOString().split('T')[0],
       })
     }, 1000)
   }
@@ -68,54 +68,58 @@ export function CreatePaiementDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Enregistrer un paiement</DialogTitle>
-          <DialogDescription>
-            Saisissez les informations du paiement reçu.
-          </DialogDescription>
+          <DialogDescription>Saisissez les informations du paiement reçu.</DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="montant" className="text-right">
               Montant
             </Label>
-            <Input 
-              id="montant" 
-              type="number" 
+            <Input
+              id="montant"
+              type="number"
               step="0.01"
               className="col-span-3"
               value={formData.montant}
-              onChange={(e) => setFormData({ ...formData, montant: (e.target as HTMLInputElement).value })}
+              onChange={(e) =>
+                setFormData({ ...formData, montant: (e.target as HTMLInputElement).value })
+              }
               required
             />
           </div>
-          
+
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="reference" className="text-right">
               Référence
             </Label>
-            <Input 
-              id="reference" 
+            <Input
+              id="reference"
               className="col-span-3"
               value={formData.reference}
-              onChange={(e) => setFormData({ ...formData, reference: (e.target as HTMLInputElement).value })}
+              onChange={(e) =>
+                setFormData({ ...formData, reference: (e.target as HTMLInputElement).value })
+              }
               placeholder="Numéro de référence"
             />
           </div>
-          
+
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="dateReception" className="text-right">
               Date
             </Label>
-            <Input 
-              id="dateReception" 
+            <Input
+              id="dateReception"
               type="date"
               className="col-span-3"
               value={formData.dateReception}
-              onChange={(e) => setFormData({ ...formData, dateReception: (e.target as HTMLInputElement).value })}
+              onChange={(e) =>
+                setFormData({ ...formData, dateReception: (e.target as HTMLInputElement).value })
+              }
               required
             />
           </div>
-          
+
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Annuler

@@ -14,8 +14,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --build",
-    "dev": "tsc --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
@@ -33,7 +33,8 @@
     "@typescript-eslint/parser": "^8.36.0",
     "eslint": "^9.30.0",
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "tsup": "^8.0.0"
   },
   "type": "module",
   "dependencies": {

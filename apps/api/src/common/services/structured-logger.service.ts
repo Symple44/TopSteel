@@ -30,15 +30,15 @@ export class StructuredLogger {
             message,
             service: 'topsteel-api',
             environment: process.env.NODE_ENV || 'development',
-            ...meta
+            ...meta,
           })
         })
       ),
       transports: [
         new winston.transports.Console(),
         new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'logs/combined.log' })
-      ]
+        new winston.transports.File({ filename: 'logs/combined.log' }),
+      ],
     })
   }
 
@@ -46,7 +46,7 @@ export class StructuredLogger {
     this.logger.info('Business Event', {
       type: 'business_event',
       event,
-      ...context
+      ...context,
     })
   }
 
@@ -55,7 +55,7 @@ export class StructuredLogger {
       type: 'security_event',
       event,
       severity,
-      ...context
+      ...context,
     })
   }
 
@@ -65,7 +65,7 @@ export class StructuredLogger {
       metric,
       value,
       unit,
-      ...context
+      ...context,
     })
   }
 
@@ -75,7 +75,7 @@ export class StructuredLogger {
       message: error.message,
       stack: error.stack,
       name: error.name,
-      ...context
+      ...context,
     })
   }
 
@@ -83,7 +83,7 @@ export class StructuredLogger {
     this.logger.info('User Action', {
       type: 'user_action',
       action,
-      ...context
+      ...context,
     })
   }
 
@@ -93,7 +93,7 @@ export class StructuredLogger {
       query: query.substring(0, 200), // Limiter la taille
       duration,
       unit: 'ms',
-      ...context
+      ...context,
     })
   }
 }

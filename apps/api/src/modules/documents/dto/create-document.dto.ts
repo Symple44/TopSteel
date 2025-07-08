@@ -1,26 +1,26 @@
-import { IsString, IsOptional, IsEnum, IsNumber } from "class-validator";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class CreateDocumentDto {
-  @ApiProperty({ description: "Nom du document" })
+  @ApiProperty({ description: 'Nom du document' })
   @IsString()
-  nom!: string;
+  nom!: string
 
-  @ApiProperty({ description: "Type du document" })
-  @IsEnum(["pdf", "image", "document", "plan"])
-  type!: "pdf" | "image" | "document" | "plan";
+  @ApiProperty({ description: 'Type du document' })
+  @IsEnum(['pdf', 'image', 'document', 'plan'])
+  type!: 'pdf' | 'image' | 'document' | 'plan'
 
-  @ApiProperty({ description: "URL du document" })
+  @ApiProperty({ description: 'URL du document' })
   @IsString()
-  url!: string;
+  url!: string
 
-  @ApiPropertyOptional({ description: "Taille du fichier" })
+  @ApiPropertyOptional({ description: 'Taille du fichier' })
   @IsNumber()
   @IsOptional()
-  taille?: number;
+  taille?: number
 
-  @ApiPropertyOptional({ description: "Description" })
+  @ApiPropertyOptional({ description: 'Description' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string
 }

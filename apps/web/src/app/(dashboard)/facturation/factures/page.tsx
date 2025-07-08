@@ -16,30 +16,24 @@ function FacturesContent() {
           Création, édition et suivi des factures clients
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 border border-dashed border-border rounded-lg">
           <h3 className="font-semibold mb-2">Factures en cours</h3>
-          <p className="text-sm text-muted-foreground">
-            Factures non finalisées
-          </p>
+          <p className="text-sm text-muted-foreground">Factures non finalisées</p>
         </div>
-        
+
         <div className="p-6 border border-dashed border-border rounded-lg">
           <h3 className="font-semibold mb-2">Factures envoyées</h3>
-          <p className="text-sm text-muted-foreground">
-            En attente de paiement
-          </p>
+          <p className="text-sm text-muted-foreground">En attente de paiement</p>
         </div>
-        
+
         <div className="p-6 border border-dashed border-border rounded-lg">
           <h3 className="font-semibold mb-2">Factures payées</h3>
-          <p className="text-sm text-muted-foreground">
-            Encaissements effectués
-          </p>
+          <p className="text-sm text-muted-foreground">Encaissements effectués</p>
         </div>
       </div>
-      
+
       <div className="p-6 border border-dashed border-border rounded-lg">
         <p className="text-center text-muted-foreground">
           Module de gestion des factures en cours de développement
@@ -51,22 +45,24 @@ function FacturesContent() {
 
 export default function FacturesPage() {
   return (
-    <ClientOnly fallback={
-      <div className="space-y-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded w-64 mb-4"></div>
-          <div className="h-4 bg-muted rounded w-48"></div>
+    <ClientOnly
+      fallback={
+        <div className="space-y-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-muted rounded w-64 mb-4"></div>
+            <div className="h-4 bg-muted rounded w-48"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-6 animate-pulse">
+                <div className="h-4 bg-muted rounded w-32 mb-2"></div>
+                <div className="h-3 bg-muted rounded w-24"></div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="p-6 animate-pulse">
-              <div className="h-4 bg-muted rounded w-32 mb-2"></div>
-              <div className="h-3 bg-muted rounded w-24"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    }>
+      }
+    >
       <FacturesContent />
     </ClientOnly>
   )

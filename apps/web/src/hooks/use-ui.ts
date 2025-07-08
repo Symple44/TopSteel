@@ -15,7 +15,7 @@ export const useUI = () => {
 
   return {
     dataView,
-    setDataView
+    setDataView,
   }
 }
 
@@ -26,34 +26,46 @@ export const useToasts = () => {
   const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = Date.now().toString()
     const newToast: Toast = { ...toast, id }
-    
-    setToasts(prev => [...prev, newToast])
-    
+
+    setToasts((prev) => [...prev, newToast])
+
     // Auto remove after delay
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id))
+      setToasts((prev) => prev.filter((t) => t.id !== id))
     }, toast.duration || 5000)
   }, [])
 
   const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id))
+    setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
-  const showSuccess = useCallback((title: string, message: string = '', duration?: number) => {
-    addToast({ type: 'success', title, message, duration })
-  }, [addToast])
+  const showSuccess = useCallback(
+    (title: string, message: string = '', duration?: number) => {
+      addToast({ type: 'success', title, message, duration })
+    },
+    [addToast]
+  )
 
-  const showError = useCallback((title: string, message: string = '', duration?: number) => {
-    addToast({ type: 'error', title, message, duration })
-  }, [addToast])
+  const showError = useCallback(
+    (title: string, message: string = '', duration?: number) => {
+      addToast({ type: 'error', title, message, duration })
+    },
+    [addToast]
+  )
 
-  const showWarning = useCallback((title: string, message: string = '', duration?: number) => {
-    addToast({ type: 'warning', title, message, duration })
-  }, [addToast])
+  const showWarning = useCallback(
+    (title: string, message: string = '', duration?: number) => {
+      addToast({ type: 'warning', title, message, duration })
+    },
+    [addToast]
+  )
 
-  const showInfo = useCallback((title: string, message: string = '', duration?: number) => {
-    addToast({ type: 'info', title, message, duration })
-  }, [addToast])
+  const showInfo = useCallback(
+    (title: string, message: string = '', duration?: number) => {
+      addToast({ type: 'info', title, message, duration })
+    },
+    [addToast]
+  )
 
   const clearAllToasts = useCallback(() => {
     setToasts([])
@@ -67,7 +79,7 @@ export const useToasts = () => {
     showError,
     showWarning,
     showInfo,
-    clearAllToasts
+    clearAllToasts,
   }
 }
 
@@ -75,7 +87,7 @@ export const useSidebar = () => {
   const [collapsed, setCollapsed] = useState(false)
 
   const toggle = useCallback(() => {
-    setCollapsed(prev => !prev)
+    setCollapsed((prev) => !prev)
   }, [])
 
   const expand = useCallback(() => {
@@ -91,7 +103,7 @@ export const useSidebar = () => {
     toggle,
     expand,
     collapse,
-    setCollapsed
+    setCollapsed,
   }
 }
 
@@ -116,7 +128,7 @@ export const useLoading = () => {
     loading,
     loadingMessage,
     startLoading,
-    stopLoading
+    stopLoading,
   }
 }
 
@@ -138,7 +150,7 @@ export const useModal = () => {
   }, [])
 
   const toggleModal = useCallback(() => {
-    setIsOpen(prev => !prev)
+    setIsOpen((prev) => !prev)
   }, [])
 
   return {
@@ -146,7 +158,7 @@ export const useModal = () => {
     modalData,
     openModal,
     closeModal,
-    toggleModal
+    toggleModal,
   }
 }
 

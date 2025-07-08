@@ -44,12 +44,12 @@ class BusinessMetrics {
       batchSize: 50,
       batchTimeout: 5000,
       enableDebugLogs: false,
-      ...config
+      ...config,
     }
-    
+
     this.maxEvents = this.config.maxEvents!
     this.isClient = typeof window !== 'undefined'
-    
+
     // ✅ Initialisation différée pour éviter les erreurs SSR
     if (this.isClient) {
       this.initializeClient()
@@ -75,12 +75,12 @@ class BusinessMetrics {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       screen: {
         width: window.screen.width,
-        height: window.screen.height
+        height: window.screen.height,
       },
       viewport: {
         width: window.innerWidth,
-        height: window.innerHeight
-      }
+        height: window.innerHeight,
+      },
     })
 
     // Traiter les événements en attente
@@ -112,7 +112,7 @@ class BusinessMetrics {
    */
   private processPendingEvents(): void {
     if (this.pendingEvents.length > 0) {
-      this.pendingEvents.forEach(event => {
+      this.pendingEvents.forEach((event) => {
         this.addEvent(event)
       })
       this.pendingEvents = []
@@ -139,13 +139,13 @@ class BusinessMetrics {
     if (this.events.length === 0) return
 
     const eventsToSend = this.events.slice(0, this.config.batchSize!)
-    
+
     try {
       await this.sendToBackend(eventsToSend)
-      
+
       // Retirer les événements envoyés
       this.events = this.events.slice(this.config.batchSize!)
-      
+
       if (this.config.enableDebugLogs) {
         console.log(`📊 Business Metrics: ${eventsToSend.length} événements envoyés`)
       }
@@ -159,7 +159,7 @@ class BusinessMetrics {
    */
   private addEvent(event: BusinessEvent): void {
     this.events.push(event)
-    
+
     // Limiter le nombre d'événements en mémoire
     if (this.events.length > this.maxEvents) {
       this.events = this.events.slice(-this.maxEvents)
@@ -175,11 +175,11 @@ class BusinessMetrics {
       properties: {
         ...properties,
         url: this.isClient ? window.location.href : '',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       },
       timestamp: Date.now(),
       userId: this.userContext.userId,
-      sessionId: this.sessionId
+      sessionId: this.sessionId,
     }
 
     if (this.initialized) {
@@ -220,7 +220,7 @@ class BusinessMetrics {
       projectType: projectData.type,
       clientId: projectData.clientId,
       estimatedValue: projectData.estimatedValue,
-      complexity: projectData.complexity
+      complexity: projectData.complexity,
     })
   }
 
@@ -229,21 +229,21 @@ class BusinessMetrics {
       projectId,
       oldStatus,
       newStatus,
-      transitionType: this.getTransitionType(oldStatus, newStatus)
+      transitionType: this.getTransitionType(oldStatus, newStatus),
     })
   }
 
   trackProjectViewed(projectId: string, viewDuration?: number): void {
     this.track('project_viewed', {
       projectId,
-      viewDuration
+      viewDuration,
     })
   }
 
   trackProductionStarted(orderId: string, projectId: string): void {
     this.track('production_started', {
       orderId,
-      projectId
+      projectId,
     })
   }
 
@@ -251,7 +251,7 @@ class BusinessMetrics {
     this.track('production_completed', {
       orderId,
       duration,
-      quality
+      quality,
     })
   }
 
@@ -259,7 +259,7 @@ class BusinessMetrics {
     this.track('user_action', {
       action,
       page: this.isClient ? window.location.pathname : '',
-      ...context
+      ...context,
     })
   }
 
@@ -268,7 +268,7 @@ class BusinessMetrics {
       formName,
       success,
       errorCount: errors?.length || 0,
-      errors: errors?.slice(0, 5)
+      errors: errors?.slice(0, 5),
     })
   }
 
@@ -276,7 +276,7 @@ class BusinessMetrics {
     this.track('search_performed', {
       query: query.substring(0, 100),
       resultCount,
-      filters
+      filters,
     })
   }
 
@@ -285,7 +285,7 @@ class BusinessMetrics {
       metric,
       value,
       unit: 'ms',
-      ...context
+      ...context,
     })
   }
 
@@ -295,7 +295,7 @@ class BusinessMetrics {
       stack: error.stack?.substring(0, 1000),
       name: error.name,
       page: this.isClient ? window.location.pathname : '',
-      ...context
+      ...context,
     })
   }
 
@@ -305,7 +305,7 @@ class BusinessMetrics {
     const progressOrder = ['BROUILLON', 'DEVIS', 'ACCEPTE', 'EN_COURS', 'TERMINE', 'FACTURE']
     const oldIndex = progressOrder.indexOf(oldStatus)
     const newIndex = progressOrder.indexOf(newStatus)
-    
+
     if (oldIndex < newIndex) return 'progress'
     if (oldIndex > newIndex) return 'regression'
 
@@ -321,7 +321,7 @@ class BusinessMetrics {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ events })
+        body: JSON.stringify({ events }),
       })
 
       if (!response.ok) {
@@ -335,27 +335,21 @@ class BusinessMetrics {
 
   // ===== MÉTHODES D'EXPORT ET DEBUG =====
 
-  getEvents(filters?: {
-    eventName?: string
-    since?: number
-    limit?: number
-  }): BusinessEvent[] {
-
+  getEvents(filters?: { eventName?: string; since?: number; limit?: number }): BusinessEvent[] {
     let filteredEvents = [...this.events]
 
-    
     if (filters?.eventName) {
-      filteredEvents = filteredEvents.filter(e => e.name === filters.eventName)
+      filteredEvents = filteredEvents.filter((e) => e.name === filters.eventName)
     }
-    
+
     if (filters?.since) {
-      filteredEvents = filteredEvents.filter(e => e.timestamp >= filters.since!)
+      filteredEvents = filteredEvents.filter((e) => e.timestamp >= filters.since!)
     }
-    
+
     if (filters?.limit) {
       filteredEvents = filteredEvents.slice(-filters.limit)
     }
-    
+
     return filteredEvents
   }
 
@@ -370,7 +364,7 @@ class BusinessMetrics {
   } {
     const eventCounts = new Map<string, number>()
 
-    this.events.forEach(event => {
+    this.events.forEach((event) => {
       eventCounts.set(event.name, (eventCounts.get(event.name) || 0) + 1)
     })
 
@@ -379,7 +373,8 @@ class BusinessMetrics {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10)
 
-    const sessionStart = this.events.find(e => e.name === 'session_started')?.timestamp || Date.now()
+    const sessionStart =
+      this.events.find((e) => e.name === 'session_started')?.timestamp || Date.now()
     const sessionDuration = Date.now() - sessionStart
 
     return {
@@ -389,19 +384,23 @@ class BusinessMetrics {
       topEvents,
       sessionDuration,
       isClient: this.isClient,
-      initialized: this.initialized
+      initialized: this.initialized,
     }
   }
 
   exportData(): string {
-    return JSON.stringify({
-      events: this.events,
-      userContext: this.userContext,
-      sessionId: this.sessionId,
-      isClient: this.isClient,
-      initialized: this.initialized,
-      exportedAt: Date.now()
-    }, null, 2)
+    return JSON.stringify(
+      {
+        events: this.events,
+        userContext: this.userContext,
+        sessionId: this.sessionId,
+        isClient: this.isClient,
+        initialized: this.initialized,
+        exportedAt: Date.now(),
+      },
+      null,
+      2
+    )
   }
 
   /**
@@ -412,7 +411,7 @@ class BusinessMetrics {
       clearTimeout(this.batchTimeout)
       this.batchTimeout = null
     }
-    
+
     // Envoyer les derniers événements
     if (this.events.length > 0) {
       this.flushEvents().catch(console.warn)
@@ -430,7 +429,7 @@ let businessMetricsInstance: BusinessMetrics | null = null
 function getBusinessMetrics(): BusinessMetrics {
   if (!businessMetricsInstance) {
     businessMetricsInstance = new BusinessMetrics({
-      enableDebugLogs: process.env.NODE_ENV === 'development'
+      enableDebugLogs: process.env.NODE_ENV === 'development',
     })
   }
 
@@ -442,11 +441,11 @@ function getBusinessMetrics(): BusinessMetrics {
  */
 export function useBusinessMetrics() {
   const metrics = getBusinessMetrics()
-  
+
   return {
     track: metrics.track.bind(metrics),
     setUserContext: metrics.setUserContext.bind(metrics),
-    
+
     // Métriques spécifiques
     trackProjectCreated: metrics.trackProjectCreated.bind(metrics),
     trackProjectStatusChanged: metrics.trackProjectStatusChanged.bind(metrics),
@@ -458,12 +457,12 @@ export function useBusinessMetrics() {
     trackSearchPerformed: metrics.trackSearchPerformed.bind(metrics),
     trackPerformanceMetric: metrics.trackPerformanceMetric.bind(metrics),
     trackError: metrics.trackError.bind(metrics),
-    
+
     // Utilitaires
     getEvents: metrics.getEvents.bind(metrics),
     generateReport: metrics.generateReport.bind(metrics),
     exportData: metrics.exportData.bind(metrics),
-    cleanup: metrics.cleanup.bind(metrics)
+    cleanup: metrics.cleanup.bind(metrics),
   }
 }
 

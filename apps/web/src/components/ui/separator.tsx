@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
@@ -10,11 +10,11 @@ interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
+  ({ className = '', children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
     }
-    
+
     return (
       <div className={className} ref={ref} {...props}>
         {children}
@@ -23,11 +23,11 @@ export const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
   }
 )
 
-Separator.displayName = "Separator"
+Separator.displayName = 'Separator'
 
 // Export des sous-composants courants si nécessaire
 export const SeparatorContent = Separator
-export const SeparatorTrigger = Separator  
+export const SeparatorTrigger = Separator
 export const SeparatorItem = Separator
 export const SeparatorValue = Separator
 export const SeparatorHeader = Separator

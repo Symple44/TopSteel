@@ -8,8 +8,8 @@ export const ConfigSchema = z.object({
     host: z.string().default('localhost'),
     cors: z.object({
       origin: z.string().url(),
-      credentials: z.boolean().default(true)
-    })
+      credentials: z.boolean().default(true),
+    }),
   }),
   database: z.object({
     host: z.string().default('localhost'),
@@ -19,23 +19,25 @@ export const ConfigSchema = z.object({
     password: z.string(),
     ssl: z.boolean().default(false),
     synchronize: z.boolean().default(false),
-    maxConnections: z.number().default(100)
+    maxConnections: z.number().default(100),
   }),
-  redis: z.object({
-    host: z.string().default('localhost'),
-    port: z.number().default(6379),
-    ttl: z.number().default(3600)
-  }).optional(),
+  redis: z
+    .object({
+      host: z.string().default('localhost'),
+      port: z.number().default(6379),
+      ttl: z.number().default(3600),
+    })
+    .optional(),
   jwt: z.object({
     secret: z.string().min(32),
     expiresIn: z.string().default('24h'),
     refreshSecret: z.string().min(32),
-    refreshExpiresIn: z.string().default('7d')
+    refreshExpiresIn: z.string().default('7d'),
   }),
   uploads: z.object({
     maxSize: z.number().default(10485760),
-    allowedTypes: z.array(z.string()).default(['image/*', 'application/pdf'])
-  })
+    allowedTypes: z.array(z.string()).default(['image/*', 'application/pdf']),
+  }),
 })
 
 export type AppConfig = z.infer<typeof ConfigSchema>
@@ -48,8 +50,8 @@ export function validateConfig(env: Record<string, string | undefined>): AppConf
       host: env.API_HOST,
       cors: {
         origin: env.FRONTEND_URL || 'http://localhost:3000',
-        credentials: true
-      }
+        credentials: true,
+      },
     },
     database: {
       host: env.DB_HOST,
@@ -59,22 +61,24 @@ export function validateConfig(env: Record<string, string | undefined>): AppConf
       password: env.DB_PASSWORD,
       ssl: env.DB_SSL === 'true',
       synchronize: env.DB_SYNCHRONIZE === 'true',
-      maxConnections: parseInt(env.DB_MAX_CONNECTIONS || '100')
+      maxConnections: parseInt(env.DB_MAX_CONNECTIONS || '100'),
     },
-    redis: env.REDIS_HOST ? {
-      host: env.REDIS_HOST,
-      port: parseInt(env.REDIS_PORT || '6379'),
-      ttl: parseInt(env.REDIS_TTL || '3600')
-    } : undefined,
+    redis: env.REDIS_HOST
+      ? {
+          host: env.REDIS_HOST,
+          port: parseInt(env.REDIS_PORT || '6379'),
+          ttl: parseInt(env.REDIS_TTL || '3600'),
+        }
+      : undefined,
     jwt: {
       secret: env.JWT_SECRET!,
       expiresIn: env.JWT_EXPIRES_IN || '24h',
       refreshSecret: env.JWT_REFRESH_SECRET!,
-      refreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN || '7d'
+      refreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN || '7d',
     },
     uploads: {
       maxSize: parseInt(env.UPLOAD_MAX_SIZE || '10485760'),
-      allowedTypes: (env.UPLOAD_ALLOWED_TYPES || 'image/*,application/pdf').split(',')
-    }
+      allowedTypes: (env.UPLOAD_ALLOWED_TYPES || 'image/*,application/pdf').split(','),
+    },
   })
 }

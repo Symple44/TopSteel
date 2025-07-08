@@ -1,19 +1,28 @@
 {
   "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src", 
-    "module": "ESNext",
     "target": "ES2022",
+    "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "strict": true,
     "noImplicitAny": false,
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "composite": false,
-    "incremental": false
+    "incremental": false,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]

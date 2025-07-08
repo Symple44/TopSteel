@@ -7,6 +7,6 @@ module.exports = {
   collectCoverageFrom: [
     ...baseConfig.collectCoverageFrom,
     '!src/**/*.controller.ts',
-    '!src/**/*.route.ts'
-  ]
+    '!src/**/*.route.ts',
+  ],
 }

@@ -1,12 +1,12 @@
 // apps/web/src/components/facturation/devis-preview.tsx
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface DevisPreviewProps {
-  devisId: string;
-  open: boolean;           
-  onOpenChange: (open: boolean) => void; 
+  devisId: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function DevisPreview({ devisId }: DevisPreviewProps) {

@@ -1,8 +1,8 @@
 // apps/web/src/components/production/ordre-info-tab.tsx
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface OrdreInfoTabProps {
-  ordre: any;
+  ordre: any
 }
 
 export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
@@ -31,19 +31,21 @@ export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
               <p className="text-sm text-muted-foreground">{ordre?.avancement || 0}%</p>
             </div>
           </div>
-          
+
           {ordre?.description && (
             <div>
               <label className="text-sm font-medium">Description</label>
               <p className="text-sm text-muted-foreground">{ordre.description}</p>
             </div>
           )}
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Date début prévue</label>
               <p className="text-sm text-muted-foreground">
-                {ordre?.dateDebutPrevue ? new Date(ordre.dateDebutPrevue).toLocaleDateString() : 'N/A'}
+                {ordre?.dateDebutPrevue
+                  ? new Date(ordre.dateDebutPrevue).toLocaleDateString()
+                  : 'N/A'}
               </p>
             </div>
             <div>
@@ -56,5 +58,5 @@ export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

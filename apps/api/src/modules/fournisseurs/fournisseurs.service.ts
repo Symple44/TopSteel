@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { PaginationResultDto } from "../../common/dto/base.dto";
-import { CreateFournisseursDto } from "./dto/create-fournisseurs.dto";
-import { FournisseursQueryDto } from "./dto/fournisseurs-query.dto";
-import { UpdateFournisseursDto } from "./dto/update-fournisseurs.dto";
+import type { Repository } from "typeorm";
+import type { PaginationResultDto } from "../../common/dto/base.dto";
+import type { CreateFournisseursDto } from "./dto/create-fournisseurs.dto";
+import type { FournisseursQueryDto } from "./dto/fournisseurs-query.dto";
+import type { UpdateFournisseursDto } from "./dto/update-fournisseurs.dto";
 import { Fournisseur } from "./entities/fournisseur.entity";
 
 @Injectable()

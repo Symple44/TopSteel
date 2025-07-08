@@ -1,7 +1,7 @@
 'use client'
 
+import { Clock, Factory, Filter, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
-import { Plus, Search, Filter, Factory, Clock } from 'lucide-react'
 
 export default function ProductionPage() {
   const [activeTab, setActiveTab] = useState('ordres')
@@ -61,7 +61,9 @@ export default function ProductionPage() {
             <div className="border rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Ordre OF-2025-001</h3>
-                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">En cours</span>
+                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                  En cours
+                </span>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -82,7 +84,9 @@ export default function ProductionPage() {
             <div className="border rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Ordre OF-2025-002</h3>
-                <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">Planifié</span>
+                <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">
+                  Planifié
+                </span>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">

@@ -3,7 +3,7 @@
  * Version ultra-simplifiée pour éviter les erreurs de types
  */
 
-"use client"
+'use client'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 

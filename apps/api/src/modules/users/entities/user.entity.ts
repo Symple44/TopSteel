@@ -1,67 +1,67 @@
+import * as bcrypt from 'bcrypt'
 import {
-  Entity,
-  PrimaryGeneratedColumn,
+  BeforeInsert,
   Column,
   CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
-  BeforeInsert,
-} from "typeorm";
-import * as bcrypt from "bcrypt";
+} from 'typeorm'
 
 export enum UserRole {
-  ADMIN = "ADMIN",
-  MANAGER = "MANAGER",
-  COMMERCIAL = "COMMERCIAL",
-  TECHNICIEN = "TECHNICIEN",
-  OPERATEUR = "OPERATEUR",
+  ADMIN = 'ADMIN',
+  MANAGER = 'MANAGER',
+  COMMERCIAL = 'COMMERCIAL',
+  TECHNICIEN = 'TECHNICIEN',
+  OPERATEUR = 'OPERATEUR',
 }
 
-@Entity("users")
+@Entity('users')
 export class User {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string
 
   @Column({ unique: true })
-  email!: string;
+  email!: string
 
   @Column()
-  password!: string;
+  password!: string
 
   @Column()
-  nom!: string;
+  nom!: string
 
   @Column()
-  prenom!: string;
+  prenom!: string
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: UserRole,
     default: UserRole.OPERATEUR,
   })
-  role!: UserRole;
+  role!: UserRole
 
   @Column({ default: true })
-  actif!: boolean;
+  actif!: boolean
 
   @Column({ nullable: true })
-  description?: string;
+  description?: string
 
   @Column({ nullable: true })
-  refreshToken?: string;
+  refreshToken?: string
 
-  @Column({ type: "jsonb", nullable: true })
-  metadata?: Record<string, any>;
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt!: Date
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedAt!: Date
 
   @BeforeInsert()
   async hashPassword() {
     if (this.password) {
-      this.password = await bcrypt.hash(this.password, 10);
+      this.password = await bcrypt.hash(this.password, 10)
     }
   }
 }

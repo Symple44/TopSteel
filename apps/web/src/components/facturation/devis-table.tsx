@@ -1,8 +1,15 @@
 // apps/web/src/components/facturation/devis-table.tsx
 'use client'
 
+import { Download, Edit, Eye, MoreHorizontal } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -12,13 +19,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Eye, Edit, Download, MoreHorizontal } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 
 // Données mock pour la démo
 const mockDevis = [
@@ -61,14 +61,10 @@ const getStatusBadge = (statut: string) => {
     accepte: { label: 'Accepté', variant: 'default' as const },
     refuse: { label: 'Refusé', variant: 'destructive' as const },
   }
-  
+
   const config = statusConfig[statut as keyof typeof statusConfig] || statusConfig.brouillon
-  
-  return (
-    <Badge variant={config.variant}>
-      {config.label}
-    </Badge>
-  )
+
+  return <Badge variant={config.variant}>{config.label}</Badge>
 }
 
 interface DevisTableProps {
@@ -120,12 +116,8 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
                         <Download className="h-4 w-4 mr-2" />
                         Télécharger PDF
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        Dupliquer
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
-                        Supprimer
-                      </DropdownMenuItem>
+                      <DropdownMenuItem>Dupliquer</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600">Supprimer</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

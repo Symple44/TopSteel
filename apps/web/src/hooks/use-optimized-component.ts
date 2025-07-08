@@ -14,10 +14,8 @@ export function useOptimizedSearch<T>(
   // Fonction de recherche typée correctement
   const searchFunction = useCallback((...args: unknown[]) => {
     const [term, items, fields] = args as [string, T[], (keyof T)[]]
-    const filtered = items.filter(item =>
-      fields.some(field =>
-        String(item[field]).toLowerCase().includes(term.toLowerCase())
-      )
+    const filtered = items.filter((item) =>
+      fields.some((field) => String(item[field]).toLowerCase().includes(term.toLowerCase()))
     )
 
     setFilteredData(filtered)
@@ -28,10 +26,10 @@ export function useOptimizedSearch<T>(
 
   // Effet pour déclencher la recherche
   useEffect(() => {
-    if (!searchTerm) {
-      setFilteredData(data)
-    } else {
+    if (searchTerm) {
       debouncedSearch(searchTerm, data, searchFields)
+    } else {
+      setFilteredData(data)
     }
   }, [searchTerm, data, searchFields, debouncedSearch])
 
@@ -48,10 +46,7 @@ export function useOptimizedCallback<T extends (...args: any[]) => any>(
 }
 
 // Hook pour optimiser les calculs coûteux avec deps non-undefined
-export function useOptimizedMemo<T>(
-  factory: () => T,
-  deps: React.DependencyList = []
-): T {
+export function useOptimizedMemo<T>(factory: () => T, deps: React.DependencyList = []): T {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(factory, deps)
 }

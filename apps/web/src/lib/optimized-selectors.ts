@@ -18,10 +18,7 @@ interface TypedZustandStore<T> {
   <R>(selector: StoreSelector<T, R>, equalityFn: EqualityFn<R>): R
   (): T
   getState(): T
-  setState(
-    partial: T | Partial<T> | ((state: T) => T | Partial<T>),
-    replace?: boolean
-  ): void
+  setState(partial: T | Partial<T> | ((state: T) => T | Partial<T>), replace?: boolean): void
   subscribe(listener: (state: T, prevState: T) => void): () => void
 }
 
@@ -30,7 +27,7 @@ export enum SelectorStrategy {
   SIMPLE = 'simple',
   SHALLOW = 'shallow',
   DEEP = 'deep',
-  SAFE = 'safe'
+  SAFE = 'safe',
 }
 
 // ===== CONFIGURATION DES SÉLECTEURS =====
@@ -53,15 +50,15 @@ class SelectorMemoCache {
   private static maxSize = 100
   private static defaultTTL = 5000
 
-  static get<R>(key: string, ttl: number = this.defaultTTL): R | undefined {
-    const entry = this.cache.get(key)
+  static get<R>(key: string, ttl: number = SelectorMemoCache.defaultTTL): R | undefined {
+    const entry = SelectorMemoCache.cache.get(key)
 
     if (!entry) return undefined
 
     const now = Date.now()
 
     if (now - entry.timestamp > ttl) {
-      this.cache.delete(key)
+      SelectorMemoCache.cache.delete(key)
 
       return undefined
     }
@@ -74,28 +71,28 @@ class SelectorMemoCache {
   static set<R>(key: string, value: R): void {
     const now = Date.now()
 
-    this.cache.set(key, {
+    SelectorMemoCache.cache.set(key, {
       value,
       timestamp: now,
-      hitCount: 1
+      hitCount: 1,
     })
 
     // Nettoyage du cache si trop grand
-    if (this.cache.size > this.maxSize) {
-      const entries = Array.from(this.cache.entries())
+    if (SelectorMemoCache.cache.size > SelectorMemoCache.maxSize) {
+      const entries = Array.from(SelectorMemoCache.cache.entries())
       const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
-      const toDelete = sortedByUsage.slice(0, Math.floor(this.maxSize * 0.3))
+      const toDelete = sortedByUsage.slice(0, Math.floor(SelectorMemoCache.maxSize * 0.3))
 
-      toDelete.forEach(([key]) => this.cache.delete(key))
+      toDelete.forEach(([key]) => SelectorMemoCache.cache.delete(key))
     }
   }
 
   static clear(): void {
-    this.cache.clear()
+    SelectorMemoCache.cache.clear()
   }
 
   static getEntries(): Array<[string, MemoCache<any>]> {
-    return Array.from(this.cache.entries())
+    return Array.from(SelectorMemoCache.cache.entries())
   }
 }
 
@@ -107,11 +104,11 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
      */
     useShallow: <R>(selector: StoreSelector<T, R>, debugLabel?: string) => {
       const result = useStore(selector, shallow as EqualityFn<R>)
-      
+
       if (process.env.NODE_ENV === 'development' && debugLabel) {
         console.debug(`🔍 [${debugLabel}] Shallow selector called`)
       }
-      
+
       return result
     },
 
@@ -119,16 +116,16 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
      * Sélecteur avec égalité profonde personnalisée
      */
     useDeep: <R>(
-      selector: StoreSelector<T, R>, 
+      selector: StoreSelector<T, R>,
       equalityFn: EqualityFn<R> = Object.is,
       debugLabel?: string
     ) => {
       const result = useStore(selector, equalityFn)
-      
+
       if (process.env.NODE_ENV === 'development' && debugLabel) {
         console.debug(`🔍 [${debugLabel}] Deep selector called`)
       }
-      
+
       return result
     },
 
@@ -137,35 +134,34 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
      */
     useSimple: <R>(selector: StoreSelector<T, R>, debugLabel?: string) => {
       const result = useStore(selector)
-      
+
       if (process.env.NODE_ENV === 'development' && debugLabel) {
         console.debug(`🔍 [${debugLabel}] Simple selector called`)
       }
-      
+
       return result
     },
 
     /**
      * Sélecteur avec valeur par défaut sécurisée
      */
-    useSafe: <R>(
-      selector: StoreSelector<T, R>, 
-      defaultValue: R,
-      debugLabel?: string
-    ) => {
-      const safeSelector = useMemo(() => (state: T) => {
-        try {
-          const result = selector(state)
+    useSafe: <R>(selector: StoreSelector<T, R>, defaultValue: R, debugLabel?: string) => {
+      const safeSelector = useMemo(
+        () => (state: T) => {
+          try {
+            const result = selector(state)
 
-          return result ?? defaultValue
-        } catch (error) {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn(`⚠️ Selector error in ${debugLabel || 'unknown'}:`, error)
+            return result ?? defaultValue
+          } catch (error) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(`⚠️ Selector error in ${debugLabel || 'unknown'}:`, error)
+            }
+
+            return defaultValue
           }
-
-          return defaultValue
-        }
-      }, [selector, defaultValue, debugLabel])
+        },
+        [selector, defaultValue, debugLabel]
+      )
 
       return useStore(safeSelector, shallow as EqualityFn<R>)
     },
@@ -176,13 +172,13 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
     useTransformed: <R, U>(
       selector: StoreSelector<T, R>,
       transform: (value: R) => U,
-      options: { 
+      options: {
         equalityFn?: EqualityFn<U>
-        debugLabel?: string 
+        debugLabel?: string
       } = {}
     ) => {
       const { equalityFn = shallow as EqualityFn<U>, debugLabel } = options
-      
+
       const transformedSelector = useMemo(
         () => (state: T) => {
           try {
@@ -220,11 +216,11 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       )
 
       const result = useStore(filteredSelector, shallow as EqualityFn<R>)
-      
+
       if (process.env.NODE_ENV === 'development' && debugLabel) {
         console.debug(`🔍 [${debugLabel}] Filtered selector: ${(result as any)?.length || 0} items`)
       }
-      
+
       return result
     },
 
@@ -240,12 +236,12 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       } = {}
     ) => {
       const { ttl = 5000, cacheKey, debugLabel } = options
-      
+
       const memoizedSelector = useMemo(() => {
         return (state: T): R => {
           // Générer clé de cache simple
           const key = cacheKey || `${debugLabel || 'memo'}-${Date.now()}`
-          
+
           // Vérifier le cache
           const cached = SelectorMemoCache.get<R>(key, ttl)
 
@@ -286,10 +282,10 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
         entries: entries.map(([key, value]) => ({
           key,
           hitCount: value.hitCount,
-          age: Date.now() - value.timestamp
-        }))
+          age: Date.now() - value.timestamp,
+        })),
       }
-    }
+    },
   }
 }
 
@@ -301,17 +297,12 @@ export function useOptimizedSelector<T, R>(
   selector: StoreSelector<T, R>,
   options: SelectorOptions<R> = {}
 ): R {
-  const { 
-    strategy = SelectorStrategy.SHALLOW, 
-    equalityFn, 
-    defaultValue,
-    debugLabel 
-  } = options
+  const { strategy = SelectorStrategy.SHALLOW, equalityFn, defaultValue, debugLabel } = options
 
   // Créer la fonction d'égalité appropriée
   const finalEqualityFn = useMemo(() => {
     if (equalityFn) return equalityFn
-    
+
     switch (strategy) {
       case SelectorStrategy.SHALLOW:
         return shallow as EqualityFn<R>
@@ -327,7 +318,7 @@ export function useOptimizedSelector<T, R>(
   // Créer le sélecteur sécurisé
   const safeSelector = useMemo(() => {
     if (defaultValue === undefined) return selector
-    
+
     return (state: T): R => {
       try {
         const result = selector(state)
@@ -364,12 +355,8 @@ export function createMemoizedSelector<T, R>(
     keySelector?: (state: T) => string
   } = {}
 ): StoreSelector<T, R> {
-  const { 
-    maxCacheSize = 10, 
-    ttl = 5000,
-    keySelector 
-  } = options
-  
+  const { maxCacheSize = 10, ttl = 5000, keySelector } = options
+
   const cache = new Map<string, MemoCache<R>>()
   let lastState: T | undefined
   let lastResult: R | undefined
@@ -381,15 +368,13 @@ export function createMemoizedSelector<T, R>(
     }
 
     // Générer la clé de cache
-    const cacheKey = keySelector ? 
-      keySelector(state) : 
-      JSON.stringify(state)
+    const cacheKey = keySelector ? keySelector(state) : JSON.stringify(state)
 
     const now = Date.now()
     const cached = cache.get(cacheKey)
 
     // Vérifier le cache
-    if (cached && (now - cached.timestamp) < ttl) {
+    if (cached && now - cached.timestamp < ttl) {
       cached.hitCount++
       lastState = state
       lastResult = cached.value
@@ -404,7 +389,7 @@ export function createMemoizedSelector<T, R>(
     cache.set(cacheKey, {
       value,
       timestamp: now,
-      hitCount: 1
+      hitCount: 1,
     })
 
     // Nettoyage du cache
@@ -430,10 +415,7 @@ export const selectorDebugUtils = {
   /**
    * Wrapper pour tracer les appels de sélecteur
    */
-  trace: <T, R>(
-    selector: StoreSelector<T, R>,
-    label: string
-  ): StoreSelector<T, R> => {
+  trace: <T, R>(selector: StoreSelector<T, R>, label: string): StoreSelector<T, R> => {
     if (process.env.NODE_ENV !== 'development') {
       return selector
     }
@@ -442,13 +424,13 @@ export const selectorDebugUtils = {
       const start = performance.now()
       const result = selector(state)
       const duration = performance.now() - start
-      
+
       console.debug(`🔍 [${label}] Duration: ${duration.toFixed(2)}ms`, {
         state,
         result,
-        duration
+        duration,
       })
-      
+
       return result
     }
   },
@@ -462,29 +444,29 @@ export const selectorDebugUtils = {
     iterations: number = 1000
   ) => {
     const results: Record<string, { averageTime: number; totalTime: number }> = {}
-    
+
     Object.entries(selectors).forEach(([name, selector]) => {
       const times: number[] = []
-      
+
       for (let i = 0; i < iterations; i++) {
         const start = performance.now()
 
         selector(state)
         times.push(performance.now() - start)
       }
-      
+
       const totalTime = times.reduce((sum, time) => sum + time, 0)
 
       results[name] = {
         averageTime: totalTime / iterations,
-        totalTime
+        totalTime,
       }
     })
-    
+
     console.table(results)
 
     return results
-  }
+  },
 }
 
 // ===== EXPORTS =====

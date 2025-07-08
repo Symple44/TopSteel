@@ -1,28 +1,22 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
-@Entity("commandes")
+@Entity('commandes')
 export class Commande {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
   @Column()
-  numero!: string;
+  numero!: string
 
-  @Column("decimal", { precision: 10, scale: 2 })
-  montant!: number;
+  @Column('decimal', { precision: 10, scale: 2 })
+  montant!: number
 
   @Column({ nullable: true })
-  fournisseur?: number;
+  fournisseur?: number
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt!: Date
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedAt!: Date
 }

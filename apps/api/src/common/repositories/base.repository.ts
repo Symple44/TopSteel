@@ -1,9 +1,9 @@
-import type { 
-  Repository, 
-  FindOptionsWhere, 
-  DeepPartial, 
+import type {
+  DeepPartial,
+  FindManyOptions,
+  FindOptionsWhere,
   ObjectLiteral,
-  FindManyOptions 
+  Repository,
 } from 'typeorm'
 
 export interface IBaseRepository<T extends ObjectLiteral> {
@@ -63,4 +63,3 @@ export abstract class BaseRepository<T extends ObjectLiteral> implements IBaseRe
     return this.repository
   }
 }
-

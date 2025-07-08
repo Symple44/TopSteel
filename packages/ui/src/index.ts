@@ -1,7 +1,7 @@
 /**
  * 📦 TOPSTEEL ERP UI PACKAGE - MAIN EXPORT
  * Point d'entrée principal pour le package UI
- * 
+ *
  * Organisation:
  * - Components: Composants UI réutilisables
  * - Utils: Utilitaires et helpers
@@ -13,24 +13,38 @@
 // COMPONENTS EXPORT
 // =============================================
 
+export {
+  Badge,
+  badgeVariants,
+  CountBadge,
+  PriorityBadge,
+  StatusBadge,
+} from './components/badge'
 // Core Components
 export {
-    ActionButton, Button, buttonVariants, FormButton,
-    IconButton
+  ActionButton,
+  Button,
+  buttonVariants,
+  FormButton,
+  IconButton,
 } from './components/button'
 
 export {
-    Badge, badgeVariants, CountBadge, PriorityBadge, StatusBadge
-} from './components/badge'
-
-export {
-    Card, CardContent, CardDescription, CardFooter, CardHeader,
-    CardTitle, cardVariants, ProjectCard,
-    StatsCard
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  cardVariants,
+  ProjectCard,
+  StatsCard,
 } from './components/card'
 
 export {
-    RangeSlider, Slider, SteppedSlider
+  RangeSlider,
+  Slider,
+  SteppedSlider,
 } from './components/slider'
 
 // =============================================
@@ -38,8 +52,26 @@ export {
 // =============================================
 
 export {
-    accessibilityProps, buttonSizes, clearClassCache, cn, combineVariants, createVariants, disabledState, focusRing, getCacheStats, hoverEffect, inputSizes, isValidClassName, paddingSizes, responsiveContainer,
-    responsiveGrid, safeClassNames, sanitizeClasses, standardTransition, UI_CONSTANTS, validationClasses
+  accessibilityProps,
+  buttonSizes,
+  clearClassCache,
+  cn,
+  combineVariants,
+  createVariants,
+  disabledState,
+  focusRing,
+  getCacheStats,
+  hoverEffect,
+  inputSizes,
+  isValidClassName,
+  paddingSizes,
+  responsiveContainer,
+  responsiveGrid,
+  safeClassNames,
+  sanitizeClasses,
+  standardTransition,
+  UI_CONSTANTS,
+  validationClasses,
 } from './lib/utils'
 
 // =============================================
@@ -63,20 +95,30 @@ import type { VariantProps as CVAVariantProps } from 'class-variance-authority'
 import type { ClassValue } from 'clsx'
 import type { BadgeProps } from './components/badge'
 import type { ButtonProps } from './components/button'
-import type { CardContentProps, CardFooterProps, CardHeaderProps, CardProps } from './components/card'
+import type {
+  CardContentProps,
+  CardFooterProps,
+  CardHeaderProps,
+  CardProps,
+} from './components/card'
 import type { SliderProps } from './components/slider'
 import type { Size, VariantProps } from './lib/utils'
 
 export type {
-    // Component Props Types
-    BadgeProps,
-    ButtonProps, CardContentProps,
-    CardFooterProps, CardHeaderProps, CardProps, ClassValue,
-    // Re-exported Types
-    CVAVariantProps, Size, SliderProps,
-
-    // Utility Types
-    VariantProps
+  // Component Props Types
+  BadgeProps,
+  ButtonProps,
+  CardContentProps,
+  CardFooterProps,
+  CardHeaderProps,
+  CardProps,
+  ClassValue,
+  // Re-exported Types
+  CVAVariantProps,
+  Size,
+  SliderProps,
+  // Utility Types
+  VariantProps,
 }
 
 // =============================================
@@ -88,7 +130,7 @@ export const UI_PACKAGE_INFO = {
   version: '2.1.0',
   description: 'UI components library for ERP TopSteel - Enterprise-grade design system',
   author: 'TopSteel Engineering Team',
-  license: 'UNLICENSED'
+  license: 'UNLICENSED',
 } as const
 
 // =============================================
@@ -98,7 +140,7 @@ export const UI_PACKAGE_INFO = {
 export const UI_THEMES = {
   LIGHT: 'light',
   DARK: 'dark',
-  SYSTEM: 'system'
+  SYSTEM: 'system',
 } as const
 
 export const UI_SIZES = {
@@ -106,7 +148,7 @@ export const UI_SIZES = {
   SM: 'sm',
   MD: 'md',
   LG: 'lg',
-  XL: 'xl'
+  XL: 'xl',
 } as const
 
 export const UI_VARIANTS = {
@@ -115,7 +157,7 @@ export const UI_VARIANTS = {
   DESTRUCTIVE: 'destructive',
   OUTLINE: 'outline',
   GHOST: 'ghost',
-  LINK: 'link'
+  LINK: 'link',
 } as const
 
 export const ERP_ENTITY_TYPES = {
@@ -124,7 +166,7 @@ export const ERP_ENTITY_TYPES = {
   QUOTE: 'quote',
   INVOICE: 'invoice',
   PRODUCTION: 'production',
-  STOCK: 'stock'
+  STOCK: 'stock',
 } as const
 
 export const STATUS_TYPES = {
@@ -133,14 +175,14 @@ export const STATUS_TYPES = {
   PENDING: 'pending',
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
-  ERROR: 'error'
+  ERROR: 'error',
 } as const
 
 export const PRIORITY_LEVELS = {
   LOW: 'low',
   MEDIUM: 'medium',
   HIGH: 'high',
-  CRITICAL: 'critical'
+  CRITICAL: 'critical',
 } as const
 
 // =============================================
@@ -154,7 +196,7 @@ export const ARIA_ROLES = {
   DIALOG: 'dialog',
   ALERT: 'alert',
   STATUS: 'status',
-  PROGRESSBAR: 'progressbar'
+  PROGRESSBAR: 'progressbar',
 } as const
 
 export const KEYBOARD_KEYS = {
@@ -167,7 +209,7 @@ export const KEYBOARD_KEYS = {
   ARROW_RIGHT: 'ArrowRight',
   TAB: 'Tab',
   HOME: 'Home',
-  END: 'End'
+  END: 'End',
 } as const
 
 // =============================================
@@ -191,8 +233,12 @@ export function isValidVariant(variant: unknown): variant is keyof typeof UI_VAR
 /**
  * Valide qu'un type d'entité ERP est valide
  */
-export function isValidEntityType(entityType: unknown): entityType is keyof typeof ERP_ENTITY_TYPES {
-  return typeof entityType === 'string' && Object.values(ERP_ENTITY_TYPES).includes(entityType as any)
+export function isValidEntityType(
+  entityType: unknown
+): entityType is keyof typeof ERP_ENTITY_TYPES {
+  return (
+    typeof entityType === 'string' && Object.values(ERP_ENTITY_TYPES).includes(entityType as any)
+  )
 }
 
 // =============================================
@@ -207,7 +253,7 @@ export const DEFAULT_CONFIG = {
   variant: UI_VARIANTS.DEFAULT,
   theme: UI_THEMES.SYSTEM,
   animation: true,
-  accessibility: true
+  accessibility: true,
 } as const
 
 /**
@@ -218,7 +264,7 @@ export function createComponentConfig<T extends Record<string, any>>(
 ): T & typeof DEFAULT_CONFIG {
   return {
     ...DEFAULT_CONFIG,
-    ...config
+    ...config,
   } as T & typeof DEFAULT_CONFIG
 }
 
@@ -230,7 +276,7 @@ export function createComponentConfig<T extends Record<string, any>>(
  * Fonction de debug pour les composants UI
  */
 export function debugComponent(
-  componentName: string, 
+  componentName: string,
   props: Record<string, any>,
   enabled: boolean = process.env.NODE_ENV === 'development'
 ): void {
@@ -267,18 +313,18 @@ export function checkCompatibility(requiredVersion: string): boolean {
   const currentVersion = UI_PACKAGE_INFO.version
   const currentParts = currentVersion.split('.')
   const requiredParts = requiredVersion.split('.')
-  
+
   if (currentParts.length === 0 || requiredParts.length === 0) {
     return false
   }
-  
+
   const currentMajor = parseInt(currentParts[0] || '0', 10)
   const requiredMajor = parseInt(requiredParts[0] || '0', 10)
-  
+
   if (isNaN(currentMajor) || isNaN(requiredMajor)) {
     return false
   }
-  
+
   return currentMajor >= requiredMajor
 }
 
@@ -293,7 +339,7 @@ export const FEATURES = {
   CUSTOM_THEMES: true,
   FORM_VALIDATION: true,
   INTERNATIONALIZATION: false, // À implémenter
-  RTL_SUPPORT: false // À implémenter
+  RTL_SUPPORT: false, // À implémenter
 } as const
 
 // =============================================
@@ -306,5 +352,5 @@ export default {
   FEATURES,
   checkCompatibility,
   debugComponent,
-  useDebugRender
+  useDebugRender,
 }

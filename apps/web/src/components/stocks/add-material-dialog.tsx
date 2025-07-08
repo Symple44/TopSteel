@@ -1,10 +1,10 @@
 'use client'
 
+import { Package, X } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Package, X } from 'lucide-react'
-import { useState } from 'react'
 
 interface AddMaterialDialogProps {
   open: boolean
@@ -18,7 +18,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
     quantite: '',
     prixUnitaire: '',
     emplacement: '',
-    seuil: ''
+    seuil: '',
   })
 
   if (!open) return null
@@ -26,7 +26,14 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onOpenChange(false)
-    setFormData({ reference: '', designation: '', quantite: '', prixUnitaire: '', emplacement: '', seuil: '' })
+    setFormData({
+      reference: '',
+      designation: '',
+      quantite: '',
+      prixUnitaire: '',
+      emplacement: '',
+      seuil: '',
+    })
   }
 
   return (
@@ -48,7 +55,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
                 <label className="text-sm font-medium">Référence *</label>
                 <Input
                   value={formData.reference}
-                  onChange={(e) => setFormData({...formData, reference: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
                   placeholder="REF-001"
                   required
                 />
@@ -58,7 +65,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
                 <Input
                   type="number"
                   value={formData.quantite}
-                  onChange={(e) => setFormData({...formData, quantite: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, quantite: e.target.value })}
                   placeholder="100"
                   required
                 />
@@ -68,7 +75,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
               <label className="text-sm font-medium">Désignation *</label>
               <Input
                 value={formData.designation}
-                onChange={(e) => setFormData({...formData, designation: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
                 placeholder="Acier S235 - Tôle 2mm"
                 required
               />
@@ -80,7 +87,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
                   type="number"
                   step="0.01"
                   value={formData.prixUnitaire}
-                  onChange={(e) => setFormData({...formData, prixUnitaire: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, prixUnitaire: e.target.value })}
                   placeholder="12.50"
                 />
               </div>
@@ -89,7 +96,7 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
                 <Input
                   type="number"
                   value={formData.seuil}
-                  onChange={(e) => setFormData({...formData, seuil: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, seuil: e.target.value })}
                   placeholder="10"
                 />
               </div>
@@ -98,15 +105,22 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
               <label className="text-sm font-medium">Emplacement</label>
               <Input
                 value={formData.emplacement}
-                onChange={(e) => setFormData({...formData, emplacement: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, emplacement: e.target.value })}
                 placeholder="A1-B2-C3"
               />
             </div>
             <div className="flex gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="flex-1"
+              >
                 Annuler
               </Button>
-              <Button type="submit" className="flex-1">Ajouter</Button>
+              <Button type="submit" className="flex-1">
+                Ajouter
+              </Button>
             </div>
           </form>
         </CardContent>
@@ -114,4 +128,3 @@ export function AddMaterialDialog({ open, onOpenChange }: AddMaterialDialogProps
     </div>
   )
 }
-

@@ -21,10 +21,10 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "../users/entities/user.entity";
-import { DocumentsService } from "./documents.service";
-import { CreateDocumentsDto } from "./dto/create-documents.dto";
-import { DocumentsQueryDto } from "./dto/documents-query.dto";
-import { UpdateDocumentsDto } from "./dto/update-documents.dto";
+import type { DocumentsService } from "./documents.service";
+import type { CreateDocumentsDto } from "./dto/create-documents.dto";
+import type { DocumentsQueryDto } from "./dto/documents-query.dto";
+import type { UpdateDocumentsDto } from "./dto/update-documents.dto";
 
 @Controller("documents")
 @ApiTags("📄 Documents")

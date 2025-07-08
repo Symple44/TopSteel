@@ -23,10 +23,10 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "../users/entities/user.entity";
-import { CreateMateriauxDto } from "./dto/create-materiaux.dto";
-import { MateriauxQueryDto } from "./dto/materiaux-query.dto";
-import { UpdateMateriauxDto } from "./dto/update-materiaux.dto";
-import { MateriauxService } from "./materiaux.service";
+import type { CreateMateriauxDto } from "./dto/create-materiaux.dto";
+import type { MateriauxQueryDto } from "./dto/materiaux-query.dto";
+import type { UpdateMateriauxDto } from "./dto/update-materiaux.dto";
+import type { MateriauxService } from "./materiaux.service";
 
 @Controller("materiaux")
 @ApiTags("🧱 Matériaux")

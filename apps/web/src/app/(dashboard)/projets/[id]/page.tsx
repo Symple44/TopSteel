@@ -1,26 +1,6 @@
 'use client'
 
-import { Projet3DTab } from "@/components/projets/projet-3d-tab";
-import { ProjetDevisTab } from '@/components/projets/projet-devis-tab';
-import { ProjetDocumentsTab } from "@/components/projets/projet-documents-tab";
-import { ProjetInfoTab } from '@/components/projets/projet-info-tab';
-import { ProjetProductionTab } from '@/components/projets/projet-production-tab';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useProjet } from '@/hooks/use-projets';
-import { formatCurrency, formatDate, getDaysUntil } from '@/lib/utils';
-import { ProjetStatut } from '@erp/types';
+import { ProjetStatut } from '@erp/types'
 import {
   AlertCircle,
   ArrowLeft,
@@ -37,10 +17,30 @@ import {
   Package,
   Paperclip,
   Send,
-  Trash2
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+  Trash2,
+} from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { Projet3DTab } from '@/components/projets/projet-3d-tab'
+import { ProjetDevisTab } from '@/components/projets/projet-devis-tab'
+import { ProjetDocumentsTab } from '@/components/projets/projet-documents-tab'
+import { ProjetInfoTab } from '@/components/projets/projet-info-tab'
+import { ProjetProductionTab } from '@/components/projets/projet-production-tab'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useProjet } from '@/hooks/use-projets'
+import { formatCurrency, formatDate, getDaysUntil } from '@/lib/utils'
 
 // ✅ FIX: Correction des types de paramètres Next.js 13+ - params sont Promise
 interface ProjetDetailPageProps {
@@ -101,7 +101,14 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
 
   // ✅ FIX: Mapping COMPLET de tous les statuts ProjetStatut
   const getStatusBadge = (statut: ProjetStatut) => {
-    const statusConfig: Record<ProjetStatut, { label: string; variant: 'outline' | 'secondary' | 'default' | 'destructive'; icon: React.ComponentType<{ className?: string }> }> = {
+    const statusConfig: Record<
+      ProjetStatut,
+      {
+        label: string
+        variant: 'outline' | 'secondary' | 'default' | 'destructive'
+        icon: React.ComponentType<{ className?: string }>
+      }
+    > = {
       [ProjetStatut.BROUILLON]: { label: 'Brouillon', variant: 'outline', icon: Edit },
       [ProjetStatut.DEVIS]: { label: 'Devis', variant: 'secondary', icon: FileText },
       [ProjetStatut.EN_ATTENTE]: { label: 'En attente', variant: 'secondary', icon: Clock },
@@ -112,7 +119,7 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
       [ProjetStatut.FACTURE]: { label: 'Facturé', variant: 'default', icon: Euro },
       [ProjetStatut.ANNULE]: { label: 'Annulé', variant: 'destructive', icon: AlertCircle },
     }
-    
+
     const config = statusConfig[statut]
 
     if (!config) {
@@ -126,7 +133,7 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
     }
 
     const Icon = config.icon
-    
+
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
@@ -145,19 +152,19 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
   // ✅ FIX: Gestion sécurisée de la propriété length sur devis
   const tabs = [
     { id: 'general', label: 'Informations générales', icon: FileText },
-    { 
-      id: 'devis', 
-      label: 'Devis', 
-      icon: Euro, 
-      badge: Array.isArray(projet.devis) ? projet.devis.length : (projet.devis ? 1 : 0)
+    {
+      id: 'devis',
+      label: 'Devis',
+      icon: Euro,
+      badge: Array.isArray(projet.devis) ? projet.devis.length : projet.devis ? 1 : 0,
     },
     { id: 'production', label: 'Production', icon: Factory },
     { id: '3d', label: 'Visualisation 3D', icon: Box },
-    { 
-      id: 'documents', 
-      label: 'Documents', 
-      icon: Paperclip, 
-      badge: Array.isArray(projet.documents) ? projet.documents.length : (projet.documents ? 1 : 0)
+    {
+      id: 'documents',
+      label: 'Documents',
+      icon: Paperclip,
+      badge: Array.isArray(projet.documents) ? projet.documents.length : projet.documents ? 1 : 0,
     },
   ]
 
@@ -173,7 +180,7 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour aux projets
           </button>
-          
+
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight">{projet.reference}</h1>
             {getStatusBadge(projet.statut)}
@@ -257,7 +264,7 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Array.isArray(projet.documents) ? projet.documents.length : (projet.documents ? 1 : 0)}
+              {Array.isArray(projet.documents) ? projet.documents.length : projet.documents ? 1 : 0}
             </div>
             <p className="text-xs text-muted-foreground">Fichiers attachés</p>
           </CardContent>

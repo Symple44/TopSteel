@@ -3,26 +3,35 @@ import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
 import { Providers } from './providers'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  display: 'swap'
+  display: 'swap',
 })
 
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-poppins',
-  display: 'swap'
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
   title: {
     default: 'TopSteel ERP - Gestion Métallurgique',
-    template: '%s | TopSteel ERP'
+    template: '%s | TopSteel ERP',
   },
-  description: 'Système ERP spécialisé pour la métallurgie - Gestion complète de production, stock, clients et facturation',
-  keywords: ['ERP', 'métallurgie', 'gestion production', 'TopSteel', 'acier', 'fabrication', 'industrie'],
+  description:
+    'Système ERP spécialisé pour la métallurgie - Gestion complète de production, stock, clients et facturation',
+  keywords: [
+    'ERP',
+    'métallurgie',
+    'gestion production',
+    'TopSteel',
+    'acier',
+    'fabrication',
+    'industrie',
+  ],
   authors: [{ name: 'TopSteel' }],
   creator: 'TopSteel',
   publisher: 'TopSteel',
@@ -45,29 +54,19 @@ export const viewport: Viewport = {
   userScalable: false,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' }
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
   ],
-  colorScheme: 'light dark'
+  colorScheme: 'light dark',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html 
-      lang="fr" 
-      className={`${inter.variable} ${poppins.variable}`}
-      suppressHydrationWarning
-    >
-      <body 
+    <html lang="fr" className={`${inter.variable} ${poppins.variable}`} suppressHydrationWarning>
+      <body
         className="font-inter antialiased bg-background text-foreground"
         suppressHydrationWarning
       >
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

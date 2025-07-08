@@ -1,7 +1,7 @@
 /**
  * 🌐 TYPES SPÉCIFIQUES WEB APP - TOPSTEEL ERP
  * Types exclusifs à l'application web Next.js
- * 
+ *
  * Structure:
  * - Types spécifiques Next.js
  * - Types de pages et layouts
@@ -14,10 +14,7 @@
 // Import des augmentations (doit être en premier)
 import './augmentations'
 
-import type {
-    DeepPartial,
-    User
-} from '@erp/types'
+import type { DeepPartial, User } from '@erp/types'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactNode } from 'react'

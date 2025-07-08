@@ -16,15 +16,15 @@ export default function NotFound() {
             La page que vous recherchez n'existe pas ou a été déplacée.
           </p>
         </div>
-        
+
         <div className="space-y-4">
-          <Link 
+          <Link
             href="/dashboard"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Retour au tableau de bord
           </Link>
-          
+
           <div className="text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground transition-colors">
               Accueil

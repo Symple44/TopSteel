@@ -1,75 +1,75 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
-  JoinColumn,
-} from "typeorm";
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 export enum OrdreFabricationStatut {
-  EN_ATTENTE = "EN_ATTENTE",
-  EN_COURS = "EN_COURS",
-  TERMINE = "TERMINE",
-  ANNULE = "ANNULE",
+  EN_ATTENTE = 'EN_ATTENTE',
+  EN_COURS = 'EN_COURS',
+  TERMINE = 'TERMINE',
+  ANNULE = 'ANNULE',
 }
 
 export enum PrioriteProduction {
-  FAIBLE = "FAIBLE",
-  NORMALE = "NORMALE",
-  ELEVEE = "ELEVEE",
-  URGENTE = "URGENTE",
+  FAIBLE = 'FAIBLE',
+  NORMALE = 'NORMALE',
+  ELEVEE = 'ELEVEE',
+  URGENTE = 'URGENTE',
 }
 
-@Entity("ordres_fabrication")
+@Entity('ordres_fabrication')
 export class OrdreFabrication {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
   @Column({ unique: true, length: 50 })
-  numero!: string;
+  numero!: string
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: OrdreFabricationStatut,
     default: OrdreFabricationStatut.EN_ATTENTE,
   })
-  statut!: OrdreFabricationStatut;
+  statut!: OrdreFabricationStatut
 
   @Column({ nullable: true })
-  projet?: number;
+  projet?: number
 
-  @Column({ type: "text", nullable: true })
-  description?: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: PrioriteProduction,
     default: PrioriteProduction.NORMALE,
   })
-  priorite!: PrioriteProduction;
+  priorite!: PrioriteProduction
 
-  @Column({ type: "timestamp", nullable: true })
-  dateDebut?: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  dateDebut?: Date
 
-  @Column({ type: "timestamp", nullable: true })
-  dateFin?: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  dateFin?: Date
 
-  @Column({ type: "text", nullable: true })
-  notes?: string;
+  @Column({ type: 'text', nullable: true })
+  notes?: string
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt!: Date
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedAt!: Date
 
   // Relation avec les opérations
-  @OneToMany("Operation", "ordreFabrication", { cascade: true })
-  operations?: any[];
+  @OneToMany('Operation', 'ordreFabrication', { cascade: true })
+  operations?: any[]
 
   // Relation virtuelle pour le projet (si vous avez une entité Projet)
-  projetEntity?: any;
+  projetEntity?: any
 }

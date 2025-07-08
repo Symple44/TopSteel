@@ -12,11 +12,11 @@ export class SecurityUtils {
     if (typeof window === 'undefined') {
       return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     }
-    
+
     return DOMPurify.sanitize(html, {
       ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'ul', 'ol', 'li'],
       ALLOWED_ATTR: ['class'],
-      KEEP_CONTENT: false
+      KEEP_CONTENT: false,
     })
   }
 
@@ -24,10 +24,11 @@ export class SecurityUtils {
    * Validation email renforcée
    */
   static validateEmailStrict(email: string): boolean {
-    const emailSchema = z.string()
+    const emailSchema = z
+      .string()
       .email()
       .max(254)
-      .refine(email => !this.isDisposableEmail(email), 'Email temporaire non autorisé')
+      .refine((email) => !SecurityUtils.isDisposableEmail(email), 'Email temporaire non autorisé')
 
     return emailSchema.safeParse(email).success
   }
@@ -38,8 +39,12 @@ export class SecurityUtils {
   static isDisposableEmail(email: string): boolean {
     const domain = email.split('@')[1]?.toLowerCase()
     const disposableDomains = [
-      'tempmail.org', '10minutemail.com', 'guerrillamail.com',
-      'mailinator.com', 'yopmail.com', 'temp-mail.org'
+      'tempmail.org',
+      '10minutemail.com',
+      'guerrillamail.com',
+      'mailinator.com',
+      'yopmail.com',
+      'temp-mail.org',
     ]
 
     return disposableDomains.includes(domain)
@@ -50,21 +55,21 @@ export class SecurityUtils {
    */
   static createRateLimiter(maxCalls: number, windowMs: number) {
     const calls: number[] = []
-    
+
     return function rateLimited<T extends (...args: any[]) => any>(fn: T): T {
       return ((...args: any[]) => {
         const now = Date.now()
         const windowStart = now - windowMs
-        
+
         // Nettoyer les anciens appels
         while (calls.length > 0 && calls[0] < windowStart) {
           calls.shift()
         }
-        
+
         if (calls.length >= maxCalls) {
           throw new Error('Trop de requêtes. Veuillez patienter.')
         }
-        
+
         calls.push(now)
 
         return fn(...args)
@@ -79,14 +84,14 @@ export class SecurityUtils {
     const sanitizedDetails = Object.fromEntries(
       Object.entries(details).map(([key, value]) => [
         key,
-        typeof value === 'string' ? this.maskSensitiveData(value) : value
+        typeof value === 'string' ? SecurityUtils.maskSensitiveData(value) : value,
       ])
     )
 
     console.warn('🔐 Security Event:', {
       event,
       timestamp: new Date().toISOString(),
-      details: sanitizedDetails
+      details: sanitizedDetails,
     })
   }
 
@@ -112,18 +117,17 @@ export class SecurityUtils {
 
     let score = 0
 
-
     // Longueur
     if (password.length >= 8) score += 20
     else feedback.push('Au moins 8 caractères requis')
 
     if (password.length >= 12) score += 10
-    
+
     // Minuscules
     if (/[a-z]/.test(password)) score += 15
     else feedback.push('Au moins une lettre minuscule')
 
-    // Majuscules  
+    // Majuscules
     if (/[A-Z]/.test(password)) score += 15
     else feedback.push('Au moins une lettre majuscule')
 
@@ -143,36 +147,34 @@ export class SecurityUtils {
     return {
       valid: score >= 70,
       score: Math.min(score, 100),
-      feedback
+      feedback,
     }
   }
 
   /**
-   * ✅ Validation d'URL sécurisée - REGEX CORRIGÉES  
+   * ✅ Validation d'URL sécurisée - REGEX CORRIGÉES
    */
   static validateSecureUrl(url: string): boolean {
     try {
       const parsed = new URL(url)
-      
+
       // Protocoles autorisés
       if (!['http:', 'https:'].includes(parsed.protocol)) {
         return false
       }
-      
+
       // Domaines dangereux
-      const dangerousDomains = [
-        'malware.com', 'phishing.net', 'suspicious.org'
-      ]
-      
-      if (dangerousDomains.some(domain => parsed.hostname.includes(domain))) {
+      const dangerousDomains = ['malware.com', 'phishing.net', 'suspicious.org']
+
+      if (dangerousDomains.some((domain) => parsed.hostname.includes(domain))) {
         return false
       }
-      
+
       // Pas d'injection JavaScript
       if (parsed.href.includes('javascript:') || parsed.href.includes('data:')) {
         return false
       }
-      
+
       return true
     } catch {
       return false
@@ -185,24 +187,22 @@ export class SecurityUtils {
   static validateFilename(filename: string): boolean {
     // Longueur
     if (filename.length > 255) return false
-    
-    // Caractères autorisés - ✅ CORRIGÉ sans échappement inutile  
+
+    // Caractères autorisés - ✅ CORRIGÉ sans échappement inutile
     if (!/^[a-zA-Z0-9._-]+$/.test(filename)) return false
-    
+
     // Pas de fichiers cachés
     if (filename.startsWith('.')) return false
-    
+
     // Extensions dangereuses
-    const dangerousExtensions = [
-      'exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js'
-    ]
-    
+    const dangerousExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js']
+
     const extension = filename.split('.').pop()?.toLowerCase()
 
     if (extension && dangerousExtensions.includes(extension)) {
       return false
     }
-    
+
     return true
   }
 
@@ -216,7 +216,7 @@ export class SecurityUtils {
       .replace(/\0/g, '\\0') // ✅ CORRIGÉ: Utiliser \0 au lieu de \x00
       .replace(/\n/g, '\\n')
       .replace(/\r/g, '\\r')
-      // ✅ SUPPRIMÉ: La ligne problématique avec \x1a pour éviter l'erreur ESLint
+    // ✅ SUPPRIMÉ: La ligne problématique avec \x1a pour éviter l'erreur ESLint
   }
 
   /**
@@ -226,10 +226,10 @@ export class SecurityUtils {
     // Format français standard
     const patterns = [
       /^(\+33|0)[1-9](\d{8})$/, // ✅ Format avec ou sans +33
-      /^(\+33|0)\s?[1-9](\s?\d{2}){4}$/ // ✅ Avec espaces
+      /^(\+33|0)\s?[1-9](\s?\d{2}){4}$/, // ✅ Avec espaces
     ]
-    
-    return patterns.some(pattern => pattern.test(phone.replace(/\s/g, '')))
+
+    return patterns.some((pattern) => pattern.test(phone.replace(/\s/g, '')))
   }
 
   /**
@@ -238,18 +238,15 @@ export class SecurityUtils {
   static generateSecureToken(length: number = 32): string {
     if (typeof window === 'undefined') {
       // Node.js
-      return Array.from(
-        { length }, 
-        () => Math.floor(Math.random() * 16).toString(16)
-      ).join('')
+      return Array.from({ length }, () => Math.floor(Math.random() * 16).toString(16)).join('')
     }
-    
+
     // Navigateur
     const array = new Uint8Array(length)
 
     crypto.getRandomValues(array)
 
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
   }
 
   /**
@@ -266,7 +263,7 @@ export class SecurityUtils {
     const hashBuffer = await crypto.subtle.digest('SHA-256', data)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
 
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
   }
 
   /**
@@ -274,13 +271,13 @@ export class SecurityUtils {
    */
   static async verifyFileIntegrity(file: File, expectedHash?: string): Promise<boolean> {
     if (!expectedHash) return true
-    
+
     try {
       const arrayBuffer = await file.arrayBuffer()
       const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer)
       const hashArray = Array.from(new Uint8Array(hashBuffer))
-      const actualHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-      
+      const actualHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+
       return actualHash === expectedHash
     } catch {
       return false
@@ -290,36 +287,35 @@ export class SecurityUtils {
 
 // ✅ SCHÉMAS ZOD RENFORCÉS
 export const enhancedSecuritySchemas = {
-  email: z.string()
+  email: z
+    .string()
     .email('Email invalide')
     .max(254)
     .refine(SecurityUtils.validateEmailStrict, 'Email non autorisé'),
-    
-  password: z.string()
+
+  password: z
+    .string()
     .min(8, 'Minimum 8 caractères')
     .max(128, 'Maximum 128 caractères')
-    .refine(
-      (pwd) => SecurityUtils.validatePasswordStrength(pwd).valid,
-      'Mot de passe trop faible'
-    ),
-    
-  secureUrl: z.string()
+    .refine((pwd) => SecurityUtils.validatePasswordStrength(pwd).valid, 'Mot de passe trop faible'),
+
+  secureUrl: z
+    .string()
     .url('URL invalide')
     .refine(SecurityUtils.validateSecureUrl, 'URL non sécurisée'),
-    
-  filename: z.string()
-    .max(255)
-    .refine(SecurityUtils.validateFilename, 'Nom de fichier invalide'),
-    
-  frenchPhone: z.string()
+
+  filename: z.string().max(255).refine(SecurityUtils.validateFilename, 'Nom de fichier invalide'),
+
+  frenchPhone: z
+    .string()
     .refine(SecurityUtils.validateFrenchPhone, 'Numéro de téléphone français invalide'),
-    
-  sanitizedHtml: z.string()
-    .transform(SecurityUtils.sanitizeHtml),
-    
-  secureToken: z.string()
+
+  sanitizedHtml: z.string().transform(SecurityUtils.sanitizeHtml),
+
+  secureToken: z
+    .string()
     .length(64, 'Token de longueur invalide')
-    .regex(/^[a-f0-9]+$/, 'Format de token invalide')
+    .regex(/^[a-f0-9]+$/, 'Format de token invalide'),
 }
 
 // ✅ INTERFACE POUR AUDIT DE SÉCURITÉ
@@ -346,7 +342,7 @@ export class SecurityAuditor {
   static async performFullAudit(): Promise<SecurityAuditReport> {
     const issues: SecurityAuditReport['issues'] = []
     const passed: string[] = []
-    
+
     // Vérification HTTPS
     if (typeof window !== 'undefined') {
       if (location.protocol === 'https:' || location.hostname === 'localhost') {
@@ -356,10 +352,10 @@ export class SecurityAuditor {
           severity: 'critical',
           category: 'Transport',
           description: 'Application non servie en HTTPS',
-          recommendation: 'Configurer HTTPS pour toutes les communications'
+          recommendation: 'Configurer HTTPS pour toutes les communications',
         })
       }
-      
+
       // Vérification CSP
       const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]')
 
@@ -370,26 +366,29 @@ export class SecurityAuditor {
           severity: 'high',
           category: 'XSS Protection',
           description: 'Content Security Policy manquant',
-          recommendation: 'Implémenter une CSP robuste'
+          recommendation: 'Implémenter une CSP robuste',
         })
       }
     }
-    
+
     const summary = {
-      critical: issues.filter(i => i.severity === 'critical').length,
-      high: issues.filter(i => i.severity === 'high').length,
-      medium: issues.filter(i => i.severity === 'medium').length,
-      low: issues.filter(i => i.severity === 'low').length
+      critical: issues.filter((i) => i.severity === 'critical').length,
+      high: issues.filter((i) => i.severity === 'high').length,
+      medium: issues.filter((i) => i.severity === 'medium').length,
+      low: issues.filter((i) => i.severity === 'low').length,
     }
-    
-    const score = Math.max(0, 100 - (summary.critical * 25) - (summary.high * 15) - (summary.medium * 10) - (summary.low * 5))
-    
+
+    const score = Math.max(
+      0,
+      100 - summary.critical * 25 - summary.high * 15 - summary.medium * 10 - summary.low * 5
+    )
+
     return {
       timestamp: new Date().toISOString(),
       score,
       issues,
       passed,
-      summary
+      summary,
     }
   }
 }

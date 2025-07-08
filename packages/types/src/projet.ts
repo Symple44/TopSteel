@@ -15,7 +15,7 @@ export enum ProjetStatut {
   EN_PAUSE = 'en_pause',
   TERMINE = 'termine',
   ANNULE = 'annule',
-  FACTURE = 'facture'
+  FACTURE = 'facture',
 }
 
 export enum ProjetType {
@@ -29,14 +29,14 @@ export enum ProjetType {
   COUVERTURE = 'COUVERTURE',
   CHARPENTE = 'CHARPENTE',
   PHOTOVOLTAIQUE = 'PHOTOVOLTAIQUE',
-  AUTRE = 'AUTRE'
+  AUTRE = 'AUTRE',
 }
 
 export enum ProjetPriorite {
   BASSE = 'BASSE',
   NORMALE = 'NORMALE',
   HAUTE = 'HAUTE',
-  URGENTE = 'URGENTE'
+  URGENTE = 'URGENTE',
 }
 
 // ===== INTERFACES EXISTANTES (inchangées) =====
@@ -85,25 +85,25 @@ export interface Projet extends BaseEntity {
 // ===== INTERFACES DE REQUÊTE (compatibles avec l'existant) =====
 
 export interface CreateProjetRequest {
-  nom: string;
-  description?: string;
-  clientId?: string;
-  budget?: number;
-  responsable?: string;
-  echeance?: Date;
-  priorite?: ProjetPriorite;
+  nom: string
+  description?: string
+  clientId?: string
+  budget?: number
+  responsable?: string
+  echeance?: Date
+  priorite?: ProjetPriorite
 }
 
 export interface UpdateProjetRequest {
-  nom?: string;
-  description?: string;
-  statut?: ProjetStatut;
-  budget?: number;
-  progression?: number;
-  responsable?: string;
-  echeance?: Date;
-  priorite?: ProjetPriorite;
-  commentaires?: string;
+  nom?: string
+  description?: string
+  statut?: ProjetStatut
+  budget?: number
+  progression?: number
+  responsable?: string
+  echeance?: Date
+  priorite?: ProjetPriorite
+  commentaires?: string
 }
 
 // ===== HELPERS ET UTILITAIRES (nouveaux) =====
@@ -134,21 +134,21 @@ export function isValidProjetPriorite(priorite: unknown): priorite is ProjetPrio
 /** Statuts indiquant un projet actif */
 export const STATUTS_ACTIFS: ProjetStatut[] = [
   ProjetStatut.EN_ATTENTE,
-  ProjetStatut.ACCEPTE, 
-  ProjetStatut.EN_COURS
+  ProjetStatut.ACCEPTE,
+  ProjetStatut.EN_COURS,
 ] as const
 
 /** Statuts indiquant un projet terminé */
 export const STATUTS_TERMINES: ProjetStatut[] = [
   ProjetStatut.TERMINE,
   ProjetStatut.FACTURE,
-  ProjetStatut.ANNULE
+  ProjetStatut.ANNULE,
 ] as const
 
 /** Priorités par ordre d'urgence */
 export const PRIORITES_ORDRE: ProjetPriorite[] = [
   ProjetPriorite.URGENTE,
   ProjetPriorite.HAUTE,
-  ProjetPriorite.NORMALE, 
-  ProjetPriorite.BASSE
+  ProjetPriorite.NORMALE,
+  ProjetPriorite.BASSE,
 ] as const

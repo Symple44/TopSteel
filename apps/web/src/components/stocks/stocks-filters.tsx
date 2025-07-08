@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 interface StocksFiltersProps {
   onFiltersChange?: (filters: StocksFilters) => void
@@ -26,7 +26,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     fournisseur: '',
     stockMin: '',
     stockMax: '',
-    statut: ''
+    statut: '',
   })
 
   const handleFilterChange = (key: keyof StocksFilters, value: string) => {
@@ -43,7 +43,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
       fournisseur: '',
       stockMin: '',
       stockMax: '',
-      statut: ''
+      statut: '',
     }
 
     setFilters(resetFilters)
@@ -60,7 +60,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           Réinitialiser
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="text-sm font-medium">Catégorie</label>
@@ -77,12 +77,14 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
             <option value="consommables">Consommables</option>
           </select>
         </div>
-        
+
         <div>
           <label className="text-sm font-medium">Emplacement</label>
           <select
             value={filters.emplacement}
-            onChange={(e) => handleFilterChange('emplacement', (e.target as HTMLSelectElement).value)}
+            onChange={(e) =>
+              handleFilterChange('emplacement', (e.target as HTMLSelectElement).value)
+            }
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les emplacements</option>
@@ -92,12 +94,14 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
             <option value="D">Zone D - Chutes</option>
           </select>
         </div>
-        
+
         <div>
           <label className="text-sm font-medium">Fournisseur</label>
           <select
             value={filters.fournisseur}
-            onChange={(e) => handleFilterChange('fournisseur', (e.target as HTMLSelectElement).value)}
+            onChange={(e) =>
+              handleFilterChange('fournisseur', (e.target as HTMLSelectElement).value)
+            }
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les fournisseurs</option>
@@ -108,7 +112,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           </select>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="text-sm font-medium">Stock minimum</label>
@@ -119,7 +123,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
             placeholder="0"
           />
         </div>
-        
+
         <div>
           <label className="text-sm font-medium">Stock maximum</label>
           <Input
@@ -129,7 +133,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
             placeholder="1000"
           />
         </div>
-        
+
         <div>
           <label className="text-sm font-medium">Statut</label>
           <select
@@ -148,10 +152,9 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
 
       {/* Affichage du nombre de filtres actifs */}
       <div className="text-sm text-muted-foreground">
-        {Object.values(filters).filter(Boolean).length > 0 
-          ? `${Object.values(filters).filter(Boolean).length} filtre(s) actif(s)` 
-          : 'Aucun filtre actif'
-        }
+        {Object.values(filters).filter(Boolean).length > 0
+          ? `${Object.values(filters).filter(Boolean).length} filtre(s) actif(s)`
+          : 'Aucun filtre actif'}
       </div>
     </div>
   )

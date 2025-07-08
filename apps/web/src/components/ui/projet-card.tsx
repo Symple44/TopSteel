@@ -1,12 +1,12 @@
 'use client'
 
+import type { Projet } from '@erp/types'
+import { Calendar, Euro, Eye, User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import type { Projet } from '@erp/types'
-import { Calendar, Euro, Eye, User } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 
 interface ProjetCardProps {
   projet: Projet
@@ -17,23 +17,35 @@ export function ProjetCard({ projet }: ProjetCardProps) {
 
   const getStatusVariant = (statut: string) => {
     switch (statut?.toLowerCase()) {
-      case 'en_cours': return 'default'
-      case 'termine': return 'default'
-      case 'en_attente': return 'secondary'
-      case 'annule': return 'destructive'
-      default: return 'outline'
+      case 'en_cours':
+        return 'default'
+      case 'termine':
+        return 'default'
+      case 'en_attente':
+        return 'secondary'
+      case 'annule':
+        return 'destructive'
+      default:
+        return 'outline'
     }
   }
 
   const getStatusLabel = (statut: string) => {
     switch (statut?.toLowerCase()) {
-      case 'en_cours': return 'En cours'
-      case 'termine': return 'Terminé'
-      case 'en_attente': return 'En attente'
-      case 'brouillon': return 'Brouillon'
-      case 'accepte': return 'Accepté'
-      case 'annule': return 'Annulé'
-      default: return statut || 'Non défini'
+      case 'en_cours':
+        return 'En cours'
+      case 'termine':
+        return 'Terminé'
+      case 'en_attente':
+        return 'En attente'
+      case 'brouillon':
+        return 'Brouillon'
+      case 'accepte':
+        return 'Accepté'
+      case 'annule':
+        return 'Annulé'
+      default:
+        return statut || 'Non défini'
     }
   }
 
@@ -46,17 +58,13 @@ export function ProjetCard({ projet }: ProjetCardProps) {
               {projet.reference || 'Projet sans référence'}
             </CardTitle>
             {projet.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {projet.description}
-              </p>
+              <p className="text-sm text-muted-foreground line-clamp-2">{projet.description}</p>
             )}
           </div>
-          <Badge variant={getStatusVariant(projet.statut)}>
-            {getStatusLabel(projet.statut)}
-          </Badge>
+          <Badge variant={getStatusVariant(projet.statut)}>{getStatusLabel(projet.statut)}</Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Informations principales */}
         <div className="space-y-2 text-sm">
@@ -66,19 +74,17 @@ export function ProjetCard({ projet }: ProjetCardProps) {
               <span>{projet.client.nom}</span>
             </div>
           )}
-          
+
           {projet.dateDebut && (
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span>{formatDate(projet.dateDebut)}</span>
               {projet.dateFin && (
-                <span className="text-muted-foreground">
-                  - {formatDate(projet.dateFin)}
-                </span>
+                <span className="text-muted-foreground">- {formatDate(projet.dateFin)}</span>
               )}
             </div>
           )}
-          
+
           {projet.montantHT && (
             <div className="flex items-center gap-2">
               <Euro className="h-4 w-4 text-muted-foreground" />
@@ -99,11 +105,15 @@ export function ProjetCard({ projet }: ProjetCardProps) {
           {/* Priorité */}
           {projet.priorite && (
             <div className="flex items-center gap-2">
-              <span className={`text-xs px-2 py-1 rounded ${
-                projet.priorite === 'URGENTE' ? 'bg-destructive text-destructive-foreground' :
-                projet.priorite === 'HAUTE' ? 'bg-warning text-warning-foreground' :
-                'bg-muted text-muted-foreground'
-              }`}>
+              <span
+                className={`text-xs px-2 py-1 rounded ${
+                  projet.priorite === 'URGENTE'
+                    ? 'bg-destructive text-destructive-foreground'
+                    : projet.priorite === 'HAUTE'
+                      ? 'bg-warning text-warning-foreground'
+                      : 'bg-muted text-muted-foreground'
+                }`}
+              >
                 {projet.priorite}
               </span>
             </div>
@@ -118,8 +128,8 @@ export function ProjetCard({ projet }: ProjetCardProps) {
               <span className="font-medium">{projet.avancement}%</span>
             </div>
             <div className="w-full bg-secondary rounded-full h-2">
-              <div 
-                className="bg-primary h-2 rounded-full transition-all duration-300" 
+              <div
+                className="bg-primary h-2 rounded-full transition-all duration-300"
                 style={{ width: `${Math.min(100, Math.max(0, projet.avancement))}%` }}
               />
             </div>

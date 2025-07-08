@@ -5,15 +5,10 @@
  * Fichier: apps/web/src/stores/auth.store.ts
  */
 
-import type {
-  BaseStoreActions,
-  BaseStoreState,
-  InitialState,
-  StoreCreator
-} from '@erp/types'; // ✅ IMPORT CORRECT depuis @erp/types au lieu de @/lib/store-utils
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
+import type { BaseStoreActions, BaseStoreState, InitialState, StoreCreator } from '@erp/types' // ✅ IMPORT CORRECT depuis @erp/types au lieu de @/lib/store-utils
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
 
 // ===== INTERFACES LOCALES =====
 
@@ -64,18 +59,18 @@ export interface AuthState extends BaseStoreState {
   user: User | null
   session: SessionInfo | null
   isAuthenticated: boolean
-  
+
   // Validation de session
   isSessionValid: boolean
   tokenRefreshInProgress: boolean
   sessionTimeLeft: number
-  
+
   // Sécurité et monitoring
   loginHistory: LoginAttempt[]
   failedAttempts: number
   isLocked: boolean
   lockoutEndTime: number | null
-  
+
   // État UI
   showWelcome: boolean
   lastActivity: number
@@ -88,18 +83,18 @@ export interface AuthActions extends BaseStoreActions {
   login: (credentials: LoginCredentials) => Promise<boolean>
   logout: () => Promise<void>
   refreshToken: () => Promise<boolean>
-  
+
   // Gestion de session
   checkSession: () => boolean
   extendSession: () => void
-  
+
   // Gestion utilisateur
   setUser: (user: User | null) => void
-  
+
   // Actions de sécurité
   recordLoginAttempt: (attempt: Omit<LoginAttempt, 'timestamp'>) => void
   clearFailedAttempts: () => void
-  
+
   // Utilitaires
   clearAuthData: () => void
   updateActivity: () => void
@@ -122,7 +117,7 @@ const initialAuthState: InitialState<AuthState> = {
   loading: false,
   error: null,
   lastUpdate: 0,
-  
+
   // Utilisateur et session
   user: null,
   session: null,
@@ -130,16 +125,16 @@ const initialAuthState: InitialState<AuthState> = {
   isSessionValid: false,
   tokenRefreshInProgress: false,
   sessionTimeLeft: 0,
-  
+
   // Sécurité
   loginHistory: [],
   failedAttempts: 0,
   isLocked: false,
   lockoutEndTime: null,
-  
+
   // État UI
   showWelcome: false,
-  lastActivity: Date.now()
+  lastActivity: Date.now(),
 }
 
 // ===== SERVICE D'AUTHENTIFICATION SIMULÉ =====
@@ -155,8 +150,8 @@ class AuthService {
         email: 'admin@topsteel.fr',
         role: 'admin' as const,
         permissions: ['*'],
-        preferences: { theme: 'dark' as const, notifications: true }
-      }
+        preferences: { theme: 'dark' as const, notifications: true },
+      },
     },
     {
       email: 'manager@topsteel.fr',
@@ -168,55 +163,56 @@ class AuthService {
         email: 'manager@topsteel.fr',
         role: 'manager' as const,
         permissions: ['projets:read', 'projets:write', 'stocks:read'],
-        preferences: { theme: 'light' as const, notifications: true }
-      }
-    }
+        preferences: { theme: 'light' as const, notifications: true },
+      },
+    },
   ]
 
   static async login(credentials: LoginCredentials): Promise<{ user: User; session: SessionInfo }> {
-    await new Promise(resolve => setTimeout(resolve, 800))
-    
-    const mockUser = this.MOCK_USERS.find(u => 
-      u.email === credentials.email && u.password === credentials.password
+    await new Promise((resolve) => setTimeout(resolve, 800))
+
+    const mockUser = AuthService.MOCK_USERS.find(
+      (u) => u.email === credentials.email && u.password === credentials.password
     )
-    
+
     if (!mockUser) {
       throw new Error('Identifiants invalides')
     }
-    
+
     const session: SessionInfo = {
       token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
       refreshToken: `refresh_${Date.now()}_${Math.random().toString(36)}`,
-      expiresAt: Date.now() + (credentials.rememberMe ? 
-        30 * 24 * 60 * 60 * 1000 : AUTH_CONFIG.sessionTimeout),
+      expiresAt:
+        Date.now() +
+        (credentials.rememberMe ? 30 * 24 * 60 * 60 * 1000 : AUTH_CONFIG.sessionTimeout),
       issuedAt: Date.now(),
       ipAddress: '127.0.0.1',
-      userAgent: navigator?.userAgent
+      userAgent: navigator?.userAgent,
     }
-    
+
     return {
       user: { ...mockUser.user, lastLogin: Date.now() },
-      session
+      session,
     }
   }
 
   static async refreshToken(refreshToken: string): Promise<SessionInfo> {
-    await new Promise(resolve => setTimeout(resolve, 300))
-    
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     if (!refreshToken.startsWith('refresh_')) {
       throw new Error('Refresh token invalide')
     }
-    
+
     return {
       token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
       refreshToken,
       expiresAt: Date.now() + AUTH_CONFIG.sessionTimeout,
-      issuedAt: Date.now()
+      issuedAt: Date.now(),
     }
   }
 
   static async logout(): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 200))
+    await new Promise((resolve) => setTimeout(resolve, 200))
   }
 }
 
@@ -259,16 +255,16 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
       })
 
       const state = get()
-      
+
       if (AuthUtils.isAccountLocked(state)) {
         const timeLeft = Math.ceil((state.lockoutEndTime! - Date.now()) / 1000 / 60)
 
         throw new Error(`Compte verrouillé. Réessayez dans ${timeLeft} minutes.`)
       }
-      
+
       try {
         const { user, session } = await AuthService.login(credentials)
-        
+
         set((state) => {
           state.user = user
           state.session = session
@@ -282,41 +278,40 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
           state.lastActivity = Date.now()
           state.loading = false
         })
-        
+
         get().recordLoginAttempt({
           email: credentials.email,
-          success: true
+          success: true,
         })
-        
+
         return true
-        
       } catch (error) {
         get().recordLoginAttempt({
           email: credentials.email,
           success: false,
-          failureReason: error instanceof Error ? error.message : 'Erreur inconnue'
+          failureReason: error instanceof Error ? error.message : 'Erreur inconnue',
         })
-        
+
         set((state) => {
           state.failedAttempts += 1
-          
+
           if (state.failedAttempts >= AUTH_CONFIG.maxFailedAttempts) {
             state.isLocked = true
             state.lockoutEndTime = Date.now() + AUTH_CONFIG.lockoutDuration
           }
         })
-        
+
         throw error
       }
     } catch (error) {
       const errorObj = error instanceof Error ? error : new Error(String(error))
-      
+
       set((state) => {
         state.loading = false
         state.error = errorObj.message
         state.lastUpdate = Date.now()
       })
-      
+
       return false
     }
   },
@@ -338,12 +333,12 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         Object.assign(state, {
           ...initialAuthState,
           lastUpdate: Date.now(),
-          loading: false
+          loading: false,
         })
       })
     } catch (error) {
       const errorObj = error instanceof Error ? error : new Error(String(error))
-      
+
       set((state) => {
         state.loading = false
         state.error = errorObj.message
@@ -359,20 +354,20 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
       })
 
       const state = get()
-      
+
       if (!state.session?.refreshToken) {
         throw new Error('Aucun refresh token disponible')
       }
-      
+
       const newSession = await AuthService.refreshToken(state.session.refreshToken)
-      
+
       set((state) => {
         state.session = newSession
         state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(newSession)
         state.lastActivity = Date.now()
         state.tokenRefreshInProgress = false
       })
-      
+
       return true
     } catch (error) {
       set((state) => {
@@ -383,7 +378,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         state.isSessionValid = false
         state.error = error instanceof Error ? error.message : String(error)
       })
-      
+
       return false
     }
   },
@@ -391,19 +386,19 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
   checkSession: () => {
     const state = get()
     const isValid = !AuthUtils.isSessionExpired(state.session) && !!state.user
-    
+
     set((state) => {
       state.isSessionValid = isValid
       state.isAuthenticated = isValid
       state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(state.session)
-      
+
       if (!isValid) {
         state.user = null
         state.session = null
       }
       state.lastUpdate = Date.now()
     })
-    
+
     return isValid
   },
 
@@ -430,11 +425,11 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
     set((state) => {
       const loginAttempt: LoginAttempt = {
         ...attempt,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
-      
+
       state.loginHistory.unshift(loginAttempt)
-      
+
       if (state.loginHistory.length > 50) {
         state.loginHistory = state.loginHistory.slice(0, 50)
       }
@@ -455,7 +450,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
     set((state) => {
       Object.assign(state, {
         ...initialAuthState,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       })
     })
   },
@@ -503,10 +498,10 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         ...initialAuthState,
         loading: false,
         error: null,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       })
     })
-  }
+  },
 })
 
 // ===== CRÉATION DU STORE =====
@@ -515,7 +510,7 @@ export const useAuthStore = create<AuthStore>()(
     devtools(
       (set, get) => ({
         ...initialAuthState,
-        ...createAuthActions(set, get)
+        ...createAuthActions(set, get),
       }),
       { name: 'auth-store' }
     )
@@ -523,30 +518,30 @@ export const useAuthStore = create<AuthStore>()(
 )
 
 // ===== HOOKS SÉLECTEURS =====
-export const useAuthUser = () => useAuthStore(state => state.user)
-export const useAuthIsAuthenticated = () => useAuthStore(state => state.isAuthenticated)
-export const useAuthLoading = () => useAuthStore(state => state.loading)
-export const useAuthError = () => useAuthStore(state => state.error)
-export const useAuthUserDisplayName = () => useAuthStore(state => 
-  state.user ? `${state.user.prenom} ${state.user.nom}` : null
-)
-export const useAuthSessionTimeLeft = () => useAuthStore(state => state.sessionTimeLeft)
-export const useAuthPermissions = () => useAuthStore(state => state.user?.permissions || [])
-export const useAuthRole = () => useAuthStore(state => state.user?.role)
-export const useAuthCanAccess = (permission: string) => useAuthStore(state => {
-  if (!state.user) return false
+export const useAuthUser = () => useAuthStore((state) => state.user)
+export const useAuthIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated)
+export const useAuthLoading = () => useAuthStore((state) => state.loading)
+export const useAuthError = () => useAuthStore((state) => state.error)
+export const useAuthUserDisplayName = () =>
+  useAuthStore((state) => (state.user ? `${state.user.prenom} ${state.user.nom}` : null))
+export const useAuthSessionTimeLeft = () => useAuthStore((state) => state.sessionTimeLeft)
+export const useAuthPermissions = () => useAuthStore((state) => state.user?.permissions || [])
+export const useAuthRole = () => useAuthStore((state) => state.user?.role)
+export const useAuthCanAccess = (permission: string) =>
+  useAuthStore((state) => {
+    if (!state.user) return false
 
-  return state.user.permissions.includes('*') || state.user.permissions.includes(permission)
-})
+    return state.user.permissions.includes('*') || state.user.permissions.includes(permission)
+  })
 
 // ===== SESSION AUTO-REFRESH =====
 if (typeof window !== 'undefined') {
   setInterval(() => {
     const state = useAuthStore.getState()
-    
+
     if (state.isAuthenticated) {
       state.checkSession()
-      
+
       if (AuthUtils.shouldRefreshToken(state.session) && !state.tokenRefreshInProgress) {
         state.refreshToken().catch((error) => {
           console.error('Erreur lors du refresh automatique:', error)
@@ -560,11 +555,11 @@ if (typeof window !== 'undefined') {
   let lastActivityUpdate = 0
   const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart']
 
-  
   const handleActivity = () => {
     const now = Date.now()
 
-    if (now - lastActivityUpdate >= 30000) { // Max 1 fois par 30 secondes
+    if (now - lastActivityUpdate >= 30000) {
+      // Max 1 fois par 30 secondes
       lastActivityUpdate = now
       const state = useAuthStore.getState()
 
@@ -574,7 +569,7 @@ if (typeof window !== 'undefined') {
     }
   }
 
-  activityEvents.forEach(event => {
+  activityEvents.forEach((event) => {
     document.addEventListener(event, handleActivity, true)
   })
 }

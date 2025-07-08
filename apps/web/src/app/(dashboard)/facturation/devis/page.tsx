@@ -1,13 +1,13 @@
 'use client'
 
+import { Clock, FileText, Filter, Plus, Search, Send } from 'lucide-react'
+import { useState } from 'react'
 import { CreateDevisDialog } from '@/components/facturation/create-devis-dialog'
 import { DevisFilters } from '@/components/facturation/devis-filters'
 import { DevisTable } from '@/components/facturation/devis-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Clock, FileText, Filter, Plus, Search, Send } from 'lucide-react'
-import { useState } from 'react'
 
 export default function DevisPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -19,15 +19,10 @@ export default function DevisPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Gestion des Devis</h1>
-          <p className="text-muted-foreground">
-            Création, suivi et conversion des devis
-          </p>
+          <p className="text-muted-foreground">Création, suivi et conversion des devis</p>
         </div>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowFilters(!showFilters)}
-          >
+          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
@@ -97,10 +92,7 @@ export default function DevisPage() {
       <div className="flex gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher par référence, client, projet..."
-            className="pl-10"
-          />
+          <Input placeholder="Rechercher par référence, client, projet..." className="pl-10" />
         </div>
         <Button variant="outline">
           <Send className="h-4 w-4 mr-2" />
@@ -112,10 +104,7 @@ export default function DevisPage() {
       <DevisTable />
 
       {/* Modal */}
-      <CreateDevisDialog 
-        open={showCreateModal} 
-        onOpenChange={setShowCreateModal} 
-      />
+      <CreateDevisDialog open={showCreateModal} onOpenChange={setShowCreateModal} />
     </div>
   )
 }

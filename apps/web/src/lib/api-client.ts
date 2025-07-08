@@ -1,6 +1,6 @@
 /**
  * ✅ API CLIENT ENTERPRISE - VERSION SÉCURISÉE ET CORRIGÉE
- * 
+ *
  * Fonctionnalités:
  * - Retry automatique avec backoff
  * - Cache intelligent multi-niveaux
@@ -48,19 +48,19 @@ interface APIMetrics {
  */
 function createRateLimiter(maxRequests: number, windowMs: number) {
   const requests: number[] = []
-  
+
   return (operation: () => void) => () => {
     const now = Date.now()
-    
+
     // Nettoyer les requêtes anciennes
     while (requests.length > 0 && requests[0] < now - windowMs) {
       requests.shift()
     }
-    
+
     if (requests.length >= maxRequests) {
       throw new Error('Rate limit exceeded')
     }
-    
+
     requests.push(now)
 
     return operation()
@@ -120,7 +120,7 @@ export class APIClient {
     requests: 0,
     errors: 0,
     cacheHits: 0,
-    avgResponseTime: 0
+    avgResponseTime: 0,
   }
 
   constructor(baseURL: string) {
@@ -132,15 +132,18 @@ export class APIClient {
    * Nettoyage automatique du cache
    */
   private startCacheCleanup(): void {
-    setInterval(() => {
-      const now = Date.now()
+    setInterval(
+      () => {
+        const now = Date.now()
 
-      for (const [key, entry] of this.cache.entries()) {
-        if (now - entry.timestamp > entry.ttl) {
-          this.cache.delete(key)
+        for (const [key, entry] of this.cache.entries()) {
+          if (now - entry.timestamp > entry.ttl) {
+            this.cache.delete(key)
+          }
         }
-      }
-    }, 5 * 60 * 1000) // Nettoyage toutes les 5 minutes
+      },
+      5 * 60 * 1000
+    ) // Nettoyage toutes les 5 minutes
   }
 
   /**
@@ -171,7 +174,7 @@ export class APIClient {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     })
   }
 
@@ -192,7 +195,7 @@ export class APIClient {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
-      ...config.headers
+      ...config.headers,
     }
 
     // Authentification automatique
@@ -212,12 +215,12 @@ export class APIClient {
    */
   private getAuthToken(): string | null {
     if (typeof window === 'undefined') return null
-    
+
     try {
       const authData = localStorage.getItem('topsteel-tokens')
 
       if (!authData) return null
-      
+
       const { accessToken } = JSON.parse(authData)
 
       return accessToken || null
@@ -231,20 +234,20 @@ export class APIClient {
    */
   private handleError(error: any, endpoint: string): never {
     this.metrics.errors++
-    
+
     const errorDetails: APIErrorDetails = {
       code: error.code || 'UNKNOWN_ERROR',
       message: error.message || 'Une erreur inconnue est survenue',
       details: error.details || null,
       timestamp: Date.now(),
-      requestId: error.requestId || `req_${Date.now()}`
+      requestId: error.requestId || `req_${Date.now()}`,
     }
 
     // Log simple (sans dépendance externe)
     console.error(`🔴 API Error [${endpoint}]:`, {
       code: errorDetails.code,
       message: errorDetails.message,
-      timestamp: new Date(errorDetails.timestamp).toISOString()
+      timestamp: new Date(errorDetails.timestamp).toISOString(),
     })
 
     throw new APIError(errorDetails)
@@ -253,20 +256,17 @@ export class APIClient {
   /**
    * Retry avec backoff exponentiel
    */
-  private async executeWithRetry<T>(
-    operation: () => Promise<T>,
-    attempts: number = 3
-  ): Promise<T> {
+  private async executeWithRetry<T>(operation: () => Promise<T>, attempts: number = 3): Promise<T> {
     for (let i = 0; i < attempts; i++) {
       try {
         return await operation()
       } catch (error) {
         if (i === attempts - 1) throw error
-        
-        // Backoff exponentiel
-        const delay = Math.min(1000 * Math.pow(2, i), 10000)
 
-        await new Promise(resolve => setTimeout(resolve, delay))
+        // Backoff exponentiel
+        const delay = Math.min(1000 * 2 ** i, 10000)
+
+        await new Promise((resolve) => setTimeout(resolve, delay))
       }
     }
     throw new Error('Max retry attempts reached')
@@ -283,7 +283,7 @@ export class APIClient {
       operation(),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Request timeout')), timeout)
-      )
+      ),
     ])
   }
 
@@ -310,30 +310,30 @@ export class APIClient {
       // Préparation de la requête
       const url = `${this.baseURL}${endpoint}`
       const headers = this.buildHeaders(config)
-      
+
       const fetchConfig: RequestInit = {
         method: config.method || 'GET',
         headers,
-        ...(config.body && { body: JSON.stringify(config.body) })
+        ...(config.body && { body: JSON.stringify(config.body) }),
       }
 
       // Exécution avec retry et timeout
       const operation = async () => {
         const response = await fetch(url, fetchConfig)
-        
+
         if (!response.ok) {
           throw {
             code: `HTTP_${response.status}`,
             message: response.statusText,
-            details: { status: response.status, statusText: response.statusText }
+            details: { status: response.status, statusText: response.statusText },
           }
         }
-        
+
         return response.json()
       }
 
       const result = await this.executeWithTimeout(
-        config.retry !== false 
+        config.retry !== false
           ? () => this.executeWithRetry(operation, config.retryAttempts)
           : operation,
         config.timeout
@@ -353,7 +353,6 @@ export class APIClient {
       this.metrics.avgResponseTime = (this.metrics.avgResponseTime + responseTime) / 2
 
       return result
-
     } catch (error) {
       this.handleError(error, endpoint)
     }
@@ -370,11 +369,11 @@ export class APIClient {
    * Requête POST
    */
   async post<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
-    return this.request<T>(endpoint, { 
-      ...config, 
-      method: 'POST', 
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'POST',
       body: data,
-      cache: false // POST jamais en cache
+      cache: false, // POST jamais en cache
     })
   }
 
@@ -382,11 +381,11 @@ export class APIClient {
    * Requête PUT
    */
   async put<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
-    return this.request<T>(endpoint, { 
-      ...config, 
-      method: 'PUT', 
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'PUT',
       body: data,
-      cache: false
+      cache: false,
     })
   }
 
@@ -394,10 +393,10 @@ export class APIClient {
    * Requête DELETE
    */
   async delete<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
-    return this.request<T>(endpoint, { 
-      ...config, 
+    return this.request<T>(endpoint, {
+      ...config,
       method: 'DELETE',
-      cache: false
+      cache: false,
     })
   }
 
@@ -405,11 +404,11 @@ export class APIClient {
    * Requête PATCH
    */
   async patch<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
-    return this.request<T>(endpoint, { 
-      ...config, 
-      method: 'PATCH', 
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'PATCH',
       body: data,
-      cache: false
+      cache: false,
     })
   }
 
@@ -422,8 +421,8 @@ export class APIClient {
       method: 'POST' as const,
       headers: {
         // Ne pas définir Content-Type pour FormData (le navigateur le fera)
-        ...config.headers
-      }
+        ...config.headers,
+      },
     }
 
     // Supprimer Content-Type pour les uploads
@@ -433,20 +432,20 @@ export class APIClient {
 
     const url = `${this.baseURL}${endpoint}`
     const headers = this.buildHeaders(uploadConfig)
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: Object.fromEntries(
         Object.entries(headers).filter(([key]) => key !== 'Content-Type')
       ),
-      body: formData
+      body: formData,
     })
 
     if (!response.ok) {
       throw {
         code: `HTTP_${response.status}`,
         message: response.statusText,
-        details: { status: response.status, statusText: response.statusText }
+        details: { status: response.status, statusText: response.statusText },
       }
     }
 
@@ -485,7 +484,7 @@ export class APIClient {
       requests: 0,
       errors: 0,
       cacheHits: 0,
-      avgResponseTime: 0
+      avgResponseTime: 0,
     }
   }
 }

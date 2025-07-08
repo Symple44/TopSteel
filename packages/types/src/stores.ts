@@ -11,7 +11,7 @@ import type {
   StoreProjetFilters,
   StoreProjetStats,
   StoreSyncState,
-  StoreUser
+  StoreUser,
 } from './store-entities'
 
 // ===== TYPES DE BASE POUR STORES =====
@@ -110,23 +110,23 @@ export interface AppState extends BaseStoreState {
   // Configuration UI
   theme: 'light' | 'dark' | 'auto'
   ui: UIState
-  
+
   // Données utilisateur
   user: StoreUser | null
   session: SessionState | null
   permissions: string[]
-  
+
   // Données métier
   projets: StoreProjet[]
   selectedProjet: StoreProjet | null
   notifications: NotificationItem[]
-  
+
   // Filtres et recherche
   filters: FilterState
-  
+
   // Métriques et performance
   metrics: MetricsState
-  
+
   // Synchronisation
   sync: SyncState
 }
@@ -198,14 +198,14 @@ export interface AppSyncActions {
 /**
  * Toutes les actions de l'app store
  */
-export interface AppStoreActions extends 
-  BaseStoreActions,
-  AppUIActions,
-  AppUserActions,
-  AppDataActions,
-  AppNotificationActions,
-  AppFilterActions,
-  AppSyncActions {}
+export interface AppStoreActions
+  extends BaseStoreActions,
+    AppUIActions,
+    AppUserActions,
+    AppDataActions,
+    AppNotificationActions,
+    AppFilterActions,
+    AppSyncActions {}
 
 /**
  * Store complet de l'application
@@ -249,25 +249,27 @@ export interface ProjetState extends BaseStoreState {
 export interface ProjetStoreActions extends BaseStoreActions {
   // Actions de données
   fetchProjets: (options?: { force?: boolean; filters?: ProjetFilters }) => Promise<StoreProjet[]>
-  createProjet: (projet: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>) => Promise<StoreProjet | null>
+  createProjet: (
+    projet: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>
+  ) => Promise<StoreProjet | null>
   updateProjet: (id: string, updates: Partial<StoreProjet>) => Promise<StoreProjet | null>
   deleteProjet: (id: string) => Promise<boolean>
   duplicateProjet: (id: string) => Promise<StoreProjet | null>
-  
+
   // Actions de sélection
   setSelectedProjet: (projet: StoreProjet | null) => void
   selectProjetById: (id: string) => void
-  
+
   // Actions de filtrage
   setFilters: (filters: Partial<ProjetFilters>) => void
   clearFilters: () => void
   setSearchTerm: (term: string) => void
-  
+
   // Actions de tri et pagination
   setSorting: (sortBy: keyof StoreProjet, sortOrder?: 'asc' | 'desc') => void
   setPage: (page: number) => void
   setPageSize: (size: number) => void
-  
+
   // Actions de cache
   invalidateCache: () => void
   refreshStats: () => Promise<void>
@@ -283,14 +285,16 @@ export type ProjetStore = ProjetState & ProjetStoreActions
 /**
  * Extracteur du state d'un store
  */
-export type ExtractState<T> = T extends infer U & BaseStoreActions ? 
-  Omit<U, keyof BaseStoreActions> : never
+export type ExtractState<T> = T extends infer U & BaseStoreActions
+  ? Omit<U, keyof BaseStoreActions>
+  : never
 
 /**
  * Extracteur des actions d'un store
  */
-export type ExtractActions<T> = T extends infer U & BaseStoreState ? 
-  Omit<U, keyof BaseStoreState> : never
+export type ExtractActions<T> = T extends infer U & BaseStoreState
+  ? Omit<U, keyof BaseStoreState>
+  : never
 
 /**
  * Type pour l'état initial d'un store
@@ -300,5 +304,7 @@ export type InitialState<T extends BaseStoreState> = Omit<T, keyof BaseStoreActi
 /**
  * Type pour la définition d'un store
  */
-export type StoreDefinition<TState extends BaseStoreState, TActions> = 
-  StoreCreator<TState, TActions>
+export type StoreDefinition<TState extends BaseStoreState, TActions> = StoreCreator<
+  TState,
+  TActions
+>

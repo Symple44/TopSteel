@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 interface SwitchProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
@@ -10,11 +10,11 @@ interface SwitchProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Switch = React.forwardRef<HTMLDivElement, SwitchProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
+  ({ className = '', children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
     }
-    
+
     return (
       <div className={className} ref={ref} {...props}>
         {children}
@@ -23,11 +23,11 @@ export const Switch = React.forwardRef<HTMLDivElement, SwitchProps>(
   }
 )
 
-Switch.displayName = "Switch"
+Switch.displayName = 'Switch'
 
 // Export des sous-composants courants si nécessaire
 export const SwitchContent = Switch
-export const SwitchTrigger = Switch  
+export const SwitchTrigger = Switch
 export const SwitchItem = Switch
 export const SwitchValue = Switch
 export const SwitchHeader = Switch

@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import type { Repository } from "typeorm";
+import type { PaginationResultDto } from "../../common/dto/base.dto";
+import type { CreateDevisDto } from "./dto/create-devis.dto";
+import type { DevisQueryDto } from "./dto/devis-query.dto";
+import type { UpdateDevisDto } from "./dto/update-devis.dto";
 import { Devis } from "./entities/devis.entity";
-import { CreateDevisDto } from "./dto/create-devis.dto";
-import { UpdateDevisDto } from "./dto/update-devis.dto";
-import { DevisQueryDto } from "./dto/devis-query.dto";
-import { PaginationResultDto } from "../../common/dto/base.dto";
 
 @Injectable()
 export class DevisService {

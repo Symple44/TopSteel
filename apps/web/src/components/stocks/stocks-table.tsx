@@ -1,8 +1,8 @@
 'use client'
 
+import { Edit, Eye, MoreHorizontal, Package, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Edit, Eye, MoreHorizontal, Package, Trash2 } from 'lucide-react'
 
 export function StocksTable() {
   const stocks = [
@@ -17,7 +17,7 @@ export function StocksTable() {
       prixUnitaire: 2.85,
       valeur: 128.25,
       statut: 'normal' as const,
-      fournisseur: 'ArcelorMittal'
+      fournisseur: 'ArcelorMittal',
     },
     {
       id: 2,
@@ -27,10 +27,10 @@ export function StocksTable() {
       unite: 'ml',
       seuil: 15,
       emplacement: 'B2-C1-D4',
-      prixUnitaire: 45.20,
-      valeur: 361.60,
+      prixUnitaire: 45.2,
+      valeur: 361.6,
       statut: 'bas' as const,
-      fournisseur: 'Aperam'
+      fournisseur: 'Aperam',
     },
     {
       id: 3,
@@ -40,10 +40,10 @@ export function StocksTable() {
       unite: 'ml',
       seuil: 12,
       emplacement: 'C1-D2-E1',
-      prixUnitaire: 12.50,
-      valeur: 25.00,
+      prixUnitaire: 12.5,
+      valeur: 25.0,
       statut: 'critique' as const,
-      fournisseur: 'Local Alu'
+      fournisseur: 'Local Alu',
     },
     {
       id: 4,
@@ -53,11 +53,11 @@ export function StocksTable() {
       unite: 'ml',
       seuil: 50,
       emplacement: 'A2-B1-C2',
-      prixUnitaire: 15.80,
-      valeur: 1975.00,
+      prixUnitaire: 15.8,
+      valeur: 1975.0,
       statut: 'normal' as const,
-      fournisseur: 'ArcelorMittal'
-    }
+      fournisseur: 'ArcelorMittal',
+    },
   ]
 
   const getStatutBadge = (statut: string) => {
@@ -104,11 +104,15 @@ export function StocksTable() {
                 <td className="p-4">
                   <div className="max-w-[300px]">
                     <div className="font-medium truncate">{stock.designation}</div>
-                    <div className="text-xs text-muted-foreground">Seuil: {stock.seuil} {stock.unite}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Seuil: {stock.seuil} {stock.unite}
+                    </div>
                   </div>
                 </td>
                 <td className="p-4 text-right">
-                  <div className={`font-medium ${stock.statut === 'critique' ? 'text-red-600' : stock.statut === 'bas' ? 'text-orange-600' : ''}`}>
+                  <div
+                    className={`font-medium ${stock.statut === 'critique' ? 'text-red-600' : stock.statut === 'bas' ? 'text-orange-600' : ''}`}
+                  >
                     {stock.quantite} {stock.unite}
                   </div>
                 </td>
@@ -118,12 +122,8 @@ export function StocksTable() {
                 <td className="p-4 text-right font-mono text-sm">
                   €{stock.prixUnitaire.toFixed(2)}
                 </td>
-                <td className="p-4 text-right font-medium">
-                  €{stock.valeur.toFixed(2)}
-                </td>
-                <td className="p-4">
-                  {getStatutBadge(stock.statut)}
-                </td>
+                <td className="p-4 text-right font-medium">€{stock.valeur.toFixed(2)}</td>
+                <td className="p-4">{getStatutBadge(stock.statut)}</td>
                 <td className="p-4">
                   <div className="flex items-center justify-end gap-1">
                     <Button variant="ghost" size="icon">
@@ -142,7 +142,7 @@ export function StocksTable() {
           </tbody>
         </table>
       </div>
-      
+
       {stocks.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />

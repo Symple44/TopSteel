@@ -23,10 +23,10 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "../users/entities/user.entity";
-import { CreateMaintenanceDto } from "./dto/create-maintenance.dto";
-import { MaintenanceQueryDto } from "./dto/maintenance-query.dto";
-import { UpdateMaintenanceDto } from "./dto/update-maintenance.dto";
-import { MaintenanceService } from "./maintenance.service";
+import type { CreateMaintenanceDto } from "./dto/create-maintenance.dto";
+import type { MaintenanceQueryDto } from "./dto/maintenance-query.dto";
+import type { UpdateMaintenanceDto } from "./dto/update-maintenance.dto";
+import type { MaintenanceService } from "./maintenance.service";
 
 @Controller("maintenance")
 @ApiTags("⚙️ Maintenance")

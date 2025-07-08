@@ -1,18 +1,5 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
 import {
   Calculator,
@@ -24,9 +11,22 @@ import {
   FileText,
   Plus,
   Send,
-  X
+  X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { formatCurrency, formatDate } from '@/lib/utils'
 
 interface ProjetDevisTabProps {
   projet: Projet
@@ -46,10 +46,10 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       statut: 'ENVOYE',
       montantHT: projet.montantHT || 0,
       montantTTC: projet.montantTTC || 0,
-      accepte: false
+      accepte: false,
     },
     {
-      id: '2', 
+      id: '2',
       numero: 'DEV-2025-001',
       version: '1.1',
       dateCreation: new Date('2025-01-20'),
@@ -57,8 +57,8 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       statut: 'ACCEPTE',
       montantHT: (projet.montantHT || 0) * 1.1,
       montantTTC: (projet.montantTTC || 0) * 1.1,
-      accepte: true
-    }
+      accepte: true,
+    },
   ]
 
   const getStatutBadge = (statut: string) => {
@@ -68,7 +68,11 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       case 'ENVOYE':
         return <Badge variant="outline">Envoyé</Badge>
       case 'ACCEPTE':
-        return <Badge variant="default" className="bg-green-500">Accepté</Badge>
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Accepté
+          </Badge>
+        )
       case 'REFUSE':
         return <Badge variant="destructive">Refusé</Badge>
       case 'EXPIRE':
@@ -78,7 +82,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
     }
   }
 
-  const devisAccepte = devis.find(d => d.accepte)
+  const devisAccepte = devis.find((d) => d.accepte)
   const dernierDevis = devis[devis.length - 1]
 
   return (
@@ -141,9 +145,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Actions</CardTitle>
-              <CardDescription>
-                Gestion des devis pour ce projet
-              </CardDescription>
+              <CardDescription>Gestion des devis pour ce projet</CardDescription>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
@@ -163,9 +165,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
       <Card>
         <CardHeader>
           <CardTitle>Historique des devis</CardTitle>
-          <CardDescription>
-            Toutes les versions de devis pour ce projet
-          </CardDescription>
+          <CardDescription>Toutes les versions de devis pour ce projet</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -191,33 +191,21 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                   <TableCell>{getStatutBadge(devisItem.statut)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-1">
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="sm"
                         onClick={() => setSelectedDevis(devisItem.id)}
                         title="Voir les détails"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        title="Télécharger PDF"
-                      >
+                      <Button variant="ghost" size="sm" title="Télécharger PDF">
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        title="Envoyer par email"
-                      >
+                      <Button variant="ghost" size="sm" title="Envoyer par email">
                         <Send className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        title="Modifier"
-                      >
+                      <Button variant="ghost" size="sm" title="Modifier">
                         <Edit className="h-4 w-4" />
                       </Button>
                     </div>
@@ -236,15 +224,9 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Détails du devis</CardTitle>
-                <CardDescription>
-                  Devis {selectedDevis} - Version actuelle
-                </CardDescription>
+                <CardDescription>Devis {selectedDevis} - Version actuelle</CardDescription>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setSelectedDevis(null)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setSelectedDevis(null)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -256,43 +238,63 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Numéro:</span>
-                    <span>{devis.find(d => d.id === selectedDevis)?.numero}</span>
+                    <span>{devis.find((d) => d.id === selectedDevis)?.numero}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Version:</span>
-                    <span>{devis.find(d => d.id === selectedDevis)?.version}</span>
+                    <span>{devis.find((d) => d.id === selectedDevis)?.version}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date création:</span>
-                    <span>{devis.find(d => d.id === selectedDevis)?.dateCreation ? formatDate(devis.find(d => d.id === selectedDevis)!.dateCreation) : '—'}</span>
+                    <span>
+                      {devis.find((d) => d.id === selectedDevis)?.dateCreation
+                        ? formatDate(devis.find((d) => d.id === selectedDevis)!.dateCreation)
+                        : '—'}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Validité:</span>
-                    <span>{devis.find(d => d.id === selectedDevis)?.dateValidite ? formatDate(devis.find(d => d.id === selectedDevis)!.dateValidite) : '—'}</span>
+                    <span>
+                      {devis.find((d) => d.id === selectedDevis)?.dateValidite
+                        ? formatDate(devis.find((d) => d.id === selectedDevis)!.dateValidite)
+                        : '—'}
+                    </span>
                   </div>
                 </div>
               </div>
-              
+
               <div>
                 <h4 className="font-medium mb-3">Montants</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Montant HT:</span>
-                    <span className="font-medium">{devis.find(d => d.id === selectedDevis)?.montantHT ? formatCurrency(devis.find(d => d.id === selectedDevis)!.montantHT) : '—'}</span>
+                    <span className="font-medium">
+                      {devis.find((d) => d.id === selectedDevis)?.montantHT
+                        ? formatCurrency(devis.find((d) => d.id === selectedDevis)!.montantHT)
+                        : '—'}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Montant TTC:</span>
-                    <span className="font-medium">{devis.find(d => d.id === selectedDevis)?.montantTTC ? formatCurrency(devis.find(d => d.id === selectedDevis)!.montantTTC) : '—'}</span>
+                    <span className="font-medium">
+                      {devis.find((d) => d.id === selectedDevis)?.montantTTC
+                        ? formatCurrency(devis.find((d) => d.id === selectedDevis)!.montantTTC)
+                        : '—'}
+                    </span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Statut:</span>
-                    <span>{devis.find(d => d.id === selectedDevis)?.statut ? getStatutBadge(devis.find(d => d.id === selectedDevis)!.statut) : '—'}</span>
+                    <span>
+                      {devis.find((d) => d.id === selectedDevis)?.statut
+                        ? getStatutBadge(devis.find((d) => d.id === selectedDevis)!.statut)
+                        : '—'}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-6 flex gap-2">
               <Button size="sm">
                 <Download className="h-4 w-4 mr-2" />

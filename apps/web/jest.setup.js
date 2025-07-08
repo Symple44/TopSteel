@@ -5,7 +5,7 @@ import { configure } from '@testing-library/react'
 configure({
   testIdAttribute: 'data-testid',
   asyncUtilTimeout: 5000,
-  computedStyleSupportsPseudoElements: true
+  computedStyleSupportsPseudoElements: true,
 })
 
 // ✅ MOCKS GLOBAUX
@@ -15,7 +15,7 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }))
 
-global.matchMedia = jest.fn().mockImplementation(query => ({
+global.matchMedia = jest.fn().mockImplementation((query) => ({
   matches: false,
   media: query,
   onchange: null,
@@ -33,9 +33,9 @@ Object.defineProperty(global, 'crypto', {
     subtle: {
       importKey: jest.fn(),
       encrypt: jest.fn(),
-      decrypt: jest.fn()
-    }
-  }
+      decrypt: jest.fn(),
+    },
+  },
 })
 
 // ✅ MOCK PERFORMANCE API
@@ -45,8 +45,8 @@ Object.defineProperty(global, 'performance', {
     mark: jest.fn(),
     measure: jest.fn(),
     getEntriesByType: jest.fn(() => []),
-    getEntriesByName: jest.fn(() => [])
-  }
+    getEntriesByName: jest.fn(() => []),
+  },
 })
 
 // ✅ MOCK INTERSECTION OBSERVER

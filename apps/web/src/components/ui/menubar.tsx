@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 interface MenubarProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
@@ -10,11 +10,11 @@ interface MenubarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
+  ({ className = '', children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
     }
-    
+
     return (
       <div className={className} ref={ref} {...props}>
         {children}
@@ -23,11 +23,11 @@ export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(
   }
 )
 
-Menubar.displayName = "Menubar"
+Menubar.displayName = 'Menubar'
 
 // Export des sous-composants courants si nécessaire
 export const MenubarContent = Menubar
-export const MenubarTrigger = Menubar  
+export const MenubarTrigger = Menubar
 export const MenubarItem = Menubar
 export const MenubarValue = Menubar
 export const MenubarHeader = Menubar

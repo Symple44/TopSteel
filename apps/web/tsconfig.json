@@ -2,8 +2,8 @@
   "extends": "../../packages/config/typescript/next.json",
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext", 
-    "lib": ["dom", "dom.iterable", "ES6", "ES2022"],
+    "module": "ESNext",
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -14,13 +14,17 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
+
     "forceConsistentCasingInFileNames": true,
     "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
@@ -36,7 +40,7 @@
       "@erp/utils": ["../../packages/utils/src"],
       "@erp/config": ["../../packages/config/src"]
     },
-    "assumeChangesOnlyAffectDirectDependencies": true,
+
     "plugins": [
       {
         "name": "next"
@@ -44,20 +48,6 @@
     ],
     "types": ["jest", "@testing-library/jest-dom", "node"]
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    "out",
-    "dist",
-    "coverage",
-    ".turbo",
-    "storybook-static"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/**/*"],
+  "exclude": ["node_modules", ".next", "out", "dist", "coverage", ".turbo", "storybook-static"]
 }

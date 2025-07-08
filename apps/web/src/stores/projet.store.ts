@@ -4,7 +4,6 @@
  * Fichier: apps/web/src/stores/projet.store.ts
  */
 
-import { StoreUtils } from '@/lib/store-utils'
 import type {
   InitialState,
   ProjetFilters,
@@ -13,12 +12,13 @@ import type {
   ProjetStore,
   ProjetStoreActions,
   StoreCreator,
-  StoreProjet
+  StoreProjet,
 } from '@erp/types'
 import { ClientType, ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { StoreUtils } from '@/lib/store-utils'
 
 // ===== ÉTAT INITIAL =====
 
@@ -27,29 +27,29 @@ const initialProjetState: InitialState<ProjetState> = {
   loading: false,
   error: null,
   lastUpdate: Date.now(),
-  
+
   // Données
   projets: [],
   selectedProjet: null,
-  
+
   // Filtres et recherche
   filters: {},
   searchTerm: '',
   sortBy: 'reference',
   sortOrder: 'desc',
-  
+
   // Pagination
   currentPage: 1,
   pageSize: 20,
   totalCount: 0,
-  
+
   // Cache et métadonnées
   lastFetch: 0,
   cacheTTL: 300000, // 5 minutes
   isSyncing: false,
-  
+
   // Statistiques
-  stats: null
+  stats: null,
 }
 
 // ===== CACHE ET UTILITAIRES =====
@@ -62,8 +62,8 @@ const statsCache = StoreUtils.createCache<string, ProjetStats>(60000) // 1 minut
 const projetService = {
   async fetchProjets(filters?: ProjetFilters): Promise<StoreProjet[]> {
     // Simulation d'appel API
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
     // Retourner des données mockées
     return [
       {
@@ -89,14 +89,14 @@ const projetService = {
             rue: '123 Rue de la Paix',
             ville: 'Paris',
             codePostal: '75001',
-            pays: 'France'
+            pays: 'France',
           },
           contact: {
             nom: 'Jean Dupont',
             telephone: '0102030405',
-            email: 'dupont@example.com'
+            email: 'dupont@example.com',
           },
-          telephone: '0102030405'
+          telephone: '0102030405',
         },
         montantHT: 5000,
         montantTTC: 6000,
@@ -106,12 +106,12 @@ const projetService = {
         adresseChantier: {
           rue: '123 Rue de la Paix',
           ville: 'Paris',
-          codePostal: '75001'
+          codePostal: '75001',
         },
         documentsIds: [],
         ordresFabricationIds: [],
         createdAt: new Date('2024-01-15'),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         id: 'proj_002',
@@ -136,14 +136,14 @@ const projetService = {
             rue: '456 Zone Industrielle',
             ville: 'Lyon',
             codePostal: '69000',
-            pays: 'France'
+            pays: 'France',
           },
           contact: {
             nom: 'Responsable SARL',
             telephone: '0405060708',
-            email: 'contact@sarl-industrielle.com'
+            email: 'contact@sarl-industrielle.com',
           },
-          telephone: '0405060708'
+          telephone: '0405060708',
         },
         montantHT: 12000,
         montantTTC: 14400,
@@ -153,21 +153,23 @@ const projetService = {
         adresseChantier: {
           rue: '456 Zone Industrielle',
           ville: 'Lyon',
-          codePostal: '69000'
+          codePostal: '69000',
         },
         documentsIds: [],
         ordresFabricationIds: [],
         createdAt: new Date('2024-01-20'),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ]
   },
 
-  async createProjet(data: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>): Promise<StoreProjet> {
-    await new Promise(resolve => setTimeout(resolve, 300))
-    
+  async createProjet(
+    data: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<StoreProjet> {
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     const now = new Date()
-    
+
     // Créer un client par défaut si non fourni
     const defaultClient = data.client || {
       id: 'default-client',
@@ -175,23 +177,23 @@ const projetService = {
       email: 'client@example.com',
       type: 'PARTICULIER' as const,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
     }
-    
+
     // Créer une adresse par défaut si non fournie
     const defaultAdresse = data.adresseChantier || {
       rue: '123 Rue Exemple',
       ville: 'Paris',
       codePostal: '75001',
-      pays: 'France'
+      pays: 'France',
     }
-    
+
     return {
       ...data,
       id: crypto.randomUUID(),
       createdAt: now,
       updatedAt: now,
-      
+
       // Propriétés obligatoires avec valeurs par défaut
       client: defaultClient,
       clientId: data.clientId || defaultClient.id,
@@ -203,51 +205,51 @@ const projetService = {
       avancement: data.avancement || 0,
       documentsIds: data.documentsIds || [],
       ordresFabricationIds: data.ordresFabricationIds || [],
-      
+
       // Valeurs par défaut avec les bons types d'enum
       type: data.type || 'AUTRE',
       statut: data.statut || 'brouillon',
       priorite: data.priorite || 'NORMALE',
-      dateCreation: data.dateCreation || now
+      dateCreation: data.dateCreation || now,
     } as StoreProjet
   },
 
   async updateProjet(id: string, updates: Partial<StoreProjet>): Promise<StoreProjet> {
-    await new Promise(resolve => setTimeout(resolve, 200))
-    
-    return { 
-      id, 
+    await new Promise((resolve) => setTimeout(resolve, 200))
+
+    return {
+      id,
       ...updates,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     } as StoreProjet
   },
 
   async deleteProjet(id: string): Promise<boolean> {
-    await new Promise(resolve => setTimeout(resolve, 200))
+    await new Promise((resolve) => setTimeout(resolve, 200))
 
     return true
   },
 
   async getStats(): Promise<ProjetStats> {
-    await new Promise(resolve => setTimeout(resolve, 300))
-    
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
     return {
       total: 15,
-      parStatut: { 
-        'en_cours': 8, 
-        'termine': 5, 
-        'devis': 2 
+      parStatut: {
+        en_cours: 8,
+        termine: 5,
+        devis: 2,
       },
-      parPriorite: { 
-        'NORMALE': 10, 
-        'HAUTE': 4, 
-        'URGENTE': 1 
+      parPriorite: {
+        NORMALE: 10,
+        HAUTE: 4,
+        URGENTE: 1,
       },
-      parType: { 
-        'PORTAIL': 6,
-        'ESCALIER': 4, 
-        'CLOTURE': 3,
-        'STRUCTURE': 2 
+      parType: {
+        PORTAIL: 6,
+        ESCALIER: 4,
+        CLOTURE: 3,
+        STRUCTURE: 2,
       },
       enRetard: 2,
       terminesTemps: 5,
@@ -256,9 +258,9 @@ const projetService = {
       chiffreAffaireAnnuel: 950000,
       margeGlobale: 18.5,
       projetsActifs: 8,
-      nouveauxCeMois: 3
+      nouveauxCeMois: 3,
     }
-  }
+  },
 }
 
 // ===== DÉFINITION DU STORE =====
@@ -293,7 +295,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
         ...initialProjetState,
         loading: false,
         error: null,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       })
     })
   },
@@ -309,7 +311,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
 
       const { force = false, filters } = options
       const cacheKey = JSON.stringify(filters || {})
-      
+
       // Vérifier le cache si pas de force
       if (!force) {
         const cached = projetCache.get(cacheKey)
@@ -325,11 +327,11 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
           return cached
         }
       }
-      
+
       const projets = await projetService.fetchProjets(filters)
 
       projetCache.set(cacheKey, projets)
-      
+
       set((state) => {
         state.projets = projets
         state.totalCount = projets.length
@@ -338,18 +340,19 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
         state.isSyncing = false
         state.lastUpdate = Date.now()
       })
-      
+
       return projets
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement des projets'
-      
+      const errorMsg =
+        error instanceof Error ? error.message : 'Erreur lors du chargement des projets'
+
       set((state) => {
         state.loading = false
         state.error = errorMsg
         state.isSyncing = false
         state.lastUpdate = Date.now()
       })
-      
+
       console.error('Erreur fetch projets:', error)
 
       return []
@@ -364,28 +367,29 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
 
       const newProjet = await projetService.createProjet(projetData)
-      
+
       set((state) => {
         state.projets.unshift(newProjet)
         state.totalCount++
         state.loading = false
         state.lastUpdate = Date.now()
       })
-      
+
       // Invalider le cache
       projetCache.delete()
       statsCache.delete()
-      
+
       return newProjet
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la création du projet'
-      
+      const errorMsg =
+        error instanceof Error ? error.message : 'Erreur lors de la création du projet'
+
       set((state) => {
         state.loading = false
         state.error = errorMsg
         state.lastUpdate = Date.now()
       })
-      
+
       console.error('Erreur création projet:', error)
 
       return null
@@ -400,37 +404,38 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
 
       const updatedProjet = await projetService.updateProjet(id, updates)
-      
+
       set((state) => {
-        const index = state.projets.findIndex(p => p.id === id)
+        const index = state.projets.findIndex((p) => p.id === id)
 
         if (index !== -1) {
           state.projets[index] = { ...state.projets[index], ...updatedProjet }
         }
-        
+
         // Mettre à jour le projet sélectionné si nécessaire
         if (state.selectedProjet?.id === id) {
           state.selectedProjet = { ...state.selectedProjet, ...updatedProjet }
         }
-        
+
         state.loading = false
         state.lastUpdate = Date.now()
       })
-      
+
       // Invalider les caches
       projetCache.delete()
       statsCache.delete()
-      
+
       return updatedProjet
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du projet'
-      
+      const errorMsg =
+        error instanceof Error ? error.message : 'Erreur lors de la mise à jour du projet'
+
       set((state) => {
         state.loading = false
         state.error = errorMsg
         state.lastUpdate = Date.now()
       })
-      
+
       console.error('Erreur mise à jour projet:', error)
 
       return null
@@ -445,36 +450,37 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
       })
 
       const success = await projetService.deleteProjet(id)
-      
+
       if (success) {
         set((state) => {
-          state.projets = state.projets.filter(p => p.id !== id)
+          state.projets = state.projets.filter((p) => p.id !== id)
           state.totalCount--
-          
+
           // Désélectionner si c'était le projet supprimé
           if (state.selectedProjet?.id === id) {
             state.selectedProjet = null
           }
-          
+
           state.loading = false
           state.lastUpdate = Date.now()
         })
-        
+
         // Invalider les caches
         projetCache.delete()
         statsCache.delete()
       }
-      
+
       return success
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Erreur lors de la suppression du projet'
-      
+      const errorMsg =
+        error instanceof Error ? error.message : 'Erreur lors de la suppression du projet'
+
       set((state) => {
         state.loading = false
         state.error = errorMsg
         state.lastUpdate = Date.now()
       })
-      
+
       console.error('Erreur suppression projet:', error)
 
       return false
@@ -484,19 +490,19 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
   duplicateProjet: async (id) => {
     try {
       const currentState = get()
-      const originalProjet = currentState.projets.find(p => p.id === id)
-      
+      const originalProjet = currentState.projets.find((p) => p.id === id)
+
       if (!originalProjet) {
         throw new Error('Projet non trouvé')
       }
-      
+
       const { id: _, createdAt: __, updatedAt: ___, ...projetData } = originalProjet
       const duplicatedProjet = await get().createProjet({
         ...projetData,
         reference: `${projetData.reference}_COPIE`,
-        description: `Copie de ${projetData.description}`
+        description: `Copie de ${projetData.description}`,
       })
-      
+
       return duplicatedProjet
     } catch (error) {
       console.error('Erreur duplication projet:', error)
@@ -515,7 +521,7 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
 
   selectProjetById: (id) => {
     set((state) => {
-      const projet = state.projets.find(p => p.id === id)
+      const projet = state.projets.find((p) => p.id === id)
 
       state.selectedProjet = projet || null
       state.lastUpdate = Date.now()
@@ -601,28 +607,29 @@ const createProjetStoreActions: StoreCreator<ProjetState, ProjetStoreActions> = 
 
         return
       }
-      
+
       const stats = await projetService.getStats()
 
       statsCache.set('stats', stats)
-      
+
       set((state) => {
         state.stats = stats
         state.loading = false
         state.lastUpdate = Date.now()
       })
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement des statistiques'
-      
+      const errorMsg =
+        error instanceof Error ? error.message : 'Erreur lors du chargement des statistiques'
+
       set((state) => {
         state.loading = false
         state.error = errorMsg
         state.lastUpdate = Date.now()
       })
-      
+
       console.error('Erreur refresh stats:', error)
     }
-  }
+  },
 })
 
 // ===== CRÉATION DU STORE =====
@@ -632,7 +639,7 @@ export const useProjetStore = create<ProjetStore>()(
     devtools(
       (set, get) => ({
         ...initialProjetState,
-        ...createProjetStoreActions(set, get)
+        ...createProjetStoreActions(set, get),
       }),
       { name: 'projet-store' }
     )
@@ -641,13 +648,12 @@ export const useProjetStore = create<ProjetStore>()(
 
 // ===== HOOKS SÉLECTEURS =====
 
-export const useProjetLoading = () => useProjetStore(state => state.loading)
-export const useProjetError = () => useProjetStore(state => state.error)
-export const useProjets = () => useProjetStore(state => state.projets)
-export const useSelectedProjet = () => useProjetStore(state => state.selectedProjet)
-export const useProjetFilters = () => useProjetStore(state => state.filters)
-export const useProjetStats = () => useProjetStore(state => state.stats)
+export const useProjetLoading = () => useProjetStore((state) => state.loading)
+export const useProjetError = () => useProjetStore((state) => state.error)
+export const useProjets = () => useProjetStore((state) => state.projets)
+export const useSelectedProjet = () => useProjetStore((state) => state.selectedProjet)
+export const useProjetFilters = () => useProjetStore((state) => state.filters)
+export const useProjetStats = () => useProjetStore((state) => state.stats)
 
 // ===== EXPORTS =====
 export type { ProjetState, ProjetStore, ProjetStoreActions }
-

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -11,15 +11,15 @@ export default function RegisterPage() {
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }))
   }
 
@@ -34,8 +34,8 @@ export default function RegisterPage() {
       }
 
       // Simulation d'une inscription
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
       router.push('/auth/login?message=Inscription réussie')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue')
@@ -69,7 +69,9 @@ export default function RegisterPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="sr-only">Prénom</label>
+                <label htmlFor="firstName" className="sr-only">
+                  Prénom
+                </label>
                 <input
                   id="firstName"
                   name="firstName"
@@ -82,7 +84,9 @@ export default function RegisterPage() {
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="sr-only">Nom</label>
+                <label htmlFor="lastName" className="sr-only">
+                  Nom
+                </label>
                 <input
                   id="lastName"
                   name="lastName"
@@ -97,7 +101,9 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="sr-only">Email</label>
+              <label htmlFor="email" className="sr-only">
+                Email
+              </label>
               <input
                 id="email"
                 name="email"
@@ -111,7 +117,9 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="sr-only">Mot de passe</label>
+              <label htmlFor="password" className="sr-only">
+                Mot de passe
+              </label>
               <input
                 id="password"
                 name="password"
@@ -125,7 +133,9 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="sr-only">Confirmer le mot de passe</label>
+              <label htmlFor="confirmPassword" className="sr-only">
+                Confirmer le mot de passe
+              </label>
               <input
                 id="confirmPassword"
                 name="confirmPassword"

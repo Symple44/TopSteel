@@ -1,40 +1,40 @@
 // apps/web/src/components/production/production-filters.tsx
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Filter, RotateCcw, Search } from "lucide-react";
-import { useState } from "react";
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 
 interface ProductionFiltersProps {
-  onFiltersChange?: (filters: ProductionFilters) => void; // Props optionnelles
-  onReset?: () => void; // Props optionnelles
+  onFiltersChange?: (filters: ProductionFilters) => void // Props optionnelles
+  onReset?: () => void // Props optionnelles
 }
 
 interface ProductionFilters {
-  search?: string;
-  statut?: string[];
-  priorite?: string[];
-  dateDebut?: string;
-  dateFin?: string;
-  responsable?: string;
+  search?: string
+  statut?: string[]
+  priorite?: string[]
+  dateDebut?: string
+  dateFin?: string
+  responsable?: string
 }
 
 export function ProductionFilters({ onFiltersChange, onReset }: ProductionFiltersProps) {
-  const [filters, setFilters] = useState<ProductionFilters>({});
+  const [filters, setFilters] = useState<ProductionFilters>({})
 
   const handleFilterChange = (key: keyof ProductionFilters, value: any) => {
-    const newFilters = { ...filters, [key]: value };
+    const newFilters = { ...filters, [key]: value }
 
-    setFilters(newFilters);
-    onFiltersChange?.(newFilters); // Safe call avec ?
-  };
+    setFilters(newFilters)
+    onFiltersChange?.(newFilters) // Safe call avec ?
+  }
 
   const handleReset = () => {
-    setFilters({});
-    onReset?.(); // Safe call avec ?
-  };
+    setFilters({})
+    onReset?.() // Safe call avec ?
+  }
 
   return (
     <Card>
@@ -83,7 +83,14 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <select
               className="w-full p-2 border rounded-md"
               value={filters.priorite?.[0] || ''}
-              onChange={(e) => handleFilterChange('priorite', (e.target as HTMLSelectElement).value ? [(e.target as HTMLSelectElement).value] : [])}
+              onChange={(e) =>
+                handleFilterChange(
+                  'priorite',
+                  (e.target as HTMLSelectElement).value
+                    ? [(e.target as HTMLSelectElement).value]
+                    : []
+                )
+              }
             >
               <option value="">Toutes les priorités</option>
               <option value="BASSE">Basse</option>
@@ -101,7 +108,9 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <Input
               type="date"
               value={filters.dateDebut || ''}
-              onChange={(e) => handleFilterChange('dateDebut', (e.target as HTMLInputElement).value)}
+              onChange={(e) =>
+                handleFilterChange('dateDebut', (e.target as HTMLInputElement).value)
+              }
             />
           </div>
           <div className="space-y-2">
@@ -121,10 +130,12 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             Réinitialiser
           </Button>
           <div className="text-sm text-muted-foreground">
-            {Object.keys(filters).length > 0 ? `${Object.keys(filters).length} filtre(s) actif(s)` : 'Aucun filtre'}
+            {Object.keys(filters).length > 0
+              ? `${Object.keys(filters).length} filtre(s) actif(s)`
+              : 'Aucun filtre'}
           </div>
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

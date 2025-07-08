@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
@@ -10,11 +10,11 @@ interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
-  ({ className = "", children, asChild, ...props }, ref) => {
+  ({ className = '', children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       return React.cloneElement(children as any, { ...props, ref })
     }
-    
+
     return (
       <div className={className} ref={ref} {...props}>
         {children}
@@ -23,11 +23,11 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
   }
 )
 
-Badge.displayName = "Badge"
+Badge.displayName = 'Badge'
 
 // Export des sous-composants courants si nécessaire
 export const BadgeContent = Badge
-export const BadgeTrigger = Badge  
+export const BadgeTrigger = Badge
 export const BadgeItem = Badge
 export const BadgeValue = Badge
 export const BadgeHeader = Badge

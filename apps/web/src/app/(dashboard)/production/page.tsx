@@ -1,12 +1,12 @@
 'use client'
 
+import { Calendar, Filter, Plus, Search } from 'lucide-react'
+import { useState } from 'react'
 import { CreateOrdreDialog } from '@/components/production/create-ordre-dialog'
 import { ProductionFilters } from '@/components/production/production-filters'
 import { ProductionTable } from '@/components/production/production-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Calendar, Filter, Plus, Search } from 'lucide-react'
-import { useState } from 'react'
 
 export default function ProductionPage() {
   const [showFilters, setShowFilters] = useState(false)
@@ -34,19 +34,19 @@ export default function ProductionPage() {
       avancement: 65,
       dateDebutPrevue: new Date('2024-01-15'),
       dateFinPrevue: new Date('2024-01-22'),
-      responsable: 'Jean Dupont'
+      responsable: 'Jean Dupont',
     },
     {
       id: 2,
-      numero: 'OF-2024-002', 
+      numero: 'OF-2024-002',
       description: 'Garde-corps balcon',
       statut: 'PLANIFIE',
       priorite: 'HAUTE',
       avancement: 0,
       dateDebutPrevue: new Date('2024-01-25'),
       dateFinPrevue: new Date('2024-01-30'),
-      responsable: 'Marie Martin'
-    }
+      responsable: 'Marie Martin',
+    },
   ]
 
   const handleView = (id: number) => {
@@ -70,15 +70,10 @@ export default function ProductionPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Production</h1>
-          <p className="text-muted-foreground">
-            Gestion des ordres de fabrication et planning
-          </p>
+          <p className="text-muted-foreground">Gestion des ordres de fabrication et planning</p>
         </div>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowFilters(!showFilters)}
-          >
+          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
@@ -131,10 +126,7 @@ export default function ProductionPage() {
 
       {/* Filtres */}
       {showFilters && (
-        <ProductionFilters 
-          onFiltersChange={handleFiltersChange} 
-          onReset={handleFiltersReset} 
-        />
+        <ProductionFilters onFiltersChange={handleFiltersChange} onReset={handleFiltersReset} />
       )}
 
       {/* Table des ordres */}
@@ -153,10 +145,7 @@ export default function ProductionPage() {
       </Card>
 
       {/* Modal création ordre */}
-      <CreateOrdreDialog
-        open={showCreateModal}
-        onOpenChange={setShowCreateModal}
-      />
+      <CreateOrdreDialog open={showCreateModal} onOpenChange={setShowCreateModal} />
     </div>
   )
 }

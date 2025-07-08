@@ -1,72 +1,79 @@
 // apps/web/src/components/stocks/chutes-optimizer.tsx
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from "lucide-react";
-import { useState } from "react";
+import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 
 interface Chute {
-  id: string;
-  reference: string;
-  materiau: string;
+  id: string
+  reference: string
+  materiau: string
   dimensions: {
-    longueur: number;
-    largeur: number;
-    epaisseur: number;
-  };
-  quantite: number;
-  emplacement: string;
-  qualite: 'EXCELLENTE' | 'BONNE' | 'ACCEPTABLE' | 'DEGRADEE';
-  valeurEstimee: number;
-  utilisationsProposees: UtilisationProposee[];
+    longueur: number
+    largeur: number
+    epaisseur: number
+  }
+  quantite: number
+  emplacement: string
+  qualite: 'EXCELLENTE' | 'BONNE' | 'ACCEPTABLE' | 'DEGRADEE'
+  valeurEstimee: number
+  utilisationsProposees: UtilisationProposee[]
 }
 
 interface UtilisationProposee {
-  id: string;
-  projetNom: string;
-  quantiteRequise: number;
-  economie: number;
-  priorite: number;
-  compatibilite: number; // %
+  id: string
+  projetNom: string
+  quantiteRequise: number
+  economie: number
+  priorite: number
+  compatibilite: number // %
 }
 
 interface ChutesOptimizerProps {
-  chutes: Chute[];
-  onOptimize: (chuteId: string, utilisationId: string) => void;
-  onSearch: (query: string) => void;
+  chutes: Chute[]
+  onOptimize: (chuteId: string, utilisationId: string) => void
+  onSearch: (query: string) => void
 }
 
 export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimizerProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedChute, setSelectedChute] = useState<Chute | null>(null);
-  const [optimizationResults, setOptimizationResults] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedChute, setSelectedChute] = useState<Chute | null>(null)
+  const [optimizationResults, setOptimizationResults] = useState<any[]>([])
 
   const getQualityColor = (qualite: string) => {
     switch (qualite) {
-      case 'EXCELLENTE': return 'text-green-600 bg-green-50';
-      case 'BONNE': return 'text-blue-600 bg-blue-50';
-      case 'ACCEPTABLE': return 'text-yellow-600 bg-yellow-50';
-      case 'DEGRADEE': return 'text-red-600 bg-red-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'EXCELLENTE':
+        return 'text-green-600 bg-green-50'
+      case 'BONNE':
+        return 'text-blue-600 bg-blue-50'
+      case 'ACCEPTABLE':
+        return 'text-yellow-600 bg-yellow-50'
+      case 'DEGRADEE':
+        return 'text-red-600 bg-red-50'
+      default:
+        return 'text-gray-600 bg-gray-50'
     }
-  };
+  }
 
   const runOptimization = () => {
     // Simulation algorithme d'optimisation
-    const results = chutes.map(chute => ({
-      chuteId: chute.id,
-      economie: chute.utilisationsProposees.reduce((sum, u) => sum + u.economie, 0),
-      utilisations: chute.utilisationsProposees.length,
-      score: Math.round(Math.random() * 100),
-    })).sort((a, b) => b.economie - a.economie);
+    const results = chutes
+      .map((chute) => ({
+        chuteId: chute.id,
+        economie: chute.utilisationsProposees.reduce((sum, u) => sum + u.economie, 0),
+        utilisations: chute.utilisationsProposees.length,
+        score: Math.round(Math.random() * 100),
+      }))
+      .sort((a, b) => b.economie - a.economie)
 
-    setOptimizationResults(results);
-  };
+    setOptimizationResults(results)
+  }
 
-  const totalEconomie = optimizationResults.reduce((sum, r) => sum + r.economie, 0);
-  const totalChutesUtilisables = optimizationResults.filter(r => r.utilisations > 0).length;
+  const totalEconomie = optimizationResults.reduce((sum, r) => sum + r.economie, 0)
+  const totalChutesUtilisables = optimizationResults.filter((r) => r.utilisations > 0).length
 
   return (
     <div className="space-y-6">
@@ -94,8 +101,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    onSearch(e.target.value);
+                    setSearchQuery(e.target.value)
+                    onSearch(e.target.value)
                   }}
                 />
               </div>
@@ -115,7 +122,9 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Économie totale</p>
-                  <p className="text-2xl font-bold text-green-600">{totalEconomie.toLocaleString()} €</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {totalEconomie.toLocaleString()} €
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -166,8 +175,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                 <div
                   key={chute.id}
                   className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                    selectedChute?.id === chute.id 
-                      ? 'border-blue-500 bg-blue-50' 
+                    selectedChute?.id === chute.id
+                      ? 'border-blue-500 bg-blue-50'
                       : 'hover:bg-gray-50'
                   }`}
                   onClick={() => setSelectedChute(chute)}
@@ -177,17 +186,20 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                       <div className="font-medium">{chute.reference}</div>
                       <div className="text-sm text-gray-600">{chute.materiau}</div>
                       <div className="text-sm text-gray-500">
-                        {chute.dimensions.longueur} × {chute.dimensions.largeur} × {chute.dimensions.epaisseur} mm
+                        {chute.dimensions.longueur} × {chute.dimensions.largeur} ×{' '}
+                        {chute.dimensions.epaisseur} mm
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-xs px-2 py-1 rounded ${getQualityColor(chute.qualite)}`}>
+                      <div
+                        className={`text-xs px-2 py-1 rounded ${getQualityColor(chute.qualite)}`}
+                      >
                         {chute.qualite}
                       </div>
                       <div className="text-sm font-medium mt-1">{chute.valeurEstimee} €</div>
                     </div>
                   </div>
-                  
+
                   {chute.utilisationsProposees.length > 0 && (
                     <div className="mt-2 text-xs text-green-600">
                       {chute.utilisationsProposees.length} utilisation(s) proposée(s)
@@ -234,18 +246,22 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            utilisation.priorite >= 8 ? 'bg-red-100 text-red-600' :
-                            utilisation.priorite >= 5 ? 'bg-yellow-100 text-yellow-600' :
-                            'bg-green-100 text-green-600'
-                          }`}>
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${
+                              utilisation.priorite >= 8
+                                ? 'bg-red-100 text-red-600'
+                                : utilisation.priorite >= 5
+                                  ? 'bg-yellow-100 text-yellow-600'
+                                  : 'bg-green-100 text-green-600'
+                            }`}
+                          >
                             Priorité {utilisation.priorite}/10
                           </span>
                         </div>
-                        
+
                         <Button
                           size="sm"
                           onClick={() => onOptimize(selectedChute.id, utilisation.id)}
@@ -269,12 +285,10 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
         <Card>
           <CardContent className="p-8 text-center">
             <Calculator className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Optimiseur intelligent
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Optimiseur intelligent</h3>
             <p className="text-gray-600 mb-4">
-              Cliquez sur "Optimiser" pour analyser vos chutes et trouver 
-              les meilleures opportunités d'utilisation.
+              Cliquez sur "Optimiser" pour analyser vos chutes et trouver les meilleures
+              opportunités d'utilisation.
             </p>
             <Button onClick={runOptimization} size="lg">
               <Zap className="h-4 w-4 mr-2" />
@@ -284,5 +298,5 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
         </Card>
       )}
     </div>
-  );
+  )
 }

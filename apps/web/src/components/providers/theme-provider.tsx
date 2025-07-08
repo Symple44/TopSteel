@@ -2,7 +2,7 @@
  * 🎨 THEME PROVIDER ENTERPRISE CORRIGÉ - TOPSTEEL ERP
  * Provider de thème optimisé pour performance et robustesse
  * Version complète et corrigée sans troncature
- * 
+ *
  * Fonctionnalités:
  * - Transitions fluides sans flash
  * - Synchronisation multi-onglets
@@ -17,14 +17,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 // =============================================
 // TYPES ET INTERFACES
@@ -125,7 +118,7 @@ const DEFAULT_COLORS: Record<ResolvedTheme, ThemeColors> = {
     destructiveForeground: 'hsl(0 0% 98%)',
     border: 'hsl(240 5.9% 90%)',
     input: 'hsl(240 5.9% 90%)',
-    ring: 'hsl(240 5.9% 10%)'
+    ring: 'hsl(240 5.9% 10%)',
   },
   dark: {
     background: 'hsl(240 10% 3.9%)',
@@ -146,8 +139,8 @@ const DEFAULT_COLORS: Record<ResolvedTheme, ThemeColors> = {
     destructiveForeground: 'hsl(0 0% 98%)',
     border: 'hsl(240 3.7% 15.9%)',
     input: 'hsl(240 3.7% 15.9%)',
-    ring: 'hsl(240 4.9% 83.9%)'
-  }
+    ring: 'hsl(240 4.9% 83.9%)',
+  },
 }
 
 // =============================================
@@ -202,7 +195,7 @@ class ThemeApplicator {
   }
 
   static applyTheme(
-    theme: ResolvedTheme, 
+    theme: ResolvedTheme,
     attribute: string = DEFAULT_ATTRIBUTE,
     colors: ThemeColors
   ): void {
@@ -227,9 +220,11 @@ class ThemeApplicator {
       })
 
       // Dispatch custom event pour les listeners externes
-      window.dispatchEvent(new CustomEvent('theme-changed', { 
-        detail: { theme, colors } 
-      }))
+      window.dispatchEvent(
+        new CustomEvent('theme-changed', {
+          detail: { theme, colors },
+        })
+      )
     } catch (error) {
       console.error('Theme application error:', error)
     }
@@ -243,42 +238,42 @@ class ThemeMetricsCollector {
     errors: 0,
     hydrationTime: 0,
     transitionCount: 0,
-    storageErrors: 0
+    storageErrors: 0,
   }
 
   static recordThemeChange(): void {
-    this.metrics.changeCount++
-    this.metrics.lastChange = Date.now()
+    ThemeMetricsCollector.metrics.changeCount++
+    ThemeMetricsCollector.metrics.lastChange = Date.now()
   }
 
   static recordTransition(): void {
-    this.metrics.transitionCount++
+    ThemeMetricsCollector.metrics.transitionCount++
   }
 
   static recordError(): void {
-    this.metrics.errors++
+    ThemeMetricsCollector.metrics.errors++
   }
 
   static recordStorageError(): void {
-    this.metrics.storageErrors++
+    ThemeMetricsCollector.metrics.storageErrors++
   }
 
   static recordHydration(time: number): void {
-    this.metrics.hydrationTime = time
+    ThemeMetricsCollector.metrics.hydrationTime = time
   }
 
   static getMetrics(): ThemeMetrics {
-    return { ...this.metrics }
+    return { ...ThemeMetricsCollector.metrics }
   }
 
   static reset(): void {
-    this.metrics = {
+    ThemeMetricsCollector.metrics = {
       changeCount: 0,
       lastChange: 0,
       errors: 0,
       hydrationTime: 0,
       transitionCount: 0,
-      storageErrors: 0
+      storageErrors: 0,
     }
   }
 }
@@ -300,7 +295,7 @@ export function ThemeProvider({
   enableSync = true,
   transitionDuration = DEFAULT_TRANSITION_DURATION,
   fallbackTheme = DEFAULT_FALLBACK_THEME,
-  customColors = { light: {}, dark: {} }
+  customColors = { light: {}, dark: {} },
 }: ThemeProviderProps) {
   // ===== ÉTATS =====
   const [theme, setThemeState] = useState<Theme>(defaultTheme)
@@ -313,96 +308,103 @@ export function ThemeProvider({
   const hydrationStartRef = useRef(Date.now())
 
   // ===== RÉSOLUTION DU THÈME =====
-  const resolveTheme = useCallback((currentTheme: Theme): ResolvedTheme => {
-    if (currentTheme === 'system') {
-      return enableSystem ? 
-        ThemeApplicator.getSystemTheme() : fallbackTheme
-    }
+  const resolveTheme = useCallback(
+    (currentTheme: Theme): ResolvedTheme => {
+      if (currentTheme === 'system') {
+        return enableSystem ? ThemeApplicator.getSystemTheme() : fallbackTheme
+      }
 
-    return currentTheme as ResolvedTheme
-  }, [enableSystem, fallbackTheme])
+      return currentTheme as ResolvedTheme
+    },
+    [enableSystem, fallbackTheme]
+  )
 
   // ===== MISE À JOUR DU THÈME RÉSOLU =====
-  const updateResolvedTheme = useCallback((newTheme: Theme) => {
-    const resolved = resolveTheme(newTheme)
-    
-    setResolvedTheme(resolved)
-    
-    // Obtenir les couleurs (fusion defaults + customs)
-    const colors = {
-      ...DEFAULT_COLORS[resolved],
-      ...customColors[resolved]
-    }
-    
-    // Appliquer le thème
-    ThemeApplicator.applyTheme(resolved, attribute, colors)
-    
-    if (enableMetrics) {
-      ThemeMetricsCollector.recordTransition()
-    }
-  }, [resolveTheme, attribute, customColors, enableMetrics])
+  const updateResolvedTheme = useCallback(
+    (newTheme: Theme) => {
+      const resolved = resolveTheme(newTheme)
+
+      setResolvedTheme(resolved)
+
+      // Obtenir les couleurs (fusion defaults + customs)
+      const colors = {
+        ...DEFAULT_COLORS[resolved],
+        ...customColors[resolved],
+      }
+
+      // Appliquer le thème
+      ThemeApplicator.applyTheme(resolved, attribute, colors)
+
+      if (enableMetrics) {
+        ThemeMetricsCollector.recordTransition()
+      }
+    },
+    [resolveTheme, attribute, customColors, enableMetrics]
+  )
 
   // ===== SETTER PRINCIPAL =====
-  const setTheme = useCallback((newTheme: Theme) => {
-    if (!['light', 'dark', 'system'].includes(newTheme)) {
-      console.warn(`Invalid theme: ${newTheme}`)
+  const setTheme = useCallback(
+    (newTheme: Theme) => {
+      if (!['light', 'dark', 'system'].includes(newTheme)) {
+        console.warn(`Invalid theme: ${newTheme}`)
 
-      return
-    }
-
-    setIsChanging(true)
-    
-    // Clear any pending timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-
-    try {
-      setThemeState(newTheme)
-      updateResolvedTheme(newTheme)
-      
-      // Sauvegarder dans le storage
-      const saved = ThemeStorage.set(newTheme)
-
-      if (!saved && enableMetrics) {
-        ThemeMetricsCollector.recordStorageError()
+        return
       }
-      
-      if (enableMetrics) {
-        ThemeMetricsCollector.recordThemeChange()
-      }
-      
-    } catch (error) {
-      console.error('Failed to set theme:', error)
-      if (enableMetrics) {
-        ThemeMetricsCollector.recordError()
-      }
-    }
 
-    // Reset changing state après transition
-    timeoutRef.current = setTimeout(() => {
-      setIsChanging(false)
-    }, transitionDuration + 50)
-  }, [updateResolvedTheme, enableMetrics, transitionDuration])
+      setIsChanging(true)
+
+      // Clear any pending timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      try {
+        setThemeState(newTheme)
+        updateResolvedTheme(newTheme)
+
+        // Sauvegarder dans le storage
+        const saved = ThemeStorage.set(newTheme)
+
+        if (!saved && enableMetrics) {
+          ThemeMetricsCollector.recordStorageError()
+        }
+
+        if (enableMetrics) {
+          ThemeMetricsCollector.recordThemeChange()
+        }
+      } catch (error) {
+        console.error('Failed to set theme:', error)
+        if (enableMetrics) {
+          ThemeMetricsCollector.recordError()
+        }
+      }
+
+      // Reset changing state après transition
+      timeoutRef.current = setTimeout(() => {
+        setIsChanging(false)
+      }, transitionDuration + 50)
+    },
+    [updateResolvedTheme, enableMetrics, transitionDuration]
+  )
 
   // ===== HYDRATATION INITIALE =====
   useEffect(() => {
     const hydrationStart = hydrationStartRef.current
-    
+
     try {
       // Obtenir le thème initial depuis le storage ou utiliser le défaut
       const storedTheme = ThemeStorage.get()
       const initialTheme = storedTheme || defaultTheme
-      
+
       setThemeState(initialTheme)
       updateResolvedTheme(initialTheme)
-      
+
       const hydrationTime = Date.now() - hydrationStart
 
       if (enableMetrics) {
         ThemeMetricsCollector.recordHydration(hydrationTime)
       }
-      
+
       setIsHydrated(true)
     } catch (error) {
       console.error('Theme hydration error:', error)
@@ -418,7 +420,7 @@ export function ThemeProvider({
     if (!enableSystem || theme !== 'system') return
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    
+
     const handleChange = () => {
       updateResolvedTheme('system')
     }
@@ -470,16 +472,18 @@ export function ThemeProvider({
   const isSystemTheme = theme === 'system'
   const colors = {
     ...DEFAULT_COLORS[resolvedTheme],
-    ...customColors[resolvedTheme]
+    ...customColors[resolvedTheme],
   }
-  const metrics = enableMetrics ? ThemeMetricsCollector.getMetrics() : {
-    changeCount: 0,
-    lastChange: 0,
-    errors: 0,
-    hydrationTime: 0,
-    transitionCount: 0,
-    storageErrors: 0
-  }
+  const metrics = enableMetrics
+    ? ThemeMetricsCollector.getMetrics()
+    : {
+        changeCount: 0,
+        lastChange: 0,
+        errors: 0,
+        hydrationTime: 0,
+        transitionCount: 0,
+        storageErrors: 0,
+      }
 
   // ===== CONTEXT VALUE =====
   const contextValue: ThemeProviderContext = {
@@ -493,7 +497,7 @@ export function ThemeProvider({
     colors,
     toggleTheme,
     setSystemTheme,
-    clearTheme
+    clearTheme,
   }
 
   // ===== NETTOYAGE =====
@@ -506,9 +510,7 @@ export function ThemeProvider({
   }, [])
 
   return (
-    <ThemeProviderContext.Provider value={contextValue}>
-      {children}
-    </ThemeProviderContext.Provider>
+    <ThemeProviderContext.Provider value={contextValue}>{children}</ThemeProviderContext.Provider>
   )
 }
 
@@ -518,11 +520,11 @@ export function ThemeProvider({
 
 export function useTheme(): ThemeProviderContext {
   const context = useContext(ThemeProviderContext)
-  
+
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider')
   }
-  
+
   return context
 }
 
@@ -554,10 +556,13 @@ export function useThemeDebug(): {
     ThemeMetricsCollector.reset()
   }, [])
 
-  const getCurrentTheme = useCallback(() => ({
-    theme,
-    resolved: resolvedTheme
-  }), [theme, resolvedTheme])
+  const getCurrentTheme = useCallback(
+    () => ({
+      theme,
+      resolved: resolvedTheme,
+    }),
+    [theme, resolvedTheme]
+  )
 
   const testThemeSwitch = useCallback(() => {
     console.log('Testing theme switch...')
@@ -571,7 +576,7 @@ export function useThemeDebug(): {
     logMetrics,
     resetMetrics,
     getCurrentTheme,
-    testThemeSwitch
+    testThemeSwitch,
   }
 }
 
@@ -583,7 +588,7 @@ export const themeUtils = {
   storage: ThemeStorage,
   applicator: ThemeApplicator,
   metrics: ThemeMetricsCollector,
-  colors: DEFAULT_COLORS
+  colors: DEFAULT_COLORS,
 }
 
 export default ThemeProvider

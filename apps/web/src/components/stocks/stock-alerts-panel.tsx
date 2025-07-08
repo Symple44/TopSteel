@@ -1,8 +1,8 @@
 'use client'
 
+import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 
 export function StockAlertsPanel() {
   const alertes = [
@@ -12,7 +12,7 @@ export function StockAlertsPanel() {
       designation: 'Acier S235 - Tôle 2mm',
       stockActuel: 5,
       seuil: 20,
-      niveau: 'critique' as const
+      niveau: 'critique' as const,
     },
     {
       id: 2,
@@ -20,7 +20,7 @@ export function StockAlertsPanel() {
       designation: 'Inox 304 - Tube rond Ø30',
       stockActuel: 8,
       seuil: 15,
-      niveau: 'bas' as const
+      niveau: 'bas' as const,
     },
     {
       id: 3,
@@ -28,8 +28,8 @@ export function StockAlertsPanel() {
       designation: 'Aluminium 6060 - Profilé',
       stockActuel: 2,
       seuil: 12,
-      niveau: 'critique' as const
-    }
+      niveau: 'critique' as const,
+    },
   ]
 
   return (
@@ -37,14 +37,21 @@ export function StockAlertsPanel() {
       {alertes.map((alerte) => (
         <div key={alerte.id} className="flex items-center justify-between p-3 border rounded-lg">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${alerte.niveau === 'critique' ? 'bg-red-100' : 'bg-orange-100'}`}>
-              <Package className={`h-4 w-4 ${alerte.niveau === 'critique' ? 'text-red-600' : 'text-orange-600'}`} />
+            <div
+              className={`p-2 rounded-lg ${alerte.niveau === 'critique' ? 'bg-red-100' : 'bg-orange-100'}`}
+            >
+              <Package
+                className={`h-4 w-4 ${alerte.niveau === 'critique' ? 'text-red-600' : 'text-orange-600'}`}
+              />
             </div>
             <div>
               <div className="font-medium text-sm">{alerte.reference}</div>
               <div className="text-xs text-muted-foreground">{alerte.designation}</div>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant={alerte.niveau === 'critique' ? 'destructive' : 'secondary'} className="text-xs">
+                <Badge
+                  variant={alerte.niveau === 'critique' ? 'destructive' : 'secondary'}
+                  className="text-xs"
+                >
                   {alerte.stockActuel} restant
                 </Badge>
                 <span className="text-xs text-muted-foreground">Seuil: {alerte.seuil}</span>

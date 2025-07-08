@@ -1,6 +1,7 @@
 // apps/web/src/components/facturation/factures-table.tsx
 'use client'
 
+import { Download, Edit, Eye } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,7 +13,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Eye, Edit, Download } from 'lucide-react'
 
 // Données mock
 const mockFactures = [
@@ -28,7 +28,7 @@ const mockFactures = [
   },
   {
     id: '2',
-    reference: 'FAC-2024-002', 
+    reference: 'FAC-2024-002',
     clientNom: 'Société XYZ',
     montantHT: 8500,
     montantTTC: 10200,
@@ -45,7 +45,7 @@ const getStatusBadge = (statut: string) => {
     payee: { label: 'Payée', variant: 'default' as const },
     en_retard: { label: 'En retard', variant: 'destructive' as const },
   }
-  
+
   const item = config[statut as keyof typeof config] || config.brouillon
 
   return <Badge variant={item.variant}>{item.label}</Badge>

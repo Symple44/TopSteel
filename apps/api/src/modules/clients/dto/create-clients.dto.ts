@@ -1,51 +1,44 @@
-import {
-  IsString,
-  IsOptional,
-  IsBoolean,
-  IsEmail,
-  MaxLength,
-  MinLength,
-} from "class-validator";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import { IsBoolean, IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
 
 export class CreateClientsDto {
-  @ApiProperty({ example: "Nom du client", minLength: 2, maxLength: 255 })
+  @ApiProperty({ example: 'Nom du client', minLength: 2, maxLength: 255 })
   @IsString()
   @MinLength(2)
   @MaxLength(255)
   @Transform(({ value }) => value?.trim())
-  nom!: string;
+  nom!: string
 
-  @ApiPropertyOptional({ example: "Description détaillée" })
+  @ApiPropertyOptional({ example: 'Description détaillée' })
   @IsOptional()
   @IsString()
   @MaxLength(2000)
-  description?: string;
+  description?: string
 
-  @ApiPropertyOptional({ example: "client@example.com" })
+  @ApiPropertyOptional({ example: 'client@example.com' })
   @IsOptional()
   @IsEmail()
-  email?: string;
+  email?: string
 
-  @ApiPropertyOptional({ example: "0123456789" })
+  @ApiPropertyOptional({ example: '0123456789' })
   @IsOptional()
   @IsString()
   @MaxLength(20)
-  telephone?: string;
+  telephone?: string
 
-  @ApiPropertyOptional({ example: "123 rue de la paix, 75001 Paris" })
+  @ApiPropertyOptional({ example: '123 rue de la paix, 75001 Paris' })
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  adresse?: string;
+  adresse?: string
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()
   @IsBoolean()
-  actif?: boolean = true;
+  actif?: boolean = true
 
   @ApiPropertyOptional()
   @IsOptional()
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any>
 }

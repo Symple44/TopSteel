@@ -42,7 +42,7 @@ export async function isPortAvailable(port: number): Promise<boolean> {
 
 // Fonction pour obtenir un port disponible
 export async function getAvailablePort(
-  preferredPort: number, 
+  preferredPort: number,
   fallbackPorts: number[] = [3002, 3003, 3004, 3005]
 ): Promise<number> {
   if (await isPortAvailable(preferredPort)) {
@@ -56,7 +56,5 @@ export async function getAvailablePort(
     }
   }
 
-  throw new Error(
-    `Aucun port disponible parmi: ${preferredPort}, ${fallbackPorts.join(', ')}`
-  )
+  throw new Error(`Aucun port disponible parmi: ${preferredPort}, ${fallbackPorts.join(', ')}`)
 }

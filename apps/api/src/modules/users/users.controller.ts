@@ -21,11 +21,11 @@ import {
 import { Roles } from "../../common/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
-import { UserQueryDto } from "./dto/user-query.dto";
+import type { CreateUserDto } from "./dto/create-user.dto";
+import type { UpdateUserDto } from "./dto/update-user.dto";
+import type { UserQueryDto } from "./dto/user-query.dto";
 import { UserRole } from "./entities/user.entity";
-import { UsersService } from "./users.service";
+import type { UsersService } from "./users.service";
 
 @Controller("users")
 @ApiTags("👤 Users")

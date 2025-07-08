@@ -1,34 +1,28 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
-@Entity("documents")
+@Entity('documents')
 export class Document {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
   @Column()
-  nom!: string;
+  nom!: string
 
   @Column()
-  chemin!: string;
+  chemin!: string
 
   @Column({ nullable: true })
-  type?: string;
+  type?: string
 
   @Column({ nullable: true })
-  taille?: number;
+  taille?: number
 
   @Column({ nullable: true })
-  projet?: number;
+  projet?: number
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt!: Date
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedAt!: Date
 }

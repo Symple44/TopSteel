@@ -11,14 +11,15 @@ export const api = {
     async getAll(filters?: ProjetFilters): Promise<Projet[]> {
       try {
         // Simulation d'appel API avec données mock
-        await new Promise(resolve => setTimeout(resolve, 100)) // Simulation délai réseau
-        
+        await new Promise((resolve) => setTimeout(resolve, 100)) // Simulation délai réseau
+
         // Données mock pour développement avec types corrects
         const mockProjets: Projet[] = [
           {
             id: '1',
             reference: 'PRJ-2024-001',
-            description: 'Garde-corps Restaurant Le Gourmet - Installation garde-corps terrasse extérieure',
+            description:
+              'Garde-corps Restaurant Le Gourmet - Installation garde-corps terrasse extérieure',
             client: {
               id: 'client-1',
               nom: 'Restaurant Le Gourmet',
@@ -29,20 +30,20 @@ export const api = {
                 rue: '123 Rue de la Paix',
                 codePostal: '75001',
                 ville: 'Paris',
-                pays: 'France'
+                pays: 'France',
               },
               contact: {
                 nom: 'Dubois',
                 prenom: 'Pierre',
                 email: 'p.dubois@legourmet.fr',
                 telephone: '01 23 45 67 89',
-                fonction: 'Gérant'
+                fonction: 'Gérant',
               },
               isActif: true,
               createdAt: new Date('2023-12-01'),
               updatedAt: new Date('2024-01-01'),
               siret: '12345678901234',
-              notes: 'Client fidèle depuis 2023'
+              notes: 'Client fidèle depuis 2023',
             },
             clientId: 'client-1',
             statut: ProjetStatut.EN_COURS,
@@ -56,7 +57,7 @@ export const api = {
               rue: '123 Rue de la Paix',
               codePostal: '75001',
               ville: 'Paris',
-              pays: 'France'
+              pays: 'France',
             },
             montantHT: 15000,
             montantTTC: 18000,
@@ -72,7 +73,8 @@ export const api = {
           {
             id: '2',
             reference: 'PRJ-2024-002',
-            description: 'Escalier métallique Villa Moderne - Fabrication et installation escalier extérieur',
+            description:
+              'Escalier métallique Villa Moderne - Fabrication et installation escalier extérieur',
             client: {
               id: 'client-2',
               nom: 'Villa Moderne SARL',
@@ -83,20 +85,20 @@ export const api = {
                 rue: '456 Avenue des Jardins',
                 codePostal: '78000',
                 ville: 'Versailles',
-                pays: 'France'
+                pays: 'France',
               },
               contact: {
                 nom: 'Martin',
                 prenom: 'Sophie',
                 email: 's.martin@villamoderne.fr',
                 telephone: '01 34 56 78 90',
-                fonction: 'Architecte'
+                fonction: 'Architecte',
               },
               isActif: true,
               createdAt: new Date('2023-11-15'),
               updatedAt: new Date('2024-01-10'),
               siret: '98765432109876',
-              notes: 'Spécialisé dans les villas de luxe'
+              notes: 'Spécialisé dans les villas de luxe',
             },
             clientId: 'client-2',
             statut: ProjetStatut.DEVIS,
@@ -110,7 +112,7 @@ export const api = {
               rue: '789 Rue du Château',
               codePostal: '78100',
               ville: 'Saint-Germain-en-Laye',
-              pays: 'France'
+              pays: 'France',
             },
             montantHT: 25000,
             montantTTC: 30000,
@@ -126,7 +128,8 @@ export const api = {
           {
             id: '3',
             reference: 'PRJ-2024-003',
-            description: 'Garde-corps Résidence Les Acacias - Installation garde-corps pour résidence neuve',
+            description:
+              'Garde-corps Résidence Les Acacias - Installation garde-corps pour résidence neuve',
             client: {
               id: 'client-3',
               nom: 'Bertrand',
@@ -137,19 +140,19 @@ export const api = {
                 rue: '12 Rue des Acacias',
                 codePostal: '92100',
                 ville: 'Boulogne-Billancourt',
-                pays: 'France'
+                pays: 'France',
               },
               contact: {
                 nom: 'Bertrand',
                 prenom: 'Jacques',
                 email: 'j.bertrand@email.com',
                 telephone: '06 12 34 56 78',
-                fonction: 'Propriétaire'
+                fonction: 'Propriétaire',
               },
               isActif: true,
               createdAt: new Date('2024-01-05'),
               updatedAt: new Date('2024-01-05'),
-              notes: 'Premier projet avec ce client particulier'
+              notes: 'Premier projet avec ce client particulier',
             },
             clientId: 'client-3',
             statut: ProjetStatut.TERMINE,
@@ -163,7 +166,7 @@ export const api = {
               rue: '12 Rue des Acacias',
               codePostal: '92100',
               ville: 'Boulogne-Billancourt',
-              pays: 'France'
+              pays: 'France',
             },
             montantHT: 8500,
             montantTTC: 10200,
@@ -175,52 +178,46 @@ export const api = {
             ordresFabricationIds: [],
             createdAt: new Date('2023-11-15'),
             updatedAt: new Date('2024-01-05'),
-          }
+          },
         ]
 
         // Application des filtres si fournis
 
         let filteredProjets = mockProjets
 
-
         if (filters) {
           if (filters.statut && filters.statut.length > 0) {
-            filteredProjets = filteredProjets.filter(p => 
-              filters.statut!.includes(p.statut)
-            )
+            filteredProjets = filteredProjets.filter((p) => filters.statut!.includes(p.statut))
           }
 
           if (filters.priorite && filters.priorite.length > 0) {
-            filteredProjets = filteredProjets.filter(p => 
-              filters.priorite!.includes(p.priorite)
-            )
+            filteredProjets = filteredProjets.filter((p) => filters.priorite!.includes(p.priorite))
           }
 
           if (filters.clientId) {
-            filteredProjets = filteredProjets.filter(p => 
-              p.clientId === filters.clientId
-            )
+            filteredProjets = filteredProjets.filter((p) => p.clientId === filters.clientId)
           }
 
           if (filters.dateDebut) {
-            filteredProjets = filteredProjets.filter(p => 
-              p.dateDebut && p.dateDebut >= filters.dateDebut!
+            filteredProjets = filteredProjets.filter(
+              (p) => p.dateDebut && p.dateDebut >= filters.dateDebut!
             )
           }
 
           if (filters.dateFin) {
-            filteredProjets = filteredProjets.filter(p => 
-              p.dateFin && p.dateFin <= filters.dateFin!
+            filteredProjets = filteredProjets.filter(
+              (p) => p.dateFin && p.dateFin <= filters.dateFin!
             )
           }
 
           if (filters.search) {
             const searchLower = filters.search.toLowerCase()
 
-            filteredProjets = filteredProjets.filter(p => 
-              p.reference.toLowerCase().includes(searchLower) ||
-              p.description?.toLowerCase().includes(searchLower) ||
-              p.client.nom.toLowerCase().includes(searchLower)
+            filteredProjets = filteredProjets.filter(
+              (p) =>
+                p.reference.toLowerCase().includes(searchLower) ||
+                p.description?.toLowerCase().includes(searchLower) ||
+                p.client.nom.toLowerCase().includes(searchLower)
             )
           }
         }
@@ -235,11 +232,11 @@ export const api = {
     async getById(id: string): Promise<Projet | null> {
       try {
         // Simulation d'appel API
-        await new Promise(resolve => setTimeout(resolve, 50))
-        
+        await new Promise((resolve) => setTimeout(resolve, 50))
+
         const projets = await this.getAll()
 
-        return projets.find(p => p.id === id) || null
+        return projets.find((p) => p.id === id) || null
       } catch (error) {
         console.error('Erreur lors de la récupération du projet:', error)
         throw new Error('Impossible de récupérer le projet')
@@ -249,8 +246,8 @@ export const api = {
     async create(data: Partial<Projet>): Promise<Projet> {
       try {
         // Simulation d'appel API
-        await new Promise(resolve => setTimeout(resolve, 200))
-        
+        await new Promise((resolve) => setTimeout(resolve, 200))
+
         // Simulation de création
         const newProjet: Projet = {
           id: Date.now().toString(),
@@ -266,7 +263,7 @@ export const api = {
             rue: '',
             codePostal: '',
             ville: '',
-            pays: 'France'
+            pays: 'France',
           },
           montantHT: data.montantHT || 0,
           montantTTC: data.montantTTC || 0,
@@ -278,7 +275,7 @@ export const api = {
           createdAt: new Date(),
           updatedAt: new Date(),
           // Note: Le client serait récupéré via une autre API en réalité
-          client: {} as Client // À compléter selon les besoins
+          client: {} as Client, // À compléter selon les besoins
         }
 
         return newProjet
@@ -291,8 +288,8 @@ export const api = {
     async update(id: string, data: Partial<Projet>): Promise<Projet> {
       try {
         // Simulation d'appel API
-        await new Promise(resolve => setTimeout(resolve, 150))
-        
+        await new Promise((resolve) => setTimeout(resolve, 150))
+
         const existingProjet = await this.getById(id)
 
         if (!existingProjet) {
@@ -302,7 +299,7 @@ export const api = {
         const updatedProjet: Projet = {
           ...existingProjet,
           ...data,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         }
 
         return updatedProjet
@@ -315,16 +312,16 @@ export const api = {
     async delete(id: string): Promise<void> {
       try {
         // Simulation d'appel API
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
         // En réalité, on ferait l'appel DELETE à l'API
         console.log(`Projet ${id} supprimé`)
       } catch (error) {
         console.error('Erreur lors de la suppression du projet:', error)
         throw new Error('Impossible de supprimer le projet')
       }
-    }
-  }
+    },
+  },
 }
 
 // Export par défaut

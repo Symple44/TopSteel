@@ -1,10 +1,10 @@
 // packages/types/src/client.ts
-import type { BaseEntity, Address, Contact } from './common'
+import type { Address, BaseEntity, Contact } from './common'
 
 export enum ClientType {
   PARTICULIER = 'PARTICULIER',
   PROFESSIONNEL = 'PROFESSIONNEL',
-  COLLECTIVITE = 'COLLECTIVITE'
+  COLLECTIVITE = 'COLLECTIVITE',
 }
 
 export interface Client extends BaseEntity {

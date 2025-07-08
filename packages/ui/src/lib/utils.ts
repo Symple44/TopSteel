@@ -1,7 +1,7 @@
 /**
  * 🛠️ UTILITAIRES UI PACKAGE - TOPSTEEL ERP
  * Utilitaires dédiés au package UI avec optimisations
- * 
+ *
  * Fonctionnalités:
  * - Combinaison de classes Tailwind optimisée
  * - Helpers pour les variantes de composants
@@ -27,6 +27,7 @@ function getCachedClass(key: string): string | undefined {
 function setCachedClass(key: string, value: string): void {
   if (classCache.size >= maxCacheSize) {
     const firstKey = classCache.keys().next().value
+
     if (firstKey) {
       classCache.delete(firstKey)
     }
@@ -46,20 +47,23 @@ export function cn(...inputs: ClassValue[]): string {
   try {
     // Créer une clé de cache à partir des inputs
     const cacheKey = JSON.stringify(inputs)
-    
+
     // Vérifier le cache
     const cached = getCachedClass(cacheKey)
+
     if (cached) {
       return cached
     }
-    
+
     // Calculer et mettre en cache
     const result = twMerge(clsx(inputs))
+
     setCachedClass(cacheKey, result)
-    
+
     return result
   } catch (error) {
     console.warn('[UI Package] Erreur lors de la combinaison des classes:', error)
+
     // Fallback sans cache ni merge
     return clsx(inputs)
   }
@@ -70,9 +74,7 @@ export function cn(...inputs: ClassValue[]): string {
 // =============================================
 
 export type VariantProps<T> = {
-  [K in keyof T]?: T[K] extends (...args: any[]) => any 
-    ? Parameters<T[K]>[0] 
-    : T[K]
+  [K in keyof T]?: T[K] extends (...args: any[]) => any ? Parameters<T[K]>[0] : T[K]
 }
 
 /**
@@ -81,10 +83,11 @@ export type VariantProps<T> = {
 export function createVariants<T extends Record<string, any>>(config: T) {
   return (props: VariantProps<T>) => {
     const classes: string[] = []
-    
+
     Object.entries(props).forEach(([key, value]) => {
       if (value != null && key in config) {
         const variantConfig = config[key]
+
         if (typeof variantConfig === 'function') {
           classes.push(variantConfig(value))
         } else if (typeof variantConfig === 'object' && value in variantConfig) {
@@ -92,7 +95,7 @@ export function createVariants<T extends Record<string, any>>(config: T) {
         }
       }
     })
-    
+
     return cn(...classes)
   }
 }
@@ -106,7 +109,7 @@ export function combineVariants(
   conditionalClasses?: Record<string, boolean>
 ): string {
   const classes = [baseClasses, variantClasses]
-  
+
   if (conditionalClasses) {
     Object.entries(conditionalClasses).forEach(([className, condition]) => {
       if (condition) {
@@ -114,7 +117,7 @@ export function combineVariants(
       }
     })
   }
-  
+
   return cn(...classes)
 }
 
@@ -135,8 +138,8 @@ export function isValidClassName(className: unknown): className is string {
 export function sanitizeClasses(...classes: unknown[]): string[] {
   return classes
     .filter(isValidClassName)
-    .map(className => className.trim())
-    .filter(className => className.length > 0)
+    .map((className) => className.trim())
+    .filter((className) => className.length > 0)
 }
 
 /**
@@ -144,6 +147,7 @@ export function sanitizeClasses(...classes: unknown[]): string[] {
  */
 export function safeClassNames(...classes: unknown[]): string {
   const validClasses = sanitizeClasses(...classes)
+
   return validClasses.join(' ')
 }
 
@@ -156,11 +160,13 @@ export function safeClassNames(...classes: unknown[]): string {
  */
 export function focusRing(variant: 'default' | 'destructive' | 'none' = 'default'): string {
   const rings = {
-    default: 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-    destructive: 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2',
-    none: 'focus-visible:outline-none'
+    default:
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+    destructive:
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2',
+    none: 'focus-visible:outline-none',
   }
-  
+
   return rings[variant]
 }
 
@@ -185,9 +191,9 @@ export function hoverEffect(variant: 'subtle' | 'prominent' | 'none' = 'subtle')
   const effects = {
     subtle: 'hover:opacity-80',
     prominent: 'hover:opacity-90 hover:scale-105',
-    none: ''
+    none: '',
   }
-  
+
   return effects[variant]
 }
 
@@ -206,9 +212,9 @@ export function buttonSizes(size: Size): string {
     sm: 'h-8 px-3 text-sm',
     md: 'h-10 px-4 text-sm',
     lg: 'h-11 px-8 text-base',
-    xl: 'h-12 px-10 text-lg'
+    xl: 'h-12 px-10 text-lg',
   }
-  
+
   return sizes[size] || sizes.md
 }
 
@@ -221,9 +227,9 @@ export function inputSizes(size: Size): string {
     sm: 'h-8 px-3 text-sm',
     md: 'h-10 px-3 text-sm',
     lg: 'h-11 px-4 text-base',
-    xl: 'h-12 px-4 text-lg'
+    xl: 'h-12 px-4 text-lg',
   }
-  
+
   return sizes[size] || sizes.md
 }
 
@@ -236,9 +242,9 @@ export function paddingSizes(size: Size): string {
     sm: 'p-2',
     md: 'p-4',
     lg: 'p-6',
-    xl: 'p-8'
+    xl: 'p-8',
   }
-  
+
   return sizes[size] || sizes.md
 }
 
@@ -256,23 +262,23 @@ export function accessibilityProps(props: {
   invalid?: boolean
 }) {
   const result: Record<string, any> = {}
-  
+
   if (props.label) {
     result['aria-label'] = props.label
   }
-  
+
   if (props.description) {
     result['aria-describedby'] = `${props.label || 'element'}-description`
   }
-  
+
   if (props.required) {
     result['aria-required'] = true
   }
-  
+
   if (props.invalid) {
     result['aria-invalid'] = true
   }
-  
+
   return result
 }
 
@@ -283,9 +289,9 @@ export function validationClasses(state: 'valid' | 'invalid' | 'neutral' = 'neut
   const states = {
     valid: 'border-green-500 text-green-900 focus:border-green-500 focus:ring-green-500',
     invalid: 'border-red-500 text-red-900 focus:border-red-500 focus:ring-red-500',
-    neutral: 'border-input'
+    neutral: 'border-input',
   }
-  
+
   return states[state]
 }
 
@@ -310,12 +316,12 @@ export function responsiveGrid(columns: {
   xl?: number
 }): string {
   const classes = ['grid']
-  
+
   if (columns.sm) classes.push(`sm:grid-cols-${columns.sm}`)
   if (columns.md) classes.push(`md:grid-cols-${columns.md}`)
   if (columns.lg) classes.push(`lg:grid-cols-${columns.lg}`)
   if (columns.xl) classes.push(`xl:grid-cols-${columns.xl}`)
-  
+
   return cn(...classes)
 }
 
@@ -329,23 +335,23 @@ export const UI_CONSTANTS = {
     md: 'rounded-md',
     lg: 'rounded-lg',
     xl: 'rounded-xl',
-    full: 'rounded-full'
+    full: 'rounded-full',
   },
-  
+
   SHADOWS: {
     sm: 'shadow-sm',
     md: 'shadow-md',
     lg: 'shadow-lg',
-    xl: 'shadow-xl'
+    xl: 'shadow-xl',
   },
-  
+
   SPACING: {
     xs: 'gap-1',
     sm: 'gap-2',
     md: 'gap-4',
     lg: 'gap-6',
-    xl: 'gap-8'
-  }
+    xl: 'gap-8',
+  },
 } as const
 
 // =============================================
@@ -370,6 +376,6 @@ export function getCacheStats(): {
   return {
     size: classCache.size,
     maxSize: maxCacheSize,
-    hitRate: 0 // À implémenter si nécessaire
+    hitRate: 0, // À implémenter si nécessaire
   }
 }

@@ -1,16 +1,23 @@
 'use client'
 
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Building2, Loader2, Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Building2, CheckCircle, Loader2, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -27,7 +34,7 @@ export default function ForgotPasswordPage() {
     register,
     handleSubmit,
     formState: { errors },
-    getValues
+    getValues,
   } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
   })
@@ -39,13 +46,13 @@ export default function ForgotPasswordPage() {
     try {
       // TODO: Implémenter la récupération de mot de passe via API
       console.log('Récupération mot de passe pour:', data.email)
-      
+
       // Simulation d'attente
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
       setIsSuccess(true)
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de l\'envoi de l\'email')
+      setError(err.message || "Erreur lors de l'envoi de l'email")
     } finally {
       setIsLoading(false)
     }
@@ -61,9 +68,7 @@ export default function ForgotPasswordPage() {
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
               <div className="space-y-2">
-                <CardTitle className="text-2xl font-bold text-green-700">
-                  Email envoyé !
-                </CardTitle>
+                <CardTitle className="text-2xl font-bold text-green-700">Email envoyé !</CardTitle>
                 <CardDescription className="text-muted-foreground">
                   Instructions de récupération envoyées
                 </CardDescription>
@@ -75,9 +80,7 @@ export default function ForgotPasswordPage() {
                 <p className="text-sm text-muted-foreground">
                   Nous avons envoyé un lien de récupération à :
                 </p>
-                <p className="font-medium text-foreground">
-                  {getValues('email')}
-                </p>
+                <p className="font-medium text-foreground">{getValues('email')}</p>
                 <p className="text-xs text-muted-foreground">
                   Vérifiez votre boîte de réception et vos spams
                 </p>
@@ -138,20 +141,12 @@ export default function ForgotPasswordPage() {
                   {...register('email')}
                   disabled={isLoading}
                 />
-                {errors.email && (
-                  <p className="text-sm text-destructive">
-                    {errors.email.message}
-                  </p>
-                )}
+                {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
               </div>
             </CardContent>
 
             <CardFooter className="flex flex-col space-y-4 pt-6">
-              <Button
-                type="submit"
-                className="w-full h-11 btn-metallurgy"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full h-11 btn-metallurgy" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
