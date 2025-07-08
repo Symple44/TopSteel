@@ -9,19 +9,14 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
       include: ['src/**/*'],
-      exclude: ['**/*.stories.*', '**/*.test.*'],
-      compilerOptions: {
-        forceConsistentCasingInFileNames: true
-      }
+      exclude: ['**/*.stories.*', '**/*.test.*']
     })
   ],
   
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'ErpUi',
-      formats: ['es', 'cjs'],
-      fileName: (format) => 'index.' + (format === 'es' ? 'mjs' : 'js')
+      name: 'ErpUi'
     },
     rollupOptions: {
       external: [
@@ -41,15 +36,11 @@ export default defineConfig({
         },
         {
           format: 'cjs',
-          entryFileNames: 'index.js',
+          entryFileNames: 'index.cjs',
           exports: 'named',
           interop: 'auto'
         }
-      ],
-      globals: {
-        react: 'React',
-        'react-dom': 'ReactDOM'
-      }
+      ]
     },
     sourcemap: true,
     target: 'esnext',
@@ -58,12 +49,7 @@ export default defineConfig({
   
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      '@/lib': resolve(__dirname, 'src/lib'),
-      '@/components': resolve(__dirname, 'src/components'),
-      '@/hooks': resolve(__dirname, 'src/hooks'),
-      '@/utils': resolve(__dirname, 'src/utils'),
-      '@/types': resolve(__dirname, 'src/types')
+      '@': resolve(__dirname, 'src')
     }
   }
 })
