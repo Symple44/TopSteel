@@ -4,11 +4,8 @@ import { OrdreInfoTab } from '@/components/production/ordre-info-tab'
 import { OrdreMateriauxTab } from '@/components/production/ordre-materiaux-tab'
 import { OrdreOperationsTab } from '@/components/production/ordre-operations-tab'
 import { OrdreQualiteTab } from '@/components/production/ordre-qualite-tab'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowLeft, Calendar, CheckCircle, Clock, Pause, Play, User } from 'lucide-react'
+import { Badge, Button, Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
+import { ArrowLeft, Calendar, CheckCircle, Pause } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 interface OrdrePageProps {

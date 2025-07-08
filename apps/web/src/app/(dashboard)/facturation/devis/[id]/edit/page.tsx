@@ -1,26 +1,11 @@
 'use client'
 
 import { DevisPreview } from '@/components/facturation/devis-preview'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+  Badge, Button, Card, CardContent, CardHeader, CardTitle,
+  Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from '@erp/ui'
 import { Calculator, Download, Eye, Plus, Save, Send, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 

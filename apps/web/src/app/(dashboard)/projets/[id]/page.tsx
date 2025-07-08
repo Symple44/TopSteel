@@ -5,22 +5,17 @@ import { ProjetDevisTab } from '@/components/projets/projet-devis-tab'
 import { ProjetDocumentsTab } from '@/components/projets/projet-documents-tab'
 import { ProjetInfoTab } from '@/components/projets/projet-info-tab'
 import { ProjetProductionTab } from '@/components/projets/projet-production-tab'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useProjet } from '@/hooks/use-projets'
+import { formatCurrency, formatDate, getDaysUntil } from '@/lib/utils'
+import { ProjetStatut } from '@erp/types'
 import {
-  DropdownMenu,
+  Badge, Button, Card, CardContent, CardHeader, CardTitle, DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useProjet } from '@/hooks/use-projets'
-import { formatCurrency, formatDate, getDaysUntil } from '@/lib/utils'
-import { ProjetStatut } from '@erp/types'
+  DropdownMenuTrigger, Progress, Tabs, TabsContent, TabsList, TabsTrigger
+} from '@erp/ui'
 import {
   AlertCircle,
   ArrowLeft,
