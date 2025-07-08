@@ -71,7 +71,7 @@
     "lint": "turbo lint",
     "clean:safe": "rimraf --verbose --glob node_modules/.cache .turbo .next dist apps/web/.next 'packages/*/dist' && pnpm install",
     "build:incremental": "pnpm clean:types && pnpm build:types && pnpm build",
-    "fix:imports": "biome check --write . || eslint --fix .",
+    "fix:imports": "biome check --write apps packages || eslint --fix .",
     "ci:validate": "pnpm type-check && pnpm lint && pnpm test",
     "_comment_utils": "--- Scripts utilitaires ---",
     "ci:type-check": "pnpm run type-check",

@@ -39,7 +39,7 @@ declare module '@erp/ui' {
     className?: string
     disabled?: boolean
     type?: 'button' | 'submit' | 'reset'
-    onClick?: (e: MouseEvent<HTMLButtonElement>) => void
+    onClick?: (_e: MouseEvent<HTMLButtonElement>) => void
   }
 
   export const Button: React.ComponentType<ButtonProps>
@@ -81,7 +81,7 @@ declare module '@erp/ui' {
     id?: string
     checked?: boolean
     defaultChecked?: boolean
-    onCheckedChange?: (checked: boolean) => void
+    onCheckedChange?: (_checked: boolean) => void
     disabled?: boolean
     className?: string
     name?: string
@@ -95,7 +95,7 @@ declare module '@erp/ui' {
     placeholder?: string
     value?: string
     defaultValue?: string
-    onChange?: (e: ChangeEvent<HTMLInputElement>) => void
+    onChange?: (_e: ChangeEvent<HTMLInputElement>) => void
     className?: string
     disabled?: boolean
 
