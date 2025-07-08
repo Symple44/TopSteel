@@ -1,18 +1,18 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@erp/ui"
+import { Input } from "@erp/ui"
+import { Label } from "@erp/ui"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
+} from "@erp/ui"
+import { Separator } from "@erp/ui"
 import {
   Table,
   TableBody,
@@ -20,8 +20,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+} from "@erp/ui"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@erp/ui"
 import { formatCurrency } from '@/lib/utils'
 import {
   Calculator,
@@ -419,3 +419,7 @@ export default function ChiffragePage() {
     </div>
   )
 }
+
+
+
+

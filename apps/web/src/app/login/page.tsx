@@ -1,6 +1,6 @@
 'use client'
 
-import { ErrorAlert } from '@/components/ui/error-alert'
+import { ErrorAlert } from "@erp/ui"
 import { useAuth } from '@/hooks/use-auth'
 import type { FormattedError } from '@/lib/error-handler'
 import { ErrorHandler } from '@/lib/error-handler'
@@ -295,3 +295,7 @@ export default function LoginPage() {
     </div>
   )
 }
+
+
+
+

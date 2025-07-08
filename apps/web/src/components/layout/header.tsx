@@ -1,9 +1,9 @@
 'use client'
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { ThemeSwitcher } from '@/components/ui/theme-switcher'
+import { Avatar, AvatarFallback } from "@erp/ui"
+import { Button } from "@erp/ui"
+import { Input } from "@erp/ui"
+import { ThemeSwitcher } from "@erp/ui"
 import { Bell, PanelLeftClose, PanelLeftOpen, Search, Zap } from 'lucide-react'
 import { useState } from 'react'
 
@@ -82,3 +82,7 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
     </header>
   )
 }
+
+
+
+

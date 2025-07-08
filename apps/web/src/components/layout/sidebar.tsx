@@ -1,8 +1,8 @@
 // apps/web/src/components/layout/sidebar.tsx - VERSION AMÉLIORÉE
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { Badge } from "@erp/ui"
+import { Separator } from "@erp/ui"
 import { cn } from '@/lib/utils'
 import {
   BarChart3,
@@ -279,3 +279,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     </div>
   )
 }
+
+
+
+

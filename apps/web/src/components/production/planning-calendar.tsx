@@ -1,8 +1,8 @@
 // apps/web/src/components/production/planning-calendar.tsx
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useState } from 'react'
 
@@ -198,3 +198,7 @@ export function PlanningCalendar({
     </Card>
   )
 }
+
+
+
+

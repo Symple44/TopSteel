@@ -1,9 +1,9 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@erp/ui"
+import { Separator } from "@erp/ui"
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
 import {
@@ -315,3 +315,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
     </div>
   )
 }
+
+
+
+

@@ -1,9 +1,9 @@
 // apps/web/src/components/stocks/chutes-optimizer.tsx
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
+import { Input } from "@erp/ui"
 import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from 'lucide-react'
 import { useState } from 'react'
 
@@ -300,3 +300,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
     </div>
   )
 }
+
+
+
+

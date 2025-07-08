@@ -148,3 +148,7 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({
     </button>
   )
 }
+
+
+
+

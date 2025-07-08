@@ -67,3 +67,6 @@ export default function ChutesPage() {
     </ClientOnly>
   )
 }
+
+
+

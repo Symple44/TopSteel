@@ -4,11 +4,11 @@ import { AddMaterialDialog } from '@/components/stocks/add-material-dialog'
 import { StockAlertsPanel } from '@/components/stocks/stock-alerts-panel'
 import { StocksFilters } from '@/components/stocks/stocks-filters'
 import { StocksTable } from '@/components/stocks/stocks-table'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from "@erp/ui"
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
+import { Input } from "@erp/ui"
 import { AlertTriangle, Filter, Package, Plus, Search, TrendingDown } from 'lucide-react'
 import { useState } from 'react'
 
@@ -141,3 +141,6 @@ export default function StocksPage() {
     </div>
   )
 }
+
+
+

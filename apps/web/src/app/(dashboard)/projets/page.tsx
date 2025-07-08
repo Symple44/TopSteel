@@ -1,12 +1,12 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DataTable } from '@/components/ui/data-table'
-import { Input } from '@/components/ui/input'
-import { PageHeader } from '@/components/ui/page-header'
-import { ProjetCard } from '@/components/ui/projet-card'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
+import { DataTable } from "@erp/ui"
+import { Input } from "@erp/ui"
+import { PageHeader } from "@erp/ui"
+import { ProjetCard } from "@erp/ui"
 import { useDataView } from '@/hooks/use-data-view'
 import { useProjets } from '@/hooks/use-projets'
 import { formatCurrency, formatDate } from '@/lib/utils'
@@ -290,3 +290,6 @@ export default function ProjetsPage() {
     </div>
   )
 }
+
+
+

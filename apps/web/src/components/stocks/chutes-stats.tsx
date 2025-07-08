@@ -1,7 +1,7 @@
 // apps/web/src/components/stocks/chutes-stats.tsx
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 import { AlertTriangle, CheckCircle, DollarSign, Package, Recycle, TrendingUp } from 'lucide-react'
 
 interface ChutesStatsProps {
@@ -226,3 +226,7 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
     </div>
   )
 }
+
+
+
+

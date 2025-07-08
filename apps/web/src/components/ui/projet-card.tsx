@@ -1,8 +1,8 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
 import { Calendar, Euro, Eye, User } from 'lucide-react'
@@ -152,3 +152,7 @@ export function ProjetCard({ projet }: ProjetCardProps) {
     </Card>
   )
 }
+
+
+
+

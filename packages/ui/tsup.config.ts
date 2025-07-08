@@ -1,28 +1,17 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/index.ts'],
-  format: ['esm', 'cjs'],
-  dts: true,
-  clean: true,
-  sourcemap: false,
-  minify: false,
-  splitting: false,
-  treeshake: true,
-  external: ['react', 'react-dom'],
-  tsconfig: './tsconfig.json',
-  outDir: 'dist',
-  target: 'es2020',
-  platform: 'neutral',
-
-  // Banner pour compatibilité client React
-  banner: {
-    js: '"use client";',
+  entry: {
+    index: 'src/index.ts',
+    'hooks/index': 'src/hooks/index.ts',
   },
-
-  // Gestion des erreurs gracieuse
-  skipNodeModulesBundle: true,
-
-  // Pas de validation stricte au build
-  onSuccess: 'echo "✅ Build UI réussi"',
+  format: ['cjs', 'esm'],
+  dts: true,
+  splitting: false,
+  sourcemap: true,
+  clean: true,
+  external: ['react', 'react-dom', 'tailwindcss'],
+  treeshake: true,
+  minify: false,
+  tsconfig: './tsconfig.json',
 })

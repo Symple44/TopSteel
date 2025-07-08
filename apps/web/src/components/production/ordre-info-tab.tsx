@@ -1,5 +1,5 @@
 // apps/web/src/components/production/ordre-info-tab.tsx
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 
 interface OrdreInfoTabProps {
   ordre: any
@@ -60,3 +60,7 @@ export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
     </div>
   )
 }
+
+
+
+

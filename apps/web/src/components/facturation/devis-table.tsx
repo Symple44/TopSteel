@@ -1,14 +1,14 @@
 // apps/web/src/components/facturation/devis-table.tsx
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@erp/ui"
 import {
   Table,
   TableBody,
@@ -16,7 +16,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Download, Edit, Eye, MoreHorizontal } from 'lucide-react'
 
@@ -129,3 +129,7 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
     </div>
   )
 }
+
+
+
+

@@ -1,8 +1,8 @@
 'use client'
 
 import { useNotifications } from '@/components/providers/notifications-provider'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { Button } from "@erp/ui"
+import { Label } from "@erp/ui"
 import { cn } from '@/lib/utils'
 import { Mail, Monitor, Volume2 } from 'lucide-react'
 
@@ -120,3 +120,7 @@ export function NotificationSettings() {
     </div>
   )
 }
+
+
+
+

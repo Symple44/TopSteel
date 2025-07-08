@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 import {
   Activity,
   AlertTriangle,
@@ -495,3 +495,7 @@ export default function Dashboard() {
     </div>
   )
 }
+
+
+
+

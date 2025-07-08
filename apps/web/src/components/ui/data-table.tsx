@@ -1,13 +1,13 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@erp/ui"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
+} from "@erp/ui"
+import { Input } from "@erp/ui"
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@erp/ui"
 import { AlertTriangle, ChevronDown, Search } from 'lucide-react'
 import * as React from 'react'
 
@@ -378,3 +378,7 @@ export function DataTable({
     </div>
   )
 }
+
+
+
+

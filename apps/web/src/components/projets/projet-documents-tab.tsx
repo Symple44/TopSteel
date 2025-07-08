@@ -1,16 +1,16 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
+import { Input } from "@erp/ui"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@erp/ui"
 import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
 import { useState } from 'react'
 
@@ -326,3 +326,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
     </div>
   )
 }
+
+
+
+

@@ -7,7 +7,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '@/components/ui/toast'
+} from "@erp/ui"
 import { useToast } from '@/hooks/use-toast'
 
 export function Toaster() {
@@ -29,3 +29,7 @@ export function Toaster() {
     </ToastProvider>
   )
 }
+
+
+
+

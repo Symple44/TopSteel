@@ -16,3 +16,7 @@ export function TooltipTrigger({ children, className, asChild }: ComponentWithCl
 export function TooltipContent({ children, className, side }: ComponentWithClassName) {
   return <div className={className}>{children}</div>
 }
+
+
+
+

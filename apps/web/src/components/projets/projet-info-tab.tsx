@@ -1,12 +1,12 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { Textarea } from '@/components/ui/textarea'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@erp/ui"
+import { Input } from "@erp/ui"
+import { Label } from "@erp/ui"
+import { Separator } from "@erp/ui"
+import { Textarea } from "@erp/ui"
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@/types'
 import { ProjetStatut } from '@erp/types'
@@ -272,3 +272,7 @@ export function ProjetInfoTab({ projet }: ProjetInfoTabProps) {
     </div>
   )
 }
+
+
+
+

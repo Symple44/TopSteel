@@ -1,8 +1,8 @@
 // apps/web/src/components/production/planning-gantt.tsx
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 import { BarChart3, Calendar, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
 
@@ -283,3 +283,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     </Card>
   )
 }
+
+
+
+

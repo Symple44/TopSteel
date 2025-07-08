@@ -1,7 +1,7 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
+import { Input } from "@erp/ui"
 import { ArrowLeft, ArrowRight, Calendar, Package, RotateCcw, Search, User } from 'lucide-react'
 import { useState } from 'react'
 
@@ -287,3 +287,7 @@ export function MouvementsTable({
     </Card>
   )
 }
+
+
+
+

@@ -1,66 +1,37 @@
 {
-  "extends": "../../packages/config/typescript/base.json",
+  "extends": "@erp/config/tsconfig/base.json",
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "es6"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
+    "noEmit": false,
+    "esModuleInterop": true,
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": false,
     "jsx": "react-jsx",
     "declaration": true,
     "declarationMap": true,
+    "incremental": false,
+    "composite": false,
     "outDir": "./dist",
     "rootDir": "./src",
-    "incremental": true,
-    "composite": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"],
-      "@/components/*": ["components/*"],
-      "@/lib/*": ["lib/*"],
-      "@/hooks/*": ["hooks/*"],
-      "@/utils/*": ["utils/*"],
-      "@/types/*": ["types/*"]
-    },
-    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
-    "types": ["node", "react", "react-dom"],
-    "plugins": []
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
-    "src/**/*",
-    "src/**/*.json",
-    "**/*.d.ts",
-    "src/stories/**/*",
-    "src/**/*.stories.ts",
-    "src/**/*.stories.tsx"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "build",
-    "coverage",
-    ".turbo",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/__tests__/**/*",
-    "**/tests/**/*",
-    "**/*.stories.ts",
-    "**/*.stories.tsx",
-    "**/stories/**/*",
-    ".storybook",
-    "storybook-static",
-    "src/stories/**/*"
-  ],
-  "references": []
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
 }

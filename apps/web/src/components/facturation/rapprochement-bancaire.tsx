@@ -1,7 +1,7 @@
 // apps/web/src/components/facturation/rapprochement-bancaire.tsx
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
 
 export function RapprochementBancaire() {
   return (
@@ -17,3 +17,7 @@ export function RapprochementBancaire() {
     </Card>
   )
 }
+
+
+
+

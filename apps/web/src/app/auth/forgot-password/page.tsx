@@ -1,7 +1,7 @@
 'use client'
 
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from "@erp/ui"
+import { Button } from "@erp/ui"
 import {
   Card,
   CardContent,
@@ -9,9 +9,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from "@erp/ui"
+import { Input } from "@erp/ui"
+import { Label } from "@erp/ui"
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, ArrowLeft, Building2, CheckCircle, Loader2, Mail } from 'lucide-react'
 import Link from 'next/link'
@@ -174,3 +174,7 @@ export default function ForgotPasswordPage() {
     </div>
   )
 }
+
+
+
+

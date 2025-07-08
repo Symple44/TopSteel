@@ -1,22 +1,22 @@
 'use client'
 
 import { useNotifications } from '@/components/providers/notifications-provider'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from "@erp/ui"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
+} from "@erp/ui"
+import { ScrollArea } from "@erp/ui"
+import { Separator } from "@erp/ui"
 import { cn } from '@/lib/utils'
 import type { Notification } from '@erp/types'
 import { AlertTriangle, Bell, CheckCheck, Clock, Settings, Trash2, X } from 'lucide-react'
@@ -213,3 +213,7 @@ export function NotificationCenter() {
     </DropdownMenu>
   )
 }
+
+
+
+

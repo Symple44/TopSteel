@@ -1,15 +1,15 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@erp/ui"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from "@erp/ui"
+import { Input } from "@erp/ui"
+import { Label } from "@erp/ui"
 import { useState } from 'react'
 
 // Interface correcte avec open et onOpenChange
@@ -133,3 +133,7 @@ export function CreatePaiementDialog({
     </Dialog>
   )
 }
+
+
+
+

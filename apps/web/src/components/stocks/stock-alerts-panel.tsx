@@ -1,7 +1,7 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from "@erp/ui"
+import { Button } from "@erp/ui"
 import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 
 export function StockAlertsPanel() {
@@ -75,3 +75,7 @@ export function StockAlertsPanel() {
     </div>
   )
 }
+
+
+
+

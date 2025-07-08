@@ -2,9 +2,9 @@
 
 import { PlanningCalendar } from '@/components/production/planning-calendar'
 import { PlanningGantt } from '@/components/production/planning-gantt'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from "@erp/ui"
+import { Card, CardContent, CardHeader, CardTitle } from "@erp/ui"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@erp/ui"
 import { Calendar, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
 import { useState } from 'react'
 
@@ -157,3 +157,6 @@ export default function PlanningPage() {
     </div>
   )
 }
+
+
+

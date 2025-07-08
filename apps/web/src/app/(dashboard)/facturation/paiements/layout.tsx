@@ -82,3 +82,6 @@ export default function PaiementsLayout({ children }: PaiementsLayoutProps) {
 // ===== CONFIGURATION =====
 export const dynamic = 'force-dynamic'
 export const revalidate = 60
+
+
+
