@@ -229,7 +229,7 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
           </SliderPrimitive.Track>
 
           {currentValue.map((_, index) => (
-            <SliderPrimitive.Thumb key={index} className={thumbClasses} />
+            <SliderPrimitive.Thumb key={`item-${index}`} className={thumbClasses} />
           ))}
         </SliderPrimitive.Root>
 
@@ -239,7 +239,7 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
             <span>{formatValue(min)}</span>
             <div className="flex gap-2">
               {currentValue.map((val, index) => (
-                <span key={index} className={cn('font-medium', !isValid && 'text-destructive')}>
+                <span key={`item-${index}`} className={cn('font-medium', !isValid && 'text-destructive')}>
                   {formatValue(val)}
                 </span>
               ))}
@@ -305,7 +305,7 @@ export const SteppedSlider = React.forwardRef<
 
             return (
               <div
-                key={index}
+                key={`item-${index}`}
                 className="absolute transform -translate-x-1/2"
                 style={{ left: `${percentage}%` }}
               >
@@ -331,3 +331,7 @@ SteppedSlider.displayName = 'SteppedSlider'
 // =============================================
 
 export { Slider }
+
+
+
+

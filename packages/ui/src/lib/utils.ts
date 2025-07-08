@@ -74,7 +74,7 @@ export function cn(...inputs: ClassValue[]): string {
 // =============================================
 
 export type VariantProps<T> = {
-  [K in keyof T]?: T[K] extends (...args: any[]) => any ? Parameters<T[K]>[0] : T[K]
+  [K in keyof T]?: T[K] extends (...args: unknown[]) => any ? Parameters<T[K]>[0] : T[K]
 }
 
 /**
@@ -379,3 +379,7 @@ export function getCacheStats(): {
     hitRate: 0, // À implémenter si nécessaire
   }
 }
+
+
+
+

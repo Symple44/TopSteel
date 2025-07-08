@@ -405,7 +405,7 @@ ActionButton.displayName = 'ActionButton'
 export const FormButton = React.forwardRef<
   HTMLButtonElement,
   ButtonProps & { formAction?: 'submit' | 'reset' | 'cancel' }
->(({ formAction = 'submit', type, variant, ...props }, ref) => {
+>(({ formAction = 'submit', _type, variant, ...props }, ref) => {
   const buttonType =
     formAction === 'submit' ? 'submit' : formAction === 'reset' ? 'reset' : 'button'
   const buttonVariant =
@@ -448,3 +448,9 @@ IconButton.displayName = 'IconButton'
 // =============================================
 
 export { Button, buttonVariants }
+
+
+
+
+
+

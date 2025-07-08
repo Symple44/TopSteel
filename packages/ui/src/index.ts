@@ -282,8 +282,8 @@ export function debugComponent(
 ): void {
   if (enabled) {
     console.group(`🎨 UI Component: ${componentName}`)
-    console.log('Props:', props)
-    console.log('Package Info:', UI_PACKAGE_INFO)
+    console.warn('Props:', props)
+    console.warn('Package Info:', UI_PACKAGE_INFO)
     console.groupEnd()
   }
 }
@@ -297,7 +297,7 @@ export function useDebugRender(
   enabled: boolean = process.env.NODE_ENV === 'development'
 ): void {
   if (enabled && typeof window !== 'undefined') {
-    console.log(`🔄 ${componentName} rendered with:`, props)
+    console.warn(`🔄 ${componentName} rendered with:`, props)
   }
 }
 
@@ -354,3 +354,7 @@ export default {
   debugComponent,
   useDebugRender,
 }
+
+
+
+

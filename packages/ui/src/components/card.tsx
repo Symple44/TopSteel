@@ -162,8 +162,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       disabled = false,
       selected = false,
       onSelect,
-      onEdit,
-      onDelete,
+      _onEdit,
+      _onDelete,
       label,
       description,
       entityType,
@@ -422,7 +422,7 @@ export const ProjectCard = React.forwardRef<
     client?: string
     status?: 'planning' | 'in_progress' | 'completed' | 'on_hold'
   }
->(({ title, description, progress, dueDate, client, status, ...props }, ref) => {
+>(({ title, description, progress, dueDate, client, _status, ...props }, ref) => {
   return (
     <Card ref={ref} entityType="project" {...props}>
       <CardHeader>
@@ -514,3 +514,9 @@ StatsCard.displayName = 'StatsCard'
 // =============================================
 
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, cardVariants }
+
+
+
+
+
+

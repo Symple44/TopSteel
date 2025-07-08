@@ -2,7 +2,11 @@
   "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "es6"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -22,26 +26,44 @@
     "rootDir": "./src",
     "incremental": true,
     "composite": true,
-
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["*"],
-      "@/components/*": ["components/*"],
-      "@/lib/*": ["lib/*"],
-      "@/hooks/*": ["hooks/*"],
-      "@/utils/*": ["utils/*"],
-      "@/types/*": ["types/*"]
+      "@/*": [
+        "*"
+      ],
+      "@/components/*": [
+        "components/*"
+      ],
+      "@/lib/*": [
+        "lib/*"
+      ],
+      "@/hooks/*": [
+        "hooks/*"
+      ],
+      "@/utils/*": [
+        "utils/*"
+      ],
+      "@/types/*": [
+        "types/*"
+      ]
     },
-
-    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
-
-    "types": ["node", "react", "react-dom"],
-
+    "typeRoots": [
+      "./node_modules/@types",
+      "../../node_modules/@types"
+    ],
+    "types": [
+      "node",
+      "react",
+      "react-dom"
+    ],
     "plugins": []
   },
-
-  "include": ["src/**/*", "src/**/*.json", "**/*.d.ts"],
-
+  "include": [
+    "src/**/*",
+    "src/**/*.json",
+    "**/*.d.ts",
+    "src/stories/**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist",
@@ -60,7 +82,5 @@
     ".storybook",
     "storybook-static"
   ],
-
   "references": []
 }
-

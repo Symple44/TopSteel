@@ -1,3 +1,4 @@
+import type React from 'react'
 // packages/ui/src/types/common.ts
 export type ComponentVariant =
   | 'default'
@@ -23,3 +24,4 @@ export interface WithChildren {
 export interface WithForwardRef<T = HTMLElement> {
   ref?: React.Ref<T>
 }
+

@@ -1,3 +1,4 @@
+import type React from 'react'
 // packages/ui/src/types/index.ts
 // Types communs pour l'UI
 export interface BaseComponentProps {
@@ -40,3 +41,4 @@ export interface FormFieldProps extends BaseComponentProps {
   required?: boolean
   disabled?: boolean
 }
+
