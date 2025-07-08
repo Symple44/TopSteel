@@ -46,3 +46,20 @@ export { cva, type VariantProps } from 'class-variance-authority'
 export { clsx, type ClassValue } from 'clsx'
 
 
+
+// === BUSINESS COMPONENTS ===
+export * from './components/business/projet-card'
+
+// === EXTENDED LAYOUT ===
+export * from './components/layout/page-header'
+
+// === EXTENDED DATA DISPLAY ===
+export * from './components/data-display/data-table'
+
+// === EXTENDED FEEDBACK ===
+export * from './components/feedback/error-alert'
+export * from './components/feedback/toaster'
+
+// === THEME ===
+export * from './components/theme/theme-switcher'
+

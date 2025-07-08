@@ -21,19 +21,39 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'ErpUi',
       formats: ['es', 'cjs'],
-      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`
+      fileName: (format) => 'index.' + (format === 'es' ? 'mjs' : 'js')
     },
     rollupOptions: {
-      external: ['react', 'react-dom', /^@radix-ui\/.*/, 'clsx', 'tailwind-merge', 'lucide-react', 'class-variance-authority'],
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM'
+      external: [
+        'react', 
+        'react-dom', 
+        /^@radix-ui\/.*/, 
+        'clsx', 
+        'tailwind-merge', 
+        'lucide-react', 
+        'class-variance-authority'
+      ],
+      output: [
+        {
+          format: 'es',
+          entryFileNames: 'index.mjs',
+          exports: 'named'
+        },
+        {
+          format: 'cjs',
+          entryFileNames: 'index.js',
+          exports: 'named',
+          interop: 'auto'
         }
+      ],
+      globals: {
+        react: 'React',
+        'react-dom': 'ReactDOM'
       }
     },
     sourcemap: true,
-    target: 'esnext'
+    target: 'esnext',
+    minify: false
   },
   
   resolve: {
