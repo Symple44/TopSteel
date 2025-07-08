@@ -1,6 +1,5 @@
 'use client'
 
-import { Download, Edit, Eye } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { Download, Edit, Eye } from 'lucide-react'
 
 // Données mock pour encaissements
 const mockEncaissements = [

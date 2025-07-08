@@ -14,8 +14,8 @@
  * - Types stricts
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 // =============================================
 // TYPES ET INTERFACES

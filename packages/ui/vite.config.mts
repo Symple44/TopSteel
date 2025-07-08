@@ -11,8 +11,8 @@
  * - Bundle analysis
  */
 
-import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'

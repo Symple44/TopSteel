@@ -1,10 +1,5 @@
 'use client'
 
-import type { Projet } from '@erp/types'
-import { Eye, FolderOpen, Grid, List, Plus, RefreshCw, Search } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { memo, useCallback, useMemo, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,6 +10,11 @@ import { ProjetCard } from '@/components/ui/projet-card'
 import { useDataView } from '@/hooks/use-data-view'
 import { useProjets } from '@/hooks/use-projets'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import type { Projet } from '@erp/types'
+import { Eye, FolderOpen, Grid, List, Plus, RefreshCw, Search } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 // Composant PageActions avec displayName
 const PageActions = memo(function PageActions({

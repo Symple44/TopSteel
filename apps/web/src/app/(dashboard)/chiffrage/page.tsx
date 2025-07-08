@@ -1,19 +1,5 @@
 'use client'
 
-import {
-  Calculator,
-  Clock,
-  Copy,
-  Euro,
-  Eye,
-  FileText,
-  History,
-  Plus,
-  Save,
-  TrendingUp,
-  X,
-} from 'lucide-react'
-import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -37,6 +23,20 @@ import {
 } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatCurrency } from '@/lib/utils'
+import {
+  Calculator,
+  Clock,
+  Copy,
+  Euro,
+  Eye,
+  FileText,
+  History,
+  Plus,
+  Save,
+  TrendingUp,
+  X,
+} from 'lucide-react'
+import { useState } from 'react'
 
 // Données mockées pour la démonstration
 const mockTemplates = [

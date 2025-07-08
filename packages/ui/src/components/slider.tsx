@@ -10,9 +10,9 @@
  * - Validation des valeurs
  */
 
+import { cn } from '@/lib/utils'
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import * as React from 'react'
-import { cn } from '@/lib/utils'
 
 // =============================================
 // TYPES ET INTERFACES
@@ -79,8 +79,8 @@ const formatDefaultValue = (value: number): string => {
 
 const validateSliderValue = (
   values: number[],
-  min: number = 0,
-  max: number = 100,
+  min = 0,
+  max = 100,
   validator?: (values: number[]) => boolean
 ): boolean => {
   // Validation des bornes
@@ -193,7 +193,8 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
     return (
       <div className="space-y-2">
         {/* Label */}
-        {label ? <label
+        {label ? (
+          <label
             htmlFor={sliderId}
             className={cn(
               'text-sm font-medium leading-none',
@@ -203,7 +204,8 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
           >
             {label}
             {props.required ? <span className="text-destructive ml-1">*</span> : null}
-          </label> : null}
+          </label>
+        ) : null}
 
         {/* Slider */}
         <SliderPrimitive.Root
@@ -232,25 +234,34 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
         </SliderPrimitive.Root>
 
         {/* Affichage des valeurs */}
-        {showValue ? <div className="flex justify-between text-xs text-muted-foreground">
+        {showValue ? (
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>{formatValue(min)}</span>
             <div className="flex gap-2">
               {currentValue.map((val, index) => (
-                <span key={`item-${index}`} className={cn('font-medium', !isValid && 'text-destructive')}>
+                <span
+                  key={`item-${index}`}
+                  className={cn('font-medium', !isValid && 'text-destructive')}
+                >
                   {formatValue(val)}
                 </span>
               ))}
             </div>
             <span>{formatValue(max)}</span>
-          </div> : null}
+          </div>
+        ) : null}
 
         {/* Description */}
-        {description ? <p id={descriptionId} className="text-xs text-muted-foreground">
+        {description ? (
+          <p id={descriptionId} className="text-xs text-muted-foreground">
             {description}
-          </p> : null}
+          </p>
+        ) : null}
 
         {/* Message d'erreur */}
-        {!isValid && errorMessage ? <p className="text-xs text-destructive">{errorMessage}</p> : null}
+        {!isValid && errorMessage ? (
+          <p className="text-xs text-destructive">{errorMessage}</p>
+        ) : null}
       </div>
     )
   }
@@ -304,9 +315,11 @@ export const SteppedSlider = React.forwardRef<
                 style={{ left: `${percentage}%` }}
               >
                 <div className="w-1 h-1 bg-muted-foreground rounded-full" />
-                {mark.label ? <span className="text-xs text-muted-foreground block text-center mt-1 whitespace-nowrap">
+                {mark.label ? (
+                  <span className="text-xs text-muted-foreground block text-center mt-1 whitespace-nowrap">
                     {mark.label}
-                  </span> : null}
+                  </span>
+                ) : null}
               </div>
             )
           })}
@@ -323,7 +336,3 @@ SteppedSlider.displayName = 'SteppedSlider'
 // =============================================
 
 export { Slider }
-
-
-
-

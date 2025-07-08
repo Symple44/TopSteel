@@ -340,7 +340,7 @@ export function useIntelligentCache<K, V>(
         // Éviction LRU (Least Recently Used)
         let lruKey: K | undefined
 
-        let lruTime = Infinity
+        let lruTime = Number.POSITIVE_INFINITY
 
         for (const [k, entry] of cache.entries()) {
           if (entry.lastAccess < lruTime) {
@@ -486,7 +486,7 @@ export function useSelectorPerformanceMonitor() {
           totalTime: 0,
           averageTime: 0,
           maxTime: 0,
-          minTime: Infinity,
+          minTime: Number.POSITIVE_INFINITY,
           errors: 0,
           lastCall: 0,
         }
@@ -512,7 +512,7 @@ export function useSelectorPerformanceMonitor() {
           totalTime: 0,
           averageTime: 0,
           maxTime: 0,
-          minTime: Infinity,
+          minTime: Number.POSITIVE_INFINITY,
           errors: 0,
           lastCall: 0,
         }

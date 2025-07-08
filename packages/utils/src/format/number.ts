@@ -1,16 +1,12 @@
 // packages/utils/src/format/number.ts
-export function formatNumber(
-  value: number,
-  decimals: number = 0,
-  locale: string = 'fr-FR'
-): string {
+export function formatNumber(value: number, decimals = 0, locale = 'fr-FR'): string {
   return new Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   }).format(value)
 }
 
-export function formatPercentage(value: number, decimals: number = 1): string {
+export function formatPercentage(value: number, decimals = 1): string {
   return `${formatNumber(value, decimals)} %`
 }
 

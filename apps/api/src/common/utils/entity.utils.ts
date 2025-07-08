@@ -22,7 +22,7 @@ export function parseEntityId(entityId: string): { type: string; id: number } | 
 
   return {
     type: type.toUpperCase(),
-    id: parseInt(numericPart, 10),
+    id: Number.parseInt(numericPart, 10),
   }
 }
 

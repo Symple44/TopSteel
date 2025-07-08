@@ -1,7 +1,5 @@
 'use client'
 
-import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
-import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
+import { useState } from 'react'
 
 interface ProjetDocumentsTabProps {
   projet?: any
@@ -232,7 +232,7 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
             <div className="text-2xl font-bold">
               {mockDocuments
                 .reduce((acc, doc) => {
-                  const size = parseFloat(doc.taille.replace(/[^\d.]/g, ''))
+                  const size = Number.parseFloat(doc.taille.replace(/[^\d.]/g, ''))
 
                   return acc + size
                 }, 0)

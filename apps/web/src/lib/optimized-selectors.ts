@@ -441,7 +441,7 @@ export const selectorDebugUtils = {
   benchmark: <T, R>(
     selectors: Record<string, StoreSelector<T, R>>,
     state: T,
-    iterations: number = 1000
+    iterations = 1000
   ) => {
     const results: Record<string, { averageTime: number; totalTime: number }> = {}
 

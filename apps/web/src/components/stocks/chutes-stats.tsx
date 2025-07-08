@@ -1,8 +1,8 @@
 // apps/web/src/components/stocks/chutes-stats.tsx
 'use client'
 
-import { AlertTriangle, CheckCircle, DollarSign, Package, Recycle, TrendingUp } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertTriangle, CheckCircle, DollarSign, Package, Recycle, TrendingUp } from 'lucide-react'
 
 interface ChutesStatsProps {
   stats: {

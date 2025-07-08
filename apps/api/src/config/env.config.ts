@@ -1,6 +1,6 @@
+import { join } from 'path'
 // apps/api/src/config/env.config.ts
 import { config } from 'dotenv'
-import { join } from 'path'
 
 // Charger les fichiers .env dans l'ordre de priorité
 // 1. .env.local (local overrides)
@@ -13,14 +13,14 @@ config({ path: join(rootDir, '.env') })
 export const envConfig = {
   // Application
   nodeEnv: process.env.NODE_ENV ?? 'development',
-  port: parseInt(process.env.API_PORT ?? '3001', 10),
+  port: Number.parseInt(process.env.API_PORT ?? '3001', 10),
   host: process.env.API_HOST ?? 'localhost',
 
   // Base de données
   database: {
     type: 'postgres' as const,
     host: process.env.DB_HOST ?? 'localhost',
-    port: parseInt(process.env.DB_PORT ?? '5432', 10),
+    port: Number.parseInt(process.env.DB_PORT ?? '5432', 10),
     username: process.env.DB_USERNAME ?? 'postgres',
     password: process.env.DB_PASSWORD ?? '',
     database: process.env.DB_NAME ?? 'erp_topsteel',
@@ -28,7 +28,7 @@ export const envConfig = {
     ssl: process.env.DB_SSL === 'true',
     synchronize: process.env.DB_SYNCHRONIZE === 'true',
     logging: process.env.DB_LOGGING === 'true',
-    maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS ?? '100', 10),
+    maxConnections: Number.parseInt(process.env.DB_MAX_CONNECTIONS ?? '100', 10),
   },
 
   // JWT
@@ -44,10 +44,10 @@ export const envConfig = {
   // Redis
   redis: {
     host: process.env.REDIS_HOST ?? 'localhost',
-    port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
+    port: Number.parseInt(process.env.REDIS_PORT ?? '6379', 10),
     password: process.env.REDIS_PASSWORD ?? undefined,
-    db: parseInt(process.env.REDIS_DB ?? '0', 10),
-    ttl: parseInt(process.env.REDIS_TTL ?? '3600', 10),
+    db: Number.parseInt(process.env.REDIS_DB ?? '0', 10),
+    ttl: Number.parseInt(process.env.REDIS_TTL ?? '3600', 10),
   },
 
   // CORS
@@ -58,13 +58,13 @@ export const envConfig = {
 
   // Rate Limiting
   throttle: {
-    ttl: parseInt(process.env.THROTTLE_TTL ?? '60000', 10),
-    limit: parseInt(process.env.THROTTLE_LIMIT ?? '100', 10),
+    ttl: Number.parseInt(process.env.THROTTLE_TTL ?? '60000', 10),
+    limit: Number.parseInt(process.env.THROTTLE_LIMIT ?? '100', 10),
   },
 
   // Uploads
   upload: {
-    maxSize: parseInt(process.env.UPLOAD_MAX_SIZE ?? '10485760', 10),
+    maxSize: Number.parseInt(process.env.UPLOAD_MAX_SIZE ?? '10485760', 10),
     destination: process.env.UPLOAD_DIR ?? 'uploads',
     allowedTypes: process.env.UPLOAD_ALLOWED_TYPES?.split(',') ?? ['image/*'],
   },

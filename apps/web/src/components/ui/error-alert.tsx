@@ -1,7 +1,7 @@
 // apps/web/src/components/ui/error-alert.tsx
 
-import { AlertCircle, X } from 'lucide-react'
 import type { FormattedError } from '@/lib/error-handler'
+import { AlertCircle, X } from 'lucide-react'
 
 interface ErrorAlertProps {
   error: FormattedError | null

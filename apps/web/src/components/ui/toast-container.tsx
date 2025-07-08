@@ -1,8 +1,8 @@
 'use client'
 
-import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui.store'
+import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
 
 // Types basés sur le store UI
 interface Toast {

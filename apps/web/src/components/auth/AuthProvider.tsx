@@ -1,9 +1,9 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { authService } from '@/services/auth.service'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 interface AuthProviderProps {
   children: React.ReactNode

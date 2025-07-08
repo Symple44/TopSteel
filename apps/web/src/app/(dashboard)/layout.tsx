@@ -4,9 +4,9 @@
  * CORRIGÉ - Ne redéfinit plus HTML/BODY
  */
 
-import type { ReactNode } from 'react'
 import { Header } from '@/components/layout/header'
 import { Sidebar } from '@/components/layout/sidebar'
+import type { ReactNode } from 'react'
 
 interface DashboardLayoutProps {
   children: ReactNode

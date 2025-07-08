@@ -256,7 +256,7 @@ export class APIClient {
   /**
    * Retry avec backoff exponentiel
    */
-  private async executeWithRetry<T>(operation: () => Promise<T>, attempts: number = 3): Promise<T> {
+  private async executeWithRetry<T>(operation: () => Promise<T>, attempts = 3): Promise<T> {
     for (let i = 0; i < attempts; i++) {
       try {
         return await operation()
@@ -275,10 +275,7 @@ export class APIClient {
   /**
    * Exécution de requête avec timeout
    */
-  private async executeWithTimeout<T>(
-    operation: () => Promise<T>,
-    timeout: number = 30000
-  ): Promise<T> {
+  private async executeWithTimeout<T>(operation: () => Promise<T>, timeout = 30000): Promise<T> {
     return Promise.race([
       operation(),
       new Promise<never>((_, reject) =>

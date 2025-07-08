@@ -4,8 +4,8 @@
  * Fichier: apps/web/src/stores/selectors/app.selectors.ts
  */
 
-import type { AppState, StoreProjet } from '@erp/types'
 import { createMemoizedSelector, createOptimizedSelectors } from '@/lib/optimized-selectors'
+import type { AppState, StoreProjet } from '@erp/types'
 import { useAppStore } from '../app.store'
 
 // ===== CRÉATION DES SÉLECTEURS OPTIMISÉS TYPÉS =====

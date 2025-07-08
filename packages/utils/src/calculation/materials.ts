@@ -21,7 +21,7 @@ export function calculateVolume(longueur: number, largeur: number, hauteur: numb
 export function calculatePoidsAcier(
   longueur: number, // en mètres
   section: number, // en cm²
-  densite: number = 7.85 // densité acier kg/dm³
+  densite = 7.85 // densité acier kg/dm³
 ): number {
   // Conversion: section cm² -> dm², longueur m -> dm
   const sectionDm2 = section / 100

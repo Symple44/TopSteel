@@ -1,10 +1,10 @@
 // apps/web/src/components/providers/monitoring-provider.tsx
 'use client'
 
-import { useEffect } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
 import { useWebVitals } from '@/hooks/use-web-vitals'
 import { useBusinessMetrics } from '@/lib/business-metrics'
+import { useEffect } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 
 interface MonitoringProviderProps {
   children: React.ReactNode

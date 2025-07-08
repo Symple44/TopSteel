@@ -5,12 +5,12 @@ import reactHooks from 'eslint-plugin-react-hooks'
 
 export default [
   ...baseConfig,
-  
+
   {
     // IGNORER COMPLÈTEMENT LES STORIES
     ignores: [
       'dist/**',
-      'node_modules/**', 
+      'node_modules/**',
       '.turbo/**',
       'storybook-static/**',
       '**/*.stories.ts',
@@ -39,7 +39,7 @@ export default [
       },
       globals: {
         window: 'readonly',
-        document: 'readonly', 
+        document: 'readonly',
         navigator: 'readonly',
         localStorage: 'readonly',
         sessionStorage: 'readonly',
@@ -61,23 +61,26 @@ export default [
     rules: {
       // Types et variables
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_' 
-      }],
-      
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+
       // Console et debugging
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      
+
       // React rules (maintenant que le plugin est configuré)
       'react/no-array-index-key': 'warn',
       'react/jsx-no-leaked-render': 'warn',
       'react/no-unescaped-entities': 'warn',
-      
+
       // React Hooks
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-      
+
       // Autres règles importantes
       'no-undef': 'error',
     },

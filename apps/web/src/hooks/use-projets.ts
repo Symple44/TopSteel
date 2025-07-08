@@ -4,9 +4,9 @@
  * Fichier: apps/web/src/hooks/use-projets.ts
  */
 
+import { useProjetStore } from '@/stores/projet.store'
 import type { ProjetFilters } from '@erp/types'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useProjetStore } from '@/stores/projet.store'
 
 export const useProjets = (autoFetch = true) => {
   const [mounted, setMounted] = useState(false)

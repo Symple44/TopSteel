@@ -5,7 +5,7 @@ export const appConfig = registerAs('app', () => ({
   name: process.env.APP_NAME || 'ERP TopSteel',
   version: process.env.APP_VERSION || '1.0.0',
   env: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.API_PORT || '3001', 10),
+  port: Number.parseInt(process.env.API_PORT || '3001', 10),
   host: process.env.API_HOST || '0.0.0.0',
   url: process.env.API_URL || 'http://localhost:3001',
   cors: {
@@ -13,16 +13,16 @@ export const appConfig = registerAs('app', () => ({
     credentials: true,
   },
   throttle: {
-    ttl: parseInt(process.env.THROTTLE_TTL || '60000', 10),
-    limit: parseInt(process.env.THROTTLE_LIMIT || '100', 10),
+    ttl: Number.parseInt(process.env.THROTTLE_TTL || '60000', 10),
+    limit: Number.parseInt(process.env.THROTTLE_LIMIT || '100', 10),
   },
   upload: {
-    maxSize: parseInt(process.env.UPLOAD_MAX_SIZE || '10485760', 10), // 10MB
+    maxSize: Number.parseInt(process.env.UPLOAD_MAX_SIZE || '10485760', 10), // 10MB
     destination: process.env.UPLOAD_DIR || 'uploads',
     allowedTypes: process.env.UPLOAD_ALLOWED_TYPES?.split(',') || ['image/*', 'application/pdf'],
   },
   security: {
-    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '12', 10),
+    bcryptRounds: Number.parseInt(process.env.BCRYPT_ROUNDS || '12', 10),
     sessionSecret: process.env.SESSION_SECRET || 'fallback-session-secret',
     cookieName: process.env.COOKIE_NAME || 'topsteel-session',
   },

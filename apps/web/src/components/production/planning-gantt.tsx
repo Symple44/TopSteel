@@ -1,10 +1,10 @@
 // apps/web/src/components/production/planning-gantt.tsx
 'use client'
 
-import { BarChart3, Calendar, ZoomIn, ZoomOut } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { BarChart3, Calendar, ZoomIn, ZoomOut } from 'lucide-react'
+import { useState } from 'react'
 
 interface GanttTask {
   id: string

@@ -12,9 +12,9 @@
  * - Patterns métier ERP intégrés
  */
 
-import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
 import { cn } from '@/lib/utils'
+import { type VariantProps, cva } from 'class-variance-authority'
+import * as React from 'react'
 
 // =============================================
 // VARIANTS CONFIGURATION
@@ -284,7 +284,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         if (confirmAction && !isConfirming) {
           e.preventDefault()
-          if (typeof window !== "undefined" && typeof window !== "undefined" && globalThis.window?.confirm(confirmMessage)) {
+          if (
+            typeof window !== 'undefined' &&
+            typeof window !== 'undefined' &&
+            globalThis.window?.confirm(confirmMessage)
+          ) {
             setIsConfirming(true)
             onClick?.(e)
             // Reset confirming state after action
@@ -303,19 +307,27 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const content = (
       <>
         {/* Icône de début ou spinner de chargement */}
-        {finalIcon && iconPosition === 'start' && !loading ? <span className={cn('flex-shrink-0', children ? 'mr-2' : '')}>{finalIcon}</span> : null}
+        {finalIcon && iconPosition === 'start' && !loading ? (
+          <span className={cn('flex-shrink-0', children ? 'mr-2' : '')}>{finalIcon}</span>
+        ) : null}
 
-        {loading ? <span className={cn('flex-shrink-0', children || loadingText ? 'mr-2' : '')}>
+        {loading ? (
+          <span className={cn('flex-shrink-0', children || loadingText ? 'mr-2' : '')}>
             <LoadingSpinner
               size={size === 'sm' ? 'sm' : size === 'lg' || size === 'xl' ? 'lg' : 'md'}
             />
-          </span> : null}
+          </span>
+        ) : null}
 
         {/* Texte principal */}
-        {(children || loadingText) ? <span className="truncate">{loading && loadingText ? loadingText : children}</span> : null}
+        {children || loadingText ? (
+          <span className="truncate">{loading && loadingText ? loadingText : children}</span>
+        ) : null}
 
         {/* Icône de fin */}
-        {finalIcon && iconPosition === 'end' && !loading ? <span className={cn('flex-shrink-0', children ? 'ml-2' : '')}>{finalIcon}</span> : null}
+        {finalIcon && iconPosition === 'end' && !loading ? (
+          <span className={cn('flex-shrink-0', children ? 'ml-2' : '')}>{finalIcon}</span>
+        ) : null}
       </>
     )
 
@@ -332,14 +344,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     if (href) {
       return (
         <a
-          ref={ref as any}
+          ref={ref as unknown}
           href={href}
           target={target}
           download={download}
           className={buttonClasses}
           onClick={isDisabled ? (e) => e.preventDefault() : undefined}
           {...accessibilityProps}
-          {...(props as any)}
+          {...(props as unknown)}
         >
           {content}
         </a>
@@ -361,9 +373,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </button>
 
         {/* Description en tooltip ou aide */}
-        {description ? <div id={`${props.id || 'button'}-description`} className="sr-only">
+        {description ? (
+          <div id={`${props.id || 'button'}-description`} className="sr-only">
             {description}
-          </div> : null}
+          </div>
+        ) : null}
       </>
     )
   }
@@ -395,7 +409,7 @@ ActionButton.displayName = 'ActionButton'
 export const FormButton = React.forwardRef<
   HTMLButtonElement,
   ButtonProps & { formAction?: 'submit' | 'reset' | 'cancel' }
->(({ formAction = 'submit', _type, variant, ...props }, ref) => {
+>(({ formAction = 'submit', type, variant, ...props }, ref) => {
   const buttonType =
     formAction === 'submit' ? 'submit' : formAction === 'reset' ? 'reset' : 'button'
   const buttonVariant =
@@ -438,13 +452,3 @@ IconButton.displayName = 'IconButton'
 // =============================================
 
 export { Button, buttonVariants }
-
-
-
-
-
-
-
-
-
-

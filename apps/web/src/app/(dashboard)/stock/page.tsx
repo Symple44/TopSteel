@@ -1,7 +1,5 @@
 'use client'
 
-import { AlertTriangle, Filter, Package, Plus, Search, TrendingDown } from 'lucide-react'
-import { useState } from 'react'
 import { AddMaterialDialog } from '@/components/stocks/add-material-dialog'
 import { StockAlertsPanel } from '@/components/stocks/stock-alerts-panel'
 import { StocksFilters } from '@/components/stocks/stocks-filters'
@@ -11,6 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { AlertTriangle, Filter, Package, Plus, Search, TrendingDown } from 'lucide-react'
+import { useState } from 'react'
 
 export default function StocksPage() {
   const [showFilters, setShowFilters] = useState(false)

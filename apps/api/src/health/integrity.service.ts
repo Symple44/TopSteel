@@ -79,7 +79,7 @@ export class IntegrityService {
         FROM pg_stat_activity 
         WHERE state = 'active'
       `);
-      return parseInt(result[0]?.connections ?? "0");
+      return Number.parseInt(result[0]?.connections ?? "0");
     } catch (_error) {
       this.logger.error(
         "Erreur lors de la récupération du nombre de clients",
@@ -94,7 +94,7 @@ export class IntegrityService {
       const result = await this.dataSource.query(
         "SELECT COUNT(*) as count FROM projets",
       );
-      return parseInt(result[0]?.count ?? "0");
+      return Number.parseInt(result[0]?.count ?? "0");
     } catch (_error) {
       return 0;
     }
@@ -105,7 +105,7 @@ export class IntegrityService {
       const result = await this.dataSource.query(
         "SELECT COUNT(*) as count FROM clients",
       );
-      return parseInt(result[0]?.count ?? "0");
+      return Number.parseInt(result[0]?.count ?? "0");
     } catch (_error) {
       return 0;
     }

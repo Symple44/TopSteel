@@ -15,9 +15,7 @@
         "kind": "build",
         "isDefault": true
       },
-      "args": [
-        "dev"
-      ]
+      "args": ["dev"]
     },
     {
       "presentation": {
@@ -29,9 +27,7 @@
       "command": "pnpm",
       "detail": "Construit tous les packages",
       "group": "build",
-      "args": [
-        "build"
-      ]
+      "args": ["build"]
     },
     {
       "presentation": {
@@ -43,9 +39,7 @@
       "command": "pnpm",
       "detail": "Exécute tous les tests",
       "group": "test",
-      "args": [
-        "test"
-      ]
+      "args": ["test"]
     },
     {
       "presentation": {
@@ -57,9 +51,7 @@
       "command": "pnpm",
       "detail": "Vérification TypeScript",
       "group": "build",
-      "args": [
-        "type-check"
-      ]
+      "args": ["type-check"]
     },
     {
       "presentation": {
@@ -71,9 +63,7 @@
       "command": "pnpm",
       "detail": "Formate le code avec Prettier",
       "group": "build",
-      "args": [
-        "format"
-      ]
+      "args": ["format"]
     },
     {
       "presentation": {
@@ -85,9 +75,7 @@
       "command": "pnpm",
       "detail": "Lint du code",
       "group": "build",
-      "args": [
-        "lint"
-      ]
+      "args": ["lint"]
     }
   ]
 }

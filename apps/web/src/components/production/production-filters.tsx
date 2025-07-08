@@ -1,11 +1,11 @@
 // apps/web/src/components/production/production-filters.tsx
 'use client'
 
-import { Filter, RotateCcw, Search } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import { useState } from 'react'
 
 interface ProductionFiltersProps {
   onFiltersChange?: (filters: ProductionFilters) => void // Props optionnelles

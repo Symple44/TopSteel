@@ -1,8 +1,8 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
 
 interface ThemeSwitcherProps {
   variant?: 'icon' | 'dropdown' | 'toggle'

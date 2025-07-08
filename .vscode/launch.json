@@ -8,9 +8,7 @@
       "sourceMaps": true,
       "name": "🐛 Debug API (NestJS)",
       "program": "${workspaceFolder}/apps/api/dist/main.js",
-      "outFiles": [
-        "${workspaceFolder}/apps/api/dist/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/apps/api/dist/**/*.js"],
       "restart": true,
       "env": {
         "NODE_ENV": "development"
@@ -24,13 +22,10 @@
       "type": "node",
       "name": "🐛 Debug Web (Next.js)",
       "console": "integratedTerminal",
-      "args": [
-        "dev"
-      ],
+      "args": ["dev"],
       "cwd": "${workspaceFolder}/apps/web",
       "request": "launch"
     }
   ],
   "version": "0.2.0"
 }
-

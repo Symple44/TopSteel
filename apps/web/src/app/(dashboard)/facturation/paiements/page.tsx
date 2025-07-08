@@ -1,7 +1,5 @@
 'use client'
 
-import { Calendar, Filter, Plus, Search, TrendingDown, TrendingUp } from 'lucide-react'
-import { useState } from 'react'
 import { CreatePaiementDialog } from '@/components/facturation/create-paiement-dialog'
 import { PaiementsChart } from '@/components/facturation/paiements-chart'
 import { PaiementsTable } from '@/components/facturation/paiements-table'
@@ -10,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Calendar, Filter, Plus, Search, TrendingDown, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
 
 export default function PaiementsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)

@@ -2,15 +2,10 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "daemon": true,
-  "globalDependencies": [
-    ".env*",
-    "tsconfig*.json"
-  ],
+  "globalDependencies": [".env*", "tsconfig*.json"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         ".env*",
@@ -19,39 +14,19 @@
         "next.config.*",
         "vitest.config.*"
       ],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
-      ],
-      "env": [
-        "NODE_ENV",
-        "NEXT_PUBLIC_*"
-      ],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "env": ["NODE_ENV", "NEXT_PUBLIC_*"],
       "cache": true
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": [
-        "NODE_ENV",
-        "PORT",
-        "DATABASE_URL",
-        "REDIS_URL"
-      ]
+      "env": ["NODE_ENV", "PORT", "DATABASE_URL", "REDIS_URL"]
     },
     "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "vitest.config.*",
-        "src/test/**"
-      ],
-      "outputs": [
-        "coverage/**"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "vitest.config.*", "src/test/**"],
+      "outputs": ["coverage/**"],
       "cache": true
     },
     "test:watch": {
@@ -59,49 +34,25 @@
       "persistent": true
     },
     "lint": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".eslintrc*",
-        "biome.json",
-        "eslint.config.*"
-      ],
-      "outputs": [
-        ".eslintcache"
-      ],
+      "inputs": ["$TURBO_DEFAULT$", ".eslintrc*", "biome.json", "eslint.config.*"],
+      "outputs": [".eslintcache"],
       "cache": true
     },
     "type-check": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "tsconfig*.json"
-      ],
-      "outputs": [
-        "*.tsbuildinfo"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"],
+      "outputs": ["*.tsbuildinfo"],
       "cache": true
     },
     "format": {
-      "inputs": [
-        "$TURBO_DEFAULT$"
-      ],
+      "inputs": ["$TURBO_DEFAULT$"],
       "cache": true
     },
     "lint:fix": {
       "outputs": [],
       "cache": false,
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".eslintrc*",
-        "biome.json"
-      ]
+      "inputs": ["$TURBO_DEFAULT$", ".eslintrc*", "biome.json"]
     }
   },
-  "globalEnv": [
-    "NODE_ENV",
-    "CI",
-    "GITHUB_TOKEN"
-  ]
+  "globalEnv": ["NODE_ENV", "CI", "GITHUB_TOKEN"]
 }

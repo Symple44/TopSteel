@@ -11,7 +11,7 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    
+
     "baseUrl": ".",
     "paths": {
       "@erp/types": ["./packages/types/src"],

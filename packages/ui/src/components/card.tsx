@@ -12,9 +12,9 @@
  * - Animations et interactions
  */
 
-import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
 import { cn } from '@/lib/utils'
+import { type VariantProps, cva } from 'class-variance-authority'
+import * as React from 'react'
 
 // =============================================
 // VARIANTS CONFIGURATION
@@ -252,9 +252,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         </div>
 
         {/* Description cachée pour l'accessibilité */}
-        {description ? <div id={`${props.id || 'card'}-description`} className="sr-only">
+        {description ? (
+          <div id={`${props.id || 'card'}-description`} className="sr-only">
             {description}
-          </div> : null}
+          </div>
+        ) : null}
       </>
     )
   }
@@ -284,7 +286,9 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
               </div>
 
               {/* Sous-titre */}
-              {subtitle ? <div className="text-sm text-muted-foreground mt-1">{subtitle}</div> : null}
+              {subtitle ? (
+                <div className="text-sm text-muted-foreground mt-1">{subtitle}</div>
+              ) : null}
             </div>
           </div>
 
@@ -477,7 +481,8 @@ export const StatsCard = React.forwardRef<
           <div className="space-y-1">
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
             <p className="text-2xl font-bold">{value}</p>
-            {change ? <p
+            {change ? (
+              <p
                 className={cn(
                   'text-xs flex items-center',
                   change.type === 'increase' ? 'text-green-600' : 'text-red-600'
@@ -494,7 +499,8 @@ export const StatsCard = React.forwardRef<
                   <path d="M10 3l7 7H3l7-7z" />
                 </svg>
                 {Math.abs(change.value)}% {change.period ? `vs ${change.period}` : null}
-              </p> : null}
+              </p>
+            ) : null}
           </div>
           {icon ? <div className="text-muted-foreground">{icon}</div> : null}
         </div>
@@ -510,9 +516,3 @@ StatsCard.displayName = 'StatsCard'
 // =============================================
 
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, cardVariants }
-
-
-
-
-
-

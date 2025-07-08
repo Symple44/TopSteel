@@ -1,8 +1,5 @@
 'use client'
 
-import { ProjetStatut } from '@erp/types'
-import { Building2, Calendar, Clock, Edit, Euro, Mail, MapPin, Phone, Save, X } from 'lucide-react'
-import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,6 +9,9 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@/types'
+import { ProjetStatut } from '@erp/types'
+import { Building2, Calendar, Clock, Edit, Euro, Mail, MapPin, Phone, Save, X } from 'lucide-react'
+import { useState } from 'react'
 
 interface ProjetInfoTabProps {
   projet: Projet

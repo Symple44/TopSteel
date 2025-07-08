@@ -4,16 +4,8 @@
   "description": "UI components library for ERP TopSteel - Enterprise-grade design system",
   "type": "module",
   "private": true,
-  "sideEffects": [
-    "**/*.css",
-    "**/*.scss"
-  ],
-  "files": [
-    "dist",
-    "src",
-    "README.md",
-    "CHANGELOG.md"
-  ],
+  "sideEffects": ["**/*.css", "**/*.scss"],
+  "files": ["dist", "src", "README.md", "CHANGELOG.md"],
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -186,12 +178,7 @@
     "node": "20.18.0",
     "pnpm": "8.15.0"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11"
-  ],
+  "browserslist": ["> 1%", "last 2 versions", "not dead", "not ie 11"],
   "config": {
     "access": "restricted"
   },
@@ -200,5 +187,3 @@
     "url": "https://topsteel.com"
   }
 }
-
-

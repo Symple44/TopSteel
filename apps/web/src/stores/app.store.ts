@@ -5,6 +5,7 @@
  * Fichier: apps/web/src/stores/app.store.ts
  */
 
+import { StoreUtils } from '@/lib/store-utils'
 import type {
   AppState,
   AppStore,
@@ -13,7 +14,6 @@ import type {
   StoreCreator,
   StoreUser,
 } from '@erp/types'
-import { StoreUtils } from '@/lib/store-utils'
 
 // ===== ÉTAT INITIAL STRICTEMENT TYPÉ =====
 

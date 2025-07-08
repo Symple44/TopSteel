@@ -1,11 +1,11 @@
 // apps/web/src/components/stocks/chutes-optimizer.tsx
 'use client'
 
-import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from 'lucide-react'
+import { useState } from 'react'
 
 interface Chute {
   id: string

@@ -1,6 +1,9 @@
 // apps/web/src/components/layout/sidebar.tsx - VERSION AMÉLIORÉE
 'use client'
 
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 import {
   BarChart3,
   ChevronDown,
@@ -21,9 +24,6 @@ import {
 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
 
 interface SidebarProps {
   isCollapsed?: boolean

@@ -1,11 +1,11 @@
 'use client'
 
-import { Bell, PanelLeftClose, PanelLeftOpen, Search, Zap } from 'lucide-react'
-import { useState } from 'react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ThemeSwitcher } from '@/components/ui/theme-switcher'
+import { Bell, PanelLeftClose, PanelLeftOpen, Search, Zap } from 'lucide-react'
+import { useState } from 'react'
 
 interface HeaderProps {
   onToggleSidebar?: () => void

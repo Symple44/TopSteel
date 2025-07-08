@@ -1,9 +1,7 @@
 // apps/web/.eslintrc.js - Configuration ultra-permissive d'urgence
 module.exports = {
   root: true,
-  extends: [
-    '@erp/config/eslint/next'
-  ],
+  extends: ['@erp/config/eslint/next'],
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
@@ -45,7 +43,7 @@ module.exports = {
     '@typescript-eslint/prefer-optional-chain': 'off',
     '@typescript-eslint/consistent-type-imports': 'off',
     'react/jsx-no-undef': 'warn',
-    
+
     // RÈGLES SPÉCIALES ULTRA-PERMISSIVES
     'no-undef': 'warn',
     'no-redeclare': 'warn',

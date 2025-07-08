@@ -6,13 +6,6 @@
  * Fichier: apps/web/src/app/register/page.tsx
  */
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Building2, CheckCircle, Eye, EyeOff, Loader2, Mail, User } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
 import { ClientOnly } from '@/components/client-only'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -26,6 +19,13 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, Building2, CheckCircle, Eye, EyeOff, Loader2, Mail, User } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 
 // ===== SCHÉMA DE VALIDATION =====
 

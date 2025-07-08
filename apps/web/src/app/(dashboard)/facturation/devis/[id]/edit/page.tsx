@@ -1,7 +1,5 @@
 'use client'
 
-import { Calculator, Download, Eye, Plus, Save, Send, Trash2 } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
 import { DevisPreview } from '@/components/facturation/devis-preview'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,6 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Calculator, Download, Eye, Plus, Save, Send, Trash2 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface DevisEditPageProps {
   params: Promise<{ id: string }>
@@ -270,7 +270,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                             updateLigne(
                               ligne.id,
                               'quantite',
-                              parseFloat(
+                              Number.parseFloat(
                                 (e.target as HTMLInputElement | HTMLTextAreaElement).value
                               ) || 0
                             )
@@ -302,7 +302,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                             updateLigne(
                               ligne.id,
                               'prixUnitaire',
-                              parseFloat(
+                              Number.parseFloat(
                                 (e.target as HTMLInputElement | HTMLTextAreaElement).value
                               ) || 0
                             )
@@ -318,7 +318,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                             updateLigne(
                               ligne.id,
                               'taux_tva',
-                              parseFloat(
+                              Number.parseFloat(
                                 (e.target as HTMLInputElement | HTMLTextAreaElement).value
                               ) || 0
                             )
@@ -334,7 +334,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                             updateLigne(
                               ligne.id,
                               'remise',
-                              parseFloat(
+                              Number.parseFloat(
                                 (e.target as HTMLInputElement | HTMLTextAreaElement).value
                               ) || 0
                             )
@@ -384,7 +384,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                         setDevis((prev) => ({
                           ...prev,
                           remiseGlobale:
-                            parseFloat(
+                            Number.parseFloat(
                               (e.target as HTMLInputElement | HTMLTextAreaElement).value
                             ) || 0,
                         }))

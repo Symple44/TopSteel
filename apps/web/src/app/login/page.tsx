@@ -1,5 +1,9 @@
 'use client'
 
+import { ErrorAlert } from '@/components/ui/error-alert'
+import { useAuth } from '@/hooks/use-auth'
+import type { FormattedError } from '@/lib/error-handler'
+import { ErrorHandler } from '@/lib/error-handler'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Building2, CheckCircle, Eye, EyeOff, Loader2, Lock, Mail, X } from 'lucide-react'
 import Link from 'next/link'
@@ -7,10 +11,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { ErrorAlert } from '@/components/ui/error-alert'
-import { useAuth } from '@/hooks/use-auth'
-import type { FormattedError } from '@/lib/error-handler'
-import { ErrorHandler } from '@/lib/error-handler'
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),

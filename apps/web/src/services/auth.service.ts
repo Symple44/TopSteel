@@ -4,9 +4,9 @@
  * Fichier: apps/web/src/services/auth.service.ts
  */
 
-import type { User, UserRole } from '@erp/types'
 import { apiClient } from '@/lib/api-client'
 import { ErrorHandler } from '@/lib/error-handler'
+import type { User, UserRole } from '@erp/types'
 
 // ===== INTERFACES =====
 interface LoginResponse {

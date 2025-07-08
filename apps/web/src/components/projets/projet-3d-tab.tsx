@@ -1,11 +1,11 @@
 'use client'
 
-import type { Projet } from '@erp/types'
-import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
+import type { Projet } from '@erp/types'
+import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
+import { useState } from 'react'
 
 interface Projet3DTabProps {
   projet: Projet

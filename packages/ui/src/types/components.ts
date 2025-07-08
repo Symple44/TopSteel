@@ -1,5 +1,5 @@
 // packages/ui/src/types/components.ts - Types robustes pour composants UI
-import type { ReactNode, ButtonHTMLAttributes } from 'react'
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 // Types de base réutilisables
 export type Variant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'

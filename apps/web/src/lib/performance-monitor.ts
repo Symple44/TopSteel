@@ -273,7 +273,7 @@ export class PerformanceMonitor {
         // Envoyer aux analytics
         PerformanceMonitor.sendToAnalytics('web_vitals', {
           metric_name: 'CLS',
-          value: parseFloat(clsValue.toFixed(3)),
+          value: Number.parseFloat(clsValue.toFixed(3)),
           rating: clsValue <= 0.1 ? 'good' : clsValue <= 0.25 ? 'needs_improvement' : 'poor',
         })
       })

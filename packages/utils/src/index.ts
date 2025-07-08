@@ -66,6 +66,6 @@ export function getGlobalProperty<T = unknown>(key: string): T | undefined {
 /**
  * Formate un pourcentage
  */
-export function formatPercent(value: number, decimals: number = 2): string {
+export function formatPercent(value: number, decimals = 2): string {
   return `${(value * 100).toFixed(decimals)}%`
 }

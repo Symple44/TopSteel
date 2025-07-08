@@ -1,5 +1,5 @@
 // packages/ui/src/lib/design-system.ts
-import { cva, type VariantProps } from 'class-variance-authority'
+import { type VariantProps, cva } from 'class-variance-authority'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
@@ -432,9 +432,9 @@ export function isValidBadgeVariant(variant: string): boolean {
 /**
  * Obtient toutes les variantes disponibles pour un composant
  */
-export function getAvailableVariants<T extends Record<string, any>>(
+export function getAvailableVariants<T extends Record<string, unknown>>(
   variantConfig: T
 ): T extends { variants: infer V } ? keyof V : never {
   // Type helper pour obtenir les clés des variantes
-  return Object.keys(variantConfig.variants || {}) as any
+  return Object.keys(variantConfig.variants || {}) as unknown
 }

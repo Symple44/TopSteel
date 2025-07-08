@@ -40,28 +40,28 @@ export const useToasts = () => {
   }, [])
 
   const showSuccess = useCallback(
-    (title: string, message: string = '', duration?: number) => {
+    (title: string, message = '', duration?: number) => {
       addToast({ type: 'success', title, message, duration })
     },
     [addToast]
   )
 
   const showError = useCallback(
-    (title: string, message: string = '', duration?: number) => {
+    (title: string, message = '', duration?: number) => {
       addToast({ type: 'error', title, message, duration })
     },
     [addToast]
   )
 
   const showWarning = useCallback(
-    (title: string, message: string = '', duration?: number) => {
+    (title: string, message = '', duration?: number) => {
       addToast({ type: 'warning', title, message, duration })
     },
     [addToast]
   )
 
   const showInfo = useCallback(
-    (title: string, message: string = '', duration?: number) => {
+    (title: string, message = '', duration?: number) => {
       addToast({ type: 'info', title, message, duration })
     },
     [addToast]
@@ -114,7 +114,7 @@ export const useLoading = () => {
   const [loading, setLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState<string>('')
 
-  const startLoading = useCallback((message: string = 'Chargement...') => {
+  const startLoading = useCallback((message = 'Chargement...') => {
     setLoading(true)
     setLoadingMessage(message)
   }, [])

@@ -1,10 +1,7 @@
 {
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.suggest.autoImports": true,
-  "editor.rulers": [
-    80,
-    120
-  ],
+  "editor.rulers": [80, 120],
   "files.associations": {
     "*.md": "markdown",
     "*.env*": "properties"
@@ -43,4 +40,3 @@
   },
   "terminal.integrated.defaultProfile.windows": "PowerShell"
 }
-

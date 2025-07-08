@@ -1,7 +1,6 @@
 // apps/web/src/components/facturation/factures-filters.tsx
 'use client'
 
-import { Filter, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -11,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Filter, Search, X } from 'lucide-react'
 
 interface FacturesFiltersProps {
   onFiltersChange?: (filters: any) => void

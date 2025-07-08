@@ -74,13 +74,13 @@ export function cn(...inputs: ClassValue[]): string {
 // =============================================
 
 export type VariantProps<T> = {
-  [K in keyof T]?: T[K] extends (...args: unknown[]) => any ? Parameters<T[K]>[0] : T[K]
+  [K in keyof T]?: T[K] extends (...args: unknown[]) => unknown ? Parameters<T[K]>[0] : T[K]
 }
 
 /**
  * Crée un helper pour les variantes de composants
  */
-export function createVariants<T extends Record<string, any>>(config: T) {
+export function createVariants<T extends Record<string, unknown>>(config: T) {
   return (props: VariantProps<T>) => {
     const classes: string[] = []
 
@@ -261,7 +261,7 @@ export function accessibilityProps(props: {
   required?: boolean
   invalid?: boolean
 }) {
-  const result: Record<string, any> = {}
+  const result: Record<string, unknown> = {}
 
   if (props.label) {
     result['aria-label'] = props.label
@@ -379,7 +379,3 @@ export function getCacheStats(): {
     hitRate: 0, // À implémenter si nécessaire
   }
 }
-
-
-
-

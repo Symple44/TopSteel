@@ -1,4 +1,3 @@
-import { useContext } from 'react'
 import {
   type CreateNotificationRequest,
   type NotificationSettings,
@@ -6,6 +5,7 @@ import {
   type NotificationsContextValue,
   type NotificationsState,
 } from '@/components/providers/notifications-provider'
+import { useContext } from 'react'
 
 /**
  * Hook principal pour utiliser les notifications

@@ -151,19 +151,19 @@ export class ProduitsService {
       .createQueryBuilder("produit")
       .select("AVG(produit.prix)", "moyenne")
       .getRawOne()
-      .then((result) => parseFloat(result.moyenne) || 0);
+      .then((result) => Number.parseFloat(result.moyenne) || 0);
 
     const prixMax = await this.repository
       .createQueryBuilder("produit")
       .select("MAX(produit.prix)", "max")
       .getRawOne()
-      .then((result) => parseFloat(result.max) || 0);
+      .then((result) => Number.parseFloat(result.max) || 0);
 
     const prixMin = await this.repository
       .createQueryBuilder("produit")
       .select("MIN(produit.prix)", "min")
       .getRawOne()
-      .then((result) => parseFloat(result.min) || 0);
+      .then((result) => Number.parseFloat(result.min) || 0);
 
     const parFournisseur = await this.repository
       .createQueryBuilder("produit")

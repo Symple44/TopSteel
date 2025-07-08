@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -11,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useState } from 'react'
 
 // Interface correcte avec open et onOpenChange
 interface CreatePaiementDialogProps {
@@ -40,7 +40,7 @@ export function CreatePaiementDialog({
     setTimeout(() => {
       const newPaiement = {
         id: `PAIEMENT-${Date.now()}`,
-        montant: parseFloat(formData.montant),
+        montant: Number.parseFloat(formData.montant),
         methode: formData.methode,
         reference: formData.reference,
         dateReception: formData.dateReception,

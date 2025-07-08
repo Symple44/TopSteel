@@ -1,5 +1,11 @@
 'use client'
 
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
+import { formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
 import { PrioriteProduction, StatutProduction } from '@erp/types'
 import {
@@ -14,12 +20,6 @@ import {
   User,
 } from 'lucide-react'
 import { useState } from 'react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
-import { formatDate } from '@/lib/utils'
 
 interface ProjetProductionTabProps {
   projet: Projet

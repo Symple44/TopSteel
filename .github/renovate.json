@@ -72,12 +72,7 @@
     },
     {
       "description": "Test dependencies",
-      "matchPackagePatterns": [
-        "@testing-library/*",
-        "jest",
-        "playwright",
-        "@types/jest"
-      ],
+      "matchPackagePatterns": ["@testing-library/*", "jest", "playwright", "@types/jest"],
       "schedule": ["before 9am on Monday"],
       "groupName": "test dependencies"
     },
@@ -118,12 +113,7 @@
     },
     {
       "description": "Group React ecosystem",
-      "matchPackagePatterns": [
-        "react",
-        "react-dom",
-        "@types/react",
-        "@types/react-dom"
-      ],
+      "matchPackagePatterns": ["react", "react-dom", "@types/react", "@types/react-dom"],
       "groupName": "react ecosystem",
       "schedule": ["before 9am on Monday"]
     },

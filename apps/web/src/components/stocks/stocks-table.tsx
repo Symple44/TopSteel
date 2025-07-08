@@ -1,8 +1,8 @@
 'use client'
 
-import { Edit, Eye, MoreHorizontal, Package, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Edit, Eye, MoreHorizontal, Package, Trash2 } from 'lucide-react'
 
 export function StocksTable() {
   const stocks = [

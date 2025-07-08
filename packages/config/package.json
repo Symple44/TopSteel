@@ -3,13 +3,7 @@
   "version": "1.0.0",
   "description": "Configurations partagées pour l'ERP TOPSTEEL",
   "main": "index.js",
-  "files": [
-    "eslint",
-    "typescript",
-    "tailwind",
-    "prettier",
-    "jest"
-  ],
+  "files": ["eslint", "typescript", "tailwind", "prettier", "jest"],
   "dependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.30.0",

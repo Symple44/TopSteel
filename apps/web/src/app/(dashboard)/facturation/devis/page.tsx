@@ -1,13 +1,13 @@
 'use client'
 
-import { Clock, FileText, Filter, Plus, Search, Send } from 'lucide-react'
-import { useState } from 'react'
 import { CreateDevisDialog } from '@/components/facturation/create-devis-dialog'
 import { DevisFilters } from '@/components/facturation/devis-filters'
 import { DevisTable } from '@/components/facturation/devis-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Clock, FileText, Filter, Plus, Search, Send } from 'lucide-react'
+import { useState } from 'react'
 
 export default function DevisPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)

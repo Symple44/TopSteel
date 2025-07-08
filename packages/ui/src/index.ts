@@ -220,14 +220,14 @@ export const KEYBOARD_KEYS = {
  * Valide qu'une taille est valide
  */
 export function isValidSize(size: unknown): size is Size {
-  return typeof size === 'string' && Object.values(UI_SIZES).includes(size as any)
+  return typeof size === 'string' && Object.values(UI_SIZES).includes(size as unknown)
 }
 
 /**
  * Valide qu'une variante est valide
  */
 export function isValidVariant(variant: unknown): variant is keyof typeof UI_VARIANTS {
-  return typeof variant === 'string' && Object.values(UI_VARIANTS).includes(variant as any)
+  return typeof variant === 'string' && Object.values(UI_VARIANTS).includes(variant as unknown)
 }
 
 /**
@@ -237,7 +237,8 @@ export function isValidEntityType(
   entityType: unknown
 ): entityType is keyof typeof ERP_ENTITY_TYPES {
   return (
-    typeof entityType === 'string' && Object.values(ERP_ENTITY_TYPES).includes(entityType as any)
+    typeof entityType === 'string' &&
+    Object.values(ERP_ENTITY_TYPES).includes(entityType as unknown)
   )
 }
 
@@ -259,7 +260,7 @@ export const DEFAULT_CONFIG = {
 /**
  * Crée une configuration de composant avec des valeurs par défaut
  */
-export function createComponentConfig<T extends Record<string, any>>(
+export function createComponentConfig<T extends Record<string, unknown>>(
   config: Partial<T>
 ): T & typeof DEFAULT_CONFIG {
   return {
@@ -277,7 +278,7 @@ export function createComponentConfig<T extends Record<string, any>>(
  */
 export function debugComponent(
   componentName: string,
-  props: Record<string, any>,
+  props: Record<string, unknown>,
   enabled: boolean = process.env.NODE_ENV === 'development'
 ): void {
   if (enabled) {
@@ -293,7 +294,7 @@ export function debugComponent(
  */
 export function useDebugRender(
   componentName: string,
-  props: Record<string, any>,
+  props: Record<string, unknown>,
   enabled: boolean = process.env.NODE_ENV === 'development'
 ): void {
   if (enabled && typeof window !== 'undefined') {
@@ -318,8 +319,8 @@ export function checkCompatibility(requiredVersion: string): boolean {
     return false
   }
 
-  const currentMajor = parseInt(currentParts[0] || '0', 10)
-  const requiredMajor = parseInt(requiredParts[0] || '0', 10)
+  const currentMajor = Number.parseInt(currentParts[0] || '0', 10)
+  const requiredMajor = Number.parseInt(requiredParts[0] || '0', 10)
 
   if (isNaN(currentMajor) || isNaN(requiredMajor)) {
     return false
@@ -354,7 +355,3 @@ export default {
   debugComponent,
   useDebugRender,
 }
-
-
-
-

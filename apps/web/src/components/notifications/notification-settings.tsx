@@ -1,10 +1,10 @@
 'use client'
 
-import { Mail, Monitor, Volume2 } from 'lucide-react'
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { Mail, Monitor, Volume2 } from 'lucide-react'
 
 // Composant Switch inline pour éviter les problèmes de props
 function CustomSwitch({

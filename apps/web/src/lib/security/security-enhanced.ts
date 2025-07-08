@@ -235,7 +235,7 @@ export class SecurityUtils {
   /**
    * ✅ Génération de token sécurisé
    */
-  static generateSecureToken(length: number = 32): string {
+  static generateSecureToken(length = 32): string {
     if (typeof window === 'undefined') {
       // Node.js
       return Array.from({ length }, () => Math.floor(Math.random() * 16).toString(16)).join('')

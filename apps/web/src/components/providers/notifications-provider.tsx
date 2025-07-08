@@ -1,10 +1,10 @@
 'use client'
 
+import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
 import type { Notification } from '@erp/types'
 import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
 
 // ===== TYPES ET INTERFACES =====
 

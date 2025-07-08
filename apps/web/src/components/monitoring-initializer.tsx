@@ -6,8 +6,8 @@
 
 'use client'
 
-import { useEffect } from 'react'
 import PerformanceMonitor from '@/lib/performance-monitor'
+import { useEffect } from 'react'
 
 interface MonitoringInitializerProps {
   enableAnalytics?: boolean

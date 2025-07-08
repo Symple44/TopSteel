@@ -1,6 +1,6 @@
+import { cn } from '@/lib/utils'
 // Composant Select corrigé pour résoudre les erreurs TypeScript
 import * as React from 'react'
-import { cn } from '@/lib/utils'
 
 // Interface étendue pour Select
 interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {

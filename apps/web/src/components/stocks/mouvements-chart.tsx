@@ -1,10 +1,10 @@
 // apps/web/src/components/stocks/mouvements-chart.tsx
 'use client'
 
-import { Activity, BarChart3, TrendingDown, TrendingUp } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Activity, BarChart3, TrendingDown, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
 
 interface MouvementStats {
   date: string

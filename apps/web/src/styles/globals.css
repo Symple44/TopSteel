@@ -148,9 +148,7 @@
 
 .focus-visible\:ring-offset-2:focus-visible {
   outline: none !important;
-  box-shadow:
-    0 0 0 2px hsl(var(--background)),
-    0 0 0 4px hsl(var(--ring)) !important;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring)) !important;
 }
 
 .focus-visible\:outline-none:focus-visible {

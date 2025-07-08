@@ -29,11 +29,11 @@ interface BusinessMetricsConfig {
 // ===== CLASSE PRINCIPALE SSR-SAFE =====
 class BusinessMetrics {
   private events: BusinessEvent[] = []
-  private sessionId: string = ''
+  private sessionId = ''
   private userContext: UserContext = {}
   private readonly maxEvents: number
-  private isClient: boolean = false
-  private initialized: boolean = false
+  private isClient = false
+  private initialized = false
   private pendingEvents: BusinessEvent[] = []
   private batchTimeout: NodeJS.Timeout | null = null
   private readonly config: BusinessMetricsConfig

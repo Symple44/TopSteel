@@ -9,22 +9,22 @@ export default defineConfig({
   minify: false,
   target: 'node18',
   platform: 'node',
-  
+
   // NestJS spécifique
   external: [
     '@nestjs/core',
     '@nestjs/common',
     '@nestjs/platform-express',
     'reflect-metadata',
-    'rxjs'
+    'rxjs',
   ],
-  
+
   // Préservation métadonnées pour decorators
   keepNames: true,
   treeshake: false,
-  
+
   // Gestion assets & ressources
   publicDir: 'public',
-  
-  onSuccess: 'echo "✅ API build réussi"'
+
+  onSuccess: 'echo "✅ API build réussi"',
 })

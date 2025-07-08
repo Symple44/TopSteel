@@ -1,7 +1,5 @@
 'use client'
 
-import { AlertTriangle, ChevronDown, Search } from 'lucide-react'
-import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -18,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { AlertTriangle, ChevronDown, Search } from 'lucide-react'
+import * as React from 'react'
 
 // ===== TYPES ROBUSTES =====
 interface Column {

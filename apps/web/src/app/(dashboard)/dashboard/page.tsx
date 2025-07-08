@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Activity,
   AlertTriangle,
@@ -16,8 +18,6 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 // Types pour les données du dashboard
 interface DashboardStats {

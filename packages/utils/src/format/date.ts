@@ -2,7 +2,7 @@
 import { format, formatDistanceToNow, isValid, parseISO } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
-export function formatDate(date: Date | string, formatStr: string = 'dd/MM/yyyy'): string {
+export function formatDate(date: Date | string, formatStr = 'dd/MM/yyyy'): string {
   const dateObj = typeof date === 'string' ? parseISO(date) : date
 
   if (!isValid(dateObj)) {

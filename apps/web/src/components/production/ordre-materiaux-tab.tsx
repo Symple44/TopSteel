@@ -1,9 +1,9 @@
 'use client'
 
-import { AlertTriangle, Package, Plus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { AlertTriangle, Package, Plus } from 'lucide-react'
 
 // Interface pour les matériaux
 interface Materiau {

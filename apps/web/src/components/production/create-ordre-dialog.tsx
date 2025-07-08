@@ -1,11 +1,11 @@
 // apps/web/src/components/production/create-ordre-dialog.tsx
 'use client'
 
-import { X } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { X } from 'lucide-react'
+import { useState } from 'react'
 
 interface CreateOrdreDialogProps {
   open: boolean // ✅ Interface standardisée

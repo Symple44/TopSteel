@@ -23,31 +23,34 @@ export function useToast(): ToastContextType {
     setToasts((prev) => prev.filter((toast) => toast.id !== id))
   }, [])
 
-  const toast = useCallback((props: Omit<Toast, 'id'>) => {
-    const id = `toast-${++toastCounter}`
-    const newToast: Toast = {
-      id,
-      duration: 5000,
-      variant: 'default',
-      ...props,
-    }
+  const toast = useCallback(
+    (props: Omit<Toast, 'id'>) => {
+      const id = `toast-${++toastCounter}`
+      const newToast: Toast = {
+        id,
+        duration: 5000,
+        variant: 'default',
+        ...props,
+      }
 
-    setToasts((prev) => [...prev, newToast])
+      setToasts((prev) => [...prev, newToast])
 
-    // Auto-dismiss avec globalThis pour compatibilité universelle
-    if (newToast.duration && newToast.duration > 0) {
-      const timeoutId = globalThis.setTimeout(() => {
-        dismiss(id)
-      }, newToast.duration)
-      
-      // Retourner une fonction de nettoyage
-      return () => {
-        if (typeof globalThis.clearTimeout !== 'undefined') {
-          globalThis.clearTimeout(timeoutId)
+      // Auto-dismiss avec globalThis pour compatibilité universelle
+      if (newToast.duration && newToast.duration > 0) {
+        const timeoutId = globalThis.setTimeout(() => {
+          dismiss(id)
+        }, newToast.duration)
+
+        // Retourner une fonction de nettoyage
+        return () => {
+          if (typeof globalThis.clearTimeout !== 'undefined') {
+            globalThis.clearTimeout(timeoutId)
+          }
         }
       }
-    }
-  }, [dismiss])
+    },
+    [dismiss]
+  )
 
   return {
     toasts,

@@ -1,8 +1,8 @@
 'use client'
 
-import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 
 export function StockAlertsPanel() {
   const alertes = [

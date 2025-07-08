@@ -11,9 +11,9 @@
  * - Animations optionnelles
  */
 
-import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
 import { cn } from '@/lib/utils'
+import { type VariantProps, cva } from 'class-variance-authority'
+import * as React from 'react'
 
 // =============================================
 // VARIANTS CONFIGURATION
@@ -180,7 +180,8 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
     const content = (
       <>
         {/* Dot indicator */}
-        {dot ? <span
+        {dot ? (
+          <span
             className={cn(
               'absolute w-2 h-2 rounded-full',
               iconPosition === 'start' ? 'left-1.5' : 'right-1.5',
@@ -192,18 +193,23 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
                     ? 'bg-red-400'
                     : 'bg-blue-400'
             )}
-          /> : null}
+          />
+        ) : null}
 
         {/* Icon start */}
-        {icon && iconPosition === 'start' && !loading ? <span className={cn('mr-1', size === 'sm' ? 'w-3 h-3' : 'w-4 h-4')}>{icon}</span> : null}
+        {icon && iconPosition === 'start' && !loading ? (
+          <span className={cn('mr-1', size === 'sm' ? 'w-3 h-3' : 'w-4 h-4')}>{icon}</span>
+        ) : null}
 
         {/* Loading spinner */}
-        {loading ? <span
+        {loading ? (
+          <span
             className={cn(
               'mr-1 animate-spin rounded-full border-2 border-current border-t-transparent',
               size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
             )}
-          /> : null}
+          />
+        ) : null}
 
         {/* Main content */}
         <span className="truncate">{children}</span>
@@ -222,10 +228,13 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
         )}
 
         {/* Icon end */}
-        {icon && iconPosition === 'end' && !loading ? <span className={cn('ml-1', size === 'sm' ? 'w-3 h-3' : 'w-4 h-4')}>{icon}</span> : null}
+        {icon && iconPosition === 'end' && !loading ? (
+          <span className={cn('ml-1', size === 'sm' ? 'w-3 h-3' : 'w-4 h-4')}>{icon}</span>
+        ) : null}
 
         {/* Remove button */}
-        {onRemove ? <button
+        {onRemove ? (
+          <button
             type="button"
             onClick={(e) => {
               e.stopPropagation()
@@ -246,7 +255,8 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button> : null}
+          </button>
+        ) : null}
       </>
     )
 
@@ -261,7 +271,7 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
           ? (e: React.KeyboardEvent) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
-                onClick?.(e as any)
+                onClick?.(e as unknown)
               }
             }
           : undefined,

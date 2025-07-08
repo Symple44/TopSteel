@@ -211,7 +211,7 @@ export class StoreUtils {
   /**
    * Cache simple et efficace avec TTL
    */
-  static createCache<K, V>(ttlMs: number = 300000) {
+  static createCache<K, V>(ttlMs = 300000) {
     const cache = new Map<K, CacheItem<V>>()
 
     return {

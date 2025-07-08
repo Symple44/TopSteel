@@ -1,13 +1,13 @@
 // packages/utils/src/calculation/pricing.ts
-export function calculateTTC(ht: number, tauxTVA: number = 20): number {
+export function calculateTTC(ht: number, tauxTVA = 20): number {
   return ht * (1 + tauxTVA / 100)
 }
 
-export function calculateHT(ttc: number, tauxTVA: number = 20): number {
+export function calculateHT(ttc: number, tauxTVA = 20): number {
   return ttc / (1 + tauxTVA / 100)
 }
 
-export function calculateTVA(ht: number, tauxTVA: number = 20): number {
+export function calculateTVA(ht: number, tauxTVA = 20): number {
   return ht * (tauxTVA / 100)
 }
 

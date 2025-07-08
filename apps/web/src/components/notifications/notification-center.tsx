@@ -1,8 +1,5 @@
 'use client'
 
-import type { Notification } from '@erp/types'
-import { AlertTriangle, Bell, CheckCheck, Clock, Settings, Trash2, X } from 'lucide-react'
-import { useState } from 'react'
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,6 +18,9 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import type { Notification } from '@erp/types'
+import { AlertTriangle, Bell, CheckCheck, Clock, Settings, Trash2, X } from 'lucide-react'
+import { useState } from 'react'
 import { NotificationSettings } from './notification-settings'
 
 export function NotificationCenter() {

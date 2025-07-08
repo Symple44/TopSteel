@@ -2,7 +2,7 @@
 export function formatCurrency(
   amount: number,
   currency: 'EUR' | 'USD' | 'GBP' = 'EUR',
-  locale: string = 'fr-FR'
+  locale = 'fr-FR'
 ): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
@@ -23,5 +23,5 @@ export function formatCurrencyCompact(amount: number): string {
 }
 
 export function parseCurrency(value: string): number {
-  return parseFloat(value.replace(/[^\d,.-]/g, '').replace(',', '.'))
+  return Number.parseFloat(value.replace(/[^\d,.-]/g, '').replace(',', '.'))
 }

@@ -1,5 +1,5 @@
 // apps/api/src/config/validation.config.ts
-import { plainToInstance, Transform, Type } from 'class-transformer'
+import { Transform, Type, plainToInstance } from 'class-transformer'
 import {
   IsBoolean,
   IsEnum,
@@ -24,27 +24,27 @@ export class EnvironmentVariables {
 
   @IsNumber()
   @Type(() => Number)
-  API_PORT: number = 3001
+  API_PORT = 3001
 
   @IsNumber()
   @Type(() => Number)
-  WEB_PORT: number = 3000
+  WEB_PORT = 3000
 
   @IsString()
-  DATABASE_HOST: string = 'localhost'
+  DATABASE_HOST = 'localhost'
 
   @IsNumber()
   @Type(() => Number)
-  DATABASE_PORT: number = 5432
+  DATABASE_PORT = 5432
 
   @IsString()
-  DATABASE_NAME: string = 'erp_topsteel'
+  DATABASE_NAME = 'erp_topsteel'
 
   @IsString()
-  DATABASE_USERNAME: string = 'postgres'
+  DATABASE_USERNAME = 'postgres'
 
   @IsString()
-  DATABASE_PASSWORD: string = ''
+  DATABASE_PASSWORD = ''
 
   @IsBoolean()
   @Transform(({ value }) => {
@@ -53,7 +53,7 @@ export class EnvironmentVariables {
     }
     return Boolean(value)
   })
-  DATABASE_SYNCHRONIZE: boolean = false
+  DATABASE_SYNCHRONIZE = false
 
   @IsOptional()
   @IsString()

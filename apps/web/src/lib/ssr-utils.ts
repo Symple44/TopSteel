@@ -273,7 +273,6 @@ export function useHydrationSafe<T>(
           setValue(serverValue)
         }
       }
-       
     },
     deps ? [mounted, serverValue, clientValue, ...deps] : [mounted, serverValue, clientValue]
   )

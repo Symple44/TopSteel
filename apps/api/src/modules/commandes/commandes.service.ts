@@ -107,7 +107,7 @@ export class CommandesService {
       .createQueryBuilder("commande")
       .select("SUM(commande.montant)", "sum")
       .getRawOne()
-      .then((result) => parseFloat(result.sum) || 0);
+      .then((result) => Number.parseFloat(result.sum) || 0);
 
     const montantMoyen = total > 0 ? montantTotal / total : 0;
 

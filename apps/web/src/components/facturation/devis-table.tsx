@@ -1,7 +1,6 @@
 // apps/web/src/components/facturation/devis-table.tsx
 'use client'
 
-import { Download, Edit, Eye, MoreHorizontal } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { Download, Edit, Eye, MoreHorizontal } from 'lucide-react'
 
 // Données mock pour la démo
 const mockDevis = [

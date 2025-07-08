@@ -1,7 +1,5 @@
 'use client'
 
-import { ArrowLeft, Calendar, CheckCircle, Clock, Pause, Play, User } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { OrdreInfoTab } from '@/components/production/ordre-info-tab'
 import { OrdreMateriauxTab } from '@/components/production/ordre-materiaux-tab'
 import { OrdreOperationsTab } from '@/components/production/ordre-operations-tab'
@@ -10,6 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ArrowLeft, Calendar, CheckCircle, Clock, Pause, Play, User } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface OrdrePageProps {
   params: Promise<{ id: string }>

@@ -1,10 +1,10 @@
 // apps/web/src/components/production/production-table.tsx
 'use client'
 
-import { AlertTriangle, CheckCircle, Clock, Edit, Eye, Pause, Play } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { AlertTriangle, CheckCircle, Clock, Edit, Eye, Pause, Play } from 'lucide-react'
 
 interface ProductionTableProps {
   ordres: OrdreFabrication[]

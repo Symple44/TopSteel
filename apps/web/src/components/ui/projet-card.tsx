@@ -1,12 +1,12 @@
 'use client'
 
-import type { Projet } from '@erp/types'
-import { Calendar, Euro, Eye, User } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import type { Projet } from '@erp/types'
+import { Calendar, Euro, Eye, User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface ProjetCardProps {
   projet: Projet
