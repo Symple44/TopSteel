@@ -1,5 +1,5 @@
 // apps/web/src/__tests__/example.test.tsx
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 // Test d'exemple - remplacez par vos vrais tests
@@ -14,3 +14,4 @@ describe('Example Test', () => {
     expect(container).toBeInTheDocument()
   })
 })
+
