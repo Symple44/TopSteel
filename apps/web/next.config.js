@@ -1,105 +1,62 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ===== CONFIGURATION DE BASE =====
-  reactStrictMode: true,
-  compress: true,
-
-  // ===== CORRECTION WINDOWS - DÉSACTIVER STANDALONE =====
-  output: undefined, // Supprime les problèmes de symlinks sur Windows
-
-  // ===== OPTIMISATIONS PERFORMANCE =====
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-
-  // ===== CONFIGURATION EXPERIMENTALE =====
+  // Next.js 15.1 optimisations stables
   experimental: {
-    optimizePackageImports: [
-      '@erp/ui',
-      '@erp/types',
-      '@erp/utils',
-      'lucide-react',
-      '@radix-ui/react-icons',
-    ],
-    // Désactivé pour éviter les problèmes Windows
-    // turbo: false,
-  },
-
-  // ===== WEBPACK CONFIGURATION =====
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Optimisation pour éviter les crashes
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      net: false,
-      tls: false,
-      crypto: false,
-    }
-
-    // Gestion gracieuse des erreurs de build
-    config.optimization = {
-      ...config.optimization,
-      minimize: !dev,
-      splitChunks: {
-        chunks: 'all',
-        cacheGroups: {
-          default: false,
-          vendors: false,
-          vendor: {
-            chunks: 'all',
-            test: /node_modules/,
-            name: 'vendor',
-            enforce: true,
-          },
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
         },
       },
     }
-
-    // Configuration pour Windows
-    if (process.platform === 'win32') {
-      config.resolve.symlinks = false
-    }
-
+  },
+  
+  // Turbo optimisations
+  transpilePackages: ['@erp/ui', '@erp/utils', '@erp/types'],
+  
+  // Performance & Bundle optimisations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production'
+  },
+  
+  // Webpack optimisations
+  webpack: (config, { dev, isServer }) => {
+    // Optimisations pour le monorepo
+    config.resolve.symlinks = false
+    
+    // Support des packages workspace
+    config.module.rules.push({
+      test: /\.tsx?$/,
+      include: [
+        /packages\/ui/,
+        /packages\/utils/,
+        /packages\/types/
+      ],
+      use: [
+        {
+          loader: 'next-swc-loader',
+          options: {
+            sourceMaps: dev,
+          },
+        },
+      ],
+    })
+    
     return config
   },
-
-  // ===== TRANSPILATION =====
-  transpilePackages: ['@erp/ui', '@erp/types', '@erp/utils'],
-
-  // ===== GESTION DES IMAGES =====
+  
+  // Images optimisations
   images: {
-    formats: ['image/webp', 'image/avif'],
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384]
   },
-
-  // ===== ENVIRONNEMENT =====
-  env: {
-    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'ERP TopSteel',
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-  },
-
-  // ===== GESTION DES ERREURS BUILD =====
-  typescript: {
-    ignoreBuildErrors: false,
-  },
+  
+  // ESLint config
   eslint: {
-    ignoreDuringBuilds: false,
-  },
-
-  // ===== POWEREDBYHEADER =====
-  poweredByHeader: false,
-
-  // ===== REDIRECTS =====
-  async redirects() {
-    return [
-      {
-        source: '/register',
-        destination: '/auth/register',
-        permanent: true,
-      },
-    ]
-  },
+    dirs: ['src', 'pages', 'components', 'lib']
+  }
 }
 
 module.exports = nextConfig

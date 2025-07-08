@@ -12,7 +12,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
 
     "noUnusedLocals": true,
@@ -46,8 +46,9 @@
         "name": "next"
       }
     ],
-    "types": ["jest", "@testing-library/jest-dom", "node"]
+    "types": ["vitest/globals", "vitest/globals", "node"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/**/*"],
   "exclude": ["node_modules", ".next", "out", "dist", "coverage", ".turbo", "storybook-static"]
 }
+

@@ -2,72 +2,68 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "daemon": true,
+  "globalDependencies": [".env*", "tsconfig*.json"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         ".env*",
         "tsup.config.*",
         "vite.config.*",
-        "next.config.*"
+        "next.config.*",
+        "vitest.config.*"
       ],
       "outputs": [
         "dist/**",
         ".next/**",
-        "!.next/cache/**",
-        "**/*.js"
+        "!.next/cache/**"
       ],
-      "env": [
-        "NODE_ENV"
-      ]
+      "env": ["NODE_ENV", "NEXT_PUBLIC_*"],
+      "cache": true
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": [
-        "NODE_ENV",
-        "PORT",
-        "DATABASE_URL"
-      ]
+      "env": ["NODE_ENV", "PORT", "DATABASE_URL", "REDIS_URL"]
     },
     "test": {
+      "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "vitest.config.*",
-        "jest.config.*"
+        "src/test/**"
       ],
-      "outputs": [
-        "coverage/**"
-      ],
-      "env": [
-        "NODE_ENV"
-      ]
+      "outputs": ["coverage/**"],
+      "cache": true
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
     },
     "lint": {
       "inputs": [
         "$TURBO_DEFAULT$",
         ".eslintrc*",
-        "biome.json"
+        "biome.json",
+        "eslint.config.*"
       ],
-      "outputs": [
-        ".eslintcache"
-      ]
+      "outputs": [".eslintcache"],
+      "cache": true
     },
     "type-check": {
+      "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "tsconfig*.json"
       ],
-      "outputs": [
-        "*.tsbuildinfo"
-      ]
+      "outputs": ["*.tsbuildinfo"],
+      "cache": true
+    },
+    "format": {
+      "inputs": ["$TURBO_DEFAULT$"],
+      "cache": true
     }
   },
-  "globalEnv": [
-    "NODE_ENV",
-    "CI"
-  ]
+  "globalEnv": ["NODE_ENV", "CI", "GITHUB_TOKEN"]
 }

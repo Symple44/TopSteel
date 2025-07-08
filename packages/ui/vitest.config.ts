@@ -15,17 +15,13 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html', 'json'],
       include: ['src/**/*'],
-      exclude: ['src/**/*.d.ts'],
+      exclude: ['src/**/*.d.ts', 'src/**/*.stories.tsx'],
       thresholds: {
-        global: { branches: 75, functions: 75, lines: 75, statements: 75 }
+        global: { branches: 80, functions: 80, lines: 80, statements: 80 }
       }
     }
   },
   resolve: {
-    alias: { 
-      '@': path.resolve(__dirname, './src'),
-      '@/components': path.resolve(__dirname, './src/components'),
-      '@/lib': path.resolve(__dirname, './src/lib')
-    }
+    alias: { '@': path.resolve(__dirname, './src') }
   }
 })
