@@ -1,7 +1,9 @@
 'use client'
 
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui'
+import * as UI from '@erp/ui'
+const Badge = UI.Badge;
+const Button = UI.Button;
+
 import { Edit, Eye, MoreHorizontal, Package, Trash2 } from 'lucide-react'
 
 export function StocksTable() {
@@ -152,3 +154,7 @@ export function StocksTable() {
     </div>
   )
 }
+
+
+
+

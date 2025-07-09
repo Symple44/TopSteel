@@ -1,11 +1,9 @@
+import {
+  Button, Card, CardContent, CardHeader, CardTitle, Checkbox,
+  Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Textarea
+} from '@erp/ui'
 import type { Meta } from '@storybook/react'
-import { Button } from '../../components/primitives/button'
-import { Input } from '../../components/primitives/input'
-import { Label } from '../../components/forms/label'
-import { Textarea } from '../../components/primitives/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/primitives/select'
-import { Checkbox } from '../../components/primitives/checkbox'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/layout/card'
 
 const meta: Meta = {
   title: '07-Forms/Form Components',

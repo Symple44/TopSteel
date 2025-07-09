@@ -1,6 +1,7 @@
 'use client'
 
-import { Button } from '@erp/ui'
+import * as UI from '@erp/ui'
+const Button = UI.Button;
 import { useState } from 'react'
 
 interface CreateMouvementDialogProps {
@@ -25,3 +26,6 @@ export function CreateMouvementDialog({ open, onOpenChange }: CreateMouvementDia
     </div>
   )
 }
+
+
+

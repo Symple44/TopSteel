@@ -1,33 +1,54 @@
 {
   "extends": "../../tsconfig.json",
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "types/**/*.d.ts"
+  ],
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "es6"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "module": "esnext",
+    "allowJs": true,
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ],
+    "paths": {
+      "@erp/types": [
+        "../../packages/types/dist"
+      ],
+      "@erp/ui": [
+        "../../packages/ui/dist"
+      ],
+      "@erp/utils": [
+        "../../packages/utils/dist"
+      ],
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "esModuleInterop": true,
+    "noEmit": true,
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@erp/ui": ["../../packages/ui/dist"],
-      "@erp/utils": ["../../packages/utils/dist"],
-      "@erp/types": ["../../packages/types/dist"]
-    }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

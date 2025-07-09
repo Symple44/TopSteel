@@ -1,3 +1,5 @@
+// packages/ui/src/index.ts
+
 // === PRIMITIVES ===
 export * from './components/primitives/button'
 export * from './components/primitives/checkbox'
@@ -7,9 +9,9 @@ export * from './components/primitives/select'
 export * from './components/primitives/switch'
 export * from './components/primitives/textarea'
 
-
 // === LAYOUT ===
 export * from './components/layout/card'
+export * from './components/layout/scroll-area'
 export * from './components/layout/separator'
 
 // === NAVIGATION ===
@@ -32,20 +34,22 @@ export * from './components/forms/label'
 
 // === UTILS & VARIANTS ===
 export {
-  alertVariants, badgeVariants, buttonVariants
+  alertVariants,
+  badgeVariants,
+  buttonVariants
 } from './lib/design-system'
 export { cn } from './lib/utils'
 
 // === TYPES ===
 export type {
-  AlertVariants, BadgeVariants, ButtonVariants
+  AlertVariants,
+  BadgeVariants,
+  ButtonVariants
 } from './lib/design-system'
 
 // === RE-EXPORTS EXTERNES ===
 export { cva, type VariantProps } from 'class-variance-authority'
 export { clsx, type ClassValue } from 'clsx'
-
-
 
 // === BUSINESS COMPONENTS ===
 export * from './components/business/projet-card'
@@ -62,4 +66,3 @@ export * from './components/feedback/toaster'
 
 // === THEME ===
 export * from './components/theme/theme-switcher'
-

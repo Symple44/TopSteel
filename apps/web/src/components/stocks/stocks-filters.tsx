@@ -1,7 +1,9 @@
 'use client'
 
-import { Button } from '@erp/ui'
-import { Input } from '@erp/ui'
+import * as UI from '@erp/ui'
+const Button = UI.Button;
+const Input = UI.Input;
+
 import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
@@ -63,10 +65,10 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="text-sm font-medium">Catégorie</label>
+          <Label className="text-sm font-medium">Catégorie</Label>
           <select
             value={filters.categorie}
-            onChange={(e) => handleFilterChange('categorie', (e.target as HTMLSelectElement).value)}
+            onChange={(e) => handleFilterChange('categorie', e.target.value)}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Toutes les catégories</option>
@@ -79,11 +81,11 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
         </div>
 
         <div>
-          <label className="text-sm font-medium">Emplacement</label>
+          <Label className="text-sm font-medium">Emplacement</Label>
           <select
             value={filters.emplacement}
             onChange={(e) =>
-              handleFilterChange('emplacement', (e.target as HTMLSelectElement).value)
+              handleFilterChange('emplacement', e.target.value)
             }
             className="w-full p-2 border rounded-md"
           >
@@ -96,11 +98,11 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
         </div>
 
         <div>
-          <label className="text-sm font-medium">Fournisseur</label>
+          <Label className="text-sm font-medium">Fournisseur</Label>
           <select
             value={filters.fournisseur}
             onChange={(e) =>
-              handleFilterChange('fournisseur', (e.target as HTMLSelectElement).value)
+              handleFilterChange('fournisseur', e.target.value)
             }
             className="w-full p-2 border rounded-md"
           >
@@ -115,7 +117,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="text-sm font-medium">Stock minimum</label>
+          <Label className="text-sm font-medium">Stock minimum</Label>
           <Input
             type="number"
             value={filters.stockMin}
@@ -125,7 +127,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
         </div>
 
         <div>
-          <label className="text-sm font-medium">Stock maximum</label>
+          <Label className="text-sm font-medium">Stock maximum</Label>
           <Input
             type="number"
             value={filters.stockMax}
@@ -135,10 +137,10 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
         </div>
 
         <div>
-          <label className="text-sm font-medium">Statut</label>
+          <Label className="text-sm font-medium">Statut</Label>
           <select
             value={filters.statut}
-            onChange={(e) => handleFilterChange('statut', (e.target as HTMLSelectElement).value)}
+            onChange={(e) => handleFilterChange('statut', e.target.value)}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Tous les statuts</option>
@@ -159,3 +161,8 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     </div>
   )
 }
+
+
+
+
+

@@ -3,12 +3,12 @@
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { cn } from '@/lib/utils'
 import type { Notification } from '@erp/types'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@erp/ui'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@erp/ui'
-import { ScrollArea } from '@erp/ui'
-import { Separator } from '@erp/ui'
+
+import {
+  Badge, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, ScrollArea,
+  Separator
+} from '@erp/ui'
+
 import { AlertTriangle, Bell, CheckCheck, Clock, Settings, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import { NotificationSettings } from './notification-settings'
@@ -54,7 +54,7 @@ export function NotificationCenter() {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-80">
+      <DropdownMenuContent className="w-80">
         <div className="p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Notifications</h3>
@@ -64,14 +64,13 @@ export function NotificationCenter() {
                   variant="ghost"
                   size="sm"
                   onClick={actions.markAllAsRead}
-                  title="Tout marquer comme lu"
                 >
                   <CheckCheck className="h-4 w-4" />
                 </Button>
               )}
               <Dialog open={showSettings} onOpenChange={setShowSettings}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" title="Paramètres">
+                  <Button variant="ghost" size="sm">
                     <Settings className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
@@ -203,3 +202,7 @@ export function NotificationCenter() {
     </DropdownMenu>
   )
 }
+
+
+
+

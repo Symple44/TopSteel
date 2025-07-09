@@ -1,7 +1,9 @@
 // apps/web/src/components/facturation/paiements-chart.tsx
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import {
+  Card, CardContent, CardHeader, CardTitle
+} from '@erp/ui'
 
 export function PaiementsChart() {
   return (
@@ -17,3 +19,6 @@ export function PaiementsChart() {
     </Card>
   )
 }
+
+
+

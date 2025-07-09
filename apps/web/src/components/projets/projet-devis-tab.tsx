@@ -2,11 +2,22 @@
 
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Separator } from '@erp/ui'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp/ui'
+import * as UI from '@erp/ui'
+const Badge = UI.Badge;
+const Button = UI.Button;
+const Card = UI.Card;
+const CardContent = UI.CardContent;
+const CardDescription = UI.CardDescription;
+const CardHeader = UI.CardHeader;
+const CardTitle = UI.CardTitle;
+const Separator = UI.Separator;
+const Table = UI.Table;
+const TableBody = UI.TableBody;
+const TableCell = UI.TableCell;
+const TableHead = UI.TableHead;
+const TableHeader = UI.TableHeader;
+const TableRow = UI.TableRow;
+
 import {
   Calculator,
   CheckCircle,
@@ -308,3 +319,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
     </div>
   )
 }
+
+
+
+

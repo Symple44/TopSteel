@@ -2,8 +2,14 @@
 
 import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 import type { Projet } from '@erp/types'
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import * as UI from '@erp/ui'
+const Button = UI.Button;
+const Card = UI.Card;
+const CardContent = UI.CardContent;
+const CardDescription = UI.CardDescription;
+const CardHeader = UI.CardHeader;
+const CardTitle = UI.CardTitle;
+
 import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
 
@@ -228,3 +234,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
     </div>
   )
 }
+
+
+
+

@@ -142,8 +142,6 @@ export const runtime = 'nodejs' // Runtime par défaut pour la compatibilité ma
 /**
  * Gestion des erreurs au niveau layout
  */
-export const errorBoundary = true
-
 // ===== STYLES SPÉCIFIQUES =====
 
 /**
@@ -205,3 +203,4 @@ export const generateStaticParams = async () => {
   // Pas de params statiques pour cette section
   return []
 }
+

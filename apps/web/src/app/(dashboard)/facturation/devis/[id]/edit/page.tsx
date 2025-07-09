@@ -4,7 +4,7 @@ import { DevisPreview } from '@/components/facturation/devis-preview'
 import {
   Badge, Button, Card, CardContent, CardHeader, CardTitle,
   Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea
 } from '@erp/ui'
 import { Calculator, Download, Eye, Plus, Save, Send, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
@@ -190,7 +190,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
 
               <div>
                 <Label htmlFor="conditions">Conditions générales</Label>
-                <textarea
+                <Textarea
                   id="conditions"
                   value={devis.conditions}
                   onChange={(e) =>

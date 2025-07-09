@@ -7,11 +7,14 @@
  */
 
 import { ClientOnly } from '@/components/client-only'
-import { Alert, AlertDescription } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@erp/ui'
-import { Input } from '@erp/ui'
-import { Label } from '@erp/ui'
+import {
+  Alert, AlertDescription,
+  Button, Card, CardContent,
+  CardDescription, CardFooter,
+  CardHeader, CardTitle,
+  Input, Label
+} from '@erp/ui'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Building2, CheckCircle, Eye, EyeOff, Loader2, Mail, User } from 'lucide-react'
 import Link from 'next/link'
@@ -520,3 +523,7 @@ export default function RegisterPage() {
     </ClientOnly>
   )
 }
+
+
+
+

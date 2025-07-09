@@ -1,5 +1,8 @@
 // apps/web/src/components/production/ordre-qualite-tab.tsx
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import {
+  Card,
+  CardContent, CardHeader, CardTitle
+} from '@erp/ui'
 
 interface OrdreQualiteTabProps {
   ordre: any
@@ -98,3 +101,6 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
     </div>
   )
 }
+
+
+

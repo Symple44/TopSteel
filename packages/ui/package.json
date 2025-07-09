@@ -44,7 +44,7 @@
     "tailwind-merge": "^3.3.1"
   },
   "module": "./dist/index.mjs",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.mjs",
   "description": "UI components library for ERP TopSteel - Enterprise-grade design system",
   "engines": {
     "pnpm": ">=8.0.0",
@@ -157,15 +157,10 @@
   "private": true,
   "exports": {
     "./package.json": "./package.json",
-    "./styles": {
-      "require": "./dist/styles.css",
-      "import": "./dist/styles.css"
-    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.cjs"
+      "default": "./dist/index.mjs"
     }
   }
 }

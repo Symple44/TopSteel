@@ -1,15 +1,26 @@
-// apps/web/src/components/production/create-ordre-dialog.tsx
+// apps/web/src/components/production/create-ordre-dialog.tsx - VERSION CORRIGÉE
 'use client'
 
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Input } from '@erp/ui'
-import { X } from 'lucide-react'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@erp/ui'
+
 import { useState } from 'react'
 
 interface CreateOrdreDialogProps {
-  open: boolean // ✅ Interface standardisée
-  onOpenChange: (open: boolean) => void // ✅ Interface standardisée
+  open: boolean
+  onOpenChange: (open: boolean) => void
   onSubmit?: (data: any) => void
 }
 
@@ -22,8 +33,6 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
     dateFinPrevue: '',
     projet: '',
   })
-
-  if (!open) return null
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,109 +60,310 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
     })
   }
 
+  // ✅ Handler simplifié pour les inputs
+  const handleInputChange = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }))
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle>Nouvel ordre de fabrication</CardTitle>
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Nouvel ordre de fabrication</DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            {/* ✅ COHÉRENCE : Utilise toujours <Label> component */}
+            <Label htmlFor="numero" className="text-sm font-medium">
+              Numéro d'ordre
+            </Label>
+            <Input
+              id="numero"
+              type="text"
+              value={formData.numero}
+              onChange={handleInputChange('numero')}
+              placeholder="OF-2025-001"/>
+          </div>
+
+          <div>
+            <Label htmlFor="description" className="text-sm font-medium">
+              Description
+            </Label>
+            <Input
+              id="description"
+              type="text"
+              value={formData.description}
+              onChange={handleInputChange('description')}
+              placeholder="Description de l'ordre..."/>
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium">
+              Priorité
+            </Label>
+            {/* ✅ CORRIGÉ : Utilise l'API Radix UI Select correcte */}
+            <Select
+              value={formData.priorite}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, priorite: value }))}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sélectionner une priorité" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="BASSE">Basse</SelectItem>
+                <SelectItem value="NORMALE">Normale</SelectItem>
+                <SelectItem value="HAUTE">Haute</SelectItem>
+                <SelectItem value="URGENTE">Urgente</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Numéro d'ordre</label>
+              <Label htmlFor="dateDebut" className="text-sm font-medium">
+                Date début
+              </Label>
               <Input
-                type="text"
-                value={formData.numero}
-                onChange={(e) =>
-                  setFormData({ ...formData, numero: (e.target as HTMLInputElement).value })
-                }
-                placeholder="OF-2025-001"
-                required
+                id="dateDebut"
+                type="date"
+                value={formData.dateDebutPrevue}
+                onChange={handleInputChange('dateDebutPrevue')}
               />
             </div>
-
             <div>
-              <label className="text-sm font-medium">Description</label>
+              <Label htmlFor="dateFin" className="text-sm font-medium">
+                Date fin
+              </Label>
               <Input
-                type="text"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: (e.target as HTMLInputElement).value })
-                }
-                placeholder="Description de l'ordre..."
-                required
+                id="dateFin"
+                type="date"
+                value={formData.dateFinPrevue}
+                onChange={handleInputChange('dateFinPrevue')}
               />
             </div>
+          </div>
 
+          <div>
+            <Label htmlFor="projet" className="text-sm font-medium">
+              Projet associé
+            </Label>
+            <Input
+              id="projet"
+              type="text"
+              value={formData.projet}
+              onChange={handleInputChange('projet')}
+              placeholder="Nom du projet (optionnel)"
+            />
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+            >
+              Annuler
+            </Button>
+            <Button type="submit">
+              Créer l'ordre
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ✅ BONUS : Version avec validation avancée
+export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: CreateOrdreDialogProps) {
+  const [formData, setFormData] = useState({
+    numero: '',
+    description: '',
+    priorite: 'NORMALE',
+    dateDebutPrevue: '',
+    dateFinPrevue: '',
+    projet: '',
+  })
+
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // ✅ Validation des champs
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.numero.trim()) {
+      newErrors.numero = 'Le numéro d\'ordre est requis'
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = 'La description est requise'
+    }
+
+    if (formData.dateDebutPrevue && formData.dateFinPrevue) {
+      if (new Date(formData.dateDebutPrevue) > new Date(formData.dateFinPrevue)) {
+        newErrors.dateFinPrevue = 'La date de fin doit être postérieure à la date de début'
+      }
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!validateForm()) {
+      return
+    }
+
+    const newOrdre = {
+      ...formData,
+      id: Date.now(),
+      statut: 'PLANIFIE' as const,
+      avancement: 0,
+      createdAt: new Date(),
+    }
+
+    onSubmit?.(newOrdre)
+    onOpenChange(false)
+    
+    // Reset form et erreurs
+    setFormData({
+      numero: '',
+      description: '',
+      priorite: 'NORMALE',
+      dateDebutPrevue: '',
+      dateFinPrevue: '',
+      projet: '',
+    })
+    setErrors({})
+  }
+
+  const handleInputChange = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }))
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-full max-w-md">
+        <DialogHeader>
+          <DialogTitle>Nouvel ordre de fabrication</DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="numero" className="text-sm font-medium">
+              Numéro d'ordre *
+            </Label>
+            <Input
+              id="numero"
+              type="text"
+              value={formData.numero}
+              onChange={handleInputChange('numero')}
+              placeholder="OF-2025-001"
+              className={errors.numero ? 'border-red-500' : ''}
+            />
+            {errors.numero && (
+              <p className="text-sm text-red-500 mt-1">{errors.numero}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="description" className="text-sm font-medium">
+              Description *
+            </Label>
+            <Input
+              id="description"
+              type="text"
+              value={formData.description}
+              onChange={handleInputChange('description')}
+              placeholder="Description de l'ordre..."
+              className={errors.description ? 'border-red-500' : ''}
+            />
+            {errors.description && (
+              <p className="text-sm text-red-500 mt-1">{errors.description}</p>
+            )}
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium">Priorité</Label>
+            <Select
+              value={formData.priorite}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, priorite: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="BASSE">🟢 Basse</SelectItem>
+                <SelectItem value="NORMALE">🟡 Normale</SelectItem>
+                <SelectItem value="HAUTE">🟠 Haute</SelectItem>
+                <SelectItem value="URGENTE">🔴 Urgente</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Priorité</label>
-              <select
-                value={formData.priorite}
-                onChange={(e) =>
-                  setFormData({ ...formData, priorite: (e.target as HTMLSelectElement).value })
-                }
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="BASSE">Basse</option>
-                <option value="NORMALE">Normale</option>
-                <option value="HAUTE">Haute</option>
-                <option value="URGENTE">Urgente</option>
-              </select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Date début</label>
-                <Input
-                  type="date"
-                  value={formData.dateDebutPrevue}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      dateDebutPrevue: (e.target as HTMLInputElement).value,
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Date fin</label>
-                <Input
-                  type="date"
-                  value={formData.dateFinPrevue}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      dateFinPrevue: (e.target as HTMLInputElement).value,
-                    })
-                  }
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">Projet associé</label>
+              <Label htmlFor="dateDebut" className="text-sm font-medium">
+                Date début
+              </Label>
               <Input
-                type="text"
-                value={formData.projet}
-                onChange={(e) =>
-                  setFormData({ ...formData, projet: (e.target as HTMLInputElement).value })
-                }
-                placeholder="Nom du projet (optionnel)"
+                id="dateDebut"
+                type="date"
+                value={formData.dateDebutPrevue}
+                onChange={handleInputChange('dateDebutPrevue')}
               />
             </div>
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Annuler
-              </Button>
-              <Button type="submit">Créer l'ordre</Button>
+            <div>
+              <Label htmlFor="dateFin" className="text-sm font-medium">
+                Date fin
+              </Label>
+              <Input
+                id="dateFin"
+                type="date"
+                value={formData.dateFinPrevue}
+                onChange={handleInputChange('dateFinPrevue')}
+                className={errors.dateFinPrevue ? 'border-red-500' : ''}
+              />
+              {errors.dateFinPrevue && (
+                <p className="text-sm text-red-500 mt-1">{errors.dateFinPrevue}</p>
+              )}
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          </div>
+
+          <div>
+            <Label htmlFor="projet" className="text-sm font-medium">
+              Projet associé
+            </Label>
+            <Input
+              id="projet"
+              type="text"
+              value={formData.projet}
+              onChange={handleInputChange('projet')}
+              placeholder="Nom du projet (optionnel)"
+            />
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+            >
+              Annuler
+            </Button>
+            <Button type="submit">
+              Créer l'ordre
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

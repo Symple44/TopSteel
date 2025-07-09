@@ -1,9 +1,12 @@
 // apps/web/src/components/production/production-table.tsx
 'use client'
 
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Card, CardContent } from '@erp/ui'
+import * as UI from '@erp/ui'
+const Badge = UI.Badge;
+const Button = UI.Button;
+const Card = UI.Card;
+const CardContent = UI.CardContent;
+
 import { AlertTriangle, CheckCircle, Clock, Edit, Eye, Pause, Play } from 'lucide-react'
 
 interface ProductionTableProps {
@@ -92,3 +95,7 @@ export function ProductionTable({ ordres, onView, onEdit, onStatusChange }: Prod
     </div>
   )
 }
+
+
+
+

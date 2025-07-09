@@ -4,7 +4,12 @@ import { CreatePaiementDialog } from '@/components/facturation/create-paiement-d
 import { PaiementsChart } from '@/components/facturation/paiements-chart'
 import { PaiementsTable } from '@/components/facturation/paiements-table'
 import { RapprochementBancaire } from '@/components/facturation/rapprochement-bancaire'
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
+import {
+  Button, Card, CardContent, CardHeader, CardTitle,
+  Input,
+  Tabs, TabsContent, TabsList,
+  TabsTrigger
+} from '@erp/ui'
 import { Calendar, Filter, Plus, Search, TrendingDown, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 
@@ -134,3 +139,6 @@ export default function PaiementsPage() {
     </div>
   )
 }
+
+
+

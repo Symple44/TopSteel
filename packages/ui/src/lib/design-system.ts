@@ -67,3 +67,77 @@ export const alertVariants = cva(
 
 export type AlertVariants = VariantProps<typeof alertVariants>
 
+
+// === SCROLL AREA VARIANTS ===
+export const scrollAreaVariants = cva(
+  "relative overflow-hidden",
+  {
+    variants: {
+      size: {
+        sm: "h-32",
+        md: "h-64", 
+        lg: "h-96",
+        xl: "h-[32rem]",
+        full: "h-full",
+      },
+    },
+    defaultVariants: {
+      size: "md",
+    },
+  }
+)
+
+export type ScrollAreaVariants = VariantProps<typeof scrollAreaVariants>
+
+// === INPUT VARIANTS ===
+export const inputVariants = cva(
+  "flex w-full rounded-md border border-input bg-transparent text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "h-9 px-3 py-1",
+        checkbox: "h-4 w-4 shrink-0 rounded-sm border-primary shadow",
+        radio: "h-4 w-4 shrink-0 rounded-full border-primary shadow"
+      },
+      size: {
+        default: "h-9 px-3 py-1",
+        sm: "h-8 px-2 text-xs",
+        lg: "h-10 px-4 text-base",
+        checkbox: "h-4 w-4",
+        radio: "h-4 w-4"
+      }
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default"
+    }
+  }
+)
+
+export type InputVariants = VariantProps<typeof inputVariants>
+
+// === SWITCH VARIANTS ===
+export const switchVariants = cva(
+  "relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
+  {
+    variants: {
+      size: {
+        sm: "h-4 w-7",
+        default: "h-6 w-11", 
+        lg: "h-8 w-14"
+      },
+      variant: {
+        default: "bg-input data-[state=checked]:bg-primary",
+        success: "bg-input data-[state=checked]:bg-green-500",
+        warning: "bg-input data-[state=checked]:bg-amber-500",
+        destructive: "bg-input data-[state=checked]:bg-destructive"
+      }
+    },
+    defaultVariants: {
+      size: "default",
+      variant: "default"
+    }
+  }
+)
+
+export type SwitchVariants = VariantProps<typeof switchVariants>

@@ -3,7 +3,9 @@
 import { useAuth } from '@/hooks/use-auth'
 import type { FormattedError } from '@/lib/error-handler'
 import { ErrorHandler } from '@/lib/error-handler'
-import { ErrorAlert } from '@erp/ui'
+import {
+  ErrorAlert
+} from '@erp/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Building2, CheckCircle, Eye, EyeOff, Loader2, Lock, Mail, X } from 'lucide-react'
 import Link from 'next/link'
@@ -295,3 +297,6 @@ export default function LoginPage() {
     </div>
   )
 }
+
+
+

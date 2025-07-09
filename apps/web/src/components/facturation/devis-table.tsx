@@ -2,10 +2,20 @@
 'use client'
 
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@erp/ui'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp/ui'
+import {
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@erp/ui'
+
 import { Download, Edit, Eye, MoreHorizontal } from 'lucide-react'
 
 // Données mock pour la démo
@@ -99,7 +109,7 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent>
                       <DropdownMenuItem>
                         <Download className="h-4 w-4 mr-2" />
                         Télécharger PDF
@@ -117,3 +127,7 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
     </div>
   )
 }
+
+
+
+

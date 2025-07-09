@@ -1,34 +1,13 @@
 'use client'
 
 import { useNotifications } from '@/components/providers/notifications-provider'
-import { cn } from '@/lib/utils'
-import { Button } from '@erp/ui'
-import { Label } from '@erp/ui'
-import { Mail, Monitor, Volume2 } from 'lucide-react'
+import {
+  Button,
+  Label,
+  Switch
+} from '@erp/ui'
 
-// Composant Switch inline pour éviter les problèmes de props
-function CustomSwitch({
-  checked,
-  onChange,
-  className = '',
-  ...props
-}: {
-  checked: boolean
-  onChange: (checked: boolean) => void
-  className?: string
-}) {
-  return (
-    <label className={cn('relative inline-flex cursor-pointer items-center', className)} {...props}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="sr-only peer"
-      />
-      <div className="relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"></div>
-    </label>
-  )
-}
+import { Mail, Monitor, Volume2 } from 'lucide-react'
 
 export function NotificationSettings() {
   const { state, actions } = useNotifications()
@@ -70,9 +49,9 @@ export function NotificationSettings() {
               </p>
             </div>
           </div>
-          <CustomSwitch
+          <Switch
             checked={state.settings.enableSound}
-            onChange={(checked) => actions.updateSettings({ enableSound: checked })}
+            onCheckedChange={(checked) => actions.updateSettings({ enableSound: checked })}
           />
         </div>
 
@@ -84,9 +63,9 @@ export function NotificationSettings() {
               <p className="text-sm text-muted-foreground">Afficher les notifications en popup</p>
             </div>
           </div>
-          <CustomSwitch
+          <Switch
             checked={state.settings.enableToast}
-            onChange={(checked) => actions.updateSettings({ enableToast: checked })}
+            onCheckedChange={(checked) => actions.updateSettings({ enableToast: checked })}
           />
         </div>
 
@@ -98,9 +77,9 @@ export function NotificationSettings() {
               <p className="text-sm text-muted-foreground">Notifications système du navigateur</p>
             </div>
           </div>
-          <CustomSwitch
+          <Switch
             checked={state.settings.enableBrowser}
-            onChange={(checked) => actions.updateSettings({ enableBrowser: checked })}
+            onCheckedChange={(checked) => actions.updateSettings({ enableBrowser: checked })}
           />
         </div>
       </div>

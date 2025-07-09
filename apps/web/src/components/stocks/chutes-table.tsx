@@ -1,5 +1,7 @@
-import { Button } from '@erp/ui'
-import { Input } from '@erp/ui'
+import * as UI from '@erp/ui'
+const Button = UI.Button;
+const Input = UI.Input;
+
 import { Edit, Eye, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -162,3 +164,7 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
     </div>
   )
 }
+
+
+
+

@@ -1,9 +1,14 @@
 'use client'
 
-import { Button } from '@erp/ui'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@erp/ui'
-import { Input } from '@erp/ui'
-import { Label } from '@erp/ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader, DialogTitle,
+  Input, Label
+} from '@erp/ui'
+
 import { useState } from 'react'
 
 // Interface correcte avec open et onOpenChange
@@ -78,9 +83,7 @@ export function CreatePaiementDialog({
               value={formData.montant}
               onChange={(e) =>
                 setFormData({ ...formData, montant: (e.target as HTMLInputElement).value })
-              }
-              required
-            />
+              }/>
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
@@ -109,9 +112,7 @@ export function CreatePaiementDialog({
               value={formData.dateReception}
               onChange={(e) =>
                 setFormData({ ...formData, dateReception: (e.target as HTMLInputElement).value })
-              }
-              required
-            />
+              }/>
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
@@ -127,3 +128,8 @@ export function CreatePaiementDialog({
     </Dialog>
   )
 }
+
+
+
+
+

@@ -1,9 +1,15 @@
 // apps/web/src/components/facturation/factures-filters.tsx
 'use client'
 
-import { Button } from '@erp/ui'
-import { Input } from '@erp/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui'
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent, SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@erp/ui'
+
 import { Filter, Search, X } from 'lucide-react'
 
 interface FacturesFiltersProps {
@@ -45,3 +51,7 @@ export function FacturesFilters({ onFiltersChange }: FacturesFiltersProps) {
     </div>
   )
 }
+
+
+
+

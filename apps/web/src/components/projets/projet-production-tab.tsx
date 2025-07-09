@@ -1,13 +1,18 @@
 'use client'
 
-import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 import { formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
 import { PrioriteProduction, StatutProduction } from '@erp/types'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Progress } from '@erp/ui'
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle, Progress
+} from '@erp/ui'
+
 import {
   AlertCircle,
   Calendar,
@@ -379,3 +384,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     </div>
   )
 }
+
+
+
+
