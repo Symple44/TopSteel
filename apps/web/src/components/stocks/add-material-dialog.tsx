@@ -16,7 +16,7 @@ import {
   Textarea
 } from '@erp/ui'
 
-import { Package } from 'lucide-react'
+import { AlertCircle, Package } from 'lucide-react'
 import { useState } from 'react'
 
 interface AddMaterialDialogProps {
@@ -25,7 +25,7 @@ interface AddMaterialDialogProps {
   onSubmit?: (material: MaterialFormData) => void
 }
 
-// ✅ Interface pour les données du matériau
+// ✅ Interface pour les données du matériau final
 interface MaterialFormData {
   reference: string
   designation: string
@@ -68,6 +68,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(false)
 
   // ✅ Handler simplifié et réutilisable
   const handleInputChange = (field: keyof FormData) => (
@@ -128,30 +129,42 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
   }
 
   // ✅ Soumission avec validation et conversion des types
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!validateForm()) {
       return
     }
 
-    const materialData: MaterialFormData = {
-      reference: formData.reference.trim(),
-      designation: formData.designation.trim(),
-      quantite: Number(formData.quantite),
-      prixUnitaire: formData.prixUnitaire ? Number(formData.prixUnitaire) : 0,
-      emplacement: formData.emplacement.trim(),
-      seuil: formData.seuil ? Number(formData.seuil) : 0,
-      categorie: formData.categorie,
-      unite: formData.unite,
-      fournisseur: formData.fournisseur.trim(),
-      notes: formData.notes.trim() || undefined,
-    }
+    setLoading(true)
 
-    console.log('Nouveau matériau:', materialData)
-    onSubmit?.(materialData)
-    handleReset()
-    onOpenChange(false)
+    try {
+      const materialData: MaterialFormData = {
+        reference: formData.reference.trim(),
+        designation: formData.designation.trim(),
+        quantite: Number(formData.quantite),
+        prixUnitaire: formData.prixUnitaire ? Number(formData.prixUnitaire) : 0,
+        emplacement: formData.emplacement.trim(),
+        seuil: formData.seuil ? Number(formData.seuil) : 0,
+        categorie: formData.categorie,
+        unite: formData.unite,
+        fournisseur: formData.fournisseur.trim(),
+        notes: formData.notes.trim() || undefined,
+      }
+
+      console.log('Nouveau matériau:', materialData)
+      
+      // Simulation API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      onSubmit?.(materialData)
+      handleReset()
+      onOpenChange(false)
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // ✅ Reset du formulaire
@@ -179,12 +192,12 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
 
   // ✅ Helper pour les classes d'erreur
   const getInputClassName = (field: string) => {
-    return errors[field] ? 'border-red-500' : ''
+    return errors[field] ? 'border-red-500 focus-visible:ring-red-500' : ''
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
@@ -193,9 +206,9 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ✅ Informations principales */}
+          {/* ✅ Section identification */}
           <div className="space-y-4">
-            <h3 className="font-medium text-sm text-muted-foreground">Informations principales</h3>
+            <h3 className="font-medium text-sm text-muted-foreground">Identification</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -205,18 +218,18 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                 <Input
                   id="reference"
                   value={formData.reference}
-                  onChange={handleInputChange('reference')
+                  onChange={handleInputChange('reference')}
                   placeholder="REF-001"
                   className={getInputClassName('reference')}
                 />
                 {errors.reference && (
                   <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-                    <span>⚠️</span>
+                    <AlertCircle className="h-3 w-3" />
                     {errors.reference}
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <Label htmlFor="categorie" className="text-sm font-medium">
                   Catégorie *
@@ -226,20 +239,20 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                   onValueChange={handleSelectChange('categorie')}
                 >
                   <SelectTrigger className={getInputClassName('categorie')}>
-                    <SelectValue placeholder="Sélectionner une catégorie" />
+                    <SelectValue placeholder="Sélectionnez une catégorie" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="acier">🔩 Acier</SelectItem>
                     <SelectItem value="inox">✨ Inoxydable</SelectItem>
-                    <SelectItem value="aluminium">⚡ Aluminium</SelectItem>
-                    <SelectItem value="cuivre">🟤 Cuivre</SelectItem>
+                    <SelectItem value="aluminium">⚪ Aluminium</SelectItem>
+                    <SelectItem value="cuivre">🟠 Cuivre</SelectItem>
                     <SelectItem value="consommables">🔧 Consommables</SelectItem>
                     <SelectItem value="quincaillerie">🔗 Quincaillerie</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.categorie && (
                   <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-                    <span>⚠️</span>
+                    <AlertCircle className="h-3 w-3" />
                     {errors.categorie}
                   </p>
                 )}
@@ -259,14 +272,14 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
               />
               {errors.designation && (
                 <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-                  <span>⚠️</span>
+                  <AlertCircle className="h-3 w-3" />
                   {errors.designation}
                 </p>
               )}
             </div>
           </div>
 
-          {/* ✅ Quantité et unité */}
+          {/* ✅ Section quantité et stock */}
           <div className="space-y-4">
             <h3 className="font-medium text-sm text-muted-foreground">Quantité et stock</h3>
             
@@ -279,6 +292,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                   id="quantite"
                   type="number"
                   min="0"
+                  step="0.01"
                   value={formData.quantite}
                   onChange={handleInputChange('quantite')}
                   placeholder="100"
@@ -286,7 +300,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                 />
                 {errors.quantite && (
                   <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-                    <span>⚠️</span>
+                    <AlertCircle className="h-3 w-3" />
                     {errors.quantite}
                   </p>
                 )}
@@ -304,18 +318,17 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="kg">kg</SelectItem>
-                    <SelectItem value="g">g</SelectItem>
-                    <SelectItem value="t">t</SelectItem>
-                    <SelectItem value="m">m</SelectItem>
-                    <SelectItem value="m²">m²</SelectItem>
-                    <SelectItem value="m³">m³</SelectItem>
-                    <SelectItem value="pièces">pièces</SelectItem>
-                    <SelectItem value="litres">litres</SelectItem>
+                    <SelectItem value="kg">kg (kilogramme)</SelectItem>
+                    <SelectItem value="t">t (tonne)</SelectItem>
+                    <SelectItem value="m">m (mètre)</SelectItem>
+                    <SelectItem value="m2">m² (mètre carré)</SelectItem>
+                    <SelectItem value="m3">m³ (mètre cube)</SelectItem>
+                    <SelectItem value="pcs">pcs (pièces)</SelectItem>
+                    <SelectItem value="l">l (litre)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <Label htmlFor="seuil" className="text-sm font-medium">
                   Seuil d'alerte
@@ -324,14 +337,15 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                   id="seuil"
                   type="number"
                   min="0"
+                  step="0.01"
                   value={formData.seuil}
-                  onChange={handleInputChange('seuil')} 
+                  onChange={handleInputChange('seuil')}
                   placeholder="10"
                   className={getInputClassName('seuil')}
                 />
                 {errors.seuil && (
                   <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-                    <span>⚠️</span>
+                    <AlertCircle className="h-3 w-3" />
                     {errors.seuil}
                   </p>
                 )}
@@ -339,11 +353,23 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
             </div>
           </div>
 
-          {/* ✅ Informations financières et logistiques */}
+          {/* ✅ Section logistique */}
           <div className="space-y-4">
-            <h3 className="font-medium text-sm text-muted-foreground">Informations complémentaires</h3>
+            <h3 className="font-medium text-sm text-muted-foreground">Logistique et coût</h3>
             
             <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="emplacement" className="text-sm font-medium">
+                  Emplacement
+                </Label>
+                <Input
+                  id="emplacement"
+                  value={formData.emplacement}
+                  onChange={handleInputChange('emplacement')}
+                  placeholder="A1-B2-C3"
+                />
+              </div>
+
               <div>
                 <Label htmlFor="prixUnitaire" className="text-sm font-medium">
                   Prix unitaire (€)
@@ -352,6 +378,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                   id="prixUnitaire"
                   type="number"
                   min="0"
+                  step="0.01"
                   value={formData.prixUnitaire}
                   onChange={handleInputChange('prixUnitaire')}
                   placeholder="12.50"
@@ -359,58 +386,48 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                 />
                 {errors.prixUnitaire && (
                   <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-                    <span>⚠️</span>
+                    <AlertCircle className="h-3 w-3" />
                     {errors.prixUnitaire}
                   </p>
                 )}
               </div>
-              
-              <div>
-                <Label htmlFor="fournisseur" className="text-sm font-medium">
-                  Fournisseur
-                </Label>
-                <Input
-                  id="fournisseur"
-                  value={formData.fournisseur}
-                  onChange={handleInputChange('fournisseur')}
-                  placeholder="Nom du fournisseur"
-                />
-              </div>
             </div>
 
             <div>
-              <Label htmlFor="emplacement" className="text-sm font-medium">
-                Emplacement
+              <Label htmlFor="fournisseur" className="text-sm font-medium">
+                Fournisseur
               </Label>
               <Select
-                value={formData.emplacement}
-                onValueChange={handleSelectChange('emplacement')}
+                value={formData.fournisseur}
+                onValueChange={handleSelectChange('fournisseur')}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un emplacement" />
+                  <SelectValue placeholder="Sélectionnez un fournisseur" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="A1-B2-C3">📍 A1-B2-C3 (Atelier principal)</SelectItem>
-                  <SelectItem value="A2-B1-C1">📍 A2-B1-C1 (Stock acier)</SelectItem>
-                  <SelectItem value="B1-A3-C2">📍 B1-A3-C2 (Stock inox)</SelectItem>
-                  <SelectItem value="C1-A1-B3">📍 C1-A1-B3 (Consommables)</SelectItem>
-                  <SelectItem value="D1-A2-B1">📍 D1-A2-B1 (Entrepôt)</SelectItem>
+                  <SelectItem value="arcelormittal">ArcelorMittal</SelectItem>
+                  <SelectItem value="aperam">Aperam</SelectItem>
+                  <SelectItem value="outokumpu">Outokumpu</SelectItem>
+                  <SelectItem value="thyssen">ThyssenKrupp</SelectItem>
+                  <SelectItem value="local">Fournisseur local</SelectItem>
+                  <SelectItem value="autre">Autre</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            <div>
-              <Label htmlFor="notes" className="text-sm font-medium">
-                Notes
-              </Label>
-              <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={handleInputChange('notes')}
-                placeholder="Informations complémentaires..."
-                rows={3}
-              />
-            </div>
+          {/* ✅ Section notes */}
+          <div>
+            <Label htmlFor="notes" className="text-sm font-medium">
+              Notes et commentaires
+            </Label>
+            <Textarea
+              id="notes"
+              value={formData.notes}
+              onChange={handleInputChange('notes')}
+              placeholder="Informations complémentaires..."
+              rows={3}
+            />
           </div>
 
           {/* ✅ Actions */}
@@ -420,145 +437,16 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
               variant="outline"
               onClick={handleCancel}
               className="flex-1"
+              disabled={loading}
             >
               Annuler
             </Button>
             <Button 
               type="submit" 
               className="flex-1"
-              disabled={Object.keys(errors).some(key => errors[key])}
+              disabled={loading || Object.keys(errors).some(key => errors[key])}
             >
-              Ajouter le matériau
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-// ✅ BONUS: Version simple pour compatibilité
-export function AddMaterialDialogSimple({ open, onOpenChange }: AddMaterialDialogProps) {
-  const [formData, setFormData] = useState({
-    reference: '',
-    designation: '',
-    quantite: '',
-    prixUnitaire: '',
-    emplacement: '',
-    seuil: '',
-  })
-
-  // ✅ Handler simplifié
-  const handleInputChange = (field: keyof typeof formData) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Matériau ajouté:', formData)
-    onOpenChange(false)
-    setFormData({
-      reference: '',
-      designation: '',
-      quantite: '',
-      prixUnitaire: '',
-      emplacement: '',
-      seuil: '',
-    })
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Ajouter un matériau
-          </DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="reference">Référence *</Label>
-              <Input
-                id="reference"
-                value={formData.reference}
-                onChange={handleInputChange('reference')}
-                placeholder="REF-001"
-              />
-            </div>
-            <div>
-              <Label htmlFor="quantite">Quantité *</Label>
-              <Input
-                id="quantite"
-                type="number"
-                min="0" 
-                value={formData.quantite}
-                onChange={handleInputChange('quantite')}
-                placeholder="100"
-              />
-            </div>
-          </div>
-          
-          <div>
-            <Label htmlFor="designation">Désignation *</Label>
-            <Input
-              id="designation"
-              value={formData.designation}
-              onChange={handleInputChange('designation')}
-              placeholder="Acier S235 - Tôle 2mm"
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="prixUnitaire">Prix unitaire</Label>
-              <Input
-                id="prixUnitaire"
-                type="number"
-                min="0" 
-                value={formData.prixUnitaire}
-                onChange={handleInputChange('prixUnitaire')}
-                placeholder="12.50"
-              />
-            </div>
-            <div>
-              <Label htmlFor="seuil">Seuil d'alerte</Label>
-              <Input
-                id="seuil"
-                type="number"
-                min="0"
-                value={formData.seuil}
-                onChange={handleInputChange('seuil')}
-                placeholder="10"
-              />
-            </div>
-          </div>
-          
-          <div>
-            <Label htmlFor="emplacement">Emplacement</Label>
-            <Input
-              id="emplacement"
-              value={formData.emplacement}
-              onChange={handleInputChange('emplacement')}
-              placeholder="A1-B2-C3"
-            />
-          </div>
-          
-          <div className="flex gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1"
-            >
-              Annuler
-            </Button>
-            <Button type="submit" className="flex-1">
-              Ajouter
+              {loading ? 'Ajout en cours...' : 'Ajouter le matériau'}
             </Button>
           </div>
         </form>

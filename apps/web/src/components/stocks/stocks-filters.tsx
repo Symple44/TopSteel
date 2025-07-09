@@ -1,8 +1,6 @@
 'use client'
 
-import * as UI from '@erp/ui'
-const Button = UI.Button;
-const Input = UI.Input;
+import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui'
 
 import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'
@@ -66,52 +64,60 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label className="text-sm font-medium">Catégorie</Label>
-          <select
+          <Select
             value={filters.categorie}
-            onChange={(e) => handleFilterChange('categorie', e.target.value)}
-            className="w-full p-2 border rounded-md"
+            onValueChange={(value) => handleFilterChange('categorie', value)}
           >
-            <option value="">Toutes les catégories</option>
-            <option value="acier">Acier</option>
-            <option value="inox">Inoxydable</option>
-            <option value="aluminium">Aluminium</option>
-            <option value="cuivre">Cuivre</option>
-            <option value="consommables">Consommables</option>
-          </select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Toutes les catégories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Toutes les catégories</SelectItem>
+              <SelectItem value="acier">Acier</SelectItem>
+              <SelectItem value="inox">Inoxydable</SelectItem>
+              <SelectItem value="aluminium">Aluminium</SelectItem>
+              <SelectItem value="cuivre">Cuivre</SelectItem>
+              <SelectItem value="consommables">Consommables</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <Label className="text-sm font-medium">Emplacement</Label>
-          <select
+          <Select
             value={filters.emplacement}
-            onChange={(e) =>
-              handleFilterChange('emplacement', e.target.value)
-            }
-            className="w-full p-2 border rounded-md"
+            onValueChange={(value) => handleFilterChange('emplacement', value)}
           >
-            <option value="">Tous les emplacements</option>
-            <option value="A">Zone A - Stockage principal</option>
-            <option value="B">Zone B - Stockage secondaire</option>
-            <option value="C">Zone C - Consommables</option>
-            <option value="D">Zone D - Chutes</option>
-          </select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Tous les emplacements" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Tous les emplacements</SelectItem>
+              <SelectItem value="A">Zone A - Stockage principal</SelectItem>
+              <SelectItem value="B">Zone B - Stockage secondaire</SelectItem>
+              <SelectItem value="C">Zone C - Consommables</SelectItem>
+              <SelectItem value="D">Zone D - Chutes</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <Label className="text-sm font-medium">Fournisseur</Label>
-          <select
+          <Select
             value={filters.fournisseur}
-            onChange={(e) =>
-              handleFilterChange('fournisseur', e.target.value)
-            }
-            className="w-full p-2 border rounded-md"
+            onValueChange={(value) => handleFilterChange('fournisseur', value)}
           >
-            <option value="">Tous les fournisseurs</option>
-            <option value="arcelormittal">ArcelorMittal</option>
-            <option value="aperam">Aperam</option>
-            <option value="outokumpu">Outokumpu</option>
-            <option value="local">Fournisseurs locaux</option>
-          </select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Tous les fournisseurs" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Tous les fournisseurs</SelectItem>
+              <SelectItem value="arcelormittal">ArcelorMittal</SelectItem>
+              <SelectItem value="aperam">Aperam</SelectItem>
+              <SelectItem value="outokumpu">Outokumpu</SelectItem>
+              <SelectItem value="local">Fournisseurs locaux</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -138,17 +144,21 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
 
         <div>
           <Label className="text-sm font-medium">Statut</Label>
-          <select
+          <Select
             value={filters.statut}
-            onChange={(e) => handleFilterChange('statut', e.target.value)}
-            className="w-full p-2 border rounded-md"
+            onValueChange={(value) => handleFilterChange('statut', value)}
           >
-            <option value="">Tous les statuts</option>
-            <option value="normal">Stock normal</option>
-            <option value="bas">Stock bas</option>
-            <option value="critique">Stock critique</option>
-            <option value="rupture">Rupture</option>
-          </select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Tous les statuts" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Tous les statuts</SelectItem>
+              <SelectItem value="normal">Stock normal</SelectItem>
+              <SelectItem value="bas">Stock bas</SelectItem>
+              <SelectItem value="critique">Stock critique</SelectItem>
+              <SelectItem value="rupture">Rupture</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -161,8 +171,3 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     </div>
   )
 }
-
-
-
-
-

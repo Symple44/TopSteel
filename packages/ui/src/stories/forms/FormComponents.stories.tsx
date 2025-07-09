@@ -1,8 +1,11 @@
-import {
-  Button, Card, CardContent, CardHeader, CardTitle, Checkbox,
-  Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-  Textarea
-} from '@erp/ui'
+import { Label } from '../../components/forms/label'
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/layout/card'
+import { Button } from '../../components/primitives/button'
+import { Checkbox } from '../../components/primitives/checkbox'
+import { Input } from '../../components/primitives/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/primitives/select'
+import { Textarea } from '../../components/primitives/textarea'
+
 import type { Meta } from '@storybook/react'
 
 const meta: Meta = {

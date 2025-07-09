@@ -1,11 +1,12 @@
 // apps/web/src/components/production/production-table.tsx
 'use client'
 
-import * as UI from '@erp/ui'
-const Badge = UI.Badge;
-const Button = UI.Button;
-const Card = UI.Card;
-const CardContent = UI.CardContent;
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent
+} from '@erp/ui'
 
 import { AlertTriangle, CheckCircle, Clock, Edit, Eye, Pause, Play } from 'lucide-react'
 

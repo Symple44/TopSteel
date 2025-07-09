@@ -1,13 +1,13 @@
 // apps/web/src/components/stocks/chutes-optimizer.tsx
 'use client'
 
-import * as UI from '@erp/ui'
-const Button = UI.Button;
-const Card = UI.Card;
-const CardContent = UI.CardContent;
-const CardHeader = UI.CardHeader;
-const CardTitle = UI.CardTitle;
-const Input = UI.Input;
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle, Input
+} from '@erp/ui'
 
 import { Calculator, CheckCircle, Recycle, Search, TrendingUp, Zap } from 'lucide-react'
 import { useState } from 'react'

@@ -1,12 +1,13 @@
 // apps/web/src/components/stocks/mouvements-chart.tsx
 'use client'
 
-import * as UI from '@erp/ui'
-const Button = UI.Button;
-const Card = UI.Card;
-const CardContent = UI.CardContent;
-const CardHeader = UI.CardHeader;
-const CardTitle = UI.CardTitle;
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from '@erp/ui'
 
 import { Activity, BarChart3, TrendingDown, TrendingUp } from 'lucide-react'
 import { useState } from 'react'

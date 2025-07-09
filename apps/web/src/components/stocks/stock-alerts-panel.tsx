@@ -1,8 +1,9 @@
 'use client'
 
-import * as UI from '@erp/ui'
-const Badge = UI.Badge;
-const Button = UI.Button;
+import {
+  Badge,
+  Button
+} from '@erp/ui'
 
 import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 

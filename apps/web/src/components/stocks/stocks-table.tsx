@@ -1,10 +1,11 @@
 'use client'
 
-import * as UI from '@erp/ui'
-const Badge = UI.Badge;
-const Button = UI.Button;
+import {
+  Badge,
+  Button
+} from '@erp/ui'
 
-import { Edit, Eye, MoreHorizontal, Package, Trash2 } from 'lucide-react'
+import { Edit, Eye, MoreHorizontal, Package } from 'lucide-react'
 
 export function StocksTable() {
   const stocks = [

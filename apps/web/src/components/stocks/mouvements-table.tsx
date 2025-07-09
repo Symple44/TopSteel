@@ -1,11 +1,12 @@
 'use client'
 
-import * as UI from '@erp/ui'
-const Card = UI.Card;
-const CardContent = UI.CardContent;
-const CardHeader = UI.CardHeader;
-const CardTitle = UI.CardTitle;
-const Input = UI.Input;
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input
+} from '@erp/ui'
 
 import { ArrowLeft, ArrowRight, Calendar, Package, RotateCcw, Search, User } from 'lucide-react'
 import { useState } from 'react'

@@ -1,0 +1,59 @@
+'use client'
+
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../../primitives'
+import { useState } from 'react'
+
+interface PaymentConfirmationProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSubmit?: (data: unknown) => void
+}
+
+export function PaymentConfirmation({ open, onOpenChange, onSubmit }: PaymentConfirmationProps) {
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    // TODO: Implement Confirmation paiement logic
+    setTimeout(() => {
+      onSubmit?.({})
+      setLoading(false)
+      onOpenChange(false)
+    }, 1000)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Confirmation paiement</DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* TODO: Add form fields */}
+          
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={loading}
+            >
+              Annuler
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'En cours...' : 'Valider'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}

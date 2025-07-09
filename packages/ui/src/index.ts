@@ -1,36 +1,7 @@
 // packages/ui/src/index.ts
 
-// === PRIMITIVES ===
-export * from './components/primitives/button'
-export * from './components/primitives/checkbox'
-export * from './components/primitives/input'
-export * from './components/primitives/radio-group'
-export * from './components/primitives/select'
-export * from './components/primitives/switch'
-export * from './components/primitives/textarea'
-
-// === LAYOUT ===
-export * from './components/layout/card'
-export * from './components/layout/scroll-area'
-export * from './components/layout/separator'
-
-// === NAVIGATION ===
-export * from './components/navigation/dropdown-menu'
-export * from './components/navigation/tabs'
-
-// === DATA DISPLAY ===
-export * from './components/data-display/avatar'
-export * from './components/data-display/badge'
-export * from './components/data-display/progress'
-export * from './components/data-display/table'
-
-// === FEEDBACK ===
-export * from './components/feedback/alert'
-export * from './components/feedback/dialog'
-export * from './components/feedback/tooltip'
-
-// === FORMS ===
-export * from './components/forms/label'
+// === COMPONENTS ===
+export * from './components'
 
 // === UTILS & VARIANTS ===
 export {
@@ -51,18 +22,3 @@ export type {
 export { cva, type VariantProps } from 'class-variance-authority'
 export { clsx, type ClassValue } from 'clsx'
 
-// === BUSINESS COMPONENTS ===
-export * from './components/business/projet-card'
-
-// === EXTENDED LAYOUT ===
-export * from './components/layout/page-header'
-
-// === EXTENDED DATA DISPLAY ===
-export * from './components/data-display/data-table'
-
-// === EXTENDED FEEDBACK ===
-export * from './components/feedback/error-alert'
-export * from './components/feedback/toaster'
-
-// === THEME ===
-export * from './components/theme/theme-switcher'

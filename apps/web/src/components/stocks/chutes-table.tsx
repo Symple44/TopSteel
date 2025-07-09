@@ -1,6 +1,6 @@
-import * as UI from '@erp/ui'
-const Button = UI.Button;
-const Input = UI.Input;
+import {
+  Button, Input
+} from '@erp/ui'
 
 import { Edit, Eye, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'

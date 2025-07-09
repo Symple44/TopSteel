@@ -1,0 +1,13 @@
+export * from './MaterialsTable'
+export * from './ProjectsTable'
+export * from './InvoicesTable'
+export * from './ClientsTable'
+export * from './StockMovementsTable'
+export * from './TasksTable'
+export * from './QuotesTable'
+export * from './SalesChart'
+export * from './ProductionChart'
+export * from './InventoryChart'
+export * from './ProfitabilityChart'
+export * from './DashboardWidget'
+

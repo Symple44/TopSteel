@@ -2,21 +2,22 @@
 
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
-import * as UI from '@erp/ui'
-const Badge = UI.Badge;
-const Button = UI.Button;
-const Card = UI.Card;
-const CardContent = UI.CardContent;
-const CardDescription = UI.CardDescription;
-const CardHeader = UI.CardHeader;
-const CardTitle = UI.CardTitle;
-const Separator = UI.Separator;
-const Table = UI.Table;
-const TableBody = UI.TableBody;
-const TableCell = UI.TableCell;
-const TableHead = UI.TableHead;
-const TableHeader = UI.TableHeader;
-const TableRow = UI.TableRow;
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Separator,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@erp/ui'
 
 import {
   Calculator,
@@ -199,17 +200,16 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => setSelectedDevis(devisItem.id)}
-                        title="Voir les détails"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" title="Télécharger PDF">
+                      <Button variant="ghost" size="sm">
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" title="Envoyer par email">
+                      <Button variant="ghost" size="sm">
                         <Send className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" title="Modifier">
+                      <Button variant="ghost" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>
                     </div>

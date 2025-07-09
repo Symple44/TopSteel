@@ -1,8 +1,8 @@
 'use client'
 
-import * as UI from '@erp/ui'
-const Button = UI.Button;
-import { useState } from 'react'
+import {
+  Button
+} from '@erp/ui'
 
 interface CreateMouvementDialogProps {
   open?: boolean

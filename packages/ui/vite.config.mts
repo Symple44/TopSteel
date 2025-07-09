@@ -9,7 +9,7 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
       include: ['src/**/*'],
-      exclude: ['**/*.stories.*', '**/*.test.*'],
+      exclude: ['**/*.stories.*', '**/*.test.*', '**/*.spec.*', '**/test-examples/**/*'],
       outDir: 'dist'
     })
   ],
@@ -17,9 +17,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'ErpUi',
+      name: 'ErpUI',
       formats: ['es'],
-      fileName: () => 'index.js'  // Force .js extension
+      fileName: 'index'
     },
     rollupOptions: {
       external: [
@@ -31,15 +31,9 @@ export default defineConfig({
         'tailwind-merge', 
         'lucide-react', 
         'class-variance-authority'
-      ],
-      output: {
-        format: 'es',
-        exports: 'named',
-        preserveModules: false
-      }
+      ]
     },
-    sourcemap: true,
-    target: 'esnext',
+    sourcemap: false,
     minify: false,
     emptyOutDir: true
   },

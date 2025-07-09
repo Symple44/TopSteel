@@ -1,14 +1,13 @@
 'use client'
 
-import { useBusinessMetrics } from '@/lib/monitoring/business-metrics'
 import type { Projet } from '@erp/types'
-import * as UI from '@erp/ui'
-const Button = UI.Button;
-const Card = UI.Card;
-const CardContent = UI.CardContent;
-const CardDescription = UI.CardDescription;
-const CardHeader = UI.CardHeader;
-const CardTitle = UI.CardTitle;
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader, CardTitle
+} from '@erp/ui'
 
 import { Box, Download, Eye, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState } from 'react'
