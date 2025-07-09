@@ -29,3 +29,7 @@ export * from './metallurgy'
 
 // Workflow et processus
 export * from './workflows'
+
+// Projet
+export * from './projet-card'
+

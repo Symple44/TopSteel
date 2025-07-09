@@ -193,10 +193,10 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                 <Textarea
                   id="conditions"
                   value={devis.conditions}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     setDevis((prev) => ({
                       ...prev,
-                      conditions: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                      conditions: e.target.value,
                     }))
                   }
                   rows={3}

@@ -1,6 +1,7 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '../../primitives'
+
+import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
 
 interface ClientCardProps {
   data?: unknown

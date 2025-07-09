@@ -1,6 +1,6 @@
 'use client'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../primitives'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../data-display'
 
 interface ProjectsTableProps {
   data: unknown[]

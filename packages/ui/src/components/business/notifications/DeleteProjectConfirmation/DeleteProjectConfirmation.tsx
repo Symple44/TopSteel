@@ -1,13 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '../../primitives'
-import { useState } from 'react'
+} from '../../../feedback'
+import {
+  Button,
+} from '../../../primitives'
 
 interface DeleteProjectConfirmationProps {
   open: boolean
