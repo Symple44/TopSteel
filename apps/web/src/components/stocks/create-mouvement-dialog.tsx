@@ -1,6 +1,5 @@
 'use client'
 
-
 interface CreateMouvementDialogProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void

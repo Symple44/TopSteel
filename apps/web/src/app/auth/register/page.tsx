@@ -1,5 +1,5 @@
-import { Button } from '@erp/ui'
 'use client'
+import { Button } from '@erp/ui'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'

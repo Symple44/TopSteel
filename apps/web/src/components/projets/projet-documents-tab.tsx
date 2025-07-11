@@ -1,9 +1,5 @@
 'use client'
 
-
-
-
-
 import * as UI from '@erp/ui'
 const Badge = UI.Badge
 const Button = UI.Button

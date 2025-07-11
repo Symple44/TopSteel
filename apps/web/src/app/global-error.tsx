@@ -1,10 +1,9 @@
+'use client'
 import { Button } from '@erp/ui'
 /**
  * Page Global Error - TopSteel ERP
  * Fichier: apps/web/src/app/global-error.tsx
  */
-
-'use client'
 
 export default function GlobalError({
   error,

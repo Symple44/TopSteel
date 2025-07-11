@@ -2,7 +2,6 @@
 
 import { Button } from '@erp/ui'
 
-
 import { Clock, Factory, Filter, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 

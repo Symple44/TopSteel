@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   ArrowUpRight,
   BarChart3,
+  Calendar as CalendarIcon,
   Clock,
   Euro,
   Factory,
@@ -15,7 +16,8 @@ import {
   Package,
   Shield,
   Target,
-  TrendingUp, Calendar as CalendarIcon } from 'lucide-react'
+  TrendingUp,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 // Types pour les données du dashboard

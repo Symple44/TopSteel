@@ -1,7 +1,5 @@
 'use client'
 
-
-
 import { PlanningCalendar } from '@/components/production/planning-calendar'
 import { PlanningGantt } from '@/components/production/planning-gantt'
 import {

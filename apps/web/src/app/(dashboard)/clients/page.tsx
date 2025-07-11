@@ -1,9 +1,9 @@
 'use client'
 
-import React from 'react'
-import { useState } from 'react'
 import { Button } from '@erp/ui'
 import { Filter, Plus, Search } from 'lucide-react'
+import React from 'react'
+import { useState } from 'react'
 
 export default function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -54,12 +54,14 @@ export default function ClientsPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="border rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-semibold">Martin Construction</h3>
-              <p className="text-sm text-muted-foreground">info@martin-construction.fr • +33 1 98 76 54 32</p>
+              <p className="text-sm text-muted-foreground">
+                info@martin-construction.fr • +33 1 98 76 54 32
+              </p>
             </div>
             <div className="flex space-x-2">
               <Button className="px-3 py-1 text-xs border rounded">Voir</Button>

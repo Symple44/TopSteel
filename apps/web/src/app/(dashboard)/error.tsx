@@ -2,7 +2,6 @@
 
 import { Button } from '@erp/ui'
 
-
 import React from 'react'
 /**
  * Page Dashboard Error - TopSteel ERP

@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-import { useState } from 'react'
 import { formatCurrency } from '@/lib/utils'
 import {
   Badge,
@@ -48,6 +46,8 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react'
+import React from 'react'
+import { useState } from 'react'
 
 // Données mockées
 const mockTemplates = [
@@ -194,8 +194,12 @@ export default function ChiffragePage() {
                       <TableCell>{chiffrage.dateCreation}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline">Voir</Button>
-                          <Button size="sm" variant="outline">Modifier</Button>
+                          <Button size="sm" variant="outline">
+                            Voir
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            Modifier
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

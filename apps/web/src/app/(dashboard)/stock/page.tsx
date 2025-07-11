@@ -1,7 +1,5 @@
 'use client'
 
-
-
 import { AddMaterialDialog } from '@/components/stocks/add-material-dialog'
 import { StockAlertsPanel } from '@/components/stocks/stock-alerts-panel'
 import { StocksFilters } from '@/components/stocks/stocks-filters'
