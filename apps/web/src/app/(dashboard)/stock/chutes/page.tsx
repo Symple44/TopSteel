@@ -49,14 +49,14 @@ export default function ChutesPage() {
       fallback={
         <div className="space-y-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-muted rounded w-64 mb-4"></div>
-            <div className="h-4 bg-muted rounded w-48"></div>
+            <div className="h-8 bg-muted rounded w-64 mb-4" />
+            <div className="h-4 bg-muted rounded w-48" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="p-6 animate-pulse">
-                <div className="h-4 bg-muted rounded w-32 mb-2"></div>
-                <div className="h-3 bg-muted rounded w-24"></div>
+                <div className="h-4 bg-muted rounded w-32 mb-2" />
+                <div className="h-3 bg-muted rounded w-24" />
               </div>
             ))}
           </div>

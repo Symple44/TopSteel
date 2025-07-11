@@ -279,7 +279,6 @@ export const storeHelpers = {
       useAppStore.getState().reset()
       useAuthStore.getState().reset()
       useProjetStore.getState().reset()
-      console.log('✅ Tous les stores ont été réinitialisés')
     } catch (error) {
       console.error('❌ Erreur lors de la réinitialisation des stores:', error)
     }
@@ -291,11 +290,6 @@ export const storeHelpers = {
   debugStoresState: () => {
     if (process.env.NODE_ENV === 'development') {
       console.group('🔍 Debug Stores State')
-      console.log('App Store:', useAppStore.getState())
-      console.log('Auth Store:', useAuthStore.getState())
-      console.log('Projet Store:', useProjetStore.getState())
-      console.log('Stats:', storeHelpers.getAllStoresStats())
-      console.log('Validation:', storeHelpers.validateStores())
       console.groupEnd()
     }
   },
@@ -312,8 +306,6 @@ if (process.env.NODE_ENV === 'development') {
       helpers: storeHelpers,
       monitor: StoreMonitor,
     }
-
-    console.log('🛠️ TopSteel Stores disponibles via window.__TOPSTEEL_STORES__')
   }
 }
 

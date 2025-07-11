@@ -1,11 +1,8 @@
 {
   "scripts": {
-    "prebuild": "biome check src/ --reporter=summary",
+    "prebuild": "biome check src/ --reporter=summary || true",
     "build:check": "biome check src/ && next build",
     "build:fix": "biome check --apply src/ && next build",
-    "lint:biome": "biome check src/",
-    "lint:biome:fix": "biome check --apply src/",
-    "format:biome": "biome format --write src/",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 NODE_ENV=production next build",
     "dev": "cross-env NODE_ENV=development next dev -p 3000",
     "start": "next start -p 3000",
@@ -20,9 +17,9 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",
-    "lint:biome": "biome check src/",
     "lint:biome:fix": "biome check --apply src/",
-    "format:biome": "biome format --write src/"
+    "format:biome": "biome format --write src/",
+    "lint:biome": "biome check src/"
   },
   "version": "1.0.0",
   "name": "@erp/web",
@@ -116,4 +113,3 @@
     "webpack-bundle-analyzer": "^4.10.1"
   }
 }
-

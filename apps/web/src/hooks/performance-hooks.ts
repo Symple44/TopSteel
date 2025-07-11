@@ -142,11 +142,6 @@ export function useRenderOptimization<T>(
       }
 
       if (logChanges) {
-        console.log(`🔄 Re-render causé par changement dans ${name}`, {
-          previous: prevValueRef.current,
-          current: value,
-          renderCount: renderCountRef.current + 1,
-        })
       }
     }
 

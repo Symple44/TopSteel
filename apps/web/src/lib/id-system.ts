@@ -547,7 +547,7 @@ class IDParser {
             if (timestampPart && /^[0-9a-z]+$/.test(timestampPart)) {
               const timestamp = Number.parseInt(timestampPart, 36)
 
-              if (!isNaN(timestamp) && timestamp > 1000000) {
+              if (!Number.isNaN(timestamp) && timestamp > 1000000) {
                 result.timestamp = timestamp
               }
             }

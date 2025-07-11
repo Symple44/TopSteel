@@ -299,14 +299,12 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       wsRef.current = ws
 
       ws.onopen = () => {
-        console.log('🔔 Notifications WebSocket connected')
         dispatch({ type: 'SET_CONNECTED', payload: true })
         dispatch({ type: 'SET_ERROR', payload: null })
         reconnectAttempts.current = 0
       }
 
       ws.onclose = () => {
-        console.log('🔔 Notifications WebSocket disconnected')
         dispatch({ type: 'SET_CONNECTED', payload: false })
 
         // Reconnexion automatique avec backoff exponentiel

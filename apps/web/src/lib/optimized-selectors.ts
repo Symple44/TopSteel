@@ -308,8 +308,6 @@ export function useOptimizedSelector<T, R>(
         return shallow as EqualityFn<R>
       case SelectorStrategy.DEEP:
         return (a: R, b: R) => JSON.stringify(a) === JSON.stringify(b)
-      case SelectorStrategy.SAFE:
-      case SelectorStrategy.SIMPLE:
       default:
         return Object.is
     }

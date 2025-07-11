@@ -67,25 +67,15 @@ export default function PlanningPage() {
     },
   ]
 
-  const handleTaskClick = (task: GanttTask) => {
-    console.log('Tâche cliquée:', task)
-  }
+  const handleTaskClick = (task: GanttTask) => {}
 
-  const handleTaskUpdate = (taskId: string, updates: Partial<GanttTask>) => {
-    console.log('Mise à jour tâche:', taskId, updates)
-  }
+  const handleTaskUpdate = (taskId: string, updates: Partial<GanttTask>) => {}
 
-  const handleEventClick = (event: PlanningEvent) => {
-    console.log('Événement cliqué:', event)
-  }
+  const handleEventClick = (event: PlanningEvent) => {}
 
-  const handleDateClick = (date: Date) => {
-    console.log('Date cliquée:', date)
-  }
+  const handleDateClick = (date: Date) => {}
 
-  const handleCreateEvent = () => {
-    console.log('Créer un nouvel événement')
-  }
+  const handleCreateEvent = () => {}
 
   return (
     <div className="space-y-6">

@@ -102,9 +102,7 @@ export default function MouvementsLayout({ children }: MouvementsLayoutProps) {
       </div>
 
       {/* Contenu principal */}
-      <main role="main" className="mouvements-content">
-        {children}
-      </main>
+      <main className="mouvements-content">{children}</main>
 
       {/* Scripts et optimisations spécifiques à cette section */}
       <script

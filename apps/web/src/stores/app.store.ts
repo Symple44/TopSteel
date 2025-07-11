@@ -366,7 +366,6 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
       state.lastUpdate = Date.now()
 
       if (isOnline && state.sync && state.sync.pendingChanges > 0) {
-        console.log('Connexion restaurée, synchronisation en attente...')
       }
     })
   },
@@ -395,8 +394,6 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
     })
 
     try {
-      console.log('Synchronisation en cours...')
-
       // Simulation d'une sync
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -409,8 +406,6 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         state.loading = false
         state.lastUpdate = Date.now()
       })
-
-      console.log('Synchronisation terminée')
     } catch (error) {
       set((state) => {
         state.loading = false
@@ -431,7 +426,6 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         state.sync.conflictCount = Math.max(0, state.sync.conflictCount - 1)
       }
       state.lastUpdate = Date.now()
-      console.log(`Conflit résolu: ${conflictId}`, resolution)
     })
   },
 })

@@ -187,11 +187,11 @@ export const api = {
 
         if (filters) {
           if (filters.statut && filters.statut.length > 0) {
-            filteredProjets = filteredProjets.filter((p) => filters.statut!.includes(p.statut))
+            filteredProjets = filteredProjets.filter((p) => filters.statut?.includes(p.statut))
           }
 
           if (filters.priorite && filters.priorite.length > 0) {
-            filteredProjets = filteredProjets.filter((p) => filters.priorite!.includes(p.priorite))
+            filteredProjets = filteredProjets.filter((p) => filters.priorite?.includes(p.priorite))
           }
 
           if (filters.clientId) {
@@ -313,9 +313,6 @@ export const api = {
       try {
         // Simulation d'appel API
         await new Promise((resolve) => setTimeout(resolve, 100))
-
-        // En réalité, on ferait l'appel DELETE à l'API
-        console.log(`Projet ${id} supprimé`)
       } catch (error) {
         console.error('Erreur lors de la suppression du projet:', error)
         throw new Error('Impossible de supprimer le projet')

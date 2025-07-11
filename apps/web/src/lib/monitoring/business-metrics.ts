@@ -35,7 +35,6 @@ class BusinessMetrics {
 
     // Log en développement
     if (process.env.NODE_ENV === 'development') {
-      console.log('📊 Métrique:', event)
     }
 
     // Envoyer au backend (à implémenter)

@@ -370,8 +370,8 @@ const MouvementsChart = dynamic(
     loading: () => (
       <div className="h-[300px] flex items-center justify-center">
         <div className="animate-pulse">
-          <div className="h-4 bg-muted rounded w-24 mb-2"></div>
-          <div className="h-48 bg-muted rounded"></div>
+          <div className="h-4 bg-muted rounded w-24 mb-2" />
+          <div className="h-48 bg-muted rounded" />
         </div>
       </div>
     ),
@@ -392,7 +392,7 @@ const MouvementsTable = dynamic(
       <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
           <div key={i} className="animate-pulse">
-            <div className="h-12 bg-muted rounded"></div>
+            <div className="h-12 bg-muted rounded" />
           </div>
         ))}
       </div>

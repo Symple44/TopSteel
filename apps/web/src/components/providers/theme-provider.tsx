@@ -194,11 +194,7 @@ class ThemeApplicator {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
-  static applyTheme(
-    theme: ResolvedTheme,
-    attribute: string = DEFAULT_ATTRIBUTE,
-    colors: ThemeColors
-  ): void {
+  static applyTheme(theme: ResolvedTheme, attribute: string, colors: ThemeColors): void {
     if (typeof document === 'undefined') return
 
     try {
@@ -565,7 +561,6 @@ export function useThemeDebug(): {
   )
 
   const testThemeSwitch = useCallback(() => {
-    console.log('Testing theme switch...')
     toggleTheme()
     setTimeout(() => {
       toggleTheme()

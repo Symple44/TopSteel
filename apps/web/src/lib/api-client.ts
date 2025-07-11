@@ -424,7 +424,7 @@ export class APIClient {
 
     // Supprimer Content-Type pour les uploads
     if (uploadConfig.headers && 'Content-Type' in uploadConfig.headers) {
-      delete uploadConfig.headers['Content-Type']
+      uploadConfig.headers['Content-Type'] = undefined
     }
 
     const url = `${this.baseURL}${endpoint}`

@@ -49,8 +49,6 @@ export function MonitoringInitializer({
         }
 
         if (enableAnalytics) {
-          // Initialiser analytics si nécessaire
-          console.log('📊 Monitoring initialized')
         }
       } catch (error) {
         console.error('Failed to initialize monitoring:', error)

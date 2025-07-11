@@ -241,7 +241,7 @@ export default function ProjetsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjets.length > 0 ? (
             filteredProjets.map((projet) =>
-              projet && projet.id ? <MemoProjetCard key={projet.id} projet={projet} /> : null
+              projet?.id ? <MemoProjetCard key={projet.id} projet={projet} /> : null
             )
           ) : (
             <div className="col-span-full">

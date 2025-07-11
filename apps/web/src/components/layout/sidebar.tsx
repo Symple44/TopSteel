@@ -262,7 +262,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
             <div className="h-8 w-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm transition-all duration-200 group-hover:from-emerald-600 group-hover:to-teal-700 group-hover:shadow-lg group-hover:scale-105">
               <User className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full transition-all duration-200 group-hover:bg-emerald-600 group-hover:scale-110"></div>
+            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full transition-all duration-200 group-hover:bg-emerald-600 group-hover:scale-110" />
           </div>
           {!isCollapsed && (
             <div className="ml-3 flex-1 transition-all duration-200">

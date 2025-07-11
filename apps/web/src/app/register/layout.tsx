@@ -150,7 +150,7 @@ export default function RegisterLayout({ children }: RegisterLayoutProps) {
       </header>
 
       {/* Contenu principal */}
-      <main role="main" className="register-content" id="main-content">
+      <main className="register-content" id="main-content">
         {children}
       </main>
 

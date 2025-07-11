@@ -124,25 +124,13 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
     return matchesSearch && matchesCategory && matchesType
   })
 
-  const handleDownload = (document: Document) => {
-    // Simulation du téléchargement
-    console.log('Téléchargement:', document.nom)
-  }
+  const handleDownload = (document: Document) => {}
 
-  const handleView = (document: Document) => {
-    // Simulation de l'aperçu
-    console.log('Aperçu:', document.nom)
-  }
+  const handleView = (document: Document) => {}
 
-  const handleEdit = (document: Document) => {
-    // Simulation de l'édition
-    console.log('Édition:', document.nom)
-  }
+  const handleEdit = (document: Document) => {}
 
-  const handleDelete = (document: Document) => {
-    // Simulation de la suppression
-    console.log('Suppression:', document.nom)
-  }
+  const handleDelete = (document: Document) => {}
 
   return (
     <div className="space-y-6">

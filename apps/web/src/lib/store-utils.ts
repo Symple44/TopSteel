@@ -118,7 +118,6 @@ export class StoreUtils {
           if (error) {
             console.warn(`Erreur réhydratation store ${name}:`, error)
           } else {
-            console.log(`Store ${name} réhydraté avec succès`)
           }
         },
       }) as any
@@ -442,12 +441,9 @@ export class StoreMonitor {
     // Log console en développement
     if (process.env.NODE_ENV === 'development') {
       console.group(`🔄 [${storeName}] ${action}`)
-      console.log('Nouvel état:', state)
       if (prevState) {
-        console.log('État précédent:', prevState)
       }
       if (event.duration) {
-        console.log(`Durée: ${event.duration}ms`)
       }
       console.groupEnd()
     }
@@ -472,7 +468,6 @@ export class StoreMonitor {
 
     // Log périodique des accès
     if (count % 100 === 0) {
-      console.log(`📊 Store ${storeName} accédé ${count} fois`)
     }
   }
 

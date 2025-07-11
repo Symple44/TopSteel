@@ -263,19 +263,19 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
         {/* Légende */}
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-gray-400 rounded"></div>
+            <div className="w-3 h-3 bg-gray-400 rounded" />
             <span>Planifié</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
+            <div className="w-3 h-3 bg-blue-500 rounded" />
             <span>En cours</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
+            <div className="w-3 h-3 bg-green-500 rounded" />
             <span>Terminé</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded"></div>
+            <div className="w-3 h-3 bg-red-500 rounded" />
             <span>En retard</span>
           </div>
         </div>

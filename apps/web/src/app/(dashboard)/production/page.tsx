@@ -13,12 +13,10 @@ export default function ProductionPage() {
 
   // Handlers pour les filtres
   const handleFiltersChange = (filters: any) => {
-    console.log('Filtres mis à jour:', filters)
     // TODO: Implémenter la logique de filtrage
   }
 
   const handleFiltersReset = () => {
-    console.log('Filtres réinitialisés')
     // TODO: Implémenter la logique de reset
   }
 
@@ -49,17 +47,14 @@ export default function ProductionPage() {
   ]
 
   const handleView = (id: number) => {
-    console.log('Voir ordre:', id)
     // TODO: Navigation vers détail
   }
 
   const handleEdit = (id: number) => {
-    console.log('Modifier ordre:', id)
     // TODO: Navigation vers édition
   }
 
   const handleStatusChange = (id: number, status: string) => {
-    console.log('Changer statut:', id, status)
     // TODO: Mise à jour statut
   }
 

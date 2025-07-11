@@ -106,7 +106,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
 
     if (!formData.quantite.trim()) {
       newErrors.quantite = 'La quantité est requise'
-    } else if (isNaN(Number(formData.quantite)) || Number(formData.quantite) <= 0) {
+    } else if (Number.isNaN(Number(formData.quantite)) || Number(formData.quantite) <= 0) {
       newErrors.quantite = 'La quantité doit être un nombre positif'
     }
 
@@ -117,12 +117,12 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
     // Validation optionnelle mais format correct
     if (
       formData.prixUnitaire &&
-      (isNaN(Number(formData.prixUnitaire)) || Number(formData.prixUnitaire) < 0)
+      (Number.isNaN(Number(formData.prixUnitaire)) || Number(formData.prixUnitaire) < 0)
     ) {
       newErrors.prixUnitaire = 'Le prix doit être un nombre positif'
     }
 
-    if (formData.seuil && (isNaN(Number(formData.seuil)) || Number(formData.seuil) < 0)) {
+    if (formData.seuil && (Number.isNaN(Number(formData.seuil)) || Number(formData.seuil) < 0)) {
       newErrors.seuil = 'Le seuil doit être un nombre positif'
     }
 
@@ -153,8 +153,6 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
         fournisseur: formData.fournisseur.trim(),
         notes: formData.notes.trim() || undefined,
       }
-
-      console.log('Nouveau matériau:', materialData)
 
       // Simulation API call
       await new Promise((resolve) => setTimeout(resolve, 1000))

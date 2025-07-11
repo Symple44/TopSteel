@@ -53,9 +53,7 @@ export default function FacturesLayout({ children }: FacturesLayoutProps) {
         </nav>
       </div>
 
-      <main role="main" className="factures-content">
-        {children}
-      </main>
+      <main className="factures-content">{children}</main>
     </div>
   )
 }

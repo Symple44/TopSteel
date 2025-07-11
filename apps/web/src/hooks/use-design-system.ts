@@ -340,8 +340,8 @@ class ClassGenerator {
   }
 
   static metallurgyButton(
-    variant: ClassVariants['variant'] = 'default',
-    size: ClassVariants['size'] = 'md',
+    variant: ClassVariants['variant'],
+    size: ClassVariants['size'],
     config: DesignSystemConfig
   ): string {
     const cacheKey = `metallurgyButton-${variant}-${size}-${config.animations}`

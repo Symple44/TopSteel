@@ -23,7 +23,6 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Nouveau devis:', formData)
     onOpenChange(false)
     setFormData({
       reference: '',

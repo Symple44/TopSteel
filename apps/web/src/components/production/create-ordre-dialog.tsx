@@ -44,8 +44,6 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
       avancement: 0,
       createdAt: new Date(),
     }
-
-    console.log('Nouvel ordre créé:', newOrdre)
     onSubmit?.(newOrdre)
     onOpenChange(false)
 

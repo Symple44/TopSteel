@@ -252,7 +252,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Date création:</span>
                     <span>
                       {devis.find((d) => d.id === selectedDevis)?.dateCreation
-                        ? formatDate(devis.find((d) => d.id === selectedDevis)!.dateCreation)
+                        ? formatDate(devis.find((d) => d.id === selectedDevis)?.dateCreation)
                         : '—'}
                     </span>
                   </div>
@@ -260,7 +260,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Validité:</span>
                     <span>
                       {devis.find((d) => d.id === selectedDevis)?.dateValidite
-                        ? formatDate(devis.find((d) => d.id === selectedDevis)!.dateValidite)
+                        ? formatDate(devis.find((d) => d.id === selectedDevis)?.dateValidite)
                         : '—'}
                     </span>
                   </div>
@@ -274,7 +274,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Montant HT:</span>
                     <span className="font-medium">
                       {devis.find((d) => d.id === selectedDevis)?.montantHT
-                        ? formatCurrency(devis.find((d) => d.id === selectedDevis)!.montantHT)
+                        ? formatCurrency(devis.find((d) => d.id === selectedDevis)?.montantHT)
                         : '—'}
                     </span>
                   </div>
@@ -282,7 +282,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Montant TTC:</span>
                     <span className="font-medium">
                       {devis.find((d) => d.id === selectedDevis)?.montantTTC
-                        ? formatCurrency(devis.find((d) => d.id === selectedDevis)!.montantTTC)
+                        ? formatCurrency(devis.find((d) => d.id === selectedDevis)?.montantTTC)
                         : '—'}
                     </span>
                   </div>
@@ -291,7 +291,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                     <span className="text-muted-foreground">Statut:</span>
                     <span>
                       {devis.find((d) => d.id === selectedDevis)?.statut
-                        ? getStatutBadge(devis.find((d) => d.id === selectedDevis)!.statut)
+                        ? getStatutBadge(devis.find((d) => d.id === selectedDevis)?.statut)
                         : '—'}
                     </span>
                   </div>

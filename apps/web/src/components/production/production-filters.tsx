@@ -199,9 +199,8 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
       if (debut && fin && new Date(debut) > new Date(fin)) {
         setDateError('La date de début ne peut pas être postérieure à la date de fin')
         return
-      } else {
-        setDateError('')
       }
+      setDateError('')
     }
 
     setFilters(newFilters)

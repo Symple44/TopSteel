@@ -211,10 +211,7 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
           }
         }
       }}
-      onReset={() => {
-        // Actions à effectuer lors du reset
-        console.log('Error boundary reset')
-      }}
+      onReset={() => {}}
     >
       <MonitoringCore>{children}</MonitoringCore>
     </ErrorBoundary>

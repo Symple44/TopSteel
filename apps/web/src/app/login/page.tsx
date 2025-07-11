@@ -136,7 +136,6 @@ export default function LoginPage() {
                       : 'border-gray-200 focus:border-blue-500'
                   }`}
                   autoComplete="email"
-                  autoFocus
                 />
               </div>
               {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}

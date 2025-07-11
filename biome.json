@@ -56,10 +56,10 @@
         "useShorthandFunctionType": "error"
       },
       "suspicious": {
-        "noArrayIndexKey": "warn",
         "noExplicitAny": "warn",
         "noDebugger": "error",
-        "noConsoleLog": "warn"
+        "noConsoleLog": "warn",
+        "noArrayIndexKey": "warn"
       },
       "performance": {
         "noDelete": "error"
@@ -85,7 +85,8 @@
         "noUnreachable": "error",
         "noUnreachableSuper": "error",
         "useIsNan": "error",
-        "useValidForDirection": "error"
+        "useValidForDirection": "error",
+        "useExhaustiveDependencies": "warn"
       }
     },
     "ignore": [
@@ -131,7 +132,15 @@
       "quoteProperties": "asNeeded",
       "attributePosition": "auto"
     },
-    "globals": ["console", "process", "Buffer", "window", "document", "React", "JSX"]
+    "globals": [
+      "console",
+      "process",
+      "Buffer",
+      "window",
+      "document",
+      "React",
+      "JSX"
+    ]
   },
   "json": {
     "formatter": {
@@ -151,7 +160,9 @@
   },
   "overrides": [
     {
-      "include": ["apps/web/src/**/*.{ts,tsx}"],
+      "include": [
+        "apps/web/src/**/*.{ts,tsx}"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
@@ -164,7 +175,9 @@
       }
     },
     {
-      "include": ["apps/api/src/**/*.{ts}"],
+      "include": [
+        "apps/api/src/**/*.{ts}"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
@@ -175,7 +188,9 @@
       }
     },
     {
-      "include": ["packages/*/src/**/*.{ts,tsx}"],
+      "include": [
+        "packages/*/src/**/*.{ts,tsx}"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
@@ -185,7 +200,9 @@
       }
     },
     {
-      "include": ["**/*.{test,spec}.{ts,tsx,js,jsx}"],
+      "include": [
+        "**/*.{test,spec}.{ts,tsx,js,jsx}"
+      ],
       "linter": {
         "rules": {
           "suspicious": {

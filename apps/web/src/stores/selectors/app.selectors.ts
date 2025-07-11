@@ -85,11 +85,7 @@ export const useAuthState = () =>
       session: state.session,
       isAuthenticated: !!(state.user && state.session),
       permissions: state.permissions || [],
-      isSessionValid: !!(
-        state.session &&
-        state.session.expiresAt &&
-        state.session.expiresAt > Date.now()
-      ),
+      isSessionValid: !!(state.session?.expiresAt && state.session.expiresAt > Date.now()),
     }),
     'auth-state'
   )

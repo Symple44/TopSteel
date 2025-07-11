@@ -217,11 +217,11 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
       {/* Legend */}
       <div className="flex items-center justify-center gap-6">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-green-500 rounded"></div>
+          <div className="w-3 h-3 bg-green-500 rounded" />
           <span className="text-sm text-muted-foreground">Entrées</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-500 rounded"></div>
+          <div className="w-3 h-3 bg-red-500 rounded" />
           <span className="text-sm text-muted-foreground">Sorties</span>
         </div>
       </div>

@@ -245,7 +245,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                     <TableHead>TVA %</TableHead>
                     <TableHead>Remise %</TableHead>
                     <TableHead>Total HT</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead />
                   </TableRow>
                 </TableHeader>
                 <TableBody>

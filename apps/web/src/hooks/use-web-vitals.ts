@@ -80,8 +80,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
           (metric) => {
             if (!mounted) return
             setVitals((prev) => ({ ...prev, CLS: metric.value }))
-            if (enableConsoleLog) console.log('📊 CLS:', metric.value.toFixed(4))
-            sendToAnalytics({ ...metric, timestamp: Date.now() })
+            if (enableConsoleLog) sendToAnalytics({ ...metric, timestamp: Date.now() })
           },
           { reportAllChanges }
         )
@@ -91,8 +90,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
           (metric) => {
             if (!mounted) return
             setVitals((prev) => ({ ...prev, INP: metric.value }))
-            if (enableConsoleLog) console.log('📊 INP:', metric.value.toFixed(2), 'ms')
-            sendToAnalytics({ ...metric, timestamp: Date.now() })
+            if (enableConsoleLog) sendToAnalytics({ ...metric, timestamp: Date.now() })
           },
           { reportAllChanges }
         )
@@ -101,8 +99,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
         onFCP((metric) => {
           if (!mounted) return
           setVitals((prev) => ({ ...prev, FCP: metric.value }))
-          if (enableConsoleLog) console.log('📊 FCP:', metric.value.toFixed(2), 'ms')
-          sendToAnalytics({ ...metric, timestamp: Date.now() })
+          if (enableConsoleLog) sendToAnalytics({ ...metric, timestamp: Date.now() })
         })
 
         // LCP - Largest Contentful Paint
@@ -110,8 +107,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
           (metric) => {
             if (!mounted) return
             setVitals((prev) => ({ ...prev, LCP: metric.value }))
-            if (enableConsoleLog) console.log('📊 LCP:', metric.value.toFixed(2), 'ms')
-            sendToAnalytics({ ...metric, timestamp: Date.now() })
+            if (enableConsoleLog) sendToAnalytics({ ...metric, timestamp: Date.now() })
           },
           { reportAllChanges }
         )
@@ -120,8 +116,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
         onTTFB((metric) => {
           if (!mounted) return
           setVitals((prev) => ({ ...prev, TTFB: metric.value }))
-          if (enableConsoleLog) console.log('📊 TTFB:', metric.value.toFixed(2), 'ms')
-          sendToAnalytics({ ...metric, timestamp: Date.now() })
+          if (enableConsoleLog) sendToAnalytics({ ...metric, timestamp: Date.now() })
         })
 
         // Métriques personnalisées TopSteel
@@ -135,7 +130,6 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
 
         setIsLoading(false)
         if (enableConsoleLog) {
-          console.log('🚀 TopSteel Web Vitals initialisées en', loadTime.toFixed(2), 'ms')
         }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error'
@@ -149,7 +143,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
         }
 
         // Fallback avec Performance API native
-        if (performance && performance.timing) {
+        if (performance?.timing) {
           const navigation = performance.timing
 
           setVitals({

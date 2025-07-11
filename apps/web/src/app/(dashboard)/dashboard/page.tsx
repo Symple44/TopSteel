@@ -183,16 +183,16 @@ export default function Dashboard() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
               <Card
-                key={i}
+                key={`item-${i}`}
                 className="animate-pulse border-0 bg-white/80 backdrop-blur-sm shadow-xl"
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <div className="h-4 bg-slate-200 rounded w-24"></div>
-                  <div className="h-8 w-8 bg-slate-200 rounded-lg"></div>
+                  <div className="h-4 bg-slate-200 rounded w-24" />
+                  <div className="h-8 w-8 bg-slate-200 rounded-lg" />
                 </CardHeader>
                 <CardContent>
-                  <div className="h-8 bg-slate-200 rounded w-16 mb-2"></div>
-                  <div className="h-3 bg-slate-200 rounded w-32"></div>
+                  <div className="h-8 bg-slate-200 rounded w-16 mb-2" />
+                  <div className="h-3 bg-slate-200 rounded w-32" />
                 </CardContent>
               </Card>
             ))}
@@ -358,11 +358,11 @@ export default function Dashboard() {
 
               {/* Graphique moderne avec barres colorées */}
               <div className="mt-8 h-40 bg-gradient-to-br from-slate-50 to-blue-50/50 rounded-2xl flex items-end justify-center p-6 overflow-hidden relative">
-                <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+                <div className="absolute inset-0 bg-grid-pattern opacity-5" />
                 <div className="flex items-end space-x-3 h-full relative z-10">
                   {[45, 65, 52, 78, 88, 67, 92, 85, 72, 68, 89, 95].map((height, i) => (
                     <div
-                      key={i}
+                      key={`item-${i}`}
                       className="rounded-t-lg transition-all duration-700 hover:scale-110 cursor-pointer"
                       style={{
                         height: `${height}%`,
@@ -440,7 +440,7 @@ export default function Dashboard() {
         {/* Actions rapides */}
         <div className="grid gap-6 md:grid-cols-3">
           <Card className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="pb-3 relative z-10">
               <CardTitle className="text-base flex items-center text-slate-800 group-hover:text-emerald-600 transition-colors">
                 <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg mr-3 group-hover:scale-110 transition-transform">
@@ -457,7 +457,7 @@ export default function Dashboard() {
           </Card>
 
           <Card className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="pb-3 relative z-10">
               <CardTitle className="text-base flex items-center text-slate-800 group-hover:text-orange-600 transition-colors">
                 <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg mr-3 group-hover:scale-110 transition-transform">
@@ -474,7 +474,7 @@ export default function Dashboard() {
           </Card>
 
           <Card className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="pb-3 relative z-10">
               <CardTitle className="text-base flex items-center text-slate-800 group-hover:text-blue-600 transition-colors">
                 <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg mr-3 group-hover:scale-110 transition-transform">
@@ -494,3 +494,4 @@ export default function Dashboard() {
     </div>
   )
 }
+

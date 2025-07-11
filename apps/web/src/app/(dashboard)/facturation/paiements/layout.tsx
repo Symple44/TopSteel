@@ -72,9 +72,7 @@ export default function PaiementsLayout({ children }: PaiementsLayoutProps) {
         </nav>
       </div>
 
-      <main role="main" className="paiements-content">
-        {children}
-      </main>
+      <main className="paiements-content">{children}</main>
     </div>
   )
 }

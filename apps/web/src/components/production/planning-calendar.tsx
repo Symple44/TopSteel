@@ -182,15 +182,15 @@ export function PlanningCalendar({
         {/* Légende */}
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-100 rounded"></div>
+            <div className="w-3 h-3 bg-blue-100 rounded" />
             <span>Ordres de fabrication</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-orange-100 rounded"></div>
+            <div className="w-3 h-3 bg-orange-100 rounded" />
             <span>Maintenance</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-100 rounded"></div>
+            <div className="w-3 h-3 bg-green-100 rounded" />
             <span>Congés</span>
           </div>
         </div>

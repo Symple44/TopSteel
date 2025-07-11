@@ -197,7 +197,7 @@ export default function ChiffragePage() {
                         <TableHead>Unité</TableHead>
                         <TableHead>Prix unitaire</TableHead>
                         <TableHead>Total HT</TableHead>
-                        <TableHead className="w-[50px]"></TableHead>
+                        <TableHead className="w-[50px]" />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -329,7 +329,7 @@ export default function ChiffragePage() {
                         <TableHead>Projet</TableHead>
                         <TableHead>Montant HT</TableHead>
                         <TableHead>Statut</TableHead>
-                        <TableHead></TableHead>
+                        <TableHead />
                       </TableRow>
                     </TableHeader>
                     <TableBody>

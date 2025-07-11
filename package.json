@@ -70,7 +70,7 @@
     "dev:web": "pnpm build:packages && turbo dev --filter=@erp/web",
     "dev:api": "turbo start:dev --filter=@erp/api",
     "test": "turbo test",
-    "lint": "turbo lint",
+    "lint": "turbo lint:biome",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
     "reset": "turbo clean && rimraf node_modules pnpm-lock.yaml && pnpm install",
@@ -110,4 +110,3 @@
   },
   "description": "ERP TopSteel - Système de gestion pour métallerie industrielle"
 }
-

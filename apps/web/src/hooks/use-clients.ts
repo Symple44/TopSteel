@@ -275,7 +275,7 @@ class ClientsService {
   private static abortControllers = new Map<string, AbortController>()
 
   static async fetchClients(
-    filters: ClientFilters = {},
+    filters: ClientFilters,
     pagination: PaginationConfig,
     signal?: AbortSignal
   ): Promise<ClientsResponse> {

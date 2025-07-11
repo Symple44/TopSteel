@@ -147,7 +147,6 @@ class BusinessMetrics {
       this.events = this.events.slice(this.config.batchSize!)
 
       if (this.config.enableDebugLogs) {
-        console.log(`📊 Business Metrics: ${eventsToSend.length} événements envoyés`)
       }
     } catch (error) {
       console.warn('Erreur envoi batch métrique:', error)
@@ -190,13 +189,11 @@ class BusinessMetrics {
     } else {
       // Côté serveur : log uniquement en dev
       if (process.env.NODE_ENV === 'development') {
-        console.log('📊 Server-side metric (not tracked):', eventName, properties)
       }
     }
 
     // Log immédiat en développement
     if (this.config.enableDebugLogs && process.env.NODE_ENV === 'development') {
-      console.log('📊 Métrique Business:', event)
     }
   }
 

@@ -53,9 +53,7 @@ export default function ChutesLayout({ children }: ChutesLayoutProps) {
         </nav>
       </div>
 
-      <main role="main" className="chutes-content">
-        {children}
-      </main>
+      <main className="chutes-content">{children}</main>
     </div>
   )
 }

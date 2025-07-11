@@ -299,7 +299,6 @@ export class PerformanceMonitor {
 
       // Console pour développement
       if (process.env.NODE_ENV === 'development') {
-        console.log(`📊 Analytics: ${eventName}`, parameters)
       }
     } catch (error) {
       console.error('Error sending analytics:', error)

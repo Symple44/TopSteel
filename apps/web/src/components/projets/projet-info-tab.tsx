@@ -105,8 +105,6 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
       dateDebut: formData.dateDebut ? new Date(formData.dateDebut) : undefined,
       dateFin: formData.dateFin ? new Date(formData.dateFin) : undefined,
     }
-
-    console.log('Sauvegarde des modifications:', updatedData)
     onUpdate?.(updatedData)
     setIsEditing(false)
     setErrors({})

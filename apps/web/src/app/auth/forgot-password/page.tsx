@@ -45,9 +45,6 @@ export default function ForgotPasswordPage() {
     setIsLoading(true)
 
     try {
-      // TODO: Implémenter la récupération de mot de passe via API
-      console.log('Récupération mot de passe pour:', data.email)
-
       // Simulation d'attente
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
