@@ -4,18 +4,11 @@ import { useDataView } from '@/hooks/use-data-view'
 import { useProjets } from '@/hooks/use-projets'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Projet } from '@erp/types'
-import {
-  Badge, Button, Card, CardContent,
-  DataTable,
-  Input,
-  PageHeader,
-  ProjetCard
-} from '@erp/ui'
+import { Badge, Button, Card, CardContent, DataTable, Input, PageHeader, ProjetCard } from '@erp/ui'
 import { Eye, FolderOpen, Grid, List, Plus, RefreshCw, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { memo, useCallback, useMemo, useState } from 'react'
-
 
 // Composant PageActions avec displayName
 const PageActions = memo(function PageActions({
@@ -291,6 +284,3 @@ export default function ProjetsPage() {
     </div>
   )
 }
-
-
-

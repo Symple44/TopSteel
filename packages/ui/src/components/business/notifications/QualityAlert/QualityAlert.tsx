@@ -9,9 +9,7 @@ export function QualityAlert({ className, children }: QualityAlertProps) {
   return (
     <div className={className}>
       {/* TODO: Implement Alerte qualité component */}
-      <p className="text-muted-foreground">
-        Alerte qualité component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Alerte qualité component - Implementation needed</p>
       {children}
     </div>
   )

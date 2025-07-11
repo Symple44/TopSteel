@@ -10,12 +10,12 @@ interface DashboardWidgetProps {
   className?: string
 }
 
-export function DashboardWidget({ 
-  data, 
-  showActions = false, 
-  onEdit, 
-  onDelete, 
-  className 
+export function DashboardWidget({
+  data,
+  showActions = false,
+  onEdit,
+  onDelete,
+  className,
 }: DashboardWidgetProps) {
   return (
     <Card className={className}>
@@ -24,10 +24,8 @@ export function DashboardWidget({
       </CardHeader>
       <CardContent>
         {/* TODO: Add Widget dashboard display content */}
-        <p className="text-muted-foreground">
-          Widget dashboard component - Implementation needed
-        </p>
-        
+        <p className="text-muted-foreground">Widget dashboard component - Implementation needed</p>
+
         {showActions && (
           <div className="flex gap-2 mt-4">
             <button onClick={onEdit} className="text-blue-600 hover:underline">

@@ -9,9 +9,7 @@ export function ProjectStatusBadge({ className, children }: ProjectStatusBadgePr
   return (
     <div className={className}>
       {/* TODO: Implement Badge statut projet component */}
-      <p className="text-muted-foreground">
-        Badge statut projet component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Badge statut projet component - Implementation needed</p>
       {children}
     </div>
   )

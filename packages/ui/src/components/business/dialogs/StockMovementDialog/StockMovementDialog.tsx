@@ -1,15 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../../../feedback'
-import {
-  Button,
-} from '../../../primitives'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../feedback'
+import { Button } from '../../../primitives'
 
 interface StockMovementDialogProps {
   open: boolean
@@ -37,10 +30,10 @@ export function StockMovementDialog({ open, onOpenChange, onSubmit }: StockMovem
         <DialogHeader>
           <DialogTitle>Mouvement de stock</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* TODO: Add form fields */}
-          
+
           <div className="flex gap-2">
             <Button
               type="button"

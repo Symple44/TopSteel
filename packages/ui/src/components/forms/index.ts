@@ -1,2 +1,2 @@
 // Forms
-export * from './label';
+export * from './label'

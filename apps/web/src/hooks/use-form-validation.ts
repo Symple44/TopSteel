@@ -35,11 +35,17 @@ export function useFormValidation<T extends Record<string, any>>(
     // String validations
     if (typeof value === 'string') {
       if (rule.minLength && value.length < rule.minLength) {
-        return rule.message?.minLength || `${String(field)} doit contenir au moins ${rule.minLength} caractères`
+        return (
+          rule.message?.minLength ||
+          `${String(field)} doit contenir au moins ${rule.minLength} caractères`
+        )
       }
 
       if (rule.maxLength && value.length > rule.maxLength) {
-        return rule.message?.maxLength || `${String(field)} ne peut pas dépasser ${rule.maxLength} caractères`
+        return (
+          rule.message?.maxLength ||
+          `${String(field)} ne peut pas dépasser ${rule.maxLength} caractères`
+        )
       }
 
       if (rule.pattern && !rule.pattern.test(value)) {
@@ -56,28 +62,29 @@ export function useFormValidation<T extends Record<string, any>>(
     return ''
   }
 
-  const handleChange = (field: keyof T) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const value = e.target.value
-    setValues(prev => ({ ...prev, [field]: value }))
+  const handleChange =
+    (field: keyof T) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = e.target.value
+      setValues((prev) => ({ ...prev, [field]: value }))
 
-    // Validation en temps réel si touché
-    if (touched[field]) {
-      const error = validateField(field, value)
-      setErrors(prev => ({ ...prev, [field]: error }))
+      // Validation en temps réel si touché
+      if (touched[field]) {
+        const error = validateField(field, value)
+        setErrors((prev) => ({ ...prev, [field]: error }))
+      }
     }
-  }
 
   const handleBlur = (field: keyof T) => () => {
-    setTouched(prev => ({ ...prev, [field]: true }))
+    setTouched((prev) => ({ ...prev, [field]: true }))
     const error = validateField(field, values[field])
-    setErrors(prev => ({ ...prev, [field]: error }))
+    setErrors((prev) => ({ ...prev, [field]: error }))
   }
 
   const validateAll = (): boolean => {
     const newErrors: Partial<Record<keyof T, string>> = {}
     const newTouched: Partial<Record<keyof T, boolean>> = {}
 
-    Object.keys(validationRules).forEach(field => {
+    Object.keys(validationRules).forEach((field) => {
       const key = field as keyof T
       newTouched[key] = true
       const error = validateField(key, values[key])
@@ -104,7 +111,7 @@ export function useFormValidation<T extends Record<string, any>>(
     validateAll,
     reset,
     isValid: Object.keys(errors).length === 0,
-    hasErrors: Object.keys(errors).some(key => errors[key as keyof T])
+    hasErrors: Object.keys(errors).some((key) => errors[key as keyof T]),
   }
 }
 

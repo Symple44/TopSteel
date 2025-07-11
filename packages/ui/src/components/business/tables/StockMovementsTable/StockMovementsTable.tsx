@@ -1,6 +1,13 @@
 'use client'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../data-display'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../../data-display'
 
 interface StockMovementsTableProps {
   data: unknown[]
@@ -9,7 +16,12 @@ interface StockMovementsTableProps {
   onDelete?: (item: unknown) => void
 }
 
-export function StockMovementsTable({ data = [], loading = false, onEdit, onDelete }: StockMovementsTableProps) {
+export function StockMovementsTable({
+  data = [],
+  loading = false,
+  onEdit,
+  onDelete,
+}: StockMovementsTableProps) {
   if (loading) {
     return <div className="p-4 text-center">Chargement...</div>
   }
@@ -38,13 +50,13 @@ export function StockMovementsTable({ data = [], loading = false, onEdit, onDele
                 <TableCell>TODO: Status</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => onEdit?.(item)}
                       className="text-blue-600 hover:underline"
                     >
                       Modifier
                     </button>
-                    <button 
+                    <button
                       onClick={() => onDelete?.(item)}
                       className="text-red-600 hover:underline"
                     >

@@ -13,7 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Textarea
+  Textarea,
 } from '@erp/ui'
 
 import { AlertCircle, Package } from 'lucide-react'
@@ -71,24 +71,23 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
   const [loading, setLoading] = useState(false)
 
   // ✅ Handler simplifié et réutilisable
-  const handleInputChange = (field: keyof FormData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const value = e.target.value
-    setFormData(prev => ({ ...prev, [field]: value }))
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+  const handleInputChange =
+    (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = e.target.value
+      setFormData((prev) => ({ ...prev, [field]: value }))
+
+      // Clear error when user starts typing
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: '' }))
+      }
     }
-  }
 
   // ✅ Handler pour les selects
   const handleSelectChange = (field: keyof FormData) => (value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    
+    setFormData((prev) => ({ ...prev, [field]: value }))
+
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+      setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
 
@@ -116,7 +115,10 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
     }
 
     // Validation optionnelle mais format correct
-    if (formData.prixUnitaire && (isNaN(Number(formData.prixUnitaire)) || Number(formData.prixUnitaire) < 0)) {
+    if (
+      formData.prixUnitaire &&
+      (isNaN(Number(formData.prixUnitaire)) || Number(formData.prixUnitaire) < 0)
+    ) {
       newErrors.prixUnitaire = 'Le prix doit être un nombre positif'
     }
 
@@ -131,7 +133,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
   // ✅ Soumission avec validation et conversion des types
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) {
       return
     }
@@ -153,15 +155,15 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
       }
 
       console.log('Nouveau matériau:', materialData)
-      
+
       // Simulation API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
       onSubmit?.(materialData)
       handleReset()
       onOpenChange(false)
     } catch (error) {
-      console.error('Erreur lors de l\'ajout:', error)
+      console.error("Erreur lors de l'ajout:", error)
     } finally {
       setLoading(false)
     }
@@ -204,12 +206,12 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
             Ajouter un matériau
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* ✅ Section identification */}
           <div className="space-y-4">
             <h3 className="font-medium text-sm text-muted-foreground">Identification</h3>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="reference" className="text-sm font-medium">
@@ -234,10 +236,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                 <Label htmlFor="categorie" className="text-sm font-medium">
                   Catégorie *
                 </Label>
-                <Select
-                  value={formData.categorie}
-                  onValueChange={handleSelectChange('categorie')}
-                >
+                <Select value={formData.categorie} onValueChange={handleSelectChange('categorie')}>
                   <SelectTrigger className={getInputClassName('categorie')}>
                     <SelectValue placeholder="Sélectionnez une catégorie" />
                   </SelectTrigger>
@@ -282,7 +281,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
           {/* ✅ Section quantité et stock */}
           <div className="space-y-4">
             <h3 className="font-medium text-sm text-muted-foreground">Quantité et stock</h3>
-            
+
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="quantite" className="text-sm font-medium">
@@ -305,15 +304,12 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <Label htmlFor="unite" className="text-sm font-medium">
                   Unité
                 </Label>
-                <Select
-                  value={formData.unite}
-                  onValueChange={handleSelectChange('unite')}
-                >
+                <Select value={formData.unite} onValueChange={handleSelectChange('unite')}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -356,7 +352,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
           {/* ✅ Section logistique */}
           <div className="space-y-4">
             <h3 className="font-medium text-sm text-muted-foreground">Logistique et coût</h3>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="emplacement" className="text-sm font-medium">
@@ -441,10 +437,10 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
             >
               Annuler
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="flex-1"
-              disabled={loading || Object.keys(errors).some(key => errors[key])}
+              disabled={loading || Object.keys(errors).some((key) => errors[key])}
             >
               {loading ? 'Ajout en cours...' : 'Ajouter le matériau'}
             </Button>

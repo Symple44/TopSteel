@@ -10,12 +10,12 @@ interface SupplierCardProps {
   className?: string
 }
 
-export function SupplierCard({ 
-  data, 
-  showActions = false, 
-  onEdit, 
-  onDelete, 
-  className 
+export function SupplierCard({
+  data,
+  showActions = false,
+  onEdit,
+  onDelete,
+  className,
 }: SupplierCardProps) {
   return (
     <Card className={className}>
@@ -24,10 +24,8 @@ export function SupplierCard({
       </CardHeader>
       <CardContent>
         {/* TODO: Add Carte fournisseur display content */}
-        <p className="text-muted-foreground">
-          Carte fournisseur component - Implementation needed
-        </p>
-        
+        <p className="text-muted-foreground">Carte fournisseur component - Implementation needed</p>
+
         {showActions && (
           <div className="flex gap-2 mt-4">
             <button onClick={onEdit} className="text-blue-600 hover:underline">

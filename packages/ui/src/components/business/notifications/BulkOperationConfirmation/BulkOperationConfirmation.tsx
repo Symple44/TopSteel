@@ -1,15 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../../../feedback'
-import {
-  Button,
-} from '../../../primitives'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../feedback'
+import { Button } from '../../../primitives'
 
 interface BulkOperationConfirmationProps {
   open: boolean
@@ -17,7 +10,11 @@ interface BulkOperationConfirmationProps {
   onSubmit?: (data: unknown) => void
 }
 
-export function BulkOperationConfirmation({ open, onOpenChange, onSubmit }: BulkOperationConfirmationProps) {
+export function BulkOperationConfirmation({
+  open,
+  onOpenChange,
+  onSubmit,
+}: BulkOperationConfirmationProps) {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,10 +34,10 @@ export function BulkOperationConfirmation({ open, onOpenChange, onSubmit }: Bulk
         <DialogHeader>
           <DialogTitle>Confirmation opération masse</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* TODO: Add form fields */}
-          
+
           <div className="flex gap-2">
             <Button
               type="button"

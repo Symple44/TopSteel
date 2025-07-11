@@ -1,6 +1,6 @@
-import * as React from "react"
-import { cn } from "../../../lib/utils"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../table"
+import * as React from 'react'
+import { cn } from '../../../lib/utils'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../table'
 
 export interface DataTableColumn {
   header?: string
@@ -17,7 +17,17 @@ export interface DataTableProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
-  ({ data = [], columns = [], loading, emptyMessage = "Aucune donnée disponible", className, ...props }, ref) => {
+  (
+    {
+      data = [],
+      columns = [],
+      loading,
+      emptyMessage = 'Aucune donnée disponible',
+      className,
+      ...props
+    },
+    ref
+  ) => {
     const [sortColumn, setSortColumn] = React.useState<string | null>(null)
     const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc')
 
@@ -32,11 +42,11 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
 
     const sortedData = React.useMemo(() => {
       if (!sortColumn) return data
-      
+
       return [...data].sort((a, b) => {
         const aValue = a[sortColumn]
         const bValue = b[sortColumn]
-        
+
         if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
         if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
         return 0
@@ -45,7 +55,7 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
 
     if (loading) {
       return (
-        <div ref={ref} className={cn("space-y-4", className)} {...props}>
+        <div ref={ref} className={cn('space-y-4', className)} {...props}>
           <Table>
             <TableHeader>
               <TableRow>
@@ -73,33 +83,34 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
     }
 
     return (
-      <div ref={ref} className={cn("space-y-4", className)} {...props}>
+      <div ref={ref} className={cn('space-y-4', className)} {...props}>
         <Table>
           <TableHeader>
             <TableRow>
               {columns.map((column, index) => (
-                <TableHead 
+                <TableHead
                   key={index}
-                  className={column.sortable ? "cursor-pointer hover:bg-muted/50" : ""}
+                  className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
                   onClick={() => column.sortable && handleSort(column.accessorKey)}
                 >
                   <div className="flex items-center space-x-1">
                     <span>{column.header || column.accessorKey}</span>
                     {column.sortable && sortColumn === column.accessorKey && (
-                      <span className="text-xs">
-                        {sortDirection === 'asc' ? '↑' : '↓'}
-                      </span>
+                      <span className="text-xs">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </div>
                 </TableHead>
               ))}
             </TableRow>
           </TableHeader>
-          
+
           <TableBody>
             {sortedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
+                <TableCell
+                  colSpan={columns.length}
+                  className="text-center py-8 text-muted-foreground"
+                >
                   {emptyMessage}
                 </TableCell>
               </TableRow>
@@ -108,10 +119,9 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
                 <TableRow key={rowIndex}>
                   {columns.map((column, colIndex) => (
                     <TableCell key={colIndex}>
-                      {column.cell 
+                      {column.cell
                         ? column.cell(row[column.accessorKey], row)
-                        : row[column.accessorKey] || '-'
-                      }
+                        : row[column.accessorKey] || '-'}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -124,6 +134,6 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
   }
 )
 
-DataTable.displayName = "DataTable"
+DataTable.displayName = 'DataTable'
 
 export { DataTable }

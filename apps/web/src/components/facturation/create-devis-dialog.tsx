@@ -1,10 +1,6 @@
 'use client'
 
-import {
-  Button, Card, CardContent, CardHeader, CardTitle,
-  Input, Label,
-  Textarea
-} from '@erp/ui'
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea } from '@erp/ui'
 
 import { X } from 'lucide-react'
 import { useState } from 'react'
@@ -61,7 +57,8 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                       reference: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
                     })
                   }
-                  placeholder="DEV-2025-001"/>
+                  placeholder="DEV-2025-001"
+                />
               </div>
               <div>
                 <Label htmlFor="dateValidite">Date de validité</Label>
@@ -90,7 +87,8 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                     clientNom: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
                   })
                 }
-                placeholder="Nom du client ou entreprise"/>
+                placeholder="Nom du client ou entreprise"
+              />
             </div>
 
             <div>
@@ -144,8 +142,3 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
     </div>
   )
 }
-
-
-
-
-

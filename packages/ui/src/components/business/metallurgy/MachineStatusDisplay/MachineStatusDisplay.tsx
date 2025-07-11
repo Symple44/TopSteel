@@ -9,9 +9,7 @@ export function MachineStatusDisplay({ className, children }: MachineStatusDispl
   return (
     <div className={className}>
       {/* TODO: Implement Statut machine component */}
-      <p className="text-muted-foreground">
-        Statut machine component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Statut machine component - Implementation needed</p>
       {children}
     </div>
   )

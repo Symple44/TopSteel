@@ -1,8 +1,6 @@
 'use client'
 
-import {
-  Button, Card, CardContent, CardHeader, CardTitle
-} from '@erp/ui'
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import {
   Activity,
   AlertTriangle,
@@ -19,7 +17,6 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
 
 // Types pour les données du dashboard
 interface DashboardStats {
@@ -497,6 +494,3 @@ export default function Dashboard() {
     </div>
   )
 }
-
-
-

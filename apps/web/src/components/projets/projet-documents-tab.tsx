@@ -1,18 +1,18 @@
 'use client'
 
 import * as UI from '@erp/ui'
-const Badge = UI.Badge;
-const Button = UI.Button;
-const Card = UI.Card;
-const CardContent = UI.CardContent;
-const CardHeader = UI.CardHeader;
-const CardTitle = UI.CardTitle;
-const Input = UI.Input;
-const Select = UI.Select;
-const SelectContent = UI.SelectContent;
-const SelectItem = UI.SelectItem;
-const SelectTrigger = UI.SelectTrigger;
-const SelectValue = UI.SelectValue;
+const Badge = UI.Badge
+const Button = UI.Button
+const Card = UI.Card
+const CardContent = UI.CardContent
+const CardHeader = UI.CardHeader
+const CardTitle = UI.CardTitle
+const Input = UI.Input
+const Select = UI.Select
+const SelectContent = UI.SelectContent
+const SelectItem = UI.SelectItem
+const SelectTrigger = UI.SelectTrigger
+const SelectValue = UI.SelectValue
 
 import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } from 'lucide-react'
 import { useState } from 'react'
@@ -329,7 +329,3 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
     </div>
   )
 }
-
-
-
-

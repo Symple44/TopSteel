@@ -1,5 +1,5 @@
-import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
@@ -10,37 +10,37 @@ export default defineConfig({
       insertTypesEntry: true,
       include: ['src/**/*'],
       exclude: ['**/*.stories.*', '**/*.test.*', '**/*.spec.*', '**/test-examples/**/*'],
-      outDir: 'dist'
-    })
+      outDir: 'dist',
+    }),
   ],
-  
+
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'ErpUI',
       formats: ['es'],
-      fileName: 'index'
+      fileName: 'index',
     },
     rollupOptions: {
       external: [
-        'react', 
-        'react-dom', 
+        'react',
+        'react-dom',
         'react/jsx-runtime',
-        /^@radix-ui\/.*/, 
-        'clsx', 
-        'tailwind-merge', 
-        'lucide-react', 
-        'class-variance-authority'
-      ]
+        /^@radix-ui\/.*/,
+        'clsx',
+        'tailwind-merge',
+        'lucide-react',
+        'class-variance-authority',
+      ],
     },
     sourcemap: false,
     minify: false,
-    emptyOutDir: true
+    emptyOutDir: true,
   },
-  
+
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src')
-    }
-  }
+      '@': resolve(__dirname, 'src'),
+    },
+  },
 })

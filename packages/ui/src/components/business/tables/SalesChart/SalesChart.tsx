@@ -9,9 +9,7 @@ export function SalesChart({ className, children }: SalesChartProps) {
   return (
     <div className={className}>
       {/* TODO: Implement Graphique ventes component */}
-      <p className="text-muted-foreground">
-        Graphique ventes component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Graphique ventes component - Implementation needed</p>
       {children}
     </div>
   )

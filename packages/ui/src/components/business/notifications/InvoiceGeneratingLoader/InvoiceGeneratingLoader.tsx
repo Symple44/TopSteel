@@ -9,9 +9,7 @@ export function InvoiceGeneratingLoader({ className, children }: InvoiceGenerati
   return (
     <div className={className}>
       {/* TODO: Implement Chargement facture component */}
-      <p className="text-muted-foreground">
-        Chargement facture component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Chargement facture component - Implementation needed</p>
       {children}
     </div>
   )

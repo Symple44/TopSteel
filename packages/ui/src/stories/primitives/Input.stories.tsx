@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Input } from '../../components/primitives/input'
 import { Label } from '../../components/forms/label'
+import { Input } from '../../components/primitives/input'
 
 const meta: Meta<typeof Input> = {
   title: '02-Primitives/Input',
@@ -51,9 +51,9 @@ export const Disabled: Story = {
 export const WithError = () => (
   <div className="space-y-2">
     <Label htmlFor="email">Email</Label>
-    <Input 
-      id="email" 
-      type="email" 
+    <Input
+      id="email"
+      type="email"
       placeholder="email@exemple.com"
       className="border-red-500 focus:ring-red-500"
     />
@@ -82,6 +82,3 @@ export const ERPInputTypes = () => (
     </div>
   </div>
 )
-
-
-

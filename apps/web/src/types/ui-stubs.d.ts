@@ -62,7 +62,9 @@ declare module '@erp/ui' {
   export const DropdownMenuContent: React.ComponentType<{
     children?: ReactNode
     className?: string
-  align?: "start" | "end" | "center"; side?: "top" | "right" | "bottom" | "left"; }>
+    align?: 'start' | 'end' | 'center'
+    side?: 'top' | 'right' | 'bottom' | 'left'
+  }>
   export const DropdownMenuItem: React.ComponentType<{
     children?: ReactNode
     className?: string
@@ -131,4 +133,3 @@ declare module '@erp/ui' {
   export const AlertDescription: React.ComponentType<{ children?: ReactNode; className?: string }>
   export const AlertTitle: React.ComponentType<{ children?: ReactNode; className?: string }>
 }
-

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Alert, AlertTitle, AlertDescription } from '../../components/feedback/alert'
 import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '../../components/feedback/alert'
 
 const meta: Meta<typeof Alert> = {
   title: '06-Feedback/Alert',
@@ -48,7 +48,7 @@ export const ERPAlerts = () => (
         Le projet "Hangar Agricole 2024" a été validé et peut passer en production.
       </AlertDescription>
     </Alert>
-    
+
     <Alert className="border-yellow-200 bg-yellow-50">
       <AlertTriangle className="h-4 w-4 text-yellow-600" />
       <AlertTitle className="text-yellow-800">Stock faible</AlertTitle>
@@ -56,7 +56,7 @@ export const ERPAlerts = () => (
         Le stock de poutrelles IPE 200 est inférieur au seuil minimum (5 unités restantes).
       </AlertDescription>
     </Alert>
-    
+
     <Alert variant="destructive">
       <XCircle className="h-4 w-4" />
       <AlertTitle>Retard de livraison</AlertTitle>
@@ -64,7 +64,7 @@ export const ERPAlerts = () => (
         La livraison du projet "Structure Industrielle" accuse 3 jours de retard.
       </AlertDescription>
     </Alert>
-    
+
     <Alert className="border-blue-200 bg-blue-50">
       <Info className="h-4 w-4 text-blue-600" />
       <AlertTitle className="text-blue-800">Nouveau devis</AlertTitle>
@@ -74,6 +74,3 @@ export const ERPAlerts = () => (
     </Alert>
   </div>
 )
-
-
-

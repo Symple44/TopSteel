@@ -8,11 +8,17 @@
 
 import { ClientOnly } from '@/components/client-only'
 import {
-  Alert, AlertDescription,
-  Button, Card, CardContent,
-  CardDescription, CardFooter,
-  CardHeader, CardTitle,
-  Input, Label
+  Alert,
+  AlertDescription,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
 } from '@erp/ui'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -523,7 +529,3 @@ export default function RegisterPage() {
     </ClientOnly>
   )
 }
-
-
-
-

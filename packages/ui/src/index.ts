@@ -7,7 +7,7 @@ export * from './components'
 export {
   alertVariants,
   badgeVariants,
-  buttonVariants
+  buttonVariants,
 } from './lib/design-system'
 export { cn } from './lib/utils'
 
@@ -15,10 +15,9 @@ export { cn } from './lib/utils'
 export type {
   AlertVariants,
   BadgeVariants,
-  ButtonVariants
+  ButtonVariants,
 } from './lib/design-system'
 
 // === RE-EXPORTS EXTERNES ===
 export { cva, type VariantProps } from 'class-variance-authority'
 export { clsx, type ClassValue } from 'clsx'
-

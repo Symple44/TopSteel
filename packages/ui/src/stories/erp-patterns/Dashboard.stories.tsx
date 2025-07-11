@@ -1,9 +1,9 @@
 import type { Meta } from '@storybook/react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/layout/card'
 import { Badge } from '../../components/data-display/badge'
-import { Button } from '../../components/primitives/button'
 import { Progress } from '../../components/data-display/progress'
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/layout/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/navigation/tabs'
+import { Button } from '../../components/primitives/button'
 
 const meta: Meta = {
   title: '08-ERP Patterns/Dashboard',
@@ -32,7 +32,7 @@ export const DashboardOverview = () => (
           <p className="text-xs text-muted-foreground">+2 ce mois</p>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">En retard</CardTitle>
@@ -42,7 +42,7 @@ export const DashboardOverview = () => (
           <p className="text-xs text-muted-foreground">Action requise</p>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">CA du mois</CardTitle>
@@ -52,7 +52,7 @@ export const DashboardOverview = () => (
           <p className="text-xs text-muted-foreground">+12% vs mois dernier</p>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Devis en attente</CardTitle>
@@ -72,9 +72,27 @@ export const DashboardOverview = () => (
       <CardContent>
         <div className="space-y-4">
           {[
-            { nom: "Hangar Agricole 2024", client: "Ferme Martin", statut: "En cours", avancement: 65, badge: "bg-green-500" },
-            { nom: "Structure Industrielle", client: "SARL Transport", statut: "En retard", avancement: 30, badge: "bg-red-500" },
-            { nom: "Garde-corps Résidentiel", client: "Particulier", statut: "Nouveau", avancement: 5, badge: "bg-blue-500" },
+            {
+              nom: 'Hangar Agricole 2024',
+              client: 'Ferme Martin',
+              statut: 'En cours',
+              avancement: 65,
+              badge: 'bg-green-500',
+            },
+            {
+              nom: 'Structure Industrielle',
+              client: 'SARL Transport',
+              statut: 'En retard',
+              avancement: 30,
+              badge: 'bg-red-500',
+            },
+            {
+              nom: 'Garde-corps Résidentiel',
+              client: 'Particulier',
+              statut: 'Nouveau',
+              avancement: 5,
+              badge: 'bg-blue-500',
+            },
           ].map((projet, index) => (
             <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex-1">
@@ -126,7 +144,7 @@ export const ProjetDetailPattern = () => (
         <TabsTrigger value="documents">Documents</TabsTrigger>
         <TabsTrigger value="facturation">Facturation</TabsTrigger>
       </TabsList>
-      
+
       <TabsContent value="overview" className="space-y-6">
         <div className="grid grid-cols-3 gap-6">
           <Card>
@@ -139,7 +157,7 @@ export const ProjetDetailPattern = () => (
               <p className="text-sm text-muted-foreground">En avance de 2 jours</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Budget</CardTitle>
@@ -150,7 +168,7 @@ export const ProjetDetailPattern = () => (
               <Progress value={64} className="mt-2" />
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Échéance</CardTitle>
@@ -161,7 +179,7 @@ export const ProjetDetailPattern = () => (
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -186,7 +204,7 @@ export const ProjetDetailPattern = () => (
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Équipe projet</CardTitle>
@@ -217,6 +235,3 @@ export const ProjetDetailPattern = () => (
     </Tabs>
   </div>
 )
-
-
-

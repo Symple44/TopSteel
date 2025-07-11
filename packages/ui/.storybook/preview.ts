@@ -28,7 +28,7 @@ const preview: Preview = {
           ['Tabs', 'Breadcrumb', 'Menu'],
           '05-Data Display',
           ['Badge', 'Table', 'Avatar', 'Progress'],
-          '06-Feedback', 
+          '06-Feedback',
           ['Alert', 'Dialog', 'Toast'],
           '07-Forms',
           ['Form Components', 'Validation'],

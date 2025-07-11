@@ -10,12 +10,12 @@ interface SalesStatsCardProps {
   className?: string
 }
 
-export function SalesStatsCard({ 
-  data, 
-  showActions = false, 
-  onEdit, 
-  onDelete, 
-  className 
+export function SalesStatsCard({
+  data,
+  showActions = false,
+  onEdit,
+  onDelete,
+  className,
 }: SalesStatsCardProps) {
   return (
     <Card className={className}>
@@ -27,7 +27,7 @@ export function SalesStatsCard({
         <p className="text-muted-foreground">
           Statistiques ventes component - Implementation needed
         </p>
-        
+
         {showActions && (
           <div className="flex gap-2 mt-4">
             <button onClick={onEdit} className="text-blue-600 hover:underline">

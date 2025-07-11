@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  Badge,
-  Button
-} from '@erp/ui'
+import { Badge, Button } from '@erp/ui'
 
 import { AlertTriangle, Package, ShoppingCart } from 'lucide-react'
 
@@ -78,7 +75,3 @@ export function StockAlertsPanel() {
     </div>
   )
 }
-
-
-
-

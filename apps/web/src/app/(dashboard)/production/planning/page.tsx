@@ -3,13 +3,18 @@
 import { PlanningCalendar } from '@/components/production/planning-calendar'
 import { PlanningGantt } from '@/components/production/planning-gantt'
 import {
-  Button, Card, CardContent, CardHeader, CardTitle,
-  Tabs, TabsContent, TabsList,
-  TabsTrigger
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@erp/ui'
 import { Calendar, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
 import { useState } from 'react'
-
 
 interface GanttTask {
   id: string
@@ -132,7 +137,7 @@ export default function PlanningPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs value={view} onValueChange={(v: string) => setView(v as "gantt" | "calendar")}>
+          <Tabs value={view} onValueChange={(v: string) => setView(v as 'gantt' | 'calendar')}>
             <TabsList>
               <TabsTrigger value="gantt">Vue Gantt</TabsTrigger>
               <TabsTrigger value="calendar">Vue Calendrier</TabsTrigger>
@@ -160,7 +165,3 @@ export default function PlanningPage() {
     </div>
   )
 }
-
-
-
-

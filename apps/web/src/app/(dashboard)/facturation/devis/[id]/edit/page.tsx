@@ -2,9 +2,26 @@
 
 import { DevisPreview } from '@/components/facturation/devis-preview'
 import {
-  Badge, Button, Card, CardContent, CardHeader, CardTitle,
-  Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Textarea,
 } from '@erp/ui'
 import { Calculator, Download, Eye, Plus, Save, Send, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
@@ -250,7 +267,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           type="number"
-                          value={ligne.quantite?.toString() ?? ""}
+                          value={ligne.quantite?.toString() ?? ''}
                           onChange={(e) =>
                             updateLigne(
                               ligne.id,
@@ -282,7 +299,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           type="number"
-                          value={ligne.prixUnitaire?.toString() ?? ""}
+                          value={ligne.prixUnitaire?.toString() ?? ''}
                           onChange={(e) =>
                             updateLigne(
                               ligne.id,
@@ -298,7 +315,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           type="number"
-                          value={ligne.taux_tva?.toString() ?? ""}
+                          value={ligne.taux_tva?.toString() ?? ''}
                           onChange={(e) =>
                             updateLigne(
                               ligne.id,
@@ -314,7 +331,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           type="number"
-                          value={ligne.remise?.toString() ?? ""}
+                          value={ligne.remise?.toString() ?? ''}
                           onChange={(e) =>
                             updateLigne(
                               ligne.id,
@@ -364,7 +381,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
-                      value={devis.remiseGlobale?.toString() ?? ""}
+                      value={devis.remiseGlobale?.toString() ?? ''}
                       onChange={(e) =>
                         setDevis((prev) => ({
                           ...prev,
@@ -421,5 +438,3 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
     </div>
   )
 }
-
-

@@ -53,4 +53,3 @@ export interface UseAsyncReturn<T = unknown> {
   error: Error | null
   execute: () => Promise<void>
 }
-

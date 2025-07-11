@@ -53,7 +53,7 @@ export const ProjetStatuts = () => (
         <Badge className="bg-gray-500">Terminé</Badge>
       </div>
     </div>
-    
+
     <div>
       <h4 className="mb-2 font-medium">Priorités</h4>
       <div className="flex flex-wrap gap-2">
@@ -63,7 +63,7 @@ export const ProjetStatuts = () => (
         <Badge variant="destructive">Urgente</Badge>
       </div>
     </div>
-    
+
     <div>
       <h4 className="mb-2 font-medium">Types de Projet</h4>
       <div className="flex flex-wrap gap-2">
@@ -73,7 +73,7 @@ export const ProjetStatuts = () => (
         <Badge className="bg-pink-500">Escalier</Badge>
       </div>
     </div>
-    
+
     <div>
       <h4 className="mb-2 font-medium">Statuts Commande</h4>
       <div className="flex flex-wrap gap-2">
@@ -93,6 +93,3 @@ export const WithNumbers = () => (
     <Badge className="bg-green-500">Terminé 15</Badge>
   </div>
 )
-
-
-

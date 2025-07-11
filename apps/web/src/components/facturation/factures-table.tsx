@@ -10,7 +10,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@erp/ui'
 
 import { Download, Edit, Eye } from 'lucide-react'
@@ -102,7 +102,3 @@ export function FacturesTable({ data = mockFactures }: FacturesTableProps) {
     </div>
   )
 }
-
-
-
-

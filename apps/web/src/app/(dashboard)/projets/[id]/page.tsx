@@ -9,12 +9,23 @@ import { useProjet } from '@/hooks/use-projets'
 import { formatCurrency, formatDate, getDaysUntil } from '@/lib/utils'
 import { ProjetStatut } from '@erp/types'
 import {
-  Badge, Button, Card, CardContent, CardHeader, CardTitle, DropdownMenu,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger, Progress, Tabs, TabsContent, TabsList, TabsTrigger
+  DropdownMenuTrigger,
+  Progress,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@erp/ui'
 import {
   AlertCircle,
@@ -308,4 +319,3 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
     </div>
   )
 }
-

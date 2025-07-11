@@ -9,9 +9,7 @@ export function ClientStatusBadge({ className, children }: ClientStatusBadgeProp
   return (
     <div className={className}>
       {/* TODO: Implement Badge statut client component */}
-      <p className="text-muted-foreground">
-        Badge statut client component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Badge statut client component - Implementation needed</p>
       {children}
     </div>
   )

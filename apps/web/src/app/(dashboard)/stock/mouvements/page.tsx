@@ -8,13 +8,18 @@
 
 import { ClientOnly } from '@/components/client-only'
 import {
-  Button, Card, CardContent, CardHeader, CardTitle,
-  Tabs, TabsContent, TabsList,
-  TabsTrigger
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@erp/ui'
 import { Download, Plus, TrendingDown, TrendingUp } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-
 
 // ===== TYPES =====
 type Period = 'week' | 'month' | 'quarter'
@@ -410,6 +415,3 @@ const CreateMouvementDialog = dynamic(
 
 // Ne pas oublier l'import dynamic en haut du fichier
 import dynamic from 'next/dynamic'
-
-
-

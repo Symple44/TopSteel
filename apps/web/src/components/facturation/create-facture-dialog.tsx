@@ -5,13 +5,16 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader, DialogTitle,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
-  Input, Label,
+  Input,
+  Label,
   Select,
-  SelectContent, SelectItem,
+  SelectContent,
+  SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@erp/ui'
 
 import { Plus } from 'lucide-react'
@@ -145,8 +148,3 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
     </Dialog>
   )
 }
-
-
-
-
-

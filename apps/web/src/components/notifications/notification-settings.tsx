@@ -1,11 +1,7 @@
 'use client'
 
 import { useNotifications } from '@/components/providers/notifications-provider'
-import {
-  Button,
-  Label,
-  Switch
-} from '@erp/ui'
+import { Button, Label, Switch } from '@erp/ui'
 
 import { Mail, Monitor, Volume2 } from 'lucide-react'
 

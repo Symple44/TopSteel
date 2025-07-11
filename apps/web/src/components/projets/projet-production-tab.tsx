@@ -10,7 +10,8 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle, Progress
+  CardTitle,
+  Progress,
 } from '@erp/ui'
 
 import {
@@ -384,7 +385,3 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     </div>
   )
 }
-
-
-
-

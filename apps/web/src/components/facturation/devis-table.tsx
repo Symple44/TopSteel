@@ -6,14 +6,15 @@ import {
   Badge,
   Button,
   DropdownMenu,
-  DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@erp/ui'
 
 import { Download, Edit, Eye, MoreHorizontal } from 'lucide-react'
@@ -127,7 +128,3 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
     </div>
   )
 }
-
-
-
-

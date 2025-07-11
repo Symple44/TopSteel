@@ -1,9 +1,7 @@
 // apps/web/src/components/facturation/devis-preview.tsx
 'use client'
 
-import {
-  Card, CardContent, CardHeader, CardTitle
-} from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
 interface DevisPreviewProps {
   devisId: string
@@ -33,6 +31,3 @@ export function DevisPreview({ devisId }: DevisPreviewProps) {
     </Card>
   )
 }
-
-
-

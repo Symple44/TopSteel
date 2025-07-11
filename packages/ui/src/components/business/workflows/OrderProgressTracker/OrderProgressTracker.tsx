@@ -9,9 +9,7 @@ export function OrderProgressTracker({ className, children }: OrderProgressTrack
   return (
     <div className={className}>
       {/* TODO: Implement Suivi commande component */}
-      <p className="text-muted-foreground">
-        Suivi commande component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Suivi commande component - Implementation needed</p>
       {children}
     </div>
   )

@@ -10,13 +10,7 @@ interface KpiCardProps {
   className?: string
 }
 
-export function KpiCard({ 
-  data, 
-  showActions = false, 
-  onEdit, 
-  onDelete, 
-  className 
-}: KpiCardProps) {
+export function KpiCard({ data, showActions = false, onEdit, onDelete, className }: KpiCardProps) {
   return (
     <Card className={className}>
       <CardHeader>
@@ -24,10 +18,8 @@ export function KpiCard({
       </CardHeader>
       <CardContent>
         {/* TODO: Add Carte KPI display content */}
-        <p className="text-muted-foreground">
-          Carte KPI component - Implementation needed
-        </p>
-        
+        <p className="text-muted-foreground">Carte KPI component - Implementation needed</p>
+
         {showActions && (
           <div className="flex gap-2 mt-4">
             <button onClick={onEdit} className="text-blue-600 hover:underline">

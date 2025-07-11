@@ -1,16 +1,33 @@
 'use client'
 
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils'
 import {
-  Badge, Button, Card, CardContent,
+  Badge,
+  Button,
+  Card,
+  CardContent,
   CardDescription,
-  CardHeader, CardTitle,
-  Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-  Tabs, TabsContent, TabsList,
-  TabsTrigger
-} from '@erp/ui';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@erp/ui'
 import {
   Calculator,
   Clock,
@@ -23,9 +40,8 @@ import {
   Save,
   TrendingUp,
   X,
-} from 'lucide-react';
-import { useState } from 'react';
-
+} from 'lucide-react'
+import { useState } from 'react'
 
 // Données mockées pour la démonstration
 const mockTemplates = [
@@ -408,8 +424,3 @@ export default function ChiffragePage() {
     </div>
   )
 }
-
-
-
-
-

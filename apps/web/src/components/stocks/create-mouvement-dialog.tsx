@@ -1,8 +1,6 @@
 'use client'
 
-import {
-  Button
-} from '@erp/ui'
+import { Button } from '@erp/ui'
 
 interface CreateMouvementDialogProps {
   open?: boolean
@@ -26,6 +24,3 @@ export function CreateMouvementDialog({ open, onOpenChange }: CreateMouvementDia
     </div>
   )
 }
-
-
-

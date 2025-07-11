@@ -9,9 +9,7 @@ export function WeightCalculator({ className, children }: WeightCalculatorProps)
   return (
     <div className={className}>
       {/* TODO: Implement Calculateur poids component */}
-      <p className="text-muted-foreground">
-        Calculateur poids component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Calculateur poids component - Implementation needed</p>
       {children}
     </div>
   )

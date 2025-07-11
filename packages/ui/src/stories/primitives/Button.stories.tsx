@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { Download, Edit, Plus, Save, Trash2 } from 'lucide-react'
 import { Button } from '../../components/primitives/button'
-import { Save, Download, Edit, Trash2, Plus } from 'lucide-react'
 
 const meta: Meta<typeof Button> = {
   title: '02-Primitives/Button',
@@ -120,20 +120,29 @@ export const ERPActions = () => (
     <div>
       <h4 className="mb-2 font-medium">Actions Projet</h4>
       <div className="flex space-x-2">
-        <Button><Plus className="mr-2 h-4 w-4" />Nouveau Projet</Button>
-        <Button variant="outline"><Edit className="mr-2 h-4 w-4" />Modifier</Button>
-        <Button variant="secondary"><Save className="mr-2 h-4 w-4" />Sauvegarder</Button>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          Nouveau Projet
+        </Button>
+        <Button variant="outline">
+          <Edit className="mr-2 h-4 w-4" />
+          Modifier
+        </Button>
+        <Button variant="secondary">
+          <Save className="mr-2 h-4 w-4" />
+          Sauvegarder
+        </Button>
       </div>
     </div>
     <div>
       <h4 className="mb-2 font-medium">Actions Destructives</h4>
       <div className="flex space-x-2">
-        <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" />Supprimer Projet</Button>
+        <Button variant="destructive">
+          <Trash2 className="mr-2 h-4 w-4" />
+          Supprimer Projet
+        </Button>
         <Button variant="destructive">Annuler Commande</Button>
       </div>
     </div>
   </div>
 )
-
-
-

@@ -27,10 +27,9 @@ export const Headings = () => (
 export const BodyText = () => (
   <div className="space-y-4">
     <p className="text-base">Corps de texte standard pour la lecture courante dans l'ERP.</p>
-    <p className="text-sm text-muted-foreground">Texte secondaire pour les informations complémentaires.</p>
+    <p className="text-sm text-muted-foreground">
+      Texte secondaire pour les informations complémentaires.
+    </p>
     <p className="text-xs text-muted-foreground">Petits textes pour les détails et métadonnées.</p>
   </div>
 )
-
-
-

@@ -9,9 +9,7 @@ export function TrendIndicator({ className, children }: TrendIndicatorProps) {
   return (
     <div className={className}>
       {/* TODO: Implement Indicateur tendance component */}
-      <p className="text-muted-foreground">
-        Indicateur tendance component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Indicateur tendance component - Implementation needed</p>
       {children}
     </div>
   )

@@ -1,11 +1,6 @@
 'use client'
 
-
-import {
-  Badge, Button,
-  Card,
-  CardContent
-} from '@erp/ui'
+import { Badge, Button, Card, CardContent } from '@erp/ui'
 
 import { AlertTriangle, Package, Plus } from 'lucide-react'
 
@@ -152,7 +147,3 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
     </div>
   )
 }
-
-
-
-

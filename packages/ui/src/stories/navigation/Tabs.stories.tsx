@@ -8,7 +8,7 @@ const meta: Meta<typeof Tabs> = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Systeme d\'onglets pour organiser le contenu dans TopSteel ERP',
+        component: "Systeme d'onglets pour organiser le contenu dans TopSteel ERP",
       },
     },
   },
@@ -29,30 +29,21 @@ export const Default: Story = {
       <TabsContent value="general">
         <div className="p-4 border rounded">
           <h3 className="font-semibold">Informations generales</h3>
-          <p className="text-sm text-gray-600">
-            Donnees principales du projet metallurgique
-          </p>
+          <p className="text-sm text-gray-600">Donnees principales du projet metallurgique</p>
         </div>
       </TabsContent>
       <TabsContent value="technique">
         <div className="p-4 border rounded">
           <h3 className="font-semibold">Specifications techniques</h3>
-          <p className="text-sm text-gray-600">
-            Details techniques et dimensionnement
-          </p>
+          <p className="text-sm text-gray-600">Details techniques et dimensionnement</p>
         </div>
       </TabsContent>
       <TabsContent value="financier">
         <div className="p-4 border rounded">
           <h3 className="font-semibold">Aspects financiers</h3>
-          <p className="text-sm text-gray-600">
-            Budget, devis et facturation
-          </p>
+          <p className="text-sm text-gray-600">Budget, devis et facturation</p>
         </div>
       </TabsContent>
     </Tabs>
   ),
 }
-
-
-

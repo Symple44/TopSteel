@@ -9,9 +9,7 @@ export function DeadlineIndicator({ className, children }: DeadlineIndicatorProp
   return (
     <div className={className}>
       {/* TODO: Implement Indicateur deadline component */}
-      <p className="text-muted-foreground">
-        Indicateur deadline component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Indicateur deadline component - Implementation needed</p>
       {children}
     </div>
   )

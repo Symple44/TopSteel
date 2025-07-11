@@ -1,15 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../../../feedback'
-import {
-  Button,
-} from '../../../primitives'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../feedback'
+import { Button } from '../../../primitives'
 
 interface ProjectTimelineDialogProps {
   open: boolean
@@ -17,7 +10,11 @@ interface ProjectTimelineDialogProps {
   onSubmit?: (data: unknown) => void
 }
 
-export function ProjectTimelineDialog({ open, onOpenChange, onSubmit }: ProjectTimelineDialogProps) {
+export function ProjectTimelineDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+}: ProjectTimelineDialogProps) {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,10 +34,10 @@ export function ProjectTimelineDialog({ open, onOpenChange, onSubmit }: ProjectT
         <DialogHeader>
           <DialogTitle>Timeline du projet</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* TODO: Add form fields */}
-          
+
           <div className="flex gap-2">
             <Button
               type="button"

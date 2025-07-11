@@ -9,9 +9,7 @@ export function ProductionTimeline({ className, children }: ProductionTimelinePr
   return (
     <div className={className}>
       {/* TODO: Implement Timeline production component */}
-      <p className="text-muted-foreground">
-        Timeline production component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Timeline production component - Implementation needed</p>
       {children}
     </div>
   )

@@ -1,6 +1,15 @@
 'use client'
 
-import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui'
+import {
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui'
 
 import { RotateCcw } from 'lucide-react'
 import { useState } from 'react'

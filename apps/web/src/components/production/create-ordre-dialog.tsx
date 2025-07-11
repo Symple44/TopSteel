@@ -13,7 +13,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@erp/ui'
 
 import { useState } from 'react'
@@ -61,9 +61,10 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
   }
 
   // ✅ Handler simplifié pour les inputs
-  const handleInputChange = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }))
-  }
+  const handleInputChange =
+    (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: e.target.value }))
+    }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,7 +72,7 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
         <DialogHeader>
           <DialogTitle>Nouvel ordre de fabrication</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             {/* ✅ COHÉRENCE : Utilise toujours <Label> component */}
@@ -83,7 +84,8 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
               type="text"
               value={formData.numero}
               onChange={handleInputChange('numero')}
-              placeholder="OF-2025-001"/>
+              placeholder="OF-2025-001"
+            />
           </div>
 
           <div>
@@ -95,17 +97,16 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
               type="text"
               value={formData.description}
               onChange={handleInputChange('description')}
-              placeholder="Description de l'ordre..."/>
+              placeholder="Description de l'ordre..."
+            />
           </div>
 
           <div>
-            <Label className="text-sm font-medium">
-              Priorité
-            </Label>
+            <Label className="text-sm font-medium">Priorité</Label>
             {/* ✅ CORRIGÉ : Utilise l'API Radix UI Select correcte */}
             <Select
               value={formData.priorite}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, priorite: value }))}
+              onValueChange={(value) => setFormData((prev) => ({ ...prev, priorite: value }))}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sélectionner une priorité" />
@@ -158,16 +159,10 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
-            <Button type="submit">
-              Créer l'ordre
-            </Button>
+            <Button type="submit">Créer l'ordre</Button>
           </div>
         </form>
       </DialogContent>
@@ -176,7 +171,11 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
 }
 
 // ✅ BONUS : Version avec validation avancée
-export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: CreateOrdreDialogProps) {
+export function CreateOrdreDialogAdvanced({
+  open,
+  onOpenChange,
+  onSubmit,
+}: CreateOrdreDialogProps) {
   const [formData, setFormData] = useState({
     numero: '',
     description: '',
@@ -193,7 +192,7 @@ export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: Crea
     const newErrors: Record<string, string> = {}
 
     if (!formData.numero.trim()) {
-      newErrors.numero = 'Le numéro d\'ordre est requis'
+      newErrors.numero = "Le numéro d'ordre est requis"
     }
 
     if (!formData.description.trim()) {
@@ -227,7 +226,7 @@ export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: Crea
 
     onSubmit?.(newOrdre)
     onOpenChange(false)
-    
+
     // Reset form et erreurs
     setFormData({
       numero: '',
@@ -240,13 +239,14 @@ export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: Crea
     setErrors({})
   }
 
-  const handleInputChange = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }))
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+  const handleInputChange =
+    (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: e.target.value }))
+      // Clear error when user starts typing
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: '' }))
+      }
     }
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -254,7 +254,7 @@ export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: Crea
         <DialogHeader>
           <DialogTitle>Nouvel ordre de fabrication</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="numero" className="text-sm font-medium">
@@ -268,9 +268,7 @@ export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: Crea
               placeholder="OF-2025-001"
               className={errors.numero ? 'border-red-500' : ''}
             />
-            {errors.numero && (
-              <p className="text-sm text-red-500 mt-1">{errors.numero}</p>
-            )}
+            {errors.numero && <p className="text-sm text-red-500 mt-1">{errors.numero}</p>}
           </div>
 
           <div>
@@ -294,7 +292,7 @@ export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: Crea
             <Label className="text-sm font-medium">Priorité</Label>
             <Select
               value={formData.priorite}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, priorite: value }))}
+              onValueChange={(value) => setFormData((prev) => ({ ...prev, priorite: value }))}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -351,16 +349,10 @@ export function CreateOrdreDialogAdvanced({ open, onOpenChange, onSubmit }: Crea
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
-            <Button type="submit">
-              Créer l'ordre
-            </Button>
+            <Button type="submit">Créer l'ordre</Button>
           </div>
         </form>
       </DialogContent>

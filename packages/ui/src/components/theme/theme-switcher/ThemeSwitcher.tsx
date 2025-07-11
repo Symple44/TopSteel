@@ -1,5 +1,5 @@
-import * as React from "react"
-import { cn } from "../../../lib/utils"
+import * as React from 'react'
+import { cn } from '../../../lib/utils'
 
 export interface ThemeSwitcherProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'outline' | 'ghost'
@@ -15,9 +15,11 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
       setMounted(true)
       // Check for saved theme preference or default to light
       const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
       const initialTheme = savedTheme || systemTheme
-      
+
       setTheme(initialTheme)
       document.documentElement.classList.toggle('dark', initialTheme === 'dark')
     }, [])
@@ -30,21 +32,22 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
     }
 
     const baseClasses = [
-      "inline-flex items-center justify-center rounded-md text-sm font-medium",
-      "transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-      "disabled:pointer-events-none disabled:opacity-50"
+      'inline-flex items-center justify-center rounded-md text-sm font-medium',
+      'transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+      'disabled:pointer-events-none disabled:opacity-50',
     ]
 
     const variantClasses = {
-      default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-      outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-      ghost: "hover:bg-accent hover:text-accent-foreground"
+      default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
+      outline:
+        'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
+      ghost: 'hover:bg-accent hover:text-accent-foreground',
     }
 
     const sizeClasses = {
-      default: "h-9 px-3",
-      sm: "h-8 px-2",
-      lg: "h-10 px-4"
+      default: 'h-9 px-3',
+      sm: 'h-8 px-2',
+      lg: 'h-10 px-4',
     }
 
     // Render placeholder until mounted to avoid hydration mismatch
@@ -52,12 +55,7 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
       return (
         <button
           ref={ref}
-          className={cn(
-            baseClasses,
-            variantClasses[variant],
-            sizeClasses[size],
-            className
-          )}
+          className={cn(baseClasses, variantClasses[variant], sizeClasses[size], className)}
           disabled
           {...props}
         >
@@ -69,12 +67,7 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
     return (
       <button
         ref={ref}
-        className={cn(
-          baseClasses,
-          variantClasses[variant],
-          sizeClasses[size],
-          className
-        )}
+        className={cn(baseClasses, variantClasses[variant], sizeClasses[size], className)}
         onClick={toggleTheme}
         title={`Basculer vers le thème ${theme === 'light' ? 'sombre' : 'clair'}`}
         {...props}
@@ -92,6 +85,6 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
   }
 )
 
-ThemeSwitcher.displayName = "ThemeSwitcher"
+ThemeSwitcher.displayName = 'ThemeSwitcher'
 
 export { ThemeSwitcher }

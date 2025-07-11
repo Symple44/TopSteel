@@ -1,8 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../../components/layout/card'
-import { Button } from '../../components/primitives/button'
 import { Badge } from '../../components/data-display/badge'
 import { Progress } from '../../components/data-display/progress'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../../components/layout/card'
+import { Button } from '../../components/primitives/button'
 
 const meta: Meta<typeof Card> = {
   title: '03-Layout/Card',
@@ -65,7 +72,9 @@ export const ProjetCard = () => (
     </CardContent>
     <CardFooter className="flex space-x-2">
       <Button size="sm">Voir détails</Button>
-      <Button variant="outline" size="sm">Modifier</Button>
+      <Button variant="outline" size="sm">
+        Modifier
+      </Button>
     </CardFooter>
   </Card>
 )
@@ -81,7 +90,7 @@ export const StatsCard = () => (
         <p className="text-xs text-muted-foreground">+2 ce mois</p>
       </CardContent>
     </Card>
-    
+
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">En retard</CardTitle>
@@ -91,7 +100,7 @@ export const StatsCard = () => (
         <p className="text-xs text-muted-foreground">Action requise</p>
       </CardContent>
     </Card>
-    
+
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">CA du mois</CardTitle>
@@ -130,11 +139,10 @@ export const CommandeCard = () => (
       </div>
     </CardContent>
     <CardFooter className="flex justify-between">
-      <Button variant="outline" size="sm">Télécharger PDF</Button>
+      <Button variant="outline" size="sm">
+        Télécharger PDF
+      </Button>
       <Button size="sm">Lancer production</Button>
     </CardFooter>
   </Card>
 )
-
-
-

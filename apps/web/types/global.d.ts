@@ -65,8 +65,8 @@ declare module '@erp/ui' {
   export const PageHeader: ComponentType<any>
   export const ProjetCard: ComponentType<any>
   export const ThemeSwitcher: ComponentType<any>
-  export const ScrollArea : ComponentType<any>
-  export const ScrollBar  : ComponentType<any>
+  export const ScrollArea: ComponentType<any>
+  export const ScrollBar: ComponentType<any>
 
   // Utility function
   export function cn(...args: any[]): string

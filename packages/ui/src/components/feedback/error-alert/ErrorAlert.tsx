@@ -1,6 +1,6 @@
-import * as React from "react"
-import { cn } from "../../../lib/utils"
-import { AlertTriangle, X } from "lucide-react"
+import { AlertTriangle, X } from 'lucide-react'
+import * as React from 'react'
+import { cn } from '../../../lib/utils'
 
 export interface ErrorAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   error?: string | Error | { message: string }
@@ -10,13 +10,13 @@ export interface ErrorAlertProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const ErrorAlert = React.forwardRef<HTMLDivElement, ErrorAlertProps>(
-  ({ error, title = "Erreur", dismissible, onDismiss, className, ...props }, ref) => {
+  ({ error, title = 'Erreur', dismissible, onDismiss, className, ...props }, ref) => {
     const errorMessage = React.useMemo(() => {
-      if (!error) return "Une erreur est survenue"
-      if (typeof error === "string") return error
+      if (!error) return 'Une erreur est survenue'
+      if (typeof error === 'string') return error
       if (error instanceof Error) return error.message
-      if (typeof error === "object" && "message" in error) return error.message
-      return "Une erreur est survenue"
+      if (typeof error === 'object' && 'message' in error) return error.message
+      return 'Une erreur est survenue'
     }, [error])
 
     if (!error) return null
@@ -25,19 +25,19 @@ const ErrorAlert = React.forwardRef<HTMLDivElement, ErrorAlertProps>(
       <div
         ref={ref}
         className={cn(
-          "relative w-full rounded-lg border border-destructive/50 bg-destructive/10 p-4",
+          'relative w-full rounded-lg border border-destructive/50 bg-destructive/10 p-4',
           className
         )}
         {...props}
       >
         <div className="flex items-start space-x-3">
           <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
-          
+
           <div className="flex-1 space-y-1">
             <h4 className="font-medium text-destructive">{title}</h4>
             <p className="text-sm text-destructive/90">{errorMessage}</p>
           </div>
-          
+
           {dismissible && onDismiss && (
             <button
               onClick={onDismiss}
@@ -52,6 +52,6 @@ const ErrorAlert = React.forwardRef<HTMLDivElement, ErrorAlertProps>(
   }
 )
 
-ErrorAlert.displayName = "ErrorAlert"
+ErrorAlert.displayName = 'ErrorAlert'
 
 export { ErrorAlert }

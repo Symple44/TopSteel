@@ -1,15 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../../../feedback'
-import {
-  Button,
-} from '../../../primitives'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../feedback'
+import { Button } from '../../../primitives'
 
 interface InventoryAdjustmentDialogProps {
   open: boolean
@@ -17,7 +10,11 @@ interface InventoryAdjustmentDialogProps {
   onSubmit?: (data: unknown) => void
 }
 
-export function InventoryAdjustmentDialog({ open, onOpenChange, onSubmit }: InventoryAdjustmentDialogProps) {
+export function InventoryAdjustmentDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+}: InventoryAdjustmentDialogProps) {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,10 +34,10 @@ export function InventoryAdjustmentDialog({ open, onOpenChange, onSubmit }: Inve
         <DialogHeader>
           <DialogTitle>Ajustement inventaire</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* TODO: Add form fields */}
-          
+
           <div className="flex gap-2">
             <Button
               type="button"

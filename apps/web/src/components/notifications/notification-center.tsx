@@ -5,8 +5,18 @@ import { cn } from '@/lib/utils'
 import type { Notification } from '@erp/types'
 
 import {
-  Badge, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, ScrollArea,
-  Separator
+  Badge,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  ScrollArea,
+  Separator,
 } from '@erp/ui'
 
 import { AlertTriangle, Bell, CheckCheck, Clock, Settings, Trash2, X } from 'lucide-react'
@@ -60,11 +70,7 @@ export function NotificationCenter() {
             <h3 className="font-semibold">Notifications</h3>
             <div className="flex gap-1">
               {state.unreadCount > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={actions.markAllAsRead}
-                >
+                <Button variant="ghost" size="sm" onClick={actions.markAllAsRead}>
                   <CheckCheck className="h-4 w-4" />
                 </Button>
               )}
@@ -202,7 +208,3 @@ export function NotificationCenter() {
     </DropdownMenu>
   )
 }
-
-
-
-

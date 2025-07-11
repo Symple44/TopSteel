@@ -13,4 +13,3 @@ export * from './HazardIndicator'
 export * from './WeightCalculator'
 export * from './CostCalculator'
 export * from './CuttingOptimizer'
-

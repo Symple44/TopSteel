@@ -24,4 +24,3 @@ export * from './StockMovementDialog'
 export * from './InventoryAdjustmentDialog'
 export * from './LowStockAlertDialog'
 export * from './StockTransferDialog'
-

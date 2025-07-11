@@ -3,7 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/layou
 import { Button } from '../../components/primitives/button'
 import { Checkbox } from '../../components/primitives/checkbox'
 import { Input } from '../../components/primitives/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/primitives/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/primitives/select'
 import { Textarea } from '../../components/primitives/textarea'
 
 import type { Meta } from '@storybook/react'
@@ -38,7 +44,7 @@ export const ProjetForm = () => (
           <Input id="reference" placeholder="PRJ-2024-001" />
         </div>
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="client">Client *</Label>
         <Select>
@@ -52,7 +58,7 @@ export const ProjetForm = () => (
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="type">Type de projet</Label>
@@ -83,7 +89,7 @@ export const ProjetForm = () => (
           </Select>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="date-debut">Date de début</Label>
@@ -94,26 +100,22 @@ export const ProjetForm = () => (
           <Input id="date-fin" type="date" />
         </div>
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="budget">Budget prévisionnel (€ HT)</Label>
         <Input id="budget" type="number" placeholder="45000" />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
-        <Textarea 
-          id="description" 
-          placeholder="Description détaillée du projet..."
-          rows={3}
-        />
+        <Textarea id="description" placeholder="Description détaillée du projet..." rows={3} />
       </div>
-      
+
       <div className="flex items-center space-x-2">
         <Checkbox id="urgent" />
         <Label htmlFor="urgent">Projet urgent nécessitant un suivi particulier</Label>
       </div>
-      
+
       <div className="flex space-x-2">
         <Button type="submit">Créer le projet</Button>
         <Button variant="outline">Annuler</Button>
@@ -132,7 +134,7 @@ export const ClientForm = () => (
         <Label htmlFor="raison-sociale">Raison sociale *</Label>
         <Input id="raison-sociale" placeholder="Ex: SARL Martin" />
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="siret">SIRET</Label>
@@ -143,12 +145,12 @@ export const ClientForm = () => (
           <Input id="tva" placeholder="FR12345678901" />
         </div>
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="adresse">Adresse</Label>
         <Textarea id="adresse" placeholder="Adresse complète..." rows={2} />
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="contact">Contact principal</Label>
@@ -159,12 +161,12 @@ export const ClientForm = () => (
           <Input id="email" type="email" placeholder="contact@martin.fr" />
         </div>
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="telephone">Téléphone</Label>
         <Input id="telephone" type="tel" placeholder="01 23 45 67 89" />
       </div>
-      
+
       <div className="flex space-x-2">
         <Button type="submit">Ajouter le client</Button>
         <Button variant="outline">Annuler</Button>
@@ -172,6 +174,3 @@ export const ClientForm = () => (
     </CardContent>
   </Card>
 )
-
-
-

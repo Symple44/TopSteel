@@ -10,12 +10,12 @@ interface ProductionStatsCardProps {
   className?: string
 }
 
-export function ProductionStatsCard({ 
-  data, 
-  showActions = false, 
-  onEdit, 
-  onDelete, 
-  className 
+export function ProductionStatsCard({
+  data,
+  showActions = false,
+  onEdit,
+  onDelete,
+  className,
 }: ProductionStatsCardProps) {
   return (
     <Card className={className}>
@@ -27,7 +27,7 @@ export function ProductionStatsCard({
         <p className="text-muted-foreground">
           Statistiques production component - Implementation needed
         </p>
-        
+
         {showActions && (
           <div className="flex gap-2 mt-4">
             <button onClick={onEdit} className="text-blue-600 hover:underline">

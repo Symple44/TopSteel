@@ -9,9 +9,7 @@ export function ProfitMarginDisplay({ className, children }: ProfitMarginDisplay
   return (
     <div className={className}>
       {/* TODO: Implement Affichage marge component */}
-      <p className="text-muted-foreground">
-        Affichage marge component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Affichage marge component - Implementation needed</p>
       {children}
     </div>
   )

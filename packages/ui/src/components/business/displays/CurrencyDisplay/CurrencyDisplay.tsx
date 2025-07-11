@@ -9,9 +9,7 @@ export function CurrencyDisplay({ className, children }: CurrencyDisplayProps) {
   return (
     <div className={className}>
       {/* TODO: Implement Affichage devise component */}
-      <p className="text-muted-foreground">
-        Affichage devise component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Affichage devise component - Implementation needed</p>
       {children}
     </div>
   )

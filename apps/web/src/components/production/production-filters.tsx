@@ -13,7 +13,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@erp/ui'
 
 import { Filter, RotateCcw, Search } from 'lucide-react'
@@ -26,8 +26,8 @@ interface ProductionFiltersProps {
 
 interface ProductionFilters {
   search?: string
-  statut?: string     
-  priorite?: string    
+  statut?: string
+  priorite?: string
   dateDebut?: string
   dateFin?: string
   responsable?: string
@@ -44,9 +44,10 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
   }
 
   // ✅ Handler pour les inputs (simplifié)
-  const handleInputChange = (key: keyof ProductionFilters) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFilterChange(key, e.target.value)
-  }
+  const handleInputChange =
+    (key: keyof ProductionFilters) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      handleFilterChange(key, e.target.value)
+    }
 
   // ✅ Reset corrigé (sans accolade orpheline)
   const handleReset = () => {
@@ -56,8 +57,8 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
   }
 
   // ✅ Compteur de filtres actifs
-  const activeFiltersCount = Object.values(filters).filter(value => 
-    value !== undefined && value !== ''
+  const activeFiltersCount = Object.values(filters).filter(
+    (value) => value !== undefined && value !== ''
   ).length
 
   return (
@@ -174,9 +175,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             Réinitialiser
           </Button>
           <div className="text-sm text-muted-foreground">
-            {activeFiltersCount > 0
-              ? `${activeFiltersCount} filtre(s) actif(s)`
-              : 'Aucun filtre'}
+            {activeFiltersCount > 0 ? `${activeFiltersCount} filtre(s) actif(s)` : 'Aucun filtre'}
           </div>
         </div>
       </CardContent>
@@ -191,12 +190,12 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
 
   const handleFilterChange = (key: keyof ProductionFilters, value: string) => {
     const newFilters = { ...filters, [key]: value || undefined }
-    
+
     // ✅ Validation des dates
     if (key === 'dateDebut' || key === 'dateFin') {
       const debut = key === 'dateDebut' ? value : newFilters.dateDebut
       const fin = key === 'dateFin' ? value : newFilters.dateFin
-      
+
       if (debut && fin && new Date(debut) > new Date(fin)) {
         setDateError('La date de début ne peut pas être postérieure à la date de fin')
         return
@@ -204,14 +203,15 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
         setDateError('')
       }
     }
-    
+
     setFilters(newFilters)
     onFiltersChange?.(newFilters)
   }
 
-  const handleInputChange = (key: keyof ProductionFilters) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFilterChange(key, e.target.value)
-  }
+  const handleInputChange =
+    (key: keyof ProductionFilters) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      handleFilterChange(key, e.target.value)
+    }
 
   const handleReset = () => {
     setFilters({})
@@ -220,8 +220,8 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
     onReset?.()
   }
 
-  const activeFiltersCount = Object.values(filters).filter(value => 
-    value !== undefined && value !== ''
+  const activeFiltersCount = Object.values(filters).filter(
+    (value) => value !== undefined && value !== ''
   ).length
 
   return (
@@ -348,18 +348,12 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
 
         {/* Actions */}
         <div className="flex justify-between items-center pt-4">
-          <Button 
-            variant="outline" 
-            onClick={handleReset} 
-            disabled={activeFiltersCount === 0}
-          >
+          <Button variant="outline" onClick={handleReset} disabled={activeFiltersCount === 0}>
             <RotateCcw className="h-4 w-4 mr-2" />
             Réinitialiser
           </Button>
           <div className="text-sm text-muted-foreground">
-            {activeFiltersCount > 0
-              ? `${activeFiltersCount} filtre(s) actif(s)`
-              : 'Aucun filtre'}
+            {activeFiltersCount > 0 ? `${activeFiltersCount} filtre(s) actif(s)` : 'Aucun filtre'}
           </div>
         </div>
       </CardContent>

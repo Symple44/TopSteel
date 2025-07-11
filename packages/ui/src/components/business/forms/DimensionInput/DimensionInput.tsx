@@ -9,9 +9,7 @@ export function DimensionInput({ className, children }: DimensionInputProps) {
   return (
     <div className={className}>
       {/* TODO: Implement Input dimensions component */}
-      <p className="text-muted-foreground">
-        Input dimensions component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Input dimensions component - Implementation needed</p>
       {children}
     </div>
   )

@@ -5,8 +5,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader, DialogTitle,
-  Input, Label
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
 } from '@erp/ui'
 
 import { useState } from 'react'
@@ -83,7 +85,8 @@ export function CreatePaiementDialog({
               value={formData.montant}
               onChange={(e) =>
                 setFormData({ ...formData, montant: (e.target as HTMLInputElement).value })
-              }/>
+              }
+            />
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
@@ -112,7 +115,8 @@ export function CreatePaiementDialog({
               value={formData.dateReception}
               onChange={(e) =>
                 setFormData({ ...formData, dateReception: (e.target as HTMLInputElement).value })
-              }/>
+              }
+            />
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
@@ -128,8 +132,3 @@ export function CreatePaiementDialog({
     </Dialog>
   )
 }
-
-
-
-
-

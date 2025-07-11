@@ -9,9 +9,7 @@ export function CostCalculator({ className, children }: CostCalculatorProps) {
   return (
     <div className={className}>
       {/* TODO: Implement Calculateur coût component */}
-      <p className="text-muted-foreground">
-        Calculateur coût component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Calculateur coût component - Implementation needed</p>
       {children}
     </div>
   )

@@ -10,12 +10,12 @@ interface TaskCardProps {
   className?: string
 }
 
-export function TaskCard({ 
-  data, 
-  showActions = false, 
-  onEdit, 
-  onDelete, 
-  className 
+export function TaskCard({
+  data,
+  showActions = false,
+  onEdit,
+  onDelete,
+  className,
 }: TaskCardProps) {
   return (
     <Card className={className}>
@@ -24,10 +24,8 @@ export function TaskCard({
       </CardHeader>
       <CardContent>
         {/* TODO: Add Carte tâche display content */}
-        <p className="text-muted-foreground">
-          Carte tâche component - Implementation needed
-        </p>
-        
+        <p className="text-muted-foreground">Carte tâche component - Implementation needed</p>
+
         {showActions && (
           <div className="flex gap-2 mt-4">
             <button onClick={onEdit} className="text-blue-600 hover:underline">

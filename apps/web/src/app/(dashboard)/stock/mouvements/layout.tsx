@@ -203,4 +203,3 @@ export const generateStaticParams = async () => {
   // Pas de params statiques pour cette section
   return []
 }
-

@@ -9,9 +9,7 @@ export function CostBreakdownDisplay({ className, children }: CostBreakdownDispl
   return (
     <div className={className}>
       {/* TODO: Implement Détail des coûts component */}
-      <p className="text-muted-foreground">
-        Détail des coûts component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Détail des coûts component - Implementation needed</p>
       {children}
     </div>
   )

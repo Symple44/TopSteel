@@ -9,9 +9,7 @@ export function BusinessSortControls({ className, children }: BusinessSortContro
   return (
     <div className={className}>
       {/* TODO: Implement Contrôles tri component */}
-      <p className="text-muted-foreground">
-        Contrôles tri component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Contrôles tri component - Implementation needed</p>
       {children}
     </div>
   )

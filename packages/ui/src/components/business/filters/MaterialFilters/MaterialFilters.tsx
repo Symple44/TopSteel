@@ -9,9 +9,7 @@ export function MaterialFilters({ className, children }: MaterialFiltersProps) {
   return (
     <div className={className}>
       {/* TODO: Implement Filtres matériaux component */}
-      <p className="text-muted-foreground">
-        Filtres matériaux component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Filtres matériaux component - Implementation needed</p>
       {children}
     </div>
   )

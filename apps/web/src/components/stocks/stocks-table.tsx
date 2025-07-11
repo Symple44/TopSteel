@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  Badge,
-  Button
-} from '@erp/ui'
+import { Badge, Button } from '@erp/ui'
 
 import { Edit, Eye, MoreHorizontal, Package } from 'lucide-react'
 
@@ -155,7 +152,3 @@ export function StocksTable() {
     </div>
   )
 }
-
-
-
-

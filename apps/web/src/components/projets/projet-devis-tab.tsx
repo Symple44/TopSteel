@@ -16,7 +16,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@erp/ui'
 
 import {
@@ -319,7 +319,3 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
     </div>
   )
 }
-
-
-
-

@@ -1,6 +1,5 @@
 'use client'
 
-
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
 
 interface ClientCardProps {
@@ -11,12 +10,12 @@ interface ClientCardProps {
   className?: string
 }
 
-export function ClientCard({ 
-  data, 
-  showActions = false, 
-  onEdit, 
-  onDelete, 
-  className 
+export function ClientCard({
+  data,
+  showActions = false,
+  onEdit,
+  onDelete,
+  className,
 }: ClientCardProps) {
   return (
     <Card className={className}>
@@ -25,10 +24,8 @@ export function ClientCard({
       </CardHeader>
       <CardContent>
         {/* TODO: Add Carte client display content */}
-        <p className="text-muted-foreground">
-          Carte client component - Implementation needed
-        </p>
-        
+        <p className="text-muted-foreground">Carte client component - Implementation needed</p>
+
         {showActions && (
           <div className="flex gap-2 mt-4">
             <button onClick={onEdit} className="text-blue-600 hover:underline">

@@ -9,9 +9,7 @@ export function SafetyRequirementsBadge({ className, children }: SafetyRequireme
   return (
     <div className={className}>
       {/* TODO: Implement Badge sécurité component */}
-      <p className="text-muted-foreground">
-        Badge sécurité component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Badge sécurité component - Implementation needed</p>
       {children}
     </div>
   )

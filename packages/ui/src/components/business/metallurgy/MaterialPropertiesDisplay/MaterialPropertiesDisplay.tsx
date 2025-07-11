@@ -9,9 +9,7 @@ export function MaterialPropertiesDisplay({ className, children }: MaterialPrope
   return (
     <div className={className}>
       {/* TODO: Implement Propriétés matériau component */}
-      <p className="text-muted-foreground">
-        Propriétés matériau component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Propriétés matériau component - Implementation needed</p>
       {children}
     </div>
   )

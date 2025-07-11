@@ -2,10 +2,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import {
-  Badge,
-  Separator
-} from '@erp/ui'
+import { Badge, Separator } from '@erp/ui'
 
 import {
   BarChart3,
@@ -282,7 +279,3 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     </div>
   )
 }
-
-
-
-

@@ -22,4 +22,3 @@ export * from './StockLevelIndicator'
 export * from './DeadlineIndicator'
 export * from './QualityIndicator'
 export * from './CompletionIndicator'
-

@@ -5,9 +5,10 @@ import {
   Button,
   Input,
   Select,
-  SelectContent, SelectItem,
+  SelectContent,
+  SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@erp/ui'
 
 import { Filter, Search, X } from 'lucide-react'
@@ -63,7 +64,3 @@ export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
     </div>
   )
 }
-
-
-
-

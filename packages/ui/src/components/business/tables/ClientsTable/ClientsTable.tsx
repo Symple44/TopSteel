@@ -1,6 +1,13 @@
 'use client'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../data-display'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../../data-display'
 
 interface ClientsTableProps {
   data: unknown[]
@@ -38,13 +45,13 @@ export function ClientsTable({ data = [], loading = false, onEdit, onDelete }: C
                 <TableCell>TODO: Status</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => onEdit?.(item)}
                       className="text-blue-600 hover:underline"
                     >
                       Modifier
                     </button>
-                    <button 
+                    <button
                       onClick={() => onDelete?.(item)}
                       className="text-red-600 hover:underline"
                     >

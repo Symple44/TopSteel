@@ -14,7 +14,7 @@ import {
   Input,
   Label,
   Separator,
-  Textarea
+  Textarea,
 } from '@erp/ui'
 
 import { Building2, Calendar, Clock, Edit, Euro, Mail, MapPin, Phone, Save, X } from 'lucide-react'
@@ -36,7 +36,7 @@ interface FormData {
 export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  
+
   // ✅ Fonction helper pour convertir les dates
   const dateToInputValue = (date: Date | undefined): string => {
     if (!date) return ''
@@ -52,17 +52,16 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
   })
 
   // ✅ Handler simplifié et réutilisable
-  const handleInputChange = (field: keyof FormData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const value = e.target.value
-    setFormData(prev => ({ ...prev, [field]: value }))
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+  const handleInputChange =
+    (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = e.target.value
+      setFormData((prev) => ({ ...prev, [field]: value }))
+
+      // Clear error when user starts typing
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: '' }))
+      }
     }
-  }
 
   // ✅ Validation des données
   const validateForm = (): boolean => {
@@ -84,7 +83,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
     if (formData.dateDebut && formData.dateFin) {
       const debut = new Date(formData.dateDebut)
       const fin = new Date(formData.dateFin)
-      
+
       if (debut >= fin) {
         newErrors.dateFin = 'La date de fin doit être postérieure à la date de début'
       }
@@ -202,7 +201,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={handleInputChange('description')} 
+                  onChange={handleInputChange('description')}
                   className={`mt-1 ${getInputClassName('description')}`}
                   rows={3}
                   placeholder="Description détaillée du projet..."
@@ -317,9 +316,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
                     )}
                   </div>
                 ) : (
-                  <div className="text-muted-foreground">
-                    Adresse non renseignée
-                  </div>
+                  <div className="text-muted-foreground">Adresse non renseignée</div>
                 )}
               </div>
             </div>
@@ -396,10 +393,12 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>
-                  <span className="font-medium">Payé:</span> {formatCurrency((projet as any).montantPaye)}
+                  <span className="font-medium">Payé:</span>{' '}
+                  {formatCurrency((projet as any).montantPaye)}
                 </span>
                 <span>
-                  <span className="font-medium">Restant:</span> {formatCurrency(projet.montantTTC - (projet as any).montantPaye)}
+                  <span className="font-medium">Restant:</span>{' '}
+                  {formatCurrency(projet.montantTTC - (projet as any).montantPaye)}
                 </span>
               </div>
             </div>

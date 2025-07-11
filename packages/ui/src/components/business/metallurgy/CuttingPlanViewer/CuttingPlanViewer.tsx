@@ -9,9 +9,7 @@ export function CuttingPlanViewer({ className, children }: CuttingPlanViewerProp
   return (
     <div className={className}>
       {/* TODO: Implement Plan de coupe component */}
-      <p className="text-muted-foreground">
-        Plan de coupe component - Implementation needed
-      </p>
+      <p className="text-muted-foreground">Plan de coupe component - Implementation needed</p>
       {children}
     </div>
   )

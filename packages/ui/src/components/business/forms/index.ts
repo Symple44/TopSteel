@@ -16,4 +16,3 @@ export * from './WorkingHoursPicker'
 export * from './MaterialsMultiSelect'
 export * from './SkillsTagInput'
 export * from './CategoriesMultiSelect'
-
