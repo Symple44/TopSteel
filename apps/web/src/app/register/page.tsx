@@ -1,22 +1,5 @@
 'use client'
 
-import {
-  Input,
-  Card,
-  CardContent,
-  Label,
-  Button,
-  AlertDescription,
-  CardTitle,
-  CardHeader,
-} from '@erp/ui'
-
-/**
- * 🔐 PAGE REGISTER ROBUSTE - TopSteel ERP
- * Page d'inscription avec gestion d'erreurs robuste et hydratation sécurisée
- * Fichier: apps/web/src/app/register/page.tsx
- */
-
 import { ClientOnly } from '@/components/client-only'
 import {
   Alert,
@@ -31,7 +14,6 @@ import {
   Input,
   Label,
 } from '@erp/ui'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Building2, CheckCircle, Eye, EyeOff, Loader2, Mail, User } from 'lucide-react'
 import Link from 'next/link'
@@ -417,7 +399,7 @@ export default function RegisterPage() {
                     disabled={state.isLoading}
                   >
                     {showPassword ? <EyeOff /> : <Eye />}
-                  </button>
+                  </Button>
                 </div>
                 {password && (
                   <div className="flex items-center space-x-2 text-sm">
@@ -469,7 +451,7 @@ export default function RegisterPage() {
                     disabled={state.isLoading}
                   >
                     {showConfirmPassword ? <EyeOff /> : <Eye />}
-                  </button>
+                  </Button>
                 </div>
                 {errors.confirmPassword && (
                   <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
@@ -538,3 +520,5 @@ export default function RegisterPage() {
     </ClientOnly>
   )
 }
+
+

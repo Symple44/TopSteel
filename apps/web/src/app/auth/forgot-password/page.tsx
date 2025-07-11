@@ -1,6 +1,6 @@
 'use client'
 
-import { Alert, AlertDescription, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from '@erp/ui'
+import { Alert, AlertDescription, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input, Label } from '@erp/ui'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, ArrowLeft, Building2, CheckCircle, Loader2, Mail } from 'lucide-react'
@@ -161,4 +161,6 @@ export default function ForgotPasswordPage() {
     </div>
   )
 }
+
+
 
