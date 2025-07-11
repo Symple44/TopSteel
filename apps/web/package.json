@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "prebuild": "biome check src/ --reporter=summary || true",
+    "prebuild": "biome check src/ --diagnostic-level=warn || echo Continue malgre warnings",
     "build:check": "biome check src/ && next build",
     "build:fix": "biome check --apply src/ && next build",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 NODE_ENV=production next build",
