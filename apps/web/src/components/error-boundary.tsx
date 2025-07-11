@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import { AlertTriangle, Bug, Home, RefreshCw } from 'lucide-react'
@@ -248,8 +249,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
 
             {/* Actions */}
             <div className="space-y-3">
-              <button
-                type="button"
+              <Button
                 onClick={this.handleManualRetry}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
               >
@@ -258,8 +258,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
               </button>
 
               <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
+                <Button
                   onClick={this.handleGoHome}
                   className="flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-3 py-2 rounded-md hover:bg-secondary/80 transition-colors text-sm"
                 >
@@ -267,8 +266,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                   Accueil
                 </button>
 
-                <button
-                  type="button"
+                <Button
                   onClick={this.handleReportBug}
                   className="flex items-center justify-center gap-2 bg-muted text-muted-foreground px-3 py-2 rounded-md hover:bg-muted/80 transition-colors text-sm"
                 >
@@ -334,8 +332,7 @@ export function ErrorTrigger({ children }: { children?: ReactNode }) {
   return (
     <div>
       {children}
-      <button
-        type="button"
+      <Button
         onClick={() => setShouldError(true)}
         className="mt-4 px-3 py-1 bg-destructive text-destructive-foreground rounded text-xs"
       >

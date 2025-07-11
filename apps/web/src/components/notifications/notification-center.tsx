@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import { useNotifications } from '@/components/providers/notifications-provider'
@@ -51,7 +52,7 @@ export function NotificationCenter() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button type="button" variant="ghost" size="sm" className="relative">
+        <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-4 w-4" />
           {state.unreadCount > 0 && (
             <Badge
@@ -70,13 +71,13 @@ export function NotificationCenter() {
             <h3 className="font-semibold">Notifications</h3>
             <div className="flex gap-1">
               {state.unreadCount > 0 && (
-                <button type="button" variant="ghost" size="sm" onClick={actions.markAllAsRead}>
+                <Button variant="ghost" size="sm" onClick={actions.markAllAsRead}>
                   <CheckCheck className="h-4 w-4" />
                 </Button>
               )}
               <Dialog open={showSettings} onOpenChange={setShowSettings}>
                 <DialogTrigger asChild>
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Settings className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
@@ -157,9 +158,7 @@ export function NotificationCenter() {
                       </div>
 
                       {notification.actionUrl && notification.actionLabel && (
-                        <button
-                          type="button"
-                          variant="outline"
+                        <Button variant="outline"
                           size="sm"
                           className="text-xs h-6 px-2"
                           onClick={(e) => {
@@ -173,8 +172,7 @@ export function NotificationCenter() {
                     </div>
                   </div>
 
-                  <button
-                    type="button"
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation()
                       actions.removeNotification(notification.id)
@@ -194,9 +192,7 @@ export function NotificationCenter() {
           <>
             <Separator />
             <div className="p-2">
-              <button
-                type="button"
-                variant="ghost"
+              <Button variant="ghost"
                 size="sm"
                 className="w-full text-gray-500 hover:text-red-600"
                 onClick={actions.clearAll}

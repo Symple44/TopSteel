@@ -126,13 +126,13 @@ export function StocksTable() {
                 <td className="p-4">{getStatutBadge(stock.statut)}</td>
                 <td className="p-4">
                   <div className="flex items-center justify-end gap-1">
-                    <button type="button" variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <button type="button" variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <button type="button" variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </div>

@@ -1,3 +1,6 @@
+import { Button } from '@erp/ui'
+'use client'
+
 // apps/web/src/components/facturation/devis-table.tsx
 'use client'
 
@@ -98,15 +101,15 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
               <TableCell>{formatDate(devis.dateValidite)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-2">
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button type="button" variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>

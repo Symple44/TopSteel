@@ -81,7 +81,7 @@ export function NotificationSettings() {
       </div>
 
       <div className="pt-4 border-t">
-        <button type="button" variant="outline" className="w-full" onClick={handleTestNotification}>
+        <Button variant="outline" className="w-full" onClick={handleTestNotification}>
           Tester les notifications
         </Button>
       </div>

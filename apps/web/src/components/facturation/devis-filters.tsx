@@ -1,3 +1,6 @@
+import { Button } from '@erp/ui'
+'use client'
+
 // apps/web/src/components/facturation/devis-filters.tsx
 'use client'
 
@@ -52,12 +55,12 @@ export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
         </SelectContent>
       </Select>
 
-      <button type="button" variant="outline" size="sm">
+      <Button variant="outline" size="sm">
         <Filter className="h-4 w-4 mr-2" />
         Filtres
       </Button>
 
-      <button type="button" variant="outline" size="sm">
+      <Button variant="outline" size="sm">
         <X className="h-4 w-4 mr-2" />
         Effacer
       </Button>

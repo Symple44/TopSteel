@@ -26,7 +26,7 @@ const PageActions = memo(function PageActions({
     <div className="flex items-center gap-2">
       {/* Bouton Nouveau projet */}
       <Link href="/projets/nouveau">
-        <button type="button">
+        <Button>
           <Plus className="h-4 w-4 mr-2" />
           Nouveau projet
         </Button>
@@ -34,8 +34,7 @@ const PageActions = memo(function PageActions({
 
       {/* Toggle vue */}
       <div className="flex border rounded-md">
-        <button
-          type="button"
+        <Button
           variant={view === 'grid' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => onViewChange('grid')}
@@ -43,8 +42,7 @@ const PageActions = memo(function PageActions({
         >
           <Grid className="h-4 w-4" />
         </Button>
-        <button
-          type="button"
+        <Button
           variant={view === 'table' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => onViewChange('table')}
@@ -55,7 +53,7 @@ const PageActions = memo(function PageActions({
       </div>
 
       {/* Bouton Actualiser */}
-      <button type="button" variant="outline" size="sm" onClick={onRefresh} disabled={isLoading}>
+      <Button variant="outline" size="sm" onClick={onRefresh} disabled={isLoading}>
         <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
       </Button>
     </div>
@@ -140,18 +138,14 @@ export default function ProjetsPage() {
         label: 'Actions',
         render: (value: unknown, projet: Projet) => (
           <div className="flex gap-1">
-            <button
-              type="button"
-              variant="ghost"
+            <Button variant="ghost"
               size="sm"
               onClick={() => router.push(`/projets/${projet.id}`)}
               aria-label={`Voir le projet ${projet.reference}`}
             >
               <Eye className="h-4 w-4" />
             </Button>
-            <button
-              type="button"
-              variant="ghost"
+            <Button variant="ghost"
               size="sm"
               onClick={() => router.push(`/projets/${projet.id}/edit`)}
               aria-label={`Modifier le projet ${projet.reference}`}
@@ -200,7 +194,7 @@ export default function ProjetsPage() {
         <div className="text-center">
           <p className="text-lg font-medium text-red-600">Erreur lors du chargement</p>
           <p className="text-gray-600">Impossible de charger les projets</p>
-          <button type="button" onClick={handleRefresh} className="mt-4">
+          <Button onClick={handleRefresh} className="mt-4">
             Réessayer
           </Button>
         </div>
@@ -262,7 +256,7 @@ export default function ProjetsPage() {
                   </p>
                   {!searchTerm && (
                     <Link href="/projets/nouveau">
-                      <button type="button">
+                      <Button>
                         <Plus className="h-4 w-4 mr-2" />
                         Créer un projet
                       </Button>

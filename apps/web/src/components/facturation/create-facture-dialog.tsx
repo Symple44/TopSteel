@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import {
@@ -80,7 +81,7 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button type="button">
+        <Button>
           <Plus className="h-4 w-4 mr-2" />
           Nouvelle Facture
         </Button>

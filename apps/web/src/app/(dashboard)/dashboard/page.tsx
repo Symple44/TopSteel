@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar } from 'lucide-react'
+
 import React from 'react'
 
 
@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   ArrowUpRight,
   BarChart3,
-  Calendar,
   Clock,
   Euro,
   Factory,
@@ -19,7 +18,7 @@ import {
   Shield,
   Target,
   TrendingUp,
-} from 'lucide-react'
+, Calendar as CalendarIcon} from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 // Types pour les données du dashboard
@@ -223,7 +222,7 @@ export default function Dashboard() {
               size="sm"
               className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white"
             >
-              <Calendar className="mr-2 h-4 w-4 text-slate-600" />
+              <CalendarIcon className="mr-2 h-4 w-4 text-slate-600" />
               Cette semaine
             </Button>
             <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">

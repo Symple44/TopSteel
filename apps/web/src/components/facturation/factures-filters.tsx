@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 // apps/web/src/components/facturation/factures-filters.tsx
 'use client'
 
@@ -40,12 +41,12 @@ export function FacturesFilters({ onFiltersChange }: FacturesFiltersProps) {
         </SelectContent>
       </Select>
 
-      <button type="button" variant="outline" size="sm">
+      <Button variant="outline" size="sm">
         <Filter className="h-4 w-4 mr-2" />
         Filtres
       </Button>
 
-      <button type="button" variant="outline" size="sm">
+      <Button variant="outline" size="sm">
         <X className="h-4 w-4 mr-2" />
         Effacer
       </Button>

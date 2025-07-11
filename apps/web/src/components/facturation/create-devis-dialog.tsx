@@ -38,7 +38,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
       <Card className="w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle>Créer un nouveau devis</CardTitle>
-          <button type="button" variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
@@ -123,9 +123,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
             </div>
 
             <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
+              <Button variant="outline"
                 onClick={() => onOpenChange(false)}
                 className="flex-1"
               >

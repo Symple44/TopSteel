@@ -1,7 +1,7 @@
 'use client'
 
-import { Badge, Button, Card, Input, Plus, Tabs } from '@erp/ui'
-import { Plus } from 'lucide-react'
+import { Badge, Button, Card, Input, Tabs } from '@erp/ui'
+
 import React from 'react'
 
 
@@ -41,11 +41,10 @@ import {
   Eye,
   FileText,
   History,
-  Plus,
   Save,
   TrendingUp,
   X,
-} from 'lucide-react'
+, Plus as PlusIcon} from 'lucide-react'
 import { useState } from 'react'
 
 // Données mockées pour la démonstration
@@ -116,7 +115,7 @@ export default function ChiffragePage() {
             Historique
           </Button>
           <Button>
-            <Plus className="h-4 w-4 mr-2" />
+            <PlusIconIcon className="h-4 w-4 mr-2" />
             Nouveau chiffrage
           </Button>
         </div>
@@ -188,7 +187,7 @@ export default function ChiffragePage() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Éléments du chiffrage</h3>
                   <Button size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
+                    <PlusIconIcon className="h-4 w-4 mr-2" />
                     Ajouter un élément
                   </Button>
                 </div>

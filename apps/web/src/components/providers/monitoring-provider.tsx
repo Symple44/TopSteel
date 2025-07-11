@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 // apps/web/src/components/providers/monitoring-provider.tsx
 'use client'
 
@@ -53,13 +54,13 @@ function ErrorFallback({
           <pre className="mt-2 text-red-600 overflow-auto">{error.message}</pre>
         </details>
         <div className="space-x-4">
-          <button
+          <Button
             onClick={resetErrorBoundary}
             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
           >
             Réessayer
           </button>
-          <button
+          <Button
             onClick={() => window.location.reload()}
             className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors"
           >

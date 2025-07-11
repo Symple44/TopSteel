@@ -59,7 +59,7 @@ export function StockAlertsPanel() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button type="button" size="sm" variant="outline">
+            <Button size="sm" variant="outline">
               <ShoppingCart className="h-3 w-3 mr-1" />
               Commander
             </Button>

@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import { AddMaterialDialog } from '@/components/stocks/add-material-dialog'
@@ -34,9 +35,7 @@ export default function StocksPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button
-            type="button"
-            variant="outline"
+          <Button variant="outline"
             onClick={() => setShowAlerts(!showAlerts)}
             className="relative"
           >
@@ -49,11 +48,11 @@ export default function StocksPage() {
               3
             </Badge>
           </Button>
-          <button type="button" variant="outline" onClick={() => setShowFilters(!showFilters)}>
+          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
-          <button type="button" onClick={() => setShowAddModal(true)}>
+          <Button onClick={() => setShowAddModal(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Ajouter matériau
           </Button>
@@ -138,7 +137,7 @@ export default function StocksPage() {
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Rechercher par référence, nom, fournisseur..." className="pl-10" />
         </div>
-        <button type="button" variant="outline">
+        <Button variant="outline">
           <TrendingDown className="h-4 w-4 mr-2" />
           Mouvements
         </Button>

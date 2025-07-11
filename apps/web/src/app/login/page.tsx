@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import { useAuth } from '@/hooks/use-auth'
@@ -106,8 +107,7 @@ export default function LoginPage() {
                   <h3 className="text-sm font-medium text-green-800">Succès</h3>
                   <p className="mt-1 text-sm text-green-700">{success}</p>
                 </div>
-                <button
-                  type="button"
+                <Button
                   className="flex-shrink-0 text-green-400 hover:text-green-600 transition-colors"
                   onClick={() => setSuccess(null)}
                   aria-label="Fermer le message de succès"
@@ -168,8 +168,7 @@ export default function LoginPage() {
                   }`}
                   autoComplete="current-password"
                 />
-                <button
-                  type="button"
+                <Button
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
@@ -197,7 +196,7 @@ export default function LoginPage() {
                 </label>
               </div>
 
-              <button
+              <Button
                 type="submit"
                 disabled={isLoading}
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:transform-none disabled:hover:shadow-lg flex items-center justify-center space-x-2"
@@ -242,8 +241,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <button
-              type="button"
+            <Button
               className="w-full inline-flex justify-center py-3 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
               aria-label="Se connecter avec Google"
             >
@@ -268,8 +266,7 @@ export default function LoginPage() {
               <span className="ml-2">Google</span>
             </button>
 
-            <button
-              type="button"
+            <Button
               className="w-full inline-flex justify-center py-3 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
               aria-label="Se connecter avec Twitter"
             >

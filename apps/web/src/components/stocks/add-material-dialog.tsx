@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import {
@@ -426,9 +427,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
 
           {/* ✅ Actions */}
           <div className="flex gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
+            <Button variant="outline"
               onClick={handleCancel}
               className="flex-1"
               disabled={loading}

@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import {
@@ -64,7 +65,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium">Filtres avancés</h3>
-        <button type="button" variant="ghost" size="sm" onClick={handleReset}>
+        <Button variant="ghost" size="sm" onClick={handleReset}>
           <RotateCcw className="h-4 w-4 mr-2" />
           Réinitialiser
         </Button>

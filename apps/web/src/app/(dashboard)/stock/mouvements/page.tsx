@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 /**
  * 📦 PAGE MOUVEMENTS STOCK SSR-SAFE - TopSteel ERP
  * Version corrigée pour éviter les erreurs SSR/hydratation
@@ -229,11 +230,11 @@ export default function MouvementsPage() {
           <p className="text-muted-foreground">Historique et suivi des entrées/sorties</p>
         </div>
         <div className="flex gap-2">
-          <button type="button" variant="outline">
+          <Button variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Exporter
           </Button>
-          <button type="button" onClick={handleShowCreateModal}>
+          <Button onClick={handleShowCreateModal}>
             <Plus className="h-4 w-4 mr-2" />
             Nouveau mouvement
           </Button>

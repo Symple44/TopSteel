@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 // apps/web/src/components/facturation/factures-table.tsx
 'use client'
 
@@ -84,13 +85,13 @@ export function FacturesTable({ data = mockFactures }: FacturesTableProps) {
               <TableCell>{formatDate(facture.dateEcheance)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-2">
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>

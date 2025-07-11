@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import { formatCurrency, formatDate } from '@/lib/utils'
@@ -122,13 +123,13 @@ export function PaiementsTable({ type, data }: PaiementsTableProps) {
               <TableCell>{getStatusBadge(paiement.statut)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-1">
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <button type="button" variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>

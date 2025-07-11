@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import {
@@ -120,7 +121,7 @@ export function CreatePaiementDialog({
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
             <Button type="submit" disabled={loading}>

@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 /**
@@ -400,8 +401,7 @@ export default function RegisterPage() {
                     className={errors.password ? 'border-red-500' : ''}
                     {...register('password')}
                   />
-                  <button
-                    type="button"
+                  <Button
                     onClick={togglePasswordVisibility}
                     className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors"
                     disabled={state.isLoading}
@@ -453,8 +453,7 @@ export default function RegisterPage() {
                     className={errors.confirmPassword ? 'border-red-500' : ''}
                     {...register('confirmPassword')}
                   />
-                  <button
-                    type="button"
+                  <Button
                     onClick={toggleConfirmPasswordVisibility}
                     className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors"
                     disabled={state.isLoading}

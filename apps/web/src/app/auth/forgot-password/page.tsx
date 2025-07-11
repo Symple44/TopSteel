@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 'use client'
 
 import {
@@ -87,7 +88,7 @@ export default function ForgotPasswordPage() {
 
             <CardFooter className="flex flex-col space-y-4">
               <Link href="/login" className="w-full">
-                <button type="button" variant="outline" className="w-full h-11">
+                <Button variant="outline" className="w-full h-11">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Retour à la connexion
                 </Button>
@@ -156,7 +157,7 @@ export default function ForgotPasswordPage() {
               </Button>
 
               <Link href="/login" className="w-full">
-                <button type="button" variant="outline" className="w-full h-11">
+                <Button variant="outline" className="w-full h-11">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Retour à la connexion
                 </Button>

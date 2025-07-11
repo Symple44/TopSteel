@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 // apps/web/src/components/production/create-ordre-dialog.tsx - VERSION CORRIGÉE
 'use client'
 
@@ -157,7 +158,7 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
             <Button type="submit">Créer l'ordre</Button>
@@ -347,7 +348,7 @@ export function CreateOrdreDialogAdvanced({
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
             <Button type="submit">Créer l'ordre</Button>
