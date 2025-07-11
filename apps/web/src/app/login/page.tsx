@@ -1,9 +1,10 @@
 'use client'
 
+import { Button, Input, Label } from '@erp/ui'
 import { useAuth } from '@/hooks/use-auth'
 import type { FormattedError } from '@/lib/error-handler'
 import { ErrorHandler } from '@/lib/error-handler'
-import { ErrorAlert } from '@erp/ui'
+import { Button, Input, Label } from '@erp/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Building2, CheckCircle, Eye, EyeOff, Loader2, Lock, Mail, X } from 'lucide-react'
 import Link from 'next/link'
@@ -113,7 +114,7 @@ export default function LoginPage() {
                   title="Fermer"
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
             )}
 
@@ -174,7 +175,7 @@ export default function LoginPage() {
                   title={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                 >
                   {showPassword ? <EyeOff /> : <Eye />}
-                </button>
+                </Button>
               </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
@@ -208,7 +209,7 @@ export default function LoginPage() {
                 ) : (
                   <span>Se connecter</span>
                 )}
-              </button>
+              </Button>
             </div>
           </form>
 
@@ -263,7 +264,7 @@ export default function LoginPage() {
                 />
               </svg>
               <span className="ml-2">Google</span>
-            </button>
+            </Button>
 
             <Button
               className="w-full inline-flex justify-center py-3 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
@@ -273,7 +274,7 @@ export default function LoginPage() {
                 <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
               </svg>
               <span className="ml-2">Twitter</span>
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -290,3 +291,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

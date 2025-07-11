@@ -254,7 +254,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
               >
                 <RefreshCw className="w-4 h-4" />
                 Réessayer
-              </button>
+              </Button>
 
               <div className="grid grid-cols-2 gap-2">
                 <Button
@@ -263,7 +263,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                 >
                   <Home className="w-4 h-4" />
                   Accueil
-                </button>
+                </Button>
 
                 <Button
                   onClick={this.handleReportBug}
@@ -271,7 +271,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                 >
                   <Bug className="w-4 h-4" />
                   Signaler
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -336,7 +336,8 @@ export function ErrorTrigger({ children }: { children?: ReactNode }) {
         className="mt-4 px-3 py-1 bg-destructive text-destructive-foreground rounded text-xs"
       >
         🧨 Test Error
-      </button>
+      </Button>
     </div>
   )
 }
+

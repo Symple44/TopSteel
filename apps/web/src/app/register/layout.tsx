@@ -1,9 +1,3 @@
-/**
- * 🔐 LAYOUT REGISTER - TopSteel ERP
- * Layout pour la page d'inscription avec métadonnées optimisées
- * Fichier: apps/web/src/app/register/layout.tsx
- */
-
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 
@@ -106,17 +100,11 @@ interface RegisterLayoutProps {
 
 // ===== COMPOSANT LAYOUT =====
 
-/**
- * Layout spécifique pour la page d'inscription
- * Optimisé pour la conversion et l'accessibilité
- */
 export default function RegisterLayout({ children }: RegisterLayoutProps) {
   return (
     <div className="register-layout min-h-screen bg-gray-50">
-      {/* SEO Schema.org pour la page d'inscription */}
       <script
         type="application/ld+json"
-        /* biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structure */`n
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
@@ -145,17 +133,17 @@ export default function RegisterLayout({ children }: RegisterLayoutProps) {
         }}
       />
 
-      {/* Header minimal pour la page d'inscription */}
+      {}
       <header className="sr-only">
         <h1>Inscription TopSteel ERP</h1>
       </header>
 
-      {/* Contenu principal */}
+      {}
       <main className="register-content" id="main-content">
         {children}
       </main>
 
-      {/* Footer minimal pour légal */}
+      {}
       <footer className="text-center py-4 text-sm text-gray-500 border-t">
         <div className="container mx-auto px-4">
           <p>
@@ -197,3 +185,4 @@ export const runtime = 'nodejs'
 
 // Segment config pour optimiser le bundle
 export const preferredRegion = 'auto'
+

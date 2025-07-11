@@ -157,7 +157,8 @@ export function NotificationCenter() {
                       </div>
 
                       {notification.actionUrl && notification.actionLabel && (
-                        <Button variant="outline"
+                        <Button
+                          variant="outline"
                           size="sm"
                           className="text-xs h-6 px-2"
                           onClick={(e) => {
@@ -191,7 +192,8 @@ export function NotificationCenter() {
           <>
             <Separator />
             <div className="p-2">
-              <Button variant="ghost"
+              <Button
+                variant="ghost"
                 size="sm"
                 className="w-full text-gray-500 hover:text-red-600"
                 onClick={actions.clearAll}

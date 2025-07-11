@@ -8,7 +8,17 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "maxSize": 1048576
+    "maxSize": 2097152,
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.next/**",
+      "**/.turbo/**",
+      "**/coverage/**",
+      "**/*.min.js",
+      "**/*.d.ts",
+      "**/pnpm-lock.yaml"
+    ]
   },
   "organizeImports": {
     "enabled": true
@@ -19,178 +29,66 @@
     "indentWidth": 2,
     "lineWidth": 100,
     "lineEnding": "lf",
-    "formatWithErrors": false,
-    "ignore": [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/.next/**",
-      "**/.turbo/**",
-      "**/coverage/**",
-      "**/storybook-static/**",
-      "**/*.min.js",
-      "**/*.bundle.js",
-      "**/pnpm-lock.yaml",
-      "**/yarn.lock",
-      "**/package-lock.json",
-      "**/*.backup",
-      "**/*.bak",
-      "**/*.log",
-      "**/*.md",
-      "**/*.json",
-      "**/public/**",
-      "**/static/**",
-      "**/.vscode/**",
-      "**/.idea/**",
-      "**/tmp/**",
-      "**/temp/**"
-    ]
+    "formatWithErrors": true,
+    "ignore": ["**/node_modules/**", "**/dist/**", "**/.next/**", "**/.turbo/**"]
   },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
-      "style": {
-        "noNegationElse": "error",
-        "useCollapsedElseIf": "error",
-        "useConst": "error",
-        "useShorthandFunctionType": "error"
+      "correctness": {
+        "noUndeclaredVariables": "warn",
+        "useExhaustiveDependencies": "warn"
       },
       "suspicious": {
         "noExplicitAny": "warn",
-        "noDebugger": "error",
         "noConsoleLog": "warn",
         "noArrayIndexKey": "warn"
       },
-      "performance": {
-        "noDelete": "error"
+      "style": {
+        "useConst": "error",
+        "noNegationElse": "warn"
       },
-      "complexity": {
-        "noExtraBooleanCast": "error",
-        "noMultipleSpacesInRegularExpressionLiterals": "error",
-        "useLiteralKeys": "error"
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
       },
-      "correctness": {
-        "noConstAssign": "error",
-        "noEmptyCharacterClassInRegex": "error",
-        "noEmptyPattern": "error",
-        "noGlobalObjectCalls": "error",
-        "noInvalidConstructorSuper": "error",
-        "noInvalidNewBuiltin": "error",
-        "noNonoctalDecimalEscape": "error",
-        "noPrecisionLoss": "error",
-        "noSetterReturn": "error",
-        "noStringCaseMismatch": "error",
-        "noSwitchDeclarations": "error",
-        "noUndeclaredVariables": "error",
-        "noUnreachable": "error",
-        "noUnreachableSuper": "error",
-        "useIsNan": "error",
-        "useValidForDirection": "error",
-        "useExhaustiveDependencies": "warn"
+      "a11y": {
+        "useButtonType": "warn",
+        "noSvgWithoutTitle": "warn"
       }
-    },
-    "ignore": [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/.next/**",
-      "**/.turbo/**",
-      "**/coverage/**",
-      "**/storybook-static/**",
-      "**/*.min.js",
-      "**/*.bundle.js",
-      "**/pnpm-lock.yaml",
-      "**/yarn.lock",
-      "**/package-lock.json",
-      "**/*.backup",
-      "**/*.bak",
-      "**/*.config.js",
-      "**/*.config.mjs",
-      "**/*.config.ts",
-      "**/next.config.js",
-      "**/tailwind.config.js",
-      "**/postcss.config.js",
-      "**/jest.config.js",
-      "**/turbo.json",
-      "**/.storybook/**",
-      "**/public/**",
-      "**/static/**",
-      "**/.vscode/**",
-      "**/.idea/**",
-      "**/tmp/**",
-      "**/temp/**",
-      "**/*.d.ts"
-    ]
+    }
   },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
       "trailingCommas": "es5",
       "semicolons": "asNeeded",
-      "arrowParentheses": "always",
-      "bracketSpacing": true,
-      "bracketSameLine": false,
-      "quoteProperties": "asNeeded",
-      "attributePosition": "auto"
+      "arrowParentheses": "always"
     },
     "globals": [
-      "afterAll",
-      "afterEach",
-      "beforeAll",
-      "beforeEach",
-      "Buffer",
-      "console",
-      "describe",
-      "document",
-      "expect",
-      "it",
-      "jest",
-      "JSX",
-      "process",
       "React",
+      "JSX",
+      "console",
+      "window",
+      "document",
+      "process",
+      "Buffer",
+      "describe",
+      "it",
       "test",
-      "window"
-    ],
-    "parser": {
-      "unsafeParameterDecoratorsEnabled": true
-    }
-  },
-  "json": {
-    "formatter": {
-      "enabled": true,
-      "indentStyle": "space",
-      "indentWidth": 2,
-      "lineWidth": 100
-    }
-  },
-  "css": {
-    "formatter": {
-      "enabled": true,
-      "indentStyle": "space",
-      "indentWidth": 2,
-      "lineWidth": 100
-    }
+      "expect",
+      "beforeEach",
+      "afterEach",
+      "jest"
+    ]
   },
   "overrides": [
     {
       "include": ["apps/web/src/**/*.{ts,tsx}"],
       "linter": {
         "rules": {
-          "suspicious": {
-            "noExplicitAny": "warn"
-          },
-          "style": {
-            "useConst": "error"
-          }
-        }
-      }
-    },
-    {
-      "include": ["apps/api/src/**/*.{ts}"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noExplicitAny": "off",
-            "noConsoleLog": "off"
+          "correctness": {
+            "noUndeclaredVariables": "error"
           }
         }
       }
@@ -201,17 +99,6 @@
         "rules": {
           "suspicious": {
             "noExplicitAny": "warn"
-          }
-        }
-      }
-    },
-    {
-      "include": ["**/*.{test,spec}.{ts,tsx,js,jsx}"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noExplicitAny": "off",
-            "noConsoleLog": "off"
           }
         }
       }

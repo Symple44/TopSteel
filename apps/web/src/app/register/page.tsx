@@ -1,5 +1,16 @@
 'use client'
 
+import {
+  Input,
+  Card,
+  CardContent,
+  Label,
+  Button,
+  AlertDescription,
+  CardTitle,
+  CardHeader,
+} from '@erp/ui'
+
 /**
  * 🔐 PAGE REGISTER ROBUSTE - TopSteel ERP
  * Page d'inscription avec gestion d'erreurs robuste et hydratation sécurisée

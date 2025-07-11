@@ -5,7 +5,7 @@ import type { DataSource } from 'typeorm'
 
 @Injectable()
 export class IntegrityService {
-  private readonly logger = new Logger(IntegrityService.name)
+  private readonly logger = new Logger(IntegrityService.name);
 
   constructor(
     @InjectDataSource()
