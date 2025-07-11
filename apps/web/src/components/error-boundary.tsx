@@ -1,4 +1,3 @@
-import { Button } from '@erp/ui'
 'use client'
 
 import { AlertTriangle, Bug, Home, RefreshCw } from 'lucide-react'

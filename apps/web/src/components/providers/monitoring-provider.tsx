@@ -1,4 +1,3 @@
-import { Button } from '@erp/ui'
 // apps/web/src/components/providers/monitoring-provider.tsx
 'use client'
 

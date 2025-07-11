@@ -1,11 +1,10 @@
-import { Button } from '@erp/ui'
+'use client'
+
 import React from 'react'
 /**
  * Page Dashboard Error - TopSteel ERP
  * Fichier: apps/web/src/app/(dashboard)/error.tsx
  */
-
-;('use client')
 
 import Link from 'next/link'
 

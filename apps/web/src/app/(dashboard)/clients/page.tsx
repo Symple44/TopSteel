@@ -1,5 +1,8 @@
-import { Button } from '@erp/ui'
 'use client'
+
+
+
+
 
 import { Filter, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
@@ -14,12 +17,10 @@ export default function ClientsPage() {
           <h1 className="text-2xl font-semibold">Clients</h1>
           <p className="text-muted-foreground">Gestion de vos clients</p>
         </div>
-        <Button
-          className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md"
-        >
+        <Button className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md">
           <Plus className="h-4 w-4 mr-2" />
           Nouveau client
-        </button>
+        </Button>
       </div>
 
       <div className="flex items-center space-x-4">
@@ -36,7 +37,7 @@ export default function ClientsPage() {
         <Button className="inline-flex items-center px-4 py-2 border rounded-md">
           <Filter className="h-4 w-4 mr-2" />
           Filtres
-        </button>
+        </Button>
       </div>
 
       <div className="border rounded-lg">
@@ -49,12 +50,8 @@ export default function ClientsPage() {
                 <p className="text-sm text-muted-foreground">contact@abc.fr</p>
               </div>
               <div className="flex space-x-2">
-                <Button className="px-3 py-1 text-xs border rounded">
-                  Voir
-                </button>
-                <Button className="px-3 py-1 text-xs border rounded">
-                  Modifier
-                </button>
+                <Button className="px-3 py-1 text-xs border rounded">Voir</Button>
+                <Button className="px-3 py-1 text-xs border rounded">Modifier</Button>
               </div>
             </div>
             <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -63,12 +60,8 @@ export default function ClientsPage() {
                 <p className="text-sm text-muted-foreground">info@xyz.com</p>
               </div>
               <div className="flex space-x-2">
-                <Button className="px-3 py-1 text-xs border rounded">
-                  Voir
-                </button>
-                <Button className="px-3 py-1 text-xs border rounded">
-                  Modifier
-                </button>
+                <Button className="px-3 py-1 text-xs border rounded">Voir</Button>
+                <Button className="px-3 py-1 text-xs border rounded">Modifier</Button>
               </div>
             </div>
           </div>

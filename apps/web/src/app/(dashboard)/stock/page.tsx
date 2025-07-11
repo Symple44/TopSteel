@@ -1,5 +1,4 @@
-import { Button } from '@erp/ui'
-'use client'
+;('use client')
 
 import { AddMaterialDialog } from '@/components/stocks/add-material-dialog'
 import { StockAlertsPanel } from '@/components/stocks/stock-alerts-panel'
@@ -35,10 +34,7 @@ export default function StocksPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline"
-            onClick={() => setShowAlerts(!showAlerts)}
-            className="relative"
-          >
+          <Button variant="outline" onClick={() => setShowAlerts(!showAlerts)} className="relative">
             <AlertTriangle className="h-4 w-4 mr-2" />
             Alertes
             <Badge

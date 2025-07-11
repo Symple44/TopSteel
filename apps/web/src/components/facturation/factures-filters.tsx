@@ -1,6 +1,5 @@
-import { Button } from '@erp/ui'
 // apps/web/src/components/facturation/factures-filters.tsx
-'use client'
+;('use client')
 
 import {
   Button,

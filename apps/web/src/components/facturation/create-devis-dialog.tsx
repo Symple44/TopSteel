@@ -123,10 +123,7 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
             </div>
 
             <div className="flex gap-2 pt-4">
-              <Button variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
                 Annuler
               </Button>
               <Button type="submit" className="flex-1">

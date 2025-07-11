@@ -1,5 +1,4 @@
-import { Button } from '@erp/ui'
-'use client'
+;('use client')
 
 import { PlanningCalendar } from '@/components/production/planning-calendar'
 import { PlanningGantt } from '@/components/production/planning-gantt'
@@ -106,7 +105,8 @@ export default function PlanningPage() {
               Semaine du {currentWeek.toLocaleDateString()}
             </CardTitle>
             <div className="flex gap-2">
-              <Button variant="outline"
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() =>
                   setCurrentWeek(new Date(currentWeek.getTime() - 7 * 24 * 60 * 60 * 1000))
@@ -114,7 +114,8 @@ export default function PlanningPage() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button variant="outline"
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() =>
                   setCurrentWeek(new Date(currentWeek.getTime() + 7 * 24 * 60 * 60 * 1000))

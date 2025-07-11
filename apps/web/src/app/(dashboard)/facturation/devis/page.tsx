@@ -2,7 +2,6 @@
 
 import React from 'react'
 
-
 import { CreateDevisDialog } from '@/components/facturation/create-devis-dialog'
 import { DevisFilters } from '@/components/facturation/devis-filters'
 import { DevisTable } from '@/components/facturation/devis-table'

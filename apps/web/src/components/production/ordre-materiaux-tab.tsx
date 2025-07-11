@@ -2,7 +2,6 @@
 
 import React from 'react'
 
-
 import { Badge, Button, Card, CardContent } from '@erp/ui'
 
 import { AlertTriangle, Package, Plus } from 'lucide-react'

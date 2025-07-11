@@ -1,11 +1,10 @@
-import { Button } from '@erp/ui'
 /**
  * 📦 PAGE MOUVEMENTS STOCK SSR-SAFE - TopSteel ERP
  * Version corrigée pour éviter les erreurs SSR/hydratation
  * Fichier: apps/web/src/app/(dashboard)/stock/mouvements/page.tsx
  */
 
-'use client'
+;('use client')
 
 import { ClientOnly } from '@/components/client-only'
 import {

@@ -1,5 +1,4 @@
-import { Button } from '@erp/ui'
-'use client'
+;('use client')
 
 import {
   Alert,

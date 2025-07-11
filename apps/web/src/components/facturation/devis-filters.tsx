@@ -1,8 +1,6 @@
-import { Button } from '@erp/ui'
 'use client'
 
 // apps/web/src/components/facturation/devis-filters.tsx
-'use client'
 
 import {
   Button,

@@ -1,6 +1,5 @@
-import { Button } from '@erp/ui'
 // apps/web/src/components/facturation/factures-table.tsx
-'use client'
+;('use client')
 
 import { formatCurrency, formatDate } from '@/lib/utils'
 import {

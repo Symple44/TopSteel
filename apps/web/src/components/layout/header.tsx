@@ -18,7 +18,8 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
       <div className="flex items-center justify-between">
         {/* Section gauche */}
         <div className="flex items-center space-x-4">
-          <Button variant="ghost"
+          <Button
+            variant="ghost"
             size="sm"
             onClick={onToggleSidebar}
             className="text-muted-foreground hover:text-foreground"

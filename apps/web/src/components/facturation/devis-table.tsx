@@ -1,8 +1,6 @@
-import { Button } from '@erp/ui'
 'use client'
 
 // apps/web/src/components/facturation/devis-table.tsx
-'use client'
 
 import { formatCurrency, formatDate } from '@/lib/utils'
 import {

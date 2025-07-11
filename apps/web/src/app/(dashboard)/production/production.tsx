@@ -1,5 +1,4 @@
-import { Button } from '@erp/ui'
-'use client'
+;('use client')
 
 import { Clock, Factory, Filter, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
@@ -14,12 +13,10 @@ export default function ProductionPage() {
           <h1 className="text-2xl font-semibold">Production</h1>
           <p className="text-muted-foreground">Gestion de la production</p>
         </div>
-        <Button
-          className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md"
-        >
+        <Button className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md">
           <Plus className="h-4 w-4 mr-2" />
           Nouvel ordre
-        </button>
+        </Button>
       </div>
 
       <div className="border-b">
@@ -33,7 +30,7 @@ export default function ProductionPage() {
             }`}
           >
             Ordres de fabrication
-          </button>
+          </Button>
           <Button
             onClick={() => setActiveTab('planning')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -43,7 +40,7 @@ export default function ProductionPage() {
             }`}
           >
             Planning
-          </button>
+          </Button>
         </nav>
       </div>
 
