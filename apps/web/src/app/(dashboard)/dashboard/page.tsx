@@ -15,8 +15,7 @@ import {
   Package,
   Shield,
   Target,
-  TrendingUp,
-, Calendar as CalendarIcon} from 'lucide-react'
+  TrendingUp, Calendar as CalendarIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 // Types pour les données du dashboard

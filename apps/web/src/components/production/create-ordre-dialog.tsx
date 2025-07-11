@@ -1,5 +1,6 @@
-// apps/web/src/components/production/create-ordre-dialog.tsx - VERSION CORRIGÉE
-;('use client')
+'use client'
+
+
 
 import {
   Button,

@@ -1,10 +1,13 @@
+import dynamic from 'next/dynamic'
+'use client'
+
 /**
  * 📦 PAGE MOUVEMENTS STOCK SSR-SAFE - TopSteel ERP
  * Version corrigée pour éviter les erreurs SSR/hydratation
  * Fichier: apps/web/src/app/(dashboard)/stock/mouvements/page.tsx
  */
 
-;('use client')
+
 
 import { ClientOnly } from '@/components/client-only'
 import {
@@ -366,7 +369,7 @@ const MouvementsChart = dynamic(
       default: mod.MouvementsChart,
     })),
   {
-    ssr: false,
+    
     loading: () => (
       <div className="h-[300px] flex items-center justify-center">
         <div className="animate-pulse">
@@ -387,7 +390,7 @@ const MouvementsTable = dynamic(
       default: mod.MouvementsTable,
     })),
   {
-    ssr: false,
+    
     loading: () => (
       <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
@@ -409,9 +412,8 @@ const CreateMouvementDialog = dynamic(
       default: mod.CreateMouvementDialog,
     })),
   {
-    ssr: false,
+    
   }
 )
 
-// Ne pas oublier l'import dynamic en haut du fichier
-import dynamic from 'next/dynamic'
+

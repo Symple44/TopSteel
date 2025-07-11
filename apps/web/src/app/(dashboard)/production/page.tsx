@@ -1,5 +1,7 @@
+'use client'
+
 import React from 'react'
-;('use client')
+
 
 import { CreateOrdreDialog } from '@/components/production/create-ordre-dialog'
 import { ProductionFilters } from '@/components/production/production-filters'

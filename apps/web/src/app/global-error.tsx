@@ -1,3 +1,4 @@
+import { Button } from '@erp/ui'
 /**
  * Page Global Error - TopSteel ERP
  * Fichier: apps/web/src/app/global-error.tsx
@@ -31,7 +32,7 @@ export default function GlobalError({
                 className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Réessayer
-              </button>
+              </Button>
 
               <div className="text-sm text-muted-foreground">
                 <a href="/dashboard" className="hover:text-foreground transition-colors">
