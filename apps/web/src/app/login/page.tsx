@@ -61,7 +61,7 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password)
       // La redirection sera gérée par l'useEffect
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erreur lors de la connexion:', err)
 
       const formattedError = ErrorHandler.formatError(err)
@@ -294,3 +294,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

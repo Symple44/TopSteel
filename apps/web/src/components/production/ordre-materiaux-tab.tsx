@@ -16,7 +16,7 @@ interface Materiau {
 }
 
 interface OrdreMateriauxTabProps {
-  ordre: any // Interface cohérente avec les autres composants
+  ordre: unknown // Interface cohérente avec les autres composants
 }
 
 export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
@@ -67,7 +67,7 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
             Liste des matériaux nécessaires pour cet ordre de fabrication
           </p>
         </div>
-        <Button size="sm">
+        <button type="button" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Ajouter matériau
         </Button>
@@ -134,10 +134,10 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
               </div>
             </div>
             <div className="mt-4 flex gap-2">
-              <Button variant="outline" size="sm">
+              <button type="button" variant="outline" size="sm">
                 Générer commande
               </Button>
-              <Button variant="outline" size="sm">
+              <button type="button" variant="outline" size="sm">
                 Vérifier alternatives
               </Button>
             </div>
@@ -147,3 +147,4 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
     </div>
   )
 }
+

@@ -20,11 +20,11 @@ export default function DevisPage() {
           <p className="text-muted-foreground">Création, suivi et conversion des devis</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
+          <button type="button" variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
-          <Button onClick={() => setShowCreateModal(true)}>
+          <button type="button" onClick={() => setShowCreateModal(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Nouveau devis
           </Button>
@@ -92,7 +92,7 @@ export default function DevisPage() {
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Rechercher par référence, client, projet..." className="pl-10" />
         </div>
-        <Button variant="outline">
+        <button type="button" variant="outline">
           <Send className="h-4 w-4 mr-2" />
           Relances
         </Button>
@@ -106,3 +106,4 @@ export default function DevisPage() {
     </div>
   )
 }
+

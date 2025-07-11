@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       setIsSuccess(true)
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || "Erreur lors de l'envoi de l'email")
     } finally {
       setIsLoading(false)
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
 
             <CardFooter className="flex flex-col space-y-4">
               <Link href="/login" className="w-full">
-                <Button variant="outline" className="w-full h-11">
+                <button type="button" variant="outline" className="w-full h-11">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Retour à la connexion
                 </Button>
@@ -156,7 +156,7 @@ export default function ForgotPasswordPage() {
               </Button>
 
               <Link href="/login" className="w-full">
-                <Button variant="outline" className="w-full h-11">
+                <button type="button" variant="outline" className="w-full h-11">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Retour à la connexion
                 </Button>
@@ -172,3 +172,4 @@ export default function ForgotPasswordPage() {
     </div>
   )
 }
+

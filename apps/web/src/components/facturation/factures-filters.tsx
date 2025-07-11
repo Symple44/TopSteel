@@ -14,7 +14,7 @@ import {
 import { Filter, Search, X } from 'lucide-react'
 
 interface FacturesFiltersProps {
-  onFiltersChange?: (filters: any) => void
+  onFiltersChange?: (filters: unknown) => void
 }
 
 export function FacturesFilters({ onFiltersChange }: FacturesFiltersProps) {
@@ -40,15 +40,16 @@ export function FacturesFilters({ onFiltersChange }: FacturesFiltersProps) {
         </SelectContent>
       </Select>
 
-      <Button variant="outline" size="sm">
+      <button type="button" variant="outline" size="sm">
         <Filter className="h-4 w-4 mr-2" />
         Filtres
       </Button>
 
-      <Button variant="outline" size="sm">
+      <button type="button" variant="outline" size="sm">
         <X className="h-4 w-4 mr-2" />
         Effacer
       </Button>
     </div>
   )
 }
+

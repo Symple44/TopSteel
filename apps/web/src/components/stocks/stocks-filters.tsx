@@ -64,7 +64,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium">Filtres avancés</h3>
-        <Button variant="ghost" size="sm" onClick={handleReset}>
+        <button type="button" variant="ghost" size="sm" onClick={handleReset}>
           <RotateCcw className="h-4 w-4 mr-2" />
           Réinitialiser
         </Button>
@@ -180,3 +180,4 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     </div>
   )
 }
+

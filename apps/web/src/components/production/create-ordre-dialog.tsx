@@ -21,7 +21,7 @@ import { useState } from 'react'
 interface CreateOrdreDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit?: (data: any) => void
+  onSubmit?: (data: unknown) => void
 }
 
 export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreDialogProps) {
@@ -357,3 +357,4 @@ export function CreateOrdreDialogAdvanced({
     </Dialog>
   )
 }
+

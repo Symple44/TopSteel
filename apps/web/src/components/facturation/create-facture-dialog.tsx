@@ -23,7 +23,7 @@ import { useState } from 'react'
 interface CreateFactureDialogProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  onFactureCreated?: (facture: any) => void
+  onFactureCreated?: (facture: unknown) => void
 }
 
 export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogProps) {
@@ -80,7 +80,7 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <button type="button">
           <Plus className="h-4 w-4 mr-2" />
           Nouvelle Facture
         </Button>
@@ -148,3 +148,4 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
     </Dialog>
   )
 }
+

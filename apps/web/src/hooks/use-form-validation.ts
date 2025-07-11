@@ -6,7 +6,7 @@ interface ValidationRule {
   minLength?: number
   maxLength?: number
   pattern?: RegExp
-  custom?: (value: any) => string | null
+  custom?: (value: unknown) => string | null
   message?: {
     required?: string
     minLength?: string
@@ -23,7 +23,7 @@ export function useFormValidation<T extends Record<string, any>>(
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({})
   const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({})
 
-  const validateField = (field: keyof T, value: any): string => {
+  const validateField = (field: keyof T, value: unknown): string => {
     const rule = validationRules[field]
     if (!rule) return ''
 
@@ -133,3 +133,4 @@ const { values, errors, handleChange, handleBlur, validateAll } = useFormValidat
   }
 )
 */
+

@@ -12,7 +12,7 @@ export default function ProductionPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
 
   // Handlers pour les filtres
-  const handleFiltersChange = (filters: any) => {
+  const handleFiltersChange = (filters: unknown) => {
     // TODO: Implémenter la logique de filtrage
   }
 
@@ -67,11 +67,11 @@ export default function ProductionPage() {
           <p className="text-muted-foreground">Gestion des ordres de fabrication et planning</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
+          <button type="button" variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
-          <Button onClick={() => setShowCreateModal(true)}>
+          <button type="button" onClick={() => setShowCreateModal(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Nouvel ordre
           </Button>
@@ -143,3 +143,4 @@ export default function ProductionPage() {
     </div>
   )
 }
+

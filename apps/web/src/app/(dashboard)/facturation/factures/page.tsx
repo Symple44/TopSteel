@@ -54,7 +54,7 @@ export default function FacturesPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-6 animate-pulse">
+              <div key={`item-${i}`} className="p-6 animate-pulse">
                 <div className="h-4 bg-muted rounded w-32 mb-2" />
                 <div className="h-3 bg-muted rounded w-24" />
               </div>
@@ -67,3 +67,4 @@ export default function FacturesPage() {
     </ClientOnly>
   )
 }
+

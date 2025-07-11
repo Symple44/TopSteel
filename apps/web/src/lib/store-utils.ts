@@ -27,8 +27,8 @@ interface StoreEvent {
   timestamp: number
   store: string
   action: string
-  state: any
-  prevState?: any
+  state: unknown
+  prevState?: unknown
   duration?: number
 }
 
@@ -55,7 +55,7 @@ export class StoreUtils {
     } = config
 
     // Store creator compatible avec Zustand
-    const storeCreator = (set: any, get: any) => {
+    const storeCreator = (set: unknown, get: unknown) => {
       const customActions = storeDefinition(set, get)
       const baseActions = StoreUtils.createBaseActions(initialState)
 
@@ -93,7 +93,7 @@ export class StoreUtils {
               return null
             }
           },
-          setItem: (key: string, value: any) => {
+          setItem: (key: string, value: unknown) => {
             try {
               localStorage.setItem(key, JSON.stringify(value))
             } catch (error) {
@@ -108,7 +108,7 @@ export class StoreUtils {
             }
           },
         },
-        partialize: (state: any) => {
+        partialize: (state: unknown) => {
           // Ne persister que les données importantes
           const { loading, error, lastUpdate, ...persistedState } = state
 
@@ -280,7 +280,7 @@ export class StoreUtils {
    */
   static validateState<TState extends BaseStoreState>(
     state: Partial<TState>,
-    schema: Record<keyof TState, (value: any) => boolean>
+    schema: Record<keyof TState, (value: unknown) => boolean>
   ): { valid: boolean; errors: string[] } {
     const errors: string[] = []
 
@@ -301,7 +301,7 @@ export class StoreUtils {
   /**
    * Debounce pour actions
    */
-  static debounce<T extends (...args: any[]) => any>(
+  static debounce<T extends (...args: unknown[]) => any>(
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
@@ -321,7 +321,7 @@ export class StoreUtils {
   /**
    * Throttle pour actions
    */
-  static throttle<T extends (...args: any[]) => any>(
+  static throttle<T extends (...args: unknown[]) => any>(
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
@@ -340,7 +340,7 @@ export class StoreUtils {
   /**
    * Monitoring et debugging des stores
    */
-  private static addMonitoring(store: any, name: string) {
+  private static addMonitoring(store: unknown, name: string) {
     const originalGetState = store.getState
     const originalSetState = store.setState
 
@@ -352,7 +352,7 @@ export class StoreUtils {
       return state
     }
 
-    store.setState = (updater: any) => {
+    store.setState = (updater: unknown) => {
       const prevState = originalGetState()
       const result = originalSetState(updater)
       const newState = originalGetState()
@@ -366,7 +366,7 @@ export class StoreUtils {
   /**
    * Utilitaires de sérialisation sécurisée
    */
-  static safeSerialize(data: any): string | null {
+  static safeSerialize(data: unknown): string | null {
     try {
       return JSON.stringify(data, (key, value) => {
         if (typeof value === 'function') return undefined
@@ -423,8 +423,8 @@ export class StoreMonitor {
   static logStateChange(
     storeName: string,
     action: string,
-    state: any,
-    prevState?: any,
+    state: unknown,
+    prevState?: unknown,
     startTime?: number
   ) {
     if (!StoreMonitor.isEnabled) return
@@ -458,7 +458,7 @@ export class StoreMonitor {
     })
   }
 
-  static logAccess(storeName: string, state: any) {
+  static logAccess(storeName: string, state: unknown) {
     if (!StoreMonitor.isEnabled) return
 
     const key = `${storeName}-access`
@@ -471,7 +471,7 @@ export class StoreMonitor {
     }
   }
 
-  private static cloneState(state: any) {
+  private static cloneState(state: unknown) {
     try {
       return structuredClone ? structuredClone(state) : JSON.parse(JSON.stringify(state))
     } catch {
@@ -496,3 +496,4 @@ export class StoreMonitor {
 
 // ===== EXPORTS UNIQUEMENT DES CLASSES UTILITAIRES =====
 export default StoreUtils
+

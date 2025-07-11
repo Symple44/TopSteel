@@ -16,7 +16,7 @@ export function CreateMouvementDialog({ open, onOpenChange }: CreateMouvementDia
         <h2 className="text-lg font-semibold mb-4">Nouveau Mouvement</h2>
         <p className="text-muted-foreground mb-4">Fonctionnalité en cours de développement</p>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange?.(false)}>
+          <button type="button" variant="outline" onClick={() => onOpenChange?.(false)}>
             Fermer
           </Button>
         </div>
@@ -24,3 +24,4 @@ export function CreateMouvementDialog({ open, onOpenChange }: CreateMouvementDia
     </div>
   )
 }
+

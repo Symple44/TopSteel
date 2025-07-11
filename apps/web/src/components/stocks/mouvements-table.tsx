@@ -25,7 +25,7 @@ interface MouvementsTableProps {
   type?: string
   mouvements?: Mouvement[]
   onSearch?: (query: string) => void
-  onFilter?: (filters: any) => void
+  onFilter?: (filters: unknown) => void
 }
 
 export function MouvementsTable({
@@ -287,3 +287,4 @@ export function MouvementsTable({
     </Card>
   )
 }
+

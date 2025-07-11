@@ -183,7 +183,7 @@ export default function Dashboard() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
               <Card
-                key={`item-${i}`}
+                key={`item-${i}-${Math.random()}`}
                 className="animate-pulse border-0 bg-white/80 backdrop-blur-sm shadow-xl"
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -214,7 +214,7 @@ export default function Dashboard() {
             <p className="text-slate-600 mt-1">Vue d'ensemble de votre activité TopSteel</p>
           </div>
           <div className="flex items-center space-x-3">
-            <Button
+            <button type="button"
               variant="outline"
               size="sm"
               className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white"
@@ -222,7 +222,7 @@ export default function Dashboard() {
               <Calendar className="mr-2 h-4 w-4 text-slate-600" />
               Cette semaine
             </Button>
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
+            <button type="button" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
               <BarChart3 className="mr-2 h-4 w-4" />
               Rapports
             </Button>
@@ -362,7 +362,7 @@ export default function Dashboard() {
                 <div className="flex items-end space-x-3 h-full relative z-10">
                   {[45, 65, 52, 78, 88, 67, 92, 85, 72, 68, 89, 95].map((height, i) => (
                     <div
-                      key={`item-${i}`}
+                      key={`item-${i}-${Math.random()}`}
                       className="rounded-t-lg transition-all duration-700 hover:scale-110 cursor-pointer"
                       style={{
                         height: `${height}%`,
@@ -424,7 +424,7 @@ export default function Dashboard() {
                 ))}
               </div>
               <div className="mt-6">
-                <Button
+                <button type="button"
                   variant="outline"
                   size="sm"
                   className="w-full border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white group"
@@ -494,3 +494,4 @@ export default function Dashboard() {
     </div>
   )
 }
+

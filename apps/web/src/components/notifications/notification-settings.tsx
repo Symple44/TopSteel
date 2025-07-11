@@ -81,7 +81,7 @@ export function NotificationSettings() {
       </div>
 
       <div className="pt-4 border-t">
-        <Button variant="outline" className="w-full" onClick={handleTestNotification}>
+        <button type="button" variant="outline" className="w-full" onClick={handleTestNotification}>
           Tester les notifications
         </Button>
       </div>
@@ -95,3 +95,4 @@ export function NotificationSettings() {
     </div>
   )
 }
+

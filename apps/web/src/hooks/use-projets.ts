@@ -189,7 +189,7 @@ export const useProjetsFilters = () => {
     setSorting: setSorting || (() => {}),
     clearFilters: clearFilters || (() => {}),
     // Helpers
-    addFilter: (key: keyof ProjetFilters, value: any) => {
+    addFilter: (key: keyof ProjetFilters, value: unknown) => {
       setFilters?.({ ...filters, [key]: value })
     },
     removeFilter: (key: keyof ProjetFilters) => {
@@ -225,7 +225,7 @@ export const useProjetsActions = () => {
     isLoading: loading,
     error,
     // Helpers avec gestion d'erreur
-    createProjetSafe: async (data: any) => {
+    createProjetSafe: async (data: unknown) => {
       try {
         return await createProjet?.(data)
       } catch (error) {
@@ -233,7 +233,7 @@ export const useProjetsActions = () => {
         throw error
       }
     },
-    updateProjetSafe: async (id: string, data: any) => {
+    updateProjetSafe: async (id: string, data: unknown) => {
       try {
         return await updateProjet?.(id, data)
       } catch (error) {
@@ -251,3 +251,4 @@ export const useProjetsActions = () => {
     },
   }
 }
+

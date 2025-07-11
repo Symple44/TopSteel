@@ -116,6 +116,7 @@ export default function RegisterLayout({ children }: RegisterLayoutProps) {
       {/* SEO Schema.org pour la page d'inscription */}
       <script
         type="application/ld+json"
+        /* biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structure */`n
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
@@ -196,3 +197,4 @@ export const runtime = 'nodejs'
 
 // Segment config pour optimiser le bundle
 export const preferredRegion = 'auto'
+

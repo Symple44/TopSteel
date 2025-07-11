@@ -84,7 +84,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
               <Recycle className="h-5 w-5" />
               Optimiseur de Chutes
             </CardTitle>
-            <Button onClick={runOptimization} className="flex items-center gap-2">
+            <button type="button" onClick={runOptimization} className="flex items-center gap-2">
               <Zap className="h-4 w-4" />
               Optimiser
             </Button>
@@ -261,7 +261,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                           </span>
                         </div>
 
-                        <Button
+                        <button type="button"
                           size="sm"
                           onClick={() => onOptimize(selectedChute.id, utilisation.id)}
                           className="flex items-center gap-1"
@@ -289,7 +289,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
               Cliquez sur "Optimiser" pour analyser vos chutes et trouver les meilleures
               opportunités d'utilisation.
             </p>
-            <Button onClick={runOptimization} size="lg">
+            <button type="button" onClick={runOptimization} size="lg">
               <Zap className="h-4 w-4 mr-2" />
               Lancer l'optimisation
             </Button>
@@ -299,3 +299,4 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
     </div>
   )
 }
+

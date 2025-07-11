@@ -122,13 +122,13 @@ export function PaiementsTable({ type, data }: PaiementsTableProps) {
               <TableCell>{getStatusBadge(paiement.statut)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-1">
-                  <Button variant="ghost" size="sm">
+                  <button type="button" variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <button type="button" variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <button type="button" variant="ghost" size="sm">
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>
@@ -147,3 +147,4 @@ export function PaiementsTable({ type, data }: PaiementsTableProps) {
     </div>
   )
 }
+

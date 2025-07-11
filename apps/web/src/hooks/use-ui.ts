@@ -139,7 +139,7 @@ export const useModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [modalData, setModalData] = useState<any>(null)
 
-  const openModal = useCallback((data?: any) => {
+  const openModal = useCallback((data?: unknown) => {
     setModalData(data)
     setIsOpen(true)
   }, [])
@@ -166,3 +166,4 @@ export const useModal = () => {
  * Export de types pour utilisation externe
  */
 export type { Toast }
+

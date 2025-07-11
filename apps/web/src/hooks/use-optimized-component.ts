@@ -37,7 +37,7 @@ export function useOptimizedSearch<T>(
 }
 
 // Fonction d'optimisation pour les composants lourds
-export function useOptimizedCallback<T extends (...args: any[]) => any>(
+export function useOptimizedCallback<T extends (...args: unknown[]) => any>(
   callback: T,
   deps: React.DependencyList
 ): T {
@@ -67,3 +67,4 @@ export function useDebounceValue<T>(value: T, delay: number): T {
 
   return debouncedValue
 }
+

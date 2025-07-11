@@ -106,11 +106,11 @@ export default function ChiffragePage() {
           <p className="text-muted-foreground">Création et gestion des devis et chiffrages</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <button type="button" variant="outline">
             <History className="h-4 w-4 mr-2" />
             Historique
           </Button>
-          <Button>
+          <button type="button">
             <Plus className="h-4 w-4 mr-2" />
             Nouveau chiffrage
           </Button>
@@ -182,7 +182,7 @@ export default function ChiffragePage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Éléments du chiffrage</h3>
-                  <Button size="sm">
+                  <button type="button" size="sm">
                     <Plus className="h-4 w-4 mr-2" />
                     Ajouter un élément
                   </Button>
@@ -210,7 +210,7 @@ export default function ChiffragePage() {
                         </TableCell>
                         <TableCell>
                           <Select>
-                            <SelectTrigger className="w-24" {...({} as any)}>
+                            <SelectTrigger className="w-24" {...({})}>
                               <SelectValue placeholder="Unité" />
                             </SelectTrigger>
                             <SelectContent>
@@ -228,7 +228,7 @@ export default function ChiffragePage() {
                           <div className="font-medium">0,00 €</div>
                         </TableCell>
                         <TableCell>
-                          <Button size="sm" variant="ghost">
+                          <button type="button" size="sm" variant="ghost">
                             <X className="h-4 w-4" />
                           </Button>
                         </TableCell>
@@ -240,11 +240,11 @@ export default function ChiffragePage() {
 
               <div className="flex justify-between items-center pt-4">
                 <div className="space-x-2">
-                  <Button variant="outline">
+                  <button type="button" variant="outline">
                     <Save className="h-4 w-4 mr-2" />
                     Sauvegarder
                   </Button>
-                  <Button variant="outline">
+                  <button type="button" variant="outline">
                     <FileText className="h-4 w-4 mr-2" />
                     Aperçu
                   </Button>
@@ -285,7 +285,7 @@ export default function ChiffragePage() {
                           <span className="text-xs text-muted-foreground">
                             {template.utilisations} utilisations
                           </span>
-                          <Button size="sm">Utiliser</Button>
+                          <button type="button" size="sm">Utiliser</Button>
                         </div>
                       </div>
                     </CardContent>
@@ -307,7 +307,7 @@ export default function ChiffragePage() {
                 <div className="flex gap-4">
                   <Input placeholder="Rechercher un chiffrage..." className="max-w-sm" />
                   <Select>
-                    <SelectTrigger className="w-[180px]" {...({} as any)}>
+                    <SelectTrigger className="w-[180px]" {...({})}>
                       <SelectValue placeholder="Statut" />
                     </SelectTrigger>
                     <SelectContent>
@@ -355,10 +355,10 @@ export default function ChiffragePage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
-                              <Button size="sm" variant="ghost">
+                              <button type="button" size="sm" variant="ghost">
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button size="sm" variant="ghost">
+                              <button type="button" size="sm" variant="ghost">
                                 <Copy className="h-4 w-4" />
                               </Button>
                             </div>
@@ -424,3 +424,4 @@ export default function ChiffragePage() {
     </div>
   )
 }
+

@@ -26,7 +26,7 @@ const PageActions = memo(function PageActions({
     <div className="flex items-center gap-2">
       {/* Bouton Nouveau projet */}
       <Link href="/projets/nouveau">
-        <Button>
+        <button type="button">
           <Plus className="h-4 w-4 mr-2" />
           Nouveau projet
         </Button>
@@ -34,7 +34,7 @@ const PageActions = memo(function PageActions({
 
       {/* Toggle vue */}
       <div className="flex border rounded-md">
-        <Button
+        <button type="button"
           variant={view === 'grid' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => onViewChange('grid')}
@@ -42,7 +42,7 @@ const PageActions = memo(function PageActions({
         >
           <Grid className="h-4 w-4" />
         </Button>
-        <Button
+        <button type="button"
           variant={view === 'table' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => onViewChange('table')}
@@ -53,7 +53,7 @@ const PageActions = memo(function PageActions({
       </div>
 
       {/* Bouton Actualiser */}
-      <Button variant="outline" size="sm" onClick={onRefresh} disabled={isLoading}>
+      <button type="button" variant="outline" size="sm" onClick={onRefresh} disabled={isLoading}>
         <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
       </Button>
     </div>
@@ -106,7 +106,7 @@ export default function ProjetsPage() {
       {
         key: 'client',
         label: 'Client',
-        render: (client: any) => client?.nom || '-',
+        render: (client: unknown) => client?.nom || '-',
         sortable: true,
       },
       {
@@ -136,9 +136,9 @@ export default function ProjetsPage() {
       {
         key: 'actions',
         label: 'Actions',
-        render: (value: any, projet: Projet) => (
+        render: (value: unknown, projet: Projet) => (
           <div className="flex gap-1">
-            <Button
+            <button type="button"
               variant="ghost"
               size="sm"
               onClick={() => router.push(`/projets/${projet.id}`)}
@@ -146,7 +146,7 @@ export default function ProjetsPage() {
             >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button
+            <button type="button"
               variant="ghost"
               size="sm"
               onClick={() => router.push(`/projets/${projet.id}/edit`)}
@@ -196,7 +196,7 @@ export default function ProjetsPage() {
         <div className="text-center">
           <p className="text-lg font-medium text-red-600">Erreur lors du chargement</p>
           <p className="text-gray-600">Impossible de charger les projets</p>
-          <Button onClick={handleRefresh} className="mt-4">
+          <button type="button" onClick={handleRefresh} className="mt-4">
             Réessayer
           </Button>
         </div>
@@ -258,7 +258,7 @@ export default function ProjetsPage() {
                   </p>
                   {!searchTerm && (
                     <Link href="/projets/nouveau">
-                      <Button>
+                      <button type="button">
                         <Plus className="h-4 w-4 mr-2" />
                         Créer un projet
                       </Button>
@@ -284,3 +284,4 @@ export default function ProjetsPage() {
     </div>
   )
 }
+

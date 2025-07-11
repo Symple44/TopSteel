@@ -13,7 +13,7 @@ export default function ProductionPage() {
           <h1 className="text-2xl font-semibold">Production</h1>
           <p className="text-muted-foreground">Gestion de la production</p>
         </div>
-        <button className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md">
+        <button type="button" className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md">
           <Plus className="h-4 w-4 mr-2" />
           Nouvel ordre
         </button>
@@ -21,7 +21,7 @@ export default function ProductionPage() {
 
       <div className="border-b">
         <nav className="flex space-x-8">
-          <button
+          <button type="button"
             onClick={() => setActiveTab('ordres')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'ordres'
@@ -31,7 +31,7 @@ export default function ProductionPage() {
           >
             Ordres de fabrication
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab('planning')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'planning'
@@ -116,3 +116,4 @@ export default function ProductionPage() {
     </div>
   )
 }
+

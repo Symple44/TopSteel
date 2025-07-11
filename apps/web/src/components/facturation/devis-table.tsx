@@ -98,15 +98,15 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
               <TableCell>{formatDate(devis.dateValidite)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-2">
-                  <Button variant="ghost" size="sm">
+                  <button type="button" variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <button type="button" variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <button type="button" variant="ghost" size="sm">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -128,3 +128,4 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
     </div>
   )
 }
+

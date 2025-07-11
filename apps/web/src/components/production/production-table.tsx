@@ -75,11 +75,11 @@ export function ProductionTable({ ordres, onView, onEdit, onStatusChange }: Prod
               </div>
 
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => onView(ordre.id)}>
+                <button type="button" variant="outline" size="sm" onClick={() => onView(ordre.id)}>
                   <Eye className="h-4 w-4 mr-2" />
                   Voir
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => onEdit(ordre.id)}>
+                <button type="button" variant="outline" size="sm" onClick={() => onEdit(ordre.id)}>
                   <Edit className="h-4 w-4 mr-2" />
                   Modifier
                 </Button>
@@ -91,3 +91,4 @@ export function ProductionTable({ ordres, onView, onEdit, onStatusChange }: Prod
     </div>
   )
 }
+

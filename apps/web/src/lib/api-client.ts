@@ -13,7 +13,7 @@
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   headers?: Record<string, string>
-  body?: any
+  body?: unknown
   cache?: boolean
   cacheTTL?: number
   retry?: boolean
@@ -23,7 +23,7 @@ interface RequestConfig {
 }
 
 interface CacheEntry {
-  data: any
+  data: unknown
   timestamp: number
   ttl: number
 }
@@ -31,7 +31,7 @@ interface CacheEntry {
 interface APIErrorDetails {
   code: string
   message: string
-  details?: any
+  details?: unknown
   timestamp: number
   requestId?: string
 }
@@ -72,7 +72,7 @@ function createRateLimiter(maxRequests: number, windowMs: number) {
  */
 export class APIError extends Error {
   public readonly code: string
-  public readonly details: any
+  public readonly details: unknown
   public readonly timestamp: number
   public readonly requestId?: string
 
@@ -170,7 +170,7 @@ export class APIClient {
   /**
    * Stockage en cache
    */
-  private setCachedData(key: string, data: any, ttl: number): void {
+  private setCachedData(key: string, data: unknown, ttl: number): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
@@ -232,7 +232,7 @@ export class APIClient {
   /**
    * Gestion des erreurs
    */
-  private handleError(error: any, endpoint: string): never {
+  private handleError(error: unknown, endpoint: string): never {
     this.metrics.errors++
 
     const errorDetails: APIErrorDetails = {
@@ -365,7 +365,7 @@ export class APIClient {
   /**
    * Requête POST
    */
-  async post<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
     return this.request<T>(endpoint, {
       ...config,
       method: 'POST',
@@ -377,7 +377,7 @@ export class APIClient {
   /**
    * Requête PUT
    */
-  async put<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
+  async put<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
     return this.request<T>(endpoint, {
       ...config,
       method: 'PUT',
@@ -400,7 +400,7 @@ export class APIClient {
   /**
    * Requête PATCH
    */
-  async patch<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
+  async patch<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
     return this.request<T>(endpoint, {
       ...config,
       method: 'PATCH',
@@ -493,3 +493,4 @@ export const apiClient = new APIClient(
 
 // ✅ TYPES EXPORTÉS
 export type { APIErrorDetails, APIMetrics, RequestConfig }
+

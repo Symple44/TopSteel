@@ -6,7 +6,7 @@ export interface ApiError {
   statusCode: number
   errors?: Array<{
     property: string
-    value: any
+    value: unknown
     constraints: Record<string, string>
   }>
 }
@@ -51,7 +51,7 @@ export class ErrorHandler {
    */
   private static formatValidationError(validationError: {
     property: string
-    value: any
+    value: unknown
     constraints: Record<string, string>
   }): FormattedError {
     const { property, constraints } = validationError
@@ -156,3 +156,4 @@ export class ErrorHandler {
     return []
   }
 }
+

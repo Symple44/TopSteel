@@ -1,2 +1,3 @@
 export type * from '@erp/types'
-export type WebAppConfig = {}
+export type WebAppConfig = Record<string, unknown>
+

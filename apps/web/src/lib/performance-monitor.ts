@@ -13,7 +13,7 @@ declare global {
       target: string,
       config?: Record<string, any>
     ) => void
-    dataLayer?: any[]
+    dataLayer?: unknown[]
   }
 }
 
@@ -77,10 +77,10 @@ export class PerformanceMonitor {
    * Décorateur pour mesurer les performances de rendu
    */
   static measureRender(componentName: string) {
-    return (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
+    return (target: unknown, propertyName: string, descriptor: PropertyDescriptor) => {
       const method = descriptor.value
 
-      descriptor.value = function (...args: any[]) {
+      descriptor.value = function (...args: unknown[]) {
         if (typeof window === 'undefined') {
           return method.apply(this, args)
         }
@@ -440,3 +440,4 @@ export default PerformanceMonitor
 
 // ✅ SUPPRESSION DE L'INITIALISATION AUTOMATIQUE
 // L'initialisation doit être faite manuellement côté client pour éviter les erreurs SSR
+

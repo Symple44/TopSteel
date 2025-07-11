@@ -34,7 +34,7 @@ export default function StocksPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowAlerts(!showAlerts)} className="relative">
+          <button type="button" variant="outline" onClick={() => setShowAlerts(!showAlerts)} className="relative">
             <AlertTriangle className="h-4 w-4 mr-2" />
             Alertes
             <Badge
@@ -44,11 +44,11 @@ export default function StocksPage() {
               3
             </Badge>
           </Button>
-          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
+          <button type="button" variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
-          <Button onClick={() => setShowAddModal(true)}>
+          <button type="button" onClick={() => setShowAddModal(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Ajouter matériau
           </Button>
@@ -133,7 +133,7 @@ export default function StocksPage() {
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Rechercher par référence, nom, fournisseur..." className="pl-10" />
         </div>
-        <Button variant="outline">
+        <button type="button" variant="outline">
           <TrendingDown className="h-4 w-4 mr-2" />
           Mouvements
         </Button>
@@ -147,3 +147,4 @@ export default function StocksPage() {
     </div>
   )
 }
+

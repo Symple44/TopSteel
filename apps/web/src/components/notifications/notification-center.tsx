@@ -51,7 +51,7 @@ export function NotificationCenter() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative">
+        <button type="button" variant="ghost" size="sm" className="relative">
           <Bell className="h-4 w-4" />
           {state.unreadCount > 0 && (
             <Badge
@@ -70,13 +70,13 @@ export function NotificationCenter() {
             <h3 className="font-semibold">Notifications</h3>
             <div className="flex gap-1">
               {state.unreadCount > 0 && (
-                <Button variant="ghost" size="sm" onClick={actions.markAllAsRead}>
+                <button type="button" variant="ghost" size="sm" onClick={actions.markAllAsRead}>
                   <CheckCheck className="h-4 w-4" />
                 </Button>
               )}
               <Dialog open={showSettings} onOpenChange={setShowSettings}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <button type="button" variant="ghost" size="sm">
                     <Settings className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
@@ -157,7 +157,7 @@ export function NotificationCenter() {
                       </div>
 
                       {notification.actionUrl && notification.actionLabel && (
-                        <Button
+                        <button type="button"
                           variant="outline"
                           size="sm"
                           className="text-xs h-6 px-2"
@@ -172,7 +172,7 @@ export function NotificationCenter() {
                     </div>
                   </div>
 
-                  <button
+                  <button type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       actions.removeNotification(notification.id)
@@ -192,7 +192,7 @@ export function NotificationCenter() {
           <>
             <Separator />
             <div className="p-2">
-              <Button
+              <button type="button"
                 variant="ghost"
                 size="sm"
                 className="w-full text-gray-500 hover:text-red-600"
@@ -208,3 +208,4 @@ export function NotificationCenter() {
     </DropdownMenu>
   )
 }
+

@@ -56,8 +56,8 @@ export class SecurityUtils {
   static createRateLimiter(maxCalls: number, windowMs: number) {
     const calls: number[] = []
 
-    return function rateLimited<T extends (...args: any[]) => any>(fn: T): T {
-      return ((...args: any[]) => {
+    return function rateLimited<T extends (...args: unknown[]) => any>(fn: T): T {
+      return ((...args: unknown[]) => {
         const now = Date.now()
         const windowStart = now - windowMs
 
@@ -392,3 +392,4 @@ export class SecurityAuditor {
     }
   }
 }
+

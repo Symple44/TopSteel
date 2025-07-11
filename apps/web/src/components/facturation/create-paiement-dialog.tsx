@@ -17,7 +17,7 @@ import { useState } from 'react'
 interface CreatePaiementDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onPaiementCreated?: (paiement: any) => void
+  onPaiementCreated?: (paiement: unknown) => void
 }
 
 export function CreatePaiementDialog({
@@ -132,3 +132,4 @@ export function CreatePaiementDialog({
     </Dialog>
   )
 }
+

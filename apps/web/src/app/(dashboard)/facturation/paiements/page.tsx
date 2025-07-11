@@ -32,11 +32,11 @@ export default function PaiementsPage() {
           <p className="text-muted-foreground">Encaissements, décaissements et rapprochements</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <button type="button" variant="outline">
             <Calendar className="h-4 w-4 mr-2" />
             Échéancier
           </Button>
-          <Button onClick={() => setShowCreateModal(true)}>
+          <button type="button" onClick={() => setShowCreateModal(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Saisir paiement
           </Button>
@@ -113,7 +113,7 @@ export default function PaiementsPage() {
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Rechercher par client, facture..." className="pl-10" />
             </div>
-            <Button variant="outline">
+            <button type="button" variant="outline">
               <Filter className="h-4 w-4 mr-2" />
               Filtres
             </Button>
@@ -127,7 +127,7 @@ export default function PaiementsPage() {
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Rechercher par fournisseur, facture..." className="pl-10" />
             </div>
-            <Button variant="outline">
+            <button type="button" variant="outline">
               <Filter className="h-4 w-4 mr-2" />
               Filtres
             </Button>
@@ -145,3 +145,4 @@ export default function PaiementsPage() {
     </div>
   )
 }
+

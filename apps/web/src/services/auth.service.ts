@@ -41,7 +41,7 @@ interface ApiResponse<T> {
 /**
  * Helper pour transformer les données user backend -> frontend
  */
-const transformUserFromAPI = (apiUser: any): User =>
+const transformUserFromAPI = (apiUser: unknown): User =>
   ({
     id: apiUser.id.toString(),
     email: apiUser.email,
@@ -254,3 +254,4 @@ export const authService = {
 
 // ===== TYPES EXPORTÉS =====
 export type { LoginResponse, RefreshTokenResponse, RegisterData }
+

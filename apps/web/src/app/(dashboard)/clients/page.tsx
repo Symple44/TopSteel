@@ -13,7 +13,7 @@ export default function ClientsPage() {
           <h1 className="text-2xl font-semibold">Clients</h1>
           <p className="text-muted-foreground">Gestion de vos clients</p>
         </div>
-        <button className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md">
+        <button type="button" className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md">
           <Plus className="h-4 w-4 mr-2" />
           Nouveau client
         </button>
@@ -30,7 +30,7 @@ export default function ClientsPage() {
             className="w-full pl-10 pr-4 py-2 border rounded-md"
           />
         </div>
-        <button className="inline-flex items-center px-4 py-2 border rounded-md">
+        <button type="button" className="inline-flex items-center px-4 py-2 border rounded-md">
           <Filter className="h-4 w-4 mr-2" />
           Filtres
         </button>
@@ -46,8 +46,8 @@ export default function ClientsPage() {
                 <p className="text-sm text-muted-foreground">contact@abc.fr</p>
               </div>
               <div className="flex space-x-2">
-                <button className="px-3 py-1 text-xs border rounded">Voir</button>
-                <button className="px-3 py-1 text-xs border rounded">Modifier</button>
+                <button type="button" className="px-3 py-1 text-xs border rounded">Voir</button>
+                <button type="button" className="px-3 py-1 text-xs border rounded">Modifier</button>
               </div>
             </div>
             <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -56,8 +56,8 @@ export default function ClientsPage() {
                 <p className="text-sm text-muted-foreground">info@xyz.com</p>
               </div>
               <div className="flex space-x-2">
-                <button className="px-3 py-1 text-xs border rounded">Voir</button>
-                <button className="px-3 py-1 text-xs border rounded">Modifier</button>
+                <button type="button" className="px-3 py-1 text-xs border rounded">Voir</button>
+                <button type="button" className="px-3 py-1 text-xs border rounded">Modifier</button>
               </div>
             </div>
           </div>
@@ -66,3 +66,4 @@ export default function ClientsPage() {
     </div>
   )
 }
+

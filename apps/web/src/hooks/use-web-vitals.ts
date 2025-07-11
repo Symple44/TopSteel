@@ -37,7 +37,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
 
   // Analytics helper avec debouncing
   const sendToAnalytics = useCallback(
-    (metric: any) => {
+    (metric: unknown) => {
       if (!enableAnalytics || Math.random() > sampleRate) return
 
       try {
@@ -217,3 +217,4 @@ export function useTopSteelMetrics() {
 }
 
 export default useWebVitals
+

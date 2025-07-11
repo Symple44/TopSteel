@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, Label } from '@erp/ui'
 
 interface OrdreInfoTabProps {
-  ordre: any
+  ordre: unknown
 }
 
 export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
@@ -61,3 +61,4 @@ export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
     </div>
   )
 }
+

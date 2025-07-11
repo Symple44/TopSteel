@@ -59,7 +59,7 @@ const storage = {
       return null
     }
   },
-  set: (key: string, value: any) => {
+  set: (key: string, value: unknown) => {
     if (typeof window === 'undefined') return
     try {
       localStorage.setItem(key, JSON.stringify(value))
@@ -341,3 +341,4 @@ export const useIsAuthenticated = () => {
 
   return isAuthenticated
 }
+

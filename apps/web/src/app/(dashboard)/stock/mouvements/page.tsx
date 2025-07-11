@@ -229,11 +229,11 @@ export default function MouvementsPage() {
           <p className="text-muted-foreground">Historique et suivi des entrées/sorties</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <button type="button" variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Exporter
           </Button>
-          <Button onClick={handleShowCreateModal}>
+          <button type="button" onClick={handleShowCreateModal}>
             <Plus className="h-4 w-4 mr-2" />
             Nouveau mouvement
           </Button>
@@ -391,7 +391,7 @@ const MouvementsTable = dynamic(
     loading: () => (
       <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="animate-pulse">
+          <div key={`item-${i}`} className="animate-pulse">
             <div className="h-12 bg-muted rounded" />
           </div>
         ))}
@@ -415,3 +415,4 @@ const CreateMouvementDialog = dynamic(
 
 // Ne pas oublier l'import dynamic en haut du fichier
 import dynamic from 'next/dynamic'
+
