@@ -1,42 +1,29 @@
 {
-  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.suggest.autoImports": true,
-  "editor.rulers": [80, 120],
-  "files.associations": {
-    "*.md": "markdown",
-    "*.env*": "properties"
-  },
-  "explorer.fileNesting.enabled": true,
-  "files.watcherExclude": {
-    "**/coverage/**": true,
-    "**/node_modules/**": true,
-    "**/dist/**": true,
-    "**/.next/**": true,
-    "**/.turbo/**": true
-  },
-  "typescript.preferences.includePackageJsonAutoImports": "auto",
-  "editor.minimap.enabled": false,
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/.turbo": true,
-    "**/coverage": true,
-    "**/.next": true,
-    "**/dist": true
-  },
-  "workbench.editor.enablePreview": false,
-  "git.autofetch": true,
-  "editor.formatOnSave": true,
-  "explorer.fileNesting.patterns": {
-    ".env": ".env.*",
-    "README.md": "README.*",
-    "package.json": "package-lock.json,pnpm-lock.yaml,yarn.lock",
-    "tsconfig.json": "tsconfig.*.json",
-    "*.ts": "${capture}.js",
-    "*.tsx": "${capture}.js"
-  },
+  "typescript.preferences.enableAutoImportFileExcludePatterns": [
+    "@radix-ui/**"
+  ],
+  "typescript.suggest.paths": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.biome": "explicit"
   },
-  "terminal.integrated.defaultProfile.windows": "PowerShell"
+  "typescript.workspaceSymbols.scope": "allOpenProjects",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "explorer.fileNesting.enabled": true,
+  "files.watcherExclude": {
+    "**/.turbo/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/node_modules/**": true,
+    "**/.next/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/.turbo": true,
+    "**/dist": true,
+    "**/.next": true
+  }
 }

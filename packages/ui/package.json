@@ -158,11 +158,15 @@
   },
   "private": true,
   "exports": {
-    "./package.json": "./package.json",
+    "./hooks": {
+      "require": "./dist/hooks/index.cjs",
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.js"
+    },
     ".": {
-      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.mjs"
+      "import": "./dist/index.js"
     }
   }
 }

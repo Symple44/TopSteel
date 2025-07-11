@@ -1,38 +1,54 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "lib": ["ES2022"],
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-
-    "baseUrl": ".",
-    "paths": {
-      "@erp/types": ["./packages/types/dist"],
-      "@erp/types/*": ["./packages/types/dist/*"],
-      "@erp/ui": ["./packages/ui/dist"],
-      "@erp/ui/*": ["./packages/ui/dist/*"],
-      "@erp/utils": ["./packages/utils/dist"],
-      "@erp/utils/*": ["./packages/utils/dist/*"],
-      "@erp/config": ["./packages/config/dist"],
-      "@erp/config/*": ["./packages/config/dist/*"]
-    }
-  },
+  "include": [
+    "apps/**/*",
+    "packages/**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist",
-    "build",
     ".next",
-    "out",
-    "coverage",
     ".turbo",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ]
+    "coverage"
+  ],
+  "compilerOptions": {
+    "module": "ESNext",
+    "noEmit": true,
+    "paths": {
+      "@erp/ui": [
+        "./packages/ui/src"
+      ],
+      "@erp/types": [
+        "./packages/types/src"
+      ],
+      "@erp/utils": [
+        "./packages/utils/src"
+      ],
+      "@erp/utils/*": [
+        "./packages/utils/src/*"
+      ],
+      "@erp/types/*": [
+        "./packages/types/src/*"
+      ],
+      "@erp/config": [
+        "./packages/config"
+      ],
+      "@erp/config/*": [
+        "./packages/config/*"
+      ],
+      "@erp/ui/*": [
+        "./packages/ui/src/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "incremental": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "strict": true
+  }
 }

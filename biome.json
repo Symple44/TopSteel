@@ -133,14 +133,26 @@
       "attributePosition": "auto"
     },
     "globals": [
-      "console",
-      "process",
+      "afterAll",
+      "afterEach",
+      "beforeAll",
+      "beforeEach",
       "Buffer",
-      "window",
+      "console",
+      "describe",
       "document",
+      "expect",
+      "it",
+      "jest",
+      "JSX",
+      "process",
       "React",
-      "JSX"
-    ]
+      "test",
+      "window"
+    ],
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
   },
   "json": {
     "formatter": {

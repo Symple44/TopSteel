@@ -1,4 +1,4 @@
-import { alertVariants } from '@/lib/design-system'
+import { alertVariants } from '../../../lib/design-system'
 import { cn } from '@/lib/utils'
 import type { VariantProps } from 'class-variance-authority'
 import * as React from 'react'
@@ -31,3 +31,4 @@ const AlertDescription = React.forwardRef<
 AlertDescription.displayName = 'AlertDescription'
 
 export { Alert, AlertTitle, AlertDescription }
+
