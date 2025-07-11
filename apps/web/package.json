@@ -1,9 +1,15 @@
 {
   "scripts": {
+    "prebuild": "biome check src/ --reporter=summary",
+    "build:check": "biome check src/ && next build",
+    "build:fix": "biome check --apply src/ && next build",
+    "lint:biome": "biome check src/",
+    "lint:biome:fix": "biome check --apply src/",
+    "format:biome": "biome format --write src/",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 NODE_ENV=production next build",
     "dev": "cross-env NODE_ENV=development next dev -p 3000",
     "start": "next start -p 3000",
-    "lint": "next lint",
+    "lint": "biome check src/",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "test": "vitest",
@@ -13,7 +19,10 @@
     "postinstall": "next telemetry disable",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "lint:biome": "biome check src/",
+    "lint:biome:fix": "biome check --apply src/",
+    "format:biome": "biome format --write src/"
   },
   "version": "1.0.0",
   "name": "@erp/web",
@@ -69,15 +78,17 @@
     "recharts": "^3.0.2",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.11",
     "use-debounce": "^10.0.5",
     "web-vitals": "^5.0.3",
     "zod": "^3.25.67",
-    "zustand": "^5.0.6",
-    "tailwindcss": "^4.1.11"
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
+    "@eslint/js": "^9.30.1",
     "@next/bundle-analyzer": "^15.3.4",
+    "@next/eslint-plugin-next": "^15.3.5",
     "@playwright/test": "^1.40.0",
     "@storybook/nextjs": "^8.6.14",
     "@storybook/react": "^8.6.14",
@@ -87,6 +98,11 @@
     "@types/node": "^24.0.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "@typescript-eslint/parser": "^8.36.0",
+    "@vitejs/plugin-react": "^4.6.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.21",
     "browserslist": "^4.25.1",
     "caniuse-lite": "^1.0.30001726",
@@ -96,10 +112,8 @@
     "tailwindcss": "^4.1.11",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.8.3",
-    "webpack-bundle-analyzer": "^4.10.1",
     "vitest": "^3.2.4",
-    "@vitest/ui": "^3.2.4",
-    "@vitest/coverage-v8": "^3.2.4",
-    "@vitejs/plugin-react": "^4.6.0"
+    "webpack-bundle-analyzer": "^4.10.1"
   }
 }
+

@@ -58,6 +58,10 @@
     "node": "22.12.0"
   },
   "scripts": {
+    "lint:biome": "biome check .",
+    "lint:biome:fix": "biome check --apply .",
+    "format:biome": "biome format --write .",
+    "check:all": "biome check . && turbo type-check",
     "build": "turbo build",
     "build:packages": "turbo build --filter='./packages/*'",
     "build:apps": "turbo build --filter='./apps/*'",
@@ -106,3 +110,4 @@
   },
   "description": "ERP TopSteel - Système de gestion pour métallerie industrielle"
 }
+

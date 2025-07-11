@@ -189,7 +189,7 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent className="w-48">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push(`/projets/${projet.id}/modifier`)}>
@@ -308,3 +308,4 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
     </div>
   )
 }
+

@@ -132,7 +132,7 @@ export default function PlanningPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs value={view} onValueChange={(v) => setView(v as any)}>
+          <Tabs value={view} onValueChange={(v: string) => setView(v as "gantt" | "calendar")}>
             <TabsList>
               <TabsTrigger value="gantt">Vue Gantt</TabsTrigger>
               <TabsTrigger value="calendar">Vue Calendrier</TabsTrigger>
@@ -160,6 +160,7 @@ export default function PlanningPage() {
     </div>
   )
 }
+
 
 
 

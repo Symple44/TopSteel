@@ -250,7 +250,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           type="number"
-                          value={ligne.quantite}
+                          value={ligne.quantite?.toString() ?? ""}
                           onChange={(e) =>
                             updateLigne(
                               ligne.id,
@@ -282,7 +282,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           type="number"
-                          value={ligne.prixUnitaire}
+                          value={ligne.prixUnitaire?.toString() ?? ""}
                           onChange={(e) =>
                             updateLigne(
                               ligne.id,
@@ -298,7 +298,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           type="number"
-                          value={ligne.taux_tva}
+                          value={ligne.taux_tva?.toString() ?? ""}
                           onChange={(e) =>
                             updateLigne(
                               ligne.id,
@@ -314,7 +314,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           type="number"
-                          value={ligne.remise}
+                          value={ligne.remise?.toString() ?? ""}
                           onChange={(e) =>
                             updateLigne(
                               ligne.id,
@@ -364,7 +364,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
-                      value={devis.remiseGlobale}
+                      value={devis.remiseGlobale?.toString() ?? ""}
                       onChange={(e) =>
                         setDevis((prev) => ({
                           ...prev,
@@ -421,3 +421,5 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
     </div>
   )
 }
+
+
