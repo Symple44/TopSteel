@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
 import { useToast } from './ToastProvider'
 
 export interface ToasterProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -56,12 +57,12 @@ const Toaster = React.forwardRef<HTMLDivElement, ToasterProps>(
                   <div className="text-sm opacity-90 mt-1">{toast.description}</div>
                 )}
               </div>
-              <button
+              <Button
                 onClick={() => removeToast(toast.id)}
                 className="ml-3 text-sm opacity-70 hover:opacity-100"
               >
                 ×
-              </button>
+              </Button>
             </div>
           </div>
         ))}
@@ -73,3 +74,4 @@ const Toaster = React.forwardRef<HTMLDivElement, ToasterProps>(
 Toaster.displayName = 'Toaster'
 
 export { Toaster }
+

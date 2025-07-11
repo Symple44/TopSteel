@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
 
 export interface ThemeSwitcherProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'outline' | 'ghost'
@@ -53,19 +54,19 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
     // Render placeholder until mounted to avoid hydration mismatch
     if (!mounted) {
       return (
-        <button
+        <Button
           ref={ref}
           className={cn(baseClasses, variantClasses[variant], sizeClasses[size], className)}
           disabled
           {...props}
         >
           <span className="h-4 w-4">🌙</span>
-        </button>
+        </Button>
       )
     }
 
     return (
-      <button
+      <Button
         ref={ref}
         className={cn(baseClasses, variantClasses[variant], sizeClasses[size], className)}
         onClick={toggleTheme}
@@ -80,7 +81,7 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
         <span className="sr-only">
           Basculer vers le thème {theme === 'light' ? 'sombre' : 'clair'}
         </span>
-      </button>
+      </Button>
     )
   }
 )
@@ -88,3 +89,4 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
 ThemeSwitcher.displayName = 'ThemeSwitcher'
 
 export { ThemeSwitcher }
+

@@ -58,13 +58,13 @@ function ErrorFallback({
             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
           >
             Réessayer
-          </button>
+          </Button>
           <Button
             onClick={() => window.location.reload()}
             className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors"
           >
             Recharger la page
-          </button>
+          </Button>
         </div>
       </div>
     </div>

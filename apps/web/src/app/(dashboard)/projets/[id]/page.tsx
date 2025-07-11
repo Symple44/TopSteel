@@ -179,13 +179,13 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <button
+          <Button
             onClick={() => router.push('/projets')}
             className="mb-4 flex items-center text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour aux projets
-          </button>
+          </Button>
 
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight">{projet.reference}</h1>

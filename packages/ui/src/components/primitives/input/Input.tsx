@@ -4,6 +4,7 @@
 import { type VariantProps, cva } from 'class-variance-authority'
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../button'
 
 // === VARIANTS POUR INPUT ENRICHI (votre structure existante) ===
 const inputVariants = cva(
@@ -240,7 +241,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
           {/* Bouton clear */}
           {clearable && displayValue && !loading && (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 onClear?.()
@@ -268,7 +269,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-            </button>
+            </Button>
           )}
 
           {/* Icône de fin */}
@@ -378,7 +379,7 @@ export const PasswordInput = React.forwardRef<
       type={showPassword ? 'text' : 'password'}
       variant="password"
       endIcon={
-        <button
+        <Button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
           className="text-muted-foreground hover:text-foreground transition-colors"
@@ -410,7 +411,7 @@ export const PasswordInput = React.forwardRef<
               />
             </svg>
           )}
-        </button>
+        </Button>
       }
       ref={ref}
       {...props}
@@ -433,3 +434,4 @@ export const RadioInput = React.forwardRef<HTMLInputElement, Omit<InputProps, 't
 RadioInput.displayName = 'RadioInput'
 
 export { Input }
+

@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../../data-display'
+import { Button } from '../../../primitives/button'
 
 interface TasksTableProps {
   data: unknown[]
@@ -45,18 +46,18 @@ export function TasksTable({ data = [], loading = false, onEdit, onDelete }: Tas
                 <TableCell>TODO: Status</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => onEdit?.(item)}
                       className="text-blue-600 hover:underline"
                     >
                       Modifier
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onDelete?.(item)}
                       className="text-red-600 hover:underline"
                     >
                       Supprimer
-                    </button>
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>

@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '@erp/ui'
 import { AlertTriangle, Bug, Home, RefreshCw } from 'lucide-react'
 import type { ErrorInfo, ReactNode } from 'react'
 import React, { Component } from 'react'

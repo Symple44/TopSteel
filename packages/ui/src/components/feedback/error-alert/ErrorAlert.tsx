@@ -1,6 +1,7 @@
 import { AlertTriangle, X } from 'lucide-react'
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
 
 export interface ErrorAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   error?: string | Error | { message: string }
@@ -39,12 +40,12 @@ const ErrorAlert = React.forwardRef<HTMLDivElement, ErrorAlertProps>(
           </div>
 
           {dismissible && onDismiss && (
-            <button
+            <Button
               onClick={onDismiss}
               className="flex-shrink-0 rounded-md p-1 text-destructive/70 hover:text-destructive hover:bg-destructive/20 transition-colors"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -55,3 +56,4 @@ const ErrorAlert = React.forwardRef<HTMLDivElement, ErrorAlertProps>(
 ErrorAlert.displayName = 'ErrorAlert'
 
 export { ErrorAlert }
+

@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '../../../layout'
+import { Button } from '../../../primitives/button'
 
 interface ProductionStatsCardProps {
   data?: unknown
@@ -30,12 +31,12 @@ export function ProductionStatsCard({
 
         {showActions && (
           <div className="flex gap-2 mt-4">
-            <button onClick={onEdit} className="text-blue-600 hover:underline">
+            <Button onClick={onEdit} className="text-blue-600 hover:underline">
               Modifier
-            </button>
-            <button onClick={onDelete} className="text-red-600 hover:underline">
+            </Button>
+            <Button onClick={onDelete} className="text-red-600 hover:underline">
               Supprimer
-            </button>
+            </Button>
           </div>
         )}
       </CardContent>
