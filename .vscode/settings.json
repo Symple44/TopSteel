@@ -1,9 +1,7 @@
 {
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.suggest.autoImports": true,
-  "typescript.preferences.enableAutoImportFileExcludePatterns": [
-    "@radix-ui/**"
-  ],
+  "typescript.preferences.enableAutoImportFileExcludePatterns": ["@radix-ui/**"],
   "typescript.suggest.paths": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",

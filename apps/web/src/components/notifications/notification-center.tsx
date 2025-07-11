@@ -157,7 +157,8 @@ export function NotificationCenter() {
                       </div>
 
                       {notification.actionUrl && notification.actionLabel && (
-                        <button type="button"
+                        <button
+                          type="button"
                           variant="outline"
                           size="sm"
                           className="text-xs h-6 px-2"
@@ -172,7 +173,8 @@ export function NotificationCenter() {
                     </div>
                   </div>
 
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       actions.removeNotification(notification.id)
@@ -192,7 +194,8 @@ export function NotificationCenter() {
           <>
             <Separator />
             <div className="p-2">
-              <button type="button"
+              <button
+                type="button"
                 variant="ghost"
                 size="sm"
                 className="w-full text-gray-500 hover:text-red-600"
@@ -208,4 +211,3 @@ export function NotificationCenter() {
     </DropdownMenu>
   )
 }
-

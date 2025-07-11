@@ -147,4 +147,3 @@ export function PaiementsTable({ type, data }: PaiementsTableProps) {
     </div>
   )
 }
-

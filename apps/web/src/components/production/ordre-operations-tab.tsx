@@ -70,4 +70,3 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
     </div>
   )
 }
-

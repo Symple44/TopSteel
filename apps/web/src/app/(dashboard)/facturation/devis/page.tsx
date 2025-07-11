@@ -1,5 +1,8 @@
 'use client'
 
+import React from 'react'
+
+
 import { CreateDevisDialog } from '@/components/facturation/create-devis-dialog'
 import { DevisFilters } from '@/components/facturation/devis-filters'
 import { DevisTable } from '@/components/facturation/devis-table'
@@ -20,11 +23,11 @@ export default function DevisPage() {
           <p className="text-muted-foreground">Création, suivi et conversion des devis</p>
         </div>
         <div className="flex gap-2">
-          <button type="button" variant="outline" onClick={() => setShowFilters(!showFilters)}>
+          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
-          <button type="button" onClick={() => setShowCreateModal(true)}>
+          <Button onClick={() => setShowCreateModal(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Nouveau devis
           </Button>
@@ -92,7 +95,7 @@ export default function DevisPage() {
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Rechercher par référence, client, projet..." className="pl-10" />
         </div>
-        <button type="button" variant="outline">
+        <Button variant="outline">
           <Send className="h-4 w-4 mr-2" />
           Relances
         </Button>
@@ -106,4 +109,3 @@ export default function DevisPage() {
     </div>
   )
 }
-

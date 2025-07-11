@@ -40,10 +40,7 @@
     "vitest": "^3.2.4"
   },
   "packageManager": "pnpm@10.12.4",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "private": true,
   "repository": {
     "type": "git",
@@ -70,7 +67,7 @@
     "dev:web": "pnpm build:packages && turbo dev --filter=@erp/web",
     "dev:api": "turbo start:dev --filter=@erp/api",
     "test": "turbo test",
-    "lint": "turbo lint:biome",
+    "lint": "biome check .",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
     "reset": "turbo clean && rimraf node_modules pnpm-lock.yaml && pnpm install",

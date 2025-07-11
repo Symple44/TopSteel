@@ -1,5 +1,8 @@
 'use client'
 
+import React from 'react'
+
+
 import { Badge, Button, Card, CardContent } from '@erp/ui'
 
 import { AlertTriangle, Package, Plus } from 'lucide-react'
@@ -67,7 +70,7 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
             Liste des matériaux nécessaires pour cet ordre de fabrication
           </p>
         </div>
-        <button type="button" size="sm">
+        <Button size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Ajouter matériau
         </Button>
@@ -134,10 +137,10 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
               </div>
             </div>
             <div className="mt-4 flex gap-2">
-              <button type="button" variant="outline" size="sm">
+              <Button variant="outline" size="sm">
                 Générer commande
               </Button>
-              <button type="button" variant="outline" size="sm">
+              <Button variant="outline" size="sm">
                 Vérifier alternatives
               </Button>
             </div>
@@ -147,4 +150,3 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
     </div>
   )
 }
-

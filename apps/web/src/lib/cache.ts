@@ -40,4 +40,3 @@ class CacheManager {
 }
 
 export const cache = new CacheManager()
-

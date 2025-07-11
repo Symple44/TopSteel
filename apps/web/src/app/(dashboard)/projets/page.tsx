@@ -34,7 +34,8 @@ const PageActions = memo(function PageActions({
 
       {/* Toggle vue */}
       <div className="flex border rounded-md">
-        <button type="button"
+        <button
+          type="button"
           variant={view === 'grid' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => onViewChange('grid')}
@@ -42,7 +43,8 @@ const PageActions = memo(function PageActions({
         >
           <Grid className="h-4 w-4" />
         </Button>
-        <button type="button"
+        <button
+          type="button"
           variant={view === 'table' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => onViewChange('table')}
@@ -138,7 +140,8 @@ export default function ProjetsPage() {
         label: 'Actions',
         render: (value: unknown, projet: Projet) => (
           <div className="flex gap-1">
-            <button type="button"
+            <button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => router.push(`/projets/${projet.id}`)}
@@ -146,7 +149,8 @@ export default function ProjetsPage() {
             >
               <Eye className="h-4 w-4" />
             </Button>
-            <button type="button"
+            <button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => router.push(`/projets/${projet.id}/edit`)}
@@ -284,4 +288,3 @@ export default function ProjetsPage() {
     </div>
   )
 }
-

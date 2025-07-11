@@ -172,9 +172,7 @@
   },
   "overrides": [
     {
-      "include": [
-        "apps/web/src/**/*.{ts,tsx}"
-      ],
+      "include": ["apps/web/src/**/*.{ts,tsx}"],
       "linter": {
         "rules": {
           "suspicious": {
@@ -187,9 +185,7 @@
       }
     },
     {
-      "include": [
-        "apps/api/src/**/*.{ts}"
-      ],
+      "include": ["apps/api/src/**/*.{ts}"],
       "linter": {
         "rules": {
           "suspicious": {
@@ -200,9 +196,7 @@
       }
     },
     {
-      "include": [
-        "packages/*/src/**/*.{ts,tsx}"
-      ],
+      "include": ["packages/*/src/**/*.{ts,tsx}"],
       "linter": {
         "rules": {
           "suspicious": {
@@ -212,9 +206,7 @@
       }
     },
     {
-      "include": [
-        "**/*.{test,spec}.{ts,tsx,js,jsx}"
-      ],
+      "include": ["**/*.{test,spec}.{ts,tsx,js,jsx}"],
       "linter": {
         "rules": {
           "suspicious": {

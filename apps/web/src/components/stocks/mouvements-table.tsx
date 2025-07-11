@@ -287,4 +287,3 @@ export function MouvementsTable({
     </Card>
   )
 }
-

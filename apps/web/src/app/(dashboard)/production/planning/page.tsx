@@ -87,11 +87,11 @@ export default function PlanningPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button type="button" variant="outline" size="sm">
+          <Button variant="outline" size="sm">
             <Filter className="h-4 w-4 mr-2" />
             Filtrer
           </Button>
-          <button type="button" variant="outline" size="sm">
+          <Button variant="outline" size="sm">
             Aujourd'hui
           </Button>
         </div>
@@ -105,7 +105,8 @@ export default function PlanningPage() {
               Semaine du {currentWeek.toLocaleDateString()}
             </CardTitle>
             <div className="flex gap-2">
-              <button type="button"
+              <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={() =>
@@ -114,7 +115,8 @@ export default function PlanningPage() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <button type="button"
+              <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={() =>
@@ -155,4 +157,3 @@ export default function PlanningPage() {
     </div>
   )
 }
-

@@ -91,4 +91,3 @@ export function ProductionTable({ ordres, onView, onEdit, onStatusChange }: Prod
     </div>
   )
 }
-

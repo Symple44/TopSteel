@@ -102,4 +102,3 @@ export function FacturesTable({ data = mockFactures }: FacturesTableProps) {
     </div>
   )
 }
-

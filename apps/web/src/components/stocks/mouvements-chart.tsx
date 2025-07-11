@@ -42,7 +42,8 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
       {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
-          <button type="button"
+          <button
+            type="button"
             variant={activeTab === 'volume' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setActiveTab('volume')}
@@ -50,7 +51,8 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
             <BarChart3 className="h-4 w-4 mr-2" />
             Volume
           </Button>
-          <button type="button"
+          <button
+            type="button"
             variant={activeTab === 'value' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setActiveTab('value')}
@@ -61,21 +63,24 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
         </div>
 
         <div className="flex gap-2">
-          <button type="button"
+          <button
+            type="button"
             variant={period === 'week' ? 'default' : 'outline'}
             size="sm"
             onClick={() => onPeriodChange('week')}
           >
             Semaine
           </Button>
-          <button type="button"
+          <button
+            type="button"
             variant={period === 'month' ? 'default' : 'outline'}
             size="sm"
             onClick={() => onPeriodChange('month')}
           >
             Mois
           </Button>
-          <button type="button"
+          <button
+            type="button"
             variant={period === 'quarter' ? 'default' : 'outline'}
             size="sm"
             onClick={() => onPeriodChange('quarter')}
@@ -228,4 +233,3 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
     </div>
   )
 }
-

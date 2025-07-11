@@ -24,4 +24,3 @@ export function CreateMouvementDialog({ open, onOpenChange }: CreateMouvementDia
     </div>
   )
 }
-

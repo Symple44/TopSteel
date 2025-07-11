@@ -1,10 +1,8 @@
 'use client'
 
-import { CreatePaiementDialog } from '@/components/facturation/create-paiement-dialog'
-import { PaiementsChart } from '@/components/facturation/paiements-chart'
-import { PaiementsTable } from '@/components/facturation/paiements-table'
-import { RapprochementBancaire } from '@/components/facturation/rapprochement-bancaire'
-import {
+import React from 'react'
+import { useState } from 'react'
+import { 
   Button,
   Card,
   CardContent,
@@ -14,11 +12,19 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
+  TabsTrigger
 } from '@erp/ui'
-import { Calendar, Filter, Plus, Search, TrendingDown, TrendingUp } from 'lucide-react'
-import { useState } from 'react'
-
+import { 
+  Calendar as CalendarIcon,
+  Filter as FilterIcon,
+  Plus as PlusIcon,
+  Search,
+  TrendingDown,
+  TrendingUp 
+} from 'lucide-react'
+import { CreatePaiementDialog } from '@/components/facturation/create-paiement-dialog'
+import { PaiementsTable } from '@/components/facturation/paiements-table'
+import { RapprochementBancaire } from '@/components/facturation/rapprochement-bancaire'
 export default function PaiementsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [activeTab, setActiveTab] = useState('encaissements')
@@ -32,12 +38,12 @@ export default function PaiementsPage() {
           <p className="text-muted-foreground">Encaissements, décaissements et rapprochements</p>
         </div>
         <div className="flex gap-2">
-          <button type="button" variant="outline">
-            <Calendar className="h-4 w-4 mr-2" />
+          <Button variant="outline">
+            <CalendarIcon className="h-4 w-4 mr-2" />
             Échéancier
           </Button>
-          <button type="button" onClick={() => setShowCreateModal(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+          <Button onClick={() => setShowCreateModal(true)}>
+            <PlusIcon className="h-4 w-4 mr-2" />
             Saisir paiement
           </Button>
         </div>
@@ -113,8 +119,8 @@ export default function PaiementsPage() {
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Rechercher par client, facture..." className="pl-10" />
             </div>
-            <button type="button" variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
+            <Button variant="outline">
+              <FilterIcon className="h-4 w-4 mr-2" />
               Filtres
             </Button>
           </div>
@@ -127,8 +133,8 @@ export default function PaiementsPage() {
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Rechercher par fournisseur, facture..." className="pl-10" />
             </div>
-            <button type="button" variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
+            <Button variant="outline">
+              <FilterIcon className="h-4 w-4 mr-2" />
               Filtres
             </Button>
           </div>
@@ -145,4 +151,3 @@ export default function PaiementsPage() {
     </div>
   )
 }
-

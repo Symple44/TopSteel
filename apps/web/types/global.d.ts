@@ -2,7 +2,7 @@
 // This ensures TypeScript recognizes all components that exist at runtime
 
 declare module '@erp/ui' {
-  import { ComponentType } from 'react'
+  import type { ComponentType } from 'react'
 
   // All components are typed as FC<any> since they work at runtime
   export const Badge: ComponentType<any>

@@ -1,54 +1,45 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import type { Repository } from "typeorm";
-import type { PaginationResultDto } from "../../common/dto/base.dto";
-import type { CreateTracabiliteDto } from "./dto/create-tracabilite.dto";
-import type { TracabiliteQueryDto } from "./dto/tracabilite-query.dto";
-import type { UpdateTracabiliteDto } from "./dto/update-tracabilite.dto";
-import { Tracabilite } from "./entities/tracabilite.entity";
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import type { Repository } from 'typeorm'
+import type { PaginationResultDto } from '../../common/dto/base.dto'
+import type { CreateTracabiliteDto } from './dto/create-tracabilite.dto'
+import type { TracabiliteQueryDto } from './dto/tracabilite-query.dto'
+import type { UpdateTracabiliteDto } from './dto/update-tracabilite.dto'
+import { Tracabilite } from './entities/tracabilite.entity'
 
 @Injectable()
 export class TracabiliteService {
   constructor(
     @InjectRepository(Tracabilite)
-    private readonly repository: Repository<Tracabilite>,
+    private readonly repository: Repository<Tracabilite>
   ) {}
 
   async create(createDto: CreateTracabiliteDto): Promise<Tracabilite> {
-    const entity = this.repository.create(createDto);
-    return this.repository.save(entity);
+    const entity = this.repository.create(createDto)
+    return this.repository.save(entity)
   }
 
-  async findAll(
-    query: TracabiliteQueryDto,
-  ): Promise<PaginationResultDto<Tracabilite>> {
-    const {
-      page = 1,
-      limit = 10,
-      search,
-      sortBy = "createdAt",
-      sortOrder = "DESC",
-    } = query;
-    const skip = (page - 1) * limit;
+  async findAll(query: TracabiliteQueryDto): Promise<PaginationResultDto<Tracabilite>> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'DESC' } = query
+    const skip = (page - 1) * limit
 
-    const queryBuilder = this.repository.createQueryBuilder("entity");
+    const queryBuilder = this.repository.createQueryBuilder('entity')
 
     if (search) {
-      queryBuilder.andWhere(
-        "(entity.nom ILIKE :search OR entity.description ILIKE :search)",
-        { search: `%${search}%` },
-      );
+      queryBuilder.andWhere('(entity.nom ILIKE :search OR entity.description ILIKE :search)', {
+        search: `%${search}%`,
+      })
     }
 
     if (query.actif !== undefined) {
-      queryBuilder.andWhere("entity.actif = :actif", { actif: query.actif });
+      queryBuilder.andWhere('entity.actif = :actif', { actif: query.actif })
     }
 
     const [data, total] = await queryBuilder
-      .orderBy(`entity.${sortBy}`, sortOrder as "ASC" | "DESC")
+      .orderBy(`entity.${sortBy}`, sortOrder as 'ASC' | 'DESC')
       .skip(skip)
       .take(limit)
-      .getManyAndCount();
+      .getManyAndCount()
 
     return {
       data,
@@ -60,37 +51,34 @@ export class TracabiliteService {
         hasNext: page < Math.ceil(total / limit),
         hasPrev: page > 1,
       },
-    };
+    }
   }
 
   async findOne(id: string): Promise<Tracabilite> {
-    const entity = await this.repository.findOne({ where: { id } });
+    const entity = await this.repository.findOne({ where: { id } })
     if (!entity) {
-      throw new NotFoundException(`Tracabilite with ID ${id} not found`);
+      throw new NotFoundException(`Tracabilite with ID ${id} not found`)
     }
-    return entity;
+    return entity
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateTracabiliteDto,
-  ): Promise<Tracabilite> {
-    await this.repository.update(id, updateDto);
-    return this.findOne(id);
+  async update(id: string, updateDto: UpdateTracabiliteDto): Promise<Tracabilite> {
+    await this.repository.update(id, updateDto)
+    return this.findOne(id)
   }
 
   async remove(id: string): Promise<void> {
-    await this.repository.softDelete(id);
+    await this.repository.softDelete(id)
   }
 
   async getStats(): Promise<unknown> {
-    const total = await this.repository.count();
-    const active = await this.repository.count({ where: { actif: true } });
+    const total = await this.repository.count()
+    const active = await this.repository.count({ where: { actif: true } })
 
     return {
       total,
       active,
       inactive: total - active,
-    };
+    }
   }
 }

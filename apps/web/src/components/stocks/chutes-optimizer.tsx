@@ -261,7 +261,8 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                           </span>
                         </div>
 
-                        <button type="button"
+                        <button
+                          type="button"
                           size="sm"
                           onClick={() => onOptimize(selectedChute.id, utilisation.id)}
                           className="flex items-center gap-1"
@@ -299,4 +300,3 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
     </div>
   )
 }
-

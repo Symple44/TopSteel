@@ -496,4 +496,3 @@ export class StoreMonitor {
 
 // ===== EXPORTS UNIQUEMENT DES CLASSES UTILITAIRES =====
 export default StoreUtils
-

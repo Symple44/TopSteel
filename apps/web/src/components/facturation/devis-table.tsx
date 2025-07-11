@@ -128,4 +128,3 @@ export function DevisTable({ data = mockDevis }: DevisTableProps) {
     </div>
   )
 }
-

@@ -180,4 +180,3 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
     </div>
   )
 }
-

@@ -133,13 +133,26 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex space-x-2">
-                    <button type="button" variant="ghost" size="sm" onClick={() => onView(chute)} className="p-1">
+                    <button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onView(chute)}
+                      className="p-1"
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <button type="button" variant="ghost" size="sm" onClick={() => onEdit(chute)} className="p-1">
+                    <button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(chute)}
+                      className="p-1"
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <button type="button"
+                    <button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => onDelete(chute)}
@@ -162,4 +175,3 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
     </div>
   )
 }
-

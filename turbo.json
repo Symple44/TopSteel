@@ -15,9 +15,7 @@
       "outputs": ["coverage/**"],
       "cache": true
     },
-    "lint": {
-      "cache": true
-    },
+    "lint": { "dependsOn": ["^build"], "inputs": ["src/**/*.{ts,tsx,js,jsx}"] }"] },
     "type-check": {
       "dependsOn": ["^build"],
       "cache": true

@@ -1,9 +1,11 @@
+import { Button } from '@erp/ui'
+import React from 'react'
 /**
  * Page Dashboard Error - TopSteel ERP
  * Fichier: apps/web/src/app/(dashboard)/error.tsx
  */
 
-'use client'
+;('use client')
 
 import Link from 'next/link'
 
@@ -26,12 +28,12 @@ export default function DashboardError({
         </div>
 
         <div className="space-y-4">
-          <button type="button"
+          <Button
             onClick={reset}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Réessayer
-          </button>
+          </Button>
 
           <div className="text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground transition-colors">
@@ -43,4 +45,3 @@ export default function DashboardError({
     </div>
   )
 }
-

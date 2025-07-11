@@ -148,4 +148,3 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
     </Dialog>
   )
 }
-

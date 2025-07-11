@@ -1,5 +1,9 @@
 'use client'
 
+import { Calendar } from 'lucide-react'
+import React from 'react'
+
+
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import {
   Activity,
@@ -214,7 +218,7 @@ export default function Dashboard() {
             <p className="text-slate-600 mt-1">Vue d'ensemble de votre activité TopSteel</p>
           </div>
           <div className="flex items-center space-x-3">
-            <button type="button"
+            <Button
               variant="outline"
               size="sm"
               className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white"
@@ -222,7 +226,7 @@ export default function Dashboard() {
               <Calendar className="mr-2 h-4 w-4 text-slate-600" />
               Cette semaine
             </Button>
-            <button type="button" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
+            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
               <BarChart3 className="mr-2 h-4 w-4" />
               Rapports
             </Button>
@@ -424,7 +428,7 @@ export default function Dashboard() {
                 ))}
               </div>
               <div className="mt-6">
-                <button type="button"
+                <Button
                   variant="outline"
                   size="sm"
                   className="w-full border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white group"
@@ -494,4 +498,3 @@ export default function Dashboard() {
     </div>
   )
 }
-

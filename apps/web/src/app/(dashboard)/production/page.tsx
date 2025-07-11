@@ -1,4 +1,5 @@
-'use client'
+import React from 'react'
+;('use client')
 
 import { CreateOrdreDialog } from '@/components/production/create-ordre-dialog'
 import { ProductionFilters } from '@/components/production/production-filters'
@@ -67,11 +68,11 @@ export default function ProductionPage() {
           <p className="text-muted-foreground">Gestion des ordres de fabrication et planning</p>
         </div>
         <div className="flex gap-2">
-          <button type="button" variant="outline" onClick={() => setShowFilters(!showFilters)}>
+          <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
             <Filter className="h-4 w-4 mr-2" />
             Filtres
           </Button>
-          <button type="button" onClick={() => setShowCreateModal(true)}>
+          <Button onClick={() => setShowCreateModal(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Nouvel ordre
           </Button>
@@ -143,4 +144,3 @@ export default function ProductionPage() {
     </div>
   )
 }
-

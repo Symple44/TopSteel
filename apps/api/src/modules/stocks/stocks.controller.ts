@@ -11,75 +11,66 @@ import {
   Post,
   Query,
   UseGuards,
-} from "@nestjs/common";
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from "@nestjs/swagger";
-import { Roles } from "../../common/decorators/roles.decorator";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { RolesGuard } from "../auth/guards/roles.guard";
-import { UserRole } from "../users/entities/user.entity";
-import type { CreateStocksDto } from "./dto/create-stocks.dto";
-import type { StocksQueryDto } from "./dto/stocks-query.dto";
-import type { UpdateStocksDto } from "./dto/update-stocks.dto";
-import type { StocksService } from "./stocks.service";
+} from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Roles } from '../../common/decorators/roles.decorator'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
+import { UserRole } from '../users/entities/user.entity'
+import type { CreateStocksDto } from './dto/create-stocks.dto'
+import type { StocksQueryDto } from './dto/stocks-query.dto'
+import type { UpdateStocksDto } from './dto/update-stocks.dto'
+import type { StocksService } from './stocks.service'
 
-@Controller("stocks")
-@ApiTags("📦 Stocks")
+@Controller('stocks')
+@ApiTags('📦 Stocks')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
 
   @Post()
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: "Créer un nouveau stocks" })
-  @ApiResponse({ status: 201, description: "Stocks créé avec succès" })
+  @ApiOperation({ summary: 'Créer un nouveau stocks' })
+  @ApiResponse({ status: 201, description: 'Stocks créé avec succès' })
   async create(@Body() createDto: CreateStocksDto) {
-    return this.stocksService.create(createDto);
+    return this.stocksService.create(createDto)
   }
 
   @Get()
-  @ApiOperation({ summary: "Lister les stocks avec pagination" })
-  @ApiQuery({ name: "page", required: false, type: Number })
-  @ApiQuery({ name: "limit", required: false, type: Number })
-  @ApiQuery({ name: "search", required: false, type: String })
+  @ApiOperation({ summary: 'Lister les stocks avec pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
   async findAll(@Query() query: StocksQueryDto) {
-    return this.stocksService.findAll(query);
+    return this.stocksService.findAll(query)
   }
 
-  @Get("stats")
+  @Get('stats')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: "Statistiques des stocks" })
+  @ApiOperation({ summary: 'Statistiques des stocks' })
   async getStats() {
-    return this.stocksService.getStats();
+    return this.stocksService.getStats()
   }
 
-  @Get(":id")
-  @ApiOperation({ summary: "Récupérer un stocks par ID" })
-  async findOne(@Param("id", ParseUUIDPipe) id: string) {
-    return this.stocksService.findOne(id);
+  @Get(':id')
+  @ApiOperation({ summary: 'Récupérer un stocks par ID' })
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.stocksService.findOne(id)
   }
 
-  @Patch(":id")
+  @Patch(':id')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: "Mettre à jour un stocks" })
-  async update(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Body() updateDto: UpdateStocksDto,
-  ) {
-    return this.stocksService.update(id, updateDto);
+  @ApiOperation({ summary: 'Mettre à jour un stocks' })
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() updateDto: UpdateStocksDto) {
+    return this.stocksService.update(id, updateDto)
   }
 
-  @Delete(":id")
+  @Delete(':id')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: "Supprimer un stocks" })
-  async remove(@Param("id", ParseUUIDPipe) id: string) {
-    return this.stocksService.remove(id);
+  @ApiOperation({ summary: 'Supprimer un stocks' })
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.stocksService.remove(id)
   }
 }

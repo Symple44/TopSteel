@@ -341,4 +341,3 @@ export const useIsAuthenticated = () => {
 
   return isAuthenticated
 }
-

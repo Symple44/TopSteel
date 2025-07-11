@@ -107,7 +107,6 @@ export default function MouvementsLayout({ children }: MouvementsLayoutProps) {
       {/* Scripts et optimisations spécifiques à cette section */}
       <script
         type="application/ld+json"
-        /* biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structure */`n
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
@@ -202,4 +201,3 @@ export const generateStaticParams = async () => {
   // Pas de params statiques pour cette section
   return []
 }
-

@@ -50,10 +50,7 @@
     "pnpm": ">=8.0.0",
     "node": ">=20.0.0"
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "version": "2.1.0",
   "config": {
     "access": "restricted"
@@ -62,12 +59,7 @@
     "name": "TopSteel Engineering Team",
     "email": "engineering@topsteel.com"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11"
-  ],
+  "browserslist": ["> 1%", "last 2 versions", "not dead", "not ie 11"],
   "bugs": {
     "url": "https://github.com/topsteel/erp-topsteel/issues"
   },

@@ -34,7 +34,12 @@ export default function StocksPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button type="button" variant="outline" onClick={() => setShowAlerts(!showAlerts)} className="relative">
+          <button
+            type="button"
+            variant="outline"
+            onClick={() => setShowAlerts(!showAlerts)}
+            className="relative"
+          >
             <AlertTriangle className="h-4 w-4 mr-2" />
             Alertes
             <Badge
@@ -147,4 +152,3 @@ export default function StocksPage() {
     </div>
   )
 }
-

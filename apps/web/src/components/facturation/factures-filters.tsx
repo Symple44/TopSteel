@@ -52,4 +52,3 @@ export function FacturesFilters({ onFiltersChange }: FacturesFiltersProps) {
     </div>
   )
 }
-

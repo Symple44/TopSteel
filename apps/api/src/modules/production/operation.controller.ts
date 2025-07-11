@@ -8,21 +8,16 @@ import {
   Patch,
   Post,
   UseGuards,
-} from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { UserRole } from '../users/entities/user.entity';
-import type { CreateOperationDto } from './dto/create-operation.dto';
-import type { UpdateOperationDto } from './dto/update-operation.dto';
-import type { OperationStatut } from './entities/operation.entity';
-import type { OperationService } from './operation.service';
+} from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Roles } from '../../common/decorators/roles.decorator'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
+import { UserRole } from '../users/entities/user.entity'
+import type { CreateOperationDto } from './dto/create-operation.dto'
+import type { UpdateOperationDto } from './dto/update-operation.dto'
+import type { OperationStatut } from './entities/operation.entity'
+import type { OperationService } from './operation.service'
 
 @Controller('operations')
 @ApiTags('🔧 Opérations')
@@ -36,58 +31,52 @@ export class OperationController {
   @ApiOperation({ summary: 'Créer une nouvelle opération' })
   @ApiResponse({ status: 201, description: 'Opération créée avec succès' })
   create(@Body() createOperationDto: CreateOperationDto) {
-    return this.operationService.create(createOperationDto);
+    return this.operationService.create(createOperationDto)
   }
 
   @Get()
   @ApiOperation({ summary: 'Lister toutes les opérations' })
   findAll() {
-    return this.operationService.findAll();
+    return this.operationService.findAll()
   }
 
   @Get('stats')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Statistiques des opérations' })
   getStats() {
-    return this.operationService.getStats();
+    return this.operationService.getStats()
   }
 
   @Get('ordre/:ordreFabricationId')
-  @ApiOperation({ summary: 'Lister les opérations d\'un ordre de fabrication' })
+  @ApiOperation({ summary: "Lister les opérations d'un ordre de fabrication" })
   findByOrdre(@Param('ordreFabricationId', ParseIntPipe) ordreFabricationId: number) {
-    return this.operationService.findByOrdre(ordreFabricationId);
+    return this.operationService.findByOrdre(ordreFabricationId)
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une opération par ID' })
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.operationService.findOne(id);
+    return this.operationService.findOne(id)
   }
 
   @Patch(':id')
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.TECHNICIEN)
   @ApiOperation({ summary: 'Mettre à jour une opération' })
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateOperationDto: UpdateOperationDto,
-  ) {
-    return this.operationService.update(id, updateOperationDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateOperationDto: UpdateOperationDto) {
+    return this.operationService.update(id, updateOperationDto)
   }
 
   @Patch(':id/statut')
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.TECHNICIEN)
-  @ApiOperation({ summary: 'Changer le statut d\'une opération' })
-  changeStatut(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: { statut: OperationStatut },
-  ) {
-    return this.operationService.changeStatut(id, body.statut);
+  @ApiOperation({ summary: "Changer le statut d'une opération" })
+  changeStatut(@Param('id', ParseIntPipe) id: number, @Body() body: { statut: OperationStatut }) {
+    return this.operationService.changeStatut(id, body.statut)
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Supprimer une opération' })
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.operationService.remove(id);
+    return this.operationService.remove(id)
   }
 }

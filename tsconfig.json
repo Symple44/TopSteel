@@ -1,43 +1,18 @@
 {
-  "include": [
-    "apps/**/*",
-    "packages/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    ".next",
-    ".turbo",
-    "coverage"
-  ],
+  "include": ["apps/**/*", "packages/**/*"],
+  "exclude": ["node_modules", "dist", ".next", ".turbo", "coverage"],
   "compilerOptions": {
     "module": "ESNext",
     "noEmit": true,
     "paths": {
-      "@erp/ui": [
-        "./packages/ui/src"
-      ],
-      "@erp/types": [
-        "./packages/types/src"
-      ],
-      "@erp/utils": [
-        "./packages/utils/src"
-      ],
-      "@erp/utils/*": [
-        "./packages/utils/src/*"
-      ],
-      "@erp/types/*": [
-        "./packages/types/src/*"
-      ],
-      "@erp/config": [
-        "./packages/config"
-      ],
-      "@erp/config/*": [
-        "./packages/config/*"
-      ],
-      "@erp/ui/*": [
-        "./packages/ui/src/*"
-      ]
+      "@erp/ui": ["./packages/ui/src"],
+      "@erp/types": ["./packages/types/src"],
+      "@erp/utils": ["./packages/utils/src"],
+      "@erp/utils/*": ["./packages/utils/src/*"],
+      "@erp/types/*": ["./packages/types/src/*"],
+      "@erp/config": ["./packages/config"],
+      "@erp/config/*": ["./packages/config/*"],
+      "@erp/ui/*": ["./packages/ui/src/*"]
     },
     "resolveJsonModule": true,
     "incremental": true,

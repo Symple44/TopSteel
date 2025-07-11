@@ -254,4 +254,3 @@ export const authService = {
 
 // ===== TYPES EXPORTÉS =====
 export type { LoginResponse, RefreshTokenResponse, RegisterData }
-

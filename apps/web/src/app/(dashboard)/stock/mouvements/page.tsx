@@ -415,4 +415,3 @@ const CreateMouvementDialog = dynamic(
 
 // Ne pas oublier l'import dynamic en haut du fichier
 import dynamic from 'next/dynamic'
-

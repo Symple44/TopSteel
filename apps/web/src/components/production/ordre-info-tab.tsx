@@ -61,4 +61,3 @@ export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
     </div>
   )
 }
-
