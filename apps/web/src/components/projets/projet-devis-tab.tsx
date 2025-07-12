@@ -89,6 +89,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
 
   const devisAccepte = devis.find((d) => d.accepte)
   const dernierDevis = devis[devis.length - 1]
+  const selectedDevisData = selectedDevis ? devis.find((d) => d.id === selectedDevis) : null
 
   return (
     <div className="space-y-6">
@@ -242,25 +243,25 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Numéro:</span>
-                    <span>{devis.find((d) => d.id === selectedDevis)?.numero}</span>
+                    <span>{selectedDevisData?.numero}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Version:</span>
-                    <span>{devis.find((d) => d.id === selectedDevis)?.version}</span>
+                    <span>{selectedDevisData?.version}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date création:</span>
                     <span>
-                      {devis.find((d) => d.id === selectedDevis)?.dateCreation
-                        ? formatDate(devis.find((d) => d.id === selectedDevis)?.dateCreation!)
+                      {selectedDevisData?.dateCreation
+                        ? formatDate(selectedDevisData.dateCreation)
                         : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Validité:</span>
                     <span>
-                      {devis.find((d) => d.id === selectedDevis)?.dateValidite
-                        ? formatDate(devis.find((d) => d.id === selectedDevis)?.dateValidite!)
+                      {selectedDevisData?.dateValidite
+                        ? formatDate(selectedDevisData.dateValidite)
                         : '—'}
                     </span>
                   </div>
@@ -273,16 +274,16 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Montant HT:</span>
                     <span className="font-medium">
-                      {devis.find((d) => d.id === selectedDevis)?.montantHT
-                        ? formatCurrency(devis.find((d) => d.id === selectedDevis)?.montantHT!)
+                      {selectedDevisData?.montantHT
+                        ? formatCurrency(selectedDevisData.montantHT)
                         : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Montant TTC:</span>
                     <span className="font-medium">
-                      {devis.find((d) => d.id === selectedDevis)?.montantTTC
-                        ? formatCurrency(devis.find((d) => d.id === selectedDevis)?.montantTTC!)
+                      {selectedDevisData?.montantTTC
+                        ? formatCurrency(selectedDevisData.montantTTC)
                         : '—'}
                     </span>
                   </div>
@@ -290,9 +291,7 @@ export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Statut:</span>
                     <span>
-                      {devis.find((d) => d.id === selectedDevis)?.statut
-                        ? getStatutBadge(devis.find((d) => d.id === selectedDevis)?.statut!)
-                        : '—'}
+                      {selectedDevisData?.statut ? getStatutBadge(selectedDevisData.statut) : '—'}
                     </span>
                   </div>
                 </div>

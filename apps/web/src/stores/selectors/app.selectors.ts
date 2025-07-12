@@ -359,7 +359,7 @@ export const useProjectsStats = () =>
         avancementMoyen: 0,
       }
 
-      projets.forEach((projet) => {
+      for (const projet of projets) {
         // Compter par statut
         stats.parStatut[projet.statut] = (stats.parStatut[projet.statut] || 0) + 1
 
@@ -375,7 +375,7 @@ export const useProjectsStats = () =>
         if (projet.avancement !== undefined) {
           stats.avancementMoyen += projet.avancement
         }
-      })
+      }
 
       // Finaliser l'avancement moyen
       if (projets.length > 0) {

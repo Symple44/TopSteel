@@ -1,8 +1,8 @@
 'use client'
 
 import { formatDate } from '@/lib/utils'
-import type { Projet } from '@erp/types'
-import { PrioriteProduction, StatutProduction } from '@erp/types'
+import type { Operation, Projet } from '@erp/types'
+import { OperationStatut, PrioriteProduction, StatutProduction, TypeOperation } from '@erp/types'
 import {
   Badge,
   Button,
@@ -40,7 +40,7 @@ interface MockOrdreFabrication {
   progression: number
   statut: StatutProduction
   priorite: PrioriteProduction
-  operations: any[]
+  operations: Operation[]
 }
 
 // Données mockées pour la démonstration - CORRIGÉES
@@ -55,26 +55,38 @@ const mockOrdresFabrication: MockOrdreFabrication[] = [
     priorite: PrioriteProduction.NORMALE,
     operations: [
       {
-        id: '1',
+        id: 1,
         nom: 'Découpe laser',
         description: 'Découpe des tôles selon plans',
+        type: TypeOperation.DECOUPE,
         dureeEstimee: 240,
         dureeReelle: 220,
-        statut: 'TERMINEE',
-        technicien: { nom: 'Pierre Durand', id: '1' },
+        statut: OperationStatut.TERMINE,
+        technicien: 'Pierre Durand',
+        technicienId: 1,
+        ordreId: 1,
+        sequence: 1,
         dateDebut: new Date('2025-06-20T08:00:00'),
         dateFin: new Date('2025-06-20T12:00:00'),
+        createdAt: new Date('2025-06-20T00:00:00'),
+        updatedAt: new Date('2025-06-20T12:00:00'),
       },
       {
-        id: '2',
+        id: 2,
         nom: 'Pliage',
         description: 'Pliage des éléments découpés',
+        type: TypeOperation.PLIAGE,
         dureeEstimee: 180,
         dureeReelle: 180,
-        statut: 'TERMINEE',
-        technicien: { nom: 'Marc Leblanc', id: '2' },
+        statut: OperationStatut.TERMINE,
+        technicien: 'Marc Leblanc',
+        technicienId: 2,
+        ordreId: 1,
+        sequence: 2,
         dateDebut: new Date('2025-06-20T13:00:00'),
         dateFin: new Date('2025-06-20T16:00:00'),
+        createdAt: new Date('2025-06-20T00:00:00'),
+        updatedAt: new Date('2025-06-20T16:00:00'),
       },
     ],
   },
@@ -87,21 +99,32 @@ const mockOrdresFabrication: MockOrdreFabrication[] = [
     priorite: PrioriteProduction.HAUTE,
     operations: [
       {
-        id: '3',
+        id: 3,
         nom: 'Soudure assemblage',
         description: 'Assemblage des éléments par soudure',
+        type: TypeOperation.SOUDAGE,
         dureeEstimee: 480,
         dureeReelle: 240,
-        statut: 'EN_COURS',
-        technicien: { nom: 'Jean Martin', id: '3' },
+        statut: OperationStatut.EN_COURS,
+        technicien: 'Jean Martin',
+        technicienId: 3,
+        ordreId: 2,
+        sequence: 1,
         dateDebut: new Date('2025-06-22T08:00:00'),
+        createdAt: new Date('2025-06-22T00:00:00'),
+        updatedAt: new Date('2025-06-22T08:00:00'),
       },
       {
-        id: '4',
+        id: 4,
         nom: 'Traitement de surface',
         description: 'Galvanisation à chaud',
+        type: TypeOperation.FINITION,
         dureeEstimee: 120,
-        statut: 'EN_ATTENTE',
+        statut: OperationStatut.EN_ATTENTE,
+        ordreId: 2,
+        sequence: 2,
+        createdAt: new Date('2025-06-22T00:00:00'),
+        updatedAt: new Date('2025-06-22T00:00:00'),
       },
     ],
   },
@@ -114,18 +137,28 @@ const mockOrdresFabrication: MockOrdreFabrication[] = [
     priorite: PrioriteProduction.BASSE,
     operations: [
       {
-        id: '5',
+        id: 5,
         nom: 'Usinage',
         description: 'Perçage et taraudage',
+        type: TypeOperation.USINAGE,
         dureeEstimee: 180,
-        statut: 'EN_ATTENTE',
+        statut: OperationStatut.EN_ATTENTE,
+        ordreId: 3,
+        sequence: 1,
+        createdAt: new Date('2025-06-25T00:00:00'),
+        updatedAt: new Date('2025-06-25T00:00:00'),
       },
       {
-        id: '6',
+        id: 6,
         nom: 'Contrôle qualité',
         description: 'Vérification dimensionnelle',
+        type: TypeOperation.CONTROLE,
         dureeEstimee: 60,
-        statut: 'EN_ATTENTE',
+        statut: OperationStatut.EN_ATTENTE,
+        ordreId: 3,
+        sequence: 2,
+        createdAt: new Date('2025-06-25T00:00:00'),
+        updatedAt: new Date('2025-06-25T00:00:00'),
       },
     ],
   },
@@ -209,15 +242,17 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
     return <Badge variant={config.variant}>{config.label}</Badge>
   }
 
-  const getOperationStatusIcon = (statut: string) => {
+  const getOperationStatusIcon = (statut: OperationStatut) => {
     switch (statut) {
-      case 'TERMINEE':
+      case OperationStatut.TERMINE:
         return <CheckCircle2 className="h-4 w-4 text-green-600" />
-      case 'EN_COURS':
+      case OperationStatut.EN_COURS:
         return <Play className="h-4 w-4 text-blue-600" />
-      case 'EN_ATTENTE':
+      case OperationStatut.EN_ATTENTE:
         return <Clock className="h-4 w-4 text-gray-400" />
-      case 'BLOQUEE':
+      case OperationStatut.PAUSE:
+        return <Pause className="h-4 w-4 text-orange-600" />
+      case OperationStatut.ANNULE:
         return <AlertCircle className="h-4 w-4 text-red-600" />
       default:
         return <Clock className="h-4 w-4 text-gray-400" />
@@ -312,6 +347,15 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
                   selectedOF?.id === of.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
                 }`}
                 onClick={() => setSelectedOF(of)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setSelectedOF(of)
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Sélectionner l'ordre de fabrication ${of.numero}`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div>
@@ -363,7 +407,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
                       <p className="text-sm text-muted-foreground">{operation.description}</p>
                       {operation.technicien && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Technicien: {operation.technicien.nom}
+                          Technicien: {operation.technicien}
                         </p>
                       )}
                     </div>

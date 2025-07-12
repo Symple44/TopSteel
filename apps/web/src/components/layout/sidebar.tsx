@@ -143,6 +143,15 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
       <div key={item.title} className="space-y-1">
         <div
           onClick={handleClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              handleClick()
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label={item.title}
           className={cn(
             'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium cursor-pointer transition-all duration-200',
             level === 0 && 'mx-1',

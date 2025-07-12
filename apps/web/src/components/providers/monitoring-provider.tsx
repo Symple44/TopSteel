@@ -133,7 +133,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
       try {
         // Observer pour les métriques de performance
         const perfObserver = new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry) => {
+          for (const entry of list.getEntries()) {
             if (entry.entryType === 'largest-contentful-paint') {
               metrics.trackPerformanceMetric('LCP', entry.startTime)
             } else if (entry.entryType === 'first-input') {
@@ -142,7 +142,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
                 (entry as any).processingStart - entry.startTime
               )
             }
-          })
+          }
         })
 
         perfObserver.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] })
@@ -164,7 +164,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
   // Monitoring des Web Vitals si disponibles
   useEffect(() => {
     if (webVitals) {
-      Object.entries(webVitals).forEach(([metric, value]) => {
+      for (const [metric, value] of Object.entries(webVitals)) {
         if (typeof value === 'number') {
           metrics.trackPerformanceMetric(metric, value)
         }
@@ -182,7 +182,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
             severity: 'warning',
           })
         }
-      })
+      }
     }
   }, [webVitals, metrics])
 

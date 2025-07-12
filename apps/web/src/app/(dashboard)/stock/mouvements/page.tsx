@@ -389,8 +389,8 @@ const MouvementsTable = dynamic(
   {
     loading: () => (
       <div className="space-y-3">
-        {[...Array(5)].map((_, i) => (
-          <div key={`item-${i}`} className="animate-pulse">
+        {Array.from({ length: 5 }, (_, i) => (
+          <div key={`table-skeleton-${Date.now()}-${i}`} className="animate-pulse">
             <div className="h-12 bg-muted rounded" />
           </div>
         ))}

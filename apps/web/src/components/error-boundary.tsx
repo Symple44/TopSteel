@@ -6,7 +6,11 @@ import type { ErrorInfo, ReactNode } from 'react'
 import React, { Component } from 'react'
 
 interface WindowWithGtag extends Window {
-  gtag?: (command: 'config' | 'event' | 'set', target: string, config?: Record<string, any>) => void
+  gtag?: (
+    command: 'config' | 'event' | 'set',
+    target: string,
+    config?: Record<string, unknown>
+  ) => void
 }
 
 interface Props {
@@ -75,7 +79,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
   override componentWillUnmount() {
     // Nettoyer les timeouts
-    this.retryTimeouts.forEach((timeout) => clearTimeout(timeout))
+    for (const timeout of this.retryTimeouts) {
+      clearTimeout(timeout)
+    }
   }
 
   private generateErrorId(): string {

@@ -94,13 +94,13 @@ class HydrationManager {
   }
 
   private _notifyListeners() {
-    this._listeners.forEach((listener) => {
+    for (const listener of this._listeners) {
       try {
         listener()
       } catch (error) {
         console.error('Erreur dans listener hydratation:', error)
       }
-    })
+    }
   }
 
   get isClient(): boolean {

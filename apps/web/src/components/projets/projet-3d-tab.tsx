@@ -148,6 +148,15 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                     key={modele.id}
                     className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
                     onClick={() => setIs3DLoaded(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setIs3DLoaded(true)
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Charger le modèle 3D ${modele.nom}`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <p className="font-medium text-sm">{modele.nom}</p>

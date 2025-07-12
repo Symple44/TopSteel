@@ -135,13 +135,22 @@ export function PlanningCalendar({
 
             return (
               <div
-                key={index}
+                key={day.date.toISOString()}
                 className={`
                   min-h-[100px] p-1 border border-gray-200 cursor-pointer hover:bg-gray-50
                   ${day.isCurrentMonth ? '' : 'bg-gray-50 text-gray-400'}
                   ${isToday ? 'bg-blue-50 border-blue-200' : ''}
                 `}
                 onClick={() => onDateClick(day.date)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onDateClick(day.date)
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Sélectionner le ${day.date.toLocaleDateString('fr-FR')}`}
               >
                 <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : ''}`}>
                   {day.date.getDate()}
@@ -166,6 +175,16 @@ export function PlanningCalendar({
                         e.stopPropagation()
                         onEventClick(event)
                       }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          onEventClick(event)
+                        }
+                      }}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`Événement: ${event.title}`}
                     >
                       {event.title}
                     </div>

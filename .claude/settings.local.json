@@ -9,7 +9,8 @@
       "Bash(npm run build:*)",
       "Bash(npx biome check:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx turbo build:*)"
+      "Bash(npx turbo build:*)",
+      "Bash(npx @biomejs/biome check:*)"
     ],
     "deny": []
   }

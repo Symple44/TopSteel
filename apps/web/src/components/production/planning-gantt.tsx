@@ -173,7 +173,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
             <div className="flex">
               {headers.map((header, index) => (
                 <div
-                  key={index}
+                  key={header.date.toISOString()}
                   className={`p-2 text-center text-sm border-r min-w-[40px] ${
                     header.isWeekend ? 'bg-gray-100' : ''
                   }`}
@@ -222,6 +222,15 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
                           width: `${position.width}px`,
                         }}
                         onClick={() => onTaskClick(task)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            onTaskClick(task)
+                          }
+                        }}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={`Tâche: ${task.name} - ${task.progress}%`}
                         title={`${task.name} - ${task.progress}%`}
                       >
                         {/* Barre de progression */}
