@@ -1,8 +1,9 @@
 // apps/web/src/components/production/ordre-operations-tab.tsx
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { OrdreFabrication, Operation } from '@erp/types'
 
 interface OrdreOperationsTabProps {
-  ordre: unknown
+  ordre: OrdreFabrication
 }
 
 export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
