@@ -8,7 +8,6 @@ export class RedisService {
 
   async get(key: string): Promise<string | null> {
     if (!this.redisClient) {
-      console.log('🚫 Redis non disponible - get() ignoré')
       return null
     }
     return this.redisClient.get(key)
@@ -16,7 +15,6 @@ export class RedisService {
 
   async set(key: string, value: string, ttl?: number): Promise<void> {
     if (!this.redisClient) {
-      console.log('🚫 Redis non disponible - set() ignoré')
       return
     }
 
@@ -29,7 +27,6 @@ export class RedisService {
 
   async del(key: string): Promise<void> {
     if (!this.redisClient) {
-      console.log('🚫 Redis non disponible - del() ignoré')
       return
     }
     await this.redisClient.del(key)
@@ -37,7 +34,6 @@ export class RedisService {
 
   async exists(key: string): Promise<boolean> {
     if (!this.redisClient) {
-      console.log('🚫 Redis non disponible - exists() retourne false')
       return false
     }
     const result = await this.redisClient.exists(key)

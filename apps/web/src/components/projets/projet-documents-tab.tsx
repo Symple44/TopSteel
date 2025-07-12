@@ -156,7 +156,9 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
                 <Input
                   placeholder="Rechercher par nom ou auteur..."
                   value={searchTerm}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setSearchTerm(e.target.value)
+                  }
                   className="pl-10"
                 />
               </div>

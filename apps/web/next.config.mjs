@@ -4,16 +4,16 @@ const nextConfig = {
   experimental: {
     esmExternals: 'loose',
     turbotrace: {
-      contextDirectory: require('path').join(__dirname, '../..'),
+      contextDirectory: require('node:path').join(__dirname, '../..'),
     },
   },
   webpack: (config, { isServer, webpack }) => {
     // Force resolve workspace packages
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@erp/ui': require('path').resolve(__dirname, '../../packages/ui/dist'),
-      '@erp/utils': require('path').resolve(__dirname, '../../packages/utils/dist'),
-      '@erp/types': require('path').resolve(__dirname, '../../packages/types/dist'),
+      '@erp/ui': require('node:path').resolve(__dirname, '../../packages/ui/dist'),
+      '@erp/utils': require('node:path').resolve(__dirname, '../../packages/utils/dist'),
+      '@erp/types': require('node:path').resolve(__dirname, '../../packages/types/dist'),
     }
 
     // Handle ESM modules properly

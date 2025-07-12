@@ -1,6 +1,6 @@
 // apps/web/src/components/production/ordre-info-tab.tsx
 
-import { type OrdreFabrication } from '@erp/types'
+import type { OrdreFabrication } from '@erp/types'
 import { Card, CardContent, CardHeader, CardTitle, Label } from '@erp/ui'
 
 interface OrdreInfoTabProps {

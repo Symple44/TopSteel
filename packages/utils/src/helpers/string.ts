@@ -19,7 +19,7 @@ export function camelCase(str: string): string {
 
 export function truncate(str: string, length: number): string {
   if (!str || str.length <= length) return str
-  return str.slice(0, length) + '...'
+  return `${str.slice(0, length)}...`
 }
 
 export function slugify(str: string): string {

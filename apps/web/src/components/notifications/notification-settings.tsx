@@ -75,7 +75,9 @@ export function NotificationSettings() {
           </div>
           <Switch
             checked={state.settings.enableBrowser}
-            onCheckedChange={(checked: boolean) => actions.updateSettings({ enableBrowser: checked })}
+            onCheckedChange={(checked: boolean) =>
+              actions.updateSettings({ enableBrowser: checked })
+            }
           />
         </div>
       </div>

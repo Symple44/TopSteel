@@ -118,7 +118,7 @@ export const toSafeString = (value: unknown, fallback = ''): string => {
  */
 export const toSafeNumber = (value: unknown, fallback = 0): number => {
   const num = Number(value)
-  return isNaN(num) ? fallback : num
+  return Number.isNaN(num) ? fallback : num
 }
 
 /**

@@ -1,6 +1,6 @@
+import { performance } from 'node:perf_hooks'
 import { Injectable, type NestMiddleware } from '@nestjs/common'
 import type { NextFunction, Request, Response } from 'express'
-import { performance } from 'perf_hooks'
 
 interface ExtendedRequest extends Request {
   startTime?: number

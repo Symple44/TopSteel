@@ -102,7 +102,9 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
               placeholder="FAC-001"
               className="col-span-3"
               value={formData.reference}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, reference: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, reference: e.target.value })
+              }
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -114,7 +116,9 @@ export function CreateFactureDialog({ onFactureCreated }: CreateFactureDialogPro
               placeholder="Nom du client"
               className="col-span-3"
               value={formData.client}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, client: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, client: e.target.value })
+              }
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">

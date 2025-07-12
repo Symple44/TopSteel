@@ -215,11 +215,13 @@ export function nettoyerTelephoneFrancais(telephone: string): string | null {
     if (pattern.test(cleaned)) {
       // Normaliser au format +33
       if (cleaned.startsWith('0')) {
-        return '+33' + cleaned.substring(1)
-      } else if (cleaned.startsWith('+33')) {
+        return `+33${cleaned.substring(1)}`
+      }
+      if (cleaned.startsWith('+33')) {
         return cleaned
-      } else if (cleaned.length === 9) {
-        return '+33' + cleaned
+      }
+      if (cleaned.length === 9) {
+        return `+33${cleaned}`
       }
     }
   }

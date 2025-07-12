@@ -103,7 +103,9 @@ export function CreateOrdreDialog({ open, onOpenChange, onSubmit }: CreateOrdreD
             {/* ✅ CORRIGÉ : Utilise l'API Radix UI Select correcte */}
             <Select
               value={formData.priorite}
-              onValueChange={(value: string) => setFormData((prev) => ({ ...prev, priorite: value }))}
+              onValueChange={(value: string) =>
+                setFormData((prev) => ({ ...prev, priorite: value }))
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sélectionner une priorité" />
@@ -289,7 +291,9 @@ export function CreateOrdreDialogAdvanced({
             <Label className="text-sm font-medium">Priorité</Label>
             <Select
               value={formData.priorite}
-              onValueChange={(value: string) => setFormData((prev) => ({ ...prev, priorite: value }))}
+              onValueChange={(value: string) =>
+                setFormData((prev) => ({ ...prev, priorite: value }))
+              }
             >
               <SelectTrigger>
                 <SelectValue />

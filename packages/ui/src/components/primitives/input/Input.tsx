@@ -214,7 +214,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 className="animate-spin h-4 w-4 border-2 border-muted-foreground border-t-transparent rounded-full"
                 role="status"
                 aria-hidden="true"
-              ></div>
+              />
             </div>
           )}
 
@@ -434,4 +434,3 @@ export const RadioInput = React.forwardRef<HTMLInputElement, Omit<InputProps, 't
 RadioInput.displayName = 'RadioInput'
 
 export { Input }
-

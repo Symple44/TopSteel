@@ -89,4 +89,3 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
 ThemeSwitcher.displayName = 'ThemeSwitcher'
 
 export { ThemeSwitcher }
-

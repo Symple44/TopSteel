@@ -136,7 +136,9 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           <Input
             type="number"
             value={filters.stockMin}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('stockMin', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleFilterChange('stockMin', e.target.value)
+            }
             placeholder="0"
           />
         </div>
@@ -146,7 +148,9 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           <Input
             type="number"
             value={filters.stockMax}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('stockMax', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleFilterChange('stockMax', e.target.value)
+            }
             placeholder="1000"
           />
         </div>

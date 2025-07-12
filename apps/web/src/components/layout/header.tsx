@@ -50,9 +50,7 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
               type="text"
               placeholder="Rechercher..."
               value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setSearchQuery(e.target.value)
-              }
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
               className="pl-10"
             />
           </div>

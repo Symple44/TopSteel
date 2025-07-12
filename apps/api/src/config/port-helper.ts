@@ -1,5 +1,5 @@
 // apps/api/src/config/port-helper.ts - Helper gestion ports intelligente
-import { createServer } from 'net'
+import { createServer } from 'node:net'
 
 export interface PortConfig {
   preferred: number

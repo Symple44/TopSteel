@@ -177,7 +177,9 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                   <Label htmlFor="client">Client</Label>
                   <Select
                     value={devis.clientId}
-                    onValueChange={(value: string) => setDevis((prev) => ({ ...prev, clientId: value }))}
+                    onValueChange={(value: string) =>
+                      setDevis((prev) => ({ ...prev, clientId: value }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner un client" />
@@ -192,7 +194,9 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                   <Label htmlFor="projet">Projet (optionnel)</Label>
                   <Select
                     value={devis.projetId}
-                    onValueChange={(value: string) => setDevis((prev) => ({ ...prev, projetId: value }))}
+                    onValueChange={(value: string) =>
+                      setDevis((prev) => ({ ...prev, projetId: value }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner un projet" />
@@ -438,4 +442,3 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
     </div>
   )
 }
-

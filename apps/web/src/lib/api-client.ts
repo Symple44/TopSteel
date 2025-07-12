@@ -164,7 +164,7 @@ export class APIClient {
 
     this.metrics.cacheHits++
 
-    return entry.data
+    return entry.data as T
   }
 
   /**
@@ -236,11 +236,11 @@ export class APIClient {
     this.metrics.errors++
 
     const errorDetails: APIErrorDetails = {
-      code: error.code || 'UNKNOWN_ERROR',
-      message: error.message || 'Une erreur inconnue est survenue',
-      details: error.details || null,
+      code: (error as any).code || 'UNKNOWN_ERROR',
+      message: (error as any).message || 'Une erreur inconnue est survenue',
+      details: (error as any).details || null,
       timestamp: Date.now(),
-      requestId: error.requestId || `req_${Date.now()}`,
+      requestId: (error as any).requestId || `req_${Date.now()}`,
     }
 
     // Log simple (sans dépendance externe)
@@ -311,7 +311,7 @@ export class APIClient {
       const fetchConfig: RequestInit = {
         method: config.method || 'GET',
         headers,
-        ...(config.body && { body: JSON.stringify(config.body) }),
+        ...(config.body ? { body: JSON.stringify(config.body) } : {}),
       }
 
       // Exécution avec retry et timeout
@@ -424,7 +424,7 @@ export class APIClient {
 
     // Supprimer Content-Type pour les uploads
     if (uploadConfig.headers && 'Content-Type' in uploadConfig.headers) {
-      uploadConfig.headers['Content-Type'] = undefined
+      delete uploadConfig.headers['Content-Type']
     }
 
     const url = `${this.baseURL}${endpoint}`

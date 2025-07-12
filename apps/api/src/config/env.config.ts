@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 // apps/api/src/config/env.config.ts
 import { config } from 'dotenv'
 

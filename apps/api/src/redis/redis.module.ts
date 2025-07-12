@@ -11,7 +11,6 @@ export class RedisModule {
     const redisEnabled = process.env.REDIS_ENABLED === 'true'
 
     if (!redisEnabled) {
-      console.log('🚫 Redis désactivé - Aucun provider Redis chargé')
       return {
         module: RedisModule,
         providers: [
@@ -24,8 +23,6 @@ export class RedisModule {
         exports: ['REDIS_CLIENT'],
       }
     }
-
-    console.log('✅ Redis activé - Provider Redis complet chargé')
     return {
       module: RedisModule,
       imports: [ConfigModule],

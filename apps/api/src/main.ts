@@ -1,5 +1,5 @@
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 // apps/api/src/main.ts
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
@@ -304,17 +304,17 @@ async function bootstrap() {
   logger.log(`🔗 CORS Origin: ${corsOrigin}`)
   logger.log('')
   logger.log('📍 URLs API disponibles:')
-  logger.log(`   • /api/users           → V1 (défaut actuel)`)
-  logger.log(`   • /api/v1/users        → V1 explicite`)
-  logger.log(`   • /api/v2/users        → V2 (future)`)
+  logger.log('   • /api/users           → V1 (défaut actuel)')
+  logger.log('   • /api/v1/users        → V1 explicite')
+  logger.log('   • /api/v2/users        → V2 (future)')
   logger.log('')
   logger.log('📚 Documentation Swagger:')
-  logger.log(`   • /api/docs           → V1 (défaut)`)
-  logger.log(`   • /api/v1/docs        → V1 explicite`)
-  logger.log(`   • /api/v2/docs        → V2 (beta)`)
+  logger.log('   • /api/docs           → V1 (défaut)')
+  logger.log('   • /api/v1/docs        → V1 explicite')
+  logger.log('   • /api/v2/docs        → V2 (beta)')
   logger.log('')
   logger.log('📊 Monitoring:')
-  logger.log(`   • /health             → Health check`)
+  logger.log('   • /health             → Health check')
   logger.log('')
   logger.log('🏭 ===============================================')
   logger.log('')

@@ -1,5 +1,5 @@
 // apps/web/src/components/production/ordre-operations-tab.tsx
-import { type OrdreFabrication, type Operation, OperationStatut } from '@erp/types'
+import { type Operation, OperationStatut, type OrdreFabrication } from '@erp/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
 interface OrdreOperationsTabProps {

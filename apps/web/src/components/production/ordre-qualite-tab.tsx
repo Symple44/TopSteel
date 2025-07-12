@@ -1,5 +1,5 @@
 // apps/web/src/components/production/ordre-qualite-tab.tsx
-import { type OrdreFabrication, type ControleQualite } from '@erp/types'
+import type { ControleQualite, OrdreFabrication } from '@erp/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
 interface OrdreQualiteTabProps {

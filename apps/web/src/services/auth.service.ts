@@ -41,21 +41,23 @@ interface ApiResponse<T> {
 /**
  * Helper pour transformer les données user backend -> frontend
  */
-const transformUserFromAPI = (apiUser: unknown): User =>
-  ({
-    id: apiUser.id.toString(),
-    email: apiUser.email,
-    nom: apiUser.nom,
-    prenom: apiUser.prenom,
-    role: apiUser.role as UserRole,
-    isActive: apiUser.isActive ?? true,
-    permissions: apiUser.permissions ?? [],
-    telephone: apiUser.telephone,
-    avatar: apiUser.avatar,
-    lastLogin: apiUser.lastLogin ? new Date(apiUser.lastLogin) : undefined,
-    createdAt: new Date(apiUser.createdAt),
-    updatedAt: new Date(apiUser.updatedAt),
-  }) satisfies User
+const transformUserFromAPI = (apiUser: unknown): User => {
+  const user = apiUser as any
+  return {
+    id: user.id.toString(),
+    email: user.email,
+    nom: user.nom,
+    prenom: user.prenom,
+    role: user.role as UserRole,
+    isActive: user.isActive ?? true,
+    permissions: user.permissions ?? [],
+    telephone: user.telephone,
+    avatar: user.avatar,
+    lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
+    createdAt: new Date(user.createdAt),
+    updatedAt: new Date(user.updatedAt),
+  } satisfies User
+}
 
 // ===== SERVICE PRINCIPAL =====
 export const authService = {

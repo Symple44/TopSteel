@@ -56,7 +56,7 @@ export class StoreUtils {
 
     // Store creator compatible avec Zustand
     const storeCreator = (set: unknown, get: unknown) => {
-      const customActions = storeDefinition(set, get)
+      const customActions = storeDefinition(set as any, get as any)
       const baseActions = StoreUtils.createBaseActions(initialState)
 
       return {
@@ -110,7 +110,7 @@ export class StoreUtils {
         },
         partialize: (state: unknown) => {
           // Ne persister que les données importantes
-          const { loading, error, lastUpdate, ...persistedState } = state
+          const { loading, error, lastUpdate, ...persistedState } = state as any
 
           return persistedState
         },
@@ -341,10 +341,11 @@ export class StoreUtils {
    * Monitoring et debugging des stores
    */
   private static addMonitoring(store: unknown, name: string) {
-    const originalGetState = store.getState
-    const originalSetState = store.setState
+    const storeTyped = store as any
+    const originalGetState = storeTyped.getState
+    const originalSetState = storeTyped.setState
 
-    store.getState = () => {
+    storeTyped.getState = () => {
       const state = originalGetState()
 
       StoreMonitor.logAccess(name, state)
@@ -352,7 +353,7 @@ export class StoreUtils {
       return state
     }
 
-    store.setState = (updater: unknown) => {
+    storeTyped.setState = (updater: unknown) => {
       const prevState = originalGetState()
       const result = originalSetState(updater)
       const newState = originalGetState()
@@ -475,7 +476,7 @@ export class StoreMonitor {
     try {
       return structuredClone ? structuredClone(state) : JSON.parse(JSON.stringify(state))
     } catch {
-      return { ...state }
+      return { ...(state as any) }
     }
   }
 

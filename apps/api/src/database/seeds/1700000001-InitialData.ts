@@ -54,12 +54,12 @@ export class InitialData1700000001 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Supprimer les données de test
-    await queryRunner.query(`DELETE FROM stocks`)
-    await queryRunner.query(`DELETE FROM produits`)
+    await queryRunner.query('DELETE FROM stocks')
+    await queryRunner.query('DELETE FROM produits')
     await queryRunner.query(
       `DELETE FROM clients WHERE nom IN ('Entreprise TEST SA', 'Jean Dupont')`
     )
     await queryRunner.query(`DELETE FROM users WHERE email = 'admin@topsteel.fr'`)
-    await queryRunner.query(`DELETE FROM parametres`)
+    await queryRunner.query('DELETE FROM parametres')
   }
 }

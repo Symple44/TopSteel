@@ -56,4 +56,3 @@ const ErrorAlert = React.forwardRef<HTMLDivElement, ErrorAlertProps>(
 ErrorAlert.displayName = 'ErrorAlert'
 
 export { ErrorAlert }
-

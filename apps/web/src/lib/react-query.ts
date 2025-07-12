@@ -4,7 +4,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error: unknown) => {
-        if (error?.status === 404) return false
+        if ((error as any)?.status === 404) return false
 
         return failureCount < 3
       },

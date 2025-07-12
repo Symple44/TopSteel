@@ -30,7 +30,7 @@ export const appConfig = registerAs('app', () => ({
 
 // Fonction utilitaire pour vérifier la disponibilité d'un port
 export async function isPortAvailable(port: number): Promise<boolean> {
-  const net = await import('net')
+  const net = await import('node:net')
   return new Promise((resolve) => {
     const server = net.createServer()
     server.listen(port, () => {

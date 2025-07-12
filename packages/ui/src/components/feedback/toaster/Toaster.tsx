@@ -74,4 +74,3 @@ const Toaster = React.forwardRef<HTMLDivElement, ToasterProps>(
 Toaster.displayName = 'Toaster'
 
 export { Toaster }
-

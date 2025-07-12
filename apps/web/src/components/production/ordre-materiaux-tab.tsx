@@ -2,7 +2,7 @@
 
 import React from 'react'
 
-import { type MaterialOrder, type OrdreFabrication } from '@erp/types'
+import type { MaterialOrder, OrdreFabrication } from '@erp/types'
 import { Badge, Button, Card, CardContent } from '@erp/ui'
 
 import { AlertTriangle, Package, Plus } from 'lucide-react'

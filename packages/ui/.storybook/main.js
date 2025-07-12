@@ -29,7 +29,7 @@ const config = {
         ...config.resolve,
         alias: {
           ...config.resolve?.alias,
-          '@': require('path').resolve(__dirname, '../src'),
+          '@': require('node:path').resolve(__dirname, '../src'),
         },
       },
     }

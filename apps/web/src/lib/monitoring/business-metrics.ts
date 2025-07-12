@@ -44,9 +44,9 @@ class BusinessMetrics {
   // Métriques spécifiques TopSteel
   trackProjectCreated(projectData: unknown) {
     this.track('project_created', {
-      projectType: projectData.type,
-      clientId: projectData.clientId,
-      estimatedValue: projectData.montantEstime,
+      projectType: (projectData as any).type,
+      clientId: (projectData as any).clientId,
+      estimatedValue: (projectData as any).montantEstime,
     })
   }
 

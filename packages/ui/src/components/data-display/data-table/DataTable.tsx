@@ -61,7 +61,7 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
               <TableRow>
                 {columns.map((column, index) => (
                   <TableHead key={index}>
-                    <div className="h-4 bg-muted animate-pulse rounded"></div>
+                    <div className="h-4 bg-muted animate-pulse rounded" />
                   </TableHead>
                 ))}
               </TableRow>
@@ -71,7 +71,7 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
                 <TableRow key={index}>
                   {columns.map((_, colIndex) => (
                     <TableCell key={colIndex}>
-                      <div className="h-4 bg-muted animate-pulse rounded"></div>
+                      <div className="h-4 bg-muted animate-pulse rounded" />
                     </TableCell>
                   ))}
                 </TableRow>
