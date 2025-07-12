@@ -83,7 +83,9 @@ class SelectorMemoCache {
       const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
       const toDelete = sortedByUsage.slice(0, Math.floor(SelectorMemoCache.maxSize * 0.3))
 
-      toDelete.forEach(([key]) => SelectorMemoCache.cache.delete(key))
+      for (const [key] of toDelete) {
+        SelectorMemoCache.cache.delete(key)
+      }
     }
   }
 
@@ -396,7 +398,9 @@ export function createMemoizedSelector<T, R>(
       const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
       const toDelete = sortedByUsage.slice(0, Math.floor(maxCacheSize * 0.3))
 
-      toDelete.forEach(([key]) => cache.delete(key))
+      for (const [key] of toDelete) {
+        cache.delete(key)
+      }
     }
 
     lastState = state
@@ -443,7 +447,7 @@ export const selectorDebugUtils = {
   ) => {
     const results: Record<string, { averageTime: number; totalTime: number }> = {}
 
-    Object.entries(selectors).forEach(([name, selector]) => {
+    for (const [name, selector] of Object.entries(selectors)) {
       const times: number[] = []
 
       for (let i = 0; i < iterations; i++) {
@@ -459,7 +463,7 @@ export const selectorDebugUtils = {
         averageTime: totalTime / iterations,
         totalTime,
       }
-    })
+    }
 
     console.table(results)
 

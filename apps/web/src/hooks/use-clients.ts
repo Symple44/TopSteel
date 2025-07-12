@@ -614,7 +614,7 @@ class ClientsService {
   }
 
   static cancelAllRequests(): void {
-    for (const controller of ClientsService.abortControllers) {
+    for (const controller of ClientsService.abortControllers.values()) {
       controller.abort()
     }
     ClientsService.abortControllers.clear()
