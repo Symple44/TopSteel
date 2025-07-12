@@ -341,4 +341,3 @@ export function ErrorTrigger({ children }: { children?: ReactNode }) {
     </div>
   )
 }
-

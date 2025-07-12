@@ -41,7 +41,7 @@ interface WithClientOnlyOptions {
   forceRemount?: boolean
 }
 
-interface SafeComponentProps<T extends Record<string, any> = Record<string, any>> {
+interface SafeComponentProps<T extends Record<string, unknown> = Record<string, unknown>> {
   isClient?: boolean
   isHydrated?: boolean
 }
@@ -365,7 +365,7 @@ export function useBrowserAPI<T>(getter: () => T, fallback: T): T {
 /**
  * Composant wrapper pour rendre n'importe quel composant safe côté client
  */
-export function SafeComponent<T extends Record<string, any>>({
+export function SafeComponent<T extends Record<string, unknown>>({
   component: Component,
   fallback,
   ...props
@@ -385,7 +385,7 @@ export function SafeComponent<T extends Record<string, any>>({
 /**
  * HOC pour wrapper automatiquement un composant avec ClientOnly
  */
-export function withClientOnly<P extends Record<string, any>>(
+export function withClientOnly<P extends Record<string, unknown>>(
   Component: ComponentType<P>,
   options: WithClientOnlyOptions = {}
 ): ComponentType<P & { clientOnlyFallback?: ReactNode }> {

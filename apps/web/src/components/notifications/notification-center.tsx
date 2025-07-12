@@ -5,18 +5,18 @@ import { cn } from '@/lib/utils'
 import type { Notification } from '@erp/types'
 
 import {
-    Badge,
-    Button,
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-    ScrollArea,
-    Separator,
+  Badge,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  ScrollArea,
+  Separator,
 } from '@erp/ui'
 
 import { AlertTriangle, Bell, CheckCheck, Clock, Settings, Trash2, X } from 'lucide-react'

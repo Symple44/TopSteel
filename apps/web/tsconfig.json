@@ -1,18 +1,39 @@
 {
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "compilerOptions": {
     "esModuleInterop": true,
     "target": "ES2022",
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@erp/types/*": ["../../packages/types/src/*"],
-      "@erp/utils/*": ["../../packages/utils/src/*"],
-      "@erp/ui/*": ["../../packages/ui/src/*"],
-      "@erp/types": ["../../packages/types/src"],
-      "@erp/utils": ["../../packages/utils/src"],
-      "@erp/ui": ["../../packages/ui/src"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@erp/types/*": [
+        "../../packages/types/src/*"
+      ],
+      "@erp/utils/*": [
+        "../../packages/utils/src/*"
+      ],
+      "@erp/ui/*": [
+        "../../packages/ui/src/*"
+      ],
+      "@erp/types": [
+        "../../packages/types/src"
+      ],
+      "@erp/utils": [
+        "../../packages/utils/src"
+      ],
+      "@erp/ui": [
+        "../../packages/ui/src"
+      ]
     },
     "noEmit": true,
     "isolatedModules": true,
@@ -30,7 +51,11 @@
         "name": "next"
       }
     ],
-    "lib": ["dom", "dom.iterable", "es6"]
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ]
   },
   "extends": "../../tsconfig.json"
 }

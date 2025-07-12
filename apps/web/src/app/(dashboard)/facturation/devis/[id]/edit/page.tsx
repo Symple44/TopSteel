@@ -118,7 +118,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
     }))
   }, [])
 
-  const updateLigne = useCallback((id: string, field: string, value: any) => {
+  const updateLigne = useCallback((id: string, field: string, value: string | number) => {
     setDevis((prev) => ({
       ...prev,
       lignes: prev.lignes.map((l) => (l.id === id ? { ...l, [field]: value } : l)),
@@ -177,7 +177,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                   <Label htmlFor="client">Client</Label>
                   <Select
                     value={devis.clientId}
-                    onValueChange={(value) => setDevis((prev) => ({ ...prev, clientId: value }))}
+                    onValueChange={(value: string) => setDevis((prev) => ({ ...prev, clientId: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner un client" />
@@ -192,7 +192,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                   <Label htmlFor="projet">Projet (optionnel)</Label>
                   <Select
                     value={devis.projetId}
-                    onValueChange={(value) => setDevis((prev) => ({ ...prev, projetId: value }))}
+                    onValueChange={(value: string) => setDevis((prev) => ({ ...prev, projetId: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner un projet" />
@@ -254,7 +254,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Input
                           value={ligne.designation}
-                          onChange={(e) =>
+                          onChange={(e: Event) =>
                             updateLigne(
                               ligne.id,
                               'designation',
@@ -268,7 +268,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                         <Input
                           type="number"
                           value={ligne.quantite?.toString() ?? ''}
-                          onChange={(e) =>
+                          onChange={(e: Event) =>
                             updateLigne(
                               ligne.id,
                               'quantite',
@@ -283,7 +283,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                       <TableCell>
                         <Select
                           value={ligne.unite}
-                          onValueChange={(value) => updateLigne(ligne.id, 'unite', value)}
+                          onValueChange={(value: string) => updateLigne(ligne.id, 'unite', value)}
                         >
                           <SelectTrigger className="w-20">
                             <SelectValue />
@@ -300,7 +300,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                         <Input
                           type="number"
                           value={ligne.prixUnitaire?.toString() ?? ''}
-                          onChange={(e) =>
+                          onChange={(e: Event) =>
                             updateLigne(
                               ligne.id,
                               'prixUnitaire',
@@ -316,7 +316,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                         <Input
                           type="number"
                           value={ligne.taux_tva?.toString() ?? ''}
-                          onChange={(e) =>
+                          onChange={(e: Event) =>
                             updateLigne(
                               ligne.id,
                               'taux_tva',
@@ -332,7 +332,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                         <Input
                           type="number"
                           value={ligne.remise?.toString() ?? ''}
-                          onChange={(e) =>
+                          onChange={(e: Event) =>
                             updateLigne(
                               ligne.id,
                               'remise',
@@ -382,7 +382,7 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
                     <Input
                       type="number"
                       value={devis.remiseGlobale?.toString() ?? ''}
-                      onChange={(e) =>
+                      onChange={(e: Event) =>
                         setDevis((prev) => ({
                           ...prev,
                           remiseGlobale:
@@ -438,3 +438,4 @@ export default function DevisEditPage({ params }: DevisEditPageProps) {
     </div>
   )
 }
+
