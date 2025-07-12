@@ -84,12 +84,12 @@ export function useFormValidation<T extends Record<string, any>>(
     const newErrors: Partial<Record<keyof T, string>> = {}
     const newTouched: Partial<Record<keyof T, boolean>> = {}
 
-    Object.keys(validationRules).forEach((field) => {
+    for (const field of Object.keys(validationRules)) {
       const key = field as keyof T
       newTouched[key] = true
       const error = validateField(key, values[key])
       if (error) newErrors[key] = error
-    })
+    }
 
     setErrors(newErrors)
     setTouched(newTouched)

@@ -112,9 +112,9 @@ class BusinessMetrics {
    */
   private processPendingEvents(): void {
     if (this.pendingEvents.length > 0) {
-      this.pendingEvents.forEach((event) => {
+      for (const event of this.pendingEvents) {
         this.addEvent(event)
-      })
+      }
       this.pendingEvents = []
     }
   }
@@ -361,9 +361,9 @@ class BusinessMetrics {
   } {
     const eventCounts = new Map<string, number>()
 
-    this.events.forEach((event) => {
+    for (const event of this.events) {
       eventCounts.set(event.name, (eventCounts.get(event.name) || 0) + 1)
-    })
+    }
 
     const topEvents = Array.from(eventCounts.entries())
       .map(([name, count]) => ({ name, count }))

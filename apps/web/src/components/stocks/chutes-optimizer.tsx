@@ -179,6 +179,15 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                       : 'hover:bg-gray-50'
                   }`}
                   onClick={() => setSelectedChute(chute)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setSelectedChute(chute)
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Sélectionner la chute ${chute.reference}`}
                 >
                   <div className="flex justify-between items-start">
                     <div>

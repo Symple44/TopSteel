@@ -41,9 +41,9 @@ export function useOptimizedMutation<TData, TVariables>(
     mutationFn,
     onSuccess: () => {
       if (invalidationKeys) {
-        invalidationKeys.forEach((key) => {
+        for (const key of invalidationKeys) {
           queryClient.invalidateQueries({ queryKey: key })
-        })
+        }
       }
     },
     onError: (error) => {
@@ -103,9 +103,9 @@ export function useSmartMutation<TData, TVariables>(
     onSuccess: (data) => {
       // Invalider les clés spécifiées
       if (options?.invalidateKeys) {
-        options.invalidateKeys.forEach((key) => {
+        for (const key of options.invalidateKeys) {
           queryClient.invalidateQueries({ queryKey: key })
-        })
+        }
       }
 
       // Callback de succès personnalisé

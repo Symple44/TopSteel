@@ -84,7 +84,7 @@ export function useSecureValidation(rules: ValidationRules) {
     (data: Record<string, string>): boolean => {
       const newErrors: ValidationErrors = {}
 
-      Object.entries(rules).forEach(([field, rule]) => {
+      for (const [field, rule] of Object.entries(rules)) {
         const value = data[field] || ''
         const fieldErrors: string[] = []
 
@@ -127,7 +127,7 @@ export function useSecureValidation(rules: ValidationRules) {
         if (fieldErrors.length > 0) {
           newErrors[field] = fieldErrors
         }
-      })
+      }
 
       setErrors(newErrors)
 

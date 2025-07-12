@@ -147,83 +147,81 @@ const DEFAULT_COLORS: Record<ResolvedTheme, ThemeColors> = {
 // UTILITAIRES THEME
 // =============================================
 
-class ThemeStorage {
-  static get(): Theme | null {
-    try {
-      if (typeof window === 'undefined') return null
+// Theme storage functions
+function getStoredTheme(): Theme | null {
+  try {
+    if (typeof window === 'undefined') return null
 
-      return (localStorage.getItem(DEFAULT_STORAGE_KEY) as Theme) || null
-    } catch (error) {
-      console.warn('Theme storage get error:', error)
+    return (localStorage.getItem(DEFAULT_STORAGE_KEY) as Theme) || null
+  } catch (error) {
+    console.warn('Theme storage get error:', error)
 
-      return null
-    }
-  }
-
-  static set(theme: Theme): boolean {
-    try {
-      if (typeof window === 'undefined') return false
-      localStorage.setItem(DEFAULT_STORAGE_KEY, theme)
-
-      return true
-    } catch (error) {
-      console.warn('Theme storage set error:', error)
-
-      return false
-    }
-  }
-
-  static remove(): boolean {
-    try {
-      if (typeof window === 'undefined') return false
-      localStorage.removeItem(DEFAULT_STORAGE_KEY)
-
-      return true
-    } catch (error) {
-      console.warn('Theme storage remove error:', error)
-
-      return false
-    }
+    return null
   }
 }
 
-class ThemeApplicator {
-  static getSystemTheme(): ResolvedTheme {
-    if (typeof window === 'undefined') return 'light'
+function setStoredTheme(theme: Theme): boolean {
+  try {
+    if (typeof window === 'undefined') return false
+    localStorage.setItem(DEFAULT_STORAGE_KEY, theme)
 
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    return true
+  } catch (error) {
+    console.warn('Theme storage set error:', error)
+
+    return false
   }
+}
 
-  static applyTheme(theme: ResolvedTheme, attribute: string, colors: ThemeColors): void {
-    if (typeof document === 'undefined') return
+function removeStoredTheme(): boolean {
+  try {
+    if (typeof window === 'undefined') return false
+    localStorage.removeItem(DEFAULT_STORAGE_KEY)
 
-    try {
-      const root = document.documentElement
+    return true
+  } catch (error) {
+    console.warn('Theme storage remove error:', error)
 
-      // Appliquer l'attribut de thème
-      if (attribute === 'class') {
-        root.classList.remove('light', 'dark')
-        root.classList.add(theme)
-      } else {
-        root.setAttribute('data-theme', theme)
-      }
+    return false
+  }
+}
 
-      // Appliquer les variables CSS
-      Object.entries(colors).forEach(([key, value]) => {
-        const cssVar = `--${key.replace(/[A-Z]/g, '-$&').toLowerCase()}`
+// Theme application functions
+function getSystemTheme(): ResolvedTheme {
+  if (typeof window === 'undefined') return 'light'
 
-        root.style.setProperty(cssVar, value)
-      })
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
 
-      // Dispatch custom event pour les listeners externes
-      window.dispatchEvent(
-        new CustomEvent('theme-changed', {
-          detail: { theme, colors },
-        })
-      )
-    } catch (error) {
-      console.error('Theme application error:', error)
+function applyTheme(theme: ResolvedTheme, attribute: string, colors: ThemeColors): void {
+  if (typeof document === 'undefined') return
+
+  try {
+    const root = document.documentElement
+
+    // Appliquer l'attribut de thème
+    if (attribute === 'class') {
+      root.classList.remove('light', 'dark')
+      root.classList.add(theme)
+    } else {
+      root.setAttribute('data-theme', theme)
     }
+
+    // Appliquer les variables CSS
+    for (const [key, value] of Object.entries(colors)) {
+      const cssVar = `--${key.replace(/[A-Z]/g, '-$&').toLowerCase()}`
+
+      root.style.setProperty(cssVar, value)
+    }
+
+    // Dispatch custom event pour les listeners externes
+    window.dispatchEvent(
+      new CustomEvent('theme-changed', {
+        detail: { theme, colors },
+      })
+    )
+  } catch (error) {
+    console.error('Theme application error:', error)
   }
 }
 
@@ -307,7 +305,7 @@ export function ThemeProvider({
   const resolveTheme = useCallback(
     (currentTheme: Theme): ResolvedTheme => {
       if (currentTheme === 'system') {
-        return enableSystem ? ThemeApplicator.getSystemTheme() : fallbackTheme
+        return enableSystem ? getSystemTheme() : fallbackTheme
       }
 
       return currentTheme as ResolvedTheme
@@ -329,7 +327,7 @@ export function ThemeProvider({
       }
 
       // Appliquer le thème
-      ThemeApplicator.applyTheme(resolved, attribute, colors)
+      applyTheme(resolved, attribute, colors)
 
       if (enableMetrics) {
         ThemeMetricsCollector.recordTransition()
@@ -359,7 +357,7 @@ export function ThemeProvider({
         updateResolvedTheme(newTheme)
 
         // Sauvegarder dans le storage
-        const saved = ThemeStorage.set(newTheme)
+        const saved = setStoredTheme(newTheme)
 
         if (!saved && enableMetrics) {
           ThemeMetricsCollector.recordStorageError()
@@ -389,7 +387,7 @@ export function ThemeProvider({
 
     try {
       // Obtenir le thème initial depuis le storage ou utiliser le défaut
-      const storedTheme = ThemeStorage.get()
+      const storedTheme = getStoredTheme()
       const initialTheme = storedTheme || defaultTheme
 
       setThemeState(initialTheme)
@@ -460,7 +458,7 @@ export function ThemeProvider({
   }, [setTheme])
 
   const clearTheme = useCallback(() => {
-    ThemeStorage.remove()
+    removeStoredTheme()
     setTheme(defaultTheme)
   }, [setTheme, defaultTheme])
 
@@ -580,8 +578,15 @@ export function useThemeDebug(): {
 // =============================================
 
 export const themeUtils = {
-  storage: ThemeStorage,
-  applicator: ThemeApplicator,
+  storage: {
+    get: getStoredTheme,
+    set: setStoredTheme,
+    remove: removeStoredTheme,
+  },
+  applicator: {
+    getSystemTheme,
+    applyTheme,
+  },
   metrics: ThemeMetricsCollector,
   colors: DEFAULT_COLORS,
 }

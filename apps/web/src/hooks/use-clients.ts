@@ -316,9 +316,9 @@ class ClientsService {
       ClientsCache.setClients(cacheKey, validatedData)
 
       // Mettre en cache les clients individuels
-      validatedData.clients.forEach((client) => {
+      for (const client of validatedData.clients) {
         ClientsCache.setClient(client.id, client)
-      })
+      }
 
       ClientsCache.recordRequest(true, performance.now() - startTime)
 
@@ -469,7 +469,7 @@ class ClientsService {
   private static serializeFilters(filters: ClientFilters): Record<string, string> {
     const serialized: Record<string, string> = {}
 
-    Object.entries(filters).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(filters)) {
       if (value != null) {
         if (Array.isArray(value)) {
           serialized[key] = value.join(',')
@@ -479,7 +479,7 @@ class ClientsService {
           serialized[key] = String(value)
         }
       }
-    })
+    }
 
     return serialized
   }
@@ -614,7 +614,9 @@ class ClientsService {
   }
 
   static cancelAllRequests(): void {
-    ClientsService.abortControllers.forEach((controller) => controller.abort())
+    for (const controller of ClientsService.abortControllers) {
+      controller.abort()
+    }
     ClientsService.abortControllers.clear()
   }
 }

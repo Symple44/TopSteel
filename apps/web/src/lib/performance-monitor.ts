@@ -128,13 +128,13 @@ export class PerformanceMonitor {
       // Performance Paint Timing
       const paintEntries = performance.getEntriesByType('paint')
 
-      paintEntries.forEach((entry) => {
+      for (const entry of paintEntries) {
         if (entry.name === 'first-paint') {
           metrics.firstPaint = entry.startTime
         } else if (entry.name === 'first-contentful-paint') {
           metrics.firstContentfulPaint = entry.startTime
         }
-      })
+      }
 
       // Log des performances lentes
       if (metrics.loadComplete > 3000) {
@@ -215,7 +215,7 @@ export class PerformanceMonitor {
       const observer = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries()
 
-        entries.forEach((entry) => {
+        for (const entry of entries) {
           const fid = (entry as any).processingStart - entry.startTime
 
           if (fid > 100) {
@@ -235,7 +235,7 @@ export class PerformanceMonitor {
             value: fid,
             rating: fid <= 100 ? 'good' : 'poor',
           })
-        })
+        }
       })
 
       observer.observe({ type: 'first-input', buffered: true })
