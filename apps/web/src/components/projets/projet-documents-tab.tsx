@@ -1,5 +1,6 @@
 'use client'
 
+import type { Projet } from '@erp/types'
 import * as UI from '@erp/ui'
 const Badge = UI.Badge
 const Button = UI.Button
@@ -18,7 +19,7 @@ import { Download, Edit, Eye, File, FileText, Image, Search, Trash2, Upload } fr
 import { useState } from 'react'
 
 interface ProjetDocumentsTabProps {
-  projet?: any
+  projet?: Projet
   projetId?: string
 }
 

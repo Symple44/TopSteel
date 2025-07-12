@@ -17,7 +17,12 @@ const ToastContext = React.createContext<{
 export const useToast = () => {
   const context = React.useContext(ToastContext)
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider')
+    // Retour d'un objet mock pour SSR au lieu de throw
+    return {
+      toasts: [],
+      addToast: () => {},
+      removeToast: () => {}
+    }
   }
   return context
 }

@@ -5,6 +5,10 @@ import { AlertTriangle, Bug, Home, RefreshCw } from 'lucide-react'
 import type { ErrorInfo, ReactNode } from 'react'
 import React, { Component } from 'react'
 
+interface WindowWithGtag extends Window {
+  gtag?: (command: 'config' | 'event' | 'set', target: string, config?: Record<string, any>) => void
+}
+
 interface Props {
   children: ReactNode
   fallback?: ReactNode
@@ -111,8 +115,8 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 
     // Analytics/monitoring
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      ;(window as any).gtag('event', 'exception', {
+    if (typeof window !== 'undefined' && (window as WindowWithGtag).gtag) {
+      ;(window as WindowWithGtag).gtag?.('event', 'exception', {
         description: error.message,
         fatal: true,
         custom_map: { error_id: this.state.errorId },

@@ -18,6 +18,12 @@ interface GanttTask {
   status: 'planned' | 'in-progress' | 'completed' | 'delayed'
 }
 
+interface GanttHeader {
+  label: string
+  date: Date
+  isWeekend: boolean
+}
+
 interface PlanningGanttProps {
   tasks: GanttTask[]
   currentWeek?: Date
@@ -29,12 +35,12 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
   const [zoomLevel, setZoomLevel] = useState(1)
   const [viewMode, setViewMode] = useState<'days' | 'weeks' | 'months'>('weeks')
 
-  const generateTimelineHeaders = () => {
+  const generateTimelineHeaders = (): GanttHeader[] => {
     const now = new Date()
     const startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
     const endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0)
 
-    const headers = []
+    const headers: GanttHeader[] = []
     const current = new Date(startDate)
 
     while (current <= endDate) {
@@ -65,7 +71,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
     return headers
   }
 
-  const calculateTaskPosition = (task: GanttTask, headers: any[]) => {
+  const calculateTaskPosition = (task: GanttTask, headers: GanttHeader[]) => {
     const startDate = headers[0]?.date || new Date()
     const dayWidth = 40 * zoomLevel
 
