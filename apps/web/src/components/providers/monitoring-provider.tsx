@@ -3,6 +3,7 @@
 
 import { useWebVitals } from '@/hooks/use-web-vitals'
 import { useBusinessMetrics } from '@/lib/business-metrics'
+import { Button } from '@erp/ui'
 import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 

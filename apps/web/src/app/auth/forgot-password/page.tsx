@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   })
 
-  const onSubmit = async (data: ForgotPasswordFormData) => {
+  const onSubmit = async (_data: ForgotPasswordFormData) => {
     setError(null)
     setIsLoading(true)
 
@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
 
       setIsSuccess(true)
     } catch (err: unknown) {
-      setError(err.message || "Erreur lors de l'envoi de l'email")
+      setError(err instanceof Error ? err.message : "Erreur lors de l'envoi de l'email")
     } finally {
       setIsLoading(false)
     }

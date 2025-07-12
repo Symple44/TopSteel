@@ -2,11 +2,12 @@
 
 import React from 'react'
 
+import { type MaterialOrder, type OrdreFabrication } from '@erp/types'
 import { Badge, Button, Card, CardContent } from '@erp/ui'
 
 import { AlertTriangle, Package, Plus } from 'lucide-react'
 
-// Interface pour les matériaux
+// Interface pour les matériaux (compatible avec MaterialOrder)
 interface Materiau {
   id: number
   reference: string
@@ -18,11 +19,20 @@ interface Materiau {
 }
 
 interface OrdreMateriauxTabProps {
-  ordre: unknown // Interface cohérente avec les autres composants
+  ordre: OrdreFabrication
 }
 
 export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
-  const materiaux: Materiau[] = ordre?.materiaux || [
+  // Conversion des MaterialOrder en Materiau avec propriétés par défaut
+  const materiaux: Materiau[] = ordre?.materiaux?.map((material: MaterialOrder) => ({
+    id: material.id,
+    reference: material.reference,
+    designation: material.nom || 'Non spécifié',
+    quantiteRequise: material.quantite,
+    quantiteStock: 0, // À remplacer par données stock réelles
+    unite: material.unite,
+    statut: 'DISPONIBLE', // À calculer selon stock
+  })) || [
     {
       id: 1,
       reference: 'ACIER-S235-02',

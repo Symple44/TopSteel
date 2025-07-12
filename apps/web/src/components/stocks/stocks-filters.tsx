@@ -75,7 +75,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           <Label className="text-sm font-medium">Catégorie</Label>
           <Select
             value={filters.categorie}
-            onValueChange={(value) => handleFilterChange('categorie', value)}
+            onValueChange={(value: string) => handleFilterChange('categorie', value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Toutes les catégories" />
@@ -95,7 +95,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           <Label className="text-sm font-medium">Emplacement</Label>
           <Select
             value={filters.emplacement}
-            onValueChange={(value) => handleFilterChange('emplacement', value)}
+            onValueChange={(value: string) => handleFilterChange('emplacement', value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Tous les emplacements" />
@@ -114,7 +114,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           <Label className="text-sm font-medium">Fournisseur</Label>
           <Select
             value={filters.fournisseur}
-            onValueChange={(value) => handleFilterChange('fournisseur', value)}
+            onValueChange={(value: string) => handleFilterChange('fournisseur', value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Tous les fournisseurs" />
@@ -136,7 +136,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           <Input
             type="number"
             value={filters.stockMin}
-            onChange={(e) => handleFilterChange('stockMin', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('stockMin', e.target.value)}
             placeholder="0"
           />
         </div>
@@ -146,7 +146,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           <Input
             type="number"
             value={filters.stockMax}
-            onChange={(e) => handleFilterChange('stockMax', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('stockMax', e.target.value)}
             placeholder="1000"
           />
         </div>
@@ -155,7 +155,7 @@ export function StocksFilters({ onFiltersChange, onReset }: StocksFiltersProps =
           <Label className="text-sm font-medium">Statut</Label>
           <Select
             value={filters.statut}
-            onValueChange={(value) => handleFilterChange('statut', value)}
+            onValueChange={(value: string) => handleFilterChange('statut', value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Tous les statuts" />

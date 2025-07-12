@@ -104,7 +104,7 @@ function createClientsError(error: unknown): ClientsError {
       message: error.message,
       details: {
         stack: error.stack,
-        cause: error.cause,
+        cause: (error as any).cause,
       },
       timestamp: new Date(),
     }

@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(pnpm build:*)",
+      "Bash(powershell:*)",
+      "Bash(cmd /c:*)",
+      "Bash(pnpm.cmd build:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx biome check:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   }

@@ -1,9 +1,10 @@
 // apps/web/src/components/production/ordre-info-tab.tsx
 
+import { type OrdreFabrication } from '@erp/types'
 import { Card, CardContent, CardHeader, CardTitle, Label } from '@erp/ui'
 
 interface OrdreInfoTabProps {
-  ordre: unknown
+  ordre: OrdreFabrication
 }
 
 export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {

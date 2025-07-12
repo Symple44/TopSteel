@@ -18,7 +18,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Progress,
@@ -201,7 +200,7 @@ export default function ProjetDetailPage({ params }: ProjetDetailPageProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-48">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push(`/projets/${projet.id}/modifier`)}>
               <Edit className="mr-2 h-4 w-4" />

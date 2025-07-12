@@ -128,7 +128,7 @@ export default function PaiementsPage() {
       </Tabs>
 
       {/* Dialog de création */}
-      {showCreateModal && <CreatePaiementDialog onClose={() => setShowCreateModal(false)} />}
+      <CreatePaiementDialog open={showCreateModal} onOpenChange={setShowCreateModal} />
     </div>
   )
 }

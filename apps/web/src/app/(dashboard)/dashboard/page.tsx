@@ -158,20 +158,6 @@ export default function Dashboard() {
     }
   }
 
-  const getActivityBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'success':
-        return 'default'
-      case 'warning':
-        return 'secondary'
-      case 'error':
-        return 'destructive'
-      case 'info':
-        return 'outline'
-      default:
-        return 'outline'
-    }
-  }
 
   if (loading || !stats) {
     return (
@@ -395,7 +381,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {activities.map((activity, index) => (
+                {activities.map((activity) => (
                   <div key={activity.id} className="flex items-start space-x-3 group">
                     <div className="flex-shrink-0 mt-1">
                       <div

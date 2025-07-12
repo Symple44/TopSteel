@@ -116,6 +116,14 @@ export function NotificationCenter() {
                     !notification.read && 'bg-blue-50 border-l-2 border-l-blue-500'
                   )}
                   onClick={() => actions.markAsRead(notification.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      actions.markAsRead(notification.id)
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                 >
                   <div className="flex-shrink-0 mt-0.5">
                     {getNotificationIcon(notification.type, notification.category)}
@@ -161,7 +169,7 @@ export function NotificationCenter() {
                           variant="outline"
                           size="sm"
                           className="text-xs h-6 px-2"
-                          onClick={(e) => {
+                          onClick={(e: React.MouseEvent) => {
                             e.stopPropagation()
                             window.open(notification.actionUrl, '_blank')
                           }}
@@ -173,7 +181,7 @@ export function NotificationCenter() {
                   </div>
 
                   <Button
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation()
                       actions.removeNotification(notification.id)
                     }}

@@ -83,8 +83,8 @@ export function CreatePaiementDialog({
               step="0.01"
               className="col-span-3"
               value={formData.montant}
-              onChange={(e) =>
-                setFormData({ ...formData, montant: (e.target as HTMLInputElement).value })
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, montant: e.target.value })
               }
             />
           </div>
@@ -97,8 +97,8 @@ export function CreatePaiementDialog({
               id="reference"
               className="col-span-3"
               value={formData.reference}
-              onChange={(e) =>
-                setFormData({ ...formData, reference: (e.target as HTMLInputElement).value })
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, reference: e.target.value })
               }
               placeholder="Numéro de référence"
             />
@@ -113,8 +113,8 @@ export function CreatePaiementDialog({
               type="date"
               className="col-span-3"
               value={formData.dateReception}
-              onChange={(e) =>
-                setFormData({ ...formData, dateReception: (e.target as HTMLInputElement).value })
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, dateReception: e.target.value })
               }
             />
           </div>

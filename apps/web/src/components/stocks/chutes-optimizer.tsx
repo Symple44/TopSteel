@@ -99,7 +99,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                   placeholder="Rechercher par matériau, dimensions..."
                   className="pl-10"
                   value={searchQuery}
-                  onChange={(e) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setSearchQuery(e.target.value)
                     onSearch(e.target.value)
                   }}

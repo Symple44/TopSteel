@@ -175,7 +175,7 @@ export function MouvementsTable({
               placeholder="Rechercher par matériau, référence, utilisateur..."
               className="pl-10"
               value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
             />
           </div>
         </div>

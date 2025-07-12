@@ -24,7 +24,7 @@ export function useOptimizedQuery<T>({
     enabled,
     refetchOnWindowFocus: false,
     retry: (failureCount, error: unknown) => {
-      if (error?.response?.status === 404) return false
+      if ((error as any)?.response?.status === 404) return false
 
       return failureCount < 3
     },
@@ -76,7 +76,7 @@ export function useSmartQuery<T>(
     refetchOnReconnect: true,
     retry: (failureCount, error: unknown) => {
       // Ne pas retry sur les erreurs 4xx
-      if (error?.response?.status >= 400 && error?.response?.status < 500) {
+      if ((error as any)?.response?.status >= 400 && (error as any)?.response?.status < 500) {
         return false
       }
 
@@ -117,7 +117,7 @@ export function useSmartMutation<TData, TVariables>(
     },
     retry: (failureCount, error: unknown) => {
       // Ne pas retry sur les erreurs client (4xx)
-      if (error?.response?.status >= 400 && error?.response?.status < 500) {
+      if ((error as any)?.response?.status >= 400 && (error as any)?.response?.status < 500) {
         return false
       }
 

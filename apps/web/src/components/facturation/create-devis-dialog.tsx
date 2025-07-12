@@ -50,10 +50,10 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                 <Input
                   id="reference"
                   value={formData.reference}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFormData({
                       ...formData,
-                      reference: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                      reference: e.target.value,
                     })
                   }
                   placeholder="DEV-2025-001"
@@ -65,10 +65,10 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                   id="dateValidite"
                   type="date"
                   value={formData.dateValidite}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFormData({
                       ...formData,
-                      dateValidite: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                      dateValidite: e.target.value,
                     })
                   }
                 />
@@ -80,10 +80,10 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
               <Input
                 id="clientNom"
                 value={formData.clientNom}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({
                     ...formData,
-                    clientNom: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                    clientNom: e.target.value,
                   })
                 }
                 placeholder="Nom du client ou entreprise"
@@ -96,10 +96,10 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
                 id="clientEmail"
                 type="email"
                 value={formData.clientEmail}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({
                     ...formData,
-                    clientEmail: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                    clientEmail: e.target.value,
                   })
                 }
                 placeholder="client@exemple.fr"
@@ -111,10 +111,10 @@ export function CreateDevisDialog({ open, onOpenChange }: CreateDevisDialogProps
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData({
                     ...formData,
-                    description: (e.target as HTMLInputElement | HTMLTextAreaElement).value,
+                    description: e.target.value,
                   })
                 }
                 placeholder="Description des travaux de métallerie..."

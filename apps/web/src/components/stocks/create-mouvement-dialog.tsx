@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from '@erp/ui'
+
 interface CreateMouvementDialogProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void

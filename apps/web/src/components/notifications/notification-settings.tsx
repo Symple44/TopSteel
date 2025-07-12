@@ -47,7 +47,7 @@ export function NotificationSettings() {
           </div>
           <Switch
             checked={state.settings.enableSound}
-            onCheckedChange={(checked) => actions.updateSettings({ enableSound: checked })}
+            onCheckedChange={(checked: boolean) => actions.updateSettings({ enableSound: checked })}
           />
         </div>
 
@@ -61,7 +61,7 @@ export function NotificationSettings() {
           </div>
           <Switch
             checked={state.settings.enableToast}
-            onCheckedChange={(checked) => actions.updateSettings({ enableToast: checked })}
+            onCheckedChange={(checked: boolean) => actions.updateSettings({ enableToast: checked })}
           />
         </div>
 
@@ -75,7 +75,7 @@ export function NotificationSettings() {
           </div>
           <Switch
             checked={state.settings.enableBrowser}
-            onCheckedChange={(checked) => actions.updateSettings({ enableBrowser: checked })}
+            onCheckedChange={(checked: boolean) => actions.updateSettings({ enableBrowser: checked })}
           />
         </div>
       </div>

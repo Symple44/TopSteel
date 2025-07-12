@@ -106,7 +106,7 @@ export default function ProjetsPage() {
       {
         key: 'client',
         label: 'Client',
-        render: (client: unknown) => client?.nom || '-',
+        render: (client: unknown) => (client as any)?.nom || '-',
         sortable: true,
       },
       {

@@ -112,7 +112,6 @@ export default function RegisterPage() {
     handleSubmit,
     formState: { errors, isValid },
     setError: setFieldError,
-    reset,
     watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -204,7 +203,7 @@ export default function RegisterPage() {
           return
         }
 
-        const result = await response.json()
+        await response.json()
 
         setState((prev) => ({ ...prev, success: true, isLoading: false }))
 

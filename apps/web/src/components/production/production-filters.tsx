@@ -90,7 +90,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <Label className="text-sm font-medium">Statut</Label>
             <Select
               value={filters.statut || ''}
-              onValueChange={(value) => handleFilterChange('statut', value)}
+              onValueChange={(value: string) => handleFilterChange('statut', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous les statuts" />
@@ -111,7 +111,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <Label className="text-sm font-medium">Priorité</Label>
             <Select
               value={filters.priorite || ''}
-              onValueChange={(value) => handleFilterChange('priorite', value)}
+              onValueChange={(value: string) => handleFilterChange('priorite', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Toutes les priorités" />
@@ -131,7 +131,7 @@ export function ProductionFilters({ onFiltersChange, onReset }: ProductionFilter
             <Label className="text-sm font-medium">Responsable</Label>
             <Select
               value={filters.responsable || ''}
-              onValueChange={(value) => handleFilterChange('responsable', value)}
+              onValueChange={(value: string) => handleFilterChange('responsable', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous les responsables" />
@@ -259,7 +259,7 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
             <Label className="text-sm font-medium">Statut</Label>
             <Select
               value={filters.statut || ''}
-              onValueChange={(value) => handleFilterChange('statut', value)}
+              onValueChange={(value: string) => handleFilterChange('statut', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous les statuts" />
@@ -279,7 +279,7 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
             <Label className="text-sm font-medium">Priorité</Label>
             <Select
               value={filters.priorite || ''}
-              onValueChange={(value) => handleFilterChange('priorite', value)}
+              onValueChange={(value: string) => handleFilterChange('priorite', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Toutes les priorités" />
@@ -298,7 +298,7 @@ export function ProductionFiltersAdvanced({ onFiltersChange, onReset }: Producti
             <Label className="text-sm font-medium">Responsable</Label>
             <Select
               value={filters.responsable || ''}
-              onValueChange={(value) => handleFilterChange('responsable', value)}
+              onValueChange={(value: string) => handleFilterChange('responsable', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous les responsables" />

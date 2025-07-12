@@ -1,8 +1,9 @@
 // apps/web/src/components/production/ordre-qualite-tab.tsx
+import { type OrdreFabrication, type ControleQualite } from '@erp/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
 interface OrdreQualiteTabProps {
-  ordre: any
+  ordre: OrdreFabrication
 }
 
 export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
@@ -27,7 +28,7 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              {controles.map((controle: any, index: number) => (
+              {controles.map((controle: ControleQualite, index: number) => (
                 <div key={controle.id || index} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium">{controle?.type || 'Contrôle qualité'}</h4>
@@ -46,7 +47,7 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium">Date contrôle</label>
+                      <span className="text-sm font-medium">Date contrôle</span>
                       <p className="text-sm text-muted-foreground">
                         {controle?.dateControle
                           ? new Date(controle.dateControle).toLocaleDateString()
@@ -54,7 +55,7 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Contrôleur</label>
+                      <span className="text-sm font-medium">Contrôleur</span>
                       <p className="text-sm text-muted-foreground">
                         {controle?.controleur || 'N/A'}
                       </p>
@@ -63,7 +64,7 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
 
                   {controle?.observations && (
                     <div className="mt-2">
-                      <label className="text-sm font-medium">Observations</label>
+                      <span className="text-sm font-medium">Observations</span>
                       <p className="text-sm text-muted-foreground">{controle.observations}</p>
                     </div>
                   )}
@@ -81,15 +82,15 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Tolérances dimensionnelles</label>
+              <span className="text-sm font-medium">Tolérances dimensionnelles</span>
               <p className="text-sm text-muted-foreground">±0.5mm (standard métallerie)</p>
             </div>
             <div>
-              <label className="text-sm font-medium">Finition requise</label>
+              <span className="text-sm font-medium">Finition requise</span>
               <p className="text-sm text-muted-foreground">{ordre?.finition || 'Selon plan'}</p>
             </div>
             <div>
-              <label className="text-sm font-medium">Normes applicables</label>
+              <span className="text-sm font-medium">Normes applicables</span>
               <p className="text-sm text-muted-foreground">EN 1090, CE</p>
             </div>
           </div>

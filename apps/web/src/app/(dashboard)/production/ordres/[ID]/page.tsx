@@ -5,6 +5,7 @@ import { OrdreMateriauxTab } from '@/components/production/ordre-materiaux-tab'
 import { OrdreOperationsTab } from '@/components/production/ordre-operations-tab'
 import { OrdreQualiteTab } from '@/components/production/ordre-qualite-tab'
 import { Badge, Button, Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
+import { OrdreStatut, OrdrePriorite } from '@erp/types'
 import { ArrowLeft, Calendar, CheckCircle, Pause } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -36,10 +37,10 @@ export default function OrdrePage({ params }: OrdrePageProps) {
 
   // Création objet ordre pour les composants (simulation)
   const ordre = {
-    id: resolvedParams.id,
+    id: Number(resolvedParams.id),
     numero: `OF-${resolvedParams.id}`,
-    statut: 'en_cours',
-    priorite: 'normale',
+    statut: OrdreStatut.EN_COURS,
+    priorite: OrdrePriorite.NORMALE,
     avancement: 65,
     description: 'Ordre de fabrication exemple',
     dateDebutPrevue: new Date('2024-01-15'),
@@ -47,6 +48,8 @@ export default function OrdrePage({ params }: OrdrePageProps) {
     operations: [],
     materiaux: [],
     controles: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   }
 
   return (

@@ -102,8 +102,8 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  private trackErrorMetrics(error: Error, errorInfo: ErrorInfo) {
-    const metrics: ErrorMetrics = {
+  private trackErrorMetrics(error: Error, _errorInfo: ErrorInfo) {
+    const _metrics: ErrorMetrics = {
       timestamp: Date.now(),
       userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Server',
       url: typeof window !== 'undefined' ? window.location.href : 'SSR',

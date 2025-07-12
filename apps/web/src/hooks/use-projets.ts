@@ -227,7 +227,7 @@ export const useProjetsActions = () => {
     // Helpers avec gestion d'erreur
     createProjetSafe: async (data: unknown) => {
       try {
-        return await createProjet?.(data)
+        return await createProjet?.(data as any)
       } catch (error) {
         console.error('Erreur création projet:', error)
         throw error
@@ -235,7 +235,7 @@ export const useProjetsActions = () => {
     },
     updateProjetSafe: async (id: string, data: unknown) => {
       try {
-        return await updateProjet?.(id, data)
+        return await updateProjet?.(id, data as any)
       } catch (error) {
         console.error('Erreur mise à jour projet:', error)
         throw error
