@@ -3,7 +3,7 @@
  * Types de requêtes pour le domaine projet
  */
 
-import type { WithoutId, DeepPartial } from '../../core'
+import type { DeepPartial, WithoutId } from '../../core'
 import type { ListRequest } from '../../infrastructure/api'
 import type { Projet, ProjetFilters } from './entities'
 import type { ProjetPriorite, ProjetStatut } from './enums'

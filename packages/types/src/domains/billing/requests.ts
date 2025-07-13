@@ -5,7 +5,7 @@
  */
 
 import type { LigneDevis, LigneFacture } from './entities'
-import type { FactureType, PaiementType, PaiementMethode } from './enums'
+import type { FactureType, PaiementMethode, PaiementType } from './enums'
 
 /**
  * Requête de création de devis

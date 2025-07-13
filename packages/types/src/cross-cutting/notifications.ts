@@ -88,15 +88,18 @@ export interface NotificationTemplate {
  */
 export interface NotificationPreferences {
   userId: string
-  categories: Record<NotificationCategory, {
-    enabled: boolean
-    channels: NotificationChannel[]
-    priority: NotificationPriority
-  }>
+  categories: Record<
+    NotificationCategory,
+    {
+      enabled: boolean
+      channels: NotificationChannel[]
+      priority: NotificationPriority
+    }
+  >
   quietHours?: {
     enabled: boolean
     start: string // HH:mm
-    end: string   // HH:mm
+    end: string // HH:mm
   }
   frequency?: {
     digest: 'none' | 'daily' | 'weekly'

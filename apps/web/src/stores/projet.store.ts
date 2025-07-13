@@ -15,7 +15,14 @@ import type {
   StoreCreator,
   StoreProjet,
 } from '@erp/types'
-import { ClientType, ClientStatut, ClientPriorite, ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
+import {
+  ClientPriorite,
+  ClientStatut,
+  ClientType,
+  ProjetPriorite,
+  ProjetStatut,
+  ProjetType,
+} from '@erp/types'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'

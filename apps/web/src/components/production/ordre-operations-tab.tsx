@@ -41,7 +41,9 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
                   <div className="grid grid-cols-3 gap-4">
                     <div>
                       <span className="text-sm font-medium">Machine</span>
-                      <p className="text-sm text-muted-foreground">{operation?.machineId || 'N/A'}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {operation?.machineId || 'N/A'}
+                      </p>
                     </div>
                     <div>
                       <span className="text-sm font-medium">Durée estimée</span>

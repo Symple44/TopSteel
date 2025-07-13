@@ -4,14 +4,14 @@
  */
 
 import type { BaseEntity } from '../../core'
-import type { 
-  OrdreStatut, 
-  OrdrePriorite, 
-  OperationStatut, 
-  TypeOperation, 
-  QualiteStatut,
+import type {
   MaterialStatus,
-  TypeMachine
+  OperationStatut,
+  OrdrePriorite,
+  OrdreStatut,
+  QualiteStatut,
+  TypeMachine,
+  TypeOperation,
 } from './enums'
 
 /**

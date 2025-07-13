@@ -3,8 +3,8 @@
  * Entités et interfaces pour le domaine client
  */
 
-import type { BaseEntity, Address, Contact } from '../../core'
-import type { ClientType, ClientStatus, ClientPriority } from './enums'
+import type { Address, BaseEntity, Contact } from '../../core'
+import type { ClientPriority, ClientStatus, ClientType } from './enums'
 
 /**
  * Entité Client principale

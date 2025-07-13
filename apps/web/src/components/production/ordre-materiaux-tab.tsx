@@ -38,7 +38,6 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
       updatedAt: new Date(),
     },
   ]
-  
   // Conversion des MaterialOrder en Materiau avec propriétés par défaut
   const materiaux: Materiau[] = mockMateriaux?.map((material: MaterialOrder, index: number) => ({
     id: index + 1, // Convert string ID to number for local interface

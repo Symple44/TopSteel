@@ -25,12 +25,12 @@ export type { OrdreFabrication, Operation, ControleQualite } from './domains/pro
 export type { OrdreFabrication as ProductionOrderType } from './domains/production'
 
 // Re-export des types de notifications avec compatibilité
-export type { 
+export type {
   Notification as NotificationBase,
   NotificationTemplate,
   NotificationPreferences,
   SendNotificationRequest,
-  NotificationStats
+  NotificationStats,
 } from './cross-cutting/notifications'
 
 // Alias de notification avec propriétés anglaises pour compatibilité
@@ -52,18 +52,27 @@ export interface Notification {
 }
 
 // Alias pour compatibilité avec l'ancienne structure
-export { ClientType as ClientTypeEnum, ClientStatus as ClientStatut, ClientPriority as ClientPriorite } from './domains/client'
+export {
+  ClientType as ClientTypeEnum,
+  ClientStatus as ClientStatut,
+  ClientPriority as ClientPriorite,
+} from './domains/client'
 export { ProjetStatut, ProjetType, ProjetPriorite } from './domains/project'
-export { 
-  OrdreStatut, 
+export {
+  OrdreStatut,
   OrdrePriorite,
   OperationStatut,
   TypeOperation,
   QualiteStatut,
-  OrdreStatut as StatutProduction, 
-  OrdrePriorite as PrioriteProduction 
+  OrdreStatut as StatutProduction,
+  OrdrePriorite as PrioriteProduction,
 } from './domains/production'
-export { NotificationCategory, NotificationType, NotificationPriority, NotificationChannel } from './cross-cutting/notifications'
+export {
+  NotificationCategory,
+  NotificationType,
+  NotificationPriority,
+  NotificationChannel,
+} from './cross-cutting/notifications'
 
 // ===== GLOBAL UTILITY TYPES =====
 // Ces types restent globaux car utilisés partout
@@ -125,35 +134,39 @@ export type ConfigSchema = Record<
   }
 >
 
-// ===== LEGACY STORES EXPORTS =====
+// ===== STORES EXPORTS (DEPUIS INFRASTRUCTURE) =====
 // Export explicite des types de store utility nécessaires
 export type {
   BaseStoreActions,
   BaseStoreState,
   InitialState,
+  StoreConfig,
+  StoreCreator,
   AppStore,
   AppState,
   AppStoreActions,
   ProjetStore,
   ProjetState,
-  ProjetStoreActions
-} from './stores'
+  ProjetStoreActions,
+} from './infrastructure/stores'
 
-// Export des types store-entities sans conflits (sans StoreProjetFilters qui conflit avec domains/project)
+// Export des types store-entities depuis infrastructure
 export type {
   StoreMetrics,
   StoreProjet,
   StoreProjetStats,
   StoreSyncState,
-  StoreUser
-} from './store-entities'
+  StoreUser,
+  StoreClient,
+  StoreNotification,
+} from './infrastructure/stores'
 
 // Export explicite des filtres depuis leurs domaines respectifs
 export type { ProjetFilters } from './domains/project'
-export type { 
-  StockFilters, 
-  MouvementFilters, 
-  StockFilters as ProductionFilters 
+export type {
+  StockFilters,
+  MouvementFilters,
+  StockFilters as ProductionFilters,
 } from './domains/stock'
 
 // Export des types utilisateur legacy (maintenant depuis domains/user)
@@ -162,16 +175,11 @@ export type { User, UserRole } from './domains/user'
 // Export des types facturation legacy (maintenant depuis domains/billing)
 export type { FacturationFilters, DevisStatut, FactureStatut } from './domains/billing'
 
-// Export du type FilterState pour les stores
-export type { 
-  FilterState, 
-  MetricsState, 
-  ProjetStats, 
+// Export du type FilterState pour les stores (depuis infrastructure)
+export type {
+  FilterState,
+  MetricsState,
+  ProjetStats,
   SessionState,
-  StoreConfig,
-  StoreCreator,
-  UIState
-} from './stores'
-
-// Export des entités store
-export type { StoreClient, StoreNotification } from './store-entities'
+  UIState,
+} from './infrastructure/stores'

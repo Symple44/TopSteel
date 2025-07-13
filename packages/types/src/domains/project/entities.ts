@@ -3,8 +3,8 @@
  * Entités et interfaces pour le domaine projet
  */
 
-import type { BaseEntity, Address } from '../../core'
-import type { ProjetStatut, ProjetType, ProjetPriorite, DocumentType } from './enums'
+import type { Address, BaseEntity } from '../../core'
+import type { DocumentType, ProjetPriorite, ProjetStatut, ProjetType } from './enums'
 
 /**
  * Document attaché à un projet

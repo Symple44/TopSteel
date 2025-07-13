@@ -140,7 +140,7 @@ export const api = {
               (p) =>
                 p.reference.toLowerCase().includes(searchLower) ||
                 p.description?.toLowerCase().includes(searchLower) ||
-p.clientId.toLowerCase().includes(searchLower)
+                p.clientId.toLowerCase().includes(searchLower)
             )
           }
         }

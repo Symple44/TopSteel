@@ -6,6 +6,8 @@
 // API Layer
 export * from './api'
 
+// Stores Layer
+export * from './stores'
+
 // TODO: Autres modules infrastructure à migrer
 // export * from './ui'
-// export * from './stores'

@@ -57,7 +57,7 @@ export interface SuccessResponse {
 /**
  * Status codes HTTP typés
  */
-export type HttpStatusCode = 
+export type HttpStatusCode =
   | 200 // OK
   | 201 // Created
   | 204 // No Content

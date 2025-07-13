@@ -12,13 +12,13 @@ import type {
   DevisStatut,
   FactureStatut,
   FactureType,
-  PaiementType,
   PaiementMethode,
   PaiementStatut,
-  RelanceType,
-  RelanceNiveau,
+  PaiementType,
   RelanceMethode,
-  RelanceStatut
+  RelanceNiveau,
+  RelanceStatut,
+  RelanceType,
 } from './enums'
 
 /**

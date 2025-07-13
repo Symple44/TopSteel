@@ -6,20 +6,20 @@
 /**
  * Opérateurs de filtrage disponibles
  */
-export type FilterOperator = 
-  | 'eq'       // égal
-  | 'ne'       // différent
-  | 'gt'       // plus grand
-  | 'gte'      // plus grand ou égal
-  | 'lt'       // plus petit
-  | 'lte'      // plus petit ou égal
-  | 'like'     // contient (recherche textuelle)
-  | 'ilike'    // contient (insensible à la casse)
-  | 'in'       // dans la liste
-  | 'not_in'   // pas dans la liste
-  | 'is_null'  // est null
+export type FilterOperator =
+  | 'eq' // égal
+  | 'ne' // différent
+  | 'gt' // plus grand
+  | 'gte' // plus grand ou égal
+  | 'lt' // plus petit
+  | 'lte' // plus petit ou égal
+  | 'like' // contient (recherche textuelle)
+  | 'ilike' // contient (insensible à la casse)
+  | 'in' // dans la liste
+  | 'not_in' // pas dans la liste
+  | 'is_null' // est null
   | 'not_null' // n'est pas null
-  | 'between'  // entre deux valeurs
+  | 'between' // entre deux valeurs
 
 /**
  * Condition de filtrage

@@ -3,14 +3,9 @@
  * Types de requêtes pour le domaine production
  */
 
-import type { WithoutId, DeepPartial } from '../../core'
+import type { DeepPartial, WithoutId } from '../../core'
 import type { ListRequest } from '../../infrastructure/api'
-import type { 
-  OrdreFabrication, 
-  Operation, 
-  ProductionFilters, 
-  OperationFilters
-} from './entities'
+import type { Operation, OperationFilters, OrdreFabrication, ProductionFilters } from './entities'
 import type { OrdrePriorite, TypeOperation } from './enums'
 
 /**

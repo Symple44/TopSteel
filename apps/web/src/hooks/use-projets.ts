@@ -197,7 +197,7 @@ export const useProjetsFilters = () => {
 
       // ✅ Type-safe deletion
       if (key in newFilters) {
-        delete (newFilters as any)[key]
+        delete (newFilters as Record<string, unknown>)[key]
         setFilters?.(newFilters)
       }
     },
