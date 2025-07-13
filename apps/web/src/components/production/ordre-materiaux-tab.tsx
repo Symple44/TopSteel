@@ -3,6 +3,7 @@
 import React from 'react'
 
 import type { MaterialOrder, OrdreFabrication } from '@erp/types'
+import { MaterialStatus } from '@erp/types'
 import { Badge, Button, Card, CardContent } from '@erp/ui'
 
 import { AlertTriangle, Package, Plus } from 'lucide-react'
@@ -23,12 +24,27 @@ interface OrdreMateriauxTabProps {
 }
 
 export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
+  // Simulation de matériaux pour la démo (en attendant la vraie logique API)
+  const mockMateriaux: MaterialOrder[] = [
+    {
+      id: 'mat-1',
+      reference: 'AC-100',
+      nom: 'Acier standard',
+      quantiteRequise: 100,
+      unite: 'kg',
+      statut: MaterialStatus.COMMANDE,
+      ordreFabricationId: ordre.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ]
+  
   // Conversion des MaterialOrder en Materiau avec propriétés par défaut
-  const materiaux: Materiau[] = ordre?.materiaux?.map((material: MaterialOrder) => ({
-    id: material.id,
+  const materiaux: Materiau[] = mockMateriaux?.map((material: MaterialOrder, index: number) => ({
+    id: index + 1, // Convert string ID to number for local interface
     reference: material.reference,
     designation: material.nom || 'Non spécifié',
-    quantiteRequise: material.quantite,
+    quantiteRequise: material.quantiteRequise,
     quantiteStock: 0, // À remplacer par données stock réelles
     unite: material.unite,
     statut: 'DISPONIBLE', // À calculer selon stock

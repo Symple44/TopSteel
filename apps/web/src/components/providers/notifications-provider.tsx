@@ -329,7 +329,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
           // Filtrer selon les paramètres utilisateur
           if (!state.settings.categories[notification.category]) return
-          if (!state.settings.priority[notification.metadata?.priority || 'normal']) return
+          if (!state.settings.priority[notification.metadata?.priority as keyof typeof state.settings.priority || 'normal']) return
 
           dispatch({ type: 'ADD_NOTIFICATION', payload: notification })
 

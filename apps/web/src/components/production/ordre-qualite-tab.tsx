@@ -1,5 +1,6 @@
 // apps/web/src/components/production/ordre-qualite-tab.tsx
 import type { ControleQualite, OrdreFabrication } from '@erp/types'
+import { QualiteStatut } from '@erp/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
 interface OrdreQualiteTabProps {
@@ -7,7 +8,8 @@ interface OrdreQualiteTabProps {
 }
 
 export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
-  const controles = ordre?.controles || []
+  // Simulation de contrôles pour la démo (ordre.controlesIds contiendrait les IDs)
+  const controles: ControleQualite[] = []
 
   return (
     <div className="space-y-6">
@@ -34,14 +36,14 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
                     <h4 className="font-medium">{controle?.type || 'Contrôle qualité'}</h4>
                     <span
                       className={`px-2 py-1 rounded text-xs ${
-                        controle?.resultat === 'CONFORME'
+                        controle?.statut === QualiteStatut.CONFORME
                           ? 'bg-green-100 text-green-800'
-                          : controle?.resultat === 'NON_CONFORME'
+                          : controle?.statut === QualiteStatut.NON_CONFORME
                             ? 'bg-red-100 text-red-800'
                             : 'bg-yellow-100 text-yellow-800'
                       }`}
                     >
-                      {controle?.resultat || 'EN_ATTENTE'}
+                      {controle?.statut || 'EN_ATTENTE'}
                     </span>
                   </div>
 
@@ -57,15 +59,15 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
                     <div>
                       <span className="text-sm font-medium">Contrôleur</span>
                       <p className="text-sm text-muted-foreground">
-                        {controle?.controleur || 'N/A'}
+                        {controle?.technicienId || 'N/A'}
                       </p>
                     </div>
                   </div>
 
-                  {controle?.observations && (
+                  {controle?.remarques && (
                     <div className="mt-2">
                       <span className="text-sm font-medium">Observations</span>
-                      <p className="text-sm text-muted-foreground">{controle.observations}</p>
+                      <p className="text-sm text-muted-foreground">{controle.remarques}</p>
                     </div>
                   )}
                 </div>
@@ -87,7 +89,7 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
             </div>
             <div>
               <span className="text-sm font-medium">Finition requise</span>
-              <p className="text-sm text-muted-foreground">{ordre?.finition || 'Selon plan'}</p>
+              <p className="text-sm text-muted-foreground">Selon plan</p>
             </div>
             <div>
               <span className="text-sm font-medium">Normes applicables</span>

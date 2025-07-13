@@ -19,51 +19,12 @@ export * from './cross-cutting'
 // Re-export des types principaux pour compatibilité
 export type { Client } from './domains/client'
 export type { Projet as ProjectType } from './domains/project'
-
-// Re-export des types de production avec compatibilité complète
-export type { OrdreFabrication, Operation, ControleQualite } from './domains/production'
 export type { OrdreFabrication as ProductionOrderType } from './domains/production'
-
-// Re-export des types de notifications avec compatibilité
-export type { 
-  Notification as NotificationBase,
-  NotificationTemplate,
-  NotificationPreferences,
-  SendNotificationRequest,
-  NotificationStats
-} from './cross-cutting/notifications'
-
-// Alias de notification avec propriétés anglaises pour compatibilité
-export interface Notification {
-  id: string
-  title: string
-  message: string
-  type: string
-  category: string
-  priority?: string
-  read: boolean
-  createdAt: Date
-  updatedAt: Date
-  userId?: string
-  actionUrl?: string
-  actionLabel?: string
-  metadata?: Record<string, any>
-  expiresAt?: Date
-}
 
 // Alias pour compatibilité avec l'ancienne structure
 export { ClientType as ClientTypeEnum, ClientStatus as ClientStatut, ClientPriority as ClientPriorite } from './domains/client'
 export { ProjetStatut, ProjetType, ProjetPriorite } from './domains/project'
-export { 
-  OrdreStatut, 
-  OrdrePriorite,
-  OperationStatut,
-  TypeOperation,
-  QualiteStatut,
-  OrdreStatut as StatutProduction, 
-  OrdrePriorite as PrioriteProduction 
-} from './domains/production'
-export { NotificationCategory, NotificationType, NotificationPriority, NotificationChannel } from './cross-cutting/notifications'
+export { OrdreStatut as StatutProduction, OrdrePriorite as PrioriteProduction } from './domains/production'
 
 // ===== GLOBAL UTILITY TYPES =====
 // Ces types restent globaux car utilisés partout
@@ -124,38 +85,3 @@ export type ConfigSchema = Record<
     description?: string
   }
 >
-
-// ===== LEGACY STORES EXPORTS =====
-// Export explicite des types de store utility nécessaires
-export type {
-  BaseStoreActions,
-  BaseStoreState,
-  InitialState,
-  StoreConfig,
-  StoreCreator,
-  AppStore,
-  AppState,
-  AppStoreActions,
-  ProjetStore,
-  ProjetState,
-  ProjetStoreActions
-} from './stores'
-
-// Export des types store-entities sans conflits (sans StoreProjetFilters qui conflit avec domains/project)
-export type {
-  StoreMetrics,
-  StoreNotification,
-  StoreProjet,
-  StoreProjetStats,
-  StoreSyncState,
-  StoreUser
-} from './store-entities'
-
-// Export explicite du bon ProjetFilters depuis domains/project
-export type { ProjetFilters } from './domains/project'
-
-// Export des types utilisateur legacy
-export type { User, UserRole } from './user'
-
-// Export des types facturation legacy
-export type { FacturationFilters, DevisStatut, FactureStatut } from './facturation'

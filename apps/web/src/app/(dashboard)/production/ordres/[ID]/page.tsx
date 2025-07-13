@@ -37,17 +37,22 @@ export default function OrdrePage({ params }: OrdrePageProps) {
 
   // Création objet ordre pour les composants (simulation)
   const ordre = {
-    id: Number(resolvedParams.id),
+    id: `ordre-${resolvedParams.id}`,
     numero: `OF-${resolvedParams.id}`,
     statut: OrdreStatut.EN_COURS,
     priorite: OrdrePriorite.NORMALE,
     avancement: 65,
     description: 'Ordre de fabrication exemple',
+    projetId: `projet-${resolvedParams.id}`,
     dateDebutPrevue: new Date('2024-01-15'),
     dateFinPrevue: new Date('2024-01-22'),
-    operations: [],
-    materiaux: [],
-    controles: [],
+    tempsPrevu: 480, // 8 heures en minutes
+    tempsReel: 312, // 5.2 heures en minutes
+    coutPrevu: 2500,
+    coutReel: 1950,
+    operationsIds: [],
+    materiauxIds: [],
+    controlesIds: [],
     createdAt: new Date(),
     updatedAt: new Date(),
   }

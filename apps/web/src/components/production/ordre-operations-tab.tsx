@@ -7,7 +7,8 @@ interface OrdreOperationsTabProps {
 }
 
 export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
-  const operations = ordre?.operations || []
+  // Simulation d'opérations pour la démo (ordre.operationsIds contiendrait les IDs)
+  const operations: Operation[] = []
 
   return (
     <div className="space-y-6">
@@ -40,7 +41,7 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
                   <div className="grid grid-cols-3 gap-4">
                     <div>
                       <span className="text-sm font-medium">Machine</span>
-                      <p className="text-sm text-muted-foreground">{operation?.machine || 'N/A'}</p>
+                      <p className="text-sm text-muted-foreground">{operation?.machineId || 'N/A'}</p>
                     </div>
                     <div>
                       <span className="text-sm font-medium">Durée estimée</span>
@@ -51,7 +52,7 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
                     <div>
                       <span className="text-sm font-medium">Technicien</span>
                       <p className="text-sm text-muted-foreground">
-                        {operation?.technicien || 'Non assigné'}
+                        {operation?.technicienId || 'Non assigné'}
                       </p>
                     </div>
                   </div>

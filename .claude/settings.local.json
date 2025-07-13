@@ -17,7 +17,10 @@
       "Bash(npx next:*)",
       "Bash(npx @biomejs/biome lint)",
       "Bash(npx @biomejs/biome lint:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

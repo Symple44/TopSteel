@@ -20,31 +20,6 @@ export const api = {
             reference: 'PRJ-2024-001',
             description:
               'Garde-corps Restaurant Le Gourmet - Installation garde-corps terrasse extérieure',
-            client: {
-              id: 'client-1',
-              nom: 'Restaurant Le Gourmet',
-              type: 'PROFESSIONNEL' as ClientType,
-              email: 'contact@legourmet.fr',
-              telephone: '01 23 45 67 89',
-              adresse: {
-                rue: '123 Rue de la Paix',
-                codePostal: '75001',
-                ville: 'Paris',
-                pays: 'France',
-              },
-              contact: {
-                nom: 'Dubois',
-                prenom: 'Pierre',
-                email: 'p.dubois@legourmet.fr',
-                telephone: '01 23 45 67 89',
-                fonction: 'Gérant',
-              },
-              isActif: true,
-              createdAt: new Date('2023-12-01'),
-              updatedAt: new Date('2024-01-01'),
-              siret: '12345678901234',
-              notes: 'Client fidèle depuis 2023',
-            },
             clientId: 'client-1',
             statut: ProjetStatut.EN_COURS,
             type: ProjetType.PORTAIL,
@@ -52,7 +27,6 @@ export const api = {
             dateDebut: new Date('2024-01-15'),
             dateFin: new Date('2024-02-15'),
             dateFinPrevue: new Date('2024-02-10'),
-            dateCreation: new Date('2024-01-01'),
             adresseChantier: {
               rue: '123 Rue de la Paix',
               codePostal: '75001',
@@ -75,31 +49,6 @@ export const api = {
             reference: 'PRJ-2024-002',
             description:
               'Escalier métallique Villa Moderne - Fabrication et installation escalier extérieur',
-            client: {
-              id: 'client-2',
-              nom: 'Villa Moderne SARL',
-              type: 'PROFESSIONNEL' as ClientType,
-              email: 'contact@villamoderne.fr',
-              telephone: '01 34 56 78 90',
-              adresse: {
-                rue: '456 Avenue des Jardins',
-                codePostal: '78000',
-                ville: 'Versailles',
-                pays: 'France',
-              },
-              contact: {
-                nom: 'Martin',
-                prenom: 'Sophie',
-                email: 's.martin@villamoderne.fr',
-                telephone: '01 34 56 78 90',
-                fonction: 'Architecte',
-              },
-              isActif: true,
-              createdAt: new Date('2023-11-15'),
-              updatedAt: new Date('2024-01-10'),
-              siret: '98765432109876',
-              notes: 'Spécialisé dans les villas de luxe',
-            },
             clientId: 'client-2',
             statut: ProjetStatut.DEVIS,
             type: ProjetType.ESCALIER,
@@ -107,7 +56,6 @@ export const api = {
             dateDebut: new Date('2024-02-01'),
             dateFin: new Date('2024-03-01'),
             dateFinPrevue: new Date('2024-02-28'),
-            dateCreation: new Date('2024-01-10'),
             adresseChantier: {
               rue: '789 Rue du Château',
               codePostal: '78100',
@@ -130,30 +78,6 @@ export const api = {
             reference: 'PRJ-2024-003',
             description:
               'Garde-corps Résidence Les Acacias - Installation garde-corps pour résidence neuve',
-            client: {
-              id: 'client-3',
-              nom: 'Bertrand',
-              type: 'PARTICULIER' as ClientType,
-              email: 'j.bertrand@email.com',
-              telephone: '06 12 34 56 78',
-              adresse: {
-                rue: '12 Rue des Acacias',
-                codePostal: '92100',
-                ville: 'Boulogne-Billancourt',
-                pays: 'France',
-              },
-              contact: {
-                nom: 'Bertrand',
-                prenom: 'Jacques',
-                email: 'j.bertrand@email.com',
-                telephone: '06 12 34 56 78',
-                fonction: 'Propriétaire',
-              },
-              isActif: true,
-              createdAt: new Date('2024-01-05'),
-              updatedAt: new Date('2024-01-05'),
-              notes: 'Premier projet avec ce client particulier',
-            },
             clientId: 'client-3',
             statut: ProjetStatut.TERMINE,
             type: ProjetType.AUTRE,
@@ -161,7 +85,6 @@ export const api = {
             dateDebut: new Date('2023-12-01'),
             dateFin: new Date('2024-01-05'),
             dateFinPrevue: new Date('2024-01-10'),
-            dateCreation: new Date('2023-11-15'),
             adresseChantier: {
               rue: '12 Rue des Acacias',
               codePostal: '92100',
@@ -198,15 +121,15 @@ export const api = {
             filteredProjets = filteredProjets.filter((p) => p.clientId === filters.clientId)
           }
 
-          if (filters.dateDebut) {
+          if (filters.dateDebutMin) {
             filteredProjets = filteredProjets.filter(
-              (p) => p.dateDebut && filters.dateDebut && p.dateDebut >= filters.dateDebut
+              (p) => p.dateDebut && filters.dateDebutMin && p.dateDebut >= filters.dateDebutMin
             )
           }
 
-          if (filters.dateFin) {
+          if (filters.dateFinMax) {
             filteredProjets = filteredProjets.filter(
-              (p) => p.dateFin && filters.dateFin && p.dateFin <= filters.dateFin
+              (p) => p.dateFin && filters.dateFinMax && p.dateFin <= filters.dateFinMax
             )
           }
 
@@ -217,7 +140,7 @@ export const api = {
               (p) =>
                 p.reference.toLowerCase().includes(searchLower) ||
                 p.description?.toLowerCase().includes(searchLower) ||
-                p.client.nom.toLowerCase().includes(searchLower)
+p.clientId.toLowerCase().includes(searchLower)
             )
           }
         }
@@ -258,7 +181,6 @@ export const api = {
           type: data.type || ProjetType.AUTRE,
           priorite: data.priorite || ProjetPriorite.NORMALE,
           dateDebut: data.dateDebut || new Date(),
-          dateCreation: new Date(),
           adresseChantier: data.adresseChantier || {
             rue: '',
             codePostal: '',
@@ -274,8 +196,6 @@ export const api = {
           ordresFabricationIds: [],
           createdAt: new Date(),
           updatedAt: new Date(),
-          // Note: Le client serait récupéré via une autre API en réalité
-          client: {} as Client, // À compléter selon les besoins
         }
 
         return newProjet

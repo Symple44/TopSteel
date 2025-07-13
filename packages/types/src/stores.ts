@@ -13,6 +13,7 @@ import type {
   StoreSyncState,
   StoreUser,
 } from './store-entities'
+import type { ProjetFilters } from './domains/project'
 
 // ===== TYPES DE BASE POUR STORES =====
 
@@ -215,9 +216,9 @@ export type AppStore = AppState & AppStoreActions
 // ===== TYPES POUR PROJET STORE =====
 
 /**
- * Filtres pour les projets (alias vers StoreProjetFilters)
+ * Filtres pour les projets (utilise le type du domaine project)
  */
-export type ProjetFilters = StoreProjetFilters
+// Note: ProjetFilters est maintenant exporté depuis domains/project pour éviter les conflits
 
 /**
  * Statistiques des projets (alias vers StoreProjetStats)
@@ -230,7 +231,7 @@ export type ProjetStats = StoreProjetStats
 export interface ProjetState extends BaseStoreState {
   projets: StoreProjet[]
   selectedProjet: StoreProjet | null
-  filters: ProjetFilters
+  filters: StoreProjetFilters
   searchTerm: string
   sortBy: keyof StoreProjet
   sortOrder: 'asc' | 'desc'
@@ -248,7 +249,7 @@ export interface ProjetState extends BaseStoreState {
  */
 export interface ProjetStoreActions extends BaseStoreActions {
   // Actions de données
-  fetchProjets: (options?: { force?: boolean; filters?: ProjetFilters }) => Promise<StoreProjet[]>
+  fetchProjets: (options?: { force?: boolean; filters?: StoreProjetFilters }) => Promise<StoreProjet[]>
   createProjet: (
     projet: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>
   ) => Promise<StoreProjet | null>
@@ -261,7 +262,7 @@ export interface ProjetStoreActions extends BaseStoreActions {
   selectProjetById: (id: string) => void
 
   // Actions de filtrage
-  setFilters: (filters: Partial<ProjetFilters>) => void
+  setFilters: (filters: Partial<StoreProjetFilters>) => void
   clearFilters: () => void
   setSearchTerm: (term: string) => void
 

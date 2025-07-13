@@ -293,7 +293,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
           <div className="flex items-center space-x-3">
             <Building2 className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="font-medium">{projet.client?.nom || 'Client non défini'}</p>
+              <p className="font-medium">{projet.clientId || 'Client non défini'}</p>
               <p className="text-sm text-muted-foreground">Entreprise</p>
             </div>
           </div>
@@ -304,36 +304,21 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
             <div className="flex items-center space-x-3">
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <div className="text-sm">
-                {projet.client?.adresse ? (
-                  <div>
-                    {projet.client.adresse.rue && <div>{projet.client.adresse.rue}</div>}
-                    {projet.client.adresse.ville && projet.client.adresse.codePostal && (
-                      <div>
-                        {projet.client.adresse.codePostal} {projet.client.adresse.ville}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-muted-foreground">Adresse non renseignée</div>
-                )}
+                <div className="text-muted-foreground">Adresse non renseignée</div>
               </div>
             </div>
 
             <div className="flex items-center space-x-3">
               <Phone className="h-4 w-4 text-muted-foreground" />
               <p className="text-sm">
-                {projet.client?.telephone || (
-                  <span className="text-muted-foreground">Téléphone non renseigné</span>
-                )}
+                <span className="text-muted-foreground">Téléphone non renseigné</span>
               </p>
             </div>
 
             <div className="flex items-center space-x-3">
               <Mail className="h-4 w-4 text-muted-foreground" />
               <p className="text-sm">
-                {projet.client?.email || (
-                  <span className="text-muted-foreground">Email non renseigné</span>
-                )}
+                <span className="text-muted-foreground">Email non renseigné</span>
               </p>
             </div>
           </div>
