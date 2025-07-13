@@ -277,355 +277,358 @@ export const ClientsCache = {
 // SERVICES ET API
 // =============================================
 
-class ClientsService {
-  private static baseUrl = '/api/clients'
-  private static abortControllers = new Map<string, AbortController>()
+// Module-level constants and state
+const clientsApiBaseUrl = '/api/clients'
+const clientsAbortControllers = new Map<string, AbortController>()
 
-  static async fetchClients(
-    filters: ClientFilters,
-    pagination: PaginationConfig,
-    signal?: AbortSignal
-  ): Promise<ClientsResponse> {
-    const startTime = performance.now()
-    const cacheKey = ClientsService.generateCacheKey(filters, pagination)
+// Module-level utility functions
+function generateClientsCacheKey(filters: ClientFilters, pagination: PaginationConfig): string {
+  return `clients-${JSON.stringify({ filters, pagination })}`
+}
 
-    // Vérifier le cache
-    const cached = ClientsCache.getClients(cacheKey)
+function serializeClientsFilters(filters: ClientFilters): Record<string, string> {
+  const serialized: Record<string, string> = {}
 
-    if (cached) {
-      return cached
-    }
-
-    try {
-      const queryParams = new URLSearchParams({
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
-        sortBy: pagination.sortBy,
-        sortOrder: pagination.sortOrder,
-        ...ClientsService.serializeFilters(filters),
-      })
-
-      const response = await fetch(`${ClientsService.baseUrl}?${queryParams}`, {
-        signal,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+  for (const [key, value] of Object.entries(filters)) {
+    if (value != null) {
+      if (Array.isArray(value)) {
+        serialized[key] = value.join(',')
+      } else if (value instanceof Date) {
+        serialized[key] = value.toISOString()
+      } else {
+        serialized[key] = String(value)
       }
-
-      const data = await response.json()
-      const validatedData = ClientsService.validateClientsResponse(data)
-
-      // Mettre en cache
-      ClientsCache.setClients(cacheKey, validatedData)
-
-      // Mettre en cache les clients individuels
-      for (const client of validatedData.clients) {
-        ClientsCache.setClient(client.id, client)
-      }
-
-      ClientsCache.recordRequest(true, performance.now() - startTime)
-
-      return validatedData
-    } catch (error) {
-      ClientsCache.recordRequest(false, performance.now() - startTime)
-      throw ClientsService.handleError(error)
     }
   }
 
-  static async fetchClient(id: string, signal?: AbortSignal): Promise<Client> {
-    const startTime = performance.now()
+  return serialized
+}
 
-    // Vérifier le cache
-    const cached = ClientsCache.getClient(id)
-
-    if (cached) {
-      return cached
-    }
-
-    try {
-      const response = await fetch(`${ClientsService.baseUrl}/${id}`, {
-        signal,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      const validatedClient = ClientsService.validateClient(data)
-
-      ClientsCache.setClient(id, validatedClient)
-      ClientsCache.recordRequest(true, performance.now() - startTime)
-
-      return validatedClient
-    } catch (error) {
-      ClientsCache.recordRequest(false, performance.now() - startTime)
-      throw ClientsService.handleError(error)
-    }
+function validateClientsResponse(data: unknown): ClientsResponse {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Réponse invalide du serveur')
   }
 
-  static async createClient(clientData: Partial<Client>, signal?: AbortSignal): Promise<Client> {
-    const startTime = performance.now()
+  const response = data as Record<string, unknown>
 
-    try {
-      const response = await fetch(ClientsService.baseUrl, {
-        method: 'POST',
-        signal,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(clientData),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      const validatedClient = ClientsService.validateClient(data)
-
-      // Invalider le cache
-      ClientsCache.invalidate('clients')
-      ClientsCache.setClient(validatedClient.id, validatedClient)
-
-      ClientsCache.recordRequest(true, performance.now() - startTime)
-
-      return validatedClient
-    } catch (error) {
-      ClientsCache.recordRequest(false, performance.now() - startTime)
-      throw ClientsService.handleError(error)
-    }
+  if (!Array.isArray(response.clients)) {
+    throw new Error('Format de réponse invalide: clients manquant')
   }
 
-  static async updateClient(
-    id: string,
-    updates: Partial<Client>,
-    signal?: AbortSignal
-  ): Promise<Client> {
-    const startTime = performance.now()
+  return {
+    clients: response.clients.map((client) => validateClientData(client)),
+    total: Number(response.total) || 0,
+    page: Number(response.page) || 1,
+    totalPages: Number(response.totalPages) || 1,
+    hasNext: Boolean(response.hasNext),
+    hasPrev: Boolean(response.hasPrev),
+  }
+}
 
-    try {
-      const response = await fetch(`${ClientsService.baseUrl}/${id}`, {
-        method: 'PATCH',
-        signal,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updates),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      const validatedClient = ClientsService.validateClient(data)
-
-      // Invalider le cache
-      ClientsCache.invalidate('clients')
-      ClientsCache.setClient(id, validatedClient)
-
-      ClientsCache.recordRequest(true, performance.now() - startTime)
-
-      return validatedClient
-    } catch (error) {
-      ClientsCache.recordRequest(false, performance.now() - startTime)
-      throw ClientsService.handleError(error)
-    }
+function validateClientData(data: unknown): Client {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Données client invalides')
   }
 
-  static async deleteClient(id: string, signal?: AbortSignal): Promise<void> {
-    const startTime = performance.now()
+  const client = data as Record<string, unknown>
 
-    try {
-      const response = await fetch(`${ClientsService.baseUrl}/${id}`, {
-        method: 'DELETE',
-        signal,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      // Invalider le cache
-      ClientsCache.invalidate('clients')
-      ClientsCache.invalidate(id)
-
-      ClientsCache.recordRequest(true, performance.now() - startTime)
-    } catch (error) {
-      ClientsCache.recordRequest(false, performance.now() - startTime)
-      throw ClientsService.handleError(error)
-    }
+  if (!client.id || !client.nom || !client.email) {
+    throw new Error('Champs obligatoires manquants')
   }
 
-  // Méthodes utilitaires privées
-  private static generateCacheKey(filters: ClientFilters, pagination: PaginationConfig): string {
-    return `clients-${JSON.stringify({ filters, pagination })}`
+  return {
+    id: String(client.id),
+    nom: String(client.nom),
+    email: String(client.email),
+    telephone: String(client.telephone || ''),
+    type: (client.type as ClientType) || 'PARTICULIER',
+    statut: (client.statut as ClientStatus) || 'PROSPECT',
+    priorite: (client.priorite as ClientPriority) || 'NORMALE',
+    dateCreation: new Date(client.dateCreation as string),
+    dateModification: new Date(client.dateModification as string),
+    chiffreAffaire: client.chiffreAffaire ? Number(client.chiffreAffaire) : undefined,
+    nombreProjets: client.nombreProjets ? Number(client.nombreProjets) : undefined,
+    derniereActivite: client.derniereActivite
+      ? new Date(client.derniereActivite as string)
+      : undefined,
+    tags: Array.isArray(client.tags) ? client.tags.map(String) : undefined,
+    notes: client.notes ? String(client.notes) : undefined,
+    commercial: client.commercial ? String(client.commercial) : undefined,
+    adresse: client.adresse ? validateClientAdresse(client.adresse) : undefined,
+  }
+}
+
+function validateClientAdresse(data: unknown): Adresse {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Adresse invalide')
   }
 
-  private static serializeFilters(filters: ClientFilters): Record<string, string> {
-    const serialized: Record<string, string> = {}
+  const adresse = data as Record<string, unknown>
 
-    for (const [key, value] of Object.entries(filters)) {
-      if (value != null) {
-        if (Array.isArray(value)) {
-          serialized[key] = value.join(',')
-        } else if (value instanceof Date) {
-          serialized[key] = value.toISOString()
-        } else {
-          serialized[key] = String(value)
-        }
-      }
-    }
-
-    return serialized
+  return {
+    rue: String(adresse.rue || ''),
+    ville: String(adresse.ville || ''),
+    codePostal: String(adresse.codePostal || ''),
+    pays: String(adresse.pays || 'France'),
+    region: adresse.region ? String(adresse.region) : undefined,
   }
+}
 
-  private static validateClientsResponse(data: unknown): ClientsResponse {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Réponse invalide du serveur')
-    }
+function handleClientsError(error: unknown): ClientsError {
+  const timestamp = new Date()
 
-    const response = data as Record<string, unknown>
-
-    if (!Array.isArray(response.clients)) {
-      throw new Error('Format de réponse invalide: clients manquant')
-    }
-
-    return {
-      clients: response.clients.map((client) => ClientsService.validateClient(client)),
-      total: Number(response.total) || 0,
-      page: Number(response.page) || 1,
-      totalPages: Number(response.totalPages) || 1,
-      hasNext: Boolean(response.hasNext),
-      hasPrev: Boolean(response.hasPrev),
-    }
-  }
-
-  private static validateClient(data: unknown): Client {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Données client invalides')
-    }
-
-    const client = data as Record<string, unknown>
-
-    if (!client.id || !client.nom || !client.email) {
-      throw new Error('Champs obligatoires manquants')
-    }
-
-    return {
-      id: String(client.id),
-      nom: String(client.nom),
-      email: String(client.email),
-      telephone: String(client.telephone || ''),
-      type: (client.type as ClientType) || 'PARTICULIER',
-      statut: (client.statut as ClientStatus) || 'PROSPECT',
-      priorite: (client.priorite as ClientPriority) || 'NORMALE',
-      dateCreation: new Date(client.dateCreation as string),
-      dateModification: new Date(client.dateModification as string),
-      chiffreAffaire: client.chiffreAffaire ? Number(client.chiffreAffaire) : undefined,
-      nombreProjets: client.nombreProjets ? Number(client.nombreProjets) : undefined,
-      derniereActivite: client.derniereActivite
-        ? new Date(client.derniereActivite as string)
-        : undefined,
-      tags: Array.isArray(client.tags) ? client.tags.map(String) : undefined,
-      notes: client.notes ? String(client.notes) : undefined,
-      commercial: client.commercial ? String(client.commercial) : undefined,
-      adresse: client.adresse ? ClientsService.validateAdresse(client.adresse) : undefined,
-    }
-  }
-
-  private static validateAdresse(data: unknown): Adresse {
-    if (!data || typeof data !== 'object') {
-      throw new Error('Adresse invalide')
-    }
-
-    const adresse = data as Record<string, unknown>
-
-    return {
-      rue: String(adresse.rue || ''),
-      ville: String(adresse.ville || ''),
-      codePostal: String(adresse.codePostal || ''),
-      pays: String(adresse.pays || 'France'),
-      region: adresse.region ? String(adresse.region) : undefined,
-    }
-  }
-
-  private static handleError(error: unknown): ClientsError {
-    const timestamp = new Date()
-
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        return {
-          code: 'ABORTED',
-          message: 'Requête annulée',
-          timestamp,
-        }
-      }
-
-      if (error.message.includes('HTTP 404')) {
-        return {
-          code: 'NOT_FOUND',
-          message: 'Client non trouvé',
-          timestamp,
-        }
-      }
-
-      if (error.message.includes('HTTP 403')) {
-        return {
-          code: 'FORBIDDEN',
-          message: 'Accès refusé',
-          timestamp,
-        }
-      }
-
-      if (error.message.includes('HTTP 500')) {
-        return {
-          code: 'SERVER_ERROR',
-          message: 'Erreur serveur interne',
-          timestamp,
-        }
-      }
-
+  if (error instanceof Error) {
+    if (error.name === 'AbortError') {
       return {
-        code: 'UNKNOWN_ERROR',
-        message: error.message,
+        code: 'ABORTED',
+        message: 'Requête annulée',
+        timestamp,
+      }
+    }
+
+    if (error.message.includes('HTTP 404')) {
+      return {
+        code: 'NOT_FOUND',
+        message: 'Client non trouvé',
+        timestamp,
+      }
+    }
+
+    if (error.message.includes('HTTP 403')) {
+      return {
+        code: 'FORBIDDEN',
+        message: 'Accès refusé',
+        timestamp,
+      }
+    }
+
+    if (error.message.includes('HTTP 500')) {
+      return {
+        code: 'SERVER_ERROR',
+        message: 'Erreur serveur interne',
         timestamp,
       }
     }
 
     return {
       code: 'UNKNOWN_ERROR',
-      message: "Une erreur inconnue s'est produite",
+      message: error.message,
       timestamp,
     }
   }
 
-  static cancelRequest(key: string): void {
-    const controller = ClientsService.abortControllers.get(key)
+  return {
+    code: 'UNKNOWN_ERROR',
+    message: "Une erreur inconnue s'est produite",
+    timestamp,
+  }
+}
 
-    if (controller) {
-      controller.abort()
-      ClientsService.abortControllers.delete(key)
-    }
+// Public API functions
+export async function fetchClients(
+  filters: ClientFilters,
+  pagination: PaginationConfig,
+  signal?: AbortSignal
+): Promise<ClientsResponse> {
+  const startTime = performance.now()
+  const cacheKey = generateClientsCacheKey(filters, pagination)
+
+  // Vérifier le cache
+  const cached = ClientsCache.getClients(cacheKey)
+
+  if (cached) {
+    return cached
   }
 
-  static cancelAllRequests(): void {
-    for (const controller of ClientsService.abortControllers.values()) {
-      controller.abort()
+  try {
+    const queryParams = new URLSearchParams({
+      page: pagination.page.toString(),
+      limit: pagination.limit.toString(),
+      sortBy: pagination.sortBy,
+      sortOrder: pagination.sortOrder,
+      ...serializeClientsFilters(filters),
+    })
+
+    const response = await fetch(`${clientsApiBaseUrl}?${queryParams}`, {
+      signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    ClientsService.abortControllers.clear()
+
+    const data = await response.json()
+    const validatedData = validateClientsResponse(data)
+
+    // Mettre en cache
+    ClientsCache.setClients(cacheKey, validatedData)
+
+    // Mettre en cache les clients individuels
+    for (const client of validatedData.clients) {
+      ClientsCache.setClient(client.id, client)
+    }
+
+    ClientsCache.recordRequest(true, performance.now() - startTime)
+
+    return validatedData
+  } catch (error) {
+    ClientsCache.recordRequest(false, performance.now() - startTime)
+    throw handleClientsError(error)
   }
+}
+
+export async function fetchClient(id: string, signal?: AbortSignal): Promise<Client> {
+  const startTime = performance.now()
+
+  // Vérifier le cache
+  const cached = ClientsCache.getClient(id)
+
+  if (cached) {
+    return cached
+  }
+
+  try {
+    const response = await fetch(`${clientsApiBaseUrl}/${id}`, {
+      signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const validatedClient = validateClientData(data)
+
+    ClientsCache.setClient(id, validatedClient)
+    ClientsCache.recordRequest(true, performance.now() - startTime)
+
+    return validatedClient
+  } catch (error) {
+    ClientsCache.recordRequest(false, performance.now() - startTime)
+    throw handleClientsError(error)
+  }
+}
+
+export async function createClient(
+  clientData: Partial<Client>,
+  signal?: AbortSignal
+): Promise<Client> {
+  const startTime = performance.now()
+
+  try {
+    const response = await fetch(clientsApiBaseUrl, {
+      method: 'POST',
+      signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(clientData),
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const validatedClient = validateClientData(data)
+
+    // Invalider le cache
+    ClientsCache.invalidate('clients')
+    ClientsCache.setClient(validatedClient.id, validatedClient)
+
+    ClientsCache.recordRequest(true, performance.now() - startTime)
+
+    return validatedClient
+  } catch (error) {
+    ClientsCache.recordRequest(false, performance.now() - startTime)
+    throw handleClientsError(error)
+  }
+}
+
+export async function updateClient(
+  id: string,
+  updates: Partial<Client>,
+  signal?: AbortSignal
+): Promise<Client> {
+  const startTime = performance.now()
+
+  try {
+    const response = await fetch(`${clientsApiBaseUrl}/${id}`, {
+      method: 'PATCH',
+      signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const validatedClient = validateClientData(data)
+
+    // Invalider le cache
+    ClientsCache.invalidate('clients')
+    ClientsCache.setClient(id, validatedClient)
+
+    ClientsCache.recordRequest(true, performance.now() - startTime)
+
+    return validatedClient
+  } catch (error) {
+    ClientsCache.recordRequest(false, performance.now() - startTime)
+    throw handleClientsError(error)
+  }
+}
+
+export async function deleteClient(id: string, signal?: AbortSignal): Promise<void> {
+  const startTime = performance.now()
+
+  try {
+    const response = await fetch(`${clientsApiBaseUrl}/${id}`, {
+      method: 'DELETE',
+      signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    // Invalider le cache
+    ClientsCache.invalidate('clients')
+    ClientsCache.invalidate(id)
+
+    ClientsCache.recordRequest(true, performance.now() - startTime)
+  } catch (error) {
+    ClientsCache.recordRequest(false, performance.now() - startTime)
+    throw handleClientsError(error)
+  }
+}
+
+export function cancelClientRequest(key: string): void {
+  const controller = clientsAbortControllers.get(key)
+
+  if (controller) {
+    controller.abort()
+    clientsAbortControllers.delete(key)
+  }
+}
+
+export function cancelAllClientRequests(): void {
+  for (const controller of clientsAbortControllers.values()) {
+    controller.abort()
+  }
+  clientsAbortControllers.clear()
 }
 
 // =============================================
@@ -712,7 +715,7 @@ export function useClients(
 
       try {
         const response = await fetchWithRetry(() =>
-          ClientsService.fetchClients(filters, pagination, abortControllerRef.current?.signal)
+          fetchClients(filters, pagination, abortControllerRef.current?.signal)
         )
 
         setClients(response.clients)
@@ -760,7 +763,7 @@ export function useClients(
 
   const createClient = useCallback(async (clientData: Partial<Client>): Promise<Client> => {
     try {
-      const newClient = await ClientsService.createClient(clientData)
+      const newClient = await createClient(clientData)
 
       // Optimistic update
       setClients((prev) => [newClient, ...prev])
@@ -781,7 +784,7 @@ export function useClients(
           prev.map((client) => (client.id === id ? { ...client, ...updates } : client))
         )
 
-        const updatedClient = await ClientsService.updateClient(id, updates)
+        const updatedClient = await updateClient(id, updates)
 
         // Mise à jour réelle
         setClients((prev) => prev.map((client) => (client.id === id ? updatedClient : client)))
@@ -806,7 +809,7 @@ export function useClients(
         setClients((prev) => prev.filter((client) => client.id !== id))
         setTotalClients((prev) => prev - 1)
 
-        await ClientsService.deleteClient(id)
+        await deleteClient(id)
       } catch (err) {
         // Rollback optimistic update
         refreshClients()

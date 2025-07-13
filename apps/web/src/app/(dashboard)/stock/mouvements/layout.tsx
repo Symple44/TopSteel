@@ -105,20 +105,6 @@ export default function MouvementsLayout({ children }: MouvementsLayoutProps) {
       <main className="mouvements-content">{children}</main>
 
       {/* Scripts et optimisations spécifiques à cette section */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'WebApplication',
-            name: 'TopSteel ERP - Mouvements de Stock',
-            description: 'Module de gestion des mouvements de stock',
-            applicationCategory: 'BusinessApplication',
-            operatingSystem: 'Web',
-            applicationSubCategory: 'ERP',
-          }),
-        }}
-      />
     </div>
   )
 }

@@ -46,7 +46,7 @@ interface MemoCache<R> {
 }
 
 // Selector memo cache as module-level functions
-const selectorCache = new Map<string, MemoCache<any>>()
+const selectorCache = new Map<string, MemoCache<unknown>>()
 const maxCacheSize = 100
 const defaultTTL = 5000
 
@@ -65,14 +65,14 @@ function getSelectorMemo<R>(key: string, ttl: number = defaultTTL): R | undefine
 
   entry.hitCount++
 
-  return entry.value
+  return entry.value as R
 }
 
 function setSelectorMemo<R>(key: string, value: R): void {
   const now = Date.now()
 
   selectorCache.set(key, {
-    value,
+    value: value as unknown,
     timestamp: now,
     hitCount: 1,
   })
@@ -93,7 +93,7 @@ function clearSelectorMemo(): void {
   selectorCache.clear()
 }
 
-function getSelectorMemoEntries(): Array<[string, MemoCache<any>]> {
+function getSelectorMemoEntries(): Array<[string, MemoCache<unknown>]> {
   return Array.from(selectorCache.entries())
 }
 

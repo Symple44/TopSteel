@@ -103,37 +103,6 @@ interface RegisterLayoutProps {
 export default function RegisterLayout({ children }: RegisterLayoutProps) {
   return (
     <div className="register-layout min-h-screen bg-gray-50">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'WebPage',
-            name: 'Inscription TopSteel ERP',
-            description: 'Créez votre compte TopSteel ERP pour gérer votre entreprise',
-            url: process.env.NEXT_PUBLIC_APP_URL
-              ? `${process.env.NEXT_PUBLIC_APP_URL}/register`
-              : undefined,
-            isPartOf: {
-              '@type': 'WebSite',
-              name: 'TopSteel ERP',
-              url: process.env.NEXT_PUBLIC_APP_URL || '',
-            },
-            inLanguage: 'fr-FR',
-            potentialAction: {
-              '@type': 'RegisterAction',
-              target: {
-                '@type': 'EntryPoint',
-                urlTemplate: process.env.NEXT_PUBLIC_APP_URL
-                  ? `${process.env.NEXT_PUBLIC_APP_URL}/register`
-                  : undefined,
-              },
-            },
-          }),
-        }}
-      />
-
-      {}
       <header className="sr-only">
         <h1>Inscription TopSteel ERP</h1>
       </header>

@@ -263,6 +263,7 @@ export function useHydrationSafe<T>(
   const [value, setValue] = useState<T>(serverValue)
   const mounted = useMounted()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Dependencies are correctly specified in the array
   useEffect(
     () => {
       if (mounted) {
@@ -310,6 +311,7 @@ export function useSSRSafeLocalStorage<T>(
 
   const [storedValue, setStoredValue] = useState<T>(defaultValue)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: serializer.deserialize is stable
   useEffect(() => {
     try {
       const item = api.getFromStorage(key)
