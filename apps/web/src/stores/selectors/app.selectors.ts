@@ -216,7 +216,7 @@ export const useFilteredProjets = () => {
 export const useUnreadNotificationsCount = () =>
   selectors.useTransformed(
     (state: AppState) => state.notifications || [],
-    (notifications) => notifications.filter((n) => !n.read).length,
+    (notifications) => notifications.filter((n) => !n.isRead).length,
     { debugLabel: 'unread-notifications-count' }
   )
 
@@ -226,7 +226,7 @@ export const useUnreadNotificationsCount = () =>
 export const useCriticalNotifications = () =>
   selectors.useFiltered(
     (state: AppState) => state.notifications || [],
-    (notification) => !notification.read && notification.type === 'error',
+    (notification) => !notification.isRead && notification.type === 'error',
     'critical-notifications'
   )
 
@@ -327,14 +327,14 @@ export const useDashboardData = () =>
     const notifications = state.notifications || []
 
     const activeProjets = projets.filter((p) => p.statut === 'en_cours' || p.statut === 'accepte')
-    const criticalNotifications = notifications.filter((n) => !n.read && n.type === 'error')
+    const criticalNotifications = notifications.filter((n) => !n.isRead && n.type === 'error')
 
     return {
       user: state.user,
       activeProjectsCount: activeProjets.length,
       totalProjectsCount: projets.length,
       criticalNotificationsCount: criticalNotifications.length,
-      unreadNotificationsCount: notifications.filter((n) => !n.read).length,
+      unreadNotificationsCount: notifications.filter((n) => !n.isRead).length,
       isOnline: state.sync?.isOnline ?? true,
       pendingChanges: state.sync?.pendingChanges || 0,
       theme: state.theme,

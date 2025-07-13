@@ -48,6 +48,32 @@ const initialAppState: InitialState<AppState> = {
 
   // Métriques
   metrics: {
+    // Propriétés héritées de BaseStoreEntity
+    id: crypto.randomUUID(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+
+    // Métriques générales
+    totalUsers: 0,
+    activeUsers: 0,
+    totalProjects: 0,
+    completedProjects: 0,
+
+    // Performance
+    averageResponseTime: 0,
+    errorRate: 0,
+    uptime: 100,
+
+    // Business
+    monthlyRevenue: 0,
+    customerSatisfaction: 0,
+
+    // Cache et sync
+    cacheHitRate: 0,
+    syncErrors: 0,
+    lastSyncAt: new Date(),
+
+    // Métriques d'activité
     pageViews: 0,
     actionCount: 0,
     lastActivity: Date.now(),
@@ -67,10 +93,15 @@ const initialAppState: InitialState<AppState> = {
   sync: {
     isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
     pendingChanges: 0,
-    lastSync: Date.now(),
-    conflictCount: 0,
-    syncInProgress: false,
-    autoSyncEnabled: true,
+    lastSync: new Date(),
+    syncErrors: [],
+    conflictsCount: 0,
+    modules: {
+      projects: { lastSync: new Date(), errors: 0 },
+      clients: { lastSync: new Date(), errors: 0 },
+      production: { lastSync: new Date(), errors: 0 },
+      billing: { lastSync: new Date(), errors: 0 },
+    },
   },
 }
 
@@ -274,8 +305,13 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
       const newNotification = {
         ...notification,
         id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: new Date(),
-        read: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        timestamp: Date.now(),
+        isRead: false,
+        isArchived: false,
+        category: notification.category || 'general',
+        priority: notification.priority || 'normal',
       }
 
       state.notifications.unshift(newNotification)
@@ -306,7 +342,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
       const notification = state.notifications.find((n) => n.id === id)
 
       if (notification) {
-        notification.read = true
+        notification.isRead = true
       }
       state.lastUpdate = Date.now()
     })
@@ -315,7 +351,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   markAllNotificationsAsRead: () => {
     set((state) => {
       for (const n of state.notifications) {
-        n.read = true
+        n.isRead = true
       }
       state.lastUpdate = Date.now()
     })
@@ -399,9 +435,8 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
       set((state) => {
         if (state.sync) {
-          state.sync.lastSync = Date.now()
+          state.sync.lastSync = new Date()
           state.sync.pendingChanges = 0
-          state.sync.syncInProgress = false
         }
         state.loading = false
         state.lastUpdate = Date.now()
@@ -411,7 +446,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         state.loading = false
         state.error = error instanceof Error ? error.message : 'Erreur de synchronisation'
         if (state.sync) {
-          state.sync.syncInProgress = false
+          // Sync error handling
         }
         state.lastUpdate = Date.now()
       })
@@ -423,7 +458,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
   resolveConflict: (conflictId, resolution) => {
     set((state) => {
       if (state.sync) {
-        state.sync.conflictCount = Math.max(0, state.sync.conflictCount - 1)
+        state.sync.conflictsCount = Math.max(0, state.sync.conflictsCount - 1)
       }
       state.lastUpdate = Date.now()
     })

@@ -193,6 +193,21 @@ export interface StoreMetrics extends BaseStoreEntity {
   cacheHitRate: number
   syncErrors: number
   lastSyncAt: Date
+
+  // Métriques d'activité (pour app.store.ts)
+  pageViews: number
+  actionCount: number
+  lastActivity: number
+  sessionStart: number
+  userCount: number
+  projectCount: number
+  orderCount: number
+  revenue: number
+  performance: {
+    loadTime: number
+    errorRate: number
+    uptime: number
+  }
 }
 
 // ===== ENTITÉS SYNCHRONISATION =====

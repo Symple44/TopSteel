@@ -244,30 +244,13 @@ const projetService = {
 
     return {
       total: 15,
-      parStatut: {
-        en_cours: 8,
-        termine: 5,
-        devis: 2,
-      },
-      parPriorite: {
-        NORMALE: 10,
-        HAUTE: 4,
-        URGENTE: 1,
-      },
-      parType: {
-        PORTAIL: 6,
-        ESCALIER: 4,
-        CLOTURE: 3,
-        STRUCTURE: 2,
-      },
+      enCours: 8,
+      termines: 5,
       enRetard: 2,
-      terminesTemps: 5,
-      avancementMoyen: 65,
-      chiffreAffaireMensuel: 85000,
-      chiffreAffaireAnnuel: 950000,
+      chiffreAffaireMois: 85000,
       margeGlobale: 18.5,
-      projetsActifs: 8,
-      nouveauxCeMois: 3,
+      tauxReussite: 95.5,
+      tempsMovenRealisation: 45,
     }
   },
 }
