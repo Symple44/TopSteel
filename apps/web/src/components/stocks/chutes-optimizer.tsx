@@ -174,6 +174,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {chutes.map((chute) => (
                 <button
+                  type="button"
                   key={chute.id}
                   className={`p-3 border rounded-lg cursor-pointer transition-colors w-full text-left ${
                     selectedChute?.id === chute.id

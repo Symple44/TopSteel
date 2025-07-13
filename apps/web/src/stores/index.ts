@@ -299,7 +299,7 @@ export const storeHelpers = {
 if (process.env.NODE_ENV === 'development') {
   // Ajouter les stores au window pour debug
   if (typeof window !== 'undefined') {
-    ;(window as any).__TOPSTEEL_STORES__ = {
+    ;(window as typeof window & { __TOPSTEEL_STORES__?: unknown }).__TOPSTEEL_STORES__ = {
       app: useAppStore,
       auth: useAuthStore,
       projet: useProjetStore,

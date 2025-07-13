@@ -215,21 +215,14 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
                       className="relative flex-1 p-2"
                       style={{ minWidth: `${headers.length * 40 * zoomLevel}px` }}
                     >
-                      <div
+                      <button
+                        type="button"
                         className={`absolute top-2 bottom-2 rounded cursor-pointer transition-all hover:opacity-80 ${getStatusColor(task.status)}`}
                         style={{
                           left: `${position.left}px`,
                           width: `${position.width}px`,
                         }}
                         onClick={() => onTaskClick(task)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault()
-                            onTaskClick(task)
-                          }
-                        }}
-                        tabIndex={0}
-                        role="button"
                         aria-label={`Tâche: ${task.name} - ${task.progress}%`}
                         title={`${task.name} - ${task.progress}%`}
                       >
@@ -245,7 +238,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
                             {task.progress}%
                           </span>
                         </div>
-                      </div>
+                      </button>
 
                       {/* Dépendances (lignes de connexion) */}
                       {task.dependencies?.map((depId) => {

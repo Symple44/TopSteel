@@ -138,110 +138,117 @@ const initialAuthState: InitialState<AuthState> = {
 }
 
 // ===== SERVICE D'AUTHENTIFICATION SIMULÉ =====
-class AuthService {
-  private static readonly MOCK_USERS = [
-    {
+const MOCK_USERS = [
+  {
+    email: 'admin@topsteel.fr',
+    password: 'admin123',
+    user: {
+      id: 'usr_001',
+      nom: 'Admin',
+      prenom: 'System',
       email: 'admin@topsteel.fr',
-      password: 'admin123',
-      user: {
-        id: 'usr_001',
-        nom: 'Admin',
-        prenom: 'System',
-        email: 'admin@topsteel.fr',
-        role: 'admin' as const,
-        permissions: ['*'],
-        preferences: { theme: 'dark' as const, notifications: true },
-      },
+      role: 'admin' as const,
+      permissions: ['*'],
+      preferences: { theme: 'dark' as const, notifications: true },
     },
-    {
+  },
+  {
+    email: 'manager@topsteel.fr',
+    password: 'manager123',
+    user: {
+      id: 'usr_002',
+      nom: 'Dupont',
+      prenom: 'Jean',
       email: 'manager@topsteel.fr',
-      password: 'manager123',
-      user: {
-        id: 'usr_002',
-        nom: 'Dupont',
-        prenom: 'Jean',
-        email: 'manager@topsteel.fr',
-        role: 'manager' as const,
-        permissions: ['projets:read', 'projets:write', 'stocks:read'],
-        preferences: { theme: 'light' as const, notifications: true },
-      },
+      role: 'manager' as const,
+      permissions: ['projets:read', 'projets:write', 'stocks:read'],
+      preferences: { theme: 'light' as const, notifications: true },
     },
-  ]
+  },
+]
 
-  static async login(credentials: LoginCredentials): Promise<{ user: User; session: SessionInfo }> {
-    await new Promise((resolve) => setTimeout(resolve, 800))
+export async function authLogin(credentials: LoginCredentials): Promise<{ user: User; session: SessionInfo }> {
+  await new Promise((resolve) => setTimeout(resolve, 800))
 
-    const mockUser = AuthService.MOCK_USERS.find(
-      (u) => u.email === credentials.email && u.password === credentials.password
-    )
+  const mockUser = MOCK_USERS.find(
+    (u) => u.email === credentials.email && u.password === credentials.password
+  )
 
-    if (!mockUser) {
-      throw new Error('Identifiants invalides')
-    }
-
-    const session: SessionInfo = {
-      token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
-      refreshToken: `refresh_${Date.now()}_${Math.random().toString(36)}`,
-      expiresAt:
-        Date.now() +
-        (credentials.rememberMe ? 30 * 24 * 60 * 60 * 1000 : AUTH_CONFIG.sessionTimeout),
-      issuedAt: Date.now(),
-      ipAddress: '127.0.0.1',
-      userAgent: navigator?.userAgent,
-    }
-
-    return {
-      user: { ...mockUser.user, lastLogin: Date.now() },
-      session,
-    }
+  if (!mockUser) {
+    throw new Error('Identifiants invalides')
   }
 
-  static async refreshToken(refreshToken: string): Promise<SessionInfo> {
-    await new Promise((resolve) => setTimeout(resolve, 300))
-
-    if (!refreshToken.startsWith('refresh_')) {
-      throw new Error('Refresh token invalide')
-    }
-
-    return {
-      token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
-      refreshToken,
-      expiresAt: Date.now() + AUTH_CONFIG.sessionTimeout,
-      issuedAt: Date.now(),
-    }
+  const session: SessionInfo = {
+    token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
+    refreshToken: `refresh_${Date.now()}_${Math.random().toString(36)}`,
+    expiresAt:
+      Date.now() +
+      (credentials.rememberMe ? 30 * 24 * 60 * 60 * 1000 : AUTH_CONFIG.sessionTimeout),
+    issuedAt: Date.now(),
+    ipAddress: '127.0.0.1',
+    userAgent: navigator?.userAgent,
   }
 
-  static async logout(): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 200))
+  return {
+    user: { ...mockUser.user, lastLogin: Date.now() },
+    session,
   }
 }
 
+export async function authRefreshToken(refreshToken: string): Promise<SessionInfo> {
+  await new Promise((resolve) => setTimeout(resolve, 300))
+
+  if (!refreshToken.startsWith('refresh_')) {
+    throw new Error('Refresh token invalide')
+  }
+
+  return {
+    token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
+    refreshToken,
+    expiresAt: Date.now() + AUTH_CONFIG.sessionTimeout,
+    issuedAt: Date.now(),
+  }
+}
+
+export async function authLogout(): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, 200))
+}
+
+// Compatibility export
+export const AuthService = {
+  login: authLogin,
+  refreshToken: authRefreshToken,
+  logout: authLogout,
+}
+
 // ===== UTILITAIRES =====
-class AuthUtils {
-  static isSessionExpired(session: SessionInfo | null): boolean {
-    if (!session) return true
+export function isSessionExpired(session: SessionInfo | null): boolean {
+  if (!session) return true
+  return Date.now() >= session.expiresAt
+}
 
-    return Date.now() >= session.expiresAt
-  }
+export function shouldRefreshToken(session: SessionInfo | null): boolean {
+  if (!session) return false
+  const timeLeft = session.expiresAt - Date.now()
+  return timeLeft <= AUTH_CONFIG.tokenRefreshThreshold && timeLeft > 0
+}
 
-  static shouldRefreshToken(session: SessionInfo | null): boolean {
-    if (!session) return false
-    const timeLeft = session.expiresAt - Date.now()
+export function calculateSessionTimeLeft(session: SessionInfo | null): number {
+  if (!session) return 0
+  return Math.max(0, session.expiresAt - Date.now())
+}
 
-    return timeLeft <= AUTH_CONFIG.tokenRefreshThreshold && timeLeft > 0
-  }
+export function isAccountLocked(state: Pick<AuthState, 'isLocked' | 'lockoutEndTime'>): boolean {
+  if (!state.isLocked || !state.lockoutEndTime) return false
+  return Date.now() < state.lockoutEndTime
+}
 
-  static calculateSessionTimeLeft(session: SessionInfo | null): number {
-    if (!session) return 0
-
-    return Math.max(0, session.expiresAt - Date.now())
-  }
-
-  static isAccountLocked(state: Pick<AuthState, 'isLocked' | 'lockoutEndTime'>): boolean {
-    if (!state.isLocked || !state.lockoutEndTime) return false
-
-    return Date.now() < state.lockoutEndTime
-  }
+// Compatibility export
+export const AuthUtils = {
+  isSessionExpired,
+  shouldRefreshToken,
+  calculateSessionTimeLeft,
+  isAccountLocked,
 }
 
 // ===== ACTIONS ASYNC =====
@@ -256,21 +263,21 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
 
       const state = get()
 
-      if (AuthUtils.isAccountLocked(state)) {
-        const timeLeft = Math.ceil((state.lockoutEndTime! - Date.now()) / 1000 / 60)
+      if (isAccountLocked(state)) {
+        const timeLeft = Math.ceil(((state.lockoutEndTime ?? Date.now()) - Date.now()) / 1000 / 60)
 
         throw new Error(`Compte verrouillé. Réessayez dans ${timeLeft} minutes.`)
       }
 
       try {
-        const { user, session } = await AuthService.login(credentials)
+        const { user, session } = await authLogin(credentials)
 
         set((state) => {
           state.user = user
           state.session = session
           state.isAuthenticated = true
           state.isSessionValid = true
-          state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(session)
+          state.sessionTimeLeft = calculateSessionTimeLeft(session)
           state.showWelcome = true
           state.failedAttempts = 0
           state.isLocked = false
@@ -326,7 +333,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
       const state = get()
 
       if (state.session) {
-        await AuthService.logout()
+        await authLogout()
       }
 
       set((state) => {
@@ -359,11 +366,11 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
         throw new Error('Aucun refresh token disponible')
       }
 
-      const newSession = await AuthService.refreshToken(state.session.refreshToken)
+      const newSession = await authRefreshToken(state.session.refreshToken)
 
       set((state) => {
         state.session = newSession
-        state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(newSession)
+        state.sessionTimeLeft = calculateSessionTimeLeft(newSession)
         state.lastActivity = Date.now()
         state.tokenRefreshInProgress = false
       })
@@ -385,12 +392,12 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
 
   checkSession: () => {
     const state = get()
-    const isValid = !AuthUtils.isSessionExpired(state.session) && !!state.user
+    const isValid = !isSessionExpired(state.session) && !!state.user
 
     set((state) => {
       state.isSessionValid = isValid
       state.isAuthenticated = isValid
-      state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(state.session)
+      state.sessionTimeLeft = calculateSessionTimeLeft(state.session)
 
       if (!isValid) {
         state.user = null
@@ -406,7 +413,7 @@ const createAuthActions: StoreCreator<AuthState, AuthActions> = (set, get) => ({
     set((state) => {
       if (state.session) {
         state.session.expiresAt = Date.now() + AUTH_CONFIG.sessionTimeout
-        state.sessionTimeLeft = AuthUtils.calculateSessionTimeLeft(state.session)
+        state.sessionTimeLeft = calculateSessionTimeLeft(state.session)
       }
       state.lastActivity = Date.now()
       state.lastUpdate = Date.now()
@@ -542,7 +549,7 @@ if (typeof window !== 'undefined') {
     if (state.isAuthenticated) {
       state.checkSession()
 
-      if (AuthUtils.shouldRefreshToken(state.session) && !state.tokenRefreshInProgress) {
+      if (shouldRefreshToken(state.session) && !state.tokenRefreshInProgress) {
         state.refreshToken().catch((error) => {
           console.error('Erreur lors du refresh automatique:', error)
         })

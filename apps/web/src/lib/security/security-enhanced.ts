@@ -55,7 +55,7 @@ export function isDisposableEmail(email: string): boolean {
 export function createRateLimiter(maxCalls: number, windowMs: number) {
     const calls: number[] = []
 
-    return function rateLimited<T extends (...args: unknown[]) => any>(fn: T): T {
+    return function rateLimited<T extends (...args: unknown[]) => unknown>(fn: T): T {
       return ((...args: unknown[]) => {
         const now = Date.now()
         const windowStart = now - windowMs
@@ -79,7 +79,7 @@ export function createRateLimiter(maxCalls: number, windowMs: number) {
 /**
  * Logger sécurisé
  */
-export function logSecurityEvent(event: string, details: Record<string, any> = {}) {
+export function logSecurityEvent(event: string, details: Record<string, unknown> = {}) {
     const sanitizedDetails = Object.fromEntries(
       Object.entries(details).map(([key, value]) => [
         key,

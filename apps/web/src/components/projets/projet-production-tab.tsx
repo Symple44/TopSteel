@@ -341,20 +341,13 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
         <CardContent>
           <div className="space-y-4">
             {mockOrdresFabrication.map((of) => (
-              <div
+              <button
+                type="button"
                 key={of.id}
-                className={`rounded-lg border p-4 cursor-pointer transition-colors ${
+                className={`rounded-lg border p-4 cursor-pointer transition-colors w-full text-left ${
                   selectedOF?.id === of.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
                 }`}
                 onClick={() => setSelectedOF(of)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    setSelectedOF(of)
-                  }
-                }}
-                tabIndex={0}
-                role="button"
                 aria-label={`Sélectionner l'ordre de fabrication ${of.numero}`}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -375,7 +368,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
                   </div>
                 </div>
                 <Progress value={of.progression} className="h-2" />
-              </div>
+              </button>
             ))}
           </div>
         </CardContent>

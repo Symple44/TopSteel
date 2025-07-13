@@ -200,7 +200,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
     /**
      * Sélecteur avec filtre dynamique
      */
-    useFiltered: <R extends readonly any[]>(
+    useFiltered: <R extends readonly unknown[]>(
       selector: StoreSelector<T, R>,
       filterFn: (item: R[number]) => boolean,
       debugLabel?: string
@@ -219,7 +219,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       const result = useStore(filteredSelector, shallow as EqualityFn<R>)
 
       if (process.env.NODE_ENV === 'development' && debugLabel) {
-        console.debug(`🔍 [${debugLabel}] Filtered selector: ${(result as any)?.length || 0} items`)
+        console.debug(`🔍 [${debugLabel}] Filtered selector: ${Array.isArray(result) ? result.length : 0} items`)
       }
 
       return result

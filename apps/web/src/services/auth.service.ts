@@ -37,12 +37,30 @@ interface ApiResponse<T> {
   status?: string
 }
 
+// ===== INTERFACES API =====
+interface APIUser {
+  id: string | number
+  email: string
+  nom: string
+  prenom: string
+  role: UserRole
+  isActive?: boolean
+  permissions?: string[]
+  telephone?: string
+  avatarUrl?: string
+  avatar?: string
+  preferences?: Record<string, unknown>
+  lastLogin?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
 // ===== HELPERS =====
 /**
  * Helper pour transformer les données user backend -> frontend
  */
 const transformUserFromAPI = (apiUser: unknown): User => {
-  const user = apiUser as any
+  const user = apiUser as APIUser
   return {
     id: user.id.toString(),
     email: user.email,
@@ -54,8 +72,8 @@ const transformUserFromAPI = (apiUser: unknown): User => {
     telephone: user.telephone,
     avatar: user.avatar,
     lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
-    createdAt: new Date(user.createdAt),
-    updatedAt: new Date(user.updatedAt),
+    createdAt: user.createdAt ? new Date(user.createdAt) : new Date(),
+    updatedAt: user.updatedAt ? new Date(user.updatedAt) : new Date(),
   } satisfies User
 }
 

@@ -128,12 +128,129 @@ interface CacheEntry<T> {
   key: string
 }
 
-class ClientsCache {
-  private static cache = new Map<string, CacheEntry<ClientsResponse>>()
-  private static clientCache = new Map<string, CacheEntry<Client>>()
-  private static defaultTTL = 5 * 60 * 1000 // 5 minutes
-  private static maxCacheSize = 100
-  private static metrics: ClientsMetrics = {
+// Module-level cache variables
+const clientsCache = new Map<string, CacheEntry<ClientsResponse>>()
+const clientCache = new Map<string, CacheEntry<Client>>()
+const defaultCacheTTL = 5 * 60 * 1000 // 5 minutes
+const maxCacheSize = 100
+let cacheMetrics: ClientsMetrics = {
+  totalRequests: 0,
+  successfulRequests: 0,
+  failedRequests: 0,
+  cacheHits: 0,
+  cacheMisses: 0,
+  averageResponseTime: 0,
+  retryAttempts: 0,
+}
+
+// Cache utility functions
+function getCacheEntry<T>(key: string, cache: Map<string, CacheEntry<T>>): T | null {
+  const entry = cache.get(key)
+
+  if (!entry) {
+    cacheMetrics.cacheMisses++
+    return null
+  }
+
+  if (Date.now() - entry.timestamp > entry.ttl) {
+    cache.delete(key)
+    cacheMetrics.cacheMisses++
+    return null
+  }
+
+  cacheMetrics.cacheHits++
+  return entry.data
+}
+
+function setCacheEntry<T>(
+  key: string,
+  data: T,
+  cache: Map<string, CacheEntry<T>>,
+  ttl = defaultCacheTTL
+): void {
+  // Fix TypeScript strict: nettoyage du cache si plein
+  if (cache.size >= maxCacheSize) {
+    // Méthode plus sûre : convertir en array pour éviter undefined
+    const keys = Array.from(cache.keys())
+    if (keys.length > 0) {
+      cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
+    }
+  }
+
+  cache.set(key, {
+    data,
+    timestamp: Date.now(),
+    ttl,
+    key,
+  })
+}
+
+export function getClientsFromCache(key: string): ClientsResponse | null {
+  return getCacheEntry(key, clientsCache)
+}
+
+export function setClientsInCache(key: string, data: ClientsResponse, ttl?: number): void {
+  setCacheEntry(key, data, clientsCache, ttl)
+}
+
+export function getClientFromCache(id: string): Client | null {
+  return getCacheEntry(id, clientCache)
+}
+
+export function setClientInCache(id: string, client: Client, ttl?: number): void {
+  setCacheEntry(id, client, clientCache, ttl)
+}
+
+export function invalidateCache(pattern?: string): void {
+  if (!pattern) {
+    clientsCache.clear()
+    clientCache.clear()
+    return
+  }
+
+  const regex = new RegExp(pattern)
+
+  for (const key of clientsCache.keys()) {
+    if (regex.test(key)) {
+      clientsCache.delete(key)
+    }
+  }
+
+  for (const key of clientCache.keys()) {
+    if (regex.test(key)) {
+      clientCache.delete(key)
+    }
+  }
+}
+
+export function recordCacheRequest(success: boolean, responseTime: number, isRetry = false): void {
+  cacheMetrics.totalRequests++
+
+  if (success) {
+    cacheMetrics.successfulRequests++
+  } else {
+    cacheMetrics.failedRequests++
+  }
+
+  if (isRetry) {
+    cacheMetrics.retryAttempts++
+  }
+
+  // Calcul de la moyenne mobile
+  const previousAvg = cacheMetrics.averageResponseTime
+  const count = cacheMetrics.totalRequests
+
+  cacheMetrics.averageResponseTime = (previousAvg * (count - 1) + responseTime) / count
+}
+
+export function getCacheMetrics(): ClientsMetrics {
+  return { ...cacheMetrics }
+}
+
+export function clearCache(): void {
+  clientsCache.clear()
+  clientCache.clear()
+  cacheMetrics = {
     totalRequests: 0,
     successfulRequests: 0,
     failedRequests: 0,
@@ -142,128 +259,18 @@ class ClientsCache {
     averageResponseTime: 0,
     retryAttempts: 0,
   }
+}
 
-  static get<T>(key: string, cache: Map<string, CacheEntry<T>>): T | null {
-    const entry = cache.get(key)
-
-    if (!entry) {
-      ClientsCache.metrics.cacheMisses++
-
-      return null
-    }
-
-    if (Date.now() - entry.timestamp > entry.ttl) {
-      cache.delete(key)
-      ClientsCache.metrics.cacheMisses++
-
-      return null
-    }
-
-    ClientsCache.metrics.cacheHits++
-
-    return entry.data
-  }
-
-  static set<T>(
-    key: string,
-    data: T,
-    cache: Map<string, CacheEntry<T>>,
-    ttl = ClientsCache.defaultTTL
-  ): void {
-    // Fix TypeScript strict: nettoyage du cache si plein
-    if (cache.size >= ClientsCache.maxCacheSize) {
-      // Méthode plus sûre : convertir en array pour éviter undefined
-      const keys = Array.from(cache.keys())
-
-      if (keys.length > 0) {
-        cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
-      }
-    }
-
-    cache.set(key, {
-      data,
-      timestamp: Date.now(),
-      ttl,
-      key,
-    })
-  }
-
-  static getClients(key: string): ClientsResponse | null {
-    return ClientsCache.get(key, ClientsCache.cache)
-  }
-
-  static setClients(key: string, data: ClientsResponse, ttl?: number): void {
-    ClientsCache.set(key, data, ClientsCache.cache, ttl)
-  }
-
-  static getClient(id: string): Client | null {
-    return ClientsCache.get(id, ClientsCache.clientCache)
-  }
-
-  static setClient(id: string, client: Client, ttl?: number): void {
-    ClientsCache.set(id, client, ClientsCache.clientCache, ttl)
-  }
-
-  static invalidate(pattern?: string): void {
-    if (!pattern) {
-      ClientsCache.cache.clear()
-      ClientsCache.clientCache.clear()
-
-      return
-    }
-
-    const regex = new RegExp(pattern)
-
-    for (const key of ClientsCache.cache.keys()) {
-      if (regex.test(key)) {
-        ClientsCache.cache.delete(key)
-      }
-    }
-
-    for (const key of ClientsCache.clientCache.keys()) {
-      if (regex.test(key)) {
-        ClientsCache.clientCache.delete(key)
-      }
-    }
-  }
-
-  static recordRequest(success: boolean, responseTime: number, isRetry = false): void {
-    ClientsCache.metrics.totalRequests++
-
-    if (success) {
-      ClientsCache.metrics.successfulRequests++
-    } else {
-      ClientsCache.metrics.failedRequests++
-    }
-
-    if (isRetry) {
-      ClientsCache.metrics.retryAttempts++
-    }
-
-    // Calcul de la moyenne mobile
-    const previousAvg = ClientsCache.metrics.averageResponseTime
-    const count = ClientsCache.metrics.totalRequests
-
-    ClientsCache.metrics.averageResponseTime = (previousAvg * (count - 1) + responseTime) / count
-  }
-
-  static getMetrics(): ClientsMetrics {
-    return { ...ClientsCache.metrics }
-  }
-
-  static clear(): void {
-    ClientsCache.cache.clear()
-    ClientsCache.clientCache.clear()
-    ClientsCache.metrics = {
-      totalRequests: 0,
-      successfulRequests: 0,
-      failedRequests: 0,
-      cacheHits: 0,
-      cacheMisses: 0,
-      averageResponseTime: 0,
-      retryAttempts: 0,
-    }
-  }
+// Compatibility export
+export const ClientsCache = {
+  getClients: getClientsFromCache,
+  setClients: setClientsInCache,
+  getClient: getClientFromCache,
+  setClient: setClientInCache,
+  invalidate: invalidateCache,
+  recordRequest: recordCacheRequest,
+  getMetrics: getCacheMetrics,
+  clear: clearCache,
 }
 
 // =============================================

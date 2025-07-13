@@ -216,7 +216,7 @@ export class PerformanceMonitor {
         const entries = entryList.getEntries()
 
         for (const entry of entries) {
-          const fid = (entry as any).processingStart - entry.startTime
+          const fid = (entry as PerformanceEventTiming & { processingStart?: number }).processingStart ?? entry.startTime - entry.startTime
 
           if (fid > 100) {
             // Seuil pour FID lent
@@ -260,8 +260,8 @@ export class PerformanceMonitor {
         const entries = entryList.getEntries()
 
         for (const entry of entries) {
-          if (!(entry as any).hadRecentInput) {
-            clsValue += (entry as any).value
+          if (!(entry as PerformanceEntry & { hadRecentInput?: boolean }).hadRecentInput) {
+            clsValue += (entry as PerformanceEntry & { value?: number }).value ?? 0
           }
         }
 
@@ -288,7 +288,7 @@ export class PerformanceMonitor {
   /**
    * Envoyer des métriques aux analytics (type-safe) - SSR-Safe
    */
-  private static sendToAnalytics(eventName: string, parameters: Record<string, any>): void {
+  private static sendToAnalytics(eventName: string, parameters: Record<string, unknown>): void {
     if (typeof window === 'undefined') return
 
     try {
@@ -334,7 +334,7 @@ export class PerformanceMonitor {
   /**
    * Enregistrer une métrique personnalisée - SSR-Safe
    */
-  recordMetric(name: string, data: Record<string, any>): void {
+  recordMetric(name: string, data: Record<string, unknown>): void {
     const metric: PerformanceMetric = {
       name,
       value: data.value || data.duration || 0,
@@ -347,7 +347,11 @@ export class PerformanceMonitor {
       this.metrics.set(name, [])
     }
 
-    const metrics = this.metrics.get(name)!
+    const metrics = this.metrics.get(name)
+    if (!metrics) {
+      console.warn(`Metrics array for ${name} not found`)
+      return
+    }
 
     metrics.push(metric)
 
@@ -390,8 +394,8 @@ export class PerformanceMonitor {
   /**
    * Obtenir un rapport de performance
    */
-  getPerformanceReport(): Record<string, any> {
-    const report: Record<string, any> = {}
+  getPerformanceReport(): Record<string, unknown> {
+    const report: Record<string, unknown> = {}
 
     for (const [name, metrics] of this.metrics.entries()) {
       if (metrics.length === 0) continue

@@ -19,7 +19,7 @@ interface BrowserAPI {
 
 interface SSRSafeConfig {
   enableDebugLogs?: boolean
-  fallbackValues?: Record<string, any>
+  fallbackValues?: Record<string, unknown>
   errorCallback?: (error: Error, context: string) => void
 }
 
@@ -407,7 +407,7 @@ export function createSafeGlobal<T extends object>(globalName: string, fallback:
   }
 
   try {
-    const globalObj = (window as any)[globalName]
+    const globalObj = (window as typeof window & Record<string, unknown>)[globalName]
 
     return globalObj || fallback
   } catch {

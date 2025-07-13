@@ -145,6 +145,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
               <div className="space-y-3">
                 {modeles3D.map((modele) => (
                   <button
+                    type="button"
                     key={modele.id}
                     className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer w-full text-left"
                     onClick={() => setIs3DLoaded(true)}

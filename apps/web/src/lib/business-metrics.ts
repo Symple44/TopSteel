@@ -7,7 +7,7 @@
 // ===== TYPES =====
 interface BusinessEvent {
   name: string
-  properties: Record<string, any>
+  properties: Record<string, unknown>
   timestamp: number
   userId?: string
   sessionId: string
@@ -47,7 +47,7 @@ class BusinessMetrics {
       ...config,
     }
 
-    this.maxEvents = this.config.maxEvents!
+    this.maxEvents = this.config.maxEvents ?? 5000
     this.isClient = typeof window !== 'undefined'
 
     // ✅ Initialisation différée pour éviter les erreurs SSR
@@ -129,7 +129,7 @@ class BusinessMetrics {
     this.batchTimeout = setTimeout(() => {
       this.flushEvents()
       this.setupBatching() // Reconfigurer pour le prochain batch
-    }, this.config.batchTimeout!)
+    }, this.config.batchTimeout ?? 5000)
   }
 
   /**
@@ -138,13 +138,13 @@ class BusinessMetrics {
   private async flushEvents(): Promise<void> {
     if (this.events.length === 0) return
 
-    const eventsToSend = this.events.slice(0, this.config.batchSize!)
+    const eventsToSend = this.events.slice(0, this.config.batchSize ?? 50)
 
     try {
       await this.sendToBackend(eventsToSend)
 
       // Retirer les événements envoyés
-      this.events = this.events.slice(this.config.batchSize!)
+      this.events = this.events.slice(this.config.batchSize ?? 50)
 
       if (this.config.enableDebugLogs) {
       }
@@ -168,7 +168,7 @@ class BusinessMetrics {
   /**
    * Méthode principale de tracking - SSR-Safe
    */
-  track(eventName: string, properties: Record<string, any> = {}): void {
+  track(eventName: string, properties: Record<string, unknown> = {}): void {
     const event: BusinessEvent = {
       name: eventName,
       properties: {
@@ -202,7 +202,7 @@ class BusinessMetrics {
    */
   setUserContext(context: UserContext): void {
     this.userContext = { ...context }
-    this.track('user_context_updated', context)
+    this.track('user_context_updated', context as Record<string, unknown>)
   }
 
   // ===== MÉTRIQUES SPÉCIFIQUES TOPSTEEL =====
@@ -252,7 +252,7 @@ class BusinessMetrics {
     })
   }
 
-  trackUserAction(action: string, context: Record<string, any> = {}): void {
+  trackUserAction(action: string, context: Record<string, unknown> = {}): void {
     this.track('user_action', {
       action,
       page: this.isClient ? window.location.pathname : '',
@@ -269,7 +269,7 @@ class BusinessMetrics {
     })
   }
 
-  trackSearchPerformed(query: string, resultCount: number, filters?: Record<string, any>): void {
+  trackSearchPerformed(query: string, resultCount: number, filters?: Record<string, unknown>): void {
     this.track('search_performed', {
       query: query.substring(0, 100),
       resultCount,
@@ -277,7 +277,7 @@ class BusinessMetrics {
     })
   }
 
-  trackPerformanceMetric(metric: string, value: number, context?: Record<string, any>): void {
+  trackPerformanceMetric(metric: string, value: number, context?: Record<string, unknown>): void {
     this.track('performance_metric', {
       metric,
       value,
@@ -286,7 +286,7 @@ class BusinessMetrics {
     })
   }
 
-  trackError(error: Error, context: Record<string, any> = {}): void {
+  trackError(error: Error, context: Record<string, unknown> = {}): void {
     this.track('error_occurred', {
       message: error.message,
       stack: error.stack?.substring(0, 1000),
@@ -340,7 +340,7 @@ class BusinessMetrics {
     }
 
     if (filters?.since) {
-      filteredEvents = filteredEvents.filter((e) => e.timestamp >= filters.since!)
+      filteredEvents = filteredEvents.filter((e) => e.timestamp >= (filters.since ?? 0))
     }
 
     if (filters?.limit) {

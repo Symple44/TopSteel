@@ -135,6 +135,7 @@ export function PlanningCalendar({
 
             return (
               <button
+                type="button"
                 key={day.date.toISOString()}
                 className={`
                   min-h-[100px] p-1 border border-gray-200 cursor-pointer hover:bg-gray-50 w-full text-left
@@ -152,6 +153,7 @@ export function PlanningCalendar({
                 <div className="space-y-1">
                   {dayEvents.slice(0, 3).map((event) => (
                     <button
+                      type="button"
                       key={event.id}
                       className={`
                         text-xs p-1 rounded cursor-pointer truncate w-full text-left

@@ -94,7 +94,7 @@ export function sanitizeUrl(url: string): string | null {
 export function createRateLimiter(maxRequests: number, windowMs: number) {
     const requests: number[] = []
 
-    return function rateLimited<T extends (...args: unknown[]) => any>(fn: T): T {
+    return function rateLimited<T extends (...args: unknown[]) => unknown>(fn: T): T {
       return ((...args: unknown[]) => {
         const now = Date.now()
         const windowStart = now - windowMs
@@ -189,7 +189,7 @@ export function auditSecurity(): SecurityAuditReport {
 /**
  * Logger sécurisé
  */
-export function logSecurityEvent(event: string, details: Record<string, any> = {}) {
+export function logSecurityEvent(event: string, details: Record<string, unknown> = {}) {
     const sanitizedDetails = Object.fromEntries(
       Object.entries(details).map(([key, value]) => [
         key,

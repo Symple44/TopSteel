@@ -55,7 +55,7 @@ export function createRobustStore<
 
     // Store creator compatible avec Zustand
     const storeCreator = (set: unknown, get: unknown) => {
-      const customActions = storeDefinition(set as any, get as any)
+      const customActions = storeDefinition(set as Parameters<typeof storeDefinition>[0], get as Parameters<typeof storeDefinition>[1])
       const baseActions = createBaseActions(initialState)
 
       return {
@@ -73,7 +73,7 @@ export function createRobustStore<
 
     // Middleware Immer pour mutations immutables
     if (enableImmer) {
-      store = immer(store) as any
+      store = immer(store) as typeof store
     }
 
     // Middleware de persistence sécurisée
@@ -109,7 +109,7 @@ export function createRobustStore<
         },
         partialize: (state: unknown) => {
           // Ne persister que les données importantes
-          const { loading, error, lastUpdate, ...persistedState } = state as any
+          const { loading, error, lastUpdate, ...persistedState } = state as Record<string, unknown>
 
           return persistedState
         },
@@ -119,17 +119,17 @@ export function createRobustStore<
           } else {
           }
         },
-      }) as any
+      }) as typeof store
     }
 
     // Middleware subscriptions si nécessaire
     if (subscriptions) {
-      store = subscribeWithSelector(store) as any
+      store = subscribeWithSelector(store) as typeof store
     }
 
     // Middleware DevTools
     if (enableDevtools && process.env.NODE_ENV === 'development') {
-      store = devtools(store, { name }) as any
+      store = devtools(store, { name }) as typeof store
     }
 
     const zustandStore = create<TState & TActions>()(store)
@@ -300,7 +300,7 @@ export function validateState<TState extends BaseStoreState>(
   /**
    * Debounce pour actions
    */
-export function debounce<T extends (...args: unknown[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
@@ -320,7 +320,7 @@ export function debounce<T extends (...args: unknown[]) => any>(
   /**
    * Throttle pour actions
    */
-export function throttle<T extends (...args: unknown[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
@@ -340,7 +340,7 @@ export function throttle<T extends (...args: unknown[]) => any>(
    * Monitoring et debugging des stores
    */
 function addMonitoring(store: unknown, name: string) {
-    const storeTyped = store as any
+    const storeTyped = store as { getState: () => unknown; setState: (fn: unknown) => void }
     const originalGetState = storeTyped.getState
     const originalSetState = storeTyped.setState
 
@@ -423,7 +423,7 @@ function cloneStoreState(state: unknown) {
   try {
     return structuredClone ? structuredClone(state) : JSON.parse(JSON.stringify(state))
   } catch {
-    return { ...(state as any) }
+    return { ...(state as Record<string, unknown>) }
   }
 }
 
@@ -492,14 +492,14 @@ function resetStoreMonitor() {
   storeMonitorSubscribers.clear()
 }
 
-// Legacy class for backward compatibility
-export class StoreMonitor {
-  static enable = enableStoreMonitor
-  static subscribe = subscribeToStoreMonitor
-  static logStateChange = logStoreStateChange
-  static logAccess = logStoreAccess
-  static getStats = getStoreMonitorStats
-  static reset = resetStoreMonitor
+// Legacy export for backward compatibility
+export const StoreMonitor = {
+  enable: enableStoreMonitor,
+  subscribe: subscribeToStoreMonitor,
+  logStateChange: logStoreStateChange,
+  logAccess: logStoreAccess,
+  getStats: getStoreMonitorStats,
+  reset: resetStoreMonitor,
 }
 
 // ===== EXPORTS UNIQUEMENT DES UTILITAIRES =====

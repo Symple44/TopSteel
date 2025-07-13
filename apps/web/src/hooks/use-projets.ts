@@ -5,7 +5,7 @@
  */
 
 import { useProjetStore } from '@/stores/projet.store'
-import type { ProjetFilters } from '@erp/types'
+import type { ProjetFilters, Projet } from '@erp/types'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export const useProjets = (autoFetch = true) => {
@@ -225,17 +225,17 @@ export const useProjetsActions = () => {
     isLoading: loading,
     error,
     // Helpers avec gestion d'erreur
-    createProjetSafe: async (data: unknown) => {
+    createProjetSafe: async (data: Partial<Projet>) => {
       try {
-        return await createProjet?.(data as any)
+        return await createProjet?.(data as Parameters<typeof createProjet>[0])
       } catch (error) {
         console.error('Erreur création projet:', error)
         throw error
       }
     },
-    updateProjetSafe: async (id: string, data: unknown) => {
+    updateProjetSafe: async (id: string, data: Partial<Projet>) => {
       try {
-        return await updateProjet?.(id, data as any)
+        return await updateProjet?.(id, data)
       } catch (error) {
         console.error('Erreur mise à jour projet:', error)
         throw error
