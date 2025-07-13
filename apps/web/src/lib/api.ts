@@ -200,13 +200,13 @@ export const api = {
 
           if (filters.dateDebut) {
             filteredProjets = filteredProjets.filter(
-              (p) => p.dateDebut && p.dateDebut >= filters.dateDebut!
+              (p) => p.dateDebut && filters.dateDebut && p.dateDebut >= filters.dateDebut
             )
           }
 
           if (filters.dateFin) {
             filteredProjets = filteredProjets.filter(
-              (p) => p.dateFin && p.dateFin <= filters.dateFin!
+              (p) => p.dateFin && filters.dateFin && p.dateFin <= filters.dateFin
             )
           }
 

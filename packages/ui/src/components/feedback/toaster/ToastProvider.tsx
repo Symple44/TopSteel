@@ -21,7 +21,7 @@ export const useToast = () => {
     return {
       toasts: [],
       addToast: () => {},
-      removeToast: () => {}
+      removeToast: () => {},
     }
   }
   return context

@@ -236,11 +236,11 @@ export class APIClient {
     this.metrics.errors++
 
     const errorDetails: APIErrorDetails = {
-      code: (error as any).code || 'UNKNOWN_ERROR',
-      message: (error as any).message || 'Une erreur inconnue est survenue',
-      details: (error as any).details || null,
+      code: (error as { code?: string }).code || 'UNKNOWN_ERROR',
+      message: (error as { message?: string }).message || 'Une erreur inconnue est survenue',
+      details: (error as { details?: unknown }).details || null,
       timestamp: Date.now(),
-      requestId: (error as any).requestId || `req_${Date.now()}`,
+      requestId: (error as { requestId?: string }).requestId || `req_${Date.now()}`,
     }
 
     // Log simple (sans dépendance externe)
@@ -424,7 +424,8 @@ export class APIClient {
 
     // Supprimer Content-Type pour les uploads
     if (uploadConfig.headers && 'Content-Type' in uploadConfig.headers) {
-      delete uploadConfig.headers['Content-Type']
+      const { 'Content-Type': removed, ...restHeaders } = uploadConfig.headers
+      uploadConfig.headers = restHeaders
     }
 
     const url = `${this.baseURL}${endpoint}`

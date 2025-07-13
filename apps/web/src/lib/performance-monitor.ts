@@ -11,7 +11,7 @@ declare global {
     gtag?: (
       command: 'config' | 'event' | 'set',
       target: string,
-      config?: Record<string, any>
+      config?: Record<string, unknown>
     ) => void
     dataLayer?: unknown[]
   }
@@ -259,11 +259,11 @@ export class PerformanceMonitor {
       const observer = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries()
 
-        entries.forEach((entry) => {
+        for (const entry of entries) {
           if (!(entry as any).hadRecentInput) {
             clsValue += (entry as any).value
           }
-        })
+        }
 
         if (clsValue > 0.1) {
           // Seuil pour CLS problématique
@@ -375,13 +375,13 @@ export class PerformanceMonitor {
     this.metrics.clear()
 
     if (this.isClient) {
-      this.observers.forEach((observer) => {
+      for (const observer of this.observers) {
         try {
           observer.disconnect()
         } catch (error) {
           console.error('Error disconnecting observer:', error)
         }
-      })
+      }
     }
 
     this.observers = []

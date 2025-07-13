@@ -52,7 +52,7 @@ export function usePerformanceMonitor(componentName: string) {
             name: `${componentName}.${measureName}`,
             duration,
             timestamp: Date.now(),
-            memory: (performance as any).memory?.usedJSHeapSize,
+            memory: (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize,
           }
 
           metricsRef.current.push(metric)
@@ -555,8 +555,9 @@ export function useMemoryLeakDetector(componentName: string) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if ((performance as any).memory) {
-        const memoryUsage = (performance as any).memory.usedJSHeapSize
+      const memoryAPI = (performance as { memory?: { usedJSHeapSize: number } }).memory
+      if (memoryAPI) {
+        const memoryUsage = memoryAPI.usedJSHeapSize
 
         memorySnapshotsRef.current.push({
           timestamp: Date.now(),

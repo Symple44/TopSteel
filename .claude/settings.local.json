@@ -10,7 +10,13 @@
       "Bash(npx biome check:*)",
       "Bash(npx tsc:*)",
       "Bash(npx turbo build:*)",
-      "Bash(npx @biomejs/biome check:*)"
+      "Bash(npx @biomejs/biome check:*)",
+      "Bash(npx biome lint:*)",
+      "Bash(npx biome format:*)",
+      "Bash(npm run:*)",
+      "Bash(npx next:*)",
+      "Bash(npx @biomejs/biome lint)",
+      "Bash(npx @biomejs/biome lint:*)"
     ],
     "deny": []
   }

@@ -134,22 +134,14 @@ export function PlanningCalendar({
             const isToday = day.date.toDateString() === new Date().toDateString()
 
             return (
-              <div
+              <button
                 key={day.date.toISOString()}
                 className={`
-                  min-h-[100px] p-1 border border-gray-200 cursor-pointer hover:bg-gray-50
+                  min-h-[100px] p-1 border border-gray-200 cursor-pointer hover:bg-gray-50 w-full text-left
                   ${day.isCurrentMonth ? '' : 'bg-gray-50 text-gray-400'}
                   ${isToday ? 'bg-blue-50 border-blue-200' : ''}
                 `}
                 onClick={() => onDateClick(day.date)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    onDateClick(day.date)
-                  }
-                }}
-                tabIndex={0}
-                role="button"
                 aria-label={`Sélectionner le ${day.date.toLocaleDateString('fr-FR')}`}
               >
                 <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : ''}`}>
@@ -159,10 +151,10 @@ export function PlanningCalendar({
                 {/* Événements */}
                 <div className="space-y-1">
                   {dayEvents.slice(0, 3).map((event) => (
-                    <div
+                    <button
                       key={event.id}
                       className={`
-                        text-xs p-1 rounded cursor-pointer truncate
+                        text-xs p-1 rounded cursor-pointer truncate w-full text-left
                         ${
                           event.type === 'ordre'
                             ? 'bg-blue-100 text-blue-800'
@@ -175,25 +167,16 @@ export function PlanningCalendar({
                         e.stopPropagation()
                         onEventClick(event)
                       }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          onEventClick(event)
-                        }
-                      }}
-                      tabIndex={0}
-                      role="button"
                       aria-label={`Événement: ${event.title}`}
                     >
                       {event.title}
-                    </div>
+                    </button>
                   ))}
                   {dayEvents.length > 3 && (
                     <div className="text-xs text-gray-500">+{dayEvents.length - 3} autres</div>
                   )}
                 </div>
-              </div>
+              </button>
             )
           })}
         </div>

@@ -23,58 +23,62 @@ interface ValidationErrors {
 /**
  * Utilitaires de sécurité simplifiés (sans dépendance externe)
  */
-class SimpleSecurityUtils {
-  /**
-   * Validation d'email simple mais sécurisée
-   */
-  static validateEmailSecure(email: string): boolean {
-    // Pattern email basique mais robuste
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+/**
+ * Validation d'email simple mais sécurisée
+ */
+function validateEmailSecure(email: string): boolean {
+  // Pattern email basique mais robuste
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
-    if (!emailPattern.test(email)) {
-      return false
-    }
-
-    // Vérifier la longueur
-    if (email.length > 254) {
-      return false
-    }
-
-    // Vérifier les domaines suspects
-    const suspiciousDomains = ['tempmail.org', '10minutemail.com', 'guerrillamail.com']
-    const domain = email.split('@')[1]?.toLowerCase()
-
-    if (domain && suspiciousDomains.includes(domain)) {
-      return false
-    }
-
-    return true
+  if (!emailPattern.test(email)) {
+    return false
   }
 
-  /**
-   * Nettoyage HTML simple
-   */
-  static sanitizeHtml(input: string): string {
-    // Suppression des balises dangereuses
-    return input
-      .replace(/<script[^>]*>.*?<\/script>/gi, '')
-      .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '')
-      .replace(/<object[^>]*>.*?<\/object>/gi, '')
-      .replace(/<embed[^>]*>/gi, '')
-      .replace(/on\w+="[^"]*"/gi, '') // Supprimer les event handlers
-      .replace(/javascript:/gi, '')
-      .trim()
+  // Vérifier la longueur
+  if (email.length > 254) {
+    return false
   }
 
-  /**
-   * Nettoyage de chaîne générique
-   */
-  static sanitizeString(input: string): string {
-    return input
-      .replace(/[<>'"&]/g, '') // Supprimer les caractères dangereux
-      .trim()
-      .substring(0, 1000) // Limiter la longueur
+  // Vérifier les domaines suspects
+  const suspiciousDomains = ['tempmail.org', '10minutemail.com', 'guerrillamail.com']
+  const domain = email.split('@')[1]?.toLowerCase()
+
+  if (domain && suspiciousDomains.includes(domain)) {
+    return false
   }
+
+  return true
+}
+
+/**
+ * Nettoyage HTML simple
+ */
+function sanitizeHtml(input: string): string {
+  // Suppression des balises dangereuses
+  return input
+    .replace(/<script[^>]*>.*?<\/script>/gi, '')
+    .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '')
+    .replace(/<object[^>]*>.*?<\/object>/gi, '')
+    .replace(/<embed[^>]*>/gi, '')
+    .replace(/on\w+="[^"]*"/gi, '') // Supprimer les event handlers
+    .replace(/javascript:/gi, '')
+    .trim()
+}
+
+/**
+ * Nettoyage de chaîne générique
+ */
+function sanitizeString(input: string): string {
+  return input
+    .replace(/[<>'"&]/g, '') // Supprimer les caractères dangereux
+    .trim()
+    .substring(0, 1000) // Limiter la longueur
+}
+
+const SimpleSecurityUtils = {
+  validateEmailSecure,
+  sanitizeHtml,
+  sanitizeString,
 }
 
 export function useSecureValidation(rules: ValidationRules) {

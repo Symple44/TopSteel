@@ -104,7 +104,7 @@ function createClientsError(error: unknown): ClientsError {
       message: error.message,
       details: {
         stack: error.stack,
-        cause: (error as any).cause,
+        cause: (error as { cause?: unknown }).cause,
       },
       timestamp: new Date(),
     }
@@ -625,39 +625,38 @@ class ClientsService {
 // RETRY AVEC BACKOFF
 // =============================================
 
-class RetryManager {
-  private static async executeWithRetry<T>(
-    operation: () => Promise<T>,
-    maxRetries = 3,
-    baseDelay = 1000
-  ): Promise<T> {
-    let lastError: unknown
+// Retry functionality as functions
+async function executeWithRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries = 3,
+  baseDelay = 1000
+): Promise<T> {
+  let lastError: unknown
 
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        return await operation()
-      } catch (error) {
-        lastError = error
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation()
+    } catch (error) {
+      lastError = error
 
-        if (attempt === maxRetries) {
-          break
-        }
-
-        // Exponential backoff with jitter
-        const delay = baseDelay * 2 ** attempt + Math.random() * 1000
-
-        await new Promise((resolve) => setTimeout(resolve, delay))
-
-        ClientsCache.recordRequest(false, 0, true)
+      if (attempt === maxRetries) {
+        break
       }
+
+      // Exponential backoff with jitter
+      const delay = baseDelay * 2 ** attempt + Math.random() * 1000
+
+      await new Promise((resolve) => setTimeout(resolve, delay))
+
+      ClientsCache.recordRequest(false, 0, true)
     }
-
-    throw lastError
   }
 
-  static async fetchWithRetry<T>(operation: () => Promise<T>): Promise<T> {
-    return RetryManager.executeWithRetry(operation)
-  }
+  throw lastError
+}
+
+async function fetchWithRetry<T>(operation: () => Promise<T>): Promise<T> {
+  return executeWithRetry(operation)
 }
 
 // =============================================
@@ -705,7 +704,7 @@ export function useClients(
       setError(null)
 
       try {
-        const response = await RetryManager.fetchWithRetry(() =>
+        const response = await fetchWithRetry(() =>
           ClientsService.fetchClients(filters, pagination, abortControllerRef.current?.signal)
         )
 

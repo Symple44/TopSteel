@@ -569,7 +569,7 @@ if (typeof window !== 'undefined') {
     }
   }
 
-  activityEvents.forEach((event) => {
+  for (const event of activityEvents) {
     document.addEventListener(event, handleActivity, true)
-  })
+  }
 }

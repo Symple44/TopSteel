@@ -34,11 +34,10 @@ interface StoreEvent {
 
 // ===== CLASSE PRINCIPALE STORE UTILS =====
 
-export class StoreUtils {
-  /**
-   * Créateur de store robuste avec middleware intégrés
-   */
-  static createRobustStore<
+/**
+ * Créateur de store robuste avec middleware intégrés
+ */
+export function createRobustStore<
     TState extends BaseStoreState,
     TActions extends BaseStoreActions = BaseStoreActions,
   >(
@@ -57,7 +56,7 @@ export class StoreUtils {
     // Store creator compatible avec Zustand
     const storeCreator = (set: unknown, get: unknown) => {
       const customActions = storeDefinition(set as any, get as any)
-      const baseActions = StoreUtils.createBaseActions(initialState)
+      const baseActions = createBaseActions(initialState)
 
       return {
         ...initialState,
@@ -137,16 +136,16 @@ export class StoreUtils {
 
     // Monitoring des changements d'état
     if (process.env.NODE_ENV === 'development') {
-      StoreUtils.addMonitoring(zustandStore, name)
+      addMonitoring(zustandStore, name)
     }
 
     return zustandStore
   }
 
-  /**
-   * Actions de base communes à tous les stores
-   */
-  static createBaseActions<TState extends BaseStoreState>(
+/**
+ * Actions de base communes à tous les stores
+ */
+export function createBaseActions<TState extends BaseStoreState>(
     initialState: InitialState<TState>
   ): BaseStoreActions {
     return {
@@ -181,11 +180,11 @@ export class StoreUtils {
     }
   }
 
-  /**
-   * Wrapper simplifié pour actions async - Version corrigée
-   * Utilisation: à appeler directement dans les actions, pas dans la définition
-   */
-  static async wrapAsyncAction<TResult>(
+/**
+ * Wrapper simplifié pour actions async - Version corrigée
+ * Utilisation: à appeler directement dans les actions, pas dans la définition
+ */
+export async function wrapAsyncAction<TResult>(
     action: () => Promise<TResult>,
     onStart?: () => void,
     onSuccess?: (result: TResult) => void,
@@ -210,7 +209,7 @@ export class StoreUtils {
   /**
    * Cache simple et efficace avec TTL
    */
-  static createCache<K, V>(ttlMs = 300000) {
+export function createCache<K, V>(ttlMs = 300000) {
     const cache = new Map<K, CacheItem<V>>()
 
     return {
@@ -278,7 +277,7 @@ export class StoreUtils {
   /**
    * Validation d'état pour stores
    */
-  static validateState<TState extends BaseStoreState>(
+export function validateState<TState extends BaseStoreState>(
     state: Partial<TState>,
     schema: Record<keyof TState, (value: unknown) => boolean>
   ): { valid: boolean; errors: string[] } {
@@ -301,7 +300,7 @@ export class StoreUtils {
   /**
    * Debounce pour actions
    */
-  static debounce<T extends (...args: unknown[]) => any>(
+export function debounce<T extends (...args: unknown[]) => any>(
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
@@ -321,7 +320,7 @@ export class StoreUtils {
   /**
    * Throttle pour actions
    */
-  static throttle<T extends (...args: unknown[]) => any>(
+export function throttle<T extends (...args: unknown[]) => any>(
     fn: T,
     delay: number
   ): (...args: Parameters<T>) => void {
@@ -340,7 +339,7 @@ export class StoreUtils {
   /**
    * Monitoring et debugging des stores
    */
-  private static addMonitoring(store: unknown, name: string) {
+function addMonitoring(store: unknown, name: string) {
     const storeTyped = store as any
     const originalGetState = storeTyped.getState
     const originalSetState = storeTyped.setState
@@ -367,7 +366,7 @@ export class StoreUtils {
   /**
    * Utilitaires de sérialisation sécurisée
    */
-  static safeSerialize(data: unknown): string | null {
+export function safeSerialize(data: unknown): string | null {
     try {
       return JSON.stringify(data, (key, value) => {
         if (typeof value === 'function') return undefined
@@ -386,7 +385,7 @@ export class StoreUtils {
   /**
    * Utilitaires de désérialisation sécurisée
    */
-  static safeDeserialize<T>(data: string): T | null {
+export function safeDeserialize<T>(data: string): T | null {
     try {
       return JSON.parse(data, (key, value) => {
         // Reconstituer les dates
@@ -402,98 +401,118 @@ export class StoreUtils {
       return null
     }
   }
-}
 
 // ===== MONITORING ET DEBUG =====
 
-export class StoreMonitor {
-  private static subscribers = new Set<(event: StoreEvent) => void>()
-  private static isEnabled = process.env.NODE_ENV === 'development'
-  private static accessLog = new Map<string, number>()
+// Store monitor as module-level functions
+const storeMonitorSubscribers = new Set<(event: StoreEvent) => void>()
+let storeMonitorEnabled = process.env.NODE_ENV === 'development'
+const storeAccessLog = new Map<string, number>()
 
-  static enable(enabled = true) {
-    StoreMonitor.isEnabled = enabled
-  }
+function enableStoreMonitor(enabled = true) {
+  storeMonitorEnabled = enabled
+}
 
-  static subscribe(callback: (event: StoreEvent) => void) {
-    StoreMonitor.subscribers.add(callback)
+function subscribeToStoreMonitor(callback: (event: StoreEvent) => void) {
+  storeMonitorSubscribers.add(callback)
 
-    return () => StoreMonitor.subscribers.delete(callback)
-  }
+  return () => storeMonitorSubscribers.delete(callback)
+}
 
-  static logStateChange(
-    storeName: string,
-    action: string,
-    state: unknown,
-    prevState?: unknown,
-    startTime?: number
-  ) {
-    if (!StoreMonitor.isEnabled) return
-
-    const event: StoreEvent = {
-      timestamp: Date.now(),
-      store: storeName,
-      action,
-      state: StoreMonitor.cloneState(state),
-      prevState: prevState ? StoreMonitor.cloneState(prevState) : undefined,
-      duration: startTime ? Date.now() - startTime : undefined,
-    }
-
-    // Log console en développement
-    if (process.env.NODE_ENV === 'development') {
-      console.group(`🔄 [${storeName}] ${action}`)
-      if (prevState) {
-      }
-      if (event.duration) {
-      }
-      console.groupEnd()
-    }
-
-    // Notifier les subscribers
-    StoreMonitor.subscribers.forEach((callback) => {
-      try {
-        callback(event)
-      } catch (error) {
-        console.error('Erreur dans subscriber du monitor:', error)
-      }
-    })
-  }
-
-  static logAccess(storeName: string, state: unknown) {
-    if (!StoreMonitor.isEnabled) return
-
-    const key = `${storeName}-access`
-    const count = (StoreMonitor.accessLog.get(key) || 0) + 1
-
-    StoreMonitor.accessLog.set(key, count)
-
-    // Log périodique des accès
-    if (count % 100 === 0) {
-    }
-  }
-
-  private static cloneState(state: unknown) {
-    try {
-      return structuredClone ? structuredClone(state) : JSON.parse(JSON.stringify(state))
-    } catch {
-      return { ...(state as any) }
-    }
-  }
-
-  static getStats() {
-    return {
-      subscribers: StoreMonitor.subscribers.size,
-      accessCount: Array.from(StoreMonitor.accessLog.entries()),
-      isEnabled: StoreMonitor.isEnabled,
-      timestamp: Date.now(),
-    }
-  }
-
-  static reset() {
-    StoreMonitor.accessLog.clear()
-    StoreMonitor.subscribers.clear()
+function cloneStoreState(state: unknown) {
+  try {
+    return structuredClone ? structuredClone(state) : JSON.parse(JSON.stringify(state))
+  } catch {
+    return { ...(state as any) }
   }
 }
 
-// ===== EXPORTS UNIQUEMENT DES CLASSES UTILITAIRES =====
+function logStoreStateChange(
+  storeName: string,
+  action: string,
+  state: unknown,
+  prevState?: unknown,
+  startTime?: number
+) {
+  if (!storeMonitorEnabled) return
+
+  const event: StoreEvent = {
+    timestamp: Date.now(),
+    store: storeName,
+    action,
+    state: cloneStoreState(state),
+    prevState: prevState ? cloneStoreState(prevState) : undefined,
+    duration: startTime ? Date.now() - startTime : undefined,
+  }
+
+  // Log console en développement
+  if (process.env.NODE_ENV === 'development') {
+    console.group(`🔄 [${storeName}] ${action}`)
+    if (prevState) {
+    }
+    if (event.duration) {
+    }
+    console.groupEnd()
+  }
+
+  // Notifier les subscribers
+  for (const callback of storeMonitorSubscribers) {
+    try {
+      callback(event)
+    } catch (error) {
+      console.error('Erreur dans subscriber du monitor:', error)
+    }
+  }
+}
+
+function logStoreAccess(storeName: string, state: unknown) {
+  if (!storeMonitorEnabled) return
+
+  const key = `${storeName}-access`
+  const count = (storeAccessLog.get(key) || 0) + 1
+
+  storeAccessLog.set(key, count)
+
+  // Log périodique des accès
+  if (count % 100 === 0) {
+  }
+}
+
+function getStoreMonitorStats() {
+  return {
+    subscribers: storeMonitorSubscribers.size,
+    accessCount: Array.from(storeAccessLog.entries()),
+    isEnabled: storeMonitorEnabled,
+    timestamp: Date.now(),
+  }
+}
+
+function resetStoreMonitor() {
+  storeAccessLog.clear()
+  storeMonitorSubscribers.clear()
+}
+
+// Legacy class for backward compatibility
+export class StoreMonitor {
+  static enable = enableStoreMonitor
+  static subscribe = subscribeToStoreMonitor
+  static logStateChange = logStoreStateChange
+  static logAccess = logStoreAccess
+  static getStats = getStoreMonitorStats
+  static reset = resetStoreMonitor
+}
+
+// ===== EXPORTS UNIQUEMENT DES UTILITAIRES =====
+export const StoreUtils = {
+  createRobustStore,
+  createBaseActions,
+  wrapAsyncAction,
+  createCache,
+  validateState,
+  debounce,
+  throttle,
+  safeSerialize,
+  safeDeserialize,
+}
+
 export default StoreUtils

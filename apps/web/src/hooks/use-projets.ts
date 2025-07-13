@@ -14,12 +14,12 @@ export const useProjets = (autoFetch = true) => {
 
   // ✅ CORRECTION: Accès sécurisé aux propriétés avec fallbacks
   const projets = useProjetStore((state) => state.projets || [])
-  const loading = useProjetStore((state) => (state as any).loading || false)
-  const error = useProjetStore((state) => (state as any).error || null)
+  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading || false)
+  const error = useProjetStore((state) => (state as { error?: unknown }).error || null)
   const filters = useProjetStore((state) => state.filters || {})
   const fetchProjets = useProjetStore((state) => state.fetchProjets)
   const setFilters = useProjetStore((state) => state.setFilters)
-  const clearError = useProjetStore((state) => (state as any).clearError)
+  const clearError = useProjetStore((state) => (state as { clearError?: () => void }).clearError)
 
   const stableFetch = useCallback(async () => {
     if (fetchInitiatedRef.current || !mounted || loading) {
@@ -76,11 +76,11 @@ export const useProjets = (autoFetch = true) => {
 
 export const useProjet = (id?: string) => {
   const selectedProjet = useProjetStore((state) => state.selectedProjet)
-  const loading = useProjetStore((state) => (state as any).loading || false)
-  const error = useProjetStore((state) => (state as any).error || null)
+  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading || false)
+  const error = useProjetStore((state) => (state as { error?: unknown }).error || null)
   const setSelectedProjet = useProjetStore((state) => state.setSelectedProjet)
   const selectProjetById = useProjetStore((state) => state.selectProjetById)
-  const clearError = useProjetStore((state) => (state as any).clearError)
+  const clearError = useProjetStore((state) => (state as { clearError?: () => void }).clearError)
 
   const selectProjet = useCallback(
     (targetId: string | undefined) => {
@@ -125,7 +125,7 @@ export const useProjet = (id?: string) => {
  */
 export const useProjetsStats = () => {
   const stats = useProjetStore((state) => state.stats)
-  const loading = useProjetStore((state) => (state as any).loading || false)
+  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading || false)
   const refreshStats = useProjetStore((state) => state.refreshStats)
 
   return {
@@ -213,8 +213,8 @@ export const useProjetsActions = () => {
   const updateProjet = useProjetStore((state) => state.updateProjet)
   const deleteProjet = useProjetStore((state) => state.deleteProjet)
   const duplicateProjet = useProjetStore((state) => state.duplicateProjet)
-  const loading = useProjetStore((state) => (state as any).loading || false)
-  const error = useProjetStore((state) => (state as any).error || null)
+  const loading = useProjetStore((state) => (state as { loading?: boolean }).loading || false)
+  const error = useProjetStore((state) => (state as { error?: unknown }).error || null)
 
   return {
     createProjet,

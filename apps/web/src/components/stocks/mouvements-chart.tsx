@@ -165,13 +165,13 @@ export function MouvementsChart({ data, period, onPeriodChange }: MouvementsChar
           <div className="h-64">
             {data.length > 0 ? (
               <div className="flex items-end justify-between h-full gap-2">
-                {data.map((item, index) => {
+                {data.map((item) => {
                   const maxVal = activeTab === 'volume' ? maxVolume : maxValue
                   const entreesVal = activeTab === 'volume' ? item.entrees : item.valeurEntrees
                   const sortiesVal = activeTab === 'volume' ? item.sorties : item.valeurSorties
 
                   return (
-                    <div key={index} className="flex flex-col items-center flex-1 max-w-20">
+                    <div key={item.date} className="flex flex-col items-center flex-1 max-w-20">
                       <div className="flex items-end gap-1 mb-2 h-48">
                         {/* Barre entrées */}
                         <div

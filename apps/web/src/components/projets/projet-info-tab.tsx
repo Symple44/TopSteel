@@ -373,30 +373,36 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
           </div>
 
           {/* ✅ Progression financière améliorée */}
-          {(projet as any).montantPaye && projet.montantTTC && (
+          {(projet as { montantPaye?: number }).montantPaye && projet.montantTTC && (
             <div className="mt-6 p-4 bg-muted/50 rounded-lg">
               <div className="flex justify-between text-sm mb-2">
                 <span className="font-medium">Progression des paiements</span>
                 <span className="font-semibold">
-                  {Math.round(((projet as any).montantPaye / projet.montantTTC) * 100)}%
+                  {Math.round(
+                    (((projet as { montantPaye?: number }).montantPaye || 0) / projet.montantTTC) *
+                      100
+                  )}
+                  %
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-3 mb-2">
                 <div
                   className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500 ease-in-out"
                   style={{
-                    width: `${Math.min(((projet as any).montantPaye / projet.montantTTC) * 100, 100)}%`,
+                    width: `${Math.min((((projet as { montantPaye?: number }).montantPaye || 0) / projet.montantTTC) * 100, 100)}%`,
                   }}
                 />
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>
                   <span className="font-medium">Payé:</span>{' '}
-                  {formatCurrency((projet as any).montantPaye)}
+                  {formatCurrency((projet as { montantPaye?: number }).montantPaye || 0)}
                 </span>
                 <span>
                   <span className="font-medium">Restant:</span>{' '}
-                  {formatCurrency(projet.montantTTC - (projet as any).montantPaye)}
+                  {formatCurrency(
+                    projet.montantTTC - ((projet as { montantPaye?: number }).montantPaye || 0)
+                  )}
                 </span>
               </div>
             </div>

@@ -5,7 +5,7 @@
  */
 
 import { apiClient } from '@/lib/api-client'
-import { ErrorHandler } from '@/lib/error-handler'
+import { formatError } from '@/lib/error-handler'
 import type { User, UserRole } from '@erp/types'
 
 // ===== INTERFACES =====
@@ -83,7 +83,7 @@ export const authService = {
       }
     } catch (error) {
       console.error('Erreur lors de la connexion:', error)
-      throw ErrorHandler.formatError(error)
+      throw formatError(error)
     }
   },
 
@@ -112,7 +112,7 @@ export const authService = {
       }
     } catch (error) {
       console.error("Erreur lors de l'inscription:", error)
-      throw ErrorHandler.formatError(error)
+      throw formatError(error)
     }
   },
 
@@ -136,7 +136,7 @@ export const authService = {
       }
     } catch (error) {
       console.error('Erreur lors du rafraîchissement du token:', error)
-      throw ErrorHandler.formatError(error)
+      throw formatError(error)
     }
   },
 
@@ -153,7 +153,7 @@ export const authService = {
       return transformUserFromAPI(user)
     } catch (error) {
       console.error('Erreur lors de la récupération du profil:', error)
-      throw ErrorHandler.formatError(error)
+      throw formatError(error)
     }
   },
 
@@ -187,7 +187,7 @@ export const authService = {
       })
     } catch (error) {
       console.error('Erreur lors du changement de mot de passe:', error)
-      throw ErrorHandler.formatError(error)
+      throw formatError(error)
     }
   },
 
@@ -199,7 +199,7 @@ export const authService = {
       await apiClient.post('/auth/forgot-password', { email })
     } catch (error) {
       console.error('Erreur lors de la demande de réinitialisation:', error)
-      throw ErrorHandler.formatError(error)
+      throw formatError(error)
     }
   },
 
@@ -214,7 +214,7 @@ export const authService = {
       })
     } catch (error) {
       console.error('Erreur lors de la réinitialisation du mot de passe:', error)
-      throw ErrorHandler.formatError(error)
+      throw formatError(error)
     }
   },
 

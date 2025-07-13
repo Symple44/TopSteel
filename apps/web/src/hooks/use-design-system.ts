@@ -208,230 +208,231 @@ export const ANIMATION_CONFIGS = {
 // CACHE ET PERFORMANCE OPTIMISÉS
 // =============================================
 
-class DesignSystemCache {
-  private static classCache = new Map<string, string>()
-  private static configCache = new Map<string, DesignSystemConfig>()
-  private static maxCacheSize = 500
-  private static metrics: DesignSystemMetrics = {
-    themeSwitches: 0,
-    classGenerations: 0,
-    cacheHits: 0,
-    performanceMs: [],
+// Design System Cache as module-level functions
+const designSystemClassCache = new Map<string, string>()
+const designSystemConfigCache = new Map<string, DesignSystemConfig>()
+const maxCacheSize = 500
+const designSystemMetrics: DesignSystemMetrics = {
+  themeSwitches: 0,
+  classGenerations: 0,
+  cacheHits: 0,
+  performanceMs: [],
+}
+
+function getDesignSystemClass(key: string): string | undefined {
+  const result = designSystemClassCache.get(key)
+
+  if (result) {
+    designSystemMetrics.cacheHits++
   }
 
-  static getClass(key: string): string | undefined {
-    const result = DesignSystemCache.classCache.get(key)
+  return result
+}
 
-    if (result) {
-      DesignSystemCache.metrics.cacheHits++
-    }
+function setDesignSystemClass(key: string, value: string): void {
+  if (designSystemClassCache.size >= maxCacheSize) {
+    const firstKey = designSystemClassCache.keys().next().value
 
-    return result
-  }
-
-  static setClass(key: string, value: string): void {
-    if (DesignSystemCache.classCache.size >= DesignSystemCache.maxCacheSize) {
-      const firstKey = DesignSystemCache.classCache.keys().next().value
-
-      if (firstKey) {
-        DesignSystemCache.classCache.delete(firstKey)
-      }
-    }
-    DesignSystemCache.classCache.set(key, value)
-  }
-
-  static recordClassGeneration(durationMs: number): void {
-    DesignSystemCache.metrics.classGenerations++
-    DesignSystemCache.metrics.performanceMs.push(durationMs)
-
-    // Garder seulement les 100 dernières mesures
-    if (DesignSystemCache.metrics.performanceMs.length > 100) {
-      DesignSystemCache.metrics.performanceMs = DesignSystemCache.metrics.performanceMs.slice(-100)
+    if (firstKey) {
+      designSystemClassCache.delete(firstKey)
     }
   }
+  designSystemClassCache.set(key, value)
+}
 
-  static recordThemeSwitch(): void {
-    DesignSystemCache.metrics.themeSwitches++
-  }
+function recordClassGeneration(durationMs: number): void {
+  designSystemMetrics.classGenerations++
+  designSystemMetrics.performanceMs.push(durationMs)
 
-  static getMetrics(): DesignSystemMetrics {
-    return { ...DesignSystemCache.metrics }
+  // Garder seulement les 100 dernières mesures
+  if (designSystemMetrics.performanceMs.length > 100) {
+    designSystemMetrics.performanceMs = designSystemMetrics.performanceMs.slice(-100)
   }
+}
 
-  static clear(): void {
-    DesignSystemCache.classCache.clear()
-    DesignSystemCache.configCache.clear()
-  }
+function recordThemeSwitch(): void {
+  designSystemMetrics.themeSwitches++
+}
+
+function getDesignSystemMetrics(): DesignSystemMetrics {
+  return { ...designSystemMetrics }
+}
+
+function clearDesignSystemCache(): void {
+  designSystemClassCache.clear()
+  designSystemConfigCache.clear()
 }
 
 // =============================================
 // GÉNÉRATEURS DE CLASSES OPTIMISÉS
 // =============================================
 
-class ClassGenerator {
-  static projectCard(config: DesignSystemConfig): string {
-    const cacheKey = `projectCard-${config.density}-${config.animations}-${config.borderRadius}`
-    const cached = DesignSystemCache.getClass(cacheKey)
+// Class generator functions
+function generateProjectCardClasses(config: DesignSystemConfig): string {
+  const cacheKey = `projectCard-${config.density}-${config.animations}-${config.borderRadius}`
+  const cached = getDesignSystemClass(cacheKey)
 
-    if (cached) return cached
+  if (cached) return cached
 
-    const startTime = performance.now()
+  const startTime = performance.now()
 
-    const densityConfig = DENSITY_CONFIGS[config.density]
-    const animationConfig = ANIMATION_CONFIGS[config.animations]
+  const densityConfig = DENSITY_CONFIGS[config.density]
+  const animationConfig = ANIMATION_CONFIGS[config.animations]
 
-    const classes = cn(
-      // Base
-      'bg-white rounded-lg shadow-sm border border-border',
+  const classes = cn(
+    // Base
+    'bg-white rounded-lg shadow-sm border border-border',
 
-      // Density
-      densityConfig.padding,
-      densityConfig.gap,
+    // Density
+    densityConfig.padding,
+    densityConfig.gap,
 
-      // Animations
-      animationConfig.transition,
-      config.animations !== 'none' && animationConfig.hover,
+    // Animations
+    animationConfig.transition,
+    config.animations !== 'none' && animationConfig.hover,
 
-      // Border radius
-      config.borderRadius === 'none' && 'rounded-none',
-      config.borderRadius === 'small' && 'rounded-sm',
-      config.borderRadius === 'medium' && 'rounded-lg',
-      config.borderRadius === 'large' && 'rounded-xl',
+    // Border radius
+    config.borderRadius === 'none' && 'rounded-none',
+    config.borderRadius === 'small' && 'rounded-sm',
+    config.borderRadius === 'medium' && 'rounded-lg',
+    config.borderRadius === 'large' && 'rounded-xl',
 
-      // Dark mode
-      'dark:bg-card-dark dark:border-border-dark'
-    )
+    // Dark mode
+    'dark:bg-card-dark dark:border-border-dark'
+  )
 
-    DesignSystemCache.recordClassGeneration(performance.now() - startTime)
-    DesignSystemCache.setClass(cacheKey, classes)
+  recordClassGeneration(performance.now() - startTime)
+  setDesignSystemClass(cacheKey, classes)
 
-    return classes
-  }
+  return classes
+}
 
-  static statusBadge(status: keyof typeof STATUS_CONFIGS, config: DesignSystemConfig): string {
-    const cacheKey = `statusBadge-${status}-${config.density}`
-    const cached = DesignSystemCache.getClass(cacheKey)
+function generateStatusBadgeClasses(
+  status: keyof typeof STATUS_CONFIGS,
+  config: DesignSystemConfig
+): string {
+  const cacheKey = `statusBadge-${status}-${config.density}`
+  const cached = getDesignSystemClass(cacheKey)
 
-    if (cached) return cached
+  if (cached) return cached
 
-    const startTime = performance.now()
+  const startTime = performance.now()
 
-    const statusConfig = STATUS_CONFIGS[status]
-    const densityConfig = DENSITY_CONFIGS[config.density]
+  const statusConfig = STATUS_CONFIGS[status]
+  const densityConfig = DENSITY_CONFIGS[config.density]
 
-    const classes = cn(
-      // Base
-      'inline-flex items-center font-medium rounded-full',
+  const classes = cn(
+    // Base
+    'inline-flex items-center font-medium rounded-full',
 
-      // Density
-      densityConfig.text,
-      config.density === 'compact' && 'px-2 py-0.5',
-      config.density === 'comfortable' && 'px-2.5 py-1',
-      config.density === 'spacious' && 'px-3 py-1.5',
+    // Density
+    densityConfig.text,
+    config.density === 'compact' && 'px-2 py-0.5',
+    config.density === 'comfortable' && 'px-2.5 py-1',
+    config.density === 'spacious' && 'px-3 py-1.5',
 
-      // Status colors
-      `bg-${statusConfig.bgColor} text-${statusConfig.textColor} border border-${statusConfig.color}/20`
-    )
+    // Status colors
+    `bg-${statusConfig.bgColor} text-${statusConfig.textColor} border border-${statusConfig.color}/20`
+  )
 
-    DesignSystemCache.recordClassGeneration(performance.now() - startTime)
-    DesignSystemCache.setClass(cacheKey, classes)
+  recordClassGeneration(performance.now() - startTime)
+  setDesignSystemClass(cacheKey, classes)
 
-    return classes
-  }
+  return classes
+}
 
-  static metallurgyButton(
-    variant: ClassVariants['variant'],
-    size: ClassVariants['size'],
-    config: DesignSystemConfig
-  ): string {
-    const cacheKey = `metallurgyButton-${variant}-${size}-${config.animations}`
-    const cached = DesignSystemCache.getClass(cacheKey)
+function generateMetallurgyButtonClasses(
+  variant: ClassVariants['variant'],
+  size: ClassVariants['size'],
+  config: DesignSystemConfig
+): string {
+  const cacheKey = `metallurgyButton-${variant}-${size}-${config.animations}`
+  const cached = getDesignSystemClass(cacheKey)
 
-    if (cached) return cached
+  if (cached) return cached
 
-    const startTime = performance.now()
+  const startTime = performance.now()
 
-    const animationConfig = ANIMATION_CONFIGS[config.animations]
+  const animationConfig = ANIMATION_CONFIGS[config.animations]
 
-    const classes = cn(
-      // Base
-      'inline-flex items-center justify-center rounded-md font-medium ring-offset-background',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-      'disabled:pointer-events-none disabled:opacity-50',
+  const classes = cn(
+    // Base
+    'inline-flex items-center justify-center rounded-md font-medium ring-offset-background',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+    'disabled:pointer-events-none disabled:opacity-50',
 
-      // Animations
-      animationConfig.transition,
+    // Animations
+    animationConfig.transition,
 
-      // Variant
-      variant === 'default' && 'bg-metallurgy-600 text-white hover:bg-metallurgy-700',
-      variant === 'secondary' && 'bg-metallurgy-100 text-metallurgy-900 hover:bg-metallurgy-200',
-      variant === 'outline' &&
-        'border border-metallurgy-300 bg-transparent hover:bg-metallurgy-50 text-metallurgy-600',
-      variant === 'ghost' && 'hover:bg-metallurgy-100 text-metallurgy-600',
-      variant === 'destructive' &&
-        'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+    // Variant
+    variant === 'default' && 'bg-metallurgy-600 text-white hover:bg-metallurgy-700',
+    variant === 'secondary' && 'bg-metallurgy-100 text-metallurgy-900 hover:bg-metallurgy-200',
+    variant === 'outline' &&
+      'border border-metallurgy-300 bg-transparent hover:bg-metallurgy-50 text-metallurgy-600',
+    variant === 'ghost' && 'hover:bg-metallurgy-100 text-metallurgy-600',
+    variant === 'destructive' &&
+      'bg-destructive text-destructive-foreground hover:bg-destructive/90',
 
-      // Size
-      size === 'sm' && 'h-9 px-3 text-sm',
-      size === 'md' && 'h-10 px-4 py-2',
-      size === 'lg' && 'h-11 px-8 text-base',
-      size === 'xl' && 'h-12 px-10 text-lg'
-    )
+    // Size
+    size === 'sm' && 'h-9 px-3 text-sm',
+    size === 'md' && 'h-10 px-4 py-2',
+    size === 'lg' && 'h-11 px-8 text-base',
+    size === 'xl' && 'h-12 px-10 text-lg'
+  )
 
-    DesignSystemCache.recordClassGeneration(performance.now() - startTime)
-    DesignSystemCache.setClass(cacheKey, classes)
+  recordClassGeneration(performance.now() - startTime)
+  setDesignSystemClass(cacheKey, classes)
 
-    return classes
-  }
+  return classes
+}
 
-  static dataTable(config: DesignSystemConfig): string {
-    const cacheKey = `dataTable-${config.density}-${config.animations}`
-    const cached = DesignSystemCache.getClass(cacheKey)
+function generateDataTableClasses(config: DesignSystemConfig): string {
+  const cacheKey = `dataTable-${config.density}-${config.animations}`
+  const cached = getDesignSystemClass(cacheKey)
 
-    if (cached) return cached
+  if (cached) return cached
 
-    const startTime = performance.now()
+  const startTime = performance.now()
 
-    const densityConfig = DENSITY_CONFIGS[config.density]
-    const animationConfig = ANIMATION_CONFIGS[config.animations]
+  const densityConfig = DENSITY_CONFIGS[config.density]
+  const animationConfig = ANIMATION_CONFIGS[config.animations]
 
-    const classes = cn(
-      // Base
-      'w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden',
+  const classes = cn(
+    // Base
+    'w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden',
 
-      // Border
-      'border border-border',
+    // Border
+    'border border-border',
 
-      // Density
-      `[&_th]:${densityConfig.padding}`,
-      `[&_td]:${densityConfig.padding}`,
-      `[&_th]:${densityConfig.text}`,
-      `[&_td]:${densityConfig.text}`,
+    // Density
+    `[&_th]:${densityConfig.padding}`,
+    `[&_td]:${densityConfig.padding}`,
+    `[&_th]:${densityConfig.text}`,
+    `[&_td]:${densityConfig.text}`,
 
-      // Hover effects
-      `[&_tbody_tr]:${animationConfig.transition}`,
-      config.animations !== 'none' && '[&_tbody_tr:hover]:bg-muted/50',
+    // Hover effects
+    `[&_tbody_tr]:${animationConfig.transition}`,
+    config.animations !== 'none' && '[&_tbody_tr:hover]:bg-muted/50',
 
-      // Striped rows
-      '[&_tbody_tr:nth-child(even)]:bg-muted/25',
+    // Striped rows
+    '[&_tbody_tr:nth-child(even)]:bg-muted/25',
 
-      // Header
-      '[&_thead_tr]:bg-muted',
-      '[&_thead_th]:font-semibold [&_thead_th]:text-left',
-      '[&_thead_th]:border-b [&_thead_th]:border-border',
+    // Header
+    '[&_thead_tr]:bg-muted',
+    '[&_thead_th]:font-semibold [&_thead_th]:text-left',
+    '[&_thead_th]:border-b [&_thead_th]:border-border',
 
-      // Dark mode
-      'dark:bg-card-dark dark:border-border-dark',
-      '[&_thead_tr]:dark:bg-muted-dark',
-      '[&_tbody_tr:nth-child(even)]:dark:bg-muted-dark/25',
-      '[&_tbody_tr:hover]:dark:bg-muted-dark/50'
-    )
+    // Dark mode
+    'dark:bg-card-dark dark:border-border-dark',
+    '[&_thead_tr]:dark:bg-muted-dark',
+    '[&_tbody_tr:nth-child(even)]:dark:bg-muted-dark/25',
+    '[&_tbody_tr:hover]:dark:bg-muted-dark/50'
+  )
 
-    DesignSystemCache.recordClassGeneration(performance.now() - startTime)
-    DesignSystemCache.setClass(cacheKey, classes)
+  recordClassGeneration(performance.now() - startTime)
+  setDesignSystemClass(cacheKey, classes)
 
-    return classes
-  }
+  return classes
 }
 
 // =============================================
@@ -533,7 +534,7 @@ export function useDesignSystem() {
 
       // Track theme switches
       if (previousConfigRef.current.theme !== config.theme) {
-        DesignSystemCache.recordThemeSwitch()
+        recordThemeSwitch()
       }
 
       previousConfigRef.current = config
@@ -545,14 +546,14 @@ export function useDesignSystem() {
   // FIX: Memoized class generators avec dépendances correctes
   const classes = useMemo(
     () => ({
-      projectCard: () => ClassGenerator.projectCard(config),
+      projectCard: () => generateProjectCardClasses(config),
       statusBadge: (status: keyof typeof STATUS_CONFIGS) =>
-        ClassGenerator.statusBadge(status, config),
+        generateStatusBadgeClasses(status, config),
       metallurgyButton: (
         variant: ClassVariants['variant'] = 'default',
         size: ClassVariants['size'] = 'md'
-      ) => ClassGenerator.metallurgyButton(variant, size, config),
-      dataTable: () => ClassGenerator.dataTable(config),
+      ) => generateMetallurgyButtonClasses(variant, size, config),
+      dataTable: () => generateDataTableClasses(config),
     }),
     [config]
   ) // ✅ Ajout de la dépendance config pour être cohérent
@@ -600,7 +601,7 @@ export function useDesignSystem() {
   )
 
   // Performance monitoring - cache optimisé sans re-calculs inutiles
-  const metrics = useMemo(() => DesignSystemCache.getMetrics(), [])
+  const metrics = useMemo(() => getDesignSystemMetrics(), [])
 
   return {
     // Configuration
@@ -636,6 +637,6 @@ export function useDesignSystem() {
 
     // Performance
     metrics,
-    clearCache: DesignSystemCache.clear,
+    clearCache: clearDesignSystemCache,
   }
 }

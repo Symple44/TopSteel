@@ -40,7 +40,9 @@ interface ChutesOptimizerProps {
 export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimizerProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedChute, setSelectedChute] = useState<Chute | null>(null)
-  const [optimizationResults, setOptimizationResults] = useState<any[]>([])
+  const [optimizationResults, setOptimizationResults] = useState<
+    { economie: number; utilisations: number }[]
+  >([])
 
   const getQualityColor = (qualite: string) => {
     switch (qualite) {
@@ -171,22 +173,14 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
           <CardContent>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {chutes.map((chute) => (
-                <div
+                <button
                   key={chute.id}
-                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                  className={`p-3 border rounded-lg cursor-pointer transition-colors w-full text-left ${
                     selectedChute?.id === chute.id
                       ? 'border-blue-500 bg-blue-50'
                       : 'hover:bg-gray-50'
                   }`}
                   onClick={() => setSelectedChute(chute)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      setSelectedChute(chute)
-                    }
-                  }}
-                  tabIndex={0}
-                  role="button"
                   aria-label={`Sélectionner la chute ${chute.reference}`}
                 >
                   <div className="flex justify-between items-start">
@@ -213,7 +207,7 @@ export function ChutesOptimizer({ chutes, onOptimize, onSearch }: ChutesOptimize
                       {chute.utilisationsProposees.length} utilisation(s) proposée(s)
                     </div>
                   )}
-                </div>
+                </button>
               ))}
             </div>
           </CardContent>

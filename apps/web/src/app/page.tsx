@@ -14,7 +14,7 @@ export default function HomePage() {
     } else {
       router.push('/login')
     }
-  }, [isAuthenticated, router])
+  }, [router])
 
   return (
     <div className="flex h-screen items-center justify-center">

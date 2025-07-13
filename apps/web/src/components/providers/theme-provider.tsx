@@ -225,8 +225,43 @@ function applyTheme(theme: ResolvedTheme, attribute: string, colors: ThemeColors
   }
 }
 
-class ThemeMetricsCollector {
-  private static metrics: ThemeMetrics = {
+// Theme metrics functions
+let themeMetrics: ThemeMetrics = {
+  changeCount: 0,
+  lastChange: 0,
+  errors: 0,
+  hydrationTime: 0,
+  transitionCount: 0,
+  storageErrors: 0,
+}
+
+function recordThemeChange(): void {
+  themeMetrics.changeCount++
+  themeMetrics.lastChange = Date.now()
+}
+
+function recordTransition(): void {
+  themeMetrics.transitionCount++
+}
+
+function recordError(): void {
+  themeMetrics.errors++
+}
+
+function recordStorageError(): void {
+  themeMetrics.storageErrors++
+}
+
+function recordHydration(time: number): void {
+  themeMetrics.hydrationTime = time
+}
+
+function getThemeMetrics(): ThemeMetrics {
+  return { ...themeMetrics }
+}
+
+function resetThemeMetrics(): void {
+  themeMetrics = {
     changeCount: 0,
     lastChange: 0,
     errors: 0,
@@ -234,42 +269,16 @@ class ThemeMetricsCollector {
     transitionCount: 0,
     storageErrors: 0,
   }
+}
 
-  static recordThemeChange(): void {
-    ThemeMetricsCollector.metrics.changeCount++
-    ThemeMetricsCollector.metrics.lastChange = Date.now()
-  }
-
-  static recordTransition(): void {
-    ThemeMetricsCollector.metrics.transitionCount++
-  }
-
-  static recordError(): void {
-    ThemeMetricsCollector.metrics.errors++
-  }
-
-  static recordStorageError(): void {
-    ThemeMetricsCollector.metrics.storageErrors++
-  }
-
-  static recordHydration(time: number): void {
-    ThemeMetricsCollector.metrics.hydrationTime = time
-  }
-
-  static getMetrics(): ThemeMetrics {
-    return { ...ThemeMetricsCollector.metrics }
-  }
-
-  static reset(): void {
-    ThemeMetricsCollector.metrics = {
-      changeCount: 0,
-      lastChange: 0,
-      errors: 0,
-      hydrationTime: 0,
-      transitionCount: 0,
-      storageErrors: 0,
-    }
-  }
+const ThemeMetricsCollector = {
+  recordThemeChange,
+  recordTransition,
+  recordError,
+  recordStorageError,
+  recordHydration,
+  getMetrics: getThemeMetrics,
+  reset: resetThemeMetrics,
 }
 
 // =============================================

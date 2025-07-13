@@ -13,25 +13,30 @@ interface MonitoringProviderProps {
 
 // Type pour le retour de useMonitoring
 interface MonitoringHook {
-  trackClick: (element: string, context?: Record<string, any>) => void
-  trackPageView: (page: string, context?: Record<string, any>) => void
+  trackClick: (element: string, context?: Record<string, unknown>) => void
+  trackPageView: (page: string, context?: Record<string, unknown>) => void
   trackFormSubmit: (form: string, success: boolean, errors?: string[]) => void
-  trackSearch: (query: string, results: number, filters?: Record<string, any>) => void
-  track: (eventName: string, properties?: Record<string, any>) => void
-  setUserContext: (context: any) => void
-  trackProjectCreated: (projectData: any) => void
+  trackSearch: (query: string, results: number, filters?: Record<string, unknown>) => void
+  track: (eventName: string, properties?: Record<string, unknown>) => void
+  setUserContext: (context: unknown) => void
+  trackProjectCreated: (projectData: unknown) => void
   trackProjectStatusChanged: (projectId: string, oldStatus: string, newStatus: string) => void
   trackProjectViewed: (projectId: string, viewDuration?: number) => void
   trackProductionStarted: (orderId: string, projectId: string) => void
   trackProductionCompleted: (orderId: string, duration: number, quality?: string) => void
-  trackUserAction: (action: string, context?: Record<string, any>) => void
+  trackUserAction: (action: string, context?: Record<string, unknown>) => void
   trackFormSubmission: (formName: string, success: boolean, errors?: string[]) => void
-  trackSearchPerformed: (query: string, resultCount: number, filters?: Record<string, any>) => void
-  trackPerformanceMetric: (metric: string, value: number, context?: Record<string, any>) => void
-  trackError: (error: Error, context?: Record<string, any>) => void
-  getEvents: (filters?: any) => any[]
-  generateReport: () => any
+  trackSearchPerformed: (
+    query: string,
+    resultCount: number,
+    filters?: Record<string, unknown>
+  ) => void
+  trackPerformanceMetric: (metric: string, value: number, context?: Record<string, unknown>) => void
+  trackError: (error: Error, context?: Record<string, unknown>) => void
+  getEvents: (filters?: unknown) => unknown[]
+  generateReport: () => unknown
   exportData: () => string
+  cleanup: () => void
 }
 
 function ErrorFallback({
@@ -139,7 +144,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
             } else if (entry.entryType === 'first-input') {
               metrics.trackPerformanceMetric(
                 'FID',
-                (entry as any).processingStart - entry.startTime
+                (entry as unknown as { processingStart: number }).processingStart - entry.startTime
               )
             }
           }
@@ -199,9 +204,13 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
         // Envoyer l'erreur au service de monitoring
         if (typeof window !== 'undefined') {
           try {
-            const metrics = (window as any).__businessMetrics
+            const metrics = (
+              window as {
+                __businessMetrics?: { trackError?: (error: Error, context: unknown) => void }
+              }
+            ).__businessMetrics
 
-            if (metrics) {
+            if (metrics && typeof metrics.trackError === 'function') {
               metrics.trackError(error, {
                 componentStack: errorInfo.componentStack,
                 source: 'error_boundary',
@@ -225,11 +234,11 @@ export function useMonitoring(): MonitoringHook {
 
   return {
     // Méthodes rapides pour les cas d'usage courants
-    trackClick: (element: string, context?: Record<string, any>) => {
+    trackClick: (element: string, context?: Record<string, unknown>) => {
       metrics.trackUserAction('click', { element, ...context })
     },
 
-    trackPageView: (page: string, context?: Record<string, any>) => {
+    trackPageView: (page: string, context?: Record<string, unknown>) => {
       metrics.track('page_view', { page, ...context })
     },
 
@@ -237,11 +246,31 @@ export function useMonitoring(): MonitoringHook {
       metrics.trackFormSubmission(form, success, errors)
     },
 
-    trackSearch: (query: string, results: number, filters?: Record<string, any>) => {
+    trackSearch: (query: string, results: number, filters?: Record<string, unknown>) => {
       metrics.trackSearchPerformed(query, results, filters)
     },
 
-    // Accès direct aux métriques
-    ...metrics,
+    // Wrapper pour setUserContext avec type unknown
+    setUserContext: (context: unknown) => {
+      metrics.setUserContext(context as Record<string, unknown>)
+    },
+
+    // Accès direct aux autres méthodes
+    track: metrics.track,
+    trackProjectCreated: (projectData: unknown) =>
+      metrics.trackProjectCreated(projectData as Record<string, unknown>),
+    trackProjectStatusChanged: metrics.trackProjectStatusChanged,
+    trackProjectViewed: metrics.trackProjectViewed,
+    trackProductionStarted: metrics.trackProductionStarted,
+    trackProductionCompleted: metrics.trackProductionCompleted,
+    trackUserAction: metrics.trackUserAction,
+    trackFormSubmission: metrics.trackFormSubmission,
+    trackSearchPerformed: metrics.trackSearchPerformed,
+    trackPerformanceMetric: metrics.trackPerformanceMetric,
+    trackError: metrics.trackError,
+    getEvents: (filters?: unknown) => metrics.getEvents(filters as Record<string, unknown>),
+    generateReport: metrics.generateReport,
+    exportData: metrics.exportData,
+    cleanup: metrics.cleanup,
   }
 }

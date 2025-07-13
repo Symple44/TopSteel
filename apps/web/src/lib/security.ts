@@ -12,11 +12,10 @@
 import { z } from 'zod'
 
 // ✅ SANITISATION XSS - VERSION NATIVE
-export class SecurityUtils {
-  /**
-   * Nettoie le HTML pour prévenir les attaques XSS (version native)
-   */
-  static sanitizeHtml(html: string): string {
+/**
+ * Nettoie le HTML pour prévenir les attaques XSS (version native)
+ */
+export function sanitizeHtml(html: string): string {
     if (typeof window === 'undefined') {
       // SSR: validation basique mais robuste
       return html
@@ -45,10 +44,10 @@ export class SecurityUtils {
       .replace(/on\w+=/gi, '')
   }
 
-  /**
-   * Nettoie une chaîne de caractères
-   */
-  static sanitizeString(input: string): string {
+/**
+ * Nettoie une chaîne de caractères
+ */
+export function sanitizeString(input: string): string {
     return input
       .replace(/[<>"']/g, '') // ✅ CORRIGÉ: Retire les caractères dangereux sans échappement inutile
       .replace(/javascript:/gi, '')
@@ -58,10 +57,10 @@ export class SecurityUtils {
       .substring(0, 1000) // Limite la longueur
   }
 
-  /**
-   * Valide et nettoie un email
-   */
-  static sanitizeEmail(email: string): string | null {
+/**
+ * Valide et nettoie un email
+ */
+export function sanitizeEmail(email: string): string | null {
     const emailSchema = z.string().email().max(254)
 
     try {
@@ -71,10 +70,10 @@ export class SecurityUtils {
     }
   }
 
-  /**
-   * Valide une URL
-   */
-  static sanitizeUrl(url: string): string | null {
+/**
+ * Valide une URL
+ */
+export function sanitizeUrl(url: string): string | null {
     try {
       const parsed = new URL(url)
 
@@ -89,10 +88,10 @@ export class SecurityUtils {
     }
   }
 
-  /**
-   * Rate limiting simple côté client
-   */
-  static createRateLimiter(maxRequests: number, windowMs: number) {
+/**
+ * Rate limiting simple côté client
+ */
+export function createRateLimiter(maxRequests: number, windowMs: number) {
     const requests: number[] = []
 
     return function rateLimited<T extends (...args: unknown[]) => any>(fn: T): T {
@@ -116,19 +115,19 @@ export class SecurityUtils {
     }
   }
 
-  /**
-   * Estimation du prochain slot disponible
-   */
-  static getNextAvailableSlot(requests: number[], windowMs: number): number {
+/**
+ * Estimation du prochain slot disponible
+ */
+export function getNextAvailableSlot(requests: number[], windowMs: number): number {
     if (requests.length === 0) return Date.now()
 
     return requests[0] + windowMs
   }
 
-  /**
-   * Génère un token CSRF
-   */
-  static generateCSRFToken(): string {
+/**
+ * Génère un token CSRF
+ */
+export function generateCSRFToken(): string {
     if (typeof window === 'undefined') {
       return (
         Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
@@ -142,10 +141,10 @@ export class SecurityUtils {
     return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
   }
 
-  /**
-   * Audit de sécurité automatique
-   */
-  static auditSecurity(): SecurityAuditReport {
+/**
+ * Audit de sécurité automatique
+ */
+export function auditSecurity(): SecurityAuditReport {
     const issues: string[] = []
     const warnings: string[] = []
 
@@ -187,14 +186,14 @@ export class SecurityUtils {
     }
   }
 
-  /**
-   * Logger sécurisé
-   */
-  static logSecurityEvent(event: string, details: Record<string, any> = {}) {
+/**
+ * Logger sécurisé
+ */
+export function logSecurityEvent(event: string, details: Record<string, any> = {}) {
     const sanitizedDetails = Object.fromEntries(
       Object.entries(details).map(([key, value]) => [
         key,
-        typeof value === 'string' ? SecurityUtils.maskSensitiveData(value) : value,
+        typeof value === 'string' ? maskSensitiveData(value) : value,
       ])
     )
 
@@ -205,16 +204,15 @@ export class SecurityUtils {
     })
   }
 
-  /**
-   * Masquage données sensibles
-   */
-  private static maskSensitiveData(data: string): string {
+/**
+ * Masquage données sensibles
+ */
+function maskSensitiveData(data: string): string {
     return data
       .replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, '***@***.***') // ✅ CORRIGÉ: Email regex sans échappement inutile
       .replace(/\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b/g, '****-****-****-****')
       .replace(/\b\d{14}\b/g, '**************')
   }
-}
 
 export interface SecurityAuditReport {
   issues: string[]
@@ -267,9 +265,9 @@ export const secureSchemas = {
     .regex(/^[a-zA-Z0-9._-]+$/, 'Nom de fichier invalide')
     .refine((name) => !name.startsWith('.'), 'Nom de fichier invalide'),
 
-  html: z.string().transform(SecurityUtils.sanitizeHtml),
+  html: z.string().transform(sanitizeHtml),
 
-  userInput: z.string().max(1000).transform(SecurityUtils.sanitizeString),
+  userInput: z.string().max(1000).transform(sanitizeString),
 }
 
 // ✅ CONSTANTES DE SÉCURITÉ
@@ -296,42 +294,53 @@ export const SECURITY_CONSTANTS = {
 }
 
 // ✅ HELPER POUR VALIDATION DE FICHIERS
-export class FileSecurityUtils {
-  /**
-   * Valide un fichier uploadé
-   */
-  static validateFile(file: File): { valid: boolean; error?: string } {
-    // Taille
-    if (file.size > SECURITY_CONSTANTS.MAX_FILE_SIZE) {
-      return { valid: false, error: 'Fichier trop volumineux' }
-    }
-
-    // Type MIME
-    if (!SECURITY_CONSTANTS.ALLOWED_FILE_TYPES.includes(file.type)) {
-      return { valid: false, error: 'Type de fichier non autorisé' }
-    }
-
-    // Nom de fichier
-    const filenameValidation = secureSchemas.filename.safeParse(file.name)
-
-    if (!filenameValidation.success) {
-      return { valid: false, error: 'Nom de fichier invalide' }
-    }
-
-    return { valid: true }
+/**
+ * Valide un fichier uploadé
+ */
+export function validateFile(file: File): { valid: boolean; error?: string } {
+  // Taille
+  if (file.size > SECURITY_CONSTANTS.MAX_FILE_SIZE) {
+    return { valid: false, error: 'Fichier trop volumineux' }
   }
 
-  /**
-   * Génère un nom de fichier sécurisé
-   */
-  static generateSecureFilename(originalName: string): string {
-    const extension = originalName.split('.').pop() || ''
-    const timestamp = Date.now()
-    const random = Math.random().toString(36).substring(2, 8)
-
-    return `file_${timestamp}_${random}.${extension}`
+  // Type MIME
+  if (!SECURITY_CONSTANTS.ALLOWED_FILE_TYPES.includes(file.type)) {
+    return { valid: false, error: 'Type de fichier non autorisé' }
   }
+
+  // Nom de fichier
+  const filenameValidation = secureSchemas.filename.safeParse(file.name)
+
+  if (!filenameValidation.success) {
+    return { valid: false, error: 'Nom de fichier invalide' }
+  }
+
+  return { valid: true }
+}
+
+/**
+ * Génère un nom de fichier sécurisé
+ */
+export function generateSecureFilename(originalName: string): string {
+  const extension = originalName.split('.').pop() || ''
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).substring(2, 8)
+
+  return `file_${timestamp}_${random}.${extension}`
+}
+
+// ✅ COMPATIBILITY EXPORT
+export const SecurityUtils = {
+  sanitizeHtml,
+  sanitizeString,
+  sanitizeEmail,
+  sanitizeUrl,
+  createRateLimiter,
+  getNextAvailableSlot,
+  generateCSRFToken,
+  auditSecurity,
+  logSecurityEvent,
 }
 
 // ✅ EXPORT PRINCIPAL
-export { SecurityUtils as default }
+export default SecurityUtils

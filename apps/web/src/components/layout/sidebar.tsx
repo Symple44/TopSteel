@@ -141,19 +141,12 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
     return (
       <div key={item.title} className="space-y-1">
-        <div
+        <button
           onClick={handleClick}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              handleClick()
-            }
-          }}
-          tabIndex={0}
-          role="button"
           aria-label={item.title}
+          type="button"
           className={cn(
-            'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium cursor-pointer transition-all duration-200',
+            'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium cursor-pointer transition-all duration-200 w-full text-left',
             level === 0 && 'mx-1',
             level === 1 && 'ml-4 mr-1',
             itemIsActive || parentIsActive
@@ -207,7 +200,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               )}
             </>
           )}
-        </div>
+        </button>
 
         {/* Sous-menu avec animation */}
         {hasChildren && isExpanded && !isCollapsed && (

@@ -45,57 +45,56 @@ interface MemoCache<R> {
   hitCount: number
 }
 
-class SelectorMemoCache {
-  private static cache = new Map<string, MemoCache<any>>()
-  private static maxSize = 100
-  private static defaultTTL = 5000
+// Selector memo cache as module-level functions
+const selectorCache = new Map<string, MemoCache<any>>()
+const maxCacheSize = 100
+const defaultTTL = 5000
 
-  static get<R>(key: string, ttl: number = SelectorMemoCache.defaultTTL): R | undefined {
-    const entry = SelectorMemoCache.cache.get(key)
+function getSelectorMemo<R>(key: string, ttl: number = defaultTTL): R | undefined {
+  const entry = selectorCache.get(key)
 
-    if (!entry) return undefined
+  if (!entry) return undefined
 
-    const now = Date.now()
+  const now = Date.now()
 
-    if (now - entry.timestamp > ttl) {
-      SelectorMemoCache.cache.delete(key)
+  if (now - entry.timestamp > ttl) {
+    selectorCache.delete(key)
 
-      return undefined
+    return undefined
+  }
+
+  entry.hitCount++
+
+  return entry.value
+}
+
+function setSelectorMemo<R>(key: string, value: R): void {
+  const now = Date.now()
+
+  selectorCache.set(key, {
+    value,
+    timestamp: now,
+    hitCount: 1,
+  })
+
+  // Nettoyage du cache si trop grand
+  if (selectorCache.size > maxCacheSize) {
+    const entries = Array.from(selectorCache.entries())
+    const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
+    const toDelete = sortedByUsage.slice(0, Math.floor(maxCacheSize * 0.3))
+
+    for (const [key] of toDelete) {
+      selectorCache.delete(key)
     }
-
-    entry.hitCount++
-
-    return entry.value
   }
+}
 
-  static set<R>(key: string, value: R): void {
-    const now = Date.now()
+function clearSelectorMemo(): void {
+  selectorCache.clear()
+}
 
-    SelectorMemoCache.cache.set(key, {
-      value,
-      timestamp: now,
-      hitCount: 1,
-    })
-
-    // Nettoyage du cache si trop grand
-    if (SelectorMemoCache.cache.size > SelectorMemoCache.maxSize) {
-      const entries = Array.from(SelectorMemoCache.cache.entries())
-      const sortedByUsage = entries.sort((a, b) => a[1].hitCount - b[1].hitCount)
-      const toDelete = sortedByUsage.slice(0, Math.floor(SelectorMemoCache.maxSize * 0.3))
-
-      for (const [key] of toDelete) {
-        SelectorMemoCache.cache.delete(key)
-      }
-    }
-  }
-
-  static clear(): void {
-    SelectorMemoCache.cache.clear()
-  }
-
-  static getEntries(): Array<[string, MemoCache<any>]> {
-    return Array.from(SelectorMemoCache.cache.entries())
-  }
+function getSelectorMemoEntries(): Array<[string, MemoCache<any>]> {
+  return Array.from(selectorCache.entries())
 }
 
 // ===== CRÉATEUR DE SÉLECTEURS OPTIMISÉS TYPÉ =====
@@ -245,7 +244,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
           const key = cacheKey || `${debugLabel || 'memo'}-${Date.now()}`
 
           // Vérifier le cache
-          const cached = SelectorMemoCache.get<R>(key, ttl)
+          const cached = getSelectorMemo<R>(key, ttl)
 
           if (cached !== undefined) {
             return cached
@@ -254,7 +253,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
           // Calculer et mettre en cache
           const result = selector(state)
 
-          SelectorMemoCache.set(key, result)
+          setSelectorMemo(key, result)
 
           return result
         }
@@ -267,7 +266,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
      * Nettoyer le cache des sélecteurs mémoïsés
      */
     clearMemoCache: () => {
-      SelectorMemoCache.clear()
+      clearSelectorMemo()
       if (process.env.NODE_ENV === 'development') {
         console.debug('🧹 Memo cache cleared')
       }
@@ -277,7 +276,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
      * Statistiques du cache
      */
     getCacheStats: () => {
-      const entries = SelectorMemoCache.getEntries()
+      const entries = getSelectorMemoEntries()
 
       return {
         size: entries.length,

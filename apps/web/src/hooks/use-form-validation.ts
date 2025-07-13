@@ -15,7 +15,7 @@ interface ValidationRule {
   }
 }
 
-export function useFormValidation<T extends Record<string, any>>(
+export function useFormValidation<T extends Record<string, unknown>>(
   initialValues: T,
   validationRules: Partial<Record<keyof T, ValidationRule>>
 ) {

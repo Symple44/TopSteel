@@ -314,9 +314,9 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
 
   markAllNotificationsAsRead: () => {
     set((state) => {
-      state.notifications.forEach((n) => {
+      for (const n of state.notifications) {
         n.read = true
-      })
+      }
       state.lastUpdate = Date.now()
     })
   },

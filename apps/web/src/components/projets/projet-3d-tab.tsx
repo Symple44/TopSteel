@@ -144,18 +144,10 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
             <CardContent>
               <div className="space-y-3">
                 {modeles3D.map((modele) => (
-                  <div
+                  <button
                     key={modele.id}
-                    className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer w-full text-left"
                     onClick={() => setIs3DLoaded(true)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        setIs3DLoaded(true)
-                      }
-                    }}
-                    tabIndex={0}
-                    role="button"
                     aria-label={`Charger le modèle 3D ${modele.nom}`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -166,7 +158,7 @@ export function Projet3DTab({ projet }: Projet3DTabProps) {
                       <span>{modele.taille}</span>
                       <span>{modele.dateModification.toLocaleDateString()}</span>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </CardContent>

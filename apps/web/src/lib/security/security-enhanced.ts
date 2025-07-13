@@ -4,11 +4,10 @@
 import DOMPurify from 'dompurify'
 import { z } from 'zod'
 
-export class SecurityUtils {
-  /**
-   * Sanitisation XSS robuste avec DOMPurify
-   */
-  static sanitizeHtml(html: string): string {
+/**
+ * Sanitisation XSS robuste avec DOMPurify
+ */
+export function sanitizeHtml(html: string): string {
     if (typeof window === 'undefined') {
       return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     }
@@ -20,23 +19,23 @@ export class SecurityUtils {
     })
   }
 
-  /**
-   * Validation email renforcée
-   */
-  static validateEmailStrict(email: string): boolean {
+/**
+ * Validation email renforcée
+ */
+export function validateEmailStrict(email: string): boolean {
     const emailSchema = z
       .string()
       .email()
       .max(254)
-      .refine((email) => !SecurityUtils.isDisposableEmail(email), 'Email temporaire non autorisé')
+      .refine((email) => !isDisposableEmail(email), 'Email temporaire non autorisé')
 
     return emailSchema.safeParse(email).success
   }
 
-  /**
-   * Détection emails temporaires
-   */
-  static isDisposableEmail(email: string): boolean {
+/**
+ * Détection emails temporaires
+ */
+export function isDisposableEmail(email: string): boolean {
     const domain = email.split('@')[1]?.toLowerCase()
     const disposableDomains = [
       'tempmail.org',
@@ -50,10 +49,10 @@ export class SecurityUtils {
     return disposableDomains.includes(domain)
   }
 
-  /**
-   * Rate limiting côté client
-   */
-  static createRateLimiter(maxCalls: number, windowMs: number) {
+/**
+ * Rate limiting côté client
+ */
+export function createRateLimiter(maxCalls: number, windowMs: number) {
     const calls: number[] = []
 
     return function rateLimited<T extends (...args: unknown[]) => any>(fn: T): T {
@@ -77,14 +76,14 @@ export class SecurityUtils {
     }
   }
 
-  /**
-   * Logger sécurisé
-   */
-  static logSecurityEvent(event: string, details: Record<string, any> = {}) {
+/**
+ * Logger sécurisé
+ */
+export function logSecurityEvent(event: string, details: Record<string, any> = {}) {
     const sanitizedDetails = Object.fromEntries(
       Object.entries(details).map(([key, value]) => [
         key,
-        typeof value === 'string' ? SecurityUtils.maskSensitiveData(value) : value,
+        typeof value === 'string' ? maskSensitiveData(value) : value,
       ])
     )
 
@@ -95,20 +94,20 @@ export class SecurityUtils {
     })
   }
 
-  /**
-   * ✅ Masquage données sensibles - REGEX CORRIGÉES
-   */
-  private static maskSensitiveData(data: string): string {
+/**
+ * ✅ Masquage données sensibles - REGEX CORRIGÉES
+ */
+function maskSensitiveData(data: string): string {
     return data
       .replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, '***@***.***') // ✅ CORRIGÉ: Email sans échappement inutile
       .replace(/\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b/g, '****-****-****-****')
       .replace(/\b\d{14}\b/g, '**************')
   }
 
-  /**
-   * ✅ Validation de mot de passe renforcée - REGEX CORRIGÉES
-   */
-  static validatePasswordStrength(password: string): {
+/**
+ * ✅ Validation de mot de passe renforcée - REGEX CORRIGÉES
+ */
+export function validatePasswordStrength(password: string): {
     valid: boolean
     score: number
     feedback: string[]
@@ -151,10 +150,10 @@ export class SecurityUtils {
     }
   }
 
-  /**
-   * ✅ Validation d'URL sécurisée - REGEX CORRIGÉES
-   */
-  static validateSecureUrl(url: string): boolean {
+/**
+ * ✅ Validation d'URL sécurisée - REGEX CORRIGÉES
+ */
+export function validateSecureUrl(url: string): boolean {
     try {
       const parsed = new URL(url)
 
@@ -181,10 +180,10 @@ export class SecurityUtils {
     }
   }
 
-  /**
-   * ✅ Validation de nom de fichier - REGEX CORRIGÉES
-   */
-  static validateFilename(filename: string): boolean {
+/**
+ * ✅ Validation de nom de fichier - REGEX CORRIGÉES
+ */
+export function validateFilename(filename: string): boolean {
     // Longueur
     if (filename.length > 255) return false
 
@@ -206,10 +205,10 @@ export class SecurityUtils {
     return true
   }
 
-  /**
-   * ✅ Échappement pour injection SQL - MÉTHODE ROBUSTE ET CORRIGÉE
-   */
-  static escapeSqlString(input: string): string {
+/**
+ * ✅ Échappement pour injection SQL - MÉTHODE ROBUSTE ET CORRIGÉE
+ */
+export function escapeSqlString(input: string): string {
     return input
       .replace(/'/g, "''") // ✅ CORRIGÉ: Doubler les apostrophes
       .replace(/\\/g, '\\\\')
@@ -219,10 +218,10 @@ export class SecurityUtils {
     // ✅ SUPPRIMÉ: La ligne problématique avec \x1a pour éviter l'erreur ESLint
   }
 
-  /**
-   * ✅ Validation de numéro de téléphone français - REGEX CORRIGÉE
-   */
-  static validateFrenchPhone(phone: string): boolean {
+/**
+ * ✅ Validation de numéro de téléphone français - REGEX CORRIGÉE
+ */
+export function validateFrenchPhone(phone: string): boolean {
     // Format français standard
     const patterns = [
       /^(\+33|0)[1-9](\d{8})$/, // ✅ Format avec ou sans +33
@@ -232,10 +231,10 @@ export class SecurityUtils {
     return patterns.some((pattern) => pattern.test(phone.replace(/\s/g, '')))
   }
 
-  /**
-   * ✅ Génération de token sécurisé
-   */
-  static generateSecureToken(length = 32): string {
+/**
+ * ✅ Génération de token sécurisé
+ */
+export function generateSecureToken(length = 32): string {
     if (typeof window === 'undefined') {
       // Node.js
       return Array.from({ length }, () => Math.floor(Math.random() * 16).toString(16)).join('')
@@ -249,10 +248,10 @@ export class SecurityUtils {
     return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
   }
 
-  /**
-   * ✅ Hachage simple pour les mots de passe (côté client)
-   */
-  static async hashPassword(password: string, salt?: string): Promise<string> {
+/**
+ * ✅ Hachage simple pour les mots de passe (côté client)
+ */
+export async function hashPassword(password: string, salt?: string): Promise<string> {
     if (typeof window === 'undefined') {
       // Fallback pour SSR
       return btoa(password + (salt || 'default-salt'))
@@ -266,10 +265,10 @@ export class SecurityUtils {
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
   }
 
-  /**
-   * ✅ Vérification d'intégrité de fichier
-   */
-  static async verifyFileIntegrity(file: File, expectedHash?: string): Promise<boolean> {
+/**
+ * ✅ Vérification d'intégrité de fichier
+ */
+export async function verifyFileIntegrity(file: File, expectedHash?: string): Promise<boolean> {
     if (!expectedHash) return true
 
     try {
@@ -283,7 +282,6 @@ export class SecurityUtils {
       return false
     }
   }
-}
 
 // ✅ SCHÉMAS ZOD RENFORCÉS
 export const enhancedSecuritySchemas = {
@@ -291,26 +289,26 @@ export const enhancedSecuritySchemas = {
     .string()
     .email('Email invalide')
     .max(254)
-    .refine(SecurityUtils.validateEmailStrict, 'Email non autorisé'),
+    .refine(validateEmailStrict, 'Email non autorisé'),
 
   password: z
     .string()
     .min(8, 'Minimum 8 caractères')
     .max(128, 'Maximum 128 caractères')
-    .refine((pwd) => SecurityUtils.validatePasswordStrength(pwd).valid, 'Mot de passe trop faible'),
+    .refine((pwd) => validatePasswordStrength(pwd).valid, 'Mot de passe trop faible'),
 
   secureUrl: z
     .string()
     .url('URL invalide')
-    .refine(SecurityUtils.validateSecureUrl, 'URL non sécurisée'),
+    .refine(validateSecureUrl, 'URL non sécurisée'),
 
-  filename: z.string().max(255).refine(SecurityUtils.validateFilename, 'Nom de fichier invalide'),
+  filename: z.string().max(255).refine(validateFilename, 'Nom de fichier invalide'),
 
   frenchPhone: z
     .string()
-    .refine(SecurityUtils.validateFrenchPhone, 'Numéro de téléphone français invalide'),
+    .refine(validateFrenchPhone, 'Numéro de téléphone français invalide'),
 
-  sanitizedHtml: z.string().transform(SecurityUtils.sanitizeHtml),
+  sanitizedHtml: z.string().transform(sanitizeHtml),
 
   secureToken: z
     .string()
@@ -338,8 +336,7 @@ export interface SecurityAuditReport {
 }
 
 // ✅ AUDITEUR DE SÉCURITÉ AVANCÉ
-export class SecurityAuditor {
-  static async performFullAudit(): Promise<SecurityAuditReport> {
+export async function performFullAudit(): Promise<SecurityAuditReport> {
     const issues: SecurityAuditReport['issues'] = []
     const passed: string[] = []
 
@@ -391,4 +388,3 @@ export class SecurityAuditor {
       summary,
     }
   }
-}

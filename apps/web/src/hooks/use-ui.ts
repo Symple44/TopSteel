@@ -137,7 +137,7 @@ export const useLoading = () => {
  */
 export const useModal = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [modalData, setModalData] = useState<any>(null)
+  const [modalData, setModalData] = useState<unknown>(null)
 
   const openModal = useCallback((data?: unknown) => {
     setModalData(data)

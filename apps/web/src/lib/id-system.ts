@@ -104,71 +104,68 @@ export const ID_FORMATS = {
 // CACHE ET PERFORMANCE
 // =============================================
 
-class IDCache {
-  private static cache = new Map<string, ParsedID>()
-  private static maxSize = 1000
-  private static metrics: IDMetrics = {
-    generated: 0,
-    errors: 0,
-    cacheHits: 0,
-    cacheMisses: 0,
-    performanceMs: [],
+// ID Cache as module-level functions
+const idCache = new Map<string, ParsedID>()
+const maxIdCacheSize = 1000
+const idCacheMetrics: IDMetrics = {
+  generated: 0,
+  errors: 0,
+  cacheHits: 0,
+  cacheMisses: 0,
+  performanceMs: [],
+}
+
+function getFromIdCache(key: string): ParsedID | undefined {
+  const result = idCache.get(key)
+
+  if (result) {
+    idCacheMetrics.cacheHits++
+
+    return result
   }
+  idCacheMetrics.cacheMisses++
 
-  static get(key: string): ParsedID | undefined {
-    const result = IDCache.cache.get(key)
+  return undefined
+}
 
-    if (result) {
-      IDCache.metrics.cacheHits++
+function setInIdCache(key: string, value: ParsedID): void {
+  // Fix TypeScript strict: nettoyage du cache si plein
+  if (idCache.size >= maxIdCacheSize) {
+    // Méthode plus sûre : convertir en array pour éviter undefined
+    const keys = Array.from(idCache.keys())
 
-      return result
-    }
-    IDCache.metrics.cacheMisses++
-
-    return undefined
-  }
-
-  static set(key: string, value: ParsedID): void {
-    // Fix TypeScript strict: nettoyage du cache si plein
-    if (IDCache.cache.size >= IDCache.maxSize) {
-      // Méthode plus sûre : convertir en array pour éviter undefined
-      const keys = Array.from(IDCache.cache.keys())
-
-      if (keys.length > 0) {
-        IDCache.cache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
-      }
-    }
-    IDCache.cache.set(key, value)
-  }
-
-  static getMetrics(): IDMetrics {
-    return { ...IDCache.metrics }
-  }
-
-  static recordGeneration(timeMs: number): void {
-    IDCache.metrics.generated++
-    IDCache.metrics.performanceMs.push(timeMs)
-
-    // Garder seulement les 100 dernières mesures
-    if (IDCache.metrics.performanceMs.length > 100) {
-      IDCache.metrics.performanceMs = IDCache.metrics.performanceMs.slice(-100)
+    if (keys.length > 0) {
+      idCache.delete(keys[0]) // Supprimer la première (plus ancienne) clé
     }
   }
+  idCache.set(key, value)
+}
 
-  static recordError(): void {
-    IDCache.metrics.errors++
-  }
+function getIdCacheMetrics(): IDMetrics {
+  return { ...idCacheMetrics }
+}
 
-  static clear(): void {
-    IDCache.cache.clear()
-    IDCache.metrics = {
-      generated: 0,
-      errors: 0,
-      cacheHits: 0,
-      cacheMisses: 0,
-      performanceMs: [],
-    }
+function recordIdGeneration(timeMs: number): void {
+  idCacheMetrics.generated++
+  idCacheMetrics.performanceMs.push(timeMs)
+
+  // Garder seulement les 100 dernières mesures
+  if (idCacheMetrics.performanceMs.length > 100) {
+    idCacheMetrics.performanceMs = idCacheMetrics.performanceMs.slice(-100)
   }
+}
+
+function recordIdError(): void {
+  idCacheMetrics.errors++
+}
+
+function clearIdCache(): void {
+  idCache.clear()
+  idCacheMetrics.generated = 0
+  idCacheMetrics.errors = 0
+  idCacheMetrics.cacheHits = 0
+  idCacheMetrics.cacheMisses = 0
+  idCacheMetrics.performanceMs = []
 }
 
 // =============================================
@@ -255,11 +252,11 @@ class IDGenerator {
         result = IDGenerator.generateServerUUID()
       }
 
-      IDCache.recordGeneration(performance.now() - startTime)
+      recordIdGeneration(performance.now() - startTime)
 
       return result
     } catch (error) {
-      IDCache.recordError()
+      recordIdError()
       console.error('UUID generation failed:', error)
 
       return IDGenerator.generateFallbackUUID()
@@ -326,12 +323,12 @@ class IDGenerator {
         result = IDGenerator.generateServerNanoId(length, defaultAlphabet)
       }
 
-      IDCache.recordGeneration(performance.now() - startTime)
+      recordIdGeneration(performance.now() - startTime)
 
       return result
     } catch (error) {
       console.warn('NanoID generation failed, using fallback:', error)
-      IDCache.recordError()
+      recordIdError()
 
       return IDGenerator.generateFallbackNanoId(length, defaultAlphabet)
     }
@@ -435,11 +432,11 @@ class IDGenerator {
         result += `-${checksumValue}`
       }
 
-      IDCache.recordGeneration(performance.now() - startTime)
+      recordIdGeneration(performance.now() - startTime)
 
       return result
     } catch (error) {
-      IDCache.recordError()
+      recordIdError()
       console.error('Business ID generation failed:', error)
 
       return `${ID_PREFIXES[prefix]}-FALLBACK-${Date.now()}`
@@ -499,7 +496,7 @@ class IDGenerator {
 
 class IDParser {
   static parse(id: string): ParsedID {
-    const cached = IDCache.get(id)
+    const cached = getFromIdCache(id)
 
     if (cached) return cached
 
@@ -518,7 +515,7 @@ class IDParser {
 
       // Validation format basique
       if (!id || typeof id !== 'string' || id.length < 3) {
-        IDCache.set(id, result)
+        setInIdCache(id, result)
 
         return result
       }
@@ -573,12 +570,12 @@ class IDParser {
         result.metadata.format = 'uuid'
       }
 
-      IDCache.recordGeneration(performance.now() - startTime)
-      IDCache.set(id, result)
+      recordIdGeneration(performance.now() - startTime)
+      setInIdCache(id, result)
 
       return result
     } catch (error) {
-      IDCache.recordError()
+      recordIdError()
       console.error('ID parsing failed:', error)
 
       const fallbackResult: ParsedID = {
@@ -591,7 +588,7 @@ class IDParser {
         },
       }
 
-      IDCache.set(id, fallbackResult)
+      setInIdCache(id, fallbackResult)
 
       return fallbackResult
     }
@@ -609,7 +606,7 @@ class IDParser {
 
       return true
     } catch (error) {
-      IDCache.recordError()
+      recordIdError()
       console.error('ID validation failed:', error)
 
       return false
@@ -652,8 +649,8 @@ export const ID = {
   validate: (id: string, prefix?: keyof typeof ID_PREFIXES) => IDParser.validate(id, prefix),
 
   // Métriques et cache
-  getMetrics: () => IDCache.getMetrics(),
-  clearCache: () => IDCache.clear(),
+  getMetrics: () => getIdCacheMetrics(),
+  clearCache: () => clearIdCache(),
 
   // Générateur personnalisé
   custom: (prefix: keyof typeof ID_PREFIXES, config?: IDConfig) =>
@@ -696,7 +693,7 @@ export function useClientId(prefix?: keyof typeof ID_PREFIXES, config?: Partial<
   // Log de l'erreur pour monitoring
   useEffect(() => {
     if (error) {
-      IDCache.recordError()
+      recordIdError()
     }
   }, [error])
 
@@ -711,11 +708,11 @@ export function useIDMetrics(): IDMetrics & {
   errorRate: number
   cacheHitRate: number
 } {
-  const [metrics, setMetrics] = useState<IDMetrics>(() => IDCache.getMetrics())
+  const [metrics, setMetrics] = useState<IDMetrics>(() => getIdCacheMetrics())
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setMetrics(IDCache.getMetrics())
+      setMetrics(getIdCacheMetrics())
     }, 5000) // Mise à jour toutes les 5 secondes
 
     return () => clearInterval(interval)

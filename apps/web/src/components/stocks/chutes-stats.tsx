@@ -56,11 +56,11 @@ export function ChutesStats({ stats }: ChutesStatsProps) {
     <div className="space-y-6">
       {/* Statistiques principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat, index) => {
+        {statCards.map((stat) => {
           const Icon = stat.icon
 
           return (
-            <Card key={index}>
+            <Card key={stat.title}>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>

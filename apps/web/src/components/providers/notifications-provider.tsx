@@ -61,7 +61,7 @@ export interface CreateNotificationRequest {
   category: 'system' | 'stock' | 'projet' | 'production' | 'maintenance'
   title: string
   message: string
-  data?: Record<string, any>
+  data?: Record<string, unknown>
   persistent?: boolean
   actionUrl?: string
   actionLabel?: string

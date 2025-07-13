@@ -37,7 +37,7 @@ export function useOptimizedSearch<T>(
 }
 
 // Fonction d'optimisation pour les composants lourds
-export function useOptimizedCallback<T extends (...args: unknown[]) => any>(
+export function useOptimizedCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   deps: React.DependencyList
 ): T {

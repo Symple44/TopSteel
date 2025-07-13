@@ -109,21 +109,14 @@ export function NotificationCenter() {
           ) : (
             <div className="p-2 space-y-1">
               {state.notifications.map((notification: Notification) => (
-                <div
+                <button
                   key={notification.id}
                   className={cn(
-                    'flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors',
+                    'flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors w-full text-left',
                     !notification.read && 'bg-blue-50 border-l-2 border-l-blue-500'
                   )}
                   onClick={() => actions.markAsRead(notification.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      actions.markAsRead(notification.id)
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
+                  type="button"
                 >
                   <div className="flex-shrink-0 mt-0.5">
                     {getNotificationIcon(notification.type, notification.category)}
@@ -190,7 +183,7 @@ export function NotificationCenter() {
                   >
                     <X className="h-4 w-4" />
                   </Button>
-                </div>
+                </button>
               ))}
             </div>
           )}
