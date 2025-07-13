@@ -3,6 +3,9 @@
  * Export des préoccupations transversales
  */
 
+// Authentification
+export * from './auth'
+
 // Notifications
 export * from './notifications'
 

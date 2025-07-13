@@ -1,5 +1,10 @@
-// packages/types/src/auth.ts
-import type { User } from './user'
+/**
+ * 🔐 AUTHENTIFICATION - TopSteel ERP
+ * Types pour l'authentification et l'autorisation
+ * Fichier: packages/types/src/cross-cutting/auth.ts
+ */
+
+import type { User } from '../domains/user'
 
 export interface LoginResponse {
   user: User

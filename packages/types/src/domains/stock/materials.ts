@@ -1,6 +1,11 @@
-// packages/types/src/stocks.ts
-import type { BaseEntity } from './common'
-import type { User } from './user'
+/**
+ * 📦 MATÉRIAUX STOCK - TopSteel ERP
+ * Types pour la gestion des matériaux et chutes
+ * Fichier: packages/types/src/domains/stock/materials.ts
+ */
+
+import type { BaseEntity } from '../../core/base'
+import type { User } from '../user'
 
 export enum StockType {
   MATIERE_PREMIERE = 'matiere_premiere',
@@ -24,7 +29,7 @@ export enum ChuteStatut {
   REBUT = 'REBUT',
 }
 
-export enum MouvementType {
+export enum MouvementStockType {
   ENTREE = 'entree',
   SORTIE = 'sortie',
   TRANSFERT = 'transfert',
@@ -64,7 +69,7 @@ export interface Materiau extends BaseEntity {
 export interface MouvementStock extends BaseEntity {
   materiauId: string
   materiau: Materiau
-  type: MouvementType
+  type: MouvementStockType
   quantite: number
   quantiteAvant: number
   quantiteApres: number
@@ -152,7 +157,7 @@ export interface CreateMaterialRequest {
 
 export interface CreateMouvementRequest {
   materiauId: string
-  type: MouvementType
+  type: MouvementStockType
   quantite: number
   prixUnitaire: number
   motif: string

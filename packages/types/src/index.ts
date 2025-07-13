@@ -131,8 +131,6 @@ export type {
   BaseStoreActions,
   BaseStoreState,
   InitialState,
-  StoreConfig,
-  StoreCreator,
   AppStore,
   AppState,
   AppStoreActions,
@@ -144,18 +142,36 @@ export type {
 // Export des types store-entities sans conflits (sans StoreProjetFilters qui conflit avec domains/project)
 export type {
   StoreMetrics,
-  StoreNotification,
   StoreProjet,
   StoreProjetStats,
   StoreSyncState,
   StoreUser
 } from './store-entities'
 
-// Export explicite du bon ProjetFilters depuis domains/project
+// Export explicite des filtres depuis leurs domaines respectifs
 export type { ProjetFilters } from './domains/project'
+export type { 
+  StockFilters, 
+  MouvementFilters, 
+  StockFilters as ProductionFilters 
+} from './domains/stock'
 
-// Export des types utilisateur legacy
-export type { User, UserRole } from './user'
+// Export des types utilisateur legacy (maintenant depuis domains/user)
+export type { User, UserRole } from './domains/user'
 
-// Export des types facturation legacy
-export type { FacturationFilters, DevisStatut, FactureStatut } from './facturation'
+// Export des types facturation legacy (maintenant depuis domains/billing)
+export type { FacturationFilters, DevisStatut, FactureStatut } from './domains/billing'
+
+// Export du type FilterState pour les stores
+export type { 
+  FilterState, 
+  MetricsState, 
+  ProjetStats, 
+  SessionState,
+  StoreConfig,
+  StoreCreator,
+  UIState
+} from './stores'
+
+// Export des entités store
+export type { StoreClient, StoreNotification } from './store-entities'

@@ -6,11 +6,11 @@
  */
 
 // Import des types existants pour éviter la duplication
-import type { Client } from './client'
-import type { Address } from './common'
-import type { Devis } from './facturation'
-import type { ProjetPriorite, ProjetStatut, ProjetType } from './projet'
-import type { User } from './user'
+import type { Client } from './domains/client'
+import type { Address } from './core/common'
+import type { Devis } from './domains/billing'
+import type { ProjetPriorite, ProjetStatut, ProjetType } from './domains/project'
+import type { User } from './domains/user'
 
 // ===== ENTITÉS DE BASE =====
 

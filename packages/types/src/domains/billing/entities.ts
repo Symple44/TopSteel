@@ -1,52 +1,29 @@
-// packages/types/src/facturation.ts
-import type { Client } from './client'
-import type { BaseEntity } from './common'
-import type { Projet } from './projet'
-import type { User } from './user'
+/**
+ * 💰 ENTITÉS BILLING - TopSteel ERP
+ * Entités principales du domaine facturation
+ * Fichier: packages/types/src/domains/billing/entities.ts
+ */
 
-export enum DevisStatut {
-  BROUILLON = 'brouillon',
-  ENVOYE = 'envoye',
-  ACCEPTE = 'accepte',
-  REFUSE = 'refuse',
-  EXPIRE = 'expire',
-}
+import type { BaseEntity } from '../../core/base'
+import type { Client } from '../client'
+import type { Projet } from '../project'
+import type { User } from '../user'
+import type {
+  DevisStatut,
+  FactureStatut,
+  FactureType,
+  PaiementType,
+  PaiementMethode,
+  PaiementStatut,
+  RelanceType,
+  RelanceNiveau,
+  RelanceMethode,
+  RelanceStatut
+} from './enums'
 
-export enum FactureStatut {
-  BROUILLON = 'brouillon',
-  ENVOYEE = 'envoyee',
-  PAYEE = 'payee',
-  PARTIELLE = 'partielle',
-  EN_RETARD = 'en_retard',
-  ANNULEE = 'annulee',
-}
-
-export enum FactureType {
-  FACTURE = 'facture',
-  AVOIR = 'avoir',
-  ACOMPTE = 'acompte',
-  SOLDE = 'solde',
-}
-
-export enum PaiementType {
-  ENCAISSEMENT = 'encaissement',
-  DECAISSEMENT = 'decaissement',
-}
-
-export enum PaiementMethode {
-  VIREMENT = 'virement',
-  CHEQUE = 'cheque',
-  ESPECES = 'especes',
-  CARTE = 'carte',
-  PRELEVEMENT = 'prelevement',
-}
-
-export enum PaiementStatut {
-  ATTENTE = 'attente',
-  VALIDE = 'valide',
-  ANNULE = 'annule',
-}
-
+/**
+ * Entité Devis
+ */
 export interface Devis extends BaseEntity {
   reference: string
   clientId: string
@@ -73,6 +50,9 @@ export interface Devis extends BaseEntity {
   commercial?: User
 }
 
+/**
+ * Ligne de devis
+ */
 export interface LigneDevis extends BaseEntity {
   devisId: string
   designation: string
@@ -91,6 +71,9 @@ export interface LigneDevis extends BaseEntity {
   ordreLigne: number
 }
 
+/**
+ * Entité Facture
+ */
 export interface Facture extends BaseEntity {
   numero: string
   clientId: string
@@ -116,6 +99,9 @@ export interface Facture extends BaseEntity {
   fichierPDF?: string
 }
 
+/**
+ * Ligne de facture
+ */
 export interface LigneFacture extends BaseEntity {
   factureId: string
   designation: string
@@ -127,6 +113,9 @@ export interface LigneFacture extends BaseEntity {
   ordreLigne: number
 }
 
+/**
+ * Entité Paiement
+ */
 export interface Paiement extends BaseEntity {
   factureId?: string
   facture?: Facture
@@ -147,49 +136,22 @@ export interface Paiement extends BaseEntity {
   pieceJointe?: string
 }
 
+/**
+ * Entité Relance
+ */
 export interface Relance extends BaseEntity {
   factureId: string
-  type: 'automatique' | 'manuelle'
-  niveau: 1 | 2 | 3
+  type: RelanceType
+  niveau: RelanceNiveau
   dateEnvoi: Date
-  methode: 'email' | 'courrier' | 'telephone'
+  methode: RelanceMethode
   contenu: string
-  statut: 'envoyee' | 'lue' | 'repondue'
+  statut: RelanceStatut
 }
 
-// Requests
-export interface CreateDevisRequest {
-  clientId: string
-  projetId?: string
-  dateValidite: Date
-  lignes: Omit<LigneDevis, 'id' | 'devisId' | 'totalHT' | 'createdAt' | 'updatedAt'>[]
-  conditions: string
-  notes?: string
-  remiseGlobale?: number
-}
-
-export interface CreateFactureRequest {
-  clientId: string
-  devisId?: string
-  projetId?: string
-  type: FactureType
-  dateEcheance: Date
-  lignes: Omit<LigneFacture, 'id' | 'factureId' | 'createdAt' | 'updatedAt'>[]
-  conditions: string
-}
-
-export interface CreatePaiementRequest {
-  factureId?: string
-  type: PaiementType
-  methode: PaiementMethode
-  montant: number
-  dateOperation: Date
-  dateValeur: Date
-  reference: string
-  compteId: string
-  notes?: string
-}
-
+/**
+ * Filtres pour la facturation
+ */
 export interface FacturationFilters {
   statut?: string[]
   dateDebut?: Date
@@ -199,6 +161,9 @@ export interface FacturationFilters {
   search?: string
 }
 
+/**
+ * Statistiques de facturation
+ */
 export interface FacturationStats {
   caFacture: number
   caEncaisse: number

@@ -15,7 +15,7 @@ import type {
   StoreCreator,
   StoreProjet,
 } from '@erp/types'
-import { ClientType, ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
+import { ClientType, ClientStatut, ClientPriorite, ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
@@ -84,7 +84,8 @@ const projetService = {
           type: ClientType.PARTICULIER,
           createdAt: new Date(),
           updatedAt: new Date(),
-          isActif: true,
+          statut: ClientStatut.ACTIF,
+          priorite: ClientPriorite.NORMALE,
           adresse: {
             rue: '123 Rue de la Paix',
             ville: 'Paris',
@@ -131,7 +132,8 @@ const projetService = {
           type: ClientType.PROFESSIONNEL,
           createdAt: new Date(),
           updatedAt: new Date(),
-          isActif: true,
+          statut: ClientStatut.ACTIF,
+          priorite: ClientPriorite.NORMALE,
           adresse: {
             rue: '456 Zone Industrielle',
             ville: 'Lyon',

@@ -12,7 +12,11 @@ export * from './project'
 // Domaine Production
 export * from './production'
 
-// TODO: Autres domaines à migrer
-// export * from './billing'
-// export * from './inventory'
-// export * from './user'
+// Domaine Stock
+export * from './stock'
+
+// Domaine Billing (Facturation)
+export * from './billing'
+
+// Domaine User (Utilisateur)
+export * from './user'
