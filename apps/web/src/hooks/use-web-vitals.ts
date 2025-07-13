@@ -160,7 +160,7 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
     return () => {
       mounted = false
     }
-  }, [enableConsoleLog, enableAnalytics, sampleRate, reportAllChanges, sendToAnalytics])
+  }, [enableConsoleLog, reportAllChanges, sendToAnalytics])
 
   return {
     ...vitals,

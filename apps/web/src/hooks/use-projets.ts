@@ -5,7 +5,7 @@
  */
 
 import { useProjetStore } from '@/stores/projet.store'
-import type { ProjetFilters, Projet } from '@erp/types'
+import type { Projet, ProjetFilters } from '@erp/types'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export const useProjets = (autoFetch = true) => {

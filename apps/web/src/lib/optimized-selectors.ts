@@ -219,7 +219,9 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       const result = useStore(filteredSelector, shallow as EqualityFn<R>)
 
       if (process.env.NODE_ENV === 'development' && debugLabel) {
-        console.debug(`🔍 [${debugLabel}] Filtered selector: ${Array.isArray(result) ? result.length : 0} items`)
+        console.debug(
+          `🔍 [${debugLabel}] Filtered selector: ${Array.isArray(result) ? result.length : 0} items`
+        )
       }
 
       return result

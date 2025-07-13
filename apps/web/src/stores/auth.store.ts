@@ -167,7 +167,9 @@ const MOCK_USERS = [
   },
 ]
 
-export async function authLogin(credentials: LoginCredentials): Promise<{ user: User; session: SessionInfo }> {
+export async function authLogin(
+  credentials: LoginCredentials
+): Promise<{ user: User; session: SessionInfo }> {
   await new Promise((resolve) => setTimeout(resolve, 800))
 
   const mockUser = MOCK_USERS.find(
@@ -182,8 +184,7 @@ export async function authLogin(credentials: LoginCredentials): Promise<{ user: 
     token: `jwt_${Date.now()}_${Math.random().toString(36)}`,
     refreshToken: `refresh_${Date.now()}_${Math.random().toString(36)}`,
     expiresAt:
-      Date.now() +
-      (credentials.rememberMe ? 30 * 24 * 60 * 60 * 1000 : AUTH_CONFIG.sessionTimeout),
+      Date.now() + (credentials.rememberMe ? 30 * 24 * 60 * 60 * 1000 : AUTH_CONFIG.sessionTimeout),
     issuedAt: Date.now(),
     ipAddress: '127.0.0.1',
     userAgent: navigator?.userAgent,

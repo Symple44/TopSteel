@@ -409,7 +409,7 @@ export function createSafeGlobal<T extends object>(globalName: string, fallback:
   try {
     const globalObj = (window as typeof window & Record<string, unknown>)[globalName]
 
-    return globalObj || fallback
+    return (globalObj as T) || fallback
   } catch {
     return fallback as T
   }

@@ -16,7 +16,8 @@
       "Bash(npm run:*)",
       "Bash(npx next:*)",
       "Bash(npx @biomejs/biome lint)",
-      "Bash(npx @biomejs/biome lint:*)"
+      "Bash(npx @biomejs/biome lint:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

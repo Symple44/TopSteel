@@ -216,7 +216,9 @@ export class PerformanceMonitor {
         const entries = entryList.getEntries()
 
         for (const entry of entries) {
-          const fid = (entry as PerformanceEventTiming & { processingStart?: number }).processingStart ?? entry.startTime - entry.startTime
+          const fid =
+            (entry as PerformanceEventTiming & { processingStart?: number }).processingStart ??
+            entry.startTime - entry.startTime
 
           if (fid > 100) {
             // Seuil pour FID lent
@@ -337,7 +339,12 @@ export class PerformanceMonitor {
   recordMetric(name: string, data: Record<string, unknown>): void {
     const metric: PerformanceMetric = {
       name,
-      value: data.value || data.duration || 0,
+      value:
+        typeof data.value === 'number'
+          ? data.value
+          : typeof data.duration === 'number'
+            ? data.duration
+            : 0,
       timestamp: Date.now(),
       url: this.isClient ? window.location.href : undefined,
       userAgent: this.isClient ? window.navigator.userAgent : undefined,

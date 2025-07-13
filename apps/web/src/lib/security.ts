@@ -16,203 +16,201 @@ import { z } from 'zod'
  * Nettoie le HTML pour prévenir les attaques XSS (version native)
  */
 export function sanitizeHtml(html: string): string {
-    if (typeof window === 'undefined') {
-      // SSR: validation basique mais robuste
-      return html
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-        .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
-        .replace(/<embed[^>]*>/gi, '')
-        .replace(/<link[^>]*>/gi, '')
-        .replace(/<meta[^>]*>/gi, '')
-        .replace(/javascript:/gi, '')
-        .replace(/vbscript:/gi, '')
-        .replace(/onload=/gi, '')
-        .replace(/onerror=/gi, '')
-        .replace(/onclick=/gi, '')
-        .replace(/onmouseover=/gi, '')
-    }
-
-    // Client: utiliser la méthode native du navigateur
-    const temp = document.createElement('div')
-
-    temp.textContent = html
-
-    return temp.innerHTML
+  if (typeof window === 'undefined') {
+    // SSR: validation basique mais robuste
+    return html
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+      .replace(/<embed[^>]*>/gi, '')
+      .replace(/<link[^>]*>/gi, '')
+      .replace(/<meta[^>]*>/gi, '')
       .replace(/javascript:/gi, '')
-      .replace(/on\w+=/gi, '')
+      .replace(/vbscript:/gi, '')
+      .replace(/onload=/gi, '')
+      .replace(/onerror=/gi, '')
+      .replace(/onclick=/gi, '')
+      .replace(/onmouseover=/gi, '')
   }
+
+  // Client: utiliser la méthode native du navigateur
+  const temp = document.createElement('div')
+
+  temp.textContent = html
+
+  return temp.innerHTML
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
+}
 
 /**
  * Nettoie une chaîne de caractères
  */
 export function sanitizeString(input: string): string {
-    return input
-      .replace(/[<>"']/g, '') // ✅ CORRIGÉ: Retire les caractères dangereux sans échappement inutile
-      .replace(/javascript:/gi, '')
-      .replace(/vbscript:/gi, '')
-      .replace(/data:/gi, '')
-      .trim()
-      .substring(0, 1000) // Limite la longueur
-  }
+  return input
+    .replace(/[<>"']/g, '') // ✅ CORRIGÉ: Retire les caractères dangereux sans échappement inutile
+    .replace(/javascript:/gi, '')
+    .replace(/vbscript:/gi, '')
+    .replace(/data:/gi, '')
+    .trim()
+    .substring(0, 1000) // Limite la longueur
+}
 
 /**
  * Valide et nettoie un email
  */
 export function sanitizeEmail(email: string): string | null {
-    const emailSchema = z.string().email().max(254)
+  const emailSchema = z.string().email().max(254)
 
-    try {
-      return emailSchema.parse(email.toLowerCase().trim())
-    } catch {
-      return null
-    }
+  try {
+    return emailSchema.parse(email.toLowerCase().trim())
+  } catch {
+    return null
   }
+}
 
 /**
  * Valide une URL
  */
 export function sanitizeUrl(url: string): string | null {
-    try {
-      const parsed = new URL(url)
+  try {
+    const parsed = new URL(url)
 
-      // Seulement HTTP/HTTPS
-      if (!['http:', 'https:'].includes(parsed.protocol)) {
-        return null
-      }
-
-      return parsed.toString()
-    } catch {
+    // Seulement HTTP/HTTPS
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
       return null
     }
+
+    return parsed.toString()
+  } catch {
+    return null
   }
+}
 
 /**
  * Rate limiting simple côté client
  */
 export function createRateLimiter(maxRequests: number, windowMs: number) {
-    const requests: number[] = []
+  const requests: number[] = []
 
-    return function rateLimited<T extends (...args: unknown[]) => unknown>(fn: T): T {
-      return ((...args: unknown[]) => {
-        const now = Date.now()
-        const windowStart = now - windowMs
+  return function rateLimited<T extends (...args: unknown[]) => unknown>(fn: T): T {
+    return ((...args: unknown[]) => {
+      const now = Date.now()
+      const windowStart = now - windowMs
 
-        // Nettoyer les anciennes requêtes
-        while (requests.length > 0 && requests[0] < windowStart) {
-          requests.shift()
-        }
+      // Nettoyer les anciennes requêtes
+      while (requests.length > 0 && requests[0] < windowStart) {
+        requests.shift()
+      }
 
-        if (requests.length >= maxRequests) {
-          throw new Error('Trop de requêtes. Veuillez patienter.')
-        }
+      if (requests.length >= maxRequests) {
+        throw new Error('Trop de requêtes. Veuillez patienter.')
+      }
 
-        requests.push(now)
+      requests.push(now)
 
-        return fn(...args)
-      }) as T
-    }
+      return fn(...args)
+    }) as T
   }
+}
 
 /**
  * Estimation du prochain slot disponible
  */
 export function getNextAvailableSlot(requests: number[], windowMs: number): number {
-    if (requests.length === 0) return Date.now()
+  if (requests.length === 0) return Date.now()
 
-    return requests[0] + windowMs
-  }
+  return requests[0] + windowMs
+}
 
 /**
  * Génère un token CSRF
  */
 export function generateCSRFToken(): string {
-    if (typeof window === 'undefined') {
-      return (
-        Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-      )
-    }
-
-    const array = new Uint8Array(32)
-
-    crypto.getRandomValues(array)
-
-    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
+  if (typeof window === 'undefined') {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
   }
+
+  const array = new Uint8Array(32)
+
+  crypto.getRandomValues(array)
+
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
 
 /**
  * Audit de sécurité automatique
  */
 export function auditSecurity(): SecurityAuditReport {
-    const issues: string[] = []
-    const warnings: string[] = []
+  const issues: string[] = []
+  const warnings: string[] = []
 
-    // Vérifications côté client
-    if (typeof window !== 'undefined') {
-      // HTTPS
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-        issues.push('Application non servie en HTTPS')
-      }
-
-      // Secure Cookies
-      if (document.cookie && !document.cookie.includes('Secure')) {
-        warnings.push('Cookies non sécurisés détectés')
-      }
-
-      // Content Security Policy
-      if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
-        warnings.push('Content Security Policy non détecté')
-      }
-
-      // Mixed Content
-      const insecureElements = document.querySelectorAll('[src^="http://"], [href^="http://"]')
-
-      if (insecureElements.length > 0) {
-        warnings.push(`${insecureElements.length} éléments non sécurisés détectés`)
-      }
-
-      // Local Storage sensible
-      if (localStorage.getItem('password') || localStorage.getItem('token')) {
-        issues.push('Données sensibles stockées en local')
-      }
+  // Vérifications côté client
+  if (typeof window !== 'undefined') {
+    // HTTPS
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      issues.push('Application non servie en HTTPS')
     }
 
-    return {
-      issues,
-      warnings,
-      score: Math.max(0, 100 - issues.length * 20 - warnings.length * 5),
-      timestamp: new Date().toISOString(),
+    // Secure Cookies
+    if (document.cookie && !document.cookie.includes('Secure')) {
+      warnings.push('Cookies non sécurisés détectés')
+    }
+
+    // Content Security Policy
+    if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
+      warnings.push('Content Security Policy non détecté')
+    }
+
+    // Mixed Content
+    const insecureElements = document.querySelectorAll('[src^="http://"], [href^="http://"]')
+
+    if (insecureElements.length > 0) {
+      warnings.push(`${insecureElements.length} éléments non sécurisés détectés`)
+    }
+
+    // Local Storage sensible
+    if (localStorage.getItem('password') || localStorage.getItem('token')) {
+      issues.push('Données sensibles stockées en local')
     }
   }
+
+  return {
+    issues,
+    warnings,
+    score: Math.max(0, 100 - issues.length * 20 - warnings.length * 5),
+    timestamp: new Date().toISOString(),
+  }
+}
 
 /**
  * Logger sécurisé
  */
 export function logSecurityEvent(event: string, details: Record<string, unknown> = {}) {
-    const sanitizedDetails = Object.fromEntries(
-      Object.entries(details).map(([key, value]) => [
-        key,
-        typeof value === 'string' ? maskSensitiveData(value) : value,
-      ])
-    )
+  const sanitizedDetails = Object.fromEntries(
+    Object.entries(details).map(([key, value]) => [
+      key,
+      typeof value === 'string' ? maskSensitiveData(value) : value,
+    ])
+  )
 
-    console.warn('🔐 Security Event:', {
-      event,
-      timestamp: new Date().toISOString(),
-      details: sanitizedDetails,
-    })
-  }
+  console.warn('🔐 Security Event:', {
+    event,
+    timestamp: new Date().toISOString(),
+    details: sanitizedDetails,
+  })
+}
 
 /**
  * Masquage données sensibles
  */
 function maskSensitiveData(data: string): string {
-    return data
-      .replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, '***@***.***') // ✅ CORRIGÉ: Email regex sans échappement inutile
-      .replace(/\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b/g, '****-****-****-****')
-      .replace(/\b\d{14}\b/g, '**************')
-  }
+  return data
+    .replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, '***@***.***') // ✅ CORRIGÉ: Email regex sans échappement inutile
+    .replace(/\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b/g, '****-****-****-****')
+    .replace(/\b\d{14}\b/g, '**************')
+}
 
 export interface SecurityAuditReport {
   issues: string[]

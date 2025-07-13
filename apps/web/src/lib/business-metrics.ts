@@ -269,7 +269,11 @@ class BusinessMetrics {
     })
   }
 
-  trackSearchPerformed(query: string, resultCount: number, filters?: Record<string, unknown>): void {
+  trackSearchPerformed(
+    query: string,
+    resultCount: number,
+    filters?: Record<string, unknown>
+  ): void {
     this.track('search_performed', {
       query: query.substring(0, 100),
       resultCount,
