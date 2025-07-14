@@ -11,9 +11,9 @@
     "react-dom": "^19.1.0",
     "tailwindcss": "^4.1.11",
     "turbo": "^2.5.4",
-    "vite": "7.0.3",
+    "vite": "7.0.4",
     "vite-plugin-dts": "4.5.4",
-    "zod": "^3.25.75"
+    "zod": "^4.0.5"
   },
   "version": "1.0.0",
   "bugs": {
