@@ -7,7 +7,7 @@
 import { apiClient } from '@/lib/api-client'
 import { formatError } from '@/lib/error-handler'
 import type { User } from '@erp/domains/core'
-import { UserRole, UserStatut } from '@erp/domains/core'
+import { type UserRole, UserStatut } from '@erp/domains/core'
 
 // ===== INTERFACES =====
 interface LoginResponse {

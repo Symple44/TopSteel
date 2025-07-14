@@ -5,8 +5,8 @@
  */
 
 import { createMemoizedSelector, createOptimizedSelectors } from '@/lib/optimized-selectors'
-import type { AppState, StoreProjet } from '@erp/types'
 import { ProjetStatut } from '@erp/domains/core'
+import type { AppState, StoreProjet } from '@erp/types'
 import { useAppStore } from '../app.store'
 
 // ===== CRÉATION DES SÉLECTEURS OPTIMISÉS TYPÉS =====
@@ -120,7 +120,9 @@ export const useSelectedProjet = () =>
  */
 const activeProjetsSelector = createMemoizedSelector(
   (state: AppState) =>
-    state.projets?.filter((p) => p.statut === ProjetStatut.EN_COURS || p.statut === ProjetStatut.ACCEPTE) || [],
+    state.projets?.filter(
+      (p) => p.statut === ProjetStatut.EN_COURS || p.statut === ProjetStatut.ACCEPTE
+    ) || [],
   { ttl: 2000 }
 )
 
@@ -142,7 +144,8 @@ export const useCompletedProjets = () =>
 export const usePendingProjets = () =>
   selectors.useFiltered(
     (state: AppState) => state.projets || [],
-    (projet: StoreProjet) => projet.statut === ProjetStatut.EN_ATTENTE || projet.statut === ProjetStatut.DEVIS,
+    (projet: StoreProjet) =>
+      projet.statut === ProjetStatut.EN_ATTENTE || projet.statut === ProjetStatut.DEVIS,
     'pending-projets'
   )
 
@@ -327,7 +330,9 @@ export const useDashboardData = () =>
     const projets = state.projets || []
     const notifications = state.notifications || []
 
-    const activeProjets = projets.filter((p) => p.statut === ProjetStatut.EN_COURS || p.statut === ProjetStatut.ACCEPTE)
+    const activeProjets = projets.filter(
+      (p) => p.statut === ProjetStatut.EN_COURS || p.statut === ProjetStatut.ACCEPTE
+    )
     const criticalNotifications = notifications.filter((n) => !n.isRead && n.type === 'error')
 
     return {

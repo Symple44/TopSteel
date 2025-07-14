@@ -38,7 +38,9 @@
       "Bash(tsup)",
       "Bash(echo)",
       "Bash(pnpm type-check:*)",
-      "Bash(npx -C \"D:/GitHub/TopSteel/packages/ui\" tsc --noEmit)"
+      "Bash(npx -C \"D:/GitHub/TopSteel/packages/ui\" tsc --noEmit)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

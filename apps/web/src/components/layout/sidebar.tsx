@@ -48,56 +48,10 @@ const navigation: NavItem[] = [
     gradient: 'from-blue-500 to-purple-600',
   },
   {
-    title: 'Projets',
-    icon: FolderOpen,
-    gradient: 'from-emerald-500 to-teal-600',
-    children: [
-      { title: 'Tous les projets', href: '/projets', icon: FolderOpen },
-      { title: 'Nouveau projet', href: '/projets/nouveau', icon: FolderOpen },
-      { title: 'Chiffrage', href: '/projets/chiffrage', icon: FileText },
-    ],
-  },
-  {
-    title: 'Production',
-    icon: Factory,
-    gradient: 'from-orange-500 to-red-600',
-    children: [
-      { title: 'Ordres de fabrication', href: '/production/ordres', icon: Wrench },
-      { title: 'Planning', href: '/production/planning', icon: BarChart3 },
-      { title: 'Suivi temps', href: '/production/temps', icon: BarChart3 },
-    ],
-  },
-  {
-    title: 'Stocks & Achats',
-    icon: Package,
-    gradient: 'from-purple-500 to-pink-600',
-    badge: '12',
-    children: [
-      { title: 'Inventaire', href: '/stocks/inventaire', icon: Package },
-      { title: 'Commandes', href: '/stocks/commandes', icon: Package },
-      { title: 'Fournisseurs', href: '/stocks/fournisseurs', icon: Users },
-    ],
-  },
-  {
-    title: 'Comptabilité',
-    icon: BarChart3,
-    gradient: 'from-green-500 to-emerald-600',
-    children: [
-      { title: 'Factures', href: '/comptabilite/factures', icon: FileText },
-      { title: 'Paiements', href: '/comptabilite/paiements', icon: CreditCard },
-      { title: 'Rapports', href: '/comptabilite/rapports', icon: BarChart3 },
-    ],
-  },
-  {
-    title: 'Administration',
+    title: 'Paramètres',
+    href: '/settings',
     icon: Settings,
     gradient: 'from-slate-500 to-slate-700',
-    children: [
-      { title: 'Utilisateurs', href: '/admin/users', icon: Users, roles: ['ADMIN'] },
-      { title: 'Paramètres', href: '/admin/settings', icon: Settings, roles: ['ADMIN'] },
-      { title: 'Sécurité', href: '/admin/security', icon: Shield, roles: ['ADMIN'] },
-      { title: 'Base de données', href: '/admin/database', icon: Database, roles: ['ADMIN'] },
-    ],
   },
 ]
 

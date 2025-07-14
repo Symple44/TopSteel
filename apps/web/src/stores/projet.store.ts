@@ -5,11 +5,7 @@
  */
 
 import { StoreUtils } from '@/lib/store-utils'
-import {
-  ProjetPriorite,
-  ProjetStatut,
-  ProjetType,
-} from '@erp/types'
+import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
 import type {
   InitialState,
   ProjetState,
@@ -206,200 +202,203 @@ const projetService = {
 
 export const useProjetStore = create<ProjetStore>()(
   devtools(
-    immer((set, get) => ({
-      ...initialProjetState,
+    immer(
+      (set, get) =>
+        ({
+          ...initialProjetState,
 
-      // ===== ACTIONS =====
+          // ===== ACTIONS =====
 
-      // Chargement des projets
-      loadProjets: async (options?: { force?: boolean; filters?: StoreProjetFilters }) => {
-        const state = get()
-        const { force = false, filters = {} } = options || {}
+          // Chargement des projets
+          loadProjets: async (options?: { force?: boolean; filters?: StoreProjetFilters }) => {
+            const state = get()
+            const { force = false, filters = {} } = options || {}
 
-        // Vérifier le cache si pas forcé
-        if (!force && state.projets.length > 0) {
-          const timeSinceLastFetch = Date.now() - state.lastFetch
-          if (timeSinceLastFetch < state.cacheTTL) {
-            return state.projets
-          }
-        }
-
-        set((state) => {
-          state.loading = true
-          state.error = null
-        })
-
-        try {
-          const projets = await projetService.fetchProjets(filters)
-
-          set((state) => {
-            state.projets = projets
-            state.loading = false
-            state.lastFetch = Date.now()
-            state.lastUpdate = Date.now()
-          })
-
-          return projets
-        } catch (error) {
-          set((state) => {
-            state.loading = false
-            state.error = error instanceof Error ? error.message : 'Erreur inconnue'
-          })
-          throw error
-        }
-      },
-
-      // Création d'un projet
-      createProjet: async (projet: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>) => {
-        set((state) => {
-          state.loading = true
-          state.error = null
-        })
-
-        try {
-          const newProjet = await projetService.createProjet(projet)
-
-          if (newProjet) {
-            set((state) => {
-              state.projets.push(newProjet)
-              state.loading = false
-              state.lastUpdate = Date.now()
-            })
-          }
-
-          return newProjet
-        } catch (error) {
-          set((state) => {
-            state.loading = false
-            state.error = error instanceof Error ? error.message : 'Erreur inconnue'
-          })
-          throw error
-        }
-      },
-
-      // Mise à jour d'un projet
-      updateProjet: async (id: string, updates: Partial<StoreProjet>) => {
-        set((state) => {
-          state.loading = true
-          state.error = null
-        })
-
-        try {
-          const updatedProjet = await projetService.updateProjet(id, updates)
-
-          if (updatedProjet) {
-            set((state) => {
-              const index = state.projets.findIndex((p) => p.id === id)
-              if (index !== -1) {
-                state.projets[index] = updatedProjet
+            // Vérifier le cache si pas forcé
+            if (!force && state.projets.length > 0) {
+              const timeSinceLastFetch = Date.now() - state.lastFetch
+              if (timeSinceLastFetch < state.cacheTTL) {
+                return state.projets
               }
-              state.loading = false
-              state.lastUpdate = Date.now()
-            })
-          }
+            }
 
-          return updatedProjet
-        } catch (error) {
-          set((state) => {
-            state.loading = false
-            state.error = error instanceof Error ? error.message : 'Erreur inconnue'
-          })
-          throw error
-        }
-      },
-
-      // Suppression d'un projet
-      deleteProjet: async (id: string) => {
-        set((state) => {
-          state.loading = true
-          state.error = null
-        })
-
-        try {
-          const success = await projetService.deleteProjet(id)
-
-          if (success) {
             set((state) => {
-              state.projets = state.projets.filter((p) => p.id !== id)
-              state.loading = false
-              state.lastUpdate = Date.now()
+              state.loading = true
+              state.error = null
             })
-          }
 
-          return success
-        } catch (error) {
-          set((state) => {
-            state.loading = false
-            state.error = error instanceof Error ? error.message : 'Erreur inconnue'
-          })
-          throw error
-        }
-      },
+            try {
+              const projets = await projetService.fetchProjets(filters)
 
-      // Chargement des statistiques
-      loadStats: async () => {
-        try {
-          const stats = await projetService.getProjetStats()
-          set((state) => {
-            state.stats = stats
-          })
-          return stats
-        } catch (error) {
-          set((state) => {
-            state.error = error instanceof Error ? error.message : 'Erreur inconnue'
-          })
-          throw error
-        }
-      },
+              set((state) => {
+                state.projets = projets
+                state.loading = false
+                state.lastFetch = Date.now()
+                state.lastUpdate = Date.now()
+              })
 
-      // Actions de l'interface
-      setSelectedProjet: (projet: StoreProjet | null) => {
-        set((state) => {
-          state.selectedProjet = projet
-        })
-      },
+              return projets
+            } catch (error) {
+              set((state) => {
+                state.loading = false
+                state.error = error instanceof Error ? error.message : 'Erreur inconnue'
+              })
+              throw error
+            }
+          },
 
-      setFilters: (filters: StoreProjetFilters) => {
-        set((state) => {
-          state.filters = filters
-        })
-      },
+          // Création d'un projet
+          createProjet: async (projet: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>) => {
+            set((state) => {
+              state.loading = true
+              state.error = null
+            })
 
-      setSearchTerm: (term: string) => {
-        set((state) => {
-          state.searchTerm = term
-        })
-      },
+            try {
+              const newProjet = await projetService.createProjet(projet)
 
-      setSortBy: (sortBy: string) => {
-        set((state) => {
-          state.sortBy = sortBy as any
-        })
-      },
+              if (newProjet) {
+                set((state) => {
+                  state.projets.push(newProjet)
+                  state.loading = false
+                  state.lastUpdate = Date.now()
+                })
+              }
 
-      setSortOrder: (order: 'asc' | 'desc') => {
-        set((state) => {
-          state.sortOrder = order
-        })
-      },
+              return newProjet
+            } catch (error) {
+              set((state) => {
+                state.loading = false
+                state.error = error instanceof Error ? error.message : 'Erreur inconnue'
+              })
+              throw error
+            }
+          },
 
-      setCurrentPage: (page: number) => {
-        set((state) => {
-          state.currentPage = page
-        })
-      },
+          // Mise à jour d'un projet
+          updateProjet: async (id: string, updates: Partial<StoreProjet>) => {
+            set((state) => {
+              state.loading = true
+              state.error = null
+            })
 
-      clearError: () => {
-        set((state) => {
-          state.error = null
-        })
-      },
+            try {
+              const updatedProjet = await projetService.updateProjet(id, updates)
 
-      // Action de reset
-      reset: () => {
-        set(initialProjetState)
-      },
-    } as any)),
+              if (updatedProjet) {
+                set((state) => {
+                  const index = state.projets.findIndex((p) => p.id === id)
+                  if (index !== -1) {
+                    state.projets[index] = updatedProjet
+                  }
+                  state.loading = false
+                  state.lastUpdate = Date.now()
+                })
+              }
+
+              return updatedProjet
+            } catch (error) {
+              set((state) => {
+                state.loading = false
+                state.error = error instanceof Error ? error.message : 'Erreur inconnue'
+              })
+              throw error
+            }
+          },
+
+          // Suppression d'un projet
+          deleteProjet: async (id: string) => {
+            set((state) => {
+              state.loading = true
+              state.error = null
+            })
+
+            try {
+              const success = await projetService.deleteProjet(id)
+
+              if (success) {
+                set((state) => {
+                  state.projets = state.projets.filter((p) => p.id !== id)
+                  state.loading = false
+                  state.lastUpdate = Date.now()
+                })
+              }
+
+              return success
+            } catch (error) {
+              set((state) => {
+                state.loading = false
+                state.error = error instanceof Error ? error.message : 'Erreur inconnue'
+              })
+              throw error
+            }
+          },
+
+          // Chargement des statistiques
+          loadStats: async () => {
+            try {
+              const stats = await projetService.getProjetStats()
+              set((state) => {
+                state.stats = stats
+              })
+              return stats
+            } catch (error) {
+              set((state) => {
+                state.error = error instanceof Error ? error.message : 'Erreur inconnue'
+              })
+              throw error
+            }
+          },
+
+          // Actions de l'interface
+          setSelectedProjet: (projet: StoreProjet | null) => {
+            set((state) => {
+              state.selectedProjet = projet
+            })
+          },
+
+          setFilters: (filters: StoreProjetFilters) => {
+            set((state) => {
+              state.filters = filters
+            })
+          },
+
+          setSearchTerm: (term: string) => {
+            set((state) => {
+              state.searchTerm = term
+            })
+          },
+
+          setSortBy: (sortBy: string) => {
+            set((state) => {
+              state.sortBy = sortBy as any
+            })
+          },
+
+          setSortOrder: (order: 'asc' | 'desc') => {
+            set((state) => {
+              state.sortOrder = order
+            })
+          },
+
+          setCurrentPage: (page: number) => {
+            set((state) => {
+              state.currentPage = page
+            })
+          },
+
+          clearError: () => {
+            set((state) => {
+              state.error = null
+            })
+          },
+
+          // Action de reset
+          reset: () => {
+            set(initialProjetState)
+          },
+        }) as any
+    ),
     {
       name: 'projet-store',
     }
