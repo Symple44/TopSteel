@@ -1,6 +1,6 @@
 'use client'
 
-import type { Projet } from '@erp/types'
+import type { Projet } from '@erp/domains/core'
 import * as UI from '@erp/ui'
 const Badge = UI.Badge
 const Button = UI.Button

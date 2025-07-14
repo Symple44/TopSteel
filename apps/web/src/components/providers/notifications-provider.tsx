@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
-import type { Notification } from '@erp/types'
+import type { Notification } from '@erp/domains/cross-cutting'
 import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
 
@@ -113,24 +113,24 @@ function notificationsReducer(
       return {
         ...state,
         notifications: newNotifications,
-        unreadCount: newNotifications.filter((n) => !n.read).length,
+        unreadCount: newNotifications.filter((n) => !n.isRead).length,
       }
     }
 
     case 'MARK_AS_READ': {
       const updatedNotifications = state.notifications.map((n) =>
-        n.id === action.payload ? { ...n, read: true } : n
+        n.id === action.payload ? { ...n, isRead: true } : n
       )
 
       return {
         ...state,
         notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.read).length,
+        unreadCount: updatedNotifications.filter((n) => !n.isRead).length,
       }
     }
 
     case 'MARK_ALL_AS_READ': {
-      const allReadNotifications = state.notifications.map((n) => ({ ...n, read: true }))
+      const allReadNotifications = state.notifications.map((n) => ({ ...n, isRead: true }))
 
       return {
         ...state,
@@ -145,7 +145,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: filteredNotifications,
-        unreadCount: filteredNotifications.filter((n) => !n.read).length,
+        unreadCount: filteredNotifications.filter((n) => !n.isRead).length,
       }
     }
 
@@ -160,7 +160,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: action.payload,
-        unreadCount: action.payload.filter((n) => !n.read).length,
+        unreadCount: action.payload.filter((n) => !n.isRead).length,
         loading: false,
       }
 
@@ -328,10 +328,11 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
           const notification: Notification = JSON.parse(event.data)
 
           // Filtrer selon les paramètres utilisateur
-          if (!state.settings.categories[notification.category]) return
+          if (!state.settings.categories[notification.metadata?.category || 'system']) return
           if (
             !state.settings.priority[
-              (notification.metadata?.priority as keyof typeof state.settings.priority) || 'normal'
+              (notification.priority?.toLowerCase() as keyof typeof state.settings.priority) ||
+                'normal'
             ]
           )
             return
@@ -343,7 +344,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
             toast({
               title: notification.title,
               description: notification.message,
-              variant: notification.type === 'error' ? 'destructive' : 'default',
+              variant: notification.type === 'ERROR' ? 'destructive' : 'default',
             })
           }
 

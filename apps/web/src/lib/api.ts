@@ -1,6 +1,6 @@
 // apps/web/src/lib/api.ts - Client API pour Zustand stores
-import type { Client, ClientType, Projet, ProjetFilters } from '@erp/types'
-import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
+import { Client, ClientType, type Projet, type ProjetFilters } from '@erp/domains/core'
+import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/domains/core'
 
 // Configuration API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
@@ -18,87 +18,147 @@ export const api = {
           {
             id: '1',
             reference: 'PRJ-2024-001',
+            nom: 'Garde-corps Restaurant Le Gourmet',
             description:
-              'Garde-corps Restaurant Le Gourmet - Installation garde-corps terrasse extérieure',
+              'Installation garde-corps terrasse extérieure',
             clientId: 'client-1',
+            responsableId: 'resp-1',
+            commercialId: 'comm-1',
+            equipeIds: [],
             statut: ProjetStatut.EN_COURS,
-            type: ProjetType.PORTAIL,
+            type: ProjetType.STANDARD,
             priorite: ProjetPriorite.NORMALE,
-            dateDebut: new Date('2024-01-15'),
-            dateFin: new Date('2024-02-15'),
-            dateFinPrevue: new Date('2024-02-10'),
-            adresseChantier: {
+            adresseLivraison: {
               rue: '123 Rue de la Paix',
               codePostal: '75001',
               ville: 'Paris',
               pays: 'France',
             },
-            montantHT: 15000,
-            montantTTC: 18000,
-            tauxTVA: 20,
-            marge: 35,
+            contact: {
+              nom: 'Dupont',
+              prenom: 'Jean',
+              email: 'jean.dupont@restaurant.com',
+              telephone: '0123456789',
+            },
+            delais: {
+              dateDebut: new Date('2024-01-15'),
+              dateFin: new Date('2024-02-15'),
+            },
+            montants: {
+              montantHT: 15000,
+              montantTTC: 18000,
+              tauxTVA: 20,
+            },
+            documents: {
+              plans: [],
+              photos: [],
+              certificats: [],
+              rapports: [],
+            },
+            materiaux: [],
+            operations: [],
             avancement: 65,
+            tags: ['garde-corps', 'restaurant'],
             notes: 'Projet en cours, livraison prévue dans les temps',
-            documentsIds: [],
-            ordresFabricationIds: [],
+            createdBy: 'user-1',
             createdAt: new Date('2024-01-01'),
             updatedAt: new Date('2024-01-15'),
           },
           {
             id: '2',
             reference: 'PRJ-2024-002',
+            nom: 'Escalier métallique Villa Moderne',
             description:
-              'Escalier métallique Villa Moderne - Fabrication et installation escalier extérieur',
+              'Fabrication et installation escalier extérieur',
             clientId: 'client-2',
+            responsableId: 'resp-2',
+            commercialId: 'comm-2',
+            equipeIds: [],
             statut: ProjetStatut.DEVIS,
-            type: ProjetType.ESCALIER,
+            type: ProjetType.FABRICATION,
             priorite: ProjetPriorite.HAUTE,
-            dateDebut: new Date('2024-02-01'),
-            dateFin: new Date('2024-03-01'),
-            dateFinPrevue: new Date('2024-02-28'),
-            adresseChantier: {
+            adresseLivraison: {
               rue: '789 Rue du Château',
               codePostal: '78100',
               ville: 'Saint-Germain-en-Laye',
               pays: 'France',
             },
-            montantHT: 25000,
-            montantTTC: 30000,
-            tauxTVA: 20,
-            marge: 40,
+            contact: {
+              nom: 'Martin',
+              prenom: 'Sophie',
+              email: 'sophie.martin@villa.com',
+              telephone: '0123456790',
+            },
+            delais: {
+              dateDebut: new Date('2024-02-01'),
+              dateFin: new Date('2024-03-01'),
+            },
+            montants: {
+              montantHT: 25000,
+              montantTTC: 30000,
+              tauxTVA: 20,
+            },
+            documents: {
+              plans: [],
+              photos: [],
+              certificats: [],
+              rapports: [],
+            },
+            materiaux: [],
+            operations: [],
             avancement: 0,
+            tags: ['escalier', 'villa', 'haut-gamme'],
             notes: 'Projet haut de gamme, attention aux finitions',
-            documentsIds: [],
-            ordresFabricationIds: [],
+            createdBy: 'user-2',
             createdAt: new Date('2024-01-10'),
             updatedAt: new Date('2024-01-10'),
           },
           {
             id: '3',
             reference: 'PRJ-2024-003',
+            nom: 'Garde-corps Résidence Les Acacias',
             description:
-              'Garde-corps Résidence Les Acacias - Installation garde-corps pour résidence neuve',
+              'Installation garde-corps pour résidence neuve',
             clientId: 'client-3',
+            responsableId: 'resp-3',
+            commercialId: 'comm-3',
+            equipeIds: [],
             statut: ProjetStatut.TERMINE,
-            type: ProjetType.AUTRE,
+            type: ProjetType.INSTALLATION,
             priorite: ProjetPriorite.NORMALE,
-            dateDebut: new Date('2023-12-01'),
-            dateFin: new Date('2024-01-05'),
-            dateFinPrevue: new Date('2024-01-10'),
-            adresseChantier: {
+            adresseLivraison: {
               rue: '12 Rue des Acacias',
               codePostal: '92100',
               ville: 'Boulogne-Billancourt',
               pays: 'France',
             },
-            montantHT: 8500,
-            montantTTC: 10200,
-            tauxTVA: 20,
-            marge: 30,
+            contact: {
+              nom: 'Leroy',
+              prenom: 'Pierre',
+              email: 'pierre.leroy@residence.com',
+              telephone: '0123456791',
+            },
+            delais: {
+              dateDebut: new Date('2023-12-01'),
+              dateFin: new Date('2024-01-05'),
+            },
+            montants: {
+              montantHT: 8500,
+              montantTTC: 10200,
+              tauxTVA: 20,
+            },
+            documents: {
+              plans: [],
+              photos: [],
+              certificats: [],
+              rapports: [],
+            },
+            materiaux: [],
+            operations: [],
             avancement: 100,
+            tags: ['garde-corps', 'résidence', 'terminé'],
             notes: 'Projet terminé avec succès, client satisfait',
-            documentsIds: [],
-            ordresFabricationIds: [],
+            createdBy: 'user-3',
             createdAt: new Date('2023-11-15'),
             updatedAt: new Date('2024-01-05'),
           },
@@ -123,13 +183,13 @@ export const api = {
 
           if (filters.dateDebutMin) {
             filteredProjets = filteredProjets.filter(
-              (p) => p.dateDebut && filters.dateDebutMin && p.dateDebut >= filters.dateDebutMin
+              (p) => p.delais.dateDebut && filters.dateDebutMin && p.delais.dateDebut >= filters.dateDebutMin
             )
           }
 
           if (filters.dateFinMax) {
             filteredProjets = filteredProjets.filter(
-              (p) => p.dateFin && filters.dateFinMax && p.dateFin <= filters.dateFinMax
+              (p) => p.delais.dateFin && filters.dateFinMax && p.delais.dateFin <= filters.dateFinMax
             )
           }
 
@@ -175,25 +235,46 @@ export const api = {
         const newProjet: Projet = {
           id: Date.now().toString(),
           reference: `PRJ-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}`,
-          description: data.description || 'Nouveau projet',
+          nom: data.nom || 'Nouveau projet',
+          description: data.description || '',
           clientId: data.clientId || '',
+          responsableId: data.responsableId || '',
+          commercialId: data.commercialId,
+          equipeIds: data.equipeIds || [],
           statut: data.statut || ProjetStatut.DEVIS,
-          type: data.type || ProjetType.AUTRE,
+          type: data.type || ProjetType.STANDARD,
           priorite: data.priorite || ProjetPriorite.NORMALE,
-          dateDebut: data.dateDebut || new Date(),
-          adresseChantier: data.adresseChantier || {
+          adresseLivraison: data.adresseLivraison || {
             rue: '',
             codePostal: '',
             ville: '',
             pays: 'France',
           },
-          montantHT: data.montantHT || 0,
-          montantTTC: data.montantTTC || 0,
-          tauxTVA: data.tauxTVA || 20,
-          marge: data.marge || 30,
-          avancement: 0,
-          documentsIds: [],
-          ordresFabricationIds: [],
+          contact: data.contact || {
+            nom: '',
+            prenom: '',
+          },
+          delais: data.delais || {
+            dateDebut: new Date(),
+            dateFin: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 jours
+          },
+          montants: data.montants || {
+            montantHT: 0,
+            montantTTC: 0,
+            tauxTVA: 20,
+          },
+          documents: data.documents || {
+            plans: [],
+            photos: [],
+            certificats: [],
+            rapports: [],
+          },
+          materiaux: data.materiaux || [],
+          operations: data.operations || [],
+          avancement: data.avancement || 0,
+          tags: data.tags || [],
+          notes: data.notes,
+          createdBy: 'user-default',
           createdAt: new Date(),
           updatedAt: new Date(),
         }

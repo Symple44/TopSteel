@@ -48,3 +48,41 @@ export function isValidPhone(phone: string): boolean {
   const phoneRegex = /^(?:\+33|0)[1-9](?:[0-9]{8})$/
   return phoneRegex.test(phone.replace(/\s/g, ''))
 }
+
+// Additional ERP-specific string utilities
+
+export function formatInitials(firstName: string, lastName: string): string {
+  const firstInitial = firstName?.charAt(0)?.toUpperCase() || ''
+  const lastInitial = lastName?.charAt(0)?.toUpperCase() || ''
+  return `${firstInitial}${lastInitial}`
+}
+
+export function removeAccents(str: string): string {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+export function validateEmail(email: string): boolean {
+  return isValidEmail(email)
+}
+
+export function validatePhone(phone: string): boolean {
+  return isValidPhone(phone)
+}
+
+export function formatFileSize(bytes: number): string {
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  if (bytes === 0) return '0 B'
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${Math.round(bytes / Math.pow(1024, i) * 100) / 100} ${sizes[i]}`
+}
+
+export function generateReference(prefix: string, number: number, length = 6): string {
+  return `${prefix}${number.toString().padStart(length, '0')}`
+}
+
+export function sanitizeFilename(filename: string): string {
+  return filename
+    .replace(/[^a-z0-9.-]/gi, '_')
+    .replace(/_{2,}/g, '_')
+    .replace(/^_|_$/g, '')
+}

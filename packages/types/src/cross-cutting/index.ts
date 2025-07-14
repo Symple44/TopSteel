@@ -1,16 +1,8 @@
 /**
- * 🌐 CROSS-CUTTING CONCERNS - TopSteel ERP
- * Export des préoccupations transversales
+ * 🔀 CROSS-CUTTING - Types transversaux
  */
 
-// Authentification
-export * from './auth'
-
-// Notifications
-export * from './notifications'
-
-// Audit et tracking
 export * from './audit'
-
-// Permissions et contrôle d'accès
+export * from './auth'
+export * from './notifications'
 export * from './permissions'

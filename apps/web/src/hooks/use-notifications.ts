@@ -117,7 +117,8 @@ export function useNotificationsStats(): {
     read: state.notifications.length - state.unreadCount,
     byCategory: state.notifications.reduce(
       (acc, notification) => {
-        acc[notification.category] = (acc[notification.category] || 0) + 1
+        const category = notification.metadata?.category || 'system'
+        acc[category] = (acc[category] || 0) + 1
 
         return acc
       },
@@ -145,19 +146,20 @@ export function useFilteredNotifications(filters?: {
   type?: string[]
   read?: boolean
   priority?: string[]
-}): import('@erp/types').Notification[] {
+}): import('@erp/domains/cross-cutting').Notification[] {
   const { state } = useNotifications()
 
   if (!filters) return state.notifications
 
   return state.notifications.filter((notification) => {
-    if (filters.category && !filters.category.includes(notification.category)) return false
+    if (filters.category && !filters.category.includes(notification.metadata?.category || ''))
+      return false
     if (filters.type && !filters.type.includes(notification.type)) return false
-    if (filters.read !== undefined && notification.read !== filters.read) return false
+    if (filters.read !== undefined && notification.isRead !== filters.read) return false
     if (
       filters.priority &&
-      notification.metadata?.priority &&
-      !filters.priority.includes(notification.metadata.priority)
+      notification.priority &&
+      !filters.priority.includes(notification.priority)
     )
       return false
 

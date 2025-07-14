@@ -6,11 +6,59 @@
  */
 
 import type { Address } from '../../core/common'
-import type { Devis } from '../../domains/billing'
-// Import des types existants pour éviter la duplication
-import type { Client } from '../../domains/client'
-import type { ProjetPriorite, ProjetStatut, ProjetType } from '../../domains/project'
-import type { User } from '../../domains/user'
+
+// Types simplifiés pour éviter les dépendances circulaires
+// Les types complets sont maintenant dans @erp/domains
+
+// Types locaux (les types complets sont dans @erp/domains)
+// FIXME: Synchroniser avec @erp/domains pour éviter les conflits
+export enum ProjetType {
+  STANDARD = 'STANDARD',
+  EXPRESS = 'EXPRESS',
+  MAINTENANCE = 'MAINTENANCE',
+  CONCEPTION = 'CONCEPTION',
+  FABRICATION = 'FABRICATION',
+  INSTALLATION = 'INSTALLATION',
+}
+
+export enum ProjetStatut {
+  BROUILLON = 'BROUILLON',
+  DEVIS = 'DEVIS',
+  EN_ATTENTE = 'EN_ATTENTE',
+  ACCEPTE = 'ACCEPTE',
+  EN_COURS = 'EN_COURS',
+  EN_PAUSE = 'EN_PAUSE',
+  TERMINE = 'TERMINE',
+  FACTURE = 'FACTURE',
+  ANNULE = 'ANNULE',
+}
+
+export enum ProjetPriorite {
+  BASSE = 'BASSE',
+  NORMALE = 'NORMALE',
+  HAUTE = 'HAUTE',
+  URGENTE = 'URGENTE',
+}
+
+/**
+ * Client simplifié pour les stores
+ */
+export interface SimpleClient {
+  id: string
+  nom: string
+  email: string
+  type: string
+}
+
+/**
+ * Devis simplifié pour les stores
+ */
+export interface SimpleDevis {
+  id: string
+  reference: string
+  statut: string
+  montantHT: number
+}
 
 // ===== ENTITÉS DE BASE =====
 
@@ -98,7 +146,7 @@ export interface StoreProjet extends BaseStoreEntity {
 
   // Client
   clientId: string
-  client: Client // Référence complète pour l'affichage
+  client: SimpleClient // Référence simplifiée pour l'affichage
 
   // Financier
   montantHT: number
@@ -116,7 +164,7 @@ export interface StoreProjet extends BaseStoreEntity {
   documentsIds: string[]
   documents?: any[] | any // Support pour les documents associés
   ordresFabricationIds: string[]
-  devis?: Devis[] | Devis // Support pour les devis associés
+  devis?: SimpleDevis[] | SimpleDevis // Support pour les devis associés
 
   // UI State (pour les stores)
   isSelected?: boolean

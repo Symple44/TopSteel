@@ -1,10 +1,25 @@
 // apps/web/src/components/production/ordre-qualite-tab.tsx
-import type { ControleQualite, OrdreFabrication } from '@erp/types'
-import { QualiteStatut } from '@erp/types'
+import type { ControleQualite, OrdrePriorite, OrdreStatut } from '@erp/domains/production'
+import { QualiteStatut } from '@erp/domains/production'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
+interface OrdreSimple {
+  id: string
+  numero: string
+  statut: OrdreStatut
+  priorite: OrdrePriorite
+  avancement: number
+  description?: string
+  projetId: string
+  operationsIds?: string[]
+  materiauxIds?: string[]
+  controlesIds?: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
 interface OrdreQualiteTabProps {
-  ordre: OrdreFabrication
+  ordre: OrdreSimple
 }
 
 export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
@@ -59,15 +74,15 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
                     <div>
                       <span className="text-sm font-medium">Contrôleur</span>
                       <p className="text-sm text-muted-foreground">
-                        {controle?.technicienId || 'N/A'}
+                        {controle?.controleurId || 'N/A'}
                       </p>
                     </div>
                   </div>
 
-                  {controle?.remarques && (
+                  {controle?.actions && controle.actions.length > 0 && (
                     <div className="mt-2">
-                      <span className="text-sm font-medium">Observations</span>
-                      <p className="text-sm text-muted-foreground">{controle.remarques}</p>
+                      <span className="text-sm font-medium">Actions</span>
+                      <p className="text-sm text-muted-foreground">{controle.actions.join(', ')}</p>
                     </div>
                   )}
                 </div>

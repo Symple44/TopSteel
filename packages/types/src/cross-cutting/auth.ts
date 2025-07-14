@@ -4,10 +4,20 @@
  * Fichier: packages/types/src/cross-cutting/auth.ts
  */
 
-import type { User } from '../domains/user'
+/**
+ * Type utilisateur pour l'authentification
+ * Note: Le type User complet est maintenant dans @erp/domains
+ */
+export interface AuthUser {
+  id: string
+  email: string
+  nom: string
+  prenom: string
+  role: string
+}
 
 export interface LoginResponse {
-  user: User
+  user: AuthUser
   accessToken: string
   refreshToken: string
   expiresIn: number
@@ -28,7 +38,7 @@ export interface RegisterData {
 }
 
 export interface AuthState {
-  user: User | null
+  user: AuthUser | null
   isAuthenticated: boolean
   isLoading: boolean
 }

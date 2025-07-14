@@ -1,7 +1,7 @@
 'use client'
 
 import { formatCurrency, formatDate } from '@/lib/utils'
-import type { Projet } from '@erp/types'
+import type { StoreProjet } from '@erp/types'
 import {
   Badge,
   Button,
@@ -34,7 +34,7 @@ import {
 import { useState } from 'react'
 
 interface ProjetDevisTabProps {
-  projet: Projet
+  projet: StoreProjet
 }
 
 export function ProjetDevisTab({ projet }: ProjetDevisTabProps) {

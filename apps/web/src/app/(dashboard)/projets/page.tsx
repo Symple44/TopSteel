@@ -3,7 +3,8 @@
 import { useDataView } from '@/hooks/use-data-view'
 import { useProjets } from '@/hooks/use-projets'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import type { Client, Projet } from '@erp/types'
+import type { Client } from '@erp/domains/core'
+import type { StoreProjet } from '@erp/types'
 import { Badge, Button, Card, CardContent, DataTable, Input, PageHeader, ProjetCard } from '@erp/ui'
 import { Eye, FolderOpen, Grid, List, Plus, RefreshCw, Search } from 'lucide-react'
 import Link from 'next/link'
@@ -61,8 +62,21 @@ const PageActions = memo(function PageActions({
 })
 
 // Composant ProjetCard mémorisé
-const MemoProjetCard = memo(function MemoProjetCard({ projet }: { projet: Projet }) {
-  return <ProjetCard projet={projet} />
+const MemoProjetCard = memo(function MemoProjetCard({ projet }: { projet: StoreProjet }) {
+  return (
+    <ProjetCard
+      project={{
+        nom: projet.reference,
+        description: projet.description,
+        client: projet.id, // Temporary mapping
+        statut: projet.statut?.toString(),
+        montant: projet.montantTTC,
+        dateDebut: projet.dateDebut?.toISOString(),
+        dateFin: projet.dateFin?.toISOString(),
+        avancement: projet.avancement,
+      }}
+    />
+  )
 })
 
 export default function ProjetsPage() {
@@ -95,7 +109,7 @@ export default function ProjetsPage() {
       {
         key: 'reference',
         label: 'Référence',
-        render: (reference: string, projet: Projet) => (
+        render: (reference: string, projet: StoreProjet) => (
           <div>
             <div className="font-medium">{reference || 'Sans référence'}</div>
             <div className="text-sm text-gray-500">{projet.reference || 'Sans référence'}</div>
@@ -136,7 +150,7 @@ export default function ProjetsPage() {
       {
         key: 'actions',
         label: 'Actions',
-        render: (value: unknown, projet: Projet) => (
+        render: (value: unknown, projet: StoreProjet) => (
           <div className="flex gap-1">
             <Button
               variant="ghost"

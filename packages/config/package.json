@@ -3,7 +3,18 @@
   "version": "1.0.0",
   "description": "Configurations partagées pour l'ERP TOPSTEEL",
   "main": "index.js",
-  "files": ["typescript", "tailwind", "prettier", "jest"],
+  "exports": {
+    "./typescript/*": "./typescript/*",
+    "./tailwind/*": "./tailwind/*",
+    "./prettier/*": "./prettier/*",
+    "./jest/*": "./jest/*"
+  },
+  "files": [
+    "typescript",
+    "tailwind",
+    "prettier",
+    "jest"
+  ],
   "dependencies": {
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
@@ -18,6 +29,8 @@
   "type": "module",
   "scripts": {
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --passWithNoTests --watch"
+    "test:watch": "jest --passWithNoTests --watch",
+    "build": "echo \"Config package - no build needed\"",
+    "clean": "echo \"Config package - no clean needed\""
   }
 }

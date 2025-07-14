@@ -7,7 +7,7 @@ import { ProjetInfoTab } from '@/components/projets/projet-info-tab'
 import { ProjetProductionTab } from '@/components/projets/projet-production-tab'
 import { useProjet } from '@/hooks/use-projets'
 import { formatCurrency, formatDate, getDaysUntil } from '@/lib/utils'
-import { ProjetStatut } from '@erp/types'
+import { ProjetStatut } from '@erp/domains/core'
 import {
   Badge,
   Button,

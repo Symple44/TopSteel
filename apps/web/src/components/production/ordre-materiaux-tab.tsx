@@ -2,8 +2,8 @@
 
 import React from 'react'
 
-import type { MaterialOrder, OrdreFabrication } from '@erp/types'
-import { MaterialStatus } from '@erp/types'
+import type { MaterialOrder, OrdrePriorite, OrdreStatut } from '@erp/domains/production'
+import { MaterialStatus } from '@erp/domains/production'
 import { Badge, Button, Card, CardContent } from '@erp/ui'
 
 import { AlertTriangle, Package, Plus } from 'lucide-react'
@@ -19,8 +19,23 @@ interface Materiau {
   statut: string
 }
 
+interface OrdreSimple {
+  id: string
+  numero: string
+  statut: OrdreStatut
+  priorite: OrdrePriorite
+  avancement: number
+  description?: string
+  projetId: string
+  operationsIds?: string[]
+  materiauxIds?: string[]
+  controlesIds?: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
 interface OrdreMateriauxTabProps {
-  ordre: OrdreFabrication
+  ordre: OrdreSimple
 }
 
 export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
@@ -28,12 +43,13 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
   const mockMateriaux: MaterialOrder[] = [
     {
       id: 'mat-1',
-      reference: 'AC-100',
-      nom: 'Acier standard',
-      quantiteRequise: 100,
+      materialId: 'AC-100',
+      designation: 'Acier standard',
+      quantite: 100,
+      quantiteRecue: 0,
       unite: 'kg',
       statut: MaterialStatus.COMMANDE,
-      ordreFabricationId: ordre.id,
+      ordreId: ordre.id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -41,9 +57,9 @@ export function OrdreMateriauxTab({ ordre }: OrdreMateriauxTabProps) {
   // Conversion des MaterialOrder en Materiau avec propriétés par défaut
   const materiaux: Materiau[] = mockMateriaux?.map((material: MaterialOrder, index: number) => ({
     id: index + 1, // Convert string ID to number for local interface
-    reference: material.reference,
-    designation: material.nom || 'Non spécifié',
-    quantiteRequise: material.quantiteRequise,
+    reference: material.materialId,
+    designation: material.designation || 'Non spécifié',
+    quantiteRequise: material.quantite,
     quantiteStock: 0, // À remplacer par données stock réelles
     unite: material.unite,
     statut: 'DISPONIBLE', // À calculer selon stock

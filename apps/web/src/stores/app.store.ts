@@ -6,14 +6,7 @@
  */
 
 import { StoreUtils } from '@/lib/store-utils'
-import type {
-  AppState,
-  AppStore,
-  AppStoreActions,
-  InitialState,
-  StoreCreator,
-  StoreUser,
-} from '@erp/types'
+import type { AppState, AppStore, AppStoreActions, InitialState, StoreCreator, StoreUser } from '@erp/types'
 
 // ===== ÉTAT INITIAL STRICTEMENT TYPÉ =====
 

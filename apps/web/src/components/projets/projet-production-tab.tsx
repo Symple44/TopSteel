@@ -1,8 +1,14 @@
 'use client'
 
 import { formatDate } from '@/lib/utils'
-import type { Operation, Projet } from '@erp/types'
-import { OperationStatut, PrioriteProduction, StatutProduction, TypeOperation } from '@erp/types'
+import type { Operation } from '@erp/domains/production'
+import {
+  OperationStatut,
+  PrioriteProduction,
+  StatutProduction,
+  TypeOperation,
+} from '@erp/domains/production'
+import type { StoreProjet } from '@erp/types'
 import {
   Badge,
   Button,
@@ -23,12 +29,13 @@ import {
   Pause,
   Play,
   Plus,
+  Settings,
   User,
 } from 'lucide-react'
 import { useState } from 'react'
 
 interface ProjetProductionTabProps {
-  projet: Projet
+  projet: StoreProjet
 }
 
 // Interface pour les ordres de fabrication mock
@@ -59,15 +66,30 @@ const mockOrdresFabrication: MockOrdreFabrication[] = [
         nom: 'Découpe laser',
         description: 'Découpe des tôles selon plans',
         type: TypeOperation.DECOUPE,
-        dureeEstimee: 240,
-        dureeReelle: 220,
-        statut: OperationStatut.TERMINE,
-        technicienId: '1',
-        ordreFabricationId: '1',
+        tempsEstime: 240,
+        tempsReel: 220,
+        statut: OperationStatut.TERMINEE,
+        operateurIds: ['1'],
+        ordreId: '1',
         ordre: 1,
-        controleRequis: true,
-        dateDebutPrevue: new Date('2025-06-20T08:00:00'),
-        dateFinPrevue: new Date('2025-06-20T12:00:00'),
+        priorite: PrioriteProduction.NORMALE,
+        schedule: {
+          dateDebut: new Date('2025-06-20T08:00:00'),
+          dateFin: new Date('2025-06-20T12:00:00'),
+          dureeEstimee: 4,
+        },
+        prerequis: [],
+        outillage: [],
+        parametres: {},
+        qualite: {
+          normes: [],
+          tolerances: {},
+          controles: [],
+          certificationsRequises: [],
+        },
+        avancement: 100,
+        projetId: 'proj_001',
+        createdBy: 'user_001',
         createdAt: new Date('2025-06-20T00:00:00'),
         updatedAt: new Date('2025-06-20T12:00:00'),
       },
@@ -76,15 +98,30 @@ const mockOrdresFabrication: MockOrdreFabrication[] = [
         nom: 'Pliage',
         description: 'Pliage des éléments découpés',
         type: TypeOperation.PLIAGE,
-        dureeEstimee: 180,
-        dureeReelle: 180,
-        statut: OperationStatut.TERMINE,
-        technicienId: '2',
-        ordreFabricationId: '1',
+        tempsEstime: 180,
+        tempsReel: 180,
+        statut: OperationStatut.TERMINEE,
+        operateurIds: ['2'],
+        ordreId: '1',
         ordre: 2,
-        controleRequis: false,
-        dateDebutPrevue: new Date('2025-06-20T13:00:00'),
-        dateFinPrevue: new Date('2025-06-20T16:00:00'),
+        priorite: PrioriteProduction.NORMALE,
+        schedule: {
+          dateDebut: new Date('2025-06-20T13:00:00'),
+          dateFin: new Date('2025-06-20T16:00:00'),
+          dureeEstimee: 3,
+        },
+        prerequis: ['1'],
+        outillage: [],
+        parametres: {},
+        qualite: {
+          normes: [],
+          tolerances: {},
+          controles: [],
+          certificationsRequises: [],
+        },
+        avancement: 100,
+        projetId: 'proj_001',
+        createdBy: 'user_001',
         createdAt: new Date('2025-06-20T00:00:00'),
         updatedAt: new Date('2025-06-20T16:00:00'),
       },
@@ -102,31 +139,46 @@ const mockOrdresFabrication: MockOrdreFabrication[] = [
         id: '3',
         nom: 'Soudure assemblage',
         description: 'Assemblage des éléments par soudure',
-        type: TypeOperation.SOUDAGE,
-        dureeEstimee: 480,
-        dureeReelle: 240,
+        type: TypeOperation.SOUDURE,
+        tempsEstime: 480,
+        tempsReel: 240,
         statut: OperationStatut.EN_COURS,
-        technicienId: '3',
-        ordreFabricationId: '2',
+        operateurIds: ['3'],
+        ordreId: '2',
         ordre: 1,
-        controleRequis: true,
-        dateDebutPrevue: new Date('2025-06-22T08:00:00'),
+        priorite: PrioriteProduction.HAUTE,
+        schedule: {
+          dateDebut: new Date('2025-06-22T08:00:00'),
+          dateFin: new Date('2025-06-22T16:00:00'),
+          dureeEstimee: 8,
+        },
+        prerequis: [],
+        outillage: ['Poste à souder MIG'],
+        parametres: { amperage: 180, vitesse: 5 },
+        qualite: {
+          normes: ['ISO 3834'],
+          tolerances: { gap: 2 },
+          controles: ['Visuel', 'Ressuage'],
+          certificationsRequises: ['EN 1090'],
+        },
+        avancement: 50,
+        projetId: 'proj_001',
+        createdBy: 'user_001',
         createdAt: new Date('2025-06-22T00:00:00'),
         updatedAt: new Date('2025-06-22T08:00:00'),
       },
-      {
+      createOperation({
         id: '4',
         nom: 'Traitement de surface',
         description: 'Galvanisation à chaud',
         type: TypeOperation.FINITION,
-        dureeEstimee: 120,
+        tempsEstime: 120,
         statut: OperationStatut.EN_ATTENTE,
-        ordreFabricationId: '2',
+        ordreId: '2',
         ordre: 2,
-        controleRequis: false,
         createdAt: new Date('2025-06-22T00:00:00'),
         updatedAt: new Date('2025-06-22T00:00:00'),
-      },
+      }),
     ],
   },
   {
@@ -134,45 +186,82 @@ const mockOrdresFabrication: MockOrdreFabrication[] = [
     numero: 'OF-2025-0091',
     dateDebut: new Date('2025-06-25'),
     progression: 0,
-    statut: StatutProduction.PLANIFIE,
+    statut: StatutProduction.EN_PREPARATION,
     priorite: PrioriteProduction.BASSE,
     operations: [
-      {
+      createOperation({
         id: '5',
         nom: 'Usinage',
         description: 'Perçage et taraudage',
         type: TypeOperation.USINAGE,
-        dureeEstimee: 180,
+        tempsEstime: 180,
         statut: OperationStatut.EN_ATTENTE,
-        ordreFabricationId: '3',
+        ordreId: '3',
         ordre: 1,
-        controleRequis: false,
         createdAt: new Date('2025-06-25T00:00:00'),
         updatedAt: new Date('2025-06-25T00:00:00'),
-      },
-      {
+      }),
+      createOperation({
         id: '6',
         nom: 'Contrôle qualité',
         description: 'Vérification dimensionnelle',
         type: TypeOperation.CONTROLE,
-        dureeEstimee: 60,
+        tempsEstime: 60,
         statut: OperationStatut.EN_ATTENTE,
-        ordreFabricationId: '3',
+        ordreId: '3',
         ordre: 2,
-        controleRequis: true,
         createdAt: new Date('2025-06-25T00:00:00'),
         updatedAt: new Date('2025-06-25T00:00:00'),
-      },
+      }),
     ],
   },
 ]
+
+// Helper pour créer une opération complète
+function createOperation(partial: Partial<Operation> & { id: string; nom: string }): Operation {
+  const now = new Date()
+  return {
+    id: partial.id,
+    nom: partial.nom,
+    description: partial.description || '',
+    type: partial.type || TypeOperation.ASSEMBLAGE,
+    statut: partial.statut || OperationStatut.EN_ATTENTE,
+    priorite: partial.priorite || PrioriteProduction.NORMALE,
+    ordre: partial.ordre || 1,
+    schedule: partial.schedule || {
+      dateDebut: now,
+      dateFin: new Date(now.getTime() + 4 * 60 * 60 * 1000), // +4h
+      dureeEstimee: 4,
+    },
+    prerequis: partial.prerequis || [],
+    machineId: partial.machineId,
+    operateurIds: partial.operateurIds || [],
+    outillage: partial.outillage || [],
+    instructions: partial.instructions,
+    parametres: partial.parametres || {},
+    qualite: partial.qualite || {
+      normes: [],
+      tolerances: {},
+      controles: [],
+      certificationsRequises: [],
+    },
+    tempsEstime: partial.tempsEstime || 240,
+    tempsReel: partial.tempsReel,
+    avancement: partial.avancement || 0,
+    ordreId: partial.ordreId || '',
+    projetId: partial.projetId || 'proj_001',
+    createdAt: partial.createdAt || now,
+    updatedAt: partial.updatedAt || now,
+    createdBy: partial.createdBy || 'user_001',
+  }
+}
 
 export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
   const [selectedOF, setSelectedOF] = useState(mockOrdresFabrication[0])
 
   const getStatutBadge = (statut: StatutProduction) => {
     const statusConfig = {
-      [StatutProduction.PLANIFIE]: {
+      [StatutProduction.NON_COMMENCE]: {
         label: 'Planifié',
         variant: 'outline' as const,
         icon: Calendar,
@@ -182,7 +271,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
         variant: 'default' as const,
         icon: Play,
       },
-      [StatutProduction.PAUSE]: {
+      [StatutProduction.EN_PAUSE]: {
         label: 'En pause',
         variant: 'secondary' as const,
         icon: Pause,
@@ -192,15 +281,20 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
         variant: 'secondary' as const,
         icon: CheckCircle2,
       },
-      [StatutProduction.ANNULE]: {
+      [StatutProduction.REJETE]: {
         label: 'Annulé',
         variant: 'destructive' as const,
         icon: AlertCircle,
       },
-      [StatutProduction.EN_ATTENTE]: {
-        label: 'En attente',
-        variant: 'outline' as const,
-        icon: Clock,
+      [StatutProduction.EN_PREPARATION]: {
+        label: 'En préparation',
+        variant: 'secondary' as const,
+        icon: Settings,
+      },
+      [StatutProduction.CONTROLE_QUALITE]: {
+        label: 'Contrôle qualité',
+        variant: 'default' as const,
+        icon: CheckCircle2,
       },
     }
 
@@ -232,7 +326,7 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
         label: 'Haute',
         variant: 'default' as const,
       },
-      [PrioriteProduction.URGENTE]: {
+      [PrioriteProduction.CRITIQUE]: {
         label: 'Urgente',
         variant: 'destructive' as const,
       },
@@ -247,15 +341,15 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
 
   const getOperationStatusIcon = (statut: OperationStatut) => {
     switch (statut) {
-      case OperationStatut.TERMINE:
+      case OperationStatut.TERMINEE:
         return <CheckCircle2 className="h-4 w-4 text-green-600" />
       case OperationStatut.EN_COURS:
         return <Play className="h-4 w-4 text-blue-600" />
       case OperationStatut.EN_ATTENTE:
         return <Clock className="h-4 w-4 text-gray-400" />
-      case OperationStatut.PAUSE:
+      case OperationStatut.BLOQUEE:
         return <Pause className="h-4 w-4 text-orange-600" />
-      case OperationStatut.ANNULE:
+      case OperationStatut.ANNULEE:
         return <AlertCircle className="h-4 w-4 text-red-600" />
       default:
         return <Clock className="h-4 w-4 text-gray-400" />
@@ -401,19 +495,19 @@ export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
                     <div>
                       <h5 className="font-medium">{operation.nom}</h5>
                       <p className="text-sm text-muted-foreground">{operation.description}</p>
-                      {operation.technicienId && (
+                      {operation.operateurIds.length > 0 && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Technicien: {operation.technicienId}
+                          Opérateurs: {operation.operateurIds.length}
                         </p>
                       )}
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium">
-                      {operation.dureeReelle || operation.dureeEstimee}min
+                      {operation.tempsReel || operation.tempsEstime}min
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {operation.dureeReelle ? 'Réalisé' : 'Estimé'}
+                      {operation.tempsReel ? 'Réalisé' : 'Estimé'}
                     </p>
                   </div>
                 </div>

@@ -39,7 +39,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const userData = await authService.getMe()
 
           if (isMounted) {
-            setUser(userData)
+            // Conversion du User des domaines vers le User local
+            setUser({
+              id: userData.id,
+              email: userData.email,
+              nom: userData.profile.nom,
+              prenom: userData.profile.prenom,
+              role: userData.role,
+              avatar: userData.profile.avatar,
+              permissions: userData.permissions || [],
+            })
           }
         } catch (error) {
           console.error("Erreur lors de la vérification de l'auth:", error)

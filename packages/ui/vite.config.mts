@@ -16,10 +16,20 @@ export default defineConfig({
 
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'ErpUI',
-      formats: ['es'],
-      fileName: 'index',
+      entry: {
+        index: resolve(__dirname, 'src/index.ts'),
+        'hooks/index': resolve(__dirname, 'src/hooks/index.ts'),
+        'primitives/index': resolve(__dirname, 'src/components/primitives/index.ts'),
+        'layout/index': resolve(__dirname, 'src/components/layout/index.ts'),
+        'forms/index': resolve(__dirname, 'src/components/forms/index.ts'),
+        'data-display/index': resolve(__dirname, 'src/components/data-display/index.ts'),
+        'feedback/index': resolve(__dirname, 'src/components/feedback/index.ts'),
+        'navigation/index': resolve(__dirname, 'src/components/navigation/index.ts'),
+        'business/index': resolve(__dirname, 'src/components/business/index.ts'),
+        'theme/index': resolve(__dirname, 'src/components/theme/index.ts'),
+      },
+      formats: ['es', 'cjs'],
+      fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
       external: [

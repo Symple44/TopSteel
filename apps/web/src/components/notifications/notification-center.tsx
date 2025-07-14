@@ -2,7 +2,7 @@
 
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { cn } from '@/lib/utils'
-import type { Notification } from '@erp/types'
+import type { Notification } from '@erp/domains/cross-cutting'
 
 import {
   Badge,
@@ -113,13 +113,13 @@ export function NotificationCenter() {
                   key={notification.id}
                   className={cn(
                     'flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors w-full text-left',
-                    !notification.read && 'bg-blue-50 border-l-2 border-l-blue-500'
+                    !notification.isRead && 'bg-blue-50 border-l-2 border-l-blue-500'
                   )}
                   onClick={() => actions.markAsRead(notification.id)}
                   type="button"
                 >
                   <div className="flex-shrink-0 mt-0.5">
-                    {getNotificationIcon(notification.type, notification.category)}
+                    {getNotificationIcon(notification.type, notification.metadata?.category || '')}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -139,35 +139,34 @@ export function NotificationCenter() {
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
-                          {notification.category}
+                          {notification.metadata?.category || notification.type}
                         </Badge>
 
-                        {notification.metadata?.priority &&
-                          notification.metadata.priority !== 'normal' && (
-                            <Badge
-                              variant={
-                                notification.metadata.priority === 'urgent'
-                                  ? 'destructive'
-                                  : 'secondary'
-                              }
-                              className="text-xs"
-                            >
-                              {notification.metadata.priority}
-                            </Badge>
-                          )}
+                        {notification.priority && notification.priority !== 'NORMAL' && (
+                          <Badge
+                            variant={
+                              notification.priority === 'URGENT' ? 'destructive' : 'secondary'
+                            }
+                            className="text-xs"
+                          >
+                            {notification.priority.toLowerCase()}
+                          </Badge>
+                        )}
                       </div>
 
-                      {notification.actionUrl && notification.actionLabel && (
+                      {notification.actions && notification.actions.length > 0 && (
                         <Button
                           variant="outline"
                           size="sm"
                           className="text-xs h-6 px-2"
                           onClick={(e: React.MouseEvent) => {
                             e.stopPropagation()
-                            window.open(notification.actionUrl, '_blank')
+                            if (notification.actions?.[0]?.url) {
+                              window.open(notification.actions[0].url, '_blank')
+                            }
                           }}
                         >
-                          {notification.actionLabel}
+                          {notification.actions[0].label}
                         </Button>
                       )}
                     </div>

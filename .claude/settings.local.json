@@ -20,7 +20,25 @@
       "Bash(grep:*)",
       "Bash(mkdir:*)",
       "Bash(cp:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(pnpm install:*)",
+      "Bash(vite build)",
+      "Bash(pnpm vite:*)",
+      "Bash(node:*)",
+      "Bash(mv:*)",
+      "Bash(npm ls:*)",
+      "Bash(pnpm.cmd install:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsup:*)",
+      "Bash(npx vite:*)",
+      "Bash(dir packages)",
+      "Bash(pnpm --filter @erp/ui build)",
+      "Bash(pnpm run:*)",
+      "Bash(tsup)",
+      "Bash(echo)",
+      "Bash(pnpm type-check:*)",
+      "Bash(npx -C \"D:/GitHub/TopSteel/packages/ui\" tsc --noEmit)"
     ],
     "deny": []
   }

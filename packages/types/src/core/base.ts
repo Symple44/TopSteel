@@ -20,11 +20,9 @@ export type JSONValue =
  * Interface de base pour toutes les entités
  */
 export interface BaseEntity {
-  id: string
-  createdAt: Date
-  updatedAt: Date
-  createdBy?: string
-  updatedBy?: string
+  readonly id: string
+  readonly createdAt: Date
+  readonly updatedAt: Date
 }
 
 /**

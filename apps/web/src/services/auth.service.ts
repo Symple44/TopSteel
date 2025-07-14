@@ -6,7 +6,8 @@
 
 import { apiClient } from '@/lib/api-client'
 import { formatError } from '@/lib/error-handler'
-import type { User, UserRole } from '@erp/types'
+import type { User } from '@erp/domains/core'
+import { UserRole, UserStatut } from '@erp/domains/core'
 
 // ===== INTERFACES =====
 interface LoginResponse {
@@ -64,14 +65,35 @@ const transformUserFromAPI = (apiUser: unknown): User => {
   return {
     id: user.id.toString(),
     email: user.email,
-    nom: user.nom,
-    prenom: user.prenom,
+    profile: {
+      nom: user.nom || '',
+      prenom: user.prenom || '',
+      telephone: user.telephone,
+      avatar: user.avatar,
+    },
     role: user.role as UserRole,
-    isActive: user.isActive ?? true,
     permissions: user.permissions ?? [],
-    telephone: user.telephone,
-    avatar: user.avatar,
-    lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
+    statut: UserStatut.ACTIF,
+    competences: [],
+    preferences: {
+      theme: 'light',
+      langue: 'fr',
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+      },
+      dashboard: {
+        widgets: [],
+        layout: 'grid',
+      },
+    },
+    security: {
+      lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
+      failedLoginAttempts: 0,
+      isLocked: false,
+      twoFactorEnabled: false,
+    },
     createdAt: user.createdAt ? new Date(user.createdAt) : new Date(),
     updatedAt: user.updatedAt ? new Date(user.updatedAt) : new Date(),
   } satisfies User

@@ -4,9 +4,9 @@
 import { type VariantProps, cva } from 'class-variance-authority'
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
-import { Button } from '../button'
+import { buttonVariants } from '../../../lib/design-system'
 
-// === VARIANTS POUR INPUT ENRICHI (votre structure existante) ===
+// === VARIANTS POUR INPUT ENRICHI ===
 const inputVariants = cva(
   'flex w-full rounded-md border border-input bg-transparent text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
   {
@@ -42,49 +42,69 @@ const inputVariants = cva(
   }
 )
 
-// === INTERFACE ENRICHIE (votre interface + support numérique) ===
+// === INTERFACE ENRICHIE ===
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'value' | 'onChange'>,
     VariantProps<typeof inputVariants> {
-  // ✅ MODIFIÉ: Support automatique des valeurs string ET number
+  // ✅ Support automatique des valeurs string ET number
   value?: string | number
 
   // ✅ onChange typé qui gère automatiquement la conversion
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 
-  // ✅ Props pour inputs checkables (votre code existant)
+  // ✅ Props pour inputs checkables
   checked?: boolean
   defaultChecked?: boolean
   onCheckedChange?: (checked: boolean) => void
 
-  // ✅ Props pour état actif/inactif (votre code existant)
+  // ✅ Props pour état actif/inactif
   active?: boolean
   onActiveChange?: (active: boolean) => void
 
-  // ✅ Props pour validation (votre code existant)
+  // ✅ Props pour validation
   error?: boolean | string
   success?: boolean
   warning?: boolean
 
-  // ✅ Props numériques (votre code existant)
+  // ✅ Props numériques
   min?: number | string
   max?: number | string
   step?: number | string
 
-  // ✅ Props pour formatage (votre code existant)
+  // ✅ Props pour formatage
   precision?: number // Pour les nombres décimaux
 
-  // ✅ Props d'amélioration UX (votre code existant)
+  // ✅ Props d'amélioration UX
   clearable?: boolean
   onClear?: () => void
 
-  // ✅ Icon support (votre code existant)
+  // ✅ Icon support
   startIcon?: React.ReactNode
   endIcon?: React.ReactNode
 
-  // ✅ Loading state (votre code existant)
+  // ✅ Loading state
   loading?: boolean
 }
+
+// === COMPOSANT BUTTON INTÉGRÉ ===
+interface InternalButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'ghost' | 'outline'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
+}
+
+const InternalButton = React.forwardRef<HTMLButtonElement, InternalButtonProps>(
+  ({ className, variant = 'ghost', size = 'icon', ...props }, ref) => {
+    return (
+      <button
+        className={cn(buttonVariants({ variant, size }), className)}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+
+InternalButton.displayName = 'InternalButton'
 
 // === COMPOSANT INPUT ENRICHI ===
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -118,13 +138,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    // ✅ Détermine l'état visuel (votre code existant)
+    // ✅ Détermine l'état visuel
     const visualState = error ? 'error' : success ? 'success' : warning ? 'warning' : state
 
-    // ✅ Gestion des types checkables (votre code existant)
+    // ✅ Gestion des types checkables
     const isCheckable = type === 'checkbox' || type === 'radio'
 
-    // ✅ Détermine la variante automatiquement (votre code existant)
+    // ✅ Détermine la variante automatiquement
     const finalVariant =
       variant ||
       (type === 'checkbox'
@@ -139,7 +159,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     const finalSize = size || (isCheckable ? (type as 'checkbox' | 'radio') : 'default')
 
-    // ✅ NOUVEAU: Conversion automatique number → string
+    // ✅ Conversion automatique number → string
     const displayValue = React.useMemo(() => {
       if (value === undefined || value === null) return ''
       if (typeof value === 'number') {
@@ -151,28 +171,28 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       return String(value)
     }, [value, type, precision])
 
-    // ✅ Handler pour les changements avec formatage (amélioré)
+    // ✅ Handler pour les changements avec formatage
     const handleChange = React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const target = e.target
 
-        // ✅ Gestion spécifique pour les inputs checkables (votre code existant)
+        // ✅ Gestion spécifique pour les inputs checkables
         if (isCheckable && onCheckedChange) {
           onCheckedChange(target.checked)
         }
 
-        // ✅ Gestion de l'état actif (votre code existant)
+        // ✅ Gestion de l'état actif
         if (onActiveChange) {
           onActiveChange(target.checked || target.value !== '')
         }
 
-        // ✅ Handler original (maintenant l'appelant n'a plus besoin de conversion)
+        // ✅ Handler original
         onChange?.(e)
       },
       [onChange, isCheckable, onCheckedChange, onActiveChange]
     )
 
-    // ✅ Props pour les inputs checkables (votre code existant)
+    // ✅ Props pour les inputs checkables
     const checkableProps = isCheckable
       ? {
           checked: checked,
@@ -180,7 +200,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         }
       : {}
 
-    // ✅ Props numériques (votre code existant amélioré)
+    // ✅ Props numériques
     const numericProps =
       type === 'number'
         ? {
@@ -190,7 +210,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           }
         : {}
 
-    // ✅ Pour les inputs avec icônes, on wrap dans un container (votre code existant)
+    // ✅ Pour les inputs avec icônes, on wrap dans un container
     if (startIcon || endIcon || clearable || loading) {
       return (
         <div className="relative">
@@ -232,7 +252,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               className
             )}
             ref={ref}
-            value={displayValue} // ✅ MODIFIÉ: Utilise la valeur convertie automatiquement
+            value={displayValue}
             onChange={handleChange}
             {...checkableProps}
             {...numericProps}
@@ -241,7 +261,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
           {/* Bouton clear */}
           {clearable && displayValue && !loading && (
-            <Button
+            <InternalButton
               type="button"
               onClick={() => {
                 onClear?.()
@@ -269,7 +289,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-            </Button>
+            </InternalButton>
           )}
 
           {/* Icône de fin */}
@@ -285,7 +305,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       )
     }
 
-    // ✅ Input simple sans icônes (votre code existant)
+    // ✅ Input simple sans icônes
     return (
       <input
         type={type}
@@ -296,7 +316,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className
         )}
         ref={ref}
-        value={displayValue} // ✅ MODIFIÉ: Utilise la valeur convertie automatiquement
+        value={displayValue}
         onChange={handleChange}
         {...checkableProps}
         {...numericProps}
@@ -308,9 +328,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 Input.displayName = 'Input'
 
-// === COMPOSANTS DE CONVENANCE (vos composants existants) ===
+// === COMPOSANTS DE CONVENANCE ===
 
-// ✅ Input numérique avec validation (votre composant existant)
+// ✅ Input numérique avec validation
 export const NumberInput = React.forwardRef<
   HTMLInputElement,
   Omit<InputProps, 'type'> & {
@@ -334,7 +354,7 @@ export const NumberInput = React.forwardRef<
 
 NumberInput.displayName = 'NumberInput'
 
-// ✅ Input de recherche avec icône (votre composant existant)
+// ✅ Input de recherche avec icône
 export const SearchInput = React.forwardRef<
   HTMLInputElement,
   Omit<InputProps, 'type' | 'startIcon'>
@@ -367,7 +387,7 @@ export const SearchInput = React.forwardRef<
 
 SearchInput.displayName = 'SearchInput'
 
-// ✅ Input de mot de passe avec toggle (votre composant existant)
+// ✅ Input de mot de passe avec toggle
 export const PasswordInput = React.forwardRef<
   HTMLInputElement,
   Omit<InputProps, 'type' | 'endIcon'>
@@ -379,7 +399,7 @@ export const PasswordInput = React.forwardRef<
       type={showPassword ? 'text' : 'password'}
       variant="password"
       endIcon={
-        <Button
+        <InternalButton
           type="button"
           onClick={() => setShowPassword(!showPassword)}
           className="text-muted-foreground hover:text-foreground transition-colors"
@@ -411,7 +431,7 @@ export const PasswordInput = React.forwardRef<
               />
             </svg>
           )}
-        </Button>
+        </InternalButton>
       }
       ref={ref}
       {...props}

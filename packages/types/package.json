@@ -5,12 +5,34 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
+    },
+    "./infrastructure": {
+      "require": "./dist/infrastructure/index.cjs",
+      "types": "./dist/infrastructure/index.d.ts",
+      "import": "./dist/infrastructure/index.js"
+    },
+    "./domains": {
+      "require": "./dist/domains/index.cjs",
+      "types": "./dist/domains/index.d.ts",
+      "import": "./dist/domains/index.js"
+    },
+    "./ui": {
+      "require": "./dist/ui/index.cjs",
+      "types": "./dist/ui/index.d.ts",
+      "import": "./dist/ui/index.js"
+    },
+    "./core": {
+      "require": "./dist/core/index.cjs",
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

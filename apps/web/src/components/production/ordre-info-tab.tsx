@@ -1,10 +1,28 @@
 // apps/web/src/components/production/ordre-info-tab.tsx
 
-import type { OrdreFabrication } from '@erp/types'
+import type { OrdrePriorite, OrdreStatut } from '@erp/domains/production'
 import { Card, CardContent, CardHeader, CardTitle, Label } from '@erp/ui'
 
+interface OrdreSimple {
+  id: string
+  numero: string
+  statut: OrdreStatut
+  priorite: OrdrePriorite
+  avancement: number
+  description?: string
+  projetId: string
+  dateDebutPrevue?: Date
+  dateFinPrevue?: Date
+  tempsPrevu?: number
+  tempsReel?: number
+  coutPrevu?: number
+  coutReel?: number
+  createdAt: Date
+  updatedAt: Date
+}
+
 interface OrdreInfoTabProps {
-  ordre: OrdreFabrication
+  ordre: OrdreSimple
 }
 
 export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
@@ -45,15 +63,13 @@ export function OrdreInfoTab({ ordre }: OrdreInfoTabProps) {
             <div>
               <Label className="text-sm font-medium">Date début prévue</Label>
               <p className="text-sm text-muted-foreground">
-                {ordre?.dateDebutPrevue
-                  ? new Date(ordre.dateDebutPrevue).toLocaleDateString()
-                  : 'N/A'}
+                {ordre?.dateDebutPrevue ? ordre.dateDebutPrevue.toLocaleDateString() : 'N/A'}
               </p>
             </div>
             <div>
               <Label className="text-sm font-medium">Date fin prévue</Label>
               <p className="text-sm text-muted-foreground">
-                {ordre?.dateFinPrevue ? new Date(ordre.dateFinPrevue).toLocaleDateString() : 'N/A'}
+                {ordre?.dateFinPrevue ? ordre.dateFinPrevue.toLocaleDateString() : 'N/A'}
               </p>
             </div>
           </div>

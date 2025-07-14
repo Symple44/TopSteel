@@ -1,0 +1,58 @@
+{
+  "name": "@erp/domains",
+  "version": "1.0.0",
+  "description": "Domaines métiers modularisés pour TopSteel ERP",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js",
+      "require": "./dist/core/index.cjs"
+    },
+    "./sales": {
+      "types": "./dist/sales/index.d.ts",
+      "import": "./dist/sales/index.js",
+      "require": "./dist/sales/index.cjs"
+    },
+    "./production": {
+      "types": "./dist/production/index.d.ts",
+      "import": "./dist/production/index.js",
+      "require": "./dist/production/index.cjs"
+    },
+    "./cross-cutting": {
+      "types": "./dist/cross-cutting/index.d.ts",
+      "import": "./dist/cross-cutting/index.js",
+      "require": "./dist/cross-cutting/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@erp/config": "workspace:*",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.6.3"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

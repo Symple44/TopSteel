@@ -9,43 +9,44 @@ import type { BaseEntity } from '../core'
  * Types de notifications
  */
 export enum NotificationType {
-  INFO = 'info',
-  SUCCESS = 'success',
-  WARNING = 'warning',
-  ERROR = 'error',
+  INFO = 'INFO',
+  SUCCESS = 'SUCCESS',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
+  SYSTEM = 'SYSTEM',
 }
 
 /**
  * Catégories de notifications
  */
 export enum NotificationCategory {
-  SYSTEME = 'systeme',
-  PROJET = 'projet',
-  PRODUCTION = 'production',
-  CLIENT = 'client',
-  FACTURATION = 'facturation',
-  STOCK = 'stock',
-  UTILISATEUR = 'utilisateur',
+  PROJET = 'PROJET',
+  PRODUCTION = 'PRODUCTION',
+  FACTURATION = 'FACTURATION',
+  STOCK = 'STOCK',
+  SYSTEM = 'SYSTEM',
+  USER = 'USER',
 }
 
 /**
  * Priorités de notification
  */
 export enum NotificationPriority {
-  BASSE = 'basse',
-  NORMALE = 'normale',
-  HAUTE = 'haute',
-  CRITIQUE = 'critique',
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT',
 }
 
 /**
  * Canaux de notification
  */
 export enum NotificationChannel {
-  IN_APP = 'in_app',
-  EMAIL = 'email',
-  SMS = 'sms',
-  PUSH = 'push',
+  IN_APP = 'IN_APP',
+  EMAIL = 'EMAIL',
+  SMS = 'SMS',
+  PUSH = 'PUSH',
+  WEBHOOK = 'WEBHOOK',
 }
 
 /**
@@ -59,8 +60,8 @@ export interface Notification extends BaseEntity {
   priority: NotificationPriority
   channels: NotificationChannel[]
   destinataireId: string
-  lue: boolean
-  dateLecture?: Date
+  lu: boolean
+  luAt?: Date
   actionUrl?: string
   actionLabel?: string
   metadata?: Record<string, any>
@@ -70,17 +71,17 @@ export interface Notification extends BaseEntity {
 /**
  * Template de notification
  */
-export interface NotificationTemplate {
-  id: string
+export interface NotificationTemplate extends BaseEntity {
   nom: string
-  category: NotificationCategory
+  description?: string
+  titre: string
+  message: string
   type: NotificationType
+  category: NotificationCategory
   priority: NotificationPriority
   channels: NotificationChannel[]
-  titreTemplate: string
-  messageTemplate: string
   variables: string[]
-  actif: boolean
+  active: boolean
 }
 
 /**
@@ -88,14 +89,8 @@ export interface NotificationTemplate {
  */
 export interface NotificationPreferences {
   userId: string
-  categories: Record<
-    NotificationCategory,
-    {
-      enabled: boolean
-      channels: NotificationChannel[]
-      priority: NotificationPriority
-    }
-  >
+  channels: Record<NotificationChannel, boolean>
+  categories: Record<NotificationCategory, boolean>
   quietHours?: {
     enabled: boolean
     start: string // HH:mm
@@ -131,10 +126,21 @@ export interface SendNotificationRequest {
  */
 export interface NotificationStats {
   total: number
-  lues: number
-  nonLues: number
-  parType: Record<NotificationType, number>
-  parCategory: Record<NotificationCategory, number>
-  parChannel: Record<NotificationChannel, number>
-  tauxLecture: number
+  unread: number
+  byType: Record<NotificationType, number>
+  byCategory: Record<NotificationCategory, number>
+  byChannel: Record<NotificationChannel, number>
+}
+
+/**
+ * Filtre pour les notifications
+ */
+export interface NotificationFilters {
+  type?: NotificationType[]
+  category?: NotificationCategory[]
+  priority?: NotificationPriority[]
+  lu?: boolean
+  dateDebut?: Date
+  dateFin?: Date
+  search?: string
 }

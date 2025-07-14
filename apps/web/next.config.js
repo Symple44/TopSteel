@@ -1,3 +1,4 @@
+const path = require('path')
 const { exec } = require('node:child_process')
 const { promisify } = require('node:util')
 const execAsync = promisify(exec)
@@ -19,8 +20,8 @@ async function runBiome() {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // SUPPRIMÉ: transpilePackages (cause le problème)
-  // Next.js doit utiliser les packages buildés, pas les sources
+  // Transpiler les packages @erp pour permettre l'utilisation depuis dist/
+  transpilePackages: ['@erp/domains', '@erp/types', '@erp/ui', '@erp/utils', '@erp/api-client'],
 
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

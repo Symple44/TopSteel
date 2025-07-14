@@ -1,9 +1,29 @@
 // apps/web/src/components/production/ordre-operations-tab.tsx
-import { type Operation, OperationStatut, type OrdreFabrication } from '@erp/types'
+import {
+  type Operation,
+  OperationStatut,
+  type OrdrePriorite,
+  type OrdreStatut,
+} from '@erp/domains/production'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
+interface OrdreSimple {
+  id: string
+  numero: string
+  statut: OrdreStatut
+  priorite: OrdrePriorite
+  avancement: number
+  description?: string
+  projetId: string
+  operationsIds?: string[]
+  materiauxIds?: string[]
+  controlesIds?: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
 interface OrdreOperationsTabProps {
-  ordre: OrdreFabrication
+  ordre: OrdreSimple
 }
 
 export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
@@ -27,7 +47,7 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
                     <h4 className="font-medium">{operation?.nom || `Opération ${index + 1}`}</h4>
                     <span
                       className={`px-2 py-1 rounded text-xs ${
-                        operation?.statut === OperationStatut.TERMINE
+                        operation?.statut === OperationStatut.TERMINEE
                           ? 'bg-green-100 text-green-800'
                           : operation?.statut === OperationStatut.EN_COURS
                             ? 'bg-blue-100 text-blue-800'
@@ -48,13 +68,15 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
                     <div>
                       <span className="text-sm font-medium">Durée estimée</span>
                       <p className="text-sm text-muted-foreground">
-                        {operation?.dureeEstimee || 0}h
+                        {operation?.tempsEstime || 0}h
                       </p>
                     </div>
                     <div>
-                      <span className="text-sm font-medium">Technicien</span>
+                      <span className="text-sm font-medium">Opérateurs</span>
                       <p className="text-sm text-muted-foreground">
-                        {operation?.technicienId || 'Non assigné'}
+                        {operation?.operateurIds?.length
+                          ? `${operation.operateurIds.length} opérateur(s)`
+                          : 'Non assigné'}
                       </p>
                     </div>
                   </div>

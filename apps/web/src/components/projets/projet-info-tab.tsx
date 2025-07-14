@@ -1,8 +1,8 @@
 'use client'
 
 import { formatCurrency, formatDate } from '@/lib/utils'
-import type { Projet } from '@/types'
-import { ProjetStatut } from '@erp/types'
+import { ProjetStatut } from '@erp/domains/core'
+import type { StoreProjet } from '@erp/types'
 import {
   Badge,
   Button,
@@ -21,8 +21,8 @@ import { Building2, Calendar, Clock, Edit, Euro, Mail, MapPin, Phone, Save, X } 
 import { useState } from 'react'
 
 interface ProjetInfoTabProps {
-  projet: Projet
-  onUpdate?: (updatedProjet: Partial<Projet>) => void
+  projet: StoreProjet
+  onUpdate?: (updatedProjet: Partial<StoreProjet>) => void
 }
 
 // ✅ Interface pour le formulaire d'édition
@@ -99,7 +99,7 @@ export function ProjetInfoTab({ projet, onUpdate }: ProjetInfoTabProps) {
       return
     }
 
-    const updatedData: Partial<Projet> = {
+    const updatedData: Partial<StoreProjet> = {
       reference: formData.reference,
       description: formData.description,
       dateDebut: formData.dateDebut ? new Date(formData.dateDebut) : undefined,

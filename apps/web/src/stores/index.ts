@@ -61,12 +61,12 @@ export type {
   BaseStoreActions,
   BaseStoreState,
   // Filtres existants (depuis modules respectifs)
-  FacturationFilters,
+  // FacturationFilters, // TODO: À ajouter à @erp/domains
   FilterState,
   InitialState,
   MetricsState,
-  ProductionFilters,
-  ProjetFilters,
+  // ProductionFilters, // Importé depuis @erp/domains
+  // ProjetFilters, // Importé depuis @erp/domains
   // Stats et métriques
   ProjetStats,
   SessionState,
@@ -80,6 +80,13 @@ export type {
   // Types UI et états
   UIState,
 } from '@erp/types'
+
+// Imports depuis @erp/domains pour les filtres migrés
+import type { ProjetFilters } from '@erp/domains/core'
+// TODO: OperationFilters, ProductionFilters, FacturationFilters doivent être ajoutés à @erp/domains si nécessaire
+
+// Re-exports des filtres depuis @erp/domains
+export type { ProjetFilters }
 // ===== HOOKS D'AUTHENTIFICATION =====
 export {
   useAuth,

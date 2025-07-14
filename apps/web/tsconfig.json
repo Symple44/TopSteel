@@ -1,18 +1,57 @@
 {
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "compilerOptions": {
     "esModuleInterop": true,
     "target": "ES2022",
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@erp/types/*": ["../../packages/types/src/*"],
-      "@erp/utils/*": ["../../packages/utils/src/*"],
-      "@erp/ui/*": ["../../packages/ui/src/*"],
-      "@erp/types": ["../../packages/types/src"],
-      "@erp/utils": ["../../packages/utils/src"],
-      "@erp/ui": ["../../packages/ui/src"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@erp/domains": [
+        "../../packages/domains/dist"
+      ],
+      "@erp/domains/*": [
+        "../../packages/domains/dist/*"
+      ],
+      "@erp/types": [
+        "../../packages/types/dist"
+      ],
+      "@erp/types/*": [
+        "../../packages/types/dist/*"
+      ],
+      "@erp/ui": [
+        "../../packages/ui/dist"
+      ],
+      "@erp/ui/*": [
+        "../../packages/ui/dist/*"
+      ],
+      "@erp/utils": [
+        "../../packages/utils/dist"
+      ],
+      "@erp/utils/*": [
+        "../../packages/utils/dist/*"
+      ],
+      "@erp/api-client": [
+        "../../packages/api-client/dist"
+      ],
+      "@erp/api-client/*": [
+        "../../packages/api-client/dist/*"
+      ],
+      "@erp/config": [
+        "../../packages/config"
+      ],
+      "@erp/config/*": [
+        "../../packages/config/*"
+      ]
     },
     "noEmit": true,
     "isolatedModules": true,
@@ -30,7 +69,11 @@
         "name": "next"
       }
     ],
-    "lib": ["dom", "dom.iterable", "es6"]
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ]
   },
   "extends": "../../tsconfig.json"
 }

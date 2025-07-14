@@ -25,6 +25,7 @@
   "name": "@erp/web",
   "private": true,
   "dependencies": {
+    "@erp/domains": "workspace:*",
     "@erp/types": "workspace:*",
     "@erp/ui": "workspace:*",
     "@erp/utils": "workspace:*",
