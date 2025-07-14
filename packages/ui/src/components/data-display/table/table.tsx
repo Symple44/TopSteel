@@ -1,10 +1,17 @@
-import { cn } from '@/lib/utils'
 import * as React from 'react'
+import { type TableVariants, tableVariants } from '../../../lib/design-system'
+import { cn } from '../../../lib/utils'
 
-const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
-  ({ className, ...props }, ref) => (
+interface TableProps extends React.HTMLAttributes<HTMLTableElement>, TableVariants {}
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, variant, size, ...props }, ref) => (
     <div className="relative w-full overflow-auto">
-      <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+      <table
+        ref={ref}
+        className={cn(tableVariants({ variant, size }), className)}
+        {...props}
+      />
     </div>
   )
 )

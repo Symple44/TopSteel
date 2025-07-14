@@ -8,6 +8,13 @@ export {
   alertVariants,
   badgeVariants,
   buttonVariants,
+  cardVariants,
+  dialogContentVariants,
+  inputVariants,
+  scrollAreaVariants,
+  sidebarVariants,
+  switchVariants,
+  tableVariants,
 } from './lib/design-system'
 export { cn } from './lib/utils'
 
@@ -16,6 +23,13 @@ export type {
   AlertVariants,
   BadgeVariants,
   ButtonVariants,
+  CardVariants,
+  DialogContentVariants,
+  InputVariants,
+  ScrollAreaVariants,
+  SidebarVariants,
+  SwitchVariants,
+  TableVariants,
 } from './lib/design-system'
 
 // === RE-EXPORTS EXTERNES ===

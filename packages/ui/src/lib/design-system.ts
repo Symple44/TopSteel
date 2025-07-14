@@ -141,3 +141,99 @@ export const switchVariants = cva(
 )
 
 export type SwitchVariants = VariantProps<typeof switchVariants>
+
+// === CARD VARIANTS ===
+export const cardVariants = cva(
+  'rounded-lg border bg-card text-card-foreground shadow',
+  {
+    variants: {
+      variant: {
+        default: 'border-border',
+        elevated: 'border-transparent shadow-lg',
+        ghost: 'border-transparent shadow-none',
+        outline: 'border-border shadow-none',
+      },
+      padding: {
+        none: 'p-0',
+        sm: 'p-4',
+        default: 'p-6',
+        lg: 'p-8',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      padding: 'default',
+    },
+  }
+)
+
+export type CardVariants = VariantProps<typeof cardVariants>
+
+// === TABLE VARIANTS ===
+export const tableVariants = cva('w-full caption-bottom text-sm', {
+  variants: {
+    variant: {
+      default: '[&_tr]:border-b',
+      striped: '[&_tbody_tr:nth-child(even)]:bg-muted/50 [&_tr]:border-b',
+      grid: 'border-collapse [&_td]:border [&_th]:border',
+    },
+    size: {
+      sm: '[&_td]:p-2 [&_th]:p-2 text-xs',
+      default: '[&_td]:p-4 [&_th]:p-4',
+      lg: '[&_td]:p-6 [&_th]:p-6 text-base',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
+})
+
+export type TableVariants = VariantProps<typeof tableVariants>
+
+// === DIALOG VARIANTS ===
+export const dialogContentVariants = cva(
+  'fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
+  {
+    variants: {
+      size: {
+        sm: 'max-w-sm',
+        default: 'max-w-lg',
+        lg: 'max-w-2xl',
+        xl: 'max-w-4xl',
+        full: 'max-w-[90vw] max-h-[90vh]',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  }
+)
+
+export type DialogContentVariants = VariantProps<typeof dialogContentVariants>
+
+// === SIDEBAR VARIANTS ===
+export const sidebarVariants = cva(
+  'flex h-full flex-col overflow-y-auto border-r bg-background',
+  {
+    variants: {
+      variant: {
+        default: 'border-border',
+        floating: 'border-transparent shadow-lg m-2 rounded-lg',
+        inset: 'border-border bg-muted/30',
+      },
+      size: {
+        default: 'w-64',
+        sm: 'w-48',
+        lg: 'w-80',
+        collapsed: 'w-16',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+)
+
+export type SidebarVariants = VariantProps<typeof sidebarVariants>

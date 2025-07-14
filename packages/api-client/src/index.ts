@@ -17,23 +17,28 @@ export * from './auth'
 
 import type { ApiClientConfig } from './core'
 import { ClientApiClient } from './clients'
+import { ProjectApiClient } from './projects'
 
 export class ERPApiClient {
   public readonly clients: ClientApiClient
+  public readonly projects: ProjectApiClient
 
   constructor(config: ApiClientConfig) {
     // Initialize domain clients
     this.clients = new ClientApiClient(config)
+    this.projects = new ProjectApiClient(config)
   }
 
   // ===== GLOBAL AUTH MANAGEMENT =====
 
   setAuthToken(token: { access_token: string; refresh_token?: string }): void {
     this.clients.setAuthToken(token)
+    this.projects.setAuthToken(token)
   }
 
   clearAuth(): void {
     this.clients.clearAuth()
+    this.projects.clearAuth()
   }
 }
 

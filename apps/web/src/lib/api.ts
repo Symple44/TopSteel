@@ -1,9 +1,16 @@
 // apps/web/src/lib/api.ts - Client API pour Zustand stores
+import { ERPApiClient } from '@erp/api-client'
 import { Client, ClientType, type Projet, type ProjetFilters } from '@erp/domains/core'
 import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/domains/core'
 
 // Configuration API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+
+// Instance du client API
+const apiClient = new ERPApiClient({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+})
 
 // Client API simple pour développement
 export const api = {
@@ -19,8 +26,7 @@ export const api = {
             id: '1',
             reference: 'PRJ-2024-001',
             nom: 'Garde-corps Restaurant Le Gourmet',
-            description:
-              'Installation garde-corps terrasse extérieure',
+            description: 'Installation garde-corps terrasse extérieure',
             clientId: 'client-1',
             responsableId: 'resp-1',
             commercialId: 'comm-1',
@@ -68,8 +74,7 @@ export const api = {
             id: '2',
             reference: 'PRJ-2024-002',
             nom: 'Escalier métallique Villa Moderne',
-            description:
-              'Fabrication et installation escalier extérieur',
+            description: 'Fabrication et installation escalier extérieur',
             clientId: 'client-2',
             responsableId: 'resp-2',
             commercialId: 'comm-2',
@@ -117,8 +122,7 @@ export const api = {
             id: '3',
             reference: 'PRJ-2024-003',
             nom: 'Garde-corps Résidence Les Acacias',
-            description:
-              'Installation garde-corps pour résidence neuve',
+            description: 'Installation garde-corps pour résidence neuve',
             clientId: 'client-3',
             responsableId: 'resp-3',
             commercialId: 'comm-3',
@@ -183,13 +187,17 @@ export const api = {
 
           if (filters.dateDebutMin) {
             filteredProjets = filteredProjets.filter(
-              (p) => p.delais.dateDebut && filters.dateDebutMin && p.delais.dateDebut >= filters.dateDebutMin
+              (p) =>
+                p.delais.dateDebut &&
+                filters.dateDebutMin &&
+                p.delais.dateDebut >= filters.dateDebutMin
             )
           }
 
           if (filters.dateFinMax) {
             filteredProjets = filteredProjets.filter(
-              (p) => p.delais.dateFin && filters.dateFinMax && p.delais.dateFin <= filters.dateFinMax
+              (p) =>
+                p.delais.dateFin && filters.dateFinMax && p.delais.dateFin <= filters.dateFinMax
             )
           }
 
