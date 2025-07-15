@@ -59,7 +59,14 @@
       "Bash(npx turbo dev:*)",
       "Bash(taskkill:*)",
       "Bash(./start_web.bat)",
-      "Bash(/c/Windows/System32/cmd.exe /c start_web.bat)"
+      "Bash(/c/Windows/System32/cmd.exe /c start_web.bat)",
+      "Bash(cat:*)",
+      "Bash(/c/Users/_/AppData/Roaming/npm/pnpm build)",
+      "Bash(npx pnpm build:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(\"/c/Users/_/AppData/Roaming/npm/pnpm\" install)",
+      "Bash(echo $PATH)",
+      "Bash(/c/Users/_/AppData/Local/pnpm/pnpm install)"
     ],
     "deny": []
   }
