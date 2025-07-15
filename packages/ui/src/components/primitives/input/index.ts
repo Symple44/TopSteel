@@ -1,5 +1,5 @@
-export * from './Input'
-export type { InputProps } from './Input'
+export * from './input'
+export type { InputProps } from './input'
 
 // Composants de convenance
-export { NumberInput, SearchInput, PasswordInput, CheckboxInput, RadioInput } from './Input'
+export { NumberInput, SearchInput, PasswordInput, CheckboxInput, RadioInput } from './input'

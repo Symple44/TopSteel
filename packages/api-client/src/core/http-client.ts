@@ -3,7 +3,7 @@
  * Client HTTP centralisé avec intercepteurs et gestion d'erreurs
  */
 
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 
 // Temporary local types until @erp/domains dependency is resolved
 export interface PaginatedResponse<T> {
@@ -74,8 +74,8 @@ export class HttpClient {
   private setupInterceptors(): void {
     // Request interceptor - add auth token
     this.client.interceptors.request.use(
-      (config: AxiosRequestConfig) => {
-        if (this.authToken && !config.headers?.Authorization) {
+      (config: InternalAxiosRequestConfig) => {
+        if (this.authToken && config.headers && !config.headers.Authorization) {
           config.headers.Authorization = `Bearer ${this.authToken.access_token}`
         }
         return config

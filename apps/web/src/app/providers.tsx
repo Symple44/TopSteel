@@ -1,10 +1,11 @@
 'use client'
 
-import { Toaster as SonnerToaster, Toaster } from '@erp/ui'
-
+import { Toaster } from 'sonner'
+import { I18nProvider } from '@/lib/i18n'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider } from 'next-themes'
+import { AuthProvider } from '@/components/auth/AuthProvider'
 
 // Configuration React Query
 const queryClient = new QueryClient({
@@ -20,19 +21,22 @@ const queryClient = new QueryClient({
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem={false}
-        disableTransitionOnChange={true}
-        storageKey="topsteel-theme"
-        forcedTheme="light"
-      >
-        {children}
-        <Toaster />
-        <SonnerToaster />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </ThemeProvider>
+      <I18nProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange={true}
+          storageKey="topsteel-theme"
+          forcedTheme="light"
+        >
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+          <Toaster position="top-right" />
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+        </ThemeProvider>
+      </I18nProvider>
     </QueryClientProvider>
   )
 }

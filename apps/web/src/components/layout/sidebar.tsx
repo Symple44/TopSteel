@@ -48,6 +48,13 @@ const navigation: NavItem[] = [
     gradient: 'from-blue-500 to-purple-600',
   },
   {
+    title: 'Configuration',
+    href: '/admin',
+    icon: Shield,
+    gradient: 'from-red-500 to-pink-600',
+    roles: ['ADMIN'],
+  },
+  {
     title: 'Paramètres',
     href: '/settings',
     icon: Settings,

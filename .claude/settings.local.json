@@ -40,7 +40,26 @@
       "Bash(pnpm type-check:*)",
       "Bash(npx -C \"D:/GitHub/TopSteel/packages/ui\" tsc --noEmit)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(timeout 10s npm run dev)",
+      "Bash(timeout 30s npm run build)",
+      "Bash(pnpm --filter @erp/web build)",
+      "Bash(pnpm.cmd run build:windows)",
+      "Bash(pnpm.cmd:*)",
+      "Bash(ls:*)",
+      "Bash(rimraf:*)",
+      "Bash(npx rimraf:*)",
+      "Bash(pnpm:*)",
+      "Bash(echo $0)",
+      "Bash(/c/Users/_/AppData/Roaming/npm/pnpm run build --filter ui)",
+      "Bash(bash:*)",
+      "Bash(env)",
+      "Bash(where pnpm)",
+      "Bash(C:Users_AppDataRoamingnpmpnpm.cmd dev)",
+      "Bash(npx turbo dev:*)",
+      "Bash(taskkill:*)",
+      "Bash(./start_web.bat)",
+      "Bash(/c/Windows/System32/cmd.exe /c start_web.bat)"
     ],
     "deny": []
   }

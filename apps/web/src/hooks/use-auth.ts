@@ -111,7 +111,7 @@ export const useAuth = () => {
   }, [])
 
   // ✅ Fonction de login - stable avec useCallback
-  const login = useCallback(async (email: string, password: string): Promise<void> => {
+  const login = useCallback(async (email: string, password: string, rememberMe: boolean = false): Promise<void> => {
     setAuthState((prev) => ({ ...prev, isLoading: true }))
 
     try {
@@ -259,6 +259,22 @@ export const useAuth = () => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        // Vérifier si la session a été nettoyée au démarrage
+        const sessionInitialized = typeof window !== 'undefined' && 
+                                  sessionStorage.getItem('topsteel-session-initialized')
+        
+        if (sessionInitialized) {
+          // Si la session est initialisée, ne pas charger depuis localStorage
+          setAuthState((prev) => ({
+            ...prev,
+            isLoading: false,
+            isAuthenticated: false,
+            user: null,
+            tokens: null,
+          }))
+          return
+        }
+        
         const storedUser = storage.get(AUTH_STORAGE_KEY)
         const storedTokens = storage.get(TOKEN_STORAGE_KEY)
 
@@ -281,6 +297,9 @@ export const useAuth = () => {
           setAuthState((prev) => ({
             ...prev,
             isLoading: false,
+            isAuthenticated: false,
+            user: null,
+            tokens: null,
           }))
         }
       } catch (error) {
@@ -288,6 +307,9 @@ export const useAuth = () => {
         setAuthState((prev) => ({
           ...prev,
           isLoading: false,
+          isAuthenticated: false,
+          user: null,
+          tokens: null,
         }))
       }
     }

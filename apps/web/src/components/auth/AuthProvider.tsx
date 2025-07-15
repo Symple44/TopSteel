@@ -28,60 +28,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // Vérification de l'authentification au chargement
+  // Nettoyer les sessions au démarrage de l'application (une seule fois)
   useEffect(() => {
-    let isMounted = true
-
-    const checkAuth = async () => {
-      // Si on a des tokens en local storage, vérifier leur validité
-      if (tokens?.accessToken && !user) {
-        try {
-          const userData = await authService.getMe()
-
-          if (isMounted) {
-            // Conversion du User des domaines vers le User local
-            setUser({
-              id: userData.id,
-              email: userData.email,
-              nom: userData.profile.nom,
-              prenom: userData.profile.prenom,
-              role: userData.role,
-              avatar: userData.profile.avatar,
-              permissions: userData.permissions || [],
-            })
-          }
-        } catch (error) {
-          console.error("Erreur lors de la vérification de l'auth:", error)
-          if (isMounted) {
-            logout()
-          }
-        }
-      }
+    // Vérifier si c'est le premier chargement de la session
+    if (typeof window !== 'undefined' && !sessionStorage.getItem('topsteel-session-initialized')) {
+      // Supprimer les données d'authentification du localStorage
+      localStorage.removeItem('topsteel-auth')
+      localStorage.removeItem('topsteel-tokens')
+      
+      // Marquer la session comme initialisée pour éviter de nettoyer à nouveau
+      sessionStorage.setItem('topsteel-session-initialized', 'true')
+      
+      // Forcer la réinitialisation de l'état d'authentification
+      logout()
+      
+      console.log('Sessions cleared on initial startup')
     }
-
-    checkAuth()
-
-    return () => {
-      isMounted = false
-    }
-  }, [tokens?.accessToken, user, setUser, logout])
+  }, [logout])
 
   // Gestion des redirections basées sur l'état d'authentification
   useEffect(() => {
+    // Ne pas faire de redirections si on est encore en train de charger
+    if (typeof window === 'undefined') return
+
     const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
     const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
 
     // Si l'utilisateur est connecté et sur une page d'auth, rediriger vers dashboard
     if (isAuthenticated && isAuthRoute) {
       router.replace('/dashboard')
-
       return
     }
 
     // Si l'utilisateur n'est pas connecté et sur une page privée, rediriger vers login
     if (!isAuthenticated && !isPublicRoute && pathname !== '/') {
       router.replace('/login')
-
       return
     }
 

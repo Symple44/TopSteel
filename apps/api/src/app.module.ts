@@ -19,6 +19,8 @@ import { HealthController } from './health/health.controller'
 import { IntegrityService } from './health/integrity.service'
 // Module d'authentification
 import { AuthModule } from './modules/auth/auth.module'
+// Module d'administration
+import { AdminModule } from './modules/admin/admin.module'
 // Modules métier harmonisés
 import { ClientsModule } from './modules/clients/clients.module'
 import { CommandesModule } from './modules/commandes/commandes.module'
@@ -56,6 +58,9 @@ import { RedisModule } from './redis/redis.module'
 
     // Authentification
     AuthModule,
+
+    // Administration
+    AdminModule,
 
     // Modules métier
     ClientsModule,

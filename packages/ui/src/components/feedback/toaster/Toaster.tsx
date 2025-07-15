@@ -1,13 +1,15 @@
-import * as React from 'react'
+'use client'
+
+import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../../lib/utils'
 import { Button } from '../../primitives/button'
 import { useToast } from './ToastProvider'
 
-export interface ToasterProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ToasterProps extends HTMLAttributes<HTMLDivElement> {
   position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'
 }
 
-const Toaster = React.forwardRef<HTMLDivElement, ToasterProps>(
+const Toaster = forwardRef<HTMLDivElement, ToasterProps>(
   ({ position = 'top-right', className, ...props }, ref) => {
     const { toasts, removeToast } = useToast()
 

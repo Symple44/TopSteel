@@ -1,61 +1,114 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui/layout'
-import { Badge } from '@erp/ui/data-display'
-import { Button } from '@erp/ui/primitives'
-import { Input } from '@erp/ui/primitives'
-import { 
-  User, 
-  Settings, 
-  Shield, 
-  Bell, 
-  Palette, 
-  Globe,
-  Save,
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Badge, Button, Input } from '@erp/ui'
+import {
+  Bell,
+  Building2,
+  Camera,
   Eye,
   EyeOff,
-  Camera,
+  Globe,
   Mail,
-  Phone,
   MapPin,
-  Building2
+  Palette,
+  Phone,
+  Save,
+  Settings,
+  Shield,
+  User,
+  Loader2,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { 
+  useUserSettings, 
+  useUpdateProfile, 
+  useUpdateCompany, 
+  useUpdatePreferences,
+  useUpdateNotifications 
+} from '@/hooks/use-user-settings'
+import { toast } from 'sonner'
 
-// Données par défaut utilisateur
-const defaultUserData = {
-  profile: {
-    firstName: 'Jean',
-    lastName: 'Dupont',
-    email: 'jean.dupont@topsteel.com',
-    phone: '+33 1 23 45 67 89',
-    position: 'Responsable Production',
-    department: 'Production',
-    avatar: null
-  },
-  company: {
-    name: 'TopSteel Métallerie',
-    address: '123 Rue de l\'Industrie',
-    city: 'Lyon',
-    postalCode: '69001',
-    country: 'France'
-  },
-  preferences: {
+export default function SettingsPage() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [activeTab, setActiveTab] = useState('profile')
+
+  // Récupération des données utilisateur depuis l'API
+  const { data: userSettings, isLoading, error } = useUserSettings()
+  
+  // Mutations pour les mises à jour
+  const updateProfile = useUpdateProfile()
+  const updateCompany = useUpdateCompany()
+  const updatePreferences = useUpdatePreferences()
+  const updateNotifications = useUpdateNotifications()
+
+  // États locaux pour les formulaires
+  const [profileData, setProfileData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    position: '',
+    department: '',
+  })
+
+  const [companyData, setCompanyData] = useState({
+    name: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    country: '',
+  })
+
+  const [preferencesData, setPreferencesData] = useState({
     language: 'fr',
     timezone: 'Europe/Paris',
-    theme: 'light',
+    theme: 'light' as 'light' | 'dark' | 'auto',
     notifications: {
       email: true,
       push: true,
-      sms: false
-    }
-  }
-}
+      sms: false,
+    },
+  })
 
-export default function SettingsPage() {
-  const [userData, setUserData] = useState(defaultUserData)
-  const [showPassword, setShowPassword] = useState(false)
-  const [activeTab, setActiveTab] = useState('profile')
+  // Synchroniser les données quand elles arrivent de l'API
+  useEffect(() => {
+    if (userSettings) {
+      if (userSettings.profile) {
+        setProfileData({
+          firstName: userSettings.profile.firstName || '',
+          lastName: userSettings.profile.lastName || '',
+          email: userSettings.profile.email || '',
+          phone: userSettings.profile.phone || '',
+          position: userSettings.profile.position || '',
+          department: userSettings.profile.department || '',
+        })
+      }
+
+      if (userSettings.company) {
+        setCompanyData({
+          name: userSettings.company.name || '',
+          address: userSettings.company.address || '',
+          city: userSettings.company.city || '',
+          postalCode: userSettings.company.postalCode || '',
+          country: userSettings.company.country || '',
+        })
+      }
+
+      if (userSettings.preferences) {
+        setPreferencesData({
+          language: userSettings.preferences.language || 'fr',
+          timezone: userSettings.preferences.timezone || 'Europe/Paris',
+          theme: userSettings.preferences.theme || 'light',
+          notifications: {
+            email: userSettings.preferences.notifications?.email ?? true,
+            push: userSettings.preferences.notifications?.push ?? true,
+            sms: userSettings.preferences.notifications?.sms ?? false,
+          },
+        })
+      }
+    }
+  }, [userSettings])
 
   const tabs = [
     { id: 'profile', label: 'Profil', icon: User },
@@ -64,10 +117,37 @@ export default function SettingsPage() {
     { id: 'preferences', label: 'Préférences', icon: Settings },
   ]
 
-  const handleSave = () => {
-    // Simulation de sauvegarde
-    console.log('Sauvegarde des paramètres:', userData)
-    // Ici on appellerait l'API pour sauvegarder
+  const handleSaveProfile = () => {
+    updateProfile.mutate(profileData)
+  }
+
+  const handleSaveCompany = () => {
+    updateCompany.mutate(companyData)
+  }
+
+  const handleSavePreferences = () => {
+    updatePreferences.mutate(preferencesData)
+  }
+
+  const handleSaveNotifications = () => {
+    updateNotifications.mutate({ notifications: preferencesData.notifications })
+  }
+
+  // Gestion des erreurs
+  if (error) {
+    toast.error('Erreur lors du chargement des paramètres')
+  }
+
+  // Affichage du loader pendant le chargement initial
+  if (isLoading) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <span className="ml-2">Chargement des paramètres...</span>
+        </div>
+      </div>
+    )
   }
 
   const renderTabContent = () => {
@@ -86,7 +166,8 @@ export default function SettingsPage() {
               <CardContent>
                 <div className="flex items-center space-x-4">
                   <div className="h-20 w-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                    {userData.profile.firstName[0]}{userData.profile.lastName[0]}
+                    {profileData.firstName[0] || 'U'}
+                    {profileData.lastName[0] || 'U'}
                   </div>
                   <div>
                     <Button variant="outline" size="sm">
@@ -109,27 +190,17 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Prénom
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
                     <Input
-                      value={userData.profile.firstName}
-                      onChange={(e) => setUserData(prev => ({
-                        ...prev,
-                        profile: { ...prev.profile, firstName: e.target.value }
-                      }))}
+                      value={profileData.firstName}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nom
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nom</label>
                     <Input
-                      value={userData.profile.lastName}
-                      onChange={(e) => setUserData(prev => ({
-                        ...prev,
-                        profile: { ...prev.profile, lastName: e.target.value }
-                      }))}
+                      value={profileData.lastName}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
                     />
                   </div>
                 </div>
@@ -141,11 +212,8 @@ export default function SettingsPage() {
                   </label>
                   <Input
                     type="email"
-                    value={userData.profile.email}
-                    onChange={(e) => setUserData(prev => ({
-                      ...prev,
-                      profile: { ...prev.profile, email: e.target.value }
-                    }))}
+                    value={profileData.email}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
                   />
                 </div>
 
@@ -155,25 +223,17 @@ export default function SettingsPage() {
                     Téléphone
                   </label>
                   <Input
-                    value={userData.profile.phone}
-                    onChange={(e) => setUserData(prev => ({
-                      ...prev,
-                      profile: { ...prev.profile, phone: e.target.value }
-                    }))}
+                    value={profileData.phone}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Poste
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Poste</label>
                     <Input
-                      value={userData.profile.position}
-                      onChange={(e) => setUserData(prev => ({
-                        ...prev,
-                        profile: { ...prev.profile, position: e.target.value }
-                      }))}
+                      value={profileData.position}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, position: e.target.value }))}
                     />
                   </div>
                   <div>
@@ -181,13 +241,25 @@ export default function SettingsPage() {
                       Département
                     </label>
                     <Input
-                      value={userData.profile.department}
-                      onChange={(e) => setUserData(prev => ({
-                        ...prev,
-                        profile: { ...prev.profile, department: e.target.value }
-                      }))}
+                      value={profileData.department}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, department: e.target.value }))}
                     />
                   </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button 
+                    onClick={handleSaveProfile}
+                    disabled={updateProfile.isPending}
+                    className="flex items-center"
+                  >
+                    {updateProfile.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
+                    Enregistrer le profil
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -206,11 +278,8 @@ export default function SettingsPage() {
                     Nom de l'entreprise
                   </label>
                   <Input
-                    value={userData.company.name}
-                    onChange={(e) => setUserData(prev => ({
-                      ...prev,
-                      company: { ...prev.company, name: e.target.value }
-                    }))}
+                    value={companyData.name}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
                   />
                 </div>
                 <div>
@@ -219,24 +288,16 @@ export default function SettingsPage() {
                     Adresse
                   </label>
                   <Input
-                    value={userData.company.address}
-                    onChange={(e) => setUserData(prev => ({
-                      ...prev,
-                      company: { ...prev.company, address: e.target.value }
-                    }))}
+                    value={companyData.address}
+                    onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Ville
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Ville</label>
                     <Input
-                      value={userData.company.city}
-                      onChange={(e) => setUserData(prev => ({
-                        ...prev,
-                        company: { ...prev.company, city: e.target.value }
-                      }))}
+                      value={companyData.city}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
                     />
                   </div>
                   <div>
@@ -244,25 +305,32 @@ export default function SettingsPage() {
                       Code postal
                     </label>
                     <Input
-                      value={userData.company.postalCode}
-                      onChange={(e) => setUserData(prev => ({
-                        ...prev,
-                        company: { ...prev.company, postalCode: e.target.value }
-                      }))}
+                      value={companyData.postalCode}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, postalCode: e.target.value }))}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Pays
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Pays</label>
                     <Input
-                      value={userData.company.country}
-                      onChange={(e) => setUserData(prev => ({
-                        ...prev,
-                        company: { ...prev.company, country: e.target.value }
-                      }))}
+                      value={companyData.country}
+                      onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
                     />
                   </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button 
+                    onClick={handleSaveCompany}
+                    disabled={updateCompany.isPending}
+                    className="flex items-center"
+                  >
+                    {updateCompany.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
+                    Enregistrer l'entreprise
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -282,10 +350,7 @@ export default function SettingsPage() {
                     Mot de passe actuel
                   </label>
                   <div className="relative">
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••"
-                    />
+                    <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -299,23 +364,15 @@ export default function SettingsPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nouveau mot de passe
                   </label>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                  />
+                  <Input type="password" placeholder="••••••••" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Confirmer le nouveau mot de passe
                   </label>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                  />
+                  <Input type="password" placeholder="••••••••" />
                 </div>
-                <Button variant="default">
-                  Mettre à jour le mot de passe
-                </Button>
+                <Button variant="default">Mettre à jour le mot de passe</Button>
               </CardContent>
             </Card>
 
@@ -331,9 +388,7 @@ export default function SettingsPage() {
                       Ajoutez une couche de sécurité supplémentaire à votre compte
                     </p>
                   </div>
-                  <Button variant="outline">
-                    Activer 2FA
-                  </Button>
+                  <Button variant="outline">Activer 2FA</Button>
                 </div>
               </CardContent>
             </Card>
@@ -356,16 +411,10 @@ export default function SettingsPage() {
                 </div>
                 <input
                   type="checkbox"
-                  checked={userData.preferences.notifications.email}
-                  onChange={(e) => setUserData(prev => ({
+                  checked={preferencesData.notifications.email}
+                  onChange={(e) => setPreferencesData(prev => ({
                     ...prev,
-                    preferences: {
-                      ...prev.preferences,
-                      notifications: {
-                        ...prev.preferences.notifications,
-                        email: e.target.checked
-                      }
-                    }
+                    notifications: { ...prev.notifications, email: e.target.checked }
                   }))}
                   className="h-4 w-4 text-blue-600 rounded border-gray-300"
                 />
@@ -380,16 +429,10 @@ export default function SettingsPage() {
                 </div>
                 <input
                   type="checkbox"
-                  checked={userData.preferences.notifications.push}
-                  onChange={(e) => setUserData(prev => ({
+                  checked={preferencesData.notifications.push}
+                  onChange={(e) => setPreferencesData(prev => ({
                     ...prev,
-                    preferences: {
-                      ...prev.preferences,
-                      notifications: {
-                        ...prev.preferences.notifications,
-                        push: e.target.checked
-                      }
-                    }
+                    notifications: { ...prev.notifications, push: e.target.checked }
                   }))}
                   className="h-4 w-4 text-blue-600 rounded border-gray-300"
                 />
@@ -398,25 +441,32 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium">Notifications SMS</h4>
-                  <p className="text-sm text-gray-500">
-                    Recevoir les alertes urgentes par SMS
-                  </p>
+                  <p className="text-sm text-gray-500">Recevoir les alertes urgentes par SMS</p>
                 </div>
                 <input
                   type="checkbox"
-                  checked={userData.preferences.notifications.sms}
-                  onChange={(e) => setUserData(prev => ({
+                  checked={preferencesData.notifications.sms}
+                  onChange={(e) => setPreferencesData(prev => ({
                     ...prev,
-                    preferences: {
-                      ...prev.preferences,
-                      notifications: {
-                        ...prev.preferences.notifications,
-                        sms: e.target.checked
-                      }
-                    }
+                    notifications: { ...prev.notifications, sms: e.target.checked }
                   }))}
                   className="h-4 w-4 text-blue-600 rounded border-gray-300"
                 />
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={handleSaveNotifications}
+                  disabled={updateNotifications.isPending}
+                  className="flex items-center"
+                >
+                  {updateNotifications.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-2" />
+                  )}
+                  Enregistrer les notifications
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -434,15 +484,10 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Langue
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Langue</label>
                   <select
-                    value={userData.preferences.language}
-                    onChange={(e) => setUserData(prev => ({
-                      ...prev,
-                      preferences: { ...prev.preferences, language: e.target.value }
-                    }))}
+                    value={preferencesData.language}
+                    onChange={(e) => setPreferencesData(prev => ({ ...prev, language: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="fr">Français</option>
@@ -455,11 +500,8 @@ export default function SettingsPage() {
                     Fuseau horaire
                   </label>
                   <select
-                    value={userData.preferences.timezone}
-                    onChange={(e) => setUserData(prev => ({
-                      ...prev,
-                      preferences: { ...prev.preferences, timezone: e.target.value }
-                    }))}
+                    value={preferencesData.timezone}
+                    onChange={(e) => setPreferencesData(prev => ({ ...prev, timezone: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="Europe/Paris">Paris (GMT+1)</option>
@@ -479,17 +521,13 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Thème
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Thème</label>
                   <div className="flex space-x-4">
                     <button
-                      onClick={() => setUserData(prev => ({
-                        ...prev,
-                        preferences: { ...prev.preferences, theme: 'light' }
-                      }))}
+                      type="button"
+                      onClick={() => setPreferencesData(prev => ({ ...prev, theme: 'light' }))}
                       className={`px-4 py-2 rounded-md border ${
-                        userData.preferences.theme === 'light'
+                        preferencesData.theme === 'light'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-300'
                       }`}
@@ -497,12 +535,10 @@ export default function SettingsPage() {
                       Clair
                     </button>
                     <button
-                      onClick={() => setUserData(prev => ({
-                        ...prev,
-                        preferences: { ...prev.preferences, theme: 'dark' }
-                      }))}
+                      type="button"
+                      onClick={() => setPreferencesData(prev => ({ ...prev, theme: 'dark' }))}
                       className={`px-4 py-2 rounded-md border ${
-                        userData.preferences.theme === 'dark'
+                        preferencesData.theme === 'dark'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-300'
                       }`}
@@ -510,12 +546,10 @@ export default function SettingsPage() {
                       Sombre
                     </button>
                     <button
-                      onClick={() => setUserData(prev => ({
-                        ...prev,
-                        preferences: { ...prev.preferences, theme: 'auto' }
-                      }))}
+                      type="button"
+                      onClick={() => setPreferencesData(prev => ({ ...prev, theme: 'auto' }))}
                       className={`px-4 py-2 rounded-md border ${
-                        userData.preferences.theme === 'auto'
+                        preferencesData.theme === 'auto'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-300'
                       }`}
@@ -523,6 +557,21 @@ export default function SettingsPage() {
                       Auto
                     </button>
                   </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button 
+                    onClick={handleSavePreferences}
+                    disabled={updatePreferences.isPending}
+                    className="flex items-center"
+                  >
+                    {updatePreferences.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
+                    Enregistrer les préférences
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -540,14 +589,8 @@ export default function SettingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Paramètres</h1>
-          <p className="text-gray-600 mt-1">
-            Gérez vos préférences et paramètres de compte
-          </p>
+          <p className="text-gray-600 mt-1">Gérez vos préférences et paramètres de compte</p>
         </div>
-        <Button onClick={handleSave} variant="default">
-          <Save className="h-4 w-4 mr-2" />
-          Sauvegarder
-        </Button>
       </div>
 
       {/* Navigation Tabs */}
@@ -574,9 +617,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="mt-6">
-        {renderTabContent()}
-      </div>
+      <div className="mt-6">{renderTabContent()}</div>
     </div>
   )
 }

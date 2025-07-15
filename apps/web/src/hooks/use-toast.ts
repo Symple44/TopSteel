@@ -301,3 +301,25 @@ export function useToastWithPromise() {
 
   return { promiseToast }
 }
+
+// Simple toast function for compatibility with admin components
+import { toast as sonnerToast } from 'sonner'
+
+export function toast({ title, description, variant = 'default' }: {
+  title: string
+  description?: string
+  variant?: 'default' | 'destructive' | 'success'
+}) {
+  const message = title && description ? `${title}\n${description}` : title
+  
+  switch (variant) {
+    case 'success':
+      sonnerToast.success(message)
+      break
+    case 'destructive':
+      sonnerToast.error(message)
+      break
+    default:
+      sonnerToast(message)
+  }
+}

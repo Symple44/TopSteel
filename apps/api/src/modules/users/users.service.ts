@@ -4,13 +4,18 @@ import type { Repository } from 'typeorm'
 import type { CreateUserDto } from './dto/create-user.dto'
 import type { UpdateUserDto } from './dto/update-user.dto'
 import type { UserQueryDto } from './dto/user-query.dto'
+import { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
+import { GetUserSettingsResponseDto } from './dto/get-user-settings.dto'
 import { User, UserRole } from './entities/user.entity'
+import { UserSettings } from './entities/user-settings.entity'
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly repository: Repository<User>
+    private readonly repository: Repository<User>,
+    @InjectRepository(UserSettings)
+    private readonly userSettingsRepository: Repository<UserSettings>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -20,7 +25,12 @@ export class UsersService {
     }
 
     const user = this.repository.create(createUserDto)
-    return this.repository.save(user)
+    const savedUser = await this.repository.save(user)
+
+    // Créer les paramètres par défaut pour l'utilisateur
+    await this.createDefaultUserSettings(savedUser.id)
+
+    return savedUser
   }
 
   async findAll(query?: UserQueryDto): Promise<User[]> {
@@ -134,5 +144,90 @@ export class UsersService {
         operators,
       },
     }
+  }
+
+  // Méthodes pour les paramètres utilisateur
+  async getUserSettings(userId: string): Promise<GetUserSettingsResponseDto> {
+    const settings = await this.userSettingsRepository.findOne({
+      where: { userId },
+    })
+
+    if (!settings) {
+      // Créer les paramètres par défaut si ils n'existent pas
+      const defaultSettings = await this.createDefaultUserSettings(userId)
+      return GetUserSettingsResponseDto.fromEntity(defaultSettings)
+    }
+
+    return GetUserSettingsResponseDto.fromEntity(settings)
+  }
+
+  async updateUserSettings(userId: string, updateDto: UpdateUserSettingsDto): Promise<GetUserSettingsResponseDto> {
+    let settings = await this.userSettingsRepository.findOne({
+      where: { userId },
+    })
+
+    if (!settings) {
+      // Créer les paramètres s'ils n'existent pas
+      settings = await this.createDefaultUserSettings(userId)
+    }
+
+    // Fusionner les nouvelles données avec les existantes
+    if (updateDto.profile) {
+      settings.profile = { ...settings.profile, ...updateDto.profile }
+    }
+
+    if (updateDto.company) {
+      settings.company = { ...settings.company, ...updateDto.company }
+    }
+
+    if (updateDto.preferences) {
+      settings.preferences = { 
+        ...settings.preferences, 
+        ...updateDto.preferences,
+        notifications: {
+          ...settings.preferences.notifications,
+          ...updateDto.preferences.notifications
+        }
+      }
+    }
+
+    if (updateDto.metadata) {
+      settings.metadata = { ...settings.metadata, ...updateDto.metadata }
+    }
+
+    const updatedSettings = await this.userSettingsRepository.save(settings)
+    return GetUserSettingsResponseDto.fromEntity(updatedSettings)
+  }
+
+  private async createDefaultUserSettings(userId: string): Promise<UserSettings> {
+    const user = await this.findOne(userId)
+    
+    const defaultSettings = this.userSettingsRepository.create({
+      userId,
+      profile: {
+        firstName: user.prenom,
+        lastName: user.nom,
+        email: user.email,
+      },
+      company: {
+        name: 'TopSteel Métallerie',
+        address: "123 Rue de l'Industrie",
+        city: 'Lyon',
+        postalCode: '69001',
+        country: 'France',
+      },
+      preferences: {
+        language: 'fr',
+        timezone: 'Europe/Paris',
+        theme: 'light',
+        notifications: {
+          email: true,
+          push: true,
+          sms: false,
+        },
+      },
+    })
+
+    return this.userSettingsRepository.save(defaultSettings)
   }
 }

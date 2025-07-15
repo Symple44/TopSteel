@@ -1,9 +1,9 @@
 'use client'
 
 import { useAuth } from '@/hooks/use-auth'
+import { Building2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { Building2 } from 'lucide-react'
 
 export default function HomePage() {
   const { isAuthenticated, isLoading } = useAuth()

@@ -142,9 +142,9 @@
     "lint": "eslint src --ext .ts,.tsx --max-warnings 0",
     "build:clean": "rimraf dist",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "dev": "vite build --watch --mode development",
+    "dev": "tsup --watch",
     "clean": "rimraf dist .turbo node_modules/.cache",
-    "build": "pnpm build:clean && tsup",
+    "build": "npm run build:clean && tsup",
     "build:watch": "vite build --watch",
     "build:analyze": "vite build && vite-bundle-analyzer"
   },

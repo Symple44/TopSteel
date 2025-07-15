@@ -18,6 +18,8 @@ import { RolesGuard } from '../auth/guards/roles.guard'
 import type { CreateUserDto } from './dto/create-user.dto'
 import type { UpdateUserDto } from './dto/update-user.dto'
 import type { UserQueryDto } from './dto/user-query.dto'
+import { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
+import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { UserRole } from './entities/user.entity'
 import type { UsersService } from './users.service'
 
@@ -71,5 +73,42 @@ export class UsersController {
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   async remove(@Param('id') id: string) {
     return this.usersService.remove(id)
+  }
+
+  // Endpoints pour les paramètres utilisateur
+  @Get('settings/me')
+  @ApiOperation({ summary: 'Récupérer mes paramètres utilisateur' })
+  @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
+  async getMySettings(@CurrentUser() user: any) {
+    return this.usersService.getUserSettings(user.id)
+  }
+
+  @Patch('settings/me')
+  @ApiOperation({ summary: 'Mettre à jour mes paramètres utilisateur' })
+  @ApiResponse({ status: 200, description: 'Paramètres utilisateur mis à jour avec succès' })
+  async updateMySettings(
+    @CurrentUser() user: any,
+    @Body() updateDto: UpdateUserSettingsDto
+  ) {
+    return this.usersService.updateUserSettings(user.id, updateDto)
+  }
+
+  @Get(':id/settings')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Récupérer les paramètres d\'un utilisateur (Admin/Manager)' })
+  @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
+  async getUserSettings(@Param('id') id: string) {
+    return this.usersService.getUserSettings(id)
+  }
+
+  @Patch(':id/settings')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Mettre à jour les paramètres d\'un utilisateur (Admin/Manager)' })
+  @ApiResponse({ status: 200, description: 'Paramètres utilisateur mis à jour avec succès' })
+  async updateUserSettings(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateUserSettingsDto
+  ) {
+    return this.usersService.updateUserSettings(id, updateDto)
   }
 }

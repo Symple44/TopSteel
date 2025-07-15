@@ -11,7 +11,7 @@ import type {
   ProjetStatut,
   ProjetType,
   ProjetPriorite 
-} from '@erp/domains/core'
+} from '@erp/domains'
 
 export interface ProjetStats {
   total: number

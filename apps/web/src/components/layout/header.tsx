@@ -1,18 +1,11 @@
 'use client'
 
-import { Button } from '@erp/ui/primitives'
 import { useAuth } from '@/hooks/use-auth'
-import { 
-  Bell, 
-  Search, 
-  Building2, 
-  User, 
-  Settings, 
-  LogOut,
-  ChevronDown 
-} from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
+import { LanguageSelector } from '@/components/ui/language-selector'
+import { Button } from '@erp/ui'
+import { Bell, Building2, ChevronDown, LogOut, Search, Settings, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 
 interface HeaderProps {
   onToggleSidebar?: () => void
@@ -79,6 +72,9 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
 
         {/* Section droite - Actions utilisateur */}
         <div className="flex items-center space-x-2">
+          {/* Language Selector */}
+          <LanguageSelector />
+          
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="relative text-gray-600 hover:text-gray-900">
             <Bell className="h-5 w-5" />
@@ -96,10 +92,10 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
               className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             >
               <div className="h-8 w-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                {user?.firstName?.[0] || 'U'}
+                {user?.prenom?.[0] || user?.nom?.[0] || 'U'}
               </div>
               <span className="hidden md:block text-sm font-medium">
-                {user?.firstName || 'Utilisateur'}
+                {user?.prenom || 'Utilisateur'}
               </span>
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -110,7 +106,7 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
                 {/* Info utilisateur */}
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-medium text-gray-900">
-                    {user?.firstName} {user?.lastName}
+                    {user?.prenom} {user?.nom}
                   </p>
                   <p className="text-sm text-gray-500">
                     {user?.email || 'jean.dupont@topsteel.com'}
@@ -129,7 +125,7 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
                     <User className="h-4 w-4 mr-3" />
                     Mon profil
                   </button>
-                  
+
                   <button
                     onClick={() => {
                       router.push('/settings')

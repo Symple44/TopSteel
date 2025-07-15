@@ -14,7 +14,7 @@ export default defineConfig({
     'theme/index': 'src/components/theme/index.ts',
   },
   format: ['cjs', 'esm'],
-  dts: false,
+  dts: true,
   splitting: false,
   sourcemap: false,
   clean: true,

@@ -6,6 +6,7 @@
 
 import { Header } from '@/components/layout/header'
 import { Sidebar } from '@/components/layout/sidebar'
+import { AuthGuard } from '@/components/auth/auth-guard'
 import type { ReactNode } from 'react'
 
 interface DashboardLayoutProps {
@@ -14,20 +15,22 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar />
+    <AuthGuard>
+      <div className="flex h-screen overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar />
 
-      {/* Contenu principal */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header */}
-        <Header />
+        {/* Contenu principal */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Header */}
+          <Header />
 
-        {/* Zone de contenu */}
-        <main className="flex-1 overflow-auto bg-gray-50/50 p-6">
-          <div className="mx-auto max-w-7xl">{children}</div>
-        </main>
+          {/* Zone de contenu */}
+          <main className="flex-1 overflow-auto bg-gray-50/50 p-6">
+            <div className="mx-auto max-w-7xl">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   )
 }
