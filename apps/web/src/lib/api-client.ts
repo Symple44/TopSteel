@@ -489,7 +489,7 @@ export class APIClient {
 
 // ✅ INSTANCE GLOBALE EXPORTÉE
 export const apiClient = new APIClient(
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+  process.env.NEXT_PUBLIC_API_URL || '/api'
 )
 
 // ✅ TYPES EXPORTÉS

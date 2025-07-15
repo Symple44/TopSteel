@@ -10,14 +10,14 @@ class Translator {
     // Initialize from localStorage if available
     if (typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('topsteel-language')
-      if (savedLanguage && this.isValidLanguage(savedLanguage)) {
+      if (savedLanguage === 'auto' || !savedLanguage) {
+        // Use automatic browser language detection
+        this.currentLanguage = this.detectBrowserLanguage()
+      } else if (savedLanguage && this.isValidLanguage(savedLanguage)) {
         this.currentLanguage = savedLanguage
       } else {
         // Try to detect browser language
-        const browserLang = navigator.language.split('-')[0]
-        if (this.isValidLanguage(browserLang)) {
-          this.currentLanguage = browserLang
-        }
+        this.currentLanguage = this.detectBrowserLanguage()
       }
       this.updateDocumentDirection()
     }
@@ -25,6 +25,16 @@ class Translator {
 
   private isValidLanguage(lang: string): boolean {
     return SUPPORTED_LANGUAGES.some(l => l.code === lang)
+  }
+
+  private detectBrowserLanguage(): string {
+    if (typeof window !== 'undefined') {
+      const browserLang = navigator.language.split('-')[0]
+      if (this.isValidLanguage(browserLang)) {
+        return browserLang
+      }
+    }
+    return DEFAULT_LANGUAGE
   }
 
   private updateDocumentDirection(): void {
@@ -47,17 +57,24 @@ class Translator {
   }
 
   public setLanguage(langCode: string): void {
-    if (!this.isValidLanguage(langCode)) {
+    if (langCode === 'auto') {
+      // Set to automatic browser language detection
+      this.currentLanguage = this.detectBrowserLanguage()
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('topsteel-language', 'auto')
+        this.updateDocumentDirection()
+      }
+    } else if (this.isValidLanguage(langCode)) {
+      this.currentLanguage = langCode
+      
+      // Persist to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('topsteel-language', langCode)
+        this.updateDocumentDirection()
+      }
+    } else {
       console.warn(`Language '${langCode}' is not supported`)
       return
-    }
-
-    this.currentLanguage = langCode
-    
-    // Persist to localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('topsteel-language', langCode)
-      this.updateDocumentDirection()
     }
 
     this.notifyListeners()

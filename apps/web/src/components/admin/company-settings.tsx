@@ -23,7 +23,7 @@ export function CompanySettings() {
           <Input
             id="company-name"
             value={parameters?.COMPANY_NAME || ''}
-            onChange={(e) => handleInputChange('COMPANY_NAME', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('COMPANY_NAME', e.target.value)}
             placeholder="TopSteel Métallerie"
           />
         </div>
@@ -33,7 +33,7 @@ export function CompanySettings() {
           <Input
             id="company-siret"
             value={parameters?.COMPANY_SIRET || ''}
-            onChange={(e) => handleInputChange('COMPANY_SIRET', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('COMPANY_SIRET', e.target.value)}
             placeholder="12345678901234"
           />
         </div>
@@ -43,7 +43,7 @@ export function CompanySettings() {
           <Input
             id="company-vat"
             value={parameters?.COMPANY_TVA || ''}
-            onChange={(e) => handleInputChange('COMPANY_TVA', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('COMPANY_TVA', e.target.value)}
             placeholder="FR12345678901"
           />
         </div>
@@ -54,7 +54,7 @@ export function CompanySettings() {
             id="company-email"
             type="email"
             value={parameters?.COMPANY_EMAIL || ''}
-            onChange={(e) => handleInputChange('COMPANY_EMAIL', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('COMPANY_EMAIL', e.target.value)}
             placeholder="contact@topsteel.com"
           />
         </div>
@@ -65,7 +65,7 @@ export function CompanySettings() {
             id="company-phone"
             type="tel"
             value={parameters?.COMPANY_PHONE || ''}
-            onChange={(e) => handleInputChange('COMPANY_PHONE', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('COMPANY_PHONE', e.target.value)}
             placeholder="+33 1 23 45 67 89"
           />
         </div>
@@ -75,7 +75,7 @@ export function CompanySettings() {
           <Input
             id="company-address"
             value={parameters?.COMPANY_ADDRESS || ''}
-            onChange={(e) => handleInputChange('COMPANY_ADDRESS', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('COMPANY_ADDRESS', e.target.value)}
             placeholder="123 Rue de l'Industrie, 69001 Lyon, France"
           />
         </div>

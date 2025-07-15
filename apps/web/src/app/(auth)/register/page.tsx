@@ -7,6 +7,9 @@ import { Button, Card, Input, Label, Separator } from '@erp/ui'
 import { Building2, Eye, EyeOff, Lock, Mail, User, ArrowLeft } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
+// Force dynamic rendering to avoid SSR issues
+export const dynamic = 'force-dynamic'
+
 export default function RegisterPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({

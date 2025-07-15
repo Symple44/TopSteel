@@ -66,7 +66,24 @@
       "Bash(cmd.exe:*)",
       "Bash(\"/c/Users/_/AppData/Roaming/npm/pnpm\" install)",
       "Bash(echo $PATH)",
-      "Bash(/c/Users/_/AppData/Local/pnpm/pnpm install)"
+      "Bash(/c/Users/_/AppData/Local/pnpm/pnpm install)",
+      "Bash(timeout:*)",
+      "mcp__ide__executeCode",
+      "Bash(dir)",
+      "Bash(C:Users_AppDataRoamingnpmpnpm.cmd build)",
+      "Bash(\"C:\\Users\\_\\AppData\\Roaming\\npm\\pnpm.cmd\" build)",
+      "Bash(build_temp.bat)",
+      "Bash(git checkout:*)",
+      "Bash(./run_pnpm.bat)",
+      "Bash(C:\\Users\\_\\AppData\\Roaming\\npm\\pnpm install)",
+      "Bash(C:Users_AppDataRoamingnpmpnpm.cmd install)",
+      "Bash(\"/c/Users/_/AppData/Roaming/npm/pnpm.cmd\" install)",
+      "Bash(npx pnpm install:*)",
+      "Bash(npm:*)",
+      "Bash(touch:*)",
+      "Bash(NEXT_DEBUG=1 npx next build)",
+      "Bash(NODE_ENV=production npx next build --experimental-build-mode compile)",
+      "Bash(NEXT_TELEMETRY_DISABLED=1 npx next build --debug)"
     ],
     "deny": []
   }

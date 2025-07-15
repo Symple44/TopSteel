@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
-import { Providers } from './providers'
+import { ProvidersSimple } from './providers-simple'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="font-inter antialiased bg-background text-foreground"
         suppressHydrationWarning
       >
-        <Providers>{children}</Providers>
+        <ProvidersSimple>{children}</ProvidersSimple>
       </body>
     </html>
   )

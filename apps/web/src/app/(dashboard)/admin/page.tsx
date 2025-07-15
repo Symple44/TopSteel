@@ -2,112 +2,197 @@
 
 import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
-import { Button, Card, Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { Save, RefreshCw } from 'lucide-react'
+import { Button, Card } from '@erp/ui'
+import { Save, RefreshCw, Building2, ListChecks, Shield, Workflow, Plug, Settings } from 'lucide-react'
 import { CompanySettings } from '@/components/admin/company-settings'
 import { UnitsAndListsSettings } from '@/components/admin/units-lists-settings'
 import { AuthenticationSettings } from '@/components/admin/authentication-settings'
 import { useSystemParameters } from '@/hooks/use-system-parameters'
 import { toast } from '@/hooks/use-toast'
 
+// Force dynamic rendering to avoid SSR issues
+export const dynamic = 'force-dynamic'
+
+const getNavigationItems = (t: any) => [
+  {
+    id: 'company',
+    label: t('tabs.company'),
+    icon: Building2,
+    description: t('company.title')
+  },
+  {
+    id: 'units',
+    label: t('tabs.units'),
+    icon: ListChecks,
+    description: t('units.title')
+  },
+  {
+    id: 'authentication',
+    label: t('tabs.authentication'),
+    icon: Shield,
+    description: t('authentication.title')
+  },
+  {
+    id: 'workflow',
+    label: t('tabs.workflow'),
+    icon: Workflow,
+    description: t('workflow.title')
+  },
+  {
+    id: 'integrations',
+    label: t('tabs.integrations'),
+    icon: Plug,
+    description: t('integrations.title')
+  },
+  {
+    id: 'advanced',
+    label: t('tabs.advanced'),
+    icon: Settings,
+    description: t('advanced.title')
+  }
+]
+
 export default function AdminConfigurationPage() {
-  const { t } = useTranslation(['admin', 'common'])
-  const [activeTab, setActiveTab] = useState('company')
+  const { t } = useTranslation('admin')
+  const [activeSection, setActiveSection] = useState('company')
   const { saveParameters, isLoading } = useSystemParameters()
+  const navigationItems = getNavigationItems(t)
 
   const handleSave = async () => {
     try {
       await saveParameters()
       toast({
-        title: t('admin:saveSuccess'),
+        title: 'Paramètres sauvegardés',
         variant: 'success',
       })
     } catch (error) {
       toast({
-        title: t('admin:saveError'),
-        description: error instanceof Error ? error.message : 'Unknown error',
+        title: 'Erreur lors de la sauvegarde',
+        description: error instanceof Error ? error.message : 'Erreur inconnue',
         variant: 'destructive',
       })
     }
   }
 
   const handleReset = () => {
-    if (window.confirm(t('admin:resetConfirm'))) {
+    if (window.confirm('Êtes-vous sûr de vouloir réinitialiser tous les paramètres ?')) {
       // TODO: Implement reset to defaults
       console.log('Reset to defaults')
     }
   }
 
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'company':
+        return <CompanySettings />
+      case 'units':
+        return <UnitsAndListsSettings />
+      case 'authentication':
+        return <AuthenticationSettings />
+      case 'workflow':
+        return (
+          <div className="text-center py-12 text-muted-foreground">
+            <Workflow className="mx-auto h-12 w-12 mb-4 opacity-50" />
+            <h3 className="text-lg font-medium mb-2">{t('workflow.title')}</h3>
+            <p>{t('workflow.comingSoon')}</p>
+          </div>
+        )
+      case 'integrations':
+        return (
+          <div className="text-center py-12 text-muted-foreground">
+            <Plug className="mx-auto h-12 w-12 mb-4 opacity-50" />
+            <h3 className="text-lg font-medium mb-2">{t('integrations.title')}</h3>
+            <p>{t('integrations.comingSoon')}</p>
+          </div>
+        )
+      case 'advanced':
+        return (
+          <div className="text-center py-12 text-muted-foreground">
+            <Settings className="mx-auto h-12 w-12 mb-4 opacity-50" />
+            <h3 className="text-lg font-medium mb-2">{t('advanced.title')}</h3>
+            <p>{t('advanced.comingSoon')}</p>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
   return (
-    <div className="container mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{t('admin:title')}</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-2">
-          Configurez les paramètres globaux de votre ERP
+          {t('subtitle')}
         </p>
       </div>
 
-      <Card className="p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="company">{t('admin:tabs.company')}</TabsTrigger>
-            <TabsTrigger value="units">{t('admin:tabs.units')}</TabsTrigger>
-            <TabsTrigger value="authentication">{t('admin:tabs.authentication')}</TabsTrigger>
-            <TabsTrigger value="workflow">{t('admin:tabs.workflow')}</TabsTrigger>
-            <TabsTrigger value="integrations">{t('admin:tabs.integrations')}</TabsTrigger>
-            <TabsTrigger value="advanced">{t('admin:tabs.advanced')}</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="company">
-            <CompanySettings />
-          </TabsContent>
-
-          <TabsContent value="units">
-            <UnitsAndListsSettings />
-          </TabsContent>
-
-          <TabsContent value="authentication">
-            <AuthenticationSettings />
-          </TabsContent>
-
-          <TabsContent value="workflow">
-            <div className="text-center py-8 text-muted-foreground">
-              Configuration des flux de travail - À venir
-            </div>
-          </TabsContent>
-
-          <TabsContent value="integrations">
-            <div className="text-center py-8 text-muted-foreground">
-              Configuration des intégrations - À venir
-            </div>
-          </TabsContent>
-
-          <TabsContent value="advanced">
-            <div className="text-center py-8 text-muted-foreground">
-              Paramètres avancés - À venir
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <div className="mt-6 flex justify-between border-t pt-6">
-          <Button
-            variant="outline"
-            onClick={handleReset}
-            disabled={isLoading}
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            {t('admin:resetToDefaults')}
-          </Button>
-          
-          <Button
-            onClick={handleSave}
-            disabled={isLoading}
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {t('common:save')}
-          </Button>
+      <div className="flex gap-6">
+        {/* Sidebar Navigation */}
+        <div className="w-96 flex-shrink-0">
+          <Card className="p-4">
+            <h2 className="font-semibold mb-4 text-sm text-muted-foreground uppercase tracking-wide">
+              Configuration
+            </h2>
+            <nav className="space-y-1">
+              {navigationItems.map((item) => {
+                const Icon = item.icon
+                const isActive = activeSection === item.id
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
+                    className={`w-full flex items-start gap-3 p-3 rounded-lg text-left transition-all ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm">{item.label}</div>
+                      <div className={`text-xs mt-1 ${
+                        isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                      }`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </nav>
+          </Card>
         </div>
-      </Card>
+
+        {/* Main Content */}
+        <div className="flex-1">
+          <Card className="p-6">
+            <div className="min-h-[600px]">
+              {renderContent()}
+            </div>
+
+            <div className="mt-6 flex justify-between border-t pt-6">
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                disabled={isLoading}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Réinitialiser
+              </Button>
+              
+              <Button
+                onClick={handleSave}
+                disabled={isLoading}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                {t('common.save', 'Sauvegarder')}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }

@@ -3,6 +3,7 @@
 
 import { cn } from '@/lib/utils'
 import { Badge, Separator } from '@erp/ui'
+import { useTranslation } from '@/lib/i18n'
 
 import {
   BarChart3,
@@ -21,6 +22,8 @@ import {
   User,
   Users,
   Wrench,
+  Menu,
+  X,
 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -40,32 +43,29 @@ interface NavItem {
   roles?: string[]
 }
 
-const navigation: NavItem[] = [
+const getNavigation = (t: any): NavItem[] => [
   {
-    title: 'Dashboard',
+    title: t('dashboard'),
     href: '/dashboard',
     icon: Home,
     gradient: 'from-blue-500 to-purple-600',
   },
   {
-    title: 'Configuration',
+    title: t('configuration'),
     href: '/admin',
     icon: Shield,
     gradient: 'from-red-500 to-pink-600',
     roles: ['ADMIN'],
-  },
-  {
-    title: 'Paramètres',
-    href: '/settings',
-    icon: Settings,
-    gradient: 'from-slate-500 to-slate-700',
   },
 ]
 
 export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const { t } = useTranslation('navigation')
   const [expandedItems, setExpandedItems] = useState<string[]>(['Projets'])
+  
+  const navigation = getNavigation(t)
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) =>
@@ -111,8 +111,8 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
             level === 0 && 'mx-1',
             level === 1 && 'ml-4 mr-1',
             itemIsActive || parentIsActive
-              ? 'bg-white/80 text-slate-900 shadow-lg backdrop-blur-sm'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-white/50',
+              ? 'bg-accent text-accent-foreground shadow-lg backdrop-blur-sm'
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent/50',
             isCollapsed && 'justify-center'
           )}
         >
@@ -132,7 +132,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               'flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
               itemIsActive || parentIsActive
                 ? `bg-gradient-to-br ${item.gradient || 'from-blue-500 to-purple-600'} text-white shadow-lg`
-                : 'text-slate-500 group-hover:text-slate-700'
+                : 'text-muted-foreground group-hover:text-foreground'
             )}
           >
             <item.icon className="h-4 w-4" />
@@ -151,7 +151,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
               {/* Chevron pour les éléments avec enfants */}
               {hasChildren && (
-                <div className="text-slate-400 group-hover:text-slate-600 transition-colors">
+                <div className="text-muted-foreground group-hover:text-foreground transition-colors">
                   {isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
                   ) : (
@@ -176,32 +176,47 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   return (
     <div
       className={cn(
-        'flex flex-col h-full bg-white/60 backdrop-blur-md border-r border-slate-200/60 transition-all duration-300 relative',
+        'flex flex-col h-full bg-card/60 backdrop-blur-md border-r border-border/60 transition-all duration-300 relative',
         isCollapsed ? 'w-16' : 'w-64'
       )}
     >
       {/* Header avec bouton toggle toujours visible */}
-      <div className="p-4 border-b border-slate-200/60">
+      <div className="p-4 border-b border-border/60 relative sidebar-header">
         <div
           className={cn('flex items-center', isCollapsed ? 'justify-center' : 'justify-between')}
         >
           {!isCollapsed && (
-            <div className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-slate-600 to-slate-800 text-white">
-                <LayoutDashboard className="h-4 w-4" />
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="navigation-icon flex h-10 w-10 items-center justify-center rounded-xl text-primary-foreground shadow-lg">
+                  <LayoutDashboard className="h-5 w-5" />
+                </div>
+                <div className="navigation-status absolute -top-1 -right-1 h-4 w-4 rounded-full border-2 border-background animate-pulse"></div>
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-800">Navigation</p>
-                <p className="text-xs text-slate-500">Modules ERP</p>
+                <p className="text-sm font-bold text-foreground tracking-wide">{t('navigationTitle')}</p>
+                <p className="text-xs text-muted-foreground font-medium">{t('modulesERP')}</p>
               </div>
             </div>
           )}
 
           {isCollapsed && (
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-slate-600 to-slate-800 text-white">
-              <LayoutDashboard className="h-4 w-4" />
+            <div className="relative">
+              <div className="navigation-icon flex h-10 w-10 items-center justify-center rounded-xl text-primary-foreground shadow-lg">
+                <LayoutDashboard className="h-5 w-5" />
+              </div>
+              <div className="navigation-status absolute -top-1 -right-1 h-4 w-4 rounded-full border-2 border-background animate-pulse"></div>
             </div>
           )}
+
+          {/* Bouton toggle */}
+          <button
+            onClick={onToggle}
+            className="toggle-button flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-accent-foreground transition-all duration-200"
+            aria-label={isCollapsed ? t('showSidebar') : t('hideSidebar')}
+          >
+            {isCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
+          </button>
         </div>
       </div>
 
@@ -210,14 +225,14 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
         {navigation.map((item) => renderNavItem(item))}
       </nav>
 
-      <Separator className="bg-slate-200/60" />
+      <Separator className="bg-border/60" />
 
       {/* Footer utilisateur simplifié avec effet hover */}
       <div className="p-4">
         <div
           className={cn(
-            'flex items-center rounded-xl bg-gradient-to-r from-slate-50 to-blue-50/50 p-3 border border-slate-200/60 transition-all duration-200 cursor-pointer group',
-            'hover:from-blue-50 hover:to-purple-50/50 hover:border-blue-200/60 hover:shadow-md',
+            'flex items-center rounded-xl bg-gradient-to-r from-muted/50 to-accent/50 p-3 border border-border/60 transition-all duration-200 cursor-pointer group',
+            'hover:from-accent/50 hover:to-accent/70 hover:border-accent/60 hover:shadow-md',
             isCollapsed && 'justify-center'
           )}
         >
@@ -229,11 +244,11 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
           </div>
           {!isCollapsed && (
             <div className="ml-3 flex-1 transition-all duration-200">
-              <p className="text-sm font-medium text-slate-800 leading-none group-hover:text-slate-900 transition-colors duration-200">
-                Connecté
+              <p className="text-sm font-medium text-foreground leading-none group-hover:text-foreground transition-colors duration-200">
+                {t('connected', 'Connecté')}
               </p>
-              <p className="text-xs text-slate-500 mt-1 group-hover:text-slate-600 transition-colors duration-200">
-                ERP Actif
+              <p className="text-xs text-muted-foreground mt-1 group-hover:text-muted-foreground transition-colors duration-200">
+                {t('erpActive', 'ERP Actif')}
               </p>
             </div>
           )}

@@ -1,0 +1,196 @@
+import { randomUUID } from 'crypto'
+import { promises as fs } from 'fs'
+import path from 'path'
+import sharp from 'sharp'
+import { createHash } from 'crypto'
+import { ImageMetadata, ImageVariant, UploadConfig, UploadResult, DEFAULT_CONFIGS } from './types'
+
+export class ImageService {
+  private uploadDir: string
+  private baseUrl: string
+
+  constructor(uploadDir: string = 'uploads', baseUrl: string = '/api/images') {
+    this.uploadDir = uploadDir
+    this.baseUrl = baseUrl
+  }
+
+  private async ensureDirectory(dirPath: string): Promise<void> {
+    try {
+      await fs.mkdir(dirPath, { recursive: true })
+    } catch (error) {
+      // Directory already exists
+    }
+  }
+
+  private async calculateHash(buffer: Buffer): Promise<string> {
+    return createHash('sha256').update(buffer).digest('hex')
+  }
+
+  private getImageDimensions(buffer: Buffer): Promise<{ width: number; height: number }> {
+    return sharp(buffer).metadata().then(metadata => ({
+      width: metadata.width || 0,
+      height: metadata.height || 0
+    }))
+  }
+
+  private async generateVariant(
+    buffer: Buffer,
+    variant: { width: number; height: number },
+    outputPath: string
+  ): Promise<{ width: number; height: number; size: number }> {
+    const result = await sharp(buffer)
+      .resize(variant.width, variant.height, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .jpeg({ quality: 90 })
+      .toFile(outputPath)
+
+    return {
+      width: result.width,
+      height: result.height,
+      size: result.size
+    }
+  }
+
+  async uploadImage(
+    file: Buffer,
+    originalName: string,
+    mimeType: string,
+    category: 'avatar' | 'logo' | 'document',
+    uploadedBy: string,
+    options: {
+      entityType?: 'user' | 'company' | 'project'
+      entityId?: string
+      tags?: string[]
+      alt?: string
+      description?: string
+    } = {}
+  ): Promise<UploadResult> {
+    const config = DEFAULT_CONFIGS[category]
+    
+    // Validation
+    if (file.length > config.maxSize) {
+      throw new Error(`File size exceeds maximum allowed size of ${config.maxSize} bytes`)
+    }
+
+    if (!config.allowedTypes.includes(mimeType)) {
+      throw new Error(`File type ${mimeType} is not allowed`)
+    }
+
+    // Génération des métadonnées
+    const imageId = randomUUID()
+    const hash = await this.calculateHash(file)
+    const dimensions = await this.getImageDimensions(file)
+    const extension = path.extname(originalName) || '.jpg'
+    const fileName = `${imageId}${extension}`
+
+    // Création des dossiers
+    const categoryDir = path.join(this.uploadDir, 'images', category)
+    const originalDir = path.join(categoryDir, 'original')
+    await this.ensureDirectory(originalDir)
+
+    // Sauvegarde de l'image originale
+    const originalPath = path.join(originalDir, fileName)
+    await fs.writeFile(originalPath, file)
+
+    const metadata: ImageMetadata = {
+      id: imageId,
+      fileName,
+      originalName,
+      mimeType,
+      size: file.length,
+      width: dimensions.width,
+      height: dimensions.height,
+      hash,
+      category,
+      uploadedBy,
+      uploadedAt: new Date(),
+      tags: options.tags,
+      alt: options.alt,
+      description: options.description,
+      entityType: options.entityType,
+      entityId: options.entityId
+    }
+
+    const variants: ImageVariant[] = []
+    const urls: any = {
+      original: `${this.baseUrl}/${category}/original/${fileName}`
+    }
+
+    // Génération des variantes si nécessaire
+    if (config.generateVariants && config.variants) {
+      for (const [variantName, variantConfig] of Object.entries(config.variants)) {
+        const variantDir = path.join(categoryDir, variantName)
+        await this.ensureDirectory(variantDir)
+        
+        const variantFileName = `${imageId}_${variantName}${extension}`
+        const variantPath = path.join(variantDir, variantFileName)
+        
+        const variantResult = await this.generateVariant(file, variantConfig, variantPath)
+        
+        const variant: ImageVariant = {
+          id: randomUUID(),
+          imageId,
+          variant: variantName as any,
+          fileName: variantFileName,
+          width: variantResult.width,
+          height: variantResult.height,
+          size: variantResult.size,
+          path: variantPath
+        }
+        
+        variants.push(variant)
+        urls[variantName] = `${this.baseUrl}/${category}/${variantName}/${variantFileName}`
+      }
+    }
+
+    return {
+      metadata,
+      variants,
+      urls
+    }
+  }
+
+  async deleteImage(imageId: string, category: string): Promise<void> {
+    const categoryDir = path.join(this.uploadDir, 'images', category)
+    
+    // Suppression de toutes les variantes
+    const variants = ['original', 'thumbnail', 'medium', 'large']
+    
+    for (const variant of variants) {
+      const variantDir = path.join(categoryDir, variant)
+      try {
+        const files = await fs.readdir(variantDir)
+        const imageFiles = files.filter(file => file.startsWith(imageId))
+        
+        for (const file of imageFiles) {
+          await fs.unlink(path.join(variantDir, file))
+        }
+      } catch (error) {
+        // Directory or file doesn't exist
+      }
+    }
+  }
+
+  async getImageMetadata(imageId: string): Promise<ImageMetadata | null> {
+    // Cette méthode devra être implémentée avec la base de données
+    // Pour l'instant, retourne null
+    return null
+  }
+
+  async searchImages(query: {
+    category?: string
+    entityType?: string
+    entityId?: string
+    tags?: string[]
+    limit?: number
+    offset?: number
+  }): Promise<ImageMetadata[]> {
+    // Cette méthode sera implémentée avec Elasticsearch
+    // Pour l'instant, retourne un tableau vide
+    return []
+  }
+}
+
+export const imageService = new ImageService()

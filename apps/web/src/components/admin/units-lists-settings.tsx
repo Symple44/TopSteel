@@ -98,11 +98,11 @@ export function UnitsAndListsSettings() {
                 {editingItem?.listKey === list.key && editingItem.item.value === item ? (
                   <Input
                     value={editingItem.item.label}
-                    onChange={(e) => setEditingItem({
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingItem({
                       listKey: list.key,
                       item: { ...editingItem.item, label: e.target.value }
                     })}
-                    onKeyDown={(e) => {
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                       if (e.key === 'Enter') {
                         handleUpdateItem(list.key, index, editingItem.item.label)
                       } else if (e.key === 'Escape') {
@@ -142,8 +142,8 @@ export function UnitsAndListsSettings() {
               <div className="flex items-center gap-2">
                 <Input
                   value={newItem.value}
-                  onChange={(e) => setNewItem({ ...newItem, value: e.target.value })}
-                  onKeyDown={(e) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewItem({ ...newItem, value: e.target.value })}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                     if (e.key === 'Enter') {
                       handleAddItem(list.key)
                     } else if (e.key === 'Escape') {

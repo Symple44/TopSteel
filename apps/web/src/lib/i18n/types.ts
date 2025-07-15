@@ -28,27 +28,6 @@ export const SUPPORTED_LANGUAGES: Language[] = [
     flag: '🇪🇸',
     direction: 'ltr',
   },
-  {
-    code: 'de',
-    name: 'German',
-    nativeName: 'Deutsch',
-    flag: '🇩🇪',
-    direction: 'ltr',
-  },
-  {
-    code: 'it',
-    name: 'Italian',
-    nativeName: 'Italiano',
-    flag: '🇮🇹',
-    direction: 'ltr',
-  },
-  {
-    code: 'ar',
-    name: 'Arabic',
-    nativeName: 'العربية',
-    flag: '🇸🇦',
-    direction: 'rtl',
-  },
 ]
 
 export const DEFAULT_LANGUAGE = 'fr'

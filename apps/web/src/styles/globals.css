@@ -39,27 +39,88 @@
   --radius: 0.5rem;
 }
 
-/* Mode sombre */
+/* Mode sombre moderne et cohérent */
 .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 210 40% 98%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 212.7 26.8% 83.9%;
+  /* Arrière-plans principaux - plus doux */
+  --background: 220 13% 18%;
+  --foreground: 220 9% 98%;
+  
+  /* Cartes et surfaces - légèrement plus claires que l'arrière-plan */
+  --card: 220 13% 21%;
+  --card-foreground: 220 9% 98%;
+  
+  /* Popovers et menus - plus contrastés */
+  --popover: 220 13% 21%;
+  --popover-foreground: 220 9% 98%;
+  
+  /* Couleurs primaires - bleu moderne */
+  --primary: 217 91% 60%;
+  --primary-foreground: 220 13% 98%;
+  
+  /* Couleurs secondaires - gris moderne */
+  --secondary: 220 13% 26%;
+  --secondary-foreground: 220 9% 98%;
+  
+  /* Couleurs muettes - entre background et card */
+  --muted: 220 13% 26%;
+  --muted-foreground: 220 9% 78%;
+  
+  /* Couleurs d'accent - pour les survols */
+  --accent: 220 13% 26%;
+  --accent-foreground: 220 9% 98%;
+  
+  /* Couleurs destructives - rouge moderne */
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 220 13% 98%;
+  
+  /* Bordures et inputs - subtiles */
+  --border: 220 13% 28%;
+  --input: 220 13% 28%;
+  
+  /* Ring de focus - bleu vif */
+  --ring: 217 91% 60%;
+}
+
+/* Nouveau thème coloré moderne - Inspired by Glassmorphism & Neo-brutalism */
+.vibrant {
+  /* Arrière-plans avec gradients subtils */
+  --background: 270 20% 96%;
+  --foreground: 270 15% 9%;
+  
+  /* Cartes avec effet glassmorphism */
+  --card: 270 20% 98%;
+  --card-foreground: 270 15% 9%;
+  
+  /* Popovers avec transparence */
+  --popover: 270 20% 98%;
+  --popover-foreground: 270 15% 9%;
+  
+  /* Couleurs primaires - violet/indigo tendance */
+  --primary: 270 91% 65%;
+  --primary-foreground: 270 20% 98%;
+  
+  /* Couleurs secondaires - rose/corail */
+  --secondary: 340 82% 75%;
+  --secondary-foreground: 270 15% 9%;
+  
+  /* Couleurs muettes - tons neutres chauds */
+  --muted: 270 20% 92%;
+  --muted-foreground: 270 15% 40%;
+  
+  /* Couleurs d'accent - orange/amber */
+  --accent: 45 86% 68%;
+  --accent-foreground: 270 15% 9%;
+  
+  /* Couleurs destructives - rouge vif moderne */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 270 20% 98%;
+  
+  /* Bordures colorées subtiles */
+  --border: 270 20% 82%;
+  --input: 270 20% 90%;
+  
+  /* Ring de focus - couleur primaire */
+  --ring: 270 91% 65%;
 }
 
 /* =================================================================== */
@@ -308,6 +369,298 @@ body {
   font-family: ui-sans-serif, system-ui, sans-serif;
   margin: 0;
   padding: 0;
+}
+
+/* =================================================================== */
+/* AMÉLIORATIONS THÈME SOMBRE */
+/* =================================================================== */
+
+/* Scrollbars en mode sombre */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground));
+}
+
+/* Toasts et notifications */
+.dark .sonner-toast {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Amélioration du contraste pour les labels et titres */
+.dark label {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 500 !important;
+}
+
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Amélioration du contraste pour les liens et boutons */
+.dark a {
+  color: hsl(var(--primary)) !important;
+}
+
+.dark button {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Amélioration du contraste pour les éléments de menu */
+.dark [role="menuitem"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark [role="menuitem"]:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Amélioration du contraste pour les éléments de liste */
+.dark li {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Amélioration du contraste pour les descriptions et textes secondaires */
+.dark .text-gray-500,
+.dark .text-gray-600,
+.dark .text-muted-foreground {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Amélioration du contraste pour les titres de section */
+.dark .text-sm.font-medium {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+/* Amélioration du contraste pour les cartes */
+.dark .card {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Amélioration du contraste pour les inputs */
+.dark input {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark input:focus {
+  border-color: hsl(var(--ring)) !important;
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2) !important;
+}
+
+/* Amélioration du contraste pour les placeholders */
+.dark input::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 0.7 !important;
+}
+
+/* =================================================================== */
+/* STYLES SPÉCIFIQUES AU THÈME VIBRANT */
+/* =================================================================== */
+
+/* Effets de glassmorphisme et gradients pour le thème vibrant */
+.vibrant {
+  /* Gradient de fond général */
+  background: linear-gradient(135deg, hsl(270 20% 96%) 0%, hsl(280 25% 94%) 50%, hsl(260 22% 97%) 100%);
+}
+
+.vibrant .bg-card {
+  background: linear-gradient(135deg, hsl(270 20% 98%) 0%, hsl(280 25% 96%) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid hsl(270 20% 88%) !important;
+  box-shadow: 0 8px 32px hsl(270 91% 65% / 0.1) !important;
+}
+
+.vibrant .bg-background {
+  background: linear-gradient(135deg, hsl(270 20% 96%) 0%, hsl(280 25% 94%) 50%, hsl(260 22% 97%) 100%) !important;
+}
+
+.vibrant .bg-accent {
+  background: linear-gradient(135deg, hsl(45 86% 68%) 0%, hsl(35 90% 65%) 100%) !important;
+  box-shadow: 0 4px 16px hsl(45 86% 68% / 0.3) !important;
+}
+
+.vibrant .bg-primary {
+  background: linear-gradient(135deg, hsl(270 91% 65%) 0%, hsl(280 95% 60%) 100%) !important;
+  box-shadow: 0 4px 16px hsl(270 91% 65% / 0.3) !important;
+}
+
+.vibrant .bg-secondary {
+  background: linear-gradient(135deg, hsl(340 82% 75%) 0%, hsl(350 85% 70%) 100%) !important;
+  box-shadow: 0 4px 16px hsl(340 82% 75% / 0.3) !important;
+}
+
+/* Sidebar avec effet glassmorphism */
+.vibrant .bg-card\/60 {
+  background: linear-gradient(135deg, hsl(270 20% 98% / 0.8) 0%, hsl(280 25% 96% / 0.8) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid hsl(270 20% 88%) !important;
+}
+
+/* Header avec effet glassmorphism */
+.vibrant .bg-card\/95 {
+  background: linear-gradient(135deg, hsl(270 20% 98% / 0.9) 0%, hsl(280 25% 96% / 0.9) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid hsl(270 20% 88%) !important;
+}
+
+/* Styles spécifiques pour les composants */
+.vibrant .flex.flex-col.h-full {
+  background: linear-gradient(135deg, hsl(270 20% 98% / 0.8) 0%, hsl(280 25% 96% / 0.8) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.vibrant .sticky.top-0 {
+  background: linear-gradient(135deg, hsl(270 20% 98% / 0.9) 0%, hsl(280 25% 96% / 0.9) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* Boutons avec effets modernes */
+.vibrant button:hover {
+  transform: translateY(-2px) !important;
+  transition: all 0.3s ease !important;
+}
+
+.vibrant .btn-primary {
+  background: linear-gradient(135deg, hsl(270 91% 65%) 0%, hsl(280 95% 60%) 100%) !important;
+  box-shadow: 0 4px 16px hsl(270 91% 65% / 0.3), 0 8px 32px hsl(270 91% 65% / 0.1) !important;
+}
+
+.vibrant .btn-primary:hover {
+  box-shadow: 0 8px 24px hsl(270 91% 65% / 0.4), 0 12px 40px hsl(270 91% 65% / 0.2) !important;
+}
+
+/* Animation et transitions fluides */
+.vibrant * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Amélioration des gradients pour les icônes */
+.vibrant .from-primary.to-primary\/80 {
+  background: linear-gradient(135deg, hsl(270 91% 65%) 0%, hsl(280 95% 60%) 100%) !important;
+}
+
+.vibrant .from-emerald-500.to-teal-600 {
+  background: linear-gradient(135deg, hsl(340 82% 75%) 0%, hsl(350 85% 70%) 100%) !important;
+}
+
+/* Amélioration des inputs et formulaires */
+.vibrant input {
+  background: linear-gradient(135deg, hsl(270 20% 98%) 0%, hsl(280 25% 96%) 100%) !important;
+  border: 1px solid hsl(270 20% 88%) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.vibrant input:focus {
+  border-color: hsl(270 91% 65%) !important;
+  box-shadow: 0 0 0 2px hsl(270 91% 65% / 0.2) !important;
+}
+
+/* Amélioration des cartes avec bordures colorées */
+.vibrant .rounded-xl {
+  border: 1px solid hsl(270 20% 88%) !important;
+  box-shadow: 0 4px 16px hsl(270 91% 65% / 0.05) !important;
+}
+
+/* Styles spécifiques pour la section Navigation Module ERP */
+.vibrant .sidebar-header {
+  background: linear-gradient(135deg, hsl(270 20% 98%) 0%, hsl(280 25% 96%) 100%) !important;
+  border-bottom: 1px solid hsl(270 20% 88%) !important;
+  position: relative !important;
+}
+
+.vibrant .sidebar-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, hsl(270 91% 65% / 0.1) 0%, hsl(340 82% 75% / 0.1) 50%, hsl(45 86% 68% / 0.1) 100%);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.vibrant .navigation-icon {
+  background: linear-gradient(135deg, hsl(270 91% 65%) 0%, hsl(280 95% 60%) 100%) !important;
+  box-shadow: 0 4px 16px hsl(270 91% 65% / 0.3) !important;
+}
+
+.vibrant .navigation-status {
+  background: linear-gradient(135deg, hsl(45 86% 68%) 0%, hsl(35 90% 65%) 100%) !important;
+  box-shadow: 0 2px 8px hsl(45 86% 68% / 0.3) !important;
+}
+
+.vibrant .toggle-button {
+  background: linear-gradient(135deg, hsl(270 20% 95%) 0%, hsl(280 25% 93%) 100%) !important;
+  border: 1px solid hsl(270 20% 88%) !important;
+  box-shadow: 0 2px 8px hsl(270 91% 65% / 0.1) !important;
+}
+
+.vibrant .toggle-button:hover {
+  background: linear-gradient(135deg, hsl(45 86% 68%) 0%, hsl(35 90% 65%) 100%) !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 16px hsl(45 86% 68% / 0.3) !important;
+}
+
+/* Amélioration des badges et composants UI */
+.dark .badge {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--secondary-foreground)) !important;
+}
+
+.vibrant .badge {
+  background: linear-gradient(135deg, hsl(340 82% 75%) 0%, hsl(350 85% 70%) 100%) !important;
+  color: hsl(var(--secondary-foreground)) !important;
+  box-shadow: 0 2px 8px hsl(340 82% 75% / 0.3) !important;
+}
+
+/* Amélioration des tabs et navigation */
+.dark .tab-active {
+  color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
+}
+
+.dark .tab-inactive {
+  color: hsl(var(--muted-foreground)) !important;
+  border-color: transparent !important;
+}
+
+.dark .tab-inactive:hover {
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Amélioration des notifications et status */
+.dark .notification-badge {
+  background-color: hsl(var(--destructive)) !important;
+  color: hsl(var(--destructive-foreground)) !important;
+}
+
+.dark .status-connected {
+  background-color: hsl(142 76% 36%) !important;
+  color: hsl(0 0% 100%) !important;
+}
+
+/* Amélioration des sessions et cartes d'information */
+.dark .info-card {
+  background-color: hsl(var(--muted)) !important;
+  border-color: hsl(var(--border)) !important;
 }
 
 /* Classes de debug pour vérifier que ce CSS est chargé */

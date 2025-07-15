@@ -84,7 +84,7 @@
   },
   "overrides": [
     {
-      "include": ["apps/web/src/**/*.{ts,tsx}"],
+      "includes": ["apps/web/src/**/*.{ts,tsx}"],
       "linter": {
         "rules": {
           "correctness": {
@@ -94,7 +94,7 @@
       }
     },
     {
-      "include": ["packages/*/src/**/*.{ts,tsx}"],
+      "includes": ["packages/*/src/**/*.{ts,tsx}"],
       "linter": {
         "rules": {
           "suspicious": {

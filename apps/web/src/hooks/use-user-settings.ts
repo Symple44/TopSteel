@@ -1,39 +1,47 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { UserSettingsApiClient, type UserSettings, type UpdateUserSettingsDto } from '@erp/api-client'
+import { apiClient } from '@/lib/api-client'
 
-// Configuration du client API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-const userSettingsApi = new UserSettingsApiClient({
-  baseURL: API_BASE_URL,
-})
+// Types pour les paramètres utilisateur
+interface UserSettings {
+  profile: {
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    position: string
+    department: string
+  }
+  company: {
+    name: string
+    address: string
+    city: string
+    postalCode: string
+    country: string
+  }
+  preferences: {
+    language: string
+    timezone: string
+    notifications: {
+      email: boolean
+      push: boolean
+      sms: boolean
+    }
+  }
+}
 
 // Query keys
 const QUERY_KEYS = {
   userSettings: ['user-settings'] as const,
+  userProfile: ['user-profile'] as const,
+  userPreferences: ['user-preferences'] as const,
 } as const
 
 export function useUserSettings() {
   return useQuery({
     queryKey: QUERY_KEYS.userSettings,
-    queryFn: () => userSettingsApi.getMySettings(),
+    queryFn: () => apiClient.get<UserSettings>('/user/settings'),
     staleTime: 5 * 60 * 1000, // 5 minutes
-  })
-}
-
-export function useUpdateUserSettings() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (settings: UpdateUserSettingsDto) => userSettingsApi.updateMySettings(settings),
-    onSuccess: (updatedSettings: UserSettings) => {
-      queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
-      toast.success('Paramètres mis à jour avec succès')
-    },
-    onError: (error: any) => {
-      console.error('Erreur lors de la mise à jour des paramètres:', error)
-      toast.error('Erreur lors de la mise à jour des paramètres')
-    },
   })
 }
 
@@ -41,8 +49,8 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (profile: UpdateUserSettingsDto['profile']) => 
-      userSettingsApi.updateProfile(profile!),
+    mutationFn: (profile: Partial<UserSettings['profile']>) => 
+      apiClient.patch<UserSettings>('/user/profile', profile),
     onSuccess: (updatedSettings: UserSettings) => {
       queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
       toast.success('Profil mis à jour avec succès')
@@ -57,8 +65,8 @@ export function useUpdateCompany() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (company: UpdateUserSettingsDto['company']) => 
-      userSettingsApi.updateCompany(company!),
+    mutationFn: (company: Partial<UserSettings['company']>) => 
+      apiClient.patch<UserSettings>('/user/settings', { company }),
     onSuccess: (updatedSettings: UserSettings) => {
       queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
       toast.success('Informations de l\'entreprise mises à jour')
@@ -73,8 +81,8 @@ export function useUpdatePreferences() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (preferences: UpdateUserSettingsDto['preferences']) => 
-      userSettingsApi.updatePreferences(preferences!),
+    mutationFn: (preferences: Partial<UserSettings['preferences']>) => 
+      apiClient.patch<UserSettings>('/user/preferences', preferences),
     onSuccess: (updatedSettings: UserSettings) => {
       queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
       toast.success('Préférences mises à jour avec succès')
@@ -89,8 +97,8 @@ export function useUpdateNotifications() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (notifications: UpdateUserSettingsDto['preferences']) => 
-      userSettingsApi.updateNotifications(notifications!.notifications!),
+    mutationFn: (notifications: UserSettings['preferences']['notifications']) => 
+      apiClient.patch<UserSettings>('/user/preferences', { notifications }),
     onSuccess: (updatedSettings: UserSettings) => {
       queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
       toast.success('Paramètres de notification mis à jour')

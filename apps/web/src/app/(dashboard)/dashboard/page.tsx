@@ -20,6 +20,9 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+// Force dynamic rendering to avoid SSR issues
+export const dynamic = 'force-dynamic'
+
 // Types pour les données du dashboard
 interface DashboardStats {
   projets: {

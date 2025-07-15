@@ -255,26 +255,10 @@ export const useAuth = () => {
     }
   }, [authState.tokens, logout])
 
-  // ✅ Initialisation depuis le stockage local - TOUTES LES DÉPENDANCES INCLUSES
+  // ✅ Initialisation depuis le stockage local - EXÉCUTION UNIQUE
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Vérifier si la session a été nettoyée au démarrage
-        const sessionInitialized = typeof window !== 'undefined' && 
-                                  sessionStorage.getItem('topsteel-session-initialized')
-        
-        if (sessionInitialized) {
-          // Si la session est initialisée, ne pas charger depuis localStorage
-          setAuthState((prev) => ({
-            ...prev,
-            isLoading: false,
-            isAuthenticated: false,
-            user: null,
-            tokens: null,
-          }))
-          return
-        }
-        
         const storedUser = storage.get(AUTH_STORAGE_KEY)
         const storedTokens = storage.get(TOKEN_STORAGE_KEY)
 
@@ -291,7 +275,14 @@ export const useAuth = () => {
             })
           } else {
             // Tokens invalides, nettoyer le stockage
-            await logout()
+            storage.remove(AUTH_STORAGE_KEY)
+            storage.remove(TOKEN_STORAGE_KEY)
+            setAuthState({
+              user: null,
+              tokens: null,
+              isLoading: false,
+              isAuthenticated: false,
+            })
           }
         } else {
           setAuthState((prev) => ({
@@ -315,7 +306,7 @@ export const useAuth = () => {
     }
 
     initializeAuth()
-  }, [validateTokens, logout]) // ✅ TOUTES LES DÉPENDANCES INCLUSES
+  }, []) // ✅ EXÉCUTION UNIQUE AU MOUNT
 
   // ✅ Auto-refresh des tokens
   useEffect(() => {

@@ -5,7 +5,7 @@ import { translator } from './translator'
 import type { Language, I18nContext } from './types'
 
 // Create React Context
-const I18nContext = createContext<I18nContext | null>(null)
+const I18nReactContext = createContext<I18nContext | null>(null)
 
 // Provider Component
 interface I18nProviderProps {
@@ -45,15 +45,15 @@ export function I18nProvider({ children }: I18nProviderProps) {
   }
 
   return (
-    <I18nContext.Provider value={contextValue}>
+    <I18nReactContext.Provider value={contextValue}>
       {children}
-    </I18nContext.Provider>
+    </I18nReactContext.Provider>
   )
 }
 
 // Main hook for translations
 export function useTranslation(namespace?: string) {
-  const context = useContext(I18nContext)
+  const context = useContext(I18nReactContext)
   
   if (!context) {
     throw new Error('useTranslation must be used within an I18nProvider')
@@ -86,7 +86,7 @@ export function useTranslation(namespace?: string) {
 
 // Hook for language switching
 export function useLanguage() {
-  const context = useContext(I18nContext)
+  const context = useContext(I18nReactContext)
   
   if (!context) {
     throw new Error('useLanguage must be used within an I18nProvider')

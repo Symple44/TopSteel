@@ -28,23 +28,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // Nettoyer les sessions au démarrage de l'application (une seule fois)
+  // Initialiser la session au démarrage (sans effacer les données existantes)
   useEffect(() => {
     // Vérifier si c'est le premier chargement de la session
     if (typeof window !== 'undefined' && !sessionStorage.getItem('topsteel-session-initialized')) {
-      // Supprimer les données d'authentification du localStorage
-      localStorage.removeItem('topsteel-auth')
-      localStorage.removeItem('topsteel-tokens')
-      
-      // Marquer la session comme initialisée pour éviter de nettoyer à nouveau
+      // Marquer la session comme initialisée
       sessionStorage.setItem('topsteel-session-initialized', 'true')
       
-      // Forcer la réinitialisation de l'état d'authentification
-      logout()
-      
-      console.log('Sessions cleared on initial startup')
+      console.log('Session initialized on startup')
     }
-  }, [logout])
+  }, [])
 
   // Gestion des redirections basées sur l'état d'authentification
   useEffect(() => {

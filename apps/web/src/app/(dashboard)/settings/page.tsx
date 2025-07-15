@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering to avoid SSR issues
+export const dynamic = 'force-dynamic'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { Badge, Button, Input } from '@erp/ui'
 import {
@@ -20,6 +23,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useTheme } from 'next-themes'
 import { 
   useUserSettings, 
   useUpdateProfile, 
@@ -27,11 +31,15 @@ import {
   useUpdatePreferences,
   useUpdateNotifications 
 } from '@/hooks/use-user-settings'
+import { useLanguage, useTranslation } from '@/lib/i18n'
 import { toast } from 'sonner'
 
 export default function SettingsPage() {
   const [showPassword, setShowPassword] = useState(false)
-  const [activeTab, setActiveTab] = useState('profile')
+  const [activeTab, setActiveTab] = useState('notifications')
+  const { theme, setTheme } = useTheme()
+  const { current: language, change: setLanguage } = useLanguage()
+  const { t } = useTranslation('settings')
 
   // Récupération des données utilisateur depuis l'API
   const { data: userSettings, isLoading, error } = useUserSettings()
@@ -61,9 +69,8 @@ export default function SettingsPage() {
   })
 
   const [preferencesData, setPreferencesData] = useState({
-    language: 'fr',
+    language: 'auto',
     timezone: 'Europe/Paris',
-    theme: 'light' as 'light' | 'dark' | 'auto',
     notifications: {
       email: true,
       push: true,
@@ -96,25 +103,35 @@ export default function SettingsPage() {
       }
 
       if (userSettings.preferences) {
+        const savedLanguage = userSettings.preferences.language || 'auto'
         setPreferencesData({
-          language: userSettings.preferences.language || 'fr',
+          language: savedLanguage,
           timezone: userSettings.preferences.timezone || 'Europe/Paris',
-          theme: userSettings.preferences.theme || 'light',
           notifications: {
             email: userSettings.preferences.notifications?.email ?? true,
             push: userSettings.preferences.notifications?.push ?? true,
             sms: userSettings.preferences.notifications?.sms ?? false,
           },
         })
+        
+        // Synchroniser la langue avec le système i18n si elle est différente
+        if (savedLanguage && savedLanguage !== language.code && savedLanguage !== 'auto') {
+          setLanguage(savedLanguage)
+        }
       }
     }
-  }, [userSettings])
+  }, [userSettings]) // Retirer language et setLanguage pour éviter les boucles
+
+  // Initialiser la langue si elle n'est pas définie
+  useEffect(() => {
+    if (!preferencesData.language && language.code) {
+      setPreferencesData(prev => ({ ...prev, language: language.code }))
+    }
+  }, [preferencesData.language, language.code])
 
   const tabs = [
-    { id: 'profile', label: 'Profil', icon: User },
-    { id: 'security', label: 'Sécurité', icon: Shield },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'preferences', label: 'Préférences', icon: Settings },
+    { id: 'notifications', label: t('notifications'), icon: Bell },
+    { id: 'preferences', label: t('interface'), icon: Settings },
   ]
 
   const handleSaveProfile = () => {
@@ -126,16 +143,61 @@ export default function SettingsPage() {
   }
 
   const handleSavePreferences = () => {
-    updatePreferences.mutate(preferencesData)
+    // Le thème est géré par next-themes, pas besoin de le sauvegarder
+    const { notifications, ...prefsToSave } = preferencesData
+    
+    // Synchroniser la langue avec le système i18n
+    if (prefsToSave.language !== language.code) {
+      setLanguage(prefsToSave.language)
+    }
+    
+    // Sauvegarder les préférences via l'API
+    updatePreferences.mutate(prefsToSave, {
+      onSuccess: () => {
+        toast.success(t('success.saved', 'Préférences enregistrées avec succès'))
+      },
+      onError: () => {
+        toast.error(t('settingsLoadError', 'Erreur lors de l\'enregistrement des préférences'))
+      }
+    })
   }
 
   const handleSaveNotifications = () => {
-    updateNotifications.mutate({ notifications: preferencesData.notifications })
+    updateNotifications.mutate({ notifications: preferencesData.notifications }, {
+      onSuccess: () => {
+        toast.success(t('success.saved', 'Notifications enregistrées avec succès'))
+      },
+      onError: () => {
+        toast.error(t('settingsLoadError', 'Erreur lors de l\'enregistrement des notifications'))
+      }
+    })
+  }
+
+  const handleLanguageChange = (newLanguage: string) => {
+    // Mettre à jour l'état local
+    setPreferencesData(prev => ({ ...prev, language: newLanguage }))
+    // Changer immédiatement la langue dans l'interface
+    setLanguage(newLanguage)
+    
+    // Sauvegarder automatiquement les préférences de langue
+    const updatedPrefs = {
+      language: newLanguage,
+      timezone: preferencesData.timezone,
+    }
+    
+    updatePreferences.mutate(updatedPrefs, {
+      onSuccess: () => {
+        toast.success(t('languageUpdated', 'Langue mise à jour'))
+      },
+      onError: () => {
+        toast.error(t('languageUpdateError', 'Erreur lors de la mise à jour de la langue'))
+      }
+    })
   }
 
   // Gestion des erreurs
   if (error) {
-    toast.error('Erreur lors du chargement des paramètres')
+    toast.error(t('settingsLoadError'))
   }
 
   // Affichage du loader pendant le chargement initial
@@ -144,7 +206,7 @@ export default function SettingsPage() {
       <div className="p-6 max-w-4xl mx-auto">
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin" />
-          <span className="ml-2">Chargement des paramètres...</span>
+          <span className="ml-2">{t('loadingSettings')}</span>
         </div>
       </div>
     )
@@ -152,305 +214,62 @@ export default function SettingsPage() {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'profile':
-        return (
-          <div className="space-y-6">
-            {/* Photo de profil */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Camera className="h-5 w-5 mr-2" />
-                  Photo de profil
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-4">
-                  <div className="h-20 w-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                    {profileData.firstName[0] || 'U'}
-                    {profileData.lastName[0] || 'U'}
-                  </div>
-                  <div>
-                    <Button variant="outline" size="sm">
-                      <Camera className="h-4 w-4 mr-2" />
-                      Changer la photo
-                    </Button>
-                    <p className="text-sm text-gray-500 mt-1">
-                      JPG, PNG ou GIF. Taille maximale : 2MB
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Informations personnelles */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Informations personnelles</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
-                    <Input
-                      value={profileData.firstName}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nom</label>
-                    <Input
-                      value={profileData.lastName}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Mail className="h-4 w-4 inline mr-1" />
-                    Email
-                  </label>
-                  <Input
-                    type="email"
-                    value={profileData.email}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Phone className="h-4 w-4 inline mr-1" />
-                    Téléphone
-                  </label>
-                  <Input
-                    value={profileData.phone}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Poste</label>
-                    <Input
-                      value={profileData.position}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, position: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Département
-                    </label>
-                    <Input
-                      value={profileData.department}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, department: e.target.value }))}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-4">
-                  <Button 
-                    onClick={handleSaveProfile}
-                    disabled={updateProfile.isPending}
-                    className="flex items-center"
-                  >
-                    {updateProfile.isPending ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4 mr-2" />
-                    )}
-                    Enregistrer le profil
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Informations entreprise */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Building2 className="h-5 w-5 mr-2" />
-                  Entreprise
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nom de l'entreprise
-                  </label>
-                  <Input
-                    value={companyData.name}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <MapPin className="h-4 w-4 inline mr-1" />
-                    Adresse
-                  </label>
-                  <Input
-                    value={companyData.address}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Ville</label>
-                    <Input
-                      value={companyData.city}
-                      onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Code postal
-                    </label>
-                    <Input
-                      value={companyData.postalCode}
-                      onChange={(e) => setCompanyData(prev => ({ ...prev, postalCode: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Pays</label>
-                    <Input
-                      value={companyData.country}
-                      onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-4">
-                  <Button 
-                    onClick={handleSaveCompany}
-                    disabled={updateCompany.isPending}
-                    className="flex items-center"
-                  >
-                    {updateCompany.isPending ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4 mr-2" />
-                    )}
-                    Enregistrer l'entreprise
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
-
-      case 'security':
-        return (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Changer le mot de passe</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Mot de passe actuel
-                  </label>
-                  <div className="relative">
-                    <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nouveau mot de passe
-                  </label>
-                  <Input type="password" placeholder="••••••••" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confirmer le nouveau mot de passe
-                  </label>
-                  <Input type="password" placeholder="••••••••" />
-                </div>
-                <Button variant="default">Mettre à jour le mot de passe</Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Authentification à deux facteurs</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">2FA désactivée</p>
-                    <p className="text-sm text-gray-500">
-                      Ajoutez une couche de sécurité supplémentaire à votre compte
-                    </p>
-                  </div>
-                  <Button variant="outline">Activer 2FA</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
-
       case 'notifications':
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Préférences de notification</CardTitle>
+              <CardTitle>{t('notificationPreferences')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">Notifications par email</h4>
-                  <p className="text-sm text-gray-500">
-                    Recevoir les notifications importantes par email
+                  <h4 className="font-medium">{t('emailNotifications')}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {t('emailNotificationsDesc')}
                   </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferencesData.notifications.email}
-                  onChange={(e) => setPreferencesData(prev => ({
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPreferencesData(prev => ({
                     ...prev,
                     notifications: { ...prev.notifications, email: e.target.checked }
                   }))}
-                  className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                  className="h-4 w-4 text-primary rounded border-input"
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">Notifications push</h4>
-                  <p className="text-sm text-gray-500">
-                    Recevoir les notifications push dans le navigateur
+                  <h4 className="font-medium">{t('pushNotifications')}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {t('pushNotificationsDesc')}
                   </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferencesData.notifications.push}
-                  onChange={(e) => setPreferencesData(prev => ({
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPreferencesData(prev => ({
                     ...prev,
                     notifications: { ...prev.notifications, push: e.target.checked }
                   }))}
-                  className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                  className="h-4 w-4 text-primary rounded border-input"
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">Notifications SMS</h4>
-                  <p className="text-sm text-gray-500">Recevoir les alertes urgentes par SMS</p>
+                  <h4 className="font-medium">{t('smsNotifications')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('smsNotificationsDesc')}</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferencesData.notifications.sms}
-                  onChange={(e) => setPreferencesData(prev => ({
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPreferencesData(prev => ({
                     ...prev,
                     notifications: { ...prev.notifications, sms: e.target.checked }
                   }))}
-                  className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                  className="h-4 w-4 text-primary rounded border-input"
                 />
               </div>
 
@@ -465,7 +284,7 @@ export default function SettingsPage() {
                   ) : (
                     <Save className="h-4 w-4 mr-2" />
                   )}
-                  Enregistrer les notifications
+                  {t('saveNotifications')}
                 </Button>
               </div>
             </CardContent>
@@ -479,34 +298,35 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Globe className="h-5 w-5 mr-2" />
-                  Préférences régionales
+                  {t('regionalPreferences')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Langue</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">{t('language')}</label>
                   <select
                     value={preferencesData.language}
-                    onChange={(e) => setPreferencesData(prev => ({ ...prev, language: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleLanguageChange(e.target.value)}
+                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
                   >
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
+                    <option value="auto">{t('languageAuto')}</option>
+                    <option value="fr">{t('languages.fr')}</option>
+                    <option value="en">{t('languages.en')}</option>
+                    <option value="es">{t('languages.es')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Fuseau horaire
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t('timezone')}
                   </label>
                   <select
                     value={preferencesData.timezone}
-                    onChange={(e) => setPreferencesData(prev => ({ ...prev, timezone: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPreferencesData(prev => ({ ...prev, timezone: e.target.value }))}
+                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
                   >
-                    <option value="Europe/Paris">Paris (GMT+1)</option>
-                    <option value="Europe/London">Londres (GMT+0)</option>
-                    <option value="America/New_York">New York (GMT-5)</option>
+                    <option value="Europe/Paris">{t('timezones.Europe/Paris')}</option>
+                    <option value="Europe/London">{t('timezones.Europe/London')}</option>
+                    <option value="America/New_York">{t('timezones.America/New_York')}</option>
                   </select>
                 </div>
               </CardContent>
@@ -516,50 +336,67 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Palette className="h-5 w-5 mr-2" />
-                  Apparence
+                  {t('appearance')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Thème</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">{t('theme')}</label>
                   <div className="flex space-x-4">
                     <button
                       type="button"
-                      onClick={() => setPreferencesData(prev => ({ ...prev, theme: 'light' }))}
-                      className={`px-4 py-2 rounded-md border ${
-                        preferencesData.theme === 'light'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300'
+                      onClick={() => setTheme('light')}
+                      className={`px-4 py-2 rounded-md border transition-colors ${
+                        theme === 'light'
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-input hover:border-ring'
                       }`}
                     >
-                      Clair
+                      {t('light', 'Clair')}
                     </button>
                     <button
                       type="button"
-                      onClick={() => setPreferencesData(prev => ({ ...prev, theme: 'dark' }))}
-                      className={`px-4 py-2 rounded-md border ${
-                        preferencesData.theme === 'dark'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300'
+                      onClick={() => setTheme('dark')}
+                      className={`px-4 py-2 rounded-md border transition-colors ${
+                        theme === 'dark'
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-input hover:border-ring'
                       }`}
                     >
-                      Sombre
+                      {t('dark', 'Sombre')}
                     </button>
                     <button
                       type="button"
-                      onClick={() => setPreferencesData(prev => ({ ...prev, theme: 'auto' }))}
-                      className={`px-4 py-2 rounded-md border ${
-                        preferencesData.theme === 'auto'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300'
+                      onClick={() => setTheme('vibrant')}
+                      className={`px-4 py-2 rounded-md border transition-colors ${
+                        theme === 'vibrant'
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-input hover:border-ring'
                       }`}
                     >
-                      Auto
+                      {t('vibrant', '🎨 Coloré')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTheme('system')}
+                      className={`px-4 py-2 rounded-md border transition-colors ${
+                        theme === 'system'
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-input hover:border-ring'
+                      }`}
+                    >
+                      {t('system', 'Auto')}
                     </button>
                   </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {t('currentTheme')} : {theme === 'light' ? t('light', 'Clair') : theme === 'dark' ? t('dark', 'Sombre') : theme === 'vibrant' ? t('vibrant', 'Coloré') : t('system', 'Auto')}
+                  </p>
                 </div>
 
-                <div className="flex justify-end pt-4">
+                <div className="flex justify-between items-center pt-4">
+                  <p className="text-sm text-muted-foreground">
+                    {t('themeAutoSave')}
+                  </p>
                   <Button 
                     onClick={handleSavePreferences}
                     disabled={updatePreferences.isPending}
@@ -570,7 +407,7 @@ export default function SettingsPage() {
                     ) : (
                       <Save className="h-4 w-4 mr-2" />
                     )}
-                    Enregistrer les préférences
+                    {t('savePreferences')}
                   </Button>
                 </div>
               </CardContent>
@@ -588,13 +425,13 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Paramètres</h1>
-          <p className="text-gray-600 mt-1">Gérez vos préférences et paramètres de compte</p>
+          <h1 className="text-3xl font-bold text-foreground">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="flex space-x-8">
           {tabs.map((tab) => {
             const Icon = tab.icon
@@ -604,8 +441,8 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'
                 }`}
               >
                 <Icon className="h-5 w-5 mr-2" />

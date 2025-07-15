@@ -44,7 +44,9 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "sharp": "^0.33.5"
+  },
   "devDependencies": {
     "@erp/config": "workspace:*",
     "@types/jest": "^29.5.12",

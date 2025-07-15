@@ -46,7 +46,7 @@ export function AuthenticationSettings() {
               <Switch
                 id="google-oauth"
                 checked={parameters?.GOOGLE_OAUTH_ENABLED === 'true'}
-                onCheckedChange={(checked) => handleSwitchChange('GOOGLE_OAUTH_ENABLED', checked)}
+                onCheckedChange={(checked: boolean) => handleSwitchChange('GOOGLE_OAUTH_ENABLED', checked)}
               />
             </div>
             
@@ -58,7 +58,7 @@ export function AuthenticationSettings() {
                     id="google-client-id"
                     type="text"
                     value={parameters?.GOOGLE_OAUTH_CLIENT_ID || ''}
-                    onChange={(e) => handleInputChange('GOOGLE_OAUTH_CLIENT_ID', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('GOOGLE_OAUTH_CLIENT_ID', e.target.value)}
                     placeholder="xxxx.apps.googleusercontent.com"
                   />
                 </div>
@@ -68,7 +68,7 @@ export function AuthenticationSettings() {
                     id="google-client-secret"
                     type="password"
                     value={parameters?.GOOGLE_OAUTH_CLIENT_SECRET || ''}
-                    onChange={(e) => handleInputChange('GOOGLE_OAUTH_CLIENT_SECRET', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('GOOGLE_OAUTH_CLIENT_SECRET', e.target.value)}
                     placeholder="GOCSPX-xxxx"
                   />
                 </div>
@@ -84,7 +84,7 @@ export function AuthenticationSettings() {
               <Switch
                 id="microsoft-oauth"
                 checked={parameters?.MICROSOFT_OAUTH_ENABLED === 'true'}
-                onCheckedChange={(checked) => handleSwitchChange('MICROSOFT_OAUTH_ENABLED', checked)}
+                onCheckedChange={(checked: boolean) => handleSwitchChange('MICROSOFT_OAUTH_ENABLED', checked)}
               />
             </div>
             
@@ -96,7 +96,7 @@ export function AuthenticationSettings() {
                     id="microsoft-client-id"
                     type="text"
                     value={parameters?.MICROSOFT_OAUTH_CLIENT_ID || ''}
-                    onChange={(e) => handleInputChange('MICROSOFT_OAUTH_CLIENT_ID', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('MICROSOFT_OAUTH_CLIENT_ID', e.target.value)}
                     placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                   />
                 </div>
@@ -106,7 +106,7 @@ export function AuthenticationSettings() {
                     id="microsoft-client-secret"
                     type="password"
                     value={parameters?.MICROSOFT_OAUTH_CLIENT_SECRET || ''}
-                    onChange={(e) => handleInputChange('MICROSOFT_OAUTH_CLIENT_SECRET', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('MICROSOFT_OAUTH_CLIENT_SECRET', e.target.value)}
                     placeholder="xxxxxxxxxxxx"
                   />
                 </div>
@@ -129,7 +129,7 @@ export function AuthenticationSettings() {
             <Switch
               id="2fa-enabled"
               checked={parameters?.TWO_FACTOR_ENABLED === 'true'}
-              onCheckedChange={(checked) => handleSwitchChange('TWO_FACTOR_ENABLED', checked)}
+              onCheckedChange={(checked: boolean) => handleSwitchChange('TWO_FACTOR_ENABLED', checked)}
             />
           </div>
 
@@ -138,7 +138,7 @@ export function AuthenticationSettings() {
               <Label htmlFor="2fa-enforce">{t('authentication.enforceFor')}</Label>
               <Select
                 value={parameters?.TWO_FACTOR_ENFORCE || 'OPTIONAL'}
-                onValueChange={(value) => handleInputChange('TWO_FACTOR_ENFORCE', value)}
+                onValueChange={(value: string) => handleInputChange('TWO_FACTOR_ENFORCE', value)}
               >
                 <SelectTrigger id="2fa-enforce">
                   <SelectValue />
@@ -169,7 +169,7 @@ export function AuthenticationSettings() {
                 id="session-timeout"
                 type="number"
                 value={parameters?.SESSION_TIMEOUT_MINUTES || '480'}
-                onChange={(e) => handleInputChange('SESSION_TIMEOUT_MINUTES', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('SESSION_TIMEOUT_MINUTES', e.target.value)}
                 min="1"
               />
             </div>
@@ -180,7 +180,7 @@ export function AuthenticationSettings() {
                 id="max-login-attempts"
                 type="number"
                 value={parameters?.MAX_LOGIN_ATTEMPTS || '5'}
-                onChange={(e) => handleInputChange('MAX_LOGIN_ATTEMPTS', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('MAX_LOGIN_ATTEMPTS', e.target.value)}
                 min="1"
               />
             </div>
@@ -191,7 +191,7 @@ export function AuthenticationSettings() {
                 id="password-min-length"
                 type="number"
                 value={parameters?.PASSWORD_MIN_LENGTH || '8'}
-                onChange={(e) => handleInputChange('PASSWORD_MIN_LENGTH', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('PASSWORD_MIN_LENGTH', e.target.value)}
                 min="1"
               />
             </div>
@@ -203,7 +203,7 @@ export function AuthenticationSettings() {
               <Switch
                 id="require-uppercase"
                 checked={parameters?.PASSWORD_REQUIRE_UPPERCASE === 'true'}
-                onCheckedChange={(checked) => handleSwitchChange('PASSWORD_REQUIRE_UPPERCASE', checked)}
+                onCheckedChange={(checked: boolean) => handleSwitchChange('PASSWORD_REQUIRE_UPPERCASE', checked)}
               />
             </div>
 
@@ -212,7 +212,7 @@ export function AuthenticationSettings() {
               <Switch
                 id="require-lowercase"
                 checked={parameters?.PASSWORD_REQUIRE_LOWERCASE === 'true'}
-                onCheckedChange={(checked) => handleSwitchChange('PASSWORD_REQUIRE_LOWERCASE', checked)}
+                onCheckedChange={(checked: boolean) => handleSwitchChange('PASSWORD_REQUIRE_LOWERCASE', checked)}
               />
             </div>
 
@@ -221,7 +221,7 @@ export function AuthenticationSettings() {
               <Switch
                 id="require-numbers"
                 checked={parameters?.PASSWORD_REQUIRE_NUMBERS === 'true'}
-                onCheckedChange={(checked) => handleSwitchChange('PASSWORD_REQUIRE_NUMBERS', checked)}
+                onCheckedChange={(checked: boolean) => handleSwitchChange('PASSWORD_REQUIRE_NUMBERS', checked)}
               />
             </div>
 
@@ -230,7 +230,7 @@ export function AuthenticationSettings() {
               <Switch
                 id="require-special"
                 checked={parameters?.PASSWORD_REQUIRE_SPECIAL === 'true'}
-                onCheckedChange={(checked) => handleSwitchChange('PASSWORD_REQUIRE_SPECIAL', checked)}
+                onCheckedChange={(checked: boolean) => handleSwitchChange('PASSWORD_REQUIRE_SPECIAL', checked)}
               />
             </div>
           </div>

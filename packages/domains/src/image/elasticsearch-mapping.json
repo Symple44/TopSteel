@@ -1,0 +1,129 @@
+{
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "fileName": {
+        "type": "text",
+        "analyzer": "standard",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "originalName": {
+        "type": "text",
+        "analyzer": "standard",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "mimeType": {
+        "type": "keyword"
+      },
+      "size": {
+        "type": "long"
+      },
+      "dimensions": {
+        "properties": {
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          }
+        }
+      },
+      "hash": {
+        "type": "keyword"
+      },
+      "category": {
+        "type": "keyword"
+      },
+      "uploadedBy": {
+        "type": "keyword"
+      },
+      "uploadedAt": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      },
+      "tags": {
+        "type": "keyword"
+      },
+      "alt": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "description": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "entity": {
+        "properties": {
+          "type": {
+            "type": "keyword"
+          },
+          "id": {
+            "type": "keyword"
+          }
+        }
+      },
+      "variants": {
+        "type": "nested",
+        "properties": {
+          "variant": {
+            "type": "keyword"
+          },
+          "fileName": {
+            "type": "keyword"
+          },
+          "dimensions": {
+            "properties": {
+              "width": {
+                "type": "integer"
+              },
+              "height": {
+                "type": "integer"
+              }
+            }
+          },
+          "size": {
+            "type": "long"
+          },
+          "url": {
+            "type": "keyword"
+          }
+        }
+      },
+      "searchText": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "suggest": {
+        "type": "completion",
+        "analyzer": "simple"
+      }
+    }
+  },
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "filename_analyzer": {
+          "tokenizer": "keyword",
+          "filter": ["lowercase", "filename_ngram"]
+        }
+      },
+      "filter": {
+        "filename_ngram": {
+          "type": "ngram",
+          "min_gram": 2,
+          "max_gram": 20
+        }
+      }
+    }
+  }
+}

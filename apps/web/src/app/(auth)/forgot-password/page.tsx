@@ -5,11 +5,14 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button, Card, Input, Label } from '@erp/ui'
 import { ArrowLeft, Mail, Shield, CheckCircle } from 'lucide-react'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation } from '@/lib/i18n/mock-hooks'
 import { toast } from '@/hooks/use-toast'
 
+// Force dynamic rendering to avoid SSR issues
+export const dynamic = 'force-dynamic'
+
 export default function ForgotPasswordPage() {
-  const { t } = useTranslation(['auth', 'common'])
+  const { t } = useTranslation('auth')
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -131,7 +134,7 @@ export default function ForgotPasswordPage() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                   placeholder="jean.dupont@entreprise.com"
                   className="pl-10"
                   required

@@ -4,7 +4,10 @@ import { useState } from 'react'
 import { Button, Card, Input, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui'
 import { Mail, Phone, MessageCircle, AlertCircle, CheckCircle, ArrowLeft, Clock, Users } from 'lucide-react'
 import Link from 'next/link'
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
+
+// Force dynamic rendering to avoid SSR issues
+export const dynamic = 'force-dynamic'
 
 const SUPPORT_CATEGORIES = [
   { value: 'technical', label: 'Problème technique', icon: AlertCircle },
@@ -43,11 +46,7 @@ export default function SupportPage() {
     
     // Validation basique
     if (!formData.name || !formData.email || !formData.subject || !formData.description) {
-      toast({
-        title: 'Erreur',
-        description: 'Veuillez remplir tous les champs obligatoires',
-        variant: 'destructive',
-      })
+      toast.error('Veuillez remplir tous les champs obligatoires')
       return
     }
 
@@ -58,17 +57,9 @@ export default function SupportPage() {
       await new Promise(resolve => setTimeout(resolve, 2000))
       
       setIsSubmitted(true)
-      toast({
-        title: 'Ticket créé',
-        description: 'Votre demande a été envoyée avec succès',
-        variant: 'success',
-      })
+      toast.success('Ticket créé - Votre demande a été envoyée avec succès')
     } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue. Veuillez réessayer.',
-        variant: 'destructive',
-      })
+      toast.error('Une erreur est survenue. Veuillez réessayer.')
     } finally {
       setIsLoading(false)
     }
@@ -189,7 +180,7 @@ export default function SupportPage() {
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
                       placeholder="Jean Dupont"
                       required
                     />
@@ -201,7 +192,7 @@ export default function SupportPage() {
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
                       placeholder="jean.dupont@entreprise.com"
                       required
                     />
@@ -213,7 +204,7 @@ export default function SupportPage() {
                   <Input
                     id="company"
                     value={formData.company}
-                    onChange={(e) => handleInputChange('company', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('company', e.target.value)}
                     placeholder="TopSteel Métallerie"
                   />
                 </div>
@@ -221,7 +212,7 @@ export default function SupportPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="category">Catégorie *</Label>
-                    <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                    <Select value={formData.category} onValueChange={(value: string) => handleInputChange('category', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionnez une catégorie" />
                       </SelectTrigger>
@@ -237,7 +228,7 @@ export default function SupportPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="urgency">Urgence *</Label>
-                    <Select value={formData.urgency} onValueChange={(value) => handleInputChange('urgency', value)}>
+                    <Select value={formData.urgency} onValueChange={(value: string) => handleInputChange('urgency', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Niveau d'urgence" />
                       </SelectTrigger>
@@ -257,7 +248,7 @@ export default function SupportPage() {
                   <Input
                     id="subject"
                     value={formData.subject}
-                    onChange={(e) => handleInputChange('subject', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('subject', e.target.value)}
                     placeholder="Résumé du problème"
                     required
                   />
@@ -268,7 +259,7 @@ export default function SupportPage() {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('description', e.target.value)}
                     placeholder="Décrivez votre problème en détail : étapes pour reproduire, messages d'erreur, capture d'écran..."
                     rows={6}
                     required
