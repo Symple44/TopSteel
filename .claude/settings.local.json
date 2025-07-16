@@ -83,7 +83,9 @@
       "Bash(touch:*)",
       "Bash(NEXT_DEBUG=1 npx next build)",
       "Bash(NODE_ENV=production npx next build --experimental-build-mode compile)",
-      "Bash(NEXT_TELEMETRY_DISABLED=1 npx next build --debug)"
+      "Bash(NEXT_TELEMETRY_DISABLED=1 npx next build --debug)",
+      "Bash(turbo build:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

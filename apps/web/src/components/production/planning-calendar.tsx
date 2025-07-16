@@ -165,7 +165,7 @@ export function PlanningCalendar({
                               : 'bg-green-100 text-green-800'
                         }
                       `}
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation()
                         onEventClick(event)
                       }}

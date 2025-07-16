@@ -245,10 +245,10 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
           {!isCollapsed && (
             <div className="ml-3 flex-1 transition-all duration-200">
               <p className="text-sm font-medium text-foreground leading-none group-hover:text-foreground transition-colors duration-200">
-                {t('connected', 'Connecté')}
+                {t('connected') || 'Connecté'}
               </p>
               <p className="text-xs text-muted-foreground mt-1 group-hover:text-muted-foreground transition-colors duration-200">
-                {t('erpActive', 'ERP Actif')}
+                {t('erpActive') || 'ERP Actif'}
               </p>
             </div>
           )}

@@ -2,20 +2,53 @@
 
 import { useTranslation } from '@/lib/i18n'
 import { Input, Label, Button, Avatar } from '@erp/ui'
-import { Upload } from 'lucide-react'
+import { Upload, RotateCcw, Save } from 'lucide-react'
 import { useSystemParameters } from '@/hooks/use-system-parameters'
+import { toast } from 'sonner'
 
 export function CompanySettings() {
   const { t } = useTranslation('admin')
-  const { parameters, updateParameter } = useSystemParameters()
+  const { parameters, updateParameter, resetToDefaults, saveParameters } = useSystemParameters()
 
   const handleInputChange = (key: string, value: string) => {
     updateParameter(key, value)
   }
 
+  const handleSave = async () => {
+    try {
+      await saveParameters()
+      toast.success(t('saveSuccess'))
+    } catch (error) {
+      toast.error(t('saveError'))
+    }
+  }
+
+  const handleReset = async () => {
+    if (confirm(t('resetConfirm'))) {
+      try {
+        await resetToDefaults()
+        toast.success(t('resetSuccess'))
+      } catch (error) {
+        toast.error(t('resetError'))
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">{t('company.title')}</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">{t('company.title')}</h2>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={handleReset}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {t('common.reset')}
+          </Button>
+          <Button onClick={handleSave}>
+            <Save className="mr-2 h-4 w-4" />
+            {t('common.save')}
+          </Button>
+        </div>
+      </div>
       
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">

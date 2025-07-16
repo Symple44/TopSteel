@@ -1,5 +1,13 @@
 // apps/web/src/lib/error-handler.ts
-import { AxiosError } from 'axios'
+
+// Interface générique pour les erreurs HTTP
+interface HttpError {
+  response?: {
+    status: number
+    data?: ApiError
+  }
+  message?: string
+}
 
 export interface ApiError {
   message: string
@@ -116,21 +124,23 @@ function formatHttpError(status: number): FormattedError {
  * Formate une erreur API pour l'affichage utilisateur
  */
 export function formatError(error: unknown): FormattedError {
-  if (error instanceof AxiosError) {
-    const apiError = error.response?.data as ApiError
+  // Vérifier si c'est une erreur HTTP avec response
+  const httpError = error as HttpError
+  if (httpError?.response?.status) {
+    const apiError = httpError.response.data as ApiError
 
     // Erreur de validation (400) avec détails
-    if (error.response?.status === 400 && apiError?.errors?.length) {
+    if (httpError.response.status === 400 && apiError?.errors?.length) {
       return formatValidationError(apiError.errors[0])
     }
 
     // Erreur spécifique avec message du backend
     if (apiError?.message) {
-      return formatSpecificError(error.response?.status || 500, apiError.message)
+      return formatSpecificError(httpError.response.status, apiError.message)
     }
 
     // Erreur HTTP générique
-    return formatHttpError(error.response?.status || 500)
+    return formatHttpError(httpError.response.status)
   }
 
   // Erreur inconnue
@@ -144,10 +154,11 @@ export function formatError(error: unknown): FormattedError {
  * Extrait tous les messages d'erreur de validation
  */
 export function getAllValidationErrors(error: unknown): string[] {
-  if (error instanceof AxiosError) {
-    const apiError = error.response?.data as ApiError
+  const httpError = error as HttpError
+  if (httpError?.response?.status) {
+    const apiError = httpError.response.data as ApiError
 
-    if (error.response?.status === 400 && apiError?.errors?.length) {
+    if (httpError.response.status === 400 && apiError?.errors?.length) {
       return apiError.errors.flatMap((err) => Object.values(err.constraints))
     }
   }

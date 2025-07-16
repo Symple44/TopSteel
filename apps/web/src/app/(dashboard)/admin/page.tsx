@@ -3,13 +3,11 @@
 import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { Button, Card } from '@erp/ui'
-import { Save, RefreshCw, Building2, ListChecks, Shield, Workflow, Plug, Settings, Search } from 'lucide-react'
+import { Building2, ListChecks, Shield, Workflow, Plug, Settings, Search } from 'lucide-react'
 import { CompanySettings } from '@/components/admin/company-settings'
 import { UnitsAndListsSettings } from '@/components/admin/units-lists-settings'
 import { AuthenticationSettings } from '@/components/admin/authentication-settings'
 import { ElasticsearchAdmin } from '@/components/admin/elasticsearch-admin'
-import { useSystemParameters } from '@/hooks/use-system-parameters'
-import { toast } from '@/hooks/use-toast'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'
@@ -37,7 +35,7 @@ const getNavigationItems = (t: any) => [
     id: 'elasticsearch',
     label: 'Elasticsearch',
     icon: Search,
-    description: 'Configuration de la recherche'
+    description: t('elasticsearch.title')
   },
   {
     id: 'workflow',
@@ -62,31 +60,7 @@ const getNavigationItems = (t: any) => [
 export default function AdminConfigurationPage() {
   const { t } = useTranslation('admin')
   const [activeSection, setActiveSection] = useState('company')
-  const { saveParameters, isLoading } = useSystemParameters()
   const navigationItems = getNavigationItems(t)
-
-  const handleSave = async () => {
-    try {
-      await saveParameters()
-      toast({
-        title: 'Paramètres sauvegardés',
-        variant: 'success',
-      })
-    } catch (error) {
-      toast({
-        title: 'Erreur lors de la sauvegarde',
-        description: error instanceof Error ? error.message : 'Erreur inconnue',
-        variant: 'destructive',
-      })
-    }
-  }
-
-  const handleReset = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir réinitialiser tous les paramètres ?')) {
-      // TODO: Implement reset to defaults
-      console.log('Reset to defaults')
-    }
-  }
 
   const renderContent = () => {
     switch (activeSection) {
@@ -179,25 +153,6 @@ export default function AdminConfigurationPage() {
           <Card className="p-6">
             <div className="min-h-[600px]">
               {renderContent()}
-            </div>
-
-            <div className="mt-6 flex justify-between border-t pt-6">
-              <Button
-                variant="outline"
-                onClick={handleReset}
-                disabled={isLoading}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Réinitialiser
-              </Button>
-              
-              <Button
-                onClick={handleSave}
-                disabled={isLoading}
-              >
-                <Save className="mr-2 h-4 w-4" />
-                {t('common.save', 'Sauvegarder')}
-              </Button>
             </div>
           </Card>
         </div>

@@ -103,7 +103,7 @@ export default function CompanySettingsPage() {
                   </label>
                   <Input
                     value={companyData.name}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Nom de l'entreprise"
                   />
                 </div>
@@ -114,7 +114,7 @@ export default function CompanySettingsPage() {
                   </label>
                   <Input
                     value={companyData.siret}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, siret: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, siret: e.target.value }))}
                     placeholder="12345678901234"
                   />
                 </div>
@@ -125,7 +125,7 @@ export default function CompanySettingsPage() {
                   </label>
                   <Input
                     value={companyData.vat}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, vat: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, vat: e.target.value }))}
                     placeholder="FR12345678901"
                   />
                 </div>
@@ -136,7 +136,7 @@ export default function CompanySettingsPage() {
                   </label>
                   <Input
                     value={companyData.phone}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, phone: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="+33 1 23 45 67 89"
                   />
                 </div>
@@ -148,7 +148,7 @@ export default function CompanySettingsPage() {
                   <Input
                     type="email"
                     value={companyData.email}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="contact@entreprise.com"
                   />
                 </div>
@@ -160,7 +160,7 @@ export default function CompanySettingsPage() {
                   <Input
                     type="url"
                     value={companyData.website}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, website: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, website: e.target.value }))}
                     placeholder="https://entreprise.com"
                   />
                 </div>
@@ -176,7 +176,7 @@ export default function CompanySettingsPage() {
                   </label>
                   <Input
                     value={companyData.address}
-                    onChange={(e) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, address: e.target.value }))}
                     placeholder="123 Rue de l'Industrie"
                   />
                 </div>
@@ -188,7 +188,7 @@ export default function CompanySettingsPage() {
                     </label>
                     <Input
                       value={companyData.city}
-                      onChange={(e) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, city: e.target.value }))}
                       placeholder="Paris"
                     />
                   </div>
@@ -199,7 +199,7 @@ export default function CompanySettingsPage() {
                     </label>
                     <Input
                       value={companyData.postalCode}
-                      onChange={(e) => setCompanyData(prev => ({ ...prev, postalCode: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, postalCode: e.target.value }))}
                       placeholder="75001"
                     />
                   </div>
@@ -210,7 +210,7 @@ export default function CompanySettingsPage() {
                     </label>
                     <Input
                       value={companyData.country}
-                      onChange={(e) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyData(prev => ({ ...prev, country: e.target.value }))}
                       placeholder="France"
                     />
                   </div>

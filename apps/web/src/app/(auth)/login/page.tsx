@@ -15,7 +15,7 @@ export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '', // Peut être email ou acronyme
     password: '',
     rememberMe: false,
   })
@@ -29,7 +29,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.email || !formData.password) {
+    if (!formData.identifier || !formData.password) {
       toast({
         title: 'Erreur',
         description: 'Veuillez remplir tous les champs',
@@ -41,7 +41,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login(formData.email, formData.password, formData.rememberMe)
+      await login(formData.identifier, formData.password, formData.rememberMe)
       toast({
         title: 'Connexion réussie',
         description: 'Bienvenue dans TopSteel ERP',
@@ -84,19 +84,22 @@ export default function LoginPage() {
             {/* Formulaire */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Adresse email</Label>
+                <Label htmlFor="identifier">Email ou Acronyme</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="admin@topsteel.com"
+                    id="identifier"
+                    type="text"
+                    value={formData.identifier}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('identifier', e.target.value)}
+                    placeholder="admin@topsteel.com ou JDO"
                     className="pl-10"
                     required
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Utilisez votre email ou votre acronyme pour vous connecter
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -107,7 +110,7 @@ export default function LoginPage() {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('password', e.target.value)}
                     placeholder="••••••••"
                     className="pl-10 pr-10"
                     required
@@ -127,7 +130,7 @@ export default function LoginPage() {
                   <input
                     type="checkbox"
                     checked={formData.rememberMe}
-                    onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('rememberMe', e.target.checked)}
                     className="rounded border-input"
                   />
                   <span className="text-muted-foreground">Se souvenir de moi</span>

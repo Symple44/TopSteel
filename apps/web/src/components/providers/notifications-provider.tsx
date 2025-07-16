@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
-import type { Notification } from '@erp/domains/cross-cutting'
+import type { Notification } from '@erp/domains/notifications'
 import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
 
@@ -22,12 +22,33 @@ export interface NotificationSettings {
   enableToast: boolean
   enableBrowser: boolean
   enableEmail: boolean
-  categories: Record<string, boolean>
+  categories: {
+    system: boolean
+    stock: boolean
+    projet: boolean
+    production: boolean
+    maintenance: boolean
+    qualite: boolean
+    facturation: boolean
+    sauvegarde: boolean
+    utilisateur: boolean
+  }
   priority: {
     low: boolean
     normal: boolean
     high: boolean
     urgent: boolean
+  }
+  schedules?: {
+    workingHours?: {
+      enabled: boolean
+      start: string
+      end: string
+    }
+    weekdays?: {
+      enabled: boolean
+      days: number[]
+    }
   }
 }
 
@@ -58,7 +79,7 @@ export interface NotificationsContextValue {
 
 export interface CreateNotificationRequest {
   type: 'info' | 'success' | 'warning' | 'error'
-  category: 'system' | 'stock' | 'projet' | 'production' | 'maintenance'
+  category: 'system' | 'stock' | 'projet' | 'production' | 'maintenance' | 'qualite' | 'facturation' | 'sauvegarde' | 'utilisateur'
   title: string
   message: string
   data?: Record<string, unknown>
@@ -82,12 +103,25 @@ const defaultSettings: NotificationSettings = {
     maintenance: true,
     qualite: true,
     facturation: true,
+    sauvegarde: false, // Désactivé par défaut
+    utilisateur: true,
   },
   priority: {
-    low: true,
+    low: false,  // Désactivé par défaut
     normal: true,
     high: true,
     urgent: true,
+  },
+  schedules: {
+    workingHours: {
+      enabled: false,
+      start: "09:00",
+      end: "18:00",
+    },
+    weekdays: {
+      enabled: false,
+      days: [1, 2, 3, 4, 5], // Lundi à vendredi
+    },
   },
 }
 
@@ -156,13 +190,15 @@ function notificationsReducer(
         unreadCount: 0,
       }
 
-    case 'SET_NOTIFICATIONS':
+    case 'SET_NOTIFICATIONS': {
+      const notifications = Array.isArray(action.payload) ? action.payload : []
       return {
         ...state,
-        notifications: action.payload,
-        unreadCount: action.payload.filter((n) => !n.isRead).length,
+        notifications,
+        unreadCount: notifications.filter((n) => !n.isRead).length,
         loading: false,
       }
+    }
 
     case 'SET_CONNECTED':
       return {
@@ -277,9 +313,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
       if (!response.ok) throw new Error('Erreur lors du chargement')
 
-      const notifications = await response.json()
+      const result = await response.json()
 
-      dispatch({ type: 'SET_NOTIFICATIONS', payload: notifications })
+      dispatch({ type: 'SET_NOTIFICATIONS', payload: result.notifications })
     } catch (error) {
       console.error('Erreur refresh notifications:', error)
       dispatch({ type: 'SET_ERROR', payload: 'Erreur lors du chargement des notifications' })
@@ -287,11 +323,14 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   }, [user])
 
   // ===== WEBSOCKET CONNECTION =====
+  // WebSocket connection is optional for real-time notifications
+  // If no NEXT_PUBLIC_WS_URL is configured, notifications will work via polling/refresh only
 
   const connectWebSocket = useCallback(() => {
-    if (!user || wsRef.current?.readyState === WebSocket.OPEN) return
+    // Skip WebSocket connection if no WebSocket URL is configured
+    if (!user || !process.env.NEXT_PUBLIC_WS_URL || wsRef.current?.readyState === WebSocket.OPEN) return
 
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001'}/notifications?userId=${user.id}`
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/notifications?userId=${user.id}`
 
     try {
       const ws = new WebSocket(wsUrl)
@@ -299,17 +338,19 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       wsRef.current = ws
 
       ws.onopen = () => {
+        console.log('🔔 WebSocket connected')
         dispatch({ type: 'SET_CONNECTED', payload: true })
         dispatch({ type: 'SET_ERROR', payload: null })
         reconnectAttempts.current = 0
       }
 
-      ws.onclose = () => {
+      ws.onclose = (event) => {
+        console.log('🔔 WebSocket closed:', event.code, event.reason)
         dispatch({ type: 'SET_CONNECTED', payload: false })
 
-        // Reconnexion automatique avec backoff exponentiel
-        if (reconnectAttempts.current < 5) {
-          const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 30000)
+        // Only try to reconnect if it was an unexpected close
+        if (event.code !== 1000 && reconnectAttempts.current < 3) {
+          const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 10000)
 
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectAttempts.current++
@@ -319,8 +360,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       }
 
       ws.onerror = (error) => {
-        console.error('🔔 WebSocket error:', error)
-        dispatch({ type: 'SET_ERROR', payload: 'Erreur de connexion temps réel' })
+        console.warn('🔔 WebSocket error (real-time notifications disabled):', error)
+        // Don't dispatch error since WebSocket is optional
+        dispatch({ type: 'SET_CONNECTED', payload: false })
       }
 
       ws.onmessage = (event) => {
@@ -344,7 +386,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
             toast({
               title: notification.title,
               description: notification.message,
-              variant: notification.type === 'ERROR' ? 'destructive' : 'default',
+              variant: notification.type === 'error' ? 'destructive' : 'default',
             })
           }
 
@@ -373,11 +415,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         }
       }
     } catch (error) {
-      console.error('Erreur connexion WebSocket:', error)
-      dispatch({
-        type: 'SET_ERROR',
-        payload: 'Impossible de se connecter au serveur de notifications',
-      })
+      console.warn('🔔 WebSocket connection failed (real-time notifications disabled):', error)
+      // Don't dispatch error since WebSocket is optional
+      dispatch({ type: 'SET_CONNECTED', payload: false })
     }
   }, [user, state.settings, toast])
 

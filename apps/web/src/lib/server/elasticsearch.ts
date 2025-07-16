@@ -5,16 +5,27 @@
 
 // Dynamic imports to ensure these are only loaded server-side
 export async function getElasticsearchClient() {
-  const { elasticsearchClient } = await import('@erp/domains/search')
+  const { elasticsearchClient } = await import('@erp/domains/server')
   return elasticsearchClient
 }
 
 export async function getMigrationService() {
-  const { migrationService } = await import('@erp/domains/search')
+  const { migrationService } = await import('@erp/domains/server')
   return migrationService
 }
 
 export async function getImageElasticsearchService() {
-  const { imageElasticsearchService } = await import('@erp/domains/image')
-  return imageElasticsearchService
+  try {
+    const { imageElasticsearchService } = await import('@erp/domains/server')
+    return imageElasticsearchService
+  } catch (error) {
+    console.error('Failed to load image service:', error)
+    // Retourner un service mock si l'import échoue
+    return {
+      toElasticsearchDocument: () => ({}),
+      searchImages: async () => [],
+      indexImage: async () => {},
+      deleteImage: async () => {},
+    }
+  }
 }

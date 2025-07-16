@@ -485,6 +485,23 @@ export class APIClient {
       avgResponseTime: 0,
     }
   }
+
+  /**
+   * Creates a context key for React Query or similar state management
+   */
+  createContextKey(domain: string, resource?: string, id?: string | number): string[] {
+    const parts = [domain]
+    
+    if (resource) {
+      parts.push(resource)
+    }
+    
+    if (id !== undefined) {
+      parts.push(String(id))
+    }
+    
+    return parts
+  }
 }
 
 // ✅ INSTANCE GLOBALE EXPORTÉE

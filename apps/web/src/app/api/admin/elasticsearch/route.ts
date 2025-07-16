@@ -17,12 +17,25 @@ export async function GET(request: NextRequest) {
 
     switch (action) {
       case 'status':
-        const isConnected = await elasticsearchClient.isConnected()
-        const health = isConnected ? await migrationService.checkIndexHealth() : {}
+        // Utiliser un timeout plus court pour éviter les attentes trop longues
+        const connectionInfo = await elasticsearchClient.getConnectionInfo(3000)
+        
+        // Si connecté, récupérer les informations sur les index
+        let indices = {}
+        if (connectionInfo.connected) {
+          try {
+            indices = await migrationService.checkIndexHealth()
+          } catch (error) {
+            console.warn('Failed to check index health:', error)
+          }
+        }
         
         return NextResponse.json({
-          connected: isConnected,
-          indices: health
+          connected: connectionInfo.connected,
+          error: connectionInfo.error,
+          version: connectionInfo.version,
+          clusterName: connectionInfo.clusterName,
+          indices
         })
 
       case 'health':

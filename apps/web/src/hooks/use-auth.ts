@@ -1,6 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 
 // Types harmonisés
+interface UserProfile {
+  acronyme?: string
+  prenom?: string
+  nom?: string
+  telephone?: string
+  poste?: string
+  departement?: string
+  adresse?: string
+  ville?: string
+  codePostal?: string
+  pays?: string
+}
+
 interface User {
   id: string
   nom: string
@@ -9,6 +22,7 @@ interface User {
   prenom?: string
   avatar?: string
   permissions?: string[]
+  profile?: UserProfile
 }
 
 interface Tokens {
@@ -34,6 +48,18 @@ const mockUser: User = {
   role: 'admin',
   avatar: '/images/avatars/default.png',
   permissions: ['read', 'write', 'admin'],
+  profile: {
+    acronyme: 'JDO',
+    prenom: 'Jean',
+    nom: 'Dubois',
+    telephone: '+33 1 23 45 67 89',
+    poste: 'Directeur technique',
+    departement: 'Production',
+    adresse: '123 Rue de l\'Industrie',
+    ville: 'Lyon',
+    codePostal: '69000',
+    pays: 'France',
+  },
 }
 
 const mockTokens: Tokens = {
@@ -111,7 +137,7 @@ export const useAuth = () => {
   }, [])
 
   // ✅ Fonction de login - stable avec useCallback
-  const login = useCallback(async (email: string, password: string, rememberMe: boolean = false): Promise<void> => {
+  const login = useCallback(async (identifier: string, password: string, rememberMe: boolean = false): Promise<void> => {
     setAuthState((prev) => ({ ...prev, isLoading: true }))
 
     try {
@@ -119,7 +145,15 @@ export const useAuth = () => {
       if (process.env.NODE_ENV === 'development') {
         await new Promise((resolve) => setTimeout(resolve, 500)) // Simulation
 
-        const userData = { ...mockUser, email }
+        // Vérifier si l'identifier correspond à l'email ou à l'acronyme
+        const isValidLogin = identifier === mockUser.email || 
+                           identifier === mockUser.profile?.acronyme
+
+        if (!isValidLogin) {
+          throw new Error('Email ou acronyme invalide')
+        }
+
+        const userData = { ...mockUser }
         const tokenData = mockTokens
 
         storage.set(AUTH_STORAGE_KEY, userData)
@@ -139,7 +173,7 @@ export const useAuth = () => {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, password }),
       })
 
       if (!response.ok) {
@@ -350,6 +384,22 @@ export const useAuth = () => {
 
     return () => clearInterval(refreshInterval)
   }, [authState.tokens?.accessToken, authState.isAuthenticated, refreshTokens])
+
+  // ✅ Écouter les mises à jour du profil utilisateur
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      const storedUser = storage.get(AUTH_STORAGE_KEY)
+      if (storedUser) {
+        setAuthState(prev => ({
+          ...prev,
+          user: storedUser,
+        }))
+      }
+    }
+
+    window.addEventListener('user-profile-updated', handleProfileUpdate)
+    return () => window.removeEventListener('user-profile-updated', handleProfileUpdate)
+  }, [])
 
   return {
     user: authState.user,

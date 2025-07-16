@@ -166,7 +166,7 @@ export function ImageUpload({
                 variant="destructive"
                 size="sm"
                 className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation()
                   handleRemove()
                 }}

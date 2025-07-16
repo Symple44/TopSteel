@@ -21,6 +21,7 @@ import {
   Shield,
   User,
   Loader2,
+  RotateCcw,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
@@ -40,6 +41,7 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
   const { current: language, change: setLanguage } = useLanguage()
   const { t } = useTranslation('settings')
+  const { t: tc } = useTranslation('common')
 
   // Récupération des données utilisateur depuis l'API
   const { data: userSettings, isLoading, error } = useUserSettings()
@@ -154,23 +156,54 @@ export default function SettingsPage() {
     // Sauvegarder les préférences via l'API
     updatePreferences.mutate(prefsToSave, {
       onSuccess: () => {
-        toast.success(t('success.saved', 'Préférences enregistrées avec succès'))
+        toast.success(t('success.saved') || 'Préférences enregistrées avec succès')
       },
       onError: () => {
-        toast.error(t('settingsLoadError', 'Erreur lors de l\'enregistrement des préférences'))
+        toast.error(t('settingsLoadError') || 'Erreur lors de l\'enregistrement des préférences')
       }
     })
   }
 
   const handleSaveNotifications = () => {
-    updateNotifications.mutate({ notifications: preferencesData.notifications }, {
+    updateNotifications.mutate(preferencesData.notifications, {
       onSuccess: () => {
-        toast.success(t('success.saved', 'Notifications enregistrées avec succès'))
+        toast.success(t('success.saved') || 'Notifications enregistrées avec succès')
       },
       onError: () => {
-        toast.error(t('settingsLoadError', 'Erreur lors de l\'enregistrement des notifications'))
+        toast.error(t('settingsLoadError') || 'Erreur lors de l\'enregistrement des notifications')
       }
     })
+  }
+
+  const handleSaveAll = () => {
+    if (activeTab === 'notifications') {
+      handleSaveNotifications()
+    } else if (activeTab === 'preferences') {
+      handleSavePreferences()
+    }
+  }
+
+  const handleResetAll = () => {
+    if (window.confirm('Êtes-vous sûr de vouloir réinitialiser ces paramètres ?')) {
+      if (activeTab === 'notifications') {
+        setPreferencesData(prev => ({
+          ...prev,
+          notifications: {
+            email: true,
+            push: true,
+            sms: false,
+          }
+        }))
+        toast.success('Paramètres de notification réinitialisés')
+      } else if (activeTab === 'preferences') {
+        setPreferencesData(prev => ({
+          ...prev,
+          language: 'auto',
+          timezone: 'Europe/Paris',
+        }))
+        toast.success('Préférences réinitialisées')
+      }
+    }
   }
 
   const handleLanguageChange = (newLanguage: string) => {
@@ -187,10 +220,10 @@ export default function SettingsPage() {
     
     updatePreferences.mutate(updatedPrefs, {
       onSuccess: () => {
-        toast.success(t('languageUpdated', 'Langue mise à jour'))
+        toast.success(t('languageUpdated') || 'Langue mise à jour')
       },
       onError: () => {
-        toast.error(t('languageUpdateError', 'Erreur lors de la mise à jour de la langue'))
+        toast.error(t('languageUpdateError') || 'Erreur lors de la mise à jour de la langue')
       }
     })
   }
@@ -273,20 +306,6 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={handleSaveNotifications}
-                  disabled={updateNotifications.isPending}
-                  className="flex items-center"
-                >
-                  {updateNotifications.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Save className="h-4 w-4 mr-2" />
-                  )}
-                  {t('saveNotifications')}
-                </Button>
-              </div>
             </CardContent>
           </Card>
         )
@@ -352,7 +371,7 @@ export default function SettingsPage() {
                           : 'border-input hover:border-ring'
                       }`}
                     >
-                      {t('light', 'Clair')}
+                      {t('light') || 'Clair'}
                     </button>
                     <button
                       type="button"
@@ -363,7 +382,7 @@ export default function SettingsPage() {
                           : 'border-input hover:border-ring'
                       }`}
                     >
-                      {t('dark', 'Sombre')}
+                      {t('dark') || 'Sombre'}
                     </button>
                     <button
                       type="button"
@@ -374,7 +393,7 @@ export default function SettingsPage() {
                           : 'border-input hover:border-ring'
                       }`}
                     >
-                      {t('vibrant', '🎨 Coloré')}
+                      {t('vibrant') || '🎨 Coloré'}
                     </button>
                     <button
                       type="button"
@@ -385,30 +404,18 @@ export default function SettingsPage() {
                           : 'border-input hover:border-ring'
                       }`}
                     >
-                      {t('system', 'Auto')}
+                      {t('system') || 'Auto'}
                     </button>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {t('currentTheme')} : {theme === 'light' ? t('light', 'Clair') : theme === 'dark' ? t('dark', 'Sombre') : theme === 'vibrant' ? t('vibrant', 'Coloré') : t('system', 'Auto')}
+                    {t('currentTheme')} : {theme === 'light' ? (t('light') || 'Clair') : theme === 'dark' ? (t('dark') || 'Sombre') : theme === 'vibrant' ? (t('vibrant') || 'Coloré') : (t('system') || 'Auto')}
                   </p>
                 </div>
 
-                <div className="flex justify-between items-center pt-4">
+                <div className="pt-4">
                   <p className="text-sm text-muted-foreground">
                     {t('themeAutoSave')}
                   </p>
-                  <Button 
-                    onClick={handleSavePreferences}
-                    disabled={updatePreferences.isPending}
-                    className="flex items-center"
-                  >
-                    {updatePreferences.isPending ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4 mr-2" />
-                    )}
-                    {t('savePreferences')}
-                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -427,6 +434,16 @@ export default function SettingsPage() {
         <div>
           <h1 className="text-3xl font-bold text-foreground">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={handleResetAll}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {tc('reset')}
+          </Button>
+          <Button onClick={handleSaveAll}>
+            <Save className="mr-2 h-4 w-4" />
+            {tc('save')}
+          </Button>
         </div>
       </div>
 

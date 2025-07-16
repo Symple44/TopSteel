@@ -23,6 +23,7 @@ export enum ParameterCategory {
   STOCKS = 'STOCKS',
   NOTIFICATION = 'NOTIFICATION',
   SECURITY = 'SECURITY',
+  ELASTICSEARCH = 'ELASTICSEARCH',
 }
 
 @Entity('system_parameters')

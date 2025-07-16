@@ -9,7 +9,9 @@ export * from './sales'
 export * from './production'
 export * from './cross-cutting'
 export * from './search'
-export * from './image'
+
+// Export conditionnel pour les images (côté serveur uniquement)
+export type * from './image/types'
 
 // ===== RE-EXPORTS ESSENTIELS =====
 

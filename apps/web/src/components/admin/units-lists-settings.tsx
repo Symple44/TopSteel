@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { Button, Card, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge } from '@erp/ui'
-import { Plus, Edit, Trash2, GripVertical } from 'lucide-react'
+import { Plus, Edit, Trash2, GripVertical, RotateCcw, Save } from 'lucide-react'
 import { useSystemParameters } from '@/hooks/use-system-parameters'
+import { toast } from 'sonner'
 
 interface ListItem {
   id: string
@@ -14,9 +15,29 @@ interface ListItem {
 
 export function UnitsAndListsSettings() {
   const { t } = useTranslation('admin')
-  const { parameters, updateParameter } = useSystemParameters()
+  const { parameters, updateParameter, resetToDefaults, saveParameters } = useSystemParameters()
   const [editingItem, setEditingItem] = useState<{ listKey: string; item: ListItem } | null>(null)
   const [newItem, setNewItem] = useState<{ listKey: string; value: string } | null>(null)
+
+  const handleSave = async () => {
+    try {
+      await saveParameters()
+      toast.success(t('saveSuccess'))
+    } catch (error) {
+      toast.error(t('saveError'))
+    }
+  }
+
+  const handleReset = async () => {
+    if (confirm(t('resetConfirm'))) {
+      try {
+        await resetToDefaults()
+        toast.success(t('resetSuccess'))
+      } catch (error) {
+        toast.error(t('resetError'))
+      }
+    }
+  }
 
   const lists = [
     { key: 'STOCK_UNITS', title: t('units.stockUnits') },
@@ -71,7 +92,19 @@ export function UnitsAndListsSettings() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">{t('units.title')}</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">{t('units.title')}</h2>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={handleReset}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {t('common.reset')}
+          </Button>
+          <Button onClick={handleSave}>
+            <Save className="mr-2 h-4 w-4" />
+            {t('common.save')}
+          </Button>
+        </div>
+      </div>
       
       {lists.map((list) => (
         <Card key={list.key} className="p-4">

@@ -54,4 +54,23 @@ export abstract class BaseApiClient {
   protected normalizeId(id: string | number): string {
     return String(id)
   }
+
+  // ===== CONTEXT KEY GENERATION =====
+
+  /**
+   * Creates a context key for React Query or similar state management
+   */
+  createContextKey(domain: string, resource?: string, id?: string | number): string[] {
+    const parts = [domain]
+    
+    if (resource) {
+      parts.push(resource)
+    }
+    
+    if (id !== undefined) {
+      parts.push(this.normalizeId(id))
+    }
+    
+    return parts
+  }
 }

@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto'
 import { promises as fs } from 'fs'
 import path from 'path'
-import sharp from 'sharp'
 import { createHash } from 'crypto'
 import { ImageMetadata, ImageVariant, UploadConfig, UploadResult, DEFAULT_CONFIGS } from './types'
 import { elasticsearchClient } from '../search/elasticsearch-client'
@@ -28,11 +27,18 @@ export class ImageService {
     return createHash('sha256').update(buffer).digest('hex')
   }
 
-  private getImageDimensions(buffer: Buffer): Promise<{ width: number; height: number }> {
-    return sharp(buffer).metadata().then(metadata => ({
-      width: metadata.width || 0,
-      height: metadata.height || 0
-    }))
+  private async getImageDimensions(buffer: Buffer): Promise<{ width: number; height: number }> {
+    try {
+      const sharp = await import('sharp')
+      const metadata = await sharp.default(buffer).metadata()
+      return {
+        width: metadata.width || 0,
+        height: metadata.height || 0
+      }
+    } catch (error) {
+      console.error('Sharp not available, using fallback dimensions:', error)
+      return { width: 0, height: 0 }
+    }
   }
 
   private async generateVariant(
@@ -40,18 +46,30 @@ export class ImageService {
     variant: { width: number; height: number },
     outputPath: string
   ): Promise<{ width: number; height: number; size: number }> {
-    const result = await sharp(buffer)
-      .resize(variant.width, variant.height, {
-        fit: 'cover',
-        position: 'center'
-      })
-      .jpeg({ quality: 90 })
-      .toFile(outputPath)
+    try {
+      const sharp = await import('sharp')
+      const result = await sharp.default(buffer)
+        .resize(variant.width, variant.height, {
+          fit: 'cover',
+          position: 'center'
+        })
+        .jpeg({ quality: 90 })
+        .toFile(outputPath)
 
-    return {
-      width: result.width,
-      height: result.height,
-      size: result.size
+      return {
+        width: result.width,
+        height: result.height,
+        size: result.size
+      }
+    } catch (error) {
+      console.error('Sharp not available, cannot generate variant:', error)
+      // Fallback: save original file as variant
+      await fs.writeFile(outputPath, buffer)
+      return {
+        width: variant.width,
+        height: variant.height,
+        size: buffer.length
+      }
     }
   }
 

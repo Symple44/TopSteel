@@ -50,7 +50,10 @@ export class SystemParametersController {
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Récupérer les paramètres groupés par catégorie' })
   @ApiResponse({ status: 200, description: 'Paramètres groupés par catégorie' })
-  async getByCategory() {
+  async getByCategory(@Query('category') category?: string) {
+    if (category) {
+      return this.systemParametersService.findByCategory(category as any)
+    }
     return this.systemParametersService.getParametersByCategory()
   }
 

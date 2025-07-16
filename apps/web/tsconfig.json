@@ -51,6 +51,9 @@
       ],
       "@erp/config/*": [
         "../../packages/config/*"
+      ],
+      "@erp/domains/notifications": [
+        "../../packages/domains/src/notifications"
       ]
     },
     "noEmit": true,

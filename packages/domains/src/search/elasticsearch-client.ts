@@ -41,13 +41,65 @@ export class ElasticsearchClient {
     return this.client
   }
 
-  async isConnected(): Promise<boolean> {
+  async isConnected(timeout: number = 5000): Promise<boolean> {
     try {
-      const response = await this.getClient().ping()
+      const client = this.getClient()
+      const response = await client.ping(undefined, {
+        requestTimeout: timeout
+      })
       return response === true
     } catch (error) {
-      console.error('Elasticsearch connection failed:', error)
+      // Ne pas logger l'erreur complète pour éviter le spam dans les logs
+      // Juste indiquer qu'Elasticsearch n'est pas disponible
       return false
+    }
+  }
+
+  async getConnectionInfo(timeout: number = 5000): Promise<{
+    connected: boolean
+    error?: string
+    version?: string
+    clusterName?: string
+  }> {
+    try {
+      const client = this.getClient()
+      
+      // Test de connexion rapide
+      const pingResponse = await client.ping(undefined, {
+        requestTimeout: timeout
+      })
+      
+      if (pingResponse !== true) {
+        return {
+          connected: false,
+          error: 'Ping failed'
+        }
+      }
+
+      // Si la connexion fonctionne, récupérer les infos du cluster
+      try {
+        const infoResponse = await client.info(undefined, {
+          requestTimeout: timeout
+        })
+        
+        return {
+          connected: true,
+          version: infoResponse.version?.number,
+          clusterName: infoResponse.cluster_name
+        }
+      } catch (infoError) {
+        // Connexion OK mais impossible de récupérer les infos
+        return {
+          connected: true,
+          error: 'Cannot retrieve cluster info'
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      return {
+        connected: false,
+        error: errorMessage
+      }
     }
   }
 

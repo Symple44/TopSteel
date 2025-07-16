@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { imageService } from '@erp/domains/image/service'
+import { imageService } from '@erp/domains/server'
 import { auth } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {

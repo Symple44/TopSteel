@@ -88,6 +88,23 @@ const nextConfig = {
         '@elastic/elasticsearch': false,
         '@elastic/transport': false,
         'sharp': false,
+        // Exclure les modules d'images qui utilisent sharp
+        '@erp/domains/image': false,
+        '@erp/domains/image/service': false,
+        '@erp/domains/server': false,
+        // Exclure toutes les dépendances wasm de sharp
+        '@img/sharp-wasm32': false,
+        '@img/sharp-wasm32/versions': false,
+        // Exclure axios et ses dépendances node-only
+        'axios': false,
+        'proxy-from-env': false,
+        'follow-redirects': false,
+        'form-data': false,
+        'combined-stream': false,
+        'mime-types': false,
+        'asynckit': false,
+        'es-set-tostringtag': false,
+        'hasown': false,
       }
     }
 

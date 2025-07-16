@@ -7,7 +7,7 @@ interface SystemParameter {
   key: string
   value: string
   type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON' | 'ENUM'
-  category: 'GENERAL' | 'COMPTABILITE' | 'PROJETS' | 'PRODUCTION' | 'ACHATS' | 'STOCKS' | 'NOTIFICATION' | 'SECURITY'
+  category: 'GENERAL' | 'COMPTABILITE' | 'PROJETS' | 'PRODUCTION' | 'ACHATS' | 'STOCKS' | 'NOTIFICATION' | 'SECURITY' | 'ELASTICSEARCH'
   description: string
   defaultValue?: string
   isEditable: boolean
@@ -34,12 +34,16 @@ export function useSystemParameters(): UseSystemParametersReturn {
   const { data: parametersList, isLoading, error } = useQuery({
     queryKey: ['system-parameters'],
     queryFn: async () => {
-      return apiClient.get<SystemParameter[]>('/admin/system-parameters')
+      const response = await fetch('/api/admin/system-parameters')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      return response.json()
     },
   })
 
   // Convert parameters list to key-value object
-  const parameters = parametersList?.reduce((acc, param) => {
+  const parameters = parametersList?.reduce((acc: Record<string, string>, param) => {
     acc[param.key] = pendingUpdates[param.key] ?? param.value
     return acc
   }, {} as Record<string, string>)
@@ -47,7 +51,17 @@ export function useSystemParameters(): UseSystemParametersReturn {
   // Update multiple parameters
   const updateMutation = useMutation({
     mutationFn: async (updates: Array<{ key: string; value: string }>) => {
-      return apiClient.patch<SystemParameter[]>('/admin/system-parameters', updates)
+      const response = await fetch('/api/admin/system-parameters', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['system-parameters'] })
@@ -74,14 +88,26 @@ export function useSystemParameters(): UseSystemParametersReturn {
 
   // Reset parameters to defaults
   const resetToDefaults = async () => {
-    if (!parametersList) return
+    if (!parametersList) {
+      console.log('No parameters list available for reset')
+      return
+    }
+    
+    console.log('All parameters for reset:', parametersList)
     
     const updates = parametersList
-      .filter(param => param.defaultValue)
+      .filter(param => param.defaultValue !== undefined)
       .map(param => ({
         key: param.key,
-        value: param.defaultValue!,
+        value: param.defaultValue || '',
       }))
+    
+    console.log('Resetting parameters to defaults:', updates)
+    
+    if (updates.length === 0) {
+      console.log('No parameters to reset')
+      return
+    }
     
     await updateMutation.mutateAsync(updates)
   }
@@ -101,10 +127,15 @@ export function useSystemParametersByCategory(category?: string) {
   return useQuery({
     queryKey: ['system-parameters', 'by-category', category],
     queryFn: async () => {
-      if (category) {
-        return apiClient.get<SystemParameter[]>(`/admin/system-parameters?category=${category}`)
+      const url = category 
+        ? `/api/admin/system-parameters?category=${category}`
+        : '/api/admin/system-parameters/by-category'
+      
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
-      return apiClient.get<Record<string, SystemParameter[]>>('/admin/system-parameters/by-category')
+      return response.json()
     },
   })
 }
@@ -121,7 +152,7 @@ export function useCompanyInfo() {
         email: string
         siret: string
         tva: string
-      }>('/admin/system-parameters/public/company-info')
+      }>('/api/admin/system-parameters/public/company-info')
     },
   })
 }
@@ -131,7 +162,7 @@ export function useSystemEnums(category: string) {
   return useQuery({
     queryKey: ['system-parameters', 'enums', category],
     queryFn: async () => {
-      return apiClient.get<string[]>(`/admin/system-parameters/public/enums/${category}`)
+      return apiClient.get<string[]>(`/api/admin/system-parameters/public/enums/${category}`)
     },
     enabled: !!category,
   })

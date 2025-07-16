@@ -147,14 +147,69 @@ export class SystemParametersService {
 
     for (const update of updates) {
       try {
+        // Essayer de mettre à jour le paramètre existant
         const parameter = await this.update(update.key, { value: update.value })
         results.push(parameter)
       } catch (error) {
-        // Log l'erreur mais continue avec les autres paramètres
-        console.error(`Failed to update parameter ${update.key}:`, error)
+        // Si le paramètre n'existe pas, le créer
+        try {
+          console.log(`Parameter ${update.key} not found, creating it...`)
+          const newParameter = await this.create({
+            key: update.key,
+            value: update.value,
+            type: this.getTypeFromKey(update.key),
+            category: this.getCategoryFromKey(update.key),
+            description: this.getDescriptionFromKey(update.key),
+            defaultValue: update.value,
+            isEditable: true,
+            isSecret: this.isSecretKey(update.key)
+          })
+          results.push(newParameter)
+        } catch (createError) {
+          console.error(`Failed to create parameter ${update.key}:`, createError)
+        }
       }
     }
 
     return results
+  }
+
+  // Méthode utilitaire pour déterminer la catégorie à partir de la clé
+  private getCategoryFromKey(key: string): any {
+    if (key.startsWith('elasticsearch.')) return 'ELASTICSEARCH'
+    if (key.startsWith('COMPANY_')) return 'GENERAL'
+    if (key.startsWith('PROJECT_')) return 'PROJETS'
+    if (key.startsWith('PRODUCTION_')) return 'PRODUCTION'
+    if (key.startsWith('STOCK_')) return 'STOCKS'
+    if (key.startsWith('PASSWORD_') || key.startsWith('SESSION_') || key.startsWith('TWO_FACTOR_') || key.startsWith('GOOGLE_') || key.startsWith('MICROSOFT_')) return 'SECURITY'
+    return 'GENERAL'
+  }
+
+  // Méthode utilitaire pour générer une description à partir de la clé
+  private getDescriptionFromKey(key: string): string {
+    const descriptions: Record<string, string> = {
+      'elasticsearch.url': 'URL du serveur Elasticsearch',
+      'elasticsearch.username': 'Nom d\'utilisateur Elasticsearch',
+      'elasticsearch.password': 'Mot de passe Elasticsearch',
+      'elasticsearch.enableAuth': 'Activer l\'authentification Elasticsearch',
+      'elasticsearch.indexPrefix': 'Préfixe des index Elasticsearch',
+      'elasticsearch.maxRetries': 'Nombre maximum de tentatives de reconnexion',
+      'elasticsearch.requestTimeout': 'Timeout des requêtes en millisecondes',
+      'elasticsearch.batchSize': 'Taille des lots pour l\'indexation',
+      'elasticsearch.enableLogging': 'Activer les logs détaillés Elasticsearch'
+    }
+    return descriptions[key] || `Paramètre ${key}`
+  }
+
+  // Méthode utilitaire pour déterminer le type à partir de la clé
+  private getTypeFromKey(key: string): any {
+    if (key.includes('enable') || key.includes('Enable')) return 'BOOLEAN'
+    if (key.includes('retries') || key.includes('timeout') || key.includes('size') || key.includes('Size')) return 'NUMBER'
+    return 'STRING'
+  }
+
+  // Méthode utilitaire pour déterminer si une clé est secrète
+  private isSecretKey(key: string): boolean {
+    return key.includes('password') || key.includes('secret') || key.includes('token')
   }
 }

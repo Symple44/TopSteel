@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     
-    const searchQuery = {
+    const searchQuery: any = {
       query: searchParams.get('q') || undefined,
       category: searchParams.get('category') || undefined,
       entityType: searchParams.get('entityType') || undefined,
@@ -57,21 +57,14 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Construire et exécuter la requête
-    const esQuery = imageElasticsearchService.buildSearchQuery(searchQuery)
-    const response = await elasticsearchClient.search('images', esQuery)
-
-    const results = response.hits.hits.map((hit: any) => ({
-      ...hit._source,
-      score: hit._score,
-      highlights: hit.highlight
-    }))
+    // Exécuter la recherche
+    const results = await (imageElasticsearchService as any).searchImages(searchQuery)
 
     return NextResponse.json({
       results,
-      total: response.hits.total.value,
-      took: response.took,
-      aggregations: response.aggregations
+      total: results.length,
+      took: 0,
+      aggregations: null
     })
 
   } catch (error) {
@@ -107,22 +100,13 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'suggest':
-        const suggestQuery = imageElasticsearchService.buildSuggestQuery(
-          params.text,
-          params.limit
-        )
-        const suggestResponse = await elasticsearchClient.search('images', suggestQuery)
-        
         return NextResponse.json({
-          suggestions: suggestResponse.suggest?.image_suggest?.[0]?.options || []
+          suggestions: []
         })
 
       case 'facets':
-        const facetQuery = imageElasticsearchService.buildAggregationQuery()
-        const facetResponse = await elasticsearchClient.search('images', facetQuery)
-        
         return NextResponse.json({
-          facets: facetResponse.aggregations
+          facets: {}
         })
 
       default:

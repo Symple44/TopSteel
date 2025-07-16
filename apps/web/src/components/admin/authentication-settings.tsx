@@ -1,13 +1,14 @@
 'use client'
 
 import { useTranslation } from '@/lib/i18n'
-import { Card, Input, Label, Switch, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator } from '@erp/ui'
-import { Shield, Key, Globe } from 'lucide-react'
+import { Card, Input, Label, Switch, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Button } from '@erp/ui'
+import { Shield, Key, Globe, RotateCcw, Save } from 'lucide-react'
 import { useSystemParameters } from '@/hooks/use-system-parameters'
+import { toast } from 'sonner'
 
 export function AuthenticationSettings() {
   const { t } = useTranslation('admin')
-  const { parameters, updateParameter } = useSystemParameters()
+  const { parameters, updateParameter, resetToDefaults, saveParameters } = useSystemParameters()
 
   const handleSwitchChange = (key: string, value: boolean) => {
     updateParameter(key, value.toString())
@@ -17,9 +18,41 @@ export function AuthenticationSettings() {
     updateParameter(key, value)
   }
 
+  const handleSave = async () => {
+    try {
+      await saveParameters()
+      toast.success(t('saveSuccess'))
+    } catch (error) {
+      toast.error(t('saveError'))
+    }
+  }
+
+  const handleReset = async () => {
+    if (confirm(t('resetConfirm'))) {
+      try {
+        await resetToDefaults()
+        toast.success(t('resetSuccess'))
+      } catch (error) {
+        toast.error(t('resetError'))
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">{t('authentication.title')}</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">{t('authentication.title')}</h2>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={handleReset}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {t('common.reset')}
+          </Button>
+          <Button onClick={handleSave}>
+            <Save className="mr-2 h-4 w-4" />
+            {t('common.save')}
+          </Button>
+        </div>
+      </div>
 
       {/* Authentication Methods */}
       <Card className="p-6">

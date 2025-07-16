@@ -5,6 +5,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { I18nProvider } from '@/lib/i18n'
 import { ThemeProvider } from 'next-themes'
+import { NotificationsProvider } from '@/components/providers/notifications-provider'
 import dynamic from 'next/dynamic'
 
 // Configuration React Query
@@ -32,8 +33,10 @@ const AllProviders = ({ children }: { children: React.ReactNode }) => {
           themes={['light', 'dark', 'system', 'vibrant']}
         >
           <AuthProvider>
-            {children}
-            <Toaster position="top-right" />
+            <NotificationsProvider>
+              {children}
+              <Toaster position="top-right" />
+            </NotificationsProvider>
           </AuthProvider>
         </ThemeProvider>
       </I18nProvider>

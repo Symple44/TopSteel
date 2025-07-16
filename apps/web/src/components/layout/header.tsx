@@ -6,6 +6,7 @@ import { Button } from '@erp/ui'
 import { Bell, Building2, ChevronDown, LogOut, Search, Settings, User, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { NotificationCenter } from '@/components/notifications/notification-center'
 
 interface HeaderProps {
   onToggleSidebar?: () => void
@@ -65,7 +66,7 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
               type="text"
               placeholder={t('search')}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-muted border border-input rounded-lg text-foreground placeholder-muted-foreground focus:bg-background focus:ring-2 focus:ring-ring focus:outline-none transition-all"
             />
           </div>
@@ -74,12 +75,7 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
         {/* Section droite - Actions utilisateur */}
         <div className="flex items-center space-x-2">
           {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative text-muted-foreground hover:text-foreground">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center">
-              3
-            </span>
-          </Button>
+          <NotificationCenter />
 
           {/* Menu utilisateur */}
           <div className="relative" ref={menuRef}>
@@ -90,10 +86,13 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
               className="flex items-center space-x-2 text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <div className="h-8 w-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                {user?.nom?.[0] || user?.email?.[0] || 'U'}
+                {user?.profile?.acronyme || user?.nom?.[0] || user?.email?.[0] || 'U'}
               </div>
               <span className="hidden md:block text-sm font-medium">
-                {user?.nom || user?.email?.split('@')[0] || t('user', 'Utilisateur')}
+                {user?.profile?.acronyme ? 
+                  `${user?.profile?.prenom || user?.prenom || ''} ${user?.profile?.nom || user?.nom || ''}`.trim() || user?.profile?.acronyme :
+                  user?.nom || user?.email?.split('@')[0] || t('user') || 'Utilisateur'
+                }
               </span>
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -104,11 +103,19 @@ export function Header({ onToggleSidebar, isSidebarCollapsed = false }: HeaderPr
                 {/* Info utilisateur */}
                 <div className="px-4 py-3 border-b border-border">
                   <p className="text-sm font-medium text-foreground">
-                    {user?.nom || user?.email?.split('@')[0] || t('user', 'Utilisateur')}
+                    {user?.profile?.acronyme ? 
+                      `${user?.profile?.prenom || user?.prenom || ''} ${user?.profile?.nom || user?.nom || ''}`.trim() || user?.profile?.acronyme :
+                      user?.nom || user?.email?.split('@')[0] || t('user') || 'Utilisateur'
+                    }
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {user?.email || 'utilisateur@topsteel.com'}
+                    {user?.profile?.acronyme && `@${user?.profile?.acronyme} • `}{user?.email || 'utilisateur@topsteel.com'}
                   </p>
+                  {user?.profile?.poste && (
+                    <p className="text-xs text-muted-foreground">
+                      {user?.profile?.poste} • {user?.profile?.departement || 'TopSteel'}
+                    </p>
+                  )}
                 </div>
 
                 {/* Actions */}
