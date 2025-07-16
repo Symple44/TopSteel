@@ -57,6 +57,8 @@ type NotificationsAction =
   | { type: 'MARK_AS_READ'; payload: string }
   | { type: 'MARK_ALL_AS_READ' }
   | { type: 'REMOVE_NOTIFICATION'; payload: string }
+  | { type: 'ARCHIVE_NOTIFICATION'; payload: string }
+  | { type: 'UNARCHIVE_NOTIFICATION'; payload: string }
   | { type: 'CLEAR_ALL' }
   | { type: 'SET_NOTIFICATIONS'; payload: Notification[] }
   | { type: 'SET_CONNECTED'; payload: boolean }
@@ -70,6 +72,8 @@ export interface NotificationsContextValue {
     markAsRead: (id: string) => void
     markAllAsRead: () => void
     removeNotification: (id: string) => void
+    archiveNotification: (id: string) => void
+    unarchiveNotification: (id: string) => void
     clearAll: () => void
     updateSettings: (settings: Partial<NotificationSettings>) => void
     createNotification: (notification: CreateNotificationRequest) => Promise<void>
@@ -147,7 +151,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: newNotifications,
-        unreadCount: newNotifications.filter((n) => !n.isRead).length,
+        unreadCount: newNotifications.filter((n) => !n.isRead && !n.isArchived).length,
       }
     }
 
@@ -159,7 +163,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.isRead).length,
+        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
       }
     }
 
@@ -179,7 +183,31 @@ function notificationsReducer(
       return {
         ...state,
         notifications: filteredNotifications,
-        unreadCount: filteredNotifications.filter((n) => !n.isRead).length,
+        unreadCount: filteredNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+      }
+    }
+
+    case 'ARCHIVE_NOTIFICATION': {
+      const updatedNotifications = state.notifications.map((n) =>
+        n.id === action.payload ? { ...n, isArchived: true } : n
+      )
+
+      return {
+        ...state,
+        notifications: updatedNotifications,
+        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+      }
+    }
+
+    case 'UNARCHIVE_NOTIFICATION': {
+      const updatedNotifications = state.notifications.map((n) =>
+        n.id === action.payload ? { ...n, isArchived: false } : n
+      )
+
+      return {
+        ...state,
+        notifications: updatedNotifications,
+        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
       }
     }
 
@@ -195,7 +223,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications,
-        unreadCount: notifications.filter((n) => !n.isRead).length,
+        unreadCount: notifications.filter((n) => !n.isRead && !n.isArchived).length,
         loading: false,
       }
     }
@@ -251,6 +279,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   // ===== ACTIONS =====
 
   const markAsRead = useCallback((id: string) => {
+    console.log('🔔 markAsRead appelé pour:', id)
     dispatch({ type: 'MARK_AS_READ', payload: id })
 
     // Marquer comme lu côté serveur
@@ -258,6 +287,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   }, [])
 
   const markAllAsRead = useCallback(() => {
+    console.log('🔔 markAllAsRead appelé')
     dispatch({ type: 'MARK_ALL_AS_READ' })
 
     // Marquer toutes comme lues côté serveur
@@ -265,11 +295,29 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   }, [])
 
   const removeNotification = useCallback((id: string) => {
+    console.log('🔔 removeNotification appelé pour:', id)
     dispatch({ type: 'REMOVE_NOTIFICATION', payload: id })
   }, [])
 
   const clearAll = useCallback(() => {
+    console.log('🔔 clearAll appelé')
     dispatch({ type: 'CLEAR_ALL' })
+  }, [])
+
+  const archiveNotification = useCallback((id: string) => {
+    console.log('🔔 archiveNotification appelé pour:', id)
+    dispatch({ type: 'ARCHIVE_NOTIFICATION', payload: id })
+    
+    // Archiver côté serveur
+    fetch(`/api/notifications/${id}/archive`, { method: 'PATCH' }).catch(console.error)
+  }, [])
+
+  const unarchiveNotification = useCallback((id: string) => {
+    console.log('🔔 unarchiveNotification appelé pour:', id)
+    dispatch({ type: 'UNARCHIVE_NOTIFICATION', payload: id })
+    
+    // Désarchiver côté serveur
+    fetch(`/api/notifications/${id}/unarchive`, { method: 'PATCH' }).catch(console.error)
   }, [])
 
   const updateSettings = useCallback((settings: Partial<NotificationSettings>) => {
@@ -324,34 +372,32 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   // ===== WEBSOCKET CONNECTION =====
   // WebSocket connection is optional for real-time notifications
-  // If no NEXT_PUBLIC_WS_URL is configured, notifications will work via polling/refresh only
+  // If no NEXT_PUBLIC_WS_URL is configured, fallback to polling simulation
 
   const connectWebSocket = useCallback(() => {
-    // Skip WebSocket connection if no WebSocket URL is configured
-    if (!user || !process.env.NEXT_PUBLIC_WS_URL || wsRef.current?.readyState === WebSocket.OPEN) return
+    if (!user || wsRef.current?.readyState === WebSocket.OPEN) return
 
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/notifications?userId=${user.id}`
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001'}/notifications?userId=${user.id}`
 
     try {
       const ws = new WebSocket(wsUrl)
-
       wsRef.current = ws
 
       ws.onopen = () => {
-        console.log('🔔 WebSocket connected')
+        console.log('🔔 WebSocket connecté')
         dispatch({ type: 'SET_CONNECTED', payload: true })
         dispatch({ type: 'SET_ERROR', payload: null })
         reconnectAttempts.current = 0
       }
 
       ws.onclose = (event) => {
-        console.log('🔔 WebSocket closed:', event.code, event.reason)
+        console.log('🔔 WebSocket fermé:', event.code, event.reason)
         dispatch({ type: 'SET_CONNECTED', payload: false })
 
-        // Only try to reconnect if it was an unexpected close
+        // Reconnexion automatique si fermeture inattendue
         if (event.code !== 1000 && reconnectAttempts.current < 3) {
           const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 10000)
-
+          
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectAttempts.current++
             connectWebSocket()
@@ -360,24 +406,17 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       }
 
       ws.onerror = (error) => {
-        console.warn('🔔 WebSocket error (real-time notifications disabled):', error)
-        // Don't dispatch error since WebSocket is optional
+        console.log('🔔 WebSocket erreur:', error)
         dispatch({ type: 'SET_CONNECTED', payload: false })
       }
 
       ws.onmessage = (event) => {
         try {
-          const notification: Notification = JSON.parse(event.data)
-
+          const notification = JSON.parse(event.data)
+          
           // Filtrer selon les paramètres utilisateur
           if (!state.settings.categories[notification.metadata?.category || 'system']) return
-          if (
-            !state.settings.priority[
-              (notification.priority?.toLowerCase() as keyof typeof state.settings.priority) ||
-                'normal'
-            ]
-          )
-            return
+          if (!state.settings.priority[notification.priority?.toLowerCase() || 'normal']) return
 
           dispatch({ type: 'ADD_NOTIFICATION', payload: notification })
 
@@ -390,20 +429,21 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
             })
           }
 
-          // Son si activé
-          if (state.settings.enableSound) {
-            const audio = new Audio('/sounds/notification.mp3')
-
-            audio.volume = 0.3
-            audio.play().catch(() => {}) // Ignore les erreurs de lecture
+          // Son si activé (désactivé temporairement - fichier son manquant)
+          if (state.settings.enableSound && false) {
+            try {
+              const audio = new Audio('/sounds/notification.mp3')
+              audio.volume = 0.3
+              audio.play().catch(() => {
+                console.log('🔔 Son désactivé ou fichier manquant')
+              })
+            } catch (error) {
+              console.log('🔔 Erreur son:', error)
+            }
           }
 
-          // Notification browser si activée et permission accordée
-          if (
-            state.settings.enableBrowser &&
-            'Notification' in window &&
-            Notification.permission === 'granted'
-          ) {
+          // Notification browser si activée
+          if (state.settings.enableBrowser && 'Notification' in window && Notification.permission === 'granted') {
             new window.Notification(notification.title, {
               body: notification.message,
               icon: '/icons/notification.png',
@@ -415,11 +455,10 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         }
       }
     } catch (error) {
-      console.warn('🔔 WebSocket connection failed (real-time notifications disabled):', error)
-      // Don't dispatch error since WebSocket is optional
+      console.log('🔔 WebSocket non disponible, mode manuel')
       dispatch({ type: 'SET_CONNECTED', payload: false })
     }
-  }, [user, state.settings, toast])
+  }, [user, state.settings, toast, refreshNotifications])
 
   // ===== EFFECTS =====
 
@@ -482,6 +521,8 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       markAsRead,
       markAllAsRead,
       removeNotification,
+      archiveNotification,
+      unarchiveNotification,
       clearAll,
       updateSettings,
       createNotification,

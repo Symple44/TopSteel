@@ -25,9 +25,9 @@ export abstract class BaseEntity {
 }
 
 export abstract class BaseAuditEntity extends BaseEntity {
-  @Column({ name: 'created_by_id', nullable: true })
+  @Column({ name: 'created_by_id', nullable: true, type: 'uuid' })
   createdById?: string
 
-  @Column({ name: 'updated_by_id', nullable: true })
+  @Column({ name: 'updated_by_id', nullable: true, type: 'uuid' })
   updatedById?: string
 }

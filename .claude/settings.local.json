@@ -85,7 +85,9 @@
       "Bash(NODE_ENV=production npx next build --experimental-build-mode compile)",
       "Bash(NEXT_TELEMETRY_DISABLED=1 npx next build --debug)",
       "Bash(turbo build:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(NODE_ENV=production npm run typeorm -- migration:run -d typeorm.config.ts)",
+      "Bash(psql:*)"
     ],
     "deny": []
   }

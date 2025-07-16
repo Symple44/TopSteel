@@ -49,18 +49,15 @@ export class UserSettings {
   @JoinColumn()
   user!: User
 
-  @Column('uuid')
+  @Column({ type: 'uuid' })
   userId!: string
 
-  // Profil utilisateur
   @Column({ type: 'jsonb', nullable: true })
   profile?: UserProfile
 
-  // Informations entreprise
   @Column({ type: 'jsonb', nullable: true })
   company?: CompanyInfo
 
-  // Préférences utilisateur
   @Column({ 
     type: 'jsonb', 
     default: {
@@ -76,7 +73,6 @@ export class UserSettings {
   })
   preferences!: UserPreferences
 
-  // Métadonnées additionnelles
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>
 

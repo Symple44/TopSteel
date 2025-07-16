@@ -3,12 +3,15 @@
 import { useNotifications } from '@/components/providers/notifications-provider'
 import { cn } from '@/lib/utils'
 import type { Notification } from '@erp/domains/notifications'
+import { createPortal } from 'react-dom'
+import { useEffect } from 'react'
 
 import {
   Badge,
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -23,6 +26,8 @@ import {
 import { AlertTriangle, Bell, CheckCheck, Clock, Settings, Trash2, X, Search, Maximize2 } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { NotificationSettings } from './notification-settings'
+import { NotificationDashboard } from './notification-dashboard'
+import { NotificationDashboardV2 } from './notification-dashboard-v2'
 
 export function NotificationCenter() {
   const { state, actions } = useNotifications()
@@ -30,6 +35,14 @@ export function NotificationCenter() {
   const [isExpanded, setIsExpanded] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const [showDashboard, setShowDashboard] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  console.log('🔔 NotificationCenter render, isExpanded:', isExpanded, 'showSettings:', showSettings, 'isOpen:', isOpen, 'showDashboard:', showDashboard)
 
   const getNotificationIcon = (type: string, category: string) => {
     if (type === 'error') return <AlertTriangle className="h-4 w-4 text-red-500" />
@@ -65,23 +78,24 @@ export function NotificationCenter() {
   }, [state.notifications, searchTerm])
 
   return (
-    <div className="relative">
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        className="relative"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <Bell className="h-4 w-4" />
-        {state.unreadCount > 0 && (
-          <Badge
-            variant="destructive"
-            className="absolute -top-2 -right-2 h-5 w-5 rounded-full text-xs flex items-center justify-center"
-          >
-            {state.unreadCount > 99 ? '99+' : state.unreadCount}
-          </Badge>
-        )}
-      </Button>
+    <>
+      <div className="relative">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="relative"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <Bell className="h-4 w-4" />
+          {state.unreadCount > 0 && (
+            <Badge
+              variant="destructive"
+              className="absolute -top-2 -right-2 h-5 w-5 rounded-full text-xs flex items-center justify-center"
+            >
+              {state.unreadCount > 99 ? '99+' : state.unreadCount}
+            </Badge>
+          )}
+        </Button>
 
       {/* Panel de notifications avec positionnement absolu */}
       {isOpen && (
@@ -95,8 +109,7 @@ export function NotificationCenter() {
           {/* Panel principal */}
           <div className={cn(
             "absolute right-0 top-full mt-2 w-96 bg-white border rounded-lg shadow-lg z-50",
-            "transform transition-all duration-200 ease-out",
-            "animate-in slide-in-from-top-2 fade-in-0"
+            "transform transition-all duration-200 ease-out"
           )}>
             {/* En-tête avec titre et actions */}
             <div className="p-4 border-b">
@@ -105,34 +118,53 @@ export function NotificationCenter() {
                 <div className="flex gap-1">
                   <Button 
                     variant="ghost" 
-                    size="sm" 
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    title="Agrandir/Réduire"
+                    size="sm"
+                    className="hover:text-blue-600 hover:bg-blue-50"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      console.log('🔔 Dashboard ouvert')
+                      setShowDashboard(true)
+                      setIsOpen(false)
+                    }}
+                    title="Ouvrir le dashboard"
                   >
                     <Maximize2 className="h-4 w-4" />
                   </Button>
                   {state.unreadCount > 0 && (
-                    <Button variant="ghost" size="sm" onClick={actions.markAllAsRead} title="Marquer tout comme lu">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        console.log('🔔 Marquer tout comme lu cliqué')
+                        actions.markAllAsRead()
+                      }} 
+                      title="Marquer tout comme lu"
+                    >
                       <CheckCheck className="h-4 w-4" />
                     </Button>
                   )}
-                  <Dialog open={showSettings} onOpenChange={setShowSettings}>
-                    <DialogTrigger asChild>
-                      <Button variant="ghost" size="sm" title="Paramètres">
-                        <Settings className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Paramètres de Notifications</DialogTitle>
-                      </DialogHeader>
-                      <NotificationSettings />
-                    </DialogContent>
-                  </Dialog>
                   <Button 
                     variant="ghost" 
-                    size="sm" 
-                    onClick={() => setIsOpen(false)}
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      console.log('🔔 Paramètres cliqué, showSettings avant:', showSettings)
+                      setShowSettings(true)
+                      setIsOpen(false) // Fermer le dropdown
+                      console.log('🔔 Paramètres, après setShowSettings(true)')
+                    }}
+                    title="Paramètres"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setIsOpen(false)
+                    }}
                     title="Fermer"
                   >
                     <X className="h-4 w-4" />
@@ -148,7 +180,7 @@ export function NotificationCenter() {
                     state.connected ? 'bg-green-500' : 'bg-orange-500'
                   )}
                 />
-                {state.connected ? 'Temps réel' : 'Manuel'}
+                {state.connected ? 'Temps réel' : 'Déconnecté'}
                 <span className="ml-2">
                   {filteredNotifications.length} / {state.notifications.length}
                 </span>
@@ -169,7 +201,7 @@ export function NotificationCenter() {
             </div>
 
             {/* Liste des notifications */}
-            <ScrollArea className={cn(isExpanded ? "max-h-96" : "max-h-64")}>
+            <ScrollArea className="max-h-64">
               {filteredNotifications.length === 0 ? (
                 <div className="p-4 text-center text-sm text-gray-500">
                   {searchTerm ? 'Aucune notification trouvée' : 'Aucune notification'}
@@ -183,7 +215,10 @@ export function NotificationCenter() {
                         'group flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors',
                         !notification.isRead && 'bg-blue-50 border-l-2 border-l-blue-500'
                       )}
-                      onClick={() => actions.markAsRead(notification.id)}
+                      onClick={() => {
+                        console.log('🔔 Notification cliquée, markAsRead:', notification.id)
+                        actions.markAsRead(notification.id)
+                      }}
                     >
                       <div className="flex-shrink-0 mt-0.5">
                         {getNotificationIcon(notification.type, notification.metadata?.category || '')}
@@ -246,6 +281,7 @@ export function NotificationCenter() {
                         size="sm"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation()
+                          console.log('🔔 Supprimer notification cliqué:', notification.id)
                           actions.removeNotification(notification.id)
                         }}
                         className="flex-shrink-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-gray-400 hover:text-gray-600 transition-opacity"
@@ -267,7 +303,11 @@ export function NotificationCenter() {
                     variant="ghost"
                     size="sm"
                     className="flex-1 text-gray-500 hover:text-red-600"
-                    onClick={actions.clearAll}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      console.log('🔔 Effacer tout cliqué')
+                      actions.clearAll()
+                    }}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Effacer tout
@@ -275,7 +315,11 @@ export function NotificationCenter() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={actions.refreshNotifications}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      console.log('🔔 Actualiser cliqué')
+                      actions.refreshNotifications()
+                    }}
                     className="flex-1"
                   >
                     Actualiser
@@ -286,6 +330,182 @@ export function NotificationCenter() {
           </div>
         </>
       )}
-    </div>
+      </div>
+
+      {/* Dialog pour les paramètres */}
+      {showSettings && mounted && createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center" style={{ zIndex: 999999 }} aria-hidden="false">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold">Paramètres de Notifications</h2>
+              <button 
+                onClick={() => setShowSettings(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="space-y-6 overflow-y-auto max-h-[60vh]">
+              {/* Paramètres généraux */}
+              <div>
+                <h3 className="font-medium text-gray-900 mb-4">Paramètres généraux</h3>
+                <div className="space-y-3">
+                  <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <div>
+                      <span className="font-medium">Notifications sonores</span>
+                      <p className="text-sm text-gray-600">Jouer un son lors des nouvelles notifications</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={state.settings.enableSound}
+                      onChange={(e) => actions.updateSettings({ enableSound: e.target.checked })}
+                      className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                  </label>
+                  
+                  <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <div>
+                      <span className="font-medium">Notifications toast</span>
+                      <p className="text-sm text-gray-600">Afficher des notifications dans l'application</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={state.settings.enableToast}
+                      onChange={(e) => actions.updateSettings({ enableToast: e.target.checked })}
+                      className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                  </label>
+                  
+                  <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <div>
+                      <span className="font-medium">Notifications navigateur</span>
+                      <p className="text-sm text-gray-600">Recevoir des notifications système</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={state.settings.enableBrowser}
+                      onChange={(e) => actions.updateSettings({ enableBrowser: e.target.checked })}
+                      className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                  </label>
+                  
+                  <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <div>
+                      <span className="font-medium">Notifications email</span>
+                      <p className="text-sm text-gray-600">Recevoir des notifications par email</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={state.settings.enableEmail}
+                      onChange={(e) => actions.updateSettings({ enableEmail: e.target.checked })}
+                      className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Catégories */}
+              <div>
+                <h3 className="font-medium text-gray-900 mb-4">Catégories de notifications</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries({
+                    system: '🖥️ Système',
+                    stock: '📦 Stock',
+                    projet: '📁 Projets',
+                    production: '🏭 Production',
+                    maintenance: '🔧 Maintenance',
+                    qualite: '✅ Qualité',
+                    facturation: '💰 Facturation',
+                    sauvegarde: '💾 Sauvegarde',
+                    utilisateur: '👥 Utilisateurs'
+                  }).map(([key, label]) => (
+                    <label key={key} className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={state.settings.categories[key as keyof typeof state.settings.categories]}
+                        onChange={(e) => actions.updateSettings({ 
+                          categories: { 
+                            ...state.settings.categories, 
+                            [key]: e.target.checked 
+                          } 
+                        })}
+                        className="h-4 w-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 mr-3"
+                      />
+                      <span className="text-sm">{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Priorités */}
+              <div>
+                <h3 className="font-medium text-gray-900 mb-4">Filtrer par priorité</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries({
+                    low: '🟢 Faible',
+                    normal: '🔵 Normal',
+                    high: '🟠 Élevée',
+                    urgent: '🔴 Urgente'
+                  }).map(([key, label]) => (
+                    <label key={key} className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={state.settings.priority[key as keyof typeof state.settings.priority]}
+                        onChange={(e) => actions.updateSettings({ 
+                          priority: { 
+                            ...state.settings.priority, 
+                            [key]: e.target.checked 
+                          } 
+                        })}
+                        className="h-4 w-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 mr-3"
+                      />
+                      <span className="text-sm">{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-between items-center border-t pt-4">
+              <button
+                onClick={() => {
+                  if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission()
+                  }
+                }}
+                className="text-sm text-blue-600 hover:text-blue-700"
+              >
+                Demander la permission navigateur
+              </button>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowSettings(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Annuler
+                </button>
+                <button 
+                  onClick={() => {
+                    // Les paramètres sont sauvegardés automatiquement via updateSettings
+                    setShowSettings(false)
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Enregistrer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Dashboard plein écran */}
+      <NotificationDashboardV2 
+        isOpen={showDashboard}
+        onClose={() => setShowDashboard(false)}
+      />
+    </>
   )
 }
