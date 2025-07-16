@@ -79,6 +79,18 @@ const nextConfig = {
       os: false,
     }
 
+    // Handle server-only modules in browser
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'apache-arrow/Arrow.node': false,
+        'apache-arrow': false,
+        '@elastic/elasticsearch': false,
+        '@elastic/transport': false,
+        'sharp': false,
+      }
+    }
+
     // Disable symlinks resolution for workspace packages
     config.resolve.symlinks = false
 

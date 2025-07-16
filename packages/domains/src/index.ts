@@ -8,6 +8,8 @@ export * from './core'
 export * from './sales'
 export * from './production'
 export * from './cross-cutting'
+export * from './search'
+export * from './image'
 
 // ===== RE-EXPORTS ESSENTIELS =====
 

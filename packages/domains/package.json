@@ -28,6 +28,16 @@
       "types": "./dist/cross-cutting/index.d.ts",
       "import": "./dist/cross-cutting/index.js",
       "require": "./dist/cross-cutting/index.cjs"
+    },
+    "./search": {
+      "types": "./dist/search/index.d.ts",
+      "import": "./dist/search/index.js",
+      "require": "./dist/search/index.cjs"
+    },
+    "./image": {
+      "types": "./dist/image/index.d.ts",
+      "import": "./dist/image/index.js",
+      "require": "./dist/image/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -45,7 +55,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "@elastic/elasticsearch": "^8.15.0",
+    "@elastic/transport": "^8.7.0"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",

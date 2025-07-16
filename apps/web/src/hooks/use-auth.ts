@@ -220,6 +220,28 @@ export const useAuth = () => {
     }
 
     try {
+      // En développement, simuler le refresh avec de nouveaux tokens mock
+      if (process.env.NODE_ENV === 'development') {
+        await new Promise((resolve) => setTimeout(resolve, 200)) // Simulation
+
+        const newTokens: Tokens = {
+          accessToken: `mock-access-token-${Date.now()}`,
+          refreshToken: `mock-refresh-token-${Date.now()}`,
+          expiresIn: 3600,
+          tokenType: 'Bearer',
+        }
+
+        storage.set(TOKEN_STORAGE_KEY, newTokens)
+
+        setAuthState((prev) => ({
+          ...prev,
+          tokens: newTokens,
+        }))
+
+        return
+      }
+
+      // Production - appel API réel
       const response = await fetch('/api/auth/refresh', {
         method: 'POST',
         headers: {

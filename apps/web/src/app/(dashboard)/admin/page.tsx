@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { Button, Card } from '@erp/ui'
-import { Save, RefreshCw, Building2, ListChecks, Shield, Workflow, Plug, Settings } from 'lucide-react'
+import { Save, RefreshCw, Building2, ListChecks, Shield, Workflow, Plug, Settings, Search } from 'lucide-react'
 import { CompanySettings } from '@/components/admin/company-settings'
 import { UnitsAndListsSettings } from '@/components/admin/units-lists-settings'
 import { AuthenticationSettings } from '@/components/admin/authentication-settings'
+import { ElasticsearchAdmin } from '@/components/admin/elasticsearch-admin'
 import { useSystemParameters } from '@/hooks/use-system-parameters'
 import { toast } from '@/hooks/use-toast'
 
@@ -31,6 +32,12 @@ const getNavigationItems = (t: any) => [
     label: t('tabs.authentication'),
     icon: Shield,
     description: t('authentication.title')
+  },
+  {
+    id: 'elasticsearch',
+    label: 'Elasticsearch',
+    icon: Search,
+    description: 'Configuration de la recherche'
   },
   {
     id: 'workflow',
@@ -89,6 +96,8 @@ export default function AdminConfigurationPage() {
         return <UnitsAndListsSettings />
       case 'authentication':
         return <AuthenticationSettings />
+      case 'elasticsearch':
+        return <ElasticsearchAdmin />
       case 'workflow':
         return (
           <div className="text-center py-12 text-muted-foreground">

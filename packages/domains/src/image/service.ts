@@ -4,6 +4,8 @@ import path from 'path'
 import sharp from 'sharp'
 import { createHash } from 'crypto'
 import { ImageMetadata, ImageVariant, UploadConfig, UploadResult, DEFAULT_CONFIGS } from './types'
+import { elasticsearchClient } from '../search/elasticsearch-client'
+import { imageElasticsearchService } from './elasticsearch-service'
 
 export class ImageService {
   private uploadDir: string
@@ -145,6 +147,9 @@ export class ImageService {
       }
     }
 
+    // Indexer dans Elasticsearch si disponible
+    await this.indexToElasticsearch(metadata, variants)
+
     return {
       metadata,
       variants,
@@ -170,6 +175,40 @@ export class ImageService {
       } catch (error) {
         // Directory or file doesn't exist
       }
+    }
+
+    // Supprimer de Elasticsearch si disponible
+    await this.removeFromElasticsearch(imageId)
+  }
+
+  private async indexToElasticsearch(metadata: ImageMetadata, variants: ImageVariant[]): Promise<void> {
+    try {
+      const isConnected = await elasticsearchClient.isConnected()
+      if (!isConnected) {
+        console.warn('Elasticsearch not available, skipping indexing')
+        return
+      }
+
+      const document = imageElasticsearchService.toElasticsearchDocument(metadata, variants)
+      await elasticsearchClient.indexDocument('images', metadata.id, document)
+      console.log(`Indexed image ${metadata.id} to Elasticsearch`)
+    } catch (error) {
+      console.error('Failed to index image to Elasticsearch:', error)
+      // Ne pas faire échouer l'upload si l'indexation échoue
+    }
+  }
+
+  private async removeFromElasticsearch(imageId: string): Promise<void> {
+    try {
+      const isConnected = await elasticsearchClient.isConnected()
+      if (!isConnected) {
+        return
+      }
+
+      await elasticsearchClient.deleteDocument('images', imageId)
+      console.log(`Removed image ${imageId} from Elasticsearch`)
+    } catch (error) {
+      console.error('Failed to remove image from Elasticsearch:', error)
     }
   }
 
