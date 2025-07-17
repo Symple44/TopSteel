@@ -1,8 +1,20 @@
 import path from 'node:path'
 import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
+import { createRequire } from 'node:module'
 
 const execAsync = promisify(exec)
+const require = createRequire(import.meta.url)
+
+// Fonction pour résoudre les modules de manière sécurisée
+function safeResolve(moduleName) {
+  try {
+    return require.resolve(moduleName)
+  } catch (error) {
+    console.warn(`Module ${moduleName} non trouvé, utilisation de fallback`)
+    return false
+  }
+}
 
 // Fonction pour exécuter Biome
 async function runBiome() {
@@ -77,6 +89,11 @@ const nextConfig = {
       fs: false,
       path: false,
       os: false,
+      debug: path.resolve(import.meta.dirname, './src/utils/debug-polyfill.js'),
+      'socket.io-parser': path.resolve(import.meta.dirname, './src/utils/socket-io-parser-polyfill.js'),
+      'engine.io-client': path.resolve(import.meta.dirname, './src/utils/engine-io-client-polyfill.js'),
+      '@socket.io/component-emitter': path.resolve(import.meta.dirname, './src/utils/component-emitter-polyfill.js'),
+      'socket.io-client/build/esm-debug/url': path.resolve(import.meta.dirname, './src/utils/socket-io-url-polyfill.js'),
     }
 
     // Handle server-only modules in browser
@@ -105,6 +122,12 @@ const nextConfig = {
         'asynckit': false,
         'es-set-tostringtag': false,
         'hasown': false,
+        // Fix Socket.IO client dependencies avec polyfills
+        'debug': path.resolve(import.meta.dirname, './src/utils/debug-polyfill.js'),
+        'socket.io-parser': path.resolve(import.meta.dirname, './src/utils/socket-io-parser-polyfill.js'),
+        'engine.io-client': path.resolve(import.meta.dirname, './src/utils/engine-io-client-polyfill.js'),
+        '@socket.io/component-emitter': path.resolve(import.meta.dirname, './src/utils/component-emitter-polyfill.js'),
+        'socket.io-client/build/esm-debug/url': path.resolve(import.meta.dirname, './src/utils/socket-io-url-polyfill.js'),
       }
     }
 

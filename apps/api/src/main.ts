@@ -34,7 +34,7 @@ async function bootstrap() {
   })
 
   const configService = app.get(ConfigService)
-  const port = configService.get<number>('app.port', 3001)
+  const port = configService.get<number>('app.port', 3002)
   const env = configService.get<string>('app.env', 'development')
   const corsOrigin = configService.get<string>('app.corsOrigin', 'http://localhost:3000')
 

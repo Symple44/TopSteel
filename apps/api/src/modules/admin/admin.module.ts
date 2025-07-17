@@ -17,6 +17,8 @@ import { SystemParametersService } from './system-parameters.service'
 import { MenuConfigurationService } from './services/menu-configuration.service'
 import { UserMenuPreferencesService } from './services/user-menu-preferences.service'
 import { DatabaseIntegrityService } from './services/database-integrity.service'
+import { DatabaseBackupService } from './services/database-backup.service'
+import { DatabaseStatsService } from './services/database-stats.service'
 
 // Controllers
 import { SystemParametersController } from './system-parameters.controller'
@@ -44,13 +46,17 @@ import { MenuConfigurationController } from './controllers/menu-configuration.co
     SystemParametersService,
     MenuConfigurationService,
     UserMenuPreferencesService,
-    DatabaseIntegrityService
+    DatabaseIntegrityService,
+    DatabaseBackupService,
+    DatabaseStatsService
   ],
   exports: [
     SystemParametersService,
     MenuConfigurationService,
     UserMenuPreferencesService,
     DatabaseIntegrityService,
+    DatabaseBackupService,
+    DatabaseStatsService,
     TypeOrmModule
   ],
 })

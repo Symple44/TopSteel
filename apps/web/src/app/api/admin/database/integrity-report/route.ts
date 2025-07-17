@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET(request: NextRequest) {
   try {
     // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/admin/database/integrity-report`
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/admin/database/integrity-report`
     
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -24,8 +24,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const data = await response.json()
-    return NextResponse.json(data)
+    const responseData = await response.json()
+    // L'API NestJS retourne { data: { success, data }, statusCode, message, timestamp }
+    // On extrait juste la partie data.data
+    return NextResponse.json(responseData.data || responseData)
   } catch (error) {
     console.error('Erreur lors de la récupération du rapport d\'intégrité:', error)
     

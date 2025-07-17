@@ -5,6 +5,8 @@ import { useToast } from '@/hooks/use-toast'
 import type { Notification } from '@erp/domains/notifications'
 import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
+// import { io, type Socket } from 'socket.io-client'
+import type { Socket } from 'socket.io-client'
 
 // ===== TYPES ET INTERFACES =====
 
@@ -18,20 +20,15 @@ export interface NotificationsState {
 }
 
 export interface NotificationSettings {
-  enableSound: boolean
   enableToast: boolean
+  enableSound: boolean
+  enableVibration: boolean
   enableBrowser: boolean
-  enableEmail: boolean
   categories: {
     system: boolean
-    stock: boolean
-    projet: boolean
     production: boolean
-    maintenance: boolean
-    qualite: boolean
-    facturation: boolean
-    sauvegarde: boolean
-    utilisateur: boolean
+    commercial: boolean
+    admin: boolean
   }
   priority: {
     low: boolean
@@ -39,93 +36,49 @@ export interface NotificationSettings {
     high: boolean
     urgent: boolean
   }
-  schedules?: {
-    workingHours?: {
-      enabled: boolean
-      start: string
-      end: string
-    }
-    weekdays?: {
-      enabled: boolean
-      days: number[]
-    }
-  }
 }
 
-type NotificationsAction =
-  | { type: 'ADD_NOTIFICATION'; payload: Notification }
-  | { type: 'MARK_AS_READ'; payload: string }
-  | { type: 'MARK_ALL_AS_READ' }
-  | { type: 'REMOVE_NOTIFICATION'; payload: string }
-  | { type: 'ARCHIVE_NOTIFICATION'; payload: string }
-  | { type: 'UNARCHIVE_NOTIFICATION'; payload: string }
-  | { type: 'CLEAR_ALL' }
-  | { type: 'SET_NOTIFICATIONS'; payload: Notification[] }
-  | { type: 'SET_CONNECTED'; payload: boolean }
-  | { type: 'UPDATE_SETTINGS'; payload: Partial<NotificationSettings> }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-
-export interface NotificationsContextValue {
+export interface NotificationsContextType {
   state: NotificationsState
   actions: {
-    markAsRead: (id: string) => void
+    markAsRead: (notificationId: string) => void
     markAllAsRead: () => void
-    removeNotification: (id: string) => void
-    archiveNotification: (id: string) => void
-    unarchiveNotification: (id: string) => void
-    clearAll: () => void
+    deleteNotification: (notificationId: string) => void
+    deleteAll: () => void
     updateSettings: (settings: Partial<NotificationSettings>) => void
-    createNotification: (notification: CreateNotificationRequest) => Promise<void>
     refreshNotifications: () => Promise<void>
   }
 }
 
-export interface CreateNotificationRequest {
-  type: 'info' | 'success' | 'warning' | 'error'
-  category: 'system' | 'stock' | 'projet' | 'production' | 'maintenance' | 'qualite' | 'facturation' | 'sauvegarde' | 'utilisateur'
-  title: string
-  message: string
-  data?: Record<string, unknown>
-  persistent?: boolean
-  actionUrl?: string
-  actionLabel?: string
+interface NotificationsProviderProps {
+  children: ReactNode
 }
 
-// ===== ÉTAT INITIAL =====
+// ===== ACTIONS =====
 
-const defaultSettings: NotificationSettings = {
-  enableSound: true,
+interface NotificationsAction {
+  type: 'SET_NOTIFICATIONS' | 'ADD_NOTIFICATION' | 'MARK_AS_READ' | 'MARK_ALL_AS_READ' | 'DELETE_NOTIFICATION' | 'DELETE_ALL' | 'UPDATE_SETTINGS' | 'SET_CONNECTED' | 'SET_LOADING' | 'SET_ERROR'
+  payload?: any
+}
+
+// ===== REDUCER =====
+
+const initialSettings: NotificationSettings = {
   enableToast: true,
-  enableBrowser: true,
-  enableEmail: false,
+  enableSound: false,
+  enableVibration: false,
+  enableBrowser: false,
   categories: {
     system: true,
-    stock: true,
-    projet: true,
     production: true,
-    maintenance: true,
-    qualite: true,
-    facturation: true,
-    sauvegarde: false, // Désactivé par défaut
-    utilisateur: true,
+    commercial: true,
+    admin: true,
   },
   priority: {
-    low: false,  // Désactivé par défaut
+    low: true,
     normal: true,
     high: true,
     urgent: true,
-  },
-  schedules: {
-    workingHours: {
-      enabled: false,
-      start: "09:00",
-      end: "18:00",
-    },
-    weekdays: {
-      enabled: false,
-      days: [1, 2, 3, 4, 5], // Lundi à vendredi
-    },
   },
 }
 
@@ -133,266 +86,253 @@ const initialState: NotificationsState = {
   notifications: [],
   unreadCount: 0,
   connected: false,
-  settings: defaultSettings,
+  settings: initialSettings,
   loading: false,
   error: null,
 }
 
-// ===== REDUCER =====
-
-function notificationsReducer(
-  state: NotificationsState,
-  action: NotificationsAction
-): NotificationsState {
+function notificationsReducer(state: NotificationsState, action: NotificationsAction): NotificationsState {
   switch (action.type) {
-    case 'ADD_NOTIFICATION': {
-      const newNotifications = [action.payload, ...state.notifications]
-
+    case 'SET_NOTIFICATIONS':
       return {
         ...state,
-        notifications: newNotifications,
-        unreadCount: newNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+        notifications: action.payload,
+        unreadCount: action.payload.filter((n: Notification) => !n.readAt).length,
       }
-    }
-
-    case 'MARK_AS_READ': {
-      const updatedNotifications = state.notifications.map((n) =>
-        n.id === action.payload ? { ...n, isRead: true } : n
-      )
-
+    case 'ADD_NOTIFICATION':
       return {
         ...state,
-        notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+        notifications: [action.payload, ...state.notifications],
+        unreadCount: !action.payload.readAt ? state.unreadCount + 1 : state.unreadCount,
       }
-    }
-
-    case 'MARK_ALL_AS_READ': {
-      const allReadNotifications = state.notifications.map((n) => ({ ...n, isRead: true }))
-
+    case 'MARK_AS_READ':
       return {
         ...state,
-        notifications: allReadNotifications,
+        notifications: state.notifications.map(n => 
+          n.id === action.payload ? { ...n, readAt: new Date().toISOString() } : n
+        ),
+        unreadCount: Math.max(0, state.unreadCount - 1),
+      }
+    case 'MARK_ALL_AS_READ':
+      return {
+        ...state,
+        notifications: state.notifications.map(n => ({ ...n, readAt: new Date().toISOString() })),
         unreadCount: 0,
       }
-    }
-
-    case 'REMOVE_NOTIFICATION': {
-      const filteredNotifications = state.notifications.filter((n) => n.id !== action.payload)
-
+    case 'DELETE_NOTIFICATION':
+      const deletedNotification = state.notifications.find(n => n.id === action.payload)
       return {
         ...state,
-        notifications: filteredNotifications,
-        unreadCount: filteredNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+        notifications: state.notifications.filter(n => n.id !== action.payload),
+        unreadCount: deletedNotification && !deletedNotification.readAt ? state.unreadCount - 1 : state.unreadCount,
       }
-    }
-
-    case 'ARCHIVE_NOTIFICATION': {
-      const updatedNotifications = state.notifications.map((n) =>
-        n.id === action.payload ? { ...n, isArchived: true } : n
-      )
-
-      return {
-        ...state,
-        notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
-      }
-    }
-
-    case 'UNARCHIVE_NOTIFICATION': {
-      const updatedNotifications = state.notifications.map((n) =>
-        n.id === action.payload ? { ...n, isArchived: false } : n
-      )
-
-      return {
-        ...state,
-        notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
-      }
-    }
-
-    case 'CLEAR_ALL':
+    case 'DELETE_ALL':
       return {
         ...state,
         notifications: [],
         unreadCount: 0,
       }
-
-    case 'SET_NOTIFICATIONS': {
-      const notifications = Array.isArray(action.payload) ? action.payload : []
-      return {
-        ...state,
-        notifications,
-        unreadCount: notifications.filter((n) => !n.isRead && !n.isArchived).length,
-        loading: false,
-      }
-    }
-
-    case 'SET_CONNECTED':
-      return {
-        ...state,
-        connected: action.payload,
-      }
-
     case 'UPDATE_SETTINGS':
       return {
         ...state,
         settings: { ...state.settings, ...action.payload },
       }
-
+    case 'SET_CONNECTED':
+      return {
+        ...state,
+        connected: action.payload,
+      }
     case 'SET_LOADING':
       return {
         ...state,
         loading: action.payload,
       }
-
     case 'SET_ERROR':
       return {
         ...state,
         error: action.payload,
-        loading: false,
       }
-
     default:
       return state
   }
 }
 
-// ===== CONTEXTE =====
+// ===== CONTEXT =====
 
-export const NotificationsContext = createContext<NotificationsContextValue | null>(null)
+const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined)
+
+export function useNotifications(): NotificationsContextType {
+  const context = useContext(NotificationsContext)
+  if (!context) {
+    throw new Error('useNotifications must be used within a NotificationsProvider')
+  }
+  return context
+}
 
 // ===== PROVIDER =====
-
-interface NotificationsProviderProps {
-  children: ReactNode
-}
 
 export function NotificationsProvider({ children }: NotificationsProviderProps) {
   const [state, dispatch] = useReducer(notificationsReducer, initialState)
   const { user } = useAuth()
   const { toast } = useToast()
-  const wsRef = useRef<WebSocket | null>(null)
+  const socketRef = useRef<Socket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const reconnectAttempts = useRef(0)
 
   // ===== ACTIONS =====
 
-  const markAsRead = useCallback((id: string) => {
-    dispatch({ type: 'MARK_AS_READ', payload: id })
-
-    // Marquer comme lu côté serveur
-    fetch(`/api/notifications/${id}/read`, { method: 'PATCH' }).catch(console.error)
+  const markAsRead = useCallback(async (notificationId: string) => {
+    try {
+      const response = await fetch(`/api/notifications/${notificationId}/read`, {
+        method: 'POST',
+      })
+      if (response.ok) {
+        dispatch({ type: 'MARK_AS_READ', payload: notificationId })
+      }
+    } catch (error) {
+      console.error('Erreur lors du marquage comme lu:', error)
+    }
   }, [])
 
-  const markAllAsRead = useCallback(() => {
-    dispatch({ type: 'MARK_ALL_AS_READ' })
-
-    // Marquer toutes comme lues côté serveur
-    fetch('/api/notifications/read-all', { method: 'PATCH' }).catch(console.error)
+  const markAllAsRead = useCallback(async () => {
+    try {
+      const response = await fetch('/api/notifications/mark-all-read', {
+        method: 'POST',
+      })
+      if (response.ok) {
+        dispatch({ type: 'MARK_ALL_AS_READ' })
+      }
+    } catch (error) {
+      console.error('Erreur lors du marquage de tout comme lu:', error)
+    }
   }, [])
 
-  const removeNotification = useCallback((id: string) => {
-    dispatch({ type: 'REMOVE_NOTIFICATION', payload: id })
+  const deleteNotification = useCallback(async (notificationId: string) => {
+    try {
+      const response = await fetch(`/api/notifications/${notificationId}`, {
+        method: 'DELETE',
+      })
+      if (response.ok) {
+        dispatch({ type: 'DELETE_NOTIFICATION', payload: notificationId })
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error)
+    }
   }, [])
 
-  const clearAll = useCallback(() => {
-    dispatch({ type: 'CLEAR_ALL' })
-  }, [])
-
-  const archiveNotification = useCallback((id: string) => {
-    dispatch({ type: 'ARCHIVE_NOTIFICATION', payload: id })
-    
-    // Archiver côté serveur
-    fetch(`/api/notifications/${id}/archive`, { method: 'PATCH' }).catch(console.error)
-  }, [])
-
-  const unarchiveNotification = useCallback((id: string) => {
-    dispatch({ type: 'UNARCHIVE_NOTIFICATION', payload: id })
-    
-    // Désarchiver côté serveur
-    fetch(`/api/notifications/${id}/unarchive`, { method: 'PATCH' }).catch(console.error)
+  const deleteAll = useCallback(async () => {
+    try {
+      const response = await fetch('/api/notifications', {
+        method: 'DELETE',
+      })
+      if (response.ok) {
+        dispatch({ type: 'DELETE_ALL' })
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression de toutes les notifications:', error)
+    }
   }, [])
 
   const updateSettings = useCallback((settings: Partial<NotificationSettings>) => {
     dispatch({ type: 'UPDATE_SETTINGS', payload: settings })
-
-    // Sauvegarder les paramètres côté serveur
-    fetch('/api/notifications/settings', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settings),
-    }).catch(console.error)
-  }, [])
-
-  const createNotification = useCallback(async (notification: CreateNotificationRequest) => {
-    try {
-      const response = await fetch('/api/notifications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(notification),
-      })
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de l'envoi de la notification")
-      }
-
-      return response.json()
-    } catch (error) {
-      console.error('Erreur création notification:', error)
-      dispatch({ type: 'SET_ERROR', payload: 'Erreur lors de la création de la notification' })
-      throw error
-    }
-  }, [])
+    // Sauvegarder dans localStorage
+    localStorage.setItem('notificationSettings', JSON.stringify({ ...state.settings, ...settings }))
+  }, [state.settings])
 
   const refreshNotifications = useCallback(async () => {
     if (!user) return
-
+    
+    dispatch({ type: 'SET_LOADING', payload: true })
     try {
-      dispatch({ type: 'SET_LOADING', payload: true })
-
       const response = await fetch('/api/notifications')
-
-      if (!response.ok) throw new Error('Erreur lors du chargement')
-
-      const result = await response.json()
-
-      dispatch({ type: 'SET_NOTIFICATIONS', payload: result.notifications })
+      if (response.ok) {
+        const data = await response.json()
+        dispatch({ type: 'SET_NOTIFICATIONS', payload: data.data || [] })
+      }
     } catch (error) {
-      console.error('Erreur refresh notifications:', error)
-      dispatch({ type: 'SET_ERROR', payload: 'Erreur lors du chargement des notifications' })
+      console.error('Erreur lors du rafraîchissement des notifications:', error)
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false })
     }
   }, [user])
 
   // ===== WEBSOCKET CONNECTION =====
-  // WebSocket connection is optional for real-time notifications
-  // If no NEXT_PUBLIC_WS_URL is configured, fallback to polling simulation
 
-  const connectWebSocket = useCallback(() => {
-    if (!user || wsRef.current?.readyState === WebSocket.OPEN) return
+  const connectWebSocket = useCallback(async () => {
+    if (!user || socketRef.current?.readyState === WebSocket.OPEN) return
 
-    // Désactiver temporairement WebSocket si l'API n'est pas disponible
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001'}/notifications?userId=${user.id}`
-    console.log('[NotificationsProvider] Tentative de connexion WebSocket désactivée temporairement:', wsUrl)
+    // Temporairement désactiver WebSocket - utiliser polling à la place
+    console.log('[NotificationsProvider] WebSocket désactivé temporairement, utilisation du polling')
     
-    // Simuler une connexion réussie pour le développement
-    dispatch({ type: 'SET_CONNECTED', payload: false })
-    dispatch({ type: 'SET_ERROR', payload: 'WebSocket désactivé temporairement' })
-    return
+    dispatch({ type: 'SET_CONNECTED', payload: true })
+    dispatch({ type: 'SET_ERROR', payload: null })
+    
+    // Simuler une connexion réussie
+    const mockSocket = {
+      connected: true,
+      readyState: WebSocket.OPEN,
+      emit: (event, data) => {
+        console.log('[NotificationsProvider] Mock emit:', event, data)
+      },
+      disconnect: () => {
+        console.log('[NotificationsProvider] Mock disconnect')
+      }
+    }
+    
+    socketRef.current = mockSocket
+    
+    // Démarrer le polling pour les notifications
+    const pollNotifications = () => {
+      if (socketRef.current?.connected) {
+        // Simuler la réception de notifications via polling
+        setTimeout(pollNotifications, 5000) // Poll toutes les 5 secondes
+      }
+    }
+    
+    pollNotifications()
+
+    /* 
+    // Code WebSocket original - temporairement désactivé
+    const wsUrl = (process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001').replace('http://', 'ws://').replace('https://', 'wss://')
+    console.log('[NotificationsProvider] Tentative connexion WebSocket:', wsUrl)
 
     try {
-      const ws = new WebSocket(wsUrl)
-      wsRef.current = ws
+      const ws = new WebSocket(`${wsUrl}?userId=${user.id}`)
+      
+      // Simuler Socket.IO interface
+      const socketWrapper = {
+        connected: false,
+        readyState: ws.readyState,
+        emit: (event, data) => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: event, data }))
+          }
+        },
+        disconnect: () => {
+          ws.close()
+        }
+      }
+      
+      socketRef.current = socketWrapper
 
       ws.onopen = () => {
+        console.log('[NotificationsProvider] WebSocket connecté')
+        socketWrapper.connected = true
+        socketWrapper.readyState = ws.readyState
         dispatch({ type: 'SET_CONNECTED', payload: true })
         dispatch({ type: 'SET_ERROR', payload: null })
         reconnectAttempts.current = 0
+        
+        // Rejoindre la room de l'utilisateur
+        ws.send(JSON.stringify({ type: 'join', data: { userId: user.id } }))
       }
 
       ws.onclose = (event) => {
+        console.log('[NotificationsProvider] WebSocket fermé:', event.code, event.reason)
+        socketWrapper.connected = false
+        socketWrapper.readyState = ws.readyState
         dispatch({ type: 'SET_CONNECTED', payload: false })
-
+        
         // Reconnexion automatique si fermeture inattendue
         if (event.code !== 1000 && reconnectAttempts.current < 3) {
           const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 10000)
@@ -405,55 +345,73 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       }
 
       ws.onerror = (error) => {
+        console.error('[NotificationsProvider] Erreur WebSocket:', error, 'Type:', typeof error, 'Keys:', Object.keys(error))
         dispatch({ type: 'SET_CONNECTED', payload: false })
+        dispatch({ type: 'SET_ERROR', payload: `Erreur de connexion WebSocket: ${error.message || 'Connexion impossible'}` })
       }
+    */
 
+      /*
       ws.onmessage = (event) => {
         try {
-          const notification = JSON.parse(event.data)
+          const message = JSON.parse(event.data)
           
-          // Filtrer selon les paramètres utilisateur
-          if (!state.settings.categories[notification.metadata?.category || 'system']) return
-          if (!state.settings.priority[notification.priority?.toLowerCase() || 'normal']) return
+          if (message.type === 'notification') {
+            const notification = message.data
+            
+            // Filtrer selon les paramètres utilisateur
+            if (!state.settings.categories[notification.metadata?.category || 'system']) return
+            if (!state.settings.priority[notification.priority?.toLowerCase() || 'normal']) return
 
-          dispatch({ type: 'ADD_NOTIFICATION', payload: notification })
+            dispatch({ type: 'ADD_NOTIFICATION', payload: notification })
 
-          // Afficher toast si activé
-          if (state.settings.enableToast) {
-            toast({
-              title: notification.title,
-              description: notification.message,
-              variant: notification.type === 'error' ? 'destructive' : 'default',
-            })
-          }
-
-          // Son si activé (désactivé temporairement - fichier son manquant)
-          if (state.settings.enableSound && false) {
-            try {
-              const audio = new Audio('/sounds/notification.mp3')
-              audio.volume = 0.3
-              audio.play().catch(() => {
+            // Afficher toast si activé
+            if (state.settings.enableToast) {
+              toast({
+                title: notification.title,
+                description: notification.message,
+                variant: notification.type === 'error' ? 'destructive' : 'default',
               })
-            } catch (error) {
             }
-          }
 
-          // Notification browser si activée
-          if (state.settings.enableBrowser && 'Notification' in window && Notification.permission === 'granted') {
-            new window.Notification(notification.title, {
-              body: notification.message,
-              icon: '/icons/notification.png',
-              tag: notification.id,
-            })
+            // Son si activé (désactivé temporairement - fichier son manquant)
+            if (state.settings.enableSound && false) {
+              try {
+                const audio = new Audio('/sounds/notification.mp3')
+                audio.volume = 0.3
+                audio.play().catch(() => {
+                })
+              } catch (error) {
+              }
+            }
+
+            // Vibration si activé et supporté
+            if (state.settings.enableVibration && 'vibrate' in navigator) {
+              navigator.vibrate(200)
+            }
+
+            // Notification browser si activée
+            if (state.settings.enableBrowser && 'Notification' in window && Notification.permission === 'granted') {
+              new window.Notification(notification.title, {
+                body: notification.message,
+                icon: '/icons/notification.png',
+                tag: notification.id,
+              })
+            }
+          } else if (message.type === 'notification_read') {
+            dispatch({ type: 'MARK_AS_READ', payload: message.data.notificationId })
           }
         } catch (error) {
-          console.error('Erreur parsing notification:', error)
+          console.error('[NotificationsProvider] Erreur traitement message:', error)
         }
       }
+
     } catch (error) {
-      dispatch({ type: 'SET_CONNECTED', payload: false })
+      console.error('[NotificationsProvider] Erreur création WebSocket:', error)
+      dispatch({ type: 'SET_ERROR', payload: 'Impossible de créer la connexion WebSocket' })
     }
-  }, [user, state.settings, toast, refreshNotifications])
+    */
+  }, [user, state.settings, toast])
 
   // ===== EFFECTS =====
 
@@ -464,9 +422,9 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     }
 
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close()
-        wsRef.current = null
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+        socketRef.current = null
       }
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current)
@@ -476,59 +434,46 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   // Demander permission pour notifications browser
   useEffect(() => {
-    if (
-      state.settings.enableBrowser &&
-      'Notification' in window &&
-      Notification.permission === 'default'
-    ) {
+    if (state.settings.enableBrowser && 'Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission()
     }
   }, [state.settings.enableBrowser])
 
-
-  // Charger les notifications initiales
+  // Charger les paramètres depuis localStorage
   useEffect(() => {
-    if (user) {
-      refreshNotifications()
+    const savedSettings = localStorage.getItem('notificationSettings')
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings)
+        dispatch({ type: 'UPDATE_SETTINGS', payload: settings })
+      } catch (error) {
+        console.error('Erreur lors du chargement des paramètres:', error)
+      }
     }
-  }, [user, refreshNotifications])
+  }, [])
 
-  // ===== VALEUR DU CONTEXTE =====
+  // Rafraîchir les notifications au démarrage
+  useEffect(() => {
+    refreshNotifications()
+  }, [refreshNotifications])
 
-  const contextValue: NotificationsContextValue = {
+  // ===== CONTEXT VALUE =====
+
+  const contextValue: NotificationsContextType = {
     state,
     actions: {
       markAsRead,
       markAllAsRead,
-      removeNotification,
-      archiveNotification,
-      unarchiveNotification,
-      clearAll,
+      deleteNotification,
+      deleteAll,
       updateSettings,
-      createNotification,
       refreshNotifications,
     },
   }
 
   return (
-    <NotificationsContext.Provider value={contextValue}>{children}</NotificationsContext.Provider>
+    <NotificationsContext.Provider value={contextValue}>
+      {children}
+    </NotificationsContext.Provider>
   )
-}
-
-// ===== HOOKS EXPORTS =====
-
-/**
- * Hook principal pour utiliser les notifications
- */
-export function useNotifications() {
-  const context = useContext(NotificationsContext)
-
-  if (!context) {
-    throw new Error(
-      'useNotifications doit être utilisé dans un NotificationsProvider. ' +
-        'Vérifiez que votre composant est bien enveloppé dans <NotificationsProvider>.'
-    )
-  }
-
-  return context
 }

@@ -5,11 +5,11 @@ export const appConfig = registerAs('app', () => ({
   name: process.env.APP_NAME || 'ERP TopSteel',
   version: process.env.APP_VERSION || '1.0.0',
   env: process.env.NODE_ENV || 'development',
-  port: Number.parseInt(process.env.API_PORT || '3001', 10),
+  port: Number.parseInt(process.env.PORT || process.env.API_PORT || '3002', 10),
   host: process.env.API_HOST || '0.0.0.0',
-  url: process.env.API_URL || 'http://localhost:3001',
+  url: process.env.API_URL || 'http://localhost:3002',
   cors: {
-    origin: process.env.API_CORS_ORIGIN || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || process.env.API_CORS_ORIGIN || 'http://localhost:3000',
     credentials: true,
   },
   throttle: {
