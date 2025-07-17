@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { I18nProvider } from '@/lib/i18n'
 import { ThemeProvider } from 'next-themes'
 import { NotificationsProvider } from '@/components/providers/notifications-provider'
+import { ToastProvider, Toaster as UIToaster } from '@erp/ui'
+import { useSyncNotifications } from '@/hooks/use-sync-notifications'
 import dynamic from 'next/dynamic'
 
 // Configuration React Query
@@ -18,6 +20,12 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// Hook pour initialiser les notifications de sync
+const SyncNotificationInitializer = () => {
+  useSyncNotifications()
+  return null
+}
 
 // Composant qui contient tous les providers
 const AllProviders = ({ children }: { children: React.ReactNode }) => {
@@ -32,12 +40,16 @@ const AllProviders = ({ children }: { children: React.ReactNode }) => {
           storageKey="topsteel-theme"
           themes={['light', 'dark', 'system', 'vibrant']}
         >
-          <AuthProvider>
-            <NotificationsProvider>
-              {children}
-              <Toaster position="top-right" />
-            </NotificationsProvider>
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <NotificationsProvider>
+                <SyncNotificationInitializer />
+                {children}
+                <Toaster position="top-right" />
+                <UIToaster position="bottom-right" />
+              </NotificationsProvider>
+            </AuthProvider>
+          </ToastProvider>
         </ThemeProvider>
       </I18nProvider>
     </QueryClientProvider>

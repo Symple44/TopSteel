@@ -68,108 +68,8 @@ class MockDatabaseConnection {
     })
   }
 
-  // Initialiser avec quelques données de test
   constructor() {
-    this.initializeMockData()
-  }
-
-  private initializeMockData() {
-    const baseDate = new Date()
-    
-    this.notifications = [
-      {
-        id: '1',
-        type: 'info',
-        category: 'system',
-        title: 'Mise à jour système',
-        message: 'Le système a été mis à jour vers la version 2.1.0',
-        priority: 'NORMAL',
-        source: 'auto-update',
-        entity_type: null,
-        entity_id: null,
-        data: null,
-        recipient_type: 'all',
-        recipient_id: null,
-        action_url: '/changelog',
-        action_label: 'Voir les notes',
-        action_type: 'primary',
-        expires_at: null,
-        persistent: true,
-        auto_read: false,
-        created_at: new Date(baseDate.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-        is_read: false,
-        read_at: null
-      },
-      {
-        id: '2',
-        type: 'warning',
-        category: 'stock',
-        title: 'Stock faible',
-        message: 'Le stock de tôles acier 2mm est en dessous du seuil critique (5 unités restantes)',
-        priority: 'HIGH',
-        source: 'inventory-check',
-        entity_type: 'material',
-        entity_id: 'STEEL_2MM',
-        data: JSON.stringify({ quantity: 5, threshold: 10 }),
-        recipient_type: 'all',
-        recipient_id: null,
-        action_url: '/commandes/nouveau?material=STEEL_2MM',
-        action_label: 'Passer commande',
-        action_type: 'primary',
-        expires_at: null,
-        persistent: true,
-        auto_read: false,
-        created_at: new Date(baseDate.getTime() - 30 * 60 * 1000).toISOString(),
-        is_read: false,
-        read_at: null
-      },
-      {
-        id: '3',
-        type: 'success',
-        category: 'sauvegarde',
-        title: 'Sauvegarde réussie',
-        message: 'La sauvegarde automatique des données a été effectuée avec succès',
-        priority: 'NORMAL',
-        source: 'auto-backup',
-        entity_type: null,
-        entity_id: null,
-        data: null,
-        recipient_type: 'all',
-        recipient_id: null,
-        action_url: null,
-        action_label: null,
-        action_type: 'primary',
-        expires_at: null,
-        persistent: false,
-        auto_read: false,
-        created_at: new Date(baseDate.getTime() - 60 * 60 * 1000).toISOString(),
-        is_read: true,
-        read_at: new Date(baseDate.getTime() - 50 * 60 * 1000).toISOString()
-      },
-      {
-        id: '4',
-        type: 'info',
-        category: 'utilisateur',
-        title: 'Nouveau message',
-        message: 'Marie Dubois a ajouté un commentaire sur le projet "Charpente industrielle"',
-        priority: 'NORMAL',
-        source: 'user-action',
-        entity_type: 'project',
-        entity_id: 'PROJ_001',
-        data: JSON.stringify({ userId: 'marie.dubois', projectName: 'Charpente industrielle' }),
-        recipient_type: 'all',
-        recipient_id: null,
-        action_url: '/projets/PROJ_001',
-        action_label: 'Voir le projet',
-        action_type: 'primary',
-        expires_at: null,
-        persistent: true,
-        auto_read: false,
-        created_at: new Date(baseDate.getTime() - 10 * 60 * 1000).toISOString(),
-        is_read: false,
-        read_at: null
-      }
-    ]
+    this.notifications = []
   }
 }
 
@@ -209,7 +109,6 @@ export async function GET(request: NextRequest) {
     const result = await notificationService.getNotifications(filters, userId)
 
     // Simuler un délai d'API
-    await new Promise(resolve => setTimeout(resolve, 100))
 
     return NextResponse.json(result)
 
@@ -257,7 +156,6 @@ export async function POST(request: NextRequest) {
     const notification = await notificationService.createNotification(notificationRequest)
 
     // Simuler un délai d'API
-    await new Promise(resolve => setTimeout(resolve, 100))
 
     return NextResponse.json(notification, { status: 201 })
 

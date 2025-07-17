@@ -17,10 +17,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreatePlanningDto } from './dto/create-planning.dto'
-import type { PlanningQueryDto } from './dto/planning-query.dto'
-import type { UpdatePlanningDto } from './dto/update-planning.dto'
-import type { PlanningService } from './planning.service'
+import { CreatePlanningDto } from './dto/create-planning.dto'
+import { PlanningQueryDto } from './dto/planning-query.dto'
+import { UpdatePlanningDto } from './dto/update-planning.dto'
+import { PlanningService } from './planning.service'
 
 @Controller('planning')
 @ApiTags('📅 Planning')

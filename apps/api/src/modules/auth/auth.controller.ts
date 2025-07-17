@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nes
 import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { Public } from '../../common/decorators/public.decorator'
 import type { User } from '../users/entities/user.entity'
-import type { AuthService } from './auth.service'
-import type { ChangePasswordDto } from './dto/change-password.dto'
+import { AuthService } from './auth.service'
+import { ChangePasswordDto } from './dto/change-password.dto'
 import { type LoginDto, RefreshTokenDto, type RegisterDto } from './dto/login.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 

@@ -27,6 +27,7 @@ import { Produit } from '../modules/stocks/entities/produit.entity'
 import { Stocks } from '../modules/stocks/entities/stocks.entity'
 import { Tracabilite } from '../modules/tracabilite/entities/tracabilite.entity'
 import { User } from '../modules/users/entities/user.entity'
+import { UserMenuPreference } from '../modules/menu/entities/user-menu-preference.entity'
 
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { User } from '../modules/users/entities/user.entity'
         const username = configService.get<string>('DB_USERNAME') || 'postgres'
         const password = configService.get<string>('DB_PASSWORD') || 'postgres'
         const database = configService.get<string>('DB_NAME') || 'erp_topsteel'
-        const synchronize = configService.get<boolean>('DB_SYNCHRONIZE') || false
+        const synchronize = false // Désactivé temporairement pour éviter les conflits d'enum
         const logging = configService.get<boolean>('DB_LOGGING') || false
         const ssl = configService.get<boolean>('DB_SSL')
 
@@ -55,6 +56,7 @@ import { User } from '../modules/users/entities/user.entity'
         const entities = [
           // Entités principales avec UUID (BaseAuditEntity)
           User,
+          UserMenuPreference,
           SystemSetting,
           Clients,
           Fournisseur,

@@ -23,17 +23,17 @@ export interface UserPreferences {
 }
 
 export interface CompanyInfo {
-  name: string
-  address: string
-  city: string
-  postalCode: string
-  country: string
+  name?: string
+  address?: string
+  city?: string
+  postalCode?: string
+  country?: string
 }
 
 export interface UserProfile {
-  firstName: string
-  lastName: string
-  email: string
+  firstName?: string
+  lastName?: string
+  email?: string
   phone?: string
   position?: string
   department?: string

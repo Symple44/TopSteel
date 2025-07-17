@@ -27,7 +27,6 @@ export async function PATCH(
       readAt: new Date().toISOString(),
     }
 
-    await new Promise(resolve => setTimeout(resolve, 100))
 
     return NextResponse.json(notifications[notificationIndex])
 

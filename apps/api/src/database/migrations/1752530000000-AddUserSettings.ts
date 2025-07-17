@@ -64,15 +64,7 @@ export class AddUserSettings1752530000000 implements MigrationInterface {
       true
     )
 
-    await queryRunner.createForeignKey(
-      'user_settings',
-      new ForeignKey({
-        columnNames: ['userId'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'users',
-        onDelete: 'CASCADE',
-      })
-    )
+    // Foreign key will be created by TypeORM annotations
 
     // Créer un trigger pour mettre à jour automatiquement updatedAt
     await queryRunner.query(`

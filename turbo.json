@@ -11,9 +11,21 @@
       "cache": false,
       "persistent": true
     },
+    "start:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "start:debug": {
+      "cache": false,
+      "persistent": true
+    },
     "test": {
       "outputs": ["coverage/**"],
       "cache": true
+    },
+    "test:e2e": {
+      "outputs": ["coverage/**"],
+      "cache": false
     },
     "lint": {
       "dependsOn": ["^build"],
@@ -28,6 +40,18 @@
     "type-check": {
       "dependsOn": ["^build"],
       "cache": true
+    },
+    "clean": {
+      "cache": false
+    },
+    "migration:run": {
+      "cache": false
+    },
+    "migration:generate": {
+      "cache": false
+    },
+    "seed:run": {
+      "cache": false
     }
   }
 }

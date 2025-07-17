@@ -17,11 +17,11 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateOrdreFabricationDto } from './dto/create-ordre-fabrication.dto'
-import type { OrdreFabricationQueryDto } from './dto/ordre-fabrication-query.dto'
-import type { UpdateOrdreFabricationDto } from './dto/update-ordre-fabrication.dto'
-import type { OrdreFabricationStatut } from './entities/ordre-fabrication.entity'
-import type { OrdreFabricationService } from './ordre-fabrication.service'
+import { CreateOrdreFabricationDto } from './dto/create-ordre-fabrication.dto'
+import { OrdreFabricationQueryDto } from './dto/ordre-fabrication-query.dto'
+import { UpdateOrdreFabricationDto } from './dto/update-ordre-fabrication.dto'
+import { OrdreFabricationStatut } from './entities/ordre-fabrication.entity'
+import { OrdreFabricationService } from './ordre-fabrication.service'
 
 @Controller('ordre-fabrication')
 @ApiTags('🏭 Ordre de fabrication')

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface'
+import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface'
 
 export function getHttpsOptions(): HttpsOptions | null {
   try {

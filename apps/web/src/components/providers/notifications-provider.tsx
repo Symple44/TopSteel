@@ -279,7 +279,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   // ===== ACTIONS =====
 
   const markAsRead = useCallback((id: string) => {
-    console.log('🔔 markAsRead appelé pour:', id)
     dispatch({ type: 'MARK_AS_READ', payload: id })
 
     // Marquer comme lu côté serveur
@@ -287,7 +286,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   }, [])
 
   const markAllAsRead = useCallback(() => {
-    console.log('🔔 markAllAsRead appelé')
     dispatch({ type: 'MARK_ALL_AS_READ' })
 
     // Marquer toutes comme lues côté serveur
@@ -295,17 +293,14 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   }, [])
 
   const removeNotification = useCallback((id: string) => {
-    console.log('🔔 removeNotification appelé pour:', id)
     dispatch({ type: 'REMOVE_NOTIFICATION', payload: id })
   }, [])
 
   const clearAll = useCallback(() => {
-    console.log('🔔 clearAll appelé')
     dispatch({ type: 'CLEAR_ALL' })
   }, [])
 
   const archiveNotification = useCallback((id: string) => {
-    console.log('🔔 archiveNotification appelé pour:', id)
     dispatch({ type: 'ARCHIVE_NOTIFICATION', payload: id })
     
     // Archiver côté serveur
@@ -313,7 +308,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   }, [])
 
   const unarchiveNotification = useCallback((id: string) => {
-    console.log('🔔 unarchiveNotification appelé pour:', id)
     dispatch({ type: 'UNARCHIVE_NOTIFICATION', payload: id })
     
     // Désarchiver côté serveur
@@ -377,21 +371,26 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   const connectWebSocket = useCallback(() => {
     if (!user || wsRef.current?.readyState === WebSocket.OPEN) return
 
+    // Désactiver temporairement WebSocket si l'API n'est pas disponible
     const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001'}/notifications?userId=${user.id}`
+    console.log('[NotificationsProvider] Tentative de connexion WebSocket désactivée temporairement:', wsUrl)
+    
+    // Simuler une connexion réussie pour le développement
+    dispatch({ type: 'SET_CONNECTED', payload: false })
+    dispatch({ type: 'SET_ERROR', payload: 'WebSocket désactivé temporairement' })
+    return
 
     try {
       const ws = new WebSocket(wsUrl)
       wsRef.current = ws
 
       ws.onopen = () => {
-        console.log('🔔 WebSocket connecté')
         dispatch({ type: 'SET_CONNECTED', payload: true })
         dispatch({ type: 'SET_ERROR', payload: null })
         reconnectAttempts.current = 0
       }
 
       ws.onclose = (event) => {
-        console.log('🔔 WebSocket fermé:', event.code, event.reason)
         dispatch({ type: 'SET_CONNECTED', payload: false })
 
         // Reconnexion automatique si fermeture inattendue
@@ -406,7 +405,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       }
 
       ws.onerror = (error) => {
-        console.log('🔔 WebSocket erreur:', error)
         dispatch({ type: 'SET_CONNECTED', payload: false })
       }
 
@@ -435,10 +433,8 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
               const audio = new Audio('/sounds/notification.mp3')
               audio.volume = 0.3
               audio.play().catch(() => {
-                console.log('🔔 Son désactivé ou fichier manquant')
               })
             } catch (error) {
-              console.log('🔔 Erreur son:', error)
             }
           }
 
@@ -455,7 +451,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         }
       }
     } catch (error) {
-      console.log('🔔 WebSocket non disponible, mode manuel')
       dispatch({ type: 'SET_CONNECTED', payload: false })
     }
   }, [user, state.settings, toast, refreshNotifications])
@@ -490,21 +485,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     }
   }, [state.settings.enableBrowser])
 
-  // Nettoyer notifications expirées
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date()
-      const validNotifications = state.notifications.filter(
-        (n) => !n.expiresAt || new Date(n.expiresAt) > now
-      )
-
-      if (validNotifications.length !== state.notifications.length) {
-        dispatch({ type: 'SET_NOTIFICATIONS', payload: validNotifications })
-      }
-    }, 60000) // Vérifier toutes les minutes
-
-    return () => clearInterval(interval)
-  }, [state.notifications])
 
   // Charger les notifications initiales
   useEffect(() => {

@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import type { PaginationResultDto } from '../../common/dto/base.dto'
-import type { CreateMateriauxDto } from './dto/create-materiaux.dto'
-import type { MateriauxQueryDto } from './dto/materiaux-query.dto'
-import type { UpdateMateriauxDto } from './dto/update-materiaux.dto'
+import { CreateMateriauxDto } from './dto/create-materiaux.dto'
+import { MateriauxQueryDto } from './dto/materiaux-query.dto'
+import { UpdateMateriauxDto } from './dto/update-materiaux.dto'
 import { Materiaux } from './entities/materiaux.entity'
 
 @Injectable()

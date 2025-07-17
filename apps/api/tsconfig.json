@@ -1,9 +1,9 @@
 {
-  "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
     "target": "ES2022",
     "module": "commonjs",
     "lib": ["ES2022"],
+    "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
@@ -21,14 +21,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "incremental": true,
-    "removeComments": true,
+    "removeComments": false,
     "importHelpers": true,
     "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"],
-      "@erp/types": ["../../packages/types/src"],
-      "@erp/utils": ["../../packages/utils/src"]
-    },
     "typeRoots": ["node_modules/@types", "../../node_modules/@types"],
     "types": ["node"]
   },

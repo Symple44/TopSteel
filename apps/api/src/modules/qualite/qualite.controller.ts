@@ -17,10 +17,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateQualiteDto } from './dto/create-qualite.dto'
-import type { QualiteQueryDto } from './dto/qualite-query.dto'
-import type { UpdateQualiteDto } from './dto/update-qualite.dto'
-import type { QualiteService } from './qualite.service'
+import { CreateQualiteDto } from './dto/create-qualite.dto'
+import { QualiteQueryDto } from './dto/qualite-query.dto'
+import { UpdateQualiteDto } from './dto/update-qualite.dto'
+import { QualiteService } from './qualite.service'
 
 @Controller('qualite')
 @ApiTags('✅ Qualité')

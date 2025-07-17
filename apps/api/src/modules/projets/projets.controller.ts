@@ -15,10 +15,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateProjetsDto } from './dto/create-projets.dto'
-import type { ProjetsQueryDto } from './dto/projets-query.dto'
-import type { UpdateProjetsDto } from './dto/update-projets.dto'
-import type { ProjetsService } from './projets.service'
+import { CreateProjetsDto } from './dto/create-projets.dto'
+import { ProjetsQueryDto } from './dto/projets-query.dto'
+import { UpdateProjetsDto } from './dto/update-projets.dto'
+import { ProjetsService } from './projets.service'
 
 @Controller('projets')
 @ApiTags('📁 Projets')

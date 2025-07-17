@@ -3,16 +3,20 @@
   "version": "1.0.0",
   "description": "API NestJS pour ERP TopSteel - Gestion métallurgique industrielle",
   "main": "dist/main.js",
+  "type": "commonjs",
   "scripts": {
-    "build": "tsup",
+    "build": "nest build",
+    "build:tsup": "tsup",
+    "dev": "nest start --watch",
+    "dev:debug": "nest start --debug --watch",
     "format": "prettier --write \\\"src/**/*.ts\\\"",
     "start": "nest start",
-    "start:dev": "cross-env NODE_ENV=development nest start --watch",
+    "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/main",
     "lint": "eslint \\\"{src,apps,libs,test}/**/*.ts\\\" --fix",
     "test": "vitest",
-    "test:cov": "jest --coverage",
+    "test:cov": "vitest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:generate": "npm run typeorm -- migration:generate",
@@ -23,7 +27,8 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",
-    "build:watch": "tsup --watch"
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@nestjs/bull": "^11.0.2",

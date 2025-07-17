@@ -17,10 +17,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateTracabiliteDto } from './dto/create-tracabilite.dto'
-import type { TracabiliteQueryDto } from './dto/tracabilite-query.dto'
-import type { UpdateTracabiliteDto } from './dto/update-tracabilite.dto'
-import type { TracabiliteService } from './tracabilite.service'
+import { CreateTracabiliteDto } from './dto/create-tracabilite.dto'
+import { TracabiliteQueryDto } from './dto/tracabilite-query.dto'
+import { UpdateTracabiliteDto } from './dto/update-tracabilite.dto'
+import { TracabiliteService } from './tracabilite.service'
 
 @Controller('tracabilite')
 @ApiTags('📋 Traçabilité')

@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import type { PaginationResultDto } from '../../common/dto/base.dto'
-import type { CreateQualiteDto } from './dto/create-qualite.dto'
-import type { QualiteQueryDto } from './dto/qualite-query.dto'
-import type { UpdateQualiteDto } from './dto/update-qualite.dto'
+import { CreateQualiteDto } from './dto/create-qualite.dto'
+import { QualiteQueryDto } from './dto/qualite-query.dto'
+import { UpdateQualiteDto } from './dto/update-qualite.dto'
 import { Qualite } from './entities/qualite.entity'
 
 @Injectable()

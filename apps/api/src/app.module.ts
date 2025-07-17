@@ -39,6 +39,7 @@ import { QualiteModule } from './modules/qualite/qualite.module'
 import { StocksModule } from './modules/stocks/stocks.module'
 import { TracabiliteModule } from './modules/tracabilite/tracabilite.module'
 import { UsersModule } from './modules/users/users.module'
+import { MenuModule } from './modules/menu/menu.module'
 import { RedisModule } from './redis/redis.module'
 
 @Module({
@@ -73,6 +74,7 @@ import { RedisModule } from './redis/redis.module'
     ProjetsModule,
     StocksModule,
     UsersModule,
+    MenuModule,
     MachinesModule,
     MaintenanceModule,
     MateriauxModule,

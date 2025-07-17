@@ -1,9 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
-import type { CreateUserDto } from './dto/create-user.dto'
-import type { UpdateUserDto } from './dto/update-user.dto'
-import type { UserQueryDto } from './dto/user-query.dto'
+import { CreateUserDto } from './dto/create-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { UserQueryDto } from './dto/user-query.dto'
 import { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
 import { GetUserSettingsResponseDto } from './dto/get-user-settings.dto'
 import { User, UserRole } from './entities/user.entity'
@@ -173,11 +173,21 @@ export class UsersService {
 
     // Fusionner les nouvelles données avec les existantes
     if (updateDto.profile) {
-      settings.profile = { ...settings.profile, ...updateDto.profile }
+      settings.profile = { 
+        ...settings.profile, 
+        ...Object.fromEntries(
+          Object.entries(updateDto.profile).filter(([_, value]) => value !== undefined)
+        )
+      }
     }
 
     if (updateDto.company) {
-      settings.company = { ...settings.company, ...updateDto.company }
+      settings.company = { 
+        ...settings.company, 
+        ...Object.fromEntries(
+          Object.entries(updateDto.company).filter(([_, value]) => value !== undefined)
+        )
+      }
     }
 
     if (updateDto.preferences) {

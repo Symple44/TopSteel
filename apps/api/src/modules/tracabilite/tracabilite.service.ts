@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import type { PaginationResultDto } from '../../common/dto/base.dto'
-import type { CreateTracabiliteDto } from './dto/create-tracabilite.dto'
-import type { TracabiliteQueryDto } from './dto/tracabilite-query.dto'
-import type { UpdateTracabiliteDto } from './dto/update-tracabilite.dto'
+import { CreateTracabiliteDto } from './dto/create-tracabilite.dto'
+import { TracabiliteQueryDto } from './dto/tracabilite-query.dto'
+import { UpdateTracabiliteDto } from './dto/update-tracabilite.dto'
 import { Tracabilite } from './entities/tracabilite.entity'
 
 @Injectable()

@@ -3,20 +3,20 @@ import { UserSettings } from '../entities/user-settings.entity'
 export class GetUserSettingsResponseDto {
   id: string
   profile?: {
-    firstName: string
-    lastName: string
-    email: string
+    firstName?: string
+    lastName?: string
+    email?: string
     phone?: string
     position?: string
     department?: string
     avatar?: string
   }
   company?: {
-    name: string
-    address: string
-    city: string
-    postalCode: string
-    country: string
+    name?: string
+    address?: string
+    city?: string
+    postalCode?: string
+    country?: string
   }
   preferences: {
     language: string

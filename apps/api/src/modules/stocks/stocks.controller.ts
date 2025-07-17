@@ -17,10 +17,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateStocksDto } from './dto/create-stocks.dto'
-import type { StocksQueryDto } from './dto/stocks-query.dto'
-import type { UpdateStocksDto } from './dto/update-stocks.dto'
-import type { StocksService } from './stocks.service'
+import { CreateStocksDto } from './dto/create-stocks.dto'
+import { StocksQueryDto } from './dto/stocks-query.dto'
+import { UpdateStocksDto } from './dto/update-stocks.dto'
+import { StocksService } from './stocks.service'
 
 @Controller('stocks')
 @ApiTags('📦 Stocks')

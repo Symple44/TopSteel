@@ -4,7 +4,7 @@ import { Client, ClientType, type Projet, type ProjetFilters } from '@erp/domain
 import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/domains/core'
 
 // Configuration API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 // Instance du client API
 const apiClient = new ERPApiClient({

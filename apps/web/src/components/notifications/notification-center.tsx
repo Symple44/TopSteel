@@ -42,7 +42,6 @@ export function NotificationCenter() {
     setMounted(true)
   }, [])
 
-  console.log('🔔 NotificationCenter render, isExpanded:', isExpanded, 'showSettings:', showSettings, 'isOpen:', isOpen, 'showDashboard:', showDashboard)
 
   const getNotificationIcon = (type: string, category: string) => {
     if (type === 'error') return <AlertTriangle className="h-4 w-4 text-red-500" />
@@ -122,7 +121,6 @@ export function NotificationCenter() {
                     className="hover:text-blue-600 hover:bg-blue-50"
                     onClick={(e) => {
                       e.stopPropagation()
-                      console.log('🔔 Dashboard ouvert')
                       setShowDashboard(true)
                       setIsOpen(false)
                     }}
@@ -136,7 +134,6 @@ export function NotificationCenter() {
                       size="sm" 
                       onClick={(e) => {
                         e.stopPropagation()
-                        console.log('🔔 Marquer tout comme lu cliqué')
                         actions.markAllAsRead()
                       }} 
                       title="Marquer tout comme lu"
@@ -149,10 +146,8 @@ export function NotificationCenter() {
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation()
-                      console.log('🔔 Paramètres cliqué, showSettings avant:', showSettings)
                       setShowSettings(true)
                       setIsOpen(false) // Fermer le dropdown
-                      console.log('🔔 Paramètres, après setShowSettings(true)')
                     }}
                     title="Paramètres"
                   >
@@ -216,7 +211,6 @@ export function NotificationCenter() {
                         !notification.isRead && 'bg-blue-50 border-l-2 border-l-blue-500'
                       )}
                       onClick={() => {
-                        console.log('🔔 Notification cliquée, markAsRead:', notification.id)
                         actions.markAsRead(notification.id)
                       }}
                     >
@@ -281,7 +275,6 @@ export function NotificationCenter() {
                         size="sm"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation()
-                          console.log('🔔 Supprimer notification cliqué:', notification.id)
                           actions.removeNotification(notification.id)
                         }}
                         className="flex-shrink-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-gray-400 hover:text-gray-600 transition-opacity"
@@ -305,7 +298,6 @@ export function NotificationCenter() {
                     className="flex-1 text-gray-500 hover:text-red-600"
                     onClick={(e) => {
                       e.stopPropagation()
-                      console.log('🔔 Effacer tout cliqué')
                       actions.clearAll()
                     }}
                   >
@@ -317,7 +309,6 @@ export function NotificationCenter() {
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation()
-                      console.log('🔔 Actualiser cliqué')
                       actions.refreshNotifications()
                     }}
                     className="flex-1"

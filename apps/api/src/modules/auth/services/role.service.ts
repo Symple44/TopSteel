@@ -1,0 +1,350 @@
+import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository, FindOptionsWhere } from 'typeorm'
+import { Role } from '../entities/role.entity'
+import { RolePermission } from '../entities/role-permission.entity'
+import { UserRole } from '../entities/user-role.entity'
+import { Permission, AccessLevel } from '../entities/permission.entity'
+import { Module } from '../entities/module.entity'
+
+export interface CreateRoleDto {
+  name: string
+  description: string
+  isActive?: boolean
+  permissions?: {
+    permissionId: string
+    accessLevel: AccessLevel
+    isGranted: boolean
+  }[]
+}
+
+export interface UpdateRoleDto {
+  name?: string
+  description?: string
+  isActive?: boolean
+}
+
+export interface RoleWithStats {
+  id: string
+  name: string
+  description: string
+  isSystemRole: boolean
+  isActive: boolean
+  userCount: number
+  moduleCount: number
+  permissionCount: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+@Injectable()
+export class RoleService {
+  constructor(
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
+    @InjectRepository(RolePermission)
+    private readonly rolePermissionRepository: Repository<RolePermission>,
+    @InjectRepository(UserRole)
+    private readonly userRoleRepository: Repository<UserRole>,
+    @InjectRepository(Permission)
+    private readonly permissionRepository: Repository<Permission>,
+    @InjectRepository(Module)
+    private readonly moduleRepository: Repository<Module>,
+  ) {}
+
+  // ===== GESTION DES RÔLES =====
+
+  async findAllRoles(includePermissions: boolean = false): Promise<RoleWithStats[]> {
+    const queryBuilder = this.roleRepository.createQueryBuilder('role')
+    
+    if (includePermissions) {
+      queryBuilder.leftJoinAndSelect('role.permissions', 'permissions')
+    }
+
+    const roles = await queryBuilder.getMany()
+
+    // Calculer les statistiques pour chaque rôle
+    const rolesWithStats = await Promise.all(
+      roles.map(async (role) => {
+        const [userCount, moduleCount, permissionCount] = await Promise.all([
+          this.userRoleRepository.count({ where: { roleId: role.id, isActive: true } }),
+          this.getModuleCountForRole(role.id),
+          this.rolePermissionRepository.count({ where: { roleId: role.id, isGranted: true } })
+        ])
+
+        return {
+          id: role.id,
+          name: role.name,
+          description: role.description,
+          isSystemRole: role.isSystemRole,
+          isActive: role.isActive,
+          userCount,
+          moduleCount,
+          permissionCount,
+          createdAt: role.createdAt,
+          updatedAt: role.updatedAt
+        }
+      })
+    )
+
+    return rolesWithStats
+  }
+
+  async findRoleById(id: string, includePermissions: boolean = false): Promise<Role> {
+    const queryBuilder = this.roleRepository.createQueryBuilder('role')
+      .where('role.id = :id', { id })
+    
+    if (includePermissions) {
+      queryBuilder.leftJoinAndSelect('role.permissions', 'permissions')
+        .leftJoinAndSelect('permissions.permission', 'permission')
+        .leftJoinAndSelect('permission.module', 'module')
+    }
+
+    const role = await queryBuilder.getOne()
+    
+    if (!role) {
+      throw new NotFoundException(`Rôle avec l'ID ${id} non trouvé`)
+    }
+
+    return role
+  }
+
+  async createRole(createRoleDto: CreateRoleDto, createdBy: string): Promise<Role> {
+    // Vérifier l'unicité du nom
+    const existingRole = await this.roleRepository.findOne({
+      where: { name: createRoleDto.name }
+    })
+
+    if (existingRole) {
+      throw new ConflictException(`Un rôle avec le nom "${createRoleDto.name}" existe déjà`)
+    }
+
+    // Créer le rôle
+    const role = Role.createCustomRole(
+      createRoleDto.name,
+      createRoleDto.description,
+      createdBy
+    )
+
+    if (createRoleDto.isActive !== undefined) {
+      role.isActive = createRoleDto.isActive
+    }
+
+    const savedRole = await this.roleRepository.save(role)
+
+    // Ajouter les permissions si spécifiées
+    if (createRoleDto.permissions && createRoleDto.permissions.length > 0) {
+      await this.updateRolePermissions(savedRole.id, createRoleDto.permissions, createdBy)
+    }
+
+    return savedRole
+  }
+
+  async updateRole(id: string, updateRoleDto: UpdateRoleDto, updatedBy: string): Promise<Role> {
+    const role = await this.findRoleById(id)
+
+    if (role.isSystemRole) {
+      throw new ForbiddenException('Impossible de modifier un rôle système')
+    }
+
+    // Vérifier l'unicité du nom si modifié
+    if (updateRoleDto.name && updateRoleDto.name !== role.name) {
+      const existingRole = await this.roleRepository.findOne({
+        where: { name: updateRoleDto.name }
+      })
+
+      if (existingRole) {
+        throw new ConflictException(`Un rôle avec le nom "${updateRoleDto.name}" existe déjà`)
+      }
+    }
+
+    // Mettre à jour
+    Object.assign(role, updateRoleDto)
+    role.updatedBy = updatedBy
+    role.updatedAt = new Date()
+
+    return await this.roleRepository.save(role)
+  }
+
+  async deleteRole(id: string): Promise<void> {
+    const role = await this.findRoleById(id)
+
+    if (role.isSystemRole) {
+      throw new ForbiddenException('Impossible de supprimer un rôle système')
+    }
+
+    // Vérifier s'il y a des utilisateurs assignés
+    const userCount = await this.userRoleRepository.count({
+      where: { roleId: id, isActive: true }
+    })
+
+    if (userCount > 0) {
+      throw new ForbiddenException(
+        `Impossible de supprimer le rôle "${role.name}" car il est assigné à ${userCount} utilisateur(s)`
+      )
+    }
+
+    // Supprimer les permissions du rôle
+    await this.rolePermissionRepository.delete({ roleId: id })
+
+    // Supprimer le rôle
+    await this.roleRepository.delete(id)
+  }
+
+  // ===== GESTION DES PERMISSIONS =====
+
+  async getRolePermissions(roleId: string): Promise<{
+    roleId: string
+    modules: any[]
+    rolePermissions: RolePermission[]
+  }> {
+    const role = await this.findRoleById(roleId)
+
+    // Récupérer tous les modules avec leurs permissions
+    const modules = await this.moduleRepository.find({
+      where: { isActive: true },
+      relations: ['permissions'],
+      order: { category: 'ASC', name: 'ASC' }
+    })
+
+    // Récupérer les permissions actuelles du rôle
+    const rolePermissions = await this.rolePermissionRepository.find({
+      where: { roleId },
+      relations: ['permission', 'permission.module']
+    })
+
+    return {
+      roleId,
+      modules,
+      rolePermissions
+    }
+  }
+
+  async updateRolePermissions(
+    roleId: string,
+    permissions: {
+      permissionId: string
+      accessLevel: AccessLevel
+      isGranted: boolean
+    }[],
+    updatedBy: string
+  ): Promise<void> {
+    const role = await this.findRoleById(roleId)
+
+    // Supprimer les permissions existantes
+    await this.rolePermissionRepository.delete({ roleId })
+
+    // Ajouter les nouvelles permissions
+    const rolePermissions = permissions.map(p => 
+      RolePermission.create(
+        roleId,
+        p.permissionId,
+        p.accessLevel,
+        p.isGranted,
+        updatedBy
+      )
+    )
+
+    await this.rolePermissionRepository.save(rolePermissions)
+  }
+
+  // ===== GESTION DES UTILISATEURS =====
+
+  async assignUserToRole(
+    userId: string,
+    roleId: string,
+    assignedBy: string,
+    expiresAt?: Date
+  ): Promise<UserRole> {
+    const role = await this.findRoleById(roleId)
+
+    // Vérifier s'il n'y a pas déjà une assignation active
+    const existingUserRole = await this.userRoleRepository.findOne({
+      where: { userId, roleId, isActive: true }
+    })
+
+    if (existingUserRole) {
+      throw new ConflictException('L\'utilisateur a déjà ce rôle')
+    }
+
+    const userRole = UserRole.assign(userId, roleId, assignedBy, expiresAt)
+    return await this.userRoleRepository.save(userRole)
+  }
+
+  async removeUserFromRole(userId: string, roleId: string): Promise<void> {
+    const userRole = await this.userRoleRepository.findOne({
+      where: { userId, roleId, isActive: true }
+    })
+
+    if (!userRole) {
+      throw new NotFoundException('Assignation de rôle non trouvée')
+    }
+
+    userRole.isActive = false
+    await this.userRoleRepository.save(userRole)
+  }
+
+  async getUserRoles(userId: string): Promise<Role[]> {
+    const userRoles = await this.userRoleRepository.find({
+      where: { userId, isActive: true },
+      relations: ['role']
+    })
+
+    return userRoles
+      .filter(ur => ur.isValid())
+      .map(ur => ur.role)
+  }
+
+  async getUserPermissions(userId: string): Promise<RolePermission[]> {
+    const userRoles = await this.getUserRoles(userId)
+    const roleIds = userRoles.map(role => role.id)
+
+    if (roleIds.length === 0) {
+      return []
+    }
+
+    return await this.rolePermissionRepository.find({
+      where: { roleId: roleIds[0] }, // Simplification: prendre le premier rôle
+      relations: ['permission', 'permission.module']
+    })
+  }
+
+  // ===== MÉTHODES UTILITAIRES =====
+
+  private async getModuleCountForRole(roleId: string): Promise<number> {
+    const result = await this.rolePermissionRepository
+      .createQueryBuilder('rp')
+      .leftJoin('rp.permission', 'p')
+      .leftJoin('p.module', 'm')
+      .where('rp.roleId = :roleId', { roleId })
+      .andWhere('rp.isGranted = true')
+      .andWhere('m.isActive = true')
+      .select('COUNT(DISTINCT m.id)', 'count')
+      .getRawOne()
+
+    return parseInt(result.count) || 0
+  }
+
+  async initializeSystemRoles(): Promise<void> {
+    // Cette méthode peut être appelée au démarrage pour s'assurer que les rôles système existent
+    const systemRoles = [
+      { name: 'SUPER_ADMIN', description: 'Super Administrateur - Accès complet' },
+      { name: 'ADMIN', description: 'Administrateur - Accès administratif' },
+      { name: 'MANAGER', description: 'Manager - Accès business complet' },
+      { name: 'COMMERCIAL', description: 'Commercial - Clients et facturation' },
+      { name: 'TECHNICIEN', description: 'Technicien - Production et stocks' },
+      { name: 'OPERATEUR', description: 'Opérateur - Lecture seule production' }
+    ]
+
+    for (const roleData of systemRoles) {
+      const existingRole = await this.roleRepository.findOne({
+        where: { name: roleData.name }
+      })
+
+      if (!existingRole) {
+        const role = Role.createSystemRole(roleData.name, roleData.description)
+        await this.roleRepository.save(role)
+      }
+    }
+  }
+}

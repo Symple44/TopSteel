@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import type { PaginationResultDto } from '../../common/dto/base.dto'
-import type { CreateMaintenanceDto } from './dto/create-maintenance.dto'
-import type { MaintenanceQueryDto } from './dto/maintenance-query.dto'
-import type { UpdateMaintenanceDto } from './dto/update-maintenance.dto'
+import { CreateMaintenanceDto } from './dto/create-maintenance.dto'
+import { MaintenanceQueryDto } from './dto/maintenance-query.dto'
+import { UpdateMaintenanceDto } from './dto/update-maintenance.dto'
 import { Maintenance } from './entities/maintenance.entity'
 
 @Injectable()

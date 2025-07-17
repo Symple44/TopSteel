@@ -17,10 +17,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateNotificationsDto } from './dto/create-notifications.dto'
-import type { NotificationsQueryDto } from './dto/notifications-query.dto'
-import type { UpdateNotificationsDto } from './dto/update-notifications.dto'
-import type { NotificationsService } from './notifications.service'
+import { CreateNotificationsDto } from './dto/create-notifications.dto'
+import { NotificationsQueryDto } from './dto/notifications-query.dto'
+import { UpdateNotificationsDto } from './dto/update-notifications.dto'
+import { NotificationsService } from './notifications.service'
 
 @Controller('notifications')
 @ApiTags('🔔 Notifications')

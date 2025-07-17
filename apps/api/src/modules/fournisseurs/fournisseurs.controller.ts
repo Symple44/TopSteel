@@ -17,10 +17,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateFournisseursDto } from './dto/create-fournisseurs.dto'
-import type { FournisseursQueryDto } from './dto/fournisseurs-query.dto'
-import type { UpdateFournisseursDto } from './dto/update-fournisseurs.dto'
-import type { FournisseursService } from './fournisseurs.service'
+import { CreateFournisseursDto } from './dto/create-fournisseurs.dto'
+import { FournisseursQueryDto } from './dto/fournisseurs-query.dto'
+import { UpdateFournisseursDto } from './dto/update-fournisseurs.dto'
+import { FournisseursService } from './fournisseurs.service'
 
 @Controller('fournisseurs')
 @ApiTags('🚚 Fournisseurs')

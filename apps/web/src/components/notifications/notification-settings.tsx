@@ -29,29 +29,6 @@ export function NotificationSettings() {
   const { t } = useTranslation('settings')
   const [activeTab, setActiveTab] = useState<'general' | 'categories' | 'priority' | 'schedule'>('general')
 
-  const handleTestNotification = () => {
-    // Simuler une notification de test
-    const testNotification = {
-      id: Date.now().toString(),
-      type: 'info' as const,
-      category: 'system' as const,
-      title: 'Notification de test',
-      message: 'Ceci est une notification de test pour vérifier vos paramètres.',
-      read: false,
-      persistent: false,
-      createdAt: new Date(),
-    }
-
-    // Ajouter directement via le WebSocket simulé
-    if (state.settings.enableToast) {
-      // Simuler réception WebSocket
-      window.dispatchEvent(
-        new MessageEvent('message', {
-          data: JSON.stringify(testNotification),
-        })
-      )
-    }
-  }
 
   const categoryIcons = {
     system: Settings2,
@@ -386,9 +363,6 @@ export function NotificationSettings() {
 
       {/* Actions */}
       <div className="space-y-4">
-        <Button variant="outline" className="w-full" onClick={handleTestNotification}>
-          Tester les notifications
-        </Button>
 
         <div className="text-xs text-muted-foreground space-y-1">
           <p>

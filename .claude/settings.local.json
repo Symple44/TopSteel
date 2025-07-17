@@ -87,7 +87,15 @@
       "Bash(turbo build:*)",
       "Bash(curl:*)",
       "Bash(NODE_ENV=production npm run typeorm -- migration:run -d typeorm.config.ts)",
-      "Bash(psql:*)"
+      "Bash(psql:*)",
+      "Bash(npx nest start:*)",
+      "Bash(npx nest build:*)",
+      "Bash(sed:*)",
+      "Bash(pg_isready:*)",
+      "Bash(del test-db-connection.js)",
+      "Bash(del create-database.js)",
+      "Bash(PORT=3003 timeout 8 node start.js hybrid)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }

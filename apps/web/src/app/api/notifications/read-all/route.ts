@@ -14,7 +14,6 @@ export async function PATCH(request: NextRequest) {
       readAt,
     }))
 
-    await new Promise(resolve => setTimeout(resolve, 100))
 
     return NextResponse.json({
       success: true,

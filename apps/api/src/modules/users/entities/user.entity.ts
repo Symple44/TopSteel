@@ -27,11 +27,11 @@ export class User {
   @Column()
   password!: string
 
-  @Column()
-  nom!: string
+  @Column({ nullable: true })
+  nom?: string
 
-  @Column()
-  prenom!: string
+  @Column({ nullable: true })
+  prenom?: string
 
   @Column({
     type: 'enum',

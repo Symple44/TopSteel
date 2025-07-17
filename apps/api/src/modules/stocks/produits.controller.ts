@@ -17,10 +17,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateProduitDto } from './dto/create-produit.dto'
-import type { ProduitsQueryDto } from './dto/produits-query.dto'
-import type { UpdateProduitDto } from './dto/update-produit.dto'
-import type { ProduitsService } from './produits.service'
+import { CreateProduitDto } from './dto/create-produit.dto'
+import { ProduitsQueryDto } from './dto/produits-query.dto'
+import { UpdateProduitDto } from './dto/update-produit.dto'
+import { ProduitsService } from './produits.service'
 
 @Controller('produits')
 @ApiTags('📦 Produits')

@@ -14,10 +14,10 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { UserRole } from '../users/entities/user.entity'
-import type { CreateOperationDto } from './dto/create-operation.dto'
-import type { UpdateOperationDto } from './dto/update-operation.dto'
-import type { OperationStatut } from './entities/operation.entity'
-import type { OperationService } from './operation.service'
+import { CreateOperationDto } from './dto/create-operation.dto'
+import { UpdateOperationDto } from './dto/update-operation.dto'
+import { OperationStatut } from './entities/operation.entity'
+import { OperationService } from './operation.service'
 
 @Controller('operations')
 @ApiTags('🔧 Opérations')

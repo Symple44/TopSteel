@@ -28,7 +28,6 @@ export async function PATCH(
       updatedAt: new Date().toISOString(),
     }
 
-    await new Promise(resolve => setTimeout(resolve, 100))
 
     return NextResponse.json(notifications[notificationIndex])
 
@@ -59,7 +58,6 @@ export async function DELETE(
       )
     }
 
-    await new Promise(resolve => setTimeout(resolve, 100))
 
     return NextResponse.json({ success: true })
 

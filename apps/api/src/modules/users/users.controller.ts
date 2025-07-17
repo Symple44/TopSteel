@@ -15,13 +15,13 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@ne
 import { Roles } from '../../common/decorators/roles.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
-import type { CreateUserDto } from './dto/create-user.dto'
-import type { UpdateUserDto } from './dto/update-user.dto'
-import type { UserQueryDto } from './dto/user-query.dto'
+import { CreateUserDto } from './dto/create-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { UserQueryDto } from './dto/user-query.dto'
 import { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
 import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { UserRole } from './entities/user.entity'
-import type { UsersService } from './users.service'
+import { UsersService } from './users.service'
 
 @Controller('users')
 @ApiTags('👤 Users')

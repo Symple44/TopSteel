@@ -77,7 +77,6 @@ let userSettings = { ...defaultSettings }
 
 export async function GET(request: NextRequest) {
   try {
-    await new Promise(resolve => setTimeout(resolve, 100))
     
     return NextResponse.json(userSettings)
   } catch (error) {
@@ -120,7 +119,6 @@ export async function PATCH(request: NextRequest) {
       },
     }
     
-    await new Promise(resolve => setTimeout(resolve, 200))
     
     return NextResponse.json(userSettings)
   } catch (error) {
@@ -137,7 +135,6 @@ export async function POST(request: NextRequest) {
     // Réinitialiser aux paramètres par défaut
     userSettings = { ...defaultSettings }
     
-    await new Promise(resolve => setTimeout(resolve, 100))
     
     return NextResponse.json(userSettings)
   } catch (error) {

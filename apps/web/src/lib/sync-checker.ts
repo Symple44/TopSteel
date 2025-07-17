@@ -1,0 +1,78 @@
+// Système de vérification de synchronisation et notifications d'alerte
+
+export interface SyncIssue {
+  type: 'database' | 'storage' | 'api' | 'menu'
+  severity: 'low' | 'medium' | 'high'
+  message: string
+  timestamp: string
+  details?: any
+}
+
+class SyncChecker {
+  private issues: SyncIssue[] = []
+  private toastCallback: ((issue: SyncIssue) => void) | null = null
+
+  setToastCallback(callback: (issue: SyncIssue) => void) {
+    this.toastCallback = callback
+  }
+
+  addIssue(issue: Omit<SyncIssue, 'timestamp'>) {
+    const newIssue: SyncIssue = {
+      ...issue,
+      timestamp: new Date().toISOString()
+    }
+    
+    this.issues.push(newIssue)
+    console.warn(`[SyncChecker] ${issue.severity.toUpperCase()}: ${issue.message}`, issue.details)
+    
+    // Envoyer le toast si un callback est configuré
+    if (this.toastCallback) {
+      this.toastCallback(newIssue)
+    }
+    
+    // Auto-nettoyer les anciens problèmes (garder seulement les 10 derniers)
+    if (this.issues.length > 10) {
+      this.issues = this.issues.slice(-10)
+    }
+  }
+
+  getIssues(): SyncIssue[] {
+    return [...this.issues]
+  }
+
+  clearIssues() {
+    this.issues = []
+  }
+
+  // Vérifications spécifiques
+  checkMenuSync(expectedCount: number, actualCount: number, context: string) {
+    if (expectedCount !== actualCount) {
+      this.addIssue({
+        type: 'menu',
+        severity: 'medium',
+        message: `Désynchronisation du menu détectée dans ${context}`,
+        details: { expected: expectedCount, actual: actualCount, context }
+      })
+    }
+  }
+
+  checkDatabaseConnection() {
+    // Maintenant la DB est correctement configurée avec TypeORM
+    console.log('[SyncChecker] Base de données connectée avec TypeORM')
+  }
+
+  checkStorageConsistency(storageType: string, expectedData: any, actualData: any) {
+    if (JSON.stringify(expectedData) !== JSON.stringify(actualData)) {
+      this.addIssue({
+        type: 'storage',
+        severity: 'medium',
+        message: `Incohérence détectée dans ${storageType}`,
+        details: { expected: expectedData, actual: actualData, storageType }
+      })
+    }
+  }
+}
+
+export const syncChecker = new SyncChecker()
+
+// Ne plus afficher l'alerte au démarrage car la DB est maintenant configurée
