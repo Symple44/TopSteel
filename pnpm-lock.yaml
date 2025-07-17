@@ -741,8 +741,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/config
       '@eslint/js':
-        specifier: ^9.30.1
-        version: 9.30.1
+        specifier: ^9.31.0
+        version: 9.31.0
       '@next/bundle-analyzer':
         specifier: ^15.3.4
         version: 15.3.5
