@@ -31,7 +31,7 @@ export class SystemParameter {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true })
   key!: string
 
   @Column('text')
@@ -51,16 +51,16 @@ export class SystemParameter {
   })
   category!: ParameterCategory
 
-  @Column()
+  @Column({ type: 'text' })
   description!: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   defaultValue?: string
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   isEditable!: boolean
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isSecret!: boolean
 
   @Column({ type: 'jsonb', nullable: true })

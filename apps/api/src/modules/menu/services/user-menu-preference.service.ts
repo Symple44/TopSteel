@@ -15,47 +15,83 @@ export class UserMenuPreferenceService {
   /**
    * Récupère les préférences d'un utilisateur, les crée si elles n'existent pas
    */
-  async findOrCreateByUserId(userId: string): Promise<UserMenuPreference> {
-    let preference = await this.userMenuPreferenceRepository.findOne({
+  async findOrCreateByUserId(userId: string): Promise<UserMenuPreference[]> {
+    let preferences = await this.userMenuPreferenceRepository.find({
       where: { userId },
     })
 
+    if (!preferences.length) {
+      // Créer les préférences par défaut pour l'admin
+      const defaultMenus = [
+        { menuId: 'main-dashboard', isVisible: true, order: 1, customLabel: 'Dashboard' },
+        { menuId: 'users', isVisible: true, order: 2, customLabel: 'Utilisateurs' },
+        { menuId: 'roles', isVisible: true, order: 3, customLabel: 'Rôles' },
+        { menuId: 'system-settings', isVisible: true, order: 4, customLabel: 'Configuration' },
+        { menuId: 'notifications', isVisible: true, order: 5, customLabel: 'Notifications' },
+      ]
+
+      preferences = await Promise.all(defaultMenus.map(async (menu) => {
+        const preference = this.userMenuPreferenceRepository.create({
+          userId,
+          menuId: menu.menuId,
+          isVisible: menu.isVisible,
+          order: menu.order,
+          customLabel: menu.customLabel,
+        })
+        return await this.userMenuPreferenceRepository.save(preference)
+      }))
+      
+      this.logger.log(`Préférences créées pour l'utilisateur ${userId} avec ${preferences.length} menus`)
+    }
+
+    return preferences
+  }
+
+
+  /**
+   * Met à jour la visibilité d'un menu
+   */
+  async updateMenuVisibility(userId: string, menuId: string, isVisible: boolean): Promise<UserMenuPreference> {
+    const preferences = await this.findOrCreateByUserId(userId)
+    let preference = preferences.find(p => p.menuId === menuId)
+    
     if (!preference) {
       preference = this.userMenuPreferenceRepository.create({
         userId,
-        selectedPages: [],
-        menuMode: 'standard',
-        pageCustomizations: {},
+        menuId,
+        isVisible,
+        order: preferences.length + 1,
       })
-      await this.userMenuPreferenceRepository.save(preference)
-      this.logger.log(`Préférences créées pour l'utilisateur ${userId}`)
+    } else {
+      preference.isVisible = isVisible
     }
-
-    return preference
-  }
-
-  /**
-   * Met à jour les pages sélectionnées
-   */
-  async updateSelectedPages(userId: string, selectedPages: string[]): Promise<UserMenuPreference> {
-    const preference = await this.findOrCreateByUserId(userId)
-    preference.selectedPages = selectedPages
     
     const updated = await this.userMenuPreferenceRepository.save(preference)
-    this.logger.log(`Pages sélectionnées mises à jour pour l'utilisateur ${userId}: ${selectedPages.length} pages`)
+    this.logger.log(`Visibilité du menu ${menuId} mise à jour pour l'utilisateur ${userId}: ${isVisible}`)
     
     return updated
   }
 
   /**
-   * Met à jour le mode du menu
+   * Met à jour l'ordre d'un menu
    */
-  async updateMenuMode(userId: string, menuMode: 'standard' | 'custom'): Promise<UserMenuPreference> {
-    const preference = await this.findOrCreateByUserId(userId)
-    preference.menuMode = menuMode
+  async updateMenuOrder(userId: string, menuId: string, order: number): Promise<UserMenuPreference> {
+    const preferences = await this.findOrCreateByUserId(userId)
+    let preference = preferences.find(p => p.menuId === menuId)
+    
+    if (!preference) {
+      preference = this.userMenuPreferenceRepository.create({
+        userId,
+        menuId,
+        isVisible: true,
+        order,
+      })
+    } else {
+      preference.order = order
+    }
     
     const updated = await this.userMenuPreferenceRepository.save(preference)
-    this.logger.log(`Mode du menu mis à jour pour l'utilisateur ${userId}: ${menuMode}`)
+    this.logger.log(`Ordre du menu ${menuId} mis à jour pour l'utilisateur ${userId}: ${order}`)
     
     return updated
   }
@@ -64,40 +100,48 @@ export class UserMenuPreferenceService {
    * Ajoute ou retire une page des sélections
    */
   async togglePage(userId: string, pageId: string): Promise<UserMenuPreference> {
-    const preference = await this.findOrCreateByUserId(userId)
+    const preferences = await this.findOrCreateByUserId(userId)
+    let preference = preferences.find(p => p.menuId === pageId)
     
-    const index = preference.selectedPages.indexOf(pageId)
-    if (index > -1) {
-      preference.selectedPages.splice(index, 1)
-      this.logger.log(`Page ${pageId} retirée pour l'utilisateur ${userId}`)
+    if (!preference) {
+      preference = this.userMenuPreferenceRepository.create({
+        userId,
+        menuId: pageId,
+        isVisible: true,
+        order: preferences.length + 1,
+      })
     } else {
-      preference.selectedPages.push(pageId)
-      this.logger.log(`Page ${pageId} ajoutée pour l'utilisateur ${userId}`)
+      preference.isVisible = !preference.isVisible
     }
     
-    return await this.userMenuPreferenceRepository.save(preference)
+    const updated = await this.userMenuPreferenceRepository.save(preference)
+    this.logger.log(`Page ${pageId} basculée pour l'utilisateur ${userId}: ${preference.isVisible}`)
+    
+    return updated
   }
 
   /**
-   * Met à jour les personnalisations d'une page
+   * Met à jour le label personnalisé d'une page
    */
   async updatePageCustomization(
     userId: string,
     pageId: string,
-    customization: {
-      customTitle?: string
-      customIcon?: string
-      customColor?: string
-      customOrder?: number
-    },
+    customLabel: string,
   ): Promise<UserMenuPreference> {
-    const preference = await this.findOrCreateByUserId(userId)
+    const preferences = await this.findOrCreateByUserId(userId)
+    let preference = preferences.find(p => p.menuId === pageId)
     
-    if (!preference.pageCustomizations) {
-      preference.pageCustomizations = {}
+    if (!preference) {
+      preference = this.userMenuPreferenceRepository.create({
+        userId,
+        menuId: pageId,
+        isVisible: true,
+        order: preferences.length + 1,
+        customLabel,
+      })
+    } else {
+      preference.customLabel = customLabel
     }
-    
-    preference.pageCustomizations[pageId] = customization
     
     return await this.userMenuPreferenceRepository.save(preference)
   }
@@ -105,16 +149,14 @@ export class UserMenuPreferenceService {
   /**
    * Réinitialise les préférences
    */
-  async resetPreferences(userId: string): Promise<UserMenuPreference> {
-    const preference = await this.findOrCreateByUserId(userId)
+  async resetPreferences(userId: string): Promise<UserMenuPreference[]> {
+    // Supprimer toutes les préférences existantes
+    await this.userMenuPreferenceRepository.delete({ userId })
     
-    preference.selectedPages = []
-    preference.menuMode = 'standard'
-    preference.pageCustomizations = {}
-    
-    const updated = await this.userMenuPreferenceRepository.save(preference)
+    // Recréer les préférences par défaut
+    const preferences = await this.findOrCreateByUserId(userId)
     this.logger.log(`Préférences réinitialisées pour l'utilisateur ${userId}`)
     
-    return updated
+    return preferences
   }
 }

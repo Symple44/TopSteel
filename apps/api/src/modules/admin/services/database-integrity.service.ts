@@ -88,7 +88,6 @@ export class DatabaseIntegrityService {
       'role_permissions',
       
       // Tables TypeORM
-      'migrations',
       'typeorm_metadata'
     ]
   }
@@ -207,23 +206,204 @@ export class DatabaseIntegrityService {
     try {
       this.logger.log('Début de la synchronisation de la base de données...')
       
+      // Nettoyer les index problématiques avant la synchronisation
+      await this.cleanupProblematicIndexes()
+      
       // Activer la synchronisation temporairement
       await this.dataSource.synchronize(false) // false = ne pas supprimer les données existantes
+      
+      // Initialiser les paramètres système par défaut
+      await this.initializeSystemDefaults()
       
       this.logger.log('Synchronisation terminée avec succès')
       
       return {
         success: true,
-        message: 'Base de données synchronisée avec succès'
+        message: 'Base de données synchronisée avec succès et paramètres système initialisés'
       }
     } catch (error) {
       this.logger.error('Erreur lors de la synchronisation:', error)
       
+      // Si c'est une erreur d'index, essayer de la résoudre
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      if (errorMessage.includes('existe déjà') || errorMessage.includes('already exists')) {
+        this.logger.log('Tentative de résolution des conflits d\'index...')
+        
+        try {
+          // Extraire le nom de l'index de l'erreur
+          const indexMatch = errorMessage.match(/«\s*([^»]+)\s*»|"([^"]+)"/);
+          if (indexMatch) {
+            const indexName = indexMatch[1] || indexMatch[2];
+            await this.dropIndexIfExists(indexName);
+            
+            // Réessayer la synchronisation
+            await this.dataSource.synchronize(false);
+            await this.initializeSystemDefaults();
+            
+            return {
+              success: true,
+              message: 'Base de données synchronisée après résolution des conflits d\'index'
+            };
+          }
+        } catch (retryError) {
+          this.logger.error('Erreur lors de la tentative de résolution:', retryError)
+        }
+      }
+      
       return {
         success: false,
         message: 'Erreur lors de la synchronisation',
-        details: error instanceof Error ? error.message : String(error)
+        details: errorMessage
       }
+    }
+  }
+  
+  /**
+   * Nettoie les index problématiques
+   */
+  private async cleanupProblematicIndexes(): Promise<void> {
+    try {
+      const problematicIndexes = [
+        // Pas d'index problématique actuellement
+      ];
+      
+      for (const indexName of problematicIndexes) {
+        await this.dropIndexIfExists(indexName);
+      }
+    } catch (error) {
+      this.logger.error('Erreur lors du nettoyage des index:', error);
+    }
+  }
+  
+  /**
+   * Supprime un index s'il existe
+   */
+  private async dropIndexIfExists(indexName: string): Promise<void> {
+    try {
+      await this.dataSource.query(`DROP INDEX IF EXISTS "${indexName}"`);
+      this.logger.log(`Index ${indexName} supprimé s'il existait`);
+    } catch (error) {
+      this.logger.error(`Erreur lors de la suppression de l'index ${indexName}:`, error);
+    }
+  }
+  
+  /**
+   * Initialise les paramètres système par défaut
+   */
+  private async initializeSystemDefaults(): Promise<void> {
+    try {
+      // Vérifier si les enums existent et les créer si nécessaire
+      await this.ensureEnumsExist()
+      
+      // Créer les paramètres système par défaut
+      await this.createDefaultSystemParameters()
+      
+      this.logger.log('Paramètres système par défaut initialisés')
+    } catch (error) {
+      this.logger.error('Erreur lors de l\'initialisation des paramètres système:', error)
+      throw error
+    }
+  }
+  
+  /**
+   * S'assurer que tous les enums nécessaires existent
+   */
+  private async ensureEnumsExist(): Promise<void> {
+    try {
+      // Vérifier et créer l'enum notifications_type_enum
+      const notifTypeEnumExists = await this.dataSource.query(`
+        SELECT EXISTS (
+          SELECT 1 FROM pg_type WHERE typname = 'notifications_type_enum'
+        );
+      `)
+      
+      if (!notifTypeEnumExists[0]?.exists) {
+        await this.dataSource.query(`
+          CREATE TYPE notifications_type_enum AS ENUM ('info', 'warning', 'error', 'success');
+        `)
+        this.logger.log('Enum notifications_type_enum créé')
+      } else {
+        // Vérifier si 'info' existe dans l'enum
+        const enumValues = await this.dataSource.query(`
+          SELECT enumlabel 
+          FROM pg_enum 
+          WHERE enumtypid = (
+            SELECT oid 
+            FROM pg_type 
+            WHERE typname = 'notifications_type_enum'
+          )
+        `)
+        
+        const hasInfo = enumValues.some((row: any) => row.enumlabel === 'info')
+        if (!hasInfo) {
+          await this.dataSource.query(`ALTER TYPE notifications_type_enum ADD VALUE 'info'`)
+          this.logger.log('Valeur "info" ajoutée à l\'enum notifications_type_enum')
+        }
+      }
+    } catch (error) {
+      this.logger.error('Erreur lors de la vérification des enums:', error)
+      throw error
+    }
+  }
+  
+  /**
+   * Créer les paramètres système par défaut
+   */
+  private async createDefaultSystemParameters(): Promise<void> {
+    try {
+      // Vérifier si des paramètres système existent déjà
+      const existingParams = await this.dataSource.query(`
+        SELECT COUNT(*) as count FROM system_parameters
+      `)
+      
+      if (existingParams[0]?.count > 0) {
+        this.logger.log('Paramètres système déjà présents, pas d\'initialisation nécessaire')
+        return
+      }
+      
+      // Créer les paramètres système par défaut
+      const defaultParams = [
+        {
+          key: 'app_name',
+          value: 'TopSteel ERP',
+          description: 'Nom de l\'application',
+          type: 'string',
+          category: 'general'
+        },
+        {
+          key: 'app_version',
+          value: '1.0.0',
+          description: 'Version de l\'application',
+          type: 'string',
+          category: 'general'
+        },
+        {
+          key: 'maintenance_mode',
+          value: 'false',
+          description: 'Mode maintenance activé',
+          type: 'boolean',
+          category: 'system'
+        },
+        {
+          key: 'notifications_enabled',
+          value: 'true',
+          description: 'Notifications activées',
+          type: 'boolean',
+          category: 'notifications'
+        }
+      ]
+      
+      for (const param of defaultParams) {
+        await this.dataSource.query(`
+          INSERT INTO system_parameters (key, value, description, type, category, created_at, updated_at)
+          VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+        `, [param.key, param.value, param.description, param.type, param.category])
+      }
+      
+      this.logger.log('Paramètres système par défaut créés')
+    } catch (error) {
+      this.logger.error('Erreur lors de la création des paramètres système par défaut:', error)
+      throw error
     }
   }
 
@@ -247,37 +427,4 @@ export class DatabaseIntegrityService {
     }
   }
 
-  /**
-   * Exécute une migration spécifique
-   */
-  async runMigration(migrationName?: string): Promise<{ success: boolean; message: string; migrations?: string[] }> {
-    try {
-      // Récupérer les migrations en attente
-      const pendingMigrations = await this.dataSource.showMigrations()
-      
-      // showMigrations retourne boolean, pas un array
-      if (!pendingMigrations) {
-        return {
-          success: true,
-          message: 'Aucune migration en attente',
-          migrations: []
-        }
-      }
-
-      await this.dataSource.runMigrations()
-      
-      return {
-        success: true,
-        message: 'Migrations exécutées avec succès',
-        migrations: ['migrations exécutées']
-      }
-    } catch (error) {
-      this.logger.error('Erreur lors de l\'exécution des migrations:', error)
-      
-      return {
-        success: false,
-        message: 'Erreur lors de l\'exécution des migrations: ' + (error instanceof Error ? error.message : String(error))
-      }
-    }
-  }
 }

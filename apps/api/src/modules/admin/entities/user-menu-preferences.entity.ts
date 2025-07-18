@@ -1,14 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm'
 import { UserMenuItemPreference } from './user-menu-item-preference.entity'
 
-@Entity('user_menu_preferences')
-@Index(['userId'], { unique: true })
+@Entity('user_menu_preferences_admin')
 export class UserMenuPreferences {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
   @Column({ type: 'uuid', unique: true })
-  @Index()
+  @Index('user_menu_preferences_admin_userId_unique', { unique: true })
   userId!: string
 
   @Column({ type: 'uuid', nullable: true })

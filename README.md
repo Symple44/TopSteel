@@ -135,7 +135,7 @@ pnpm build --filter="!@erp/web" --filter="!@erp/api"
 #### **3. Configuration de la base de données**
 ```bash
 # Créer la base de données
-createdb erp_topsteel_dev
+createdb erp_topsteel
 
 # PostgreSQL sur Windows avec script automatique
 .\scripts\setup-postgres.ps1
@@ -252,7 +252,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=your_password
-DB_NAME=erp_topsteel_dev
+DB_NAME=erp_topsteel
 DB_SSL=false
 DB_MAX_CONNECTIONS=100
 
@@ -418,9 +418,9 @@ pnpm analyze
 ## 📚 Documentation
 
 ### **Liens utiles**
-- 📖 **Documentation complète** : [docs.topsteel.com](https://docs.topsteel.com)
-- 🔗 **API Reference** : [api.topsteel.com/docs](https://api.topsteel.com/docs)
-- 🎨 **Design System** : [storybook.topsteel.com](https://storybook.topsteel.com)
+- 📖 **Documentation complète** : [docs.topsteel.tech](https://docs.topsteel.tech)
+- 🔗 **API Reference** : [api.topsteel.tech/docs](https://api.topsteel.tech/docs)
+- 🎨 **Design System** : [storybook.topsteel.tech](https://storybook.topsteel.tech)
 - 🐛 **Rapporter un bug** : [GitHub Issues](https://github.com/YOUR_ORG/TopSteel/issues)
 
 ### **Guides techniques**
@@ -452,13 +452,13 @@ Merci aux équipes qui maintiennent les outils exceptionnels utilisés dans ce p
 ## 🆘 Support et aide
 
 ### **Support technique**
-- 📧 **Email** : support@topsteel.com
+- 📧 **Email** : support@topsteel.tech
 - 💬 **Teams** : Canal #dev-support
-- 🎫 **Tickets** : [Support Portal](https://support.topsteel.com)
+- 🎫 **Tickets** : [Support Portal](https://support.topsteel.tech)
 
 ### **Support urgence**
 - 🚨 **24/7** : +33 X XX XX XX XX
-- 📱 **On-call** : equipe-urgence@topsteel.com
+- 📱 **On-call** : equipe-urgence@topsteel.tech
 
 ---
 

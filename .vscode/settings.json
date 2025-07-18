@@ -23,5 +23,16 @@
     "**/.turbo": true,
     "**/dist": true,
     "**/.next": true
-  }
+  },
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "postgres",
+      "database": "erp_topsteel",
+      "username": "postgres"
+    }
+  ]
 }

@@ -91,6 +91,15 @@ export class UsersService {
     return this.repository.findOne({ where: { email } })
   }
 
+  async findByEmailOrAcronym(identifier: string): Promise<User | null> {
+    return this.repository.findOne({ 
+      where: [
+        { email: identifier },
+        { acronyme: identifier }
+      ]
+    })
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id)
 

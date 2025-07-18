@@ -5,7 +5,7 @@
  * Fichier: apps/web/src/stores/auth.store.ts
  */
 
-import type { BaseStoreActions, BaseStoreState, InitialState, StoreCreator } from '@erp/types' // ✅ IMPORT CORRECT depuis @erp/types au lieu de @/lib/store-utils
+import type { BaseStoreActions, BaseStoreState, InitialState, StoreCreator } from '@erp/types'; // ✅ IMPORT CORRECT depuis @erp/types au lieu de @/lib/store-utils
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
@@ -141,7 +141,7 @@ const initialAuthState: InitialState<AuthState> = {
 const MOCK_USERS = [
   {
     email: 'admin@topsteel.fr',
-    password: 'admin123',
+    password: 'TopSteel44!',
     user: {
       id: 'usr_001',
       nom: 'Admin',

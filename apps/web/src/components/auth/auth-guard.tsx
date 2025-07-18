@@ -20,7 +20,10 @@ export function AuthGuard({
   const router = useRouter()
 
   useEffect(() => {
+    console.log('🛡️ AuthGuard state:', { isLoading, isAuthenticated, user: user?.email })
+    
     if (!isLoading && !isAuthenticated) {
+      console.log('🔄 Redirecting to login - not authenticated')
       // Rediriger vers la page de login si non authentifié
       router.replace(fallbackUrl)
       return

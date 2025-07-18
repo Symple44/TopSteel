@@ -15,17 +15,17 @@ export enum DevisStatut {
 
 @Entity('devis')
 export class Devis extends BaseAuditEntity {
-  @Column({ unique: true, length: 50 })
+  @Column({ type: 'varchar', unique: true, length: 50 })
   reference!: string
 
-  @Column()
+  @Column({ type: 'uuid' })
   clientId!: string
 
   @ManyToOne(() => Clients)
   @JoinColumn({ name: 'clientId' })
   client!: Clients
 
-  @Column({ nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   projetId?: string
 
   @ManyToOne(() => Projet, { nullable: true })
@@ -81,10 +81,10 @@ export class Devis extends BaseAuditEntity {
   @Column('decimal', { precision: 5, scale: 2, default: 0 })
   tauxMarge!: number
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   fichierPDF?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   commercialId?: string
 
   @Column({ type: 'jsonb', nullable: true })
@@ -102,7 +102,7 @@ export class Devis extends BaseAuditEntity {
   )
   lignes!: LigneDevis[]
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   @Index()
   actif!: boolean
 }

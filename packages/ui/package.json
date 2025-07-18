@@ -9,7 +9,7 @@
   },
   "funding": {
     "type": "corporate",
-    "url": "https://topsteel.com"
+    "url": "https://topsteel.tech"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",
@@ -57,7 +57,7 @@
   },
   "author": {
     "name": "TopSteel Engineering Team",
-    "email": "engineering@topsteel.com"
+    "email": "engineering@topsteel.tech"
   },
   "browserslist": ["> 1%", "last 2 versions", "not dead", "not ie 11"],
   "bugs": {

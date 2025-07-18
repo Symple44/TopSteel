@@ -1,21 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { menuStorage } from '@/lib/menu-storage'
+import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = 'current-user' // Dans un vrai système, récupérer depuis l'auth
+    const cookieStore = await cookies()
+    const token = cookieStore.get('accessToken')?.value
     
-    // Réinitialiser toutes les données utilisateur
-    menuStorage.resetUser(userId)
+    if (!token) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Non autorisé'
+        },
+        { status: 401 }
+      )
+    }
     
-    // Récupérer les nouvelles préférences par défaut
-    const resetPreferences = menuStorage.getUserPreferences(userId)
-    
-    return NextResponse.json({
-      success: true,
-      data: resetPreferences,
-      message: 'Préférences réinitialisées'
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences/reset`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    
+    return NextResponse.json(data)
   } catch (error) {
     console.error('Erreur lors de la réinitialisation:', error)
     return NextResponse.json(

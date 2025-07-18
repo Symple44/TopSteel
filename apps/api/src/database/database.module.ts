@@ -2,9 +2,21 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { DatabaseCleanupService } from './database-cleanup.service'
+import { DatabaseSyncService } from './database-sync.service'
+import { DatabasePreSyncService } from './database-pre-sync.service'
 
 // Import explicite de TOUTES les entités pour debugging
+// Entités admin (entitites)
 import { SystemSetting } from '../modules/admin/entitites/system-setting.entity'
+import { SystemParameter } from '../modules/admin/entitites/system-parameter.entity'
+// Entités admin (entities)
+import { MenuConfiguration } from '../modules/admin/entities/menu-configuration.entity'
+import { MenuItem } from '../modules/admin/entities/menu-item.entity'
+import { MenuItemPermission } from '../modules/admin/entities/menu-item-permission.entity'
+import { MenuItemRole } from '../modules/admin/entities/menu-item-role.entity'
+import { UserMenuPreferences } from '../modules/admin/entities/user-menu-preferences.entity'
+import { UserMenuItemPreference } from '../modules/admin/entities/user-menu-item-preference.entity'
 import { Clients } from '../modules/clients/entities/clients.entity'
 import { Commande } from '../modules/commandes/entities/commande.entity'
 import { Devis } from '../modules/devis/entities/devis.entity'
@@ -39,7 +51,7 @@ import { UserMenuPreference } from '../modules/menu/entities/user-menu-preferenc
         const username = configService.get<string>('DB_USERNAME') || 'postgres'
         const password = configService.get<string>('DB_PASSWORD') || 'postgres'
         const database = configService.get<string>('DB_NAME') || 'erp_topsteel'
-        const synchronize = false // Désactivé temporairement pour éviter les conflits d'enum
+        const synchronize = true // Activé pour créer les tables automatiquement
         const logging = configService.get<boolean>('DB_LOGGING') || false
         const ssl = configService.get<boolean>('DB_SSL')
 
@@ -54,10 +66,19 @@ import { UserMenuPreference } from '../modules/menu/entities/user-menu-preferenc
 
         // TOUTES les entités du système
         const entities = [
+          // Entités admin
+          SystemSetting,
+          SystemParameter,
+          MenuConfiguration,
+          MenuItem,
+          MenuItemPermission,
+          MenuItemRole,
+          UserMenuPreferences,
+          UserMenuItemPreference,
+          
           // Entités principales avec UUID (BaseAuditEntity)
           User,
           UserMenuPreference,
-          SystemSetting,
           Clients,
           Fournisseur,
           Machine,
@@ -97,11 +118,22 @@ import { UserMenuPreference } from '../modules/menu/entities/user-menu-preferenc
           password,
           database,
           entities,
-          synchronize,
+          synchronize: false, // Désactivé - géré par DatabaseSyncService
           logging,
           ssl: false, // Désactivé pour le développement local
+          // Configuration pour la production
+          dropSchema: false, // Ne jamais drop le schéma automatiquement
+          migrationsRun: false,
+          migrations: [],
+          // Options de connexion
+          connectTimeoutMS: 30000,
+          maxQueryExecutionTime: 10000,
+          // Pool de connexions
+          poolSize: 10,
           extra: {
-            // Options supplémentaires pour PostgreSQL local
+            max: 10,
+            connectionTimeoutMillis: 30000,
+            idleTimeoutMillis: 30000,
             sslmode: 'disable',
           },
         }
@@ -109,5 +141,7 @@ import { UserMenuPreference } from '../modules/menu/entities/user-menu-preferenc
       inject: [ConfigService],
     }),
   ],
+  providers: [DatabaseCleanupService, DatabaseSyncService, DatabasePreSyncService],
+  exports: [DatabaseCleanupService, DatabaseSyncService, DatabasePreSyncService],
 })
 export class DatabaseModule {}

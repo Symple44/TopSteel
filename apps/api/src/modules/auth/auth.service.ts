@@ -22,8 +22,8 @@ export class AuthService {
     private readonly configService: ConfigService
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email)
+  async validateUser(emailOrAcronym: string, password: string): Promise<any> {
+    const user = await this.usersService.findByEmailOrAcronym(emailOrAcronym)
     if (!user) {
       throw new UnauthorizedException('Invalid credentials')
     }
@@ -53,8 +53,9 @@ export class AuthService {
 
     return {
       user,
-      access_token: accessToken,
-      refresh_token: refreshToken,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      expiresIn: 24 * 60 * 60, // 24 heures en secondes
     }
   }
 
@@ -105,8 +106,9 @@ export class AuthService {
       await this.usersService.updateRefreshToken(user.id, newRefreshToken)
 
       return {
-        access_token: newAccessToken,
-        refresh_token: newRefreshToken,
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+        expiresIn: 24 * 60 * 60, // 24 heures en secondes
       }
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token')

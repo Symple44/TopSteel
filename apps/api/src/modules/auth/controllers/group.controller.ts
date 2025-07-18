@@ -4,7 +4,7 @@ import { RolesGuard } from '../guards/roles.guard'
 import { Roles } from '../decorators/roles.decorator'
 import { GroupService, CreateGroupDto, UpdateGroupDto } from '../services/group.service'
 
-@Controller('api/admin/groups')
+@Controller('admin/groups')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}

@@ -39,35 +39,6 @@ interface AuthState {
   isAuthenticated: boolean
 }
 
-// Données mock pour le développement
-const mockUser: User = {
-  id: '1',
-  nom: 'Dubois',
-  prenom: 'Jean',
-  email: 'jean.dubois@topsteel.com',
-  role: 'admin',
-  avatar: '/images/avatars/default.png',
-  permissions: ['read', 'write', 'admin'],
-  profile: {
-    acronyme: 'JDO',
-    prenom: 'Jean',
-    nom: 'Dubois',
-    telephone: '+33 1 23 45 67 89',
-    poste: 'Directeur technique',
-    departement: 'Production',
-    adresse: '123 Rue de l\'Industrie',
-    ville: 'Lyon',
-    codePostal: '69000',
-    pays: 'France',
-  },
-}
-
-const mockTokens: Tokens = {
-  accessToken: `mock-access-token-${Date.now()}`,
-  refreshToken: `mock-refresh-token-${Date.now()}`,
-  expiresIn: 3600,
-  tokenType: 'Bearer',
-}
 
 // Stockage local sécurisé
 const AUTH_STORAGE_KEY = 'topsteel-auth'
@@ -103,6 +74,47 @@ const storage = {
   },
 }
 
+// Utilitaires de gestion des cookies
+const cookieUtils = {
+  set: (name: string, value: string, days?: number) => {
+    if (typeof document === 'undefined') return
+    try {
+      let expires = ''
+      if (days) {
+        const date = new Date()
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000))
+        expires = '; expires=' + date.toUTCString()
+      }
+      document.cookie = `${name}=${value}${expires}; path=/; secure; samesite=lax`
+    } catch (error) {
+      console.warn('Failed to set cookie:', error)
+    }
+  },
+  get: (name: string) => {
+    if (typeof document === 'undefined') return null
+    try {
+      const nameEQ = name + '='
+      const ca = document.cookie.split(';')
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i]
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length)
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length)
+      }
+      return null
+    } catch {
+      return null
+    }
+  },
+  remove: (name: string) => {
+    if (typeof document === 'undefined') return
+    try {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+    } catch (error) {
+      console.warn('Failed to remove cookie:', error)
+    }
+  },
+}
+
 export const useAuth = () => {
   // État principal
   const [authState, setAuthState] = useState<AuthState>({
@@ -114,14 +126,18 @@ export const useAuth = () => {
 
   // ✅ Validation des tokens - fonction stable avec useCallback
   const validateTokens = useCallback(async (tokens: Tokens): Promise<boolean> => {
-    // En mode développement, toujours valide
-    if (process.env.NODE_ENV === 'development') {
-      return true
-    }
-
     try {
-      const response = await fetch('/api/auth/validate', {
-        method: 'POST',
+      // Vérifier d'abord si le token n'est pas expiré localement
+      if (tokens.expiresIn) {
+        const tokenAge = Date.now() - (tokens.expiresIn * 1000)
+        if (tokenAge > 0) {
+          console.warn('Token expired locally')
+          return false
+        }
+      }
+
+      const response = await fetch('/api/auth/verify', {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `${tokens.tokenType || 'Bearer'} ${tokens.accessToken}`,
@@ -131,7 +147,6 @@ export const useAuth = () => {
       return response.ok
     } catch (error) {
       console.warn('Token validation failed:', error)
-
       return false
     }
   }, [])
@@ -141,50 +156,32 @@ export const useAuth = () => {
     setAuthState((prev) => ({ ...prev, isLoading: true }))
 
     try {
-      // En développement, utiliser les données mock
-      if (process.env.NODE_ENV === 'development') {
-        await new Promise((resolve) => setTimeout(resolve, 500)) // Simulation
-
-        // Vérifier si l'identifier correspond à l'email ou à l'acronyme
-        const isValidLogin = identifier === mockUser.email || 
-                           identifier === mockUser.profile?.acronyme
-
-        if (!isValidLogin) {
-          throw new Error('Email ou acronyme invalide')
-        }
-
-        const userData = { ...mockUser }
-        const tokenData = mockTokens
-
-        storage.set(AUTH_STORAGE_KEY, userData)
-        storage.set(TOKEN_STORAGE_KEY, tokenData)
-
-        setAuthState({
-          user: userData,
-          tokens: tokenData,
-          isLoading: false,
-          isAuthenticated: true,
-        })
-
-        return
-      }
-
-      // Production - appel API réel
+      // Appel API réel
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ email: identifier, password }),
       })
 
       if (!response.ok) {
-        throw new Error(`Login failed: ${response.status}`)
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || 'Email ou mot de passe incorrect')
       }
 
-      const { user, accessToken, refreshToken, expiresIn } = await response.json()
+      const responseData = await response.json()
+      console.log('🔐 API Response:', responseData)
+      
+      const { user, accessToken, refreshToken, expiresIn } = responseData.data
       const tokens: Tokens = { accessToken, refreshToken, expiresIn, tokenType: 'Bearer' }
 
+      // Stocker dans localStorage et cookies
       storage.set(AUTH_STORAGE_KEY, user)
       storage.set(TOKEN_STORAGE_KEY, tokens)
+      
+      // Stocker le token dans les cookies pour les API routes
+      const expirationDays = rememberMe ? 30 : 1 // 30 jours si "Se souvenir", sinon 1 jour
+      cookieUtils.set('accessToken', accessToken, expirationDays)
+      cookieUtils.set('refreshToken', refreshToken, expirationDays)
 
       setAuthState({
         user,
@@ -192,6 +189,8 @@ export const useAuth = () => {
         isLoading: false,
         isAuthenticated: true,
       })
+      
+      console.log('🔐 Auth state updated:', { user, isAuthenticated: true })
     } catch (error) {
       setAuthState((prev) => ({ ...prev, isLoading: false }))
       throw error
@@ -204,20 +203,23 @@ export const useAuth = () => {
 
     try {
       // Appel API pour invalider les tokens côté serveur
-      if (authState.tokens?.accessToken && process.env.NODE_ENV === 'production') {
+      const currentTokens = authState.tokens
+      if (currentTokens?.accessToken) {
         await fetch('/api/auth/logout', {
           method: 'POST',
           headers: {
-            Authorization: `${authState.tokens.tokenType} ${authState.tokens.accessToken}`,
+            Authorization: `${currentTokens.tokenType || 'Bearer'} ${currentTokens.accessToken}`,
           },
         })
       }
     } catch (error) {
       console.warn('Logout API error:', error)
     } finally {
-      // Nettoyer le stockage local
+      // Nettoyer le stockage local et les cookies
       storage.remove(AUTH_STORAGE_KEY)
       storage.remove(TOKEN_STORAGE_KEY)
+      cookieUtils.remove('accessToken')
+      cookieUtils.remove('refreshToken')
 
       setAuthState({
         user: null,
@@ -226,7 +228,7 @@ export const useAuth = () => {
         isAuthenticated: false,
       })
     }
-  }, [authState.tokens])
+  }, [])
 
   // ✅ Mise à jour utilisateur - stable avec useCallback
   const setUser = useCallback((user: User | null) => {
@@ -249,40 +251,20 @@ export const useAuth = () => {
 
   // ✅ Rafraîchir les tokens - stable avec useCallback
   const refreshTokens = useCallback(async (): Promise<void> => {
-    if (!authState.tokens?.refreshToken) {
+    const currentTokens = authState.tokens
+    if (!currentTokens?.refreshToken) {
       throw new Error('No refresh token available')
     }
 
     try {
-      // En développement, simuler le refresh avec de nouveaux tokens mock
-      if (process.env.NODE_ENV === 'development') {
-        await new Promise((resolve) => setTimeout(resolve, 200)) // Simulation
-
-        const newTokens: Tokens = {
-          accessToken: `mock-access-token-${Date.now()}`,
-          refreshToken: `mock-refresh-token-${Date.now()}`,
-          expiresIn: 3600,
-          tokenType: 'Bearer',
-        }
-
-        storage.set(TOKEN_STORAGE_KEY, newTokens)
-
-        setAuthState((prev) => ({
-          ...prev,
-          tokens: newTokens,
-        }))
-
-        return
-      }
-
-      // Production - appel API réel
+      // Appel API réel
       const response = await fetch('/api/auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          refreshToken: authState.tokens.refreshToken,
+          refreshToken: currentTokens.refreshToken,
         }),
       })
 
@@ -290,7 +272,8 @@ export const useAuth = () => {
         throw new Error('Token refresh failed')
       }
 
-      const { accessToken, refreshToken, expiresIn } = await response.json()
+      const responseData = await response.json()
+      const { accessToken, refreshToken, expiresIn } = responseData.data
       const newTokens: Tokens = {
         accessToken,
         refreshToken,
@@ -298,7 +281,10 @@ export const useAuth = () => {
         tokenType: 'Bearer',
       }
 
+      // Mettre à jour localStorage et cookies
       storage.set(TOKEN_STORAGE_KEY, newTokens)
+      cookieUtils.set('accessToken', accessToken, 1) // 1 jour par défaut
+      cookieUtils.set('refreshToken', refreshToken, 1)
 
       setAuthState((prev) => ({
         ...prev,
@@ -306,10 +292,20 @@ export const useAuth = () => {
       }))
     } catch (error) {
       console.error('Token refresh failed:', error)
-      await logout()
+      // Nettoyer le stockage local et cookies
+      storage.remove(AUTH_STORAGE_KEY)
+      storage.remove(TOKEN_STORAGE_KEY)
+      cookieUtils.remove('accessToken')
+      cookieUtils.remove('refreshToken')
+      setAuthState({
+        user: null,
+        tokens: null,
+        isLoading: false,
+        isAuthenticated: false,
+      })
       throw error
     }
-  }, [authState.tokens, logout])
+  }, [])
 
   // ✅ Initialisation depuis le stockage local - EXÉCUTION UNIQUE
   useEffect(() => {
@@ -317,47 +313,67 @@ export const useAuth = () => {
       try {
         const storedUser = storage.get(AUTH_STORAGE_KEY)
         const storedTokens = storage.get(TOKEN_STORAGE_KEY)
+        
+        // Vérifier aussi les cookies
+        const cookieToken = cookieUtils.get('accessToken')
+        const cookieRefreshToken = cookieUtils.get('refreshToken')
 
         if (storedUser && storedTokens) {
-          // Vérifier la validité des tokens
-          const isTokenValid = await validateTokens(storedTokens)
-
-          if (isTokenValid) {
-            setAuthState({
-              user: storedUser,
-              tokens: storedTokens,
-              isLoading: false,
-              isAuthenticated: true,
-            })
-          } else {
-            // Tokens invalides, nettoyer le stockage
-            storage.remove(AUTH_STORAGE_KEY)
-            storage.remove(TOKEN_STORAGE_KEY)
-            setAuthState({
-              user: null,
-              tokens: null,
-              isLoading: false,
-              isAuthenticated: false,
-            })
+          console.log('🔐 Found stored auth data, restoring session...')
+          
+          // S'assurer que les cookies sont synchronisés
+          if (cookieToken !== storedTokens.accessToken) {
+            console.log('🔐 Synchronizing cookies with localStorage...')
+            cookieUtils.set('accessToken', storedTokens.accessToken, 1)
+            if (storedTokens.refreshToken) {
+              cookieUtils.set('refreshToken', storedTokens.refreshToken, 1)
+            }
           }
-        } else {
-          setAuthState((prev) => ({
-            ...prev,
+          
+          setAuthState({
+            user: storedUser,
+            tokens: storedTokens,
             isLoading: false,
-            isAuthenticated: false,
+            isAuthenticated: true,
+          })
+        } else if (cookieToken && cookieRefreshToken) {
+          console.log('🔐 Found cookies, restoring minimal session...')
+          
+          // Si on a des cookies mais pas de localStorage, créer une session minimale
+          const tokensFromCookies: Tokens = {
+            accessToken: cookieToken,
+            refreshToken: cookieRefreshToken,
+            tokenType: 'Bearer',
+          }
+          
+          setAuthState({
+            user: null, // L'utilisateur sera récupéré au prochain appel API
+            tokens: tokensFromCookies,
+            isLoading: false,
+            isAuthenticated: true,
+          })
+        } else {
+          console.log('🔐 No stored auth data found')
+          setAuthState({
             user: null,
             tokens: null,
-          }))
+            isLoading: false,
+            isAuthenticated: false,
+          })
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
-        setAuthState((prev) => ({
-          ...prev,
-          isLoading: false,
-          isAuthenticated: false,
+        // En cas d'erreur, nettoyer le stockage et considérer comme non authentifié
+        storage.remove(AUTH_STORAGE_KEY)
+        storage.remove(TOKEN_STORAGE_KEY)
+        cookieUtils.remove('accessToken')
+        cookieUtils.remove('refreshToken')
+        setAuthState({
           user: null,
           tokens: null,
-        }))
+          isLoading: false,
+          isAuthenticated: false,
+        })
       }
     }
 

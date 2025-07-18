@@ -32,7 +32,7 @@ export class Operation {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   nom!: string
 
   @Column({ type: 'text', nullable: true })
@@ -52,7 +52,7 @@ export class Operation {
   })
   statut!: OperationStatut
 
-  @Column({ name: 'ordre_fabrication_id' })
+  @Column({ type: 'int', name: 'ordre_fabrication_id' })
   ordreFabricationId!: number
 
   @ManyToOne(
@@ -72,10 +72,10 @@ export class Operation {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   dureeReelle?: number
 
-  @Column({ name: 'machine_id', nullable: true })
+  @Column({ type: 'int', name: 'machine_id', nullable: true })
   machineId?: number
 
-  @Column({ name: 'technicien_id', nullable: true })
+  @Column({ type: 'int', name: 'technicien_id', nullable: true })
   technicienId?: number
 
   @Column({ type: 'timestamp', name: 'date_debut', nullable: true })

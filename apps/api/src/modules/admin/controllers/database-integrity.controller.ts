@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'
 import { DatabaseIntegrityService, DatabaseIntegrityReport } from '../services/database-integrity.service'
 import { DatabaseBackupService } from '../services/database-backup.service'
 import { DatabaseStatsService } from '../services/database-stats.service'
+import { DatabaseEnumFixService } from '../services/database-enum-fix.service'
 
 @ApiTags('Database Management')
 @Controller('admin/database')
@@ -13,7 +14,8 @@ export class DatabaseIntegrityController {
   constructor(
     private readonly databaseIntegrityService: DatabaseIntegrityService,
     private readonly databaseBackupService: DatabaseBackupService,
-    private readonly databaseStatsService: DatabaseStatsService
+    private readonly databaseStatsService: DatabaseStatsService,
+    private readonly databaseEnumFixService: DatabaseEnumFixService
   ) {}
 
   @Get('integrity-report')
@@ -44,13 +46,6 @@ export class DatabaseIntegrityController {
   @ApiResponse({ status: 200, description: 'Synchronisation réussie' })
   async synchronizeDatabase(): Promise<{ success: boolean; message: string; details?: any }> {
     return await this.databaseIntegrityService.synchronizeDatabase()
-  }
-
-  @Post('run-migrations')
-  @ApiOperation({ summary: 'Exécuter les migrations en attente' })
-  @ApiResponse({ status: 200, description: 'Migrations exécutées' })
-  async runMigrations(): Promise<{ success: boolean; message: string; migrations?: string[] }> {
-    return await this.databaseIntegrityService.runMigration()
   }
 
   @Get('tables')
@@ -118,5 +113,11 @@ export class DatabaseIntegrityController {
   @ApiOperation({ summary: 'Télécharger une sauvegarde' })
   async downloadBackup(@Param('id') backupId: string): Promise<any> {
     return await this.databaseBackupService.downloadBackup(backupId)
+  }
+
+  @Post('fix-enum')
+  @ApiOperation({ summary: 'Corriger l\'enum notifications_type_enum' })
+  async fixNotificationTypeEnum(): Promise<{ success: boolean; message: string; data?: any }> {
+    return await this.databaseEnumFixService.fixNotificationTypeEnum()
   }
 }

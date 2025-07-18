@@ -11,6 +11,7 @@ import { MenuItemPermission } from './entities/menu-item-permission.entity'
 import { MenuItemRole } from './entities/menu-item-role.entity'
 import { UserMenuPreferences } from './entities/user-menu-preferences.entity'
 import { UserMenuItemPreference } from './entities/user-menu-item-preference.entity'
+import { DiscoveredPage } from '../menu/entities/discovered-page.entity'
 
 // Services
 import { SystemParametersService } from './system-parameters.service'
@@ -19,11 +20,14 @@ import { UserMenuPreferencesService } from './services/user-menu-preferences.ser
 import { DatabaseIntegrityService } from './services/database-integrity.service'
 import { DatabaseBackupService } from './services/database-backup.service'
 import { DatabaseStatsService } from './services/database-stats.service'
+import { DatabaseEnumFixService } from './services/database-enum-fix.service'
+import { PageSyncService } from '../menu/services/page-sync.service'
 
 // Controllers
 import { SystemParametersController } from './system-parameters.controller'
 import { DatabaseIntegrityController } from './controllers/database-integrity.controller'
 import { MenuConfigurationController } from './controllers/menu-configuration.controller'
+import { PageSyncController } from './controllers/page-sync.controller'
 
 @Module({
   imports: [
@@ -34,13 +38,15 @@ import { MenuConfigurationController } from './controllers/menu-configuration.co
       MenuItemPermission,
       MenuItemRole,
       UserMenuPreferences,
-      UserMenuItemPreference
+      UserMenuItemPreference,
+      DiscoveredPage
     ])
   ],
   controllers: [
     SystemParametersController,
     DatabaseIntegrityController,
-    MenuConfigurationController
+    MenuConfigurationController,
+    PageSyncController
   ],
   providers: [
     SystemParametersService,
@@ -48,7 +54,9 @@ import { MenuConfigurationController } from './controllers/menu-configuration.co
     UserMenuPreferencesService,
     DatabaseIntegrityService,
     DatabaseBackupService,
-    DatabaseStatsService
+    DatabaseStatsService,
+    DatabaseEnumFixService,
+    PageSyncService
   ],
   exports: [
     SystemParametersService,
@@ -57,6 +65,8 @@ import { MenuConfigurationController } from './controllers/menu-configuration.co
     DatabaseIntegrityService,
     DatabaseBackupService,
     DatabaseStatsService,
+    DatabaseEnumFixService,
+    PageSyncService,
     TypeOrmModule
   ],
 })

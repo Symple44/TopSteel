@@ -1,36 +1,41 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm'
 // Note: Import relatif pour éviter les problèmes de dépendances circulaires
 
 @Entity('user_menu_preferences')
+@Index(['userId', 'menuId'], { unique: true })
 export class UserMenuPreference {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column('uuid')
+  @Column('uuid', { name: 'user_id' })
   userId: string
 
   // Relation optionnelle pour éviter les problèmes de dépendance
   // @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  // @JoinColumn({ name: 'userId' })
+  // @JoinColumn({ name: 'user_id' })
   // user: User
 
-  @Column('jsonb', { default: [] })
-  selectedPages: string[]
+  @Column('varchar', { name: 'menu_id' })
+  menuId: string
 
-  @Column({ default: 'standard' })
-  menuMode: 'standard' | 'custom'
+  @Column('boolean', { name: 'is_visible', default: true })
+  isVisible: boolean
 
-  @Column('jsonb', { nullable: true })
-  pageCustomizations: Record<string, {
-    customTitle?: string
-    customIcon?: string
-    customColor?: string
-    customOrder?: number
-  }>
+  @Column('integer', { name: 'order', default: 0 })
+  order: number
 
-  @CreateDateColumn()
+  @Column('varchar', { name: 'custom_label', nullable: true })
+  customLabel: string
+
+  @Column('integer', { default: 1 })
+  version: number
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date
+
+  @Column('timestamp', { name: 'deleted_at', nullable: true })
+  deletedAt: Date
 }

@@ -36,6 +36,16 @@ const nextConfig = {
   // Transpile workspace packages for Next.js 15
   transpilePackages: ['@erp/ui', '@erp/utils', '@erp/types', '@erp/domains', '@erp/api-client'],
   
+  // API rewrites for development
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:3001/api/:path*',
+      },
+    ]
+  },
+  
   // Disable static generation to avoid context issues during build
   // output: 'standalone', // Disabled for Windows compatibility
   

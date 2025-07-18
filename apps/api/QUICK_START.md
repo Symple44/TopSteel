@@ -125,7 +125,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
-DB_NAME=erp_topsteel_dev
+DB_NAME=erp_topsteel
 
 # JWT
 JWT_SECRET=your-secret-here

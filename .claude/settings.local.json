@@ -95,7 +95,21 @@
       "Bash(del test-db-connection.js)",
       "Bash(del create-database.js)",
       "Bash(PORT=3003 timeout 8 node start.js hybrid)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(PORT=3001 npm run dev)",
+      "Bash(set NEXT_PUBLIC_API_URL=http://localhost:3002)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx tsx:*)",
+      "Bash(del force-clean.ts clean-and-sync.ts clean-db.sql manual-index-drop.sql)",
+      "Bash(set PGPASSWORD=postgres)",
+      "Bash(dropdb:*)",
+      "Bash(createdb:*)",
+      "Bash(NODE_ENV=development npm run start:dev)",
+      "Bash(npx typeorm migration:generate:*)",
+      "Bash(npx typeorm migration:run:*)",
+      "Bash(pkill:*)",
+      "Bash(tasklist)",
+      "Bash(PORT=3010 node dist/main.js)"
     ],
     "deny": []
   }

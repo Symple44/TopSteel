@@ -14,11 +14,12 @@ import { databaseConfig } from './config/database.config'
 import { jwtConfig } from './config/jwt.config'
 import { redisConfig } from './config/redis.config'
 // Modules système
-import { DatabaseModule } from './database/database.module'
+import { DatabaseProductionModule } from './database/database-production.module'
 import { HealthController } from './health/health.controller'
 import { IntegrityService } from './health/integrity.service'
 // Module d'authentification
 import { AuthModule } from './modules/auth/auth.module'
+import { RoleAuthModule } from './modules/auth/role-auth.module'
 // Module d'administration
 import { AdminModule } from './modules/admin/admin.module'
 // Modules métier harmonisés
@@ -41,6 +42,8 @@ import { TracabiliteModule } from './modules/tracabilite/tracabilite.module'
 import { UsersModule } from './modules/users/users.module'
 import { MenuModule } from './modules/menu/menu.module'
 import { RedisModule } from './redis/redis.module'
+// Service d'initialisation - remplacé par DatabaseStartupService dans DatabaseProductionModule
+// import { DatabaseInitService } from './services/database-init.service'
 
 @Module({
   imports: [
@@ -52,13 +55,14 @@ import { RedisModule } from './redis/redis.module'
     }),
 
     // Modules système
-    DatabaseModule,
+    DatabaseProductionModule,
     ScheduleModule.forRoot(),
     TerminusModule,
     RedisModule.forRoot(),
 
     // Authentification
     AuthModule,
+    RoleAuthModule,
 
     // Administration
     AdminModule,

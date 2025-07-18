@@ -4,10 +4,10 @@ import { User } from '../../users/entities/user.entity'
 
 @Entity('system_settings')
 export class SystemSetting extends BaseAuditEntity {
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   category!: string
 
-  @Column({ length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   key!: string
 
   @Column('jsonb')
@@ -16,7 +16,7 @@ export class SystemSetting extends BaseAuditEntity {
   @Column('text', { nullable: true })
   description?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   updatedBy?: string
 
   @ManyToOne(() => User, { nullable: true })

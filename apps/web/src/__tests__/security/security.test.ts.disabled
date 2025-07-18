@@ -33,7 +33,7 @@ describe('SecurityUtils', () => {
     })
 
     it('should accept valid business emails', () => {
-      const businessEmail = 'contact@topsteel.com'
+      const businessEmail = 'contact@topsteel.tech'
       const result = SecurityUtils.validateEmailStrict(businessEmail)
       
       expect(result).toBe(true)

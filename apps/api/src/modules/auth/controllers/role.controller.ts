@@ -19,7 +19,7 @@ import { RolesGuard } from '../guards/roles.guard'
 import { AccessLevel } from '../entities/permission.entity'
 
 @ApiTags('Roles')
-@Controller('api/admin/roles')
+@Controller('admin/roles')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}

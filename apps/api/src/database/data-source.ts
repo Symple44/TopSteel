@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
 import type { DataSourceOptions } from 'typeorm'
 import { DataSource } from 'typeorm'
+import { resolve } from 'path'
 
 config()
 
@@ -16,9 +17,18 @@ export const dataSourceOptions: DataSourceOptions = {
   username: configService.get('DB_USERNAME', 'postgres'),
   password: configService.get('DB_PASSWORD', 'postgres'),
   database: configService.get('DB_NAME', 'erp_topsteel'),
-  entities: ['src/**/*.entity{.ts,.js}'],
+  entities: [
+    isDevelopment 
+      ? 'src/**/*.entity{.ts,.js}' 
+      : 'dist/**/*.entity{.ts,.js}'
+  ],
   synchronize: isDevelopment && configService.get('USE_SYNC', 'false') === 'true',
-  migrations: ['src/database/migrations/*{.ts,.js}'],
+  migrations: [
+    isDevelopment 
+      ? 'src/database/migrations/*{.ts,.js}'
+      : 'dist/database/migrations/*{.ts,.js}'
+  ],
+  migrationsRun: false,
   logging: configService.get('NODE_ENV') === 'development',
   ssl:
     configService.get('DB_SSL') === 'true'

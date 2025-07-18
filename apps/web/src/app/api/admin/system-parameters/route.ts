@@ -60,11 +60,11 @@ const mockParameters: SystemParameter[] = [
   {
     id: '4',
     key: 'COMPANY_EMAIL',
-    value: 'contact@topsteel.com',
+    value: 'contact@topsteel.tech',
     type: 'STRING',
     category: 'GENERAL',
     description: 'Email de la société',
-    defaultValue: 'contact@topsteel.com',
+    defaultValue: 'contact@topsteel.tech',
     isEditable: true,
     isSecret: false,
     createdAt: new Date().toISOString(),

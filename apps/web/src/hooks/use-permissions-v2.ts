@@ -16,22 +16,22 @@ interface UserPermissions {
  * Hook pour gérer les permissions dynamiques basées sur les rôles
  */
 export function usePermissions() {
-  const { user } = useAuth()
+  const { user, tokens } = useAuth()
   const [userPermissions, setUserPermissions] = useState<UserPermissions | null>(null)
   const [loading, setLoading] = useState(true)
 
   // Charger les permissions utilisateur
   useEffect(() => {
-    if (user) {
+    if (user && tokens?.accessToken) {
       loadUserPermissions()
     } else {
       setUserPermissions(null)
       setLoading(false)
     }
-  }, [user])
+  }, [user, tokens?.accessToken])
 
   const loadUserPermissions = async () => {
-    if (!user) return
+    if (!user || !tokens?.accessToken) return
 
     try {
       // Utiliser le cache si disponible
@@ -49,14 +49,20 @@ export function usePermissions() {
       // Charger depuis l'API backend
       const response = await fetch(`/api/admin/roles/${user.role}/permissions`, {
         headers: {
-          'Authorization': `Bearer ${user.token || 'mock-token'}`,
+          'Authorization': `Bearer ${tokens.accessToken}`,
           'Content-Type': 'application/json'
         }
       })
+      
+      if (!response.ok) {
+        console.error('Permissions API error:', response.status, response.statusText)
+        return
+      }
+      
       const data = await response.json()
       
       if (data.success) {
-        const permissions = data.data.rolePermissions
+        const permissions = data.data.rolePermissions || data.data
         
         // Mettre en cache
         permissionsCache.set(user.id, permissions)

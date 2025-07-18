@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { SYSTEM_PERMISSIONS, SYSTEM_MODULES, AccessLevel } from '@/types/permissions'
-
-// Cette API utilise la même logique que l'API roles mais se concentre sur les permissions
 
 // GET - Récupérer les permissions d'un rôle
 export async function GET(
@@ -10,27 +7,38 @@ export async function GET(
 ) {
   try {
     const { id } = await params
+    const authHeader = request.headers.get('authorization')
     
-    // Récupérer les modules et permissions disponibles
-    const modules = SYSTEM_MODULES.map(module => ({
-      ...module,
-      permissions: SYSTEM_PERMISSIONS[module.id] || []
-    }))
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'No auth token' },
+        { status: 401 }
+      )
+    }
+
+    const token = authHeader.substring(7)
     
-    // Simuler les permissions actuelles du rôle
-    const rolePermissions = generateRolePermissions(id)
-    
-    return NextResponse.json({
-      success: true,
-      data: {
-        roleId: id,
-        modules,
-        rolePermissions
-      }
+    // Rediriger vers l'API backend
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const response = await fetch(`${apiUrl}/api/v1/admin/roles/${id}/permissions`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'API error' }))
+      return NextResponse.json(errorData, { status: response.status })
+    }
+
+    const data = await response.json()
+    return NextResponse.json(data)
   } catch (error) {
+    console.error('Admin roles permissions error:', error)
     return NextResponse.json(
-      { success: false, error: 'Erreur lors de la récupération des permissions' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

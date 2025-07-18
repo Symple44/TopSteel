@@ -4,7 +4,7 @@ import { Devis } from './devis.entity'
 
 @Entity('lignes_devis')
 export class LigneDevis extends BaseAuditEntity {
-  @Column()
+  @Column({ type: 'uuid' })
   devisId!: string
 
   @ManyToOne(
@@ -15,7 +15,7 @@ export class LigneDevis extends BaseAuditEntity {
   @JoinColumn({ name: 'devisId' })
   devis!: Devis
 
-  @Column({ length: 500 })
+  @Column({ type: 'varchar', length: 500 })
   designation!: string
 
   @Column('text', { nullable: true })
@@ -24,7 +24,7 @@ export class LigneDevis extends BaseAuditEntity {
   @Column('decimal', { precision: 8, scale: 2 })
   quantite!: number
 
-  @Column({ length: 10 })
+  @Column({ type: 'varchar', length: 10 })
   unite!: string
 
   @Column('decimal', { precision: 8, scale: 2 })
@@ -39,7 +39,7 @@ export class LigneDevis extends BaseAuditEntity {
   @Column('decimal', { precision: 10, scale: 2 })
   totalHT!: number
 
-  @Column({ nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   produitId?: string
 
   @Column({ type: 'integer' })

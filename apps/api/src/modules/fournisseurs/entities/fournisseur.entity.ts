@@ -4,23 +4,23 @@ import { BaseAuditEntity } from '../../../common/base/base.entity'
 
 @Entity('fournisseurs')
 export class Fournisseur extends BaseAuditEntity {
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   @Index()
   nom!: string
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true })
   email!: string
 
-  @Column({ length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   telephone?: string
 
   @Column({ type: 'text', nullable: true })
   adresse?: string
 
-  @Column({ length: 14, nullable: true })
+  @Column({ type: 'varchar', length: 14, nullable: true })
   siret?: string
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   @Index()
   actif!: boolean
 }

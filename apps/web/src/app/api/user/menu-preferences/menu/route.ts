@@ -1,41 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { menuStorage, allAvailablePages } from '@/lib/menu-storage'
+import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = 'current-user' // Dans un vrai système, récupérer depuis l'auth
-    const selectedPageIds = menuStorage.getSelectedPages(userId)
+    const cookieStore = await cookies()
+    const token = cookieStore.get('accessToken')?.value
     
-    // Filtrer les pages disponibles selon la sélection utilisateur
-    const customMenu = allAvailablePages
-      .filter(page => selectedPageIds.includes(page.id))
-      .map(page => ({
-        id: page.id,
-        title: page.title,
-        href: page.href,
-        icon: page.icon,
-        orderIndex: selectedPageIds.indexOf(page.id), // Ordre selon la sélection
-        isVisible: true,
-        children: [],
-        depth: 0
-      }))
-      .sort((a, b) => a.orderIndex - b.orderIndex) // Trier par ordre de sélection
+    if (!token) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Non autorisé'
+        },
+        { status: 401 }
+      )
+    }
     
-    return NextResponse.json({
-      success: true,
-      data: customMenu,
-      message: `Menu personnalisé chargé avec ${customMenu.length} pages`
-    })
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences/menu`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        return NextResponse.json(data)
+      } else {
+        console.log('Backend API erreur:', response.status, 'Utilisation des données mock')
+        throw new Error(`Backend API error: ${response.status}`)
+      }
+    } catch (backendError) {
+      console.log('Backend indisponible, utilisation des données mock pour le menu personnalisé')
+      
+      // Retourner des données mock pour le menu personnalisé
+      const mockMenuData = {
+        success: true,
+        data: {
+          customMenu: [],
+          preferences: {
+            showIcons: true,
+            compactMode: false,
+            grouping: 'category'
+          }
+        },
+        message: 'Menu personnalisé (données mock)'
+      }
+      
+      return NextResponse.json(mockMenuData)
+    }
   } catch (error) {
     console.error('Erreur lors du chargement du menu personnalisé:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Erreur lors du chargement du menu personnalisé',
-        error: error instanceof Error ? error.message : 'Erreur inconnue'
+    
+    // En cas d'erreur complète, retourner des données mock
+    const mockMenuData = {
+      success: true,
+      data: {
+        customMenu: [],
+        preferences: {
+          showIcons: true,
+          compactMode: false,
+          grouping: 'category'
+        }
       },
-      { status: 500 }
-    )
+      message: 'Menu personnalisé (données mock - erreur)'
+    }
+    
+    return NextResponse.json(mockMenuData)
   }
 }
 

@@ -341,7 +341,7 @@ jobs:
         id: deploy
         run: |
           echo "🚀 Deploying to staging environment..."
-          echo "url=https://staging.topsteel.com" >> $GITHUB_OUTPUT
+          echo "url=https://staging.topsteel.tech" >> $GITHUB_OUTPUT
           echo "✅ Staging deployment completed!"
 
       - name: 🔍 Post-deployment health check
@@ -373,7 +373,7 @@ jobs:
         id: deploy
         run: |
           echo "🚀 Deploying to production environment..."
-          echo "url=https://topsteel.com" >> $GITHUB_OUTPUT
+          echo "url=https://topsteel.tech" >> $GITHUB_OUTPUT
           echo "✅ Production deployment completed!"
 
       - name: 🔍 Post-deployment verification

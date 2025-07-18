@@ -5,16 +5,16 @@ export class Produit {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   nom!: string
 
-  @Column()
+  @Column({ type: 'varchar', length: 100 })
   reference!: string
 
   @Column('decimal', { precision: 10, scale: 2 })
   prix!: number
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   fournisseurPrincipal?: number
 
   @CreateDateColumn()

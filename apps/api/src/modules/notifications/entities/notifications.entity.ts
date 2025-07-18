@@ -36,7 +36,7 @@ export enum RecipientType {
 
 @Entity('notifications')
 export class Notifications extends BaseAuditEntity {
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   @Index()
   title!: string
 

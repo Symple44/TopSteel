@@ -5,13 +5,13 @@ export class Commande {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column()
+  @Column({ type: 'varchar', length: 100 })
   numero!: string
 
   @Column('decimal', { precision: 10, scale: 2 })
   montant!: number
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   fournisseur?: number
 
   @CreateDateColumn()

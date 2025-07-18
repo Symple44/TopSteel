@@ -195,7 +195,7 @@ Component stack:
 ${this.state.errorInfo?.componentStack || 'No component stack available'}
     `.trim()
 
-    const mailtoUrl = `mailto:support@topsteel.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    const mailtoUrl = `mailto:support@topsteel.tech?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 
     if (typeof window !== 'undefined') {
       window.location.href = mailtoUrl

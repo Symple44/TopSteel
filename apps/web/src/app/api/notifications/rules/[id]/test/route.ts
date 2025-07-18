@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
 // Service de test des règles (mockée)
 class RuleTestService {
@@ -353,7 +353,7 @@ export async function GET(
           email_id: 'email_789',
           from: 'client@important.com',
           from_name: 'Client Important',
-          to: 'contact@topsteel.com',
+          to: 'contact@topsteel.tech',
           subject: 'Urgent: Modification commande',
           body: 'Bonjour, nous devons modifier notre commande...',
           priority: 'HIGH',

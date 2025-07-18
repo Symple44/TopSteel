@@ -5,19 +5,19 @@ export class Document {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   nom!: string
 
-  @Column()
+  @Column({ type: 'varchar', length: 500 })
   chemin!: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   type?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'bigint', nullable: true })
   taille?: number
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   projet?: number
 
   @CreateDateColumn()

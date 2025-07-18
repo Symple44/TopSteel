@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
@@ -21,16 +22,17 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
+  @Index('users_email_unique')
   email!: string
 
-  @Column()
+  @Column({ type: 'varchar' })
   password!: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   nom?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   prenom?: string
 
   @Column({
@@ -40,22 +42,32 @@ export class User {
   })
   role!: UserRole
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   actif!: boolean
 
-  @Column({ nullable: true })
-  description?: string
+  @Column({ type: 'varchar', nullable: true })
+  @Index('UQ_users_acronyme', { unique: true })
+  acronyme?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
+  dernier_login?: Date
+
+  @Column({ type: 'integer', default: 1 })
+  version!: number
+
+  @Column({ type: 'timestamp', nullable: true })
+  deleted_at?: Date
+
+  @Column({ type: 'varchar', nullable: true })
   refreshToken?: string
 
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date
 
   @BeforeInsert()

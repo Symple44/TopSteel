@@ -14,7 +14,7 @@ import { Roles } from '../decorators/roles.decorator'
 import { RolesGuard } from '../guards/roles.guard'
 
 @ApiTags('Modules')
-@Controller('api/admin/modules')
+@Controller('admin/modules')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ModuleController {
   constructor(

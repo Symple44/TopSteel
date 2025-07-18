@@ -3,7 +3,7 @@ import { BaseAuditEntity } from '../../../common/base/base.entity'
 
 @Entity('materiaux')
 export class Materiaux extends BaseAuditEntity {
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   @Index()
   nom!: string
 
@@ -19,13 +19,13 @@ export class Materiaux extends BaseAuditEntity {
   @Column('decimal', { precision: 10, scale: 2, default: 0 })
   seuilAlerte?: number
 
-  @Column({ length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   emplacement?: string
 
   @Column({ type: 'date', nullable: true })
   dateLastInventaire?: Date
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   @Index()
   actif!: boolean
 

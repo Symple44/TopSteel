@@ -205,7 +205,7 @@ async function bootstrap() {
       `
       )
       .setVersion('2.0.0-beta')
-      .setContact('Équipe TopSteel', 'https://topsteel.com', 'support@topsteel.com')
+      .setContact('Équipe TopSteel', 'https://topsteel.tech', 'support@topsteel.tech')
       .addBearerAuth(
         {
           type: 'http',

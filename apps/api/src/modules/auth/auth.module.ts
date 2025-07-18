@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { RolesGuard } from './guards/roles.guard'
 import { JwtUtilsService } from './services/jwt-utils.service'
+import { SessionInvalidationService } from './services/session-invalidation.service'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { LocalStrategy } from './strategies/local.strategy'
 
@@ -38,11 +39,11 @@ import { LocalStrategy } from './strategies/local.strategy'
       },
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User]),
+    // TypeOrmModule.forFeature([User]), // Retiré car déjà déclaré dans UsersModule
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtUtilsService, RolesGuard],
-  exports: [AuthService, JwtUtilsService, RolesGuard],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtUtilsService, SessionInvalidationService, RolesGuard],
+  exports: [AuthService, JwtUtilsService, SessionInvalidationService, RolesGuard],
 })
 export class AuthModule {}

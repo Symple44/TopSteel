@@ -7,11 +7,17 @@ import { AuthService } from './auth.service'
 import { ChangePasswordDto } from './dto/change-password.dto'
 import { type LoginDto, RefreshTokenDto, type RegisterDto } from './dto/login.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
+import { Roles } from './decorators/roles.decorator'
+import { RolesGuard } from './guards/roles.guard'
+import { SessionInvalidationService } from './services/session-invalidation.service'
 
 @ApiTags('🔐 Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly sessionInvalidationService: SessionInvalidationService
+  ) {}
 
   @Public()
   @Post('login')
@@ -104,5 +110,23 @@ export class AuthController {
   })
   async verify(@CurrentUser() user: User) {
     return this.authService.getProfile(user.id)
+  }
+
+  @Post('admin/invalidate-all-sessions')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Invalider toutes les sessions',
+    description: 'Invalider toutes les sessions actives (réservé aux administrateurs)',
+  })
+  async invalidateAllSessions(@CurrentUser() user: User) {
+    const affectedUsers = await this.sessionInvalidationService.forceInvalidateAllSessions()
+    return { 
+      message: 'Toutes les sessions ont été invalidées',
+      affectedUsers,
+      invalidatedBy: user.email
+    }
   }
 }

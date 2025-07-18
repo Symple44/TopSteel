@@ -28,7 +28,7 @@ export class OrdreFabrication {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column({ unique: true, length: 50 })
+  @Column({ type: 'varchar', unique: true, length: 50 })
   numero!: string
 
   @Column({
@@ -38,7 +38,7 @@ export class OrdreFabrication {
   })
   statut!: OrdreFabricationStatut
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   projet?: number
 
   @Column({ type: 'text', nullable: true })

@@ -129,6 +129,10 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   
   // Convertir le menu dynamique au format NavItem
   const convertDynamicToNavItem = (items: any[]): NavItem[] => {
+    if (!Array.isArray(items)) {
+      console.warn('convertDynamicToNavItem: items is not an array:', items)
+      return []
+    }
     return items.map(item => {
       // Appliquer les préférences utilisateur si disponibles
       const displayTitle = item.userPreferences?.customTitle || 
@@ -156,7 +160,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   
   // Utiliser le menu dynamique si disponible, sinon le menu statique
   // En mode custom, utiliser le menu filtré même s'il est vide
-  const navigation = !loading && (filteredMenu.length > 0 || mode === 'custom')
+  const navigation = !loading && (Array.isArray(filteredMenu) && (filteredMenu.length > 0 || mode === 'custom'))
     ? convertDynamicToNavItem(filteredMenu)
     : staticNavigation
 

@@ -24,14 +24,14 @@ export enum OrigineType {
 
 @Entity('chutes')
 export class Chute extends BaseAuditEntity {
-  @Column()
+  @Column({ type: 'uuid' })
   materiauId!: string
 
   @ManyToOne(() => Materiaux)
   @JoinColumn({ name: 'materiauId' })
   materiau!: Materiaux
 
-  @Column({ length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   reference!: string
 
   @Column('decimal', { precision: 8, scale: 2, nullable: true })
@@ -56,7 +56,7 @@ export class Chute extends BaseAuditEntity {
   })
   qualite!: ChuteQualite
 
-  @Column({ length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   emplacement?: string
 
   @Column({
@@ -66,7 +66,7 @@ export class Chute extends BaseAuditEntity {
   })
   origineType?: OrigineType
 
-  @Column({ length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   origineReference?: string
 
   @Column('decimal', { precision: 8, scale: 2, nullable: true })

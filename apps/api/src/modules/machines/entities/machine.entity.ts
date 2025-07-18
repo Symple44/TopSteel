@@ -6,25 +6,25 @@ export class Machine {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   nom?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   typeMachine?: string // ← camelCase cohérent
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   marque?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   modele?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   puissance?: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   capaciteMax?: string // ← camelCase cohérent
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   statut?: string
 
   @Column({ type: 'date', nullable: true })
@@ -33,7 +33,7 @@ export class Machine {
   @Column({ type: 'date', nullable: true })
   prochaineMaintenance?: Date // ← Type Date cohérent
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   actif!: boolean
 
   @CreateDateColumn()
@@ -42,10 +42,10 @@ export class Machine {
   @UpdateDateColumn()
   updatedAt!: Date // ← camelCase cohérent
 
-  @Column({ nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   createdBy?: string // ← camelCase cohérent
 
-  @Column({ nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   updatedBy?: string // ← camelCase cohérent
 
   // Métadonnées pour l'audit

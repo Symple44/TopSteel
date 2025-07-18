@@ -22,7 +22,8 @@ export function useSelectedPages() {
       const data = await response.json()
       
       if (data.success) {
-        setSelectedPages(new Set(data.data))
+        const pages = Array.isArray(data.data) ? data.data : []
+        setSelectedPages(new Set(pages))
       } else {
         setError(data.message || 'Erreur inconnue')
       }

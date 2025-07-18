@@ -22,10 +22,10 @@ export class Projet {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   nom!: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   description?: string
 
   @Column({
@@ -38,16 +38,16 @@ export class Projet {
   @Column('decimal', { precision: 15, scale: 2, nullable: true })
   montantTotal?: number
 
-  @Column({ nullable: true })
+  @Column({ type: 'date', nullable: true })
   dateDebut?: Date
 
-  @Column({ nullable: true })
+  @Column({ type: 'date', nullable: true })
   dateFin?: Date
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   clientId?: number
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   responsableId?: number
 
   @CreateDateColumn()

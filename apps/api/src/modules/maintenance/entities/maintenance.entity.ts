@@ -3,14 +3,14 @@ import { BaseAuditEntity } from '../../../common/base/base.entity'
 
 @Entity('maintenances')
 export class Maintenance extends BaseAuditEntity {
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   @Index()
   nom!: string
 
   @Column({ type: 'text', nullable: true })
   description?: string
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   @Index()
   actif!: boolean
 
