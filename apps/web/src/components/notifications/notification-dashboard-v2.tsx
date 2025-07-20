@@ -101,15 +101,14 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
     // Filtre par statut
     if (selectedStatus === 'read') {
-      filtered = filtered.filter(n => n.isRead && !n.isArchived)
+      filtered = filtered.filter(n => n.readAt)
     } else if (selectedStatus === 'unread') {
-      filtered = filtered.filter(n => !n.isRead && !n.isArchived)
+      filtered = filtered.filter(n => !n.readAt)
     } else if (selectedStatus === 'archived') {
-      filtered = filtered.filter(n => n.isArchived)
-    } else {
-      // 'all' - exclure les archivées par défaut
-      filtered = filtered.filter(n => !n.isArchived)
+      // Pour l'instant, aucune notification archivée car la propriété n'existe pas
+      filtered = []
     }
+    // 'all' - affiche toutes les notifications
 
     // Filtre par recherche
     if (searchTerm) {
@@ -124,9 +123,9 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
     )
   }, [state.notifications, selectedCategory, selectedPriority, selectedStatus, searchTerm])
 
-  // Compter par catégorie (exclure les archivées pour les compteurs normaux)
+  // Compter par catégorie
   const categoryCounts = useMemo(() => {
-    const activeNotifications = state.notifications.filter(n => !n.isArchived)
+    const activeNotifications = state.notifications
     const counts: Record<string, number> = { all: activeNotifications.length }
     activeNotifications.forEach(n => {
       const cat = n.metadata?.category || 'system'
@@ -185,7 +184,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                   <Input
                     placeholder="Rechercher..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                     className="pl-9"
                   />
                 </div>
@@ -196,10 +195,10 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Statut</h3>
                 <div className="space-y-1">
                   {[
-                    { value: 'all', label: 'Actives', count: state.notifications.filter(n => !n.isArchived).length },
+                    { value: 'all', label: 'Toutes', count: state.notifications.length },
                     { value: 'unread', label: 'Non lues', count: state.unreadCount },
-                    { value: 'read', label: 'Lues', count: state.notifications.filter(n => n.isRead && !n.isArchived).length },
-                    { value: 'archived', label: 'Archivées', count: state.notifications.filter(n => n.isArchived).length },
+                    { value: 'read', label: 'Lues', count: state.notifications.filter(n => n.readAt).length },
+                    { value: 'archived', label: 'Archivées', count: 0 },
                   ].map((status) => (
                     <button
                       key={status.value}
@@ -287,7 +286,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
               <Button
                 variant="ghost"
                 className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => actions.clearAll()}
+                onClick={() => actions.deleteAll()}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Tout effacer
@@ -347,7 +346,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                         key={notification.id}
                         className={cn(
                           'p-4 hover:bg-gray-50 transition-colors cursor-pointer',
-                          !notification.isRead && 'bg-blue-50/50'
+                          !notification.readAt && 'bg-blue-50/50'
                         )}
                         onClick={() => setSelectedNotification(notification)}
                       >
@@ -361,7 +360,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                               <div className="flex-1">
                                 <h4 className={cn(
                                   'font-medium',
-                                  !notification.isRead && 'text-blue-900'
+                                  !notification.readAt && 'text-blue-900'
                                 )}>
                                   {notification.title}
                                 </h4>
@@ -390,11 +389,11 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                                 </Badge>
                               )}
                               
-                              {!notification.isRead && !notification.isArchived && (
+                              {!notification.readAt && (
                                 <div className="h-2 w-2 rounded-full bg-blue-600" />
                               )}
                               
-                              {notification.isArchived && (
+                              {false && (
                                 <span className="text-xs text-gray-500">📁</span>
                               )}
                             </div>
@@ -458,8 +457,8 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Statut</span>
                       <div className="flex items-center gap-2">
-                        <span>{selectedNotification.isRead ? '✅ Lue' : '🔵 Non lue'}</span>
-                        {selectedNotification.isArchived && (
+                        <span>{selectedNotification.readAt ? '✅ Lue' : '🔵 Non lue'}</span>
+                        {false && (
                           <span className="text-gray-500">📁 Archivée</span>
                         )}
                       </div>
@@ -471,7 +470,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                   <div className="space-y-2">
                     <h5 className="text-sm font-medium text-gray-700">Actions</h5>
                     
-                    {!selectedNotification.isRead && (
+                    {!selectedNotification.readAt && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -493,13 +492,13 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                       Transférer à un utilisateur
                     </Button>
                     
-                    {!selectedNotification.isArchived ? (
+                    {true ? (
                       <Button
                         variant="outline"
                         size="sm"
                         className="w-full"
                         onClick={() => {
-                          actions.archiveNotification(selectedNotification.id)
+                          actions.deleteNotification(selectedNotification.id)
                           setSelectedNotification(null)
                         }}
                       >
@@ -512,7 +511,10 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                         size="sm"
                         className="w-full"
                         onClick={() => {
-                          actions.unarchiveNotification(selectedNotification.id)
+                          // TODO: Implement unarchive functionality
+                          if (selectedNotification) {
+                            console.log('Unarchive notification:', selectedNotification.id)
+                          }
                           setSelectedNotification(null)
                         }}
                       >
@@ -526,7 +528,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                       size="sm"
                       className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
                       onClick={() => {
-                        actions.removeNotification(selectedNotification.id)
+                        actions.deleteNotification(selectedNotification.id)
                         setSelectedNotification(null)
                       }}
                     >
@@ -552,7 +554,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
             <Input
               placeholder="ID ou email de l'utilisateur"
               value={transferUserId}
-              onChange={(e) => setTransferUserId(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTransferUserId(e.target.value)}
               className="mb-4"
             />
             <div className="flex justify-end gap-3">

@@ -3,6 +3,7 @@
 import React from 'react'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { useTranslation } from '@/lib/i18n/hooks'
 import {
   Activity,
   AlertTriangle,
@@ -61,14 +62,15 @@ interface RecentActivity {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation('dashboard')
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [activities, setActivities] = useState<RecentActivity[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Simulation des données (à remplacer par les appels API)
+  // Data simulation (to be replaced by API calls)
   useEffect(() => {
     const fetchDashboardData = async () => {
-      // Simulation d'appel API
+      // API call simulation
       setTimeout(() => {
         setStats({
           projets: {
@@ -101,33 +103,33 @@ export default function Dashboard() {
           {
             id: '1',
             type: 'projet',
-            title: 'Nouveau projet créé',
+            title: t('newProjectCreated'),
             description: 'PRJ-2025-007 - Hangar agricole Dupont',
-            timestamp: 'Il y a 2 heures',
+            timestamp: t('hoursAgo', { hours: 2 }),
             status: 'success',
           },
           {
             id: '2',
             type: 'production',
-            title: 'Ordre de fabrication terminé',
+            title: t('productionOrderCompleted'),
             description: 'OF-2025-023 - Portail coulissant',
-            timestamp: 'Il y a 4 heures',
+            timestamp: t('hoursAgo', { hours: 4 }),
             status: 'success',
           },
           {
             id: '3',
             type: 'stock',
-            title: 'Stock faible détecté',
-            description: 'Profilé IPE 200 - 5 unités restantes',
-            timestamp: 'Il y a 6 heures',
+            title: t('lowStockDetected'),
+            description: `Profilé IPE 200 - ${t('remainingUnits', { units: 5 })}`,
+            timestamp: t('hoursAgo', { hours: 6 }),
             status: 'warning',
           },
           {
             id: '4',
             type: 'facture',
-            title: 'Facture impayée',
+            title: t('unpaidInvoice'),
             description: 'FACT-2024-156 - Client Martin (30j)',
-            timestamp: 'Il y a 1 jour',
+            timestamp: t('dayAgo', { days: 1 }),
             status: 'error',
           },
         ])
@@ -167,7 +169,7 @@ export default function Dashboard() {
         <div className="space-y-8 p-8">
           <div className="flex items-center justify-between">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-              Tableau de bord
+              {t('title')}
             </h1>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -199,9 +201,9 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-              Tableau de bord
+              {t('title')}
             </h1>
-            <p className="text-slate-600 mt-1">Vue d'ensemble de votre activité TopSteel</p>
+            <p className="text-slate-600 mt-1">{t('overview')}</p>
           </div>
           <div className="flex items-center space-x-3">
             <Button
@@ -210,11 +212,11 @@ export default function Dashboard() {
               className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white"
             >
               <CalendarIcon className="mr-2 h-4 w-4 text-slate-600" />
-              Cette semaine
+              {t('thisWeek')}
             </Button>
             <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
               <BarChart3 className="mr-2 h-4 w-4" />
-              Rapports
+              {t('reports')}
             </Button>
           </div>
         </div>
@@ -224,7 +226,7 @@ export default function Dashboard() {
           {/* Projets actifs */}
           <Card className="group border-0 bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-emerald-100">Projets actifs</CardTitle>
+              <CardTitle className="text-sm font-medium text-emerald-100">{t('activeProjects')}</CardTitle>
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <FolderOpen className="h-5 w-5 text-white" />
               </div>
@@ -235,12 +237,12 @@ export default function Dashboard() {
                 {stats.projets.enRetard > 0 ? (
                   <>
                     <AlertTriangle className="mr-1 h-3 w-3" />
-                    {stats.projets.enRetard} en retard
+                    {stats.projets.enRetard} {t('delayedProjects')}
                   </>
                 ) : (
                   <>
                     <Shield className="mr-1 h-3 w-3" />
-                    Aucun retard
+                    {t('noDelays')}
                   </>
                 )}
               </div>
@@ -250,7 +252,7 @@ export default function Dashboard() {
           {/* Chiffre d'affaires */}
           <Card className="group border-0 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-blue-100">CA mensuel</CardTitle>
+              <CardTitle className="text-sm font-medium text-blue-100">{t('monthlyRevenue')}</CardTitle>
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <Euro className="h-5 w-5 text-white" />
               </div>
@@ -261,7 +263,7 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center text-sm text-blue-100">
                 <TrendingUp className="mr-1 h-3 w-3 text-green-300" />
-                +12% vs mois dernier
+                {t('vsLastMonth')}
               </div>
             </CardContent>
           </Card>
@@ -269,7 +271,7 @@ export default function Dashboard() {
           {/* Production */}
           <Card className="group border-0 bg-gradient-to-br from-orange-500 to-red-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-orange-100">Taux occupation</CardTitle>
+              <CardTitle className="text-sm font-medium text-orange-100">{t('occupancyRate')}</CardTitle>
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <Factory className="h-5 w-5 text-white" />
               </div>
@@ -288,7 +290,7 @@ export default function Dashboard() {
           {/* Stocks */}
           <Card className="group border-0 bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-100">Alertes stock</CardTitle>
+              <CardTitle className="text-sm font-medium text-purple-100">{t('stockAlerts')}</CardTitle>
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <Package className="h-5 w-5 text-white" />
               </div>
@@ -297,7 +299,7 @@ export default function Dashboard() {
               <div className="text-3xl font-bold mb-1">{stats.stocks.alertes}</div>
               <div className="flex items-center text-sm text-purple-100">
                 <AlertTriangle className="mr-1 h-3 w-3 text-yellow-300" />
-                {stats.stocks.ruptures} ruptures
+                {stats.stocks.ruptures} {t('stockBreaks')}
               </div>
             </CardContent>
           </Card>
@@ -311,10 +313,10 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-xl font-semibold text-slate-800">
-                    Progression annuelle
+                    {t('annualProgress')}
                   </CardTitle>
                   <p className="text-slate-600 text-sm mt-1">
-                    Évolution du chiffre d'affaires 2025
+                    {t('revenueEvolution')}
                   </p>
                 </div>
                 <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
@@ -325,7 +327,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-700">Objectif 2025</span>
+                  <span className="font-medium text-slate-700">{t('objective2025')}</span>
                   <span className="text-slate-600">
                     {formatCurrency(stats.chiffreAffaires.objectif)}
                   </span>
@@ -338,7 +340,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-600">
-                    {formatCurrency(stats.chiffreAffaires.annuel)} réalisé
+                    {formatCurrency(stats.chiffreAffaires.annuel)} {t('achieved')}
                   </span>
                   <span className="font-medium text-slate-800">
                     {stats.chiffreAffaires.progression}%
@@ -372,9 +374,9 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-xl font-semibold text-slate-800">
-                    Activité récente
+                    {t('recentActivity')}
                   </CardTitle>
-                  <p className="text-slate-600 text-sm mt-1">Dernières actions</p>
+                  <p className="text-slate-600 text-sm mt-1">{t('lastActions')}</p>
                 </div>
                 <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
                   <Activity className="h-5 w-5 text-white" />
@@ -419,7 +421,7 @@ export default function Dashboard() {
                   size="sm"
                   className="w-full border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white group"
                 >
-                  Voir toute l'activité
+                  {t('viewAllActivity')}
                   <ArrowUpRight className="ml-2 h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Button>
               </div>
@@ -436,12 +438,12 @@ export default function Dashboard() {
                 <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg mr-3 group-hover:scale-110 transition-transform">
                   <FolderOpen className="h-5 w-5 text-white" />
                 </div>
-                Nouveau projet
+                {t('newProject')}
               </CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
               <p className="text-sm text-slate-600 group-hover:text-slate-700">
-                Créer un nouveau projet de métallerie
+                {t('createNewProject')}
               </p>
             </CardContent>
           </Card>
@@ -453,12 +455,12 @@ export default function Dashboard() {
                 <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg mr-3 group-hover:scale-110 transition-transform">
                   <Factory className="h-5 w-5 text-white" />
                 </div>
-                Ordre de fabrication
+                {t('productionOrder')}
               </CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
               <p className="text-sm text-slate-600 group-hover:text-slate-700">
-                Lancer un nouvel ordre de fabrication
+                {t('launchProductionOrder')}
               </p>
             </CardContent>
           </Card>
@@ -470,12 +472,12 @@ export default function Dashboard() {
                 <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg mr-3 group-hover:scale-110 transition-transform">
                   <Euro className="h-5 w-5 text-white" />
                 </div>
-                Nouveau devis
+                {t('newQuote')}
               </CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
               <p className="text-sm text-slate-600 group-hover:text-slate-700">
-                Créer un devis pour un client
+                {t('createQuoteForClient')}
               </p>
             </CardContent>
           </Card>

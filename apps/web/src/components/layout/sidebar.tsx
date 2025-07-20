@@ -46,7 +46,9 @@ import {
   ToggleRight,
   ListChecks,
   Palette,
-  Settings2
+  Settings2,
+  Monitor,
+  Languages
 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
@@ -97,7 +99,9 @@ const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
   Package,
   User,
-  Wrench
+  Wrench,
+  Monitor,
+  Languages
 }
 
 const getNavigation = (t: any): NavItem[] => [
@@ -113,6 +117,22 @@ const getNavigation = (t: any): NavItem[] => [
     icon: Shield,
     gradient: 'from-red-500 to-pink-600',
     roles: ['ADMIN'],
+    children: [
+      {
+        title: 'Sessions Utilisateurs',
+        href: '/admin/sessions',
+        icon: Monitor,
+        gradient: 'from-cyan-500 to-teal-600',
+        roles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        title: 'Gestion des Traductions',
+        href: '/admin/translations',
+        icon: Languages,
+        gradient: 'from-emerald-500 to-green-600',
+        roles: ['SUPER_ADMIN', 'ADMIN'],
+      }
+    ]
   },
 ]
 
@@ -120,7 +140,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { t } = useTranslation('navigation')
-  const [expandedItems, setExpandedItems] = useState<string[]>(['Administration'])
+  const [expandedItems, setExpandedItems] = useState<string[]>([t('administration')])
   
   // Hooks pour la gestion du menu
   const { filteredMenu, loading, error, currentMode, refreshMenu } = useDynamicMenu()

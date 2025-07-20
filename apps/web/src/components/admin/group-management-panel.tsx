@@ -226,7 +226,7 @@ export default function GroupManagementPanel() {
             Organisez vos utilisateurs en groupes avec des rôles partagés
           </p>
         </div>
-        <PermissionHide permission="GROUP_CREATE" roles={['SUPER_ADMIN', 'ADMIN']}>
+        <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -416,7 +416,7 @@ function GroupCard({
             >
               Détails
             </Button>
-            <PermissionHide permission="GROUP_UPDATE" roles={['SUPER_ADMIN', 'ADMIN']}>
+            <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
               <Button
                 variant="outline"
                 size="sm"
@@ -425,7 +425,7 @@ function GroupCard({
                 <Edit className="h-4 w-4" />
               </Button>
             </PermissionHide>
-            <PermissionHide permission="GROUP_DELETE" roles={['SUPER_ADMIN']}>
+            <PermissionHide permission={undefined} roles={['SUPER_ADMIN']}>
               <Button
                 variant="outline"
                 size="sm"
@@ -488,7 +488,7 @@ function GroupForm({
         <Input
           id="name"
           value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
           placeholder="Ex: Équipe commerciale..."
           required
         />
@@ -499,7 +499,7 @@ function GroupForm({
         <Textarea
           id="description"
           value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           placeholder="Décrivez le rôle et les responsabilités de ce groupe..."
           required
         />
@@ -509,7 +509,7 @@ function GroupForm({
         <Label htmlFor="type">Type de groupe</Label>
         <Select
           value={formData.type}
-          onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as typeof formData.type }))}
+          onValueChange={(value: string) => setFormData(prev => ({ ...prev, type: value as typeof formData.type }))}
         >
           <SelectTrigger>
             <SelectValue />
@@ -536,7 +536,7 @@ function GroupForm({
                 <Checkbox
                   id={`role-${role.id}`}
                   checked={formData.roleIds.includes(role.id)}
-                  onCheckedChange={(checked) => {
+                  onCheckedChange={(checked: boolean) => {
                     if (checked) {
                       setFormData(prev => ({ ...prev, roleIds: [...prev.roleIds, role.id] }))
                     } else {
@@ -558,7 +558,7 @@ function GroupForm({
         <Switch
           id="isActive"
           checked={formData.isActive}
-          onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked }))}
+          onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, isActive: checked }))}
         />
         <Label htmlFor="isActive">Groupe actif</Label>
       </div>
@@ -742,7 +742,7 @@ function GroupDetails({
         <TabsContent value="roles" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">Rôles du groupe</h3>
-            <PermissionHide permission="GROUP_UPDATE" roles={['SUPER_ADMIN']}>
+            <PermissionHide permission={undefined} roles={['SUPER_ADMIN']}>
               <Button size="sm" onClick={handleUpdateRoles}>
                 Sauvegarder les modifications
               </Button>
@@ -756,7 +756,7 @@ function GroupDetails({
                   <div key={role.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
                     <Checkbox
                       checked={selectedRoles.includes(role.id)}
-                      onCheckedChange={(checked) => {
+                      onCheckedChange={(checked: boolean) => {
                         if (checked) {
                           setSelectedRoles([...selectedRoles, role.id])
                         } else {

@@ -1,11 +1,11 @@
 import { Controller, Get } from '@nestjs/common'
 import { PageSyncService } from '../services/page-sync.service'
 
-@Controller('user/menu-preferences')
+@Controller('user/available-pages')
 export class AvailablePagesController {
   constructor(private readonly pageSyncService: PageSyncService) {}
 
-  @Get('available-pages')
+  @Get()
   async getAvailablePages() {
     try {
       // Synchroniser les pages d'abord

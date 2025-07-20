@@ -145,4 +145,37 @@ export class UserMenuPreferenceController {
       data: reset,
     }
   }
+
+  @Post('selected-pages')
+  @ApiOperation({ summary: 'Sauvegarder les pages sélectionnées' })
+  async saveSelectedPages(
+    @Request() req,
+    @Body() body: { selectedPages: string[] },
+  ): Promise<{ success: boolean; data: string[] }> {
+    const userId = req.user.id
+    const { selectedPages } = body
+    
+    // Mettre à jour la visibilité de toutes les pages
+    const preferences = await this.userMenuPreferenceService.findOrCreateByUserId(userId)
+    
+    for (const preference of preferences) {
+      const isSelected = selectedPages.includes(preference.menuId)
+      if (preference.isVisible !== isSelected) {
+        await this.userMenuPreferenceService.updateMenuVisibility(userId, preference.menuId, isSelected)
+      }
+    }
+    
+    // Pour les nouvelles pages qui n'ont pas encore de préférences
+    for (const pageId of selectedPages) {
+      const exists = preferences.some(p => p.menuId === pageId)
+      if (!exists) {
+        await this.userMenuPreferenceService.updateMenuVisibility(userId, pageId, true)
+      }
+    }
+    
+    return {
+      success: true,
+      data: selectedPages,
+    }
+  }
 }

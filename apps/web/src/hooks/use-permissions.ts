@@ -12,10 +12,21 @@ export type Permission =
   | 'NOTIFICATION_ADMIN' | 'NOTIFICATION_RULES' | 'NOTIFICATION_SETTINGS'
   | 'REPORT_VIEW' | 'REPORT_EXPORT'
 
-export type Role = 'ADMIN' | 'MANAGER' | 'COMMERCIAL' | 'TECHNICIEN' | 'OPERATEUR'
+export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'COMMERCIAL' | 'TECHNICIEN' | 'COMPTABLE' | 'OPERATEUR' | 'VIEWER'
 
 // Matrice des permissions par rôle
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
+  SUPER_ADMIN: [
+    'USER_VIEW', 'USER_CREATE', 'USER_UPDATE', 'USER_DELETE',
+    'CLIENT_VIEW', 'CLIENT_CREATE', 'CLIENT_UPDATE', 'CLIENT_DELETE',
+    'PROJECT_VIEW', 'PROJECT_CREATE', 'PROJECT_UPDATE', 'PROJECT_DELETE',
+    'BILLING_VIEW', 'BILLING_CREATE', 'BILLING_UPDATE', 'BILLING_DELETE',
+    'PRODUCTION_VIEW', 'PRODUCTION_CREATE', 'PRODUCTION_UPDATE', 'PRODUCTION_DELETE',
+    'STOCK_VIEW', 'STOCK_CREATE', 'STOCK_UPDATE', 'STOCK_DELETE',
+    'SYSTEM_ADMIN', 'SYSTEM_SETTINGS', 'SYSTEM_LOGS', 'SYSTEM_BACKUP',
+    'NOTIFICATION_ADMIN', 'NOTIFICATION_RULES', 'NOTIFICATION_SETTINGS',
+    'REPORT_VIEW', 'REPORT_EXPORT'
+  ],
   ADMIN: [
     'USER_VIEW', 'USER_CREATE', 'USER_UPDATE', 'USER_DELETE',
     'CLIENT_VIEW', 'CLIENT_CREATE', 'CLIENT_UPDATE', 'CLIENT_DELETE',
@@ -55,12 +66,30 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'STOCK_VIEW', 'STOCK_UPDATE',
     'REPORT_VIEW'
   ],
+  COMPTABLE: [
+    'USER_VIEW',
+    'CLIENT_VIEW',
+    'PROJECT_VIEW',
+    'BILLING_VIEW', 'BILLING_CREATE', 'BILLING_UPDATE',
+    'PRODUCTION_VIEW',
+    'STOCK_VIEW',
+    'REPORT_VIEW', 'REPORT_EXPORT'
+  ],
   OPERATEUR: [
     'USER_VIEW',
     'CLIENT_VIEW',
     'PROJECT_VIEW',
     'BILLING_VIEW',
     'PRODUCTION_VIEW', 'PRODUCTION_UPDATE',
+    'STOCK_VIEW',
+    'REPORT_VIEW'
+  ],
+  VIEWER: [
+    'USER_VIEW',
+    'CLIENT_VIEW',
+    'PROJECT_VIEW',
+    'BILLING_VIEW',
+    'PRODUCTION_VIEW',
     'STOCK_VIEW',
     'REPORT_VIEW'
   ]
@@ -78,8 +107,8 @@ export function usePermissions() {
   const hasPermission = (permission: Permission): boolean => {
     if (!user) return false
 
-    // L'admin a toutes les permissions
-    if (user.role === 'admin' || user.role === 'ADMIN') {
+    // L'admin et super admin ont toutes les permissions
+    if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
       return true
     }
 
@@ -174,10 +203,13 @@ export function useRoles() {
     hasRole,
     hasAnyRole,
     userRole: user?.role as Role,
+    isSuperAdmin: hasRole('SUPER_ADMIN'),
     isAdmin: hasRole('ADMIN'),
     isManager: hasRole('MANAGER'),
     isCommercial: hasRole('COMMERCIAL'),
     isTechnicien: hasRole('TECHNICIEN'),
-    isOperateur: hasRole('OPERATEUR')
+    isComptable: hasRole('COMPTABLE'),
+    isOperateur: hasRole('OPERATEUR'),
+    isViewer: hasRole('VIEWER')
   }
 }

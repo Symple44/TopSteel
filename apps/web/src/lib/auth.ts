@@ -109,5 +109,5 @@ export function hasAnyRole(session: AuthSession | null, roles: string[]): boolea
  * Vérifier si l'utilisateur est admin
  */
 export function isAdmin(session: AuthSession | null): boolean {
-  return hasRole(session, 'admin') || hasRole(session, 'super-admin')
+  return hasRole(session, 'ADMIN') || hasRole(session, 'SUPER_ADMIN')
 }

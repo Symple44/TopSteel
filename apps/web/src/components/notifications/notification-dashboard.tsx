@@ -278,7 +278,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                   <Input
                     placeholder="Rechercher dans les notifications..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                     className="pl-9"
                   />
                 </div>
@@ -333,9 +333,9 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={(e) => {
+                                onClick={(e: React.MouseEvent) => {
                                   e.stopPropagation()
-                                  actions.removeNotification(notification.id)
+                                  actions.deleteNotification(notification.id)
                                 }}
                                 className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity"
                               >
@@ -374,7 +374,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => actions.clearAll()}
+                  onClick={() => actions.deleteAll()}
                   className="text-red-600 hover:text-red-700"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />

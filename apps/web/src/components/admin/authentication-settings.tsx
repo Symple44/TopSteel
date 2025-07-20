@@ -228,6 +228,48 @@ export function AuthenticationSettings() {
                 min="1"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="jwt-expires-in">{t('authentication.jwtExpiresIn')}</Label>
+              <Select
+                value={parameters?.JWT_EXPIRES_IN || '24h'}
+                onValueChange={(value: string) => handleInputChange('JWT_EXPIRES_IN', value)}
+              >
+                <SelectTrigger id="jwt-expires-in">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1h">1 heure</SelectItem>
+                  <SelectItem value="2h">2 heures</SelectItem>
+                  <SelectItem value="4h">4 heures</SelectItem>
+                  <SelectItem value="8h">8 heures</SelectItem>
+                  <SelectItem value="12h">12 heures</SelectItem>
+                  <SelectItem value="24h">24 heures</SelectItem>
+                  <SelectItem value="48h">48 heures</SelectItem>
+                  <SelectItem value="7d">7 jours</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="jwt-refresh-expires-in">{t('authentication.jwtRefreshExpiresIn')}</Label>
+              <Select
+                value={parameters?.JWT_REFRESH_EXPIRES_IN || '7d'}
+                onValueChange={(value: string) => handleInputChange('JWT_REFRESH_EXPIRES_IN', value)}
+              >
+                <SelectTrigger id="jwt-refresh-expires-in">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1d">1 jour</SelectItem>
+                  <SelectItem value="3d">3 jours</SelectItem>
+                  <SelectItem value="7d">7 jours</SelectItem>
+                  <SelectItem value="14d">14 jours</SelectItem>
+                  <SelectItem value="30d">30 jours</SelectItem>
+                  <SelectItem value="90d">90 jours</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-4">

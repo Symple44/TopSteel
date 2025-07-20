@@ -10,6 +10,16 @@ import { AuthService } from './auth.service'
 import { RolesGuard } from './guards/roles.guard'
 import { JwtUtilsService } from './services/jwt-utils.service'
 import { SessionInvalidationService } from './services/session-invalidation.service'
+import { SessionRedisService } from './services/session-redis.service'
+import { GeolocationService } from './services/geolocation.service'
+import { TOTPService } from './services/totp.service'
+import { WebAuthnService } from './services/webauthn.service'
+import { MFAService } from './services/mfa.service'
+import { SessionsController } from './controllers/sessions.controller'
+import { MFAController } from './controllers/mfa.controller'
+import { UserSession } from './entities/user-session.entity'
+import { UserMFA } from './entities/user-mfa.entity'
+import { MFASession } from './entities/mfa-session.entity'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { LocalStrategy } from './strategies/local.strategy'
 
@@ -39,11 +49,33 @@ import { LocalStrategy } from './strategies/local.strategy'
       },
       inject: [ConfigService],
     }),
-    // TypeOrmModule.forFeature([User]), // Retiré car déjà déclaré dans UsersModule
+    TypeOrmModule.forFeature([UserSession, UserMFA, MFASession]),
     UsersModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtUtilsService, SessionInvalidationService, RolesGuard],
-  exports: [AuthService, JwtUtilsService, SessionInvalidationService, RolesGuard],
+  controllers: [AuthController, SessionsController, MFAController],
+  providers: [
+    AuthService, 
+    LocalStrategy, 
+    JwtStrategy, 
+    JwtUtilsService, 
+    SessionInvalidationService, 
+    SessionRedisService,
+    GeolocationService,
+    TOTPService,
+    WebAuthnService,
+    MFAService,
+    RolesGuard
+  ],
+  exports: [
+    AuthService, 
+    JwtUtilsService, 
+    SessionInvalidationService, 
+    SessionRedisService,
+    GeolocationService,
+    TOTPService,
+    WebAuthnService,
+    MFAService,
+    RolesGuard
+  ],
 })
 export class AuthModule {}

@@ -1,4 +1,5 @@
 'use client'
+import { useTranslation } from '@/lib/i18n/hooks'
 // import { Button } from '@erp/ui'
 /**
  * Page Global Error - TopSteel ERP
@@ -12,16 +13,18 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const { t } = useTranslation('errors')
+  
   return (
     <html lang="fr">
       <body>
         <div className="min-h-screen flex items-center justify-center bg-background">
           <div className="text-center space-y-6 p-8">
             <div className="space-y-2">
-              <h1 className="text-6xl font-bold text-destructive">Erreur</h1>
-              <h2 className="text-2xl font-semibold">Une erreur est survenue</h2>
+              <h1 className="text-6xl font-bold text-destructive">{t('title')}</h1>
+              <h2 className="text-2xl font-semibold">{t('general')}</h2>
               <p className="text-muted-foreground max-w-md">
-                Une erreur inattendue s'est produite. Veuillez réessayer.
+                {t('unexpectedDetailed')}
               </p>
             </div>
 
@@ -30,12 +33,12 @@ export default function GlobalError({
                 onClick={reset}
                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
               >
-                Réessayer
+                {t('tryAgain')}
               </button>
 
               <div className="text-sm text-muted-foreground">
                 <a href="/dashboard" className="hover:text-foreground transition-colors">
-                  Retour au tableau de bord
+                  {t('backHome')}
                 </a>
               </div>
             </div>

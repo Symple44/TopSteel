@@ -1,110 +1,132 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { serverStorage } from '@/lib/server-storage'
+import { AuthHelper } from '@/lib/auth-helper'
 
 export async function GET(request: NextRequest) {
+  const defaultPages = ['dashboard', 'clients', 'projets', 'stocks', 'production']
+  
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
+    // Utiliser l'endpoint standard et filtrer les pages visibles
+    const response = await AuthHelper.fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences`
+    )
     
-    if (!token) {
-      console.log('Pas de token, utilisation du stockage local')
-      // Continuer sans token en mode dev
-    }
-    
-    try {
-      if (token) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences/selected-pages`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
-        
-        if (response.ok) {
-          const data = await response.json()
-          return NextResponse.json(data)
-        } else {
-          console.log('Backend API erreur:', response.status, 'Utilisation du stockage local')
-          throw new Error(`Backend API error: ${response.status}`)
-        }
-      } else {
-        throw new Error('Pas de token')
-      }
-    } catch (backendError) {
-      console.log('Backend indisponible, utilisation du stockage local')
-      
-      // Utiliser le stockage serveur local
-      const savedPages = await serverStorage.getSelectedPages()
+    if (response.ok) {
+      const data = await response.json()
+      // Extraire seulement les pages visibles
+      const selectedPages = data.data
+        .filter((p: any) => p.isVisible)
+        .map((p: any) => p.menuId)
       
       return NextResponse.json({
         success: true,
-        data: savedPages,
-        message: 'Pages sélectionnées (stockage local)'
+        data: selectedPages,
+        message: 'Pages sélectionnées depuis la base de données'
       })
+    } else {
+      console.log('Backend API erreur:', response.status)
+      throw new Error(`Backend API error: ${response.status}`)
     }
   } catch (error) {
     console.error('Erreur lors de la récupération des pages sélectionnées:', error)
     
-    // En cas d'erreur, utiliser les valeurs par défaut
-    try {
-      const defaultPages = await serverStorage.getSelectedPages()
-      return NextResponse.json({
-        success: true,
-        data: defaultPages,
-        message: 'Pages sélectionnées (valeurs par défaut)'
-      })
-    } catch {
-      return NextResponse.json({
-        success: true,
-        data: ['dashboard', 'clients', 'projets', 'stocks', 'production'],
-        message: 'Pages sélectionnées (valeurs par défaut)'
-      })
+    // Gérer les différents types d'erreurs
+    if (error instanceof Error) {
+      if (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN') {
+        return AuthHelper.unauthorizedResponse('Authentification requise')
+      }
     }
+    
+    // Pour toute autre erreur
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Erreur lors de la récupération des pages',
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      },
+      { status: 500 }
+    )
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
-    
-    if (!token) {
-      // En mode dev, continuer même sans token
-      console.log('Pas de token, sauvegarde locale des pages sélectionnées')
-    }
+    const { selectedPages = [] } = body
     
     try {
-      if (token) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences/selected-pages`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(body),
+      // D'abord, récupérer les pages actuellement sélectionnées
+      const currentResponse = await AuthHelper.fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences`
+      )
+      
+      if (!currentResponse.ok) {
+        throw new Error(`Failed to get current preferences: ${currentResponse.status}`)
+      }
+      
+      const currentData = await currentResponse.json()
+      const currentSelectedPages = currentData.data
+        .filter((p: any) => p.isVisible)
+        .map((p: any) => p.menuId)
+      
+      // Déterminer quelles pages ajouter/retirer
+      const pagesToAdd = selectedPages.filter((p: string) => !currentSelectedPages.includes(p))
+      const pagesToRemove = currentSelectedPages.filter((p: string) => !selectedPages.includes(p))
+      
+      let allSuccess = true
+      
+      // Ajouter les nouvelles pages
+      for (const pageId of pagesToAdd) {
+        const res = await AuthHelper.fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences/toggle-page`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ pageId }),
+          }
+        )
+        if (!res.ok) allSuccess = false
+      }
+      
+      // Retirer les pages désélectionnées
+      for (const pageId of pagesToRemove) {
+        const res = await AuthHelper.fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences/toggle-page`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ pageId }),
+          }
+        )
+        if (!res.ok) allSuccess = false
+      }
+      
+      if (allSuccess) {
+        return NextResponse.json({
+          success: true,
+          data: selectedPages,
+          message: 'Pages sélectionnées sauvegardées en base'
         })
-        
-        if (response.ok) {
-          const data = await response.json()
-          return NextResponse.json(data)
-        }
+      } else {
+        throw new Error('Erreur lors de la sauvegarde de certaines pages')
       }
     } catch (backendError) {
-      console.log('Backend indisponible, sauvegarde locale')
+      console.log('Erreur lors de la sauvegarde:', backendError)
+      
+      // Gérer les différents types d'erreurs
+      if (backendError instanceof Error) {
+        if (backendError.message === 'NO_AUTH' || backendError.message === 'INVALID_TOKEN') {
+          return AuthHelper.unauthorizedResponse('Authentification requise pour sauvegarder les préférences')
+        }
+      }
+      
+      // Pour les autres erreurs, retourner une erreur 500
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Erreur lors de la sauvegarde',
+          error: backendError instanceof Error ? backendError.message : 'Erreur inconnue'
+        },
+        { status: 500 }
+      )
     }
-    
-    // Sauvegarder les pages sélectionnées dans le stockage local
-    const selectedPages = body.selectedPages || []
-    await serverStorage.saveSelectedPages(selectedPages)
-    
-    console.log('Pages sélectionnées sauvegardées:', selectedPages.length, 'pages')
-    return NextResponse.json({
-      success: true,
-      data: selectedPages,
-      message: 'Pages sélectionnées sauvegardées avec succès'
-    })
   } catch (error) {
     console.error('Erreur lors de la sauvegarde des pages sélectionnées:', error)
     return NextResponse.json(

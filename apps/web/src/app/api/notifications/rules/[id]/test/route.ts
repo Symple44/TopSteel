@@ -183,10 +183,10 @@ let notificationRules: any[] = [
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const { testData } = await request.json()
 
     if (!testData || typeof testData !== 'object') {
@@ -272,10 +272,10 @@ export async function POST(
 // Endpoint pour obtenir des exemples de données de test
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Trouver la règle
     const rule = notificationRules.find(r => r.id === id)

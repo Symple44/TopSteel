@@ -119,24 +119,24 @@ const planningData = [
   }
 ]
 
-const statusConfig = {
+const statusConfig: Record<string, { label: string; color: string }> = {
   planifie: { label: "Planifié", color: "bg-gray-500" },
   en_cours: { label: "En cours", color: "bg-blue-500" },
   termine: { label: "Terminé", color: "bg-green-500" },
   en_retard: { label: "En retard", color: "bg-red-500" }
 }
 
-const taskStatusConfig = {
+const taskStatusConfig: Record<string, { label: string; color: string }> = {
   a_faire: { label: "À faire", color: "text-gray-600" },
   en_cours: { label: "En cours", color: "text-blue-600" },
   termine: { label: "Terminé", color: "text-green-600" }
 }
 
 export default function TestPlanningPage() {
-  const [selectedProject, setSelectedProject] = useState(null)
+  const [selectedProject, setSelectedProject] = useState<any>(null)
   const [viewMode, setViewMode] = useState('list') // 'list', 'gantt', 'calendar'
 
-  const getProgressBarColor = (progress) => {
+  const getProgressBarColor = (progress: number) => {
     if (progress === 100) return "bg-green-500"
     if (progress >= 60) return "bg-blue-500"
     if (progress >= 30) return "bg-yellow-500"

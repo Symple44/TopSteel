@@ -24,6 +24,7 @@ export interface NotificationSettings {
   enableSound: boolean
   enableVibration: boolean
   enableBrowser: boolean
+  enableEmail: boolean
   categories: {
     system: boolean
     production: boolean
@@ -68,6 +69,7 @@ const initialSettings: NotificationSettings = {
   enableSound: false,
   enableVibration: false,
   enableBrowser: false,
+  enableEmail: false,
   categories: {
     system: true,
     production: true,

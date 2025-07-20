@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import type { Notification } from '@erp/domains/notifications'
 import { createPortal } from 'react-dom'
 import { useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 import {
   Badge,
@@ -30,6 +31,7 @@ import { NotificationDashboard } from './notification-dashboard'
 import { NotificationDashboardV2 } from './notification-dashboard-v2'
 
 export function NotificationCenter() {
+  const { t } = useTranslation('common')
   const { state, actions } = useNotifications()
   const [showSettings, setShowSettings] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -113,13 +115,13 @@ export function NotificationCenter() {
             {/* En-tête avec titre et actions */}
             <div className="p-4 border-b">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Notifications</h3>
+                <h3 className="font-semibold">{t('notifications')}</h3>
                 <div className="flex gap-1">
                   <Button 
                     variant="ghost" 
                     size="sm"
                     className="hover:text-blue-600 hover:bg-blue-50"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation()
                       setShowDashboard(true)
                       setIsOpen(false)
@@ -132,11 +134,11 @@ export function NotificationCenter() {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent) => {
                         e.stopPropagation()
                         actions.markAllAsRead()
                       }} 
-                      title="Marquer tout comme lu"
+                      title={t('markAllAsRead')}
                     >
                       <CheckCheck className="h-4 w-4" />
                     </Button>
@@ -144,19 +146,19 @@ export function NotificationCenter() {
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation()
                       setShowSettings(true)
                       setIsOpen(false) // Fermer le dropdown
                     }}
-                    title="Paramètres"
+                    title={t('settings')}
                   >
                     <Settings className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation()
                       setIsOpen(false)
                     }}
@@ -189,7 +191,7 @@ export function NotificationCenter() {
                 <Input
                   placeholder="Rechercher..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                   className="pl-9 h-8"
                 />
               </div>
@@ -275,7 +277,7 @@ export function NotificationCenter() {
                         size="sm"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation()
-                          actions.removeNotification(notification.id)
+                          actions.deleteNotification(notification.id)
                         }}
                         className="flex-shrink-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-gray-400 hover:text-gray-600 transition-opacity"
                         title="Supprimer"
@@ -296,18 +298,18 @@ export function NotificationCenter() {
                     variant="ghost"
                     size="sm"
                     className="flex-1 text-gray-500 hover:text-red-600"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation()
-                      actions.clearAll()
+                      actions.deleteAll()
                     }}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Effacer tout
+                    {t('clearAll')}
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation()
                       actions.refreshNotifications()
                     }}
@@ -328,7 +330,7 @@ export function NotificationCenter() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center" style={{ zIndex: 999999 }} aria-hidden="false">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Paramètres de Notifications</h2>
+              <h2 className="text-xl font-semibold">{t('notificationSettings')}</h2>
               <button 
                 onClick={() => setShowSettings(false)}
                 className="text-gray-500 hover:text-gray-700"
@@ -340,11 +342,11 @@ export function NotificationCenter() {
             <div className="space-y-6 overflow-y-auto max-h-[60vh]">
               {/* Paramètres généraux */}
               <div>
-                <h3 className="font-medium text-gray-900 mb-4">Paramètres généraux</h3>
+                <h3 className="font-medium text-gray-900 mb-4">{t('generalSettings')}</h3>
                 <div className="space-y-3">
                   <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
                     <div>
-                      <span className="font-medium">Notifications sonores</span>
+                      <span className="font-medium">{t('soundNotifications')}</span>
                       <p className="text-sm text-gray-600">Jouer un son lors des nouvelles notifications</p>
                     </div>
                     <input
@@ -389,7 +391,7 @@ export function NotificationCenter() {
                     <input
                       type="checkbox"
                       checked={state.settings.enableEmail}
-                      onChange={(e) => actions.updateSettings({ enableEmail: e.target.checked })}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => actions.updateSettings({ enableEmail: e.target.checked })}
                       className="h-5 w-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                     />
                   </label>

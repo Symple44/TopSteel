@@ -15,9 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
   Badge,
-  Textarea
+  Textarea,
+  Switch
 } from '@erp/ui'
-import { Switch } from '@/components/ui/switch'
 import { Plus, Trash2, Filter, Code, Eye } from 'lucide-react'
 
 interface Condition {
@@ -191,7 +191,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
       return (
         <Select
           value={condition.value.toString()}
-          onValueChange={(value) => updateCondition(condition.id, { value: value === 'true' })}
+          onValueChange={(value: string) => updateCondition(condition.id, { value: value === 'true' })}
         >
           <SelectTrigger className="w-32">
             <SelectValue />
@@ -208,7 +208,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
       return (
         <Textarea
           value={Array.isArray(condition.value) ? condition.value.join('\n') : condition.value}
-          onChange={(e) => updateCondition(condition.id, { value: e.target.value.split('\n').filter(Boolean) })}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateCondition(condition.id, { value: e.target.value.split('\n').filter(Boolean) })}
           placeholder="Une valeur par ligne"
           className="w-48"
           rows={3}
@@ -221,7 +221,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
         <Input
           type="number"
           value={condition.value}
-          onChange={(e) => updateCondition(condition.id, { value: parseFloat(e.target.value) || 0 })}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCondition(condition.id, { value: parseFloat(e.target.value) || 0 })}
           className="w-32"
           placeholder="0"
         />
@@ -233,7 +233,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
         <Input
           type="datetime-local"
           value={condition.value}
-          onChange={(e) => updateCondition(condition.id, { value: e.target.value })}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCondition(condition.id, { value: e.target.value })}
           className="w-48"
         />
       )
@@ -242,7 +242,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
     return (
       <Input
         value={condition.value}
-        onChange={(e) => updateCondition(condition.id, { value: e.target.value })}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCondition(condition.id, { value: e.target.value })}
         className="w-48"
         placeholder="Valeur"
       />
@@ -327,7 +327,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
                 {index > 0 && (
                   <Select
                     value={condition.logic}
-                    onValueChange={(value) => updateCondition(condition.id, { logic: value as any })}
+                    onValueChange={(value: string) => updateCondition(condition.id, { logic: value as any })}
                   >
                     <SelectTrigger className="w-20">
                       <SelectValue />
@@ -341,7 +341,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
 
                 <Select
                   value={condition.field}
-                  onValueChange={(value) => updateCondition(condition.id, { 
+                  onValueChange={(value: string) => updateCondition(condition.id, { 
                     field: value,
                     type: getFieldType(value),
                     operator: 'equals',
@@ -362,7 +362,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
 
                 <Select
                   value={condition.operator}
-                  onValueChange={(value) => updateCondition(condition.id, { 
+                  onValueChange={(value: string) => updateCondition(condition.id, { 
                     operator: value as any,
                     value: ['is_null', 'is_not_null'].includes(value) ? '' : condition.value
                   })}

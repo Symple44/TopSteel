@@ -24,14 +24,29 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Connexion utilisateur',
-    description: 'Authentifie un utilisateur avec email et mot de passe',
+    description: 'Authentifie un utilisateur avec email et mot de passe. Peut retourner requiresMFA=true si MFA est activé.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Connexion réussie',
+    description: 'Connexion réussie ou MFA requis',
   })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto)
+  }
+
+  @Public()
+  @Post('login-mfa')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Connexion avec MFA',
+    description: 'Complète la connexion après vérification MFA',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Connexion MFA réussie',
+  })
+  async loginWithMFA(@Body() body: { userId: string; mfaSessionToken: string }) {
+    return this.authService.loginWithMFA(body.userId, body.mfaSessionToken)
   }
 
   @Public()

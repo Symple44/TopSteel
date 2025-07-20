@@ -2,6 +2,13 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Poppins } from 'next/font/google'
 import '../styles/globals.css'
 import { ProvidersSimple } from './providers-simple'
+import { AppInitializer } from '@/components/app/app-initializer'
+import { logStartupInfo } from '@/lib/startup-logger'
+
+// Log startup info on server side
+if (typeof window === 'undefined') {
+  logStartupInfo()
+}
 
 const inter = Inter({
   subsets: ['latin'],
@@ -66,7 +73,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="font-inter antialiased bg-background text-foreground"
         suppressHydrationWarning
       >
-        <ProvidersSimple>{children}</ProvidersSimple>
+        <ProvidersSimple>
+          <AppInitializer>
+            {children}
+          </AppInitializer>
+        </ProvidersSimple>
       </body>
     </html>
   )

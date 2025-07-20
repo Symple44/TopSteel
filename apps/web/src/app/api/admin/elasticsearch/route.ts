@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getElasticsearchClient, getMigrationService } from '@/lib/server/elasticsearch'
 
+export const runtime = 'nodejs'
+
 export async function GET(request: NextRequest) {
   try {
     // TODO: Add authentication when implemented

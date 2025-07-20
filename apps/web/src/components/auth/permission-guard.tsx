@@ -80,10 +80,10 @@ export function PermissionGuard({
       // Désactiver le composant en clonant l'élément avec disabled: true
       if (isValidElement(children)) {
         return cloneElement(children as ReactElement, {
-          disabled: true,
-          className: `${(children as ReactElement).props.className || ''} ${disabledClassName}`.trim(),
+          disabled: true as any,
+          className: `${((children as ReactElement).props as any).className || ''} ${disabledClassName}`.trim(),
           title: errorMessage || 'Vous n\'avez pas les permissions nécessaires'
-        })
+        } as any)
       }
       return <>{children}</>
 

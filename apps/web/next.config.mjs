@@ -63,12 +63,23 @@ const nextConfig = {
     reactCompiler: false, // Disable React Compiler for now
   },
   
+  // External packages for server-side only
+  serverExternalPackages: ['sharp', '@img/sharp-wasm32'],
+  
   // Disable image optimization during build
   images: {
     unoptimized: true,
   },
 
   webpack: (config, { isServer }) => {
+    // Mock Sharp pour le côté client
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'sharp$': path.resolve(import.meta.dirname, './src/mocks/sharp.js'),
+      }
+    }
+    
     // Force resolve workspace packages
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -122,6 +133,7 @@ const nextConfig = {
         // Exclure toutes les dépendances wasm de sharp
         '@img/sharp-wasm32': false,
         '@img/sharp-wasm32/versions': false,
+        '@img': false,
         // Exclure axios et ses dépendances node-only
         'axios': false,
         'proxy-from-env': false,

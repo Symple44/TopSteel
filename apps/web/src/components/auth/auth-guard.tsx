@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -17,6 +18,7 @@ export function AuthGuard({
   fallbackUrl = '/login' 
 }: AuthGuardProps) {
   const { user, isLoading, isAuthenticated } = useAuth()
+  const { t } = useTranslation('auth')
   const router = useRouter()
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export function AuthGuard({
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Vérification de l'authentification...</p>
+          <p className="text-gray-600">{t('verifyingAuthentication')}</p>
         </div>
       </div>
     )
@@ -71,13 +73,13 @@ export function AuthGuard({
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
             <div className="text-red-600 text-6xl mb-4">🚫</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Accès refusé</h1>
-            <p className="text-gray-600 mb-4">Vous n'avez pas les permissions nécessaires pour accéder à cette page.</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('accessDenied')}</h1>
+            <p className="text-gray-600 mb-4">{t('insufficientPermissionsText')}</p>
             <button
               onClick={() => router.back()}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
             >
-              Retour
+              {t('back')}
             </button>
           </div>
         </div>

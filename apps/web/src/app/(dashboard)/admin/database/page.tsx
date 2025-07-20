@@ -127,8 +127,8 @@ export default function DatabaseManagementPage() {
         const statsData = await statsResponse.json()
         setStats(statsData.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement:', error)
+    } catch (err) {
+      console.error('Erreur lors du chargement:', err)
       error('Erreur de chargement', 'Impossible de charger les données de la base de données')
     } finally {
       setLoading(false)

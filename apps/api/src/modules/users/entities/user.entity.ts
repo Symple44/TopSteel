@@ -10,11 +10,14 @@ import {
 } from 'typeorm'
 
 export enum UserRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
   MANAGER = 'MANAGER',
   COMMERCIAL = 'COMMERCIAL',
   TECHNICIEN = 'TECHNICIEN',
+  COMPTABLE = 'COMPTABLE',
   OPERATEUR = 'OPERATEUR',
+  VIEWER = 'VIEWER',
 }
 
 @Entity('users')

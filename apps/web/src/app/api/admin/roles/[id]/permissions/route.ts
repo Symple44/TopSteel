@@ -1,5 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Mock des permissions système
+const SYSTEM_PERMISSIONS: Record<string, any[]> = {
+  CLIENT_MANAGEMENT: [
+    { id: 'client.view', name: 'Voir les clients', level: 'READ' },
+    { id: 'client.create', name: 'Créer des clients', level: 'WRITE' },
+    { id: 'client.edit', name: 'Modifier des clients', level: 'WRITE' },
+    { id: 'client.delete', name: 'Supprimer des clients', level: 'DELETE' },
+  ],
+  PROJECT_MANAGEMENT: [
+    { id: 'project.view', name: 'Voir les projets', level: 'READ' },
+    { id: 'project.create', name: 'Créer des projets', level: 'WRITE' },
+    { id: 'project.edit', name: 'Modifier des projets', level: 'WRITE' },
+    { id: 'project.delete', name: 'Supprimer des projets', level: 'DELETE' },
+  ],
+  SYSTEM_SETTINGS: [
+    { id: 'system.view', name: 'Voir les paramètres', level: 'READ' },
+    { id: 'system.edit', name: 'Modifier les paramètres', level: 'ADMIN' },
+  ],
+}
+
 // GET - Récupérer les permissions d'un rôle
 export async function GET(
   request: NextRequest,
@@ -63,7 +83,7 @@ export async function POST(
     }
     
     // Valider les permissions
-    const validAccessLevels: AccessLevel[] = ['BLOCKED', 'READ', 'WRITE', 'DELETE', 'ADMIN']
+    const validAccessLevels = ['BLOCKED', 'READ', 'WRITE', 'DELETE', 'ADMIN']
     const invalidPermissions = permissions.filter(p => 
       !p.permissionId || 
       !validAccessLevels.includes(p.accessLevel) ||
@@ -102,7 +122,7 @@ function generateRolePermissions(roleId: string) {
   
   Object.entries(SYSTEM_PERMISSIONS).forEach(([moduleId, perms]) => {
     perms.forEach(perm => {
-      let accessLevel: AccessLevel = 'BLOCKED'
+      let accessLevel = 'BLOCKED'
       let isGranted = false
       
       // Logique par rôle

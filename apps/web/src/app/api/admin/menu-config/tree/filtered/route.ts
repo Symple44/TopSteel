@@ -1,170 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { AuthHelper } from '@/lib/auth-helper'
 
 export async function GET(request: NextRequest) {
   try {
-    // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/admin/menu-config/tree/filtered`
-    
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(request.headers.get('authorization') && {
-          'Authorization': request.headers.get('authorization')!
-        }),
-      },
-    })
+    // Vérifier l'authentification et faire la requête
+    const response = await AuthHelper.fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/menu-config/tree/filtered`
+    )
 
-    if (!response.ok) {
+    if (response.ok) {
+      const data = await response.json()
+      return NextResponse.json(data)
+    } else {
       console.error('API Error:', response.status, response.statusText)
-      console.log('Utilisation des données mock en raison de l\'erreur API')
-      // Utiliser les données mock en cas d'erreur API
-      const mockMenu = {
-        success: true,
-        data: [
-          {
-            id: 'dashboard',
-            title: 'Tableau de bord',
-            href: '/dashboard',
-            icon: 'Home',
-            orderIndex: 1,
-            isVisible: true,
-            children: [],
-            depth: 0
-          },
-          {
-            id: 'production',
-            title: 'Production',
-            href: '/production',
-            icon: 'Factory',
-            orderIndex: 2,
-            isVisible: true,
-            children: [
-              {
-                id: 'production-orders',
-                title: 'Ordres de fabrication',
-                href: '/production/orders',
-                icon: 'FileText',
-                orderIndex: 1,
-                isVisible: true,
-                children: [],
-                depth: 1
-              }
-            ],
-            depth: 0
-          },
-          {
-            id: 'admin',
-            title: 'Administration',
-            href: '/admin',
-            icon: 'Shield',
-            orderIndex: 100,
-            isVisible: true,
-            children: [
-              {
-                id: 'admin-users',
-                title: 'Gestion des utilisateurs',
-                href: '/admin/users',
-                icon: 'Users',
-                orderIndex: 1,
-                isVisible: true,
-                children: [],
-                depth: 1
-              },
-              {
-                id: 'admin-database',
-                title: 'Base de données',
-                href: '/admin/database',
-                icon: 'Database',
-                orderIndex: 2,
-                isVisible: true,
-                children: [],
-                depth: 1
-              }
-            ],
-            depth: 0
-          }
-        ]
-      }
-      return NextResponse.json(mockMenu)
+      throw new Error(`Backend error: ${response.status}`)
     }
-
-    const responseData = await response.json()
-    // L'API NestJS retourne { data: { success, data }, statusCode, message, timestamp }
-    // On extrait juste la partie data.data
-    return NextResponse.json(responseData.data || responseData)
   } catch (error) {
     console.error('Erreur lors de la récupération du menu filtré:', error)
     
-    // Retourner des données mock si l'API n'est pas disponible
-    const mockMenu = {
-      success: true,
-      data: [
-        {
-          id: 'dashboard',
-          title: 'Tableau de bord',
-          href: '/dashboard',
-          icon: 'Home',
-          orderIndex: 1,
-          isVisible: true,
-          children: [],
-          depth: 0
-        },
-        {
-          id: 'production',
-          title: 'Production',
-          href: '/production',
-          icon: 'Factory',
-          orderIndex: 2,
-          isVisible: true,
-          children: [
-            {
-              id: 'production-orders',
-              title: 'Ordres de fabrication',
-              href: '/production/orders',
-              icon: 'FileText',
-              orderIndex: 1,
-              isVisible: true,
-              children: [],
-              depth: 1
-            }
-          ],
-          depth: 0
-        },
-        {
-          id: 'admin',
-          title: 'Administration',
-          href: '/admin',
-          icon: 'Shield',
-          orderIndex: 100,
-          isVisible: true,
-          children: [
-            {
-              id: 'admin-users',
-              title: 'Gestion des utilisateurs',
-              href: '/admin/users',
-              icon: 'Users',
-              orderIndex: 1,
-              isVisible: true,
-              children: [],
-              depth: 1
-            },
-            {
-              id: 'admin-database',
-              title: 'Base de données',
-              href: '/admin/database',
-              icon: 'Database',
-              orderIndex: 2,
-              isVisible: true,
-              children: [],
-              depth: 1
-            }
-          ],
-          depth: 0
-        }
-      ]
+    // Gérer les erreurs d'authentification
+    if (error instanceof Error && 
+        (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN')) {
+      return AuthHelper.unauthorizedResponse('Authentification requise pour accéder au menu admin')
     }
     
-    return NextResponse.json(mockMenu)
+    // Pour les autres erreurs, retourner une erreur 500
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Erreur lors de la récupération du menu',
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      },
+      { status: 500 }
+    )
   }
 }

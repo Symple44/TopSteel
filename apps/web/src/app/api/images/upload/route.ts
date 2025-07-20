@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { imageService } from '@erp/domains/server'
 import { auth } from '@/lib/auth'
+import { getImageService } from './image-service'
+
+export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,6 +34,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes)
 
     // Upload de l'image
+    const imageService = await getImageService()
     const result = await imageService.uploadImage(
       buffer,
       file.name,
@@ -76,6 +79,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
     }
 
+    const imageService = await getImageService()
     await imageService.deleteImage(imageId, category)
 
     return NextResponse.json({ success: true })

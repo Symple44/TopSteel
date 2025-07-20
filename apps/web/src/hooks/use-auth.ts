@@ -32,11 +32,24 @@ interface Tokens {
   tokenType?: string
 }
 
+interface MFAState {
+  required: boolean
+  userId?: string
+  email?: string
+  availableMethods?: Array<{
+    type: string
+    isEnabled: boolean
+    lastUsed?: Date
+  }>
+  sessionToken?: string
+}
+
 interface AuthState {
   user: User | null
   tokens: Tokens | null
   isLoading: boolean
   isAuthenticated: boolean
+  mfa: MFAState
 }
 
 
@@ -122,6 +135,9 @@ export const useAuth = () => {
     tokens: null,
     isLoading: true,
     isAuthenticated: false,
+    mfa: {
+      required: false
+    }
   })
 
   // ✅ Validation des tokens - fonction stable avec useCallback
@@ -171,6 +187,22 @@ export const useAuth = () => {
       const responseData = await response.json()
       console.log('🔐 API Response:', responseData)
       
+      // Vérifier si MFA est requis
+      if (responseData.data?.requiresMFA) {
+        console.log('🔐 MFA Required')
+        setAuthState(prev => ({
+          ...prev,
+          isLoading: false,
+          mfa: {
+            required: true,
+            userId: responseData.data.userId,
+            email: responseData.data.email,
+            availableMethods: responseData.data.availableMethods
+          }
+        }))
+        return // Arrêter ici, le login n'est pas terminé
+      }
+      
       const { user, accessToken, refreshToken, expiresIn } = responseData.data
       const tokens: Tokens = { accessToken, refreshToken, expiresIn, tokenType: 'Bearer' }
 
@@ -188,6 +220,9 @@ export const useAuth = () => {
         tokens,
         isLoading: false,
         isAuthenticated: true,
+        mfa: {
+          required: false
+        }
       })
       
       console.log('🔐 Auth state updated:', { user, isAuthenticated: true })
@@ -195,6 +230,86 @@ export const useAuth = () => {
       setAuthState((prev) => ({ ...prev, isLoading: false }))
       throw error
     }
+  }, [])
+
+  // ✅ Fonction de vérification MFA - stable avec useCallback
+  const verifyMFA = useCallback(async (mfaType: string, code?: string, webauthnResponse?: any): Promise<void> => {
+    if (!authState.mfa?.required || !authState.mfa?.userId) {
+      throw new Error('MFA not required or no user ID available')
+    }
+
+    setAuthState((prev) => ({ ...prev, isLoading: true }))
+
+    try {
+      // Appel API pour vérifier le code MFA
+      const response = await fetch('/api/auth/mfa/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: authState.mfa?.userId,
+          mfaType,
+          code,
+          webauthnResponse
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || 'Code MFA invalide')
+      }
+
+      const responseData = await response.json()
+      
+      // Si la vérification réussit, finaliser la connexion
+      if (responseData.data.sessionToken) {
+        // Obtenir les tokens finaux après MFA
+        const loginResponse = await fetch('/api/auth/mfa/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: authState.mfa?.userId,
+            sessionToken: responseData.data.sessionToken
+          }),
+        })
+
+        if (!loginResponse.ok) {
+          throw new Error('Erreur lors de la finalisation de la connexion')
+        }
+
+        const loginData = await loginResponse.json()
+        const { user, accessToken, refreshToken, expiresIn } = loginData.data
+        const tokens: Tokens = { accessToken, refreshToken, expiresIn, tokenType: 'Bearer' }
+
+        // Stocker dans localStorage et cookies
+        storage.set(AUTH_STORAGE_KEY, user)
+        storage.set(TOKEN_STORAGE_KEY, tokens)
+        cookieUtils.set('accessToken', accessToken, 1)
+        cookieUtils.set('refreshToken', refreshToken, 1)
+
+        setAuthState({
+          user,
+          tokens,
+          isLoading: false,
+          isAuthenticated: true,
+          mfa: {
+            required: false
+          }
+        })
+      }
+    } catch (error) {
+      setAuthState((prev) => ({ ...prev, isLoading: false }))
+      throw error
+    }
+  }, [authState.mfa?.required, authState.mfa?.userId])
+
+  // ✅ Fonction de réinitialisation MFA - stable avec useCallback
+  const resetMFA = useCallback(() => {
+    setAuthState((prev) => ({
+      ...prev,
+      mfa: {
+        required: false
+      }
+    }))
   }, [])
 
   // ✅ Fonction de logout - stable avec useCallback
@@ -226,6 +341,9 @@ export const useAuth = () => {
         tokens: null,
         isLoading: false,
         isAuthenticated: false,
+        mfa: {
+          required: false
+        }
       })
     }
   }, [])
@@ -302,6 +420,9 @@ export const useAuth = () => {
         tokens: null,
         isLoading: false,
         isAuthenticated: false,
+        mfa: {
+          required: false
+        }
       })
       throw error
     }
@@ -335,6 +456,9 @@ export const useAuth = () => {
             tokens: storedTokens,
             isLoading: false,
             isAuthenticated: true,
+            mfa: {
+              required: false
+            }
           })
         } else if (cookieToken && cookieRefreshToken) {
           console.log('🔐 Found cookies, restoring minimal session...')
@@ -351,6 +475,9 @@ export const useAuth = () => {
             tokens: tokensFromCookies,
             isLoading: false,
             isAuthenticated: true,
+            mfa: {
+              required: false
+            }
           })
         } else {
           console.log('🔐 No stored auth data found')
@@ -359,6 +486,9 @@ export const useAuth = () => {
             tokens: null,
             isLoading: false,
             isAuthenticated: false,
+            mfa: {
+              required: false
+            }
           })
         }
       } catch (error) {
@@ -373,6 +503,9 @@ export const useAuth = () => {
           tokens: null,
           isLoading: false,
           isAuthenticated: false,
+          mfa: {
+            required: false
+          }
         })
       }
     }
@@ -422,8 +555,11 @@ export const useAuth = () => {
     tokens: authState.tokens,
     isLoading: authState.isLoading,
     isAuthenticated: authState.isAuthenticated,
+    mfa: authState.mfa,
     login,
     logout,
+    verifyMFA,
+    resetMFA,
     setUser,
     refreshTokens,
     validateTokens,

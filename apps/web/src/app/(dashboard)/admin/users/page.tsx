@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { AdminGuard } from '@/components/auth/admin-guard'
 import {
   Card,
   CardContent,
@@ -102,6 +103,18 @@ interface User {
 }
 
 export default function UsersManagementPage() {
+  return (
+    <AdminGuard 
+      requiredRoles={['SUPER_ADMIN', 'ADMIN']}
+      requiredPermissions={['USER_VIEW']}
+      showUnauthorized={true}
+    >
+      <UsersManagementContent />
+    </AdminGuard>
+  )
+}
+
+function UsersManagementContent() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')

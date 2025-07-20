@@ -6,12 +6,14 @@ import Link from 'next/link'
 import { Button, Card, Input, Label, Separator } from '@erp/ui'
 import { Building2, Eye, EyeOff, Lock, Mail, User, ArrowLeft } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { t } = useTranslation('auth')
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -33,8 +35,8 @@ export default function RegisterPage() {
   const validateForm = () => {
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       toast({
-        title: 'Erreur',
-        description: 'Veuillez remplir tous les champs obligatoires',
+        title: t('error'),
+        description: t('fillRequiredFields'),
         variant: 'destructive',
       })
       return false
@@ -42,8 +44,8 @@ export default function RegisterPage() {
 
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: 'Erreur',
-        description: 'Les mots de passe ne correspondent pas',
+        title: t('error'),
+        description: t('passwordsDoNotMatch'),
         variant: 'destructive',
       })
       return false
@@ -51,8 +53,8 @@ export default function RegisterPage() {
 
     if (formData.password.length < 8) {
       toast({
-        title: 'Erreur',
-        description: 'Le mot de passe doit contenir au moins 8 caractères',
+        title: t('error'),
+        description: t('passwordMinLength'),
         variant: 'destructive',
       })
       return false
@@ -60,19 +62,19 @@ export default function RegisterPage() {
 
     if (!formData.acceptTerms) {
       toast({
-        title: 'Erreur',
-        description: 'Veuillez accepter les conditions d\'utilisation',
+        title: t('error'),
+        description: t('acceptTermsError'),
         variant: 'destructive',
       })
       return false
     }
 
-    // Validation email basique
+    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) {
       toast({
-        title: 'Erreur',
-        description: 'Veuillez saisir une adresse email valide',
+        title: t('error'),
+        description: t('enterValidEmail'),
         variant: 'destructive',
       })
       return false
@@ -89,20 +91,20 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      // Simuler la création de compte
+      // Simulate account creation
       await new Promise(resolve => setTimeout(resolve, 2000))
       
       toast({
-        title: 'Compte créé avec succès',
-        description: 'Vous pouvez maintenant vous connecter',
+        title: t('accountCreatedSuccess'),
+        description: t('canNowLogin'),
         variant: 'success',
       })
       
       router.push('/login')
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la création du compte',
+        title: t('error'),
+        description: t('accountCreationError'),
         variant: 'destructive',
       })
     } finally {
@@ -119,16 +121,16 @@ export default function RegisterPage() {
             <Building2 className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">TopSteel ERP</h1>
-          <p className="text-gray-600 mt-1">Créer votre compte</p>
+          <p className="text-gray-600 mt-1">{t('createYourAccount')}</p>
         </div>
 
         <Card className="p-8 shadow-lg">
           <div className="space-y-6">
             {/* Header formulaire */}
             <div className="text-center space-y-2">
-              <h2 className="text-xl font-semibold text-gray-900">Inscription</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('registration')}</h2>
               <p className="text-gray-600 text-sm">
-                Démarrez votre essai gratuit de 30 jours
+                {t('startFreeTrial')}
               </p>
             </div>
 
@@ -136,30 +138,30 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom *</Label>
+                  <Label htmlFor="firstName">{t('firstNameRequired')}</Label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange('firstName')}
-                    placeholder="Jean"
+                    placeholder={t('firstNamePlaceholder')}
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom *</Label>
+                  <Label htmlFor="lastName">{t('lastNameRequired')}</Label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange('lastName')}
-                    placeholder="Dupont"
+                    placeholder={t('lastNamePlaceholder')}
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Adresse email *</Label>
+                <Label htmlFor="email">{t('emailRequired')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
@@ -167,7 +169,7 @@ export default function RegisterPage() {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange('email')}
-                    placeholder="jean.dupont@entreprise.com"
+                    placeholder={t('emailPlaceholder')}
                     className="pl-10"
                     required
                   />
@@ -175,21 +177,21 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="company">Entreprise</Label>
+                <Label htmlFor="company">{t('companyOptional')}</Label>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
                     id="company"
                     value={formData.company}
                     onChange={handleInputChange('company')}
-                    placeholder="Métallerie Dupont"
+                    placeholder={t('companyPlaceholder')}
                     className="pl-10"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe *</Label>
+                <Label htmlFor="password">{t('passwordRequired')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
@@ -210,12 +212,12 @@ export default function RegisterPage() {
                   </button>
                 </div>
                 <p className="text-xs text-gray-500">
-                  Au moins 8 caractères avec majuscules, minuscules et chiffres
+                  {t('passwordRequirements')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe *</Label>
+                <Label htmlFor="confirmPassword">{t('confirmPasswordRequired')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
@@ -247,13 +249,13 @@ export default function RegisterPage() {
                     required
                   />
                   <span className="text-gray-600">
-                    J'accepte les{' '}
+                    {t('acceptTermsText')}{' '}
                     <Link href="/terms" className="text-blue-600 hover:underline">
-                      conditions d'utilisation
+                      {t('termsOfService')}
                     </Link>
-                    {' '}et la{' '}
+                    {' '}{t('and')}{' '}
                     <Link href="/privacy" className="text-blue-600 hover:underline">
-                      politique de confidentialité
+                      {t('privacyPolicy')}
                     </Link>
                   </span>
                 </label>
@@ -264,18 +266,18 @@ export default function RegisterPage() {
                 className="w-full"
                 disabled={isLoading}
               >
-                {isLoading ? 'Création du compte...' : 'Créer mon compte'}
+                {isLoading ? t('creatingAccount') : t('createAccount')}
               </Button>
             </form>
 
             {/* Avantages de l'inscription */}
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm">
-              <h3 className="font-medium text-green-900 mb-2">✨ Votre essai inclut :</h3>
+              <h3 className="font-medium text-green-900 mb-2">{t('trialIncludes')}</h3>
               <ul className="text-green-800 space-y-1">
-                <li>• 30 jours d'essai gratuit</li>
-                <li>• Accès à tous les modules</li>
-                <li>• Support technique inclus</li>
-                <li>• Formation en ligne gratuite</li>
+                <li>• {t('daysFree')}</li>
+                <li>• {t('accessAllModules')}</li>
+                <li>• {t('technicalSupport')}</li>
+                <li>• {t('freeTraining')}</li>
               </ul>
             </div>
 
@@ -285,23 +287,23 @@ export default function RegisterPage() {
               
               <div className="text-center space-y-2">
                 <p className="text-sm text-gray-600">
-                  Vous avez déjà un compte ?{' '}
+                  {t('alreadyHaveAccount')}{' '}
                   <Link href="/login" className="text-blue-600 hover:underline font-medium">
-                    Se connecter
+                    {t('signIn')}
                   </Link>
                 </p>
                 
                 <div className="text-xs text-gray-500 space-x-3">
                   <Link href="/support" className="hover:underline">
-                    Support
+                    {t('support')}
                   </Link>
                   <span>•</span>
                   <Link href="/privacy" className="hover:underline">
-                    Confidentialité
+                    {t('privacy')}
                   </Link>
                   <span>•</span>
                   <Link href="/terms" className="hover:underline">
-                    Conditions
+                    {t('terms')}
                   </Link>
                 </div>
               </div>
@@ -314,7 +316,7 @@ export default function RegisterPage() {
           <Link href="/login">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour à la connexion
+              {t('backToLogin')}
             </Button>
           </Link>
         </div>

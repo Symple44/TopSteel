@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Non autorisé'
+          message: 'Authentification requise'
         },
         { status: 401 }
       )
@@ -32,42 +32,21 @@ export async function GET(request: NextRequest) {
         throw new Error(`Backend API error: ${response.status}`)
       }
     } catch (backendError) {
-      console.log('Backend indisponible, utilisation des données mock pour le menu personnalisé')
-      
-      // Retourner des données mock pour le menu personnalisé
-      const mockMenuData = {
-        success: true,
-        data: {
-          customMenu: [],
-          preferences: {
-            showIcons: true,
-            compactMode: false,
-            grouping: 'category'
-          }
-        },
-        message: 'Menu personnalisé (données mock)'
-      }
-      
-      return NextResponse.json(mockMenuData)
+      console.error('Backend indisponible:', backendError)
+      throw backendError
     }
   } catch (error) {
     console.error('Erreur lors du chargement du menu personnalisé:', error)
     
-    // En cas d'erreur complète, retourner des données mock
-    const mockMenuData = {
-      success: true,
-      data: {
-        customMenu: [],
-        preferences: {
-          showIcons: true,
-          compactMode: false,
-          grouping: 'category'
-        }
+    // Retourner une erreur 500
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Erreur lors du chargement du menu',
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
       },
-      message: 'Menu personnalisé (données mock - erreur)'
-    }
-    
-    return NextResponse.json(mockMenuData)
+      { status: 500 }
+    )
   }
 }
 

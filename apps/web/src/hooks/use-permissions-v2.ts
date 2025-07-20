@@ -55,7 +55,15 @@ export function usePermissions() {
       })
       
       if (!response.ok) {
-        console.error('Permissions API error:', response.status, response.statusText)
+        if (response.status === 401) {
+          console.warn('Permissions API: User not authenticated, redirecting to login')
+          // Rediriger vers la page de login si l'utilisateur n'est pas authentifié
+          if (typeof window !== 'undefined') {
+            window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
+          }
+        } else {
+          console.error('Permissions API error:', response.status, response.statusText)
+        }
         return
       }
       

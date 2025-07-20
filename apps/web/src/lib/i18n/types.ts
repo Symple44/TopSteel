@@ -43,3 +43,55 @@ export interface I18nContext {
   t: (key: string, params?: Record<string, string | number>) => string
   isLoading: boolean
 }
+
+// Types pour l'interface admin des traductions
+export interface TranslationEntry {
+  id: string
+  namespace: string
+  key: string
+  fullKey: string // namespace.key
+  translations: Record<string, string>
+  category?: string
+  description?: string
+  createdAt?: Date
+  updatedAt?: Date
+  modifiedBy?: string
+}
+
+export interface TranslationCategory {
+  id: string
+  name: string
+  description?: string
+  count?: number
+}
+
+export interface TranslationFilter {
+  search?: string
+  namespace?: string
+  category?: string
+  language?: string
+  untranslated?: boolean
+}
+
+export interface TranslationStats {
+  total: number
+  translated: Record<string, number>
+  untranslated: Record<string, number>
+  percentageComplete: Record<string, number>
+}
+
+export interface TranslationExport {
+  version: string
+  exportDate: string
+  languages: string[]
+  translations: TranslationEntry[]
+}
+
+export interface TranslationImportResult {
+  success: boolean
+  imported: number
+  updated: number
+  skipped: number
+  errors: string[]
+  warnings: string[]
+}

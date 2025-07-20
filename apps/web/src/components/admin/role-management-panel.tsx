@@ -154,7 +154,7 @@ export default function RoleManagementPanel() {
             Configurez les rôles utilisateurs et leurs permissions d'accès aux modules
           </p>
         </div>
-        <PermissionHide permission="ROLE_CREATE" roles={['SUPER_ADMIN', 'ADMIN']}>
+        <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -234,7 +234,7 @@ export default function RoleManagementPanel() {
                         <Settings className="h-4 w-4 mr-2" />
                         Permissions
                       </Button>
-                      <PermissionHide permission="ROLE_UPDATE" roles={['SUPER_ADMIN', 'ADMIN']}>
+                      <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
                         <Button
                           variant="outline"
                           size="sm"
@@ -247,7 +247,7 @@ export default function RoleManagementPanel() {
                           <Edit className="h-4 w-4" />
                         </Button>
                       </PermissionHide>
-                      <PermissionHide permission="ROLE_DELETE" roles={['SUPER_ADMIN']}>
+                      <PermissionHide permission={undefined} roles={['SUPER_ADMIN']}>
                         <Button
                           variant="outline"
                           size="sm"
@@ -350,7 +350,7 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null, onSave: () =>
         <Input
           id="name"
           value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
           placeholder="Ex: Deviseur, Superviseur..."
           required
         />
@@ -361,7 +361,7 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null, onSave: () =>
         <Textarea
           id="description"
           value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           placeholder="Décrivez les responsabilités de ce rôle..."
           required
         />
@@ -371,7 +371,7 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null, onSave: () =>
         <Switch
           id="isActive"
           checked={formData.isActive}
-          onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked }))}
+          onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, isActive: checked }))}
         />
         <Label htmlFor="isActive">Rôle actif</Label>
       </div>
@@ -572,7 +572,7 @@ function PermissionEditor({ role, modules, onSave }: {
                         <TableCell>
                           <Switch
                             checked={permission.isGranted}
-                            onCheckedChange={(checked) => updatePermission(permission.permissionId, permission.accessLevel, checked)}
+                            onCheckedChange={(checked: boolean) => updatePermission(permission.permissionId, permission.accessLevel, checked)}
                           />
                         </TableCell>
                       </TableRow>

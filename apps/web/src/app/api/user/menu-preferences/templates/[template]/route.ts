@@ -37,10 +37,10 @@ const templates = {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { template: string } }
+  { params }: { params: Promise<{ template: string }> }
 ) {
   try {
-    const { template } = params
+    const { template } = await params
     
     if (!templates[template as keyof typeof templates]) {
       return NextResponse.json(

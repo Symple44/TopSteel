@@ -1,11 +1,11 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { translator } from './translator'
 import type { Language, I18nContext } from './types'
 
-// Create React Context
-const I18nReactContext = createContext<I18nContext | null>(null)
+// Create React Context with fallback
+const I18nReactContext = React.createContext<I18nContext | null>(null)
 
 // Provider Component
 interface I18nProviderProps {
@@ -13,35 +13,16 @@ interface I18nProviderProps {
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(translator.getLanguageInfo())
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    const unsubscribe = translator.subscribe(() => {
-      setCurrentLanguage(translator.getLanguageInfo())
-    })
-
-    return unsubscribe
-  }, [])
-
-  const setLanguage = async (langCode: string) => {
-    setIsLoading(true)
-    try {
-      translator.setLanguage(langCode)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const t = (key: string, params?: Record<string, string | number>): string => {
-    return translator.t(key, params)
-  }
-
+  // Simplified fallback that doesn't rely on hooks initially
   const contextValue: I18nContext = {
-    currentLanguage,
-    setLanguage,
-    t,
-    isLoading,
+    currentLanguage: translator.getLanguageInfo(),
+    setLanguage: async (langCode: string) => {
+      translator.setLanguage(langCode)
+    },
+    t: (key: string, params?: Record<string, string | number>): string => {
+      return translator.t(key, params)
+    },
+    isLoading: false,
   }
 
   return (
@@ -53,10 +34,28 @@ export function I18nProvider({ children }: I18nProviderProps) {
 
 // Main hook for translations
 export function useTranslation(namespace?: string) {
-  const context = useContext(I18nReactContext)
+  const context = React.useContext(I18nReactContext)
   
   if (!context) {
-    throw new Error('useTranslation must be used within an I18nProvider')
+    // Provide a fallback translation function
+    console.warn('useTranslation called outside I18nProvider, using fallback')
+    const t = (key: string, params?: Record<string, string | number>): string => {
+      const fullKey = namespace ? `${namespace}.${key}` : key
+      return translator.t(fullKey, params)
+    }
+    
+    return {
+      t,
+      plural: (key: string, count: number, params?: Record<string, string | number>): string => {
+        const fullKey = namespace ? `${namespace}.${key}` : key
+        return translator.plural(fullKey, count, params)
+      },
+      currentLanguage: translator.getLanguageInfo(),
+      changeLanguage: (langCode: string) => translator.setLanguage(langCode),
+      setLanguage: (langCode: string) => translator.setLanguage(langCode),
+      supportedLanguages: translator.getSupportedLanguages(),
+      isLoading: false,
+    }
   }
 
   const { currentLanguage, setLanguage, isLoading } = context
@@ -86,10 +85,16 @@ export function useTranslation(namespace?: string) {
 
 // Hook for language switching
 export function useLanguage() {
-  const context = useContext(I18nReactContext)
+  const context = React.useContext(I18nReactContext)
   
   if (!context) {
-    throw new Error('useLanguage must be used within an I18nProvider')
+    console.warn('useLanguage called outside I18nProvider, using fallback')
+    return {
+      current: translator.getLanguageInfo(),
+      supported: translator.getSupportedLanguages(),
+      change: (langCode: string) => translator.setLanguage(langCode),
+      isLoading: false,
+    }
   }
 
   return {

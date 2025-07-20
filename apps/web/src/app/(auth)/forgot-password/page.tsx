@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button, Card, Input, Label } from '@erp/ui'
 import { ArrowLeft, Mail, Shield, CheckCircle } from 'lucide-react'
-import { useTranslation } from '@/lib/i18n/mock-hooks'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { toast } from '@/hooks/use-toast'
 
 // Force dynamic rendering to avoid SSR issues
@@ -23,8 +23,8 @@ export default function ForgotPasswordPage() {
     
     if (!email.trim()) {
       toast({
-        title: 'Erreur',
-        description: 'Veuillez saisir votre adresse email',
+        title: t('common.error') || 'Erreur',
+        description: t('enterEmail'),
         variant: 'destructive',
       })
       return
@@ -34,8 +34,8 @@ export default function ForgotPasswordPage() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       toast({
-        title: 'Erreur',
-        description: 'Veuillez saisir une adresse email valide',
+        title: t('common.error') || 'Erreur',
+        description: t('enterValidEmail'),
         variant: 'destructive',
       })
       return
@@ -49,14 +49,14 @@ export default function ForgotPasswordPage() {
       
       setIsEmailSent(true)
       toast({
-        title: 'Email envoyé',
-        description: 'Un email de récupération a été envoyé à votre adresse',
+        title: t('emailSent'),
+        description: t('emailSentToast'),
         variant: 'success',
       })
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue. Veuillez réessayer.',
+        title: t('common.error') || 'Erreur',
+        description: t('common.tryAgain') || 'Une erreur est survenue. Veuillez réessayer.',
         variant: 'destructive',
       })
     } finally {
@@ -74,16 +74,15 @@ export default function ForgotPasswordPage() {
             </div>
             
             <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-gray-900">Email envoyé !</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('emailSent')}</h1>
               <p className="text-gray-600">
-                Nous avons envoyé un lien de récupération à <strong>{email}</strong>
+                {t('emailSentDescription')} <strong>{email}</strong>
               </p>
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
               <p className="text-blue-800">
-                <strong>Vérifiez votre boîte mail</strong> (y compris les spams). 
-                Le lien expire dans 24 heures.
+                <strong>{t('checkEmailInbox')}</strong> {t('checkEmailDetails')}
               </p>
             </div>
 
@@ -93,13 +92,13 @@ export default function ForgotPasswordPage() {
                 variant="outline"
                 className="w-full"
               >
-                Renvoyer l'email
+                {t('resendEmail')}
               </Button>
               
               <Link href="/login">
                 <Button variant="ghost" className="w-full">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Retour à la connexion
+                  {t('backToLogin')}
                 </Button>
               </Link>
             </div>
@@ -118,16 +117,16 @@ export default function ForgotPasswordPage() {
             <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
               <Shield className="h-8 w-8 text-blue-600" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Mot de passe oublié</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('forgotPasswordTitle')}</h1>
             <p className="text-gray-600">
-              Saisissez votre email pour recevoir un lien de récupération
+              {t('forgotPasswordSubtitle')}
             </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Adresse email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
@@ -147,15 +146,14 @@ export default function ForgotPasswordPage() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Envoi en cours...' : 'Envoyer le lien de récupération'}
+              {isLoading ? t('sendingInProgress') : t('sendRecoveryLink')}
             </Button>
           </form>
 
           {/* Security notice */}
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm">
             <p className="text-amber-800">
-              <strong>Sécurité :</strong> Si vous ne recevez pas l'email, vérifiez que l'adresse 
-              est correcte ou contactez votre administrateur.
+              <strong>{t('securityNotice')}</strong> {t('securityNoticeText')}
             </p>
           </div>
 
@@ -164,12 +162,12 @@ export default function ForgotPasswordPage() {
             <Link href="/login">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Retour à la connexion
+                {t('backToLogin')}
               </Button>
             </Link>
             
             <div className="text-xs text-gray-500">
-              Besoin d'aide ? <Link href="/support" className="text-blue-600 hover:underline">Contactez le support</Link>
+              {t('needHelp')} <Link href="/support" className="text-blue-600 hover:underline">{t('contactSupport')}</Link>
             </div>
           </div>
         </div>
