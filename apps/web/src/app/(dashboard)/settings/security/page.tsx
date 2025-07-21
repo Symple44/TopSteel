@@ -40,6 +40,7 @@ interface MFAStats {
 
 export default function SecuritySettingsPage() {
   const { t } = useTranslation('common')
+  const { t: ts } = useTranslation('settings')
   const [mfaStats, setMFAStats] = useState<MFAStats | null>(null)
   const [mfaMethods, setMFAMethods] = useState<MFAMethod[]>([])
   const [loading, setLoading] = useState(true)
@@ -268,16 +269,16 @@ export default function SecuritySettingsPage() {
 
   const getSecurityLevelText = (level: string) => {
     switch (level) {
-      case 'none': return 'Aucune protection MFA'
-      case 'basic': return 'Protection de base'
-      case 'enhanced': return 'Protection renforcée'
+      case 'none': return ts('security.noMfaProtection')
+      case 'basic': return ts('security.basicProtection')
+      case 'enhanced': return ts('security.enhancedProtection')
       default: return 'Inconnu'
     }
   }
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="p-6">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
@@ -286,11 +287,11 @@ export default function SecuritySettingsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Sécurité & Authentification</h1>
-          <p className="text-muted-foreground">Gérez vos paramètres de sécurité et l'authentification à deux facteurs</p>
+          <h1 className="text-3xl font-bold">{ts('security.title')}</h1>
+          <p className="text-muted-foreground">{ts('security.subtitle')}</p>
         </div>
         {mfaStats && (
           <Badge variant={getSecurityLevelColor(mfaStats.securityLevel)} className="text-sm">
@@ -305,7 +306,7 @@ export default function SecuritySettingsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5" />
-            Aperçu de la sécurité
+{ts('security.overview')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -313,26 +314,26 @@ export default function SecuritySettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary">{mfaStats.totalUsage}</div>
-                <div className="text-sm text-muted-foreground">Utilisations MFA</div>
+                <div className="text-sm text-muted-foreground">{ts('security.mfaUsage')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
                   {Object.values(mfaStats.methods).filter(m => m.enabled && m.verified).length}
                 </div>
-                <div className="text-sm text-muted-foreground">Méthodes actives</div>
+                <div className="text-sm text-muted-foreground">{ts('security.activeMethods')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
                   {mfaStats.methods.webauthn.credentialsCount}
                 </div>
-                <div className="text-sm text-muted-foreground">Clés de sécurité</div>
+                <div className="text-sm text-muted-foreground">{ts('security.securityKeys')}</div>
               </div>
             </div>
           ) : (
             <Alert>
               <AlertTriangle className="w-4 h-4" />
               <AlertDescription>
-                Aucune protection MFA configurée. Il est recommandé d'activer l'authentification à deux facteurs.
+{ts('security.recommendMfa')}
               </AlertDescription>
             </Alert>
           )}

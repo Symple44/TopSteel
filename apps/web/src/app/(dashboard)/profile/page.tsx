@@ -139,9 +139,9 @@ export default function ProfilePage() {
         }
       }
       
-      toast.success(t('success.updated') || 'Profil mis à jour avec succès')
+      toast.success(t('success.updated'))
     } catch (error) {
-      toast.error(t('errors.general') || 'Erreur lors de la mise à jour du profil')
+      toast.error(t('errors.general'))
     } finally {
       setIsLoading(false)
     }
@@ -149,7 +149,7 @@ export default function ProfilePage() {
 
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('Les mots de passe ne correspondent pas')
+      toast.error(t('errors.passwords.mismatch'))
       return
     }
 
@@ -157,21 +157,21 @@ export default function ProfilePage() {
     try {
       // Simulation d'un appel API
       await new Promise(resolve => setTimeout(resolve, 1000))
-      toast.success(t('success.updated') || 'Mot de passe modifié avec succès')
+      toast.success(t('success.passwordChanged'))
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       })
     } catch (error) {
-      toast.error(t('errors.general') || 'Erreur lors de la modification du mot de passe')
+      toast.error(t('errors.passwords.updateFailed'))
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleReset = async () => {
-    if (window.confirm('Êtes-vous sûr de vouloir réinitialiser vos informations ?')) {
+    if (window.confirm(t('errors.reset.confirmText'))) {
       if (user) {
         setProfileData({
           acronyme: user.profile?.acronyme || '',
@@ -188,7 +188,7 @@ export default function ProfilePage() {
           role: user.role || '',
           permissions: user.permissions || [],
         })
-        toast.success('Informations réinitialisées')
+        toast.success(t('errors.reset.success'))
       }
     }
   }
@@ -213,7 +213,7 @@ export default function ProfilePage() {
                   entityId={user?.id}
                   variant="avatar"
                   onUploadSuccess={(result) => {
-                    toast.success(t('success.updated') || 'Photo de profil mise à jour')
+                    toast.success(t('success.photoUpdated'))
                     // Vous pouvez ici mettre à jour l'état local ou recharger les données utilisateur
                   }}
                   onUploadError={(error) => {
@@ -558,7 +558,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

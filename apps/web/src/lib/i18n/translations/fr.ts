@@ -251,8 +251,9 @@ export const fr = {
   },
 
   admin: {
-    title: 'Configuration du système',
-    subtitle: 'Configurez les paramètres globaux de votre ERP',
+    title: 'Administration',
+    subtitle: 'Centre de contrôle et de configuration du système',
+    description: 'Gérez les utilisateurs, les permissions, les configurations et les paramètres système',
     categories: {
       general: 'Général',
       accounting: 'Comptabilité',
@@ -377,6 +378,51 @@ export const fr = {
       statusError: 'Erreur lors de la récupération du statut Elasticsearch',
       configurationRetrievalError: 'Erreur lors de la récupération de la configuration',
     },
+    
+    modules: {
+      generalConfig: {
+        title: 'Configuration générale',
+        description: 'Paramètres système et configurations globales',
+      },
+      users: {
+        title: 'Gestion des utilisateurs',
+        description: 'Créer et gérer les comptes utilisateurs',
+      },
+      roles: {
+        title: 'Rôles et permissions',
+        description: 'Définir les rôles et leurs autorisations',
+      },
+      sessions: {
+        title: 'Sessions utilisateurs',
+        description: 'Surveiller et gérer les sessions actives',
+      },
+      company: {
+        title: 'Configuration entreprise',
+        description: 'Informations et paramètres de l\'entreprise',
+      },
+      menuConfig: {
+        title: 'Configuration des menus',
+        description: 'Personnaliser l\'organisation des menus',
+      },
+      database: {
+        title: 'Base de données',
+        description: 'Outils d\'administration de la base de données',
+      },
+      notifications: {
+        title: 'Règles de notification',
+        description: 'Configurer les notifications système',
+      },
+      translations: {
+        title: 'Gestion des traductions',
+        description: 'Configurer les traductions multilingues',
+      },
+      access: 'Accéder',
+      noModules: {
+        title: 'Aucun module accessible',
+        description: 'Vous n\'avez pas les permissions nécessaires pour accéder aux modules d\'administration.',
+      }
+    },
+    
     common: {
       save: 'Sauvegarder',
       reset: 'Réinitialiser',
@@ -435,6 +481,42 @@ export const fr = {
     hoursAgo: 'Il y a {hours} heures',
     dayAgo: 'Il y a {days} jour',
     remainingUnits: '{units} unités restantes',
+    
+    // Homepage specific
+    welcome: 'Bienvenue dans {companyName}',
+    subtitle: 'Plateforme de gestion intégrée pour l\'industrie métallurgique',
+    description: 'Gérez vos projets, production, stocks et équipes en un seul endroit',
+    accessDashboard: 'Accéder au tableau de bord',
+    configureCompany: 'Configurer l\'entreprise',
+    quickActionsTitle: 'Actions rapides',
+    
+    actions: {
+      dashboard: {
+        title: 'Tableau de bord',
+        description: 'Vue d\'ensemble des activités',
+      },
+      newProject: {
+        title: 'Nouveau projet',
+        description: 'Créer un nouveau projet',
+      },
+      production: {
+        title: 'Production',
+        description: 'Gérer les ordres de fabrication',
+      },
+      inventory: {
+        title: 'Gestion des stocks',
+        description: 'Suivre les niveaux de stock',
+      },
+      users: {
+        title: 'Utilisateurs',
+        description: 'Gérer les utilisateurs',
+      },
+      configuration: {
+        title: 'Configuration',
+        description: 'Paramètres du système',
+      },
+      access: 'Accéder'
+    }
   },
 
   navigation: {
@@ -544,6 +626,7 @@ export const fr = {
     connected: 'Connecté',
     session: 'Session',
     security: 'Sécurité',
+    status: 'Statut',
     changePassword: 'Changer le mot de passe',
     currentPassword: 'Mot de passe actuel',
     newPassword: 'Nouveau mot de passe',
@@ -557,11 +640,37 @@ export const fr = {
     currentSession: 'Session actuelle',
     saveProfile: 'Enregistrer le profil',
     browser: 'Navigateur',
+    
+    // Messages d'erreur et de succès
+    errors: {
+      general: 'Erreur lors de la mise à jour du profil',
+      passwords: {
+        mismatch: 'Les mots de passe ne correspondent pas',
+        updateFailed: 'Erreur lors de la modification du mot de passe'
+      },
+      reset: {
+        confirmText: 'Êtes-vous sûr de vouloir réinitialiser vos informations ?',
+        success: 'Informations réinitialisées'
+      }
+    },
+    success: {
+      updated: 'Profil mis à jour avec succès',
+      passwordChanged: 'Mot de passe modifié avec succès',
+      photoUpdated: 'Photo de profil mise à jour'
+    }
   },
 
   settings: {
-    title: 'Préférences',
-    subtitle: 'Configurez vos préférences personnelles du logiciel',
+    title: 'Paramètres',
+    subtitle: 'Personnalisez votre expérience utilisateur',
+    description: 'Configurez vos préférences, votre profil et les paramètres de votre compte',
+    connectedAs: 'Connecté en tant que',
+    accountInfo: 'Informations du compte',
+    fullName: 'Nom complet:',
+    email: 'Email:',
+    role: 'Rôle:',
+    status: 'Statut:',
+    active: 'Actif',
     notifications: 'Notifications',
     interface: 'Interface',
     notificationPreferences: 'Préférences de notification',
@@ -595,5 +704,66 @@ export const fr = {
     languageUpdateError: 'Erreur lors de la mise à jour de la langue',
     loadingSettings: 'Chargement des paramètres...',
     settingsLoadError: 'Erreur lors du chargement des paramètres',
+    
+    // Titres de pages spécifiques
+    security: {
+      title: 'Sécurité & Authentification',
+      subtitle: 'Gérez vos paramètres de sécurité et l\'authentification à deux facteurs',
+      overview: 'Aperçu de la sécurité',
+      securityLevel: 'Niveau de sécurité',
+      noMfaProtection: 'Aucune protection MFA',
+      basicProtection: 'Protection de base',
+      enhancedProtection: 'Protection renforcée',
+      mfaUsage: 'Utilisations MFA',
+      activeMethods: 'Méthodes actives',
+      securityKeys: 'Clés de sécurité',
+      recommendMfa: 'Aucune protection MFA configurée. Il est recommandé d\'activer l\'authentification à deux facteurs.'
+    },
+    appearance: {
+      title: 'Apparence & Langue',
+      subtitle: 'Personnalisez l\'interface et configurez la langue',
+      loading: 'Chargement...',
+      saveSuccess: 'Préférences sauvegardées avec succès!',
+      saveError: 'Erreur lors de la sauvegarde des préférences',
+      resetConfirm: 'Êtes-vous sûr de vouloir réinitialiser tous les paramètres ?',
+      reset: 'Réinitialiser',
+      back: 'Retour',
+      save: 'Sauvegarder',
+      saved: 'Sauvegardé',
+      unsavedChanges: 'Vous avez des modifications non sauvegardées. N\'oubliez pas de sauvegarder vos préférences.'
+    },
+    notifications: {
+      title: 'Notifications',
+      subtitle: 'Gérez vos préférences de notification et d\'alertes',
+      loading: 'Chargement...',
+      saveSuccess: 'Préférences sauvegardées avec succès!',
+      saveError: 'Erreur lors de la sauvegarde des préférences',
+      resetConfirm: 'Êtes-vous sûr de vouloir réinitialiser tous les paramètres ?',
+      reset: 'Réinitialiser',
+      back: 'Retour',
+      save: 'Sauvegarder',
+      saved: 'Sauvegardé',
+      unsavedChanges: 'Vous avez des modifications non sauvegardées. N\'oubliez pas de sauvegarder vos préférences.'
+    },
+    
+    modules: {
+      menu: {
+        title: 'Menu personnalisé',
+        description: 'Personnalisez votre navigation et vos raccourcis',
+      },
+      security: {
+        title: 'Paramètres de sécurité',
+        description: 'Configurer la sécurité de votre compte',
+      },
+      notifications: {
+        title: 'Notifications',
+        description: 'Gérer vos préférences de notification et d\'alertes',
+      },
+      appearance: {
+        title: 'Apparence & Langue',
+        description: 'Personnaliser le thème, l\'interface et la langue',
+      },
+      configure: 'Configurer',
+    }
   },
 }
