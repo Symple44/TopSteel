@@ -92,7 +92,16 @@ export class RoleService {
 
   async findRoleById(id: string, includePermissions: boolean = false): Promise<Role> {
     const queryBuilder = this.roleRepository.createQueryBuilder('role')
-      .where('role.id = :id', { id })
+    
+    // Vérifier si id est un UUID ou un nom
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
+    
+    if (isUuid) {
+      queryBuilder.where('role.id = :id', { id })
+    } else {
+      // Chercher par nom si ce n'est pas un UUID
+      queryBuilder.where('role.name = :name', { name: id })
+    }
     
     if (includePermissions) {
       queryBuilder.leftJoinAndSelect('role.permissions', 'permissions')
@@ -103,7 +112,7 @@ export class RoleService {
     const role = await queryBuilder.getOne()
     
     if (!role) {
-      throw new NotFoundException(`Rôle avec l'ID ${id} non trouvé`)
+      throw new NotFoundException(`Rôle avec l'ID/nom ${id} non trouvé`)
     }
 
     return role
@@ -207,14 +216,14 @@ export class RoleService {
       order: { category: 'ASC', name: 'ASC' }
     })
 
-    // Récupérer les permissions actuelles du rôle
+    // Récupérer les permissions actuelles du rôle - utiliser l'ID réel du rôle trouvé
     const rolePermissions = await this.rolePermissionRepository.find({
-      where: { roleId },
+      where: { roleId: role.id },
       relations: ['permission', 'permission.module']
     })
 
     return {
-      roleId,
+      roleId: role.id,
       modules,
       rolePermissions
     }
@@ -231,13 +240,13 @@ export class RoleService {
   ): Promise<void> {
     const role = await this.findRoleById(roleId)
 
-    // Supprimer les permissions existantes
-    await this.rolePermissionRepository.delete({ roleId })
+    // Supprimer les permissions existantes - utiliser l'ID réel du rôle
+    await this.rolePermissionRepository.delete({ roleId: role.id })
 
-    // Ajouter les nouvelles permissions
+    // Ajouter les nouvelles permissions - utiliser l'ID réel du rôle
     const rolePermissions = permissions.map(p => 
       RolePermission.create(
-        roleId,
+        role.id,
         p.permissionId,
         p.accessLevel,
         p.isGranted,
@@ -258,22 +267,24 @@ export class RoleService {
   ): Promise<UserRole> {
     const role = await this.findRoleById(roleId)
 
-    // Vérifier s'il n'y a pas déjà une assignation active
+    // Vérifier s'il n'y a pas déjà une assignation active - utiliser l'ID réel du rôle
     const existingUserRole = await this.userRoleRepository.findOne({
-      where: { userId, roleId, isActive: true }
+      where: { userId, roleId: role.id, isActive: true }
     })
 
     if (existingUserRole) {
       throw new ConflictException('L\'utilisateur a déjà ce rôle')
     }
 
-    const userRole = UserRole.assign(userId, roleId, assignedBy, expiresAt)
+    const userRole = UserRole.assign(userId, role.id, assignedBy, expiresAt)
     return await this.userRoleRepository.save(userRole)
   }
 
   async removeUserFromRole(userId: string, roleId: string): Promise<void> {
+    const role = await this.findRoleById(roleId)
+    
     const userRole = await this.userRoleRepository.findOne({
-      where: { userId, roleId, isActive: true }
+      where: { userId, roleId: role.id, isActive: true }
     })
 
     if (!userRole) {

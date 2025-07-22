@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import React, { type ReactNode } from 'react'
 import { translator } from './translator'
 import type { Language, I18nContext } from './types'
 
@@ -13,7 +13,18 @@ interface I18nProviderProps {
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
-  // Simplified fallback that doesn't rely on hooks initially
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0)
+  
+  React.useEffect(() => {
+    // S'abonner aux changements du translator
+    const unsubscribe = translator.subscribe(() => {
+      // Forcer un re-render quand le translator change (langue ou overrides)
+      forceUpdate()
+    })
+    
+    return unsubscribe
+  }, [])
+  
   const contextValue: I18nContext = {
     currentLanguage: translator.getLanguageInfo(),
     setLanguage: async (langCode: string) => {

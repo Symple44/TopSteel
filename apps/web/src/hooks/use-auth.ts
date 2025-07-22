@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 
 // Types harmonisés
 interface UserProfile {
@@ -130,7 +130,7 @@ const cookieUtils = {
 
 export const useAuth = () => {
   // État principal
-  const [authState, setAuthState] = useState<AuthState>({
+  const [authState, setAuthState] = React.useState<AuthState>({
     user: null,
     tokens: null,
     isLoading: true,
@@ -141,7 +141,7 @@ export const useAuth = () => {
   })
 
   // ✅ Validation des tokens - fonction stable avec useCallback
-  const validateTokens = useCallback(async (tokens: Tokens): Promise<boolean> => {
+  const validateTokens = React.useCallback(async (tokens: Tokens): Promise<boolean> => {
     try {
       // Vérifier d'abord si le token n'est pas expiré localement
       if (tokens.expiresIn) {
@@ -168,7 +168,7 @@ export const useAuth = () => {
   }, [])
 
   // ✅ Fonction de login - stable avec useCallback
-  const login = useCallback(async (identifier: string, password: string, rememberMe: boolean = false): Promise<void> => {
+  const login = React.useCallback(async (identifier: string, password: string, rememberMe: boolean = false): Promise<void> => {
     setAuthState((prev) => ({ ...prev, isLoading: true }))
 
     try {
@@ -233,7 +233,7 @@ export const useAuth = () => {
   }, [])
 
   // ✅ Fonction de vérification MFA - stable avec useCallback
-  const verifyMFA = useCallback(async (mfaType: string, code?: string, webauthnResponse?: any): Promise<void> => {
+  const verifyMFA = React.useCallback(async (mfaType: string, code?: string, webauthnResponse?: any): Promise<void> => {
     if (!authState.mfa?.required || !authState.mfa?.userId) {
       throw new Error('MFA not required or no user ID available')
     }
@@ -303,7 +303,7 @@ export const useAuth = () => {
   }, [authState.mfa?.required, authState.mfa?.userId])
 
   // ✅ Fonction de réinitialisation MFA - stable avec useCallback
-  const resetMFA = useCallback(() => {
+  const resetMFA = React.useCallback(() => {
     setAuthState((prev) => ({
       ...prev,
       mfa: {
@@ -313,7 +313,7 @@ export const useAuth = () => {
   }, [])
 
   // ✅ Fonction de logout - stable avec useCallback
-  const logout = useCallback(async (): Promise<void> => {
+  const logout = React.useCallback(async (): Promise<void> => {
     setAuthState((prev) => ({ ...prev, isLoading: true }))
 
     try {
@@ -349,7 +349,7 @@ export const useAuth = () => {
   }, [])
 
   // ✅ Mise à jour utilisateur - stable avec useCallback
-  const setUser = useCallback((user: User | null) => {
+  const setUser = React.useCallback((user: User | null) => {
     if (user) {
       storage.set(AUTH_STORAGE_KEY, user)
       setAuthState((prev) => ({
@@ -368,7 +368,7 @@ export const useAuth = () => {
   }, [])
 
   // ✅ Rafraîchir les tokens - stable avec useCallback
-  const refreshTokens = useCallback(async (): Promise<void> => {
+  const refreshTokens = React.useCallback(async (): Promise<void> => {
     const currentTokens = authState.tokens
     if (!currentTokens?.refreshToken) {
       throw new Error('No refresh token available')
@@ -429,7 +429,7 @@ export const useAuth = () => {
   }, [])
 
   // ✅ Initialisation depuis le stockage local - EXÉCUTION UNIQUE
-  useEffect(() => {
+  React.useEffect(() => {
     const initializeAuth = async () => {
       try {
         const storedUser = storage.get(AUTH_STORAGE_KEY)
@@ -514,7 +514,7 @@ export const useAuth = () => {
   }, []) // ✅ EXÉCUTION UNIQUE AU MOUNT
 
   // ✅ Auto-refresh des tokens
-  useEffect(() => {
+  React.useEffect(() => {
     if (!authState.tokens?.accessToken || !authState.isAuthenticated) {
       return
     }
@@ -535,7 +535,7 @@ export const useAuth = () => {
   }, [authState.tokens?.accessToken, authState.isAuthenticated, refreshTokens])
 
   // ✅ Écouter les mises à jour du profil utilisateur
-  useEffect(() => {
+  React.useEffect(() => {
     const handleProfileUpdate = () => {
       const storedUser = storage.get(AUTH_STORAGE_KEY)
       if (storedUser) {

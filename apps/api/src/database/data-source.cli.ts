@@ -1,13 +1,15 @@
 import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
-import { resolve } from 'path'
+import { join } from 'path'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
 
 // Load environment variables
-config({ path: resolve(__dirname, '../../.env.local') })
+config()
 
 // Use glob patterns for entity discovery
 
-export const AppDataSource = new DataSource({
+export default new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
@@ -23,5 +25,3 @@ export const AppDataSource = new DataSource({
   migrations: ['src/database/migrations/*.ts'],
   migrationsTableName: 'migrations',
 })
-
-export default AppDataSource

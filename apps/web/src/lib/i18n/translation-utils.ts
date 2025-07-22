@@ -4,6 +4,11 @@ import { en } from './translations/en'
 import { es } from './translations/es'
 import * as XLSX from 'xlsx'
 
+// Fonction helper pour vérifier si une traduction est valide
+const isValidTranslation = (value: any): boolean => {
+  return typeof value === 'string' && value.trim() !== ''
+}
+
 // Obtenir toutes les traductions disponibles
 export const getAllTranslations = (): Record<string, any> => ({
   fr,
@@ -46,7 +51,7 @@ export const flattenTranslations = (
     // Récupérer la traduction pour chaque langue
     languages.forEach(lang => {
       const value = getNestedValue(translations[lang], fullKey)
-      if (value !== undefined) {
+      if (value !== undefined && typeof value === 'string') {
         entry.translations[lang] = value
       }
     })
@@ -102,12 +107,12 @@ export const calculateTranslationStats = (entries: TranslationEntry[]): Translat
   }
   
   languages.forEach(lang => {
-    const translated = entries.filter(e => e.translations[lang] && e.translations[lang].trim() !== '').length
+    const translated = entries.filter(e => isValidTranslation(e.translations[lang])).length
     const untranslated = entries.length - translated
     
     stats.translated[lang] = translated
     stats.untranslated[lang] = untranslated
-    stats.percentageComplete[lang] = Math.round((translated / entries.length) * 100)
+    stats.percentageComplete[lang] = entries.length > 0 ? Math.round((translated / entries.length) * 100) : 0
   })
   
   return stats
@@ -122,6 +127,7 @@ export const filterTranslations = (
     category?: string
     language?: string
     untranslated?: boolean
+    modified?: boolean
   }
 ): TranslationEntry[] => {
   return entries.filter(entry => {
@@ -143,10 +149,12 @@ export const filterTranslations = (
     
     // Filtre traductions manquantes
     if (filter.untranslated && filter.language) {
-      const hasTranslation = entry.translations[filter.language] && 
-                           entry.translations[filter.language].trim() !== ''
+      const hasTranslation = isValidTranslation(entry.translations[filter.language])
       if (hasTranslation) return false
     }
+    
+    // Filtre traductions modifiées
+    if (filter.modified && !entry.isModified) return false
     
     return true
   })
@@ -277,39 +285,54 @@ export const saveTranslation = async (entry: TranslationEntry): Promise<boolean>
 
 // Charger les traductions avec les modifications
 export const loadTranslationsWithOverrides = async (): Promise<TranslationEntry[]> => {
+  // Toujours commencer par les traductions de base (référence)
+  const baseTranslations = flattenTranslations(getAllTranslations())
+  
   try {
     const response = await fetch('/api/admin/translations')
     
     if (!response.ok) {
       console.warn(`Translation API error: ${response.status} ${response.statusText}`)
-      // Return fallback empty array instead of throwing
-      return []
+      // Retourner les traductions de base si l'API échoue
+      return baseTranslations
     }
     
     const result = await response.json()
     
-    if (result.success) {
-      const baseTranslations = flattenTranslations(result.data.translations)
-      const overrides = result.data.overrides || {}
+    if (result.success && result.data.overrides) {
+      const overrides = result.data.overrides
       
-      // Appliquer les modifications
+      // Appliquer les overrides aux traductions de base
       return baseTranslations.map(entry => {
         if (overrides[entry.id]) {
           return {
             ...entry,
-            ...overrides[entry.id],
-            updatedAt: new Date(overrides[entry.id].updatedAt)
+            // Fusionner les traductions : base + overrides
+            translations: {
+              ...entry.translations,
+              ...overrides[entry.id].translations
+            },
+            // Marquer comme modifié si des overrides existent
+            isModified: true,
+            updatedAt: new Date(overrides[entry.id].updatedAt),
+            updatedBy: overrides[entry.id].updatedBy
           }
         }
-        return entry
+        return {
+          ...entry,
+          isModified: false
+        }
       })
     }
   } catch (error) {
-    console.error('Error loading translations from API:', error)
+    console.error('Error loading translation overrides:', error)
   }
   
-  // Fallback vers les traductions de base en cas d'erreur
-  return flattenTranslations(getAllTranslations())
+  // Retourner les traductions de base avec un flag non-modifié
+  return baseTranslations.map(entry => ({
+    ...entry,
+    isModified: false
+  }))
 }
 
 // Importer des traductions via l'API

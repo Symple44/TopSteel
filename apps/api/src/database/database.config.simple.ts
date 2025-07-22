@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config'
 import { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { User } from '../modules/users/entities/user.entity'
+import { UserSettings } from '../modules/users/entities/user-settings.entity'
 import { MenuConfiguration } from '../modules/admin/entities/menu-configuration.entity'
 import { MenuItem } from '../modules/admin/entities/menu-item.entity'
 import { MenuItemPermission } from '../modules/admin/entities/menu-item-permission.entity'
@@ -12,6 +13,10 @@ import { UserRole } from '../modules/auth/entities/user-role.entity'
 import { Group } from '../modules/auth/entities/group.entity'
 import { UserGroup } from '../modules/auth/entities/user-group.entity'
 import { Module } from '../modules/auth/entities/module.entity'
+import { UserSession } from '../modules/auth/entities/user-session.entity'
+import { UserMFA } from '../modules/auth/entities/user-mfa.entity'
+import { MFASession } from '../modules/auth/entities/mfa-session.entity'
+import { UserMenuPreference } from '../modules/menu/entities/user-menu-preference.entity'
 
 export const createSimpleDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const config: TypeOrmModuleOptions = {
@@ -25,6 +30,7 @@ export const createSimpleDatabaseConfig = (configService: ConfigService): TypeOr
     // Entities avec import explicite pour User + patterns
     entities: [
       User,
+      UserSettings,
       MenuConfiguration,
       MenuItem,
       MenuItemPermission,
@@ -36,6 +42,10 @@ export const createSimpleDatabaseConfig = (configService: ConfigService): TypeOr
       Group,
       UserGroup,
       Module,
+      UserSession,
+      UserMFA,
+      MFASession,
+      UserMenuPreference,
       __dirname + '/../modules/**/*.entity.{ts,js}',
       __dirname + '/../common/**/*.entity.{ts,js}',
     ],

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authFromRequest, hasAnyRole } from '@/lib/auth'
 import fs from 'fs/promises'
 import path from 'path'
+import { fr } from '@/lib/i18n/translations/fr'
+import { en } from '@/lib/i18n/translations/en'
+import { es } from '@/lib/i18n/translations/es'
 
 // GET - Récupérer toutes les traductions
 export async function GET(request: NextRequest) {
@@ -17,27 +20,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 })
     }
 
-    // Lire les fichiers de traduction
-    const translationsDir = path.join(process.cwd(), 'apps/web/src/lib/i18n/translations')
-    
-    const translations: Record<string, any> = {}
-    
-    // Lire tous les fichiers de langue
-    const files = await fs.readdir(translationsDir)
-    
-    for (const file of files) {
-      if (file.endsWith('.ts')) {
-        const lang = file.replace('.ts', '')
-        const filePath = path.join(translationsDir, file)
-        
-        try {
-          // Dynamiquement importer le fichier de traduction
-          const module = await import(filePath)
-          translations[lang] = module[lang] || module.default
-        } catch (error) {
-          console.error(`Erreur lors du chargement de ${file}:`, error)
-        }
-      }
+    // Charger les traductions directement depuis les imports
+    const translations: Record<string, any> = {
+      fr,
+      en,
+      es
     }
 
     // Lire les modifications depuis la base de données ou fichier de configuration

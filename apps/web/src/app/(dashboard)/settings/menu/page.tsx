@@ -35,19 +35,11 @@ import {
   Check,
   X
 } from 'lucide-react'
-import { Breadcrumb } from '@/components/ui/breadcrumb'
-import { useUserMenuPreferences } from '@/hooks/use-user-menu-preferences'
 import { useAvailablePages } from '@/hooks/use-available-pages'
 import { useSelectedPages } from '@/hooks/use-selected-pages'
 import { useDynamicMenu } from '@/hooks/use-dynamic-menu'
 
 export default function MenuSettingsPage() {
-  const { 
-    loading, 
-    error, 
-    resetPreferences
-  } = useUserMenuPreferences()
-
   const { 
     categories, 
     loading: pagesLoading,
@@ -57,6 +49,7 @@ export default function MenuSettingsPage() {
   const {
     selectedPages,
     loading: selectedLoading,
+    error: selectedError,
     togglePage,
     selectAllPages,
     deselectAllPages,
@@ -70,10 +63,6 @@ export default function MenuSettingsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['dashboard']))
 
-  const breadcrumbItems = [
-    { title: 'Paramètres', href: '/settings' },
-    { title: 'Personnalisation du menu', current: true }
-  ]
 
   const toggleCategory = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories)
@@ -109,7 +98,6 @@ export default function MenuSettingsPage() {
   const handleReset = async () => {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes vos sélections ?')) {
       await resetSelection()
-      await resetPreferences()
       // Mettre à jour le menu immédiatement
       refreshMenu()
     }
@@ -125,7 +113,7 @@ export default function MenuSettingsPage() {
       })).filter(category => category.pages.length > 0)
     : categories
 
-  if (loading || pagesLoading || selectedLoading) {
+  if (pagesLoading || selectedLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -138,9 +126,6 @@ export default function MenuSettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbItems} />
-
       {/* En-tête */}
       <div className="flex justify-between items-start">
         <div>
@@ -163,9 +148,11 @@ export default function MenuSettingsPage() {
         </div>
       </div>
 
-      {error && (
+      {selectedError && (
         <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            {selectedError}
+          </AlertDescription>
         </Alert>
       )}
 

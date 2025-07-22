@@ -663,6 +663,134 @@ body {
   border-color: hsl(var(--border)) !important;
 }
 
+/* =================================================================== */
+/* CLASSES POUR LES PRÉFÉRENCES D'APPARENCE */
+/* =================================================================== */
+
+/* Variables CSS pour les préférences utilisateur */
+:root {
+  --font-size-multiplier: 1;
+  --density-multiplier: 1;
+  --sidebar-width: 260px;
+  --accent-color: hsl(217 91% 60%);
+}
+
+/* Classes pour la taille de police */
+body.font-small {
+  --font-size-multiplier: 0.875;
+}
+
+body.font-medium {
+  --font-size-multiplier: 1;
+}
+
+body.font-large {
+  --font-size-multiplier: 1.125;
+}
+
+/* Application de la taille de police */
+body.font-small .text-sm { font-size: calc(0.875rem * var(--font-size-multiplier)) !important; }
+body.font-small .text-base { font-size: calc(1rem * var(--font-size-multiplier)) !important; }
+body.font-small .text-lg { font-size: calc(1.125rem * var(--font-size-multiplier)) !important; }
+body.font-small .text-xl { font-size: calc(1.25rem * var(--font-size-multiplier)) !important; }
+body.font-small .text-2xl { font-size: calc(1.5rem * var(--font-size-multiplier)) !important; }
+body.font-small .text-3xl { font-size: calc(1.875rem * var(--font-size-multiplier)) !important; }
+
+body.font-large .text-sm { font-size: calc(0.875rem * var(--font-size-multiplier)) !important; }
+body.font-large .text-base { font-size: calc(1rem * var(--font-size-multiplier)) !important; }
+body.font-large .text-lg { font-size: calc(1.125rem * var(--font-size-multiplier)) !important; }
+body.font-large .text-xl { font-size: calc(1.25rem * var(--font-size-multiplier)) !important; }
+body.font-large .text-2xl { font-size: calc(1.5rem * var(--font-size-multiplier)) !important; }
+body.font-large .text-3xl { font-size: calc(1.875rem * var(--font-size-multiplier)) !important; }
+
+/* Classes pour la densité */
+body.density-compact {
+  --density-multiplier: 0.75;
+}
+
+body.density-comfortable {
+  --density-multiplier: 1;
+}
+
+body.density-spacious {
+  --density-multiplier: 1.25;
+}
+
+/* Application de la densité */
+body.density-compact .p-2 { padding: calc(0.5rem * var(--density-multiplier)) !important; }
+body.density-compact .p-3 { padding: calc(0.75rem * var(--density-multiplier)) !important; }
+body.density-compact .p-4 { padding: calc(1rem * var(--density-multiplier)) !important; }
+body.density-compact .p-6 { padding: calc(1.5rem * var(--density-multiplier)) !important; }
+body.density-compact .py-2 { padding-top: calc(0.5rem * var(--density-multiplier)) !important; padding-bottom: calc(0.5rem * var(--density-multiplier)) !important; }
+body.density-compact .py-3 { padding-top: calc(0.75rem * var(--density-multiplier)) !important; padding-bottom: calc(0.75rem * var(--density-multiplier)) !important; }
+body.density-compact .py-4 { padding-top: calc(1rem * var(--density-multiplier)) !important; padding-bottom: calc(1rem * var(--density-multiplier)) !important; }
+body.density-compact .gap-2 { gap: calc(0.5rem * var(--density-multiplier)) !important; }
+body.density-compact .gap-4 { gap: calc(1rem * var(--density-multiplier)) !important; }
+body.density-compact .gap-6 { gap: calc(1.5rem * var(--density-multiplier)) !important; }
+
+body.density-spacious .p-2 { padding: calc(0.5rem * var(--density-multiplier)) !important; }
+body.density-spacious .p-3 { padding: calc(0.75rem * var(--density-multiplier)) !important; }
+body.density-spacious .p-4 { padding: calc(1rem * var(--density-multiplier)) !important; }
+body.density-spacious .p-6 { padding: calc(1.5rem * var(--density-multiplier)) !important; }
+body.density-spacious .py-2 { padding-top: calc(0.5rem * var(--density-multiplier)) !important; padding-bottom: calc(0.5rem * var(--density-multiplier)) !important; }
+body.density-spacious .py-3 { padding-top: calc(0.75rem * var(--density-multiplier)) !important; padding-bottom: calc(0.75rem * var(--density-multiplier)) !important; }
+body.density-spacious .py-4 { padding-top: calc(1rem * var(--density-multiplier)) !important; padding-bottom: calc(1rem * var(--density-multiplier)) !important; }
+body.density-spacious .gap-2 { gap: calc(0.5rem * var(--density-multiplier)) !important; }
+body.density-spacious .gap-4 { gap: calc(1rem * var(--density-multiplier)) !important; }
+body.density-spacious .gap-6 { gap: calc(1.5rem * var(--density-multiplier)) !important; }
+
+/* Classes pour la largeur de sidebar */
+.sidebar-width {
+  width: var(--sidebar-width) !important;
+}
+
+/* Classes pour les couleurs d'accent personnalisées */
+.accent-color {
+  color: var(--accent-color) !important;
+}
+
+.bg-accent-color {
+  background-color: var(--accent-color) !important;
+}
+
+.border-accent-color {
+  border-color: var(--accent-color) !important;
+}
+
+/* Classes pour la largeur du contenu */
+body.content-compact {
+  --content-max-width: 1200px;
+}
+
+body.content-full {
+  --content-max-width: none;
+}
+
+/* Application de la largeur de contenu aux conteneurs principaux */
+body.content-compact .max-w-4xl { max-width: var(--content-max-width) !important; }
+body.content-compact .max-w-6xl { max-width: var(--content-max-width) !important; }
+body.content-compact .max-w-7xl { max-width: var(--content-max-width) !important; }
+
+body.content-full .max-w-4xl { max-width: none !important; }
+body.content-full .max-w-6xl { max-width: none !important; }
+body.content-full .max-w-7xl { max-width: none !important; }
+
+/* Styles pour les conteneurs de pages */
+body.content-full .page-container,
+body.content-full main,
+body.content-full .dashboard-content {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+body.content-compact .page-container,
+body.content-compact main,
+body.content-compact .dashboard-content {
+  max-width: var(--content-max-width) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 /* Classes de debug pour vérifier que ce CSS est chargé */
 .debug-css-loaded {
   position: fixed;
@@ -677,4 +805,592 @@ body {
 
 .debug-css-loaded::after {
   content: "CSS CHARGÉ ✅";
+}
+
+/* =================================================================== */
+/* STYLES POUR LE DATATABLE AMÉLIORÉ */
+/* =================================================================== */
+
+/* Styles de base pour le DataTable */
+.datatable-enhanced {
+  --dt-border-color: hsl(var(--border));
+  --dt-header-bg: hsl(var(--muted));
+  --dt-header-fg: hsl(var(--foreground));
+  --dt-row-hover: hsl(var(--muted) / 0.5);
+  --dt-selected-bg: hsl(var(--primary) / 0.1);
+}
+
+/* Mode sombre */
+.dark .datatable-enhanced {
+  --dt-border-color: hsl(var(--border));
+  --dt-header-bg: hsl(var(--background));
+  --dt-header-fg: hsl(var(--foreground));
+  --dt-row-hover: hsl(var(--muted) / 0.3);
+  --dt-selected-bg: hsl(var(--primary) / 0.15);
+}
+
+/* Grille avec bordures verticales */
+.datatable-enhanced td,
+.datatable-enhanced th {
+  border-right: 1px solid var(--dt-border-color);
+}
+
+.datatable-enhanced td:last-child,
+.datatable-enhanced th:last-child {
+  border-right: none;
+}
+
+/* En-têtes non transparents */
+.datatable-enhanced thead {
+  background-color: var(--dt-header-bg);
+  border-bottom: 2px solid var(--dt-border-color);
+}
+
+.datatable-enhanced thead th {
+  background-color: var(--dt-header-bg);
+  color: var(--dt-header-fg);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Amélioration des lignes */
+.datatable-enhanced tbody tr {
+  border-bottom: 1px solid var(--dt-border-color);
+}
+
+.datatable-enhanced tbody tr:hover {
+  background-color: var(--dt-row-hover);
+}
+
+.datatable-enhanced tbody tr.selected {
+  background-color: var(--dt-selected-bg);
+}
+
+/* Amélioration du compact mode */
+.table-compact td,
+.table-compact th {
+  padding: 0.25rem 0.5rem;
+}
+
+/* Amélioration du striped mode */
+.table-striped tbody tr:nth-child(even) {
+  background-color: hsl(var(--muted) / 0.3);
+}
+
+/* Amélioration des cellules sélectionnées */
+.datatable-enhanced td.cell-selected {
+  background-color: hsl(var(--primary) / 0.2);
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: -1px;
+}
+
+/* Styles pour les dropdowns de filtres de colonnes */
+[data-radix-popper-content-wrapper] {
+  z-index: 50 !important;
+}
+
+/* Fix pour les dropdowns qui sortent du conteneur */
+.datatable-content {
+  overflow: visible !important;
+}
+
+/* Mais garder le scroll pour le contenu */
+.datatable-enhanced-container .datatable-content {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  position: relative;
+}
+
+/* Styles pour les contenus de dropdown */
+[role="menu"],
+[data-radix-menu-content],
+[data-radix-select-content],
+[data-radix-dropdown-menu-content] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Mode sombre pour les dropdowns */
+.dark [role="menu"],
+.dark [data-radix-menu-content],
+.dark [data-radix-select-content],
+.dark [data-radix-dropdown-menu-content] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+/* Amélioration des items de menu */
+[role="menuitem"],
+[data-radix-dropdown-menu-item] {
+  padding: 0.5rem 0.75rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+[role="menuitem"]:hover,
+[data-radix-dropdown-menu-item]:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Fix pour les positions des dropdowns */
+.column-filter-dropdown {
+  position: relative !important;
+}
+
+/* Styles pour les vues alternatives */
+.kanban-column {
+  background-color: hsl(var(--muted) / 0.3);
+  border: 1px solid hsl(var(--border));
+}
+
+.dark .kanban-column {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+}
+
+.kanban-card {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  transition: all 0.2s;
+}
+
+.kanban-card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  transform: translateY(-2px);
+}
+
+/* Styles pour les vues cartes */
+.cards-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.card-item {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.card-item:hover {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  transform: translateY(-2px);
+}
+
+/* Styles pour la timeline */
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: hsl(var(--border));
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 0.25rem;
+  top: 0.5rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+}
+
+/* Fix pour les conteneurs avec hauteur définie */
+.datatable-enhanced-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.datatable-enhanced-container .overflow-auto {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Amélioration des filtres avancés */
+.advanced-filters-panel {
+  background-color: hsl(var(--muted) / 0.5);
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Amélioration des règles de couleurs */
+.color-rule-preview {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+/* Amélioration du regroupement en arbre */
+.tree-group-header {
+  background-color: hsl(var(--muted) / 0.5);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tree-group-header:hover {
+  background-color: hsl(var(--muted) / 0.7);
+}
+
+/* Fix pour les problèmes de z-index */
+.datatable-toolbar {
+  position: relative;
+  z-index: 20;
+}
+
+.datatable-header {
+  position: relative;
+  z-index: 15;
+}
+
+/* Amélioration des sélecteurs de vue */
+.view-selector-button {
+  transition: all 0.2s;
+}
+
+.view-selector-button.active {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* Fix pour les dropdowns qui se cachent */
+.dropdown-portal-content {
+  position: fixed !important;
+  z-index: 9999 !important;
+}
+
+/* Styles pour les dropdowns de filtres de colonnes qui survolent */
+.column-filter-dropdown {
+  position: fixed !important;
+  z-index: 10003 !important;
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 
+    0 10px 10px -5px rgb(0 0 0 / 0.04),
+    0 0 0 1px rgb(0 0 0 / 0.05) !important;
+}
+
+.dark .column-filter-dropdown {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  box-shadow: 
+    0 20px 25px -5px rgb(0 0 0 / 0.4), 
+    0 10px 10px -5px rgb(0 0 0 / 0.1),
+    0 0 0 1px rgb(255 255 255 / 0.05) !important;
+}
+
+/* Portail pour les dropdowns */
+#dropdown-portal {
+  pointer-events: none !important;
+  position: fixed !important;
+  z-index: 10000 !important;
+}
+
+#dropdown-portal > * {
+  pointer-events: auto !important;
+}
+
+/* Styles pour les filtres avancés de colonnes */
+.column-filter-advanced {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 
+    0 20px 25px -5px rgb(0 0 0 / 0.25), 
+    0 10px 10px -5px rgb(0 0 0 / 0.1),
+    0 0 0 1px rgb(0 0 0 / 0.05) !important;
+  opacity: 1 !important;
+}
+
+.dark .column-filter-advanced {
+  background-color: hsl(var(--background)) !important;
+  box-shadow: 
+    0 20px 25px -5px rgb(0 0 0 / 0.5), 
+    0 10px 10px -5px rgb(0 0 0 / 0.2),
+    0 0 0 1px rgb(255 255 255 / 0.1) !important;
+}
+
+/* Styles pour l'icône de filtre améliorée */
+.filter-icon-active {
+  position: relative;
+}
+
+.filter-icon-active::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  background-color: rgb(37, 99, 235); /* blue-600 */
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px white;
+}
+
+.dark .filter-icon-active::after {
+  box-shadow: 0 0 0 1px hsl(var(--background));
+}
+
+/* Animation pour l'apparition de l'icône */
+@keyframes filterIconFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.filter-icon-hover {
+  animation: filterIconFadeIn 0.2s ease-out;
+}
+
+/* Amélioration de la lisibilité des filtres */
+.filter-dropdown-content {
+  min-width: 250px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Scrollbar personnalisée pour les dropdowns */
+.filter-dropdown-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-dropdown-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filter-dropdown-content::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+.filter-dropdown-content::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* =================================================================== */
+/* STYLES POUR LES DIALOGUES ET MODALES */
+/* =================================================================== */
+
+/* Fix pour les dialogues Radix UI */
+[data-radix-dialog-overlay] {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 50 !important;
+  background-color: hsl(0 0% 0% / 0.8) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+[data-radix-dialog-content] {
+  position: fixed !important;
+  z-index: 50 !important;
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Mode sombre pour les dialogues */
+.dark [data-radix-dialog-content] {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+/* Fix pour le contenu des dialogues */
+[data-radix-dialog-content] > * {
+  color: inherit !important;
+}
+
+/* Fix pour les Select dans les dialogues */
+[data-radix-dialog-content] [data-radix-select-content] {
+  z-index: 100 !important;
+}
+
+/* Fix pour les Select dans les modales SimpleModal */
+[data-radix-select-content] {
+  z-index: 10001 !important;
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.25), 0 10px 10px -5px rgb(0 0 0 / 0.04) !important;
+  max-width: 400px !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+/* Fix spécifique pour les Select dans les SimpleModal */
+.simple-modal-container [data-radix-select-content] {
+  position: fixed !important;
+  max-width: 350px !important;
+}
+
+/* Style spécifique pour les Select dans les ColorRuleManager */
+.color-rule-select-container [data-radix-select-content] {
+  min-width: 200px !important;
+  max-width: 300px !important;
+}
+
+/* Amélioration de la visibilité des dialogues */
+.dialog-content {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .dialog-content {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+}
+
+/* Fix pour les contenus vides ou invisibles */
+[data-state="open"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Amélioration des transitions */
+[data-radix-dialog-content] {
+  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes contentShow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Fix pour les problèmes de rendu */
+[role="dialog"] {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+/* Amélioration des z-index pour éviter les conflits */
+.dialog-overlay {
+  z-index: 9998 !important;
+}
+
+.dialog-content-wrapper {
+  z-index: 9999 !important;
+}
+
+/* Fix pour les problèmes de fond gris */
+[data-radix-dialog-portal] {
+  position: fixed !important;
+  z-index: 9997 !important;
+  pointer-events: none !important;
+}
+
+[data-radix-dialog-portal] > * {
+  pointer-events: auto !important;
+}
+
+/* =================================================================== */
+/* STYLES POUR LES SELECT DANS LES MODALES */
+/* =================================================================== */
+
+/* Fix pour les items de Select */
+[data-radix-select-item] {
+  padding: 0.5rem 0.75rem !important;
+  cursor: pointer !important;
+  background-color: transparent !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border-radius: 0.25rem !important;
+  margin: 2px !important;
+}
+
+[data-radix-select-item]:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+[data-radix-select-item][data-state="checked"] {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* Fix pour les Select Viewport */
+[data-radix-select-viewport] {
+  padding: 0.5rem !important;
+}
+
+/* Fix pour les Select Trigger */
+[data-radix-select-trigger] {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+[data-radix-select-trigger]:focus {
+  ring: 2px solid hsl(var(--ring)) !important;
+}
+
+/* Fix pour le Select Value */
+[data-radix-select-value] {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Fix pour les portails Select */
+[data-radix-select-portal] {
+  z-index: 10001 !important;
+}
+
+/* Mode sombre pour les Select */
+.dark [data-radix-select-content] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+.dark [data-radix-select-item] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+.dark [data-radix-select-item]:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.dark [data-radix-select-trigger] {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
 }

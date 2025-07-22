@@ -1,9 +1,12 @@
 'use client'
 
 import React from 'react'
+import { useAuth } from '@/hooks/use-auth'
+import { useRouter } from 'next/navigation'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n/hooks'
+import { CompanyLogo } from '@/components/ui/company-logo'
 import {
   Activity,
   AlertTriangle,
@@ -19,7 +22,6 @@ import {
   Target,
   TrendingUp,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'
@@ -63,12 +65,21 @@ interface RecentActivity {
 
 export default function Dashboard() {
   const { t } = useTranslation('dashboard')
-  const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [activities, setActivities] = useState<RecentActivity[]>([])
-  const [loading, setLoading] = useState(true)
-
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
+  const router = useRouter()
+  const [stats, setStats] = React.useState<DashboardStats | null>(null)
+  const [activities, setActivities] = React.useState<RecentActivity[]>([])
+  const [loading, setLoading] = React.useState(true)
+  
+  // Vérifier l'authentification
+  React.useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login?redirect=/dashboard')
+    }
+  }, [isAuthenticated, authLoading, router])
+  
   // Data simulation (to be replaced by API calls)
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchDashboardData = async () => {
       // API call simulation
       setTimeout(() => {
@@ -140,6 +151,18 @@ export default function Dashboard() {
 
     fetchDashboardData()
   }, [])
+  
+  // Afficher un loader si pas encore authentifié
+  if (authLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Vérification de l'authentification...</p>
+        </div>
+      </div>
+    )
+  }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
@@ -199,11 +222,14 @@ export default function Dashboard() {
       <div className="space-y-8 p-8">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-              {t('title')}
-            </h1>
-            <p className="text-slate-600 mt-1">{t('overview')}</p>
+          <div className="flex items-center space-x-4">
+            <CompanyLogo size="lg" showName={false} className="flex-shrink-0" />
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                {t('title')}
+              </h1>
+              <p className="text-slate-600 mt-1">{t('overview')}</p>
+            </div>
           </div>
           <div className="flex items-center space-x-3">
             <Button

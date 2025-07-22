@@ -19,7 +19,7 @@ interface BreadcrumbProps {
 
 export function Breadcrumb({ items, className, showHome = true }: BreadcrumbProps) {
   const allItems = showHome 
-    ? [{ title: 'Accueil', href: '/dashboard' }, ...items]
+    ? [{ title: 'Accueil', href: '/' }, ...items]
     : items
 
   return (

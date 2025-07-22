@@ -1,8 +1,8 @@
 'use client'
 
+import React from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useCallback } from 'react'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -36,7 +36,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const pathname = usePathname()
 
   // Fonction de redirection sécurisée
-  const safeRedirect = useCallback((url: string) => {
+  const safeRedirect = React.useCallback((url: string) => {
     try {
       router.replace(url)
     } catch (error) {
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [router])
 
   // Initialiser la session au démarrage
-  useEffect(() => {
+  React.useEffect(() => {
     if (typeof window !== 'undefined' && !sessionStorage.getItem('topsteel-session-initialized')) {
       sessionStorage.setItem('topsteel-session-initialized', 'true')
       console.log('Session initialized on startup')
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   // Gestion des redirections basées sur l'état d'authentification
-  useEffect(() => {
+  React.useEffect(() => {
     // Ne pas faire de redirections si on est encore en train de charger
     if (typeof window === 'undefined' || isLoading) return
 
@@ -91,13 +91,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return
     }
 
-    // Redirection depuis la page racine
-    if (pathname === '/') {
-      if (isAuthenticated) {
-        safeRedirect('/dashboard')
-      } else {
-        safeRedirect('/login')
-      }
+    // Redirection depuis la page racine uniquement si non authentifié
+    if (pathname === '/' && !isAuthenticated) {
+      safeRedirect('/login')
     }
   }, [isAuthenticated, isLoading, pathname, safeRedirect])
 
@@ -110,7 +106,7 @@ export function useRequireAuth() {
   const router = useRouter()
   const pathname = usePathname()
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Ne pas rediriger pendant le chargement
     if (isLoading) return
 
@@ -183,7 +179,7 @@ export function RouteGuard({
   const { user, isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isLoading) return
 
     if (!isAuthenticated) {

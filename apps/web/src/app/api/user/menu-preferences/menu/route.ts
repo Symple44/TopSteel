@@ -26,9 +26,23 @@ export async function GET(request: NextRequest) {
       
       if (response.ok) {
         const data = await response.json()
-        return NextResponse.json(data)
+        
+        // Gérer les différentes structures de réponse possibles
+        if (data.data && data.data.success) {
+          // Structure: { data: { success: true, data: [...] } }
+          return NextResponse.json({
+            success: data.data.success,
+            data: data.data.data,
+            message: data.message || 'Menu récupéré avec succès'
+          })
+        } else if (data.success) {
+          // Structure: { success: true, data: [...] }
+          return NextResponse.json(data)
+        } else {
+          // Structure directe ou autre
+          return NextResponse.json(data)
+        }
       } else {
-        console.log('Backend API erreur:', response.status, 'Utilisation des données mock')
         throw new Error(`Backend API error: ${response.status}`)
       }
     } catch (backendError) {

@@ -3,16 +3,7 @@ import { pageDiscoveryService } from '@/services/page-discovery.service'
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Ajouter l'authentification
-    // const session = await getServerSession(authOptions)
-    // if (!session?.user) {
-    //   return NextResponse.json(
-    //     { success: false, error: 'Non authentifié' },
-    //     { status: 401 }
-    //   )
-    // }
-
-    // Découvrir les pages disponibles
+    // Découvrir les pages disponibles depuis le système de fichiers
     const categories = pageDiscoveryService.discoverPages()
     
     // Filtrer les pages selon les permissions de l'utilisateur

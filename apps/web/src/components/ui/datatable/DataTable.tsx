@@ -1,0 +1,1908 @@
+'use client'
+
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import {
+  ColumnConfig,
+  DataTableConfig,
+  SortConfig,
+  FilterConfig,
+  SelectionState,
+  TableSettings
+} from './types'
+import AdvancedFilters, { AdvancedFilterGroup } from './AdvancedFilters'
+import { useRangeSelection } from './use-range-selection'
+import { useKeyboardShortcuts } from './keyboard-shortcuts'
+import { FormulaEngine } from './formula-engine'
+import { ExportUtils } from './export-utils'
+import { ClipboardUtils } from './clipboard-utils'
+import { InlineEditor } from './InlineEditor'
+import { useDragDropColumns, DragDropUtils } from './drag-drop-utils'
+import { SettingsManager, usePersistedTableSettings } from './settings-manager'
+import { ColumnFilterAdvanced } from './ColumnFilterAdvanced'
+import { ColorRuleManager, ColorRule } from './ColorRuleManager'
+import { useColorRules } from './use-color-rules'
+import { useTreeGrouping, TreeGroupingConfig } from './use-tree-grouping'
+import { TreeGroupingPanel } from './TreeGroupingPanel'
+import { useDataViews } from './use-data-views'
+import { ViewSelector } from './ViewSelector'
+import { KanbanView } from './views/KanbanView'
+import { CardsView } from './views/CardsView'
+import { TimelineView } from './views/TimelineView'
+import { CalendarView } from './views/CalendarView'
+import { KanbanCardEditor } from './KanbanCardEditor'
+import { GenericCardEditor } from './GenericCardEditor'
+import { RenderUtils } from './render-utils'
+import { DataTableSkeleton } from './DataTableSkeleton'
+import { DataTableError } from './DataTableError'
+import { DataTableEmpty } from './DataTableEmpty'
+import { TooltipSimple } from '@/components/ui/tooltip-simple'
+import { ExportDialog } from './ExportDialog'
+import { RichTextEditor } from './RichTextEditor'
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Checkbox,
+  Badge
+} from '@erp/ui'
+import { DropdownPortal, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown-portal'
+import {
+  ChevronUp,
+  ChevronDown,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  Settings,
+  Eye,
+  EyeOff,
+  GripVertical,
+  Plus,
+  Trash2,
+  Edit,
+  MoreHorizontal,
+  Type,
+  Palette,
+  Network,
+  ChevronRight,
+  LayoutGrid
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
+
+export interface DataTableProps<T = any> extends DataTableConfig<T> {
+  loading?: boolean
+  error?: string | null
+}
+
+export function DataTable<T = any>({
+  data,
+  columns: initialColumns,
+  keyField,
+  tableId,
+  userId,
+  sortable = true,
+  searchable = true,
+  filterable = true,
+  editable = false,
+  selectable = false,
+  pagination = false,
+  actions,
+  settings: initialSettings,
+  onSettingsChange,
+  onRowClick,
+  onRowDoubleClick,
+  onCellEdit,
+  onSelectionChange,
+  className,
+  height,
+  striped = true,
+  bordered = true,
+  compact = false,
+  loading = false,
+  error = null
+}: DataTableProps<T>) {
+  
+  // États
+  const [columns, setColumns] = useState<ColumnConfig<T>[]>(initialColumns)
+  const [draggedColumn, setDraggedColumn] = useState<string | null>(null)
+  const [sortConfig, setSortConfig] = useState<SortConfig[]>([])
+  const [filters, setFilters] = useState<FilterConfig[]>([])
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterGroup[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300)
+  const [selection, setSelection] = useState<SelectionState>({
+    selectedRows: new Set(),
+    selectAll: false
+  })
+  
+  // Sélection de plages Excel
+  const rangeSelection = useRangeSelection()
+  const [editingCell, setEditingCell] = useState<{
+    row: number
+    column: string
+  } | null>(null)
+  const [focusedCell, setFocusedCell] = useState<{row: number, column: string} | null>(null)
+  const [clipboardData, setClipboardData] = useState<string[][] | null>(null)
+  const [showPastePreview, setShowPastePreview] = useState(false)
+  const [showExportDialog, setShowExportDialog] = useState(false)
+  const [richTextEditor, setRichTextEditor] = useState<{
+    row: number
+    column: string
+    value: string
+  } | null>(null)
+  
+  // États pour les règles de couleurs
+  const [colorRules, setColorRules] = useState<ColorRule[]>([])
+  const [showColorRuleManager, setShowColorRuleManager] = useState(false)
+  
+  // États pour le regroupement en arbre
+  const [showTreeGroupingPanel, setShowTreeGroupingPanel] = useState(false)
+  
+  // États pour l'édition Kanban
+  const [showKanbanEditor, setShowKanbanEditor] = useState(false)
+  const [editingKanbanCard, setEditingKanbanCard] = useState<any>(null)
+  
+  // États pour les éditeurs génériques (Cards, Timeline, Calendar)
+  const [showGenericEditor, setShowGenericEditor] = useState(false)
+  const [editingGenericItem, setEditingGenericItem] = useState<any>(null)
+  const [editingViewType, setEditingViewType] = useState<'cards' | 'timeline' | 'calendar'>('cards')
+  
+  // Utiliser les paramètres persistés si tableId est fourni
+  const persistedSettings = tableId ? usePersistedTableSettings(tableId, initialColumns, userId) : null
+  
+  const [localSettings, setLocalSettings] = useState<TableSettings>(
+    initialSettings || persistedSettings?.settings || { columns: {} }
+  )
+  
+  const settings = persistedSettings?.settings || localSettings
+  
+  const setSettings = (newSettings: TableSettings) => {
+    if (persistedSettings) {
+      persistedSettings.setSettings(newSettings)
+    } else {
+      setLocalSettings(newSettings)
+    }
+    onSettingsChange?.(newSettings)
+  }
+  
+  // Refs
+  const tableRef = useRef<HTMLTableElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  
+  // Drag & Drop pour les colonnes
+  const {
+    handleColumnDragStart,
+    handleColumnDragOver,
+    handleColumnDragLeave,
+    handleColumnDrop,
+    handleColumnDragEnd,
+    canMoveColumn
+  } = useDragDropColumns(
+    columns,
+    settings,
+    (newColumns) => {
+      setColumns(newColumns)
+    },
+    (newSettings) => {
+      setSettings(newSettings)
+      onSettingsChange?.(newSettings)
+    }
+  )
+
+  
+  // Mémoriser les colonnes ordonnées et filtrées
+  const orderedColumns = useMemo(() => {
+    return [...columns]
+      .filter(col => {
+        // Vérifier d'abord dans settings, puis fallback sur col.visible
+        const settingVisible = settings.columns[col.id]?.visible
+        if (settingVisible !== undefined) {
+          return settingVisible
+        }
+        return col.visible !== false
+      })
+      .sort((a, b) => {
+        const orderA = settings.columns[a.id]?.order ?? 999
+        const orderB = settings.columns[b.id]?.order ?? 999
+        return orderA - orderB
+      })
+  }, [columns, settings])
+
+  // Fonctions utilitaires de filtrage (définies avant processedData)
+  const applyFilter = (value: any, filter: FilterConfig): boolean => {
+    // Nouveau format de filtre depuis ColumnFilterAdvanced
+    if (filter.value && typeof filter.value === 'object') {
+      const filterValue = filter.value as any
+      
+      // Filtre par valeurs multiples (checkbox)
+      if (filterValue.type === 'values' && Array.isArray(filterValue.values)) {
+        return filterValue.values.includes(String(value))
+      }
+      
+      // Filtre par plage numérique
+      if (filterValue.type === 'range') {
+        const numValue = Number(value)
+        if (isNaN(numValue)) return false
+        
+        if (filterValue.min !== null && numValue < filterValue.min) return false
+        if (filterValue.max !== null && numValue > filterValue.max) return false
+        return true
+      }
+      
+      // Filtre par plage de dates
+      if (filterValue.type === 'dateRange') {
+        const dateValue = new Date(value)
+        if (isNaN(dateValue.getTime())) return false
+        
+        if (filterValue.start && dateValue < new Date(filterValue.start)) return false
+        if (filterValue.end && dateValue > new Date(filterValue.end)) return false
+        return true
+      }
+    }
+    
+    // Ancien format de filtre (compatibilité)
+    switch (filter.operator) {
+      case 'equals':
+        return value === filter.value
+      case 'contains':
+        return String(value || '').toLowerCase().includes(String(filter.value).toLowerCase())
+      case 'startsWith':
+        return String(value || '').toLowerCase().startsWith(String(filter.value).toLowerCase())
+      case 'endsWith':
+        return String(value || '').toLowerCase().endsWith(String(filter.value).toLowerCase())
+      case 'gt':
+        return Number(value) > Number(filter.value)
+      case 'lt':
+        return Number(value) < Number(filter.value)
+      case 'gte':
+        return Number(value) >= Number(filter.value)
+      case 'lte':
+        return Number(value) <= Number(filter.value)
+      default:
+        return true
+    }
+  }
+  
+  const applyAdvancedFilter = (value: any, rule: any, column: ColumnConfig<T>): boolean => {
+    switch (rule.operator) {
+      case 'equals':
+        return value === rule.value
+      case 'not_equals':
+        return value !== rule.value
+      case 'contains':
+        return String(value || '').toLowerCase().includes(String(rule.value || '').toLowerCase())
+      case 'not_contains':
+        return !String(value || '').toLowerCase().includes(String(rule.value || '').toLowerCase())
+      case 'starts_with':
+        return String(value || '').toLowerCase().startsWith(String(rule.value || '').toLowerCase())
+      case 'ends_with':
+        return String(value || '').toLowerCase().endsWith(String(rule.value || '').toLowerCase())
+      case 'gt':
+        return Number(value) > Number(rule.value)
+      case 'gte':
+        return Number(value) >= Number(rule.value)
+      case 'lt':
+        return Number(value) < Number(rule.value)
+      case 'lte':
+        return Number(value) <= Number(rule.value)
+      case 'between':
+        return Number(value) >= Number(rule.value) && Number(value) <= Number(rule.value2)
+      case 'in':
+        const inValues = String(rule.value).split(',').map(v => v.trim())
+        return inValues.includes(String(value))
+      case 'not_in':
+        const notInValues = String(rule.value).split(',').map(v => v.trim())
+        return !notInValues.includes(String(value))
+      case 'is_empty':
+        return value === null || value === undefined || String(value).trim() === ''
+      case 'is_not_empty':
+        return value !== null && value !== undefined && String(value).trim() !== ''
+      default:
+        return true
+    }
+  }
+
+  // Mémoriser les données filtrées et triées
+  const processedData = useMemo(() => {
+    let result = [...data]
+    
+    // Appliquer la recherche (avec debouncing)
+    if (debouncedSearchTerm && searchable) {
+      const searchLower = debouncedSearchTerm.toLowerCase()
+      result = result.filter(row => {
+        return orderedColumns.some(col => {
+          if (col.searchable === false) return false
+          
+          // Utiliser getValue si défini, sinon la clé normale
+          const value = col.getValue ? col.getValue(row) : (row as any)[col.key]
+          
+          if (value === null || value === undefined) return false
+          
+          // Recherche dans les différents types de valeurs
+          if (typeof value === 'string') {
+            return value.toLowerCase().includes(searchLower)
+          }
+          
+          if (typeof value === 'number') {
+            return value.toString().includes(searchLower)
+          }
+          
+          if (typeof value === 'boolean') {
+            const boolText = value ? 'oui true vrai' : 'non false faux'
+            return boolText.includes(searchLower)
+          }
+          
+          if (value instanceof Date) {
+            const dateStr = value.toLocaleDateString('fr-FR')
+            return dateStr.toLowerCase().includes(searchLower)
+          }
+          
+          if (Array.isArray(value)) {
+            return value.some(v => String(v).toLowerCase().includes(searchLower))
+          }
+          
+          // Fallback pour autres types
+          return String(value).toLowerCase().includes(searchLower)
+        })
+      })
+    }
+    
+    // Appliquer les filtres
+    filters.forEach(filter => {
+      result = result.filter(row => {
+        const value = (row as any)[filter.column]
+        return applyFilter(value, filter)
+      })
+    })
+    
+    // Appliquer les filtres avancés
+    if (advancedFilters.length > 0) {
+      result = result.filter(row => {
+        return advancedFilters.every(group => {
+          if (group.rules.length === 0) return true
+          
+          const ruleResults = group.rules
+            .filter(rule => rule.enabled)
+            .map(rule => {
+              const column = orderedColumns.find(col => col.id === rule.column)
+              if (!column) return false
+              
+              const value = column.getValue ? column.getValue(row) : (row as any)[column.key]
+              return applyAdvancedFilter(value, rule, column)
+            })
+          
+          if (ruleResults.length === 0) return true
+          
+          return group.logic === 'OR' 
+            ? ruleResults.some(result => result)
+            : ruleResults.every(result => result)
+        })
+      })
+    }
+    
+    // Appliquer le tri
+    sortConfig.forEach(sort => {
+      result.sort((a, b) => {
+        const aVal = (a as any)[sort.column]
+        const bVal = (b as any)[sort.column]
+        
+        if (aVal === bVal) return 0
+        
+        // Logique de tri simple et fiable (même que les en-têtes)
+        if (aVal < bVal) return sort.direction === 'desc' ? -1 : 1
+        if (aVal > bVal) return sort.direction === 'desc' ? 1 : -1
+        return 0
+      })
+    })
+    
+    return result
+  }, [data, orderedColumns, debouncedSearchTerm, filters, advancedFilters, sortConfig, searchable])
+  
+  // Calculer les valeurs des formules
+  const dataWithFormulas = useMemo(() => {
+    return processedData.map((row, rowIndex) => {
+      const enhancedRow = { ...row }
+      
+      // Calculer les colonnes avec formules
+      orderedColumns.forEach(col => {
+        if (col.type === 'formula' && col.formula) {
+          const context = {
+            row: enhancedRow,
+            rowIndex,
+            data: processedData,
+            columns: orderedColumns,
+            getValue: (columnId: string, targetRowIndex?: number) => {
+              const targetRow = targetRowIndex !== undefined 
+                ? processedData[targetRowIndex] 
+                : enhancedRow
+              const targetColumn = orderedColumns.find(c => c.id === columnId)
+              return targetColumn ? (targetRow as any)[targetColumn.key] : null
+            }
+          }
+          
+          const engine = new FormulaEngine(context)
+          const result = engine.evaluate(col.formula.expression)
+          ;(enhancedRow as any)[col.key] = result
+        }
+      })
+      
+      return enhancedRow
+    })
+  }, [processedData, orderedColumns])
+  
+  // Hook pour les règles de couleurs
+  const colorRuleSystem = useColorRules(dataWithFormulas, orderedColumns, colorRules)
+  
+  // Hook pour le regroupement en arbre
+  const treeGrouping = useTreeGrouping(dataWithFormulas, orderedColumns)
+  
+  // Hook pour les vues alternatives
+  const dataViews = useDataViews(dataWithFormulas, orderedColumns, keyField)
+  
+  // Mémoriser les statistiques pour éviter les recalculs
+  const tableStats = useMemo(() => {
+    return {
+      totalRows: data.length,
+      visibleRows: processedData.length,
+      selectedRows: selection.selectedRows.size,
+      visibleColumns: orderedColumns.length,
+      hasFilters: debouncedSearchTerm || filters.length > 0 || advancedFilters.some(group => group.rules.length > 0)
+    }
+  }, [data.length, processedData.length, selection.selectedRows.size, orderedColumns.length, debouncedSearchTerm, filters.length, advancedFilters])
+  
+  // Gestionnaires d'événements
+  const handleSort = useCallback((columnId: string, forceDirection?: 'asc' | 'desc' | null) => {
+    if (!sortable) return
+    
+    setSortConfig(prev => {
+      const existing = prev.find(s => s.column === columnId)
+      
+      // Si forceDirection est null, supprimer le tri
+      if (forceDirection === null) {
+        return prev.filter(s => s.column !== columnId)
+      }
+      
+      // Si une direction est forcée, l'utiliser
+      if (forceDirection === 'asc' || forceDirection === 'desc') {
+        if (existing) {
+          return prev.map(s => s.column === columnId ? { ...s, direction: forceDirection } : s)
+        } else {
+          return [...prev, { column: columnId, direction: forceDirection }]
+        }
+      }
+      
+      // Si forceDirection est undefined, utiliser la logique de cycle (clics sur en-têtes)
+      if (forceDirection === undefined) {
+        // Utiliser la logique de cycle normal
+        if (existing) {
+          if (existing.direction === 'desc') {
+            return prev.map(s => s.column === columnId ? { ...s, direction: 'asc' as const } : s)
+          } else {
+            return prev.filter(s => s.column !== columnId)
+          }
+        } else {
+          return [...prev, { column: columnId, direction: 'desc' as const }]
+        }
+      }
+      
+      // Cas par défaut 
+      return prev
+    })
+  }, [sortable])
+  
+  const handleCellEdit = useCallback((
+    rowIndex: number, 
+    columnId: string, 
+    newValue: any
+  ) => {
+    if (!editable) return
+    
+    const column = orderedColumns.find(col => col.id === columnId)
+    const row = dataWithFormulas[rowIndex]
+    
+    if (column && onCellEdit) {
+      onCellEdit(newValue, row, column)
+    }
+    
+    setEditingCell(null)
+  }, [editable, orderedColumns, dataWithFormulas, onCellEdit])
+  
+  const handleExport = useCallback((format: 'xlsx' | 'csv' | 'pdf') => {
+    ExportUtils.exportToExcel(dataWithFormulas, orderedColumns, {
+      format,
+      filename: `export_${new Date().toISOString().split('T')[0]}.${format}`,
+      visibleColumnsOnly: true
+    })
+  }, [dataWithFormulas, orderedColumns])
+  
+  const handleColumnVisibilityToggle = useCallback((columnId: string) => {
+    const newSettings = {
+      ...settings,
+      columns: {
+        ...settings.columns,
+        [columnId]: {
+          ...settings.columns[columnId],
+          visible: !(settings.columns[columnId]?.visible ?? true)
+        }
+      }
+    }
+    setSettings(newSettings)
+    onSettingsChange?.(newSettings)
+  }, [settings, setSettings, onSettingsChange])
+  
+  // Gestionnaires pour copier-coller (définis avant keyboardActions)
+  const handleCopySelection = useCallback(async () => {
+    if (selection.selectedRows.size === 0) return
+    
+    const selectedData = dataWithFormulas.filter((_, index) => 
+      selection.selectedRows.has((dataWithFormulas[index] as any)[keyField])
+    )
+    
+    const clipboardText = ClipboardUtils.dataToClipboard(selectedData, orderedColumns)
+    const success = await ClipboardUtils.copyToClipboard(clipboardText)
+    
+    if (success) {
+      console.log('Données copiées')
+    }
+  }, [selection, dataWithFormulas, orderedColumns, keyField])
+  
+  const handlePaste = useCallback(async (event?: ClipboardEvent) => {
+    let clipboardText: string | null = null
+    
+    // Si on a un événement paste, l'utiliser (plus fiable)
+    if (event) {
+      clipboardText = ClipboardUtils.handlePasteEvent(event)
+    } else {
+      // Sinon essayer de lire le clipboard (peut échouer)
+      clipboardText = await ClipboardUtils.readFromClipboard()
+    }
+    
+    if (!clipboardText) {
+      console.warn('Impossible de lire le contenu du presse-papier. Utilisez Ctrl+V dans le tableau.')
+      return
+    }
+    
+    const pastedData = ClipboardUtils.parseClipboardData(clipboardText)
+    if (pastedData.length === 0) return
+    
+    setClipboardData(pastedData)
+    setShowPastePreview(true)
+  }, [])
+  
+  const handleConfirmPaste = useCallback((hasHeaders: boolean = true) => {
+    if (!clipboardData) return
+    
+    const validationResult = ClipboardUtils.validatePastedData(
+      clipboardData,
+      orderedColumns,
+      hasHeaders
+    )
+    
+    if (validationResult.errors.length > 0) {
+      console.error('Erreurs de validation:', validationResult.errors)
+      return
+    }
+    
+    console.log('Données à ajouter:', validationResult.data)
+    
+    setClipboardData(null)
+    setShowPastePreview(false)
+  }, [clipboardData, orderedColumns])
+  
+  // Gestionnaires pour les raccourcis clavier Excel
+  const keyboardActions = useMemo(() => ({
+    onArrowKey: (direction: 'up' | 'down' | 'left' | 'right', shiftKey: boolean) => {
+      if (!focusedCell) return
+      
+      const { row: currentRow, column: currentColumn } = focusedCell
+      const columnIndex = orderedColumns.findIndex(col => col.id === currentColumn)
+      
+      let newRow = currentRow
+      let newColumnIndex = columnIndex
+      
+      switch (direction) {
+        case 'up':
+          newRow = Math.max(0, currentRow - 1)
+          break
+        case 'down':
+          newRow = Math.min(dataWithFormulas.length - 1, currentRow + 1)
+          break
+        case 'left':
+          newColumnIndex = Math.max(0, columnIndex - 1)
+          break
+        case 'right':
+          newColumnIndex = Math.min(orderedColumns.length - 1, columnIndex + 1)
+          break
+      }
+      
+      const newColumn = orderedColumns[newColumnIndex]?.id || currentColumn
+      const newPosition = { row: newRow, column: newColumn }
+      
+      setFocusedCell(newPosition)
+      
+      if (shiftKey) {
+        // Étendre la sélection
+        rangeSelection.extendSelection(newPosition)
+      } else {
+        // Commencer nouvelle sélection
+        rangeSelection.startSelection(newPosition)
+      }
+    },
+    
+    onSelectAll: () => {
+      const allRowKeys = dataWithFormulas.map((row, index) => (row as any)[keyField] || index)
+      setSelection({
+        selectedRows: new Set(allRowKeys),
+        selectAll: true
+      })
+    },
+    
+    onCopy: () => {
+      if (rangeSelection.selection.ranges.length > 0 || rangeSelection.selection.activeRange) {
+        rangeSelection.copyToClipboard(dataWithFormulas, orderedColumns)
+      } else {
+        handleCopySelection()
+      }
+    },
+    
+    onPaste: () => {
+      // TODO: Implémenter le collage
+      console.log('Paste action')
+    },
+    
+    onFillDown: () => {
+      rangeSelection.fillDown(
+        dataWithFormulas, 
+        orderedColumns.map(col => ({ id: col.id, key: col.key })),
+        handleCellEdit
+      )
+    },
+    
+    onFillRight: () => {
+      rangeSelection.fillRight(
+        dataWithFormulas,
+        orderedColumns.map(col => ({ id: col.id, key: col.key })),
+        handleCellEdit
+      )
+    },
+    
+    onEditCell: (rowIndex: number, columnId: string) => {
+      setEditingCell({ row: rowIndex, column: columnId })
+    },
+    
+    onCancelEdit: () => {
+      setEditingCell(null)
+    },
+    
+    onCreate: () => {
+      actions?.create?.()
+    },
+    
+    onExport: () => {
+      handleExport('xlsx')
+    },
+    
+    onTabNavigation: (forward: boolean) => {
+      if (!focusedCell) {
+        // Si pas de cellule focalisée, commencer par la première
+        const firstCell = { row: 0, column: orderedColumns[0]?.id || '' }
+        setFocusedCell(firstCell)
+        rangeSelection.startSelection(firstCell)
+        return
+      }
+      
+      const { row: currentRow, column: currentColumn } = focusedCell
+      const columnIndex = orderedColumns.findIndex(col => col.id === currentColumn)
+      
+      let newRow = currentRow
+      let newColumnIndex = columnIndex
+      
+      if (forward) {
+        // Tab : colonne suivante
+        newColumnIndex++
+        if (newColumnIndex >= orderedColumns.length) {
+          // Fin de ligne, passer à la ligne suivante, première colonne
+          newColumnIndex = 0
+          newRow++
+          if (newRow >= dataWithFormulas.length) {
+            // Fin du tableau, rester sur la dernière cellule
+            newRow = dataWithFormulas.length - 1
+            newColumnIndex = orderedColumns.length - 1
+          }
+        }
+      } else {
+        // Shift+Tab : colonne précédente
+        newColumnIndex--
+        if (newColumnIndex < 0) {
+          // Début de ligne, passer à la ligne précédente, dernière colonne
+          newColumnIndex = orderedColumns.length - 1
+          newRow--
+          if (newRow < 0) {
+            // Début du tableau, rester sur la première cellule
+            newRow = 0
+            newColumnIndex = 0
+          }
+        }
+      }
+      
+      const newColumn = orderedColumns[newColumnIndex]?.id || currentColumn
+      const newPosition = { row: newRow, column: newColumn }
+      
+      setFocusedCell(newPosition)
+      rangeSelection.startSelection(newPosition)
+      
+      // Si la cellule est éditable, commencer l'édition
+      const targetColumn = orderedColumns.find(col => col.id === newColumn)
+      if (editable && targetColumn?.editable) {
+        setEditingCell(newPosition)
+      }
+    },
+    
+    onEnterNavigation: () => {
+      if (!focusedCell) return
+      
+      const { row: currentRow, column: currentColumn } = focusedCell
+      
+      // Enter : ligne suivante, même colonne
+      let newRow = currentRow + 1
+      if (newRow >= dataWithFormulas.length) {
+        newRow = 0 // Retour au début
+      }
+      
+      const newPosition = { row: newRow, column: currentColumn }
+      setFocusedCell(newPosition)
+      rangeSelection.startSelection(newPosition)
+      
+      // Si la cellule est éditable, commencer l'édition
+      const targetColumn = orderedColumns.find(col => col.id === currentColumn)
+      if (editable && targetColumn?.editable) {
+        setEditingCell(newPosition)
+      }
+    }
+  }), [focusedCell, orderedColumns, dataWithFormulas, rangeSelection, keyField, setSelection, handleCopySelection, handleCellEdit, actions, handleExport, editable, setEditingCell])
+  
+  // Configurer les raccourcis clavier
+  useKeyboardShortcuts({}, keyboardActions, true, tableRef)
+
+  // Fonctions pour l'édition Kanban
+  const handleKanbanCardEdit = useCallback((card: any) => {
+    setEditingKanbanCard(card)
+    setShowKanbanEditor(true)
+  }, [])
+
+  const handleKanbanCardSave = useCallback((updatedCard: any) => {
+    // Mettre à jour les données
+    const rowIndex = dataWithFormulas.findIndex(row => 
+      row[keyField] === updatedCard.originalData[keyField]
+    )
+    
+    if (rowIndex !== -1 && actions?.edit) {
+      actions.edit(updatedCard.originalData, rowIndex)
+    }
+    
+    setShowKanbanEditor(false)
+    setEditingKanbanCard(null)
+  }, [dataWithFormulas, keyField, actions])
+
+  const handleKanbanEditorClose = useCallback(() => {
+    setShowKanbanEditor(false)
+    setEditingKanbanCard(null)
+  }, [])
+
+  // Fonctions pour l'édition générique (Cards, Timeline, Calendar)
+  const handleGenericItemEdit = useCallback((item: any, viewType: 'cards' | 'timeline' | 'calendar') => {
+    setEditingGenericItem(item)
+    setEditingViewType(viewType)
+    setShowGenericEditor(true)
+  }, [])
+
+  const handleGenericItemSave = useCallback((updatedItem: any) => {
+    // Mettre à jour les données
+    const rowIndex = dataWithFormulas.findIndex(row => 
+      row[keyField] === updatedItem.originalData[keyField]
+    )
+    
+    if (rowIndex !== -1 && actions?.edit) {
+      actions.edit(updatedItem.originalData, rowIndex)
+    }
+    
+    setShowGenericEditor(false)
+    setEditingGenericItem(null)
+  }, [dataWithFormulas, keyField, actions])
+
+  const handleGenericEditorClose = useCallback(() => {
+    setShowGenericEditor(false)
+    setEditingGenericItem(null)
+  }, [])
+  
+  // Gestionnaire d'événements clavier pour les actions de base
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key) {
+        case 'c':
+          if (selection.selectedRows.size > 0) {
+            e.preventDefault()
+            handleCopySelection()
+          }
+          break
+        case 'v':
+          // Ne pas intercepter Ctrl+V, laisser le navigateur déclencher l'événement paste
+          break
+      }
+    }
+  }, [selection, editable, handleCopySelection, handlePaste])
+  
+  // Rendu d'une cellule
+  const renderCell = useCallback((
+    value: any, 
+    row: T, 
+    column: ColumnConfig<T>, 
+    rowIndex: number
+  ) => {
+    // Utiliser getValue si défini, sinon utiliser la valeur par défaut
+    const cellValue = column.getValue ? column.getValue(row) : value
+    
+    const isEditing = editingCell?.row === rowIndex && editingCell?.column === column.id
+    
+    if (isEditing && editable && column.editable) {
+      return (
+        <InlineEditor
+          value={cellValue}
+          row={row}
+          column={column}
+          onSave={(newValue) => handleCellEdit(rowIndex, column.id, newValue)}
+          onCancel={() => setEditingCell(null)}
+          autoFocus
+          allColumns={orderedColumns}
+          sampleData={dataWithFormulas.slice(0, 10)} // Échantillon pour les tests de formules
+          onTabNavigation={keyboardActions.onTabNavigation}
+          onOpenRichTextEditor={() => {
+            if (column.type === 'richtext') {
+              setEditingCell(null) // Fermer l'inline editor
+              setRichTextEditor({
+                row: rowIndex,
+                column: column.id,
+                value: cellValue || ''
+              })
+            }
+          }}
+        />
+      )
+    }
+    
+    if (column.render) {
+      const rendered = column.render(cellValue, row, column)
+      // S'assurer que le rendu personnalisé est sécurisé pour React
+      return RenderUtils.isReactSafe(rendered) ? rendered : RenderUtils.safeRender(rendered, column)
+    }
+    
+    // Formatage par défaut selon le type
+    if (column.format) {
+      if (column.format.transform) {
+        return column.format.transform(value)
+      }
+      
+      if (typeof value === 'number') {
+        let formatted = value.toString()
+        if (column.format.decimals !== undefined) {
+          formatted = value.toFixed(column.format.decimals)
+        }
+        if (column.format.prefix) formatted = column.format.prefix + formatted
+        if (column.format.suffix) formatted = formatted + column.format.suffix
+        return formatted
+      }
+    }
+    
+    if (column.type === 'boolean') {
+      return (
+        <Checkbox checked={Boolean(value)} disabled />
+      )
+    }
+    
+    if (column.type === 'select' && column.options) {
+      const option = column.options.find(opt => opt.value === value)
+      return option ? (
+        <Badge variant="outline" style={{ backgroundColor: option.color }}>
+          {option.label}
+        </Badge>
+      ) : String(value || '')
+    }
+    
+    if (column.type === 'date' || column.type === 'datetime') {
+      if (value instanceof Date) {
+        return column.type === 'date' 
+          ? value.toLocaleDateString('fr-FR')
+          : value.toLocaleString('fr-FR')
+      }
+      return String(value || '')
+    }
+    
+    if (column.type === 'richtext') {
+      // Nettoyage HTML basique pour la sécurité
+      const sanitizeHtml = (html: string): string => {
+        if (!html) return ''
+        return html
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+          .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
+          .replace(/on\w+\s*=\s*'[^']*'/gi, '')
+          .replace(/javascript:/gi, '')
+      }
+      
+      const sanitizedValue = value ? sanitizeHtml(value) : '<span class="text-muted-foreground italic">Aucun contenu</span>'
+      
+      return (
+        <div 
+          className="group relative max-w-xs overflow-hidden richtext-cell"
+          style={{
+            maxHeight: '80px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            fontSize: '13px',
+            lineHeight: '1.4'
+          }}
+        >
+          <div dangerouslySetInnerHTML={{ __html: sanitizedValue }} />
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              const rowIndex = dataWithFormulas.findIndex(r => r === row)
+              setRichTextEditor({
+                row: rowIndex,
+                column: column.id,
+                value: value || ''
+              })
+            }}
+            className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 hover:bg-white p-1 rounded shadow-sm border"
+            title="Ouvrir l'éditeur de texte riche"
+          >
+            <Type className="h-3 w-3 text-blue-600" />
+          </button>
+        </div>
+      )
+    }
+    
+    // Conversion sécurisée pour tous les autres types
+    if (value === null || value === undefined) return ''
+    if (typeof value === 'object') {
+      // Pour les objets complexes, essayer JSON.stringify ou retourner [Object]
+      try {
+        return JSON.stringify(value)
+      } catch {
+        return '[Object]'
+      }
+    }
+    
+    // Utiliser le rendu sécurisé par défaut
+    return RenderUtils.makeReactSafe(cellValue, column)
+  }, [editingCell, editable, handleCellEdit])
+  
+  // Effet pour focus sur l'input d'édition
+  useEffect(() => {
+    if (editingCell && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [editingCell])
+  
+  // Effet pour les raccourcis clavier
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  // Gestionnaire d'événement paste pour le clipboard
+  useEffect(() => {
+    const handlePasteEvent = (e: ClipboardEvent) => {
+      // Vérifier si le focus est dans le tableau
+      const activeElement = document.activeElement
+      const tableElement = tableRef.current
+      
+      if (tableElement && (tableElement.contains(activeElement) || activeElement === tableElement)) {
+        e.preventDefault()
+        handlePaste(e)
+      }
+    }
+
+    document.addEventListener('paste', handlePasteEvent)
+    return () => document.removeEventListener('paste', handlePasteEvent)
+  }, [handlePaste])
+  
+  // Early returns pour les états spéciaux
+  if (loading) {
+    return (
+      <DataTableSkeleton 
+        rows={5} 
+        columns={orderedColumns.length}
+        className={className}
+      />
+    )
+  }
+
+  if (error) {
+    return (
+      <DataTableError 
+        error={error}
+        className={className}
+      />
+    )
+  }
+
+  return (
+    <div className={cn('w-full', className)}>
+      {/* Styles pour drag & drop, rich text et améliorations esthétiques */}
+      <style jsx>{`
+        /* Drag & Drop */
+        .column-dragging {
+          opacity: 0.5;
+          cursor: move;
+        }
+        
+        .column-draggable {
+          cursor: move;
+        }
+        
+        .column-draggable:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .drag-over {
+          border-left: 3px solid #3b82f6;
+          background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Améliorations esthétiques du tableau */
+        .datatable-enhanced {
+          --grid-color: rgba(226, 232, 240, 0.6);
+          --header-bg: #f8fafc;
+          --header-border: #e2e8f0;
+          --row-hover: rgba(59, 130, 246, 0.04);
+          --row-selected: rgba(59, 130, 246, 0.08);
+        }
+        
+        /* Quadrillage vertical léger */
+        .datatable-enhanced table {
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+        
+        .datatable-enhanced th,
+        .datatable-enhanced td {
+          border-right: 1px solid var(--grid-color);
+          position: relative;
+        }
+        
+        .datatable-enhanced th:last-child,
+        .datatable-enhanced td:last-child {
+          border-right: none;
+        }
+        
+        /* En-têtes avec fond non transparent */
+        .datatable-enhanced thead th {
+          background: var(--header-bg) !important;
+          border-bottom: 2px solid var(--header-border) !important;
+          backdrop-filter: none;
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+        
+        /* Amélioration des lignes */
+        .datatable-enhanced tbody tr {
+          transition: background-color 0.15s ease;
+          border-bottom: 1px solid var(--grid-color);
+        }
+        
+        .datatable-enhanced tbody tr:hover {
+          background-color: var(--row-hover) !important;
+        }
+        
+        .datatable-enhanced tbody tr.selected {
+          background-color: var(--row-selected) !important;
+        }
+        
+        /* Amélioration des cellules */
+        .datatable-enhanced td {
+          padding: 12px 16px;
+          vertical-align: middle;
+        }
+        
+        .datatable-enhanced th {
+          padding: 16px;
+          font-weight: 600;
+          color: #374151;
+          text-align: left;
+        }
+        
+        /* Styles pour les liens dans les cellules rich text */
+        .richtext-cell a {
+          color: #2563eb;
+          text-decoration: underline;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          font-weight: 500;
+          padding: 1px 2px;
+          border-radius: 2px;
+          display: inline;
+        }
+        
+        .richtext-cell a:hover {
+          color: #1d4ed8;
+          background-color: #dbeafe;
+          text-decoration: none;
+          transform: translateY(-0.5px);
+        }
+        
+        .richtext-cell a::after {
+          content: "↗";
+          font-size: 0.6em;
+          margin-left: 1px;
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+        
+        .richtext-cell a:hover::after {
+          opacity: 0.7;
+        }
+        
+        .column-locked {
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+      `}</style>
+      
+      {/* Barre d'outils */}
+      <div className="flex items-center justify-between mb-4 gap-2 datatable-toolbar">
+        <div className="flex items-center gap-2">
+          {/* Recherche */}
+          {searchable && (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={cn(
+                  "pl-9 w-64 transition-all duration-200",
+                  searchTerm !== debouncedSearchTerm && "pr-10"
+                )}
+              />
+              {/* Indicateur de recherche en cours */}
+              {searchTerm !== debouncedSearchTerm && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Actions */}
+          {actions?.create && (
+            <Button onClick={actions.create} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter
+            </Button>
+          )}
+          
+          {/* Bouton éditeur rich text */}
+          {focusedCell && (() => {
+            const column = orderedColumns.find(c => c.id === focusedCell.column)
+            if (column?.type === 'richtext' && editable && column.editable) {
+              return (
+                <Button 
+                  onClick={() => {
+                    const row = dataWithFormulas[focusedCell.row]
+                    const cellValue = column.getValue ? column.getValue(row) : (row as any)[column.key]
+                    setRichTextEditor({
+                      row: focusedCell.row,
+                      column: focusedCell.column,
+                      value: cellValue || ''
+                    })
+                  }}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Type className="h-4 w-4 mr-2" />
+                  Éditeur Rich Text
+                </Button>
+              )
+            }
+            return null
+          })()}
+          
+          
+          {selection.selectedRows.size > 0 && (
+            <>
+              <Button onClick={handleCopySelection} variant="outline" size="sm">
+                Copier ({selection.selectedRows.size})
+              </Button>
+              
+              {actions?.delete && (
+                <Button
+                  onClick={() => {
+                    const selectedData = dataWithFormulas.filter((_, index) => 
+                      selection.selectedRows.has((dataWithFormulas[index] as any)[keyField])
+                    )
+                    actions.delete(selectedData)
+                  }}
+                  variant="destructive"
+                  size="sm"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer ({selection.selectedRows.size})
+                </Button>
+              )}
+            </>
+          )}
+          
+          {editable && (
+            <Button onClick={handlePaste} variant="outline" size="sm">
+              Coller
+            </Button>
+          )}
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {/* Règles de couleurs */}
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowColorRuleManager(true)}
+          >
+            <Palette className="h-4 w-4 mr-2" />
+            Couleurs {colorRuleSystem.activeRules > 0 ? `(${colorRuleSystem.activeRules})` : ''}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowTreeGroupingPanel(true)}
+          >
+            <Network className="h-4 w-4 mr-2" />
+            Grouper {treeGrouping.isGrouped ? `(${treeGrouping.groupingColumns.length})` : ''}
+          </Button>
+
+          {/* Sélecteur de vues */}
+          <ViewSelector
+            currentView={dataViews.currentView}
+            onViewChange={dataViews.setCurrentView}
+            availableViews={dataViews.getAvailableViews()}
+            columns={orderedColumns}
+            viewConfigs={dataViews.viewConfigs}
+            onViewConfigUpdate={dataViews.updateViewConfig}
+          />
+
+          {/* Export */}
+          <DropdownPortal
+            align="end"
+            trigger={
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Exporter
+              </Button>
+            }
+          >
+            <DropdownItem onClick={() => handleExport('xlsx')}>
+              Export rapide Excel
+            </DropdownItem>
+            <DropdownItem onClick={() => handleExport('csv')}>
+              Export rapide CSV
+            </DropdownItem>
+            <DropdownSeparator />
+            <DropdownItem onClick={() => setShowExportDialog(true)}>
+              <Download className="h-4 w-4 mr-2" />
+              Export avancé...
+            </DropdownItem>
+          </DropdownPortal>
+          
+          {/* Paramètres des colonnes */}
+          <DropdownPortal
+            align="end"
+            className="min-w-[200px] max-h-[400px] overflow-y-auto"
+            trigger={
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Colonnes
+              </Button>
+            }
+          >
+            {columns.map(column => {
+              // Déterminer si la colonne est visible (même logique que orderedColumns)
+              const settingVisible = settings.columns[column.id]?.visible
+              const isVisible = settingVisible !== undefined ? settingVisible : column.visible !== false
+              
+              return (
+                <DropdownItem
+                  key={column.id}
+                  onClick={() => handleColumnVisibilityToggle(column.id)}
+                >
+                  {isVisible ? (
+                    <Eye className="h-4 w-4 mr-2" />
+                  ) : (
+                    <EyeOff className="h-4 w-4 mr-2" />
+                  )}
+                  {column.title}
+                </DropdownItem>
+              )
+            })}
+            
+            {persistedSettings && (
+              <>
+                <DropdownSeparator />
+                <DropdownItem
+                  onClick={() => persistedSettings.resetSettings()}
+                >
+                  Réinitialiser
+                </DropdownItem>
+                <DropdownItem
+                  onClick={() => {
+                    const exported = persistedSettings.exportSettings()
+                    const blob = new Blob([JSON.stringify(exported, null, 2)], { type: 'application/json' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `datatable-settings-${tableId || 'export'}.json`
+                    a.click()
+                    URL.revokeObjectURL(url)
+                  }}
+                >
+                  Exporter paramètres
+                </DropdownItem>
+              </>
+            )}
+          </DropdownPortal>
+          
+          {/* Filtres avancés */}
+          <AdvancedFilters
+            columns={orderedColumns}
+            filters={advancedFilters}
+            onFiltersChange={setAdvancedFilters}
+          />
+        </div>
+      </div>
+      
+      {/* Contenu principal - Vue conditionnelle */}
+      <div className="relative border rounded-lg datatable-enhanced-container" style={{ height }}>
+        <div className="overflow-auto h-full datatable-content">
+          {dataViews.currentView === 'table' ? (
+            // Vue tableau traditionnelle
+          <table
+            ref={tableRef}
+            className={cn(
+              'w-full datatable-enhanced',
+              striped && 'table-striped',
+              bordered && 'table-bordered',
+              compact && 'table-compact'
+            )}
+          >
+          <thead className="sticky top-0 datatable-header">
+            <tr>
+              {selectable && (
+                <th className="w-12 p-2">
+                  <Checkbox
+                    checked={selection.selectAll}
+                    onCheckedChange={(checked) => {
+                      const newSelection = {
+                        selectedRows: checked 
+                          ? new Set(dataWithFormulas.map(row => (row as any)[keyField]))
+                          : new Set(),
+                        selectAll: !!checked
+                      }
+                      setSelection(newSelection)
+                      onSelectionChange?.(newSelection)
+                    }}
+                  />
+                </th>
+              )}
+              
+              {orderedColumns.map((column, columnIndex) => (
+                <th
+                  key={column.id}
+                  className={cn(
+                    'group p-2 text-left font-medium text-muted-foreground relative',
+                    column.sortable && sortable && 'cursor-pointer hover:bg-muted/80',
+                    'select-none',
+                    canMoveColumn(column) && 'cursor-move',
+                    column.locked && 'opacity-60'
+                  )}
+                  style={{
+                    width: settings.columns[column.id]?.width || column.width,
+                    minWidth: column.minWidth,
+                    maxWidth: column.maxWidth
+                  }}
+                  draggable={canMoveColumn(column)}
+                  onDragStart={handleColumnDragStart(column.id, columnIndex)}
+                  onDragOver={handleColumnDragOver}
+                  onDragLeave={handleColumnDragLeave}
+                  onDrop={handleColumnDrop(column.id, columnIndex)}
+                  onDragEnd={handleColumnDragEnd}
+                  onClick={() => column.sortable && !draggedColumn && handleSort(column.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {canMoveColumn(column) && (
+                        <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+                      )}
+                      <TooltipSimple
+                        content={
+                          <div className="text-center">
+                            <div className="font-medium">{column.title}</div>
+                            {column.description && (
+                              <div className="text-xs opacity-80 mt-1">{column.description}</div>
+                            )}
+                            <div className="text-xs opacity-60 mt-1">
+                              {column.sortable && 'Triable • '}
+                              {column.searchable && 'Recherchable • '}
+                              {column.editable && 'Éditable • '}
+                              Type: {column.type}
+                            </div>
+                          </div>
+                        }
+                        side="bottom"
+                        delay={700}
+                      >
+                        <span className="cursor-help">{column.title}</span>
+                      </TooltipSimple>
+                    </div>
+                    
+                    <div className="flex items-center gap-1">
+                      {/* Filtre rapide de colonne */}
+                      <ColumnFilterAdvanced
+                        column={column}
+                        data={dataWithFormulas}
+                        currentSort={sortConfig.find(s => s.column === column.id)?.direction || null}
+                        currentFilters={filters.find(f => f.column === column.id)?.value}
+                        onSort={(direction) => handleSort(column.id, direction)}
+                        onFilter={(filter) => {
+                          if (filter) {
+                            setFilters(prev => [
+                              ...prev.filter(f => f.column !== column.id),
+                              { column: column.id, value: filter, operator: 'equals' as const }
+                            ])
+                          } else {
+                            setFilters(prev => prev.filter(f => f.column !== column.id))
+                          }
+                        }}
+                      />
+                      
+                      {/* Indicateur de tri */}
+                      {column.sortable && sortable && (
+                        <div className="ml-1">
+                          {sortConfig.find(s => s.column === column.id)?.direction === 'asc' && (
+                            <ChevronUp className="h-4 w-4" />
+                          )}
+                          {sortConfig.find(s => s.column === column.id)?.direction === 'desc' && (
+                            <ChevronDown className="h-4 w-4" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </th>
+              ))}
+              
+              {actions && (
+                <th className="w-20 p-2">Actions</th>
+              )}
+            </tr>
+          </thead>
+          
+          <tbody>
+            {(treeGrouping.isGrouped ? treeGrouping.tree.flatList : dataWithFormulas).map((item, itemIndex) => {
+              // Si c'est un nœud de groupe
+              if (treeGrouping.isGroupNode(item)) {
+                const groupNode = item
+                return (
+                  <tr
+                    key={groupNode.id}
+                    className="bg-muted/20 font-medium border-t-2 border-muted"
+                  >
+                    <td 
+                      colSpan={orderedColumns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)}
+                      className="p-3"
+                    >
+                      <div 
+                        className="flex items-center gap-2 cursor-pointer hover:bg-muted/30 rounded p-1"
+                        onClick={() => treeGrouping.toggleNodeExpansion(groupNode.id)}
+                        style={{ paddingLeft: `${groupNode.level * 20}px` }}
+                      >
+                        {groupNode.isExpanded ? (
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <Badge variant="outline" className="text-xs">
+                          {groupNode.column.title}
+                        </Badge>
+                        <span>{groupNode.groupLabel}</span>
+                        <Badge variant="secondary" className="text-xs ml-auto">
+                          {groupNode.items.length + groupNode.children.reduce((sum, child) => sum + child.items.length, 0)} éléments
+                        </Badge>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              }
+              
+              // Si c'est un élément de données normal
+              const row = item as T
+              const originalRowIndex = dataWithFormulas.findIndex(r => r === row)
+              const rowIndex = treeGrouping.isGrouped ? originalRowIndex : itemIndex
+              
+              return (
+                <tr
+                  key={(row as any)[keyField] || rowIndex}
+                  className={cn(
+                    'hover:bg-muted/50 cursor-pointer',
+                    selection.selectedRows.has((row as any)[keyField]) && 'bg-primary/10',
+                    // Highlight des plages sélectionnées Excel
+                    rangeSelection.selection.ranges.some(range => 
+                      rangeSelection.isCellInActiveRange(rowIndex, orderedColumns[0]?.id || '', orderedColumns.map(c => c.id))
+                    ) && 'bg-blue-100/50',
+                    rangeSelection.selection.activeRange && rangeSelection.isCellInActiveRange(rowIndex, orderedColumns[0]?.id || '', orderedColumns.map(c => c.id)) && 'bg-blue-200/50'
+                  )}
+                  onClick={() => {
+                    onRowClick?.(row)
+                    setFocusedCell({ row: rowIndex, column: orderedColumns[0]?.id || '' })
+                  }}
+                  onDoubleClick={() => onRowDoubleClick?.(row)}
+                >
+                  {selectable && (
+                    <td className="p-2" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selection.selectedRows.has((row as any)[keyField])}
+                        onCheckedChange={(checked) => {
+                          const newSelected = new Set(selection.selectedRows)
+                          if (checked) {
+                            newSelected.add((row as any)[keyField])
+                          } else {
+                            newSelected.delete((row as any)[keyField])
+                          }
+                          
+                          const newSelection = {
+                            selectedRows: newSelected,
+                            selectAll: newSelected.size === dataWithFormulas.length
+                          }
+                          setSelection(newSelection)
+                          onSelectionChange?.(newSelection)
+                        }}
+                      />
+                    </td>
+                  )}
+                  
+                  {orderedColumns.map((column, columnIndex) => (
+                    <td
+                      key={column.id}
+                      className={cn(
+                        'p-2 border-t relative',
+                        editable && column.editable && 'cursor-text',
+                        // Styles pour sélection Excel
+                        rangeSelection.isCellSelected(rowIndex, column.id, orderedColumns.map(c => c.id)) && 'bg-blue-100',
+                        rangeSelection.isCellInActiveRange(rowIndex, column.id, orderedColumns.map(c => c.id)) && 'bg-blue-200/70',
+                        focusedCell?.row === rowIndex && focusedCell?.column === column.id && 'ring-2 ring-blue-500'
+                      )}
+                      style={{
+                        ...colorRuleSystem.getCellStyle(originalRowIndex, column.id) && {
+                          backgroundColor: colorRuleSystem.getCellStyle(originalRowIndex, column.id)?.backgroundColor,
+                          color: colorRuleSystem.getCellStyle(originalRowIndex, column.id)?.color
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        
+                        const cellPosition = { row: rowIndex, column: column.id }
+                        setFocusedCell(cellPosition)
+                        
+                        if (e.shiftKey) {
+                          rangeSelection.extendSelection(cellPosition)
+                        } else if (e.ctrlKey || e.metaKey) {
+                          rangeSelection.startSelection(cellPosition, true)
+                        } else {
+                          rangeSelection.startSelection(cellPosition)
+                        }
+                        
+                        if (editable && column.editable && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                          setEditingCell({ row: rowIndex, column: column.id })
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        const cellPosition = { row: rowIndex, column: column.id }
+                        if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                          rangeSelection.startSelection(cellPosition)
+                        }
+                      }}
+                      onMouseEnter={(e) => {
+                        if (e.buttons === 1) { // Si le bouton gauche est pressé
+                          rangeSelection.extendSelection({ row: rowIndex, column: column.id })
+                        }
+                      }}
+                      onMouseUp={() => {
+                        rangeSelection.endSelection()
+                      }}
+                    >
+                      {renderCell(
+                        column.getValue ? column.getValue(row) : (row as any)[column.key], 
+                        row, 
+                        column, 
+                        rowIndex
+                      )}
+                    </td>
+                  ))}
+                  
+                  {actions && (
+                    <td 
+                      className="p-2 border-t" 
+                      onClick={(e) => {
+                        console.log('Actions cell clicked, stopping propagation')
+                        e.stopPropagation()
+                      }}
+                    >
+                      <DropdownPortal
+                        align="end"
+                        side="bottom"
+                        trigger={
+                          <Button variant="ghost" size="sm" onClick={() => console.log('Action button clicked for row:', row)}>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        }
+                      >
+                        {actions.edit && (
+                          <DropdownItem onClick={() => actions.edit!(row)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Modifier
+                          </DropdownItem>
+                        )}
+                        {actions.delete && (
+                          <DropdownItem
+                            onClick={() => actions.delete!([row])}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Supprimer
+                          </DropdownItem>
+                        )}
+                      </DropdownPortal>
+                    </td>
+                  )}
+                </tr>
+              )
+            })}
+          </tbody>
+          </table>
+          ) : dataViews.currentView === 'kanban' ? (
+            // Vue Kanban
+            <div className="p-4">
+              <KanbanView
+                columns={dataViews.kanbanData}
+                onCardClick={(card) => onRowClick?.(card.originalData)}
+                onCardEdit={handleKanbanCardEdit}
+                onCardDelete={(card) => actions?.delete?.([card.originalData])}
+                onAddCard={actions?.create}
+              />
+            </div>
+          ) : dataViews.currentView === 'cards' ? (
+            // Vue Cartes
+            <div className="p-4">
+              <CardsView
+                cards={dataViews.cardsData}
+                cardsPerRow={dataViews.viewConfigs.cards.settings.cards?.cardsPerRow || 3}
+                onCardClick={(card) => onRowClick?.(card.originalData)}
+                onCardEdit={(card) => handleGenericItemEdit(card, 'cards')}
+                onCardDelete={(card) => actions?.delete?.([card.originalData])}
+              />
+            </div>
+          ) : dataViews.currentView === 'timeline' ? (
+            // Vue Timeline
+            <div className="p-4">
+              <TimelineView
+                items={dataViews.timelineData}
+                onItemClick={(item) => onRowClick?.(item.originalData)}
+                onItemEdit={(item) => handleGenericItemEdit(item, 'timeline')}
+                onItemDelete={(item) => actions?.delete?.([item.originalData])}
+              />
+            </div>
+          ) : dataViews.currentView === 'calendar' ? (
+            // Vue Calendar
+            <div className="p-4">
+              <CalendarView
+                events={dataViews.calendarData}
+                onEventClick={(event) => onRowClick?.(event.originalData)}
+                onEventEdit={(event) => handleGenericItemEdit(event, 'calendar')}
+                onEventDelete={(event) => actions?.delete?.([event.originalData])}
+              />
+            </div>
+          ) : null}
+          
+          {dataWithFormulas.length === 0 && dataViews.currentView === 'table' && (
+            <DataTableEmpty
+              searchTerm={debouncedSearchTerm}
+              onClearSearch={() => setSearchTerm('')}
+              action={actions?.create ? {
+                label: "Ajouter un élément",
+                onClick: actions.create
+              } : undefined}
+            />
+          )}
+        </div>
+      </div>
+      
+      {/* Statistiques et Pagination */}
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span>
+            {tableStats.hasFilters && tableStats.visibleRows !== tableStats.totalRows 
+              ? `${tableStats.visibleRows} sur ${tableStats.totalRows} résultats`
+              : `${tableStats.totalRows} résultats`
+            }
+          </span>
+          {tableStats.selectedRows > 0 && (
+            <span className="text-primary font-medium">
+              {tableStats.selectedRows} sélectionné{tableStats.selectedRows > 1 ? 's' : ''}
+            </span>
+          )}
+          {tableStats.hasFilters && (
+            <span className="text-blue-600">
+              Filtré{debouncedSearchTerm && ` • Recherche: "${debouncedSearchTerm}"`}
+            </span>
+          )}
+        </div>
+        
+        {pagination && (
+          <div>
+            {/* TODO: Implémenter la pagination complète */}
+            <span className="text-xs text-muted-foreground">Pagination à venir</span>
+          </div>
+        )}
+      </div>
+      
+      {/* Dialog de prévisualisation du collage */}
+      {showPastePreview && clipboardData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-auto">
+            <h3 className="text-lg font-semibold mb-4">Prévisualisation du collage</h3>
+            
+            <div className="mb-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  defaultChecked={true}
+                  onChange={(e) => {
+                    // Mettre à jour la prévisualisation selon le statut des en-têtes
+                  }}
+                />
+                La première ligne contient les en-têtes
+              </label>
+            </div>
+            
+            <div className="border rounded max-h-64 overflow-auto mb-4">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {clipboardData[0]?.map((header, index) => (
+                      <th key={index} className="p-2 text-left border-b">
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {clipboardData.slice(1).map((row, rowIndex) => (
+                    <tr key={rowIndex} className="border-b">
+                      {row.map((cell, cellIndex) => (
+                        <td key={cellIndex} className="p-2">
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setClipboardData(null)
+                  setShowPastePreview(false)
+                }}
+              >
+                Annuler
+              </Button>
+              <Button onClick={() => handleConfirmPaste(true)}>
+                Confirmer le collage
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Dialogue d'export avancé */}
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        data={dataWithFormulas}
+        columns={orderedColumns}
+        filename={tableId || 'export'}
+      />
+      
+      {/* Éditeur de texte riche */}
+      {richTextEditor && (
+        <RichTextEditor
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setRichTextEditor(null)
+            }
+          }}
+          initialContent={richTextEditor.value}
+          onSave={(content) => {
+            // Sauvegarder le contenu
+            handleCellEdit(richTextEditor.row, richTextEditor.column, content)
+            setRichTextEditor(null)
+          }}
+          placeholder="Éditer le texte..."
+        />
+      )}
+      
+      {/* Gestionnaire de règles de couleurs */}
+      <ColorRuleManager
+        open={showColorRuleManager}
+        onOpenChange={setShowColorRuleManager}
+        columns={orderedColumns}
+        rules={colorRules}
+        onRulesChange={setColorRules}
+      />
+      
+      {/* Panneau de regroupement en arbre */}
+      <TreeGroupingPanel
+        open={showTreeGroupingPanel}
+        onOpenChange={setShowTreeGroupingPanel}
+        columns={orderedColumns}
+        config={treeGrouping.config}
+        onConfigChange={() => {}} // Géré par les fonctions individuelles
+        onAddColumn={treeGrouping.addGroupingColumn}
+        onRemoveColumn={treeGrouping.removeGroupingColumn}
+        onReorderColumns={treeGrouping.reorderGroupingColumns}
+        onExpandAll={treeGrouping.expandAll}
+        onCollapseAll={treeGrouping.collapseAll}
+        onClearGrouping={treeGrouping.clearGrouping}
+      />
+      
+      {/* Éditeur de cartes Kanban */}
+      <KanbanCardEditor
+        card={editingKanbanCard}
+        isOpen={showKanbanEditor}
+        onClose={handleKanbanEditorClose}
+        onSave={handleKanbanCardSave}
+        columns={dataViews.kanbanData}
+        tableColumns={orderedColumns}
+        kanbanSettings={dataViews.viewConfigs.kanban.settings.kanban || {}}
+        keyField={keyField}
+      />
+
+      {/* Éditeur générique pour Cards, Timeline, Calendar */}
+      <GenericCardEditor
+        item={editingGenericItem}
+        isOpen={showGenericEditor}
+        onClose={handleGenericEditorClose}
+        onSave={handleGenericItemSave}
+        tableColumns={orderedColumns}
+        keyField={keyField}
+        title={
+          editingViewType === 'cards' ? 'Modifier la carte' :
+          editingViewType === 'timeline' ? 'Modifier l\'événement' :
+          'Modifier l\'événement calendrier'
+        }
+        viewType={editingViewType}
+      />
+    </div>
+  )
+}
+
+export default DataTable

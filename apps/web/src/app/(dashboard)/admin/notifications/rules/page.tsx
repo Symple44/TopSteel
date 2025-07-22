@@ -3,7 +3,7 @@ import { PermissionGuard } from '@/components/auth/permission-guard'
 
 export default function NotificationRulesPage() {
   return (
-    <div className="container mx-auto py-6">
+    <div className="py-6">
       <PermissionGuard 
         permission={['NOTIFICATION_ADMIN', 'NOTIFICATION_RULES']}
         roles={['ADMIN', 'MANAGER']}

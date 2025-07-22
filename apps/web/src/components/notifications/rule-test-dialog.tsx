@@ -192,7 +192,7 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
               <Textarea
                 id="testData"
                 value={testData}
-                onChange={(e) => setTestData(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTestData(e.target.value)}
                 placeholder="Entrez vos données de test au format JSON..."
                 className="min-h-[200px] font-mono"
               />

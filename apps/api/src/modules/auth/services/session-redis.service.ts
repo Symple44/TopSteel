@@ -31,12 +31,20 @@ interface ActiveSessionData {
 @Injectable()
 export class SessionRedisService {
   private readonly logger = new Logger(SessionRedisService.name)
-  private redis: Redis
+  private redis: Redis | null = null
   private readonly sessionPrefix = 'session:'
   private readonly userSessionPrefix = 'user_sessions:'
   private readonly onlineUsersKey = 'online_users'
+  private readonly redisEnabled: boolean
 
   constructor(private configService: ConfigService) {
+    this.redisEnabled = this.configService.get<string>('REDIS_ENABLED') === 'true'
+    
+    if (!this.redisEnabled) {
+      this.logger.log('Redis is disabled, SessionRedisService will operate in fallback mode')
+      return
+    }
+
     const redisUrl = this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379'
     
     this.redis = new Redis(redisUrl, {
@@ -58,6 +66,10 @@ export class SessionRedisService {
   }
 
   async isConnected(): Promise<boolean> {
+    if (!this.redisEnabled || !this.redis) {
+      return false
+    }
+    
     try {
       await this.redis.ping()
       return true
@@ -71,6 +83,11 @@ export class SessionRedisService {
    * Ajouter une session active
    */
   async addActiveSession(sessionData: ActiveSessionData, ttlSeconds: number = 24 * 60 * 60): Promise<void> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, skipping session storage')
+      return
+    }
+    
     try {
       const key = `${this.sessionPrefix}${sessionData.sessionId}`
       
@@ -96,6 +113,11 @@ export class SessionRedisService {
    * Mettre à jour l'activité d'une session
    */
   async updateSessionActivity(sessionId: string): Promise<void> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, skipping session activity update')
+      return
+    }
+    
     try {
       const key = `${this.sessionPrefix}${sessionId}`
       const sessionData = await this.getActiveSession(sessionId)
@@ -116,6 +138,11 @@ export class SessionRedisService {
    * Récupérer une session active
    */
   async getActiveSession(sessionId: string): Promise<ActiveSessionData | null> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, returning default value for getActiveSession')
+      return null
+    }
+    
     try {
       const key = `${this.sessionPrefix}${sessionId}`
       const data = await this.redis.get(key)
@@ -134,6 +161,11 @@ export class SessionRedisService {
    * Récupérer toutes les sessions actives
    */
   async getAllActiveSessions(): Promise<ActiveSessionData[]> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, returning default value for getAllActiveSessions')
+      return []
+    }
+    
     try {
       const keys = await this.redis.keys(`${this.sessionPrefix}*`)
       const sessions: ActiveSessionData[] = []
@@ -173,6 +205,11 @@ export class SessionRedisService {
    * Supprimer une session active
    */
   async removeActiveSession(sessionId: string): Promise<boolean> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, returning default value for removeActiveSession')
+      return false
+    }
+    
     try {
       const sessionData = await this.getActiveSession(sessionId)
       if (!sessionData) {
@@ -207,6 +244,11 @@ export class SessionRedisService {
    * Forcer la déconnexion d'un utilisateur (toutes ses sessions)
    */
   async forceLogoutUser(userId: string): Promise<string[]> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, returning default value for forceLogoutUser')
+      return []
+    }
+    
     try {
       const userSessionsKey = `${this.userSessionPrefix}${userId}`
       const sessionIds = await this.redis.smembers(userSessionsKey)
@@ -239,6 +281,11 @@ export class SessionRedisService {
    * Récupérer les sessions d'un utilisateur
    */
   async getUserActiveSessions(userId: string): Promise<ActiveSessionData[]> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, returning default value for getUserActiveSessions')
+      return []
+    }
+    
     try {
       const userSessionsKey = `${this.userSessionPrefix}${userId}`
       const sessionIds = await this.redis.smembers(userSessionsKey)
@@ -263,6 +310,11 @@ export class SessionRedisService {
    * Nettoyer les sessions expirées
    */
   async cleanupExpiredSessions(): Promise<number> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, returning default value for cleanupExpiredSessions')
+      return 0
+    }
+    
     try {
       const allSessions = await this.getAllActiveSessions()
       let cleanedCount = 0
@@ -319,6 +371,9 @@ export class SessionRedisService {
    * Fermer la connexion Redis
    */
   async disconnect(): Promise<void> {
+    if (!this.redisEnabled || !this.redis) {
+      return
+    }
     await this.redis.disconnect()
   }
 }

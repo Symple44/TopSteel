@@ -9,7 +9,9 @@
 import { Header } from '@/components/layout/header'
 import { Sidebar } from '@/components/layout/sidebar'
 import { AuthGuard } from '@/components/auth/auth-guard'
+import { AutoBreadcrumb } from '@/components/ui/auto-breadcrumb'
 import { useState } from 'react'
+import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
 import type { ReactNode } from 'react'
 
 interface DashboardLayoutProps {
@@ -18,9 +20,18 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const { settings } = useAppearanceSettings()
 
   const handleToggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed)
+  }
+
+  // Déterminer la classe de largeur en fonction du paramètre utilisateur
+  const getContainerClass = () => {
+    if (settings.contentWidth === 'full') {
+      return 'w-full' // Pleine largeur
+    }
+    return 'mx-auto max-w-7xl' // Largeur limitée (comportement actuel)
   }
 
   return (
@@ -42,7 +53,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Zone de contenu */}
           <main className="flex-1 overflow-auto bg-muted/30 p-6">
-            <div className="mx-auto max-w-7xl">{children}</div>
+            <div className={getContainerClass()}>
+              <AutoBreadcrumb />
+              {children}
+            </div>
           </main>
         </div>
       </div>

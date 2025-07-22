@@ -48,7 +48,8 @@ import {
   Palette,
   Settings2,
   Monitor,
-  Languages
+  Languages,
+  Table
 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
@@ -101,7 +102,8 @@ const iconMap: Record<string, LucideIcon> = {
   User,
   Wrench,
   Monitor,
-  Languages
+  Languages,
+  Table
 }
 
 const getNavigation = (t: any): NavItem[] => [
@@ -130,6 +132,13 @@ const getNavigation = (t: any): NavItem[] => [
         href: '/admin/translations',
         icon: Languages,
         gradient: 'from-emerald-500 to-green-600',
+        roles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        title: 'Test DataTable',
+        href: '/admin/datatable-test',
+        icon: Table,
+        gradient: 'from-violet-500 to-purple-600',
         roles: ['SUPER_ADMIN', 'ADMIN'],
       }
     ]
@@ -229,7 +238,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     }
 
     return (
-      <div key={item.title} className="space-y-1">
+      <div className="space-y-1">
         <button
           onClick={handleClick}
           aria-label={item.title}
@@ -294,7 +303,9 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
         {/* Sous-menu avec animation */}
         {hasChildren && isExpanded && !isCollapsed && (
           <div className="space-y-1 animate-in slide-in-from-top-1 duration-200">
-            {item.children?.map((child) => renderNavItem(child, level + 1))}
+            {item.children?.map((child) => (
+              <React.Fragment key={child.title}>{renderNavItem(child, level + 1)}</React.Fragment>
+            ))}
           </div>
         )}
       </div>
@@ -452,7 +463,9 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-        {navigation.map((item) => renderNavItem(item))}
+        {navigation.map((item) => (
+          <React.Fragment key={item.title}>{renderNavItem(item)}</React.Fragment>
+        ))}
       </nav>
 
       <Separator className="bg-border/60" />

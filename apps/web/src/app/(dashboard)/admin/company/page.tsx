@@ -2,6 +2,7 @@
 
 import ImageUpload from "@/components/ui/image-upload";
 import { useTranslation } from "@/lib/i18n";
+import { useAppearanceSettings } from "@/hooks/use-appearance-settings";
 import {
   Button,
   Card,
@@ -16,6 +17,7 @@ import { toast } from "sonner";
 
 export default function CompanySettingsPage() {
 	const { t } = useTranslation("admin");
+	const { settings } = useAppearanceSettings();
 	const [isLoading, setIsLoading] = useState(false);
 
 	const [companyData, setCompanyData] = useState({
@@ -54,7 +56,7 @@ export default function CompanySettingsPage() {
 	};
 
 	return (
-		<div className="p-6 max-w-4xl mx-auto space-y-6">
+		<div className="p-6 space-y-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>

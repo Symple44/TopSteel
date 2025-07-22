@@ -222,103 +222,14 @@ export function NotificationSettings() {
         return (
           <div className="space-y-6">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>Limiter aux heures de travail</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Ne recevoir les notifications que pendant les heures de bureau
-                  </p>
-                </div>
-                <Switch
-                  checked={state.settings.schedules?.workingHours?.enabled || false}
-                  onCheckedChange={(checked: boolean) =>
-                    actions.updateSettings({
-                      schedules: {
-                        ...state.settings.schedules,
-                        workingHours: {
-                          ...state.settings.schedules?.workingHours,
-                          enabled: checked,
-                          start: state.settings.schedules?.workingHours?.start || "09:00",
-                          end: state.settings.schedules?.workingHours?.end || "18:00",
-                        },
-                      },
-                    })
-                  }
-                />
+              <div className="text-center p-4 text-muted-foreground">
+                <p>Configuration des horaires disponible dans les paramètres utilisateur</p>
               </div>
-
-              {state.settings.schedules?.workingHours?.enabled && (
-                <div className="grid grid-cols-2 gap-4 ml-6">
-                  <div>
-                    <Label htmlFor="start-time" className="text-sm">Début</Label>
-                    <input
-                      id="start-time"
-                      type="time"
-                      value={state.settings.schedules?.workingHours?.start || "09:00"}
-                      onChange={(e) =>
-                        actions.updateSettings({
-                          schedules: {
-                            ...state.settings.schedules,
-                            workingHours: {
-                              ...state.settings.schedules?.workingHours,
-                              enabled: true,
-                              start: e.target.value,
-                              end: state.settings.schedules?.workingHours?.end || "18:00",
-                            },
-                          },
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="end-time" className="text-sm">Fin</Label>
-                    <input
-                      id="end-time"
-                      type="time"
-                      value={state.settings.schedules?.workingHours?.end || "18:00"}
-                      onChange={(e) =>
-                        actions.updateSettings({
-                          schedules: {
-                            ...state.settings.schedules,
-                            workingHours: {
-                              ...state.settings.schedules?.workingHours,
-                              enabled: true,
-                              start: state.settings.schedules?.workingHours?.start || "09:00",
-                              end: e.target.value,
-                            },
-                          },
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-                    />
-                  </div>
-                </div>
-              )}
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>Limiter aux jours ouvrables</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Ne recevoir les notifications que du lundi au vendredi
-                  </p>
-                </div>
-                <Switch
-                  checked={state.settings.schedules?.weekdays?.enabled || false}
-                  onCheckedChange={(checked: boolean) =>
-                    actions.updateSettings({
-                      schedules: {
-                        ...state.settings.schedules,
-                        weekdays: {
-                          enabled: checked,
-                          days: state.settings.schedules?.weekdays?.days || [1, 2, 3, 4, 5],
-                        },
-                      },
-                    })
-                  }
-                />
+              <div className="text-center p-4 text-muted-foreground">
+                <p>Configuration des jours ouvrables disponible dans les paramètres utilisateur</p>
               </div>
             </div>
           </div>

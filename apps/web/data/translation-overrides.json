@@ -1,0 +1,22 @@
+{
+  "common.buttons.save": {
+    "id": "common.buttons.save",
+    "translations": {
+      "fr": "Sauvegarder (modifié)",
+      "en": "Save (modified)",
+      "es": "Guardar (modificado)"
+    },
+    "updatedAt": "2025-01-21T10:00:00.000Z",
+    "updatedBy": "admin@topsteel.tech"
+  },
+  "dashboard.welcome": {
+    "id": "dashboard.welcome",
+    "translations": {
+      "fr": "Bienvenue sur TopSteel ERP (Version personnalisée)",
+      "en": "Welcome to TopSteel ERP (Custom version)",
+      "es": "Bienvenido a TopSteel ERP (Versión personalizada)"
+    },
+    "updatedAt": "2025-01-21T10:00:00.000Z",
+    "updatedBy": "admin@topsteel.tech"
+  }
+}

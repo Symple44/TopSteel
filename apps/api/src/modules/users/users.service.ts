@@ -200,12 +200,113 @@ export class UsersService {
     }
 
     if (updateDto.preferences) {
-      settings.preferences = { 
-        ...settings.preferences, 
-        ...updateDto.preferences,
-        notifications: {
-          ...settings.preferences.notifications,
-          ...updateDto.preferences.notifications
+      // Update top-level preferences
+      if (updateDto.preferences.language !== undefined) {
+        settings.preferences.language = updateDto.preferences.language
+      }
+      if (updateDto.preferences.timezone !== undefined) {
+        settings.preferences.timezone = updateDto.preferences.timezone
+      }
+      if (updateDto.preferences.theme !== undefined) {
+        settings.preferences.theme = updateDto.preferences.theme
+      }
+
+      // Update notifications if provided
+      if (updateDto.preferences.notifications) {
+        const newNotifications = updateDto.preferences.notifications
+        
+        // Update top-level notification settings
+        if (newNotifications.email !== undefined) {
+          settings.preferences.notifications.email = newNotifications.email
+        }
+        if (newNotifications.push !== undefined) {
+          settings.preferences.notifications.push = newNotifications.push
+        }
+        if (newNotifications.sms !== undefined) {
+          settings.preferences.notifications.sms = newNotifications.sms
+        }
+
+        // Update emailTypes
+        if (newNotifications.emailTypes && settings.preferences.notifications.emailTypes) {
+          const emailTypes = newNotifications.emailTypes
+          if (emailTypes.newMessages !== undefined) {
+            settings.preferences.notifications.emailTypes.newMessages = emailTypes.newMessages
+          }
+          if (emailTypes.systemAlerts !== undefined) {
+            settings.preferences.notifications.emailTypes.systemAlerts = emailTypes.systemAlerts
+          }
+          if (emailTypes.taskReminders !== undefined) {
+            settings.preferences.notifications.emailTypes.taskReminders = emailTypes.taskReminders
+          }
+          if (emailTypes.weeklyReports !== undefined) {
+            settings.preferences.notifications.emailTypes.weeklyReports = emailTypes.weeklyReports
+          }
+          if (emailTypes.securityAlerts !== undefined) {
+            settings.preferences.notifications.emailTypes.securityAlerts = emailTypes.securityAlerts
+          }
+          if (emailTypes.maintenanceNotice !== undefined) {
+            settings.preferences.notifications.emailTypes.maintenanceNotice = emailTypes.maintenanceNotice
+          }
+        }
+
+        // Update pushTypes
+        if (newNotifications.pushTypes && settings.preferences.notifications.pushTypes) {
+          const pushTypes = newNotifications.pushTypes
+          if (pushTypes.enabled !== undefined) {
+            settings.preferences.notifications.pushTypes.enabled = pushTypes.enabled
+          }
+          if (pushTypes.sound !== undefined) {
+            settings.preferences.notifications.pushTypes.sound = pushTypes.sound
+          }
+          if (pushTypes.urgent !== undefined) {
+            settings.preferences.notifications.pushTypes.urgent = pushTypes.urgent
+          }
+          if (pushTypes.normal !== undefined) {
+            settings.preferences.notifications.pushTypes.normal = pushTypes.normal
+          }
+          if (pushTypes.quiet !== undefined) {
+            settings.preferences.notifications.pushTypes.quiet = pushTypes.quiet
+          }
+        }
+
+        // Update quietHours
+        if (newNotifications.quietHours && settings.preferences.notifications.quietHours) {
+          const quietHours = newNotifications.quietHours
+          if (quietHours.enabled !== undefined) {
+            settings.preferences.notifications.quietHours.enabled = quietHours.enabled
+          }
+          if (quietHours.start !== undefined) {
+            settings.preferences.notifications.quietHours.start = quietHours.start
+          }
+          if (quietHours.end !== undefined) {
+            settings.preferences.notifications.quietHours.end = quietHours.end
+          }
+        }
+      }
+
+      // Update appearance settings if provided
+      if (updateDto.preferences.appearance && settings.preferences.appearance) {
+        const appearance = updateDto.preferences.appearance
+        if (appearance.theme !== undefined) {
+          settings.preferences.appearance.theme = appearance.theme
+        }
+        if (appearance.language !== undefined) {
+          settings.preferences.appearance.language = appearance.language
+        }
+        if (appearance.fontSize !== undefined) {
+          settings.preferences.appearance.fontSize = appearance.fontSize
+        }
+        if (appearance.sidebarWidth !== undefined) {
+          settings.preferences.appearance.sidebarWidth = appearance.sidebarWidth
+        }
+        if (appearance.density !== undefined) {
+          settings.preferences.appearance.density = appearance.density
+        }
+        if (appearance.accentColor !== undefined) {
+          settings.preferences.appearance.accentColor = appearance.accentColor
+        }
+        if (appearance.contentWidth !== undefined) {
+          settings.preferences.appearance.contentWidth = appearance.contentWidth
         }
       }
     }
@@ -238,12 +339,41 @@ export class UsersService {
       preferences: {
         language: 'fr',
         timezone: 'Europe/Paris',
-        theme: 'light',
+        theme: 'vibrant',
         notifications: {
           email: true,
           push: true,
           sms: false,
+          emailTypes: {
+            newMessages: true,
+            systemAlerts: true,
+            taskReminders: false,
+            weeklyReports: true,
+            securityAlerts: true,
+            maintenanceNotice: false
+          },
+          pushTypes: {
+            enabled: true,
+            sound: true,
+            urgent: true,
+            normal: false,
+            quiet: true
+          },
+          quietHours: {
+            enabled: true,
+            start: '22:00',
+            end: '07:00'
+          }
         },
+        appearance: {
+          theme: 'vibrant',
+          language: 'fr',
+          fontSize: 'medium',
+          sidebarWidth: 'normal',
+          density: 'comfortable',
+          accentColor: 'blue',
+          contentWidth: 'compact'
+        }
       },
     })
 

@@ -40,6 +40,9 @@ import { Stocks } from '../modules/stocks/entities/stocks.entity'
 import { Tracabilite } from '../modules/tracabilite/entities/tracabilite.entity'
 import { User } from '../modules/users/entities/user.entity'
 import { UserMenuPreference } from '../modules/menu/entities/user-menu-preference.entity'
+import { UserSession } from '../modules/auth/entities/user-session.entity'
+import { UserMFA } from '../modules/auth/entities/user-mfa.entity'
+import { MFASession } from '../modules/auth/entities/mfa-session.entity'
 
 @Module({
   imports: [
@@ -75,6 +78,11 @@ import { UserMenuPreference } from '../modules/menu/entities/user-menu-preferenc
           MenuItemRole,
           UserMenuPreferences,
           UserMenuItemPreference,
+          
+          // Entités auth
+          UserSession,
+          UserMFA,
+          MFASession,
           
           // Entités principales avec UUID (BaseAuditEntity)
           User,

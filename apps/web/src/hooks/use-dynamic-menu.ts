@@ -110,7 +110,6 @@ export function useDynamicMenu() {
       const data = await response.json()
       
       if (data.success) {
-        console.log('[useDynamicMenu] Menu personnalisé chargé:', data.data.length, 'items')
         setCustomMenu(data.data || [])
         
         // Vérifier si le menu a l'air synchronisé
@@ -237,7 +236,6 @@ export function useDynamicMenu() {
   // Recharger le menu quand le mode change
   useEffect(() => {
     if (!modeLoading && mode) {
-      console.log('[useDynamicMenu] Mode changé vers:', mode)
       if (mode === 'custom') {
         loadUserCustomizedMenu()
       } else {
@@ -246,22 +244,32 @@ export function useDynamicMenu() {
     }
   }, [mode, modeLoading, loadUserCustomizedMenu, loadStandardMenu])
 
+  // Écouter les changements de préférences de menu
+  useEffect(() => {
+    const handleMenuPreferencesChange = () => {
+      if (mode === 'custom') {
+        loadUserCustomizedMenu()
+      } else {
+        loadStandardMenu()
+      }
+    }
+
+    window.addEventListener('menuPreferencesChanged', handleMenuPreferencesChange)
+    
+    return () => {
+      window.removeEventListener('menuPreferencesChanged', handleMenuPreferencesChange)
+    }
+  }, [mode, loadUserCustomizedMenu, loadStandardMenu])
+
   // Menu utilisé basé sur le mode sélectionné
   const currentMenu = mode === 'custom' ? customMenu : standardMenu
   const filteredMenu = currentMenu
 
-  // Debug pour voir quel menu est utilisé
-  useEffect(() => {
-    console.log('[useDynamicMenu] Mode:', mode, '| Standard:', standardMenu.length, '| Custom:', customMenu.length, '| Utilisé:', filteredMenu.length)
-  }, [mode, standardMenu, customMenu, filteredMenu])
 
   const refreshMenu = useCallback(() => {
-    console.log('[useDynamicMenu] refreshMenu appelé, mode:', mode)
     if (mode === 'custom') {
-      console.log('[useDynamicMenu] Rechargement du menu personnalisé')
       return loadUserCustomizedMenu()
     } else {
-      console.log('[useDynamicMenu] Rechargement du menu standard')
       return loadStandardMenu()
     }
   }, [mode, loadUserCustomizedMenu, loadStandardMenu])

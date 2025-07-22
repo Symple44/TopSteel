@@ -9,7 +9,7 @@ export default function TranslationsAdminPage() {
       requiredRoles={['SUPER_ADMIN', 'ADMIN']}
       requiredPermissions={['MANAGE_TRANSLATIONS']}
     >
-      <div className="container mx-auto py-6">
+      <div className="py-6">
         <TranslationAdmin />
       </div>
     </AdminGuard>

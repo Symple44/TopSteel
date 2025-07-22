@@ -55,7 +55,8 @@ export interface TranslationEntry {
   description?: string
   createdAt?: Date
   updatedAt?: Date
-  modifiedBy?: string
+  updatedBy?: string
+  isModified?: boolean // Indique si cette traduction a été modifiée par rapport à la base
 }
 
 export interface TranslationCategory {
@@ -71,6 +72,7 @@ export interface TranslationFilter {
   category?: string
   language?: string
   untranslated?: boolean
+  modified?: boolean
 }
 
 export interface TranslationStats {

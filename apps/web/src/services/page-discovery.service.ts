@@ -276,7 +276,10 @@ export class PageDiscoveryService {
       'admin-users': { title: 'Utilisateurs', description: 'Gestion des utilisateurs' },
       'admin-roles': { title: 'Rôles', description: 'Gestion des rôles et permissions' },
       'admin-notifications-rules': { title: 'Règles de notification', description: 'Configuration des notifications' },
+      'admin-sessions': { title: 'Sessions utilisateurs', description: 'Gestion des sessions actives' },
+      'admin-translations': { title: 'Gestion des traductions', description: 'Configuration des traductions' },
       'settings-menu': { title: 'Menu personnalisé', description: 'Personnalisation du menu' },
+      'settings-security': { title: 'Paramètres de sécurité', description: 'Configuration de la sécurité' },
       'planning-test': { title: 'Planning de test', description: 'Page de test pour la planification' }
     }
 

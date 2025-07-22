@@ -13,13 +13,44 @@ export interface NotificationSettings {
   email: boolean
   push: boolean
   sms: boolean
+  emailTypes?: {
+    newMessages: boolean
+    systemAlerts: boolean
+    taskReminders: boolean
+    weeklyReports: boolean
+    securityAlerts: boolean
+    maintenanceNotice: boolean
+  }
+  pushTypes?: {
+    enabled: boolean
+    sound: boolean
+    urgent: boolean
+    normal: boolean
+    quiet: boolean
+  }
+  quietHours?: {
+    enabled: boolean
+    start: string
+    end: string
+  }
+}
+
+export interface AppearanceSettings {
+  theme: 'light' | 'dark' | 'vibrant' | 'system'
+  language: string
+  fontSize: 'small' | 'medium' | 'large'
+  sidebarWidth: 'compact' | 'normal' | 'wide'
+  density: 'compact' | 'comfortable' | 'spacious'
+  accentColor: 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'red'
+  contentWidth: 'compact' | 'full'
 }
 
 export interface UserPreferences {
   language: string
   timezone: string
-  theme: 'light' | 'dark' | 'auto'
+  theme: 'light' | 'dark' | 'vibrant' | 'system'
   notifications: NotificationSettings
+  appearance: AppearanceSettings
 }
 
 export interface CompanyInfo {
@@ -63,11 +94,40 @@ export class UserSettings {
     default: {
       language: 'fr',
       timezone: 'Europe/Paris',
-      theme: 'light',
+      theme: 'vibrant',
       notifications: {
         email: true,
         push: true,
-        sms: false
+        sms: false,
+        emailTypes: {
+          newMessages: true,
+          systemAlerts: true,
+          taskReminders: false,
+          weeklyReports: true,
+          securityAlerts: true,
+          maintenanceNotice: false
+        },
+        pushTypes: {
+          enabled: true,
+          sound: true,
+          urgent: true,
+          normal: false,
+          quiet: true
+        },
+        quietHours: {
+          enabled: true,
+          start: '22:00',
+          end: '07:00'
+        }
+      },
+      appearance: {
+        theme: 'vibrant',
+        language: 'fr',
+        fontSize: 'medium',
+        sidebarWidth: 'normal',
+        density: 'comfortable',
+        accentColor: 'blue',
+        contentWidth: 'compact'
       }
     }
   })

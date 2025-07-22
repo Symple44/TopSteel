@@ -1,10 +1,13 @@
-import { translations } from './translations'
+import { translations as baseTranslations } from './translations'
 import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES } from './types'
-import type { Language } from './types'
+import type { Language, Translations } from './types'
+import { overrideService } from './override-service'
 
 class Translator {
   private currentLanguage: string = DEFAULT_LANGUAGE
   private listeners: Set<() => void> = new Set()
+  private translations: Translations = baseTranslations
+  private overridesLoaded = false
 
   constructor() {
     // Initialize from localStorage if available
@@ -92,9 +95,36 @@ class Translator {
     return SUPPORTED_LANGUAGES
   }
 
+  /**
+   * Charge et applique les overrides de traduction
+   */
+  public async loadOverrides(): Promise<void> {
+    if (this.overridesLoaded) return
+
+    try {
+      await overrideService.loadOverrides()
+      this.translations = overrideService.applyOverrides(baseTranslations)
+      this.overridesLoaded = true
+      
+      // Notifier les listeners que les traductions ont été mises à jour
+      this.notifyListeners()
+    } catch (error) {
+      console.error('Failed to load translation overrides:', error)
+    }
+  }
+
+  /**
+   * Force le rechargement des overrides
+   */
+  public async refreshOverrides(): Promise<void> {
+    this.overridesLoaded = false
+    await overrideService.refresh()
+    await this.loadOverrides()
+  }
+
   public translate(key: string, params?: Record<string, string | number>): string {
     const keys = key.split('.')
-    let value: any = translations[this.currentLanguage]
+    let value: any = this.translations[this.currentLanguage]
 
     // Navigate through the nested object
     for (const k of keys) {
@@ -102,7 +132,7 @@ class Translator {
         value = value[k]
       } else {
         // Fallback to default language
-        value = translations[DEFAULT_LANGUAGE]
+        value = this.translations[DEFAULT_LANGUAGE]
         for (const fallbackKey of keys) {
           if (value && typeof value === 'object' && fallbackKey in value) {
             value = value[fallbackKey]

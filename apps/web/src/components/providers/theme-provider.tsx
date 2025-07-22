@@ -16,8 +16,8 @@
 
 'use client'
 
+import React from 'react'
 import type { ReactNode } from 'react'
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 // =============================================
 // TYPES ET INTERFACES
@@ -285,7 +285,7 @@ const ThemeMetricsCollector = {
 // CONTEXT ET PROVIDER
 // =============================================
 
-const ThemeProviderContext = createContext<ThemeProviderContext | undefined>(undefined)
+const ThemeProviderContext = React.createContext<ThemeProviderContext | undefined>(undefined)
 
 export function ThemeProvider({
   children,
@@ -301,17 +301,17 @@ export function ThemeProvider({
   customColors = { light: {}, dark: {} },
 }: ThemeProviderProps) {
   // ===== ÉTATS =====
-  const [theme, setThemeState] = useState<Theme>(defaultTheme)
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(fallbackTheme)
-  const [isHydrated, setIsHydrated] = useState(false)
-  const [isChanging, setIsChanging] = useState(false)
+  const [theme, setThemeState] = React.useState<Theme>(defaultTheme)
+  const [resolvedTheme, setResolvedTheme] = React.useState<ResolvedTheme>(fallbackTheme)
+  const [isHydrated, setIsHydrated] = React.useState(false)
+  const [isChanging, setIsChanging] = React.useState(false)
 
   // ===== REFS =====
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const hydrationStartRef = useRef(Date.now())
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+  const hydrationStartRef = React.useRef(Date.now())
 
   // ===== RÉSOLUTION DU THÈME =====
-  const resolveTheme = useCallback(
+  const resolveTheme = React.useCallback(
     (currentTheme: Theme): ResolvedTheme => {
       if (currentTheme === 'system') {
         return enableSystem ? getSystemTheme() : fallbackTheme
@@ -323,7 +323,7 @@ export function ThemeProvider({
   )
 
   // ===== MISE À JOUR DU THÈME RÉSOLU =====
-  const updateResolvedTheme = useCallback(
+  const updateResolvedTheme = React.useCallback(
     (newTheme: Theme) => {
       const resolved = resolveTheme(newTheme)
 
@@ -346,7 +346,7 @@ export function ThemeProvider({
   )
 
   // ===== SETTER PRINCIPAL =====
-  const setTheme = useCallback(
+  const setTheme = React.useCallback(
     (newTheme: Theme) => {
       if (!['light', 'dark', 'system'].includes(newTheme)) {
         console.warn(`Invalid theme: ${newTheme}`)
@@ -391,7 +391,7 @@ export function ThemeProvider({
   )
 
   // ===== HYDRATATION INITIALE =====
-  useEffect(() => {
+  React.useEffect(() => {
     const hydrationStart = hydrationStartRef.current
 
     try {
@@ -419,7 +419,7 @@ export function ThemeProvider({
   }, [defaultTheme, updateResolvedTheme, enableMetrics])
 
   // ===== LISTENER SYSTÈME =====
-  useEffect(() => {
+  React.useEffect(() => {
     if (!enableSystem || theme !== 'system') return
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -434,7 +434,7 @@ export function ThemeProvider({
   }, [theme, enableSystem, updateResolvedTheme])
 
   // ===== SYNCHRONISATION MULTI-ONGLETS =====
-  useEffect(() => {
+  React.useEffect(() => {
     if (!enableSync) return
 
     const handleStorageChange = (e: StorageEvent) => {
@@ -454,7 +454,7 @@ export function ThemeProvider({
   }, [theme, storageKey, enableSync, updateResolvedTheme])
 
   // ===== MÉTHODES UTILITAIRES =====
-  const toggleTheme = useCallback(() => {
+  const toggleTheme = React.useCallback(() => {
     if (theme === 'system') {
       setTheme(resolvedTheme === 'light' ? 'dark' : 'light')
     } else {
@@ -462,11 +462,11 @@ export function ThemeProvider({
     }
   }, [theme, resolvedTheme, setTheme])
 
-  const setSystemTheme = useCallback(() => {
+  const setSystemTheme = React.useCallback(() => {
     setTheme('system')
   }, [setTheme])
 
-  const clearTheme = useCallback(() => {
+  const clearTheme = React.useCallback(() => {
     removeStoredTheme()
     setTheme(defaultTheme)
   }, [setTheme, defaultTheme])
@@ -504,7 +504,7 @@ export function ThemeProvider({
   }
 
   // ===== NETTOYAGE =====
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
@@ -522,7 +522,7 @@ export function ThemeProvider({
 // =============================================
 
 export function useTheme(): ThemeProviderContext {
-  const context = useContext(ThemeProviderContext)
+  const context = React.useContext(ThemeProviderContext)
 
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider')
@@ -549,17 +549,17 @@ export function useThemeDebug(): {
 } {
   const { theme, resolvedTheme, toggleTheme } = useTheme()
 
-  const logMetrics = useCallback(() => {
+  const logMetrics = React.useCallback(() => {
     const metrics = ThemeMetricsCollector.getMetrics()
 
     console.table(metrics)
   }, [])
 
-  const resetMetrics = useCallback(() => {
+  const resetMetrics = React.useCallback(() => {
     ThemeMetricsCollector.reset()
   }, [])
 
-  const getCurrentTheme = useCallback(
+  const getCurrentTheme = React.useCallback(
     () => ({
       theme,
       resolved: resolvedTheme,
@@ -567,7 +567,7 @@ export function useThemeDebug(): {
     [theme, resolvedTheme]
   )
 
-  const testThemeSwitch = useCallback(() => {
+  const testThemeSwitch = React.useCallback(() => {
     toggleTheme()
     setTimeout(() => {
       toggleTheme()

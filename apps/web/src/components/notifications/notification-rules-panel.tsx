@@ -491,7 +491,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
   const [formData, setFormData] = useState({
     name: rule?.name || '',
     description: rule?.description || '',
-    isActive: rule?.isActive || true,
+    isActive: rule?.isActive ?? true,
     triggerType: rule?.trigger.type || 'user',
     triggerEvent: rule?.trigger.event || '',
     notificationType: rule?.notification.type || 'info',
@@ -528,7 +528,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Ex: Alerte stock critique"
               />
             </div>
@@ -538,7 +538,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
                 <Switch
                   id="isActive"
                   checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked }))}
+                  onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, isActive: checked }))}
                 />
                 <Label htmlFor="isActive">
                   {formData.isActive ? 'Actif' : 'Inactif'}
@@ -551,7 +551,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Décrivez quand cette règle doit s'activer..."
               rows={3}
             />
@@ -564,7 +564,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Label htmlFor="triggerType">Type d'événement</Label>
               <Select
                 value={formData.triggerType}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, triggerType: value as any, triggerEvent: '' }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, triggerType: value as any, triggerEvent: '' }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez un type" />
@@ -583,7 +583,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Label htmlFor="triggerEvent">Événement</Label>
               <Select
                 value={formData.triggerEvent}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, triggerEvent: value }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, triggerEvent: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez un événement" />
@@ -622,7 +622,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Label htmlFor="notificationType">Type de notification</Label>
               <Select
                 value={formData.notificationType}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, notificationType: value as any }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, notificationType: value as any }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -639,7 +639,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Label htmlFor="priority">Priorité</Label>
               <Select
                 value={formData.priority}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value as any }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, priority: value as any }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -658,7 +658,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
             <Input
               id="titleTemplate"
               value={formData.titleTemplate}
-              onChange={(e) => setFormData(prev => ({ ...prev, titleTemplate: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, titleTemplate: e.target.value }))}
               placeholder="Ex: Stock critique: {{material_name}}"
             />
             <p className="text-xs text-muted-foreground">
@@ -670,7 +670,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
             <Textarea
               id="messageTemplate"
               value={formData.messageTemplate}
-              onChange={(e) => setFormData(prev => ({ ...prev, messageTemplate: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, messageTemplate: e.target.value }))}
               placeholder="Ex: Le stock de {{material_name}} est maintenant de {{quantity}} unités"
               rows={3}
             />
@@ -681,7 +681,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Input
                 id="actionUrl"
                 value={formData.actionUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, actionUrl: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, actionUrl: e.target.value }))}
                 placeholder="Ex: /stock/materials/{{material_id}}"
               />
             </div>
@@ -690,7 +690,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Input
                 id="actionLabel"
                 value={formData.actionLabel}
-                onChange={(e) => setFormData(prev => ({ ...prev, actionLabel: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, actionLabel: e.target.value }))}
                 placeholder="Ex: Voir le stock"
               />
             </div>

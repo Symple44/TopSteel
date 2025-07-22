@@ -357,7 +357,7 @@ export default function DatabaseManagementPage() {
 
   if (loading && !report) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="p-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -369,7 +369,7 @@ export default function DatabaseManagementPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-7xl">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Database className="w-8 h-8 text-blue-600" />

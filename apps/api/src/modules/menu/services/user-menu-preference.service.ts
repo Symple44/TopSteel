@@ -21,13 +21,41 @@ export class UserMenuPreferenceService {
     })
 
     if (!preferences.length) {
-      // Créer les préférences par défaut pour l'admin
+      // Créer les préférences par défaut basées sur la structure hiérarchique
       const defaultMenus = [
-        { menuId: 'main-dashboard', isVisible: true, order: 1, customLabel: 'Dashboard' },
-        { menuId: 'users', isVisible: true, order: 2, customLabel: 'Utilisateurs' },
-        { menuId: 'roles', isVisible: true, order: 3, customLabel: 'Rôles' },
-        { menuId: 'system-settings', isVisible: true, order: 4, customLabel: 'Configuration' },
-        { menuId: 'notifications', isVisible: true, order: 5, customLabel: 'Notifications' },
+        // Pages principales (toujours visibles)
+        { menuId: 'home', isVisible: true, order: 0, customLabel: 'Accueil' },
+        { menuId: 'dashboard', isVisible: true, order: 1, customLabel: 'Tableau de bord' },
+        
+        // Section administration (visible pour admin)
+        { menuId: 'admin', isVisible: true, order: 2, customLabel: 'Administration' },
+        { menuId: 'admin-users', isVisible: true, order: 21, customLabel: 'Gestion des utilisateurs' },
+        { menuId: 'admin-roles', isVisible: true, order: 22, customLabel: 'Gestion des rôles' },
+        { menuId: 'admin-menu-config', isVisible: false, order: 23, customLabel: 'Configuration des menus' },
+        { menuId: 'admin-company', isVisible: false, order: 24, customLabel: 'Informations entreprise' },
+        { menuId: 'admin-database', isVisible: false, order: 25, customLabel: 'Base de données' },
+        { menuId: 'admin-notifications-rules', isVisible: false, order: 26, customLabel: 'Règles de notification' },
+        { menuId: 'admin-sessions', isVisible: false, order: 27, customLabel: 'Sessions utilisateurs' },
+        { menuId: 'admin-translations', isVisible: false, order: 28, customLabel: 'Gestion des traductions' },
+        
+        // Section paramètres
+        { menuId: 'settings', isVisible: true, order: 3, customLabel: 'Paramètres' },
+        { menuId: 'settings-menu', isVisible: true, order: 31, customLabel: 'Personnalisation du menu' },
+        { menuId: 'settings-security', isVisible: false, order: 32, customLabel: 'Paramètres de sécurité' },
+        
+        // Profil utilisateur
+        { menuId: 'profile', isVisible: true, order: 4, customLabel: 'Mon profil' },
+        
+        // Modules métier (pas encore disponibles)
+        { menuId: 'clients', isVisible: false, order: 5, customLabel: 'Clients' },
+        { menuId: 'projets', isVisible: false, order: 6, customLabel: 'Projets' },
+        { menuId: 'stocks', isVisible: false, order: 7, customLabel: 'Stocks' },
+        { menuId: 'production', isVisible: false, order: 8, customLabel: 'Production' },
+        { menuId: 'planning', isVisible: false, order: 9, customLabel: 'Planification' },
+        
+        // Legacy (compatibilité)
+        { menuId: 'users', isVisible: false, order: 100, customLabel: 'Utilisateurs (legacy)' },
+        { menuId: 'roles', isVisible: false, order: 101, customLabel: 'Rôles (legacy)' },
       ]
 
       preferences = await Promise.all(defaultMenus.map(async (menu) => {

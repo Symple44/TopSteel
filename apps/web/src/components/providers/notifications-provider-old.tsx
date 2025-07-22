@@ -152,7 +152,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: newNotifications,
-        unreadCount: newNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+        unreadCount: newNotifications.filter((n) => !n.isRead).length,
       }
     }
 
@@ -164,7 +164,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+        unreadCount: updatedNotifications.filter((n) => !n.isRead).length,
       }
     }
 
@@ -184,7 +184,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: filteredNotifications,
-        unreadCount: filteredNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+        unreadCount: filteredNotifications.filter((n) => !n.isRead).length,
       }
     }
 
@@ -196,7 +196,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+        unreadCount: updatedNotifications.filter((n) => !n.isRead).length,
       }
     }
 
@@ -208,7 +208,7 @@ function notificationsReducer(
       return {
         ...state,
         notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.isRead && !n.isArchived).length,
+        unreadCount: updatedNotifications.filter((n) => !n.isRead).length,
       }
     }
 

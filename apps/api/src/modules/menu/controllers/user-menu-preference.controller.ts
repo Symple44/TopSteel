@@ -114,19 +114,224 @@ export class UserMenuPreferenceController {
     const userId = req.user.id
     const preferences = await this.userMenuPreferenceService.findOrCreateByUserId(userId)
     
-    // Construire le menu basé sur les préférences
-    const menuItems = preferences
-      .filter(p => p.isVisible)
-      .sort((a, b) => a.order - b.order)
-      .map(preference => ({
-        id: preference.menuId,
-        title: preference.customLabel || preference.menuId.charAt(0).toUpperCase() + preference.menuId.slice(1).replace('-', ' '),
+    // Mapping basé sur la vraie structure hiérarchique du projet
+    const defaultMenuMapping = {
+      // Pages principales
+      'home': { 
+        title: 'Accueil', 
+        href: '/', 
+        icon: 'Home',
+        parentId: null,
+        orderIndex: 0
+      },
+      'dashboard': { 
+        title: 'Tableau de bord', 
+        href: '/dashboard', 
+        icon: 'LayoutDashboard',
+        parentId: null,
+        orderIndex: 1
+      },
+      
+      // Section Administration (parent)
+      'admin': { 
+        title: 'Administration', 
+        href: '/admin', 
+        icon: 'Shield',
+        parentId: null,
+        orderIndex: 2
+      },
+      
+      // Sous-sections Administration (les menuId suivent le pattern admin-xxx)
+      'admin-users': { 
+        title: 'Gestion des utilisateurs', 
+        href: '/admin/users', 
+        icon: 'Users',
+        parentId: 'admin',
+        orderIndex: 1
+      },
+      'admin-roles': { 
+        title: 'Gestion des rôles', 
+        href: '/admin/roles', 
+        icon: 'Shield',
+        parentId: 'admin',
+        orderIndex: 2
+      },
+      'admin-menu-config': { 
+        title: 'Configuration des menus', 
+        href: '/admin/menu-config', 
+        icon: 'Menu',
+        parentId: 'admin',
+        orderIndex: 3
+      },
+      'admin-company': { 
+        title: 'Informations entreprise', 
+        href: '/admin/company', 
+        icon: 'Building',
+        parentId: 'admin',
+        orderIndex: 4
+      },
+      'admin-database': { 
+        title: 'Base de données', 
+        href: '/admin/database', 
+        icon: 'Database',
+        parentId: 'admin',
+        orderIndex: 5
+      },
+      'admin-notifications-rules': { 
+        title: 'Règles de notification', 
+        href: '/admin/notifications/rules', 
+        icon: 'Bell',
+        parentId: 'admin',
+        orderIndex: 6
+      },
+      'admin-sessions': { 
+        title: 'Sessions utilisateurs', 
+        href: '/admin/sessions', 
+        icon: 'Clock',
+        parentId: 'admin',
+        orderIndex: 7
+      },
+      'admin-translations': { 
+        title: 'Gestion des traductions', 
+        href: '/admin/translations', 
+        icon: 'Languages',
+        parentId: 'admin',
+        orderIndex: 8
+      },
+      
+      // Section Paramètres
+      'settings': { 
+        title: 'Paramètres', 
+        href: '/settings', 
+        icon: 'Settings',
+        parentId: null,
+        orderIndex: 3
+      },
+      'settings-menu': { 
+        title: 'Personnalisation du menu', 
+        href: '/settings/menu', 
+        icon: 'Layout',
+        parentId: 'settings',
+        orderIndex: 1
+      },
+      'settings-security': { 
+        title: 'Paramètres de sécurité', 
+        href: '/settings/security', 
+        icon: 'Lock',
+        parentId: 'settings',
+        orderIndex: 2
+      },
+      
+      // Section Profil
+      'profile': { 
+        title: 'Mon profil', 
+        href: '/profile', 
+        icon: 'User',
+        parentId: null,
+        orderIndex: 4
+      },
+      
+      // Modules métier (si disponibles)
+      'planning': { 
+        title: 'Planification', 
+        href: '/planning', 
+        icon: 'Calendar',
+        parentId: null,
+        orderIndex: 5
+      },
+      'planning-test': { 
+        title: 'Planning de test', 
+        href: '/planning/test', 
+        icon: 'Calendar',
+        parentId: 'planning',
+        orderIndex: 1
+      },
+      
+      // Legacy/compatibilité
+      'users': { title: 'Utilisateurs', href: '/admin/users', icon: 'Users', parentId: 'admin', orderIndex: 1 },
+      'roles': { title: 'Rôles', href: '/admin/roles', icon: 'Shield', parentId: 'admin', orderIndex: 2 },
+      'clients': { title: 'Clients', href: '/clients', icon: 'Users', parentId: null, orderIndex: 6 },
+      'projets': { title: 'Projets', href: '/projets', icon: 'FolderOpen', parentId: null, orderIndex: 7 },
+      'stocks': { title: 'Stocks', href: '/stocks', icon: 'Package', parentId: null, orderIndex: 8 },
+      'production': { title: 'Production', href: '/production', icon: 'Factory', parentId: null, orderIndex: 9 },
+    }
+    
+    // Construire une map des préférences pour un accès rapide
+    const preferenceMap = new Map()
+    preferences.forEach(p => preferenceMap.set(p.menuId, p))
+    
+    // Construire tous les items de menu (visibles et leurs parents nécessaires)
+    const allMenuItems = new Map()
+    
+    // Ajouter tous les items visibles et leurs parents nécessaires
+    preferences.filter(p => p.isVisible).forEach(preference => {
+      const defaultMenu = defaultMenuMapping[preference.menuId] || {
+        title: preference.menuId.charAt(0).toUpperCase() + preference.menuId.slice(1).replace('-', ' '),
         href: `/${preference.menuId}`,
         icon: 'FileText',
+        parentId: null,
+        orderIndex: preference.order
+      }
+      
+      // Ajouter l'item principal
+      allMenuItems.set(preference.menuId, {
+        id: preference.menuId,
+        parentId: defaultMenu.parentId,
+        title: preference.customLabel || defaultMenu.title,
+        href: defaultMenu.href,
+        icon: defaultMenu.icon,
         isVisible: preference.isVisible,
         order: preference.order,
-        children: []
-      }))
+        orderIndex: defaultMenu.orderIndex || preference.order,
+        children: [],
+        depth: defaultMenu.parentId ? 1 : 0,
+        moduleId: preference.menuId
+      })
+      
+      // Ajouter le parent si nécessaire
+      if (defaultMenu.parentId && !allMenuItems.has(defaultMenu.parentId)) {
+        const parentMenu = defaultMenuMapping[defaultMenu.parentId]
+        if (parentMenu) {
+          allMenuItems.set(defaultMenu.parentId, {
+            id: defaultMenu.parentId,
+            parentId: parentMenu.parentId,
+            title: parentMenu.title,
+            href: parentMenu.href,
+            icon: parentMenu.icon,
+            isVisible: true, // Parent visible si enfant visible
+            order: 0,
+            orderIndex: parentMenu.orderIndex || 0,
+            children: [],
+            depth: 0,
+            moduleId: defaultMenu.parentId
+          })
+        }
+      }
+    })
+    
+    // Construire la hiérarchie parent/enfant
+    const rootItems: any[] = []
+    const itemsArray = Array.from(allMenuItems.values())
+    
+    // Trier par order d'abord
+    itemsArray.sort((a, b) => a.orderIndex - b.orderIndex)
+    
+    // Organiser en hiérarchie
+    itemsArray.forEach(item => {
+      if (!item.parentId) {
+        // Item racine
+        rootItems.push(item)
+      } else {
+        // Item enfant - l'ajouter à son parent
+        const parent = allMenuItems.get(item.parentId)
+        if (parent) {
+          parent.children.push(item)
+          parent.children.sort((a, b) => a.orderIndex - b.orderIndex)
+        }
+      }
+    })
+    
+    const menuItems = rootItems
     
     return {
       success: true,

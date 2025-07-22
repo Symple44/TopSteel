@@ -13,6 +13,8 @@ const publicRoutes = [
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
   '/api/health',
+  '/backend-error',
+  '/unauthorized',
   '/_next',
   '/favicon.ico',
 ]
@@ -81,6 +83,11 @@ export function middleware(request: NextRequest) {
   // Pour les pages (non-API)
   if (!pathname.startsWith('/api')) {
     if (!token) {
+      // Éviter la boucle infinie : ne pas rediriger si on est déjà sur login
+      if (pathname === '/login') {
+        return NextResponse.next()
+      }
+      
       // Rediriger vers la page de login
       const url = request.nextUrl.clone()
       url.pathname = '/login'

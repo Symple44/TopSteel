@@ -109,7 +109,12 @@
       "Bash(npx typeorm migration:run:*)",
       "Bash(pkill:*)",
       "Bash(tasklist)",
-      "Bash(PORT=3010 node dist/main.js)"
+      "Bash(PORT=3010 node dist/main.js)",
+      "Bash(tail:*)",
+      "Bash(PORT=3001 node dist/main.js)",
+      "Bash(rg:*)",
+      "Bash(true)",
+      "Bash(ts-node:*)"
     ],
     "deny": []
   }

@@ -1,477 +1,182 @@
+/**
+ * Page de paramètres utilisateur - TopSteel ERP
+ * Fichier: apps/web/src/app/(dashboard)/settings/page.tsx
+ */
+
 'use client'
 
-// Force dynamic rendering to avoid SSR issues
-export const dynamic = 'force-dynamic'
-
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Badge, Button, Input } from '@erp/ui'
+import React from 'react'
+import { useAuth } from '@/hooks/use-auth'
+import { useRouter } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n/hooks'
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import {
-  Bell,
-  Building2,
-  Camera,
-  Eye,
-  EyeOff,
-  Globe,
-  Mail,
-  MapPin,
-  Palette,
-  Phone,
-  Save,
-  Settings,
-  Shield,
+  ArrowRight,
   User,
-  Loader2,
-  RotateCcw,
+  Menu,
+  Shield,
+  Bell,
+  Palette,
+  Globe,
+  Settings,
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { useTheme } from 'next-themes'
-import { 
-  useUserSettings, 
-  useUpdateProfile, 
-  useUpdateCompany, 
-  useUpdatePreferences,
-  useUpdateNotifications 
-} from '@/hooks/use-user-settings'
-import { useLanguage, useTranslation } from '@/lib/i18n'
-import { toast } from 'sonner'
 
 export default function SettingsPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [activeTab, setActiveTab] = useState('notifications')
-  const { theme, setTheme } = useTheme()
-  const { current: language, change: setLanguage } = useLanguage()
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
   const { t } = useTranslation('settings')
-  const { t: tc } = useTranslation('common')
-
-  // Récupération des données utilisateur depuis l'API
-  const { data: userSettings, isLoading, error } = useUserSettings()
+  const { t: tCommon } = useTranslation('common')
+  const router = useRouter()
   
-  // Mutations pour les mises à jour
-  const updateProfile = useUpdateProfile()
-  const updateCompany = useUpdateCompany()
-  const updatePreferences = useUpdatePreferences()
-  const updateNotifications = useUpdateNotifications()
-
-  // États locaux pour les formulaires
-  const [profileData, setProfileData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    position: '',
-    department: '',
-  })
-
-  const [companyData, setCompanyData] = useState({
-    name: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    country: '',
-  })
-
-  const [preferencesData, setPreferencesData] = useState({
-    language: 'auto',
-    timezone: 'Europe/Paris',
-    notifications: {
-      email: true,
-      push: true,
-      sms: false,
-    },
-  })
-
-  // Synchroniser les données quand elles arrivent de l'API
-  useEffect(() => {
-    if (userSettings) {
-      if (userSettings.profile) {
-        setProfileData({
-          firstName: userSettings.profile.firstName || '',
-          lastName: userSettings.profile.lastName || '',
-          email: userSettings.profile.email || '',
-          phone: userSettings.profile.phone || '',
-          position: userSettings.profile.position || '',
-          department: userSettings.profile.department || '',
-        })
-      }
-
-      if (userSettings.company) {
-        setCompanyData({
-          name: userSettings.company.name || '',
-          address: userSettings.company.address || '',
-          city: userSettings.company.city || '',
-          postalCode: userSettings.company.postalCode || '',
-          country: userSettings.company.country || '',
-        })
-      }
-
-      if (userSettings.preferences) {
-        const savedLanguage = userSettings.preferences.language || 'auto'
-        setPreferencesData({
-          language: savedLanguage,
-          timezone: userSettings.preferences.timezone || 'Europe/Paris',
-          notifications: {
-            email: userSettings.preferences.notifications?.email ?? true,
-            push: userSettings.preferences.notifications?.push ?? true,
-            sms: userSettings.preferences.notifications?.sms ?? false,
-          },
-        })
-        
-        // Synchroniser la langue avec le système i18n si elle est différente
-        if (savedLanguage && savedLanguage !== language.code && savedLanguage !== 'auto') {
-          setLanguage(savedLanguage)
-        }
-      }
+  // Vérifier l'authentification
+  React.useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login?redirect=/settings')
     }
-  }, [userSettings]) // Retirer language et setLanguage pour éviter les boucles
-
-  // Initialiser la langue si elle n'est pas définie
-  useEffect(() => {
-    if (!preferencesData.language && language.code) {
-      setPreferencesData(prev => ({ ...prev, language: language.code }))
-    }
-  }, [preferencesData.language, language.code])
-
-  const tabs = [
-    { id: 'notifications', label: t('notifications'), icon: Bell },
-    { id: 'preferences', label: t('interface'), icon: Settings },
-  ]
-
-  const handleSaveProfile = () => {
-    updateProfile.mutate(profileData)
-  }
-
-  const handleSaveCompany = () => {
-    updateCompany.mutate(companyData)
-  }
-
-  const handleSavePreferences = () => {
-    // Le thème est géré par next-themes, pas besoin de le sauvegarder
-    const { notifications, ...prefsToSave } = preferencesData
-    
-    // Synchroniser la langue avec le système i18n
-    if (prefsToSave.language !== language.code) {
-      setLanguage(prefsToSave.language)
-    }
-    
-    // Sauvegarder les préférences via l'API
-    updatePreferences.mutate(prefsToSave, {
-      onSuccess: () => {
-        toast.success(t('success.saved') || 'Préférences enregistrées avec succès')
-      },
-      onError: () => {
-        toast.error(t('settingsLoadError') || 'Erreur lors de l\'enregistrement des préférences')
-      }
-    })
-  }
-
-  const handleSaveNotifications = () => {
-    updateNotifications.mutate(preferencesData.notifications, {
-      onSuccess: () => {
-        toast.success(t('success.saved') || 'Notifications enregistrées avec succès')
-      },
-      onError: () => {
-        toast.error(t('settingsLoadError') || 'Erreur lors de l\'enregistrement des notifications')
-      }
-    })
-  }
-
-  const handleSaveAll = () => {
-    if (activeTab === 'notifications') {
-      handleSaveNotifications()
-    } else if (activeTab === 'preferences') {
-      handleSavePreferences()
-    }
-  }
-
-  const handleResetAll = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir réinitialiser ces paramètres ?')) {
-      if (activeTab === 'notifications') {
-        setPreferencesData(prev => ({
-          ...prev,
-          notifications: {
-            email: true,
-            push: true,
-            sms: false,
-          }
-        }))
-        toast.success('Paramètres de notification réinitialisés')
-      } else if (activeTab === 'preferences') {
-        setPreferencesData(prev => ({
-          ...prev,
-          language: 'auto',
-          timezone: 'Europe/Paris',
-        }))
-        toast.success('Préférences réinitialisées')
-      }
-    }
-  }
-
-  const handleLanguageChange = (newLanguage: string) => {
-    // Mettre à jour l'état local
-    setPreferencesData(prev => ({ ...prev, language: newLanguage }))
-    // Changer immédiatement la langue dans l'interface
-    setLanguage(newLanguage)
-    
-    // Sauvegarder automatiquement les préférences de langue
-    const updatedPrefs = {
-      language: newLanguage,
-      timezone: preferencesData.timezone,
-    }
-    
-    updatePreferences.mutate(updatedPrefs, {
-      onSuccess: () => {
-        toast.success(t('languageUpdated') || 'Langue mise à jour')
-      },
-      onError: () => {
-        toast.error(t('languageUpdateError') || 'Erreur lors de la mise à jour de la langue')
-      }
-    })
-  }
-
-  // Gestion des erreurs
-  if (error) {
-    toast.error(t('settingsLoadError'))
-  }
-
-  // Affichage du loader pendant le chargement initial
-  if (isLoading) {
+  }, [isAuthenticated, authLoading, router])
+  
+  // Afficher un loader si pas encore authentifié
+  if (authLoading || !isAuthenticated) {
     return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin" />
-          <span className="ml-2">{t('loadingSettings')}</span>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>{tCommon('loading')}</p>
         </div>
       </div>
     )
   }
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'notifications':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('notificationPreferences')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium">{t('emailNotifications')}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {t('emailNotificationsDesc')}
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={preferencesData.notifications.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPreferencesData(prev => ({
-                    ...prev,
-                    notifications: { ...prev.notifications, email: e.target.checked }
-                  }))}
-                  className="h-4 w-4 text-primary rounded border-input"
-                />
-              </div>
+  const settingsModules = [
+    {
+      title: t('modules.menu.title'),
+      description: t('modules.menu.description'),
+      icon: Menu,
+      href: '/settings/menu',
+      color: 'from-purple-500 to-pink-600'
+    },
+    {
+      title: t('modules.security.title'),
+      description: t('modules.security.description'),
+      icon: Shield,
+      href: '/settings/security',
+      color: 'from-green-500 to-teal-600'
+    },
+    {
+      title: t('modules.notifications.title'),
+      description: t('modules.notifications.description'),
+      icon: Bell,
+      href: '/settings/notifications',
+      color: 'from-yellow-500 to-orange-600'
+    },
+    {
+      title: t('modules.appearance.title'),
+      description: t('modules.appearance.description'),
+      icon: Palette,
+      href: '/settings/appearance',
+      color: 'from-indigo-500 to-purple-600'
+    }
+  ]
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium">{t('pushNotifications')}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {t('pushNotificationsDesc')}
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={preferencesData.notifications.push}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPreferencesData(prev => ({
-                    ...prev,
-                    notifications: { ...prev.notifications, push: e.target.checked }
-                  }))}
-                  className="h-4 w-4 text-primary rounded border-input"
-                />
-              </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/30 to-purple-50/30">
+      <div className="px-4 sm:px-6 lg:px-8 py-12">
+        
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl">
+              <Settings className="h-12 w-12 text-white" />
+            </div>
+          </div>
+          
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-purple-600 bg-clip-text text-transparent mb-4">
+            {t('title')}
+          </h1>
+          
+          <p className="text-xl text-slate-600 mb-2">
+            {t('subtitle')}
+          </p>
+          
+          <p className="text-slate-500 mb-8">
+            {t('description')}
+          </p>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium">{t('smsNotifications')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('smsNotificationsDesc')}</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={preferencesData.notifications.sms}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPreferencesData(prev => ({
-                    ...prev,
-                    notifications: { ...prev.notifications, sms: e.target.checked }
-                  }))}
-                  className="h-4 w-4 text-primary rounded border-input"
-                />
-              </div>
+          {user && (
+            <div className="inline-flex items-center bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg border border-white/20">
+              <User className="h-5 w-5 text-blue-600 mr-2" />
+              <span className="text-slate-700 font-medium">
+                {t('connectedAs')} <span className="text-blue-600">{user.prenom} {user.nom}</span>
+              </span>
+            </div>
+          )}
+        </div>
 
-            </CardContent>
-          </Card>
-        )
-
-      case 'preferences':
-        return (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Globe className="h-5 w-5 mr-2" />
-                  {t('regionalPreferences')}
+        {/* Settings Modules Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {settingsModules.map((module, index) => (
+            <Card
+              key={index}
+              className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative"
+              onClick={() => router.push(module.href)}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${module.color}/10 opacity-0 group-hover:opacity-100 transition-opacity`} />
+              
+              <CardHeader className="pb-3 relative z-10">
+                <CardTitle className="text-lg flex items-center text-slate-800 group-hover:text-slate-900 transition-colors">
+                  <div className={`p-3 bg-gradient-to-r ${module.color} rounded-lg mr-3 group-hover:scale-110 transition-transform`}>
+                    <module.icon className="h-6 w-6 text-white" />
+                  </div>
+                  {module.title}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">{t('language')}</label>
-                  <select
-                    value={preferencesData.language}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleLanguageChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-                  >
-                    <option value="auto">{t('languageAuto')}</option>
-                    <option value="fr">{t('languages.fr')}</option>
-                    <option value="en">{t('languages.en')}</option>
-                    <option value="es">{t('languages.es')}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    {t('timezone')}
-                  </label>
-                  <select
-                    value={preferencesData.timezone}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPreferencesData(prev => ({ ...prev, timezone: e.target.value }))}
-                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-                  >
-                    <option value="Europe/Paris">{t('timezones.Europe/Paris')}</option>
-                    <option value="Europe/London">{t('timezones.Europe/London')}</option>
-                    <option value="America/New_York">{t('timezones.America/New_York')}</option>
-                  </select>
+              
+              <CardContent className="relative z-10">
+                <p className="text-slate-600 group-hover:text-slate-700 mb-4">
+                  {module.description}
+                </p>
+                <div className="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                  {t('modules.configure')}
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </CardContent>
             </Card>
+          ))}
+        </div>
 
-            <Card>
+        {/* User Info Card */}
+        {user && (
+          <div className="mt-16">
+            <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Palette className="h-5 w-5 mr-2" />
-                  {t('appearance')}
+                <CardTitle className="text-xl text-slate-800 flex items-center">
+                  <User className="h-6 w-6 mr-3 text-blue-600" />
+                  {t('accountInfo')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">{t('theme')}</label>
-                  <div className="flex space-x-4">
-                    <button
-                      type="button"
-                      onClick={() => setTheme('light')}
-                      className={`px-4 py-2 rounded-md border transition-colors ${
-                        theme === 'light'
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-input hover:border-ring'
-                      }`}
-                    >
-                      {t('light') || 'Clair'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTheme('dark')}
-                      className={`px-4 py-2 rounded-md border transition-colors ${
-                        theme === 'dark'
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-input hover:border-ring'
-                      }`}
-                    >
-                      {t('dark') || 'Sombre'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTheme('vibrant')}
-                      className={`px-4 py-2 rounded-md border transition-colors ${
-                        theme === 'vibrant'
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-input hover:border-ring'
-                      }`}
-                    >
-                      {t('vibrant') || '🎨 Coloré'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTheme('system')}
-                      className={`px-4 py-2 rounded-md border transition-colors ${
-                        theme === 'system'
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-input hover:border-ring'
-                      }`}
-                    >
-                      {t('system') || 'Auto'}
-                    </button>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-slate-500">{t('fullName')}</span>
+                    <div className="font-medium text-slate-800">{user.prenom} {user.nom}</div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {t('currentTheme')} : {theme === 'light' ? (t('light') || 'Clair') : theme === 'dark' ? (t('dark') || 'Sombre') : theme === 'vibrant' ? (t('vibrant') || 'Coloré') : (t('system') || 'Auto')}
-                  </p>
-                </div>
-
-                <div className="pt-4">
-                  <p className="text-sm text-muted-foreground">
-                    {t('themeAutoSave')}
-                  </p>
+                  <div>
+                    <span className="text-slate-500">{t('email')}</span>
+                    <div className="font-medium text-slate-800">{user.email}</div>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">{t('role')}</span>
+                    <div className="font-medium text-slate-800">{user.role}</div>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">{t('status')}</span>
+                    <div className="font-medium text-green-600">{t('active')}</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-        )
-
-      default:
-        return null
-    }
-  }
-
-  return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('title')}</h1>
-          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={handleResetAll}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            {tc('reset')}
-          </Button>
-          <Button onClick={handleSaveAll}>
-            <Save className="mr-2 h-4 w-4" />
-            {tc('save')}
-          </Button>
-        </div>
+        )}
       </div>
-
-      {/* Navigation Tabs */}
-      <div className="border-b border-border">
-        <nav className="flex space-x-8">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'
-                }`}
-              >
-                <Icon className="h-5 w-5 mr-2" />
-                {tab.label}
-              </button>
-            )
-          })}
-        </nav>
-      </div>
-
-      {/* Tab Content */}
-      <div className="mt-6">{renderTabContent()}</div>
     </div>
   )
 }

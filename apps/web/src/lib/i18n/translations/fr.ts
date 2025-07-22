@@ -4,6 +4,12 @@ export const fr = {
     loading: 'Chargement...',
     save: 'Enregistrer',
     cancel: 'Annuler',
+    buttons: {
+      save: 'Sauvegarder',
+      cancel: 'Annuler',
+      delete: 'Supprimer',
+      edit: 'Modifier'
+    },
     delete: 'Supprimer',
     edit: 'Modifier',
     add: 'Ajouter',

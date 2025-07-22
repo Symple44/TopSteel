@@ -19,6 +19,8 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserQueryDto } from './dto/user-query.dto'
 import { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
+import { UpdateAppearanceSettingsDto, GetAppearanceSettingsResponseDto } from './dto/appearance-settings.dto'
+import { UpdateNotificationSettingsDto, GetNotificationSettingsResponseDto } from './dto/notification-settings.dto'
 import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { UserRole } from './entities/user.entity'
 import { UsersService } from './users.service'
@@ -110,5 +112,65 @@ export class UsersController {
     @Body() updateDto: UpdateUserSettingsDto
   ) {
     return this.usersService.updateUserSettings(id, updateDto)
+  }
+
+  // Endpoints spécialisés pour les préférences d'apparence
+  @Get('appearance/me')
+  @ApiOperation({ summary: 'Récupérer mes préférences d\'apparence' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Préférences d\'apparence récupérées avec succès',
+    type: GetAppearanceSettingsResponseDto 
+  })
+  async getMyAppearanceSettings(@CurrentUser() user: any): Promise<GetAppearanceSettingsResponseDto> {
+    const settings = await this.usersService.getUserSettings(user.id)
+    return new GetAppearanceSettingsResponseDto(settings.preferences.appearance)
+  }
+
+  @Patch('appearance/me')
+  @ApiOperation({ summary: 'Mettre à jour mes préférences d\'apparence' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Préférences d\'apparence mises à jour avec succès',
+    type: GetAppearanceSettingsResponseDto 
+  })
+  async updateMyAppearanceSettings(
+    @CurrentUser() user: any,
+    @Body() updateDto: UpdateAppearanceSettingsDto
+  ): Promise<GetAppearanceSettingsResponseDto> {
+    const updatedSettings = await this.usersService.updateUserSettings(user.id, {
+      preferences: { appearance: updateDto }
+    })
+    return new GetAppearanceSettingsResponseDto(updatedSettings.preferences.appearance)
+  }
+
+  // Endpoints spécialisés pour les notifications
+  @Get('notifications/me')
+  @ApiOperation({ summary: 'Récupérer mes préférences de notification' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Préférences de notification récupérées avec succès',
+    type: GetNotificationSettingsResponseDto 
+  })
+  async getMyNotificationSettings(@CurrentUser() user: any): Promise<GetNotificationSettingsResponseDto> {
+    const settings = await this.usersService.getUserSettings(user.id)
+    return new GetNotificationSettingsResponseDto(settings.preferences.notifications)
+  }
+
+  @Patch('notifications/me')
+  @ApiOperation({ summary: 'Mettre à jour mes préférences de notification' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Préférences de notification mises à jour avec succès',
+    type: GetNotificationSettingsResponseDto 
+  })
+  async updateMyNotificationSettings(
+    @CurrentUser() user: any,
+    @Body() updateDto: UpdateNotificationSettingsDto
+  ): Promise<GetNotificationSettingsResponseDto> {
+    const updatedSettings = await this.usersService.updateUserSettings(user.id, {
+      preferences: { notifications: updateDto }
+    })
+    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications)
   }
 }

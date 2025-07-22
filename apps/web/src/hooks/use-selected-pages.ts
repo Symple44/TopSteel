@@ -16,7 +16,8 @@ export function useSelectedPages() {
       const response = await fetch('/api/user/menu-preferences/selected-pages')
       
       if (!response.ok) {
-        throw new Error('Erreur lors du chargement')
+        const errorText = await response.text()
+        throw new Error(`Erreur lors du chargement (${response.status}): ${errorText}`)
       }
       
       const data = await response.json()
@@ -25,11 +26,22 @@ export function useSelectedPages() {
         const pages = Array.isArray(data.data) ? data.data : []
         setSelectedPages(new Set(pages))
       } else {
-        setError(data.message || 'Erreur inconnue')
+        const errorMsg = data.message || 'Erreur inconnue'
+        setError(errorMsg)
       }
     } catch (err) {
-      console.error('Erreur lors du chargement des pages sélectionnées:', err)
-      setError('Erreur de connexion')
+      console.error('[useSelectedPages] Erreur lors du chargement des pages sélectionnées:', err)
+      
+      // En cas d'erreur, utiliser des pages par défaut pour ne pas bloquer l'UI
+      // Ne pas afficher d'erreur si on peut récupérer avec des valeurs par défaut
+      const defaultPages = ['dashboard', 'clients', 'projets', 'stocks', 'production']
+      setSelectedPages(new Set(defaultPages))
+      
+      // Seulement définir une erreur si c'est critique (ex: problème d'authentification)
+      if (err instanceof Error && (err.message.includes('401') || err.message.includes('403'))) {
+        setError('Vous devez être connecté pour accéder aux préférences de menu')
+      }
+      // Sinon, laisser l'erreur à null et utiliser les valeurs par défaut
     } finally {
       setLoading(false)
     }
@@ -39,7 +51,6 @@ export function useSelectedPages() {
   const saveSelectedPages = useCallback(async (pages: Set<string>) => {
     try {
       const pagesArray = Array.from(pages)
-      console.log('[useSelectedPages] Sauvegarde de', pagesArray.length, 'pages')
       
       const response = await fetch('/api/user/menu-preferences/selected-pages', {
         method: 'POST',
@@ -47,8 +58,10 @@ export function useSelectedPages() {
         body: JSON.stringify({ selectedPages: pagesArray })
       })
       
+      
       if (!response.ok) {
-        throw new Error('Erreur lors de la sauvegarde')
+        const errorText = await response.text()
+        throw new Error(`Erreur lors de la sauvegarde (${response.status}): ${errorText}`)
       }
       
       const data = await response.json()
@@ -57,10 +70,17 @@ export function useSelectedPages() {
         throw new Error(data.message || 'Erreur de sauvegarde')
       }
       
+      
+      // Déclencher un événement pour notifier les autres composants de recharger le menu
+      // Ajouter un petit délai pour s'assurer que la BDD est bien mise à jour
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('menuPreferencesChanged'))
+      }, 500)
+      
       return true
     } catch (err) {
-      console.error('Erreur lors de la sauvegarde:', err)
-      setError('Erreur de sauvegarde')
+      console.error('[useSelectedPages] Erreur lors de la sauvegarde:', err)
+      setError(err instanceof Error ? err.message : 'Erreur de sauvegarde')
       return false
     }
   }, [])

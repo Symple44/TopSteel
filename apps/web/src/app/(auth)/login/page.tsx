@@ -6,7 +6,7 @@ import { Button, Card, Input, Label, Separator } from "@erp/ui";
 import { Building2, Eye, EyeOff, Lock, Mail, Shield } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React from "react";
 import { useTranslation } from '@/lib/i18n/hooks';
 
 // Force dynamic rendering to avoid SSR issues
@@ -16,15 +16,15 @@ export default function LoginPage() {
 	const router = useRouter();
 	const { login, mfa, verifyMFA, resetMFA } = useAuth();
 	const { t } = useTranslation('auth');
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = React.useState({
 		identifier: "", // Peut être email ou acronyme
 		password: "",
 		rememberMe: false,
 	});
-	const [showPassword, setShowPassword] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
-	const [mfaCode, setMfaCode] = useState("");
-	const [selectedMfaMethod, setSelectedMfaMethod] = useState("");
+	const [showPassword, setShowPassword] = React.useState(false);
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [mfaCode, setMfaCode] = React.useState("");
+	const [selectedMfaMethod, setSelectedMfaMethod] = React.useState("");
 
 	const handleInputChange = (field: string, value: string | boolean) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -57,7 +57,12 @@ export default function LoginPage() {
 					description: t('welcomeToTopSteel'),
 					variant: "success",
 				});
-				router.push("/dashboard");
+				
+				// Obtenir le paramètre redirect depuis l'URL de manière sécurisée
+				const redirectTo = typeof window !== 'undefined' 
+					? new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
+					: '/dashboard';
+				router.push(redirectTo);
 			} else {
 				// MFA required - interface will be automatically updated
 				toast({
@@ -102,7 +107,12 @@ export default function LoginPage() {
 				description: t('welcomeToTopSteel'),
 				variant: "success",
 			});
-			router.push("/dashboard");
+			
+			// Obtenir le paramètre redirect depuis l'URL de manière sécurisée
+			const redirectTo = typeof window !== 'undefined' 
+				? new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
+				: '/dashboard';
+			router.push(redirectTo);
 		} catch (error) {
 			toast({
 				title: t('mfaError'),

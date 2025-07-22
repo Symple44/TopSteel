@@ -144,7 +144,7 @@ export default function TestPlanningPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="py-8 space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Planning de Production - Test</h1>

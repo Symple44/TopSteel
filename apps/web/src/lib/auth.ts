@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
-import { authService } from '@/services/auth.service'
+import { serverAuthService } from './auth-server'
 
 export interface AuthSession {
   user: {
@@ -20,21 +20,21 @@ export interface AuthSession {
 export async function auth(): Promise<AuthSession | null> {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get('auth-token')?.value
+    const token = cookieStore.get('accessToken')?.value
     
     if (!token) {
       return null
     }
 
-    // Valider le token avec le service
-    const isValid = await authService.validateToken(token)
+    // Valider le token avec le service serveur
+    const isValid = await serverAuthService.validateToken(token)
     
     if (!isValid) {
       return null
     }
 
     // Récupérer les infos utilisateur
-    const user = await authService.getProfile()
+    const user = await serverAuthService.getProfile(token)
 
     return {
       user: {
@@ -58,21 +58,21 @@ export async function auth(): Promise<AuthSession | null> {
  */
 export async function authFromRequest(request: NextRequest): Promise<AuthSession | null> {
   try {
-    const token = request.cookies.get('auth-token')?.value
+    const token = request.cookies.get('accessToken')?.value
     
     if (!token) {
       return null
     }
 
-    // Valider le token avec le service
-    const isValid = await authService.validateToken(token)
+    // Valider le token avec le service serveur
+    const isValid = await serverAuthService.validateToken(token)
     
     if (!isValid) {
       return null
     }
 
     // Récupérer les infos utilisateur
-    const user = await authService.getProfile()
+    const user = await serverAuthService.getProfile(token)
 
     return {
       user: {
