@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { ViewType, ViewConfig, ViewSettings } from './use-data-views'
 import { ColumnConfig } from './types'
+import { cn } from '@/lib/utils'
 
 const VIEW_ICONS: Record<ViewType, React.ComponentType<{ className?: string }>> = {
   table: Table,
@@ -89,19 +90,26 @@ export function ViewSelector<T = any>({
             <React.Fragment key={view.type}>
               <DropdownItem 
                 onClick={() => onViewChange(view.type)}
-                className={isActive ? 'bg-accent text-accent-foreground' : ''}
+                className={
+                  isActive 
+                    ? 'bg-accent text-accent-foreground font-semibold' 
+                    : 'text-foreground font-medium hover:bg-accent/50 hover:text-accent-foreground'
+                }
               >
-                <IconComponent className="h-4 w-4 mr-2" />
-                {view.name}
+                <IconComponent className={cn("h-4 w-4 mr-2", isActive ? "text-accent-foreground" : "text-muted-foreground")} />
+                <span className="flex-1">{view.name}</span>
                 {isActive && (
-                  <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full" />
+                  <div className="ml-auto w-2 h-2 bg-accent-foreground rounded-full" />
                 )}
               </DropdownItem>
               
               {view.type !== 'table' && (
-                <DropdownItem onClick={() => handleOpenSettings(view.type)}>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Configurer {view.name}
+                <DropdownItem 
+                  onClick={() => handleOpenSettings(view.type)}
+                  className="text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
+                >
+                  <Settings className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <span className="text-sm">Configurer {view.name}</span>
                 </DropdownItem>
               )}
               

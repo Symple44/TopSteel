@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     
     // Rediriger vers l'API backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     const response = await fetch(`${apiUrl}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
@@ -14,7 +14,20 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(body),
     })
 
-    const data = await response.json()
+    // Vérifier si la réponse est JSON
+    let data
+    const contentType = response.headers.get('content-type')
+    
+    if (contentType?.includes('application/json')) {
+      try {
+        data = await response.json()
+      } catch (e) {
+        data = { error: 'Invalid JSON response from API' }
+      }
+    } else {
+      const textData = await response.text()
+      data = { error: `API returned non-JSON response: ${textData}` }
+    }
     
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status })

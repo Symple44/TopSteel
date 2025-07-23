@@ -52,7 +52,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   React.useEffect(() => {
     if (typeof window !== 'undefined' && !sessionStorage.getItem('topsteel-session-initialized')) {
       sessionStorage.setItem('topsteel-session-initialized', 'true')
-      console.log('Session initialized on startup')
+      // Session initialized
     }
 
     // Nettoyer le marqueur de session à la fermeture

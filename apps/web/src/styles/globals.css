@@ -420,7 +420,59 @@ body {
   color: hsl(var(--foreground)) !important;
 }
 
-/* Amélioration du contraste pour les éléments de menu */
+/* =================================================================== */
+/* AMÉLIORATION CONTRASTE POUR LE MENU NAVIGATION */
+/* =================================================================== */
+
+/* Amélioration du contraste pour les éléments de menu inactifs - Thème clair */
+nav button:not([aria-current]):not(.navigation-icon) .text-muted-foreground,
+nav button:not([aria-current]):not(.navigation-icon).text-muted-foreground {
+  color: hsl(var(--foreground) / 0.7) !important;
+  font-weight: 500 !important;
+}
+
+nav button:not([aria-current]):not(.navigation-icon):hover .text-muted-foreground,
+nav button:not([aria-current]):not(.navigation-icon):hover.text-muted-foreground {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+/* Thème sombre - contraste optimal */
+.dark nav button:not([aria-current]):not(.navigation-icon) .text-muted-foreground,
+.dark nav button:not([aria-current]):not(.navigation-icon).text-muted-foreground {
+  color: hsl(var(--foreground) / 0.8) !important;
+  font-weight: 500 !important;
+}
+
+.dark nav button:not([aria-current]):not(.navigation-icon):hover .text-muted-foreground,
+.dark nav button:not([aria-current]):not(.navigation-icon):hover.text-muted-foreground {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+/* Thème vibrant - même principe avec adaptation automatique */
+.vibrant nav button:not([aria-current]):not(.navigation-icon) .text-muted-foreground,
+.vibrant nav button:not([aria-current]):not(.navigation-icon).text-muted-foreground {
+  color: hsl(var(--foreground) / 0.75) !important;
+  font-weight: 500 !important;
+}
+
+.vibrant nav button:not([aria-current]):not(.navigation-icon):hover .text-muted-foreground,
+.vibrant nav button:not([aria-current]):not(.navigation-icon):hover.text-muted-foreground {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+/* Amélioration générale pour tous les éléments de menu */
+[role="menuitem"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+[role="menuitem"]:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
 .dark [role="menuitem"] {
   color: hsl(var(--foreground)) !important;
 }
@@ -428,6 +480,574 @@ body {
 .dark [role="menuitem"]:hover {
   background-color: hsl(var(--accent)) !important;
   color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Amélioration du contraste pour les icônes dans le menu */
+nav button .group-hover\\:text-foreground,
+nav [class*="group-hover:text-foreground"] {
+  color: hsl(var(--foreground) / 0.7) !important;
+  transition: color 0.2s ease !important;
+}
+
+nav button:hover .group-hover\\:text-foreground,
+nav button:hover [class*="group-hover:text-foreground"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Thème sombre - icônes du menu */
+.dark nav button .group-hover\\:text-foreground,
+.dark nav [class*="group-hover:text-foreground"] {
+  color: hsl(var(--foreground) / 0.8) !important;
+}
+
+.dark nav button:hover .group-hover\\:text-foreground,
+.dark nav button:hover [class*="group-hover:text-foreground"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Thème vibrant - icônes du menu */
+.vibrant nav button .group-hover\\:text-foreground,
+.vibrant nav [class*="group-hover:text-foreground"] {
+  color: hsl(var(--foreground) / 0.75) !important;
+}
+
+.vibrant nav button:hover .group-hover\\:text-foreground,
+.vibrant nav button:hover [class*="group-hover:text-foreground"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Amélioration spécifique pour les chevrons et indicateurs */
+nav .text-muted-foreground.transition-colors {
+  color: hsl(var(--foreground) / 0.6) !important;
+}
+
+nav button:hover .text-muted-foreground.transition-colors {
+  color: hsl(var(--foreground) / 0.9) !important;
+}
+
+.dark nav .text-muted-foreground.transition-colors {
+  color: hsl(var(--foreground) / 0.7) !important;
+}
+
+.dark nav button:hover .text-muted-foreground.transition-colors {
+  color: hsl(var(--foreground)) !important;
+}
+
+.vibrant nav .text-muted-foreground.transition-colors {
+  color: hsl(var(--foreground) / 0.65) !important;
+}
+
+.vibrant nav button:hover .text-muted-foreground.transition-colors {
+  color: hsl(var(--foreground) / 0.95) !important;
+}
+
+/* =================================================================== */
+/* CLASSES PERSONNALISÉES POUR LE MENU NAVIGATION */
+/* =================================================================== */
+
+/* Classes de base pour les éléments de menu */
+.menu-item-active-primary {
+  background-color: hsl(var(--primary)) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.3) !important;
+}
+
+.menu-item-active-secondary {
+  background-color: hsl(var(--primary) / 0.9) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 4px hsl(var(--primary) / 0.2) !important;
+}
+
+/* Correction spécifique pour les sous-menus actifs sur thème clair UNIQUEMENT */
+:root:not(.dark):not(.vibrant) .menu-item-active-secondary {
+  background-color: hsl(var(--primary)) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px hsl(var(--primary) / 0.3) !important;
+}
+
+.menu-item-inactive {
+  color: hsl(var(--foreground) / 0.7) !important;
+  font-weight: 500 !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.menu-item-inactive-sub {
+  color: hsl(var(--foreground) / 0.65) !important;
+  font-weight: 500 !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.menu-item-hover {
+  background-color: hsl(var(--primary) / 0.1) !important;
+  color: hsl(var(--primary)) !important;
+  font-weight: 600 !important;
+  border: 1px solid hsl(var(--primary) / 0.2) !important;
+  transform: translateX(2px) !important;
+  transition: all 0.2s ease !important;
+}
+
+.menu-item-hover-sub {
+  background-color: hsl(var(--primary) / 0.08) !important;
+  color: hsl(var(--primary)) !important;
+  font-weight: 600 !important;
+  border: 1px solid hsl(var(--primary) / 0.15) !important;
+  transform: translateX(1px) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* États pour parent avec enfant actif - AUCUN FOND, juste icône en surbrillance */
+nav button.menu-item-parent-with-active-child,
+button.menu-item-parent-with-active-child,
+.menu-item-parent-with-active-child {
+  color: hsl(var(--foreground) / 0.8) !important;
+  font-weight: 500 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+  /* JAMAIS de fond coloré pour le parent */
+}
+
+.menu-icon-parent-with-active-child {
+  background-color: hsl(var(--primary) / 0.15) !important;
+  color: hsl(var(--primary)) !important;
+  box-shadow: 0 1px 3px hsl(var(--primary) / 0.2) !important;
+  transform: scale(1.02) !important;
+}
+
+/* Classes pour les icônes */
+.menu-icon-active {
+  background-color: white !important;
+  color: hsl(var(--primary)) !important;
+  box-shadow: 0 2px 6px hsl(var(--primary) / 0.4) !important;
+  transform: scale(1.05) !important;
+}
+
+.menu-icon-inactive {
+  color: hsl(var(--foreground) / 0.7) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.menu-icon-hover {
+  color: hsl(var(--primary)) !important;
+  background-color: hsl(var(--primary) / 0.1) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 1px 3px hsl(var(--primary) / 0.3) !important;
+}
+
+/* Classes pour les chevrons */
+.menu-chevron {
+  color: hsl(var(--foreground) / 0.6) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.menu-chevron-hover {
+  color: hsl(var(--primary)) !important;
+}
+
+/* =================================================================== */
+/* STYLES DE SURVOL DIRECTS POUR LE MENU */
+/* =================================================================== */
+
+/* Survol des éléments de menu inactifs */
+nav button.menu-item-inactive:hover,
+button.menu-item-inactive:hover,
+.menu-item-inactive:hover {
+  background-color: hsl(var(--primary) / 0.1) !important;
+  color: hsl(var(--primary)) !important;
+  font-weight: 600 !important;
+  border: 1px solid hsl(var(--primary) / 0.2) !important;
+  transform: translateX(2px) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Survol des sous-menus inactifs */
+nav button.menu-item-inactive-sub:hover,
+button.menu-item-inactive-sub:hover,
+.menu-item-inactive-sub:hover {
+  background-color: hsl(var(--primary) / 0.08) !important;
+  color: hsl(var(--primary)) !important;
+  font-weight: 600 !important;
+  border: 1px solid hsl(var(--primary) / 0.15) !important;
+  transform: translateX(1px) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Survol des icônes inactives */
+nav button.menu-item-inactive:hover .menu-icon-inactive,
+nav button.menu-item-inactive-sub:hover .menu-icon-inactive,
+button:hover .menu-icon-inactive,
+.menu-item-inactive:hover .menu-icon-inactive,
+.menu-item-inactive-sub:hover .menu-icon-inactive {
+  color: hsl(var(--primary)) !important;
+  background-color: hsl(var(--primary) / 0.1) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 1px 3px hsl(var(--primary) / 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Survol des chevrons */
+nav button:hover .menu-chevron,
+button:hover .menu-chevron,
+.menu-item-inactive:hover .menu-chevron,
+.menu-item-inactive-sub:hover .menu-chevron {
+  color: hsl(var(--primary)) !important;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Adaptations pour le thème sombre */
+.dark nav button.menu-item-inactive:hover,
+.dark button.menu-item-inactive:hover,
+.dark .menu-item-inactive:hover {
+  background-color: hsl(var(--primary) / 0.15) !important;
+  color: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.3) !important;
+  transform: translateX(2px) !important;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.2) !important;
+}
+
+.dark nav button.menu-item-inactive-sub:hover,
+.dark button.menu-item-inactive-sub:hover,
+.dark .menu-item-inactive-sub:hover {
+  background-color: hsl(var(--primary) / 0.12) !important;
+  color: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.25) !important;
+  transform: translateX(1px) !important;
+  box-shadow: 0 1px 4px hsl(var(--primary) / 0.15) !important;
+}
+
+/* Adaptations pour le thème vibrant */
+.vibrant nav button.menu-item-inactive:hover,
+.vibrant button.menu-item-inactive:hover,
+.vibrant .menu-item-inactive:hover {
+  background-color: hsl(var(--primary) / 0.12) !important;
+  color: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.25) !important;
+  transform: translateX(2px) !important;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.25), 0 0 0 1px hsl(var(--primary) / 0.15) !important;
+}
+
+.vibrant nav button.menu-item-inactive-sub:hover,
+.vibrant button.menu-item-inactive-sub:hover,
+.vibrant .menu-item-inactive-sub:hover {
+  background-color: hsl(var(--primary) / 0.1) !important;
+  color: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.2) !important;
+  transform: translateX(1px) !important;
+  box-shadow: 0 1px 4px hsl(var(--primary) / 0.2) !important;
+}
+
+/* Classes pour les fonds des sous-menus */
+.menu-submenu-bg {
+  background-color: hsl(var(--muted) / 0.2) !important;
+}
+
+/* Adaptations pour le thème sombre */
+.dark .menu-item-inactive {
+  color: hsl(var(--foreground) / 0.8) !important;
+}
+
+.dark .menu-item-inactive-sub {
+  color: hsl(var(--foreground) / 0.75) !important;
+}
+
+.dark .menu-icon-inactive {
+  color: hsl(var(--foreground) / 0.8) !important;
+}
+
+.dark .menu-chevron {
+  color: hsl(var(--foreground) / 0.7) !important;
+}
+
+.dark .menu-chevron-hover {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .menu-submenu-bg {
+  background-color: hsl(var(--muted) / 0.3) !important;
+}
+
+.dark .menu-item-hover {
+  background-color: hsl(var(--primary) / 0.15) !important;
+  color: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.3) !important;
+  transform: translateX(2px) !important;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.2) !important;
+}
+
+.dark .menu-item-hover-sub {
+  background-color: hsl(var(--primary) / 0.12) !important;
+  color: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.25) !important;
+  transform: translateX(1px) !important;
+  box-shadow: 0 1px 4px hsl(var(--primary) / 0.15) !important;
+}
+
+.dark nav button.menu-item-parent-with-active-child,
+.dark button.menu-item-parent-with-active-child,
+.dark .menu-item-parent-with-active-child {
+  color: hsl(var(--foreground) / 0.85) !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+  /* JAMAIS de fond pour le parent en mode sombre */
+}
+
+.dark .menu-icon-parent-with-active-child {
+  background-color: hsl(var(--primary) / 0.2) !important;
+  color: hsl(var(--primary)) !important;
+  box-shadow: 0 1px 3px hsl(var(--primary) / 0.3) !important;
+  transform: scale(1.02) !important;
+  border: 1px solid hsl(var(--primary) / 0.2) !important;
+}
+
+/* Adaptations spécifiques pour les éléments actifs en mode sombre */
+.dark .menu-item-active-primary {
+  background-color: hsl(var(--primary)) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.4) !important;
+}
+
+.dark .menu-item-active-secondary {
+  background-color: hsl(var(--primary) / 0.9) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 4px hsl(var(--primary) / 0.3) !important;
+}
+
+.dark .menu-icon-active {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--primary)) !important;
+  box-shadow: 0 2px 6px hsl(var(--primary) / 0.5) !important;
+  transform: scale(1.05) !important;
+  border: 1px solid hsl(var(--primary) / 0.3) !important;
+}
+
+/* Adaptations pour le thème vibrant */
+.vibrant .menu-item-inactive {
+  color: hsl(var(--foreground) / 0.75) !important;
+}
+
+.vibrant .menu-item-inactive-sub {
+  color: hsl(var(--foreground) / 0.7) !important;
+}
+
+.vibrant .menu-icon-inactive {
+  color: hsl(var(--foreground) / 0.75) !important;
+}
+
+.vibrant .menu-chevron {
+  color: hsl(var(--foreground) / 0.65) !important;
+}
+
+.vibrant .menu-chevron-hover {
+  color: hsl(var(--foreground) / 0.95) !important;
+}
+
+.vibrant .menu-submenu-bg {
+  background-color: hsl(var(--muted) / 0.25) !important;
+}
+
+.vibrant .menu-item-hover {
+  background-color: hsl(var(--primary) / 0.12) !important;
+  color: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.25) !important;
+  transform: translateX(2px) !important;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.25), 0 0 0 1px hsl(var(--primary) / 0.15) !important;
+}
+
+.vibrant .menu-item-hover-sub {
+  background-color: hsl(var(--primary) / 0.1) !important;
+  color: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary) / 0.2) !important;
+  transform: translateX(1px) !important;
+  box-shadow: 0 1px 4px hsl(var(--primary) / 0.2) !important;
+}
+
+.vibrant nav button.menu-item-parent-with-active-child,
+.vibrant button.menu-item-parent-with-active-child,
+.vibrant .menu-item-parent-with-active-child {
+  color: hsl(var(--foreground) / 0.82) !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+  /* JAMAIS de fond pour le parent en mode vibrant */
+}
+
+.vibrant .menu-icon-parent-with-active-child {
+  background-color: hsl(var(--primary) / 0.18) !important;
+  color: hsl(var(--primary)) !important;
+  box-shadow: 0 1px 3px hsl(var(--primary) / 0.25), 0 0 0 1px hsl(var(--primary) / 0.15) !important;
+  transform: scale(1.02) !important;
+}
+
+/* RÈGLES ULTRA-SPÉCIFIQUES POUR FORCER L'ABSENCE DE FOND SUR LES PARENTS */
+/* Ces règles écrasent TOUT ce qui pourrait donner un fond aux parents */
+
+/* Règles générales */
+nav button.menu-item-parent-with-active-child:hover,
+nav button.menu-item-parent-with-active-child:focus,
+nav button.menu-item-parent-with-active-child:active,
+button.menu-item-parent-with-active-child:hover,
+button.menu-item-parent-with-active-child:focus,
+button.menu-item-parent-with-active-child:active,
+.menu-item-parent-with-active-child:hover,
+.menu-item-parent-with-active-child:focus,
+.menu-item-parent-with-active-child:active {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+}
+
+/* Règles pour thème sombre */
+.dark nav button.menu-item-parent-with-active-child:hover,
+.dark nav button.menu-item-parent-with-active-child:focus,
+.dark nav button.menu-item-parent-with-active-child:active,
+.dark button.menu-item-parent-with-active-child:hover,
+.dark button.menu-item-parent-with-active-child:focus,
+.dark button.menu-item-parent-with-active-child:active,
+.dark .menu-item-parent-with-active-child:hover,
+.dark .menu-item-parent-with-active-child:focus,
+.dark .menu-item-parent-with-active-child:active {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+}
+
+/* Règles pour thème vibrant */
+.vibrant nav button.menu-item-parent-with-active-child:hover,
+.vibrant nav button.menu-item-parent-with-active-child:focus,
+.vibrant nav button.menu-item-parent-with-active-child:active,
+.vibrant button.menu-item-parent-with-active-child:hover,
+.vibrant button.menu-item-parent-with-active-child:focus,
+.vibrant button.menu-item-parent-with-active-child:active,
+.vibrant .menu-item-parent-with-active-child:hover,
+.vibrant .menu-item-parent-with-active-child:focus,
+.vibrant .menu-item-parent-with-active-child:active {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+}
+
+/* SUPPRESSION FORCÉE DE TOUTES LES CLASSES TAILWIND CONFLICTUELLES */
+nav button.menu-item-parent-with-active-child,
+button.menu-item-parent-with-active-child,
+.menu-item-parent-with-active-child {
+  /* Supprimer toutes les variantes de bg-* de Tailwind */
+}
+
+.dark nav button.menu-item-parent-with-active-child,
+.dark button.menu-item-parent-with-active-child,
+.dark .menu-item-parent-with-active-child {
+  /* Supprimer toutes les variantes de bg-* de Tailwind en mode sombre */
+}
+
+.vibrant nav button.menu-item-parent-with-active-child,
+.vibrant button.menu-item-parent-with-active-child,
+.vibrant .menu-item-parent-with-active-child {
+  /* Supprimer toutes les variantes de bg-* de Tailwind en mode vibrant */
+}
+
+/* Adaptations spécifiques pour les éléments actifs en mode vibrant */
+.vibrant .menu-item-active-primary {
+  background-color: hsl(var(--primary)) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.3), 0 0 0 1px hsl(var(--primary) / 0.2) !important;
+}
+
+.vibrant .menu-item-active-secondary {
+  background-color: hsl(var(--primary) / 0.9) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 4px hsl(var(--primary) / 0.2) !important;
+}
+
+.vibrant .menu-icon-active {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--primary)) !important;
+  box-shadow: 0 2px 6px hsl(var(--primary) / 0.4), 0 0 0 1px hsl(var(--primary) / 0.3) !important;
+  transform: scale(1.05) !important;
+}
+
+/* =================================================================== */
+/* AMÉLIORATION DES ARRIÈRE-PLANS DU MENU POUR TOUS LES THÈMES */
+/* =================================================================== */
+
+/* États des éléments de menu - Thème clair */
+nav button:not([aria-current]):not(.navigation-icon):hover {
+  background-color: hsl(var(--accent) / 0.4) !important;
+}
+
+nav button[aria-current]:not(.navigation-icon),
+nav button.bg-accent\\/80:not(.navigation-icon) {
+  background-color: hsl(var(--accent) / 0.8) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+nav button.bg-accent\\/60:not(.navigation-icon) {
+  background-color: hsl(var(--accent) / 0.6) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* États des éléments de menu - Thème sombre */
+.dark nav button:not([aria-current]):not(.navigation-icon):hover {
+  background-color: hsl(var(--accent) / 0.4) !important;
+}
+
+.dark nav button[aria-current]:not(.navigation-icon),
+.dark nav button.bg-accent\\/80:not(.navigation-icon) {
+  background-color: hsl(var(--accent) / 0.8) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.dark nav button.bg-accent\\/60:not(.navigation-icon) {
+  background-color: hsl(var(--accent) / 0.6) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* États des éléments de menu - Thème vibrant */
+.vibrant nav button:not([aria-current]):not(.navigation-icon):hover {
+  background-color: hsl(var(--accent) / 0.4) !important;
+}
+
+.vibrant nav button[aria-current]:not(.navigation-icon),
+.vibrant nav button.bg-accent\\/80:not(.navigation-icon) {
+  background-color: hsl(var(--accent) / 0.8) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.vibrant nav button.bg-accent\\/60:not(.navigation-icon) {
+  background-color: hsl(var(--accent) / 0.6) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Amélioration pour les sous-menus */
+nav button.bg-muted\\/20:not(.navigation-icon) {
+  background-color: hsl(var(--muted) / 0.2) !important;
+}
+
+nav button.bg-muted\\/20:not(.navigation-icon):hover {
+  background-color: hsl(var(--accent) / 0.3) !important;
+}
+
+.dark nav button.bg-muted\\/20:not(.navigation-icon) {
+  background-color: hsl(var(--muted) / 0.3) !important;
+}
+
+.dark nav button.bg-muted\\/20:not(.navigation-icon):hover {
+  background-color: hsl(var(--accent) / 0.3) !important;
+}
+
+.vibrant nav button.bg-muted\\/20:not(.navigation-icon) {
+  background-color: hsl(var(--muted) / 0.25) !important;
+}
+
+.vibrant nav button.bg-muted\\/20:not(.navigation-icon):hover {
+  background-color: hsl(var(--accent) / 0.35) !important;
 }
 
 /* Amélioration du contraste pour les éléments de liste */
@@ -496,6 +1116,29 @@ body {
 .vibrant .bg-accent {
   background: linear-gradient(135deg, hsl(45 86% 68%) 0%, hsl(35 90% 65%) 100%) !important;
   box-shadow: 0 4px 16px hsl(45 86% 68% / 0.3) !important;
+}
+
+/* =================================================================== */
+/* AMÉLIORATION CONTRASTE POUR LE THÈME VIBRANT */
+/* =================================================================== */
+
+/* Correction des éléments sélectionnés pour le thème vibrant */
+.vibrant .bg-blue-50,
+.vibrant .bg-indigo-50, 
+.vibrant .bg-slate-50 {
+  background-color: hsl(var(--primary) / 0.15) !important;
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.vibrant .bg-blue-50 .text-slate-800,
+.vibrant .bg-blue-50 .text-slate-600,
+.vibrant .bg-indigo-50 .text-slate-800,
+.vibrant .bg-indigo-50 .text-slate-600,
+.vibrant .bg-slate-50 .text-slate-800,
+.vibrant .bg-slate-50 .text-slate-600 {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
 }
 
 .vibrant .bg-primary {
@@ -622,6 +1265,402 @@ body {
 .dark .badge {
   background-color: hsl(var(--secondary)) !important;
   color: hsl(var(--secondary-foreground)) !important;
+}
+
+/* Amélioration du logo navigation en mode sombre */
+.dark .navigation-icon,
+.dark .sidebar-header .navigation-icon {
+  background: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(217 91% 50%) 100%) !important;
+  box-shadow: 0 4px 16px hsl(217 91% 60% / 0.2), 0 0 0 1px hsl(217 91% 70% / 0.2) !important;
+  border: 1px solid hsl(217 91% 65% / 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.dark .navigation-icon:hover,
+.dark .sidebar-header .navigation-icon:hover {
+  background: linear-gradient(135deg, hsl(217 91% 65%) 0%, hsl(217 91% 55%) 100%) !important;
+  box-shadow: 0 6px 20px hsl(217 91% 60% / 0.3), 0 0 0 1px hsl(217 91% 70% / 0.3) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Amélioration du logo navigation en mode clair */
+.navigation-icon {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.navigation-icon:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 20px hsl(var(--primary) / 0.3) !important;
+}
+
+/* =================================================================== */
+/* TRANSITIONS POUR LES MENUS */
+/* =================================================================== */
+
+/* Transitions pour les éléments de menu de la sidebar */
+nav button,
+.sidebar-header button,
+nav .group {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Effet de survol amélioré pour les éléments de menu */
+nav button:not(.navigation-icon):hover {
+  transform: translateX(4px) !important;
+  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.1) !important;
+}
+
+/* Amélioration des couleurs de survol pour le mode clair */
+nav button.hover\:bg-accent\/40:hover {
+  background-color: hsl(var(--accent) / 0.5) !important;
+}
+
+nav button.hover\:bg-accent\/30:hover {
+  background-color: hsl(var(--accent) / 0.4) !important;
+}
+
+/* Transitions spécifiques pour le mode sombre */
+.dark nav button {
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.dark nav button:hover {
+  box-shadow: 0 2px 12px hsl(var(--foreground) / 0.2) !important;
+}
+
+/* Amélioration du contraste au survol en mode sombre */
+.dark nav button.hover\:bg-accent\/40:hover {
+  background-color: hsl(var(--accent) / 0.6) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.dark nav button.hover\:bg-accent\/30:hover {
+  background-color: hsl(var(--accent) / 0.5) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Transitions pour les badges et indicateurs */
+.badge, .indicator {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Effet de pulsation subtile pour les éléments actifs */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Indicateur actif avec animation */
+.navigation-status {
+  animation: subtle-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* =================================================================== */
+/* DÉGRADÉS ADAPTATIFS POUR LES FONDS DE PAGE */
+/* =================================================================== */
+
+/* Dégradé principal pour les pages */
+.bg-gradient-to-br.from-slate-50.to-blue-50,
+.bg-gradient-to-br.from-slate-50.via-blue-50\/30.to-purple-50\/30,
+.bg-gradient-to-br.from-blue-50.via-indigo-50\/30.to-purple-50\/30,
+.bg-gradient-to-br.from-yellow-50.via-orange-50\/30.to-red-50\/30 {
+  background: linear-gradient(to bottom right, 
+    hsl(var(--background)) 0%, 
+    hsl(var(--background) / 0.95) 50%, 
+    hsl(var(--background) / 0.9) 100%) !important;
+}
+
+/* Mode sombre - dégradés subtils */
+.dark .bg-gradient-to-br.from-slate-50.to-blue-50,
+.dark .bg-gradient-to-br.from-slate-50.via-blue-50\/30.to-purple-50\/30,
+.dark .bg-gradient-to-br.from-blue-50.via-indigo-50\/30.to-purple-50\/30,
+.dark .bg-gradient-to-br.from-yellow-50.via-orange-50\/30.to-red-50\/30 {
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(217 91% 15% / 0.3) 50%, 
+    hsl(270 91% 15% / 0.2) 100%) !important;
+}
+
+/* Mode vibrant - dégradés colorés */
+.vibrant .bg-gradient-to-br.from-slate-50.to-blue-50,
+.vibrant .bg-gradient-to-br.from-slate-50.via-blue-50\/30.to-purple-50\/30,
+.vibrant .bg-gradient-to-br.from-blue-50.via-indigo-50\/30.to-purple-50\/30,
+.vibrant .bg-gradient-to-br.from-yellow-50.via-orange-50\/30.to-red-50\/30 {
+  background: linear-gradient(135deg, 
+    hsl(270 20% 96%) 0%, 
+    hsl(280 25% 94%) 50%, 
+    hsl(260 22% 97%) 100%) !important;
+}
+
+/* Textes avec dégradés */
+.bg-gradient-to-r.from-slate-900.to-slate-600 {
+  background: linear-gradient(to right, 
+    hsl(var(--foreground)) 0%, 
+    hsl(var(--foreground) / 0.8) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+.dark .bg-gradient-to-r.from-slate-900.to-slate-600 {
+  background: linear-gradient(to right, 
+    hsl(var(--foreground)) 0%, 
+    hsl(var(--foreground) / 0.9) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+/* Cartes avec fond blanc/80 */
+.bg-white\/80 {
+  background-color: hsl(var(--card) / 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.dark .bg-white\/80 {
+  background-color: hsl(var(--card) / 0.9) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Ajustement des couleurs de dégradé pour les cartes */
+.from-slate-500.to-gray-600 {
+  --tw-gradient-from: hsl(var(--muted-foreground)) !important;
+  --tw-gradient-to: hsl(var(--muted-foreground) / 0.8) !important;
+}
+
+/* =================================================================== */
+/* CORRECTION DES COULEURS DE TEXTE HARDCODÉES */
+/* =================================================================== */
+
+/* Couleurs de texte slate et gray adaptées au thème */
+.text-slate-900,
+.text-slate-800 {
+  color: hsl(var(--foreground)) !important;
+}
+
+.text-slate-600 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.text-gray-900,
+.text-gray-800 {
+  color: hsl(var(--foreground)) !important;
+}
+
+.text-gray-600 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Adaptation spécifique pour le mode sombre */
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-gray-900,
+.dark .text-gray-800 {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .text-slate-600,
+.dark .text-gray-600 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Boutons hover adaptés */
+.hover\:text-slate-900:hover {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .hover\:text-slate-900:hover {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Correction des éléments sélectionnés dans les cartes */
+.bg-white\/80 .text-slate-800,
+.bg-white\/80 .text-slate-600 {
+  color: hsl(var(--card-foreground)) !important;
+}
+
+.dark .bg-white\/80 .text-slate-800,
+.dark .bg-white\/80 .text-slate-600 {
+  color: hsl(var(--card-foreground)) !important;
+}
+
+/* Correction des cartes sélectionnées avec fond */
+[class*="ring-"]:has(.text-slate-800),
+[class*="border-"]:has(.text-slate-800) {
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Correction des éléments sélectionnés avec bordures colorées */
+.border-blue-500 {
+  border-color: hsl(var(--primary)) !important;
+}
+
+.bg-blue-50 {
+  background-color: hsl(var(--primary) / 0.15) !important;
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.dark .bg-blue-50 {
+  background-color: hsl(var(--primary) / 0.3) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* Correction spécifique pour les textes dans les éléments sélectionnés */
+.bg-blue-50 .text-slate-800,
+.bg-blue-50 .text-slate-600 {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.dark .bg-blue-50 .text-slate-800,
+.dark .bg-blue-50 .text-slate-600 {
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* Correction pour les éléments de sélection de thème */
+.border-indigo-500 {
+  border-color: hsl(var(--primary)) !important;
+}
+
+.bg-indigo-50 {
+  background-color: hsl(var(--primary) / 0.15) !important;
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.dark .bg-indigo-50 {
+  background-color: hsl(var(--primary) / 0.3) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.bg-indigo-50 .text-slate-800,
+.bg-indigo-50 .text-slate-600 {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.dark .bg-indigo-50 .text-slate-800,
+.dark .bg-indigo-50 .text-slate-600 {
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* Correction pour les éléments de sélection de couleur d'accent */
+.border-slate-400 {
+  border-color: hsl(var(--primary)) !important;
+}
+
+.bg-slate-50 {
+  background-color: hsl(var(--primary) / 0.15) !important;
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: hsl(var(--primary) / 0.3) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.bg-slate-50 .text-slate-800,
+.bg-slate-50 .text-slate-600 {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.dark .bg-slate-50 .text-slate-800,
+.dark .bg-slate-50 .text-slate-600 {
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* Bordures de survol */
+.border-slate-200 {
+  border-color: hsl(var(--border)) !important;
+  transition: all 0.2s ease !important;
+}
+
+.hover\:border-slate-300:hover {
+  border-color: hsl(var(--primary) / 0.5) !important;
+  background-color: hsl(var(--accent) / 0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px hsl(var(--foreground) / 0.1) !important;
+}
+
+.dark .border-slate-200 {
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .hover\:border-slate-300:hover {
+  border-color: hsl(var(--primary) / 0.6) !important;
+  background-color: hsl(var(--accent) / 0.4) !important;
+  box-shadow: 0 4px 12px hsl(var(--foreground) / 0.2) !important;
+}
+
+/* Effets de survol pour les éléments de sélection de thème */
+[class*="cursor-pointer"][class*="p-3"]:not(.border-blue-500):hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px hsl(var(--foreground) / 0.15) !important;
+  background-color: hsl(var(--accent) / 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.dark [class*="cursor-pointer"][class*="p-3"]:not(.border-blue-500):hover {
+  background-color: hsl(var(--accent) / 0.3) !important;
+  box-shadow: 0 8px 20px hsl(var(--foreground) / 0.25) !important;
+}
+
+/* Animation pour les éléments sélectionnés */
+.border-blue-500.bg-blue-50,
+.border-indigo-500.bg-indigo-50,
+.border-slate-400.bg-slate-50 {
+  animation: selected-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+@keyframes selected-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.2);
+  }
+  50% {
+    box-shadow: 0 6px 16px hsl(var(--primary) / 0.3);
+  }
+}
+
+/* Couleurs d'icônes thématiques */
+.text-indigo-600 {
+  color: hsl(var(--primary)) !important;
+}
+
+.text-blue-600 {
+  color: hsl(var(--primary)) !important;
+}
+
+.text-purple-600 {
+  color: hsl(var(--primary)) !important;
+}
+
+.text-green-600 {
+  color: hsl(142 76% 36%) !important;
+}
+
+.text-orange-600 {
+  color: hsl(25 95% 53%) !important;
+}
+
+/* Mode sombre pour les couleurs d'icônes */
+.dark .text-indigo-600,
+.dark .text-blue-600,
+.dark .text-purple-600 {
+  color: hsl(var(--primary)) !important;
+}
+
+.dark .text-green-600 {
+  color: hsl(142 70% 45%) !important;
+}
+
+.dark .text-orange-600 {
+  color: hsl(25 90% 60%) !important;
 }
 
 .vibrant .badge {
@@ -823,7 +1862,7 @@ body.content-compact .dashboard-content {
 /* Mode sombre */
 .dark .datatable-enhanced {
   --dt-border-color: hsl(var(--border));
-  --dt-header-bg: hsl(var(--background));
+  --dt-header-bg: hsl(var(--muted));
   --dt-header-fg: hsl(var(--foreground));
   --dt-row-hover: hsl(var(--muted) / 0.3);
   --dt-selected-bg: hsl(var(--primary) / 0.15);
@@ -1393,4 +2432,210 @@ body.content-compact .dashboard-content {
   background-color: hsl(var(--background)) !important;
   color: hsl(var(--foreground)) !important;
   border: 1px solid hsl(var(--border)) !important;
+}
+
+/* =================================================================== */
+/* STYLES POUR LES DATATABLES */
+/* =================================================================== */
+
+/* Styles de base pour les tableaux */
+.datatable-enhanced {
+  background-color: hsl(var(--card));
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Lignes du tableau avec alternance et hover */
+.datatable-enhanced tbody tr {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+/* Lignes alternées */
+.table-striped tbody tr:nth-child(even) {
+  background-color: hsl(var(--muted) / 0.3);
+}
+
+.table-striped tbody tr:nth-child(odd) {
+  background-color: transparent;
+}
+
+/* Effet hover sur les lignes */
+.datatable-enhanced tbody tr:hover {
+  background-color: hsl(var(--accent) / 0.5) !important;
+}
+
+/* En-têtes de colonnes */
+.datatable-enhanced thead th {
+  background-color: hsl(var(--muted)) !important;
+  border-bottom: 2px solid hsl(var(--border));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  font-size: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Cellules du tableau */
+.datatable-enhanced td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+
+/* Bordures pour le mode bordered */
+.table-bordered {
+  border: 1px solid hsl(var(--border));
+}
+
+.table-bordered th,
+.table-bordered td {
+  border-left: 1px solid hsl(var(--border));
+}
+
+.table-bordered th:first-child,
+.table-bordered td:first-child {
+  border-left: none;
+}
+
+/* Mode compact */
+.table-compact th,
+.table-compact td {
+  padding: 0.5rem 0.75rem;
+}
+
+/* Lignes sélectionnées */
+.datatable-enhanced tbody tr.selected {
+  background-color: hsl(var(--primary) / 0.1) !important;
+  border-color: hsl(var(--primary) / 0.3);
+}
+
+/* Adaptation pour le thème sombre */
+.dark .datatable-enhanced {
+  background-color: hsl(var(--card));
+}
+
+.dark .table-striped tbody tr:nth-child(even) {
+  background-color: hsl(var(--muted) / 0.2);
+}
+
+.dark .datatable-enhanced tbody tr:hover {
+  background-color: hsl(var(--accent) / 0.3) !important;
+}
+
+.dark .datatable-enhanced thead th {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Règles très spécifiques pour forcer les entêtes en mode sombre */
+.dark table thead th,
+.dark .datatable-enhanced table thead th,
+.dark [class*="datatable"] thead th,
+.dark thead.datatable-header th,
+.dark thead th.group {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Règle globale pour tous les th en mode sombre */
+.dark th {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Correction des bordures pour sidebar et header en mode sombre */
+.dark .border-border\/60,
+.dark [class*="border-border/60"] {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Forcer les bordures du header et sidebar */
+.dark header,
+.dark .sidebar-header {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Adaptation pour le thème vibrant */
+.vibrant .datatable-enhanced {
+  background: linear-gradient(135deg, hsl(270 20% 98%) 0%, hsl(280 25% 96%) 100%);
+  border: 1px solid hsl(270 20% 88%);
+  box-shadow: 0 4px 16px hsl(270 91% 65% / 0.05);
+}
+
+.vibrant .table-striped tbody tr:nth-child(even) {
+  background-color: hsl(270 20% 94% / 0.6);
+}
+
+.vibrant .datatable-enhanced tbody tr:hover {
+  background-color: hsl(45 86% 68% / 0.2) !important;
+  transform: scale(1.005);
+  transition: all 0.2s ease;
+}
+
+.vibrant .datatable-enhanced thead th {
+  background: linear-gradient(135deg, hsl(270 20% 92%) 0%, hsl(280 25% 90%) 100%);
+  border-bottom-color: hsl(270 20% 85%);
+}
+
+/* =================================================================== */
+/* STYLES POUR LES DROPDOWNS */
+/* =================================================================== */
+
+/* Force l'application des styles pour les dropdowns */
+[data-dropdown-portal] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 4px 6px -1px hsl(var(--foreground) / 0.1), 0 2px 4px -1px hsl(var(--foreground) / 0.06) !important;
+}
+
+/* Items du dropdown */
+[data-dropdown-item] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+[data-dropdown-item]:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Séparateurs */
+[data-dropdown-portal] .h-px {
+  background-color: hsl(var(--border)) !important;
+}
+
+/* Adaptation pour le thème sombre */
+.dark [data-dropdown-portal] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+  box-shadow: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -1px hsl(0 0% 0% / 0.2) !important;
+}
+
+.dark [data-dropdown-item] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+.dark [data-dropdown-item]:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Adaptation pour le thème vibrant */
+.vibrant [data-dropdown-portal] {
+  background: linear-gradient(135deg, hsl(270 20% 98%) 0%, hsl(280 25% 96%) 100%) !important;
+  color: hsl(270 15% 9%) !important;
+  border: 1px solid hsl(270 20% 88%) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 8px 32px hsl(270 91% 65% / 0.1) !important;
+}
+
+.vibrant [data-dropdown-item] {
+  color: hsl(270 15% 9%) !important;
+}
+
+.vibrant [data-dropdown-item]:hover {
+  background-color: hsl(45 86% 68% / 0.3) !important;
+  color: hsl(270 15% 9%) !important;
 }

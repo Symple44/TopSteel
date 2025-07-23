@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Appeler l'API backend pour finaliser la connexion après MFA
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     const apiResponse = await fetch(`${backendUrl}/api/auth/mfa/complete`, {
       method: 'POST',
       headers: {

@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AuthHelper } from '@/lib/auth-helper'
 
 export async function GET(request: NextRequest) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   const defaultPages = ['dashboard', 'clients', 'projets', 'stocks', 'production']
   
   try {
     // Utiliser l'endpoint standard et filtrer les pages visibles
     const response = await AuthHelper.fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences`
+      `${apiUrl}/api/v1/user/menu-preferences`
     )
     
     if (response.ok) {
@@ -63,13 +64,14 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   try {
     const body = await request.json()
     const { selectedPages = [] } = body
     
     // Utiliser directement l'endpoint backend qui gère tout
     const response = await AuthHelper.fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences/selected-pages`,
+      `${apiUrl}/api/v1/user/menu-preferences/selected-pages`,
       {
         method: 'POST',
         body: JSON.stringify({ selectedPages }),

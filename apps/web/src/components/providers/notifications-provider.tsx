@@ -192,7 +192,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         dispatch({ type: 'MARK_AS_READ', payload: notificationId })
       }
     } catch (error) {
-      console.error('Erreur lors du marquage comme lu:', error)
+      // Error marking as read (silenced)
     }
   }, [])
 
@@ -205,7 +205,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         dispatch({ type: 'MARK_ALL_AS_READ' })
       }
     } catch (error) {
-      console.error('Erreur lors du marquage de tout comme lu:', error)
+      // Error marking all as read (silenced)
     }
   }, [])
 
@@ -218,7 +218,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         dispatch({ type: 'DELETE_NOTIFICATION', payload: notificationId })
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
+      // Error deleting notification (silenced)
     }
   }, [])
 
@@ -231,7 +231,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         dispatch({ type: 'DELETE_ALL' })
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression de toutes les notifications:', error)
+      // Error deleting all notifications (silenced)
     }
   }, [])
 
@@ -252,7 +252,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         dispatch({ type: 'SET_NOTIFICATIONS', payload: data.data || [] })
       }
     } catch (error) {
-      console.error('Erreur lors du rafraîchissement des notifications:', error)
+      // Error refreshing notifications (silenced)
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -264,7 +264,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     if (!user || socketRef.current?.readyState === WebSocket.OPEN) return
 
     // Temporairement désactiver WebSocket - utiliser polling à la place
-    console.log('[NotificationsProvider] WebSocket désactivé temporairement, utilisation du polling')
+    // WebSocket disabled, using polling (log silenced)
     
     dispatch({ type: 'SET_CONNECTED', payload: true })
     dispatch({ type: 'SET_ERROR', payload: null })
@@ -274,10 +274,10 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       connected: true,
       readyState: WebSocket.OPEN,
       emit: (event, data) => {
-        console.log('[NotificationsProvider] Mock emit:', event, data)
+        // Mock emit (silenced)
       },
       disconnect: () => {
-        console.log('[NotificationsProvider] Mock disconnect')
+        // Mock disconnect (silenced)
       }
     }
     
@@ -449,7 +449,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         const settings = JSON.parse(savedSettings)
         dispatch({ type: 'UPDATE_SETTINGS', payload: settings })
       } catch (error) {
-        console.error('Erreur lors du chargement des paramètres:', error)
+        // Error loading settings (silenced)
       }
     }
   }, [])

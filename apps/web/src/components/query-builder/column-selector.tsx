@@ -1,0 +1,355 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+// import { useDrag, useDrop } from 'react-dnd' // Temporairement désactivé
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { 
+  Database, 
+  Key, 
+  Link2, 
+  Search, 
+  GripVertical,
+  Eye,
+  EyeOff,
+  Filter,
+  ArrowUpDown,
+  Hash,
+  Type,
+  Calendar,
+  ToggleLeft
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+interface Column {
+  id?: string
+  tableName: string
+  columnName: string
+  alias: string
+  label: string
+  description?: string
+  dataType: string
+  isPrimaryKey: boolean
+  isForeignKey: boolean
+  isVisible: boolean
+  isFilterable: boolean
+  isSortable: boolean
+  displayOrder: number
+}
+
+interface ColumnSelectorProps {
+  selectedTables: string[]
+  columns: Column[]
+  onColumnsChange: (columns: Column[]) => void
+  layout: any
+  onLayoutChange: (layout: any) => void
+}
+
+const DraggableColumn = ({ column, index, moveColumn, toggleVisibility, selected, onSelect }: any) => {
+  // Temporairement désactivé le drag & drop
+  const isDragging = false
+
+  const getDataTypeIcon = (dataType: string) => {
+    if (dataType.includes('int') || dataType.includes('numeric') || dataType.includes('decimal')) {
+      return <Hash className="h-3 w-3" />
+    }
+    if (dataType.includes('char') || dataType.includes('text')) {
+      return <Type className="h-3 w-3" />
+    }
+    if (dataType.includes('date') || dataType.includes('time')) {
+      return <Calendar className="h-3 w-3" />
+    }
+    if (dataType.includes('bool')) {
+      return <ToggleLeft className="h-3 w-3" />
+    }
+    return null
+  }
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2 p-2 rounded-md transition-colors",
+        isDragging && "opacity-50",
+        selected && "bg-accent"
+      )}
+    >
+      <div className="cursor-move">
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <Checkbox
+        checked={selected}
+        onCheckedChange={onSelect}
+      />
+      <div className="flex-1 flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {column.isPrimaryKey && <Key className="h-3 w-3 text-yellow-500" />}
+          {column.isForeignKey && <Link2 className="h-3 w-3 text-blue-500" />}
+          {getDataTypeIcon(column.dataType)}
+        </div>
+        <div className="flex-1">
+          <div className="font-medium text-sm">{column.label}</div>
+          <div className="text-xs text-muted-foreground">
+            {column.tableName}.{column.columnName}
+          </div>
+        </div>
+        <Badge variant="outline" className="text-xs">
+          {column.dataType}
+        </Badge>
+        <div className="flex items-center gap-1">
+          {column.isFilterable && <Filter className="h-3 w-3 text-muted-foreground" />}
+          {column.isSortable && <ArrowUpDown className="h-3 w-3 text-muted-foreground" />}
+        </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => toggleVisibility(index)}
+        >
+          {column.isVisible ? (
+            <Eye className="h-4 w-4" />
+          ) : (
+            <EyeOff className="h-4 w-4 text-muted-foreground" />
+          )}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+export function ColumnSelector({
+  selectedTables,
+  columns,
+  onColumnsChange,
+  layout,
+  onLayoutChange,
+}: ColumnSelectorProps) {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [availableColumns, setAvailableColumns] = useState<any[]>([])
+  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(new Set())
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (selectedTables.length > 0) {
+      fetchColumnsForTables(selectedTables)
+    }
+  }, [selectedTables])
+
+  // Synchroniser selectedColumns avec les colonnes importées
+  useEffect(() => {
+    const importedColumnIds = new Set(
+      columns.map(col => `${col.tableName}.${col.columnName}`)
+    )
+    setSelectedColumns(importedColumnIds)
+  }, [columns])
+
+  const fetchColumnsForTables = async (tables: string[]) => {
+    setLoading(true)
+    try {
+      const allColumns = []
+      
+      for (const table of tables) {
+        const response = await fetch(`/api/query-builder/schema/tables/${table}/columns`)
+        if (response.ok) {
+          const result = await response.json()
+          // Assurer que nous avons bien un tableau
+          const tableColumns = Array.isArray(result) ? result : result.data || result.columns || []
+          allColumns.push(...tableColumns)
+        }
+      }
+      
+      setAvailableColumns(allColumns)
+    } catch (error) {
+      console.error('Failed to fetch columns:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddColumns = () => {
+    const newColumns: Column[] = []
+    let maxOrder = Math.max(...columns.map(c => c.displayOrder), -1)
+
+    selectedColumns.forEach(colId => {
+      const [tableName, columnName] = colId.split('.')
+      const sourceColumn = availableColumns.find(
+        c => c.tableName === tableName && c.columnName === columnName
+      )
+
+      if (sourceColumn && !columns.some(c => c.alias === colId)) {
+        newColumns.push({
+          tableName,
+          columnName,
+          alias: colId,
+          label: columnName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          description: sourceColumn.comment,
+          dataType: sourceColumn.dataType,
+          isPrimaryKey: sourceColumn.isPrimaryKey,
+          isForeignKey: sourceColumn.isForeignKey,
+          isVisible: true,
+          isFilterable: true,
+          isSortable: true,
+          displayOrder: ++maxOrder,
+        })
+      }
+    })
+
+    if (newColumns.length > 0) {
+      onColumnsChange([...columns, ...newColumns])
+      setSelectedColumns(new Set())
+    }
+  }
+
+  const moveColumn = (fromIndex: number, toIndex: number) => {
+    const newColumns = [...columns]
+    const [movedColumn] = newColumns.splice(fromIndex, 1)
+    newColumns.splice(toIndex, 0, movedColumn)
+    
+    // Update display order
+    newColumns.forEach((col, index) => {
+      col.displayOrder = index
+    })
+    
+    onColumnsChange(newColumns)
+  }
+
+  const toggleColumnVisibility = (index: number) => {
+    const newColumns = [...columns]
+    newColumns[index].isVisible = !newColumns[index].isVisible
+    onColumnsChange(newColumns)
+  }
+
+  const removeColumn = (index: number) => {
+    onColumnsChange(columns.filter((_, i) => i !== index))
+  }
+
+  const filteredAvailableColumns = availableColumns.filter(col =>
+    col.columnName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    col.tableName.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  return (
+    <div className="h-full flex gap-4">
+      <Card className="flex-1 flex flex-col">
+        <CardHeader>
+          <CardTitle>Available Columns</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col">
+          <div className="space-y-2 mb-4">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search columns..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8"
+              />
+            </div>
+            <Button 
+              onClick={handleAddColumns}
+              disabled={selectedColumns.size === 0}
+              className="w-full"
+            >
+              Add Selected Columns ({selectedColumns.size})
+            </Button>
+          </div>
+
+          <ScrollArea className="flex-1">
+            {loading ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Loading columns...
+              </div>
+            ) : filteredAvailableColumns.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {selectedTables.length === 0 
+                  ? 'Select a table to see available columns'
+                  : 'No columns found'}
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {filteredAvailableColumns.map((col) => {
+                  const colId = `${col.tableName}.${col.columnName}`
+                  const isSelected = selectedColumns.has(colId)
+                  const isAdded = columns.some(c => c.alias === colId)
+
+                  return (
+                    <div
+                      key={colId}
+                      className={cn(
+                        "flex items-center gap-2 p-2 rounded-md hover:bg-accent cursor-pointer",
+                        isAdded && "opacity-50 cursor-not-allowed"
+                      )}
+                      onClick={() => {
+                        if (!isAdded) {
+                          setSelectedColumns(prev => {
+                            const newSet = new Set(prev)
+                            if (newSet.has(colId)) {
+                              newSet.delete(colId)
+                            } else {
+                              newSet.add(colId)
+                            }
+                            return newSet
+                          })
+                        }
+                      }}
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        disabled={isAdded}
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{col.columnName}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {col.tableName}
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {col.dataType}
+                      </Badge>
+                      {isAdded && (
+                        <Badge variant="secondary" className="text-xs">
+                          Added
+                        </Badge>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Card className="flex-1 flex flex-col">
+        <CardHeader>
+          <CardTitle>Selected Columns ({columns.length})</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <ScrollArea className="h-full">
+            {columns.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No columns selected
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {columns.map((column, index) => (
+                  <DraggableColumn
+                    key={column.alias}
+                    column={column}
+                    index={index}
+                    moveColumn={moveColumn}
+                    toggleVisibility={toggleColumnVisibility}
+                    selected={false}
+                    onSelect={() => {}}
+                  />
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

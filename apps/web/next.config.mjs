@@ -38,10 +38,49 @@ const nextConfig = {
   
   // API rewrites for development
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     return [
+      // Routes spécifiques qui vont vers le backend
+      // Query Builder utilise les routes Next.js (pas de rewrite)
       {
-        source: '/api/:path*',
-        destination: 'http://localhost:3001/api/:path*',
+        source: '/api/admin/:path*',
+        destination: `${apiUrl}/api/v1/admin/:path*`,
+      },
+      {
+        source: '/api/auth/:path*',
+        destination: `${apiUrl}/api/v1/auth/:path*`,
+      },
+      {
+        source: '/api/user/:path*',
+        destination: `${apiUrl}/api/v1/user/:path*`,
+      },
+      {
+        source: '/api/users/:path*',
+        destination: `${apiUrl}/api/v1/users/:path*`,
+      },
+      {
+        source: '/api/health/:path*',
+        destination: `${apiUrl}/api/v1/health/:path*`,
+      },
+      {
+        source: '/api/notifications/:path*',
+        destination: `${apiUrl}/api/v1/notifications/:path*`,
+      },
+      {
+        source: '/api/translations/:path*',
+        destination: `${apiUrl}/api/v1/translations/:path*`,
+      },
+      {
+        source: '/api/config/:path*',
+        destination: `${apiUrl}/api/v1/config/:path*`,
+      },
+      {
+        source: '/api/search/:path*',
+        destination: `${apiUrl}/api/v1/search/:path*`,
+      },
+      {
+        source: '/api/images/:path*',
+        destination: `${apiUrl}/api/v1/images/:path*`,
       },
     ]
   },
@@ -61,6 +100,13 @@ const nextConfig = {
   experimental: {
     // Next.js 15 with React 19 support
     reactCompiler: false, // Disable React Compiler for now
+    instrumentationHook: false, // Disable instrumentation that causes createContextKey error
+  },
+  
+  // Disable telemetry and tracing that causes api.createContextKey error
+  env: {
+    NEXT_OTEL_DISABLED: '1',
+    OTEL_SDK_DISABLED: 'true',
   },
   
   // External packages for server-side only

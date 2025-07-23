@@ -1,7 +1,6 @@
 "use client";
 
 import { NotificationCenter } from "@/components/notifications/notification-center";
-import { BackendStatusIndicator } from "@/components/ui/backend-status-indicator";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "@/lib/i18n";
 import { Button } from "@erp/ui";
@@ -60,7 +59,7 @@ export function Header({
 			<div className="flex items-center justify-between">
 				{/* Section gauche - Logo */}
 				<div className="flex items-center space-x-3">
-					<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+					<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
 						<Building2 className="h-5 w-5" />
 					</div>
 					<div className="hidden md:block">
@@ -89,9 +88,6 @@ export function Header({
 				<div className="flex items-center space-x-2">
 					{/* Notifications */}
 					<NotificationCenter />
-
-					{/* Statut du backend */}
-					<BackendStatusIndicator />
 
 					{/* Menu utilisateur */}
 					<div className="relative" ref={menuRef}>

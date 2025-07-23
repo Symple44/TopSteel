@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
+import { useToastShortcuts } from '@/hooks/use-toast'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import {
   Palette,
@@ -30,6 +31,7 @@ export default function AppearanceSettingsPage() {
   const router = useRouter()
   const { t } = useTranslation('settings')
   const { t: tc } = useTranslation('common')
+  const { success, error } = useToastShortcuts()
   
   // Hook pour gérer les préférences d'apparence
   const {
@@ -48,6 +50,23 @@ export default function AppearanceSettingsPage() {
     }
   }, [isAuthenticated, authLoading, router])
   
+  // Sauvegarde automatique lorsque les paramètres changent
+  React.useEffect(() => {
+    if (hasUnsavedChanges && !settingsLoading) {
+      const timeoutId = setTimeout(async () => {
+        try {
+          await saveSettings()
+          success('Paramètres sauvegardés', 'Vos préférences d\'apparence ont été mises à jour avec succès')
+        } catch (saveError) {
+          console.error('Erreur lors de la sauvegarde:', saveError)
+          error('Erreur de sauvegarde', 'Impossible de sauvegarder vos préférences d\'apparence')
+        }
+      }, 1000) // Attendre 1 seconde après le dernier changement
+      
+      return () => clearTimeout(timeoutId)
+    }
+  }, [settings, hasUnsavedChanges, saveSettings, success, error, settingsLoading])
+  
   // Afficher un loader si pas encore authentifié ou si les paramètres chargent
   if (authLoading || !isAuthenticated || settingsLoading) {
     return (
@@ -58,16 +77,6 @@ export default function AppearanceSettingsPage() {
         </div>
       </div>
     )
-  }
-
-  const handleSave = async () => {
-    try {
-      await saveSettings()
-      alert(t('appearance.saveSuccess'))
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-      alert(t('appearance.saveError'))
-    }
   }
 
   const handleReset = () => {
@@ -317,45 +326,6 @@ export default function AppearanceSettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Boutons d'action */}
-          <div className="flex justify-between pt-8">
-            <Button 
-              variant="outline" 
-              onClick={handleReset}
-              className="px-6 text-red-600 border-red-200 hover:bg-red-50"
-            >
-{t('appearance.reset')}
-            </Button>
-            
-            <div className="flex space-x-4">
-              <Button 
-                variant="outline" 
-                onClick={() => router.back()}
-                className="px-8"
-              >
-                {t('appearance.back')}
-              </Button>
-              <Button 
-                onClick={handleSave}
-                disabled={!hasUnsavedChanges}
-                className={`px-8 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 ${
-                  !hasUnsavedChanges ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                <Check className="h-4 w-4 mr-2" />
-{hasUnsavedChanges ? t('appearance.save') : t('appearance.saved')}
-              </Button>
-            </div>
-          </div>
-          
-          {/* Indicateur de changements non sauvegardés */}
-          {hasUnsavedChanges && (
-            <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-              <p className="text-sm text-orange-700">
-                ⚠️ {t('appearance.unsavedChanges')}
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>

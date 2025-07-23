@@ -17,6 +17,11 @@ import { UserSession } from '../modules/auth/entities/user-session.entity'
 import { UserMFA } from '../modules/auth/entities/user-mfa.entity'
 import { MFASession } from '../modules/auth/entities/mfa-session.entity'
 import { UserMenuPreference } from '../modules/menu/entities/user-menu-preference.entity'
+import { QueryBuilder } from '../modules/query-builder/entities/query-builder.entity'
+import { QueryBuilderColumn } from '../modules/query-builder/entities/query-builder-column.entity'
+import { QueryBuilderJoin } from '../modules/query-builder/entities/query-builder-join.entity'
+import { QueryBuilderCalculatedField } from '../modules/query-builder/entities/query-builder-calculated-field.entity'
+import { QueryBuilderPermission } from '../modules/query-builder/entities/query-builder-permission.entity'
 
 export const createSimpleDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const config: TypeOrmModuleOptions = {
@@ -46,6 +51,11 @@ export const createSimpleDatabaseConfig = (configService: ConfigService): TypeOr
       UserMFA,
       MFASession,
       UserMenuPreference,
+      QueryBuilder,
+      QueryBuilderColumn,
+      QueryBuilderJoin,
+      QueryBuilderCalculatedField,
+      QueryBuilderPermission,
       __dirname + '/../modules/**/*.entity.{ts,js}',
       __dirname + '/../common/**/*.entity.{ts,js}',
     ],

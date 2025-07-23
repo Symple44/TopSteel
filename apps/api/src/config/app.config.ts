@@ -9,7 +9,7 @@ export const appConfig = registerAs('app', () => ({
   host: process.env.API_HOST || '0.0.0.0',
   url: process.env.API_URL || 'http://localhost:3002',
   cors: {
-    origin: process.env.FRONTEND_URL || process.env.API_CORS_ORIGIN || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || process.env.API_CORS_ORIGIN || 'http://localhost:3005',
     credentials: true,
   },
   throttle: {

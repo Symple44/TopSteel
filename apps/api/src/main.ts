@@ -36,7 +36,10 @@ async function bootstrap() {
   const configService = app.get(ConfigService)
   const port = configService.get<number>('app.port', 3002)
   const env = configService.get<string>('app.env', 'development')
-  const corsOrigin = configService.get<string>('app.corsOrigin', 'http://localhost:3000')
+  const corsOrigin = configService.get<string>('app.cors.origin') || 
+                      process.env.FRONTEND_URL || 
+                      process.env.API_CORS_ORIGIN || 
+                      'http://localhost:3005'
 
   // ============================================================================
   // SÉCURITÉ ET MIDDLEWARE
@@ -184,8 +187,8 @@ async function bootstrap() {
       .addTag('🧾 Facturation', 'Facturation et comptabilité')
       .addTag('📄 Documents', 'Gestion électronique de documents')
       .addTag('🔔 Notifications', 'Système de notifications')
-      .addServer(`http://localhost:${port}/`, 'Serveur de développement')
-      .addServer(`http://localhost:${port}/v1`, 'API V1 explicite')
+      .addServer(`${process.env.API_URL || `http://localhost:${port}`}/`, 'Serveur de développement')
+      .addServer(`${process.env.API_URL || `http://localhost:${port}`}/v1`, 'API V1 explicite')
       .build()
 
     // Documentation API V2 (Future - préparation)
@@ -220,7 +223,7 @@ async function bootstrap() {
       .addTag('🔐 Auth V2', 'Authentification améliorée')
       .addTag('👤 Users V2', 'Gestion utilisateurs avec analytics')
       .addTag('📊 Analytics', 'Tableaux de bord et métriques (Nouveau)')
-      .addServer(`http://localhost:${port}/v2`, 'API V2 (Bêta)')
+      .addServer(`${process.env.API_URL || `http://localhost:${port}`}/v2`, 'API V2 (Bêta)')
       .build()
 
     // Génération des documents Swagger
@@ -268,9 +271,10 @@ async function bootstrap() {
       customSiteTitle: 'TopSteel ERP API v2 Documentation (Beta)',
     })
 
-    logger.log(`📚 Documentation Swagger V1 (défaut): http://localhost:${port}/api/docs`)
-    logger.log(`📚 Documentation Swagger V1 explicite: http://localhost:${port}/api/v1/docs`)
-    logger.log(`📚 Documentation Swagger V2 (beta): http://localhost:${port}/api/v2/docs`)
+    const serverUrl = process.env.API_URL || `http://localhost:${port}`
+    logger.log(`📚 Documentation Swagger V1 (défaut): ${serverUrl}/api/docs`)
+    logger.log(`📚 Documentation Swagger V1 explicite: ${serverUrl}/api/v1/docs`)
+    logger.log(`📚 Documentation Swagger V2 (beta): ${serverUrl}/api/v2/docs`)
   }
 
   // Graceful shutdown
@@ -299,7 +303,7 @@ async function bootstrap() {
   logger.log('🏭 ===============================================')
   logger.log('🏭           TOPSTEEL ERP API')
   logger.log('🏭 ===============================================')
-  logger.log(`🚀 Serveur démarré: http://localhost:${portForLogs}`)
+  logger.log(`🚀 Serveur démarré: ${process.env.API_URL || `http://localhost:${portForLogs}`}`)
   logger.log(`🌟 Environnement: ${env}`)
   logger.log(`🔗 CORS Origin: ${corsOrigin}`)
   logger.log('')

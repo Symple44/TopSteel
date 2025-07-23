@@ -149,7 +149,10 @@
     "setup": "pnpm install && pnpm build:packages",
     "ci:install": "pnpm install --frozen-lockfile",
     "ci:build": "pnpm build:packages && pnpm build:apps",
-    "ci:test": "turbo test"
+    "ci:test": "turbo test",
+    "version:update": "node scripts/set-version.mjs",
+    "version:set": "node scripts/set-version.mjs",
+    "version:info": "node --input-type=module -e \"import pkg from './package.json' assert { type: 'json' }; console.log('Version:', pkg.version)\""
   },
   "author": {
     "name": "TopSteel",

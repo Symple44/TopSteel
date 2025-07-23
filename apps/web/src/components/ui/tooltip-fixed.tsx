@@ -179,10 +179,12 @@ export function TooltipFixed({
     <div
       ref={tooltipRef}
       className={cn(
-        'fixed z-[99999] overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground',
-        'shadow-lg border border-border/20',
+        'fixed z-[99999] overflow-hidden rounded-lg px-3 py-2 text-xs',
+        'bg-slate-900/95 dark:bg-slate-800/95 text-white',
+        'backdrop-blur-sm border border-slate-700/50 dark:border-slate-600/50',
+        'shadow-xl shadow-black/20',
         'animate-in fade-in-0 zoom-in-95 duration-200',
-        'pointer-events-none select-none'
+        'pointer-events-none select-none max-w-xs'
       )}
       style={{
         left: position.x,

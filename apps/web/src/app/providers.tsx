@@ -24,11 +24,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <I18nProvider>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange={true}
+          defaultTheme="vibrant"
+          enableSystem={true}
+          disableTransitionOnChange={false}
           storageKey="topsteel-theme"
-          forcedTheme="light"
         >
           <AuthProvider>
             {children}

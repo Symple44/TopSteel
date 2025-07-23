@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     
     // Rediriger vers l'API backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     const response = await fetch(`${apiUrl}/api/v1/auth/refresh`, {
       method: 'POST',
       headers: {

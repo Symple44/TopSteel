@@ -60,7 +60,7 @@ export function useCompanyInfo() {
         throw new Error(data.message || 'Erreur lors du chargement des informations')
       }
     } catch (err) {
-      console.error('Erreur lors du chargement des informations entreprise:', err)
+      // Error loading company info (silenced)
       
       // En cas d'erreur, utiliser des données par défaut
       setCompanyInfo({

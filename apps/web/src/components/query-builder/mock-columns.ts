@@ -1,0 +1,75 @@
+// Mock data pour les colonnes users quand pas d'authentification
+export const mockUsersColumns = [
+  {
+    tableName: 'users',
+    columnName: 'id',
+    dataType: 'uuid',
+    isPrimaryKey: true,
+    isForeignKey: false,
+    isNullable: false,
+    comment: 'Primary key'
+  },
+  {
+    tableName: 'users',
+    columnName: 'email',
+    dataType: 'varchar',
+    isPrimaryKey: false,
+    isForeignKey: false,
+    isNullable: false,
+    comment: 'User email address'
+  },
+  {
+    tableName: 'users',
+    columnName: 'prenom',
+    dataType: 'varchar',
+    isPrimaryKey: false,
+    isForeignKey: false,
+    isNullable: true,
+    comment: 'First name'
+  },
+  {
+    tableName: 'users',
+    columnName: 'nom',
+    dataType: 'varchar',
+    isPrimaryKey: false,
+    isForeignKey: false,
+    isNullable: true,
+    comment: 'Last name'
+  },
+  {
+    tableName: 'users',
+    columnName: 'role',
+    dataType: 'enum',
+    isPrimaryKey: false,
+    isForeignKey: false,
+    isNullable: false,
+    comment: 'User role'
+  },
+  {
+    tableName: 'users',
+    columnName: 'actif',
+    dataType: 'boolean',
+    isPrimaryKey: false,
+    isForeignKey: false,
+    isNullable: false,
+    comment: 'Active status'
+  },
+  {
+    tableName: 'users',
+    columnName: 'dernier_login',
+    dataType: 'timestamp',
+    isPrimaryKey: false,
+    isForeignKey: false,
+    isNullable: true,
+    comment: 'Last login time'
+  },
+  {
+    tableName: 'users',
+    columnName: 'created_at',
+    dataType: 'timestamp',
+    isPrimaryKey: false,
+    isForeignKey: false,
+    isNullable: false,
+    comment: 'Creation timestamp'
+  }
+]

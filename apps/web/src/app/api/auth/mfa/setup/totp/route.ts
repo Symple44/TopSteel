@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Appeler l'API backend pour configurer TOTP
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     const apiResponse = await fetch(`${backendUrl}/api/auth/mfa/setup/totp`, {
       method: 'POST',
       headers: {

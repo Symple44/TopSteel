@@ -4,65 +4,48 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertTriangle, RefreshCw, Server, Wifi } from 'lucide-react'
 import { Button } from '@erp/ui'
-import { BackendHealthService, BackendHealthStatus } from '@/lib/backend-health'
+import { useBackendHealth, BackendHealthInfo } from '@/hooks/use-backend-health'
 import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function BackendErrorPage() {
   const router = useRouter()
   const { t } = useTranslation('errors')
-  const [status, setStatus] = useState<BackendHealthStatus>({
-    isAvailable: false,
-    status: 'checking',
-    message: t('backend.checking'),
-    lastCheck: new Date()
-  })
+  const { health, checkHealth } = useBackendHealth()
   const [isRetrying, setIsRetrying] = useState(false)
 
   useEffect(() => {
-    const service = BackendHealthService.getInstance()
-    
-    // S'abonner aux changements de statut
-    const unsubscribe = service.subscribe((newStatus) => {
-      setStatus(newStatus)
-      
-      // Si le backend devient disponible, rediriger vers le dashboard
-      if (newStatus.isAvailable && newStatus.status === 'healthy') {
-        setTimeout(() => {
-          router.push('/dashboard')
-        }, 1000)
-      }
-    })
-
-    // Vérifier immédiatement
-    service.checkHealth()
-
-    return unsubscribe
-  }, [router])
+    // Si le backend devient disponible, rediriger vers le dashboard
+    if (health.status === 'online') {
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1000)
+    }
+  }, [health.status, router])
 
   const handleRetry = async () => {
     setIsRetrying(true)
-    const service = BackendHealthService.getInstance()
-    
     try {
-      await service.checkHealth()
+      await checkHealth()
     } finally {
       setIsRetrying(false)
     }
   }
 
   const getStatusColor = () => {
-    switch (status.status) {
-      case 'healthy': return 'text-green-600'
-      case 'unhealthy': return 'text-red-600'
+    switch (health.status) {
+      case 'online': return 'text-green-600'
+      case 'offline':
+      case 'error': return 'text-red-600'
       case 'checking': return 'text-yellow-600'
       default: return 'text-gray-600'
     }
   }
 
   const getStatusIcon = () => {
-    switch (status.status) {
-      case 'healthy': return <Wifi className="h-8 w-8 text-green-600" />
-      case 'unhealthy': return <Server className="h-8 w-8 text-red-600" />
+    switch (health.status) {
+      case 'online': return <Wifi className="h-8 w-8 text-green-600" />
+      case 'offline':
+      case 'error': return <Server className="h-8 w-8 text-red-600" />
       case 'checking': return <RefreshCw className="h-8 w-8 text-yellow-600 animate-spin" />
       default: return <AlertTriangle className="h-8 w-8 text-gray-600" />
     }
@@ -79,12 +62,12 @@ export default function BackendErrorPage() {
 
           {/* Titre */}
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {status.isAvailable ? t('backend.connected') : t('backend.unavailable')}
+            {health.status === 'online' ? t('backend.connected') : t('backend.unavailable')}
           </h1>
 
           {/* Message de statut */}
           <p className={`text-lg mb-6 ${getStatusColor()}`}>
-            {status.message}
+            {health.error || (health.status === 'online' ? 'Backend connecté' : 'Backend non disponible')}
           </p>
 
           {/* Informations détaillées */}
@@ -93,16 +76,16 @@ export default function BackendErrorPage() {
             <div className="space-y-2 text-sm text-gray-600">
               <div>
                 <span className="font-medium">{t('status')} :</span>{' '}
-                <span className={getStatusColor()}>{status.status}</span>
+                <span className={getStatusColor()}>{health.status}</span>
               </div>
               <div>
                 <span className="font-medium">{t('backend.lastCheck')}</span>{' '}
-                {status.lastCheck.toLocaleTimeString()}
+                {health.lastCheck?.toLocaleTimeString() || 'Jamais'}
               </div>
-              {status.responseTime && (
+              {health.responseTime && (
                 <div>
                   <span className="font-medium">{t('backend.responseTime')}</span>{' '}
-                  {status.responseTime}ms
+                  {health.responseTime}ms
                 </div>
               )}
               <div>
@@ -114,7 +97,7 @@ export default function BackendErrorPage() {
 
           {/* Actions */}
           <div className="space-y-3">
-            {status.isAvailable ? (
+            {health.status === 'online' ? (
               <Button
                 onClick={() => router.push('/dashboard')}
                 className="w-full"
@@ -125,10 +108,10 @@ export default function BackendErrorPage() {
               <>
                 <Button
                   onClick={handleRetry}
-                  disabled={isRetrying || status.status === 'checking'}
+                  disabled={isRetrying || health.status === 'checking'}
                   className="w-full"
                 >
-                  {isRetrying || status.status === 'checking' ? (
+                  {isRetrying || health.status === 'checking' ? (
                     <>
                       <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                       {t('backend.verifying')}
@@ -149,7 +132,7 @@ export default function BackendErrorPage() {
           </div>
 
           {/* Conseils de dépannage */}
-          {!status.isAvailable && (
+          {health.status !== 'online' && (
             <details className="mt-6 text-left">
               <summary className="cursor-pointer font-medium text-gray-700 hover:text-gray-900">
                 {t('backend.troubleshooting')}

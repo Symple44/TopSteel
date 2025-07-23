@@ -114,7 +114,8 @@
       "Bash(PORT=3001 node dist/main.js)",
       "Bash(rg:*)",
       "Bash(true)",
-      "Bash(ts-node:*)"
+      "Bash(ts-node:*)",
+      "Bash(echo:*)"
     ],
     "deny": []
   }

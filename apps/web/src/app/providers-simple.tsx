@@ -40,7 +40,7 @@ export function ProvidersSimple({ children }: { children: ReactNode }) {
       <I18nProvider>
         <TranslationOverrideProvider>
           <ThemeProviderWrapper>
-            <AppearanceProvider>
+            {/* <AppearanceProvider> Temporairement désactivé pour debug */}
               <AuthProvider>
                 <NotificationsProvider>
                   <SyncNotificationInitializer />
@@ -48,7 +48,7 @@ export function ProvidersSimple({ children }: { children: ReactNode }) {
                   <Toaster position="top-right" />
                 </NotificationsProvider>
               </AuthProvider>
-            </AppearanceProvider>
+            {/* </AppearanceProvider> */}
           </ThemeProviderWrapper>
         </TranslationOverrideProvider>
       </I18nProvider>

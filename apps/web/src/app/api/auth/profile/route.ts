@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const token = authHeader.substring(7)
     
     // Rediriger vers l'API backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     const response = await fetch(`${apiUrl}/api/v1/auth/profile`, {
       method: 'GET',
       headers: {

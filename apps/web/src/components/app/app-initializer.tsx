@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, Server, AlertTriangle } from 'lucide-react'
-import { BackendHealthService, BackendHealthStatus } from '@/lib/backend-health'
+import { useBackendHealth, BackendHealthInfo } from '@/hooks/use-backend-health'
 import { useStartupLogger } from '@/lib/startup-logger'
 
 interface AppInitializerProps {
@@ -13,39 +13,23 @@ interface AppInitializerProps {
 export function AppInitializer({ children }: AppInitializerProps) {
   const router = useRouter()
   const [initState, setInitState] = useState<'checking' | 'success' | 'backend-error'>('checking')
-  const [backendStatus, setBackendStatus] = useState<BackendHealthStatus | null>(null)
+  const { health } = useBackendHealth()
   
   // Active les logs côté client
   useStartupLogger()
 
   useEffect(() => {
-    const initializeApp = async () => {
-      const service = BackendHealthService.getInstance()
-      
-      // S'abonner aux changements de statut
-      const unsubscribe = service.subscribe((status) => {
-        setBackendStatus(status)
-        
-        if (status.status === 'healthy') {
-          setInitState('success')
-        } else if (status.status === 'unhealthy' && status.lastCheck) {
-          // Attendre un peu avant de considérer comme erreur
-          setTimeout(() => {
-            if (status.status === 'unhealthy') {
-              setInitState('backend-error')
-            }
-          }, 2000)
+    if (health.status === 'online') {
+      setInitState('success')
+    } else if ((health.status === 'offline' || health.status === 'error') && health.lastCheck) {
+      // Attendre un peu avant de considérer comme erreur
+      setTimeout(() => {
+        if (health.status === 'offline' || health.status === 'error') {
+          setInitState('backend-error')
         }
-      })
-
-      // Démarrer la vérification
-      await service.checkHealth()
-
-      return unsubscribe
+      }, 2000)
     }
-
-    initializeApp()
-  }, [])
+  }, [health.status, health.lastCheck])
 
   // Rediriger vers la page d'erreur backend si nécessaire
   useEffect(() => {
@@ -70,20 +54,18 @@ export function AppInitializer({ children }: AppInitializerProps) {
           
           <div className="space-y-2 text-gray-600">
             <p>Vérification de la connexion au serveur...</p>
-            {backendStatus && (
-              <p className="text-sm">
-                Statut : {backendStatus.message}
-              </p>
-            )}
+            <p className="text-sm">
+              Statut : {health.error || (health.status === 'checking' ? 'Vérification...' : health.status)}
+            </p>
           </div>
           
           <div className="mt-8 bg-gray-100 rounded-lg p-4 text-left max-w-md mx-auto">
             <h3 className="font-medium text-gray-900 mb-2">Étapes d'initialisation :</h3>
             <div className="space-y-1 text-sm text-gray-600">
               <div className="flex items-center gap-2">
-                {backendStatus?.status === 'checking' ? (
+                {health.status === 'checking' ? (
                   <Loader2 className="h-3 w-3 animate-spin text-blue-600" />
-                ) : backendStatus?.isAvailable ? (
+                ) : health.status === 'online' ? (
                   <div className="h-3 w-3 rounded-full bg-green-500" />
                 ) : (
                   <div className="h-3 w-3 rounded-full bg-red-500" />

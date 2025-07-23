@@ -17,7 +17,7 @@ export function ThemeProviderWrapper({ children }: ThemeProviderWrapperProps) {
   return (
     <DynamicThemeProvider
       attribute="class"
-      defaultTheme="vibrant" // Thème coloré par défaut
+      defaultTheme="vibrant" // Thème par défaut aligné sur useAppearanceSettings
       enableSystem={true}
       disableTransitionOnChange={false}
       storageKey="topsteel-theme"

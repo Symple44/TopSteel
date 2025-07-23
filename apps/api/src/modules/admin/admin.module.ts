@@ -28,9 +28,14 @@ import { SystemParametersController } from './system-parameters.controller'
 import { DatabaseIntegrityController } from './controllers/database-integrity.controller'
 import { MenuConfigurationController } from './controllers/menu-configuration.controller'
 import { PageSyncController } from './controllers/page-sync.controller'
+import { AdminUsersController } from './controllers/admin-users.controller'
+
+// Import du module users
+import { UsersModule } from '../users/users.module'
 
 @Module({
   imports: [
+    UsersModule,
     TypeOrmModule.forFeature([
       SystemParameter,
       MenuConfiguration,
@@ -46,7 +51,8 @@ import { PageSyncController } from './controllers/page-sync.controller'
     SystemParametersController,
     DatabaseIntegrityController,
     MenuConfigurationController,
-    PageSyncController
+    PageSyncController,
+    AdminUsersController
   ],
   providers: [
     SystemParametersService,

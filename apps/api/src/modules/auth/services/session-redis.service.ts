@@ -368,6 +368,41 @@ export class SessionRedisService {
   }
 
   /**
+   * Compter le nombre d'utilisateurs uniques actifs
+   */
+  async getActiveUsersCount(): Promise<number> {
+    if (!this.redisEnabled || !this.redis) {
+      this.logger.debug('Redis disabled, returning 0 for getActiveUsersCount')
+      return 0
+    }
+    
+    try {
+      const pattern = `${this.sessionPrefix}*`
+      const keys = await this.redis.keys(pattern)
+      
+      if (keys.length === 0) {
+        return 0
+      }
+
+      // Récupérer tous les userId uniques des sessions actives
+      const userIds = new Set<string>()
+      
+      for (const key of keys) {
+        const sessionData = await this.redis.get(key)
+        if (sessionData) {
+          const session: ActiveSessionData = JSON.parse(sessionData)
+          userIds.add(session.userId)
+        }
+      }
+      
+      return userIds.size
+    } catch (error) {
+      this.logger.error('Erreur lors du comptage des utilisateurs actifs:', error)
+      return 0
+    }
+  }
+
+  /**
    * Fermer la connexion Redis
    */
   async disconnect(): Promise<void> {

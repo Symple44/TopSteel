@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AuthHelper } from '@/lib/auth-helper'
 
 export async function GET(request: NextRequest) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   const defaultPreferences = [
     { menuId: 'dashboard', isVisible: true, order: 1, customLabel: 'Tableau de bord' },
     { menuId: 'clients', isVisible: true, order: 2, customLabel: 'Clients' },
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   try {
     // Essayer de faire la requête avec authentification
     const response = await AuthHelper.fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences`
+      `${apiUrl}/api/v1/user/menu-preferences`
     )
     
     if (response.ok) {
@@ -45,12 +46,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   try {
     const body = await request.json()
     
     // Essayer de faire la requête avec authentification
     const response = await AuthHelper.fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences`,
+      `${apiUrl}/api/v1/user/menu-preferences`,
       {
         method: 'PUT',
         body: JSON.stringify(body),

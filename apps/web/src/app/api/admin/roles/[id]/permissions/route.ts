@@ -1,196 +1,124 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
-// Mock des permissions système
-const SYSTEM_PERMISSIONS: Record<string, any[]> = {
-  CLIENT_MANAGEMENT: [
-    { id: 'client.view', name: 'Voir les clients', level: 'READ' },
-    { id: 'client.create', name: 'Créer des clients', level: 'WRITE' },
-    { id: 'client.edit', name: 'Modifier des clients', level: 'WRITE' },
-    { id: 'client.delete', name: 'Supprimer des clients', level: 'DELETE' },
-  ],
-  PROJECT_MANAGEMENT: [
-    { id: 'project.view', name: 'Voir les projets', level: 'READ' },
-    { id: 'project.create', name: 'Créer des projets', level: 'WRITE' },
-    { id: 'project.edit', name: 'Modifier des projets', level: 'WRITE' },
-    { id: 'project.delete', name: 'Supprimer des projets', level: 'DELETE' },
-  ],
-  SYSTEM_SETTINGS: [
-    { id: 'system.view', name: 'Voir les paramètres', level: 'READ' },
-    { id: 'system.edit', name: 'Modifier les paramètres', level: 'ADMIN' },
-  ],
-}
-
-// GET - Récupérer les permissions d'un rôle
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
-    const authHeader = request.headers.get('authorization')
+    // Vérifier l'authentification
+    const cookieStore = await cookies()
+    const token = cookieStore.get('accessToken')?.value
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return NextResponse.json(
-        { error: 'No auth token' },
+        {
+          success: false,
+          message: 'Authentification requise'
+        },
         { status: 401 }
       )
     }
 
-    const token = authHeader.substring(7)
-    
-    // Rediriger vers l'API backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    const response = await fetch(`${apiUrl}/api/v1/admin/roles/${id}/permissions`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
+    const { id: roleId } = await params
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'API error' }))
-      return NextResponse.json(errorData, { status: response.status })
-    }
-
-    const data = await response.json()
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error('Admin roles permissions error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
-
-// POST - Mettre à jour les permissions d'un rôle
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params
-    const body = await request.json()
-    
-    const { permissions } = body
-    
-    if (!Array.isArray(permissions)) {
-      return NextResponse.json(
-        { success: false, error: 'Format de permissions invalide' },
-        { status: 400 }
-      )
-    }
-    
-    // Valider les permissions
-    const validAccessLevels = ['BLOCKED', 'READ', 'WRITE', 'DELETE', 'ADMIN']
-    const invalidPermissions = permissions.filter(p => 
-      !p.permissionId || 
-      !validAccessLevels.includes(p.accessLevel) ||
-      typeof p.isGranted !== 'boolean'
-    )
-    
-    if (invalidPermissions.length > 0) {
-      return NextResponse.json(
-        { success: false, error: 'Permissions invalides détectées' },
-        { status: 400 }
-      )
-    }
-    
-    // Ici, on sauvegarderait en base de données
-    // Pour le mock, on retourne simplement un succès
-    
-    return NextResponse.json({
-      success: true,
-      data: {
-        roleId: id,
-        updatedPermissions: permissions,
-        message: 'Permissions mises à jour avec succès'
-      }
-    })
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Erreur lors de la mise à jour des permissions' },
-      { status: 500 }
-    )
-  }
-}
-
-// Générer les permissions par défaut pour un rôle
-function generateRolePermissions(roleId: string) {
-  const permissions: any[] = []
-  
-  Object.entries(SYSTEM_PERMISSIONS).forEach(([moduleId, perms]) => {
-    perms.forEach(perm => {
-      let accessLevel = 'BLOCKED'
-      let isGranted = false
-      
-      // Logique par rôle
-      switch (roleId) {
-        case 'SUPER_ADMIN':
-          accessLevel = 'ADMIN'
-          isGranted = true
-          break
-          
-        case 'ADMIN':
-          if (moduleId !== 'SYSTEM_SETTINGS' || perm.level !== 'ADMIN') {
-            accessLevel = perm.level === 'ADMIN' ? 'DELETE' : perm.level
-            isGranted = true
-          } else {
-            accessLevel = 'WRITE'
-            isGranted = true
-          }
-          break
-          
-        case 'MANAGER':
-          if (['CLIENT_MANAGEMENT', 'PROJECT_MANAGEMENT', 'BILLING_MANAGEMENT', 'PRODUCTION_MANAGEMENT', 'STOCK_MANAGEMENT', 'NOTIFICATION_MANAGEMENT'].includes(moduleId)) {
-            accessLevel = perm.level === 'ADMIN' ? 'DELETE' : perm.level
-            isGranted = true
-          }
-          break
-          
-        case 'COMMERCIAL':
-          if (['CLIENT_MANAGEMENT', 'PROJECT_MANAGEMENT', 'BILLING_MANAGEMENT'].includes(moduleId)) {
-            accessLevel = perm.action === 'delete' ? 'WRITE' : perm.level
-            isGranted = true
-          }
-          break
-          
-        case 'TECHNICIEN':
-          if (['PRODUCTION_MANAGEMENT', 'STOCK_MANAGEMENT'].includes(moduleId)) {
-            accessLevel = perm.level === 'DELETE' ? 'WRITE' : perm.level
-            isGranted = true
-          }
-          break
-          
-        case 'OPERATEUR':
-          if (moduleId === 'PRODUCTION_MANAGEMENT') {
-            accessLevel = 'READ'
-            isGranted = perm.action === 'view'
-          }
-          break
-          
-        case 'DEVISEUR':
-          if (['CLIENT_MANAGEMENT', 'BILLING_MANAGEMENT'].includes(moduleId)) {
-            accessLevel = perm.level
-            isGranted = !(
-              (moduleId === 'CLIENT_MANAGEMENT' && perm.action === 'delete') ||
-              (moduleId === 'BILLING_MANAGEMENT' && perm.action === 'validate')
-            )
-          }
-          break
-      }
-      
-      permissions.push({
-        id: `${roleId}_${perm.id}`,
-        roleId,
-        permissionId: perm.id,
-        moduleId,
-        accessLevel,
-        isGranted
+    try {
+      // Appeler le vrai backend NestJS
+      const response = await fetch(`${apiUrl}/api/v1/admin/roles/${roleId}/permissions`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(5000), // Timeout de 5 secondes
       })
-    })
-  })
-  
-  return permissions
+
+      if (response.ok) {
+        const data = await response.json()
+        return NextResponse.json(data, { status: 200 })
+      } else {
+        throw new Error(`Backend error: ${response.status}`)
+      }
+    } catch (backendError) {
+      // Si le backend n'est pas disponible, utiliser des données par défaut temporaires
+      const fallbackPermissions = [
+        {
+          permissionId: 'users.read',
+          moduleId: 'users',
+          permissionName: 'Read Users',
+          isGranted: true,
+          accessLevel: 'ADMIN'
+        },
+        {
+          permissionId: 'users.write',
+          moduleId: 'users', 
+          permissionName: 'Write Users',
+          isGranted: true,
+          accessLevel: 'ADMIN'
+        },
+        {
+          permissionId: 'admin.read',
+          moduleId: 'admin',
+          permissionName: 'Read Admin',
+          isGranted: true,
+          accessLevel: 'ADMIN'
+        },
+        {
+          permissionId: 'admin.write',
+          moduleId: 'admin',
+          permissionName: 'Write Admin', 
+          isGranted: true,
+          accessLevel: 'ADMIN'
+        },
+        {
+          permissionId: 'roles.read',
+          moduleId: 'roles',
+          permissionName: 'Read Roles',
+          isGranted: true,
+          accessLevel: 'ADMIN'
+        },
+        {
+          permissionId: 'roles.write',
+          moduleId: 'roles',
+          permissionName: 'Write Roles',
+          isGranted: true,
+          accessLevel: 'ADMIN'
+        },
+        {
+          permissionId: 'settings.read',
+          moduleId: 'settings',
+          permissionName: 'Read Settings',
+          isGranted: true,
+          accessLevel: 'ADMIN'
+        },
+        {
+          permissionId: 'settings.write',
+          moduleId: 'settings',
+          permissionName: 'Write Settings',
+          isGranted: true,
+          accessLevel: 'ADMIN'
+        }
+      ]
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          roleId: roleId,
+          roleName: roleId,
+          rolePermissions: fallbackPermissions
+        },
+        fallback: true // Indiquer que ce sont des données de fallback
+      }, { status: 200 })
+    }
+
+  } catch (error) {
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: 'Error loading role permissions',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }, 
+      { status: 500 }
+    )
+  }
 }

@@ -44,6 +44,7 @@ export class UsersService {
         'user.role',
         'user.actif',
         'user.createdAt',
+        'user.dernier_login',
       ])
       .orderBy('user.createdAt', 'DESC')
 
@@ -122,6 +123,12 @@ export class UsersService {
   async updateRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
     await this.repository.update(userId, {
       refreshToken: refreshToken || undefined,
+    })
+  }
+
+  async updateLastLogin(userId: string): Promise<void> {
+    await this.repository.update(userId, { 
+      dernier_login: new Date() 
     })
   }
 

@@ -1058,11 +1058,11 @@ export function DataTable<T = any>({
         
         /* Améliorations esthétiques du tableau */
         .datatable-enhanced {
-          --grid-color: rgba(226, 232, 240, 0.6);
-          --header-bg: #f8fafc;
-          --header-border: #e2e8f0;
-          --row-hover: rgba(59, 130, 246, 0.04);
-          --row-selected: rgba(59, 130, 246, 0.08);
+          --grid-color: hsl(var(--border));
+          --header-bg: hsl(var(--muted));
+          --header-border: hsl(var(--border));
+          --row-hover: hsl(var(--accent) / 0.1);
+          --row-selected: hsl(var(--primary) / 0.1);
         }
         
         /* Quadrillage vertical léger */
@@ -1320,13 +1320,21 @@ export function DataTable<T = any>({
                 <DropdownItem
                   key={column.id}
                   onClick={() => handleColumnVisibilityToggle(column.id)}
+                  className={
+                    isVisible
+                      ? 'text-foreground font-medium hover:bg-accent/50 hover:text-accent-foreground'
+                      : 'text-muted-foreground font-medium hover:bg-muted hover:text-foreground'
+                  }
                 >
                   {isVisible ? (
-                    <Eye className="h-4 w-4 mr-2" />
+                    <Eye className="h-4 w-4 mr-2 text-foreground" />
                   ) : (
-                    <EyeOff className="h-4 w-4 mr-2" />
+                    <EyeOff className="h-4 w-4 mr-2 text-muted-foreground" />
                   )}
-                  {column.title}
+                  <span className="flex-1">{column.title}</span>
+                  {isVisible && (
+                    <div className="ml-2 w-2 h-2 bg-foreground rounded-full" />
+                  )}
                 </DropdownItem>
               )
             })}
@@ -1336,8 +1344,9 @@ export function DataTable<T = any>({
                 <DropdownSeparator />
                 <DropdownItem
                   onClick={() => persistedSettings.resetSettings()}
+                  className="text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
                 >
-                  Réinitialiser
+                  <span className="text-sm">Réinitialiser</span>
                 </DropdownItem>
                 <DropdownItem
                   onClick={() => {
@@ -1350,8 +1359,9 @@ export function DataTable<T = any>({
                     a.click()
                     URL.revokeObjectURL(url)
                   }}
+                  className="text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
                 >
-                  Exporter paramètres
+                  <span className="text-sm">Exporter paramètres</span>
                 </DropdownItem>
               </>
             )}
@@ -1383,7 +1393,7 @@ export function DataTable<T = any>({
           <thead className="sticky top-0 datatable-header">
             <tr>
               {selectable && (
-                <th className="w-12 p-2">
+                <th className="w-12 p-2 bg-muted">
                   <Checkbox
                     checked={selection.selectAll}
                     onCheckedChange={(checked) => {
@@ -1404,7 +1414,7 @@ export function DataTable<T = any>({
                 <th
                   key={column.id}
                   className={cn(
-                    'group p-2 text-left font-medium text-muted-foreground relative',
+                    'group p-2 text-left font-medium text-muted-foreground relative bg-muted',
                     column.sortable && sortable && 'cursor-pointer hover:bg-muted/80',
                     'select-none',
                     canMoveColumn(column) && 'cursor-move',
@@ -1487,7 +1497,7 @@ export function DataTable<T = any>({
               ))}
               
               {actions && (
-                <th className="w-20 p-2">Actions</th>
+                <th className="w-20 p-2 bg-muted">Actions</th>
               )}
             </tr>
           </thead>
@@ -1763,7 +1773,7 @@ export function DataTable<T = any>({
       {/* Dialog de prévisualisation du collage */}
       {showPastePreview && clipboardData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-auto">
+          <div className="bg-card border rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-auto">
             <h3 className="text-lg font-semibold mb-4">Prévisualisation du collage</h3>
             
             <div className="mb-4">
@@ -1781,7 +1791,7 @@ export function DataTable<T = any>({
             
             <div className="border rounded max-h-64 overflow-auto mb-4">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50">
+                <thead className="bg-muted">
                   <tr>
                     {clipboardData[0]?.map((header, index) => (
                       <th key={index} className="p-2 text-left border-b">

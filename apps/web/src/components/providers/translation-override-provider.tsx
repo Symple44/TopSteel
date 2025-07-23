@@ -20,11 +20,11 @@ export function TranslationOverrideProvider({ children }: TranslationOverridePro
 
     const loadOverrides = async () => {
       try {
-        console.log('[TranslationOverrideProvider] Loading translation overrides...')
+        // Loading translation overrides
         await translator.loadOverrides()
         
         if (mounted) {
-          console.log('[TranslationOverrideProvider] Translation overrides loaded successfully')
+          // Translation overrides loaded
           setIsLoading(false)
         }
       } catch (err) {
@@ -40,7 +40,7 @@ export function TranslationOverrideProvider({ children }: TranslationOverridePro
 
     // Écouter les événements de mise à jour des traductions
     const handleTranslationUpdate = () => {
-      console.log('[TranslationOverrideProvider] Translation update event received')
+      // Translation update received
       translator.refreshOverrides().catch(console.error)
     }
 

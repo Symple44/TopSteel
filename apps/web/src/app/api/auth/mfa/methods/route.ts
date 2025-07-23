@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Appeler l'API backend pour récupérer les méthodes MFA
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     const apiResponse = await fetch(`${backendUrl}/api/auth/mfa/methods`, {
       method: 'GET',
       headers: {

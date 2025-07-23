@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
+import { SessionRedisService } from '../modules/auth/services/session-redis.service'
 
 @Injectable()
 export class IntegrityService {
@@ -9,7 +10,8 @@ export class IntegrityService {
 
   constructor(
     @InjectDataSource()
-    private readonly dataSource: DataSource
+    private readonly dataSource: DataSource,
+    private readonly sessionRedisService: SessionRedisService
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -57,9 +59,45 @@ export class IntegrityService {
         totalProjects: await this.getProjectCount(),
         totalClients: await this.getClientCount(),
       },
+      users: {
+        activeUsers: await this.getActiveUsersCount(),
+      },
     }
 
     return metrics
+  }
+
+  async getActiveUsersCount(): Promise<number> {
+    let activeFromRedis = 0
+    let activeFromDB = 0
+    
+    try {
+      // Essayer Redis d'abord (mais ne pas s'arrêter si c'est 0)
+      activeFromRedis = await this.sessionRedisService.getActiveUsersCount()
+      this.logger.debug(`Utilisateurs actifs depuis Redis: ${activeFromRedis}`)
+    } catch (error) {
+      this.logger.debug('Redis non disponible pour le comptage utilisateurs', error)
+    }
+    
+    try {
+      // Toujours vérifier la BDD aussi (surtout si Redis est OFF)
+      const result = await this.dataSource.query(`
+        SELECT COUNT(*) as count 
+        FROM users 
+        WHERE dernier_login > NOW() - INTERVAL '30 minutes'
+        AND actif = true
+      `)
+      activeFromDB = Number.parseInt(result[0]?.count ?? '0')
+      this.logger.debug(`Utilisateurs actifs depuis BDD: ${activeFromDB}`)
+    } catch (error) {
+      this.logger.warn('Erreur lors du comptage BDD', error)
+    }
+    
+    // Retourner le maximum entre Redis et BDD
+    const maxCount = Math.max(activeFromRedis, activeFromDB)
+    this.logger.debug(`Utilisateurs actifs final: ${maxCount} (Redis: ${activeFromRedis}, BDD: ${activeFromDB})`)
+    
+    return maxCount
   }
 
   private async checkDatabaseIntegrity() {

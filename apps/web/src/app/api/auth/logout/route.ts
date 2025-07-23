@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const token = authHeader.substring(7)
     
     // Rediriger vers l'API backend pour invalider le token
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     const response = await fetch(`${apiUrl}/api/v1/auth/logout`, {
       method: 'POST',
       headers: {

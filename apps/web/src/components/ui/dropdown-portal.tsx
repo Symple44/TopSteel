@@ -262,8 +262,8 @@ export function DropdownPortal({
       ref={contentRef}
       className={cn(
         'fixed z-[99999] min-w-[8rem] overflow-hidden rounded-md border shadow-lg',
-        'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100',
-        'border-gray-200 dark:border-gray-700',
+        'bg-popover text-popover-foreground',
+        'border-border',
         'p-1',
         'animate-in fade-in-0 zoom-in-95 duration-200',
         className
@@ -273,9 +273,7 @@ export function DropdownPortal({
         left: position.x,
         top: position.y,
         opacity: position.x === 0 && position.y === 0 ? 0 : 1,
-        transition: 'opacity 150ms ease-in-out',
-        backgroundColor: 'white',
-        border: '1px solid #e5e7eb'
+        transition: 'opacity 150ms ease-in-out'
       }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -332,7 +330,7 @@ export function DropdownItem({
       data-dropdown-item
       className={cn(
         'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors',
-        'hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700',
+        'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
         disabled && 'pointer-events-none opacity-50',
         className
       )}
@@ -343,5 +341,5 @@ export function DropdownItem({
 }
 
 export function DropdownSeparator({ className }: { className?: string }) {
-  return <div className={cn('-mx-1 my-1 h-px bg-gray-200 dark:bg-gray-600', className)} />
+  return <div className={cn('-mx-1 my-1 h-px bg-border', className)} />
 }

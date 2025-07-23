@@ -56,13 +56,13 @@ export function usePermissions() {
       
       if (!response.ok) {
         if (response.status === 401) {
-          console.warn('Permissions API: User not authenticated, redirecting to login')
+          // User not authenticated - redirecting
           // Rediriger vers la page de login si l'utilisateur n'est pas authentifié
           if (typeof window !== 'undefined') {
             window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
           }
         } else {
-          console.error('Permissions API error:', response.status, response.statusText)
+          // Permissions API error (silenced)
         }
         return
       }
@@ -82,7 +82,7 @@ export function usePermissions() {
         })
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des permissions:', error)
+      // Error loading permissions (silenced)
     } finally {
       setLoading(false)
     }

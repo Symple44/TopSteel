@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')?.value
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/menu-preferences/reset`, {
+    const response = await fetch(`${apiUrl}/api/v1/user/menu-preferences/reset`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

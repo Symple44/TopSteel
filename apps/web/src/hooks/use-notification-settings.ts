@@ -102,7 +102,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
             }
           }
           
-          const response = await fetch(`${apiUrl}/users/notifications/me`, {
+          const response = await fetch(`${apiUrl}/api/v1/users/notifications/me`, {
             headers,
             credentials: 'include',
           })
@@ -116,7 +116,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
             return
           }
         } catch (apiError) {
-          console.log('API non disponible, utilisation du localStorage')
+          // API unavailable, using localStorage
         }
         
         // Fallback vers le localStorage
@@ -196,19 +196,19 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
           setSavedSettings(updatedSettings)
           // Mettre à jour le cache local
           localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedSettings))
-          console.log('Paramètres de notification sauvegardés sur le serveur:', updatedSettings)
+          // Notification settings saved on server
           return
         } else {
-          console.warn('Échec de la sauvegarde sur le serveur, sauvegarde locale seulement')
+          // Server save failed, using local storage
         }
       } catch (apiError) {
-        console.warn('API non disponible pour la sauvegarde, sauvegarde locale seulement')
+        // API unavailable, using local storage
       }
       
       // Fallback vers localStorage
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
       setSavedSettings(settings)
-      console.log('Paramètres de notification sauvegardés localement:', settings)
+      // Notification settings saved locally
       
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des paramètres:', error)

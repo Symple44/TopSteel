@@ -147,7 +147,7 @@ export const useAuth = () => {
       if (tokens.expiresIn) {
         const tokenAge = Date.now() - (tokens.expiresIn * 1000)
         if (tokenAge > 0) {
-          console.warn('Token expired locally')
+          // Token expired locally
           return false
         }
       }
@@ -162,8 +162,33 @@ export const useAuth = () => {
 
       return response.ok
     } catch (error) {
-      console.warn('Token validation failed:', error)
+      // Token validation failed
       return false
+    }
+  }, [])
+
+  // ✅ Récupération du profil utilisateur
+  const fetchUserProfile = React.useCallback(async (tokens: Tokens): Promise<User | null> => {
+    try {
+      const response = await fetch('/api/auth/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${tokens.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+
+      if (response.ok) {
+        const userData = await response.json()
+        return userData
+      } else {
+        // Failed to fetch user profile
+        return null
+      }
+    } catch (error) {
+      // Error fetching user profile
+      return null
     }
   }, [])
 
@@ -185,11 +210,11 @@ export const useAuth = () => {
       }
 
       const responseData = await response.json()
-      console.log('🔐 API Response:', responseData)
+      // Login successful
       
       // Vérifier si MFA est requis
       if (responseData.data?.requiresMFA) {
-        console.log('🔐 MFA Required')
+        // MFA Required
         setAuthState(prev => ({
           ...prev,
           isLoading: false,
@@ -225,7 +250,7 @@ export const useAuth = () => {
         }
       })
       
-      console.log('🔐 Auth state updated:', { user, isAuthenticated: true })
+      // Auth state updated successfully
     } catch (error) {
       setAuthState((prev) => ({ ...prev, isLoading: false }))
       throw error
@@ -440,11 +465,10 @@ export const useAuth = () => {
         const cookieRefreshToken = cookieUtils.get('refreshToken')
 
         if (storedUser && storedTokens) {
-          console.log('🔐 Found stored auth data, restoring session...')
           
           // S'assurer que les cookies sont synchronisés
           if (cookieToken !== storedTokens.accessToken) {
-            console.log('🔐 Synchronizing cookies with localStorage...')
+            // Synchronizing cookies with localStorage
             cookieUtils.set('accessToken', storedTokens.accessToken, 1)
             if (storedTokens.refreshToken) {
               cookieUtils.set('refreshToken', storedTokens.refreshToken, 1)
@@ -461,26 +485,45 @@ export const useAuth = () => {
             }
           })
         } else if (cookieToken && cookieRefreshToken) {
-          console.log('🔐 Found cookies, restoring minimal session...')
+          // Restoring session from cookies
           
-          // Si on a des cookies mais pas de localStorage, créer une session minimale
+          // Si on a des cookies mais pas de localStorage, créer une session et récupérer l'utilisateur
           const tokensFromCookies: Tokens = {
             accessToken: cookieToken,
             refreshToken: cookieRefreshToken,
             tokenType: 'Bearer',
           }
           
-          setAuthState({
-            user: null, // L'utilisateur sera récupéré au prochain appel API
-            tokens: tokensFromCookies,
-            isLoading: false,
-            isAuthenticated: true,
-            mfa: {
-              required: false
-            }
-          })
+          // Récupérer activement le profil utilisateur
+          const userProfile = await fetchUserProfile(tokensFromCookies)
+          
+          if (userProfile) {
+            setAuthState({
+              user: userProfile, // Profil utilisateur récupéré
+              tokens: tokensFromCookies,
+              isLoading: false,
+              isAuthenticated: true,
+              mfa: {
+                required: false
+              }
+            })
+          } else {
+            // Si on ne peut pas récupérer le profil, nettoyer la session
+            // Failed to restore user profile, clearing session
+            cookies.remove('topsteel-token')
+            cookies.remove('topsteel-refresh-token')
+            setAuthState({
+              user: null,
+              tokens: null,
+              isLoading: false,
+              isAuthenticated: false,
+              mfa: {
+                required: false
+              }
+            })
+          }
         } else {
-          console.log('🔐 No stored auth data found')
+          // No stored auth data found
           setAuthState({
             user: null,
             tokens: null,

@@ -93,7 +93,7 @@ export function useDynamicMenu() {
       
       // Vérifier le statut de la réponse
       if (!response.ok) {
-        console.warn(`API error ${response.status}: ${response.statusText}`)
+        // API error loading user menu (silenced)
         setCustomMenu([])
         return
       }
@@ -150,7 +150,7 @@ export function useDynamicMenu() {
       // Vérifier si la réponse est bien du JSON
       const contentType = response.headers.get('content-type')
       if (!contentType || !contentType.includes('application/json')) {
-        console.warn('API response is not JSON for standard menu')
+        // API response not JSON for standard menu (silenced)
         setStandardMenu([])
         return
       }

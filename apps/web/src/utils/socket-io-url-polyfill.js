@@ -20,15 +20,19 @@ export function url(uri, path, loc) {
       }
     } catch (error) {
       console.warn('URL parsing error:', error)
+      // Utiliser les variables d'environnement pour les valeurs par défaut
+      const defaultApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+      const defaultUrl = new URL(defaultApiUrl)
+      
       obj = {
-        protocol: 'http:',
-        hostname: 'localhost',
-        port: '3001',
+        protocol: defaultUrl.protocol,
+        hostname: defaultUrl.hostname,
+        port: defaultUrl.port || (defaultUrl.protocol === 'https:' ? '443' : '3002'),
         pathname: '/',
         search: '',
         hash: '',
-        host: 'localhost:3001',
-        origin: 'http://localhost:3001'
+        host: defaultUrl.host,
+        origin: defaultUrl.origin
       }
     }
   }

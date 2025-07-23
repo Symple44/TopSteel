@@ -89,6 +89,7 @@ export class AuthService {
     const refreshToken = await this.generateRefreshToken(payload)
 
     await this.usersService.updateRefreshToken(user.id, refreshToken)
+    await this.usersService.updateLastLogin(user.id)
 
     // Extraire les informations de la requête pour le tracking
     let ipAddress = '0.0.0.0'
