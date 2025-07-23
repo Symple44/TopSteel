@@ -146,4 +146,165 @@ export class RenderUtils {
     
     return this.safeRender(value, column)
   }
+
+  /**
+   * Rend la valeur d'une cellule avec support pour l'édition
+   */
+  static renderCellValue(
+    value: any, 
+    column: ColumnConfig<any>, 
+    item: any,
+    readonly: boolean = false,
+    onValueChange?: (newValue: any) => void
+  ): React.ReactNode {
+    // Si readonly ou pas d'édition possible, rendu simple
+    if (readonly || !column.editable || !onValueChange) {
+      return this.makeReactSafe(value, column)
+    }
+
+    // Pour l'édition, on retourne un composant éditable selon le type
+    return this.renderEditableCell(value, column, item, onValueChange)
+  }
+
+  /**
+   * Rend une cellule éditable selon son type
+   */
+  private static renderEditableCell(
+    value: any,
+    column: ColumnConfig<any>,
+    item: any,
+    onValueChange: (newValue: any) => void
+  ): React.ReactNode {
+    const handleChange = (newValue: any) => {
+      // Validation basique selon le type
+      let validatedValue = newValue
+
+      switch (column.type) {
+        case 'number':
+          validatedValue = parseFloat(newValue) || 0
+          break
+        case 'boolean':
+          validatedValue = Boolean(newValue)
+          break
+        case 'date':
+        case 'datetime':
+          if (newValue && !(newValue instanceof Date)) {
+            validatedValue = new Date(newValue)
+          }
+          break
+        default:
+          validatedValue = String(newValue || '')
+      }
+
+      onValueChange(validatedValue)
+    }
+
+    // Rendu selon le type de colonne
+    switch (column.type) {
+      case 'boolean':
+        return React.createElement('input', {
+          type: 'checkbox',
+          checked: Boolean(value),
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.checked),
+          className: 'h-4 w-4 text-primary rounded border-input bg-transparent transition-colors focus-visible:ring-1 focus-visible:ring-ring'
+        })
+
+      case 'select':
+        if (column.options) {
+          return React.createElement('select', {
+            value: value || '',
+            onChange: (e: React.ChangeEvent<HTMLSelectElement>) => handleChange(e.target.value),
+            className: 'w-full h-8 px-2 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring'
+          }, [
+            React.createElement('option', { key: '', value: '' }, ''),
+            ...column.options.map((option: any) => 
+              React.createElement('option', { 
+                key: typeof option === 'object' ? option.value : option,
+                value: typeof option === 'object' ? option.value : option
+              }, typeof option === 'object' ? option.label : option)
+            )
+          ])
+        }
+        break
+
+      case 'multiselect':
+        if (column.options) {
+          const currentValues = Array.isArray(value) ? value : []
+          return React.createElement('div', {
+            className: 'flex flex-wrap gap-1 p-1 min-h-8 border border-input bg-transparent rounded-md'
+          }, column.options.map((option: any) => {
+            const optionValue = typeof option === 'object' ? option.value : option
+            const optionLabel = typeof option === 'object' ? option.label : option
+            const isSelected = currentValues.includes(optionValue)
+            
+            return React.createElement('label', {
+              key: optionValue,
+              className: 'inline-flex items-center space-x-1 text-xs cursor-pointer hover:bg-accent/50 rounded px-1 transition-colors'
+            }, [
+              React.createElement('input', {
+                type: 'checkbox',
+                checked: isSelected,
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const newValues = e.target.checked
+                    ? [...currentValues, optionValue]
+                    : currentValues.filter((v: any) => v !== optionValue)
+                  handleChange(newValues)
+                },
+                className: 'h-3 w-3 text-primary rounded border-input bg-transparent transition-colors focus-visible:ring-1 focus-visible:ring-ring'
+              }),
+              React.createElement('span', { className: 'text-foreground' }, optionLabel)
+            ])
+          }))
+        }
+        break
+
+      case 'number':
+        return React.createElement('input', {
+          type: 'number',
+          value: value || '',
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value),
+          className: 'w-full h-8 px-2 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+          step: column.format?.decimals ? `0.${'0'.repeat(column.format.decimals - 1)}1` : '1'
+        })
+
+      case 'date':
+        const dateValue = value instanceof Date ? value.toISOString().split('T')[0] : ''
+        return React.createElement('input', {
+          type: 'date',
+          value: dateValue,
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value),
+          className: 'w-full h-8 px-2 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring'
+        })
+
+      case 'datetime':
+        const datetimeValue = value instanceof Date ? 
+          value.toISOString().slice(0, 16) : ''
+        return React.createElement('input', {
+          type: 'datetime-local',
+          value: datetimeValue,
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value),
+          className: 'w-full h-8 px-2 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring'
+        })
+
+      case 'richtext':
+        return React.createElement('div', {
+          contentEditable: true,
+          dangerouslySetInnerHTML: { __html: value || '' },
+          onBlur: (e: React.FocusEvent<HTMLDivElement>) => handleChange(e.target.innerHTML),
+          className: 'w-full px-2 py-1 text-xs border border-input bg-transparent rounded-md shadow-sm min-h-8 transition-colors focus-visible:ring-1 focus-visible:ring-ring'
+        })
+
+      default:
+        // Type text par défaut
+        return React.createElement('input', {
+          type: 'text',
+          value: value || '',
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value),
+          className: 'w-full h-8 px-2 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring'
+        })
+    }
+
+    // Fallback si aucun type ne correspond
+    return this.makeReactSafe(value, column)
+  }
 }

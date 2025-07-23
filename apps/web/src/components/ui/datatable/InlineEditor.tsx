@@ -131,9 +131,9 @@ export function InlineEditor<T = any>({
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
-              'h-8 text-xs',
-              !validation.isValid && 'border-red-500',
-              validation.warning && 'border-yellow-500'
+              'h-8 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+              !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
+              validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
             placeholder={column.title}
           />
@@ -149,9 +149,9 @@ export function InlineEditor<T = any>({
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
-              'h-8 text-xs',
-              !validation.isValid && 'border-red-500',
-              validation.warning && 'border-yellow-500'
+              'h-8 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+              !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
+              validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
             min={column.validation?.min}
             max={column.validation?.max}
@@ -169,9 +169,9 @@ export function InlineEditor<T = any>({
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
-              'h-8 text-xs',
-              !validation.isValid && 'border-red-500',
-              validation.warning && 'border-yellow-500'
+              'h-8 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+              !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
+              validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
           />
         )
@@ -186,9 +186,9 @@ export function InlineEditor<T = any>({
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
-              'h-8 text-xs',
-              !validation.isValid && 'border-red-500',
-              validation.warning && 'border-yellow-500'
+              'h-8 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+              !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
+              validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
           />
         )
@@ -225,16 +225,16 @@ export function InlineEditor<T = any>({
             })) || []}
             placeholder="Choisir..."
             className={cn(
-              'h-8 text-xs',
-              !validation.isValid && 'border-red-500',
-              validation.warning && 'border-yellow-500'
+              'h-8 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+              !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
+              validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
           />
         )
         
       case 'multiselect':
         return (
-          <div className="min-h-8 p-1 border rounded-md text-xs">
+          <div className="min-h-8 p-1 border border-input bg-transparent rounded-md text-xs">
             {Array.isArray(value) ? value.map((val, index) => {
               const option = column.options?.find(opt => opt.value === val)
               return (
@@ -267,7 +267,7 @@ export function InlineEditor<T = any>({
             <button
               type="button"
               onClick={() => setShowFormulaEditor(true)}
-              className="h-8 px-2 border rounded hover:bg-muted transition-colors"
+              className="h-8 px-2 border border-input bg-transparent rounded-md hover:bg-accent transition-colors"
               title="Ouvrir l'éditeur de formules"
             >
               <Calculator className="h-3 w-3" />
@@ -281,9 +281,9 @@ export function InlineEditor<T = any>({
             ref={inputRef}
             contentEditable
             className={cn(
-              "p-2 border rounded min-h-[60px] max-h-[120px] overflow-y-auto bg-background focus:outline-none focus:ring-2 focus:ring-primary/20",
-              !validation.isValid && 'border-red-500',
-              validation.warning && 'border-yellow-500'
+              "p-2 border border-input bg-transparent rounded-md min-h-[60px] max-h-[120px] overflow-y-auto text-xs shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus:outline-none",
+              !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
+              validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
             dangerouslySetInnerHTML={{ __html: value || '' }}
             onInput={(e) => {
@@ -314,9 +314,9 @@ export function InlineEditor<T = any>({
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
-              'h-8 text-xs',
-              !validation.isValid && 'border-red-500',
-              validation.warning && 'border-yellow-500'
+              'h-8 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+              !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
+              validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
           />
         )
@@ -344,7 +344,7 @@ export function InlineEditor<T = any>({
       {showValidation && (validation.error || validation.warning) && (
         <div className={cn(
           'absolute z-50 top-full left-0 right-0 mt-1 p-2 rounded-md shadow-lg border text-xs',
-          validation.error ? 'bg-red-50 border-red-200 text-red-700' : 'bg-yellow-50 border-yellow-200 text-yellow-700'
+          validation.error ? 'bg-red-50 border-red-500 text-red-700' : 'bg-yellow-50 border-yellow-500 text-yellow-700'
         )}>
           {validation.error || validation.warning}
         </div>

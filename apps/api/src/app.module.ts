@@ -42,6 +42,7 @@ import { TracabiliteModule } from './modules/tracabilite/tracabilite.module'
 import { UsersModule } from './modules/users/users.module'
 import { MenuModule } from './modules/menu/menu.module'
 import { QueryBuilderModule } from './modules/query-builder/query-builder.module'
+import { UiPreferencesModule } from './modules/ui-preferences.module'
 import { RedisModule } from './redis/redis.module'
 // Service d'initialisation - remplacé par DatabaseStartupService dans DatabaseProductionModule
 // import { DatabaseInitService } from './services/database-init.service'
@@ -81,6 +82,7 @@ import { RedisModule } from './redis/redis.module'
     UsersModule,
     MenuModule,
     QueryBuilderModule,
+    UiPreferencesModule,
     MachinesModule,
     MaintenanceModule,
     MateriauxModule,

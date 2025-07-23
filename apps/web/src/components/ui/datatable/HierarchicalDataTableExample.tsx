@@ -156,7 +156,8 @@ const quotationColumns: ColumnConfig<QuotationItem>[] = [
     type: 'text',
     sortable: true,
     searchable: true,
-    visible: true
+    visible: true,
+    editable: true
   },
   {
     id: 'category',
@@ -171,6 +172,7 @@ const quotationColumns: ColumnConfig<QuotationItem>[] = [
       { value: 'service', label: 'Service' }
     ],
     visible: true,
+    editable: true,
     getValue: (item) => {
       const categoryMap = {
         material: 'Matériau',
@@ -188,7 +190,8 @@ const quotationColumns: ColumnConfig<QuotationItem>[] = [
     type: 'number',
     width: 100,
     sortable: true,
-    visible: true
+    visible: true,
+    editable: true
   },
   {
     id: 'unit',
@@ -196,7 +199,8 @@ const quotationColumns: ColumnConfig<QuotationItem>[] = [
     title: 'Unité',
     type: 'text',
     width: 80,
-    visible: true
+    visible: true,
+    editable: true
   },
   {
     id: 'unit_price',
@@ -206,6 +210,7 @@ const quotationColumns: ColumnConfig<QuotationItem>[] = [
     width: 120,
     sortable: true,
     visible: true,
+    editable: true,
     getValue: (item) => `${item.unit_price.toFixed(2)} €`
   },
   {
@@ -225,6 +230,7 @@ const quotationColumns: ColumnConfig<QuotationItem>[] = [
     type: 'boolean',
     width: 100,
     visible: true,
+    editable: true,
     getValue: (item) => item.is_optional ? 'Oui' : 'Non'
   }
 ]

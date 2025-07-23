@@ -5,6 +5,7 @@ import '@/styles/datatable-demo.css'
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from '@erp/ui'
 import { DataTableExample } from '@/components/ui/datatable/DataTableExample'
 import { SimpleDataTableExample } from '@/components/ui/datatable/SimpleExample'
+import { HierarchicalDataTableExample } from '@/components/ui/datatable/HierarchicalDataTableExample'
 import { DropdownTest } from '@/components/ui/dropdown-test'
 import { useTranslation } from '@/lib/i18n/hooks'
 import {
@@ -20,7 +21,8 @@ import {
   Users,
   FileSpreadsheet,
   Edit3,
-  Type
+  Type,
+  TreePine
 } from 'lucide-react'
 
 export default function DataTableTestPage() {
@@ -245,6 +247,32 @@ export default function DataTableTestPage() {
           <CardContent className="p-0">
             <div className="rounded-b-2xl overflow-hidden">
               <DataTableExample />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Hierarchical DataTable Demo */}
+        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-2xl fade-in-up">
+          <CardHeader className="pb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl font-bold text-slate-800 flex items-center">
+                  <TreePine className="h-6 w-6 mr-3 text-green-600" />
+                  DataTable Hiérarchique
+                </CardTitle>
+                <p className="text-slate-600 mt-2">
+                  Affichage et gestion de données hiérarchiques avec drag & drop
+                </p>
+              </div>
+              <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shimmer-btn">
+                <ArrowUpRight className="h-4 w-4 mr-2" />
+                Voir Structure
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="rounded-b-2xl overflow-hidden">
+              <HierarchicalDataTableExample />
             </div>
           </CardContent>
         </Card>

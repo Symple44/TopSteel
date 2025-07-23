@@ -12,7 +12,7 @@ export interface AppearanceSettings {
   fontSize: 'small' | 'medium' | 'large'
   sidebarWidth: 'compact' | 'normal' | 'wide'
   density: 'compact' | 'comfortable' | 'spacious'
-  accentColor: 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'red'
+  accentColor: 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'red' | 'teal' | 'indigo' | 'yellow' | 'emerald' | 'rose' | 'cyan'
   contentWidth: 'compact' | 'full'
 }
 
@@ -86,7 +86,13 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
       purple: '270 91% 65%',
       orange: '45 86% 68%',
       pink: '340 82% 75%',
-      red: '0 84% 60%'
+      red: '0 84% 60%',
+      teal: '173 80% 40%',
+      indigo: '239 84% 67%',
+      yellow: '48 96% 53%',
+      emerald: '160 84% 39%',
+      rose: '330 81% 60%',
+      cyan: '188 94% 59%'
     }
     
     if (accentColors[newSettings.accentColor]) {

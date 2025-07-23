@@ -22,6 +22,9 @@ import { QueryBuilderColumn } from '../modules/query-builder/entities/query-buil
 import { QueryBuilderJoin } from '../modules/query-builder/entities/query-builder-join.entity'
 import { QueryBuilderCalculatedField } from '../modules/query-builder/entities/query-builder-calculated-field.entity'
 import { QueryBuilderPermission } from '../modules/query-builder/entities/query-builder-permission.entity'
+import { DatatableHierarchicalPreferences } from '../entities/datatable-hierarchical-preferences.entity'
+import { DatatableHierarchyOrder } from '../entities/datatable-hierarchy-order.entity'
+import { UiPreferencesReorderableList } from '../entities/ui-preferences-reorderable-list.entity'
 
 export const createSimpleDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const config: TypeOrmModuleOptions = {
@@ -56,7 +59,11 @@ export const createSimpleDatabaseConfig = (configService: ConfigService): TypeOr
       QueryBuilderJoin,
       QueryBuilderCalculatedField,
       QueryBuilderPermission,
+      DatatableHierarchicalPreferences,
+      DatatableHierarchyOrder,
+      UiPreferencesReorderableList,
       __dirname + '/../modules/**/*.entity.{ts,js}',
+      __dirname + '/../entities/**/*.entity.{ts,js}',
       __dirname + '/../common/**/*.entity.{ts,js}',
     ],
     

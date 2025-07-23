@@ -26,7 +26,7 @@ export function Breadcrumb({ items, className, showHome = true }: BreadcrumbProp
     <nav className={cn('flex', className)} aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
         {allItems.map((item, index) => (
-          <li key={index} className="inline-flex items-center">
+          <li key={`${item.href || item.title || 'breadcrumb'}-${index}`} className="inline-flex items-center">
             {index > 0 && (
               <ChevronRight className="h-4 w-4 text-muted-foreground mx-1" />
             )}

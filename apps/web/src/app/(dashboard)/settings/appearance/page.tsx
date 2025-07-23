@@ -12,6 +12,7 @@ import { useTranslation } from '@/lib/i18n/hooks'
 import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
 import { useToastShortcuts } from '@/hooks/use-toast'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { TemplateSelector } from '@/components/settings/template-selector'
 import {
   Palette,
   Monitor,
@@ -105,7 +106,13 @@ export default function AppearanceSettingsPage() {
     { id: 'purple', label: 'Violet', color: 'bg-purple-500' },
     { id: 'orange', label: 'Orange', color: 'bg-orange-500' },
     { id: 'pink', label: 'Rose', color: 'bg-pink-500' },
-    { id: 'red', label: 'Rouge', color: 'bg-red-500' }
+    { id: 'red', label: 'Rouge', color: 'bg-red-500' },
+    { id: 'teal', label: 'Sarcelle', color: 'bg-teal-500' },
+    { id: 'indigo', label: 'Indigo', color: 'bg-indigo-500' },
+    { id: 'yellow', label: 'Jaune', color: 'bg-yellow-500' },
+    { id: 'emerald', label: 'Émeraude', color: 'bg-emerald-500' },
+    { id: 'rose', label: 'Rose vif', color: 'bg-rose-500' },
+    { id: 'cyan', label: 'Cyan', color: 'bg-cyan-500' }
   ]
 
   return (
@@ -139,6 +146,13 @@ export default function AppearanceSettingsPage() {
         </div>
 
         <div className="space-y-8">
+          {/* Sélecteur de Templates */}
+          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+            <CardContent className="p-6">
+              <TemplateSelector />
+            </CardContent>
+          </Card>
+
           {/* Thème */}
           <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
             <CardHeader>

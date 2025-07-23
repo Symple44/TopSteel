@@ -11,7 +11,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      'inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground',
+      'inline-flex h-12 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground shadow-sm border border-border/50',
       className
     )}
     {...props}
@@ -22,16 +22,48 @@ TabsList.displayName = TabsPrimitive.List.displayName
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      'inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow',
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  // Injecter du CSS global pour écraser les styles Radix
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const styleId = 'radix-tabs-override'
+      if (!document.getElementById(styleId)) {
+        const style = document.createElement('style')
+        style.id = styleId
+        style.textContent = `
+          /* Styles pour les onglets actifs - NE PAS TOUCHER */
+          button[data-state="active"] {
+            background: linear-gradient(to bottom right, hsl(var(--primary) / 0.95), hsl(var(--primary) / 0.75)) !important;
+            color: hsl(var(--primary-foreground)) !important;
+            font-weight: 600 !important;
+            box-shadow: 0 10px 15px -3px hsl(var(--primary) / 0.3), 0 4px 6px -2px hsl(var(--primary) / 0.2) !important;
+          }
+          [role="tab"][data-state="active"] {
+            background: linear-gradient(to bottom right, hsl(var(--primary) / 0.95), hsl(var(--primary) / 0.75)) !important;
+            color: hsl(var(--primary-foreground)) !important;
+            font-weight: 600 !important;
+            box-shadow: 0 10px 15px -3px hsl(var(--primary) / 0.3), 0 4px 6px -2px hsl(var(--primary) / 0.2) !important;
+          }
+          
+        `
+        document.head.appendChild(style)
+      }
+    }
+  }, [])
+
+  return (
+    <TabsPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        'inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+        // État inactif
+        'text-muted-foreground hover:text-foreground/80 hover:bg-background/30',
+        className
+      )}
+      {...props}
+    />
+  )
+})
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 
 const TabsContent = React.forwardRef<
@@ -41,7 +73,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      'mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'mt-6 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       className
     )}
     {...props}

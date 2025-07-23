@@ -370,7 +370,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
         {hasChildren && isExpanded && !isCollapsed && (
           <div className="mt-1 ml-4 pl-4 border-l-2 border-primary/30 bg-muted/20 rounded-r-lg space-y-0.5 animate-in slide-in-from-top-1 duration-200">
             {item.children?.map((child, childIndex) => (
-              <React.Fragment key={child.href || child.title || `child-${childIndex}`}>{renderNavItem(child, level + 1)}</React.Fragment>
+              <React.Fragment key={`${child.href || child.title || 'unnamed'}-child-${childIndex}-level-${level}`}>{renderNavItem(child, level + 1)}</React.Fragment>
             ))}
           </div>
         )}
@@ -541,7 +541,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
       {/* Navigation */}
       <nav className="flex-1 p-1.5 space-y-0.5 overflow-y-auto">
         {navigation.map((item, index) => (
-          <React.Fragment key={item.href || item.title || `nav-item-${index}`}>{renderNavItem(item)}</React.Fragment>
+          <React.Fragment key={`${item.href || item.title || 'unnamed'}-nav-${index}`}>{renderNavItem(item)}</React.Fragment>
         ))}
       </nav>
 

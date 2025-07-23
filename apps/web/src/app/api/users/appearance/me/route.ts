@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest) {
     
     // Valider et nettoyer les données pour correspondre exactement au DTO backend
     const allowedFields = ['theme', 'language', 'fontSize', 'sidebarWidth', 'density', 'accentColor', 'contentWidth']
-    const cleanedBody = {}
+    const cleanedBody: Record<string, any> = {}
     
     for (const field of allowedFields) {
       if (body[field] !== undefined) {

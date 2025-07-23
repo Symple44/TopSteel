@@ -100,7 +100,6 @@ const nextConfig = {
   experimental: {
     // Next.js 15 with React 19 support
     reactCompiler: false, // Disable React Compiler for now
-    instrumentationHook: false, // Disable instrumentation that causes createContextKey error
   },
   
   // Disable telemetry and tracing that causes api.createContextKey error

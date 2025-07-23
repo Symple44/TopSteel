@@ -272,7 +272,7 @@ function HierarchicalNode<T extends HierarchicalItem>({
                     column.getValue ? column.getValue(item) : (item as any)[column.key],
                     column,
                     item,
-                    false, // readonly for now
+                    !column.editable, // readonly si la colonne n'est pas éditable
                     (value) => onCellEdit?.(item, column.id, value)
                   )}
                 </div>
