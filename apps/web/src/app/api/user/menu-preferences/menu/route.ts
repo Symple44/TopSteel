@@ -48,60 +48,121 @@ export async function GET(request: NextRequest) {
       }
     } catch (backendError) {
       // Fallback uniquement si le backend est indisponible
-      const defaultMenu = [
+      // Format conforme à ce qui est attendu par useDynamicMenu
+      const defaultCustomMenu = [
         {
-          id: 'dashboard',
-          title: 'Tableau de bord',
-          icon: 'dashboard',
-          url: '/dashboard',
-          visible: true,
-          order: 0
+          id: 'dashboard-custom',
+          parentId: null,
+          title: 'Mon Tableau de bord',
+          titleKey: 'dashboard',
+          href: '/dashboard',
+          icon: 'Home',
+          gradient: 'from-purple-500 to-pink-600',
+          orderIndex: 0,
+          isVisible: true,
+          depth: 0,
+          children: [],
+          userPreferences: {
+            isVisible: true,
+            isFavorite: true,
+            isPinned: true,
+            customTitle: 'Mon Tableau de bord',
+            customIcon: 'Home',
+            customColor: 'purple'
+          }
         },
         {
-          id: 'admin',
-          title: 'Administration', 
-          icon: 'admin',
-          url: '/admin',
-          visible: true,
-          order: 1,
+          id: 'query-builder-custom',
+          parentId: null,
+          title: 'Mes Requêtes',
+          href: '/query-builder',
+          icon: 'Search',
+          gradient: 'from-green-500 to-emerald-600',
+          orderIndex: 1,
+          isVisible: true,
+          depth: 0,
+          children: [],
+          userPreferences: {
+            isVisible: true,
+            isFavorite: false,
+            isPinned: false,
+            customTitle: 'Mes Requêtes'
+          }
+        },
+        {
+          id: 'admin-custom',
+          parentId: null,
+          title: 'Config Perso',
+          href: '/admin',
+          icon: 'Shield',
+          gradient: 'from-orange-500 to-red-600',
+          orderIndex: 2,
+          isVisible: true,
+          depth: 0,
+          roles: ['ADMIN'],
           children: [
             {
-              id: 'admin-users',
-              title: 'Utilisateurs',
-              url: '/admin/users',
-              visible: true,
-              order: 0
-            },
-            {
-              id: 'admin-roles',
-              title: 'Rôles',
-              url: '/admin/roles',
-              visible: true,
-              order: 1
-            },
-            {
-              id: 'admin-settings',
-              title: 'Configuration',
-              url: '/admin/settings',
-              visible: true,
-              order: 2
+              id: 'admin-users-custom',
+              parentId: 'admin-custom',
+              title: 'Mes Utilisateurs',
+              href: '/admin/users',
+              icon: 'Users',
+              gradient: 'from-blue-500 to-indigo-600',
+              orderIndex: 0,
+              isVisible: true,
+              depth: 1,
+              roles: ['SUPER_ADMIN', 'ADMIN'],
+              children: [],
+              userPreferences: {
+                isVisible: true,
+                customTitle: 'Mes Utilisateurs'
+              }
             }
-          ]
+          ],
+          userPreferences: {
+            isVisible: true,
+            customTitle: 'Config Perso'
+          }
         },
         {
-          id: 'settings',
-          title: 'Paramètres',
-          icon: 'settings',
-          url: '/settings',
-          visible: true,
-          order: 2
+          id: 'settings-custom',
+          parentId: null,
+          title: 'Mes Paramètres',
+          href: '/settings',
+          icon: 'Settings',
+          gradient: 'from-indigo-500 to-purple-600',
+          orderIndex: 3,
+          isVisible: true,
+          depth: 0,
+          children: [
+            {
+              id: 'settings-appearance-custom',
+              parentId: 'settings-custom',
+              title: 'Mon Thème',
+              href: '/settings/appearance',
+              icon: 'Palette',
+              gradient: 'from-pink-500 to-rose-600',
+              orderIndex: 0,
+              isVisible: true,
+              depth: 1,
+              children: [],
+              userPreferences: {
+                isVisible: true,
+                customTitle: 'Mon Thème'
+              }
+            }
+          ],
+          userPreferences: {
+            isVisible: true,
+            customTitle: 'Mes Paramètres'
+          }
         }
       ]
 
       return NextResponse.json({
         success: true,
-        data: defaultMenu,
-        message: 'Menu récupéré avec succès',
+        data: defaultCustomMenu,
+        message: 'Menu personnalisé récupéré avec succès (fallback)',
         fallback: true
       })
     }

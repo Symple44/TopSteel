@@ -184,9 +184,20 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const { isOnline, statusColor, statusText } = useBackendStatus()
   
   // Hooks pour la gestion du menu
-  const { filteredMenu, loading, error, currentMode, refreshMenu } = useDynamicMenu()
-  const { mode, toggleMode, isStandard, isCustom } = useMenuMode()
+  const { 
+    filteredMenu, 
+    loading, 
+    error, 
+    currentMode, 
+    refreshMenu, 
+    toggleMode, 
+    isStandard, 
+    isCustom 
+  } = useDynamicMenu()
   const staticNavigation = getNavigation(t)
+  
+  // Utiliser le mode depuis useDynamicMenu pour éviter les désynchronisations
+  const mode = currentMode
   
   // Convertir le menu dynamique au format NavItem
   const convertDynamicToNavItem = (items: any[]): NavItem[] => {
@@ -224,6 +235,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const navigation = !loading && (Array.isArray(filteredMenu) && (filteredMenu.length > 0 || mode === 'custom'))
     ? convertDynamicToNavItem(filteredMenu)
     : staticNavigation
+    
 
   // Sidebar state tracking (debug removed)
 
@@ -254,11 +266,6 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     const isExpanded = expandedItems.includes(item.title)
     const itemIsActive = isActive(item.href)
     const parentIsActive = isParentActive(item)
-    
-    // Debug temporaire pour comprendre la hiérarchie
-    if (hasChildren) {
-      console.log(`📂 Item: "${item.title}", Level: ${level}, Expanded: ${isExpanded}, Children: ${item.children?.length}`)
-    }
     const hasActiveChild = hasChildren && item.children?.some((child) => {
       if (!child.href) return false
       // Un enfant est actif si l'URL courante correspond exactement ou est une sous-page
@@ -453,7 +460,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               <div className="flex items-center justify-between p-2 rounded-lg bg-gradient-to-r from-muted/50 to-accent/20 backdrop-blur-sm border border-border/40 hover:from-accent/20 hover:to-accent/30 transition-all duration-300 cursor-pointer group flex-1"
                 onClick={() => {
                   toggleMode()
-                  setTimeout(() => refreshMenu(), 100)
+                  // Le refreshMenu sera déclenché automatiquement par le useEffect du changement de mode
                 }}
               >
                 <div className="flex items-center gap-2 flex-1">

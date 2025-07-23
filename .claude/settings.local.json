@@ -115,7 +115,8 @@
       "Bash(rg:*)",
       "Bash(true)",
       "Bash(ts-node:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(head:*)"
     ],
     "deny": []
   }

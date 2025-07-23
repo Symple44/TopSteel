@@ -152,7 +152,8 @@
     "ci:test": "turbo test",
     "version:update": "node scripts/set-version.mjs",
     "version:set": "node scripts/set-version.mjs",
-    "version:info": "node --input-type=module -e \"import pkg from './package.json' assert { type: 'json' }; console.log('Version:', pkg.version)\""
+    "version:info": "node --input-type=module -e \"import pkg from './package.json' assert { type: 'json' }; console.log('Version:', pkg.version)\"",
+    "verify:packages": "node scripts/verify-package-consistency.js"
   },
   "author": {
     "name": "TopSteel",

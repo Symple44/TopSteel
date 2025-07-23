@@ -52,7 +52,7 @@ export function useDynamicMenu() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { hasPermission, hasRole, canAccessModule } = usePermissions()
-  const { mode, loading: modeLoading } = useMenuMode()
+  const { mode, loading: modeLoading, toggleMode, setMenuMode } = useMenuMode()
 
   const loadActiveMenuConfig = useCallback(async () => {
     try {
@@ -93,7 +93,6 @@ export function useDynamicMenu() {
       
       // Vérifier le statut de la réponse
       if (!response.ok) {
-        // API error loading user menu (silenced)
         setCustomMenu([])
         return
       }
@@ -101,8 +100,6 @@ export function useDynamicMenu() {
       // Vérifier si la réponse est bien du JSON
       const contentType = response.headers.get('content-type')
       if (!contentType || !contentType.includes('application/json')) {
-        const responseText = await response.text()
-        console.warn('API response is not JSON for user menu:', responseText.substring(0, 200))
         setCustomMenu([])
         return
       }
@@ -110,7 +107,8 @@ export function useDynamicMenu() {
       const data = await response.json()
       
       if (data.success) {
-        setCustomMenu(data.data || [])
+        const menuData = data.data || []
+        setCustomMenu(menuData)
         
         // Vérifier si le menu a l'air synchronisé
         if (data.data.length === 0 && mode === 'custom') {
@@ -122,7 +120,6 @@ export function useDynamicMenu() {
           })
         }
       } else {
-        console.warn('API returned success: false for user menu:', data.message)
         setCustomMenu([])
         
         syncChecker.addIssue({
@@ -145,7 +142,8 @@ export function useDynamicMenu() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/admin/menu-config/tree/filtered')
+      // CORRECTION: Le menu standard doit venir de la config active définie par les admins
+      const response = await fetch('/api/admin/menu-config/active')
       
       // Vérifier si la réponse est bien du JSON
       const contentType = response.headers.get('content-type')
@@ -158,11 +156,10 @@ export function useDynamicMenu() {
       const data = await response.json()
       
       if (data.success) {
-        setStandardMenu(data.data)
-        setMenuConfig(prev => prev ? {
-          ...prev,
-          filteredItems: data.data
-        } : null)
+        // Pour le menu standard, on utilise les items de la configuration active
+        const menuItems = data.data?.items || []
+        setStandardMenu(menuItems)
+        setMenuConfig(data.data)
       }
     } catch (err) {
       console.error('Erreur lors du chargement du menu standard:', err)
@@ -263,7 +260,13 @@ export function useDynamicMenu() {
 
   // Menu utilisé basé sur le mode sélectionné
   const currentMenu = mode === 'custom' ? customMenu : standardMenu
-  const filteredMenu = currentMenu
+  
+  // Appliquer le filtrage par permissions seulement au menu standard
+  // Le menu custom est déjà filtré côté serveur
+  const filteredMenu = mode === 'custom' 
+    ? currentMenu 
+    : filterMenuByPermissions(currentMenu)
+    
 
 
   const refreshMenu = useCallback(() => {
@@ -287,7 +290,12 @@ export function useDynamicMenu() {
     loadStandardMenu,
     loadUserCustomizedMenu,
     filterMenuByPermissions,
-    canUserAccessItem
+    canUserAccessItem,
+    // Exposer les fonctions de gestion du mode depuis le hook interne
+    toggleMode,
+    setMenuMode,
+    isStandard: mode === 'standard',
+    isCustom: mode === 'custom'
   }
 }
 

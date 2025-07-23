@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   Card,
   CardContent,
@@ -13,6 +13,10 @@ import {
   Checkbox,
   Alert,
   AlertDescription,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@erp/ui'
 import { 
   Settings,
@@ -33,11 +37,291 @@ import {
   Save,
   RotateCcw,
   Check,
-  X
+  X,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
+  Palette,
+  List
 } from 'lucide-react'
 import { useAvailablePages } from '@/hooks/use-available-pages'
 import { useSelectedPages } from '@/hooks/use-selected-pages'
 import { useDynamicMenu } from '@/hooks/use-dynamic-menu'
+import { ReorderableList } from '@/components/ui/reorderable-list'
+import { cn } from '@/lib/utils'
+
+// Mapping des icônes
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  LayoutDashboard,
+  Settings,
+  Package,
+  Factory,
+  TrendingUp,
+  CreditCard,
+  UserCheck,
+  FileBarChart,
+  dashboard: LayoutDashboard,
+  admin: Settings,
+  company: Package,
+  roles: UserCheck,
+  database: FileBarChart,
+}
+
+// Interface pour les éléments de menu
+interface MenuItem {
+  id: string
+  title: string
+  href?: string
+  icon?: string
+  gradient?: string
+  orderIndex: number
+  isVisible: boolean
+  parentId?: string
+  children?: MenuItem[]
+  userPreferences?: {
+    customTitle?: string
+    isFavorite?: boolean
+  }
+}
+
+// Composant moderne pour l'affichage d'un élément de menu
+function MenuItemDisplay({ item, onToggleVisibility }: { 
+  item: MenuItem
+  onToggleVisibility: (id: string) => void 
+}) {
+  const IconComponent = item.icon ? iconMap[item.icon] || LayoutDashboard : LayoutDashboard
+
+  return (
+    <div className="flex items-center gap-3 w-full py-1 px-2 group rounded-md hover:bg-accent/10 transition-colors duration-200">
+      {/* Icône avec gradient et effets */}
+      <div className={cn(
+        'flex items-center justify-center rounded-lg h-8 w-8 flex-shrink-0',
+        'transition-all duration-200 ease-out',
+        'hover:scale-110 hover:shadow-lg',
+        item.gradient
+          ? `bg-gradient-to-br ${item.gradient} text-white shadow-md`
+          : 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 hover:border-primary/30'
+      )}>
+        <IconComponent className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+      </div>
+
+      {/* Contenu principal */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-sm text-foreground truncate transition-all duration-200 group-hover:text-primary">
+            {item.userPreferences?.customTitle || item.title}
+          </h3>
+          
+          {/* Badges modernes */}
+          {item.children && item.children.length > 0 && (
+            <Badge variant="outline" className="h-5 px-2 text-xs bg-primary/5 text-primary border-primary/20">
+              {item.children.length}
+            </Badge>
+          )}
+          {item.userPreferences?.isFavorite && (
+            <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500 drop-shadow-sm" />
+          )}
+        </div>
+        
+        {item.href && (
+          <p className="text-xs text-muted-foreground/80 truncate mt-0.5 font-mono">
+            {item.href}
+          </p>
+        )}
+      </div>
+
+      {/* Toggle moderne */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={(e: React.MouseEvent) => {
+          e.stopPropagation()
+          e.preventDefault()
+          onToggleVisibility(item.id)
+        }}
+        onMouseDown={(e: React.MouseEvent) => e.stopPropagation()}
+        onPointerDown={(e: React.PointerEvent) => e.stopPropagation()}
+        className={cn(
+          'h-8 w-8 p-0 shrink-0 rounded-lg transition-all duration-200 ease-out',
+          'hover:scale-110 active:scale-95 hover:shadow-md',
+          item.isVisible
+            ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 bg-emerald-50/50 border border-emerald-200/50'
+            : 'text-muted-foreground hover:text-foreground hover:bg-accent border border-transparent hover:border-border'
+        )}
+      >
+        {item.isVisible ? (
+          <Eye className="h-4 w-4" />
+        ) : (
+          <EyeOff className="h-4 w-4" />
+        )}
+      </Button>
+    </div>
+  )
+}
+
+// Composant de carte pour l'organisation du menu
+function MenuOrderingCard() {
+  const { customMenu, standardMenu, currentMode, refreshMenu } = useDynamicMenu()
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [hasChanges, setHasChanges] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  // Convertir le menu en format compatible
+  const convertToMenuItems = (menu: any[]): MenuItem[] => {
+    return menu.map((item, index) => ({
+      id: item.id || `item-${index}`,
+      title: item.title,
+      href: item.href,
+      icon: item.icon,
+      gradient: item.gradient,
+      orderIndex: item.orderIndex ?? index,
+      isVisible: item.isVisible ?? true,
+      parentId: item.parentId,
+      children: item.children ? convertToMenuItems(item.children) : undefined,
+      userPreferences: item.userPreferences,
+    }))
+  }
+
+  // Charger le menu actuel
+  React.useEffect(() => {
+    const currentMenuData = currentMode === 'custom' ? customMenu : standardMenu
+    if (currentMenuData && currentMenuData.length > 0) {
+      const converted = convertToMenuItems(currentMenuData)
+      const sorted = [...converted].sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0))
+      setMenuItems(sorted)
+      setHasChanges(false)
+    }
+  }, [customMenu, standardMenu, currentMode])
+
+  // Gérer les changements d'ordre
+  const handleItemsChange = (newItems: MenuItem[]) => {
+    const updateOrderIndex = (items: MenuItem[], startIndex = 0): MenuItem[] => {
+      return items.map((item, index) => ({
+        ...item,
+        orderIndex: startIndex + index,
+        children: item.children ? updateOrderIndex(item.children, 0) : undefined
+      }))
+    }
+
+    const updatedItems = updateOrderIndex(newItems)
+    setMenuItems(updatedItems)
+    setHasChanges(true)
+  }
+
+  // Basculer la visibilité
+  const handleToggleVisibility = (id: string) => {
+    const toggleInItems = (items: MenuItem[]): MenuItem[] => {
+      return items.map((item) => {
+        if (item.id === id) {
+          return { ...item, isVisible: !item.isVisible }
+        }
+        if (item.children) {
+          return { ...item, children: toggleInItems(item.children) }
+        }
+        return item
+      })
+    }
+
+    const updatedItems = toggleInItems(menuItems)
+    setMenuItems(updatedItems)
+    setHasChanges(true)
+  }
+
+  // Sauvegarder
+  const handleSave = async (items: MenuItem[]) => {
+    setSaving(true)
+    try {
+      const menuData = items.map((item, index) => ({
+        id: item.id,
+        title: item.title,
+        href: item.href,
+        icon: item.icon,  
+        gradient: item.gradient,
+        orderIndex: index,
+        isVisible: item.isVisible,
+        parentId: item.parentId,
+        children: item.children || [],
+        userPreferences: item.userPreferences || {}
+      }))
+
+      const response = await fetch('/api/user/menu-preferences/menu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ menuItems: menuData }),
+      })
+
+      if (response.ok) {
+        setHasChanges(false)
+        await refreshMenu()
+      }
+    } catch (error) {
+      // Gérer l'erreur silencieusement
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (menuItems.length === 0) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center min-h-[300px]">
+          <div className="text-center text-muted-foreground">
+            <List className="h-8 w-8 mx-auto mb-3" />
+            <p>Aucun élément de menu à organiser</p>
+            <p className="text-sm mt-2">
+              Sélectionnez d'abord des pages dans l'onglet "Sélection des pages"
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Header moderne */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <GripVertical className="h-5 w-5 text-primary/70" />
+            Ordre d'affichage
+          </h2>
+          <div className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
+            <span>Glissez-déposez pour réorganiser • Mode:</span>
+            <Badge variant="outline">{currentMode === 'custom' ? 'Personnalisé' : 'Standard'}</Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* Alert moderne */}
+      {hasChanges && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-md text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-amber-500 rounded-full" />
+            Modifications non sauvegardées - Cliquez sur "Sauvegarder" pour les appliquer
+          </div>
+        </div>
+      )}
+
+      {/* Liste moderne */}
+      <div className="bg-card border border-border/50 rounded-lg p-4">
+        
+        <ReorderableList
+          items={menuItems}
+          onItemsChange={handleItemsChange}
+          onSave={handleSave}
+          renderItem={({ item }) => (
+            <MenuItemDisplay 
+              item={item} 
+              onToggleVisibility={handleToggleVisibility} 
+            />
+          )}
+        />
+      </div>
+    </div>
+  )
+}
 
 export default function MenuSettingsPage() {
   const { 
@@ -134,7 +418,7 @@ export default function MenuSettingsPage() {
             Personnalisation du Menu
           </h1>
           <p className="text-muted-foreground mt-2">
-            Sélectionnez les pages que vous souhaitez voir apparaître dans votre menu personnalisé
+            Personnalisez votre menu : sélectionnez les pages et organisez leur ordre d'affichage
           </p>
         </div>
         <div className="flex space-x-2">
@@ -164,7 +448,21 @@ export default function MenuSettingsPage() {
         </AlertDescription>
       </Alert>
 
-      <div className="grid gap-6 lg:grid-cols-12">
+      {/* Onglets pour les différentes vues */}
+      <Tabs defaultValue="selection" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="selection" className="flex items-center gap-2">
+            <List className="h-4 w-4" />
+            Sélection des pages
+          </TabsTrigger>
+          <TabsTrigger value="ordering" className="flex items-center gap-2">
+            <Palette className="h-4 w-4" />
+            Ordre d'affichage
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="selection" className="mt-6">
+          <div className="grid gap-6 lg:grid-cols-12">
         {/* Panneau de recherche et statistiques */}
         <div className="lg:col-span-4">
           <Card className="sticky top-4">
@@ -331,7 +629,13 @@ export default function MenuSettingsPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="ordering" className="mt-6">
+          <MenuOrderingCard />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

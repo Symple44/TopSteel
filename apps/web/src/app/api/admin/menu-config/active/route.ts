@@ -1,0 +1,193 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(request: NextRequest) {
+  try {
+    // Configuration du menu standard définie par les administrateurs
+    // Ce menu est identique pour tous les utilisateurs en mode standard
+    const standardMenuConfig = {
+      id: 'standard-config',
+      name: 'Configuration Standard',
+      description: 'Menu standard défini par les administrateurs',
+      isActive: true,
+      isSystem: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      items: [
+        {
+          id: 'dashboard',
+          parentId: null,
+          title: 'Tableau de bord',
+          titleKey: 'dashboard',
+          href: '/dashboard',
+          icon: 'Home',
+          gradient: 'from-blue-500 to-purple-600',
+          orderIndex: 0,
+          isVisible: true,
+          depth: 0,
+          children: []
+        },
+        {
+          id: 'query-builder',
+          parentId: null,
+          title: 'Query Builder',
+          href: '/query-builder',
+          icon: 'Search',
+          gradient: 'from-emerald-500 to-teal-600',
+          orderIndex: 1,
+          isVisible: true,
+          depth: 0,
+          children: []
+        },
+        {
+          id: 'administration',
+          parentId: null,
+          title: 'Configuration',
+          titleKey: 'configuration',
+          href: '/admin',
+          icon: 'Shield',
+          gradient: 'from-red-500 to-pink-600',
+          orderIndex: 2,
+          isVisible: true,
+          depth: 0,
+          roles: ['ADMIN'],
+          children: [
+            {
+              id: 'admin-company',
+              parentId: 'administration',
+              title: 'Société',
+              href: '/admin/company',
+              icon: 'Building2',
+              gradient: 'from-indigo-500 to-blue-600',
+              orderIndex: 0,
+              isVisible: true,
+              depth: 1,
+              roles: ['SUPER_ADMIN', 'ADMIN'],
+              children: []
+            },
+            {
+              id: 'admin-roles',
+              parentId: 'administration',
+              title: 'Rôles & Permissions',
+              href: '/admin/roles',
+              icon: 'Shield',
+              gradient: 'from-orange-500 to-red-600',
+              orderIndex: 1,
+              isVisible: true,
+              depth: 1,
+              roles: ['SUPER_ADMIN', 'ADMIN'],
+              children: []
+            },
+            {
+              id: 'admin-users',
+              parentId: 'administration',
+              title: 'Utilisateurs',
+              href: '/admin/users',
+              icon: 'Users',
+              gradient: 'from-green-500 to-emerald-600',
+              orderIndex: 2,
+              isVisible: true,
+              depth: 1,
+              roles: ['SUPER_ADMIN', 'ADMIN'],
+              children: []
+            },
+            {
+              id: 'admin-sessions',
+              parentId: 'administration',
+              title: 'Sessions Utilisateurs',
+              href: '/admin/sessions',
+              icon: 'Monitor',
+              gradient: 'from-cyan-500 to-teal-600',
+              orderIndex: 3,
+              isVisible: true,
+              depth: 1,
+              roles: ['SUPER_ADMIN', 'ADMIN'],
+              children: []
+            },
+            {
+              id: 'admin-translations',
+              parentId: 'administration',
+              title: 'Gestion des Traductions',
+              href: '/admin/translations',
+              icon: 'Languages',
+              gradient: 'from-emerald-500 to-green-600',
+              orderIndex: 4,
+              isVisible: true,
+              depth: 1,
+              roles: ['SUPER_ADMIN', 'ADMIN'],
+              children: []
+            },
+            {
+              id: 'admin-datatable-test',
+              parentId: 'administration',
+              title: 'Test DataTable',
+              href: '/admin/datatable-test',
+              icon: 'Table',
+              gradient: 'from-violet-500 to-purple-600',
+              orderIndex: 5,
+              isVisible: true,
+              depth: 1,
+              roles: ['SUPER_ADMIN', 'ADMIN'],
+              children: []
+            }
+          ]
+        },
+        {
+          id: 'settings',
+          parentId: null,
+          title: 'Paramètres',
+          href: '/settings',
+          icon: 'Settings',
+          gradient: 'from-gray-500 to-slate-600',
+          orderIndex: 3,
+          isVisible: true,
+          depth: 0,
+          children: [
+            {
+              id: 'settings-appearance',
+              parentId: 'settings',
+              title: 'Apparence',
+              href: '/settings/appearance',
+              icon: 'Palette',
+              gradient: 'from-pink-500 to-rose-600',
+              orderIndex: 0,
+              isVisible: true,
+              depth: 1,
+              children: []
+            },
+            {
+              id: 'settings-menu',
+              parentId: 'settings',
+              title: 'Menu',
+              href: '/settings/menu',
+              icon: 'Menu',
+              gradient: 'from-blue-500 to-indigo-600',
+              orderIndex: 1,
+              isVisible: true,
+              depth: 1,
+              children: []
+            }
+          ]
+        }
+      ]
+    }
+
+    const response = {
+      success: true,
+      data: standardMenuConfig,
+      message: 'Configuration de menu standard récupérée avec succès'
+    }
+
+    return NextResponse.json(response, { status: 200 })
+
+  } catch (error) {
+    console.error('Erreur lors du chargement de la configuration de menu standard:', error)
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Erreur lors du chargement de la configuration de menu',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    )
+  }
+}
