@@ -5,7 +5,7 @@ import { FacturationController } from './facturation.controller'
 import { FacturationService } from './facturation.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Facturation])],
+  imports: [TypeOrmModule.forFeature([Facturation], 'tenant')],
   controllers: [FacturationController],
   providers: [FacturationService],
   exports: [FacturationService],

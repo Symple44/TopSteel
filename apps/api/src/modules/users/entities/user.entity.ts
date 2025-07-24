@@ -3,10 +3,12 @@ import {
   BeforeInsert,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  VersionColumn,
 } from 'typeorm'
 
 export enum UserRole {
@@ -17,6 +19,7 @@ export enum UserRole {
   TECHNICIEN = 'TECHNICIEN',
   COMPTABLE = 'COMPTABLE',
   OPERATEUR = 'OPERATEUR',
+  USER = 'USER',
   VIEWER = 'VIEWER',
 }
 
@@ -55,11 +58,11 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   dernier_login?: Date
 
-  @Column({ type: 'integer', default: 1 })
+  @VersionColumn({ default: 1 })
   version!: number
 
-  @Column({ type: 'timestamp', nullable: true })
-  deleted_at?: Date
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  deletedAt?: Date
 
   @Column({ type: 'varchar', nullable: true })
   refreshToken?: string

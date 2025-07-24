@@ -5,7 +5,7 @@ import { TracabiliteController } from './tracabilite.controller'
 import { TracabiliteService } from './tracabilite.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Tracabilite])],
+  imports: [TypeOrmModule.forFeature([Tracabilite], 'tenant')],
   controllers: [TracabiliteController],
   providers: [TracabiliteService],
   exports: [TracabiliteService],

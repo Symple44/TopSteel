@@ -34,11 +34,11 @@ export interface GroupWithStats {
 @Injectable()
 export class GroupService {
   constructor(
-    @InjectRepository(Group)
+    @InjectRepository(Group, 'auth')
     private readonly groupRepository: Repository<Group>,
-    @InjectRepository(UserGroup)
+    @InjectRepository(UserGroup, 'auth')
     private readonly userGroupRepository: Repository<UserGroup>,
-    @InjectRepository(Role)
+    @InjectRepository(Role, 'auth')
     private readonly roleRepository: Repository<Role>,
   ) {}
 

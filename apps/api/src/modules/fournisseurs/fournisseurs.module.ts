@@ -5,7 +5,7 @@ import { FournisseursController } from './fournisseurs.controller'
 import { FournisseursService } from './fournisseurs.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Fournisseur])],
+  imports: [TypeOrmModule.forFeature([Fournisseur], 'tenant')],
   controllers: [FournisseursController],
   providers: [FournisseursService],
   exports: [FournisseursService],

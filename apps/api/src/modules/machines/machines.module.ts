@@ -5,7 +5,7 @@ import { MachinesController } from './machines.controller'
 import { MachinesService } from './machines.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Machine])],
+  imports: [TypeOrmModule.forFeature([Machine], 'tenant')],
   controllers: [MachinesController],
   providers: [MachinesService],
   exports: [MachinesService],

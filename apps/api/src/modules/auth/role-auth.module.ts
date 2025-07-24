@@ -36,7 +36,7 @@ import { GroupController } from './controllers/group.controller'
       UserRole,
       Group,
       UserGroup
-    ]),
+    ], 'auth'),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'your-secret-key',

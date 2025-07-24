@@ -5,9 +5,12 @@ import { PassportModule } from '@nestjs/passport'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from '../users/entities/user.entity'
 import { UsersModule } from '../users/users.module'
+import { SocietesModule } from '../societes/societes.module'
+import { DatabaseMultiTenantModule } from '../database/database-multi-tenant.module'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { RolesGuard } from './guards/roles.guard'
+import { TenantGuard } from './guards/tenant.guard'
 import { JwtUtilsService } from './services/jwt-utils.service'
 import { SessionInvalidationService } from './services/session-invalidation.service'
 import { SessionRedisService } from './services/session-redis.service'
@@ -26,6 +29,7 @@ import { LocalStrategy } from './strategies/local.strategy'
 @Module({
   imports: [
     ConfigModule,
+    DatabaseMultiTenantModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -49,8 +53,9 @@ import { LocalStrategy } from './strategies/local.strategy'
       },
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([UserSession, UserMFA, MFASession]),
+    // Les entités sont déjà déclarées dans DatabaseMultiTenantModule
     UsersModule,
+    SocietesModule,
   ],
   controllers: [AuthController, SessionsController, MFAController],
   providers: [
@@ -64,7 +69,8 @@ import { LocalStrategy } from './strategies/local.strategy'
     TOTPService,
     WebAuthnService,
     MFAService,
-    RolesGuard
+    RolesGuard,
+    TenantGuard
   ],
   exports: [
     AuthService, 
@@ -75,7 +81,8 @@ import { LocalStrategy } from './strategies/local.strategy'
     TOTPService,
     WebAuthnService,
     MFAService,
-    RolesGuard
+    RolesGuard,
+    TenantGuard
   ],
 })
 export class AuthModule {}

@@ -10,7 +10,7 @@ import { Clients } from './entities/clients.entity'
 @Injectable()
 export class ClientsService {
   constructor(
-    @InjectRepository(Clients)
+    @InjectRepository(Clients, 'tenant')
     private readonly repository: Repository<Clients>
   ) {}
 

@@ -31,7 +31,29 @@
     "db:check": "ts-node src/scripts/check-database.ts",
     "db:reset": "ts-node src/scripts/reset-database.ts",
     "db:reset:force": "ts-node src/scripts/reset-database.ts --force",
-    "db:force-cleanup": "ts-node src/scripts/force-cleanup-index.ts"
+    "db:force-cleanup": "ts-node src/scripts/force-cleanup-index.ts",
+    
+    "migration:auth:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source-auth.ts",
+    "migration:shared:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source-shared.ts",
+    "migration:tenant:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source-tenant.ts",
+    
+    "db:backup": "ts-node src/scripts/migration/backup-current-database.ts",
+    "db:audit": "ts-node src/scripts/migration/audit-current-data.ts",
+    "db:clean": "ts-node src/scripts/migration/clean-test-data.ts",
+    "db:clean:execute": "ts-node src/scripts/migration/clean-test-data.ts --execute",
+    "db:migrate": "ts-node src/scripts/migration/migration-service.ts",
+    "db:rollback": "ts-node src/scripts/migration/rollback-migration.ts --force",
+    "db:rollback:validate": "ts-node src/scripts/migration/rollback-migration.ts --validate",
+    "db:migration:dry-run": "ts-node src/scripts/migration/dry-run-migration.ts",
+    "db:validate:integrity": "ts-node src/scripts/migration/validate-migration-integrity.ts",
+    "db:test:migration": "ts-node src/scripts/migration/test-migration-on-copy.ts",
+    "db:test:migration:keep": "ts-node src/scripts/migration/test-migration-on-copy.ts --keep-test-dbs",
+    "db:identify:orphans": "ts-node src/scripts/migration/identify-orphaned-data.ts",
+    "db:migrate:entities": "ts-node src/scripts/migration/migrate-business-entities.ts",
+    "db:migrate:entities:dry-run": "ts-node src/scripts/migration/migrate-business-entities.ts --dry-run",
+    "db:migrate:entities:remove": "ts-node src/scripts/migration/migrate-business-entities.ts --remove-from-main",
+    "db:test:topsteel": "ts-node src/scripts/migration/test-with-topsteel-prefix.ts",
+    "db:test:topsteel:keep": "ts-node src/scripts/migration/test-with-topsteel-prefix.ts --keep-databases"
   },
   "dependencies": {
     "@azure/identity": "^4.10.2",

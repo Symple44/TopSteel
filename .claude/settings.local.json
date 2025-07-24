@@ -117,7 +117,18 @@
       "Bash(ts-node:*)",
       "Bash(echo:*)",
       "Bash(head:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npx eslint:*)",
+      "Bash(start cmd /c \"npm run start:prod\")",
+      "Bash(set NODE_ENV=production)",
+      "Bash(net start:*)",
+      "Bash(sc query:*)",
+      "Bash(sc start:*)",
+      "Bash(start /B npm run start:prod)",
+      "Bash(PORT=3010 timeout 15 node dist/main.js)",
+      "Bash(start:*)",
+      "Bash(PORT=3006 npm run start:prod)",
+      "Bash(PORT=3007 npm start)"
     ],
     "deny": []
   }

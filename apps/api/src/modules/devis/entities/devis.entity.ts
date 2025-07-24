@@ -2,7 +2,7 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm
 import { BaseAuditEntity } from '../../../common/base/base.entity'
 import { Clients } from '../../clients/entities/clients.entity'
 import { Projet } from '../../projets/entities/projet.entity'
-import { User } from '../../users/entities/user.entity'
+// Note: User est dans AUTH database - pas de relation directe possible
 import { LigneDevis } from './ligne-devis.entity'
 
 export enum DevisStatut {
@@ -91,9 +91,8 @@ export class Devis extends BaseAuditEntity {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: Record<string, any>
 
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'commercialId' })
-  commercial?: User
+  // commercial: User - Relation cross-database gérée manuellement via commercialId
+  // Utiliser un service pour récupérer les données User depuis la base AUTH
 
   @OneToMany(
     () => LigneDevis,

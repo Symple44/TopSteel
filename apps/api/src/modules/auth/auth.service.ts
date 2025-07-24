@@ -14,9 +14,11 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { UsersService } from '../users/users.service'
 import { UserRole } from '../users/entities/user.entity'
+import { SocietesService } from '../societes/services/societes.service'
+import { SocieteUsersService } from '../societes/services/societe-users.service'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
-import { JwtPayload } from './interfaces/jwt-payload.interface'
+import { JwtPayload, MultiTenantJwtPayload } from './interfaces/jwt-payload.interface'
 import { SessionRedisService } from './services/session-redis.service'
 import { GeolocationService } from './services/geolocation.service'
 import { MFAService } from './services/mfa.service'
@@ -31,7 +33,9 @@ export class AuthService {
     private readonly sessionRedisService: SessionRedisService,
     private readonly geolocationService: GeolocationService,
     private readonly mfaService: MFAService,
-    @InjectRepository(UserSession)
+    private readonly societesService: SocietesService,
+    private readonly societeUsersService: SocieteUsersService,
+    @InjectRepository(UserSession, 'auth')
     private readonly userSessionRepository: Repository<UserSession>
   ) {}
 
@@ -69,6 +73,123 @@ export class AuthService {
 
     // Procéder avec la connexion normale si pas de MFA
     return await this.completeLogin(user, request)
+  }
+
+  /**
+   * Récupérer les sociétés disponibles pour un utilisateur
+   */
+  async getUserSocietes(userId: string) {
+    const userSocietes = await this.societeUsersService.findByUser(userId)
+    
+    return userSocietes.map(us => ({
+      id: us.societe.id,
+      nom: us.societe.nom,
+      code: us.societe.code,
+      role: us.role,
+      isDefault: us.isDefault,
+      permissions: us.permissions,
+      sites: us.societe.sites?.map(site => ({
+        id: site.id,
+        nom: site.nom,
+        code: site.code,
+        isPrincipal: site.isPrincipal
+      })) || []
+    }))
+  }
+
+  /**
+   * Login avec sélection de société
+   */
+  async loginWithSociete(userId: string, societeId: string, siteId?: string, request?: any) {
+    // Vérifier que l'utilisateur a accès à cette société
+    const userSociete = await this.societeUsersService.findUserSociete(userId, societeId)
+    if (!userSociete || !userSociete.actif) {
+      throw new UnauthorizedException('Accès non autorisé à cette société')
+    }
+
+    // Récupérer les informations complètes de l'utilisateur
+    const user = await this.usersService.findById(userId)
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur non trouvé')
+    }
+
+    // Générer un ID de session unique
+    const sessionId = uuidv4()
+
+    // Créer le payload multi-tenant
+    const payload: MultiTenantJwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      sessionId,
+      societeId: userSociete.societeId,
+      societeCode: userSociete.societe.code,
+      siteId: siteId,
+      permissions: userSociete.permissions,
+      tenantDatabase: userSociete.societe.databaseName
+    }
+
+    const accessToken = await this.generateAccessToken(payload)
+    const refreshToken = await this.generateRefreshToken(payload)
+
+    // Mettre à jour l'activité utilisateur
+    await this.usersService.updateRefreshToken(user.id, refreshToken)
+    await this.usersService.updateLastLogin(user.id)
+    await this.societeUsersService.updateLastActivity(userId, societeId)
+
+    // Extraire les informations de la requête pour le tracking
+    let ipAddress = '0.0.0.0'
+    let userAgent = 'Unknown'
+    let location: any = null
+    let deviceInfo: any = null
+
+    if (request) {
+      ipAddress = this.geolocationService.extractRealIP(request)
+      userAgent = request.headers['user-agent'] || 'Unknown'
+      location = await this.geolocationService.getLocationFromIP(ipAddress)
+      deviceInfo = this.geolocationService.parseUserAgent(userAgent)
+    }
+
+    // Créer la session en base de données
+    const dbSession = UserSession.createNew(
+      user.id,
+      sessionId,
+      accessToken,
+      ipAddress,
+      userAgent,
+      refreshToken
+    )
+    
+    if (location) {
+      dbSession.location = location
+    }
+    if (deviceInfo) {
+      dbSession.deviceInfo = deviceInfo
+    }
+
+    await this.userSessionRepository.save(dbSession)
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        nom: user.nom,
+        prenom: user.prenom,
+        role: user.role,
+        societe: {
+          id: userSociete.societe.id,
+          nom: userSociete.societe.nom,
+          code: userSociete.societe.code,
+          databaseName: userSociete.societe.databaseName
+        },
+        permissions: userSociete.permissions
+      },
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
+      sessionId,
+    }
   }
 
   /**

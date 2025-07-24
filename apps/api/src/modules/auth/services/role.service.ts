@@ -40,15 +40,15 @@ export interface RoleWithStats {
 @Injectable()
 export class RoleService {
   constructor(
-    @InjectRepository(Role)
+    @InjectRepository(Role, 'auth')
     private readonly roleRepository: Repository<Role>,
-    @InjectRepository(RolePermission)
+    @InjectRepository(RolePermission, 'auth')
     private readonly rolePermissionRepository: Repository<RolePermission>,
-    @InjectRepository(UserRole)
+    @InjectRepository(UserRole, 'auth')
     private readonly userRoleRepository: Repository<UserRole>,
-    @InjectRepository(Permission)
+    @InjectRepository(Permission, 'auth')
     private readonly permissionRepository: Repository<Permission>,
-    @InjectRepository(Module)
+    @InjectRepository(Module, 'auth')
     private readonly moduleRepository: Repository<Module>,
   ) {}
 

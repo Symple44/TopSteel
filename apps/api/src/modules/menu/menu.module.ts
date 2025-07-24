@@ -8,7 +8,7 @@ import { UserMenuPreferenceController } from './controllers/user-menu-preference
 import { AvailablePagesController } from './controllers/available-pages.controller'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserMenuPreference, DiscoveredPage])],
+  imports: [TypeOrmModule.forFeature([UserMenuPreference, DiscoveredPage], 'auth')],
   controllers: [UserMenuPreferenceController, AvailablePagesController],
   providers: [UserMenuPreferenceService, PageSyncService],
   exports: [UserMenuPreferenceService, PageSyncService],

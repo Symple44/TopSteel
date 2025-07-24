@@ -5,7 +5,7 @@ import { MaintenanceController } from './maintenance.controller'
 import { MaintenanceService } from './maintenance.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Maintenance])],
+  imports: [TypeOrmModule.forFeature([Maintenance], 'tenant')],
   controllers: [MaintenanceController],
   providers: [MaintenanceService],
   exports: [MaintenanceService],

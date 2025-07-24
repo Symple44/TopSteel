@@ -45,7 +45,7 @@ import { UsersModule } from '../users/users.module'
       UserMenuPreferences,
       UserMenuItemPreference,
       DiscoveredPage
-    ])
+    ], 'auth')
   ],
   controllers: [
     SystemParametersController,

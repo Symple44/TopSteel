@@ -5,7 +5,7 @@ import { QualiteController } from './qualite.controller'
 import { QualiteService } from './qualite.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Qualite])],
+  imports: [TypeOrmModule.forFeature([Qualite], 'tenant')],
   controllers: [QualiteController],
   providers: [QualiteService],
   exports: [QualiteService],

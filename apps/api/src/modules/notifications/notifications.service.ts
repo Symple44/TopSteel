@@ -10,7 +10,7 @@ import { Notifications } from './entities/notifications.entity'
 @Injectable()
 export class NotificationsService {
   constructor(
-    @InjectRepository(Notifications)
+    @InjectRepository(Notifications, 'auth')
     private readonly repository: Repository<Notifications>
   ) {}
 

@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule'
 import { TerminusModule } from '@nestjs/terminus'
 // Controllers
 import { AppController } from './app.controller'
+import { TestController } from './test.controller'
 import { AppService } from './app.service'
 // Middleware
 import { LoggerMiddleware } from './common/middleware/logger.middleware'
@@ -14,7 +15,8 @@ import { databaseConfig } from './config/database.config'
 import { jwtConfig } from './config/jwt.config'
 import { redisConfig } from './config/redis.config'
 // Modules système
-import { DatabaseProductionModule } from './database/database-production.module'
+// import { DatabaseProductionModule } from './database/database-production.module'
+import { DatabaseMultiTenantModule } from './modules/database/database-multi-tenant.module'
 import { HealthController } from './health/health.controller'
 import { IntegrityService } from './health/integrity.service'
 // Module d'authentification
@@ -44,8 +46,11 @@ import { MenuModule } from './modules/menu/menu.module'
 import { QueryBuilderModule } from './modules/query-builder/query-builder.module'
 import { UiPreferencesModule } from './modules/ui-preferences.module'
 import { RedisModule } from './redis/redis.module'
-// Service d'initialisation - remplacé par DatabaseStartupService dans DatabaseProductionModule
-// import { DatabaseInitService } from './services/database-init.service'
+// Modules multi-tenant
+import { SocietesModule } from './modules/societes/societes.module'
+import { SharedModule } from './modules/shared/shared.module'
+// Service d'initialisation automatique
+import { DatabaseStartupService } from './services/database-startup.service'
 
 @Module({
   imports: [
@@ -57,42 +62,47 @@ import { RedisModule } from './redis/redis.module'
     }),
 
     // Modules système
-    DatabaseProductionModule,
+    DatabaseMultiTenantModule,
+    // DatabaseProductionModule,
     ScheduleModule.forRoot(),
     TerminusModule,
     RedisModule.forRoot(),
 
     // Authentification
-    AuthModule,
-    RoleAuthModule,
+    // AuthModule,
+    // RoleAuthModule,
 
     // Administration
-    AdminModule,
+    // AdminModule,
+
+    // Modules multi-tenant
+    SocietesModule,
+    SharedModule,
 
     // Modules métier
-    ClientsModule,
-    DevisModule,
-    DocumentsModule,
-    FacturationModule,
-    FournisseursModule,
-    NotificationsModule,
-    ProductionModule,
-    ProjetsModule,
-    StocksModule,
+    // ClientsModule,
+    // DevisModule,
+    // DocumentsModule,
+    // FacturationModule,
+    // FournisseursModule,
+    // NotificationsModule,
+    // ProductionModule,
+    // ProjetsModule,
+    // StocksModule,
     UsersModule,
-    MenuModule,
-    QueryBuilderModule,
-    UiPreferencesModule,
-    MachinesModule,
-    MaintenanceModule,
-    MateriauxModule,
-    PlanningModule,
-    QualiteModule,
-    TracabiliteModule,
-    CommandesModule,
+    // MenuModule,
+    // QueryBuilderModule,
+    // UiPreferencesModule,
+    // MachinesModule,
+    // MaintenanceModule,
+    // MateriauxModule,
+    // PlanningModule,
+    // QualiteModule,
+    // TracabiliteModule,
+    // CommandesModule,
   ],
-  controllers: [AppController, HealthController],
-  providers: [AppService, IntegrityService],
+  controllers: [AppController, TestController /*, HealthController*/],
+  providers: [AppService, /*IntegrityService,*/ DatabaseStartupService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

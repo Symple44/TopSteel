@@ -22,9 +22,9 @@ export class NotificationRuleEngineService {
   private readonly logger = new Logger(NotificationRuleEngineService.name)
 
   constructor(
-    @InjectRepository(NotificationRule)
+    @InjectRepository(NotificationRule, 'shared')
     private readonly ruleRepository: Repository<NotificationRule>,
-    @InjectRepository(Notifications)
+    @InjectRepository(Notifications, 'auth')
     private readonly notificationRepository: Repository<Notifications>,
     private readonly ruleService: NotificationRuleService,
   ) {}

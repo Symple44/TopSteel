@@ -5,7 +5,7 @@ import { PlanningController } from './planning.controller'
 import { PlanningService } from './planning.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Planning])],
+  imports: [TypeOrmModule.forFeature([Planning], 'tenant')],
   controllers: [PlanningController],
   providers: [PlanningService],
   exports: [PlanningService],

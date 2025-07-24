@@ -5,7 +5,7 @@ import { ProjetsController } from './projets.controller'
 import { ProjetsService } from './projets.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Projet])],
+  imports: [TypeOrmModule.forFeature([Projet], 'tenant')],
   controllers: [ProjetsController],
   providers: [ProjetsService],
   exports: [ProjetsService],

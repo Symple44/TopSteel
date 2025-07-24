@@ -33,9 +33,9 @@ export class MFAService {
   private readonly logger = new Logger(MFAService.name)
 
   constructor(
-    @InjectRepository(UserMFA)
+    @InjectRepository(UserMFA, 'auth')
     private readonly userMFARepository: Repository<UserMFA>,
-    @InjectRepository(MFASession)
+    @InjectRepository(MFASession, 'auth')
     private readonly mfaSessionRepository: Repository<MFASession>,
     private readonly totpService: TOTPService,
     private readonly webauthnService: WebAuthnService,

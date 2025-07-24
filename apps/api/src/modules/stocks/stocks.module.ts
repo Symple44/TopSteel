@@ -8,7 +8,7 @@ import { StocksController } from './stocks.controller'
 import { StocksService } from './stocks.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Stocks, Produit])],
+  imports: [TypeOrmModule.forFeature([Stocks, Produit], 'tenant')],
   controllers: [StocksController, ProduitsController],
   providers: [StocksService, ProduitsService],
   exports: [StocksService, ProduitsService],

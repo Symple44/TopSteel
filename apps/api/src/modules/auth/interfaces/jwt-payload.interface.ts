@@ -7,6 +7,14 @@ export interface JwtPayload {
   exp?: number
 }
 
+export interface MultiTenantJwtPayload extends JwtPayload {
+  societeId?: string
+  societeCode?: string
+  siteId?: string
+  permissions?: string[]
+  tenantDatabase?: string
+}
+
 export interface ExtendedJwtPayload extends JwtPayload {
   iss?: string
   aud?: string

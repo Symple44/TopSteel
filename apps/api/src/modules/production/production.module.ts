@@ -11,7 +11,7 @@ import { ProductionController } from './production.controller'
 import { ProductionService } from './production.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Production, OrdreFabrication, Operation])],
+  imports: [TypeOrmModule.forFeature([Production, OrdreFabrication, Operation], 'tenant')],
   controllers: [ProductionController, OrdreFabricationController, OperationController],
   providers: [ProductionService, OrdreFabricationService, OperationService],
   exports: [ProductionService, OrdreFabricationService, OperationService],

@@ -5,7 +5,7 @@ import { DevisService } from './devis.service'
 import { Devis } from './entities/devis.entity'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Devis])],
+  imports: [TypeOrmModule.forFeature([Devis], 'tenant')],
   controllers: [DevisController],
   providers: [DevisService],
   exports: [DevisService],

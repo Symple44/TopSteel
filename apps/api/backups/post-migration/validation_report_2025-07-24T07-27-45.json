@@ -1,0 +1,148 @@
+{
+  "timestamp": "2025-07-24T07:27:45.168Z",
+  "summary": {
+    "total": 17,
+    "passed": 16,
+    "warnings": 0,
+    "failed": 1
+  },
+  "checks": [
+    {
+      "name": "DB_AUTH",
+      "description": "Base AUTH existe",
+      "status": "PASS",
+      "details": {
+        "name": "topsteel_test_auth_2025-07-24T07-27-42"
+      }
+    },
+    {
+      "name": "DB_SHARED",
+      "description": "Base SHARED existe",
+      "status": "PASS",
+      "details": {
+        "name": "topsteel_test_shared_2025-07-24T07-27-42"
+      }
+    },
+    {
+      "name": "DB_TENANT",
+      "description": "Base TENANT existe",
+      "status": "PASS",
+      "details": {
+        "name": "erp_topsteel_topsteel"
+      }
+    },
+    {
+      "name": "USER_MIGRATION",
+      "description": "Utilisateurs migrés vers AUTH",
+      "status": "PASS",
+      "details": {
+        "count": "1"
+      }
+    },
+    {
+      "name": "USER_DATA",
+      "description": "Intégrité des données utilisateur",
+      "status": "PASS",
+      "details": {
+        "sample": 1
+      }
+    },
+    {
+      "name": "DEFAULT_COMPANY",
+      "description": "Société TopSteel créée",
+      "status": "PASS",
+      "details": {
+        "id": "f0d3fbd5-25f1-47b4-bd9d-0aa877bea760",
+        "nom": "TopSteel",
+        "code": "TOPSTEEL",
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "name": "DEFAULT_SITE",
+      "description": "Site principal créé",
+      "status": "PASS",
+      "details": {
+        "site": "Site Principal TopSteel"
+      }
+    },
+    {
+      "name": "USER_SOCIETE",
+      "description": "Aucune association trouvée",
+      "status": "FAIL"
+    },
+    {
+      "name": "TENANT_CLIENTS",
+      "description": "Table clients migrée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    },
+    {
+      "name": "TENANT_FOURNISSEURS",
+      "description": "Table fournisseurs migrée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    },
+    {
+      "name": "TENANT_MATERIAUX",
+      "description": "Table materiaux migrée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    },
+    {
+      "name": "TENANT_STOCKS",
+      "description": "Table stocks migrée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    },
+    {
+      "name": "TENANT_COMMANDES",
+      "description": "Table commandes migrée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    },
+    {
+      "name": "SHARED_SHARED_MATERIALS",
+      "description": "Table shared_materials créée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    },
+    {
+      "name": "SHARED_SHARED_SUPPLIERS",
+      "description": "Table shared_suppliers créée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    },
+    {
+      "name": "SHARED_SHARED_PROCESSES",
+      "description": "Table shared_processes créée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    },
+    {
+      "name": "SHARED_SHARED_QUALITY_STANDARDS",
+      "description": "Table shared_quality_standards créée",
+      "status": "PASS",
+      "details": {
+        "count": "0"
+      }
+    }
+  ],
+  "conclusion": "MIGRATION_ISSUES"
+}

@@ -8,7 +8,7 @@ export class SessionInvalidationService implements OnModuleInit {
   private readonly logger = new Logger(SessionInvalidationService.name)
 
   constructor(
-    @InjectRepository(User)
+    @InjectRepository(User, 'auth')
     private readonly userRepository: Repository<User>
   ) {}
 

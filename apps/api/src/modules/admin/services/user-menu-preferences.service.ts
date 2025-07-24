@@ -50,9 +50,9 @@ export interface UserMenuWithPreferences extends MenuTreeNode {
 @Injectable()
 export class UserMenuPreferencesService {
   constructor(
-    @InjectRepository(UserMenuPreferences)
+    @InjectRepository(UserMenuPreferences, 'auth')
     private readonly preferencesRepository: Repository<UserMenuPreferences>,
-    @InjectRepository(UserMenuItemPreference)
+    @InjectRepository(UserMenuItemPreference, 'auth')
     private readonly itemPreferencesRepository: Repository<UserMenuItemPreference>,
     private readonly menuConfigService: MenuConfigurationService
   ) {}

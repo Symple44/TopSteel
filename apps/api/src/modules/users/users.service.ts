@@ -12,9 +12,9 @@ import { UserSettings } from './entities/user-settings.entity'
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
+    @InjectRepository(User, 'auth')
     private readonly repository: Repository<User>,
-    @InjectRepository(UserSettings)
+    @InjectRepository(UserSettings, 'auth')
     private readonly userSettingsRepository: Repository<UserSettings>,
   ) {}
 

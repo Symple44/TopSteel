@@ -107,7 +107,13 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
         purple: '270 20% 98%',
         orange: '45 20% 15%', // Texte sombre pour orange
         pink: '340 20% 98%',
-        red: '0 20% 98%'
+        red: '0 20% 98%',
+        teal: '173 20% 98%',
+        indigo: '239 20% 98%',
+        yellow: '48 20% 15%', // Texte sombre pour jaune
+        emerald: '160 20% 98%',
+        rose: '330 20% 98%',
+        cyan: '188 20% 15%' // Texte sombre pour cyan
       }
       
       root.style.setProperty('--primary-foreground', luminosityMap[newSettings.accentColor] || '0 0% 98%')

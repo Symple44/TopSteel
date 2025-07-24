@@ -18,7 +18,7 @@ import { RolesGuard } from '../guards/roles.guard'
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ModuleController {
   constructor(
-    @InjectRepository(Module)
+    @InjectRepository(Module, 'auth')
     private readonly moduleRepository: Repository<Module>
   ) {}
 

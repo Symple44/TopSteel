@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { Clients } from '../../clients/entities/clients.entity'
-import { User } from '../../users/entities/user.entity'
+// Note: User est dans AUTH database - pas de relation directe possible
 
 export enum ProjetStatut {
   BROUILLON = 'brouillon',
@@ -47,8 +47,8 @@ export class Projet {
   @Column({ type: 'int', nullable: true })
   clientId?: number
 
-  @Column({ type: 'int', nullable: true })
-  responsableId?: number
+  @Column({ type: 'uuid', nullable: true })
+  responsableId?: string
 
   @CreateDateColumn()
   createdAt!: Date
@@ -60,7 +60,6 @@ export class Projet {
   @JoinColumn({ name: 'clientId' })
   client?: Clients
 
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'responsableId' })
-  responsable?: User
+  // responsable: User - Relation cross-database gérée manuellement via responsableId
+  // Utiliser un service pour récupérer les données User depuis la base AUTH
 }

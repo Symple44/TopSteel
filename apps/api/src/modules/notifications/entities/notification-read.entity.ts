@@ -5,11 +5,11 @@ import { Notifications } from './notifications.entity'
 @Entity('notification_reads')
 @Unique(['notificationId', 'userId'])
 export class NotificationRead extends BaseAuditEntity {
-  @Column({ type: 'varchar', length: 36 })
+  @Column({ type: 'uuid' })
   @Index()
   notificationId!: string
 
-  @Column({ type: 'varchar', length: 36 })
+  @Column({ type: 'uuid' })
   @Index()
   userId!: string
 

@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm'
-import { BaseAuditEntity } from '../../../common/base/base.entity'
+import { CommonEntity } from '../../../database/entities/base/multi-tenant.entity'
 
 export enum NotificationType {
   INFO = 'info',
@@ -35,7 +35,7 @@ export enum RecipientType {
 }
 
 @Entity('notifications')
-export class Notifications extends BaseAuditEntity {
+export class Notifications extends CommonEntity {
   @Column({ type: 'varchar', length: 255 })
   @Index()
   title!: string

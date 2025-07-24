@@ -8,7 +8,7 @@ export class UserMenuPreferenceService {
   private readonly logger = new Logger(UserMenuPreferenceService.name)
 
   constructor(
-    @InjectRepository(UserMenuPreference)
+    @InjectRepository(UserMenuPreference, 'auth')
     private readonly userMenuPreferenceRepository: Repository<UserMenuPreference>,
   ) {}
 

@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm'
-import { BaseAuditEntity } from '../../../common/base/base.entity'
+import { CommonEntity } from '../../../database/entities/base/multi-tenant.entity'
 
 interface CategorySettings {
   system: boolean
@@ -33,7 +33,7 @@ interface ScheduleSettings {
 }
 
 @Entity('notification_settings')
-export class NotificationSettings extends BaseAuditEntity {
+export class NotificationSettings extends CommonEntity {
   @Column({ type: 'varchar', length: 36, unique: true })
   @Index()
   userId!: string

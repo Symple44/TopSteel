@@ -5,7 +5,7 @@ import { MateriauxController } from './materiaux.controller'
 import { MateriauxService } from './materiaux.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Materiaux])],
+  imports: [TypeOrmModule.forFeature([Materiaux], 'tenant')],
   controllers: [MateriauxController],
   providers: [MateriauxService],
   exports: [MateriauxService],

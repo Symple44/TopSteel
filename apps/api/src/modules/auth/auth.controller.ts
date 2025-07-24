@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, Req, Param } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { Public } from '../../common/decorators/public.decorator'
@@ -125,6 +125,34 @@ export class AuthController {
   })
   async verify(@CurrentUser() user: User) {
     return this.authService.getProfile(user.id)
+  }
+
+  @Get('societes')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Récupérer les sociétés disponibles',
+    description: 'Obtenir la liste des sociétés auxquelles l\'utilisateur a accès',
+  })
+  async getUserSocietes(@CurrentUser() user: User) {
+    return this.authService.getUserSocietes(user.id)
+  }
+
+  @Post('login-societe/:societeId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Se connecter à une société spécifique',
+    description: 'Établir la session avec une société et obtenir un token multi-tenant',
+  })
+  async loginWithSociete(
+    @CurrentUser() user: User,
+    @Param('societeId') societeId: string,
+    @Body() body: { siteId?: string },
+    @Req() request: any
+  ) {
+    return this.authService.loginWithSociete(user.id, societeId, body.siteId, request)
   }
 
   @Post('admin/invalidate-all-sessions')

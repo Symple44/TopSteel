@@ -6,7 +6,7 @@ import { CommandesService } from './commandes.service'
 import { Commande } from './entities/commande.entity'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Commande])],
+  imports: [TypeOrmModule.forFeature([Commande], 'tenant')],
   controllers: [CommandesController],
   providers: [CommandesService],
   exports: [CommandesService],
