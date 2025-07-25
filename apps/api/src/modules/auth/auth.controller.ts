@@ -155,6 +155,21 @@ export class AuthController {
     return this.authService.loginWithSociete(user.id, societeId, body.siteId, request)
   }
 
+  @Post('societe-default/:societeId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Définir une société par défaut',
+    description: 'Définir une société comme société par défaut pour l\'utilisateur',
+  })
+  async setDefaultSociete(
+    @CurrentUser() user: User,
+    @Param('societeId') societeId: string
+  ) {
+    return this.authService.setDefaultSociete(user.id, societeId)
+  }
+
   @Post('admin/invalidate-all-sessions')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')

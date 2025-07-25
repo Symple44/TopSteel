@@ -2,13 +2,13 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { UserRole } from './user-role.entity'
 import { RolePermission } from './role-permission.entity'
 
-@Entity('roles')
+@Entity('roles', { schema: 'public' })
 @Index(['name'], { unique: true })
 export class Role {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ type: 'varchar', length: 100, unique: true })
+  @Column({ type: 'varchar', length: 100, unique: true, name: 'nom' })
   name!: string
 
   @Column({ type: 'text' })
@@ -18,24 +18,15 @@ export class Role {
   @Index()
   isSystemRole!: boolean
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: true, name: 'actif' })
   @Index()
   isActive!: boolean
 
-  @Column({ type: 'json', nullable: true })
-  metadata?: Record<string, any>
-
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date
-
-  @Column({ type: 'uuid', nullable: true })
-  createdBy?: string
-
-  @Column({ type: 'uuid', nullable: true })
-  updatedBy?: string
 
   // Relations
   @OneToMany(() => UserRole, userRole => userRole.role)
@@ -54,13 +45,12 @@ export class Role {
     return role
   }
 
-  static createCustomRole(name: string, description: string, createdBy: string): Role {
+  static createCustomRole(name: string, description: string): Role {
     const role = new Role()
     role.name = name
     role.description = description
     role.isSystemRole = false
     role.isActive = true
-    role.createdBy = createdBy
     return role
   }
 

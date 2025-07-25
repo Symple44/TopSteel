@@ -16,7 +16,7 @@ export class Site extends CommonEntity {
   societeId!: string
 
   @ManyToOne(() => Societe, societe => societe.sites)
-  @JoinColumn({ name: 'societe_id' })
+  @JoinColumn({ name: 'societeId' })
   societe!: Societe
 
   @Column({ type: 'varchar', length: 255 })

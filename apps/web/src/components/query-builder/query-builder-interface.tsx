@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { Button } from '@/components/ui/button'
 import { Save, Play, Settings, Download, Eye } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'

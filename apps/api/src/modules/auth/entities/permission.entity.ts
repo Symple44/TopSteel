@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, Index } from 'typeorm'
-import { Module } from './module.entity'
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, Index } from 'typeorm'
 import { RolePermission } from './role-permission.entity'
 
 export enum AccessLevel {
@@ -10,48 +9,28 @@ export enum AccessLevel {
   ADMIN = 'ADMIN'
 }
 
-@Entity('permissions')
-@Index(['moduleId', 'action'], { unique: true })
+@Entity('permissions', { schema: 'public' })
 export class Permission {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'varchar', length: 50, name: 'module' })
   @Index()
   moduleId!: string
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 50 })
   action!: string
 
-  @Column({ type: 'varchar', length: 200 })
+  @Column({ type: 'varchar', length: 100, name: 'nom' })
   name!: string
 
   @Column({ type: 'text' })
   description!: string
 
-  @Column({ type: 'enum', enum: AccessLevel, default: AccessLevel.READ })
-  level!: AccessLevel
-
-  @Column({ type: 'boolean', default: false })
-  isRequired!: boolean
-
-  @Column({ type: 'json', nullable: true })
-  conditions?: Record<string, any>
-
-  @Column({ type: 'json', nullable: true })
-  metadata?: Record<string, any>
-
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
 
-  @UpdateDateColumn()
-  updatedAt!: Date
-
   // Relations
-  @ManyToOne(() => Module, module => module.permissions)
-  @JoinColumn({ name: 'moduleId' })
-  module!: Module
-
   @OneToMany(() => RolePermission, rolePermission => rolePermission.permission)
   rolePermissions!: RolePermission[]
 
@@ -60,17 +39,13 @@ export class Permission {
     moduleId: string,
     action: string,
     name: string,
-    description: string,
-    level: AccessLevel,
-    isRequired: boolean = false
+    description: string
   ): Permission {
     const permission = new Permission()
     permission.moduleId = moduleId
     permission.action = action
     permission.name = name
     permission.description = description
-    permission.level = level
-    permission.isRequired = isRequired
     return permission
   }
 

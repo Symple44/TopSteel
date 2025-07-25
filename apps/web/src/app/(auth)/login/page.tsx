@@ -8,13 +8,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useTranslation } from '@/lib/i18n/hooks';
+import CompanySelector from '@/components/auth/company-selector';
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
 	const router = useRouter();
-	const { login, mfa, verifyMFA, resetMFA } = useAuth();
+	const { login, mfa, verifyMFA, resetMFA, requiresCompanySelection, selectCompany } = useAuth();
 	const { t } = useTranslation('auth');
 	const [formData, setFormData] = React.useState({
 		identifier: "", // Peut être email ou acronyme
@@ -50,19 +51,26 @@ export default function LoginPage() {
 			// Vérifier si MFA est requis après le login
 			// L'état MFA sera mis à jour automatiquement par le hook useAuth
 			
-			// Si pas de MFA requis, rediriger
+			// Si pas de MFA requis, vérifier si sélection de société requise
 			if (!mfa.required) {
-				toast({
-					title: t('loginSuccess'),
-					description: t('welcomeToTopSteel'),
-					variant: "success",
-				});
-				
-				// Obtenir le paramètre redirect depuis l'URL de manière sécurisée
-				const redirectTo = typeof window !== 'undefined' 
-					? new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
-					: '/dashboard';
-				router.push(redirectTo);
+				// Attendre un peu pour que l'état soit mis à jour
+				setTimeout(() => {
+					// Si sélection de société pas requise, rediriger
+					if (!requiresCompanySelection) {
+						toast({
+							title: t('loginSuccess'),
+							description: t('welcomeToTopSteel'),
+							variant: "success",
+						});
+						
+						// Obtenir le paramètre redirect depuis l'URL de manière sécurisée
+						const redirectTo = typeof window !== 'undefined' 
+							? new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
+							: '/dashboard';
+						router.push(redirectTo);
+					}
+					// Sinon, le composant CompanySelector s'affichera automatiquement
+				}, 100);
 			} else {
 				// MFA required - interface will be automatically updated
 				toast({
@@ -133,6 +141,20 @@ export default function LoginPage() {
 		setSelectedMfaMethod("");
 	};
 
+	const handleCompanySelected = () => {
+		toast({
+			title: t('loginSuccess'),
+			description: t('welcomeToTopSteel'),
+			variant: "success",
+		});
+		
+		// Obtenir le paramètre redirect depuis l'URL de manière sécurisée
+		const redirectTo = typeof window !== 'undefined' 
+			? new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
+			: '/dashboard';
+		router.push(redirectTo);
+	};
+
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-background p-4">
 			<div className="w-full max-w-md">
@@ -147,7 +169,17 @@ export default function LoginPage() {
 					</p>
 				</div>
 
-				<Card className="p-8 shadow-lg">
+				{/* Sélection de société si requise */}
+				{requiresCompanySelection && !mfa.required && (
+					<CompanySelector
+						showInDialog={false}
+						onCompanySelected={handleCompanySelected}
+					/>
+				)}
+
+				{/* Formulaire de connexion - masqué si sélection de société requise */}
+				{!requiresCompanySelection && (
+					<Card className="p-8 shadow-lg">
 					<div className="space-y-6">
 						{/* Header formulaire */}
 						<div className="text-center space-y-2">
@@ -357,6 +389,7 @@ export default function LoginPage() {
 						)}
 					</div>
 				</Card>
+				)}
 
 				{/* Footer */}
 				<div className="text-center mt-6 text-xs text-muted-foreground">

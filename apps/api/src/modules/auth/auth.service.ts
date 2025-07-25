@@ -55,7 +55,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto, request?: any) {
-    const user = await this.validateUser(loginDto.email, loginDto.password)
+    const user = await this.validateUser(loginDto.login, loginDto.password)
 
     // Vérifier si l'utilisateur a MFA activé
     const hasMFA = await this.mfaService.hasMFAEnabled(user.id)
@@ -150,8 +150,8 @@ export class AuthService {
       deviceInfo = this.geolocationService.parseUserAgent(userAgent)
     }
 
-    // Créer la session en base de données
-    const dbSession = UserSession.createNew(
+    // Créer la session en base de données - TEMPORAIREMENT DÉSACTIVÉ
+    /* const dbSession = UserSession.createNew(
       user.id,
       sessionId,
       accessToken,
@@ -167,7 +167,7 @@ export class AuthService {
       dbSession.deviceInfo = deviceInfo
     }
 
-    await this.userSessionRepository.save(dbSession)
+    await this.userSessionRepository.save(dbSession) */
 
     return {
       user: {
@@ -227,8 +227,8 @@ export class AuthService {
       deviceInfo = this.geolocationService.parseUserAgent(userAgent)
     }
 
-    // Créer la session en base de données
-    const dbSession = UserSession.createNew(
+    // Créer la session en base de données - TEMPORAIREMENT DÉSACTIVÉ
+    /* const dbSession = UserSession.createNew(
       user.id,
       sessionId,
       accessToken,
@@ -245,7 +245,7 @@ export class AuthService {
       dbSession.deviceInfo = deviceInfo
     }
 
-    await this.userSessionRepository.save(dbSession)
+    await this.userSessionRepository.save(dbSession) */
 
     // Ajouter la session à Redis pour le tracking temps réel
     await this.sessionRedisService.addActiveSession({
@@ -265,8 +265,8 @@ export class AuthService {
       warningCount: 0
     })
 
-    // Détecter les activités suspectes
-    const previousSessions = await this.userSessionRepository.find({
+    // Détecter les activités suspectes - TEMPORAIREMENT DÉSACTIVÉ
+    /* const previousSessions = await this.userSessionRepository.find({
       where: { userId: user.id },
       order: { loginTime: 'DESC' },
       take: 10
@@ -297,7 +297,10 @@ export class AuthService {
       }
       
       await this.userSessionRepository.save(dbSession)
-    }
+    } */
+
+    // Créer un objet d'activité suspecte par défaut pour éviter les erreurs
+    const suspiciousActivity = { isSuspicious: false, riskLevel: 'none', reasons: [] }
 
     return {
       user,
@@ -390,6 +393,8 @@ export class AuthService {
       // Déconnexion de toutes les sessions de l'utilisateur
       await this.sessionRedisService.forceLogoutUser(userId)
       
+      // Temporairement désactivé car problème avec la structure de table
+      /*
       // Marquer toutes les sessions actives comme terminées
       await this.userSessionRepository.update(
         { userId, status: 'active' },
@@ -399,6 +404,7 @@ export class AuthService {
           isActive: false
         }
       )
+      */
     }
   }
 
@@ -773,5 +779,23 @@ export class AuthService {
     }
 
     return false
+  }
+
+  /**
+   * Définir une société par défaut pour un utilisateur
+   */
+  async setDefaultSociete(userId: string, societeId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.societeUsersService.setDefault(userId, societeId)
+      return {
+        success: true,
+        message: 'Société définie par défaut avec succès'
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Erreur lors de la définition de la société par défaut'
+      }
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
 import { exec } from 'child_process'
 import { promisify } from 'util'
@@ -21,7 +22,7 @@ interface BackupInfo {
 export class DatabaseBackupService {
   private readonly backupDir = path.join(process.cwd(), 'backups')
 
-  constructor(private dataSource: DataSource) {
+  constructor(@InjectDataSource('auth') private dataSource: DataSource) {
     this.ensureBackupDir()
   }
 

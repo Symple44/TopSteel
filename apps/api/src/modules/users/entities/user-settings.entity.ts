@@ -77,10 +77,10 @@ export class UserSettings {
   id!: string
 
   @OneToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn()
+  @JoinColumn({ name: 'userId' })
   user!: User
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'userId' })
   userId!: string
 
   @Column({ type: 'jsonb', nullable: true })

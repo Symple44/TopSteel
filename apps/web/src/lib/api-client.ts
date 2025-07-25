@@ -221,7 +221,8 @@ export class APIClient {
 
       if (!authData) return null
 
-      const { accessToken } = JSON.parse(authData)
+      const tokenData = JSON.parse(authData)
+      const { accessToken } = tokenData
 
       return accessToken || null
     } catch {

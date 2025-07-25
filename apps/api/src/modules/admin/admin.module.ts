@@ -11,7 +11,11 @@ import { MenuItemPermission } from './entities/menu-item-permission.entity'
 import { MenuItemRole } from './entities/menu-item-role.entity'
 import { UserMenuPreferences } from './entities/user-menu-preferences.entity'
 import { UserMenuItemPreference } from './entities/user-menu-item-preference.entity'
-import { DiscoveredPage } from '../menu/entities/discovered-page.entity'
+
+// Auth entities
+import { Role } from '../auth/entities/role.entity'
+import { Permission } from '../auth/entities/permission.entity'
+import { RolePermission } from '../auth/entities/role-permission.entity'
 
 // Services
 import { SystemParametersService } from './system-parameters.service'
@@ -21,7 +25,10 @@ import { DatabaseIntegrityService } from './services/database-integrity.service'
 import { DatabaseBackupService } from './services/database-backup.service'
 import { DatabaseStatsService } from './services/database-stats.service'
 import { DatabaseEnumFixService } from './services/database-enum-fix.service'
-import { PageSyncService } from '../menu/services/page-sync.service'
+import { AdminRolesService } from './services/admin-roles.service'
+
+// Import du MenuModule pour accéder à PageSyncService
+import { MenuModule } from '../menu/menu.module'
 
 // Controllers
 import { SystemParametersController } from './system-parameters.controller'
@@ -29,6 +36,7 @@ import { DatabaseIntegrityController } from './controllers/database-integrity.co
 import { MenuConfigurationController } from './controllers/menu-configuration.controller'
 import { PageSyncController } from './controllers/page-sync.controller'
 import { AdminUsersController } from './controllers/admin-users.controller'
+import { AdminRolesController } from './controllers/admin-roles.controller'
 
 // Import du module users
 import { UsersModule } from '../users/users.module'
@@ -36,23 +44,16 @@ import { UsersModule } from '../users/users.module'
 @Module({
   imports: [
     UsersModule,
-    TypeOrmModule.forFeature([
-      SystemParameter,
-      MenuConfiguration,
-      MenuItem,
-      MenuItemPermission,
-      MenuItemRole,
-      UserMenuPreferences,
-      UserMenuItemPreference,
-      DiscoveredPage
-    ], 'auth')
+    MenuModule,
+    TypeOrmModule.forFeature([Role, Permission, RolePermission], 'auth')
   ],
   controllers: [
     SystemParametersController,
     DatabaseIntegrityController,
     MenuConfigurationController,
     PageSyncController,
-    AdminUsersController
+    AdminUsersController,
+    AdminRolesController
   ],
   providers: [
     SystemParametersService,
@@ -62,7 +63,7 @@ import { UsersModule } from '../users/users.module'
     DatabaseBackupService,
     DatabaseStatsService,
     DatabaseEnumFixService,
-    PageSyncService
+    AdminRolesService
   ],
   exports: [
     SystemParametersService,
@@ -72,7 +73,6 @@ import { UsersModule } from '../users/users.module'
     DatabaseBackupService,
     DatabaseStatsService,
     DatabaseEnumFixService,
-    PageSyncService,
     TypeOrmModule
   ],
 })

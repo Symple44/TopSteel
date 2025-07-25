@@ -3,6 +3,7 @@ import { type ExecutionContext, Injectable, Logger, UnauthorizedException } from
 import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 import type { Observable } from 'rxjs'
+import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator'
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -16,7 +17,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
     // Vérifier si la route est marquée comme publique
-    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ])
@@ -42,6 +43,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     // Log des tentatives d'accès en développement
     if (process.env.NODE_ENV === 'development') {
       this.logger.debug(`Auth attempt: ${request.method} ${request.url}`)
+      
+      // Log du token pour debug
+      const authHeader = request.headers.authorization
+      if (authHeader) {
+        const token = authHeader.replace('Bearer ', '')
+        this.logger.debug(`Token (first 50 chars): ${token.substring(0, 50)}...`)
+      } else {
+        this.logger.debug('No authorization header')
+      }
     }
 
     // Gestion des erreurs spécifiques

@@ -11,6 +11,8 @@ import { NotificationsProvider } from '@/components/providers/notifications-prov
 import { TranslationOverrideProvider } from '@/components/providers/translation-override-provider'
 import { useSyncNotifications } from '@/hooks/use-sync-notifications'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import TabSyncNotification from '@/components/auth/tab-sync-notification'
+import { useTabCleanup } from '@/lib/tab-detection'
 
 // Dynamically load React Query to avoid SSR issues
 const DynamicQueryClientProvider = dynamic(
@@ -21,6 +23,7 @@ const DynamicQueryClientProvider = dynamic(
 // Hook pour initialiser les notifications de sync
 const SyncNotificationInitializer = () => {
   useSyncNotifications()
+  useTabCleanup()
   return null
 }
 
@@ -44,6 +47,7 @@ export function ProvidersSimple({ children }: { children: ReactNode }) {
               <AuthProvider>
                 <NotificationsProvider>
                   <SyncNotificationInitializer />
+                  <TabSyncNotification />
                   {children}
                   <Toaster position="top-right" />
                 </NotificationsProvider>

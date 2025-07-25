@@ -1,105 +1,161 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Patch, 
+  Delete,
+  Param, 
+  Body, 
+  UseGuards,
+  Query 
+} from '@nestjs/common'
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'
 import { SocieteUsersService } from '../services/societe-users.service'
-import { SocieteUser } from '../entities/societe-user.entity'
-import { CommonDatabase } from '../../../common/decorators/tenant.decorator'
+import { SocietesService } from '../services/societes.service'
 
-@ApiTags('Société Users')
-@Controller('societe-users')
-@CommonDatabase()
+@ApiTags('Societes - Users')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
+@Controller('societes')
 export class SocieteUsersController {
-  constructor(private readonly societeUsersService: SocieteUsersService) {}
+  constructor(
+    private readonly societeUsersService: SocieteUsersService,
+    private readonly societesService: SocietesService
+  ) {}
+
+  @Get('users/:userId/companies')
+  @ApiOperation({ summary: 'Get all company access for a user' })
+  @ApiResponse({ status: 200, description: 'List of company access' })
+  async getUserCompanies(@Param('userId') userId: string) {
+    const userAccess = await this.societeUsersService.getUserCompanies(userId)
+    return {
+      data: userAccess,
+      statusCode: 200,
+      message: 'Success',
+      timestamp: new Date().toISOString()
+    }
+  }
+
+  @Get(':societeId/users')
+  @ApiOperation({ summary: 'Get all users for a company' })
+  @ApiResponse({ status: 200, description: 'List of users with access' })
+  async getCompanyUsers(@Param('societeId') societeId: string) {
+    const users = await this.societeUsersService.getCompanyUsers(societeId)
+    return {
+      data: users,
+      statusCode: 200,
+      message: 'Success',
+      timestamp: new Date().toISOString()
+    }
+  }
+
+  @Post(':societeId/users')
+  @ApiOperation({ summary: 'Grant user access to a company' })
+  @ApiResponse({ status: 201, description: 'Access granted' })
+  async grantAccess(
+    @Param('societeId') societeId: string,
+    @Body() body: {
+      userId: string
+      role: string
+      permissions?: string[]
+      isActive?: boolean
+    }
+  ) {
+    const access = await this.societeUsersService.grantUserAccess(
+      societeId,
+      body.userId,
+      body.role,
+      body.permissions || [],
+      body.isActive !== false
+    )
+    return {
+      data: access,
+      statusCode: 201,
+      message: 'Access granted successfully',
+      timestamp: new Date().toISOString()
+    }
+  }
+
+  @Patch('users/:societeUserId')
+  @ApiOperation({ summary: 'Update user access for a company' })
+  @ApiResponse({ status: 200, description: 'Access updated' })
+  async updateAccess(
+    @Param('societeUserId') societeUserId: string,
+    @Body() body: {
+      role?: string
+      permissions?: string[]
+      isActive?: boolean
+    }
+  ) {
+    const updated = await this.societeUsersService.updateUserAccess(
+      societeUserId,
+      body
+    )
+    return {
+      data: updated,
+      statusCode: 200,
+      message: 'Access updated successfully',
+      timestamp: new Date().toISOString()
+    }
+  }
+
+  @Patch('users/:societeUserId/permissions')
+  @ApiOperation({ summary: 'Update user permissions for a company' })
+  @ApiResponse({ status: 200, description: 'Permissions updated' })
+  async updatePermissions(
+    @Param('societeUserId') societeUserId: string,
+    @Body() body: { permissions: string[] }
+  ) {
+    const updated = await this.societeUsersService.updateUserPermissions(
+      societeUserId,
+      body.permissions
+    )
+    return {
+      data: updated,
+      statusCode: 200,
+      message: 'Permissions updated successfully',
+      timestamp: new Date().toISOString()
+    }
+  }
+
+  @Post('users/:userId/default-societe')
+  @ApiOperation({ summary: 'Set default company for a user' })
+  @ApiResponse({ status: 200, description: 'Default company set' })
+  async setDefaultCompany(
+    @Param('userId') userId: string,
+    @Body() body: { societeId: string }
+  ) {
+    await this.societeUsersService.setDefaultSociete(userId, body.societeId)
+    return {
+      statusCode: 200,
+      message: 'Default company set successfully',
+      timestamp: new Date().toISOString()
+    }
+  }
+
+  @Delete('users/:societeUserId')
+  @ApiOperation({ summary: 'Revoke user access to a company' })
+  @ApiResponse({ status: 200, description: 'Access revoked' })
+  async revokeAccess(@Param('societeUserId') societeUserId: string) {
+    await this.societeUsersService.revokeUserAccess(societeUserId)
+    return {
+      statusCode: 200,
+      message: 'Access revoked successfully',
+      timestamp: new Date().toISOString()
+    }
+  }
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer toutes les associations utilisateur-société' })
-  async findAll(): Promise<SocieteUser[]> {
-    return this.societeUsersService.findAll()
-  }
-
-  @Get('by-user/:userId')
-  @ApiOperation({ summary: 'Récupérer les sociétés d\'un utilisateur' })
-  async findByUser(@Param('userId') userId: string): Promise<SocieteUser[]> {
-    return this.societeUsersService.findByUser(userId)
-  }
-
-  @Get('by-societe/:societeId')
-  @ApiOperation({ summary: 'Récupérer les utilisateurs d\'une société' })
-  async findBySociete(@Param('societeId') societeId: string): Promise<SocieteUser[]> {
-    return this.societeUsersService.findBySociete(societeId)
-  }
-
-  @Get('default/:userId')
-  @ApiOperation({ summary: 'Récupérer la société par défaut d\'un utilisateur' })
-  async findDefaultSociete(@Param('userId') userId: string): Promise<SocieteUser | null> {
-    return this.societeUsersService.findDefaultSociete(userId)
-  }
-
-  @Get(':userId/:societeId')
-  @ApiOperation({ summary: 'Récupérer une association utilisateur-société spécifique' })
-  async findUserSociete(
-    @Param('userId') userId: string,
-    @Param('societeId') societeId: string
-  ): Promise<SocieteUser | null> {
-    return this.societeUsersService.findUserSociete(userId, societeId)
-  }
-
-  @Post()
-  @ApiOperation({ summary: 'Créer une nouvelle association utilisateur-société' })
-  async create(@Body() associationData: Partial<SocieteUser>): Promise<SocieteUser> {
-    return this.societeUsersService.create(associationData)
-  }
-
-  @Put(':id')
-  @ApiOperation({ summary: 'Mettre à jour une association utilisateur-société' })
-  async update(
-    @Param('id') id: string,
-    @Body() associationData: Partial<SocieteUser>
-  ): Promise<SocieteUser> {
-    return this.societeUsersService.update(id, associationData)
-  }
-
-  @Put('set-default/:userId/:societeId')
-  @ApiOperation({ summary: 'Définir la société par défaut d\'un utilisateur' })
-  async setDefault(
-    @Param('userId') userId: string,
-    @Param('societeId') societeId: string
-  ): Promise<SocieteUser> {
-    return this.societeUsersService.setDefault(userId, societeId)
-  }
-
-  @Put(':id/activate')
-  @ApiOperation({ summary: 'Activer une association utilisateur-société' })
-  async activate(@Param('id') id: string): Promise<SocieteUser> {
-    return this.societeUsersService.activate(id)
-  }
-
-  @Put(':id/deactivate')
-  @ApiOperation({ summary: 'Désactiver une association utilisateur-société' })
-  async deactivate(@Param('id') id: string): Promise<SocieteUser> {
-    return this.societeUsersService.deactivate(id)
-  }
-
-  @Put(':id/grant-permissions')
-  @ApiOperation({ summary: 'Accorder des permissions à une association' })
-  async grantPermissions(
-    @Param('id') id: string,
-    @Body('permissions') permissions: string[]
-  ): Promise<SocieteUser> {
-    return this.societeUsersService.grantPermissions(id, permissions)
-  }
-
-  @Put(':id/revoke-permissions')
-  @ApiOperation({ summary: 'Révoquer des permissions d\'une association' })
-  async revokePermissions(
-    @Param('id') id: string,
-    @Body('permissions') permissions: string[]
-  ): Promise<SocieteUser> {
-    return this.societeUsersService.revokePermissions(id, permissions)
-  }
-
-  @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer une association utilisateur-société' })
-  async delete(@Param('id') id: string): Promise<void> {
-    return this.societeUsersService.delete(id)
+  @ApiOperation({ summary: 'Get all companies (for dropdown)' })
+  @ApiResponse({ status: 200, description: 'List of all companies' })
+  async getAllCompanies() {
+    const companies = await this.societesService.findAll()
+    return {
+      data: companies,
+      statusCode: 200,
+      message: 'Success',
+      timestamp: new Date().toISOString()
+    }
   }
 }

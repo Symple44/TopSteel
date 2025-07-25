@@ -9,10 +9,12 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Roles } from '../../common/decorators/roles.decorator'
+import { Public } from '../../common/decorators/public.decorator'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/guards/roles.guard'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -56,28 +58,8 @@ export class UsersController {
     return this.usersService.getStats()
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
-  async findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id)
-  }
 
-  @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
-  async update(@Param('id') id: string, @Body() updateDto: UpdateUserDto) {
-    return this.usersService.update(id, updateDto)
-  }
-
-  @Delete(':id')
-  @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un utilisateur' })
-  async remove(@Param('id') id: string) {
-    return this.usersService.remove(id)
-  }
-
-  // Endpoints pour les paramètres utilisateur
+  // Endpoints pour les paramètres utilisateur (DOIVENT être avant :id)
   @Get('settings/me')
   @ApiOperation({ summary: 'Récupérer mes paramètres utilisateur' })
   @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
@@ -95,26 +77,7 @@ export class UsersController {
     return this.usersService.updateUserSettings(user.id, updateDto)
   }
 
-  @Get(':id/settings')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Récupérer les paramètres d\'un utilisateur (Admin/Manager)' })
-  @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
-  async getUserSettings(@Param('id') id: string) {
-    return this.usersService.getUserSettings(id)
-  }
-
-  @Patch(':id/settings')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Mettre à jour les paramètres d\'un utilisateur (Admin/Manager)' })
-  @ApiResponse({ status: 200, description: 'Paramètres utilisateur mis à jour avec succès' })
-  async updateUserSettings(
-    @Param('id') id: string,
-    @Body() updateDto: UpdateUserSettingsDto
-  ) {
-    return this.usersService.updateUserSettings(id, updateDto)
-  }
-
-  // Endpoints spécialisés pour les préférences d'apparence
+  // Endpoints spécialisés pour les préférences d'apparence (DOIVENT être avant :id)
   @Get('appearance/me')
   @ApiOperation({ summary: 'Récupérer mes préférences d\'apparence' })
   @ApiResponse({ 
@@ -124,6 +87,9 @@ export class UsersController {
   })
   async getMyAppearanceSettings(@CurrentUser() user: any): Promise<GetAppearanceSettingsResponseDto> {
     const settings = await this.usersService.getUserSettings(user.id)
+    if (!settings?.preferences?.appearance) {
+      throw new Error('Paramètres d\'apparence non trouvés')
+    }
     return new GetAppearanceSettingsResponseDto(settings.preferences.appearance)
   }
 
@@ -144,7 +110,7 @@ export class UsersController {
     return new GetAppearanceSettingsResponseDto(updatedSettings.preferences.appearance)
   }
 
-  // Endpoints spécialisés pour les notifications
+  // Endpoints spécialisés pour les notifications (DOIVENT être avant :id)
   @Get('notifications/me')
   @ApiOperation({ summary: 'Récupérer mes préférences de notification' })
   @ApiResponse({ 
@@ -173,4 +139,46 @@ export class UsersController {
     })
     return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications)
   }
+
+  // Endpoints avec paramètre ID (DOIVENT être APRÈS les endpoints spécifiques)
+  @Get(':id')
+  @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
+  async findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id)
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  async update(@Param('id') id: string, @Body() updateDto: UpdateUserDto) {
+    return this.usersService.update(id, updateDto)
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  async remove(@Param('id') id: string) {
+    return this.usersService.remove(id)
+  }
+
+  @Get(':id/settings')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Récupérer les paramètres d\'un utilisateur (Admin/Manager)' })
+  @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
+  async getUserSettings(@Param('id') id: string) {
+    return this.usersService.getUserSettings(id)
+  }
+
+  @Patch(':id/settings')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Mettre à jour les paramètres d\'un utilisateur (Admin/Manager)' })
+  @ApiResponse({ status: 200, description: 'Paramètres utilisateur mis à jour avec succès' })
+  async updateUserSettings(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateUserSettingsDto
+  ) {
+    return this.usersService.updateUserSettings(id, updateDto)
+  }
+
 }

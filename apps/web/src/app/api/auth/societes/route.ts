@@ -1,0 +1,48 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Authorization header required' }, { status: 401 })
+    }
+
+    // Rediriger vers l'API backend
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+    const response = await fetch(`${apiUrl}/api/v1/auth/societes`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader,
+      },
+    })
+
+    // Vérifier si la réponse est JSON
+    let data
+    const contentType = response.headers.get('content-type')
+    
+    if (contentType?.includes('application/json')) {
+      try {
+        data = await response.json()
+      } catch (e) {
+        data = { error: 'Invalid JSON response from API' }
+      }
+    } else {
+      const textData = await response.text()
+      data = { error: `API returned non-JSON response: ${textData}` }
+    }
+    
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status })
+    }
+
+    // Retourner directement le tableau des sociétés si c'est dans data
+    return NextResponse.json(data.data || data)
+  } catch (error) {
+    console.error('Get user companies error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}

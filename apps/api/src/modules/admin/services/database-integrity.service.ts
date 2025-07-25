@@ -29,7 +29,7 @@ export class DatabaseIntegrityService {
   private readonly logger = new Logger(DatabaseIntegrityService.name)
 
   constructor(
-    @InjectDataSource()
+    @InjectDataSource('auth')
     private readonly dataSource: DataSource,
   ) {}
 

@@ -11,7 +11,7 @@ import {
 @Injectable()
 export class SystemParametersService {
   constructor(
-    @InjectRepository(SystemParameter)
+    @InjectRepository(SystemParameter, 'auth')
     private readonly systemParameterRepository: Repository<SystemParameter>,
   ) {}
 

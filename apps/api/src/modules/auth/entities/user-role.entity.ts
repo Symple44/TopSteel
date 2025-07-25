@@ -7,59 +7,30 @@ export class UserRole {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'user_id' })
   @Index()
   userId!: string
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'role_id' })
   @Index()
   roleId!: string
 
-  @Column({ type: 'uuid', nullable: true })
-  assignedBy?: string
-
-  @Column({ type: 'timestamp', nullable: true })
-  expiresAt?: Date
-
-  @Column({ type: 'boolean', default: true })
-  @Index()
-  isActive!: boolean
-
-  @Column({ type: 'json', nullable: true })
-  metadata?: Record<string, any>
-
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
-
-  @UpdateDateColumn()
-  updatedAt!: Date
 
   // Relations
   @ManyToOne(() => Role, role => role.userRoles)
-  @JoinColumn({ name: 'roleId' })
+  @JoinColumn({ name: 'role_id' })
   role!: Role
 
   // Méthodes utilitaires
   static assign(
     userId: string,
-    roleId: string,
-    assignedBy?: string,
-    expiresAt?: Date
+    roleId: string
   ): UserRole {
     const userRole = new UserRole()
     userRole.userId = userId
     userRole.roleId = roleId
-    userRole.assignedBy = assignedBy
-    userRole.expiresAt = expiresAt
-    userRole.isActive = true
     return userRole
-  }
-
-  isExpired(): boolean {
-    return this.expiresAt ? new Date() > this.expiresAt : false
-  }
-
-  isValid(): boolean {
-    return this.isActive && !this.isExpired()
   }
 }

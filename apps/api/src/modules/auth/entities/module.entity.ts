@@ -47,8 +47,7 @@ export class Module {
   updatedAt!: Date
 
   // Relations
-  @OneToMany(() => Permission, permission => permission.module)
-  permissions!: Permission[]
+  // Note: Permission.module relation removed as modules table doesn't exist in auth DB
 
   // Méthodes utilitaires
   static createSystemModule(

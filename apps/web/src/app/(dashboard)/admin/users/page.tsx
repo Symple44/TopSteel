@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AdminGuard } from '@/components/auth/admin-guard'
 import { 
   Dialog, 
@@ -18,13 +19,13 @@ import {
 import { Mail, Phone, Calendar, Shield, Building } from 'lucide-react'
 import { UsersDataTable } from './users-datatable'
 export default function UsersManagementPage() {
+  const router = useRouter()
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   const handleUserEdit = (user: any) => {
-    console.log('Ouverture du modal pour:', user) // Debug
-    setSelectedUser(user)
-    setIsDetailOpen(true)
+    // Navigation vers la page de détail
+    router.push(`/admin/users/${user.id}`)
   }
 
   const handleUserCreate = () => {

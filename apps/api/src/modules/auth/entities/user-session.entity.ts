@@ -31,7 +31,7 @@ export class UserSession {
   @Index()
   lastActivity!: Date
 
-  @Column({ type: 'inet', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   ipAddress?: string
 
   @Column({ type: 'text', nullable: true })
@@ -62,7 +62,7 @@ export class UserSession {
   @Column({ type: 'boolean', default: false })
   isIdle!: boolean
 
-  @Column({ type: 'enum', enum: ['active', 'ended', 'forced_logout', 'expired'], default: 'active' })
+  @Column({ type: 'varchar', length: 50, default: 'active' })
   @Index()
   status!: 'active' | 'ended' | 'forced_logout' | 'expired'
 

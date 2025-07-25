@@ -15,6 +15,8 @@ interface LoginResponse {
   accessToken: string
   refreshToken: string
   expiresIn: number
+  requiresCompanySelection?: boolean
+  societe?: CompanyInfo
 }
 
 interface RegisterData {
@@ -29,6 +31,33 @@ interface RefreshTokenResponse {
   accessToken: string
   refreshToken: string
   expiresIn: number
+}
+
+interface CompanyInfo {
+  id: string
+  nom: string
+  code: string
+  status: string
+  plan: string
+}
+
+interface UserCompany {
+  id: string
+  nom: string
+  code: string
+  role: string
+  isDefault: boolean
+  permissions: string[]
+  sites: any[]
+}
+
+interface CompanyLoginResponse {
+  user: User
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
+  societe: CompanyInfo
+  permissions: string[]
 }
 
 // Type pour la réponse API avec structure data
@@ -107,7 +136,7 @@ export const authService = {
   async login(email: string, password: string): Promise<LoginResponse> {
     try {
       const response = await apiClient.post<ApiResponse<LoginResponse>>('/auth/login', {
-        email,
+        login: email,
         password,
       })
 
@@ -292,7 +321,71 @@ export const authService = {
       return false
     }
   },
+
+  /**
+   * ✅ Récupérer les sociétés disponibles pour l'utilisateur
+   */
+  async getUserCompanies(): Promise<UserCompany[]> {
+    try {
+      const companies = await apiClient.get<UserCompany[]>('/auth/societes')
+      return companies || []
+    } catch (error) {
+      console.error('Erreur lors de la récupération des sociétés:', error)
+      throw formatError(error)
+    }
+  },
+
+  /**
+   * ✅ Se connecter à une société spécifique
+   */
+  async loginToCompany(societeId: string): Promise<CompanyLoginResponse> {
+    try {
+      const response = await apiClient.post<ApiResponse<CompanyLoginResponse>>(
+        `/auth/login-societe/${societeId}`
+      )
+      
+      const responseData = response.data
+      const { user, accessToken, refreshToken, expiresIn, societe, permissions } = responseData
+      
+      return {
+        user: transformUserFromAPI(user),
+        accessToken,
+        refreshToken,
+        expiresIn,
+        societe,
+        permissions,
+      }
+    } catch (error) {
+      console.error('Erreur lors de la connexion à la société:', error)
+      throw formatError(error)
+    }
+  },
+
+  /**
+   * ✅ Définir une société par défaut
+   */
+  async setDefaultCompany(societeId: string): Promise<void> {
+    try {
+      await apiClient.post(`/auth/societe-default/${societeId}`)
+    } catch (error) {
+      console.error('Erreur lors de la définition de la société par défaut:', error)
+      throw formatError(error)
+    }
+  },
+
+  /**
+   * ✅ Obtenir la société actuelle
+   */
+  async getCurrentCompany(): Promise<CompanyInfo | null> {
+    try {
+      const response = await apiClient.get<ApiResponse<{ societe: CompanyInfo }>>('/auth/current-societe')
+      return response.data.data?.societe || null
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la société actuelle:', error)
+      return null
+    }
+  },
 }
 
 // ===== TYPES EXPORTÉS =====
-export type { LoginResponse, RefreshTokenResponse, RegisterData }
+export type { LoginResponse, RefreshTokenResponse, RegisterData, UserCompany, CompanyInfo, CompanyLoginResponse }

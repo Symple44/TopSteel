@@ -13,7 +13,7 @@ export interface PageSyncResult {
 @Injectable()
 export class PageSyncService {
   constructor(
-    @InjectRepository(DiscoveredPage)
+    @InjectRepository(DiscoveredPage, 'auth')
     private readonly discoveredPageRepository: Repository<DiscoveredPage>
   ) {}
 

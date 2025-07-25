@@ -4,8 +4,7 @@ import { Repository, FindOptionsWhere } from 'typeorm'
 import { Role } from '../entities/role.entity'
 import { RolePermission } from '../entities/role-permission.entity'
 import { UserRole } from '../entities/user-role.entity'
-import { Permission, AccessLevel } from '../entities/permission.entity'
-import { Module } from '../entities/module.entity'
+import { Permission } from '../entities/permission.entity'
 
 export interface CreateRoleDto {
   name: string
@@ -13,8 +12,6 @@ export interface CreateRoleDto {
   isActive?: boolean
   permissions?: {
     permissionId: string
-    accessLevel: AccessLevel
-    isGranted: boolean
   }[]
 }
 
@@ -48,8 +45,6 @@ export class RoleService {
     private readonly userRoleRepository: Repository<UserRole>,
     @InjectRepository(Permission, 'auth')
     private readonly permissionRepository: Repository<Permission>,
-    @InjectRepository(Module, 'auth')
-    private readonly moduleRepository: Repository<Module>,
   ) {}
 
   // ===== GESTION DES RÔLES =====
@@ -66,11 +61,11 @@ export class RoleService {
     // Calculer les statistiques pour chaque rôle
     const rolesWithStats = await Promise.all(
       roles.map(async (role) => {
-        const [userCount, moduleCount, permissionCount] = await Promise.all([
-          this.userRoleRepository.count({ where: { roleId: role.id, isActive: true } }),
-          this.getModuleCountForRole(role.id),
-          this.rolePermissionRepository.count({ where: { roleId: role.id, isGranted: true } })
+        const [userCount, permissionCount] = await Promise.all([
+          this.userRoleRepository.count({ where: { roleId: role.id } }),
+          this.rolePermissionRepository.count({ where: { roleId: role.id } })
         ])
+        const moduleCount = 0 // Modules table doesn't exist in auth DB
 
         return {
           id: role.id,
@@ -106,7 +101,6 @@ export class RoleService {
     if (includePermissions) {
       queryBuilder.leftJoinAndSelect('role.permissions', 'permissions')
         .leftJoinAndSelect('permissions.permission', 'permission')
-        .leftJoinAndSelect('permission.module', 'module')
     }
 
     const role = await queryBuilder.getOne()
@@ -131,8 +125,7 @@ export class RoleService {
     // Créer le rôle
     const role = Role.createCustomRole(
       createRoleDto.name,
-      createRoleDto.description,
-      createdBy
+      createRoleDto.description
     )
 
     if (createRoleDto.isActive !== undefined) {
@@ -169,7 +162,6 @@ export class RoleService {
 
     // Mettre à jour
     Object.assign(role, updateRoleDto)
-    role.updatedBy = updatedBy
     role.updatedAt = new Date()
 
     return await this.roleRepository.save(role)
@@ -184,7 +176,7 @@ export class RoleService {
 
     // Vérifier s'il y a des utilisateurs assignés
     const userCount = await this.userRoleRepository.count({
-      where: { roleId: id, isActive: true }
+      where: { roleId: id }
     })
 
     if (userCount > 0) {
@@ -209,17 +201,13 @@ export class RoleService {
   }> {
     const role = await this.findRoleById(roleId)
 
-    // Récupérer tous les modules avec leurs permissions
-    const modules = await this.moduleRepository.find({
-      where: { isActive: true },
-      relations: ['permissions'],
-      order: { category: 'ASC', name: 'ASC' }
-    })
+    // Modules table doesn't exist in auth DB
+    const modules: any[] = []
 
     // Récupérer les permissions actuelles du rôle - utiliser l'ID réel du rôle trouvé
     const rolePermissions = await this.rolePermissionRepository.find({
       where: { roleId: role.id },
-      relations: ['permission', 'permission.module']
+      relations: ['permission']
     })
 
     return {
@@ -233,8 +221,6 @@ export class RoleService {
     roleId: string,
     permissions: {
       permissionId: string
-      accessLevel: AccessLevel
-      isGranted: boolean
     }[],
     updatedBy: string
   ): Promise<void> {
@@ -247,10 +233,7 @@ export class RoleService {
     const rolePermissions = permissions.map(p => 
       RolePermission.create(
         role.id,
-        p.permissionId,
-        p.accessLevel,
-        p.isGranted,
-        updatedBy
+        p.permissionId
       )
     )
 
@@ -269,14 +252,14 @@ export class RoleService {
 
     // Vérifier s'il n'y a pas déjà une assignation active - utiliser l'ID réel du rôle
     const existingUserRole = await this.userRoleRepository.findOne({
-      where: { userId, roleId: role.id, isActive: true }
+      where: { userId, roleId: role.id }
     })
 
     if (existingUserRole) {
       throw new ConflictException('L\'utilisateur a déjà ce rôle')
     }
 
-    const userRole = UserRole.assign(userId, role.id, assignedBy, expiresAt)
+    const userRole = UserRole.assign(userId, role.id)
     return await this.userRoleRepository.save(userRole)
   }
 
@@ -284,25 +267,23 @@ export class RoleService {
     const role = await this.findRoleById(roleId)
     
     const userRole = await this.userRoleRepository.findOne({
-      where: { userId, roleId: role.id, isActive: true }
+      where: { userId, roleId: role.id }
     })
 
     if (!userRole) {
       throw new NotFoundException('Assignation de rôle non trouvée')
     }
 
-    userRole.isActive = false
-    await this.userRoleRepository.save(userRole)
+    await this.userRoleRepository.delete(userRole.id)
   }
 
   async getUserRoles(userId: string): Promise<Role[]> {
     const userRoles = await this.userRoleRepository.find({
-      where: { userId, isActive: true },
+      where: { userId },
       relations: ['role']
     })
 
     return userRoles
-      .filter(ur => ur.isValid())
       .map(ur => ur.role)
   }
 
@@ -316,25 +297,11 @@ export class RoleService {
 
     return await this.rolePermissionRepository.find({
       where: { roleId: roleIds[0] }, // Simplification: prendre le premier rôle
-      relations: ['permission', 'permission.module']
+      relations: ['permission']
     })
   }
 
   // ===== MÉTHODES UTILITAIRES =====
-
-  private async getModuleCountForRole(roleId: string): Promise<number> {
-    const result = await this.rolePermissionRepository
-      .createQueryBuilder('rp')
-      .leftJoin('rp.permission', 'p')
-      .leftJoin('p.module', 'm')
-      .where('rp.roleId = :roleId', { roleId })
-      .andWhere('rp.isGranted = true')
-      .andWhere('m.isActive = true')
-      .select('COUNT(DISTINCT m.id)', 'count')
-      .getRawOne()
-
-    return parseInt(result.count) || 0
-  }
 
   async initializeSystemRoles(): Promise<void> {
     // Cette méthode peut être appelée au démarrage pour s'assurer que les rôles système existent

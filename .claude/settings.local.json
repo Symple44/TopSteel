@@ -128,7 +128,11 @@
       "Bash(PORT=3010 timeout 15 node dist/main.js)",
       "Bash(start:*)",
       "Bash(PORT=3006 npm run start:prod)",
-      "Bash(PORT=3007 npm start)"
+      "Bash(PORT=3007 npm start)",
+      "Bash(PORT=3007 node dist/main.js)",
+      "Bash(PORT=3008 node dist/main.js)",
+      "Bash(PGPASSWORD=topsteel_prod_2024! psql -h localhost -p 5433 -U topsteel_prod -d topsteel_auth -c \"\\dt user_mfa\")",
+      "Bash(PGPASSWORD=postgres psql -U postgres -d erp_topsteel_auth -c \"\\d user_settings\")"
     ],
     "deny": []
   }

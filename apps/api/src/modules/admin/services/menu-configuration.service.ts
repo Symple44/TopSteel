@@ -45,13 +45,13 @@ export interface MenuTreeNode extends MenuItemDto {
 @Injectable()
 export class MenuConfigurationService {
   constructor(
-    @InjectRepository(MenuConfiguration)
+    @InjectRepository(MenuConfiguration, 'auth')
     private readonly configRepository: Repository<MenuConfiguration>,
-    @InjectRepository(MenuItem)
+    @InjectRepository(MenuItem, 'auth')
     private readonly itemRepository: Repository<MenuItem>,
-    @InjectRepository(MenuItemPermission)
+    @InjectRepository(MenuItemPermission, 'auth')
     private readonly permissionRepository: Repository<MenuItemPermission>,
-    @InjectRepository(MenuItemRole)
+    @InjectRepository(MenuItemRole, 'auth')
     private readonly roleRepository: Repository<MenuItemRole>,
   ) {}
 

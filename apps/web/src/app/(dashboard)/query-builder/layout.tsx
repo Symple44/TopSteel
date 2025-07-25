@@ -5,6 +5,7 @@ import { QueryBuilderSidebar } from './query-builder-sidebar'
 
 interface QueryBuilderLayoutProps {
   children: ReactNode
+  sidebar?: ReactNode
 }
 
 export default function QueryBuilderLayout({ children }: QueryBuilderLayoutProps) {

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, IsNull } from 'typeorm'
-import { SocieteUser } from '../entities/societe-user.entity'
+import { SocieteUser, UserSocieteRole } from '../entities/societe-user.entity'
 
 @Injectable()
 export class SocieteUsersService {
@@ -23,7 +23,7 @@ export class SocieteUsersService {
         userId,
         deletedAt: IsNull() 
       },
-      relations: ['user', 'societe']
+      relations: ['user', 'societe', 'societe.sites']
     })
   }
 
@@ -178,5 +178,127 @@ export class SocieteUsersService {
       throw new NotFoundException(`SocieteUser with ID ${id} not found`)
     }
     return updatedAssociation
+  }
+
+  async getUserCompanies(userId: string): Promise<SocieteUser[]> {
+    return await this.societeUserRepository.find({
+      where: { userId },
+      relations: ['societe']
+    })
+  }
+
+  async getCompanyUsers(societeId: string): Promise<SocieteUser[]> {
+    return await this.societeUserRepository.find({
+      where: { societeId },
+      relations: ['user']
+    })
+  }
+
+  async grantUserAccess(
+    societeId: string,
+    userId: string,
+    role: string,
+    permissions: string[] = [],
+    isActive: boolean = true
+  ): Promise<SocieteUser> {
+    const roleEnum = role as UserSocieteRole
+    const existingAccess = await this.findUserSociete(userId, societeId)
+    
+    if (existingAccess) {
+      // Update existing access
+      await this.societeUserRepository.update(existingAccess.id, {
+        role: roleEnum,
+        permissions,
+        actif: isActive
+      })
+      const updated = await this.societeUserRepository.findOne({
+        where: { id: existingAccess.id },
+        relations: ['user', 'societe']
+      })
+      if (!updated) {
+        throw new NotFoundException(`SocieteUser with ID ${existingAccess.id} not found`)
+      }
+      return updated
+    } else {
+      // Create new access
+      const newAccess = this.societeUserRepository.create({
+        userId,
+        societeId,
+        role: roleEnum,
+        permissions,
+        actif: isActive
+      })
+      return await this.societeUserRepository.save(newAccess)
+    }
+  }
+
+  async updateUserAccess(
+    societeUserId: string,
+    updates: {
+      role?: string
+      permissions?: string[]
+      isActive?: boolean
+    }
+  ): Promise<SocieteUser> {
+    const updateData: any = {}
+    if (updates.role !== undefined) updateData.role = updates.role as UserSocieteRole
+    if (updates.permissions !== undefined) updateData.permissions = updates.permissions
+    if (updates.isActive !== undefined) updateData.actif = updates.isActive
+    
+    await this.societeUserRepository.update(societeUserId, updateData)
+    
+    const updated = await this.societeUserRepository.findOne({
+      where: { id: societeUserId },
+      relations: ['user', 'societe']
+    })
+    
+    if (!updated) {
+      throw new NotFoundException(`SocieteUser with ID ${societeUserId} not found`)
+    }
+    
+    return updated
+  }
+
+  async updateUserPermissions(
+    societeUserId: string,
+    permissions: string[]
+  ): Promise<SocieteUser> {
+    await this.societeUserRepository.update(societeUserId, { permissions })
+    
+    const updated = await this.societeUserRepository.findOne({
+      where: { id: societeUserId },
+      relations: ['user', 'societe']
+    })
+    
+    if (!updated) {
+      throw new NotFoundException(`SocieteUser with ID ${societeUserId} not found`)
+    }
+    
+    return updated
+  }
+
+  async revokeUserAccess(societeUserId: string): Promise<void> {
+    const result = await this.societeUserRepository.delete(societeUserId)
+    if (result.affected === 0) {
+      throw new NotFoundException(`SocieteUser with ID ${societeUserId} not found`)
+    }
+  }
+
+  async setDefaultSociete(userId: string, societeId: string): Promise<void> {
+    // D'abord, enlever le statut par défaut de toutes les sociétés de l'utilisateur
+    await this.societeUserRepository.update(
+      { userId },
+      { isDefault: false }
+    )
+
+    // Ensuite, définir la société spécifiée comme par défaut
+    const result = await this.societeUserRepository.update(
+      { userId, societeId },
+      { isDefault: true }
+    )
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`No access found for user ${userId} to company ${societeId}`)
+    }
   }
 }

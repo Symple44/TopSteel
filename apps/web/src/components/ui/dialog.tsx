@@ -30,6 +30,11 @@ interface DialogTitleProps {
   children: React.ReactNode
 }
 
+interface DialogDescriptionProps {
+  className?: string
+  children: React.ReactNode
+}
+
 const DialogContext = React.createContext<{
   open: boolean
   setOpen: (open: boolean) => void
@@ -119,10 +124,22 @@ const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
 )
 DialogTitle.displayName = 'DialogTitle'
 
+const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
+  ({ className, ...props }, ref) => (
+    <p
+      ref={ref}
+      className={cn('text-sm text-muted-foreground', className)}
+      {...props}
+    />
+  )
+)
+DialogDescription.displayName = 'DialogDescription'
+
 export {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 }

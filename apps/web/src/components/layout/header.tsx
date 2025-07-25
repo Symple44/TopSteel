@@ -10,23 +10,31 @@ import {
 	LogOut,
 	Search,
 	Settings,
-	User
+	User,
+	Building,
+	Wifi,
+	WifiOff
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import SyncIndicator from "@/components/auth/sync-indicator";
+import { getApproximateTabCount } from "@/lib/tab-detection";
 
 interface HeaderProps {
 	onToggleSidebar?: () => void;
 	isSidebarCollapsed?: boolean;
+	onShowCompanySelector?: () => void;
 }
 
 export function Header({
 	onToggleSidebar,
 	isSidebarCollapsed = false,
+	onShowCompanySelector,
 }: HeaderProps) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showUserMenu, setShowUserMenu] = useState(false);
-	const { user, logout } = useAuth();
+	const [tabCount, setTabCount] = useState(1);
+	const { user, logout, company } = useAuth();
 	const { t } = useTranslation("common");
 	const router = useRouter();
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -43,6 +51,22 @@ export function Header({
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
+	}, []);
+
+	// Mettre à jour le nombre d'onglets périodiquement
+	useEffect(() => {
+		const updateTabCount = () => {
+			const count = getApproximateTabCount();
+			setTabCount(count);
+		};
+
+		// Mise à jour initiale
+		updateTabCount();
+
+		// Mise à jour toutes les 5 secondes
+		const interval = setInterval(updateTabCount, 5000);
+
+		return () => clearInterval(interval);
 	}, []);
 
 	const handleLogout = async () => {
@@ -86,6 +110,34 @@ export function Header({
 
 				{/* Section droite - Actions utilisateur */}
 				<div className="flex items-center space-x-2">
+					{/* Indicateur de synchronisation */}
+					<SyncIndicator />
+
+					{/* Sélecteur de société */}
+					<div className="hidden md:flex items-center space-x-2">
+						<Button
+							variant="outline"  
+							size="sm"
+							onClick={() => onShowCompanySelector?.()}
+							className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
+							title={company 
+								? (tabCount > 1 ? `Changement affectera ${tabCount} onglets` : "Changer de société")
+								: "Sélectionner une société"
+							}
+						>
+							<Building className="h-4 w-4" />
+							<span className="text-sm font-medium">
+								{company ? company.code : "Sélectionner société"}
+							</span>
+							{tabCount > 1 && (
+								<span className="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full font-medium">
+									{tabCount}
+								</span>
+							)}
+							<ChevronDown className="h-3 w-3" />
+						</Button>
+					</div>
+
 					{/* Notifications */}
 					<NotificationCenter />
 
@@ -181,6 +233,7 @@ export function Header({
 					</div>
 				</div>
 			</div>
+
 		</header>
 	);
 }

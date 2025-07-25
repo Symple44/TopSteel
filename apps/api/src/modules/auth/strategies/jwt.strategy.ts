@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { UsersService } from '../../users/users.service'
-import type { JwtPayload } from '../interfaces/jwt-payload.interface'
+import type { JwtPayload, MultiTenantJwtPayload } from '../interfaces/jwt-payload.interface'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload | MultiTenantJwtPayload) {
     const user = await this.usersService.findById(payload.sub)
 
     if (!user) {
@@ -33,6 +33,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     // Retourner l'utilisateur sans le mot de passe
     const { password, ...result } = user
+    
+    // Si c'est un token multi-tenant, ajouter les informations de société
+    if ('societeId' in payload) {
+      return {
+        ...result,
+        societeId: payload.societeId,
+        societeCode: payload.societeCode,
+        permissions: payload.permissions,
+        tenantDatabase: payload.tenantDatabase,
+        siteId: payload.siteId
+      }
+    }
 
     return result
   }

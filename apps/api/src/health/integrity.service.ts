@@ -9,7 +9,7 @@ export class IntegrityService {
   private readonly logger = new Logger(IntegrityService.name);
 
   constructor(
-    @InjectDataSource()
+    @InjectDataSource('auth')
     private readonly dataSource: DataSource,
     private readonly sessionRedisService: SessionRedisService
   ) {}

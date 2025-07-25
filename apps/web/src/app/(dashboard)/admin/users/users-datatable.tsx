@@ -446,6 +446,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
           delete: handleDelete
         }}
         onCellEdit={handleCellEdit}
+        onRowDoubleClick={handleEdit}
         loading={loading}
         error={error}
         className="border rounded-lg"

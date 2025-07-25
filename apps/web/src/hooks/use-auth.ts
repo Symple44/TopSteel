@@ -1,4 +1,5 @@
 import React from 'react'
+import { getTabId } from '@/lib/tab-id'
 
 // Types harmonisés
 interface UserProfile {
@@ -23,6 +24,17 @@ interface User {
   avatar?: string
   permissions?: string[]
   profile?: UserProfile
+  societeId?: string
+  societeCode?: string
+  societeName?: string
+}
+
+interface CompanyInfo {
+  id: string
+  nom: string
+  code: string
+  status: string
+  plan: string
 }
 
 interface Tokens {
@@ -50,12 +62,15 @@ interface AuthState {
   isLoading: boolean
   isAuthenticated: boolean
   mfa: MFAState
+  company: CompanyInfo | null
+  requiresCompanySelection: boolean
 }
 
 
 // Stockage local sécurisé
 const AUTH_STORAGE_KEY = 'topsteel-auth'
 const TOKEN_STORAGE_KEY = 'topsteel-tokens'
+const COMPANY_STORAGE_KEY = 'topsteel-company'
 
 // Utilitaires de stockage avec gestion d'erreur
 const storage = {
@@ -129,6 +144,9 @@ const cookieUtils = {
 }
 
 export const useAuth = () => {
+  // Identifiant unique pour cet onglet (partagé globalement)
+  const tabId = React.useRef<string>(getTabId())
+
   // État principal
   const [authState, setAuthState] = React.useState<AuthState>({
     user: null,
@@ -137,7 +155,9 @@ export const useAuth = () => {
     isAuthenticated: false,
     mfa: {
       required: false
-    }
+    },
+    company: null,
+    requiresCompanySelection: false
   })
 
   // ✅ Validation des tokens - fonction stable avec useCallback
@@ -201,7 +221,7 @@ export const useAuth = () => {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: identifier, password }),
+        body: JSON.stringify({ login: identifier, password }),
       })
 
       if (!response.ok) {
@@ -235,20 +255,43 @@ export const useAuth = () => {
       storage.set(AUTH_STORAGE_KEY, user)
       storage.set(TOKEN_STORAGE_KEY, tokens)
       
+      // Vérifier s'il y a une société stockée précédemment
+      const storedCompany = storage.get(COMPANY_STORAGE_KEY)
+      
       // Stocker le token dans les cookies pour les API routes
       const expirationDays = rememberMe ? 30 : 1 // 30 jours si "Se souvenir", sinon 1 jour
       cookieUtils.set('accessToken', accessToken, expirationDays)
       cookieUtils.set('refreshToken', refreshToken, expirationDays)
 
-      setAuthState({
+      const newAuthState = {
         user,
         tokens,
         isLoading: false,
         isAuthenticated: true,
         mfa: {
           required: false
-        }
-      })
+        },
+        company: storedCompany || null,
+        requiresCompanySelection: !storedCompany // Si pas de société stockée, demander la sélection
+      }
+
+      setAuthState(newAuthState)
+
+      // ✅ Notifier les autres onglets de la connexion
+      if (typeof window !== 'undefined') {
+        const channel = new BroadcastChannel('topsteel-auth')
+        channel.postMessage({
+          type: 'USER_LOGIN',
+          tabId: tabId.current,
+          data: {
+            user,
+            tokens,
+            company: storedCompany || null,
+            requiresCompanySelection: !storedCompany
+          }
+        })
+        channel.close()
+      }
       
       // Auth state updated successfully
     } catch (error) {
@@ -337,6 +380,100 @@ export const useAuth = () => {
     }))
   }, [])
 
+  // ✅ Fonction pour se connecter à une société
+  const selectCompany = React.useCallback(async (company: CompanyInfo): Promise<void> => {
+    try {
+      setAuthState((prev) => ({ ...prev, isLoading: true }))
+      
+      const response = await fetch(`/api/auth/login-societe/${company.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authState.tokens?.accessToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la connexion à la société')
+      }
+
+      const responseData = await response.json()
+      
+      // La structure correcte de la réponse : data.tokens contient accessToken et refreshToken
+      const { user, tokens: responseTokens, sessionId } = responseData.data
+      const { accessToken, refreshToken } = responseTokens
+      const societe = user.societe // societe est dans user
+      
+      const tokens: Tokens = { accessToken, refreshToken, tokenType: 'Bearer' }
+
+      // Mettre à jour le stockage
+      storage.set(AUTH_STORAGE_KEY, user)
+      storage.set(TOKEN_STORAGE_KEY, tokens)
+      storage.set(COMPANY_STORAGE_KEY, societe)
+      
+      // Mettre à jour les cookies
+      cookieUtils.set('accessToken', accessToken, 1)
+      cookieUtils.set('refreshToken', refreshToken, 1)
+
+      const newAuthState = {
+        user,
+        tokens,
+        isLoading: false,
+        isAuthenticated: true,
+        mfa: {
+          required: false
+        },
+        company: societe,
+        requiresCompanySelection: false
+      }
+
+      setAuthState(newAuthState)
+
+      // ✅ Notifier les autres onglets du changement de société
+      if (typeof window !== 'undefined') {
+        const channel = new BroadcastChannel('topsteel-auth')
+        channel.postMessage({
+          type: 'COMPANY_CHANGED',
+          tabId: tabId.current,
+          data: {
+            company: societe,
+            user,
+            tokens
+          }
+        })
+        channel.close()
+      }
+    } catch (error) {
+      setAuthState((prev) => ({ ...prev, isLoading: false }))
+      throw error
+    }
+  }, [authState.tokens?.accessToken])
+
+  // ✅ Fonction pour rafraîchir les données auth
+  const refreshAuth = React.useCallback(async (): Promise<void> => {
+    try {
+      const storedUser = storage.get(AUTH_STORAGE_KEY)
+      const storedTokens = storage.get(TOKEN_STORAGE_KEY)
+      const storedCompany = storage.get(COMPANY_STORAGE_KEY)
+      
+      if (storedUser && storedTokens) {
+        setAuthState({
+          user: storedUser,
+          tokens: storedTokens,
+          isLoading: false,
+          isAuthenticated: true,
+          mfa: {
+            required: false
+          },
+          company: storedCompany || null,
+          requiresCompanySelection: false
+        })
+      }
+    } catch (error) {
+      console.error('Error refreshing auth:', error)
+    }
+  }, [])
+
   // ✅ Fonction de logout - stable avec useCallback
   const logout = React.useCallback(async (): Promise<void> => {
     setAuthState((prev) => ({ ...prev, isLoading: true }))
@@ -358,20 +495,36 @@ export const useAuth = () => {
       // Nettoyer le stockage local et les cookies
       storage.remove(AUTH_STORAGE_KEY)
       storage.remove(TOKEN_STORAGE_KEY)
+      storage.remove(COMPANY_STORAGE_KEY)
       cookieUtils.remove('accessToken')
       cookieUtils.remove('refreshToken')
 
-      setAuthState({
+      const newAuthState = {
         user: null,
         tokens: null,
         isLoading: false,
         isAuthenticated: false,
         mfa: {
           required: false
-        }
-      })
+        },
+        company: null,
+        requiresCompanySelection: false
+      }
+
+      setAuthState(newAuthState)
+
+      // ✅ Notifier les autres onglets de la déconnexion
+      if (typeof window !== 'undefined') {
+        const channel = new BroadcastChannel('topsteel-auth')
+        channel.postMessage({
+          type: 'USER_LOGOUT',
+          tabId: tabId.current,
+          data: {}
+        })
+        channel.close()
+      }
     }
-  }, [])
+  }, [authState.tokens])
 
   // ✅ Mise à jour utilisateur - stable avec useCallback
   const setUser = React.useCallback((user: User | null) => {
@@ -459,6 +612,7 @@ export const useAuth = () => {
       try {
         const storedUser = storage.get(AUTH_STORAGE_KEY)
         const storedTokens = storage.get(TOKEN_STORAGE_KEY)
+        const storedCompany = storage.get(COMPANY_STORAGE_KEY)
         
         // Vérifier aussi les cookies
         const cookieToken = cookieUtils.get('accessToken')
@@ -482,7 +636,9 @@ export const useAuth = () => {
             isAuthenticated: true,
             mfa: {
               required: false
-            }
+            },
+            company: storedCompany || null,
+            requiresCompanySelection: false
           })
         } else if (cookieToken && cookieRefreshToken) {
           // Restoring session from cookies
@@ -510,8 +666,8 @@ export const useAuth = () => {
           } else {
             // Si on ne peut pas récupérer le profil, nettoyer la session
             // Failed to restore user profile, clearing session
-            cookies.remove('topsteel-token')
-            cookies.remove('topsteel-refresh-token')
+            cookieUtils.remove('accessToken')
+            cookieUtils.remove('refreshToken')
             setAuthState({
               user: null,
               tokens: null,
@@ -593,12 +749,138 @@ export const useAuth = () => {
     return () => window.removeEventListener('user-profile-updated', handleProfileUpdate)
   }, [])
 
+  // ✅ Synchronisation entre onglets avec localStorage events
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      // Détecter les changements de société
+      if (e.key === COMPANY_STORAGE_KEY) {
+        const newCompany = e.newValue ? JSON.parse(e.newValue) : null
+        setAuthState(prev => ({
+          ...prev,
+          company: newCompany,
+          requiresCompanySelection: !newCompany
+        }))
+      }
+      
+      // Détecter les changements d'authentification
+      if (e.key === AUTH_STORAGE_KEY) {
+        const newUser = e.newValue ? JSON.parse(e.newValue) : null
+        const storedTokens = storage.get(TOKEN_STORAGE_KEY)
+        const storedCompany = storage.get(COMPANY_STORAGE_KEY)
+        
+        if (!newUser || !storedTokens) {
+          // Déconnexion détectée
+          setAuthState({
+            user: null,
+            tokens: null,
+            isLoading: false,
+            isAuthenticated: false,
+            mfa: { required: false },
+            company: null,
+            requiresCompanySelection: false
+          })
+        } else {
+          // Mise à jour utilisateur
+          setAuthState(prev => ({
+            ...prev,
+            user: newUser,
+            tokens: storedTokens,
+            isAuthenticated: true,
+            company: storedCompany || null,
+            requiresCompanySelection: !storedCompany
+          }))
+        }
+      }
+      
+      // Détecter les changements de tokens
+      if (e.key === TOKEN_STORAGE_KEY) {
+        const newTokens = e.newValue ? JSON.parse(e.newValue) : null
+        if (!newTokens) {
+          // Tokens supprimés = déconnexion
+          setAuthState({
+            user: null,
+            tokens: null,
+            isLoading: false,
+            isAuthenticated: false,
+            mfa: { required: false },
+            company: null,
+            requiresCompanySelection: false
+          })
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
+  // ✅ Synchronisation avancée avec BroadcastChannel pour même origine
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const channel = new BroadcastChannel('topsteel-auth')
+    
+    const handleBroadcastMessage = (event: MessageEvent) => {
+      const { type, data, tabId: senderTabId } = event.data
+      
+      // Ignorer les messages de notre propre onglet
+      if (senderTabId === tabId.current) {
+        return
+      }
+      
+      switch (type) {
+        case 'COMPANY_CHANGED':
+          setAuthState(prev => ({
+            ...prev,
+            company: data.company,
+            user: data.user,
+            tokens: data.tokens,
+            requiresCompanySelection: false
+          }))
+          break
+          
+        case 'USER_LOGOUT':
+          setAuthState({
+            user: null,
+            tokens: null,
+            isLoading: false,
+            isAuthenticated: false,
+            mfa: { required: false },
+            company: null,
+            requiresCompanySelection: false
+          })
+          break
+          
+        case 'USER_LOGIN':
+          setAuthState({
+            user: data.user,
+            tokens: data.tokens,
+            isLoading: false,
+            isAuthenticated: true,
+            mfa: { required: false },
+            company: data.company || null,
+            requiresCompanySelection: data.requiresCompanySelection || false
+          })
+          break
+      }
+    }
+
+    channel.addEventListener('message', handleBroadcastMessage)
+    
+    return () => {
+      channel.removeEventListener('message', handleBroadcastMessage)
+      channel.close()
+    }
+  }, [])
+
   return {
     user: authState.user,
     tokens: authState.tokens,
     isLoading: authState.isLoading,
     isAuthenticated: authState.isAuthenticated,
     mfa: authState.mfa,
+    company: authState.company,
+    requiresCompanySelection: authState.requiresCompanySelection,
     login,
     logout,
     verifyMFA,
@@ -606,6 +888,8 @@ export const useAuth = () => {
     setUser,
     refreshTokens,
     validateTokens,
+    selectCompany,
+    refreshAuth,
   }
 }
 

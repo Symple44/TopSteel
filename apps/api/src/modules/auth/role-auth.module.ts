@@ -5,7 +5,6 @@ import { PassportModule } from '@nestjs/passport'
 
 // Entities
 import { Role } from './entities/role.entity'
-import { Module as ModuleEntity } from './entities/module.entity'
 import { Permission } from './entities/permission.entity'
 import { RolePermission } from './entities/role-permission.entity'
 import { UserRole } from './entities/user-role.entity'
@@ -18,7 +17,6 @@ import { GroupService } from './services/group.service'
 
 // Controllers
 import { RoleController } from './controllers/role.controller'
-import { ModuleController } from './controllers/module.controller'
 import { GroupController } from './controllers/group.controller'
 
 // Guards & Strategies (à créer si nécessaire)
@@ -30,7 +28,6 @@ import { GroupController } from './controllers/group.controller'
   imports: [
     TypeOrmModule.forFeature([
       Role,
-      ModuleEntity,
       Permission,
       RolePermission,
       UserRole,
@@ -45,7 +42,6 @@ import { GroupController } from './controllers/group.controller'
   ],
   controllers: [
     RoleController,
-    ModuleController,
     GroupController
   ],
   providers: [

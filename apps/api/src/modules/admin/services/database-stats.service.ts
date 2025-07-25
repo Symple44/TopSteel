@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
 
 interface DatabaseStats {
@@ -21,7 +22,7 @@ interface DatabaseStats {
 
 @Injectable()
 export class DatabaseStatsService {
-  constructor(private dataSource: DataSource) {}
+  constructor(@InjectDataSource('auth') private dataSource: DataSource) {}
 
   async getStats(): Promise<DatabaseStats> {
     try {

@@ -69,11 +69,11 @@ import { DatabaseStartupService } from './services/database-startup.service'
     RedisModule.forRoot(),
 
     // Authentification
-    // AuthModule,
+    AuthModule,
     // RoleAuthModule,
 
     // Administration
-    // AdminModule,
+    AdminModule,
 
     // Modules multi-tenant
     SocietesModule,
@@ -90,7 +90,7 @@ import { DatabaseStartupService } from './services/database-startup.service'
     // ProjetsModule,
     // StocksModule,
     UsersModule,
-    // MenuModule,
+    MenuModule,
     // QueryBuilderModule,
     // UiPreferencesModule,
     // MachinesModule,
@@ -101,8 +101,8 @@ import { DatabaseStartupService } from './services/database-startup.service'
     // TracabiliteModule,
     // CommandesModule,
   ],
-  controllers: [AppController, TestController /*, HealthController*/],
-  providers: [AppService, /*IntegrityService,*/ DatabaseStartupService],
+  controllers: [AppController, TestController, HealthController],
+  providers: [AppService, IntegrityService, DatabaseStartupService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

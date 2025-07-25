@@ -20,7 +20,7 @@ export class SocieteUser extends CommonEntity {
   userId!: string
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'userId' })
   user!: User
 
   @Column({ type: 'uuid' })
@@ -28,7 +28,7 @@ export class SocieteUser extends CommonEntity {
   societeId!: string
 
   @ManyToOne(() => Societe)
-  @JoinColumn({ name: 'societe_id' })
+  @JoinColumn({ name: 'societeId' })
   societe!: Societe
 
   @Column({
@@ -75,7 +75,7 @@ export class SocieteUser extends CommonEntity {
     notifications?: Record<string, boolean>
   }
 
-  // Métadonnées
-  @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>
+  // Métadonnées - DISABLED: column doesn't exist in database
+  // @Column({ type: 'jsonb', nullable: true })
+  // metadata?: Record<string, any>
 }

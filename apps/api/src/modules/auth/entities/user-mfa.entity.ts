@@ -6,35 +6,35 @@ export class UserMFA {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'user_id' })
   @Index()
   userId!: string
 
-  @Column({ type: 'enum', enum: ['totp', 'sms', 'email', 'webauthn'], default: 'totp' })
+  @Column({ type: 'varchar', length: 50, default: 'totp' })
   @Index()
   type!: 'totp' | 'sms' | 'email' | 'webauthn'
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, name: 'is_enabled' })
   @Index()
   isEnabled!: boolean
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, name: 'is_verified' })
   @Index()
   isVerified!: boolean
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   secret?: string // Pour TOTP, crypté
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'backup_codes' })
   backupCodes?: string // Codes de récupération, cryptés
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'phone_number' })
   phoneNumber?: string // Pour SMS
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   email?: string // Pour email
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'jsonb', nullable: true, name: 'webauthn_credentials' })
   webauthnCredentials?: {
     credentialId: string
     publicKey: string
@@ -58,22 +58,22 @@ export class UserMFA {
     lastFailedAttempt?: string
   }
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'last_used_at' })
   @Index()
   lastUsedAt?: Date
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'verified_at' })
   verifiedAt?: Date
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date
 
   // Relations
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'user_id' })
   user!: User
 
   // Méthodes utilitaires

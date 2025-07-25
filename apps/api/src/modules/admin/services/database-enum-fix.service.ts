@@ -5,7 +5,7 @@ import { DataSource } from 'typeorm'
 @Injectable()
 export class DatabaseEnumFixService {
   constructor(
-    @InjectDataSource()
+    @InjectDataSource('auth')
     private dataSource: DataSource
   ) {}
 
