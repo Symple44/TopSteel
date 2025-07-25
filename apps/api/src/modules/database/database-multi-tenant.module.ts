@@ -27,15 +27,8 @@ import { Module as ModuleEntity } from '../auth/entities/module.entity'
 
 // Import des entités de préférences utilisateur (maintenant dans AUTH)
 import { UserSettings } from '../users/entities/user-settings.entity'
-import { UserMenuPreference } from '../menu/entities/user-menu-preference.entity'
 import { DiscoveredPage } from '../menu/entities/discovered-page.entity'
-import { UserMenuItemPreference } from '../admin/entities/user-menu-item-preference.entity'
-import { UserMenuPreferences } from '../admin/entities/user-menu-preferences.entity'
 import { SystemParameter } from '../admin/entitites/system-parameter.entity'
-import { MenuConfiguration } from '../admin/entities/menu-configuration.entity'
-import { MenuItem } from '../admin/entities/menu-item.entity'
-import { MenuItemPermission } from '../admin/entities/menu-item-permission.entity'
-import { MenuItemRole } from '../admin/entities/menu-item-role.entity'
 
 // Import des entités de notifications (maintenant dans AUTH)
 import { Notifications } from '../notifications/entities/notifications.entity'
@@ -104,13 +97,14 @@ import { Commande } from '../commandes/entities/commande.entity'
       UserSettings,
       // UserMenuPreference, // Enregistré dans MenuModule
       DiscoveredPage,
-      UserMenuItemPreference,
-      UserMenuPreferences,
       SystemParameter,
-      MenuConfiguration,
-      MenuItem,
-      MenuItemPermission,
-      MenuItemRole,
+      // Entités de menu (données globales) - Enregistrées dans AdminModule
+      // MenuConfiguration,
+      // MenuItem,
+      // MenuItemPermission,
+      // MenuItemRole,
+      // UserMenuPreferences,
+      // UserMenuItemPreference,
       // Notifications
       Notifications,
       NotificationSettings,
@@ -126,6 +120,7 @@ import { Commande } from '../commandes/entities/commande.entity'
       Materiaux,
       Stocks,
       Commande,
+      // Menu entities are registered in AdminModule and MenuModule
     ], 'tenant'),
   ],
   providers: [MultiTenantDatabaseConfig],

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm'
 // Note: Import relatif pour éviter les problèmes de dépendances circulaires
 
-@Entity('user_menu_preferences')
+@Entity('user_menu_preference_items')
 @Index(['userId', 'menuId'], { unique: true })
 export class UserMenuPreference {
   @PrimaryGeneratedColumn('uuid')

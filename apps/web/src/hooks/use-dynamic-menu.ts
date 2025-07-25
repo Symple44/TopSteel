@@ -18,6 +18,10 @@ export interface MenuItemConfig {
   isVisible: boolean
   moduleId?: string
   target?: string
+  type: 'M' | 'P' | 'L' | 'D'
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
   permissions?: string[]
   roles?: string[]
   children: MenuItemConfig[]
@@ -59,7 +63,7 @@ export function useDynamicMenu() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/admin/menu-config/active')
+      const response = await fetch('/api/admin/menus/configurations/active')
       
       // Vérifier si la réponse est bien du JSON
       const contentType = response.headers.get('content-type')
@@ -72,7 +76,8 @@ export function useDynamicMenu() {
       const data = await response.json()
       
       if (data.success) {
-        setMenuConfig(data.data)
+        setMenuConfig(data.data.configuration)
+        setStandardMenu(data.data.menuTree || [])
       } else {
         setError('Erreur lors du chargement du menu')
       }
@@ -142,8 +147,8 @@ export function useDynamicMenu() {
       setLoading(true)
       setError(null)
       
-      // CORRECTION: Le menu standard doit venir de la config active définie par les admins
-      const response = await fetch('/api/admin/menu-config/active')
+      // Utiliser l'API pour récupérer le menu filtré par les permissions de l'utilisateur
+      const response = await fetch('/api/user/menu/filtered')
       
       // Vérifier si la réponse est bien du JSON
       const contentType = response.headers.get('content-type')
@@ -156,10 +161,9 @@ export function useDynamicMenu() {
       const data = await response.json()
       
       if (data.success) {
-        // Pour le menu standard, on utilise les items de la configuration active
-        const menuItems = data.data?.items || []
+        // Pour le menu standard, on utilise les items filtrés par les permissions
+        const menuItems = data.data || []
         setStandardMenu(menuItems)
-        setMenuConfig(data.data)
       }
     } catch (err) {
       console.error('Erreur lors du chargement du menu standard:', err)
@@ -313,15 +317,42 @@ export function useMenu() {
 
 // Utilitaires pour convertir les items de menu en format compatible avec la sidebar existante
 export function convertToNavItems(menuItems: MenuItemConfig[]): any[] {
-  return menuItems.map(item => ({
-    title: item.titleKey || item.title,
-    href: item.href,
-    icon: item.icon,
-    badge: item.badge,
-    gradient: item.gradient,
-    children: item.children.length > 0 ? convertToNavItems(item.children) : undefined,
-    roles: item.roles
-  }))
+  return menuItems.map(item => {
+    // Générer l'URL basée sur le type de menu
+    let href: string | undefined
+    
+    switch (item.type) {
+      case 'P': // Programme
+        href = item.programId || item.href
+        break
+      case 'L': // Lien externe
+        href = item.externalUrl
+        break
+      case 'D': // Vue Data
+        href = item.queryBuilderId ? `/query-builder/${item.queryBuilderId}/view` : undefined
+        break
+      case 'M': // Dossier - pas de href
+      default:
+        href = undefined
+        break
+    }
+
+    return {
+      title: item.titleKey || item.title,
+      href,
+      icon: item.icon,
+      badge: item.badge,
+      gradient: item.gradient,
+      target: item.type === 'L' || item.type === 'D' ? '_blank' : undefined,
+      children: item.children.length > 0 ? convertToNavItems(item.children) : undefined,
+      roles: item.roles,
+      menuType: item.type,
+      isFolder: item.type === 'M',
+      isProgram: item.type === 'P',
+      isLink: item.type === 'L',
+      isDataView: item.type === 'D'
+    }
+  })
 }
 
 // Hook pour la compatibilité avec l'ancien système

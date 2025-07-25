@@ -4,7 +4,7 @@ import { config } from 'dotenv'
 // Charger les variables d'environnement
 config()
 
-export const AppDataSource = new DataSource({
+export const MenuMigrationDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
@@ -15,10 +15,10 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: true,
   
-  // Entités - utiliser des chemins relatifs simples
-  entities: ['src/**/*.entity.{ts,js}'],
+  // Pas d'entité nécessaire pour les migrations simples
+  entities: [],
   
-  // Migrations
-  migrations: ['src/database/migrations/**/*.{ts,js}'],
+  // Migrations spécifiques aux menus
+  migrations: ['src/database/migrations/auth/005-AddMenuItemTypes.ts'],
   migrationsTableName: 'migrations',
 })

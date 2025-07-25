@@ -19,16 +19,11 @@ export class AddStatusColumnToUserSessions1721852100000 implements MigrationInte
         }
 
         // Mettre à jour les sessions existantes sans status
+        // Considérer toutes les sessions existantes comme actives par défaut
         await queryRunner.query(`
             UPDATE "user_sessions" 
             SET "status" = 'active' 
-            WHERE "status" IS NULL AND "is_active" = true
-        `)
-
-        await queryRunner.query(`
-            UPDATE "user_sessions" 
-            SET "status" = 'ended' 
-            WHERE "status" IS NULL AND "is_active" = false
+            WHERE "status" IS NULL
         `)
     }
 

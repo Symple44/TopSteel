@@ -2,7 +2,7 @@ import { Injectable, ConflictException, NotFoundException, ForbiddenException } 
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
-import { MenuItem } from '../entities/menu-item.entity'
+import { MenuItem, MenuItemType } from '../entities/menu-item.entity'
 import { MenuItemPermission } from '../entities/menu-item-permission.entity'
 import { MenuItemRole } from '../entities/menu-item-role.entity'
 
@@ -19,6 +19,10 @@ export interface MenuItemDto {
   isVisible: boolean
   moduleId?: string
   target?: string
+  type: MenuItemType
+  programId?: string
+  externalUrl?: string
+  queryBuilderId?: string
   permissions?: string[]
   roles?: string[]
   children?: MenuItemDto[]
@@ -203,6 +207,10 @@ export class MenuConfigurationService {
           isVisible: item.isVisible,
           moduleId: item.moduleId,
           target: item.target,
+          type: item.type,
+          programId: item.programId,
+          externalUrl: item.externalUrl,
+          queryBuilderId: item.queryBuilderId,
           permissions: item.permissions?.map(p => p.permissionId) || [],
           roles: item.roles?.map(r => r.roleId) || [],
           children: this.buildMenuTree(children, allItems),
@@ -213,14 +221,25 @@ export class MenuConfigurationService {
 
   private async createMenuItems(configId: string, items: MenuItemDto[], parentId?: string): Promise<void> {
     for (const itemDto of items) {
-      // Créer l'item
-      const item = MenuItem.create(
-        configId,
-        itemDto.title,
-        itemDto.href,
-        itemDto.icon,
-        parentId || itemDto.parentId
-      )
+      // Créer l'item selon son type
+      let item: MenuItem
+      
+      switch (itemDto.type) {
+        case MenuItemType.FOLDER:
+          item = MenuItem.createFolder(configId, itemDto.title, itemDto.icon, parentId || itemDto.parentId)
+          break
+        case MenuItemType.PROGRAM:
+          item = MenuItem.createProgram(configId, itemDto.title, itemDto.programId || itemDto.href || '', itemDto.icon, parentId || itemDto.parentId)
+          break
+        case MenuItemType.LINK:
+          item = MenuItem.createLink(configId, itemDto.title, itemDto.externalUrl || '', itemDto.icon, parentId || itemDto.parentId)
+          break
+        case MenuItemType.DATA_VIEW:
+          item = MenuItem.createDataView(configId, itemDto.title, itemDto.queryBuilderId || '', itemDto.icon, parentId || itemDto.parentId)
+          break
+        default:
+          item = MenuItem.create(configId, itemDto.title, itemDto.type, itemDto.href, itemDto.icon, parentId || itemDto.parentId)
+      }
 
       Object.assign(item, {
         titleKey: itemDto.titleKey,
@@ -333,7 +352,8 @@ export class MenuConfigurationService {
       {
         title: 'Tableau de bord',
         titleKey: 'dashboard',
-        href: '/dashboard',
+        type: MenuItemType.PROGRAM,
+        programId: '/dashboard',
         icon: 'Home',
         orderIndex: 1,
         isVisible: true
@@ -341,7 +361,7 @@ export class MenuConfigurationService {
       {
         title: 'Administration',
         titleKey: 'administration',
-        href: '/admin',
+        type: MenuItemType.FOLDER,
         icon: 'Shield',
         orderIndex: 100,
         isVisible: true,
@@ -350,7 +370,8 @@ export class MenuConfigurationService {
           {
             title: 'Gestion des utilisateurs',
             titleKey: 'users_management',
-            href: '/admin/users',
+            type: MenuItemType.PROGRAM,
+            programId: '/admin/users',
             icon: 'Users',
             orderIndex: 1,
             isVisible: true,
@@ -360,7 +381,8 @@ export class MenuConfigurationService {
           {
             title: 'Gestion des rôles',
             titleKey: 'roles_management',
-            href: '/admin/roles',
+            type: MenuItemType.PROGRAM,
+            programId: '/admin/roles',
             icon: 'Shield',
             orderIndex: 2,
             isVisible: true,
@@ -370,14 +392,35 @@ export class MenuConfigurationService {
           {
             title: 'Gestion des groupes',
             titleKey: 'groups_management',
-            href: '/admin/groups',
+            type: MenuItemType.PROGRAM,
+            programId: '/admin/groups',
             icon: 'Building',
             orderIndex: 3,
             isVisible: true,
             moduleId: 'USER_MANAGEMENT',
             permissions: ['USER_MANAGEMENT_VIEW']
+          },
+          {
+            title: 'Gestion des menus',
+            titleKey: 'menu_management',
+            type: MenuItemType.PROGRAM,
+            programId: '/admin/menus',
+            icon: 'Menu',
+            orderIndex: 4,
+            isVisible: true,
+            moduleId: 'MENU_MANAGEMENT',
+            permissions: ['MENU_MANAGEMENT_VIEW']
           }
         ]
+      },
+      {
+        title: 'Query Builder',
+        titleKey: 'query_builder',
+        type: MenuItemType.PROGRAM,
+        programId: '/query-builder',
+        icon: 'Database',
+        orderIndex: 50,
+        isVisible: true
       }
     ]
 
@@ -407,5 +450,45 @@ export class MenuConfigurationService {
       description: data.description,
       items: data.items
     }, createdBy)
+  }
+
+  // ===== INTÉGRATION QUERY BUILDER =====
+
+  async createDataViewMenuItem(
+    configId: string,
+    queryBuilderId: string,
+    title: string,
+    icon?: string,
+    parentId?: string
+  ): Promise<MenuItem> {
+    const item = MenuItem.createDataView(configId, title, queryBuilderId, icon, parentId)
+    return await this.itemRepository.save(item)
+  }
+
+  async addUserDataViewToMenu(
+    userId: string,
+    queryBuilderId: string,
+    title: string,
+    icon?: string
+  ): Promise<MenuItem> {
+    // Rechercher ou créer une configuration personnelle pour l'utilisateur
+    let userConfig = await this.configRepository.findOne({
+      where: { createdBy: userId, name: `Menus personnels - ${userId}` }
+    })
+
+    if (!userConfig) {
+      userConfig = await this.createConfiguration({
+        name: `Menus personnels - ${userId}`,
+        description: 'Configuration personnelle de menus utilisateur',
+        items: []
+      }, userId)
+    }
+
+    return await this.createDataViewMenuItem(
+      userConfig.id,
+      queryBuilderId,
+      title,
+      icon || 'BarChart3'
+    )
   }
 }

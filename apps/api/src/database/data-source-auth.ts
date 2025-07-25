@@ -19,6 +19,8 @@ export const authDataSourceOptions: DataSourceOptions = {
     'src/modules/societes/entities/*.entity{.ts,.js}',
     'src/modules/users/entities/*.entity{.ts,.js}',
     'src/modules/auth/entities/*.entity{.ts,.js}',
+    'src/modules/admin/entities/*.entity{.ts,.js}',
+    'src/modules/menu/entities/*.entity{.ts,.js}',
     'src/modules/shared/entities/shared-data-registry.entity{.ts,.js}'
   ],
   migrations: ['src/database/migrations/auth/*{.ts,.js}'],

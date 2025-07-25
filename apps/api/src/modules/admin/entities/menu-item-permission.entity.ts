@@ -7,18 +7,18 @@ export class MenuItemPermission {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'menuItemId' })
   @Index()
   menuItemId!: string
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, name: 'permissionId' })
   @Index()
   permissionId!: string
 
-  @Column({ type: 'boolean', default: true })
-  isRequired!: boolean
+  // isRequired n'existe pas en base, propriété virtuelle
+  isRequired?: boolean
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt!: Date
 
   // Relations

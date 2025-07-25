@@ -13,27 +13,27 @@ export class MenuConfiguration {
   @Column({ type: 'text', nullable: true })
   description?: string
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, name: 'isactive' })
   @Index()
   isActive!: boolean
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, name: 'issystem' })
   @Index()
   isSystem!: boolean
 
   @Column({ type: 'json', nullable: true })
   metadata?: Record<string, any>
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdat' })
   createdAt!: Date
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updatedat' })
   updatedAt!: Date
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, name: 'createdby' })
   createdBy?: string
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, name: 'updatedby' })
   updatedBy?: string
 
   // Relations

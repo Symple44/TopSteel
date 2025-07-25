@@ -47,6 +47,14 @@ import { Produit } from '../../modules/stocks/entities/produit.entity'
 import { Stocks } from '../../modules/stocks/entities/stocks.entity'
 import { Tracabilite } from '../../modules/tracabilite/entities/tracabilite.entity'
 
+// Entités de menu
+import { MenuConfiguration } from '../../modules/admin/entities/menu-configuration.entity'
+import { MenuItem } from '../../modules/admin/entities/menu-item.entity'
+import { MenuItemPermission } from '../../modules/admin/entities/menu-item-permission.entity'
+import { MenuItemRole } from '../../modules/admin/entities/menu-item-role.entity'
+import { UserMenuPreferences } from '../../modules/admin/entities/user-menu-preferences.entity'
+import { UserMenuItemPreference } from '../../modules/admin/entities/user-menu-item-preference.entity'
+
 @Injectable()
 export class MultiTenantDatabaseConfig {
   private dataSources: Map<string, DataSource> = new Map()

@@ -101,4 +101,22 @@ export class QueryBuilderController {
   remove(@Param('id') id: string, @Request() req) {
     return this.queryBuilderService.remove(id, req.user.id)
   }
+
+  @Post(':id/add-to-menu')
+  async addToMenu(
+    @Param('id') id: string,
+    @Body() body: { title?: string; icon?: string },
+    @Request() req
+  ) {
+    const queryBuilder = await this.queryBuilderService.findOne(id, req.user.id)
+    
+    // Retourner les informations nécessaires pour ajouter au menu
+    return {
+      queryBuilderId: id,
+      title: body.title || queryBuilder.name,
+      icon: body.icon || 'BarChart3',
+      type: 'D',
+      description: `Vue Data: ${queryBuilder.description || queryBuilder.name}`
+    }
+  }
 }
