@@ -24,6 +24,7 @@ import { UserSession } from './entities/user-session.entity'
 import { UserMFA } from './entities/user-mfa.entity'
 import { MFASession } from './entities/mfa-session.entity'
 import { JwtStrategy } from './strategies/jwt.strategy'
+import { JwtEnhancedStrategy } from './strategies/jwt-enhanced.strategy'
 import { LocalStrategy } from './strategies/local.strategy'
 
 @Module({
@@ -61,7 +62,8 @@ import { LocalStrategy } from './strategies/local.strategy'
   providers: [
     AuthService, 
     LocalStrategy, 
-    JwtStrategy, 
+    JwtStrategy,
+    JwtEnhancedStrategy, 
     JwtUtilsService, 
     SessionInvalidationService, 
     SessionRedisService,

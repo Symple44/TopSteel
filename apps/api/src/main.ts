@@ -12,22 +12,71 @@ import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
 import { TransformInterceptor } from './common/interceptors/transform.interceptor'
+import { EnhancedThrottlerGuard } from './common/guards/enhanced-throttler.guard'
+import { MetricsSafeInterceptor } from './common/interceptors/metrics-safe.interceptor'
 import { listenWithPortFallback } from './config/port-helper'
+import { ServerManager } from './config/server-manager'
+import { EnhancedServerManager } from './config/enhanced-server-manager'
+import { GracefulShutdownService } from './config/graceful-shutdown.service'
 
 // ============================================================================
 // CHARGEMENT VARIABLES D'ENVIRONNEMENT MONOREPO
 // ============================================================================
-console.info('🔧 __dirname:', __dirname)
-const rootDir = join(__dirname, '../../../')
-const envLocalPath = join(rootDir, '.env.local')
-console.info('🔧 Tentative de chargement .env.local depuis:', envLocalPath)
-console.info('🔧 Fichier .env.local existe?', existsSync(envLocalPath))
+// Ajustement du chemin selon l'environnement avec path.resolve pour Windows
+const isCompiled = __dirname.includes('dist')
+let rootDir: string
 
-config({ path: envLocalPath })
-config({ path: join(rootDir, '.env') })
+try {
+  if (isCompiled) {
+    // En production: dist/main.js -> ../../../../
+    rootDir = join(__dirname, '../../../../')
+  } else {
+    // En développement: src/main.ts -> ../../../
+    rootDir = join(__dirname, '../../../')
+  }
+  
+  // Normaliser le chemin pour Windows
+  rootDir = rootDir.replace(/\\/g, '/')
+  
+  const envLocalPath = join(rootDir, '.env.local')
+  
+  // Chargement silencieux des variables d'environnement
+  config({ path: envLocalPath, quiet: true })
+  config({ path: join(rootDir, '.env'), quiet: true })
+} catch (error) {
+  console.warn('Erreur lors du chargement des variables d\'environnement:', error)
+  
+  // Fallback: essayer de charger depuis le répertoire courant
+  config({ path: '.env.local', quiet: true })
+  config({ path: '.env', quiet: true })
+}
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap')
+
+  try {
+    // Nettoyage silencieux sauf si problème détecté
+    const targetPort = parseInt(process.env.PORT || process.env.API_PORT || '3002')
+    
+    // Vérifier d'abord la disponibilité du port
+    const isPortFree = await EnhancedServerManager.isPortAvailable(targetPort)
+    
+    if (!isPortFree) {
+      logger.log(`🔍 Port ${targetPort} occupé, nettoyage...`)
+      
+      // Nettoyer les processus orphelins d'abord
+      await EnhancedServerManager.cleanupOrphanedProcesses()
+      
+      // Nettoyage complet du port avec retry
+      const success = await EnhancedServerManager.cleanupPort(targetPort, 2)
+      if (!success) {
+        logger.warn(`⚠️  Port ${targetPort} occupé, utilisation du fallback automatique`)
+      }
+    }
+    
+  } catch (error) {
+    logger.warn(`⚠️  Erreur lors du nettoyage initial: ${error}`)
+  }
 
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
@@ -89,16 +138,8 @@ async function bootstrap() {
   // CONFIGURATION VERSIONING
   // ============================================================================
 
-  app.use((req: any, res: any, next: any) => {
-    if (req.originalUrl.startsWith('/api/') && !req.originalUrl.includes('/v1/')) {
-      const newUrl = req.originalUrl.replace('/api/', '/api/v1/')
-      return res.redirect(308, newUrl)
-    }
-    next()
-  })
-
-  // Prefix global pour l'API
-  app.setGlobalPrefix('api')
+  // Configuration du préfixe global - temporairement désactivé pour debug
+  // app.setGlobalPrefix('api')
 
   // Configuration versioning
   app.enableVersioning({
@@ -128,9 +169,13 @@ async function bootstrap() {
   // Interceptors globaux
   app.useGlobalInterceptors(new LoggingInterceptor())
   app.useGlobalInterceptors(new TransformInterceptor())
+  app.useGlobalInterceptors(app.get(MetricsSafeInterceptor))
 
   // Filtres globaux
   app.useGlobalFilters(new HttpExceptionFilter())
+
+  // Guards globaux - Utiliser le guard standard pour éviter les complications
+  app.useGlobalGuards(app.get(EnhancedThrottlerGuard))
 
   // ============================================================================
   // DOCUMENTATION SWAGGER COMPLÈTE V1/V2
@@ -277,20 +322,15 @@ async function bootstrap() {
     logger.log(`📚 Documentation Swagger V2 (beta): ${serverUrl}/api/v2/docs`)
   }
 
-  // Graceful shutdown
-  const gracefulShutdown = () => {
-    logger.log('🔄 Arrêt gracieux du serveur...')
-    app.close().then(() => {
-      logger.log('✅ Serveur arrêté avec succès')
-      process.exit(0)
-    })
-  }
-
-  process.on('SIGTERM', gracefulShutdown)
-  process.on('SIGINT', gracefulShutdown)
-
+  // Système de graceful shutdown amélioré
+  const gracefulShutdownService = new GracefulShutdownService(configService)
+  
   // Gestion intelligente des ports avec fallback
   const actualPort = await listenWithPortFallback(app, configService, logger)
+  
+  // Configurer le service de shutdown avec les infos de l'app
+  gracefulShutdownService.setApp(app, actualPort)
+  gracefulShutdownService.setupSignalHandlers()
 
   // Mise à jour des logs avec le port réel
   const portForLogs = actualPort

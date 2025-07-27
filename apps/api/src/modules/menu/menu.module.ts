@@ -8,10 +8,19 @@ import { AvailablePagesController } from './controllers/available-pages.controll
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserMenuPreference], 'auth')
+    // UserMenuPreference est déjà enregistré dans DatabaseMultiTenantModule
   ],
-  controllers: [UserMenuPreferenceController, AvailablePagesController],
-  providers: [UserMenuPreferenceService, PageSyncService],
-  exports: [UserMenuPreferenceService, PageSyncService],
+  controllers: [
+    UserMenuPreferenceController,
+    AvailablePagesController
+  ],
+  providers: [
+    UserMenuPreferenceService,
+    PageSyncService
+  ],
+  exports: [
+    UserMenuPreferenceService,
+    PageSyncService
+  ],
 })
 export class MenuModule {}

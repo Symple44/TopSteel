@@ -31,6 +31,7 @@ import {
   Calendar
 } from 'lucide-react'
 import { UserCompaniesDataTable } from './user-companies-datatable'
+import BulkOperationsHistory from '@/components/admin/bulk-operations-history'
 
 interface UserDetails {
   id: string
@@ -190,6 +191,10 @@ export default function UserDetailsPage() {
               <Building className="h-4 w-4 mr-2" />
               Sociétés et droits
             </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center">
+              <Calendar className="h-4 w-4 mr-2" />
+              Historique des modifications
+            </TabsTrigger>
           </TabsList>
 
           {/* Tab: Informations générales */}
@@ -320,6 +325,11 @@ export default function UserDetailsPage() {
                 <UserCompaniesDataTable userId={userId} />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Tab: Historique des modifications */}
+          <TabsContent value="history" className="space-y-6">
+            <BulkOperationsHistory userId={userId} limit={50} />
           </TabsContent>
         </Tabs>
       </div>

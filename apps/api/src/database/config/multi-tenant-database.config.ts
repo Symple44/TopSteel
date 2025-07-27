@@ -9,6 +9,7 @@ import { Site } from '../../modules/societes/entities/site.entity'
 import { SocieteUser } from '../../modules/societes/entities/societe-user.entity'
 import { User } from '../../modules/users/entities/user.entity'
 import { UserSettings } from '../../modules/users/entities/user-settings.entity'
+import { UserMenuPreference } from '../../modules/menu/entities/user-menu-preference.entity'
 import { Group } from '../../modules/auth/entities/group.entity'
 import { Module } from '../../modules/auth/entities/module.entity'
 import { Permission } from '../../modules/auth/entities/permission.entity'
@@ -55,6 +56,11 @@ import { MenuItemRole } from '../../modules/admin/entities/menu-item-role.entity
 import { UserMenuPreferences } from '../../modules/admin/entities/user-menu-preferences.entity'
 import { UserMenuItemPreference } from '../../modules/admin/entities/user-menu-item-preference.entity'
 
+// Entités marketplace
+import { MarketplaceModule as MarketplaceModuleEntity } from '../../modules/marketplace/entities/marketplace-module.entity'
+import { ModuleInstallation } from '../../modules/marketplace/entities/module-installation.entity'
+import { ModuleRating } from '../../modules/marketplace/entities/module-rating.entity'
+
 @Injectable()
 export class MultiTenantDatabaseConfig {
   private dataSources: Map<string, DataSource> = new Map()
@@ -80,6 +86,7 @@ export class MultiTenantDatabaseConfig {
         SharedDataRegistry, // Registre des données partagées
         User,
         UserSettings,
+        UserMenuPreference,
         Group,
         Module,
         Permission,
@@ -90,6 +97,8 @@ export class MultiTenantDatabaseConfig {
         UserSession,
         UserMFA,
         MFASession,
+        // Entités marketplace (seulement catalogue global)
+        MarketplaceModuleEntity,
       ],
       synchronize: false, // Toujours false en production
       logging: this.configService.get('DB_LOGGING', false),
@@ -151,6 +160,9 @@ export class MultiTenantDatabaseConfig {
         Produit,
         Stocks,
         Tracabilite,
+        // Entités marketplace spécifiques au tenant
+        ModuleInstallation,
+        ModuleRating,
       ],
       synchronize: false,
       logging: this.configService.get('DB_LOGGING', false),

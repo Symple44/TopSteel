@@ -35,6 +35,11 @@ interface DialogDescriptionProps {
   children: React.ReactNode
 }
 
+interface DialogFooterProps {
+  className?: string
+  children: React.ReactNode
+}
+
 const DialogContext = React.createContext<{
   open: boolean
   setOpen: (open: boolean) => void
@@ -135,6 +140,13 @@ const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescripti
 )
 DialogDescription.displayName = 'DialogDescription'
 
+const DialogFooter = ({ className, ...props }: DialogFooterProps) => (
+  <div
+    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6', className)}
+    {...props}
+  />
+)
+
 export {
   Dialog,
   DialogTrigger,
@@ -142,4 +154,5 @@ export {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 }

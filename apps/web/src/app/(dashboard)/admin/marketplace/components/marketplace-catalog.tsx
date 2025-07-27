@@ -1,0 +1,267 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { ModuleDetailsDialog } from './module-details-dialog'
+import { Search, Star, Download, ExternalLink, Users, ShoppingCart, BarChart3, Zap, Shield, Wrench, DollarSign, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+
+interface MarketplaceModule {
+  id: string
+  moduleKey: string
+  displayName: string
+  description: string
+  shortDescription?: string
+  category: string
+  version: string
+  publisher: string
+  pricing: {
+    type: string
+    amount?: number
+    currency?: string
+    period?: string
+    description?: string
+  }
+  icon?: string
+  downloadCount: number
+  ratingAverage: number
+  ratingCount: number
+  isInstalled?: boolean
+}
+
+// Pas de données mockées - utilisation de l'API réelle
+
+const CATEGORY_ICONS = {
+  HR: Users,
+  PROCUREMENT: ShoppingCart,
+  ANALYTICS: BarChart3,
+  INTEGRATION: Zap,
+  QUALITY: Shield,
+  MAINTENANCE: Wrench,
+  FINANCE: DollarSign
+}
+
+const CATEGORY_LABELS = {
+  HR: 'Ressources Humaines',
+  PROCUREMENT: 'Achats & Approvisionnement',
+  ANALYTICS: 'Analytique & BI',
+  INTEGRATION: 'Intégrations',
+  QUALITY: 'Qualité',
+  MAINTENANCE: 'Maintenance',
+  FINANCE: 'Finance'
+}
+
+export function MarketplaceCatalog() {
+  const [modules, setModules] = useState<MarketplaceModule[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedModule, setSelectedModule] = useState<MarketplaceModule | null>(null)
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Charger les modules depuis l'API
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/admin/marketplace/modules')
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des modules')
+        }
+        
+        const data = await response.json()
+        setModules(data)
+      } catch (err) {
+        console.error('Erreur lors du chargement des modules:', err)
+        setError(err instanceof Error ? err.message : 'Erreur inconnue')
+        toast.error('Impossible de charger les modules')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchModules()
+  }, [])
+
+  const filteredModules = modules.filter(module => {
+    const matchesSearch = searchQuery === '' || 
+      module.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      module.description.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    const matchesCategory = selectedCategory === 'all' || module.category === selectedCategory
+
+    return matchesSearch && matchesCategory
+  })
+
+  const handleModuleClick = (module: MarketplaceModule) => {
+    setSelectedModule(module)
+    setShowDetailsDialog(true)
+  }
+
+  const formatPrice = (pricing: MarketplaceModule['pricing']) => {
+    switch (pricing.type) {
+      case 'FREE':
+        return 'Gratuit'
+      case 'ONE_TIME':
+        return `${pricing.amount}${pricing.currency} (unique)`
+      case 'SUBSCRIPTION':
+        const period = pricing.period === 'YEAR' ? 'an' : 'mois'
+        return `${pricing.amount}${pricing.currency}/${period}`
+      case 'COMMISSION':
+        return 'Commission sur économies'
+      case 'USAGE_BASED':
+        return 'Basé sur usage'
+      default:
+        return 'Prix sur demande'
+    }
+  }
+
+  const getCategoryIcon = (category: string) => {
+    const IconComponent = CATEGORY_ICONS[category as keyof typeof CATEGORY_ICONS]
+    return IconComponent ? <IconComponent className="h-4 w-4" /> : null
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Chargement des modules...</span>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-destructive mb-4">{error}</p>
+        <Button onClick={() => window.location.reload()}>Réessayer</Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Filtres */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher des modules..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Toutes les catégories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Toutes les catégories</SelectItem>
+            {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+              <SelectItem key={key} value={key}>
+                <div className="flex items-center gap-2">
+                  {getCategoryIcon(key)}
+                  {label}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Grille des modules */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {filteredModules.map((module) => (
+          <Card 
+            key={module.id} 
+            className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02]"
+            onClick={() => handleModuleClick(module)}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  {getCategoryIcon(module.category)}
+                  <div>
+                    <CardTitle className="text-lg">{module.displayName}</CardTitle>
+                    <CardDescription className="text-xs">
+                      par {module.publisher} • v{module.version}
+                    </CardDescription>
+                  </div>
+                </div>
+                {module.isInstalled && (
+                  <Badge variant="secondary" className="text-xs">
+                    Installé
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {module.shortDescription || module.description}
+              </p>
+              
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    <span>{module.ratingAverage}</span>
+                    <span>({module.ratingCount})</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Download className="h-3 w-3" />
+                    <span>{module.downloadCount.toLocaleString()}</span>
+                  </div>
+                </div>
+                
+                <Badge variant="outline" className="text-xs">
+                  {CATEGORY_LABELS[module.category as keyof typeof CATEGORY_LABELS]}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center justify-between pt-2 border-t">
+                <div className="font-medium text-sm">
+                  {formatPrice(module.pricing)}
+                </div>
+                
+                {module.isInstalled ? (
+                  <Button size="sm" variant="outline" disabled>
+                    Installé
+                  </Button>
+                ) : (
+                  <Button size="sm">
+                    Voir détails
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {filteredModules.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Aucun module trouvé pour votre recherche.</p>
+        </div>
+      )}
+
+      {/* Dialog des détails du module */}
+      {selectedModule && (
+        <ModuleDetailsDialog
+          module={selectedModule}
+          open={showDetailsDialog}
+          onOpenChange={setShowDetailsDialog}
+        />
+      )}
+    </div>
+  )
+}

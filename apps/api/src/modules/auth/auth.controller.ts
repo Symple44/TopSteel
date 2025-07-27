@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, Req, Para
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { Public } from '../../common/decorators/public.decorator'
+import { ThrottleAuth } from '../../common/decorators/throttle-config.decorator'
 import type { User } from '../users/entities/user.entity'
 import { AuthService } from './auth.service'
 import { ChangePasswordDto } from './dto/change-password.dto'
@@ -20,6 +21,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @ThrottleAuth()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -35,6 +37,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottleAuth()
   @Post('login-mfa')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -138,6 +141,7 @@ export class AuthController {
     return this.authService.getUserSocietes(user.id)
   }
 
+  @ThrottleAuth()
   @Post('login-societe/:societeId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')

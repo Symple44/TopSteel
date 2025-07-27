@@ -68,26 +68,26 @@ import { UserMenuPreference } from '../menu/entities/user-menu-preference.entity
     // MenuConfigurationController,  // Dépend d'entités TypeORM problématiques
     PageSyncController,
     AdminUsersController,
-    AdminRolesController,
+    AdminRolesController,  // Réactivé pour l'endpoint permissions
     // AdminMenusController,  // Dépend d'entités TypeORM problématiques
     // MenuTestController,  // Dépend d'entités TypeORM problématiques
-    // MenuRawController  // Retiré temporairement car dépend de MenuRawService
+    MenuRawController  // Service de menu avec requêtes SQL brutes
   ],
   providers: [
     SystemParametersService,
     // MenuConfigurationService,  // Retiré car dépend d'entités TypeORM problématiques
-    // MenuRawService,  // Retiré temporairement pour tester
+    MenuRawService,  // Service de menu avec requêtes SQL brutes - FONCTIONNEL
     // UserMenuPreferencesService,  // Service retiré temporairement
     DatabaseIntegrityService,
     DatabaseBackupService,
     DatabaseStatsService,
     DatabaseEnumFixService,
-    // AdminRolesService  // Retiré temporairement pour isoler le problème
+    AdminRolesService  // Réactivé pour AdminRolesController
   ],
   exports: [
     SystemParametersService,
     // MenuConfigurationService,  // Retiré car dépend d'entités TypeORM problématiques
-    // MenuRawService,  // Retiré temporairement pour tester
+    MenuRawService,  // Service de menu avec requêtes SQL brutes - FONCTIONNEL
     // UserMenuPreferencesService,  // Service retiré temporairement
     DatabaseIntegrityService,
     DatabaseBackupService,

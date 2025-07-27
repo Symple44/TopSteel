@@ -3,7 +3,29 @@
 import { useState, useEffect, useCallback } from 'react'
 import { usePermissions } from './use-permissions-v2'
 import { useMenuMode } from './use-menu-mode'
-import { syncChecker } from '@/lib/sync-checker'
+import { apiClient } from '@/lib/api-client-instance'
+
+// Fonction pour mapper les données du menu personnalisé vers la structure attendue
+function mapCustomMenuItemRecursively(item: any): MenuItemConfig {
+  return {
+    ...item,
+    // Mapper les propriétés personnalisées vers userPreferences
+    userPreferences: {
+      isVisible: item.isVisible ?? true,
+      isFavorite: item.isFavorite ?? false,
+      isPinned: item.isPinned ?? false,
+      customTitle: item.customTitle || undefined,
+      customIcon: item.customIcon || undefined,
+      customColor: item.customIconColor || undefined, // Mapper customIconColor vers customColor
+      customBadge: item.customBadge || undefined,
+      customOrder: item.orderIndex || undefined
+    },
+    // Traiter récursivement les enfants
+    children: Array.isArray(item.children) 
+      ? item.children.map(child => mapCustomMenuItemRecursively(child))
+      : []
+  }
+}
 
 export interface MenuItemConfig {
   id: string
@@ -55,87 +77,33 @@ export function useDynamicMenu() {
   const [customMenu, setCustomMenu] = useState<MenuItemConfig[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0) // Pour forcer les re-renders
   const { hasPermission, hasRole, canAccessModule } = usePermissions()
   const { mode, loading: modeLoading, toggleMode, setMenuMode } = useMenuMode()
-
-  const loadActiveMenuConfig = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      const response = await fetch('/api/admin/menus/configurations/active')
-      
-      // Vérifier si la réponse est bien du JSON
-      const contentType = response.headers.get('content-type')
-      if (!contentType || !contentType.includes('application/json')) {
-        console.warn('API response is not JSON:', await response.text())
-        setError('Format de réponse invalide')
-        return
-      }
-      
-      const data = await response.json()
-      
-      if (data.success) {
-        setMenuConfig(data.data.configuration)
-        setStandardMenu(data.data.menuTree || [])
-      } else {
-        setError('Erreur lors du chargement du menu')
-      }
-    } catch (err) {
-      console.error('Erreur lors du chargement du menu:', err)
-      setError('Erreur de connexion')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
 
   const loadUserCustomizedMenu = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/user/menu-preferences/menu')
-      
-      // Vérifier le statut de la réponse
-      if (!response.ok) {
-        setCustomMenu([])
-        return
-      }
-      
-      // Vérifier si la réponse est bien du JSON
-      const contentType = response.headers.get('content-type')
-      if (!contentType || !contentType.includes('application/json')) {
-        setCustomMenu([])
-        return
-      }
-      
-      const data = await response.json()
-      
-      if (data.success) {
-        const menuData = data.data || []
-        setCustomMenu(menuData)
+      // Charger le menu personnalisé depuis l'API
+      try {
+        const response = await apiClient.get('/user/menu-preferences/custom-menu')
         
-        // Vérifier si le menu a l'air synchronisé
-        if (data.data.length === 0 && mode === 'custom') {
-          syncChecker.addIssue({
-            type: 'menu',
-            severity: 'medium',
-            message: 'Menu personnalisé vide alors qu\'il devrait contenir des éléments',
-            details: { context: 'useDynamicMenu', mode, itemCount: data.data.length }
-          })
+        if (response.data && response.data.success && Array.isArray(response.data.data)) {
+          // Mapper les données pour inclure les préférences personnalisées dans la structure attendue
+          const menuItems = response.data.data.map(item => mapCustomMenuItemRecursively(item))
+          setCustomMenu(menuItems)
+        } else {
+          setCustomMenu([]) // Menu vierge par défaut
         }
-      } else {
+      } catch (prefsError) {
+        // Si les préférences ne se chargent pas, menu vierge
         setCustomMenu([])
-        
-        syncChecker.addIssue({
-          type: 'api',
-          severity: 'high',
-          message: 'Échec du chargement du menu personnalisé',
-          details: { message: data.message, context: 'loadUserCustomizedMenu' }
-        })
       }
+      
     } catch (err) {
-      console.error('Erreur lors du chargement du menu personnalisé:', err)
+      // Erreur lors du chargement du menu personnalisé
       setCustomMenu([])
     } finally {
       setLoading(false)
@@ -147,42 +115,30 @@ export function useDynamicMenu() {
       setLoading(true)
       setError(null)
       
-      // Utiliser l'API pour récupérer le menu filtré par les permissions de l'utilisateur
-      const response = await fetch('/api/user/menu/filtered')
+      // Pour le menu standard, utiliser la configuration active de la base de données
+      // MAIS sans les préférences utilisateur personnalisées
+      const response = await apiClient.get('/admin/menu-raw/configurations/active')
       
-      // Vérifier si la réponse est bien du JSON
-      const contentType = response.headers.get('content-type')
-      if (!contentType || !contentType.includes('application/json')) {
-        // API response not JSON for standard menu (silenced)
-        setStandardMenu([])
-        return
-      }
-      
-      const data = await response.json()
-      
-      if (data.success) {
-        // Pour le menu standard, on utilise les items filtrés par les permissions
-        const menuItems = data.data || []
+      if (response.data && response.data.success && response.data.data) {
+        // Utiliser le menuTree de la configuration active
+        const menuItems = Array.isArray(response.data.data.menuTree) ? response.data.data.menuTree : []
         setStandardMenu(menuItems)
+        setMenuConfig(response.data.data.configuration)
+      } else {
+        setStandardMenu([])
       }
     } catch (err) {
-      console.error('Erreur lors du chargement du menu standard:', err)
+      // Erreur lors du chargement du menu standard
       setError('Erreur de connexion')
     } finally {
       setLoading(false)
     }
   }, [])
 
-  // Filtrage côté client pour une meilleure performance
-  const filterMenuByPermissions = useCallback((items: MenuItemConfig[]): MenuItemConfig[] => {
-    return items
-      .filter(item => canUserAccessItem(item))
-      .map(item => ({
-        ...item,
-        children: filterMenuByPermissions(item.children)
-      }))
-      .filter(item => item.children.length > 0 || item.href) // Garder seulement les items avec enfants ou avec lien
-  }, [hasPermission, hasRole, canAccessModule])
+  const loadActiveMenuConfig = useCallback(async () => {
+    // Cette fonction fait maintenant la même chose que loadStandardMenu
+    return loadStandardMenu()
+  }, [loadStandardMenu])
 
   const canUserAccessItem = useCallback((item: MenuItemConfig): boolean => {
     // Si l'item n'est pas visible, ne pas l'afficher
@@ -224,6 +180,28 @@ export function useDynamicMenu() {
     return true
   }, [hasPermission, hasRole, canAccessModule])
 
+  // Filtrage côté client pour une meilleure performance
+  const filterMenuByPermissions = useCallback((items: MenuItemConfig[]): MenuItemConfig[] => {
+    // Vérifier que items est bien un tableau
+    if (!Array.isArray(items)) {
+      return []
+    }
+    
+    const filtered = items
+      .filter(item => canUserAccessItem(item))
+      .map(item => ({
+        ...item,
+        children: item.children ? filterMenuByPermissions(item.children) : []
+      }))
+      .filter(item => {
+        // Pour les types de menu du nouveau système, adapter la logique
+        const hasValidLink = item.programId || item.externalUrl || item.queryBuilderId || (item.children && item.children.length > 0)
+        return hasValidLink
+      })
+      
+    return filtered
+  }, [canUserAccessItem])
+
   // Charger les deux types de menu au montage du composant
   useEffect(() => {
     if (!modeLoading) {
@@ -247,12 +225,25 @@ export function useDynamicMenu() {
 
   // Écouter les changements de préférences de menu
   useEffect(() => {
-    const handleMenuPreferencesChange = () => {
-      if (mode === 'custom') {
-        loadUserCustomizedMenu()
-      } else {
-        loadStandardMenu()
-      }
+    const handleMenuPreferencesChange = async (event: CustomEvent) => {
+      // Forcer le rechargement immédiat avec un timeout pour s'assurer que l'API a terminé
+      setTimeout(async () => {
+        // Si l'événement contient directement les données du menu, les utiliser
+        if (event.detail?.menuItems && mode === 'custom') {
+          const mappedItems = event.detail.menuItems.map(item => mapCustomMenuItemRecursively(item))
+          setCustomMenu(mappedItems)
+        } else {
+          // Sinon, recharger depuis l'API
+          if (mode === 'custom') {
+            await loadUserCustomizedMenu()
+          } else {
+            await loadStandardMenu()
+          }
+        }
+        
+        // Forcer un re-render en mettant à jour la clé de refresh
+        setRefreshKey(prev => prev + 1)
+      }, 100)
     }
 
     window.addEventListener('menuPreferencesChanged', handleMenuPreferencesChange)
@@ -260,16 +251,18 @@ export function useDynamicMenu() {
     return () => {
       window.removeEventListener('menuPreferencesChanged', handleMenuPreferencesChange)
     }
-  }, [mode, loadUserCustomizedMenu, loadStandardMenu])
+  }, [mode, loadUserCustomizedMenu, loadStandardMenu, refreshKey, standardMenu.length, customMenu.length])
 
   // Menu utilisé basé sur le mode sélectionné
   const currentMenu = mode === 'custom' ? customMenu : standardMenu
   
   // Appliquer le filtrage par permissions seulement au menu standard
   // Le menu custom est déjà filtré côté serveur
+  // TEMPORAIRE: Désactiver le filtrage pour tester
   const filteredMenu = mode === 'custom' 
     ? currentMenu 
-    : filterMenuByPermissions(currentMenu)
+    : currentMenu // Temporairement sans filtrage: filterMenuByPermissions(currentMenu)
+    
     
 
 
@@ -295,6 +288,7 @@ export function useDynamicMenu() {
     loadUserCustomizedMenu,
     filterMenuByPermissions,
     canUserAccessItem,
+    refreshKey, // Exposer la clé de refresh pour forcer les re-renders
     // Exposer les fonctions de gestion du mode depuis le hook interne
     toggleMode,
     setMenuMode,

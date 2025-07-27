@@ -10,6 +10,7 @@ import { RolePermission } from './entities/role-permission.entity'
 import { UserRole } from './entities/user-role.entity'
 import { Group } from './entities/group.entity'
 import { UserGroup } from './entities/user-group.entity'
+import { Module as ModuleEntity } from './entities/module.entity'
 
 // Services
 import { RoleService } from './services/role.service'
@@ -18,6 +19,7 @@ import { GroupService } from './services/group.service'
 // Controllers
 import { RoleController } from './controllers/role.controller'
 import { GroupController } from './controllers/group.controller'
+import { ModuleController } from './controllers/module.controller'
 
 // Guards & Strategies (à créer si nécessaire)
 // import { JwtAuthGuard } from './guards/jwt-auth.guard'
@@ -32,7 +34,8 @@ import { GroupController } from './controllers/group.controller'
       RolePermission,
       UserRole,
       Group,
-      UserGroup
+      UserGroup,
+      ModuleEntity
     ], 'auth'),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
@@ -42,7 +45,8 @@ import { GroupController } from './controllers/group.controller'
   ],
   controllers: [
     RoleController,
-    GroupController
+    GroupController,
+    ModuleController
   ],
   providers: [
     RoleService,

@@ -42,45 +42,50 @@ const nextConfig = {
     return [
       // Routes spécifiques qui vont vers le backend
       // Query Builder utilise les routes Next.js (pas de rewrite)
+      // Exclure les routes tenant qui ont des proxies Next.js
       {
-        source: '/api/admin/:path*',
-        destination: `${apiUrl}/api/v1/admin/:path*`,
+        source: '/api/admin/database/((?!health/tenant|migrations/tenant).*)',
+        destination: `${apiUrl}/api/admin/database/$1`,
+      },
+      {
+        source: '/api/admin/((?!database/health/tenant|database/migrations/tenant).*)',
+        destination: `${apiUrl}/api/admin/$1`,
       },
       {
         source: '/api/auth/:path*',
-        destination: `${apiUrl}/api/v1/auth/:path*`,
+        destination: `${apiUrl}/api/auth/:path*`,
       },
       {
         source: '/api/user/:path*',
-        destination: `${apiUrl}/api/v1/user/:path*`,
+        destination: `${apiUrl}/api/user/:path*`,
       },
       {
         source: '/api/users/:path*',
-        destination: `${apiUrl}/api/v1/users/:path*`,
+        destination: `${apiUrl}/api/users/:path*`,
       },
       {
         source: '/api/health/:path*',
-        destination: `${apiUrl}/api/v1/health/:path*`,
+        destination: `${apiUrl}/api/health/:path*`,
       },
       {
         source: '/api/notifications/:path*',
-        destination: `${apiUrl}/api/v1/notifications/:path*`,
+        destination: `${apiUrl}/api/notifications/:path*`,
       },
       {
         source: '/api/translations/:path*',
-        destination: `${apiUrl}/api/v1/translations/:path*`,
+        destination: `${apiUrl}/api/translations/:path*`,
       },
       {
         source: '/api/config/:path*',
-        destination: `${apiUrl}/api/v1/config/:path*`,
+        destination: `${apiUrl}/api/config/:path*`,
       },
       {
         source: '/api/search/:path*',
-        destination: `${apiUrl}/api/v1/search/:path*`,
+        destination: `${apiUrl}/api/search/:path*`,
       },
       {
         source: '/api/images/:path*',
-        destination: `${apiUrl}/api/v1/images/:path*`,
+        destination: `${apiUrl}/api/images/:path*`,
       },
     ]
   },

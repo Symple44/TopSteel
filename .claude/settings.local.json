@@ -132,7 +132,12 @@
       "Bash(PORT=3007 node dist/main.js)",
       "Bash(PORT=3008 node dist/main.js)",
       "Bash(PGPASSWORD=topsteel_prod_2024! psql -h localhost -p 5433 -U topsteel_prod -d topsteel_auth -c \"\\dt user_mfa\")",
-      "Bash(PGPASSWORD=postgres psql -U postgres -d erp_topsteel_auth -c \"\\d user_settings\")"
+      "Bash(PGPASSWORD=postgres psql -U postgres -d erp_topsteel_auth -c \"\\d user_settings\")",
+      "Bash(-H \"Content-Type: application/json\")",
+      "Bash(set API_PORT=3004)",
+      "Bash(npx turbo run:*)",
+      "Bash(JWT_SECRET=development-secret-key-min-32-chars-long-topsteel-erp npx ts-node src/scripts/create-admin-user.ts)",
+      "Bash(./cleanup-ports.bat)"
     ],
     "deny": []
   }

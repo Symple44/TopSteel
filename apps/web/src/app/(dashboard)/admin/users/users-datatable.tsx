@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react'
 import { DataTable } from '@/components/ui/datatable/DataTable'
 import { ColumnConfig } from '@/components/ui/datatable/types'
 import { Button, Badge, Avatar, AvatarFallback } from '@erp/ui'
-import { UserPlus, Download, Mail, Calendar, Shield, Building, Users, UserCheck } from 'lucide-react'
+import { UserPlus, Download, Mail, Calendar, Shield, Building, Users, UserCheck, Settings } from 'lucide-react'
+import BulkProfileManagement from '@/components/admin/bulk-profile-management'
 
 interface User {
   id: string
@@ -264,6 +265,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isBulkManagementOpen, setIsBulkManagementOpen] = useState(false)
 
   // Charger les utilisateurs
   useEffect(() => {
@@ -370,6 +372,10 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
             <Download className="h-4 w-4 mr-2" />
             Exporter
           </Button>
+          <Button variant="outline" onClick={() => setIsBulkManagementOpen(true)}>
+            <Settings className="h-4 w-4 mr-2" />
+            Gestion en masse
+          </Button>
           <Button onClick={handleCreate}>
             <UserPlus className="h-4 w-4 mr-2" />
             Nouvel utilisateur
@@ -450,6 +456,15 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         loading={loading}
         error={error}
         className="border rounded-lg"
+      />
+
+      {/* Dialog de gestion en masse */}
+      <BulkProfileManagement
+        isOpen={isBulkManagementOpen}
+        onClose={() => setIsBulkManagementOpen(false)}
+        onComplete={() => {
+          loadUsers()
+        }}
       />
     </div>
   )

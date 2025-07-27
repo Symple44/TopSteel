@@ -208,7 +208,7 @@ export default function LoginPage() {
 										required
 									>
 										<option value="">{t('selectMethod')}</option>
-										{mfa.availableMethods?.map((method) => (
+										{(mfa.availableMethods || []).map((method) => (
 											<option key={method.type} value={method.type}>
 												{method.type === 'totp' ? t('totpMethod') :
 												 method.type === 'webauthn' ? t('webauthnMethod') :

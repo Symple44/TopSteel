@@ -21,7 +21,7 @@ export class AdminUsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Lister tous les utilisateurs (Administration)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -71,7 +71,7 @@ export class AdminUsersController {
   }
 
   @Get(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER)
   @ApiOperation({ summary: 'Récupérer les détails d\'un utilisateur' })
   @ApiResponse({ status: 200, description: 'Détails de l\'utilisateur récupérés avec succès' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })

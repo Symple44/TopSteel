@@ -38,6 +38,7 @@ import {
   Checkbox
 } from '@erp/ui'
 import { PermissionHide } from '@/components/auth/permission-guard'
+import BulkUserAssignment from './bulk-user-assignment'
 import { 
   Users,
   Shield,
@@ -49,7 +50,8 @@ import {
   FolderOpen,
   Settings,
   UserPlus,
-  UserMinus
+  UserMinus,
+  UsersIcon
 } from 'lucide-react'
 // Fonction utilitaire pour formater les dates
 const formatDate = (date: string | Date) => {
@@ -122,6 +124,8 @@ export default function GroupManagementPanel() {
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('groups')
   const [loading, setLoading] = useState(true)
+  const [isBulkAssignmentOpen, setIsBulkAssignmentOpen] = useState(false)
+  const [bulkAssignmentGroup, setBulkAssignmentGroup] = useState<Group | null>(null)
 
   useEffect(() => {
     loadGroups()
@@ -198,6 +202,11 @@ export default function GroupManagementPanel() {
     await loadGroupDetails(group.id)
   }
 
+  const openBulkAssignment = (group?: Group) => {
+    setBulkAssignmentGroup(group || null)
+    setIsBulkAssignmentOpen(true)
+  }
+
   // Regrouper les groupes par type
   const groupsByType = groups.reduce((acc, group) => {
     if (!acc[group.type]) acc[group.type] = []
@@ -226,28 +235,39 @@ export default function GroupManagementPanel() {
             Organisez vos utilisateurs en groupes avec des rôles partagés
           </p>
         </div>
-        <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nouveau groupe
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Créer un nouveau groupe</DialogTitle>
-              </DialogHeader>
-              <GroupForm 
-                roles={roles}
-                onSave={() => {
-                  setIsCreateDialogOpen(false)
-                  loadGroups()
-                }} 
-              />
-            </DialogContent>
-          </Dialog>
-        </PermissionHide>
+        <div className="flex gap-2">
+          <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
+            <Button
+              variant="outline"
+              onClick={() => openBulkAssignment()}
+            >
+              <UsersIcon className="h-4 w-4 mr-2" />
+              Assignation en masse
+            </Button>
+          </PermissionHide>
+          <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nouveau groupe
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Créer un nouveau groupe</DialogTitle>
+                </DialogHeader>
+                <GroupForm 
+                  roles={roles}
+                  onSave={() => {
+                    setIsCreateDialogOpen(false)
+                    loadGroups()
+                  }} 
+                />
+              </DialogContent>
+            </Dialog>
+          </PermissionHide>
+        </div>
       </div>
 
       {/* Statistiques */}
@@ -287,6 +307,7 @@ export default function GroupManagementPanel() {
                 }}
                 onDelete={() => handleDeleteGroup(group.id)}
                 onViewDetails={() => openDetailDialog(group)}
+                onBulkAssignment={() => openBulkAssignment(group)}
               />
             ))}
           </div>
@@ -315,6 +336,7 @@ export default function GroupManagementPanel() {
                       }}
                       onDelete={() => handleDeleteGroup(group.id)}
                       onViewDetails={() => openDetailDialog(group)}
+                      onBulkAssignment={() => openBulkAssignment(group)}
                     />
                   ))}
                 </div>
@@ -356,6 +378,19 @@ export default function GroupManagementPanel() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Dialog d'assignation en masse */}
+      <BulkUserAssignment
+        isOpen={isBulkAssignmentOpen}
+        onClose={() => setIsBulkAssignmentOpen(false)}
+        targetGroup={bulkAssignmentGroup}
+        onAssignmentComplete={() => {
+          loadGroups()
+          if (selectedGroup) {
+            loadGroupDetails(selectedGroup.id)
+          }
+        }}
+      />
     </div>
   )
 }
@@ -365,12 +400,14 @@ function GroupCard({
   group, 
   onEdit, 
   onDelete, 
-  onViewDetails 
+  onViewDetails,
+  onBulkAssignment 
 }: { 
   group: Group
   onEdit: () => void
   onDelete: () => void
   onViewDetails: () => void
+  onBulkAssignment: () => void
 }) {
   const Icon = GROUP_TYPE_ICONS[group.type]
   
@@ -416,6 +453,16 @@ function GroupCard({
             >
               Détails
             </Button>
+            <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onBulkAssignment}
+                title="Assignation en masse pour ce groupe"
+              >
+                <UsersIcon className="h-4 w-4" />
+              </Button>
+            </PermissionHide>
             <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
               <Button
                 variant="outline"

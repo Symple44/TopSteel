@@ -109,8 +109,8 @@ export class UserMenuPreferenceController {
   }
 
   @Get('menu')
-  @ApiOperation({ summary: 'Récupérer le menu personnalisé' })
-  async getCustomMenu(@Request() req): Promise<{ success: boolean; data: any[] }> {
+  @ApiOperation({ summary: 'Récupérer le menu personnalisé (legacy)' })
+  async getCustomMenuLegacy(@Request() req): Promise<{ success: boolean; data: any[] }> {
     const userId = req.user.id
     const preferences = await this.userMenuPreferenceService.findOrCreateByUserId(userId)
     
@@ -348,6 +348,55 @@ export class UserMenuPreferenceController {
     return {
       success: true,
       data: reset,
+    }
+  }
+
+  @Post('custom-menu')
+  @ApiOperation({ summary: 'Sauvegarder le menu personnalisé complet' })
+  async saveCustomMenu(
+    @Request() req,
+    @Body() body: { menuItems: any[] },
+  ): Promise<{ success: boolean; data: any; error?: string }> {
+    const userId = req.user.id
+    const { menuItems } = body
+    
+    try {
+      // Sauvegarder le menu personnalisé dans les métadonnées utilisateur
+      const result = await this.userMenuPreferenceService.saveCustomMenu(userId, menuItems)
+      
+      return {
+        success: true,
+        data: result,
+      }
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde du menu personnalisé:', error)
+      return {
+        success: false,
+        data: null,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }
+  }
+
+  @Get('custom-menu')
+  @ApiOperation({ summary: 'Récupérer le menu personnalisé complet' })
+  async getCustomMenu(@Request() req): Promise<{ success: boolean; data: any[]; error?: string }> {
+    const userId = req.user.id
+    
+    try {
+      const customMenu = await this.userMenuPreferenceService.getCustomMenu(userId)
+      
+      return {
+        success: true,
+        data: customMenu || [],
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération du menu personnalisé:', error)
+      return {
+        success: false,
+        data: [],
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
     }
   }
 

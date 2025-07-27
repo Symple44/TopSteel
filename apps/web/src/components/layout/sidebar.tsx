@@ -1,7 +1,7 @@
 // apps/web/src/components/layout/sidebar.tsx - VERSION AMÉLIORÉE
 'use client'
 
-import React from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { Badge, Separator, Button } from '@erp/ui'
 import { TooltipFixed } from '@/components/ui/tooltip-fixed'
@@ -71,9 +71,10 @@ interface SidebarProps {
 interface NavItem {
   title: string
   href?: string
-  icon: React.ComponentType<{ className?: string }> | string
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }> | string
   badge?: string
   gradient?: string
+  customIconColor?: string
   children?: NavItem[]
   roles?: string[]
   isFavorite?: boolean
@@ -114,6 +115,7 @@ const iconMap: Record<string, LucideIcon> = {
   Languages,
   Table,
   Search,
+  Globe,
   // Mappings pour les icônes des routes API
   dashboard: LayoutDashboard,
   admin: Shield,
@@ -125,7 +127,22 @@ const iconMap: Record<string, LucideIcon> = {
   rules: Scale,
   planning: CalendarDays,
   test: TestTube,
-  menu: Menu
+  menu: Menu,
+  // Mappings pour les icônes du menu par défaut
+  'Home': Home,
+  'LayoutDashboard': LayoutDashboard,
+  'FolderOpen': FolderOpen,
+  'Users': Users,
+  'Shield': Shield,
+  'Building': Building,
+  'Menu': Menu,
+  'Settings': Settings,
+  'Database': Database,
+  'Activity': Activity,
+  'Bell': Bell,
+  'Languages': Languages,
+  'Search': Search,
+  'Globe': Globe
 }
 
 const getNavigation = (t: any): NavItem[] => [
@@ -192,32 +209,53 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     refreshMenu, 
     toggleMode, 
     isStandard, 
-    isCustom 
+    isCustom,
+    refreshKey 
   } = useDynamicMenu()
   const staticNavigation = getNavigation(t)
   
   // Utiliser le mode depuis useDynamicMenu pour éviter les désynchronisations
   const mode = currentMode
   
-  // Convertir le menu dynamique au format NavItem
-  const convertDynamicToNavItem = (items: any[]): NavItem[] => {
+  // Convertir le menu dynamique au format NavItem (mémoïsé pour éviter les re-renders)
+  const convertDynamicToNavItem = useCallback((items: any[]): NavItem[] => {
     if (!Array.isArray(items)) {
-      console.warn('convertDynamicToNavItem: items is not an array:', items)
       return []
     }
-    return items.map(item => {
+    
+    const converted = items.map(item => {
       // Appliquer les préférences utilisateur si disponibles
       const displayTitle = item.userPreferences?.customTitle || 
                           (item.titleKey ? t(item.titleKey) : item.title)
       const displayIcon = item.userPreferences?.customIcon || item.icon
       const displayBadge = item.userPreferences?.customBadge || item.badge
       
+      // Générer le href basé sur le type de menu du nouveau système
+      let href: string | undefined
+      
+      switch (item.type) {
+        case 'P': // Programme
+          href = item.programId
+          break
+        case 'L': // Lien externe
+          href = item.externalUrl
+          break
+        case 'D': // Vue Data
+          href = item.queryBuilderId ? `/query-builder/${item.queryBuilderId}/view` : undefined
+          break
+        case 'M': // Dossier - pas de href
+        default:
+          href = item.href // Fallback pour compatibilité
+          break
+      }
+      
       return {
         title: displayTitle,
-        href: item.href,
+        href,
         icon: typeof displayIcon === 'string' ? iconMap[displayIcon] || Settings : displayIcon,
         badge: displayBadge,
         gradient: item.gradient,
+        customIconColor: item.userPreferences?.customColor, // Ajouter la couleur personnalisée
         children: item.children ? convertDynamicToNavItem(item.children) : undefined,
         roles: item.roles,
         // Ajouter des indicateurs visuels pour les préférences
@@ -228,13 +266,24 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
                      item.userPreferences?.customBadge
       }
     })
-  }
+    
+    return converted
+  }, [t])
   
-  // Utiliser le menu dynamique si disponible, sinon le menu statique
-  // En mode custom, utiliser le menu filtré même s'il est vide
-  const navigation = !loading && (Array.isArray(filteredMenu) && (filteredMenu.length > 0 || mode === 'custom'))
-    ? convertDynamicToNavItem(filteredMenu)
-    : staticNavigation
+  // Utiliser le menu dynamique (depuis la DB) dans tous les cas
+  // En mode custom, même si le menu est vide, ne pas retomber sur staticNavigation
+  const navigation = useMemo(() => {
+    if (!loading && Array.isArray(filteredMenu)) {
+      return convertDynamicToNavItem(filteredMenu) // Peut être vide en mode custom
+    } else if (loading) {
+      return staticNavigation  // Pendant le loading, afficher le menu statique temporairement
+    } else if (error) {
+      return staticNavigation  // Fallback en cas d'erreur
+    } else {
+      return []  // Menu vide si pas de données et pas d'erreur
+    }
+  }, [loading, filteredMenu, convertDynamicToNavItem, staticNavigation, error, refreshKey])
+      
     
 
   // Sidebar state tracking (debug removed)
@@ -335,9 +384,15 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
             )}
           >
             {item.icon ? (
-              <item.icon className={level === 0 ? 'h-3.5 w-3.5' : 'h-3 w-3'} />
+              <item.icon 
+                className={level === 0 ? 'h-3.5 w-3.5' : 'h-3 w-3'} 
+                style={item.customIconColor && !itemIsActive ? { color: item.customIconColor } : undefined}
+              />
             ) : (
-              <Settings className={level === 0 ? 'h-3.5 w-3.5' : 'h-3 w-3'} />
+              <Settings 
+                className={level === 0 ? 'h-3.5 w-3.5' : 'h-3 w-3'} 
+                style={item.customIconColor && !itemIsActive ? { color: item.customIconColor } : undefined}
+              />
             )}
           </div>
 
@@ -369,7 +424,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
         {/* Sous-menu avec animation - séparation claire et hiérarchie renforcée */}
         {hasChildren && isExpanded && !isCollapsed && (
           <div className="mt-1 ml-4 pl-4 border-l-2 border-primary/30 bg-muted/20 rounded-r-lg space-y-0.5 animate-in slide-in-from-top-1 duration-200">
-            {item.children?.map((child, childIndex) => (
+            {(item.children || []).map((child, childIndex) => (
               <React.Fragment key={`${child.href || child.title || 'unnamed'}-child-${childIndex}-level-${level}`}>{renderNavItem(child, level + 1)}</React.Fragment>
             ))}
           </div>
@@ -540,9 +595,33 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 p-1.5 space-y-0.5 overflow-y-auto">
-        {navigation.map((item, index) => (
-          <React.Fragment key={`${item.href || item.title || 'unnamed'}-nav-${index}`}>{renderNavItem(item)}</React.Fragment>
-        ))}
+        {navigation.length === 0 && mode === 'custom' && !loading ? (
+          // Message quand le menu personnalisé est vierge
+          <div className="p-4 text-center">
+            <div className="text-muted-foreground text-sm">
+              <Palette className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="font-medium mb-1">Menu personnalisé vierge</p>
+              <p className="text-xs opacity-75 mb-3">
+                Personnalisez votre menu en ajoutant les éléments souhaités
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push('/settings/menu')}
+                className="text-xs"
+              >
+                <Settings2 className="h-3 w-3 mr-1" />
+                Personnaliser
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {navigation.map((item, index) => (
+              <React.Fragment key={`${item.href || item.title || 'unnamed'}-nav-${index}-${navigation.length}-refresh-${refreshKey}`}>{renderNavItem(item)}</React.Fragment>
+            ))}
+          </>
+        )}
       </nav>
 
       <Separator className="bg-border/60" />

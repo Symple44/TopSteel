@@ -1,0 +1,376 @@
+'use client'
+
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Settings, MoreVertical, Power, Trash2, RefreshCw, ExternalLink, Calendar, Activity } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
+
+interface InstalledModule {
+  id: string
+  moduleKey: string
+  displayName: string
+  description: string
+  category: string
+  version: string
+  publisher: string
+  installedAt: string
+  lastUsedAt: string
+  status: 'ACTIVE' | 'INACTIVE' | 'ERROR'
+  usageStats: {
+    dailyActiveUsers: number
+    monthlyUsage: number
+    features: { name: string, usage: number }[]
+  }
+}
+
+const MOCK_INSTALLED_MODULES: InstalledModule[] = [
+  {
+    id: '1',
+    moduleKey: 'procurement-optimizer',
+    displayName: 'Optimisation des Achats',
+    description: 'Mutualisation des demandes d\'achats et négociation groupée',
+    category: 'PROCUREMENT',
+    version: '1.5.2',
+    publisher: 'ProcureMax',
+    installedAt: '2024-01-10T10:30:00Z',
+    lastUsedAt: '2024-01-24T15:45:00Z',
+    status: 'ACTIVE',
+    usageStats: {
+      dailyActiveUsers: 12,
+      monthlyUsage: 387,
+      features: [
+        { name: 'Demandes groupées', usage: 156 },
+        { name: 'Comparateur fournisseurs', usage: 89 },
+        { name: 'Marketplace B2B', usage: 142 }
+      ]
+    }
+  },
+  {
+    id: '2',
+    moduleKey: 'quality-compliance',
+    displayName: 'Conformité Qualité',
+    description: 'Suivi des normes ISO, certifications et audits qualité',
+    category: 'QUALITY',
+    version: '2.3.1',
+    publisher: 'QualityFirst',
+    installedAt: '2024-01-05T09:15:00Z',
+    lastUsedAt: '2024-01-23T11:20:00Z',
+    status: 'ACTIVE',
+    usageStats: {
+      dailyActiveUsers: 8,
+      monthlyUsage: 234,
+      features: [
+        { name: 'Suivi certifications', usage: 98 },
+        { name: 'Audits qualité', usage: 76 },
+        { name: 'Reporting conformité', usage: 60 }
+      ]
+    }
+  },
+  {
+    id: '3',
+    moduleKey: 'hr-basic-tools',
+    displayName: 'Outils RH Basiques',
+    description: 'Gestion basique des congés et évaluations',
+    category: 'HR',
+    version: '1.0.5',
+    publisher: 'HRTools Inc.',
+    installedAt: '2023-12-15T14:22:00Z',
+    lastUsedAt: '2024-01-15T16:30:00Z',
+    status: 'INACTIVE',
+    usageStats: {
+      dailyActiveUsers: 2,
+      monthlyUsage: 45,
+      features: [
+        { name: 'Gestion congés', usage: 23 },
+        { name: 'Évaluations', usage: 12 },
+        { name: 'Planning équipes', usage: 10 }
+      ]
+    }
+  },
+  {
+    id: '4',
+    moduleKey: 'integration-connector',
+    displayName: 'Connecteur ERP',
+    description: 'Intégration avec systèmes externes',
+    category: 'INTEGRATION',
+    version: '2.1.0',
+    publisher: 'IntegrationPro',
+    installedAt: '2024-01-20T08:45:00Z',
+    lastUsedAt: '2024-01-24T09:12:00Z',
+    status: 'ERROR',
+    usageStats: {
+      dailyActiveUsers: 0,
+      monthlyUsage: 12,
+      features: [
+        { name: 'Sync SAP', usage: 8 },
+        { name: 'Export données', usage: 4 },
+        { name: 'Webhook listener', usage: 0 }
+      ]
+    }
+  }
+]
+
+const STATUS_CONFIG = {
+  ACTIVE: { 
+    label: 'Actif', 
+    color: 'bg-green-500', 
+    variant: 'default' as const 
+  },
+  INACTIVE: { 
+    label: 'Inactif', 
+    color: 'bg-gray-500', 
+    variant: 'secondary' as const 
+  },
+  ERROR: { 
+    label: 'Erreur', 
+    color: 'bg-red-500', 
+    variant: 'destructive' as const 
+  }
+}
+
+export function InstalledModules() {
+  const [modules, setModules] = useState<InstalledModule[]>(MOCK_INSTALLED_MODULES)
+  const [selectedModule, setSelectedModule] = useState<InstalledModule | null>(null)
+
+  const handleToggleStatus = (moduleId: string) => {
+    setModules(prev => prev.map(module => {
+      if (module.id === moduleId) {
+        const newStatus = module.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
+        toast({
+          title: `Module ${newStatus === 'ACTIVE' ? 'activé' : 'désactivé'}`,
+          description: `${module.displayName} a été ${newStatus === 'ACTIVE' ? 'activé' : 'désactivé'} avec succès.`
+        })
+        return { ...module, status: newStatus }
+      }
+      return module
+    }))
+  }
+
+  const handleUninstall = (moduleId: string) => {
+    const module = modules.find(m => m.id === moduleId)
+    if (module) {
+      setModules(prev => prev.filter(m => m.id !== moduleId))
+      toast({
+        title: 'Module désinstallé',
+        description: `${module.displayName} a été désinstallé avec succès.`,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  const handleUpdate = (moduleId: string) => {
+    const module = modules.find(m => m.id === moduleId)
+    if (module) {
+      toast({
+        title: 'Mise à jour démarrée',
+        description: `Mise à jour de ${module.displayName} en cours...`
+      })
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const getDaysSince = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - date.getTime())
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Résumé */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Modules Actifs</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {modules.filter(m => m.status === 'ACTIVE').length}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Utilisateurs Quotidiens</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {modules.reduce((sum, m) => sum + m.usageStats.dailyActiveUsers, 0)}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Usage Mensuel</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {modules.reduce((sum, m) => sum + m.usageStats.monthlyUsage, 0)}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Liste des modules */}
+      <div className="space-y-4">
+        {modules.map((module) => (
+          <Card key={module.id}>
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <CardTitle className="text-lg">{module.displayName}</CardTitle>
+                    <Badge variant={STATUS_CONFIG[module.status].variant}>
+                      {STATUS_CONFIG[module.status].label}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    {module.description} • v{module.version} par {module.publisher}
+                  </CardDescription>
+                </div>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setSelectedModule(module)}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Configurer
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleToggleStatus(module.id)}>
+                      <Power className="mr-2 h-4 w-4" />
+                      {module.status === 'ACTIVE' ? 'Désactiver' : 'Activer'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleUpdate(module.id)}>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Mettre à jour
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleUninstall(module.id)}
+                      className="text-red-600"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Désinstaller
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </CardHeader>
+            
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Installé le</p>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {formatDate(module.installedAt)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Il y a {getDaysSince(module.installedAt)} jours
+                  </p>
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Dernière utilisation</p>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Activity className="h-3 w-3" />
+                    {formatDate(module.lastUsedAt)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Il y a {getDaysSince(module.lastUsedAt)} jours
+                  </p>
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Utilisateurs actifs</p>
+                  <p className="text-lg font-semibold">{module.usageStats.dailyActiveUsers}</p>
+                  <p className="text-xs text-muted-foreground">Par jour</p>
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Usage mensuel</p>
+                  <p className="text-lg font-semibold">{module.usageStats.monthlyUsage}</p>
+                  <p className="text-xs text-muted-foreground">Actions ce mois</p>
+                </div>
+              </div>
+              
+              {module.status === 'ERROR' && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-800">
+                    ⚠️ Ce module rencontre des problèmes. Contactez le support ou essayez de le redémarrer.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {modules.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Aucun module installé.</p>
+          <Button className="mt-4" onClick={() => window.location.href = '#catalog'}>
+            Parcourir le catalogue
+          </Button>
+        </div>
+      )}
+
+      {/* Dialog de configuration */}
+      <Dialog open={!!selectedModule} onOpenChange={(open) => !open && setSelectedModule(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Configuration - {selectedModule?.displayName}</DialogTitle>
+            <DialogDescription>
+              Paramètres et statistiques d'usage du module
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedModule && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2">Fonctionnalités les plus utilisées</h4>
+                <div className="space-y-2">
+                  {selectedModule.usageStats.features.map((feature, index) => (
+                    <div key={index} className="flex items-center justify-between text-sm">
+                      <span>{feature.name}</span>
+                      <span className="font-medium">{feature.usage} utilisations</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setSelectedModule(null)}>
+                  Fermer
+                </Button>
+                <Button>
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Ouvrir le module
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}

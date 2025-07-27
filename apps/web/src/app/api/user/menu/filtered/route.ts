@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     const userPermissions = userData.permissions || []
 
     // Appeler l'API backend pour récupérer le menu filtré pour cet utilisateur
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menus/filtered-menu`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menu-raw/filtered-menu`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,

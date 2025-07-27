@@ -175,7 +175,7 @@ export class SeederService {
 				"System",
 				"admin@topsteel.tech",
 				hashedPassword,
-				"ADMIN",
+				"SUPER_ADMIN",
 				true,
 				"TOP",
 			],

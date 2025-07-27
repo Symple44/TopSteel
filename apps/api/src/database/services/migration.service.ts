@@ -2,6 +2,22 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { DataSource } from 'typeorm'
 
+export interface MigrationResult {
+  database: string
+  success: boolean
+  migrationsRun: string[]
+  error?: string
+}
+
+export interface MigrationStatus {
+  database: string
+  executed: number
+  pending: number
+  lastMigration?: string
+  status: 'up-to-date' | 'pending' | 'error'
+  error?: string
+}
+
 @Injectable()
 export class MigrationService {
   private readonly logger = new Logger(MigrationService.name)

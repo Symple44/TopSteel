@@ -175,6 +175,80 @@ export class UserMenuPreferenceService {
   }
 
   /**
+   * Sauvegarde le menu personnalisé complet
+   */
+  async saveCustomMenu(userId: string, menuItems: any[]): Promise<any> {
+    try {
+      // Trouver ou créer une préférence spéciale pour stocker le menu complet
+      let customMenuPreference = await this.userMenuPreferenceRepository.findOne({
+        where: { userId, menuId: '__custom_menu__' }
+      })
+
+      if (!customMenuPreference) {
+        customMenuPreference = this.userMenuPreferenceRepository.create({
+          userId,
+          menuId: '__custom_menu__',
+          isVisible: true,
+          order: 0,
+          customLabel: 'Menu personnalisé complet'
+        })
+      }
+
+      // Stocker les données du menu dans les métadonnées (ou un champ JSON si disponible)
+      // Pour l'instant on utilise customLabel comme stockage JSON simple
+      customMenuPreference.customLabel = JSON.stringify({
+        type: 'custom_menu_data',
+        menuItems: menuItems,
+        savedAt: new Date().toISOString()
+      })
+
+      const result = await this.userMenuPreferenceRepository.save(customMenuPreference)
+      this.logger.log(`Menu personnalisé sauvegardé pour l'utilisateur ${userId} avec ${menuItems.length} éléments`)
+      
+      return {
+        success: true,
+        itemCount: menuItems.length,
+        savedAt: new Date().toISOString()
+      }
+    } catch (error) {
+      this.logger.error(`Erreur lors de la sauvegarde du menu personnalisé pour ${userId}:`, error)
+      throw error
+    }
+  }
+
+  /**
+   * Récupère le menu personnalisé complet
+   */
+  async getCustomMenu(userId: string): Promise<any[]> {
+    try {
+      const customMenuPreference = await this.userMenuPreferenceRepository.findOne({
+        where: { userId, menuId: '__custom_menu__' }
+      })
+
+      if (!customMenuPreference || !customMenuPreference.customLabel) {
+        this.logger.log(`Aucun menu personnalisé trouvé pour l'utilisateur ${userId}`)
+        return []
+      }
+
+      try {
+        const menuData = JSON.parse(customMenuPreference.customLabel)
+        if (menuData.type === 'custom_menu_data' && Array.isArray(menuData.menuItems)) {
+          this.logger.log(`Menu personnalisé récupéré pour l'utilisateur ${userId} avec ${menuData.menuItems.length} éléments`)
+          return menuData.menuItems
+        }
+      } catch (parseError) {
+        this.logger.error(`Erreur de parsing du menu personnalisé pour ${userId}:`, parseError)
+        return []
+      }
+
+      return []
+    } catch (error) {
+      this.logger.error(`Erreur lors de la récupération du menu personnalisé pour ${userId}:`, error)
+      throw error
+    }
+  }
+
+  /**
    * Réinitialise les préférences
    */
   async resetPreferences(userId: string): Promise<UserMenuPreference[]> {

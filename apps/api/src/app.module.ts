@@ -3,6 +3,8 @@ import { type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common
 import { ConfigModule } from '@nestjs/config'
 import { ScheduleModule } from '@nestjs/schedule'
 import { TerminusModule } from '@nestjs/terminus'
+import { ThrottlerModule } from '@nestjs/throttler'
+import { PrometheusModule, makeCounterProvider, makeHistogramProvider, makeGaugeProvider } from '@willsoto/nestjs-prometheus'
 // Controllers
 import { AppController } from './app.controller'
 import { TestController } from './test.controller'
@@ -14,6 +16,8 @@ import { appConfig } from './config/app.config'
 import { databaseConfig } from './config/database.config'
 import { jwtConfig } from './config/jwt.config'
 import { redisConfig } from './config/redis.config'
+import { throttlerAsyncConfig } from './config/throttler.config'
+import { prometheusAsyncConfig, CUSTOM_METRICS } from './config/prometheus.config'
 // Modules système
 // import { DatabaseProductionModule } from './database/database-production.module'
 import { DatabaseMultiTenantModule } from './modules/database/database-multi-tenant.module'
@@ -46,11 +50,20 @@ import { MenuModule } from './modules/menu/menu.module'
 import { QueryBuilderModule } from './modules/query-builder/query-builder.module'
 import { UiPreferencesModule } from './modules/ui-preferences.module'
 import { RedisModule } from './redis/redis.module'
+import { MarketplaceAppModule } from './modules/marketplace/marketplace.module'
 // Modules multi-tenant
 import { SocietesModule } from './modules/societes/societes.module'
 import { SharedModule } from './modules/shared/shared.module'
+// Module Database Core
+import { DatabaseCoreModule } from './modules/database-core/database-core.module'
 // Service d'initialisation automatique
 import { DatabaseStartupService } from './services/database-startup.service'
+import { SystemHealthService } from './health/system-health-simple.service'
+import { MetricsService } from './common/services/metrics.service'
+import { MetricsSafeInterceptor } from './common/interceptors/metrics-safe.interceptor'
+import { CircuitBreakerService } from './common/services/circuit-breaker.service'
+import { CircuitBreakerHealthIndicator } from './health/circuit-breaker-health.indicator'
+import { EnhancedThrottlerGuard } from './common/guards/enhanced-throttler.guard'
 
 @Module({
   imports: [
@@ -63,46 +76,74 @@ import { DatabaseStartupService } from './services/database-startup.service'
 
     // Modules système
     DatabaseMultiTenantModule,
+    DatabaseCoreModule,
     // DatabaseProductionModule,
     ScheduleModule.forRoot(),
     TerminusModule,
     RedisModule.forRoot(),
+    ThrottlerModule.forRootAsync(throttlerAsyncConfig),
+    PrometheusModule.registerAsync(prometheusAsyncConfig),
 
     // Authentification
     AuthModule,
-    // RoleAuthModule,
+    RoleAuthModule,
 
     // Administration
     AdminModule,
+
+    // Marketplace
+    MarketplaceAppModule,
 
     // Modules multi-tenant
     SocietesModule,
     SharedModule,
 
-    // Modules métier
+    // Modules métier essentiels (activés)
+    UsersModule,
+    MenuModule,
+    
+    // Modules métier à réactiver progressivement
     // ClientsModule,
+    // FournisseursModule,
+    // MateriauxModule,
+    // StocksModule,
+    // CommandesModule,
+    
+    // Modules métier avancés (désactivés temporairement)
     // DevisModule,
     // DocumentsModule,
     // FacturationModule,
-    // FournisseursModule,
     // NotificationsModule,
     // ProductionModule,
     // ProjetsModule,
-    // StocksModule,
-    UsersModule,
-    MenuModule,
     // QueryBuilderModule,
     // UiPreferencesModule,
     // MachinesModule,
     // MaintenanceModule,
-    // MateriauxModule,
     // PlanningModule,
     // QualiteModule,
     // TracabiliteModule,
-    // CommandesModule,
   ],
   controllers: [AppController, TestController, HealthController],
-  providers: [AppService, IntegrityService, DatabaseStartupService],
+  providers: [
+    AppService, 
+    IntegrityService, 
+    DatabaseStartupService, 
+    SystemHealthService,
+    MetricsService,
+    MetricsSafeInterceptor,
+    CircuitBreakerService,
+    CircuitBreakerHealthIndicator,
+    EnhancedThrottlerGuard,
+    // Métriques Prometheus personnalisées
+    makeCounterProvider(CUSTOM_METRICS.HTTP_REQUESTS_TOTAL),
+    makeHistogramProvider(CUSTOM_METRICS.HTTP_REQUEST_DURATION),
+    makeCounterProvider(CUSTOM_METRICS.AUTH_FAILURES),
+    makeGaugeProvider(CUSTOM_METRICS.DB_CONNECTIONS),
+    makeCounterProvider(CUSTOM_METRICS.CACHE_OPERATIONS),
+    makeHistogramProvider(CUSTOM_METRICS.UPLOAD_SIZE),
+    makeGaugeProvider(CUSTOM_METRICS.ACTIVE_SESSIONS),
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

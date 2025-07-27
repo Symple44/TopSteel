@@ -8,6 +8,8 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus'
 import { IntegrityService } from './integrity.service'
+import { SystemHealthService } from './system-health-simple.service'
+import { CircuitBreakerHealthIndicator } from './circuit-breaker-health.indicator'
 
 @Controller('health')
 export class HealthController {
@@ -19,14 +21,16 @@ export class HealthController {
     private memory: MemoryHealthIndicator,
     private disk: DiskHealthIndicator,
     private integrity: IntegrityService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private systemHealth: SystemHealthService,
+    private circuitBreaker: CircuitBreakerHealthIndicator
   ) {}
 
   @Get()
   async check() {
     try {
       const healthChecks: Array<() => Promise<any>> = [
-        () => this.db.pingCheck('database'),
+        () => this.db.pingCheck('database', { connection: 'auth' }),
         () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
         () => this.memory.checkRSS('memory_rss', 150 * 1024 * 1024),
       ]
@@ -125,5 +129,23 @@ export class HealthController {
   @Get('metrics')
   async getMetrics() {
     return this.integrity.getSystemMetrics()
+  }
+
+  @Get('system')
+  async getSystemHealth() {
+    return this.systemHealth.checkSystemHealth()
+  }
+
+  @Get('summary')
+  async getHealthSummary() {
+    return this.systemHealth.getHealthSummary()
+  }
+
+  @Get('circuit-breakers')
+  @HealthCheck()
+  async checkCircuitBreakers() {
+    return this.health.check([
+      () => this.circuitBreaker.check(),
+    ])
   }
 }

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Appeler l'API backend pour récupérer la configuration active
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menus/configurations/active`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menu-raw/configurations/active`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,

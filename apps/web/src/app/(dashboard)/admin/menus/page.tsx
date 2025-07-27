@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { Badge } from '@/components/ui/badge'
 import { apiClient } from '@/lib/api-client'
 import { Plus, Settings, Download, Upload, Play, Trash2, Edit } from 'lucide-react'
@@ -49,6 +49,7 @@ export default function MenuAdminPage() {
   const [configurations, setConfigurations] = useState<MenuConfiguration[]>([])
   const [activeConfig, setActiveConfig] = useState<MenuConfiguration | null>(null)
   const [selectedConfig, setSelectedConfig] = useState<MenuConfiguration | null>(null)
+  const [selectedConfigItems, setSelectedConfigItems] = useState<MenuItem[]>([])
   const [menuTypes, setMenuTypes] = useState<MenuType[]>([])
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState<'view' | 'edit' | 'create'>('view')
@@ -58,14 +59,26 @@ export default function MenuAdminPage() {
     loadMenuTypes()
   }, [])
 
+  // Charger les items quand une configuration est sélectionnée
+  useEffect(() => {
+    if (selectedConfig?.id) {
+      loadMenuItems(selectedConfig.id)
+    } else {
+      setSelectedConfigItems([])
+    }
+  }, [selectedConfig])
+
   const loadConfigurations = async () => {
     try {
       const [configsResponse, activeResponse] = await Promise.all([
-        apiClient.get('/admin/menus/configurations'),
-        apiClient.get('/admin/menus/configurations/active')
+        apiClient.get('/admin/menu-raw/configurations'),
+        apiClient.get('/admin/menu-raw/configurations/active')
       ])
       
-      setConfigurations(configsResponse.data)
+      // L'API menu-raw retourne une structure imbriquée: { data: { success: true, data: [...] } }
+      const responseData = configsResponse.data?.data || configsResponse.data
+      const configs = Array.isArray(responseData) ? responseData : []
+      setConfigurations(configs)
       if (activeResponse.data) {
         setActiveConfig(activeResponse.data.configuration)
         if (!selectedConfig) {
@@ -88,12 +101,24 @@ export default function MenuAdminPage() {
     }
   }
 
+  const loadMenuItems = async (configId: string) => {
+    try {
+      const response = await apiClient.get(`/admin/menu-raw/tree?configId=${configId}`)
+      const responseData = response.data?.data || response.data
+      const items = Array.isArray(responseData) ? responseData : []
+      setSelectedConfigItems(items)
+    } catch (error) {
+      console.error('Erreur lors du chargement des items de menu:', error)
+      setSelectedConfigItems([])
+    }
+  }
+
   const handleActivateConfiguration = async (configId: string) => {
     try {
       await apiClient.post(`/admin/menus/configurations/${configId}/activate`)
       await loadConfigurations()
     } catch (error) {
-      console.error('Erreur lors de l\\'activation:', error)
+      console.error('Erreur lors de l\'activation:', error)
     }
   }
 
@@ -135,46 +160,46 @@ export default function MenuAdminPage() {
       a.click()
       URL.revokeObjectURL(url)
     } catch (error) {
-      console.error('Erreur lors de l\\'export:', error)
+      console.error('Erreur lors de l\'export:', error)
     }
   }
 
   if (loading) {
     return (
-      <div className=\"flex items-center justify-center h-48\">
-        <div className=\"animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900\"></div>
+      <div className="flex items-center justify-center h-48">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     )
   }
 
   return (
-    <div className=\"container mx-auto py-6 space-y-6\">
-      <div className=\"flex justify-between items-center\">
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className=\"text-3xl font-bold tracking-tight\">Gestion des Menus</h1>
-          <p className=\"text-muted-foreground\">
+          <h1 className="text-3xl font-bold tracking-tight">Gestion des Menus</h1>
+          <p className="text-muted-foreground">
             Configurez et gérez les menus de l'application
           </p>
         </div>
         
-        <div className=\"flex gap-2\">
-          <Button variant=\"outline\" onClick={handleCreateDefault}>
-            <Settings className=\"h-4 w-4 mr-2\" />
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleCreateDefault}>
+            <Settings className="h-4 w-4 mr-2" />
             Créer Config. par Défaut
           </Button>
           <Button onClick={() => setEditMode('create')}>
-            <Plus className=\"h-4 w-4 mr-2\" />
+            <Plus className="h-4 w-4 mr-2" />
             Nouvelle Configuration
           </Button>
         </div>
       </div>
 
-      <div className=\"grid grid-cols-1 lg:grid-cols-4 gap-6\">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Liste des configurations */}
-        <div className=\"lg:col-span-1\">
+        <div className="lg:col-span-1">
           <Card>
             <CardHeader>
-              <CardTitle className=\"text-lg\">Configurations</CardTitle>
+              <CardTitle className="text-lg">Configurations</CardTitle>
               <CardDescription>
                 {configurations.length} configuration(s) disponible(s)
               </CardDescription>
@@ -198,63 +223,63 @@ export default function MenuAdminPage() {
         </div>
 
         {/* Contenu principal */}
-        <div className=\"lg:col-span-3\">
+        <div className="lg:col-span-3">
           <Tabs value={editMode} onValueChange={(value) => setEditMode(value as any)}>
             <TabsList>
-              <TabsTrigger value=\"view\">Aperçu</TabsTrigger>
-              <TabsTrigger value=\"edit\" disabled={!selectedConfig}>Éditer</TabsTrigger>
-              <TabsTrigger value=\"create\">Créer</TabsTrigger>
+              <TabsTrigger value="view">Aperçu</TabsTrigger>
+              <TabsTrigger value="edit" disabled={!selectedConfig}>Éditer</TabsTrigger>
+              <TabsTrigger value="create">Créer</TabsTrigger>
             </TabsList>
 
-            <TabsContent value=\"view\" className=\"space-y-4\">
+            <TabsContent value="view" className="space-y-4">
               {selectedConfig ? (
-                <div className=\"space-y-4\">
+                <div className="space-y-4">
                   <Card>
                     <CardHeader>
-                      <div className=\"flex justify-between items-start\">
+                      <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className=\"flex items-center gap-2\">
+                          <CardTitle className="flex items-center gap-2">
                             {selectedConfig.name}
                             {selectedConfig.isActive && (
-                              <Badge variant=\"default\">Active</Badge>
+                              <Badge variant="default">Active</Badge>
                             )}
                             {selectedConfig.isSystem && (
-                              <Badge variant=\"secondary\">Système</Badge>
+                              <Badge variant="secondary">Système</Badge>
                             )}
                           </CardTitle>
                           <CardDescription>
                             {selectedConfig.description}
                           </CardDescription>
                         </div>
-                        <div className=\"flex gap-2\">
+                        <div className="flex gap-2">
                           {!selectedConfig.isActive && (
                             <Button 
-                              size=\"sm\" 
+                              size="sm" 
                               onClick={() => handleActivateConfiguration(selectedConfig.id)}
                             >
-                              <Play className=\"h-4 w-4 mr-2\" />
+                              <Play className="h-4 w-4 mr-2" />
                               Activer
                             </Button>
                           )}
                           <Button 
-                            size=\"sm\" 
-                            variant=\"outline\"
+                            size="sm" 
+                            variant="outline"
                             onClick={() => handleExportConfig(selectedConfig.id)}
                           >
-                            <Download className=\"h-4 w-4\" />
+                            <Download className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <MenuPreview menuItems={selectedConfig.items} />
+                      <MenuPreview menuItems={selectedConfigItems} />
                     </CardContent>
                   </Card>
                 </div>
               ) : (
                 <Card>
-                  <CardContent className=\"flex items-center justify-center h-48\">
-                    <p className=\"text-muted-foreground\">
+                  <CardContent className="flex items-center justify-center h-48">
+                    <p className="text-muted-foreground">
                       Sélectionnez une configuration pour voir l'aperçu
                     </p>
                   </CardContent>
@@ -262,7 +287,7 @@ export default function MenuAdminPage() {
               )}
             </TabsContent>
 
-            <TabsContent value=\"edit\">
+            <TabsContent value="edit">
               {selectedConfig && (
                 <MenuConfigurationEditor
                   configuration={selectedConfig}
@@ -276,7 +301,7 @@ export default function MenuAdminPage() {
               )}
             </TabsContent>
 
-            <TabsContent value=\"create\">
+            <TabsContent value="create">
               <MenuConfigurationEditor
                 menuTypes={menuTypes}
                 onSave={async (config) => {

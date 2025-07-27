@@ -27,6 +27,7 @@ import { Module as ModuleEntity } from '../auth/entities/module.entity'
 
 // Import des entités de préférences utilisateur (maintenant dans AUTH)
 import { UserSettings } from '../users/entities/user-settings.entity'
+import { UserMenuPreference } from '../menu/entities/user-menu-preference.entity'
 import { DiscoveredPage } from '../menu/entities/discovered-page.entity'
 import { SystemParameter } from '../admin/entitites/system-parameter.entity'
 
@@ -95,7 +96,7 @@ import { Commande } from '../commandes/entities/commande.entity'
       ModuleEntity,
       // Préférences utilisateur
       UserSettings,
-      // UserMenuPreference, // Enregistré dans MenuModule
+      UserMenuPreference,
       DiscoveredPage,
       SystemParameter,
       // Entités de menu (données globales) - Enregistrées dans AdminModule
@@ -123,7 +124,9 @@ import { Commande } from '../commandes/entities/commande.entity'
       // Menu entities are registered in AdminModule and MenuModule
     ], 'tenant'),
   ],
-  providers: [MultiTenantDatabaseConfig],
+  providers: [
+    MultiTenantDatabaseConfig,
+  ],
   exports: [
     MultiTenantDatabaseConfig,
     TypeOrmModule,
