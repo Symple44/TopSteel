@@ -38,54 +38,54 @@ const nextConfig = {
   
   // API rewrites for development
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
     return [
       // Routes spécifiques qui vont vers le backend
       // Query Builder utilise les routes Next.js (pas de rewrite)
       // Exclure les routes tenant qui ont des proxies Next.js
       {
         source: '/api/admin/database/((?!health/tenant|migrations/tenant).*)',
-        destination: `${apiUrl}/api/admin/database/$1`,
+        destination: `${apiUrl}/api/v1/admin/database/$1`,
       },
       {
         source: '/api/admin/((?!database/health/tenant|database/migrations/tenant).*)',
-        destination: `${apiUrl}/api/admin/$1`,
+        destination: `${apiUrl}/api/v1/admin/$1`,
       },
       {
         source: '/api/auth/:path*',
-        destination: `${apiUrl}/api/auth/:path*`,
+        destination: `${apiUrl}/api/v1/auth/:path*`,
       },
       {
         source: '/api/user/:path*',
-        destination: `${apiUrl}/api/user/:path*`,
+        destination: `${apiUrl}/api/v1/user/:path*`,
       },
       {
         source: '/api/users/:path*',
-        destination: `${apiUrl}/api/users/:path*`,
+        destination: `${apiUrl}/api/v1/users/:path*`,
       },
       {
         source: '/api/health/:path*',
-        destination: `${apiUrl}/api/health/:path*`,
+        destination: `${apiUrl}/api/v1/health/:path*`,
       },
       {
         source: '/api/notifications/:path*',
-        destination: `${apiUrl}/api/notifications/:path*`,
+        destination: `${apiUrl}/api/v1/notifications/:path*`,
       },
       {
         source: '/api/translations/:path*',
-        destination: `${apiUrl}/api/translations/:path*`,
+        destination: `${apiUrl}/api/v1/translations/:path*`,
       },
       {
         source: '/api/config/:path*',
-        destination: `${apiUrl}/api/config/:path*`,
+        destination: `${apiUrl}/api/v1/config/:path*`,
       },
       {
         source: '/api/search/:path*',
-        destination: `${apiUrl}/api/search/:path*`,
+        destination: `${apiUrl}/api/v1/search/:path*`,
       },
       {
         source: '/api/images/:path*',
-        destination: `${apiUrl}/api/images/:path*`,
+        destination: `${apiUrl}/api/v1/images/:path*`,
       },
     ]
   },

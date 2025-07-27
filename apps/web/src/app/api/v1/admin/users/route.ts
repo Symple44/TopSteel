@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://127.0.0.1:3002'
     
     // Récupérer les headers d'authentification
     const authHeader = request.headers.get('authorization')

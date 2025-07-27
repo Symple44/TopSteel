@@ -2,7 +2,7 @@ import { BackendHealthService } from './backend-health'
 
 export async function logStartupInfo() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'Non configurée'
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3000'
   const appName = process.env.NEXT_PUBLIC_APP_NAME || 'TopSteel ERP'
   
   console.log('\n')

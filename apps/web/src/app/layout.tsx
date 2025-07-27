@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3000'),
   robots: {
     index: false,
     follow: false,

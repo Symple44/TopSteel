@@ -73,7 +73,7 @@ export class MultiTenantDatabaseConfig {
   getAuthDatabaseConfig(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: this.configService.get('DB_HOST', 'localhost'),
+      host: this.configService.get('DB_HOST', '127.0.0.1'),
       port: this.configService.get('DB_PORT', 5432),
       username: this.configService.get('DB_USERNAME', 'postgres'),
       password: this.configService.get('DB_PASSWORD', 'postgres'),
@@ -113,7 +113,7 @@ export class MultiTenantDatabaseConfig {
   getSharedDatabaseConfig(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: this.configService.get('DB_HOST', 'localhost'),
+      host: this.configService.get('DB_HOST', '127.0.0.1'),
       port: this.configService.get('DB_PORT', 5432),
       username: this.configService.get('DB_USERNAME', 'postgres'),
       password: this.configService.get('DB_PASSWORD', 'postgres'),
@@ -132,7 +132,7 @@ export class MultiTenantDatabaseConfig {
   getTenantDatabaseConfig(societeCode: string): DataSourceOptions {
     return {
       type: 'postgres',
-      host: this.configService.get('DB_HOST', 'localhost'),
+      host: this.configService.get('DB_HOST', '127.0.0.1'),
       port: this.configService.get('DB_PORT', 5432),
       username: this.configService.get('DB_USERNAME', 'postgres'),
       password: this.configService.get('DB_PASSWORD', 'postgres'),
@@ -243,7 +243,7 @@ export class MultiTenantDatabaseConfig {
   async createTenantDatabase(societe: Societe): Promise<void> {
     const adminDataSource = new DataSource({
       type: 'postgres',
-      host: this.configService.get('DB_HOST', 'localhost'),
+      host: this.configService.get('DB_HOST', '127.0.0.1'),
       port: this.configService.get('DB_PORT', 5432),
       username: this.configService.get('DB_USERNAME', 'postgres'),
       password: this.configService.get('DB_PASSWORD', 'postgres'),

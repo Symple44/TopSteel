@@ -55,7 +55,16 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto, request?: any) {
-    const user = await this.validateUser(loginDto.login, loginDto.password)
+    console.log('🔍 [DEBUG] Login attempt with:', { login: loginDto.login, hasPassword: !!loginDto.password })
+    
+    let user: any;
+    try {
+      user = await this.validateUser(loginDto.login, loginDto.password)
+      console.log('✅ [DEBUG] User validated:', { userId: user.id, email: user.email })
+    } catch (error: any) {
+      console.error('❌ [DEBUG] User validation failed:', error?.message || error)
+      throw error
+    }
 
     // Vérifier si l'utilisateur a MFA activé
     const hasMFA = await this.mfaService.hasMFAEnabled(user.id)

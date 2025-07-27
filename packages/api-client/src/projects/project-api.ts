@@ -7,7 +7,10 @@ import { BaseApiClient } from '../core/base-api-client'
 import type { RequestOptions } from '../core/http-client'
 import type { 
   Projet, 
-  ProjetFilters,
+  ProjetFilters
+} from '@erp/domains'
+
+import { 
   ProjetStatut,
   ProjetType,
   ProjetPriorite 

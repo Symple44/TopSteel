@@ -14,12 +14,12 @@ export const envConfig = {
   // Application
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: Number.parseInt(process.env.API_PORT ?? '3001', 10),
-  host: process.env.API_HOST ?? 'localhost',
+  host: process.env.API_HOST ?? '127.0.0.1',
 
   // Base de données
   database: {
     type: 'postgres' as const,
-    host: process.env.DB_HOST ?? 'localhost',
+    host: process.env.DB_HOST ?? '127.0.0.1',
     port: Number.parseInt(process.env.DB_PORT ?? '5432', 10),
     username: process.env.DB_USERNAME ?? 'postgres',
     password: process.env.DB_PASSWORD ?? '',
@@ -43,7 +43,7 @@ export const envConfig = {
 
   // Redis
   redis: {
-    host: process.env.REDIS_HOST ?? 'localhost',
+    host: process.env.REDIS_HOST ?? '127.0.0.1',
     port: Number.parseInt(process.env.REDIS_PORT ?? '6379', 10),
     password: process.env.REDIS_PASSWORD ?? undefined,
     db: Number.parseInt(process.env.REDIS_DB ?? '0', 10),
@@ -52,7 +52,7 @@ export const envConfig = {
 
   // CORS
   cors: {
-    origin: process.env.API_CORS_ORIGIN ?? 'http://localhost:3000',
+    origin: process.env.API_CORS_ORIGIN ?? 'http://127.0.0.1:3000',
     credentials: true,
   },
 

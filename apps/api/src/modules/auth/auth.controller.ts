@@ -33,6 +33,8 @@ export class AuthController {
     description: 'Connexion réussie ou MFA requis',
   })
   async login(@Body() loginDto: LoginDto) {
+    console.log('🔍 [DEBUG] Controller received login data:', JSON.stringify(loginDto, null, 2))
+    console.log('🔍 [DEBUG] Data types:', typeof loginDto.login, typeof loginDto.password)
     return this.authService.login(loginDto)
   }
 

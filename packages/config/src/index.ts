@@ -5,14 +5,14 @@ export const ConfigSchema = z.object({
   environment: z.enum(['development', 'staging', 'production', 'test']),
   api: z.object({
     port: z.number().default(3001),
-    host: z.string().default('localhost'),
+    host: z.string().default('127.0.0.1'),
     cors: z.object({
       origin: z.string().url(),
       credentials: z.boolean().default(true),
     }),
   }),
   database: z.object({
-    host: z.string().default('localhost'),
+    host: z.string().default('127.0.0.1'),
     port: z.number().default(5432),
     name: z.string().default('erp_topsteel'),
     username: z.string(),
@@ -23,7 +23,7 @@ export const ConfigSchema = z.object({
   }),
   redis: z
     .object({
-      host: z.string().default('localhost'),
+      host: z.string().default('127.0.0.1'),
       port: z.number().default(6379),
       ttl: z.number().default(3600),
     })
@@ -49,7 +49,7 @@ export function validateConfig(env: Record<string, string | undefined>): AppConf
       port: Number.parseInt(env.API_PORT || '3001'),
       host: env.API_HOST,
       cors: {
-        origin: env.FRONTEND_URL || 'http://localhost:3000',
+        origin: env.FRONTEND_URL || 'http://127.0.0.1:3000',
         credentials: true,
       },
     },

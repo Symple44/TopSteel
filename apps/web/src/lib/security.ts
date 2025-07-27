@@ -149,7 +149,7 @@ export function auditSecurity(): SecurityAuditReport {
   // Vérifications côté client
   if (typeof window !== 'undefined') {
     // HTTPS
-    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
       issues.push('Application non servie en HTTPS')
     }
 

@@ -21,7 +21,7 @@ export function url(uri, path, loc) {
     } catch (error) {
       console.warn('URL parsing error:', error)
       // Utiliser les variables d'environnement pour les valeurs par défaut
-      const defaultApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+      const defaultApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
       const defaultUrl = new URL(defaultApiUrl)
       
       obj = {
@@ -44,7 +44,7 @@ export function url(uri, path, loc) {
 
   // Construire l'URL finale
   const protocol = obj.protocol || 'http:'
-  const hostname = obj.hostname || 'localhost'
+  const hostname = obj.hostname || '127.0.0.1'
   const port = obj.port || (protocol === 'https:' ? '443' : '80')
   const pathname = obj.pathname || '/'
   const search = obj.search || ''

@@ -156,8 +156,8 @@ cp apps/web/.env.example apps/web/.env.local
 pnpm dev
 
 # Ou individuellement
-pnpm dev:api    # API sur http://localhost:3001
-pnpm dev:web    # Web sur http://localhost:3000
+pnpm dev:api    # API sur http://127.0.0.1:3001
+pnpm dev:web    # Web sur http://127.0.0.1:3000
 ```
 
 ## 🛠️ Commandes de développement
@@ -245,10 +245,10 @@ pnpm reset                # 🔄 Reset complet (node_modules)
 # Application
 NODE_ENV=development
 PORT=3001
-APP_URL=http://localhost:3001
+APP_URL=http://127.0.0.1:3001
 
 # Base de données PostgreSQL
-DB_HOST=localhost
+DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=your_password
@@ -257,7 +257,7 @@ DB_SSL=false
 DB_MAX_CONNECTIONS=100
 
 # Redis (Cache & Queues)
-REDIS_HOST=localhost
+REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
 REDIS_PASSWORD=
 REDIS_DB=0
@@ -281,12 +281,12 @@ LOG_FILE=true
 ### **Variables d'environnement Web**
 ```bash
 # URLs de base
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://127.0.0.1:3001/api
+NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
 
 # NextAuth.js
 NEXTAUTH_SECRET=your-nextauth-secret
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://127.0.0.1:3000
 
 # Services optionnels
 NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn
@@ -373,11 +373,11 @@ docker-compose up -d
 ## 📊 Monitoring et observabilité
 
 ### **URLs de développement**
-- 🌐 **Frontend** : http://localhost:3000
-- 🔗 **API** : http://localhost:3001
-- 📚 **Documentation API** : http://localhost:3001/api/docs
-- ❤️ **Health Check** : http://localhost:3001/health
-- 📖 **Storybook** : http://localhost:6006
+- 🌐 **Frontend** : http://127.0.0.1:3000
+- 🔗 **API** : http://127.0.0.1:3001
+- 📚 **Documentation API** : http://127.0.0.1:3001/api/docs
+- ❤️ **Health Check** : http://127.0.0.1:3001/health
+- 📖 **Storybook** : http://127.0.0.1:6006
 
 ### **Logs et debugging**
 ```bash

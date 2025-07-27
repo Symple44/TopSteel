@@ -4,7 +4,12 @@ import { Toaster } from 'sonner'
 import { I18nProvider } from '@/lib/i18n'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider } from 'next-themes'
+import dynamic from 'next/dynamic'
+
+const ThemeProvider = dynamic(
+  () => import('next-themes').then((mod) => mod.ThemeProvider),
+  { ssr: false }
+)
 import { AuthProvider } from '@/components/auth/AuthProvider'
 
 // Configuration React Query
@@ -28,6 +33,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           enableSystem={true}
           disableTransitionOnChange={false}
           storageKey="topsteel-theme"
+          suppressHydrationWarning
         >
           <AuthProvider>
             {children}

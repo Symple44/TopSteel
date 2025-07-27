@@ -7,9 +7,9 @@ export const appConfig = registerAs('app', () => ({
   env: process.env.NODE_ENV || 'development',
   port: Number.parseInt(process.env.PORT || process.env.API_PORT || '3002', 10),
   host: process.env.API_HOST || '0.0.0.0',
-  url: process.env.API_URL || 'http://localhost:3002',
+  url: process.env.API_URL || 'http://127.0.0.1:3002',
   cors: {
-    origin: process.env.FRONTEND_URL || process.env.API_CORS_ORIGIN || 'http://localhost:3005',
+    origin: process.env.FRONTEND_URL || process.env.API_CORS_ORIGIN || 'http://127.0.0.1:3005',
     credentials: true,
   },
   throttle: {
