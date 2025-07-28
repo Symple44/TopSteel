@@ -27,6 +27,9 @@ export class UserMenuPreference {
   @Column('varchar', { name: 'custom_label', nullable: true })
   customLabel: string
 
+  @Column('jsonb', { name: 'title_translations', nullable: true })
+  titleTranslations: Record<string, string>
+
   @Column('integer', { default: 1 })
   version: number
 

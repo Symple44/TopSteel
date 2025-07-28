@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -84,6 +85,7 @@ export function MenuConfigurationEditor({
   onSave,
   onCancel
 }: MenuConfigurationEditorProps) {
+  const { t } = useTranslation('admin')
   const [formData, setFormData] = useState({
     name: configuration?.name || '',
     description: configuration?.description || ''
@@ -152,7 +154,7 @@ export function MenuConfigurationEditor({
 
   const addMenuItem = () => {
     const newItem: MenuItem = {
-      title: 'Nouvel élément',
+      title: t('menuConfig.editor.newMenuItem'),
       type: 'P',
       icon: 'Play',
       orderIndex: menuItems.length,
@@ -195,27 +197,27 @@ export function MenuConfigurationEditor({
       <Card>
         <CardHeader>
           <CardTitle>
-            {configuration ? 'Modifier la Configuration' : 'Nouvelle Configuration'}
+            {configuration ? t('menuConfig.editor.editConfiguration') : t('menuConfig.editor.newConfiguration')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nom de la configuration</Label>
+              <Label htmlFor="name">{t('menuConfig.editor.configurationName')}</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nom de la configuration"
+                placeholder={t('menuConfig.editor.configurationNamePlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('menuConfig.editor.configurationDescription')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Description optionnelle"
+                placeholder={t('menuConfig.editor.configurationDescriptionPlaceholder')}
                 rows={3}
               />
             </div>
@@ -226,9 +228,9 @@ export function MenuConfigurationEditor({
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>Éléments du Menu</CardTitle>
+            <CardTitle>{t('menuConfig.editor.menuItems')}</CardTitle>
             <Button onClick={addMenuItem} size="sm">
-              Ajouter un élément
+              {t('menuConfig.editor.addMenuItem')}
             </Button>
           </div>
         </CardHeader>
@@ -236,12 +238,12 @@ export function MenuConfigurationEditor({
           {rightsLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="text-muted-foreground mt-2">Chargement des données de droits...</p>
+              <p className="text-muted-foreground mt-2">{t('menuConfig.editor.loadingRightsData')}</p>
             </div>
           ) : menuItems.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p>Aucun élément de menu configuré</p>
-              <p className="text-sm">Cliquez sur "Ajouter un élément" pour commencer</p>
+              <p>{t('menuConfig.editor.noMenuItems')}</p>
+              <p className="text-sm">{t('menuConfig.editor.addFirstMenuItem')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -268,11 +270,11 @@ export function MenuConfigurationEditor({
       <div className="flex justify-end gap-2">
         <Button variant="outline" onClick={onCancel}>
           <X className="h-4 w-4 mr-2" />
-          Annuler
+          {t('menuConfig.editor.cancel')}
         </Button>
         <Button onClick={handleSave} disabled={saving || !formData.name}>
           <Save className="h-4 w-4 mr-2" />
-          {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+          {saving ? t('menuConfig.editor.saving') : t('menuConfig.editor.save')}
         </Button>
       </div>
     </div>

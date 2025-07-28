@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { DataTable } from '@/components/ui/datatable/DataTable'
 import { ColumnConfig } from '@/components/ui/datatable/types'
 import { Button, Badge, Avatar, AvatarFallback } from '@erp/ui'
@@ -38,10 +39,11 @@ interface User {
   }[]
 }
 
-const formatDate = (date: string | Date | null | undefined) => {
-  if (!date) return 'Jamais'
+// We'll need to move this function inside the component to access translations
+const formatDate = (date: string | Date | null | undefined, t: any) => {
+  if (!date) return t('users.never')
   const d = new Date(date)
-  if (isNaN(d.getTime())) return 'Date invalide'
+  if (isNaN(d.getTime())) return t('users.invalidDate')
   
   const now = new Date()
   const diff = now.getTime() - d.getTime()
@@ -51,14 +53,14 @@ const formatDate = (date: string | Date | null | undefined) => {
     return d.toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit'
-    }) + ' (aujourd\'hui)'
+    }) + ` (${t('users.today')})`
   } else if (days === 1) {
-    return 'Hier à ' + d.toLocaleTimeString('fr-FR', {
+    return t('users.yesterday') + ' ' + d.toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit'
     })
   } else if (days < 7) {
-    return `Il y a ${days} jours`
+    return t('users.daysAgo', { days })
   } else {
     return d.toLocaleDateString('fr-FR', {
       day: '2-digit',
@@ -68,12 +70,12 @@ const formatDate = (date: string | Date | null | undefined) => {
   }
 }
 
-const columns: ColumnConfig<User>[] = [
+const getColumns = (t: any): ColumnConfig<User>[] => [
   {
     id: 'user',
     key: 'firstName',
-    title: 'Utilisateur',
-    description: 'Informations de l\'utilisateur (nom, prénom, email)',
+    title: t('users.user'),
+    description: t('users.userInfo'),
     type: 'text',
     sortable: true,
     searchable: true,
@@ -83,7 +85,7 @@ const columns: ColumnConfig<User>[] = [
     getValue: (row) => {
       const fullName = row.firstName || row.lastName 
         ? `${row.firstName || ''} ${row.lastName || ''}`.trim()
-        : 'Utilisateur'
+        : t('users.user')
       return `${fullName} ${row.email}`
     },
     render: (_, row) => (
@@ -97,7 +99,7 @@ const columns: ColumnConfig<User>[] = [
           <p className="font-semibold text-foreground">
             {row.firstName || row.lastName 
               ? `${row.firstName || ''} ${row.lastName || ''}`.trim()
-              : 'Utilisateur'
+              : t('users.user')
             }
           </p>
           <p className="text-sm text-muted-foreground flex items-center">
@@ -111,8 +113,8 @@ const columns: ColumnConfig<User>[] = [
   {
     id: 'roles',
     key: 'roles',
-    title: 'Rôles',
-    description: 'Rôles assignés à l\'utilisateur',
+    title: t('users.roles'),
+    description: t('users.rolesAssigned'),
     type: 'select',
     sortable: true,
     searchable: true,
@@ -145,7 +147,7 @@ const columns: ColumnConfig<User>[] = [
             </Badge>
           ))}
           {roles.length === 0 && (
-            <span className="text-sm text-muted-foreground">Aucun rôle</span>
+            <span className="text-sm text-muted-foreground">{t('users.noRoles')}</span>
           )}
         </div>
       )
@@ -154,8 +156,8 @@ const columns: ColumnConfig<User>[] = [
   {
     id: 'groups',
     key: 'groups',
-    title: 'Groupes',
-    description: 'Groupes auxquels l\'utilisateur appartient',
+    title: t('users.groups'),
+    description: t('users.groupsAssigned'),
     type: 'text',
     sortable: true,
     searchable: true,
@@ -180,7 +182,7 @@ const columns: ColumnConfig<User>[] = [
             </Badge>
           ))}
           {groups.length === 0 && (
-            <span className="text-sm text-muted-foreground">Aucun groupe</span>
+            <span className="text-sm text-muted-foreground">{t('users.noGroups')}</span>
           )}
         </div>
       )
@@ -189,7 +191,7 @@ const columns: ColumnConfig<User>[] = [
   {
     id: 'department',
     key: 'department',
-    title: 'Département',
+    title: t('users.department'),
     type: 'text',
     sortable: true,
     searchable: true,
@@ -202,7 +204,7 @@ const columns: ColumnConfig<User>[] = [
   {
     id: 'lastLogin',
     key: 'lastLogin',
-    title: 'Dernière connexion',
+    title: t('users.lastLogin'),
     type: 'datetime',
     sortable: true,
     searchable: false,
@@ -215,7 +217,7 @@ const columns: ColumnConfig<User>[] = [
         <div className="flex items-center space-x-1.5">
           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
           <span className={value ? "text-foreground font-medium" : "text-muted-foreground"}>
-            {formatDate(value)}
+            {formatDate(value, t)}
           </span>
         </div>
       </div>
@@ -224,25 +226,25 @@ const columns: ColumnConfig<User>[] = [
   {
     id: 'isActive',
     key: 'isActive',
-    title: 'Statut',
+    title: t('users.status'),
     type: 'select',
     sortable: true,
     editable: true,
     width: 100,
     options: [
-      { value: true, label: 'Actif', color: '#10b981' },
-      { value: false, label: 'Inactif', color: '#6b7280' }
+      { value: true, label: t('users.active'), color: '#10b981' },
+      { value: false, label: t('users.inactive'), color: '#6b7280' }
     ],
     render: (value) => (
       <Badge variant={value ? 'default' : 'secondary'}>
-        {value ? 'Actif' : 'Inactif'}
+        {value ? t('users.active') : t('users.inactive')}
       </Badge>
     )
   },
   {
     id: 'createdAt',
     key: 'createdAt',
-    title: 'Créé le',
+    title: t('users.createdAt'),
     type: 'datetime',
     sortable: true,
     searchable: false,
@@ -251,7 +253,7 @@ const columns: ColumnConfig<User>[] = [
       dateFormat: 'dd/MM/yyyy'
     },
     render: (value) => (
-      <span className="text-muted-foreground font-medium">{formatDate(value)}</span>
+      <span className="text-muted-foreground font-medium">{formatDate(value, t)}</span>
     )
   }
 ]
@@ -262,10 +264,14 @@ interface UsersDataTableProps {
 }
 
 export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps) {
+  const { t } = useTranslation('admin')
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isBulkManagementOpen, setIsBulkManagementOpen] = useState(false)
+  
+  // Create columns with translation support
+  const columns = getColumns(t)
 
   // Charger les utilisateurs
   useEffect(() => {
@@ -288,7 +294,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
       if (response.ok && data.success && data.data) {
         setUsers(data.data)
       } else {
-        setError('Erreur lors du chargement des utilisateurs')
+        setError(t('users.loadingError'))
         console.error('Erreur API:', {
           status: response.status,
           statusText: response.statusText,
@@ -296,7 +302,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         })
       }
     } catch (error) {
-      setError('Erreur de connexion au serveur')
+      setError(t('users.connectionError'))
       console.error('Erreur lors du chargement des utilisateurs:', error)
     } finally {
       setLoading(false)
@@ -311,7 +317,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
           : user
       )
     )
-    // Ici on pourrait envoyer la mise à jour au serveur
+    // Here we could send the update to the server
   }
 
   const handleCreate = () => {
@@ -333,16 +339,16 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
   }
 
   const exportUsers = () => {
-    const headers = ['Email', 'Nom', 'Prénom', 'Département', 'Statut', 'Rôles', 'Groupes', 'Dernière connexion']
+    const headers = [t('users.exportHeaders.email'), t('users.exportHeaders.lastName'), t('users.exportHeaders.firstName'), t('users.exportHeaders.department'), t('users.exportHeaders.status'), t('users.exportHeaders.roles'), t('users.exportHeaders.groups'), t('users.exportHeaders.lastLogin')]
     const rows = users.map(user => [
       user.email,
       user.lastName || '',
       user.firstName || '',
       user.department || '',
-      user.isActive ? 'Actif' : 'Inactif',
+      user.isActive ? t('users.active') : t('users.inactive'),
       user.roles.map(r => r.name).join(', '),
       user.groups.map(g => g.name).join(', '),
-      formatDate(user.lastLogin)
+      formatDate(user.lastLogin, t)
     ])
     
     const csv = [headers, ...rows]
@@ -353,32 +359,32 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `utilisateurs-${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `users-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
   }
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
+      {/* Header */}
       <div className="flex justify-between items-start">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Gestion des Utilisateurs</h1>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">{t('users.userManagement')}</h1>
           <p className="text-muted-foreground/80 text-lg">
-            Vue complète des utilisateurs avec DataTable avancé
+            {t('users.userManagementDescription')}
           </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" onClick={exportUsers}>
             <Download className="h-4 w-4 mr-2" />
-            Exporter
+            {t('users.export')}
           </Button>
           <Button variant="outline" onClick={() => setIsBulkManagementOpen(true)}>
             <Settings className="h-4 w-4 mr-2" />
-            Gestion en masse
+            {t('users.bulkManagement')}
           </Button>
           <Button onClick={handleCreate}>
             <UserPlus className="h-4 w-4 mr-2" />
-            Nouvel utilisateur
+            {t('users.newUser')}
           </Button>
         </div>
       </div>
@@ -388,7 +394,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Total utilisateurs</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('users.totalUsers')}</h3>
               <p className="text-3xl font-bold text-foreground">{users.length}</p>
             </div>
             <div className="p-3 bg-primary rounded-lg">
@@ -400,7 +406,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Utilisateurs actifs</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('users.activeUsers')}</h3>
               <p className="text-3xl font-bold text-foreground">{users.filter(u => u.isActive).length}</p>
             </div>
             <div className="p-3 bg-primary rounded-lg">
@@ -412,7 +418,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Avec rôles</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('users.withRoles')}</h3>
               <p className="text-3xl font-bold text-foreground">{users.filter(u => u.roles.length > 0).length}</p>
             </div>
             <div className="p-3 bg-secondary rounded-lg">
@@ -424,7 +430,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Avec groupes</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('users.withGroups')}</h3>
               <p className="text-3xl font-bold text-foreground">{users.filter(u => u.groups.length > 0).length}</p>
             </div>
             <div className="p-3 bg-secondary rounded-lg">

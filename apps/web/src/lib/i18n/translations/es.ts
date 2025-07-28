@@ -51,6 +51,13 @@ export const es = {
     uploading: 'Subiendo...',
     remove: 'Eliminar',
     changePhoto: 'Cambiar foto',
+    reset: 'Restablecer',
+    resetToDefaults: 'Restablecer a valores predeterminados',
+    
+    // Páginas del sistema
+    pageNotFound: 'Página no encontrada',
+    pageNotFoundMessage: 'La página que buscas no existe o ha sido movida.',
+    backHome: 'Volver al inicio',
   },
 
   auth: {
@@ -169,6 +176,27 @@ export const es = {
     advanced: {
       title: 'Configuración avanzada',
       comingSoon: 'Esta sección estará disponible pronto',
+    },
+    translations: {
+      title: 'Gestión de traducciones',
+      description: 'Configurar traducciones multiidioma',
+      statistics: 'Estadísticas',
+      totalKeys: 'Claves totales',
+      translatedKeys: 'Claves traducidas',
+      pendingKeys: 'Pendientes',
+      completionRate: 'Tasa de completado',
+      actions: 'Acciones',
+      quickActions: 'Acciones Rápidas',
+      export: 'Exportar',
+      import: 'Importar',
+      importTitle: 'Importar Traducciones',
+      importSuccess: 'Traducciones importadas con éxito',
+      exportSuccess: 'Traducciones exportadas con éxito',
+      saveSuccess: 'Traducción guardada correctamente',
+      loadError: 'Error al cargar traducciones',
+      saveError: 'Error al guardar traducción',
+      exportError: 'Error al exportar traducciones',
+      importError: 'Error al importar traducciones',
     },
   },
 
@@ -306,5 +334,64 @@ export const es = {
     languageUpdateError: 'Error al actualizar el idioma',
     loadingSettings: 'Cargando configuración...',
     settingsLoadError: 'Error al cargar la configuración',
+  },
+
+  roles: {
+    super_admin: 'Super Administrador',
+    admin: 'Administrador',
+    manager: 'Gerente',
+    commercial: 'Comercial',
+    technician: 'Técnico',
+    accountant: 'Contador',
+    operator: 'Operador',
+    user: 'Usuario',
+    viewer: 'Observador',
+  },
+
+  status: {
+    active: 'Activo',
+    inactive: 'Inactivo',
+    pending: 'Pendiente',
+  },
+
+  system: {
+    modules: {
+      available: 'Módulos del Sistema Disponibles',
+    },
+    permissions: {
+      default: 'Permisos por Defecto',
+    },
+  },
+
+  projects: {
+    types: {
+      steel_structure: 'Estructura Metálica',
+      maintenance: 'Mantenimiento',
+      custom_fabrication: 'Fabricación a Medida',
+    },
+    workflow: {
+      default_steps: 'Pasos por Defecto del Proyecto',
+    },
+  },
+
+  materials: {
+    steel_grades: 'Grados de Acero Disponibles',
+  },
+
+  codeViewer: {
+    title: 'Visor de Código',
+    loading: 'Cargando archivo...',
+    loadError: 'No se pudo cargar el archivo',
+    error: 'Error',
+    retry: 'Reintentar',
+    copySelection: 'Copiar selección',
+    copyAll: 'Copiar todo',
+    clear: 'Limpiar',
+    copied: '¡Copiado!',
+    code: 'Código',
+    lines: 'líneas',
+    linesSelected: 'línea(s) seleccionada(s)',
+    clickLineNumbers: 'Haz clic en los números de línea para seleccionar • Ctrl+Clic para multi-selección • Shift+Clic para rango',
+    lineTooltip: 'Línea {number} - Clic: seleccionar, Ctrl+Clic: multi-selección, Shift+Clic: rango',
   },
 }

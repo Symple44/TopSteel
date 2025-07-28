@@ -1,21 +1,30 @@
 import { Global, Module } from '@nestjs/common'
-import { TenantConnectionService } from './services/tenant-connection.service'
-import { DatabaseHealthService } from './services/database-health.service'
-import { MigrationManagerService } from './services/migration-manager.service'
+import { TypeOrmModule } from '@nestjs/typeorm'
 import { DatabaseAdminController } from './controllers/database-admin.controller'
+import { DatabaseHealthSimpleService } from './services/database-health-simple.service'
+import { MigrationManagerService } from './services/migration-manager.service'
+import { TenantConnectionService } from './services/tenant-connection.service'
+import { TenantConnectionSimpleService } from './services/tenant-connection-simple.service'
 
 @Global()
 @Module({
+  imports: [
+    TypeOrmModule.forFeature([], 'auth'),
+    TypeOrmModule.forFeature([], 'shared'), 
+    TypeOrmModule.forFeature([], 'tenant'),
+  ],
   controllers: [DatabaseAdminController],
   providers: [
-    TenantConnectionService,
-    DatabaseHealthService,
+    DatabaseHealthSimpleService,
     MigrationManagerService,
+    TenantConnectionService,
+    TenantConnectionSimpleService,
   ],
   exports: [
-    TenantConnectionService,
-    DatabaseHealthService,
+    DatabaseHealthSimpleService,
     MigrationManagerService,
+    TenantConnectionService,
+    TenantConnectionSimpleService,
   ],
 })
 export class DatabaseCoreModule {}

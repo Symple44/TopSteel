@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 import {
   Card,
   CardContent,
@@ -66,7 +67,8 @@ interface MenuConfiguration {
 }
 
 export default function MenuConfigurationPage() {
-  const [configurations, setConfigurations] = useState<MenuConfiguration[]>([])
+  const { t } = useTranslation('admin')
+  const [configurations, setConfigurations] = useState<MenuConfiguration[]>([]
   const [selectedConfig, setSelectedConfig] = useState<MenuConfiguration | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -93,7 +95,7 @@ export default function MenuConfigurationPage() {
   }
 
   const handleActivateConfig = async (configId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir activer cette configuration ? La configuration actuelle sera désactivée.')) {
+    if (!confirm(t('menuConfig.confirmActivate'))) {
       return
     }
 
@@ -113,7 +115,7 @@ export default function MenuConfigurationPage() {
   }
 
   const handleDeleteConfig = async (configId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette configuration ?')) {
+    if (!confirm(t('menuConfig.confirmDelete'))) {
       return
     }
 
@@ -159,7 +161,7 @@ export default function MenuConfigurationPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
-          <p className="mt-4 text-gray-600">Chargement des configurations...</p>
+          <p className="mt-4 text-gray-600">{t('menuConfig.loadingConfigurations')}</p>
         </div>
       </div>
     )
@@ -170,27 +172,27 @@ export default function MenuConfigurationPage() {
       {/* En-tête */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold">Configuration du Menu</h1>
+          <h1 className="text-3xl font-bold">{t('menuConfig.title')}</h1>
           <p className="text-muted-foreground mt-2">
-            Gérez les configurations de menu et personnalisez la navigation
+            {t('menuConfig.description')}
           </p>
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" onClick={handleCreateDefault}>
             <Zap className="h-4 w-4 mr-2" />
-            Menu par défaut
+            {t('menuConfig.defaultMenu')}
           </Button>
           {/* <PermissionHide permission="MENU_CREATE" roles={['SUPER_ADMIN']}> */}
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Nouvelle configuration
+                  {t('menuConfig.newConfiguration')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Créer une nouvelle configuration de menu</DialogTitle>
+                  <DialogTitle>{t('menuConfig.createNewConfiguration')}</DialogTitle>
                 </DialogHeader>
                 <MenuConfigForm 
                   onSave={() => {
@@ -209,7 +211,7 @@ export default function MenuConfigurationPage() {
         <Alert>
           <Check className="h-4 w-4" />
           <AlertDescription>
-            Configuration active : <strong>{activeConfig.name}</strong>
+            {t('menuConfig.activeConfiguration')} : <strong>{activeConfig.name}</strong>
             {activeConfig.description && ` - ${activeConfig.description}`}
           </AlertDescription>
         </Alert>
@@ -217,28 +219,28 @@ export default function MenuConfigurationPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="configurations">Configurations ({configurations.length})</TabsTrigger>
-          <TabsTrigger value="preview">Aperçu du menu</TabsTrigger>
+          <TabsTrigger value="configurations">{t('menuConfig.configurations')} ({configurations.length})</TabsTrigger>
+          <TabsTrigger value="preview">{t('menuConfig.preview')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="configurations" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Configurations de menu</CardTitle>
+              <CardTitle>{t('menuConfig.configurations')}</CardTitle>
               <CardDescription>
-                Gérez vos différentes configurations de menu de navigation
+                {t('menuConfig.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Nom</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Créé le</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('menuConfig.name')}</TableHead>
+                    <TableHead>{t('menuConfig.description')}</TableHead>
+                    <TableHead>{t('common.type')}</TableHead>
+                    <TableHead>{t('common.status')}</TableHead>
+                    <TableHead>{t('menuConfig.createdAt')}</TableHead>
+                    <TableHead>{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -250,7 +252,7 @@ export default function MenuConfigurationPage() {
                           {config.isActive && (
                             <Badge variant="default" className="text-xs">
                               <Power className="h-3 w-3 mr-1" />
-                              Active
+                              {t('menuConfig.active')}
                             </Badge>
                           )}
                         </div>
@@ -258,12 +260,12 @@ export default function MenuConfigurationPage() {
                       <TableCell>{config.description || '-'}</TableCell>
                       <TableCell>
                         <Badge variant={config.isSystem ? 'secondary' : 'outline'}>
-                          {config.isSystem ? 'Système' : 'Personnalisée'}
+                          {config.isSystem ? t('menuConfig.system') : t('menuConfig.custom')}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant={config.isActive ? 'default' : 'secondary'}>
-                          {config.isActive ? 'Active' : 'Inactive'}
+                          {config.isActive ? t('menuConfig.active') : t('menuConfig.inactive')}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -336,8 +338,8 @@ export default function MenuConfigurationPage() {
               {configurations.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucune configuration de menu trouvée</p>
-                  <p className="text-sm">Créez votre première configuration pour personnaliser la navigation</p>
+                  <p>{t('menuConfig.noConfigurations')}</p>
+                  <p className="text-sm">{t('menuConfig.noConfigurationsDescription')}</p>
                 </div>
               )}
             </CardContent>
@@ -353,7 +355,7 @@ export default function MenuConfigurationPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Modifier la configuration: {selectedConfig?.name}</DialogTitle>
+            <DialogTitle>{t('menuConfig.edit')}: {selectedConfig?.name}</DialogTitle>
           </DialogHeader>
           <MenuConfigEditor 
             config={selectedConfig}
@@ -369,7 +371,7 @@ export default function MenuConfigurationPage() {
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Aperçu: {selectedConfig?.name}</DialogTitle>
+            <DialogTitle>{t('menuConfig.preview')}: {selectedConfig?.name}</DialogTitle>
           </DialogHeader>
           <MenuConfigPreview config={selectedConfig} />
         </DialogContent>
@@ -380,6 +382,7 @@ export default function MenuConfigurationPage() {
 
 // Composant pour créer une configuration
 function MenuConfigForm({ onSave }: { onSave: () => void }) {
+  const { t } = useTranslation('admin')
   const [formData, setFormData] = useState({
     name: '',
     description: ''
@@ -409,32 +412,32 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="name">Nom de la configuration</Label>
+        <Label htmlFor="name">{t('menuConfig.name')}</Label>
         <Input
           id="name"
           value={formData.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          placeholder="Ex: Menu commercial, Menu production..."
+          placeholder={t('menuConfig.form.namePlaceholder')}
           required
         />
       </div>
       
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t('menuConfig.description')}</Label>
         <Textarea
           id="description"
           value={formData.description}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          placeholder="Décrivez cette configuration de menu..."
+          placeholder={t('menuConfig.form.descriptionPlaceholder')}
         />
       </div>
       
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
-          Annuler
+          {t('menuConfig.form.cancel')}
         </Button>
         <Button type="submit">
-          Créer
+          {t('menuConfig.form.create')}
         </Button>
       </div>
     </form>
@@ -443,6 +446,7 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
 
 // Composant pour éditer une configuration (placeholder)
 function MenuConfigEditor({ config, onSave }: { config: MenuConfiguration | null, onSave: () => void }) {
+  const { t } = useTranslation('admin')
   if (!config) return null
 
   return (
@@ -450,14 +454,14 @@ function MenuConfigEditor({ config, onSave }: { config: MenuConfiguration | null
       <Alert>
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          L'éditeur de menu avancé sera disponible dans une prochaine version.
-          Pour le moment, vous pouvez exporter/importer des configurations.
+          {t('menuConfig.editor.advancedEditorSoon')}
+          {t('menuConfig.editor.exportImportInfo')}
         </AlertDescription>
       </Alert>
       
       <div className="flex justify-end">
         <Button onClick={onSave}>
-          Fermer
+          {t('menuConfig.editor.close')}
         </Button>
       </div>
     </div>
@@ -466,6 +470,7 @@ function MenuConfigEditor({ config, onSave }: { config: MenuConfiguration | null
 
 // Composant pour prévisualiser une configuration
 function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
+  const { t } = useTranslation('admin')
   const [menuTree, setMenuTree] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -492,7 +497,7 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Chargement de l'aperçu...</div>
+    return <div className="text-center py-8">{t('menuConfig.preview.loadingPreview')}</div>
   }
 
   const renderMenuItem = (item: any, depth: number = 0) => (
@@ -513,13 +518,13 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
   return (
     <div className="space-y-4">
       <div className="bg-gray-50 rounded-lg p-4 border">
-        <h3 className="font-medium mb-3">Structure du menu</h3>
+        <h3 className="font-medium mb-3">{t('menuConfig.preview.menuStructure', { fallback: 'Structure du menu' })}</h3>
         {menuTree.length > 0 ? (
           <div className="space-y-1">
             {menuTree.map(item => renderMenuItem(item))}
           </div>
         ) : (
-          <p className="text-muted-foreground">Aucun item de menu configuré</p>
+          <p className="text-muted-foreground">{t('menuConfig.preview.noItems')}</p>
         )}
       </div>
     </div>
@@ -528,6 +533,7 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
 
 // Composant pour prévisualiser le menu actuel
 function MenuPreview() {
+  const { t } = useTranslation('admin')
   const [menuTree, setMenuTree] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -550,7 +556,7 @@ function MenuPreview() {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Chargement du menu...</div>
+    return <div className="text-center py-8">{t('menuConfig.preview.loadingPreview')}</div>
   }
 
   const renderMenuItem = (item: any, depth: number = 0) => (
@@ -578,9 +584,9 @@ function MenuPreview() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Menu de navigation actuel</CardTitle>
+        <CardTitle>{t('menuConfig.preview.currentNavigationMenu', { fallback: 'Menu de navigation actuel' })}</CardTitle>
         <CardDescription>
-          Aperçu du menu tel qu'il apparaît pour votre utilisateur
+          {t('menuConfig.preview.userMenuPreview', { fallback: 'Aperçu du menu tel qu\'il apparaît pour votre utilisateur' })}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -591,7 +597,7 @@ function MenuPreview() {
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Aucun menu configuré ou accessible</p>
+            <p>{t('menuConfig.preview.noMenuConfigured', { fallback: 'Aucun menu configuré ou accessible' })}</p>
           </div>
         )}
       </CardContent>

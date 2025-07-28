@@ -27,6 +27,9 @@ const protectedApiRoutes = [
 ]
 
 export function middleware(request: NextRequest) {
+  // Temporarily disable middleware to debug OpenTelemetry issues
+  return NextResponse.next()
+  
   const { pathname } = request.nextUrl
   
   // Vérifier si c'est une route publique

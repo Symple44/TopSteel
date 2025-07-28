@@ -7,32 +7,12 @@
 
 import React from 'react'
 import { usePathname } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { Breadcrumb, BreadcrumbItem } from './breadcrumb'
-
-// Configuration des titres des routes
-const routeTitles: Record<string, string> = {
-  '': 'Accueil',
-  'admin': 'Administration',
-  'settings': 'Paramètres',
-  'appearance': 'Apparence',
-  'notifications': 'Notifications',
-  'security': 'Sécurité',
-  'menu': 'Personnalisation du menu',
-  'users': 'Gestion des utilisateurs',
-  'sessions': 'Sessions utilisateurs',
-  'company': 'Configuration entreprise',
-  'database': 'Base de données',
-  'menu-config': 'Configuration des menus',
-  'roles': 'Rôles et permissions',
-  'translations': 'Traductions',
-  'profile': 'Profil',
-  'dashboard': 'Tableau de bord',
-  'planning': 'Planning',
-  'test': 'Test'
-}
 
 export function AutoBreadcrumb() {
   const pathname = usePathname()
+  const { t } = useTranslation('breadcrumb')
   
   // Générer les éléments du breadcrumb basés sur l'URL
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
@@ -49,7 +29,8 @@ export function AutoBreadcrumb() {
     segments.forEach((segment, index) => {
       currentPath += `/${segment}`
       const isLast = index === segments.length - 1
-      const title = routeTitles[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
+      // Utiliser la traduction ou fallback sur le segment formaté
+      const title = t(segment) || segment.charAt(0).toUpperCase() + segment.slice(1)
       
       breadcrumbs.push({
         title,

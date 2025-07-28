@@ -1,6 +1,7 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm'
 
 export class CreateUserPreferencesTables1721808002000 implements MigrationInterface {
+  name = 'CreateUserPreferencesTables1721808002000'
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Activer l'extension uuid-ossp
     await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')

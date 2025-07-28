@@ -7,6 +7,14 @@ import { Badge, Button } from '@erp/ui'
 import { Clock, Tag, Edit2, Download, Upload, Plus, Trash2, Copy } from 'lucide-react'
 import type { TranslationEntry, TranslationFilter } from '@/lib/i18n/types'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
+import {
+  NamespaceCell,
+  CategoryCell,
+  StatusCell,
+  FullKeyCell,
+  TranslationCell,
+  DescriptionCell
+} from './TranslationCellComponents'
 
 interface TranslationDataTableProps {
   entries: TranslationEntry[]
@@ -57,30 +65,7 @@ export function TranslationDataTable({
         sortable: true,
         searchable: true,
         locked: true, // Empêcher le déplacement de cette colonne importante
-        render: (value, row) => (
-          <div className="space-y-1">
-            <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
-              {value}
-            </code>
-            <div className="flex items-center gap-1 flex-wrap">
-              <Badge variant="secondary" className="text-xs">
-                {row.namespace}
-              </Badge>
-              {row.category && (
-                <Badge variant="outline" className="text-xs">
-                  <Tag className="h-3 w-3 mr-1" />
-                  {row.category}
-                </Badge>
-              )}
-              {row.isModified && (
-                <Badge variant="default" className="text-xs bg-orange-100 text-orange-800">
-                  <Clock className="h-3 w-3 mr-1" />
-                  Modifiée
-                </Badge>
-              )}
-            </div>
-          </div>
-        )
+        render: (value, row) => <FullKeyCell entry={row} />
       },
       {
         id: 'namespace',
@@ -96,11 +81,7 @@ export function TranslationDataTable({
           label: ns,
           color: '#3b82f6'
         })),
-        render: (value) => (
-          <Badge variant="secondary" className="text-xs">
-            {value}
-          </Badge>
-        )
+        render: (value) => <NamespaceCell value={value} />
       },
       {
         id: 'category',
@@ -116,16 +97,7 @@ export function TranslationDataTable({
           label: cat,
           color: '#10b981'
         })),
-        render: (value) => (
-          value ? (
-            <Badge variant="outline" className="text-xs">
-              <Tag className="h-3 w-3 mr-1" />
-              {value}
-            </Badge>
-          ) : (
-            <span className="text-xs text-muted-foreground italic">Aucune</span>
-          )
-        )
+        render: (value) => <CategoryCell value={value} />
       },
       {
         id: 'description',
@@ -137,11 +109,7 @@ export function TranslationDataTable({
         sortable: true,
         searchable: true,
         editable: true,
-        render: (value) => (
-          <span className="text-xs text-muted-foreground">
-            {String(value || '(Aucune description)')}
-          </span>
-        ),
+        render: (value) => <DescriptionCell value={value} />,
         validation: {
           maxLength: 200
         }
@@ -154,20 +122,7 @@ export function TranslationDataTable({
         type: 'boolean',
         width: 100,
         sortable: true,
-        render: (value, row) => (
-          <div className="flex items-center gap-2">
-            {value ? (
-              <Badge variant="default" className="text-xs bg-orange-100 text-orange-800">
-                <Clock className="h-3 w-3 mr-1" />
-                Modifiée
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="text-xs">
-                Original
-              </Badge>
-            )}
-          </div>
-        )
+        render: (value) => <StatusCell value={value} />
       }
     ]
 
@@ -183,34 +138,8 @@ export function TranslationDataTable({
       editable: true,
       searchable: true,
       render: (value, row) => {
-        // Toujours extraire la traduction de l'objet row pour être sûr
         const translation = row.translations[lang.code] || ''
-        const isEmpty = typeof translation !== 'string' || !translation.trim()
-        
-        if (isEmpty) {
-          return (
-            <div className="min-h-[40px] flex items-center">
-              <p className="text-sm text-muted-foreground italic">(Non traduit)</p>
-            </div>
-          )
-        }
-
-        // Si la traduction contient du HTML, l'afficher comme rich text
-        if (translation.includes('<') && translation.includes('>')) {
-          return (
-            <div 
-              className="min-h-[40px] richtext-cell text-sm"
-              dangerouslySetInnerHTML={{ __html: translation }}
-            />
-          )
-        }
-
-        // Sinon affichage normal
-        return (
-          <div className="min-h-[40px] flex items-center">
-            <p className="text-sm">{translation}</p>
-          </div>
-        )
+        return <TranslationCell translation={translation} />
       },
       validation: {
         custom: (value) => {
@@ -304,14 +233,15 @@ export function TranslationDataTable({
       // Callbacks
       onCellEdit={handleCellEdit}
       loading={loading}
-      // Configuration personnalisée
+      // Configuration personnalisée avec pagination activée
+      pagination={true}
       config={{
         enableColumnReorder: true,
         enableColumnResize: true,
         enableDensityToggle: true,
         enableFullscreen: true,
-        pageSize: 50,
-        pageSizeOptions: [25, 50, 100, 200]
+        pageSize: 25,
+        pageSizeOptions: [10, 25, 50, 100]
       }}
     />
   )

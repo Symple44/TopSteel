@@ -18,5 +18,37 @@
     },
     "updatedAt": "2025-01-21T10:00:00.000Z",
     "updatedBy": "admin@topsteel.tech"
+  },
+  "admin.advanced.comingSoon": {
+    "id": "admin.advanced.comingSoon",
+    "namespace": "admin",
+    "key": "advanced.comingSoon",
+    "fullKey": "admin.advanced.comingSoon",
+    "translations": {
+      "fr": "Cette section sera disponible prochainement",
+      "en": ".This section will be available soon",
+      "es": "Esta sección estará disponible pronto"
+    },
+    "category": "Administration",
+    "createdAt": "2025-07-28T09:55:50.637Z",
+    "updatedAt": "2025-07-28T09:56:26.390Z",
+    "isModified": true,
+    "updatedBy": "admin@topsteel.tech"
+  },
+  "admin.advanced.title": {
+    "id": "admin.advanced.title",
+    "namespace": "admin",
+    "key": "advanced.title",
+    "fullKey": "admin.advanced.title",
+    "translations": {
+      "fr": "Paramètres avancés",
+      "en": "Advanced Settings",
+      "es": "Configuración avanzada"
+    },
+    "category": "Administration",
+    "createdAt": "2025-07-28T09:55:50.637Z",
+    "updatedAt": "2025-07-28T09:56:41.809Z",
+    "isModified": true,
+    "updatedBy": "admin@topsteel.tech"
   }
 }

@@ -75,11 +75,6 @@ function useDragAndDrop<T extends ReorderableItem>(
     }
 
     // Logique simplifiée de drop - à adapter selon vos besoins
-    console.log('🎯 DROP EVENT:', {
-      draggedId: draggedItem.id, 
-      targetId, 
-      position: dropPosition
-    })
 
     // Ici vous pouvez implémenter votre logique de réorganisation
     // En utilisant la logique existante du composant original

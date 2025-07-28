@@ -17,6 +17,305 @@ import { useAuth } from '@/hooks/use-auth'
 import { authService } from '@/services/auth.service'
 import { toast } from 'sonner'
 import { getApproximateTabCount } from '@/lib/tab-detection'
+import { useTranslation } from '@/lib/i18n/hooks'
+
+// Interface pour les données de rôle
+interface RoleData {
+  key: string
+  value: string
+  icon?: string
+  color?: string
+  order?: number
+  permissions?: string[]
+  category?: string
+}
+
+// Cache pour les rôles avec persistance sessionStorage
+const ROLES_CACHE_KEY = 'topsteel-roles-cache'
+const ROLES_CACHE_EXPIRY_KEY = 'topsteel-roles-cache-expiry'
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
+let rolesCache: RoleData[] | null = null
+
+// Fonction pour charger le cache depuis sessionStorage
+const loadCacheFromStorage = (): RoleData[] | null => {
+  if (typeof window === 'undefined') return null
+  
+  try {
+    const cached = sessionStorage.getItem(ROLES_CACHE_KEY)
+    const expiry = sessionStorage.getItem(ROLES_CACHE_EXPIRY_KEY)
+    
+    if (cached && expiry && Date.now() < parseInt(expiry)) {
+      return JSON.parse(cached)
+    }
+  } catch (error) {
+    console.warn('Erreur lors du chargement du cache des rôles:', error)
+  }
+  
+  return null
+}
+
+// Fonction pour sauvegarder le cache dans sessionStorage
+const saveCacheToStorage = (roles: RoleData[]) => {
+  if (typeof window === 'undefined') return
+  
+  try {
+    sessionStorage.setItem(ROLES_CACHE_KEY, JSON.stringify(roles))
+    sessionStorage.setItem(ROLES_CACHE_EXPIRY_KEY, (Date.now() + CACHE_TTL).toString())
+  } catch (error) {
+    console.warn('Erreur lors de la sauvegarde du cache des rôles:', error)
+  }
+}
+
+// Fonction pour charger les rôles depuis l'API des paramètres
+const loadRolesFromParameters = async (language: string = 'fr', forceReload: boolean = false): Promise<RoleData[]> => {
+  // Vérifier d'abord le cache en mémoire
+  if (rolesCache && !forceReload) return rolesCache
+  
+  // Puis le cache sessionStorage
+  if (!forceReload) {
+    const cachedRoles = loadCacheFromStorage()
+    if (cachedRoles) {
+      rolesCache = cachedRoles
+      return cachedRoles
+    }
+  }
+
+  try {
+    const response = await fetch(`/api/parameters/system/user_roles?language=${language}`)
+    if (response.ok) {
+      const data = await response.json()
+      
+      // Vérifier la structure de la réponse
+      let rolesList = []
+      
+      if (Array.isArray(data)) {
+        // Réponse directe en tableau
+        rolesList = data
+      } else if (data.data && Array.isArray(data.data)) {
+        // Réponse avec data wrapper
+        rolesList = data.data
+      } else if (data.success && data.data && Array.isArray(data.data)) {
+        // Réponse avec success + data wrapper
+        rolesList = data.data
+      } else if (data.success && Array.isArray(data.roles)) {
+        // Autre format possible
+        rolesList = data.roles
+      } else if (typeof data === 'object' && data !== null) {
+        // Si c'est un objet, vérifier s'il contient des rôles
+        const possibleArrays = Object.values(data).filter(Array.isArray)
+        if (possibleArrays.length > 0) {
+          rolesList = possibleArrays[0] as any[]
+        }
+      }
+      
+      if (!Array.isArray(rolesList) || rolesList.length === 0) {
+        console.warn('Aucun rôle trouvé dans la réponse, utilisation des rôles par défaut:', data)
+        // Utiliser des rôles par défaut
+        rolesList = [
+          { key: 'ADMIN', value: 'Administrateur', icon: '🔧', color: 'orange', order: 1 },
+          { key: 'USER', value: 'Utilisateur', icon: '👤', color: 'blue', order: 2 }
+        ]
+      }
+      
+      // Mapper les données du backend vers le format attendu
+      rolesCache = rolesList.map((role: any) => ({
+        key: role.key || role.id || 'UNKNOWN',
+        value: role.value || role.name || role.label || 'Rôle',
+        icon: role.icon || '👤',
+        color: role.color || 'blue',
+        order: role.order || 999,
+        permissions: role.permissions || [],
+        category: role.category || 'standard',
+        translationKey: role.translationKey || null
+      }))
+      
+      // Sauvegarder en cache
+      saveCacheToStorage(rolesCache)
+      return rolesCache
+    }
+  } catch (error) {
+    console.warn('Erreur lors du chargement des rôles depuis les paramètres:', error)
+  }
+
+  // Fallback sur les rôles hardcodés si l'API échoue
+  return getFallbackRoles(language)
+}
+
+// Fonction pour obtenir la traduction d'un rôle
+const getRoleTranslation = (roleKey: string, translator: (key: string) => string): string => {
+  const roleMap: Record<string, string> = {
+    'SUPER_ADMIN': translator('roles.super_admin'),
+    'ADMIN': translator('roles.admin'),
+    'MANAGER': translator('roles.manager'),
+    'COMMERCIAL': translator('roles.commercial'),
+    'TECHNICIEN': translator('roles.technician'),
+    'COMPTABLE': translator('roles.accountant'),
+    'OPERATEUR': translator('roles.operator'),
+    'USER': translator('roles.user'),
+    'VIEWER': translator('roles.viewer')
+  }
+  return roleMap[roleKey] || roleKey
+}
+
+// Rôles de fallback (cas où l'API des paramètres n'est pas disponible)
+const getFallbackRoles = (language: string = 'fr'): RoleData[] => {
+  // Créer un translator simple pour le fallback
+  const fallbackTranslator = (key: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      'roles.super_admin': { fr: 'Super Administrateur', en: 'Super Administrator', es: 'Super Administrador' },
+      'roles.admin': { fr: 'Administrateur', en: 'Administrator', es: 'Administrador' },
+      'roles.manager': { fr: 'Manager', en: 'Manager', es: 'Gerente' },
+      'roles.commercial': { fr: 'Commercial', en: 'Sales Representative', es: 'Comercial' },
+      'roles.technician': { fr: 'Technicien', en: 'Technician', es: 'Técnico' },
+      'roles.accountant': { fr: 'Comptable', en: 'Accountant', es: 'Contador' },
+      'roles.operator': { fr: 'Opérateur', en: 'Operator', es: 'Operador' },
+      'roles.user': { fr: 'Utilisateur', en: 'User', es: 'Usuario' },
+      'roles.viewer': { fr: 'Observateur', en: 'Viewer', es: 'Observador' }
+    }
+    return translations[key]?.[language] || key
+  }
+
+  return [
+    { key: 'SUPER_ADMIN', value: fallbackTranslator('roles.super_admin'), icon: '👑', color: 'destructive', order: 1 },
+    { key: 'ADMIN', value: fallbackTranslator('roles.admin'), icon: '🔧', color: 'orange', order: 2 },
+    { key: 'MANAGER', value: fallbackTranslator('roles.manager'), icon: '📋', color: 'purple', order: 3 },
+    { key: 'COMMERCIAL', value: fallbackTranslator('roles.commercial'), icon: '💼', color: 'green', order: 4 },
+    { key: 'TECHNICIEN', value: fallbackTranslator('roles.technician'), icon: '🔨', color: 'yellow', order: 5 },
+    { key: 'COMPTABLE', value: fallbackTranslator('roles.accountant'), icon: '💰', color: 'cyan', order: 6 },
+    { key: 'OPERATEUR', value: fallbackTranslator('roles.operator'), icon: '⚙️', color: 'blue', order: 7 },
+    { key: 'USER', value: fallbackTranslator('roles.user'), icon: '👤', color: 'blue', order: 8 },
+    { key: 'VIEWER', value: fallbackTranslator('roles.viewer'), icon: '👁️', color: 'gray', order: 9 }
+  ]
+}
+
+// Fonction pour récupérer les données d'un rôle
+const getRoleData = async (roleKey: string, language: string = 'fr'): Promise<RoleData | null> => {
+  const roles = await loadRolesFromParameters(language)
+  return roles.find(role => role.key === roleKey) || null
+}
+
+// Utilitaires pour l'affichage des rôles (maintenant basés sur les paramètres)
+const getRoleDisplay = async (role: string, language: string = 'fr') => {
+  const roleData = await getRoleData(role, language)
+  if (roleData) {
+    return `${roleData.icon || '👤'} ${roleData.value}`
+  }
+  return `👤 ${role}`
+}
+
+const getRoleStyle = async (role: string, isSelected: boolean, language: string = 'fr') => {
+  const roleData = await getRoleData(role, language)
+  const color = roleData?.color || 'blue'
+  
+  // Mappage des couleurs vers les classes Tailwind
+  const colorMap: Record<string, { selected: string; hover: string }> = {
+    destructive: {
+      selected: 'bg-destructive/20 text-destructive border-destructive/30',
+      hover: 'bg-destructive/10 text-destructive/80 group-hover:bg-destructive/20 group-hover:text-destructive'
+    },
+    orange: {
+      selected: 'bg-orange-100 text-orange-700 border-orange-200',
+      hover: 'bg-orange-50 text-orange-600 group-hover:bg-orange-100 group-hover:text-orange-700'
+    },
+    purple: {
+      selected: 'bg-purple-100 text-purple-700 border-purple-200',
+      hover: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100 group-hover:text-purple-700'
+    },
+    green: {
+      selected: 'bg-green-100 text-green-700 border-green-200',
+      hover: 'bg-green-50 text-green-600 group-hover:bg-green-100 group-hover:text-green-700'
+    },
+    yellow: {
+      selected: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      hover: 'bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100 group-hover:text-yellow-700'
+    },
+    cyan: {
+      selected: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+      hover: 'bg-cyan-50 text-cyan-600 group-hover:bg-cyan-100 group-hover:text-cyan-700'
+    },
+    blue: {
+      selected: 'bg-blue-100 text-blue-700 border-blue-200',
+      hover: 'bg-blue-50 text-blue-600 group-hover:bg-blue-100 group-hover:text-blue-700'
+    },
+    gray: {
+      selected: 'bg-gray-100 text-gray-700 border-gray-200',
+      hover: 'bg-gray-50 text-gray-600 group-hover:bg-gray-100 group-hover:text-gray-700'
+    }
+  }
+
+  const colorClasses = colorMap[color] || colorMap.blue
+  return isSelected ? colorClasses.selected : colorClasses.hover
+}
+
+// Versions synchrones pour l'affichage immédiat (utilise le cache ou fallback)
+const getRoleDisplaySync = (role: string, translator: (key: string) => string): string => {
+  if (rolesCache) {
+    const roleData = rolesCache.find(r => r.key === role)
+    if (roleData) {
+      // Si on a une clé de traduction, utiliser le système i18n, sinon utiliser la valeur
+      const displayName = roleData.translationKey ? translator(roleData.translationKey) : roleData.value
+      return `${roleData.icon || '👤'} ${displayName}`
+    }
+  }
+  
+  // Fallback immédiat avec traduction
+  const fallbackRoles = getFallbackRoles()
+  const roleData = fallbackRoles.find(r => r.key === role)
+  return roleData ? `${roleData.icon} ${getRoleTranslation(role, translator)}` : `👤 ${role}`
+}
+
+const getRoleStyleSync = (role: string, isSelected: boolean): string => {
+  let color = 'blue'
+  
+  if (rolesCache) {
+    const roleData = rolesCache.find(r => r.key === role)
+    color = roleData?.color || 'blue'
+  } else {
+    // Fallback immédiat
+    const fallbackRoles = getFallbackRoles()
+    const roleData = fallbackRoles.find(r => r.key === role)
+    color = roleData?.color || 'blue'
+  }
+  
+  const colorMap: Record<string, { selected: string; hover: string }> = {
+    destructive: {
+      selected: 'bg-destructive/20 text-destructive border-destructive/30',
+      hover: 'bg-destructive/10 text-destructive/80 group-hover:bg-destructive/20 group-hover:text-destructive'
+    },
+    orange: {
+      selected: 'bg-orange-100 text-orange-700 border-orange-200',
+      hover: 'bg-orange-50 text-orange-600 group-hover:bg-orange-100 group-hover:text-orange-700'
+    },
+    purple: {
+      selected: 'bg-purple-100 text-purple-700 border-purple-200',
+      hover: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100 group-hover:text-purple-700'
+    },
+    green: {
+      selected: 'bg-green-100 text-green-700 border-green-200',
+      hover: 'bg-green-50 text-green-600 group-hover:bg-green-100 group-hover:text-green-700'
+    },
+    yellow: {
+      selected: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      hover: 'bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100 group-hover:text-yellow-700'
+    },
+    cyan: {
+      selected: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+      hover: 'bg-cyan-50 text-cyan-600 group-hover:bg-cyan-100 group-hover:text-cyan-700'
+    },
+    blue: {
+      selected: 'bg-blue-100 text-blue-700 border-blue-200',
+      hover: 'bg-blue-50 text-blue-600 group-hover:bg-blue-100 group-hover:text-blue-700'
+    },
+    gray: {
+      selected: 'bg-gray-100 text-gray-700 border-gray-200',
+      hover: 'bg-gray-50 text-gray-600 group-hover:bg-gray-100 group-hover:text-gray-700'
+    }
+  }
+
+  const colorClasses = colorMap[color] || colorMap.blue
+  return isSelected ? colorClasses.selected : colorClasses.hover
+}
 
 interface Company {
   id: string
@@ -43,6 +342,7 @@ export default function CompanySelector({
 }: CompanySelectorProps) {
   const router = useRouter()
   const { user, refreshAuth, logout, selectCompany } = useAuth()
+  const { t } = useTranslation()
   const [companies, setCompanies] = useState<Company[]>([])
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('')
   const [saveAsDefault, setSaveAsDefault] = useState(false)
@@ -56,22 +356,39 @@ export default function CompanySelector({
     // Détecter le nombre d'onglets ouverts
     const count = getApproximateTabCount()
     setTabCount(count)
+
+    // Précharger les rôles depuis l'API des paramètres
+    // Ne plus vider le cache systématiquement, utiliser le cache persistant
+    loadRolesFromParameters('fr', false).catch(error => {
+      console.warn('Impossible de charger les rôles depuis les paramètres, utilisation du fallback:', error)
+    })
   }, [])
 
   const loadCompanies = async () => {
     try {
       setLoading(true)
       const data = await authService.getUserCompanies()
-      setCompanies(data)
+      
+      
+      // S'assurer que data est un tableau
+      let companiesArray: Company[] = []
+      if (Array.isArray(data)) {
+        companiesArray = data
+      } else if (data && typeof data === 'object') {
+        // Si les données sont dans une propriété (ex: data.data, data.companies, etc.)
+        companiesArray = data.data || data.companies || data.societes || []
+      }
+      
+      setCompanies(companiesArray)
       
       // Sélectionner automatiquement la société par défaut s'il y en a une
-      const defaultCompany = data.find(c => c.isDefault)
+      const defaultCompany = companiesArray.find(c => c.isDefault)
       if (defaultCompany) {
         setSelectedCompanyId(defaultCompany.id)
         setSaveAsDefault(true)
-      } else if (data.length === 1) {
+      } else if (companiesArray.length === 1) {
         // Si une seule société, la sélectionner automatiquement
-        setSelectedCompanyId(data[0].id)
+        setSelectedCompanyId(companiesArray[0].id)
       }
     } catch (error) {
       console.error('Erreur lors du chargement des sociétés:', error)
@@ -217,15 +534,9 @@ export default function CompanySelector({
                           ✓ ACTIF
                         </span>
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs transition-all ${
-                          company.permissions.includes('*')
-                            ? selectedCompanyId === company.id
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-amber-50 text-amber-600 group-hover:bg-amber-100 group-hover:text-amber-700'
-                            : selectedCompanyId === company.id
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100 group-hover:text-blue-700'
+                          getRoleStyleSync(company.role, selectedCompanyId === company.id)
                         }`}>
-                          {company.permissions.includes('*') ? '👑 Admin' : '👤 Utilisateur'}
+                          {getRoleDisplaySync(company.role, t)}
                         </span>
                       </div>
                     </div>
@@ -337,12 +648,16 @@ export default function CompanySelector({
   )
 
   if (!showInDialog) {
-    return content
+    return (
+      <div className="bg-card border border-border rounded-lg p-6 shadow-lg">
+        {content}
+      </div>
+    )
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col bg-card border border-border shadow-xl">
         <DialogHeader className="pb-3 border-b flex-shrink-0">
           <DialogTitle className="flex items-center space-x-2 text-lg font-semibold">
             <div className="bg-primary/10 p-1.5 rounded-lg">

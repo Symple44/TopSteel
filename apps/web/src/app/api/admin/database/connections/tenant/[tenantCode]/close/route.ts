@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { tenantCode: string } }
+  { params }: { params: Promise<{ tenantCode: string }> }
 ) {
   try {
-    const { tenantCode } = params
+    const { tenantCode } = await params
     
     // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/database/connections/tenant/${tenantCode}/close`
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/connections/tenant/${tenantCode}/close`
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -42,7 +42,7 @@ export async function POST(
     return NextResponse.json(
       { 
         success: false, 
-        message: `Erreur interne - impossible de fermer la connexion pour le tenant ${params.tenantCode}` 
+        message: `Erreur interne - impossible de fermer la connexion pour le tenant ${(await params).tenantCode}` 
       },
       { status: 500 }
     )

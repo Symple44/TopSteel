@@ -194,13 +194,45 @@ export class UserMenuPreferenceService {
         })
       }
 
-      // Stocker les données du menu dans les métadonnées (ou un champ JSON si disponible)
-      // Pour l'instant on utilise customLabel comme stockage JSON simple
+      // Stocker les données du menu dans les métadonnées
       customMenuPreference.customLabel = JSON.stringify({
         type: 'custom_menu_data',
         menuItems: menuItems,
         savedAt: new Date().toISOString()
       })
+      
+      // Extraire et sauvegarder les traductions individuellement si le champ existe
+      if (menuItems && Array.isArray(menuItems)) {
+        const translationsMap: Record<string, string> = {}
+        
+        // Parcourir récursivement les éléments pour extraire les traductions
+        const extractTranslations = (items: any[]) => {
+          items.forEach(item => {
+            if (item.id && item.titleTranslations && typeof item.titleTranslations === 'object') {
+              Object.entries(item.titleTranslations).forEach(([lang, title]) => {
+                translationsMap[`${item.id}_${lang}`] = title as string
+              })
+            }
+            if (item.children && Array.isArray(item.children)) {
+              extractTranslations(item.children)
+            }
+          })
+        }
+        
+        extractTranslations(menuItems)
+        
+        this.logger.log(`💾 Traductions extraites:`, {
+          itemsCount: menuItems.length,
+          translationsCount: Object.keys(translationsMap).length,
+          translationsKeys: Object.keys(translationsMap),
+          sampleTranslations: Object.fromEntries(Object.entries(translationsMap).slice(0, 3))
+        })
+        
+        // Stocker les traductions dans le champ titleTranslations s'il existe
+        if (Object.keys(translationsMap).length > 0) {
+          customMenuPreference.titleTranslations = translationsMap
+        }
+      }
 
       const result = await this.userMenuPreferenceRepository.save(customMenuPreference)
       this.logger.log(`Menu personnalisé sauvegardé pour l'utilisateur ${userId} avec ${menuItems.length} éléments`)
@@ -221,8 +253,18 @@ export class UserMenuPreferenceService {
    */
   async getCustomMenu(userId: string): Promise<any[]> {
     try {
+      this.logger.log(`🔍 Début récupération menu personnalisé pour utilisateur ${userId}`)
+      
       const customMenuPreference = await this.userMenuPreferenceRepository.findOne({
         where: { userId, menuId: '__custom_menu__' }
+      })
+
+      this.logger.log(`📥 Résultat requête DB:`, {
+        found: !!customMenuPreference,
+        hasCustomLabel: !!customMenuPreference?.customLabel,
+        hasTitleTranslations: !!customMenuPreference?.titleTranslations,
+        titleTranslationsKeys: customMenuPreference?.titleTranslations ? Object.keys(customMenuPreference.titleTranslations) : [],
+        customLabelPreview: customMenuPreference?.customLabel?.substring(0, 100)
       })
 
       if (!customMenuPreference || !customMenuPreference.customLabel) {
@@ -233,8 +275,41 @@ export class UserMenuPreferenceService {
       try {
         const menuData = JSON.parse(customMenuPreference.customLabel)
         if (menuData.type === 'custom_menu_data' && Array.isArray(menuData.menuItems)) {
-          this.logger.log(`Menu personnalisé récupéré pour l'utilisateur ${userId} avec ${menuData.menuItems.length} éléments`)
-          return menuData.menuItems
+          let menuItems = menuData.menuItems
+          
+          // Réappliquer les traductions si elles existent
+          if (customMenuPreference.titleTranslations) {
+            const applyTranslations = (items: any[]) => {
+              return items.map(item => {
+                if (item.id) {
+                  // Reconstituer les traductions pour cet élément
+                  const itemTranslations: Record<string, string> = {}
+                  Object.entries(customMenuPreference.titleTranslations || {}).forEach(([key, value]) => {
+                    if (key.startsWith(`${item.id}_`)) {
+                      const lang = key.substring(`${item.id}_`.length)
+                      itemTranslations[lang] = value
+                    }
+                  })
+                  
+                  if (Object.keys(itemTranslations).length > 0) {
+                    item.titleTranslations = itemTranslations
+                  }
+                }
+                
+                // Traiter récursivement les enfants
+                if (item.children && Array.isArray(item.children)) {
+                  item.children = applyTranslations(item.children)
+                }
+                
+                return item
+              })
+            }
+            
+            menuItems = applyTranslations(menuItems)
+          }
+          
+          this.logger.log(`Menu personnalisé récupéré pour l'utilisateur ${userId} avec ${menuItems.length} éléments`)
+          return menuItems
         }
       } catch (parseError) {
         this.logger.error(`Erreur de parsing du menu personnalisé pour ${userId}:`, parseError)

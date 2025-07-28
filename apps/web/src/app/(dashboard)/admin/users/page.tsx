@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { AdminGuard } from '@/components/auth/admin-guard'
 import { 
   Dialog, 
@@ -20,17 +21,18 @@ import { Mail, Phone, Calendar, Shield, Building } from 'lucide-react'
 import { UsersDataTable } from './users-datatable'
 export default function UsersManagementPage() {
   const router = useRouter()
+  const { t } = useTranslation('admin')
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   const handleUserEdit = (user: any) => {
-    // Navigation vers la page de détail
+    // Navigate to detail page
     router.push(`/admin/users/${user.id}`)
   }
 
   const handleUserCreate = () => {
-    // TODO: Implémenter la création d'utilisateur
-    console.log('Créer un nouvel utilisateur')
+    // TODO: Implement user creation
+    console.log(t('users.createNew'))
   }
 
   return (
@@ -44,7 +46,7 @@ export default function UsersManagementPage() {
         onUserCreate={handleUserCreate}
       />
       
-      {/* Dialog pour les détails utilisateur */}
+      {/* User details dialog */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
           {selectedUser && (
@@ -61,7 +63,7 @@ export default function UsersManagementPage() {
                     <DialogTitle className="text-xl text-gray-900">
                       {selectedUser.firstName || selectedUser.lastName 
                         ? `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim()
-                        : 'Utilisateur'
+                        : t('users.user')
                       }
                     </DialogTitle>
                     <DialogDescription className="text-gray-600 flex items-center mt-1">
@@ -73,16 +75,16 @@ export default function UsersManagementPage() {
                     variant={selectedUser.isActive ? 'default' : 'secondary'}
                     className={selectedUser.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
                   >
-                    {selectedUser.isActive ? 'Actif' : 'Inactif'}
+                    {selectedUser.isActive ? t('users.active') : t('users.inactive')}
                   </Badge>
                 </div>
               </DialogHeader>
               
               <div className="py-6 space-y-6">
-                {/* Informations générales */}
+                {/* General information */}
                 <Card>
                   <CardHeader>
-                    <h3 className="text-lg font-semibold text-gray-900">Informations générales</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('users.generalInfo')}</h3>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-6">
@@ -95,39 +97,39 @@ export default function UsersManagementPage() {
                       </div>
                       
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-500">Téléphone</p>
+                        <p className="text-sm font-medium text-gray-500">{t('users.phone')}</p>
                         <p className="text-gray-900 flex items-center">
                           <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                          {selectedUser.phone || 'Non renseigné'}
+                          {selectedUser.phone || t('users.notSpecified')}
                         </p>
                       </div>
                       
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-500">Département</p>
+                        <p className="text-sm font-medium text-gray-500">{t('users.department')}</p>
                         <p className="text-gray-900 flex items-center">
                           <Building className="h-4 w-4 mr-2 text-gray-400" />
-                          {selectedUser.department || 'Non renseigné'}
+                          {selectedUser.department || t('users.notSpecified')}
                         </p>
                       </div>
                       
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-500">Dernière connexion</p>
+                        <p className="text-sm font-medium text-gray-500">{t('users.lastLogin')}</p>
                         <p className="text-gray-900 flex items-center">
                           <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                          {selectedUser.lastLogin ? new Date(selectedUser.lastLogin).toLocaleDateString('fr-FR') : 'Jamais'}
+                          {selectedUser.lastLogin ? new Date(selectedUser.lastLogin).toLocaleDateString('fr-FR') : t('users.never')}
                         </p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Rôles et permissions */}
+                {/* Roles and permissions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
                       <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                         <Shield className="h-5 w-5 mr-2 text-blue-600" />
-                        Rôles ({selectedUser.roles?.length || 0})
+                        {t('users.rolesCount', { count: selectedUser.roles?.length || 0 })}
                       </h3>
                     </CardHeader>
                     <CardContent>
@@ -140,13 +142,13 @@ export default function UsersManagementPage() {
                                 <p className="text-sm text-blue-600">{role.description}</p>
                               </div>
                               <Badge variant="outline" className="bg-white border-blue-200 text-blue-700">
-                                Rôle
+                                {t('users.roleLabel')}
                               </Badge>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-center text-gray-500 py-4">Aucun rôle assigné</p>
+                        <p className="text-center text-gray-500 py-4">{t('users.noRolesAssigned')}</p>
                       )}
                     </CardContent>
                   </Card>
@@ -155,7 +157,7 @@ export default function UsersManagementPage() {
                     <CardHeader>
                       <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                         <Building className="h-5 w-5 mr-2 text-purple-600" />
-                        Groupes ({selectedUser.groups?.length || 0})
+                        {t('users.groupsCount', { count: selectedUser.groups?.length || 0 })}
                       </h3>
                     </CardHeader>
                     <CardContent>
@@ -168,13 +170,13 @@ export default function UsersManagementPage() {
                                 <p className="text-sm text-purple-600">{group.type}</p>
                               </div>
                               <Badge variant="outline" className="bg-white border-purple-200 text-purple-700">
-                                Groupe
+                                {t('users.groupLabel')}
                               </Badge>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-center text-gray-500 py-4">Aucun groupe assigné</p>
+                        <p className="text-center text-gray-500 py-4">{t('users.noGroupsAssigned')}</p>
                       )}
                     </CardContent>
                   </Card>

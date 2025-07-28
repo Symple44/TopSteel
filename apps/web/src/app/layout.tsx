@@ -1,8 +1,15 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Poppins } from 'next/font/google'
-import '../styles/globals.css'
+import '../styles/globals.css' 
 import { ProvidersSimple } from './providers-simple'
 // import { logStartupInfo } from '@/lib/startup-logger'
+
+// Import fetch repair for CLIENT error fix
+import '../utils/fetch-repair'
+// Tests désactivés pour réduire les logs
+// import '../utils/fetch-test'
+// import '../utils/menu-preferences-debug'
+import '../utils/telemetry-test'
 
 // Log startup info on server side
 // if (typeof window === 'undefined') {

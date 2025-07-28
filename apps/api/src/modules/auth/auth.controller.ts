@@ -32,10 +32,16 @@ export class AuthController {
     status: 200,
     description: 'Connexion réussie ou MFA requis',
   })
-  async login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto, @Req() request: any) {
+    console.log('🔍 [DEBUG] Raw request body:', request.body)
     console.log('🔍 [DEBUG] Controller received login data:', JSON.stringify(loginDto, null, 2))
-    console.log('🔍 [DEBUG] Data types:', typeof loginDto.login, typeof loginDto.password)
-    return this.authService.login(loginDto)
+    console.log('🔍 [DEBUG] Data types:', typeof loginDto?.login, typeof loginDto?.password)
+    
+    // Utiliser les données brutes si le DTO est vide mais que request.body a des données
+    const actualData = (loginDto?.login || loginDto?.password) ? loginDto : request.body
+    console.log('🔍 [DEBUG] Using data:', actualData)
+    
+    return this.authService.login(actualData)
   }
 
   @Public()

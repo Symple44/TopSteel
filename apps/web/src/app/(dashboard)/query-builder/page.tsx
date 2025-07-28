@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function QueryBuilderPage() {
   const router = useRouter()
+  const { t } = useTranslation('queryBuilder')
 
   useEffect(() => {
     router.push('/query-builder/new')
@@ -13,9 +15,9 @@ export default function QueryBuilderPage() {
   return (
     <div className="flex items-center justify-center h-full">
       <div className="text-center">
-        <h2 className="text-2xl font-semibold mb-2">Bienvenue dans Query Builder</h2>
+        <h2 className="text-2xl font-semibold mb-2">{t('welcome')}</h2>
         <p className="text-muted-foreground">
-          Sélectionnez un query builder existant ou créez-en un nouveau
+          {t('selectOrCreate')}
         </p>
       </div>
     </div>

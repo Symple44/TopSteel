@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,12 +20,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Appel vers le backend
-    const response = await fetch(`${apiUrl}/api/v1/health`, {
-      method: 'GET',
-      headers,
-      // Timeout de 5 secondes
-      signal: AbortSignal.timeout(5000)
-    })
+    const fullUrl = `${apiUrl}/api/v1/health`
+    
+    let response
+    try {
+      response = await safeFetch(fullUrl, {
+        method: 'GET',
+        headers,
+        // Timeout de 5 secondes
+        signal: AbortSignal.timeout(5000)
+      })
+    } catch (fetchError) {
+      console.error('🔴 Health fetch error:', fetchError)
+      throw fetchError
+    }
 
     if (response.ok) {
       const responseData = await response.json()
@@ -34,7 +44,7 @@ export async function GET(request: NextRequest) {
       let activeUsers = null
       try {
         if (token) {
-          const usersResponse = await fetch(`${apiUrl}/api/v1/admin/users`, {
+          const usersResponse = await safeFetch(`${apiUrl}/api/v1/admin/users`, {
             method: 'GET',
             headers,
             signal: AbortSignal.timeout(3000)

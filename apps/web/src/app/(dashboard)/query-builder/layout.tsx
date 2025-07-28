@@ -5,10 +5,10 @@ import { QueryBuilderSidebar } from './query-builder-sidebar'
 
 interface QueryBuilderLayoutProps {
   children: ReactNode
-  sidebar?: ReactNode
+  sidebar: ReactNode
 }
 
-export default function QueryBuilderLayout({ children }: QueryBuilderLayoutProps) {
+export default function QueryBuilderLayout({ children, sidebar }: QueryBuilderLayoutProps) {
   return (
     <div className="flex h-full">
       <aside className="w-64 border-r border-border bg-muted/10">

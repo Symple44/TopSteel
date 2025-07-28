@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
 
 export async function GET(request: NextRequest) {
   try {
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/database/connections`
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/connections`
     
     // Récupérer les headers d'authentification
     const authHeader = request.headers.get('authorization')
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
       headers['Cookie'] = cookieHeader
     }
 
-    const response = await fetch(apiUrl, {
+    const response = await safeFetch(apiUrl, {
       method: 'GET',
       headers,
       signal: AbortSignal.timeout(10000)

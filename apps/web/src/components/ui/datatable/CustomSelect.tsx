@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { ChevronDown, Check } from 'lucide-react'
 import { Button } from '@erp/ui'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 interface SelectOption {
   value: string
@@ -21,14 +22,17 @@ interface CustomSelectProps {
 export function CustomSelect({
   value,
   onValueChange,
-  placeholder = "Sélectionner...",
+  placeholder,
   options,
   className = "",
   disabled = false
 }: CustomSelectProps) {
+  const { t } = useTranslation('datatable')
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  
+  const defaultPlaceholder = placeholder || t('filter.select', 'Select...')
 
   const selectedOption = options.find(opt => opt.value === value)
 
@@ -87,7 +91,7 @@ export function CustomSelect({
         type="button"
       >
         <span className="truncate">
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? selectedOption.label : defaultPlaceholder}
         </span>
         <ChevronDown 
           className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -117,7 +121,7 @@ export function CustomSelect({
             ))}
             {options.length === 0 && (
               <div className="px-3 py-2 text-sm text-muted-foreground">
-                Aucune option disponible
+                {t('filter.noOptions')}
               </div>
             )}
           </div>

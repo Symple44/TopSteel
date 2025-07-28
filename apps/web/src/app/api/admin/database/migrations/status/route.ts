@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
 
 export async function GET(request: NextRequest) {
   try {
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/database/migrations/status`
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/status`
     
     // Récupérer les headers d'authentification
     const authHeader = request.headers.get('authorization')
@@ -34,26 +35,54 @@ export async function GET(request: NextRequest) {
       headers['Cookie'] = cookieHeader
     }
 
-    const response = await fetch(apiUrl, {
+    console.log(`[API Route] Tentative de connexion à: ${apiUrl}`)
+    
+    const response = await safeFetch(apiUrl, {
       method: 'GET',
       headers,
-      signal: AbortSignal.timeout(10000)
+      signal: AbortSignal.timeout(15000)
     })
+
+    console.log(`[API Route] Réponse reçue: ${response.status} ${response.statusText}`)
 
     if (response.ok) {
       const responseData = await response.json()
       const actualData = responseData.data || responseData
+      console.log(`[API Route] Données reçues:`, actualData)
       return NextResponse.json(actualData)
     } else {
+      const errorText = await response.text()
+      console.error(`[API Route] Erreur backend: ${response.status} - ${errorText}`)
       return NextResponse.json(
-        { error: 'API backend error', status: response.status },
+        { 
+          error: 'API backend error', 
+          status: response.status,
+          details: errorText,
+          url: apiUrl
+        },
         { status: response.status }
       )
     }
   } catch (error) {
-    console.error('Erreur lors de la récupération des migrations:', error)
+    console.error('[API Route] Erreur lors de la récupération des migrations:', error)
+    console.error('[API Route] URL tentée:', apiUrl)
+    
+    // Plus de détails sur l'erreur
+    const errorDetails = {
+      message: error instanceof Error ? error.message : 'Erreur inconnue',
+      name: error instanceof Error ? error.name : 'UnknownError',
+      url: apiUrl,
+      env: {
+        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+        NODE_ENV: process.env.NODE_ENV
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'API backend non disponible' },
+      { 
+        error: 'API backend non disponible',
+        details: errorDetails
+      },
       { status: 503 }
     )
   }

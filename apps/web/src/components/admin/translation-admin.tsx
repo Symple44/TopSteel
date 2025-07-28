@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { TranslationDataTable } from './TranslationDataTable'
 import {
   Card,
@@ -50,6 +50,7 @@ import {
   User
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { useLanguage } from '@/lib/i18n'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
@@ -67,6 +68,14 @@ import type { TranslationEntry, TranslationStats } from '@/lib/i18n/types'
 export default function TranslationAdmin() {
   const { t } = useTranslation('admin')
   const { current: currentLanguage } = useLanguage()
+  
+  // Debounced stats update pour éviter les recalculs excessifs
+  const debouncedStatsUpdate = useCallback(
+    useDebouncedValue(() => {
+      setStats(calculateTranslationStats(entries))
+    }, 500),
+    [entries]
+  )
   
   // États
   const [entries, setEntries] = useState<TranslationEntry[]>([])
@@ -89,14 +98,17 @@ export default function TranslationAdmin() {
       setEntries(loadedEntries)
       setStats(calculateTranslationStats(loadedEntries))
     } catch (error) {
-      toast.error('Erreur lors du chargement des traductions')
+      toast.error(t('modules.translations.loadError'))
       console.error(error)
     } finally {
       setLoading(false)
     }
   }
   
-  // Filtrer les entrées
+  // Mémoriser les calculs coûteux
+  const memoizedStats = useMemo(() => {
+    return stats ? calculateTranslationStats(entries) : null
+  }, [entries, stats])
   
   // Gérer l'édition
   const handleEdit = (entry: TranslationEntry) => {
@@ -108,25 +120,21 @@ export default function TranslationAdmin() {
     
     const success = await saveTranslation(editingEntry)
     if (success) {
-      toast.success('Traduction sauvegardée')
+      toast.success(t('modules.translations.saveSuccess'))
       
       // Mettre à jour la liste
       setEntries(prev => prev.map(e => 
         e.id === editingEntry.id ? editingEntry : e
       ))
       
-      // Recalculer les stats
-      const updatedEntries = entries.map(e => 
-        e.id === editingEntry.id ? editingEntry : e
-      )
-      setStats(calculateTranslationStats(updatedEntries))
+      // Les stats seront recalculées automatiquement via useMemo
       
       setEditingEntry(null)
       
       // Déclencher un événement pour recharger les traductions
       window.dispatchEvent(new Event('translation-updated'))
     } else {
-      toast.error('Erreur lors de la sauvegarde')
+      toast.error(t('modules.translations.saveError'))
     }
   }
   
@@ -137,24 +145,21 @@ export default function TranslationAdmin() {
       if (success) {
         toast.success('Traduction mise à jour')
         
-        // Mettre à jour la liste locale
+        // Mettre à jour la liste locale sans recalculer les stats immédiatement
         setEntries(prev => prev.map(e => 
           e.id === row.id ? row : e
         ))
         
-        // Recalculer les stats
-        const updatedEntries = entries.map(e => 
-          e.id === row.id ? row : e
-        )
-        setStats(calculateTranslationStats(updatedEntries))
-        
         // Déclencher un événement pour recharger les traductions
         window.dispatchEvent(new Event('translation-updated'))
+        
+        // Recalculer les stats de manière débouncée
+        debouncedStatsUpdate()
       } else {
-        toast.error('Erreur lors de la sauvegarde')
+        toast.error(t('modules.translations.saveError'))
       }
     } catch (error) {
-      toast.error('Erreur lors de la sauvegarde')
+      toast.error(t('modules.translations.saveError'))
       console.error(error)
     }
   }
@@ -172,9 +177,9 @@ export default function TranslationAdmin() {
       a.click()
       
       URL.revokeObjectURL(url)
-      toast.success('Export réussi')
+      toast.success(t('modules.translations.exportSuccess'))
     } catch (error) {
-      toast.error('Erreur lors de l\'export')
+      toast.error(t('modules.translations.exportError'))
       console.error(error)
     }
   }
@@ -209,7 +214,7 @@ export default function TranslationAdmin() {
       URL.revokeObjectURL(url)
       toast.success(`Export de ${translations.length} traduction(s) réussi`)
     } catch (error) {
-      toast.error('Erreur lors de l\'export')
+      toast.error(t('modules.translations.exportError'))
       console.error(error)
     }
   }
@@ -265,7 +270,7 @@ export default function TranslationAdmin() {
         toast.error(response.message || 'Erreur lors de l\'import')
       }
     } catch (error) {
-      toast.error('Erreur lors de l\'import')
+      toast.error(t('modules.translations.importError'))
       console.error(error)
     }
   }
@@ -290,24 +295,24 @@ export default function TranslationAdmin() {
             onClick={() => setImportDialog(true)}
           >
             <Upload className="h-4 w-4 mr-2" />
-            Importer
+            {t('modules.translations.import')}
           </Button>
           <Button onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
-            Exporter
+            {t('modules.translations.export')}
           </Button>
         </div>
       </div>
       
-      {/* Statistiques */}
-      {stats && (
+      {/* {t('modules.translations.statistics')} */}
+      {memoizedStats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total des clés</p>
-                  <p className="text-2xl font-bold">{stats.total}</p>
+                  <p className="text-2xl font-bold">{memoizedStats.total}</p>
                 </div>
                 <Hash className="h-8 w-8 text-muted-foreground/20" />
               </div>
@@ -323,13 +328,13 @@ export default function TranslationAdmin() {
                     <p className="font-medium">{lang.name}</p>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {stats.percentageComplete[lang.code]}%
+                    {memoizedStats.percentageComplete[lang.code]}%
                   </span>
                 </div>
-                <Progress value={stats.percentageComplete[lang.code]} className="h-2" />
+                <Progress value={memoizedStats.percentageComplete[lang.code]} className="h-2" />
                 <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                  <span>{stats.translated[lang.code]} traduites</span>
-                  <span>{stats.untranslated[lang.code]} manquantes</span>
+                  <span>{memoizedStats.translated[lang.code]} traduites</span>
+                  <span>{memoizedStats.untranslated[lang.code]} manquantes</span>
                 </div>
               </CardContent>
             </Card>
@@ -337,12 +342,12 @@ export default function TranslationAdmin() {
         </div>
       )}
       
-      {/* Actions globales */}
+      {/* {t('modules.translations.actions')} globales */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Globe className="h-5 w-5" />
-            Actions Rapides
+            {t('modules.translations.quickActions')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -482,7 +487,7 @@ export default function TranslationAdmin() {
       <Dialog open={importDialog} onOpenChange={setImportDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Importer des traductions</DialogTitle>
+            <DialogTitle>{t('modules.translations.importTitle')}</DialogTitle>
             <DialogDescription>
               Importez un fichier Excel avec les traductions
             </DialogDescription>
@@ -518,7 +523,7 @@ export default function TranslationAdmin() {
               disabled={!selectedFile}
             >
               <Upload className="h-4 w-4 mr-2" />
-              Importer
+              {t('modules.translations.import')}
             </Button>
           </DialogFooter>
         </DialogContent>

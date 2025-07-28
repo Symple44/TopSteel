@@ -47,12 +47,12 @@ export default function CompanySettingsPage() {
 	};
 
 	const handleLogoUpload = (result: any) => {
-		toast.success("Logo d'entreprise mis à jour avec succès");
+		toast.success(t("company.logoUpdated"));
 		// Ici vous pourriez mettre à jour le logo dans les données de l'entreprise
 	};
 
 	const handleLogoError = (error: string) => {
-		toast.error(`Erreur lors de l'upload du logo: ${error}`);
+		toast.error(`${t("company.logoError")}: ${error}`);
 	};
 
 	return (
@@ -64,7 +64,7 @@ export default function CompanySettingsPage() {
 						{t("company.title")}
 					</h1>
 					<p className="text-muted-foreground mt-1">
-						Configurez les informations de votre entreprise
+						{t("company.subtitle")}
 					</p>
 				</div>
 			</div>
@@ -97,7 +97,7 @@ export default function CompanySettingsPage() {
 								className="h-48"
 							/>
 							<p className="text-sm text-muted-foreground mt-2">
-								PNG, JPG, SVG, WebP jusqu'à 5MB
+								{t("company.logoFormats")}
 							</p>
 						</CardContent>
 					</Card>
@@ -124,7 +124,7 @@ export default function CompanySettingsPage() {
 												name: e.target.value,
 											}))
 										}
-										placeholder="Nom de l'entreprise"
+										placeholder={t("company.companyName")}
 									/>
 								</div>
 
@@ -195,7 +195,7 @@ export default function CompanySettingsPage() {
 
 								<div>
 									<label className="block text-sm font-medium text-foreground mb-2">
-										Site web
+										{t("company.website")}
 									</label>
 									<Input
 										type="url"
@@ -219,7 +219,7 @@ export default function CompanySettingsPage() {
 
 								<div>
 									<label className="block text-sm font-medium text-foreground mb-2">
-										Adresse
+										{t("company.address")}
 									</label>
 									<Input
 										value={companyData.address}
@@ -236,7 +236,7 @@ export default function CompanySettingsPage() {
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 									<div>
 										<label className="block text-sm font-medium text-foreground mb-2">
-											Ville
+											{t("company.city")}
 										</label>
 										<Input
 											value={companyData.city}
@@ -252,7 +252,7 @@ export default function CompanySettingsPage() {
 
 									<div>
 										<label className="block text-sm font-medium text-foreground mb-2">
-											Code postal
+											{t("company.postalCode")}
 										</label>
 										<Input
 											value={companyData.postalCode}
@@ -268,7 +268,7 @@ export default function CompanySettingsPage() {
 
 									<div>
 										<label className="block text-sm font-medium text-foreground mb-2">
-											Pays
+											{t("company.country")}
 										</label>
 										<Input
 											value={companyData.country}
@@ -292,7 +292,7 @@ export default function CompanySettingsPage() {
 									className="flex items-center"
 								>
 									<Save className="h-4 w-4 mr-2" />
-									{isLoading ? "Enregistrement..." : "Enregistrer"}
+									{isLoading ? t("company.saving") : t("company.save")}
 								</Button>
 							</div>
 						</CardContent>

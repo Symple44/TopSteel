@@ -132,12 +132,12 @@ export function cleanupTabDetection(): void {
 export function useTabCleanup(): void {
   if (typeof window === 'undefined') return
 
-  // Nettoyer à la fermeture de l'onglet
+  // Nettoyer à la fermeture de l'onglet (unload est deprecated)
   window.addEventListener('beforeunload', cleanupTabDetection)
-  window.addEventListener('unload', cleanupTabDetection)
+  window.addEventListener('pagehide', cleanupTabDetection)
 
   // Nettoyer aussi quand l'onglet devient inactif
-  document.addEventListener('visibilitychange', () => {
+  const handleVisibilityChange = () => {
     if (document.visibilityState === 'hidden') {
       // Marquer comme potentiellement fermé après 5 minutes d'inactivité
       setTimeout(() => {
@@ -146,5 +146,17 @@ export function useTabCleanup(): void {
         }
       }, 5 * 60 * 1000)
     }
-  })
+  }
+  
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+}
+
+/**
+ * Fonction pour nettoyer les event listeners
+ */
+export function removeTabCleanup(): void {
+  if (typeof window === 'undefined') return
+  
+  window.removeEventListener('beforeunload', cleanupTabDetection)
+  window.removeEventListener('pagehide', cleanupTabDetection)
 }

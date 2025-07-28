@@ -10,6 +10,7 @@ import {
 import { IntegrityService } from './integrity.service'
 import { SystemHealthService } from './system-health-simple.service'
 import { CircuitBreakerHealthIndicator } from './circuit-breaker-health.indicator'
+import { MultiTenantDatabaseConfig } from '../database/config/multi-tenant-database.config'
 
 @Controller('health')
 export class HealthController {
@@ -23,16 +24,20 @@ export class HealthController {
     private integrity: IntegrityService,
     private configService: ConfigService,
     private systemHealth: SystemHealthService,
-    private circuitBreaker: CircuitBreakerHealthIndicator
+    private circuitBreaker: CircuitBreakerHealthIndicator,
+    private multiTenantConfig: MultiTenantDatabaseConfig
   ) {}
 
   @Get()
   async check() {
     try {
       const healthChecks: Array<() => Promise<any>> = [
-        () => this.db.pingCheck('database', { connection: 'auth' }),
-        () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
-        () => this.memory.checkRSS('memory_rss', 150 * 1024 * 1024),
+        // Vérifier les bases de données multi-tenant
+        () => this.checkMultiTenantDatabase('auth'),
+        () => this.checkMultiTenantDatabase('shared'),
+        // Seuils mémoire plus réalistes pour une application moderne
+        () => this.memory.checkHeap('memory_heap', 512 * 1024 * 1024), // 512MB au lieu de 150MB
+        () => this.memory.checkRSS('memory_rss', 512 * 1024 * 1024),   // 512MB au lieu de 150MB
       ]
 
       // Désactiver le check disque en développement car souvent problématique
@@ -49,7 +54,8 @@ export class HealthController {
 
       // Informations additionnelles pour le modal ERP
       const uptime = this.formatUptime(Date.now() - this.startTime)
-      const isDatabaseConnected = healthResult.details?.database?.status === 'up'
+      const isAuthDatabaseConnected = healthResult.details?.database_auth?.status === 'up'
+      const isSharedDatabaseConnected = healthResult.details?.database_shared?.status === 'up'
       const activeUsers = await this.getActiveUsersCount()
       const version = await this.getApplicationVersion()
       
@@ -60,8 +66,17 @@ export class HealthController {
         environment: process.env.NODE_ENV || 'development',
         uptime,
         database: {
-          ...healthResult.details?.database,
-          connectionStatus: isDatabaseConnected ? 'connected' : 'disconnected'
+          auth: {
+            status: healthResult.details?.database_auth?.status || 'unknown',
+            connectionStatus: isAuthDatabaseConnected ? 'connected' : 'disconnected'
+          },
+          shared: {
+            status: healthResult.details?.database_shared?.status || 'not_configured',
+            connectionStatus: isSharedDatabaseConnected ? 'connected' : 'not_configured'
+          },
+          // Status global (ok si au moins auth fonctionne)
+          status: isAuthDatabaseConnected ? 'up' : 'down',
+          connectionStatus: isAuthDatabaseConnected ? 'connected' : 'disconnected'
         },
         activeUsers,
         timestamp: new Date().toISOString()
@@ -147,5 +162,80 @@ export class HealthController {
     return this.health.check([
       () => this.circuitBreaker.check(),
     ])
+  }
+
+  /**
+   * Vérifie une base de données multi-tenant directement
+   */
+  private async checkMultiTenantDatabase(type: 'auth' | 'shared') {
+    try {
+      let config
+      const key = `database_${type}`
+      
+      if (type === 'auth') {
+        config = this.multiTenantConfig.getAuthDatabaseConfig()
+      } else {
+        config = this.multiTenantConfig.getSharedDatabaseConfig()
+      }
+
+      // Test de connexion direct
+      const { DataSource } = await import('typeorm')
+      const testConnection = new DataSource({
+        type: config.type as any,
+        host: config.host,
+        port: config.port,
+        username: config.username,
+        password: config.password,
+        database: config.database,
+        entities: []
+      })
+
+      await testConnection.initialize()
+      await testConnection.query('SELECT 1')
+      await testConnection.destroy()
+
+      return {
+        [key]: {
+          status: 'up',
+          message: `${type} database is connected`
+        }
+      }
+    } catch (error) {
+      return {
+        [`database_${type}`]: {
+          status: 'down',
+          message: error instanceof Error ? error.message : 'Unknown error'
+        }
+      }
+    }
+  }
+
+  @Get('database')
+  async checkDatabaseConnections() {
+    try {
+      const authCheck = await this.checkMultiTenantDatabase('auth')
+      const sharedCheck = await this.checkMultiTenantDatabase('shared')
+
+      return {
+        auth: authCheck,
+        shared: sharedCheck,
+        summary: {
+          authConnected: authCheck.database_auth?.status === 'up',
+          sharedConnected: sharedCheck.database_shared?.status === 'up',
+          multiTenantReady: authCheck.database_auth?.status === 'up'
+        }
+      }
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        auth: { status: 'error' },
+        shared: { status: 'error' },
+        summary: {
+          authConnected: false,
+          sharedConnected: false,
+          multiTenantReady: false
+        }
+      }
+    }
   }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -46,17 +47,24 @@ const CATEGORY_ICONS = {
   FINANCE: DollarSign
 }
 
-const CATEGORY_LABELS = {
-  HR: 'Ressources Humaines',
-  PROCUREMENT: 'Achats & Approvisionnement',
-  ANALYTICS: 'Analytique & BI',
-  INTEGRATION: 'Intégrations',
-  QUALITY: 'Qualité',
-  MAINTENANCE: 'Maintenance',
-  FINANCE: 'Finance'
-}
+// CATEGORY_LABELS sera remplacé par les traductions dans le composant
 
 export function MarketplaceCatalog() {
+  const { t } = useTranslation('admin')
+  
+  const getCategoryLabel = (category: string) => {
+    const categoryLabels = {
+      HR: t('marketplace.categories.hr'),
+      PROCUREMENT: t('marketplace.categories.procurement'),
+      ANALYTICS: t('marketplace.categories.analytics'),
+      INTEGRATION: t('marketplace.categories.integration'),
+      QUALITY: t('marketplace.categories.quality'),
+      MAINTENANCE: t('marketplace.categories.maintenance'),
+      FINANCE: t('marketplace.categories.finance')
+    }
+    return categoryLabels[category as keyof typeof categoryLabels] || category
+  }
+  
   const [modules, setModules] = useState<MarketplaceModule[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -73,15 +81,15 @@ export function MarketplaceCatalog() {
         const response = await fetch('/api/admin/marketplace/modules')
         
         if (!response.ok) {
-          throw new Error('Erreur lors du chargement des modules')
+          throw new Error(t('marketplace.loadingError'))
         }
         
         const data = await response.json()
         setModules(data)
       } catch (err) {
         console.error('Erreur lors du chargement des modules:', err)
-        setError(err instanceof Error ? err.message : 'Erreur inconnue')
-        toast.error('Impossible de charger les modules')
+        setError(err instanceof Error ? err.message : t('common.unknownError'))
+        toast.error(t('marketplace.loadingErrorMessage'))
       } finally {
         setLoading(false)
       }
@@ -108,18 +116,18 @@ export function MarketplaceCatalog() {
   const formatPrice = (pricing: MarketplaceModule['pricing']) => {
     switch (pricing.type) {
       case 'FREE':
-        return 'Gratuit'
+        return t('marketplace.installedModules.pricing.free')
       case 'ONE_TIME':
-        return `${pricing.amount}${pricing.currency} (unique)`
+        return `${pricing.amount}${pricing.currency} (${t('marketplace.installedModules.pricing.oneTime')})`
       case 'SUBSCRIPTION':
-        const period = pricing.period === 'YEAR' ? 'an' : 'mois'
+        const period = pricing.period === 'YEAR' ? t('marketplace.installedModules.pricing.year') : t('marketplace.installedModules.pricing.month')
         return `${pricing.amount}${pricing.currency}/${period}`
       case 'COMMISSION':
-        return 'Commission sur économies'
+        return t('marketplace.installedModules.pricing.commission')
       case 'USAGE_BASED':
-        return 'Basé sur usage'
+        return t('marketplace.installedModules.pricing.usageBased')
       default:
-        return 'Prix sur demande'
+        return t('marketplace.installedModules.pricing.onRequest')
     }
   }
 
@@ -132,7 +140,7 @@ export function MarketplaceCatalog() {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Chargement des modules...</span>
+        <span className="ml-2">{t('marketplace.loading')}</span>
       </div>
     )
   }
@@ -141,7 +149,7 @@ export function MarketplaceCatalog() {
     return (
       <div className="text-center py-12">
         <p className="text-destructive mb-4">{error}</p>
-        <Button onClick={() => window.location.reload()}>Réessayer</Button>
+        <Button onClick={() => window.location.reload()}>{t('marketplace.retry')}</Button>
       </div>
     )
   }
@@ -153,7 +161,7 @@ export function MarketplaceCatalog() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Rechercher des modules..."
+            placeholder={t('marketplace.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -162,15 +170,15 @@ export function MarketplaceCatalog() {
         
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Toutes les catégories" />
+            <SelectValue placeholder={t('marketplace.allCategories')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toutes les catégories</SelectItem>
-            {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+            <SelectItem value="all">{t('marketplace.allCategories')}</SelectItem>
+            {Object.keys(CATEGORY_ICONS).map((key) => (
               <SelectItem key={key} value={key}>
                 <div className="flex items-center gap-2">
                   {getCategoryIcon(key)}
-                  {label}
+                  {getCategoryLabel(key)}
                 </div>
               </SelectItem>
             ))}
@@ -193,13 +201,13 @@ export function MarketplaceCatalog() {
                   <div>
                     <CardTitle className="text-lg">{module.displayName}</CardTitle>
                     <CardDescription className="text-xs">
-                      par {module.publisher} • v{module.version}
+                      {t('marketplace.by')} {module.publisher} • v{module.version}
                     </CardDescription>
                   </div>
                 </div>
                 {module.isInstalled && (
                   <Badge variant="secondary" className="text-xs">
-                    Installé
+                    {t('marketplace.installed')}
                   </Badge>
                 )}
               </div>
@@ -224,7 +232,7 @@ export function MarketplaceCatalog() {
                 </div>
                 
                 <Badge variant="outline" className="text-xs">
-                  {CATEGORY_LABELS[module.category as keyof typeof CATEGORY_LABELS]}
+                  {getCategoryLabel(module.category)}
                 </Badge>
               </div>
               
@@ -235,11 +243,11 @@ export function MarketplaceCatalog() {
                 
                 {module.isInstalled ? (
                   <Button size="sm" variant="outline" disabled>
-                    Installé
+                    {t('marketplace.installed')}
                   </Button>
                 ) : (
                   <Button size="sm">
-                    Voir détails
+                    {t('marketplace.viewDetails')}
                   </Button>
                 )}
               </div>
@@ -250,7 +258,7 @@ export function MarketplaceCatalog() {
 
       {filteredModules.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Aucun module trouvé pour votre recherche.</p>
+          <p className="text-muted-foreground">{t('marketplace.noModulesFound')}</p>
         </div>
       )}
 

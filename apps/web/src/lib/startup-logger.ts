@@ -25,10 +25,8 @@ export async function logStartupInfo() {
       })
       
       if (response.status === 404) {
-        console.log('✅ Backend accessible (404 = serveur répond)')
         console.log(`📍 Backend opérationnel sur: ${apiUrl}`)
       } else if (response.status < 500) {
-        console.log(`✅ Backend accessible (${response.status})`)
         console.log(`📍 Backend opérationnel sur: ${apiUrl}`)
       } else {
         console.log(`⚠️  Backend retourne une erreur ${response.status}`)

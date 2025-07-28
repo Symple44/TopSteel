@@ -46,7 +46,6 @@ export function useMenuMode() {
   // Basculer entre standard et custom
   const toggleMode = useCallback(() => {
     const newMode: MenuMode = mode === 'standard' ? 'custom' : 'standard'
-    console.log('🔄 TOGGLE MODE - Ancien:', mode, '-> Nouveau:', newMode)
     setMode(newMode)
     saveMode(newMode)
   }, [mode, saveMode])

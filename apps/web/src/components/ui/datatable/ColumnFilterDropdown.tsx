@@ -11,6 +11,7 @@ import {
   X
 } from 'lucide-react'
 import { DropdownPortal } from './DropdownPortal'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 interface ColumnFilterDropdownProps<T = any> {
   column: {
@@ -34,6 +35,7 @@ export function ColumnFilterDropdown<T = any>({
   onFilter,
   onAdvancedFilter
 }: ColumnFilterDropdownProps<T>) {
+  const { t } = useTranslation('datatable')
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedValues, setSelectedValues] = useState<string[]>(currentFilters)
@@ -187,7 +189,7 @@ export function ColumnFilterDropdown<T = any>({
                 className="flex-1"
               >
                 <ArrowUp className="h-3 w-3 mr-1" />
-                Croissant
+                {t('filter.ascending', 'Ascending')}
               </Button>
               <Button
                 variant={currentSort === 'desc' ? 'default' : 'outline'}
@@ -196,7 +198,7 @@ export function ColumnFilterDropdown<T = any>({
                 className="flex-1"
               >
                 <ArrowDown className="h-3 w-3 mr-1" />
-                Décroissant
+                {t('filter.descending', 'Descending')}
               </Button>
             </div>
 
@@ -207,7 +209,7 @@ export function ColumnFilterDropdown<T = any>({
               className="w-full"
             >
               <Search className="h-3 w-3 mr-1" />
-              Filtre avancé
+              {t('filter.advanced', 'Advanced Filter')}
             </Button>
           </div>
 
@@ -216,7 +218,7 @@ export function ColumnFilterDropdown<T = any>({
               <Search className="absolute left-2 top-2.5 h-3 w-3 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Rechercher..."
+                placeholder={t('filter.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-7 pr-3 py-2 text-sm bg-background text-foreground border border-border rounded focus:outline-none focus:ring-2 focus:ring-ring"
@@ -232,7 +234,7 @@ export function ColumnFilterDropdown<T = any>({
                 onClick={handleSelectAll}
                 className="text-xs"
               >
-                {selectedValues.length === filteredValues.length ? 'Désélectionner tout' : 'Sélectionner tout'}
+                {selectedValues.length === filteredValues.length ? t('filter.clear') : t('filter.selectAll')}
               </Button>
               <div className="flex-1" />
               <span className="text-xs text-muted-foreground">
@@ -244,7 +246,7 @@ export function ColumnFilterDropdown<T = any>({
           <div className="max-h-48 overflow-y-auto">
             {filteredValues.length === 0 ? (
               <div className="p-3 text-sm text-muted-foreground text-center">
-                Aucune valeur trouvée
+                {t('filter.noValues')}
               </div>
             ) : (
               filteredValues.map((value) => (
@@ -273,7 +275,7 @@ export function ColumnFilterDropdown<T = any>({
               className="flex-1"
             >
               <X className="h-3 w-3 mr-1" />
-              Effacer
+              {t('filter.clear')}
             </Button>
             <Button
               variant="default"
@@ -282,7 +284,7 @@ export function ColumnFilterDropdown<T = any>({
               className="flex-1"
             >
               <Check className="h-3 w-3 mr-1" />
-              Appliquer
+              {t('filter.apply', 'Apply')}
             </Button>
           </div>
           </div>

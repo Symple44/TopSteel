@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function GET(req: NextRequest) {
   try {
@@ -7,7 +9,7 @@ export async function GET(req: NextRequest) {
     const accessToken = cookieStore.get('accessToken')?.value
     
     // Appeler directement l'API backend
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menu-raw/configurations`, {
+    const response = await safeFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/menu-raw/configurations`, {
       headers: {
         'Authorization': accessToken ? `Bearer ${accessToken}` : '',
         'Content-Type': 'application/json'

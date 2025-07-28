@@ -22,10 +22,8 @@ export async function GET() {
   }
 
   // Log au démarrage
-  console.log('\n🔧 Configuration endpoint called:')
   console.log(`   Frontend: ${config.frontend.url}`)
   console.log(`   Backend: ${config.backend.url}`)
-  console.log(`   Backend configured: ${config.backend.configured ? '✅' : '❌'}`)
   
   return NextResponse.json(config, { 
     status: 200,

@@ -35,6 +35,11 @@ import { SystemParameter } from '../admin/entitites/system-parameter.entity'
 import { Notifications } from '../notifications/entities/notifications.entity'
 import { NotificationSettings } from '../notifications/entities/notification-settings.entity'
 
+// Import des entités de paramètres (dans AUTH)
+import { ParameterSystem } from '../parameters/entities/parameter-system.entity'
+import { ParameterApplication } from '../parameters/entities/parameter-application.entity'
+import { ParameterClient } from '../parameters/entities/parameter-client.entity'
+
 // Import des entités TENANT principales (pour datasource par défaut)
 import { Clients } from '../clients/entities/clients.entity'
 import { Fournisseur } from '../fournisseurs/entities/fournisseur.entity'
@@ -109,6 +114,10 @@ import { Commande } from '../commandes/entities/commande.entity'
       // Notifications
       Notifications,
       NotificationSettings,
+      // Paramètres système
+      ParameterSystem,
+      ParameterApplication,
+      ParameterClient,
     ], 'auth'),
 
     // Export des repositories SHARED

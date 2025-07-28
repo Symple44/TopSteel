@@ -12,6 +12,7 @@ import {
   EyeOff
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 interface MenuItem {
   id: string
@@ -32,11 +33,13 @@ interface MenuPreviewProps {
 }
 
 export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
+  const { t } = useTranslation('admin')
+  
   // Vérifier que menuItems est un tableau valide
   if (!Array.isArray(menuItems)) {
     return (
       <div className="text-center py-4 text-muted-foreground">
-        <p>Aucun élément de menu à afficher</p>
+        <p>{t('menus.noMenuItems')}</p>
       </div>
     )
   }
@@ -55,10 +58,10 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
 
   const getTypeBadge = (type: string) => {
     switch (type) {
-      case 'M': return <Badge variant="secondary" className="text-xs">Dossier</Badge>
-      case 'P': return <Badge variant="default" className="text-xs">Programme</Badge>
-      case 'L': return <Badge variant="outline" className="text-xs">Lien</Badge>
-      case 'D': return <Badge variant="destructive" className="text-xs">Vue Data</Badge>
+      case 'M': return <Badge variant="secondary" className="text-xs">{t('menu.folder')}</Badge>
+      case 'P': return <Badge variant="default" className="text-xs">{t('menu.program')}</Badge>
+      case 'L': return <Badge variant="outline" className="text-xs">{t('menu.link')}</Badge>
+      case 'D': return <Badge variant="destructive" className="text-xs">{t('menu.dataView')}</Badge>
       default: return null
     }
   }
@@ -75,7 +78,7 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
   if (sortedItems.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        <p>Aucun élément de menu configuré</p>
+        <p>{t('menus.noMenuItemsConfigured')}</p>
       </div>
     )
   }
@@ -104,12 +107,12 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
                   {!item.isVisible && (
                     <Badge variant="outline" className="text-xs">
                       <EyeOff className="h-3 w-3 mr-1" />
-                      Masqué
+                      {t('menu.hidden')}
                     </Badge>
                   )}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>Ordre: {item.orderIndex}</span>
+                  <span>{t('menu.order')}: {item.orderIndex}</span>
                 </div>
               </div>
 
@@ -117,26 +120,26 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
               <div className="text-sm text-muted-foreground pl-6">
                 {item.type === 'P' && item.programId && (
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">Programme:</span>
+                    <span className="font-medium">{t('menu.program')}:</span>
                     <code className="bg-muted px-2 py-1 rounded text-xs">{item.programId}</code>
                   </div>
                 )}
                 {item.type === 'L' && item.externalUrl && (
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">URL:</span>
+                    <span className="font-medium">{t('menu.url')}:</span>
                     <code className="bg-muted px-2 py-1 rounded text-xs">{item.externalUrl}</code>
                   </div>
                 )}
                 {item.type === 'D' && item.queryBuilderId && (
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">Query Builder ID:</span>
+                    <span className="font-medium">{t('menu.queryBuilderId')}:</span>
                     <code className="bg-muted px-2 py-1 rounded text-xs">{item.queryBuilderId}</code>
                   </div>
                 )}
                 {item.type === 'M' && (
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">Conteneur</span>
-                    <span>({item.children.length} élément(s))</span>
+                    <span className="font-medium">{t('menu.container')}</span>
+                    <span>({item.children.length} {t('menu.items')})</span>
                   </div>
                 )}
               </div>

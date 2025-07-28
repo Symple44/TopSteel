@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Badge } from '@erp/ui'
-import { Progress } from '@erp/ui'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import { 
   PlayCircle, 
   CheckCircle2, 
@@ -16,8 +16,10 @@ import {
   Layers,
   ChevronDown,
   ChevronUp,
-  Info
+  Info,
+  Eye
 } from 'lucide-react'
+import CodeViewerDialog from '@/components/ui/code-viewer-dialog'
 
 interface MigrationFile {
   name: string
@@ -49,6 +51,8 @@ export default function MigrationStatusCard({
 }: MigrationStatusCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
+  const [selectedMigration, setSelectedMigration] = useState<string | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   const getStatusIcon = () => {
     switch (status) {
@@ -102,8 +106,14 @@ export default function MigrationStatusCard({
     return <FileText className="w-3 h-3" />
   }
 
+  const handleViewMigration = (migrationName: string) => {
+    setSelectedMigration(migrationName)
+    setDialogOpen(true)
+  }
+
   return (
-    <Card className={`border-l-4 ${getVariantColor()} hover:shadow-md transition-all duration-200`}>
+    <>
+      <Card className={`border-l-4 ${getVariantColor()} hover:shadow-md transition-all duration-200`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -179,7 +189,7 @@ export default function MigrationStatusCard({
               size="sm"
               onClick={onRunMigrations}
               disabled={isLoading}
-              className="text-xs"
+              className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
             >
               <PlayCircle className={`w-3 h-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
               Exécuter ({pending.length})
@@ -208,17 +218,27 @@ export default function MigrationStatusCard({
             {/* Migrations en attente */}
             {pending.length > 0 && (
               <div>
-                <h4 className="text-sm font-medium text-yellow-700 dark:text-yellow-300 mb-2">
+                <h4 className="text-sm font-semibold text-yellow-700 dark:text-yellow-300 mb-2">
                   Migrations en attente ({pending.length})
                 </h4>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {pending.map((migration, index) => (
-                    <div key={index} className="flex items-center space-x-2 text-xs p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
-                      <AlertCircle className="w-3 h-3 text-yellow-600 flex-shrink-0" />
-                      {getFileIcon(migration)}
-                      <span className="font-mono text-yellow-800 dark:text-yellow-200 truncate">
-                        {formatMigrationName(migration)}
-                      </span>
+                    <div key={index} className="flex items-center justify-between text-xs p-3 bg-yellow-50/80 dark:bg-yellow-950/50 rounded-lg hover:bg-yellow-100/80 dark:hover:bg-yellow-950/70 transition-colors border border-yellow-200/60 dark:border-yellow-800/60">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <AlertCircle className="w-3 h-3 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+                        {getFileIcon(migration)}
+                        <span className="font-mono text-yellow-900 dark:text-yellow-100 truncate font-medium">
+                          {formatMigrationName(migration)}
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleViewMigration(migration)}
+                        className="h-6 w-6 p-0 flex-shrink-0 ml-2 hover:bg-yellow-200/60 dark:hover:bg-yellow-800/60"
+                      >
+                        <Eye className="w-3 h-3 text-yellow-700 dark:text-yellow-300" />
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -228,18 +248,30 @@ export default function MigrationStatusCard({
             {/* Migrations exécutées (dernières) */}
             {executed.length > 0 && (
               <div>
-                <h4 className="text-sm font-medium text-green-700 dark:text-green-300 mb-2">
+                <h4 className="text-sm font-semibold text-green-700 dark:text-green-300 mb-2">
                   Dernières migrations ({Math.min(executed.length, 5)}/{executed.length})
                 </h4>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {executed.slice(-5).map((migration, index) => (
-                    <div key={index} className="flex items-center space-x-2 text-xs p-2 bg-green-50 dark:bg-green-900/20 rounded">
-                      <CheckCircle2 className="w-3 h-3 text-green-600 flex-shrink-0" />
-                      {getFileIcon(migration)}
-                      <span className="font-mono text-green-800 dark:text-green-200 truncate">
-                        {formatMigrationName(migration)}
-                      </span>
-                      <Clock className="w-3 h-3 text-muted-foreground ml-auto" />
+                    <div key={index} className="flex items-center justify-between text-xs p-3 bg-green-50/80 dark:bg-green-950/50 rounded-lg hover:bg-green-100/80 dark:hover:bg-green-950/70 transition-colors border border-green-200/60 dark:border-green-800/60">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <CheckCircle2 className="w-3 h-3 text-green-600 dark:text-green-400 flex-shrink-0" />
+                        {getFileIcon(migration)}
+                        <span className="font-mono text-green-900 dark:text-green-100 truncate font-medium">
+                          {formatMigrationName(migration)}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-1 flex-shrink-0">
+                        <Clock className="w-3 h-3 text-green-600 dark:text-green-400" />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleViewMigration(migration)}
+                          className="h-6 w-6 p-0 hover:bg-green-200/60 dark:hover:bg-green-800/60"
+                        >
+                          <Eye className="w-3 h-3 text-green-700 dark:text-green-300" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -257,5 +289,33 @@ export default function MigrationStatusCard({
         )}
       </CardContent>
     </Card>
+
+    {/* Dialogue de visionneuse de code */}
+    <CodeViewerDialog
+      isOpen={dialogOpen}
+      onClose={() => {
+        setDialogOpen(false)
+        setSelectedMigration(null)
+      }}
+      title="Détails de la migration"
+      subtitle={selectedMigration || ''}
+      onLoadDetails={async () => {
+        const response = await fetch(`/api/admin/database/migrations/${database}/${selectedMigration}/details`)
+        if (!response.ok) {
+          throw new Error('Impossible de charger les détails')
+        }
+        const data = await response.json()
+        return {
+          name: selectedMigration || '',
+          content: data.content,
+          size: data.size,
+          lastModified: data.lastModified,
+          path: data.path,
+          type: data.type || 'Migration',
+          language: 'TypeScript'
+        }
+      }}
+    />
+    </>
   )
 }

@@ -1,6 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
+import { TranslationField } from '@/components/ui/translation-field'
+import { getTranslatedTitle } from '@/utils/menu-translations'
+import { translator } from '@/lib/i18n/translator'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -113,6 +117,7 @@ interface UserMenuItem {
   children: UserMenuItem[]
   icon?: string
   customTitle?: string
+  titleTranslations?: Record<string, string>
   customIcon?: string
   customIconColor?: string
   isUserCreated?: boolean // Indique si l'élément a été créé par l'utilisateur (éditable)
@@ -180,16 +185,16 @@ const getAvailableIcons = () => {
   return Object.keys(iconMap).sort()
 }
 
-const getIconsByCategory = () => {
+const getIconsByCategory = (t: any) => {
   return {
-    'Navigation & Structure': ['Home', 'LayoutDashboard', 'FolderOpen', 'Settings', 'Search', 'Eye'],
-    'Administration & Sécurité': ['Shield', 'Users', 'User', 'Key', 'Lock'],
-    'Entreprise & Organisation': ['Building', 'Building2', 'Globe', 'Briefcase'],
-    'Données & Rapports': ['Database', 'BarChart3', 'PieChart', 'Activity', 'TrendingUp', 'FileText'],
-    'Production & Stock': ['Package', 'Wrench', 'Truck'],
-    'Communication': ['Mail', 'Phone', 'Calendar', 'Bell'],
-    'Actions & États': ['Download', 'Upload', 'CheckCircle', 'AlertTriangle', 'RefreshCw'],
-    'Finance & Technique': ['CreditCard', 'Monitor', 'ExternalLink', 'MapPin', 'Check']
+    [t('settings.menu.iconCategories.navigation')]: ['Home', 'LayoutDashboard', 'FolderOpen', 'Settings', 'Search', 'Eye'],
+    [t('settings.menu.iconCategories.security')]: ['Shield', 'Users', 'User', 'Key', 'Lock'],
+    [t('settings.menu.iconCategories.enterprise')]: ['Building', 'Building2', 'Globe', 'Briefcase'],
+    [t('settings.menu.iconCategories.data')]: ['Database', 'BarChart3', 'PieChart', 'Activity', 'TrendingUp', 'FileText'],
+    [t('settings.menu.iconCategories.production')]: ['Package', 'Wrench', 'Truck'],
+    [t('settings.menu.iconCategories.communication')]: ['Mail', 'Phone', 'Calendar', 'Bell'],
+    [t('settings.menu.iconCategories.actions')]: ['Download', 'Upload', 'CheckCircle', 'AlertTriangle', 'RefreshCw'],
+    [t('settings.menu.iconCategories.finance')]: ['CreditCard', 'Monitor', 'ExternalLink', 'MapPin', 'Check']
   }
 }
 
@@ -197,28 +202,23 @@ const getIconComponent = (iconName: string) => {
   return iconMap[iconName] || Settings
 }
 
-const getAvailableColors = () => {
+const getAvailableColors = (t: any) => {
   return {
-    // Couleurs métier
-    'Bleu': '#3b82f6',
-    'Vert': '#10b981', 
-    'Orange': '#f97316',
-    'Rouge': '#ef4444',
-    'Violet': '#8b5cf6',
-    'Rose': '#ec4899',
-    'Jaune': '#eab308',
-    'Cyan': '#06b6d4',
-    
-    // Couleurs neutres
-    'Gris': '#6b7280',
-    'Ardoise': '#475569',
-    'Zinc': '#52525b',
-    
-    // Couleurs spéciales
-    'Indigo': '#6366f1',
-    'Émeraude': '#059669',
-    'Lime': '#65a30d',
-    'Ambre': '#d97706'
+    [t('settings.menu.colors.blue')]: '#3b82f6',
+    [t('settings.menu.colors.green')]: '#10b981', 
+    [t('settings.menu.colors.orange')]: '#f97316',
+    [t('settings.menu.colors.red')]: '#ef4444',
+    [t('settings.menu.colors.purple')]: '#8b5cf6',
+    [t('settings.menu.colors.pink')]: '#ec4899',
+    [t('settings.menu.colors.yellow')]: '#eab308',
+    [t('settings.menu.colors.cyan')]: '#06b6d4',
+    [t('settings.menu.colors.gray')]: '#6b7280',
+    [t('settings.menu.colors.slate')]: '#475569',
+    [t('settings.menu.colors.zinc')]: '#52525b',
+    [t('settings.menu.colors.indigo')]: '#6366f1',
+    [t('settings.menu.colors.emerald')]: '#059669',
+    [t('settings.menu.colors.lime')]: '#65a30d',
+    [t('settings.menu.colors.amber')]: '#d97706'
   }
 }
 
@@ -245,6 +245,7 @@ function FolderMenuItem({
   expandedItems?: string[],
   onToggleExpanded?: (id: string) => void
 }) {
+  const { t } = useTranslation('settings')
   const IconComponent = item.customIcon ? getIconComponent(item.customIcon) : getTypeIcon(item.type)
   const Icon = IconComponent
   const iconStyle = getColorStyle(item.customIconColor)
@@ -343,16 +344,16 @@ function FolderMenuItem({
           <Icon className="h-4 w-4" style={iconStyle} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-sm">{item.customTitle || item.title}</span>
+              <span className="font-medium text-sm">{getTranslatedTitle(item)}</span>
               <Badge className={`text-xs ${getTypeBadgeColor(item.type)} text-white`}>
-                {getTypeLabel(item.type)}
+                {getTypeLabel(item.type, t)}
               </Badge>
               <Badge variant="outline" className={`text-xs ${
                 isDragOver 
                   ? 'bg-purple-200 text-purple-800 border-purple-400' 
                   : 'bg-purple-50 text-purple-700 border-purple-200'
               }`}>
-                {isDragOver ? '🎯 Déposer ici!' : 'Dossier - Déposer des éléments ici'}
+                {isDragOver ? `🎯 ${t('menu.dropHere')}` : t('menu.folderDropHint')}
               </Badge>
             </div>
             {item.programId && (
@@ -421,7 +422,7 @@ function FolderMenuItem({
       {/* Debug pour voir si c'est un dossier vide */}
       {(!item.children || item.children.length === 0) && (
         <div className="ml-4 text-xs text-muted-foreground italic">
-          📁 Dossier vide
+          📁 {t('menu.folderEmpty')}
         </div>
       )}
     </div>
@@ -442,6 +443,7 @@ function SortableUserMenuItem({
   onDropInFolder?: (parentId: string, droppedItem: any) => void,
   onEdit?: (item: UserMenuItem) => void
 }) {
+  const { t } = useTranslation('settings')
   const {
     attributes,
     listeners,
@@ -484,9 +486,9 @@ function SortableUserMenuItem({
           <Icon className="h-4 w-4" style={iconStyle} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-sm">{item.customTitle || item.title}</span>
+              <span className="font-medium text-sm">{getTranslatedTitle(item)}</span>
               <Badge className={`text-xs ${getTypeBadgeColor(item.type)} text-white`}>
-                {getTypeLabel(item.type)}
+                {getTypeLabel(item.type, t)}
               </Badge>
             </div>
             {item.programId && (
@@ -534,7 +536,8 @@ function StandardMenuItemDisplay({
   expanded, 
   onToggleExpanded,
   expandedItems = [],
-  onToggleExpandedItem 
+  onToggleExpandedItem,
+  t
 }: { 
   item: MenuItemConfig, 
   level?: number,
@@ -542,7 +545,8 @@ function StandardMenuItemDisplay({
   expanded?: boolean,
   onToggleExpanded?: () => void,
   expandedItems?: string[],
-  onToggleExpandedItem?: (id: string) => void
+  onToggleExpandedItem?: (id: string) => void,
+  t: any
 }) {
   const Icon = getTypeIcon(item.type)
   const hasChildren = item.children && item.children.length > 0
@@ -620,16 +624,16 @@ function StandardMenuItemDisplay({
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{item.title}</span>
               <Badge className={`text-xs ${getTypeBadgeColor(item.type)} text-white`}>
-                {getTypeLabel(item.type)}
+                {getTypeLabel(item.type, t)}
               </Badge>
               {hasChildren && (
                 <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                  {item.children.length} enfant(s) - Cliquer pour déplier / Glisser pour ajouter le menu complet
+                  {t('menu.childrenCount').replace('{count}', item.children.length.toString())}
                 </Badge>
               )}
               {!hasChildren && (
                 <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                  Glisser pour ajouter
+                  {t('menu.dragToAdd')}
                 </Badge>
               )}
             </div>
@@ -657,6 +661,7 @@ function StandardMenuItemDisplay({
               onDragStart={onDragStart}
               expandedItems={expandedItems}
               onToggleExpandedItem={onToggleExpandedItem}
+              t={t}
             />
           ))}
         </div>
@@ -666,12 +671,12 @@ function StandardMenuItemDisplay({
 }
 
 // Fonctions utilitaires
-const getTypeLabel = (type: string) => {
+const getTypeLabel = (type: string, t: any) => {
   switch (type) {
-    case 'M': return 'Dossier'
-    case 'P': return 'Programme'
-    case 'L': return 'Lien'
-    case 'D': return 'Vue Data'
+    case 'M': return t('menu.elementTypes.folder')
+    case 'P': return t('menu.elementTypes.program')
+    case 'L': return t('menu.elementTypes.link')
+    case 'D': return t('menu.elementTypes.dataView')
     default: return type
   }
 }
@@ -697,6 +702,7 @@ const getTypeIcon = (type: string) => {
 }
 
 export default function MenuDragDropPage() {
+  const { t } = useTranslation('settings')
   const [standardMenu, setStandardMenu] = useState<MenuItemConfig[]>([])
   const [userMenu, setUserMenu] = useState<UserMenuItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -720,6 +726,7 @@ export default function MenuDragDropPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingItem, setEditingItem] = useState<UserMenuItem | null>(null)
   const [editTitle, setEditTitle] = useState('')
+  const [editTitleTranslations, setEditTitleTranslations] = useState<Record<string, string>>({})
   const [editIcon, setEditIcon] = useState('')
   const [editIconColor, setEditIconColor] = useState('')
   const [editUrl, setEditUrl] = useState('')
@@ -761,7 +768,7 @@ export default function MenuDragDropPage() {
     return {
       id: item.id || `item-${Date.now()}-${index}`,
       parentId: parentId || item.parentId,
-      title: item.customTitle || item.title || 'Sans titre',
+      title: getTranslatedTitle(item) || 'Sans titre',
       type: item.type || 'P',
       programId: item.programId,
       externalUrl: item.externalUrl,
@@ -1044,7 +1051,8 @@ export default function MenuDragDropPage() {
 
   const openEditModal = (item: UserMenuItem) => {
     setEditingItem(item)
-    setEditTitle(item.customTitle || item.title)
+    setEditTitle(getTranslatedTitle(item))
+    setEditTitleTranslations(item.titleTranslations || {})
     setEditIcon(item.customIcon || item.icon || '')
     setEditIconColor(item.customIconColor || '')
     setEditUrl(item.externalUrl || '')
@@ -1057,7 +1065,8 @@ export default function MenuDragDropPage() {
 
   const resetItemEdit = () => {
     if (!editingItem) return
-    setEditTitle(editingItem.customTitle || editingItem.title)
+    setEditTitle(getTranslatedTitle(editingItem))
+    setEditTitleTranslations(editingItem.titleTranslations || {})
     setEditIcon(editingItem.customIcon || editingItem.icon || '')
     setEditIconColor(editingItem.customIconColor || '')
     setEditUrl(editingItem.externalUrl || '')
@@ -1117,9 +1126,19 @@ export default function MenuDragDropPage() {
       const updateItemRecursively = (items: UserMenuItem[]): UserMenuItem[] => {
         return items.map(item => {
           if (item.id === editingItem.id) {
+            const currentLanguage = translator.getCurrentLanguage()
+            const updatedTranslations = { ...editTitleTranslations }
+            
+            // Sauvegarder le titre dans la langue courante
+            if (editTitle.trim()) {
+              updatedTranslations[currentLanguage] = editTitle.trim()
+            }
+            
+            
             return {
               ...item,
-              customTitle: editTitle.trim() || item.title,
+              customTitle: editTitle.trim() || item.title, // Garder pour compatibilité
+              titleTranslations: updatedTranslations,
               customIcon: editIcon || item.icon,
               customIconColor: editIconColor || undefined,
               externalUrl: editingItem.type === 'L' ? editUrl : item.externalUrl,
@@ -1141,6 +1160,13 @@ export default function MenuDragDropPage() {
       
       // Sauvegarder automatiquement en BDD après modification
       try {
+        console.log('🌍 Sauvegarde des traductions:', {
+          itemId: editingItem.id,
+          translations: updatedTranslations,
+          currentLanguage: translator.getCurrentLanguage(),
+          updatedItem: updatedMenu.find(item => item.id === editingItem.id)
+        })
+        
         const response = await apiClient.post('/user/menu-preferences/custom-menu', {
           menuItems: updatedMenu
         })
@@ -1170,6 +1196,7 @@ export default function MenuDragDropPage() {
         setShowEditModal(false)
         setEditingItem(null)
         setEditTitle('')
+        setEditTitleTranslations({})
         setEditIcon('')
         setEditIconColor('')
         setEditUrl('')
@@ -1213,19 +1240,19 @@ export default function MenuDragDropPage() {
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Personnalisation du Menu</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('menu.title')}</h1>
           <p className="text-muted-foreground">
-            Créez votre menu personnalisé en glissant-déposant les éléments
+            {t('menu.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={resetUserMenu}>
             <RotateCcw className="h-4 w-4 mr-2" />
-            Réinitialiser
+            {t('menu.reset')}
           </Button>
           <Button onClick={saveUserMenu} disabled={saving}>
             <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+            {saving ? t('menu.saving') : t('menu.save')}
           </Button>
         </div>
       </div>
@@ -1236,43 +1263,43 @@ export default function MenuDragDropPage() {
           <CardHeader className="flex-shrink-0">
             <CardTitle className="flex items-center gap-2">
               <Eye className="h-5 w-5" />
-              Votre Menu Personnalisé
+              {t('menu.yourCustomMenu')}
             </CardTitle>
             <CardDescription>
-              Aperçu de votre menu tel qu'il apparaîtra dans la sidebar
+              {t('menu.menuPreview')}
             </CardDescription>
             <div className="flex gap-2 flex-wrap">
               <Dialog open={showCreateFolder} onOpenChange={setShowCreateFolder}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">
                     <FolderPlus className="h-4 w-4 mr-1" />
-                    Dossier
+                    {t('menu.folder')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Créer un nouveau dossier</DialogTitle>
+                    <DialogTitle>{t('menu.createNewFolder')}</DialogTitle>
                     <DialogDescription>
-                      Un dossier peut contenir d'autres éléments de menu
+                      {t('menu.folderDescription')}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="folder-title">Nom du dossier</Label>
+                      <Label htmlFor="folder-title">{t('menu.folderName')}</Label>
                       <Input
                         id="folder-title"
                         value={newItemTitle}
                         onChange={(e) => setNewItemTitle(e.target.value)}
-                        placeholder="Mon nouveau dossier"
+                        placeholder={t('menu.folderPlaceholder')}
                       />
                     </div>
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setShowCreateFolder(false)}>
-                      Annuler
+                      {t('menu.cancel')}
                     </Button>
                     <Button onClick={createFolder}>
-                      Créer
+                      {t('menu.create')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -1282,42 +1309,42 @@ export default function MenuDragDropPage() {
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">
                     <Link className="h-4 w-4 mr-1" />
-                    Lien
+                    {t('menu.link')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Créer un nouveau lien</DialogTitle>
+                    <DialogTitle>{t('menu.createNewLink')}</DialogTitle>
                     <DialogDescription>
-                      Un lien vers un site web externe
+                      {t('menu.linkDescription')}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="link-title">Nom du lien</Label>
+                      <Label htmlFor="link-title">{t('menu.linkName')}</Label>
                       <Input
                         id="link-title"
                         value={newItemTitle}
                         onChange={(e) => setNewItemTitle(e.target.value)}
-                        placeholder="Mon site web"
+                        placeholder={t('menu.linkPlaceholder')}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="link-url">URL</Label>
+                      <Label htmlFor="link-url">{t('menu.url')}</Label>
                       <Input
                         id="link-url"
                         value={newItemUrl}
                         onChange={(e) => setNewItemUrl(e.target.value)}
-                        placeholder="https://example.com"
+                        placeholder={t('menu.urlPlaceholder')}
                       />
                     </div>
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setShowCreateLink(false)}>
-                      Annuler
+                      {t('menu.cancel')}
                     </Button>
                     <Button onClick={createLink}>
-                      Créer
+                      {t('menu.create')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -1327,42 +1354,42 @@ export default function MenuDragDropPage() {
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">
                     <Search className="h-4 w-4 mr-1" />
-                    Vue Data
+                    {t('menu.dataView')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Créer une nouvelle vue de données</DialogTitle>
+                    <DialogTitle>{t('menu.createNewDataView')}</DialogTitle>
                     <DialogDescription>
-                      Une vue personnalisée basée sur le Query Builder
+                      {t('menu.dataViewDescription')}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="query-title">Nom de la vue</Label>
+                      <Label htmlFor="query-title">{t('menu.dataViewName')}</Label>
                       <Input
                         id="query-title"
                         value={newItemTitle}
                         onChange={(e) => setNewItemTitle(e.target.value)}
-                        placeholder="Ma vue de données"
+                        placeholder={t('menu.dataViewPlaceholder')}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="query-id">ID de la requête</Label>
+                      <Label htmlFor="query-id">{t('menu.queryId')}</Label>
                       <Input
                         id="query-id"
                         value={newItemQueryId}
                         onChange={(e) => setNewItemQueryId(e.target.value)}
-                        placeholder="query-123"
+                        placeholder={t('menu.queryIdPlaceholder')}
                       />
                     </div>
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setShowCreateQuery(false)}>
-                      Annuler
+                      {t('menu.cancel')}
                     </Button>
                     <Button onClick={createQuery}>
-                      Créer
+                      {t('menu.create')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -1383,9 +1410,9 @@ export default function MenuDragDropPage() {
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center text-muted-foreground">
                     <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="font-medium mb-2">Menu vierge</p>
+                    <p className="font-medium mb-2">{t('menu.emptyMenu')}</p>
                     <p className="text-sm">
-                      Glissez des éléments depuis la bibliothèque ou créez-en de nouveaux
+                      {t('menu.emptyMenuDescription')}
                     </p>
                   </div>
                 </div>
@@ -1431,10 +1458,10 @@ export default function MenuDragDropPage() {
           <CardHeader className="flex-shrink-0">
             <CardTitle className="flex items-center gap-2">
               <Database className="h-5 w-5" />
-              Bibliothèque d'Éléments
+              {t('menu.library')}
             </CardTitle>
             <CardDescription>
-              Éléments disponibles du menu standard - glissez pour les ajouter
+              {t('menu.libraryDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex-1 min-h-0">
@@ -1446,6 +1473,7 @@ export default function MenuDragDropPage() {
                   onDragStart={handleStandardItemDragStart}
                   expandedItems={expandedStandardItems}
                   onToggleExpandedItem={toggleStandardItemExpansion}
+                  t={t}
                 />
               ))}
             </div>
@@ -1478,7 +1506,7 @@ export default function MenuDragDropPage() {
                 isSaving ? 'text-green-600' : 'text-foreground'
               }`} />
               <span className="transition-colors duration-300">
-                {isSaving ? 'Sauvegarde en cours...' : 'Modifier'}
+                {isSaving ? t('menu.savingInProgress') : t('menu.edit')}
               </span>
             </DialogTitle>
           </DialogHeader>
@@ -1510,13 +1538,15 @@ export default function MenuDragDropPage() {
                 {/* Titre personnalisable */}
                 <div className="flex-1 space-y-3">
                   <div>
-                    <Input
-                      id="edit-title"
+                    <TranslationField
                       value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
+                      onChange={setEditTitle}
+                      translations={editTitleTranslations}
+                      onTranslationsChange={setEditTitleTranslations}
                       placeholder={editingItem.title}
-                      className="text-lg font-medium transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      className="text-lg font-medium"
                       disabled={isSaving}
+                      label={t('menu.title')}
                     />
                   </div>
 
@@ -1551,7 +1581,7 @@ export default function MenuDragDropPage() {
                   {/* Sélecteur de couleurs */}
                   <div>
                     <div className="grid grid-cols-8 gap-2">
-                      {Object.entries(getAvailableColors()).map(([colorName, colorValue]) => (
+                      {Object.entries(getAvailableColors(t)).map(([colorName, colorValue]) => (
                         <button
                           key={colorName}
                           type="button"
@@ -1561,7 +1591,7 @@ export default function MenuDragDropPage() {
                               ? 'border-primary shadow-md ring-2 ring-primary/20' 
                               : 'border-border hover:border-primary/50'
                           }`}
-                          title={`${colorName} - Cliquer pour appliquer`}
+                          title={t('menu.clickToApply', { name: colorName })}
                           disabled={isSaving}
                         >
                           <div 
@@ -1584,7 +1614,7 @@ export default function MenuDragDropPage() {
                             ? 'border-primary bg-primary/10' 
                             : 'border-border hover:bg-accent'
                         }`}
-                        title="Couleur par défaut"
+                        title={t('menu.defaultColor')}
                       >
                         <div className="w-6 h-6 rounded-full mx-auto bg-gradient-to-br from-gray-200 to-gray-400 flex items-center justify-center">
                           <span className="text-[8px] font-bold text-gray-600">DEF</span>
@@ -1596,7 +1626,7 @@ export default function MenuDragDropPage() {
                   {/* Sélecteur d'icônes par catégorie */}
                   <div>
                     <div className="max-h-48 overflow-y-auto border rounded-lg p-3 space-y-3">
-                      {Object.entries(getIconsByCategory()).map(([categoryName, icons]) => (
+                      {Object.entries(getIconsByCategory(t)).map(([categoryName, icons]) => (
                         <div key={categoryName}>
                           <h4 className="text-xs font-medium text-muted-foreground mb-2 border-b pb-1">
                             {categoryName}
@@ -1644,7 +1674,7 @@ export default function MenuDragDropPage() {
                     {editTitle.trim() || editingItem.title}
                   </span>
                   <Badge className={`text-xs ${getTypeBadgeColor(editingItem.type)} text-white transition-all duration-300`}>
-                    {getTypeLabel(editingItem.type)}
+                    {getTypeLabel(editingItem.type, t)}
                   </Badge>
                   {isSaving && (
                     <div className="flex items-center gap-2 ml-auto">

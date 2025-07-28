@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = req.headers.get('authorization')
@@ -10,11 +11,11 @@ export async function POST(
       return NextResponse.json({ error: 'Authorization header required' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
 
     // Rediriger vers l'API backend
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const response = await fetch(`${apiUrl}/api/v1/auth/login-societe/${id}`, {
+    const response = await safeFetch(`${apiUrl}/api/v1/auth/login-societe/${id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

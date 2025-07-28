@@ -522,6 +522,9 @@ export const useAuth = () => {
           data: {}
         })
         channel.close()
+        
+        // Rediriger vers la page de login
+        window.location.href = '/login'
       }
     }
   }, [authState.tokens])

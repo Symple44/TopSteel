@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,7 +11,8 @@ export async function GET(req: NextRequest) {
 
     // Rediriger vers l'API backend
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const response = await fetch(`${apiUrl}/api/v1/auth/societes`, {
+    
+    const response = await safeFetch(`${apiUrl}/api/v1/auth/societes`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -36,8 +39,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data, { status: response.status })
     }
 
-    // Retourner directement le tableau des sociétés si c'est dans data
-    return NextResponse.json(data.data || data)
+    return NextResponse.json(data)
   } catch (error) {
     console.error('Get user companies error:', error)
     return NextResponse.json(

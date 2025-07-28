@@ -148,7 +148,7 @@ export default function SecuritySettingsPage() {
         setWebauthnSetup(data.data)
         setSetupDialog({ open: true, type: 'webauthn' })
         
-        // Déclencher l'enregistrement WebAuthn
+        // Trigger WebAuthn registration
         await startWebAuthnRegistration(data.data.options)
       } else {
         toast.error(t('security.mfa.webauthn.configError'))
@@ -160,13 +160,13 @@ export default function SecuritySettingsPage() {
 
   const startWebAuthnRegistration = async (options: any) => {
     try {
-      // Vérifier le support WebAuthn
+      // Check WebAuthn support
       if (!window.navigator.credentials || !window.PublicKeyCredential) {
         toast.error(t('security.mfa.webauthn.notSupported'))
         return
       }
 
-      // Créer les credentials
+      // Create credentials
       const credential = await navigator.credentials.create({
         publicKey: options
       }) as PublicKeyCredential
@@ -176,7 +176,7 @@ export default function SecuritySettingsPage() {
         return
       }
 
-      // Préparer la réponse
+      // Prepare response
       const response = {
         id: credential.id,
         rawId: credential.id,
@@ -187,10 +187,10 @@ export default function SecuritySettingsPage() {
         }
       }
 
-      // Vérifier l'enregistrement
+      // Verify registration
       await verifyWebAuthnRegistration(response)
     } catch (error) {
-      console.error('Erreur WebAuthn:', error)
+      console.error('WebAuthn Error:', error)
       toast.error(t('security.mfa.webauthn.registrationError'))
     }
   }
@@ -205,7 +205,7 @@ export default function SecuritySettingsPage() {
         body: JSON.stringify({
           mfaId: webauthnSetup.mfaId,
           response,
-          deviceName: deviceName || 'Appareil WebAuthn'
+          deviceName: deviceName || ts('security.defaultDevice')
         })
       })
 
@@ -232,7 +232,7 @@ export default function SecuritySettingsPage() {
       })
 
       if (response.ok) {
-        toast.success(`${type.toUpperCase()} désactivé`)
+        toast.success(`${type.toUpperCase()} ${ts('security.disabled')}`)
         loadMFAData()
       } else {
         toast.error(t('security.mfa.disableError'))
@@ -301,7 +301,7 @@ export default function SecuritySettingsPage() {
         )}
       </div>
 
-      {/* Aperçu de la sécurité */}
+      {/* Security Overview */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -349,7 +349,7 @@ export default function SecuritySettingsPage() {
           </TabsTrigger>
           <TabsTrigger value="webauthn" className="flex items-center gap-2">
             <Key className="w-4 h-4" />
-            WebAuthn / Biométrie
+            WebAuthn / Biometric
           </TabsTrigger>
         </TabsList>
 
@@ -364,36 +364,36 @@ export default function SecuritySettingsPage() {
                 {mfaStats?.methods.totp.enabled && (
                   <Badge variant="outline" className="text-green-600">
                     <CheckCircle className="w-3 h-3 mr-1" />
-                    Activé
+                    {ts('security.enabled')}
                   </Badge>
                 )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Utilisez une application d'authentification comme Google Authenticator, Authy, ou 1Password pour générer des codes de vérification.
+                {ts('security.totpDescription')}
               </p>
 
               {mfaStats?.methods.totp.enabled ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
-                      <p className="font-medium">TOTP configuré</p>
+                      <p className="font-medium">{ts('security.configured')}</p>
                       <p className="text-sm text-muted-foreground">
-                        Dernière utilisation: {mfaStats.methods.totp.lastUsed ? 
+                        {ts('security.lastUsed')} {mfaStats.methods.totp.lastUsed ? 
                           new Date(mfaStats.methods.totp.lastUsed).toLocaleString() : 
-                          'Jamais utilisé'
+                          ts('security.neverUsed')
                         }
                       </p>
                     </div>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={handleGetBackupCodes}>
                         <Eye className="w-4 h-4 mr-2" />
-                        Codes de récupération
+                        {ts('security.backupCodes')}
                       </Button>
                       <Button variant="destructive" size="sm" onClick={() => handleDisableMFA('totp')}>
                         <Trash2 className="w-4 h-4 mr-2" />
-                        Désactiver
+                        {ts('security.disable')}
                       </Button>
                     </div>
                   </div>
@@ -403,12 +403,12 @@ export default function SecuritySettingsPage() {
                   <Alert>
                     <Shield className="w-4 h-4" />
                     <AlertDescription>
-                      TOTP non configuré. Activez cette méthode pour améliorer la sécurité de votre compte.
+                      {ts('security.notConfigured')}
                     </AlertDescription>
                   </Alert>
                   <Button onClick={handleSetupTOTP} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
-                    Configurer TOTP
+                    {ts('security.configure')}
                   </Button>
                 </div>
               )}
@@ -422,19 +422,19 @@ export default function SecuritySettingsPage() {
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Key className="w-5 h-5" />
-                  WebAuthn / Clés de sécurité
+                  {ts('security.webauthnKeys')}
                 </span>
                 {mfaStats?.methods.webauthn.enabled && (
                   <Badge variant="outline" className="text-green-600">
                     <CheckCircle className="w-3 h-3 mr-1" />
-                    {mfaStats.methods.webauthn.credentialsCount} clé(s)
+                    {mfaStats.methods.webauthn.credentialsCount} {ts('security.keyCredentials')}
                   </Badge>
                 )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Utilisez la biométrie (empreinte, reconnaissance faciale) ou des clés de sécurité physiques (YubiKey, etc.).
+                {ts('security.webauthnDescription')}
               </p>
 
               {mfaStats?.methods.webauthn.enabled ? (
@@ -447,12 +447,12 @@ export default function SecuritySettingsPage() {
                           <div>
                             <p className="font-medium">{credential.deviceName}</p>
                             <p className="text-sm text-muted-foreground">
-                              Ajouté le {new Date(credential.createdAt).toLocaleDateString()}
+                              {ts('security.deviceAdded')} {new Date(credential.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                           <Button variant="destructive" size="sm">
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Supprimer
+                            {ts('security.removeDevice')}
                           </Button>
                         </div>
                       ))
@@ -460,7 +460,7 @@ export default function SecuritySettingsPage() {
                   
                   <Button variant="outline" onClick={handleSetupWebAuthn} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
-                    Ajouter une nouvelle clé
+                    {ts('security.addNewKey')}
                   </Button>
                 </div>
               ) : (
@@ -468,12 +468,12 @@ export default function SecuritySettingsPage() {
                   <Alert>
                     <Key className="w-4 h-4" />
                     <AlertDescription>
-                      WebAuthn non configuré. Cette méthode offre la meilleure sécurité possible.
+                      {ts('security.webauthnNotConfigured')}
                     </AlertDescription>
                   </Alert>
                   <Button onClick={handleSetupWebAuthn} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
-                    Configurer WebAuthn
+                    {ts('security.configureWebauthn')}
                   </Button>
                 </div>
               )}
@@ -486,9 +486,9 @@ export default function SecuritySettingsPage() {
       <Dialog open={setupDialog.open && setupDialog.type === 'totp'} onOpenChange={(open: boolean) => setSetupDialog({ open, type: null })}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Configuration TOTP</DialogTitle>
+            <DialogTitle>{ts('security.totpSetupTitle')}</DialogTitle>
             <DialogDescription>
-              Scannez le QR code avec votre application d'authentification
+              {ts('security.totpSetupDescription')}
             </DialogDescription>
           </DialogHeader>
           
@@ -499,17 +499,17 @@ export default function SecuritySettingsPage() {
               </div>
               
               <div className="space-y-2">
-                <p className="text-sm font-medium">Clé manuelle :</p>
+                <p className="text-sm font-medium">{ts('security.manualKey')}</p>
                 <code className="block p-2 bg-muted rounded text-sm break-all">
                   {totpSetup.manualEntryKey}
                 </code>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Code de vérification :</label>
+                <label className="text-sm font-medium">{ts('security.verificationCodeLabel')}</label>
                 <input
                   type="text"
-                  placeholder="123456"
+                  placeholder={ts('security.verificationCodePlaceholder')}
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   className="w-full p-2 border rounded"
@@ -518,7 +518,7 @@ export default function SecuritySettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm font-medium">Codes de récupération :</p>
+                <p className="text-sm font-medium">{ts('security.backupCodesLabel')}</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   {totpSetup.backupCodes.map((code, index) => (
                     <code key={index} className="block p-1 bg-muted rounded text-center">
@@ -527,7 +527,7 @@ export default function SecuritySettingsPage() {
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Conservez ces codes en lieu sûr. Ils ne s'afficheront qu'une seule fois.
+                  {ts('security.backupCodesWarning')}
                 </p>
               </div>
             </div>
@@ -535,10 +535,10 @@ export default function SecuritySettingsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setSetupDialog({ open: false, type: null })}>
-              Annuler
+              {ts('security.cancel')}
             </Button>
             <Button onClick={handleVerifyTOTP} disabled={!verificationCode || verificationCode.length !== 6}>
-              Vérifier et Activer
+              {ts('security.verifyAndActivate')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -548,18 +548,18 @@ export default function SecuritySettingsPage() {
       <Dialog open={setupDialog.open && setupDialog.type === 'webauthn'} onOpenChange={(open: boolean) => setSetupDialog({ open, type: null })}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Configuration WebAuthn</DialogTitle>
+            <DialogTitle>{ts('security.webauthnSetupTitle')}</DialogTitle>
             <DialogDescription>
-              Configurez une clé de sécurité ou utilisez la biométrie de votre appareil
+              {ts('security.webauthnSetupDescription')}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Nom de l'appareil (optionnel) :</label>
+              <label className="text-sm font-medium">{ts('security.deviceNameLabel')}</label>
               <input
                 type="text"
-                placeholder="Mon iPhone, Ma YubiKey..."
+                placeholder={ts('security.deviceNamePlaceholder')}
                 value={deviceName}
                 onChange={(e) => setDeviceName(e.target.value)}
                 className="w-full p-2 border rounded"
@@ -569,26 +569,26 @@ export default function SecuritySettingsPage() {
             <Alert>
               <Key className="w-4 h-4" />
               <AlertDescription>
-                Suivez les instructions de votre navigateur pour enregistrer votre clé de sécurité ou utiliser la biométrie.
+                {ts('security.webauthnInstructions')}
               </AlertDescription>
             </Alert>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setSetupDialog({ open: false, type: null })}>
-              Annuler
+              {ts('security.cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Dialog des codes de récupération */}
+      {/* Recovery codes dialog */}
       <Dialog open={showBackupCodes} onOpenChange={setShowBackupCodes}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Codes de récupération</DialogTitle>
+            <DialogTitle>{ts('security.backupCodesTitle')}</DialogTitle>
             <DialogDescription>
-              Utilisez ces codes si vous perdez l'accès à votre authentificateur
+              {ts('security.backupCodesDescription')}
             </DialogDescription>
           </DialogHeader>
           
@@ -604,14 +604,14 @@ export default function SecuritySettingsPage() {
             <Alert>
               <AlertTriangle className="w-4 h-4" />
               <AlertDescription>
-                Conservez ces codes en lieu sûr. Chaque code ne peut être utilisé qu'une seule fois.
+                {ts('security.backupCodesSecure')}
               </AlertDescription>
             </Alert>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowBackupCodes(false)}>
-              Fermer
+              {ts('security.close')}
             </Button>
             <Button onClick={() => {
               const codesText = backupCodes.join('\n')
@@ -619,7 +619,7 @@ export default function SecuritySettingsPage() {
               toast.success(t('security.mfa.codesCopied'))
             }}>
               <Download className="w-4 h-4 mr-2" />
-              Copier les codes
+              {ts('security.copyCodes')}
             </Button>
           </DialogFooter>
         </DialogContent>

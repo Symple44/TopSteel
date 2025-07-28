@@ -137,7 +137,10 @@
       "Bash(set API_PORT=3004)",
       "Bash(npx turbo run:*)",
       "Bash(JWT_SECRET=development-secret-key-min-32-chars-long-topsteel-erp npx ts-node src/scripts/create-admin-user.ts)",
-      "Bash(./cleanup-ports.bat)"
+      "Bash(./cleanup-ports.bat)",
+      "Bash(npx typeorm-ts-node-commonjs migration:generate:*)",
+      "Bash(turbo dev:*)",
+      "Bash(npx typeorm query:*)"
     ],
     "deny": []
   }

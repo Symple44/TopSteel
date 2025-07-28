@@ -2653,3 +2653,51 @@ body.content-compact .dashboard-content {
   background-color: hsl(45 86% 68% / 0.3) !important;
   color: hsl(270 15% 9%) !important;
 }
+
+/* =================================================================== */
+/* STYLES POUR LA VISIONNEUSE DE CODE */
+/* =================================================================== */
+
+/* Styles de scrollbar pour la visionneuse de code */
+.code-viewer-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.4) hsl(var(--muted) / 0.5);
+  /* Force la scrollbar à être toujours visible */
+  overflow-y: scroll !important;
+  overflow-x: auto !important;
+}
+
+.code-viewer-scroll::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  /* Force la visibilité */
+  display: block !important;
+}
+
+.code-viewer-scroll::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.3);
+  border-radius: 6px;
+}
+
+.code-viewer-scroll::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 6px;
+  border: 2px solid hsl(var(--muted) / 0.3);
+}
+
+.code-viewer-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.6);
+}
+
+.code-viewer-scroll::-webkit-scrollbar-corner {
+  background: hsl(var(--muted) / 0.3);
+}
+
+/* Force la scrollbar même sur macOS */
+.code-viewer-scroll::-webkit-scrollbar-thumb:vertical {
+  min-height: 20px;
+}
+
+.code-viewer-scroll::-webkit-scrollbar-thumb:horizontal {
+  min-width: 20px;
+}

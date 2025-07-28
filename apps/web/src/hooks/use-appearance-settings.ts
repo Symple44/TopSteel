@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTheme } from 'next-themes'
+import { translator } from '@/lib/i18n/translator'
 
 export interface AppearanceSettings {
   theme: 'light' | 'dark' | 'vibrant' | 'system'
@@ -53,8 +54,13 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
   const applySettings = useCallback((newSettings: AppearanceSettings) => {
     const root = document.documentElement
     
-    // Appliquer la langue au document
+    // Appliquer la langue au document ET au système i18n
     root.setAttribute('lang', newSettings.language || 'fr')
+    
+    // Synchroniser avec le système i18n
+    if (translator.getCurrentLanguage() !== newSettings.language) {
+      translator.setLanguage(newSettings.language)
+    }
     
     // Appliquer la taille de police
     root.style.setProperty('--font-size-multiplier', 
@@ -353,6 +359,7 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
         // Charger d'abord depuis localStorage pour éviter le flash de thème par défaut
         const localSettings = localStorage.getItem(STORAGE_KEY)
         const themeFromNextThemes = localStorage.getItem(THEME_STORAGE_KEY)
+        const languageFromI18n = translator.getCurrentLanguage()
         
         let initialSettings = defaultSettings
         if (localSettings) {
@@ -362,6 +369,11 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
             // Si next-themes a un thème différent, utiliser celui de next-themes
             if (themeFromNextThemes && themeFromNextThemes !== parsedSettings.theme) {
               parsedSettings.theme = themeFromNextThemes as AppearanceSettings['theme']
+            }
+            
+            // Synchroniser avec la langue du système i18n si différente
+            if (languageFromI18n && languageFromI18n !== parsedSettings.language) {
+              parsedSettings.language = languageFromI18n
             }
             
             initialSettings = parsedSettings
@@ -381,18 +393,18 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
             lastAppliedSettings.current = fallbackSettings
           }
         } else {
-          // Pas de localStorage, vérifier si next-themes a un thème
-          if (themeFromNextThemes) {
-            const fallbackSettings = { ...defaultSettings, theme: themeFromNextThemes as AppearanceSettings['theme'] }
-            setTheme(fallbackSettings.theme)
-            applySettings(fallbackSettings)
-            lastAppliedSettings.current = fallbackSettings
-          } else {
-            // Pas de localStorage, appliquer défaut
-            setTheme(defaultSettings.theme)
-            applySettings(defaultSettings)
-            lastAppliedSettings.current = defaultSettings
+          // Pas de localStorage, vérifier si next-themes a un thème ou si i18n a une langue
+          const fallbackSettings = { 
+            ...defaultSettings, 
+            theme: (themeFromNextThemes as AppearanceSettings['theme']) || defaultSettings.theme,
+            language: languageFromI18n || defaultSettings.language
           }
+          setSettings(fallbackSettings)
+          setSavedSettings(fallbackSettings)
+          settingsRef.current = fallbackSettings
+          setTheme(fallbackSettings.theme)
+          applySettings(fallbackSettings)
+          lastAppliedSettings.current = fallbackSettings
         }
 
         // Essayer de charger depuis l'API pour mise à jour
@@ -487,6 +499,24 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
       lastAppliedSettings.current = settings
     }
   }, [settings, setTheme, applySettings])
+
+  // Écouter les changements du translator i18n
+  useEffect(() => {
+    if (!hasInitialized.current) return
+    
+    const unsubscribe = translator.subscribe(() => {
+      const currentLang = translator.getCurrentLanguage()
+      if (currentLang !== settings.language) {
+        // La langue du translator a changé, synchroniser les settings
+        setSettings(prevSettings => ({
+          ...prevSettings,
+          language: currentLang
+        }))
+      }
+    })
+    
+    return unsubscribe
+  }, [settings.language])
 
   // Mettre à jour un paramètre
   const updateSetting = useCallback(<K extends keyof AppearanceSettings>(

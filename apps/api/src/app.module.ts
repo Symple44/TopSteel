@@ -28,6 +28,8 @@ import { AuthModule } from './modules/auth/auth.module'
 import { RoleAuthModule } from './modules/auth/role-auth.module'
 // Module d'administration
 import { AdminModule } from './modules/admin/admin.module'
+// Module de paramètres
+import { ParametersModule } from './modules/parameters/parameters.module'
 // Modules métier harmonisés
 import { ClientsModule } from './modules/clients/clients.module'
 import { CommandesModule } from './modules/commandes/commandes.module'
@@ -90,6 +92,7 @@ import { EnhancedThrottlerGuard } from './common/guards/enhanced-throttler.guard
 
     // Administration
     AdminModule,
+    ParametersModule,
 
     // Marketplace
     MarketplaceAppModule,

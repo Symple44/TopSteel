@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -21,6 +22,8 @@ interface QuickStats {
 }
 
 export default function MarketplacePage() {
+  const { t } = useTranslation('admin')
+  const { t: tMp } = useTranslation('admin')
   const [activeTab, setActiveTab] = useState('catalog')
   const [quickStats, setQuickStats] = useState<QuickStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -53,15 +56,15 @@ export default function MarketplacePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Marketplace de Modules</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('marketplace.title')}</h1>
           <p className="text-muted-foreground">
-            Découvrez et installez des modules pour étendre les fonctionnalités de votre ERP
+            {t('marketplace.description')}
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline">
             <Settings className="mr-2 h-4 w-4" />
-            Paramètres
+            {t('marketplace.settings')}
           </Button>
         </div>
       </div>
@@ -70,7 +73,7 @@ export default function MarketplacePage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Modules Disponibles</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('marketplace.modulesAvailable')}</CardTitle>
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -80,7 +83,7 @@ export default function MarketplacePage() {
               <>
                 <div className="text-2xl font-bold">{quickStats?.totalModules || 0}</div>
                 <p className="text-xs text-muted-foreground">
-                  {quickStats?.publishedModules || 0} publiés
+                  {quickStats?.publishedModules || 0} {tMp('marketplace.published')}
                 </p>
               </>
             )}
@@ -89,7 +92,7 @@ export default function MarketplacePage() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Téléchargements</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('marketplace.totalDownloads')}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -99,7 +102,7 @@ export default function MarketplacePage() {
               <>
                 <div className="text-2xl font-bold">{quickStats?.totalDownloads?.toLocaleString() || '0'}</div>
                 <p className="text-xs text-muted-foreground">
-                  Installations totales
+                  {tMp('marketplace.totalInstalls')}
                 </p>
               </>
             )}
@@ -108,7 +111,7 @@ export default function MarketplacePage() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Note Moyenne</CardTitle>
+            <CardTitle className="text-sm font-medium">{tMp('marketplace.averageRating')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -120,7 +123,7 @@ export default function MarketplacePage() {
                   {quickStats?.averageRating ? quickStats.averageRating.toFixed(1) : '0'}/5
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Satisfaction utilisateurs
+                  {tMp('marketplace.userSatisfaction')}
                 </p>
               </>
             )}
@@ -129,7 +132,7 @@ export default function MarketplacePage() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Marketplace</CardTitle>
+            <CardTitle className="text-sm font-medium">{tMp('marketplace.title')}</CardTitle>
             <div className="flex">
               {[1, 2, 3, 4, 5].map((star) => (
                 <div key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400">★</div>
@@ -137,9 +140,9 @@ export default function MarketplacePage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Actif</div>
+            <div className="text-2xl font-bold">{tMp('marketplace.active')}</div>
             <p className="text-xs text-muted-foreground">
-              Modules réels disponibles
+              {tMp('marketplace.realModules')}
             </p>
           </CardContent>
         </Card>
@@ -148,10 +151,10 @@ export default function MarketplacePage() {
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="catalog">Catalogue</TabsTrigger>
-          <TabsTrigger value="installed">Modules Installés</TabsTrigger>
-          <TabsTrigger value="stats">Statistiques</TabsTrigger>
-          <TabsTrigger value="publish">Publier un Module</TabsTrigger>
+          <TabsTrigger value="catalog">{t('marketplace.categories')}</TabsTrigger>
+          <TabsTrigger value="installed">{t('marketplace.installed')}</TabsTrigger>
+          <TabsTrigger value="stats">{t('marketplace.quickStats')}</TabsTrigger>
+          <TabsTrigger value="publish">{tMp('marketplace.publishModule')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="catalog" className="space-y-4">

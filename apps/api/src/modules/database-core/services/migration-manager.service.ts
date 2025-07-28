@@ -50,8 +50,50 @@ export class MigrationManagerService {
       // Vérifier s'il y a des migrations en attente
       const hasPendingMigrations = await dataSource.showMigrations()
       
-      // Obtenir la liste des migrations disponibles
-      const allMigrations = dataSource.migrations.map(migration => migration.name || migration.constructor.name)
+      // Obtenir la liste des migrations disponibles à partir des fichiers
+      const fs = require('fs')
+      const path = require('path')
+      
+      let migrationDir = ''
+      if (databaseName === 'auth') {
+        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'auth')
+      } else if (databaseName === 'shared') {
+        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'shared')
+      } else if (databaseName.startsWith('tenant_')) {
+        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'tenant')
+      }
+
+      let allMigrations: string[] = []
+      try {
+        if (fs.existsSync(migrationDir)) {
+          const files = fs.readdirSync(migrationDir).filter(file => file.endsWith('.ts'))
+          
+          // Extraire les noms de classe des migrations depuis les fichiers
+          allMigrations = files.map(file => {
+            try {
+              const content = fs.readFileSync(path.join(migrationDir, file), 'utf8')
+              const nameMatch = content.match(/name = '([^']+)'/)
+              if (nameMatch) {
+                return nameMatch[1]
+              }
+              
+              // Fallback : extraire le nom de classe
+              const classMatch = content.match(/export class (\w+)/)
+              if (classMatch) {
+                return classMatch[1]
+              }
+              
+              // Dernier fallback : nom de fichier sans extension
+              return file.replace('.ts', '')
+            } catch (error) {
+              this.logger.warn(`Erreur lors de la lecture du fichier ${file}`)
+              return file.replace('.ts', '')
+            }
+          }).sort()
+        }
+      } catch (error) {
+        this.logger.warn(`Erreur lors de la lecture du dossier ${migrationDir}`)
+      }
       
       // Obtenir les migrations exécutées
       let executedMigrations: string[] = []
@@ -101,12 +143,32 @@ export class MigrationManagerService {
         throw new Error('DataSource not initialized')
       }
 
+      this.logger.log(`🔄 Début exécution migrations pour ${databaseName}`)
+      this.logger.debug(`DataSource config:`, {
+        database: dataSource.options.database,
+        migrations: dataSource.options.migrations,
+        name: dataSource.name
+      })
+
+      // Vérifier s'il y a des migrations en attente
+      const pendingMigrations = await dataSource.showMigrations()
+      this.logger.log(`📋 ${pendingMigrations ? 'Des migrations sont en attente' : 'Aucune migration en attente'} pour ${databaseName}`)
+
+      if (!pendingMigrations) {
+        return {
+          database: databaseName,
+          success: true,
+          migrations: [],
+        }
+      }
+
       const migrations = await dataSource.runMigrations({
         transaction: 'each',
       })
 
       this.logger.log(
-        `✅ ${migrations.length} migration(s) exécutée(s) pour ${databaseName}`
+        `✅ ${migrations.length} migration(s) exécutée(s) pour ${databaseName}:`,
+        migrations.map(m => m.name)
       )
 
       return {
@@ -116,6 +178,7 @@ export class MigrationManagerService {
       }
     } catch (error) {
       this.logger.error(`❌ Erreur migrations ${databaseName}:`, error)
+      this.logger.error(`Stack trace:`, error instanceof Error ? error.stack : 'No stack trace')
       return {
         database: databaseName,
         success: false,
@@ -186,5 +249,75 @@ export class MigrationManagerService {
         error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
+  }
+
+  /**
+   * Obtenir les détails d'une migration spécifique
+   */
+  async getMigrationDetails(database: string, migrationName: string): Promise<any> {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      
+      let migrationDir = ''
+      
+      if (database === 'auth') {
+        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'auth')
+      } else if (database === 'shared') {
+        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'shared')
+      } else if (database.startsWith('tenant_')) {
+        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'tenant')
+      }
+
+      // Chercher le fichier qui contient le nom de la migration
+      const files = fs.readdirSync(migrationDir)
+      const migrationFile = files.find(file => 
+        file.includes(migrationName) || 
+        migrationName.includes(file.replace(/\.(ts|js)$/, '').replace(/^\d{3}-/, ''))
+      )
+
+      if (!migrationFile) {
+        this.logger.warn(`Migration recherchée: ${migrationName}`)
+        this.logger.warn(`Fichiers disponibles: ${files.join(', ')}`)
+        throw new Error(`Fichier de migration non trouvé pour: ${migrationName} dans ${database}`)
+      }
+
+      const migrationPath = path.join(migrationDir, migrationFile)
+      const content = fs.readFileSync(migrationPath, 'utf8')
+      const stats = fs.statSync(migrationPath)
+
+      return {
+        database,
+        migrationName: migrationFile.replace(/\.(ts|js)$/, ''),
+        content,
+        size: content.length,
+        lastModified: stats.mtime.toISOString(),
+        path: migrationPath.replace(process.cwd(), ''),
+        description: this.getMigrationDescription(migrationFile),
+        type: this.getMigrationType(migrationFile)
+      }
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      this.logger.error(`Erreur lors de la lecture du fichier de migration: ${errorMessage}`)
+      throw new Error(`Erreur lors de la lecture du fichier de migration: ${errorMessage}`)
+    }
+  }
+
+  private getMigrationDescription(migrationName: string): string {
+    if (migrationName.includes('Create')) return 'Création de nouvelles tables'
+    if (migrationName.includes('Add')) return 'Ajout de colonnes ou fonctionnalités'
+    if (migrationName.includes('Update')) return 'Mise à jour de structures existantes'
+    if (migrationName.includes('Drop')) return 'Suppression d\'éléments'
+    return 'Migration de base de données'
+  }
+
+  private getMigrationType(migrationName: string): string {
+    if (migrationName.includes('User') || migrationName.includes('Auth')) return 'Authentification'
+    if (migrationName.includes('Production')) return 'Production'
+    if (migrationName.includes('Inventory')) return 'Inventaire'
+    if (migrationName.includes('Translation')) return 'Internationalisation'
+    if (migrationName.includes('Menu')) return 'Interface'
+    return 'Structure'
   }
 }

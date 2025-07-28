@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -114,25 +115,26 @@ const MOCK_INSTALLED_MODULES: InstalledModule[] = [
   }
 ]
 
-const STATUS_CONFIG = {
+const getStatusConfig = (t: any) => ({
   ACTIVE: { 
-    label: 'Actif', 
+    label: t('marketplace.installedModules.status.active'), 
     color: 'bg-green-500', 
     variant: 'default' as const 
   },
   INACTIVE: { 
-    label: 'Inactif', 
+    label: t('marketplace.installedModules.status.inactive'), 
     color: 'bg-gray-500', 
     variant: 'secondary' as const 
   },
   ERROR: { 
-    label: 'Erreur', 
+    label: t('marketplace.installedModules.status.error'), 
     color: 'bg-red-500', 
     variant: 'destructive' as const 
   }
-}
+})
 
 export function InstalledModules() {
+  const { t } = useTranslation('admin')
   const [modules, setModules] = useState<InstalledModule[]>(MOCK_INSTALLED_MODULES)
   const [selectedModule, setSelectedModule] = useState<InstalledModule | null>(null)
 
@@ -141,8 +143,10 @@ export function InstalledModules() {
       if (module.id === moduleId) {
         const newStatus = module.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
         toast({
-          title: `Module ${newStatus === 'ACTIVE' ? 'activé' : 'désactivé'}`,
-          description: `${module.displayName} a été ${newStatus === 'ACTIVE' ? 'activé' : 'désactivé'} avec succès.`
+          title: newStatus === 'ACTIVE' ? t('marketplace.installedModules.moduleActivated') : t('marketplace.installedModules.moduleDeactivated'),
+          description: newStatus === 'ACTIVE' ? 
+            t('marketplace.installedModules.moduleActivatedDesc').replace('{name}', module.displayName) : 
+            t('marketplace.installedModules.moduleDeactivatedDesc').replace('{name}', module.displayName)
         })
         return { ...module, status: newStatus }
       }
@@ -155,8 +159,8 @@ export function InstalledModules() {
     if (module) {
       setModules(prev => prev.filter(m => m.id !== moduleId))
       toast({
-        title: 'Module désinstallé',
-        description: `${module.displayName} a été désinstallé avec succès.`,
+        title: t('marketplace.installedModules.moduleUninstalled'),
+        description: t('marketplace.installedModules.moduleUninstalledDesc').replace('{name}', module.displayName),
         variant: 'destructive'
       })
     }
@@ -166,8 +170,8 @@ export function InstalledModules() {
     const module = modules.find(m => m.id === moduleId)
     if (module) {
       toast({
-        title: 'Mise à jour démarrée',
-        description: `Mise à jour de ${module.displayName} en cours...`
+        title: t('marketplace.installedModules.updateStarted'),
+        description: t('marketplace.installedModules.updateInProgress').replace('{name}', module.displayName)
       })
     }
   }
@@ -195,7 +199,7 @@ export function InstalledModules() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Modules Actifs</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('marketplace.installedModules.activeModules')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -206,7 +210,7 @@ export function InstalledModules() {
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Utilisateurs Quotidiens</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('marketplace.installedModules.dailyActiveUsers')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -217,7 +221,7 @@ export function InstalledModules() {
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Usage Mensuel</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('marketplace.installedModules.monthlyUsage')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -236,12 +240,12 @@ export function InstalledModules() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
                     <CardTitle className="text-lg">{module.displayName}</CardTitle>
-                    <Badge variant={STATUS_CONFIG[module.status].variant}>
-                      {STATUS_CONFIG[module.status].label}
+                    <Badge variant={getStatusConfig(t)[module.status].variant}>
+                      {getStatusConfig(t)[module.status].label}
                     </Badge>
                   </div>
                   <CardDescription>
-                    {module.description} • v{module.version} par {module.publisher}
+                    {module.description} • v{module.version} {t('marketplace.installedModules.by')} {module.publisher}
                   </CardDescription>
                 </div>
                 
@@ -254,22 +258,22 @@ export function InstalledModules() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => setSelectedModule(module)}>
                       <Settings className="mr-2 h-4 w-4" />
-                      Configurer
+                      {t('marketplace.installedModules.actions.configure')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleToggleStatus(module.id)}>
                       <Power className="mr-2 h-4 w-4" />
-                      {module.status === 'ACTIVE' ? 'Désactiver' : 'Activer'}
+                      {module.status === 'ACTIVE' ? t('marketplace.installedModules.actions.deactivate') : t('marketplace.installedModules.actions.activate')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleUpdate(module.id)}>
                       <RefreshCw className="mr-2 h-4 w-4" />
-                      Mettre à jour
+                      {t('marketplace.installedModules.actions.update')}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => handleUninstall(module.id)}
                       className="text-red-600"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Désinstaller
+                      {t('marketplace.installedModules.actions.uninstall')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -279,44 +283,44 @@ export function InstalledModules() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Installé le</p>
+                  <p className="text-sm font-medium">{t('marketplace.installedModules.installedOn')}</p>
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     {formatDate(module.installedAt)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Il y a {getDaysSince(module.installedAt)} jours
+                    {t('marketplace.installedModules.daysAgo').replace('{days}', getDaysSince(module.installedAt).toString())}
                   </p>
                 </div>
                 
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Dernière utilisation</p>
+                  <p className="text-sm font-medium">{t('marketplace.installedModules.lastUsed')}</p>
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Activity className="h-3 w-3" />
                     {formatDate(module.lastUsedAt)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Il y a {getDaysSince(module.lastUsedAt)} jours
+                    {t('marketplace.installedModules.daysAgo').replace('{days}', getDaysSince(module.lastUsedAt).toString())}
                   </p>
                 </div>
                 
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Utilisateurs actifs</p>
+                  <p className="text-sm font-medium">{t('marketplace.installedModules.activeUsers')}</p>
                   <p className="text-lg font-semibold">{module.usageStats.dailyActiveUsers}</p>
-                  <p className="text-xs text-muted-foreground">Par jour</p>
+                  <p className="text-xs text-muted-foreground">{t('marketplace.installedModules.perDay')}</p>
                 </div>
                 
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Usage mensuel</p>
+                  <p className="text-sm font-medium">{t('marketplace.installedModules.usage')}</p>
                   <p className="text-lg font-semibold">{module.usageStats.monthlyUsage}</p>
-                  <p className="text-xs text-muted-foreground">Actions ce mois</p>
+                  <p className="text-xs text-muted-foreground">{t('marketplace.installedModules.actionsThisMonth')}</p>
                 </div>
               </div>
               
               {module.status === 'ERROR' && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-sm text-red-800">
-                    ⚠️ Ce module rencontre des problèmes. Contactez le support ou essayez de le redémarrer.
+                    ⚠️ {t('marketplace.installedModules.moduleHasIssues')}
                   </p>
                 </div>
               )}
@@ -327,9 +331,9 @@ export function InstalledModules() {
 
       {modules.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Aucun module installé.</p>
+          <p className="text-muted-foreground">{t('marketplace.installedModules.noModulesInstalled')}.</p>
           <Button className="mt-4" onClick={() => window.location.href = '#catalog'}>
-            Parcourir le catalogue
+            {t('marketplace.installedModules.browse')}
           </Button>
         </div>
       )}
@@ -338,21 +342,21 @@ export function InstalledModules() {
       <Dialog open={!!selectedModule} onOpenChange={(open) => !open && setSelectedModule(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Configuration - {selectedModule?.displayName}</DialogTitle>
+            <DialogTitle>{t('marketplace.installedModules.configuration')} - {selectedModule?.displayName}</DialogTitle>
             <DialogDescription>
-              Paramètres et statistiques d'usage du module
+              {t('marketplace.installedModules.configurationDesc')}
             </DialogDescription>
           </DialogHeader>
           
           {selectedModule && (
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium mb-2">Fonctionnalités les plus utilisées</h4>
+                <h4 className="font-medium mb-2">{t('marketplace.installedModules.mostUsedFeatures')}</h4>
                 <div className="space-y-2">
                   {selectedModule.usageStats.features.map((feature, index) => (
                     <div key={index} className="flex items-center justify-between text-sm">
                       <span>{feature.name}</span>
-                      <span className="font-medium">{feature.usage} utilisations</span>
+                      <span className="font-medium">{feature.usage} {t('marketplace.installedModules.usages')}</span>
                     </div>
                   ))}
                 </div>
@@ -360,11 +364,11 @@ export function InstalledModules() {
               
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setSelectedModule(null)}>
-                  Fermer
+                  {t('marketplace.installedModules.close')}
                 </Button>
                 <Button>
                   <ExternalLink className="mr-2 h-4 w-4" />
-                  Ouvrir le module
+                  {t('marketplace.installedModules.openModule')}
                 </Button>
               </div>
             </div>

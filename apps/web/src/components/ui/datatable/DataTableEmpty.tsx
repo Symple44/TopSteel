@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { cn } from '@/lib/utils'
 import { Button } from '@erp/ui'
 import { Package, Plus, Search, X } from 'lucide-react'
@@ -26,15 +27,16 @@ export function DataTableEmpty({
   onClearSearch,
   className 
 }: DataTableEmptyProps) {
+  const { t } = useTranslation('datatable')
   const isSearchResult = Boolean(searchTerm)
   
   const defaultTitle = isSearchResult 
-    ? `Aucun résultat pour "${searchTerm}"`
-    : 'Aucune donnée à afficher'
+    ? t('empty.noSearchResults', { searchTerm })
+    : t('empty.noData')
     
   const defaultDescription = isSearchResult
-    ? 'Essayez de modifier votre recherche ou supprimez les filtres.'
-    : 'Il n\'y a actuellement aucune donnée dans ce tableau.'
+    ? t('empty.noSearchResultsDescription')
+    : t('empty.noDataDescription')
 
   return (
     <div className={cn(
@@ -66,7 +68,7 @@ export function DataTableEmpty({
             size="sm"
           >
             <X className="h-4 w-4 mr-2" />
-            Effacer la recherche
+            {t('empty.clearSearch')}
           </Button>
         )}
         

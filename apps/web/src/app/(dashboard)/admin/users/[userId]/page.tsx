@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { AdminGuard } from '@/components/auth/admin-guard'
 import { apiClient } from '@/lib/api-client'
 import { toast } from '@/hooks/use-toast'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { 
   Card, 
   CardContent, 
@@ -58,6 +59,7 @@ interface UserDetails {
 }
 
 export default function UserDetailsPage() {
+  const { t } = useTranslation('admin')
   const params = useParams()
   const router = useRouter()
   const userId = params.userId as string
@@ -79,8 +81,8 @@ export default function UserDetailsPage() {
     } catch (error) {
       console.error('Erreur lors du chargement des détails utilisateur:', error)
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les détails de l\'utilisateur',
+        title: t('common.error'),
+        description: t('users.loadingError'),
         variant: 'destructive'
       })
     } finally {
@@ -111,9 +113,9 @@ export default function UserDetailsPage() {
     return (
       <AdminGuard requiredRoles={['SUPER_ADMIN', 'ADMIN']} requiredPermissions={['USER_VIEW']}>
         <div className="text-center py-12">
-          <p className="text-gray-500">Utilisateur non trouvé</p>
+          <p className="text-gray-500">{t('users.userNotFound')}</p>
           <Button onClick={handleBack} className="mt-4">
-            Retour à la liste
+            {t('common.back')}
           </Button>
         </div>
       </AdminGuard>
@@ -148,7 +150,7 @@ export default function UserDetailsPage() {
                   <h1 className="text-2xl font-bold text-gray-900">
                     {user.firstName || user.lastName 
                       ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                      : 'Utilisateur'
+                      : t('users.user')
                     }
                   </h1>
                   <p className="text-sm text-gray-600 flex items-center">
@@ -161,7 +163,7 @@ export default function UserDetailsPage() {
                   variant={user.isActive ? 'default' : 'secondary'}
                   className={user.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
                 >
-                  {user.isActive ? 'Actif' : 'Inactif'}
+                  {user.isActive ? t('users.active') : t('users.inactive')}
                 </Badge>
               </div>
               
@@ -173,7 +175,7 @@ export default function UserDetailsPage() {
                   className="flex items-center"
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Actualiser
+                  {t('users.refresh')}
                 </Button>
               </div>
             </div>
@@ -185,15 +187,15 @@ export default function UserDetailsPage() {
           <TabsList className="bg-gray-100">
             <TabsTrigger value="general" className="flex items-center">
               <Users className="h-4 w-4 mr-2" />
-              Informations générales
+              {t('users.generalInfo')}
             </TabsTrigger>
             <TabsTrigger value="companies" className="flex items-center">
               <Building className="h-4 w-4 mr-2" />
-              Sociétés et droits
+              {t('users.companiesAndRights')}
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center">
               <Calendar className="h-4 w-4 mr-2" />
-              Historique des modifications
+              {t('users.modificationHistory')}
             </TabsTrigger>
           </TabsList>
 
@@ -202,21 +204,21 @@ export default function UserDetailsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Informations personnelles</CardTitle>
+                  <CardTitle className="text-lg">{t('users.personalInfo')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Nom complet</p>
+                    <p className="text-sm font-medium text-gray-500">{t('users.fullName')}</p>
                     <p className="text-gray-900">
                       {user.firstName || user.lastName 
                         ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                        : 'Non renseigné'
+                        : t('users.notProvided')
                       }
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Email</p>
+                    <p className="text-sm font-medium text-gray-500">{t('users.email')}</p>
                     <p className="text-gray-900 flex items-center">
                       <Mail className="h-4 w-4 mr-2 text-gray-400" />
                       {user.email}
@@ -224,23 +226,23 @@ export default function UserDetailsPage() {
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Téléphone</p>
+                    <p className="text-sm font-medium text-gray-500">{t('users.phone')}</p>
                     <p className="text-gray-900 flex items-center">
                       <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                      {user.phone || 'Non renseigné'}
+                      {user.phone || t('users.notProvided')}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Département</p>
+                    <p className="text-sm font-medium text-gray-500">{t('users.department')}</p>
                     <p className="text-gray-900 flex items-center">
                       <Building className="h-4 w-4 mr-2 text-gray-400" />
-                      {user.department || 'Non renseigné'}
+                      {user.department || t('users.notProvided')}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Dernière connexion</p>
+                    <p className="text-sm font-medium text-gray-500">{t('users.lastConnection')}</p>
                     <p className="text-gray-900 flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-gray-400" />
                       {user.lastLogin 
@@ -251,7 +253,7 @@ export default function UserDetailsPage() {
                             hour: '2-digit',
                             minute: '2-digit'
                           })
-                        : 'Jamais'
+                        : t('users.never')
                       }
                     </p>
                   </div>
@@ -263,7 +265,7 @@ export default function UserDetailsPage() {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center">
                       <Shield className="h-5 w-5 mr-2 text-blue-600" />
-                      Rôles globaux
+                      {t('users.globalRoles')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -279,7 +281,7 @@ export default function UserDetailsPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-center text-gray-500 py-4">Aucun rôle global assigné</p>
+                      <p className="text-center text-gray-500 py-4">{t('users.noGlobalRoles')}</p>
                     )}
                   </CardContent>
                 </Card>
@@ -288,7 +290,7 @@ export default function UserDetailsPage() {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center">
                       <Users className="h-5 w-5 mr-2 text-purple-600" />
-                      Groupes
+                      {t('users.groups')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -304,7 +306,7 @@ export default function UserDetailsPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-center text-gray-500 py-4">Aucun groupe assigné</p>
+                      <p className="text-center text-gray-500 py-4">{t('users.noGroupsAssigned')}</p>
                     )}
                   </CardContent>
                 </Card>
@@ -316,9 +318,9 @@ export default function UserDetailsPage() {
           <TabsContent value="companies" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Gestion des droits par société</CardTitle>
+                <CardTitle>{t('users.rightsManagement')}</CardTitle>
                 <p className="text-sm text-gray-600 mt-1">
-                  Gérez les accès et permissions de l'utilisateur pour chaque société
+                  {t('users.rightsManagementDescription')}
                 </p>
               </CardHeader>
               <CardContent>

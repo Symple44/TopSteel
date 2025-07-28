@@ -36,58 +36,9 @@ const nextConfig = {
   // Transpile workspace packages for Next.js 15
   transpilePackages: ['@erp/ui', '@erp/utils', '@erp/types', '@erp/domains', '@erp/api-client'],
   
-  // API rewrites for development
+  // API rewrites temporarily disabled to debug errors
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
-    return [
-      // Routes spécifiques qui vont vers le backend
-      // Query Builder utilise les routes Next.js (pas de rewrite)
-      // Exclure les routes tenant qui ont des proxies Next.js
-      {
-        source: '/api/admin/database/((?!health/tenant|migrations/tenant).*)',
-        destination: `${apiUrl}/api/v1/admin/database/$1`,
-      },
-      {
-        source: '/api/admin/((?!database/health/tenant|database/migrations/tenant).*)',
-        destination: `${apiUrl}/api/v1/admin/$1`,
-      },
-      {
-        source: '/api/auth/:path*',
-        destination: `${apiUrl}/api/v1/auth/:path*`,
-      },
-      {
-        source: '/api/user/:path*',
-        destination: `${apiUrl}/api/v1/user/:path*`,
-      },
-      {
-        source: '/api/users/:path*',
-        destination: `${apiUrl}/api/v1/users/:path*`,
-      },
-      {
-        source: '/api/health/:path*',
-        destination: `${apiUrl}/api/v1/health/:path*`,
-      },
-      {
-        source: '/api/notifications/:path*',
-        destination: `${apiUrl}/api/v1/notifications/:path*`,
-      },
-      {
-        source: '/api/translations/:path*',
-        destination: `${apiUrl}/api/v1/translations/:path*`,
-      },
-      {
-        source: '/api/config/:path*',
-        destination: `${apiUrl}/api/v1/config/:path*`,
-      },
-      {
-        source: '/api/search/:path*',
-        destination: `${apiUrl}/api/v1/search/:path*`,
-      },
-      {
-        source: '/api/images/:path*',
-        destination: `${apiUrl}/api/v1/images/:path*`,
-      },
-    ]
+    return []
   },
   
   // Disable static generation to avoid context issues during build
@@ -102,19 +53,28 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
+  // Add dev origins
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
+  
+  // OpenTelemetry contrôlé - réactivation progressive
+  env: {
+    // Réactiver progressivement OpenTelemetry
+    OTEL_ENABLED: process.env.ENABLE_TELEMETRY === 'true' ? 'true' : 'false',
+    // Garder les désactivations Next.js pour éviter les conflits
+    NEXT_OTEL_DISABLED: process.env.ENABLE_TELEMETRY === 'true' ? '0' : '1',
+    NEXT_TRACING_DISABLED: process.env.ENABLE_TELEMETRY === 'true' ? '0' : '1',
+    // SDK externe contrôlé
+    OTEL_SDK_DISABLED: process.env.ENABLE_TELEMETRY === 'true' ? 'false' : 'true',
+  },
+  
+  // Disable experimental features that might cause issues
   experimental: {
     // Next.js 15 with React 19 support
     reactCompiler: false, // Disable React Compiler for now
   },
   
-  // Disable telemetry and tracing that causes api.createContextKey error
-  env: {
-    NEXT_OTEL_DISABLED: '1',
-    OTEL_SDK_DISABLED: 'true',
-  },
-  
   // External packages for server-side only
-  serverExternalPackages: ['sharp', '@img/sharp-wasm32'],
+  serverExternalPackages: ['sharp', '@img/sharp-wasm32', '@opentelemetry/api'],
   
   // Disable image optimization during build
   images: {
@@ -122,12 +82,48 @@ const nextConfig = {
   },
 
   webpack: (config, { isServer }) => {
+    // OpenTelemetry conditionnel basé sur ENABLE_TELEMETRY
+    const enableTelemetry = process.env.ENABLE_TELEMETRY === 'true'
+    const otelPolyfill = path.resolve(import.meta.dirname, './src/utils/otel-polyfill-universal.js')
+    
+    if (!enableTelemetry) {
+      // Désactiver OpenTelemetry avec polyfill universel
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@opentelemetry/api': otelPolyfill,
+        '@opentelemetry/sdk-node': false,
+        '@opentelemetry/resources': false,
+        '@opentelemetry/auto-instrumentations-node': false,
+        '@opentelemetry/core': false,
+        '@opentelemetry/instrumentation': false,
+      }
+    } else {
+      // OpenTelemetry activé - configuration minimale
+      console.log('🔧 OpenTelemetry ACTIVÉ en mode contrôlé')
+    }
+    
+    // For edge runtime and middleware - également conditionnel
+    if (!enableTelemetry && (config.name === 'edge-runtime' || config.name === 'middleware')) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@opentelemetry/api': otelPolyfill,
+      }
+    }
+
     // Mock Sharp pour le côté client
     if (!isServer) {
-      config.resolve.alias = {
+      const clientAliases = {
         ...config.resolve.alias,
         'sharp$': path.resolve(import.meta.dirname, './src/mocks/sharp.js'),
       }
+      
+      // Désactiver OpenTelemetry côté client seulement si télémétrie désactivée
+      if (!enableTelemetry) {
+        clientAliases['@opentelemetry/api'] = otelPolyfill
+        clientAliases['@opentelemetry/sdk-node'] = false
+      }
+      
+      config.resolve.alias = clientAliases
     }
     
     // Force resolve workspace packages

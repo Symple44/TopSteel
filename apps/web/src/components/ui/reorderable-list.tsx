@@ -80,7 +80,6 @@ function useDragAndDrop<T extends ReorderableItem>(
   const dragImageRef = useRef<HTMLDivElement>(null)
 
   const handleDragStart = useCallback((e: React.DragEvent, item: T) => {
-    console.log('Native drag started:', item.id)
     setDraggedItem(item)
     
     // Créer une image de drag personnalisée
@@ -98,7 +97,6 @@ function useDragAndDrop<T extends ReorderableItem>(
     e.dataTransfer.dropEffect = 'move'
     
     if (draggedItem && draggedItem.id !== targetId) {
-      console.log('DragOver detected:', draggedItem.id, '->', targetId)
       setDragOverItem(targetId)
       
       // Calculer la position de drop basée sur la position de la souris
@@ -106,18 +104,14 @@ function useDragAndDrop<T extends ReorderableItem>(
       const y = e.clientY - rect.top
       const height = rect.height
       
-      console.log('Mouse position in element:', { y, height, ratio: y/height })
       
       // Zones plus intuitives : inside plus large pour faciliter l'insertion
       if (y < height * 0.2) {
         setDropPosition('above')
-        console.log('Position: above')
       } else if (y > height * 0.8) {
         setDropPosition('below')
-        console.log('Position: below')
       } else {
         setDropPosition('inside')
-        console.log('Position: inside (zone élargie)')
       }
     }
   }, [draggedItem])
@@ -138,12 +132,6 @@ function useDragAndDrop<T extends ReorderableItem>(
       return
     }
 
-    console.log('🎯 DROP EVENT:', {
-      draggedId: draggedItem.id, 
-      targetId, 
-      position: dropPosition,
-      timestamp: Date.now()
-    })
 
     // STEP 1: Trouver le parent de chaque élément
     const findItemParent = (items: T[], childId: string, parentId: string | null = null): string | null => {
@@ -162,54 +150,38 @@ function useDragAndDrop<T extends ReorderableItem>(
     const draggedParentId = findItemParent(items, draggedItem.id)
     const targetParentId = findItemParent(items, targetId)
 
-    console.log('🔍 PARENT DETECTION:', {
-      draggedId: draggedItem.id,
-      draggedParent: draggedParentId || 'ROOT',
-      targetId: targetId,
-      targetParent: targetParentId || 'ROOT',
-      sameParent: draggedParentId === targetParentId,
-      position: dropPosition,
-      isTargetTheParent: draggedParentId === targetId
-    })
 
     // STEP 2: Logique différenciée selon la position
     if (dropPosition === 'inside') {
       // Pour 'inside': on ne bouge que si on change de parent
       if (draggedParentId === targetId) {
-        console.log('⚠️  DROPPING INSIDE CURRENT PARENT - No action needed')
         setDraggedItem(null)
         setDragOverItem(null)
         setDropPosition('inside')
         return
       } else {
-        console.log('📁 MOVING TO NEW PARENT - Inter-parent move')
         // Continue avec la logique inter-parent
       }
     } else if (draggedParentId === targetParentId) {
-      console.log('✅ SAME PARENT - Simple reorder')
       
       // Fonction pour réorganiser dans le même tableau
       const reorderInSameParent = (items: T[]): T[] => {
         if (draggedParentId === null) {
           // Niveau racine
-          console.log('📍 Reordering at ROOT level')
           const newItems = [...items]
           const draggedIdx = newItems.findIndex(i => i.id === draggedItem.id)
           const targetIdx = newItems.findIndex(i => i.id === targetId)
           
           if (draggedIdx !== -1 && targetIdx !== -1) {
-            console.log('🔄 Moving from index', draggedIdx, 'to', targetIdx)
             const [moved] = newItems.splice(draggedIdx, 1)
             let insertIdx = targetIdx
             if (draggedIdx < targetIdx) insertIdx--
             if (dropPosition === 'below') insertIdx++
             newItems.splice(insertIdx, 0, moved)
-            console.log('✨ New order:', newItems.map(i => i.id))
           }
           return newItems
         } else {
           // Dans un parent spécifique
-          console.log('📍 Reordering in parent:', draggedParentId)
           const updateItems = (currentItems: T[]): T[] => {
             return currentItems.map(item => {
               if (item.id === draggedParentId && item.children) {
@@ -218,13 +190,11 @@ function useDragAndDrop<T extends ReorderableItem>(
                 const targetIdx = children.findIndex(i => i.id === targetId)
                 
                 if (draggedIdx !== -1 && targetIdx !== -1) {
-                  console.log('🔄 Moving child from index', draggedIdx, 'to', targetIdx)
                   const [moved] = children.splice(draggedIdx, 1)
                   let insertIdx = targetIdx
                   if (draggedIdx < targetIdx) insertIdx--
                   if (dropPosition === 'below') insertIdx++
                   children.splice(insertIdx, 0, moved)
-                  console.log('✨ New children order:', children.map(i => i.id))
                   return { ...item, children }
                 }
               }
@@ -239,14 +209,12 @@ function useDragAndDrop<T extends ReorderableItem>(
       }
 
       const newItems = reorderInSameParent(items)
-      console.log('🎉 INTRA-PARENT move completed')
       onItemsChange?.(newItems)
     }
     
     // STEP 3: Logique inter-parent (soit position 'inside' vers nouveau parent, soit parents différents)
     if ((dropPosition === 'inside' && draggedParentId !== targetId) || 
         (dropPosition !== 'inside' && draggedParentId !== targetParentId)) {
-      console.log('🔄 INTER-PARENT - Complex move')
       
       // STEP 3: Logique inter-parent - retirer de l'ancien parent et insérer dans le nouveau
       const removeItemFromTree = (items: T[], itemId: string): { newItems: T[], removedItem: T | null } => {
@@ -255,7 +223,6 @@ function useDragAndDrop<T extends ReorderableItem>(
             if (currentItems[i].id === itemId) {
               const removed = currentItems[i]
               const newItems = [...currentItems.slice(0, i), ...currentItems.slice(i + 1)]
-              console.log('🗑️ Removed item from level, remaining:', newItems.map(item => item.id))
               return { newItems, removedItem: removed }
             }
             if (currentItems[i].children && currentItems[i].children!.length > 0) {
@@ -263,7 +230,6 @@ function useDragAndDrop<T extends ReorderableItem>(
               if (result.removedItem) {
                 const newItems = [...currentItems]
                 newItems[i] = { ...newItems[i], children: result.newItems }
-                console.log('🗑️ Removed item from parent:', currentItems[i].id)
                 return { newItems, removedItem: result.removedItem }
               }
             }
@@ -274,43 +240,34 @@ function useDragAndDrop<T extends ReorderableItem>(
       }
 
       const insertItemInTree = (items: T[], item: T, targetId: string, position: 'above' | 'below' | 'inside'): T[] => {
-        console.log('🔍 insertItemInTree called with:', { targetId, position, itemId: item.id })
         
         const processLevel = (currentItems: T[]): { items: T[], found: boolean } => {
           for (let i = 0; i < currentItems.length; i++) {
             if (currentItems[i].id === targetId) {
-              console.log('🎯 Found target item at index:', i, 'in level with', currentItems.length, 'items')
               const newItems = [...currentItems]
               
               if (position === 'above') {
-                console.log('📍 Inserting above target at index:', i)
                 newItems.splice(i, 0, item)
               } else if (position === 'below') {
-                console.log('📍 Inserting below target at index:', i + 1)
                 newItems.splice(i + 1, 0, item)
               } else { // inside
-                console.log('📁 Inserting inside target as child. Current children:', newItems[i].children?.length || 0)
                 
                 // Nettoyer l'item avant de l'insérer (retirer d'éventuels parents)
                 const cleanItem = { ...item }
                 delete cleanItem.parentId
                 
                 if (!newItems[i].children) {
-                  console.log('📁 Creating new children array for:', newItems[i].id)
                   newItems[i] = { ...newItems[i], children: [cleanItem] }
                 } else {
-                  console.log('📁 Adding to existing children array')
                   const updatedChildren = [...(newItems[i].children as T[]), cleanItem]
                   newItems[i] = { 
                     ...newItems[i], 
                     children: updatedChildren
                   }
                 }
-                console.log('✅ Child added successfully. New children count:', newItems[i].children?.length)
                 
                 // Auto-expand le parent pour montrer le résultat
                 if (onExpandItem) {
-                  console.log('🔓 Auto-expanding parent:', newItems[i].id)
                   onExpandItem(newItems[i].id)
                 }
               }
@@ -332,23 +289,18 @@ function useDragAndDrop<T extends ReorderableItem>(
         
         const result = processLevel(items)
         if (!result.found) {
-          console.log('❌ Target not found in tree structure!')
         }
         return result.items
       }
 
       // Retirer l'élément de sa position actuelle
-      console.log('🔍 Removing item from tree...')
       const { newItems: itemsWithoutDragged, removedItem } = removeItemFromTree(items, draggedItem.id)
       
       if (removedItem) {
-        console.log('✅ Item removed successfully, now inserting...')
         // Insérer l'élément à sa nouvelle position
         const finalItems = insertItemInTree(itemsWithoutDragged, removedItem, targetId, dropPosition)
-        console.log('🎉 INTER-PARENT move completed')
         onItemsChange?.(finalItems)
       } else {
-        console.log('❌ ERROR: Could not remove item from tree')
       }
     }
 
@@ -359,7 +311,6 @@ function useDragAndDrop<T extends ReorderableItem>(
   }, [draggedItem, dropPosition, items, onItemsChange, onExpandItem])
 
   const handleDragEnd = useCallback(() => {
-    console.log('Drag ended')
     setDraggedItem(null)
     setDragOverItem(null)
     setDropPosition('inside')

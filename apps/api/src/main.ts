@@ -9,6 +9,7 @@ import compression from 'compression'
 import { config } from 'dotenv'
 import express from 'express'
 import helmet from 'helmet'
+import { catchError } from 'rxjs/operators'
 import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
@@ -172,20 +173,12 @@ async function bootstrap() {
     })
   )
 
-  // Interceptors globaux
+  // Interceptors globaux  
   app.useGlobalInterceptors(new LoggingInterceptor())
   app.useGlobalInterceptors(new TransformInterceptor())
   app.useGlobalInterceptors(app.get(MetricsSafeInterceptor))
   
-  // Intercepteur pour logs de debug sans casser le flow
-  app.useGlobalInterceptors({
-    intercept: (context: any, next: any) => {
-      return next.handle().catch((error: any) => {
-        console.log('🔍 [DEBUG] Intercepted error:', error.constructor.name, error.message)
-        throw error
-      })
-    }
-  } as any)
+  
 
   // Filtres globaux
   app.useGlobalFilters(new HttpExceptionFilter())

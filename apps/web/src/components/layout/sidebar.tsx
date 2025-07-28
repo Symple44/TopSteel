@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { Badge, Separator, Button } from '@erp/ui'
 import { TooltipFixed } from '@/components/ui/tooltip-fixed'
 import { useTranslation } from '@/lib/i18n'
+import { getTranslatedTitle } from '@/utils/menu-translations'
 import { useDynamicMenu } from '@/hooks/use-dynamic-menu'
 import { useMenuMode } from '@/hooks/use-menu-mode'
 import { useBackendStatus } from '@/hooks/use-backend-health'
@@ -166,21 +167,21 @@ const getNavigation = (t: any): NavItem[] => [
     roles: ['ADMIN'],
     children: [
       {
-        title: 'Sessions Utilisateurs',
+        titleKey: 'sessionsManagement',
         href: '/admin/sessions',
         icon: Monitor,
         gradient: 'from-cyan-500 to-teal-600',
         roles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
-        title: 'Gestion des Traductions',
+        titleKey: 'translationsManagement',
         href: '/admin/translations',
         icon: Languages,
         gradient: 'from-emerald-500 to-green-600',
         roles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
-        title: 'Test DataTable',
+        titleKey: 'dataTableTest',
         href: '/admin/datatable-test',
         icon: Table,
         gradient: 'from-violet-500 to-purple-600',
@@ -226,7 +227,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     const converted = items.map(item => {
       // Appliquer les préférences utilisateur si disponibles
       const displayTitle = item.userPreferences?.customTitle || 
-                          (item.titleKey ? t(item.titleKey) : item.title)
+                          (item.titleKey ? t(item.titleKey) : getTranslatedTitle(item))
       const displayIcon = item.userPreferences?.customIcon || item.icon
       const displayBadge = item.userPreferences?.customBadge || item.badge
       
@@ -398,7 +399,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
           {!isCollapsed && (
             <>
-              <span className="flex-1 truncate">{item.title}</span>
+              <span className="flex-1 truncate">{getTranslatedTitle(item)}</span>
 
               {/* Badge moderne - plus compact */}
               {item.badge && (
@@ -498,16 +499,16 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               content={
                 <div>
                   <p className="font-medium">
-                    {isCustom ? 'Menu Personnalisé' : 'Menu Standard'}
+                    {isCustom ? t('customMenu') : t('standardMenu')}
                   </p>
                   <p className="text-xs opacity-90 mt-1">
                     {isCustom 
-                      ? 'Vos préférences sont appliquées' 
-                      : 'Menu standard administrateur'
+                      ? t('customPreferencesApplied')
+                      : t('standardAdminMenu')
                     }
                   </p>
                   <p className="text-xs opacity-75 mt-1">
-                    Cliquez pour basculer
+                    {t('clickToSwitch')}
                   </p>
                 </div>
               }
@@ -541,7 +542,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
                     )}
                   </div>
                   <span className="text-xs font-medium text-foreground flex-1 text-left">
-                    {isCustom ? 'Menu Personnalisé' : 'Menu Standard'}
+                    {isCustom ? t('customMenu') : t('standardMenu')}
                   </span>
                 </div>
               </div>
@@ -554,9 +555,9 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
                 sideOffset={15}
                 content={
                   <div>
-                    <p className="font-medium">Personnaliser le menu</p>
+                    <p className="font-medium">{t('customizeMenu')}</p>
                     <p className="text-xs opacity-90 mt-1">
-                      Ouvrir le dashboard de personnalisation
+                      {t('openCustomizationDashboard')}
                     </p>
                   </div>
                 }
@@ -600,9 +601,9 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
           <div className="p-4 text-center">
             <div className="text-muted-foreground text-sm">
               <Palette className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="font-medium mb-1">Menu personnalisé vierge</p>
+              <p className="font-medium mb-1">{t('emptyCustomMenu')}</p>
               <p className="text-xs opacity-75 mb-3">
-                Personnalisez votre menu en ajoutant les éléments souhaités
+                {t('customizeMenuDescription')}
               </p>
               <Button
                 variant="outline"
@@ -611,7 +612,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
                 className="text-xs"
               >
                 <Settings2 className="h-3 w-3 mr-1" />
-                Personnaliser
+                {t('customize')}
               </Button>
             </div>
           </div>

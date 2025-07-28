@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { Button } from '@erp/ui'
 import { Badge } from '@erp/ui'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
@@ -72,6 +73,8 @@ interface ConnectionsData {
 }
 
 export default function DatabaseManagementPage() {
+  const { t } = useTranslation('admin')
+  const { t: tDb } = useTranslation('admin')
   const [systemHealth, setSystemHealth] = useState<SystemDatabaseHealth | null>(null)
   const [migrationStatuses, setMigrationStatuses] = useState<MigrationStatus[]>([])
   const [connections, setConnections] = useState<ConnectionsData | null>(null)
@@ -85,9 +88,9 @@ export default function DatabaseManagementPage() {
 
   useEffect(() => {
     loadData()
-    // Actualisation automatique toutes les 30 secondes
-    const interval = setInterval(loadData, 30000)
-    return () => clearInterval(interval)
+    // Actualisation automatique désactivée
+    // const interval = setInterval(loadData, 30000)
+    // return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
@@ -121,7 +124,7 @@ export default function DatabaseManagementPage() {
       }
     } catch (err) {
       console.error('Erreur lors du chargement:', err)
-      error('Erreur de chargement', 'Impossible de charger les données de la base de données')
+      error(tDb('database.loadError'), tDb('database.loadErrorMessage'))
     } finally {
       setLoading(false)
     }
@@ -168,14 +171,14 @@ export default function DatabaseManagementPage() {
       const result = await response.json()
       
       if (response.ok) {
-        success('Migrations exécutées', 'Toutes les migrations ont été exécutées avec succès')
+        success(tDb('database.migrationsExecuted'), tDb('database.migrationsSuccess'))
         loadData()
       } else {
-        error('Erreur de migration', result.message || 'Impossible d\'exécuter les migrations')
+        error(tDb('database.migrationError'), result.message || 'Impossible d\'exécuter les migrations')
       }
     } catch (err) {
       console.error('Erreur lors des migrations:', err)
-      error('Erreur de migration', 'Impossible d\'exécuter les migrations')
+      error(tDb('database.migrationError'), 'Impossible d\'exécuter les migrations')
     } finally {
       setLoading(false)
     }
@@ -191,7 +194,7 @@ export default function DatabaseManagementPage() {
       const result = await response.json()
       
       if (response.ok) {
-        success('Migrations tenant exécutées', `Migrations exécutées pour le tenant ${tenantCode}`)
+        success(tDb('database.migrationTenantExecuted'), `Migrations exécutées pour le tenant ${tenantCode}`)
         loadTenantData(tenantCode)
         loadData()
       } else {
@@ -212,14 +215,14 @@ export default function DatabaseManagementPage() {
       })
 
       if (response.ok) {
-        success('Connexion fermée', `Connexion fermée pour le tenant ${tenantCode}`)
+        success(tDb('database.connectionClosed'), `Connexion fermée pour le tenant ${tenantCode}`)
         loadData()
       } else {
-        error('Erreur', 'Impossible de fermer la connexion')
+        error(tDb('database.error'), 'Impossible de fermer la connexion')
       }
     } catch (err) {
       console.error('Erreur lors de la fermeture:', err)
-      error('Erreur', 'Impossible de fermer la connexion')
+      error(tDb('database.error'), 'Impossible de fermer la connexion')
     }
   }
 
@@ -247,7 +250,7 @@ export default function DatabaseManagementPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p>Chargement des données...</p>
+            <p>{tDb('database.loading')}</p>
           </div>
         </div>
       </div>
@@ -260,26 +263,26 @@ export default function DatabaseManagementPage() {
         <div className="flex items-center space-x-3">
           <Database className="w-8 h-8 text-blue-600" />
           <div>
-            <h1 className="text-3xl font-bold">Administration Multi-Tenant</h1>
+            <h1 className="text-3xl font-bold">{tDb('database.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Gestion centralisée des bases de données AUTH, SHARED et TENANT
+              {tDb('database.subtitle')}
             </p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
           <Button onClick={loadData} disabled={loading} size="sm">
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Actualiser
+            {tDb('database.refresh')}
           </Button>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full max-w-2xl bg-muted p-1 rounded-lg">
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="migrations">Migrations</TabsTrigger>
-          <TabsTrigger value="connections">Connexions</TabsTrigger>
-          <TabsTrigger value="tenants">Tenants</TabsTrigger>
+          <TabsTrigger value="overview">{tDb('database.overview')}</TabsTrigger>
+          <TabsTrigger value="migrations">{tDb('database.migrations')}</TabsTrigger>
+          <TabsTrigger value="connections">{tDb('database.connections')}</TabsTrigger>
+          <TabsTrigger value="tenants">{tDb('database.tenants')}</TabsTrigger>
         </TabsList>
 
         {/* Vue d'ensemble */}
@@ -293,10 +296,10 @@ export default function DatabaseManagementPage() {
                     <div>
                       <CardTitle className="flex items-center space-x-2">
                         <Activity className="w-5 h-5" />
-                        <span>État du Système Multi-Tenant</span>
+                        <span>{tDb('database.systemStatus')}</span>
                       </CardTitle>
                       <CardDescription>
-                        Dernière vérification : {new Date(systemHealth.timestamp).toLocaleString()}
+                        {tDb('database.lastCheck')} {new Date(systemHealth.timestamp).toLocaleString()}
                       </CardDescription>
                     </div>
                     <Badge variant={getStatusBadgeVariant(systemHealth.overallStatus) as any} className="text-lg px-4 py-2">
@@ -316,7 +319,7 @@ export default function DatabaseManagementPage() {
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span>Connexion</span>
+                          <span>{tDb('database.connection')}</span>
                           {systemHealth.auth.isConnected ? (
                             <Wifi className="w-4 h-4 text-green-600" />
                           ) : (
@@ -325,8 +328,8 @@ export default function DatabaseManagementPage() {
                         </div>
                         {systemHealth.auth.responseTime && (
                           <div className="flex items-center justify-between text-sm">
-                            <span>Temps de réponse</span>
-                            <span className="font-mono">{systemHealth.auth.responseTime}ms</span>
+                            <span>{tDb('database.responseTime')}</span>
+                            <span className="font-mono">{systemHealth.auth.responseTime.toFixed(2)}ms</span>
                           </div>
                         )}
                       </div>
@@ -342,7 +345,7 @@ export default function DatabaseManagementPage() {
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span>Connexion</span>
+                          <span>{tDb('database.connection')}</span>
                           {systemHealth.shared.isConnected ? (
                             <Wifi className="w-4 h-4 text-green-600" />
                           ) : (
@@ -351,8 +354,8 @@ export default function DatabaseManagementPage() {
                         </div>
                         {systemHealth.shared.responseTime && (
                           <div className="flex items-center justify-between text-sm">
-                            <span>Temps de réponse</span>
-                            <span className="font-mono">{systemHealth.shared.responseTime}ms</span>
+                            <span>{tDb('database.responseTime')}</span>
+                            <span className="font-mono">{systemHealth.shared.responseTime.toFixed(2)}ms</span>
                           </div>
                         )}
                       </div>
@@ -368,7 +371,7 @@ export default function DatabaseManagementPage() {
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span>Connexion</span>
+                          <span>{tDb('database.connection')}</span>
                           {systemHealth.tenant.isConnected ? (
                             <Wifi className="w-4 h-4 text-green-600" />
                           ) : (
@@ -377,8 +380,8 @@ export default function DatabaseManagementPage() {
                         </div>
                         {systemHealth.tenant.responseTime && (
                           <div className="flex items-center justify-between text-sm">
-                            <span>Temps de réponse</span>
-                            <span className="font-mono">{systemHealth.tenant.responseTime}ms</span>
+                            <span>{tDb('database.responseTime')}</span>
+                            <span className="font-mono">{systemHealth.tenant.responseTime.toFixed(2)}ms</span>
                           </div>
                         )}
                       </div>
@@ -391,7 +394,7 @@ export default function DatabaseManagementPage() {
               <div className="grid md:grid-cols-4 gap-4">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Tenants Actifs</CardTitle>
+                    <CardTitle className="text-sm font-medium">{tDb('database.activeTenants')}</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
@@ -404,42 +407,42 @@ export default function DatabaseManagementPage() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Connexions</CardTitle>
+                    <CardTitle className="text-sm font-medium">{tDb('database.connections')}</CardTitle>
                     <HardDrive className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
                       {connections ? connections.connections.length : '0'}
                     </div>
-                    <p className="text-xs text-muted-foreground">Connexions actives</p>
+                    <p className="text-xs text-muted-foreground">{tDb('database.connectionsActive')}</p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Migrations</CardTitle>
+                    <CardTitle className="text-sm font-medium">{tDb('database.migrations')}</CardTitle>
                     <BarChart3 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
                       {migrationStatuses.filter(m => m.status === 'pending').length}
                     </div>
-                    <p className="text-xs text-muted-foreground">En attente</p>
+                    <p className="text-xs text-muted-foreground">{tDb('database.pending')}</p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Performance</CardTitle>
+                    <CardTitle className="text-sm font-medium">{tDb('database.performance')}</CardTitle>
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {Math.round((systemHealth.auth.responseTime || 0) + 
-                                (systemHealth.shared.responseTime || 0) + 
-                                (systemHealth.tenant.responseTime || 0)) / 3}ms
+                      {(((systemHealth.auth.responseTime || 0) + 
+                         (systemHealth.shared.responseTime || 0) + 
+                         (systemHealth.tenant.responseTime || 0)) / 3).toFixed(2)}ms
                     </div>
-                    <p className="text-xs text-muted-foreground">Temps moyen</p>
+                    <p className="text-xs text-muted-foreground">{tDb('database.averageTime')}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -500,14 +503,14 @@ export default function DatabaseManagementPage() {
         <TabsContent value="migrations" className="space-y-4">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold">Gestion des Migrations</h2>
+              <h2 className="text-2xl font-bold">{tDb('database.migrationsManagement')}</h2>
               <p className="text-muted-foreground">
-                État et gestion des migrations pour toutes les bases de données
+                {tDb('database.migrationsDescription')}
               </p>
             </div>
             <Button onClick={handleRunAllMigrations} disabled={loading}>
               <PlayCircle className="w-4 h-4 mr-2" />
-              Exécuter Toutes les Migrations
+              {tDb('database.executeAllMigrations')}
             </Button>
           </div>
 
@@ -546,7 +549,7 @@ export default function DatabaseManagementPage() {
           {migrationStatuses.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Résumé Global</CardTitle>
+                <CardTitle className="text-lg">{tDb('database.globalSummary')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -554,25 +557,25 @@ export default function DatabaseManagementPage() {
                     <div className="text-2xl font-bold text-blue-600">
                       {migrationStatuses.length}
                     </div>
-                    <div className="text-sm text-muted-foreground">Bases de données</div>
+                    <div className="text-sm text-muted-foreground">{tDb('database.databases')}</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-green-600">
                       {migrationStatuses.reduce((sum, m) => sum + m.executed.length, 0)}
                     </div>
-                    <div className="text-sm text-muted-foreground">Migrations exécutées</div>
+                    <div className="text-sm text-muted-foreground">{tDb('database.executedMigrations')}</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-yellow-600">
                       {migrationStatuses.reduce((sum, m) => sum + m.pending.length, 0)}
                     </div>
-                    <div className="text-sm text-muted-foreground">Migrations en attente</div>
+                    <div className="text-sm text-muted-foreground">{tDb('database.pendingMigrations')}</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-red-600">
                       {migrationStatuses.filter(m => m.status === 'error').length}
                     </div>
-                    <div className="text-sm text-muted-foreground">Erreurs</div>
+                    <div className="text-sm text-muted-foreground">{tDb('database.errors')}</div>
                   </div>
                 </div>
               </CardContent>
@@ -584,9 +587,9 @@ export default function DatabaseManagementPage() {
             <Card>
               <CardContent className="text-center py-12">
                 <PlayCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Aucune migration trouvée</p>
+                <p className="text-muted-foreground">{tDb('database.noMigrations')}</p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Vérifiez la configuration des bases de données
+                  {tDb('database.noMigrationsDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -613,21 +616,21 @@ export default function DatabaseManagementPage() {
         <TabsContent value="tenants" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Gestion des Tenants</CardTitle>
+              <CardTitle>{tDb('database.tenantsManagement')}</CardTitle>
               <CardDescription>
-                Sélectionnez un tenant pour voir ses détails
+                {tDb('database.selectTenant')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium">Tenant :</span>
+                  <span className="text-sm font-medium">{tDb('database.selectTenantLabel')}</span>
                   <select 
                     value={selectedTenant} 
                     onChange={(e) => setSelectedTenant(e.target.value)}
                     className="border rounded px-3 py-1"
                   >
-                    <option value="">Sélectionner un tenant...</option>
+                    <option value="">{tDb('database.selectTenantPlaceholder')}</option>
                     {systemHealth?.activeTenants.map((tenant) => (
                       <option key={tenant} value={tenant}>{tenant}</option>
                     ))}
@@ -638,7 +641,7 @@ export default function DatabaseManagementPage() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Santé du Tenant</CardTitle>
+                        <CardTitle className="text-lg">{tDb('database.tenantHealth')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
@@ -649,7 +652,7 @@ export default function DatabaseManagementPage() {
                             </Badge>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span>Connexion</span>
+                            <span>{tDb('database.connection')}</span>
                             {tenantHealth.isConnected ? (
                               <Wifi className="w-4 h-4 text-green-600" />
                             ) : (
@@ -658,8 +661,8 @@ export default function DatabaseManagementPage() {
                           </div>
                           {tenantHealth.responseTime && (
                             <div className="flex items-center justify-between">
-                              <span>Temps de réponse</span>
-                              <span className="font-mono">{tenantHealth.responseTime}ms</span>
+                              <span>{tDb('database.responseTime')}</span>
+                              <span className="font-mono">{tenantHealth.responseTime.toFixed(2)}ms</span>
                             </div>
                           )}
                         </div>
@@ -668,24 +671,24 @@ export default function DatabaseManagementPage() {
 
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Configuration</CardTitle>
+                        <CardTitle className="text-lg">{tDb('database.configuration')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <span>Base</span>
+                            <span>{tDb('database.base')}</span>
                             <span className="font-mono text-sm">
                               {(tenantHealth as any)?.configuration?.database || `erp_topsteel_${selectedTenant.toLowerCase()}`}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span>Pool</span>
+                            <span>{tDb('database.pool')}</span>
                             <span className="font-mono">
-                              {(tenantHealth as any)?.configuration?.poolSize || 10} connexions
+                              {(tenantHealth as any)?.configuration?.poolSize || 10} {tDb('database.connectionsLabel')}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span>Timeout</span>
+                            <span>{tDb('database.timeout')}</span>
                             <span className="font-mono">
                               {((tenantHealth as any)?.configuration?.connectionTimeout || 30000) / 1000}s
                             </span>
@@ -697,7 +700,7 @@ export default function DatabaseManagementPage() {
                     {tenantMigrations && (
                       <Card>
                         <CardHeader>
-                          <CardTitle className="text-lg">Migrations</CardTitle>
+                          <CardTitle className="text-lg">{tDb('database.migrations')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-3">
@@ -708,11 +711,11 @@ export default function DatabaseManagementPage() {
                               </Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span>Exécutées</span>
+                              <span>{tDb('database.executed')}</span>
                               <span>{tenantMigrations.executed.length}</span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span>En attente</span>
+                              <span>{tDb('database.pending')}</span>
                               <span>{tenantMigrations.pending.length}</span>
                             </div>
                             {tenantMigrations.pending.length > 0 && (
@@ -721,7 +724,7 @@ export default function DatabaseManagementPage() {
                                 size="sm"
                                 className="w-full"
                               >
-                                Exécuter les Migrations
+                                {tDb('database.executeMigrations')}
                               </Button>
                             )}
                           </div>

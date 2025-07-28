@@ -10,7 +10,7 @@ export interface PortConfig {
 export const defaultPortConfig: PortConfig = {
   preferred: 3001,
   fallbacks: [3002, 3003, 3004, 3005],
-  host: '0.0.0.0',
+  host: '127.0.0.1',
 }
 
 /**
@@ -58,7 +58,7 @@ export async function listenWithPortFallback(
   logger: any
 ): Promise<number> {
   const preferredPort = configService.get('app.port') || 3001
-  const host = configService.get('app.host') || '0.0.0.0'
+  const host = configService.get('app.host') || '127.0.0.1'
 
   const portConfig: PortConfig = {
     preferred: preferredPort,

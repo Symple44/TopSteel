@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
 
 export async function POST(request: NextRequest) {
   try {
     // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/database/migrations/run`
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/run`
     
-    const response = await fetch(apiUrl, {
+    const response = await safeFetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

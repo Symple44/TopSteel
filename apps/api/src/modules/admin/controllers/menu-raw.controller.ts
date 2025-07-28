@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common'
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Req } from '@nestjs/common'
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'
 import { MenuRawService } from '../services/menu-raw.service'
 
 @Controller('admin/menu-raw')
+@UseGuards(JwtAuthGuard)
 export class MenuRawController {
   constructor(private readonly menuRawService: MenuRawService) {}
 

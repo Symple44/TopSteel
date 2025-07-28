@@ -14,6 +14,7 @@ interface UserMenuItem {
   children: UserMenuItem[]
   icon?: string
   customTitle?: string
+  titleTranslations?: Record<string, string>
   customIcon?: string
   customIconColor?: string
   isUserCreated?: boolean
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
 
     try {
       // Appeler le backend NestJS pour récupérer le menu personnalisé
+      console.log('🔍 Appel API custom-menu vers:', `${apiUrl}/api/v1/user/menu-preferences/custom-menu`)
       const response = await fetch(`${apiUrl}/api/v1/user/menu-preferences/custom-menu`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -46,15 +48,36 @@ export async function GET(request: NextRequest) {
         signal: AbortSignal.timeout(10000),
       })
       
+      console.log('📡 Réponse API custom-menu:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      })
+      
       if (response.ok) {
         const data = await response.json()
+        
+        // Log pour debug des traductions au chargement
+        console.log('📥 API: Chargement des données menu:', {
+          itemsCount: data?.data?.length,
+          itemsWithTranslations: data?.data?.filter((item: any) => item.titleTranslations && Object.keys(item.titleTranslations).length > 0).length,
+          sampleItem: data?.data?.find((item: any) => item.titleTranslations && Object.keys(item.titleTranslations).length > 0)
+        })
+        
         return NextResponse.json(data)
       } else {
         // Backend API error, utilisation du fallback
-        throw new Error(`Backend API error: ${response.status}`)
+        const errorText = await response.text()
+        console.error('❌ Erreur backend custom-menu:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
+        })
+        throw new Error(`Backend API error: ${response.status} - ${errorText}`)
       }
     } catch (backendError) {
       // Backend indisponible pour custom-menu, utilisation du fallback
+      console.error('❌ Backend indisponible custom-menu:', backendError)
       
       // Fallback : retourner un menu vide par défaut
       return NextResponse.json({
@@ -95,6 +118,13 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { menuItems } = body
+    
+    // Log pour debug des traductions
+    console.log('🔍 API: Réception des données menu:', {
+      itemsCount: menuItems?.length,
+      itemsWithTranslations: menuItems?.filter((item: any) => item.titleTranslations && Object.keys(item.titleTranslations).length > 0).length,
+      sampleTranslations: menuItems?.find((item: any) => item.titleTranslations && Object.keys(item.titleTranslations).length > 0)?.titleTranslations
+    })
     
     // Validation des données
     if (!Array.isArray(menuItems)) {

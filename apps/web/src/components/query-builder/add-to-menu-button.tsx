@@ -76,10 +76,10 @@ export function AddToMenuButton({
       window.dispatchEvent(new CustomEvent('menuPreferencesChanged'))
 
     } catch (error: any) {
-      console.error('Erreur lors de l\\'ajout au menu:', error)
+      console.error('Erreur lors de l\'ajout au menu:', error)
       toast({
         title: 'Erreur',
-        description: error.response?.data?.message || 'Impossible d\\'ajouter la vue au menu',
+        description: error.response?.data?.message || 'Impossible d\'ajouter la vue au menu',
         variant: 'destructive'
       })
     } finally {

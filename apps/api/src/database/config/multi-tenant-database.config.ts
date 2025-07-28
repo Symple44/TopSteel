@@ -61,6 +61,11 @@ import { MarketplaceModule as MarketplaceModuleEntity } from '../../modules/mark
 import { ModuleInstallation } from '../../modules/marketplace/entities/module-installation.entity'
 import { ModuleRating } from '../../modules/marketplace/entities/module-rating.entity'
 
+// Entités de paramètres (dans AUTH)
+import { ParameterSystem } from '../../modules/parameters/entities/parameter-system.entity'
+import { ParameterApplication } from '../../modules/parameters/entities/parameter-application.entity'
+import { ParameterClient } from '../../modules/parameters/entities/parameter-client.entity'
+
 @Injectable()
 export class MultiTenantDatabaseConfig {
   private dataSources: Map<string, DataSource> = new Map()
@@ -99,10 +104,14 @@ export class MultiTenantDatabaseConfig {
         MFASession,
         // Entités marketplace (seulement catalogue global)
         MarketplaceModuleEntity,
+        // Entités de paramètres
+        ParameterSystem,
+        ParameterApplication,
+        ParameterClient,
       ],
       synchronize: false, // Toujours false en production
       logging: this.configService.get('DB_LOGGING', false),
-      migrations: ['dist/database/migrations/auth/*.js'],
+      migrations: ['src/database/migrations/auth/*{.ts,.js}'],
       migrationsRun: false,
     }
   }
@@ -121,7 +130,7 @@ export class MultiTenantDatabaseConfig {
       entities: SharedEntities,
       synchronize: false,
       logging: this.configService.get('DB_LOGGING', false),
-      migrations: ['dist/database/migrations/shared/*.js'],
+      migrations: ['src/database/migrations/shared/*{.ts,.js}'],
       migrationsRun: false,
     }
   }
@@ -166,7 +175,7 @@ export class MultiTenantDatabaseConfig {
       ],
       synchronize: false,
       logging: this.configService.get('DB_LOGGING', false),
-      migrations: [`dist/database/migrations/tenant/*.js`],
+      migrations: [`src/database/migrations/tenant/*{.ts,.js}`],
       migrationsRun: false,
     }
   }

@@ -4,11 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import { usePermissions } from './use-permissions-v2'
 import { useMenuMode } from './use-menu-mode'
 import { apiClient } from '@/lib/api-client-instance'
+import { translator } from '@/lib/i18n/translator'
 
 // Fonction pour mapper les données du menu personnalisé vers la structure attendue
 function mapCustomMenuItemRecursively(item: any): MenuItemConfig {
   return {
     ...item,
+    // Inclure les traductions
+    titleTranslations: item.titleTranslations || {},
     // Mapper les propriétés personnalisées vers userPreferences
     userPreferences: {
       isVisible: item.isVisible ?? true,
@@ -32,6 +35,7 @@ export interface MenuItemConfig {
   parentId?: string
   title: string
   titleKey?: string
+  titleTranslations?: Record<string, string>
   href?: string
   icon?: string
   gradient?: string
@@ -202,17 +206,7 @@ export function useDynamicMenu() {
     return filtered
   }, [canUserAccessItem])
 
-  // Charger les deux types de menu au montage du composant
-  useEffect(() => {
-    if (!modeLoading) {
-      Promise.all([
-        loadStandardMenu(),
-        loadUserCustomizedMenu()
-      ])
-    }
-  }, [modeLoading, loadStandardMenu, loadUserCustomizedMenu])
-
-  // Recharger le menu quand le mode change
+  // Charger le menu approprié seulement une fois au montage ou au changement de mode
   useEffect(() => {
     if (!modeLoading && mode) {
       if (mode === 'custom') {
@@ -221,29 +215,25 @@ export function useDynamicMenu() {
         loadStandardMenu()
       }
     }
-  }, [mode, modeLoading, loadUserCustomizedMenu, loadStandardMenu])
+  }, [mode, modeLoading]) // Retirer les fonctions des dépendances pour éviter les re-exécutions
 
   // Écouter les changements de préférences de menu
   useEffect(() => {
     const handleMenuPreferencesChange = async (event: CustomEvent) => {
-      // Forcer le rechargement immédiat avec un timeout pour s'assurer que l'API a terminé
-      setTimeout(async () => {
-        // Si l'événement contient directement les données du menu, les utiliser
-        if (event.detail?.menuItems && mode === 'custom') {
-          const mappedItems = event.detail.menuItems.map(item => mapCustomMenuItemRecursively(item))
-          setCustomMenu(mappedItems)
-        } else {
-          // Sinon, recharger depuis l'API
-          if (mode === 'custom') {
-            await loadUserCustomizedMenu()
-          } else {
-            await loadStandardMenu()
-          }
-        }
-        
-        // Forcer un re-render en mettant à jour la clé de refresh
+      // Si l'événement contient directement les données du menu, les utiliser
+      if (event.detail?.menuItems && mode === 'custom') {
+        const mappedItems = event.detail.menuItems.map(item => mapCustomMenuItemRecursively(item))
+        setCustomMenu(mappedItems)
         setRefreshKey(prev => prev + 1)
-      }, 100)
+      } else {
+        // Sinon, recharger depuis l'API uniquement si nécessaire
+        if (mode === 'custom') {
+          await loadUserCustomizedMenu()
+        } else {
+          await loadStandardMenu()
+        }
+        setRefreshKey(prev => prev + 1)
+      }
     }
 
     window.addEventListener('menuPreferencesChanged', handleMenuPreferencesChange)
@@ -251,7 +241,17 @@ export function useDynamicMenu() {
     return () => {
       window.removeEventListener('menuPreferencesChanged', handleMenuPreferencesChange)
     }
-  }, [mode, loadUserCustomizedMenu, loadStandardMenu, refreshKey, standardMenu.length, customMenu.length])
+  }, [mode]) // Simplifier les dépendances
+
+  // Effet pour recharger les menus quand la langue change
+  useEffect(() => {
+    const unsubscribe = translator.subscribe(() => {
+      // Forcer un re-render quand la langue change pour mettre à jour les traductions
+      setRefreshKey(prev => prev + 1)
+    })
+    
+    return unsubscribe
+  }, [])
 
   // Menu utilisé basé sur le mode sélectionné
   const currentMenu = mode === 'custom' ? customMenu : standardMenu
