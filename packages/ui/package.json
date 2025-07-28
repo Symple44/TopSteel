@@ -40,7 +40,7 @@
     "@radix-ui/react-visually-hidden": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.525.0",
+    "lucide-react": "^0.532.0",
     "tailwind-merge": "^3.3.1"
   },
   "module": "./dist/index.mjs",
@@ -124,7 +124,7 @@
     "rollup-plugin-visualizer": "^6.0.3",
     "storybook": "^8.6.14",
     "typescript": "^5.8.3",
-    "vite": "^7.0.4",
+    "vite": "^7.0.6",
     "vite-bundle-analyzer": "^1.0.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
