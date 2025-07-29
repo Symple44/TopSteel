@@ -58,8 +58,8 @@
   "dependencies": {
     "@erp/domains": "workspace:*",
     "@erp/utils": "workspace:*",
-    "axios": "^1.7.2",
-    "zod": "^3.22.4"
+    "axios": "^1.11.0",
+    "zod": "^4.0.13"
   },
   "devDependencies": {
     "@erp/config": "workspace:*",
