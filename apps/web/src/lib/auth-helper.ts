@@ -1,7 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse, NextRequest } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendApi } from '@/utils/backend-api'
 
 export interface AuthResult {
   token: string | null
@@ -66,7 +65,10 @@ export class AuthHelper {
     }
 
     try {
-      const response = await safeFetch(url, {
+      // Extraire l'endpoint depuis l'URL complète
+      const endpoint = url.replace(/^.*\/api\/v1\//, '').replace(/^.*\/api\//, '')
+      
+      const response = await callBackendApi(endpoint, {
         ...options,
         headers
       })

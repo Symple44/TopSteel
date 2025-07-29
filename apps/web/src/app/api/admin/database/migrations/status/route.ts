@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,9 +37,8 @@ export async function GET(request: NextRequest) {
 
     console.log(`[API Route] Tentative de connexion à: ${apiUrl}`)
     
-    const response = await safeFetch(apiUrl, {
+    const response = await callBackendFromApi(request, 'admin/database/migrations/status', {
       method: 'GET',
-      headers,
       signal: AbortSignal.timeout(15000)
     })
 

@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
     // Proxy vers l'API backend
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/stats`
     
-    const response = await safeFetch(apiUrl, {
+    const response = await callBackendFromApi(request, 'admin/database/stats', {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(request.headers.get('authorization') && {
-          'Authorization': request.headers.get('authorization')!
-        }),
-      },
     })
 
     if (!response.ok) {

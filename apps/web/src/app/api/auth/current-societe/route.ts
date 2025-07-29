@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,13 +9,8 @@ export async function GET(req: NextRequest) {
     }
 
     // Rediriger vers l'API backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const response = await safeFetch(`${apiUrl}/api/v1/auth/current-societe`, {
+    const response = await callBackendFromApi(req, 'auth/current-societe', {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
     })
 
     // Vérifier si la réponse est JSON

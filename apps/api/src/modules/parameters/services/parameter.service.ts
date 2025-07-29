@@ -25,24 +25,31 @@ export class ParameterService {
    * SUPER_ADMIN est non-modifiable (réservé à l'équipe TOPSTEEL)
    */
   async getUserRoles(language: string = 'fr') {
+    this.logger.debug(`🔍 getUserRoles appelé avec language: ${language}`)
+    
     // Vérifier le cache d'abord
     const now = Date.now()
     if (this.rolesCache && now < this.cacheExpiry) {
-      this.logger.debug('Retour des rôles depuis le cache backend')
+      this.logger.debug('✅ Retour des rôles depuis le cache backend')
       return this.mapRolesForLanguage(this.rolesCache, language)
     }
 
     try {
+      this.logger.debug('🔍 Recherche des rôles en base de données...')
+      
       // Vérifier si les rôles existent en base, sinon les créer
       const existingRoles = await this.systemRepo.find({
         where: { group: 'user_roles', isActive: true },
         order: { key: 'ASC' }
       })
 
+      this.logger.debug(`📊 Rôles trouvés en base: ${existingRoles.length}`)
+
       // Si pas de rôles en base, créer les rôles par défaut
       if (existingRoles.length === 0) {
-        this.logger.warn('Aucun rôle trouvé en base, création des rôles par défaut')
+        this.logger.warn('⚠️ Aucun rôle trouvé en base, création des rôles par défaut')
         await this.createDefaultUserRoles()
+        this.logger.debug('✅ Rôles par défaut créés, relance de la requête')
         // Récupérer les rôles nouvellement créés
         return this.getUserRoles(language)
       }
@@ -50,21 +57,24 @@ export class ParameterService {
       // Mettre en cache
       this.rolesCache = existingRoles
       this.cacheExpiry = now + this.CACHE_TTL
-      this.logger.debug(`Rôles mis en cache backend pour ${this.CACHE_TTL / 1000 / 60} minutes`)
+      this.logger.debug(`✅ ${existingRoles.length} rôles mis en cache backend pour ${this.CACHE_TTL / 1000 / 60} minutes`)
 
-      return this.mapRolesForLanguage(existingRoles, language)
+      const mappedRoles = this.mapRolesForLanguage(existingRoles, language)
+      this.logger.debug(`📤 Retour de ${mappedRoles.length} rôles mappés pour ${language}`)
+      return mappedRoles
 
     } catch (error) {
-      this.logger.error('Erreur lors de la récupération des rôles:', error)
+      this.logger.error('❌ Erreur lors de la récupération des rôles:', error instanceof Error ? error.message : String(error))
+      this.logger.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace available')
       
       // Fallback sur le cache même expiré si disponible
       if (this.rolesCache) {
-        this.logger.warn('Utilisation du cache expiré comme fallback')
+        this.logger.warn('🔄 Utilisation du cache expiré comme fallback')
         return this.mapRolesForLanguage(this.rolesCache, language)
       }
 
       // Dernier fallback: rôles hardcodés
-      this.logger.warn('Utilisation des rôles hardcodés comme fallback ultime')
+      this.logger.warn('🆘 Utilisation des rôles hardcodés comme fallback ultime')
       return this.getFallbackRoles(language)
     }
   }
@@ -144,6 +154,7 @@ export class ParameterService {
    * Crée les rôles utilisateur par défaut avec le nouveau système de traductions
    */
   private async createDefaultUserRoles() {
+    this.logger.debug('🏗️ Début de la création des rôles par défaut');
     const defaultRoles = [
       {
         group: 'user_roles',
@@ -293,10 +304,20 @@ export class ParameterService {
     ]
 
     // Créer les rôles en base
-    for (const roleData of defaultRoles) {
-      const role = this.systemRepo.create(roleData)
-      await this.systemRepo.save(role)
+    this.logger.debug(`📝 Création de ${defaultRoles.length} rôles par défaut...`)
+    for (const [index, roleData] of defaultRoles.entries()) {
+      try {
+        this.logger.debug(`➡️ Création du rôle ${index + 1}/${defaultRoles.length}: ${roleData.key}`)
+        const role = this.systemRepo.create(roleData)
+        await this.systemRepo.save(role)
+        this.logger.debug(`✅ Rôle ${roleData.key} créé avec succès`)
+      } catch (error) {
+        this.logger.error(`❌ Erreur création rôle ${roleData.key}:`, error instanceof Error ? error.message : String(error))
+        throw error
+      }
     }
+    
+    this.logger.debug('🎉 Tous les rôles par défaut ont été créés avec succès')
     
     // Invalider le cache après création
     this.invalidateRolesCache()

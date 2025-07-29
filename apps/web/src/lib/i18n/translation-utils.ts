@@ -3,6 +3,7 @@ import { fr } from './translations/fr'
 import { en } from './translations/en'
 import { es } from './translations/es'
 import * as XLSX from 'xlsx'
+import { callClientApi } from '@/utils/backend-api'
 
 // Fonction helper pour vérifier si une traduction est valide
 const isValidTranslation = (value: any): boolean => {
@@ -263,27 +264,8 @@ export const importFromExcel = async (
 // Sauvegarder les traductions modifiées
 export const saveTranslation = async (entry: TranslationEntry): Promise<boolean> => {
   try {
-    // Récupérer le token depuis les cookies
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`
-      const parts = value.split(`; ${name}=`)
-      if (parts.length === 2) return parts.pop()?.split(';').shift()
-      return null
-    }
-    
-    const token = getCookie('accessToken')
-    
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    }
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
-    }
-    
-    const response = await fetch('/api/admin/translations', {
+    const response = await callClientApi('admin/translations', {
       method: 'POST',
-      headers,
       body: JSON.stringify({ translationEntry: entry })
     })
     
@@ -305,23 +287,8 @@ export const loadTranslationsWithOverrides = async (): Promise<TranslationEntry[
   const baseTranslations = flattenTranslations(getAllTranslations())
   
   try {
-    // Récupérer le token depuis les cookies
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`
-      const parts = value.split(`; ${name}=`)
-      if (parts.length === 2) return parts.pop()?.split(';').shift()
-      return null
-    }
-    
-    const token = getCookie('accessToken')
-    const headers: HeadersInit = {}
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
-    }
-    
-    const response = await fetch('/api/admin/translations', {
-      headers
+    const response = await callClientApi('admin/translations', {
+      method: 'GET'
     })
     
     if (!response.ok) {
@@ -375,27 +342,8 @@ export const bulkImportTranslations = async (translations: TranslationEntry[]): 
   stats?: { imported: number, updated: number }
 }> => {
   try {
-    // Récupérer le token depuis les cookies
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`
-      const parts = value.split(`; ${name}=`)
-      if (parts.length === 2) return parts.pop()?.split(';').shift()
-      return null
-    }
-    
-    const token = getCookie('accessToken')
-    
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    }
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
-    }
-    
-    const response = await fetch('/api/admin/translations', {
+    const response = await callClientApi('admin/translations', {
       method: 'PUT',
-      headers,
       body: JSON.stringify({ translations })
     })
     

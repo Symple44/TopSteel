@@ -119,7 +119,7 @@ import { EnhancedThrottlerGuard } from './common/guards/enhanced-throttler.guard
     // NotificationsModule,
     // ProductionModule,
     // ProjetsModule,
-    // QueryBuilderModule,
+    QueryBuilderModule, // Activé pour le test multi-tenant
     // UiPreferencesModule,
     // MachinesModule,
     // MaintenanceModule,

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { toast } from 'sonner'
+import { callClientApi } from '@/utils/backend-api'
 
 interface ElasticsearchStatus {
   connected: boolean
@@ -80,7 +81,7 @@ export function ElasticsearchAdmin() {
     }
 
     try {
-      const response = await fetch('/api/admin/elasticsearch?action=status')
+      const response = await callClientApi('admin/elasticsearch?action=status')
       const data = await response.json()
       setStatus(data)
       setLastStatusCheck(now)
@@ -94,7 +95,7 @@ export function ElasticsearchAdmin() {
 
   const fetchConfig = async () => {
     try {
-      const response = await fetch('/api/admin/system-parameters/by-category?category=ELASTICSEARCH')
+      const response = await callClientApi('admin/system-parameters/by-category?category=ELASTICSEARCH')
       const data = await response.json()
       console.log('Fetched config data:', data)
       
@@ -170,9 +171,8 @@ export function ElasticsearchAdmin() {
         { key: 'elasticsearch.enableLogging', value: defaultConfig.enableLogging.toString() }
       ]
 
-      const response = await fetch('/api/admin/system-parameters', {
+      const response = await callClientApi('admin/system-parameters', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates)
       })
 
@@ -201,9 +201,8 @@ export function ElasticsearchAdmin() {
 
       console.log('Saving config with updates:', updates)
 
-      const response = await fetch('/api/admin/system-parameters', {
+      const response = await callClientApi('admin/system-parameters', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates)
       })
 
@@ -258,9 +257,8 @@ export function ElasticsearchAdmin() {
           { key: 'elasticsearch.enableLogging', value: defaultConfig.enableLogging.toString() }
         ]
 
-        const response = await fetch('/api/admin/system-parameters', {
+        const response = await callClientApi('admin/system-parameters', {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updates)
         })
 
@@ -290,9 +288,8 @@ export function ElasticsearchAdmin() {
   const runMigrations = async () => {
     setOperationLoading('migrate')
     try {
-      const response = await fetch('/api/admin/elasticsearch', {
+      const response = await callClientApi('admin/elasticsearch', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'migrate' })
       })
       
@@ -319,9 +316,8 @@ export function ElasticsearchAdmin() {
 
     setOperationLoading(`reset-${indexName}`)
     try {
-      const response = await fetch('/api/admin/elasticsearch', {
+      const response = await callClientApi('admin/elasticsearch', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'reset', indexName })
       })
       

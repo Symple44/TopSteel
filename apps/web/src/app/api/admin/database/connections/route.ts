@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,9 +35,8 @@ export async function GET(request: NextRequest) {
       headers['Cookie'] = cookieHeader
     }
 
-    const response = await safeFetch(apiUrl, {
+    const response = await callBackendFromApi(request, 'admin/database/connections', {
       method: 'GET',
-      headers,
       signal: AbortSignal.timeout(10000)
     })
 

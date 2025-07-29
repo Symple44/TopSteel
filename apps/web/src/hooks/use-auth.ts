@@ -1,5 +1,6 @@
 import React from 'react'
 import { getTabId } from '@/lib/tab-id'
+import { callClientApi } from '@/utils/backend-api'
 
 // Types harmonisés
 interface UserProfile {
@@ -172,13 +173,7 @@ export const useAuth = () => {
         }
       }
 
-      const response = await fetch('/api/auth/verify', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${tokens.tokenType || 'Bearer'} ${tokens.accessToken}`,
-        },
-      })
+      const response = await callClientApi('auth/verify')
 
       return response.ok
     } catch (error) {
@@ -190,14 +185,7 @@ export const useAuth = () => {
   // ✅ Récupération du profil utilisateur
   const fetchUserProfile = React.useCallback(async (tokens: Tokens): Promise<User | null> => {
     try {
-      const response = await fetch('/api/auth/profile', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${tokens.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      })
+      const response = await callClientApi('auth/profile')
 
       if (response.ok) {
         const userData = await response.json()
@@ -218,7 +206,7 @@ export const useAuth = () => {
 
     try {
       // Appel API réel
-      const response = await fetch('/api/auth/login', {
+      const response = await callClientApi('auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login: identifier, password }),
@@ -310,7 +298,7 @@ export const useAuth = () => {
 
     try {
       // Appel API pour vérifier le code MFA
-      const response = await fetch('/api/auth/mfa/verify', {
+      const response = await callClientApi('auth/mfa/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -331,7 +319,7 @@ export const useAuth = () => {
       // Si la vérification réussit, finaliser la connexion
       if (responseData.data.sessionToken) {
         // Obtenir les tokens finaux après MFA
-        const loginResponse = await fetch('/api/auth/mfa/complete', {
+        const loginResponse = await callClientApi('auth/mfa/complete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -385,11 +373,10 @@ export const useAuth = () => {
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true }))
       
-      const response = await fetch(`/api/auth/login-societe/${company.id}`, {
+      const response = await callClientApi(`auth/login-societe/${company.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${authState.tokens?.accessToken}`,
         },
       })
 
@@ -482,11 +469,8 @@ export const useAuth = () => {
       // Appel API pour invalider les tokens côté serveur
       const currentTokens = authState.tokens
       if (currentTokens?.accessToken) {
-        await fetch('/api/auth/logout', {
+        await callClientApi('auth/logout', {
           method: 'POST',
-          headers: {
-            Authorization: `${currentTokens.tokenType || 'Bearer'} ${currentTokens.accessToken}`,
-          },
         })
       }
     } catch (error) {
@@ -557,7 +541,7 @@ export const useAuth = () => {
 
     try {
       // Appel API réel
-      const response = await fetch('/api/auth/refresh', {
+      const response = await callClientApi('auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

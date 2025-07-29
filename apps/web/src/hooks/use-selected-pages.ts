@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 export function useSelectedPages() {
   const [selectedPages, setSelectedPages] = useState<Set<string>>(new Set())
@@ -13,7 +14,7 @@ export function useSelectedPages() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/user/menu-preferences/selected-pages')
+      const response = await callClientApi('user/menu-preferences/selected-pages')
       
       if (!response.ok) {
         const errorText = await response.text()
@@ -52,9 +53,8 @@ export function useSelectedPages() {
     try {
       const pagesArray = Array.from(pages)
       
-      const response = await fetch('/api/user/menu-preferences/selected-pages', {
+      const response = await callClientApi('user/menu-preferences/selected-pages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ selectedPages: pagesArray })
       })
       

@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface BackendHealthInfo {
   status: 'online' | 'offline' | 'checking' | 'error'
@@ -51,10 +52,8 @@ async function performHealthCheck(): Promise<BackendHealthInfo> {
   const startTime = Date.now()
 
   try {
-    const response = await fetch('/api/health', {
+    const response = await callClientApi('health', {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       signal: AbortSignal.timeout(8000)
     })
 

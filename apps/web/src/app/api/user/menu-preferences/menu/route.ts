@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,11 +21,8 @@ export async function GET(request: NextRequest) {
 
     try {
       // Appeler le vrai backend NestJS
-      const response = await safeFetch(`${apiUrl}/api/v1/user/menu-preferences/menu`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      const response = await callBackendFromApi(request, 'user/menu-preferences/menu', {
+        method: 'GET',
         signal: AbortSignal.timeout(5000),
       })
       
@@ -201,12 +197,8 @@ export async function POST(request: NextRequest) {
     
     try {
       // Appeler le vrai backend NestJS pour la sauvegarde
-      const response = await safeFetch(`${apiUrl}/api/v1/user/menu-preferences/menu`, {
+      const response = await callBackendFromApi(request, 'user/menu-preferences/menu', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(5000),
       })

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { Progress } from '@erp/ui'
 import { useToastShortcuts } from '@/hooks/use-toast'
+import { callClientApi } from '@/utils/backend-api'
 import DatabaseMonitoringCard from '@/components/admin/database-monitoring-card'
 import PerformanceMetricsChart from '@/components/admin/performance-metrics-chart'
 import SystemAlertsPanel from '@/components/admin/system-alerts-panel'
@@ -103,9 +104,9 @@ export default function DatabaseManagementPage() {
     setLoading(true)
     try {
       const [healthResponse, migrationsResponse, connectionsResponse] = await Promise.all([
-        fetch('/api/admin/database/health'),
-        fetch('/api/admin/database/migrations/status'),
-        fetch('/api/admin/database/connections')
+        callClientApi('admin/database/health'),
+        callClientApi('admin/database/migrations/status'),
+        callClientApi('admin/database/connections')
       ])
 
       if (healthResponse.ok) {
@@ -133,18 +134,8 @@ export default function DatabaseManagementPage() {
   const loadTenantData = async (tenantCode: string) => {
     try {
       const [healthResponse, migrationsResponse] = await Promise.all([
-        fetch(`/api/admin/database/health/tenant/${tenantCode}`, {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }),
-        fetch(`/api/admin/database/migrations/tenant/${tenantCode}/status`, {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+        callClientApi(`admin/database/health/tenant/${tenantCode}`),
+        callClientApi(`admin/database/migrations/tenant/${tenantCode}/status`)
       ])
 
       if (healthResponse.ok) {
@@ -164,7 +155,7 @@ export default function DatabaseManagementPage() {
   const handleRunAllMigrations = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/admin/database/migrations/run', {
+      const response = await callClientApi('admin/database/migrations/run', {
         method: 'POST'
       })
 
@@ -187,7 +178,7 @@ export default function DatabaseManagementPage() {
   const handleRunTenantMigrations = async (tenantCode: string) => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/admin/database/migrations/tenant/${tenantCode}/run`, {
+      const response = await callClientApi(`admin/database/migrations/tenant/${tenantCode}/run`, {
         method: 'POST'
       })
 
@@ -210,7 +201,7 @@ export default function DatabaseManagementPage() {
 
   const handleCloseTenantConnection = async (tenantCode: string) => {
     try {
-      const response = await fetch(`/api/admin/database/connections/tenant/${tenantCode}/close`, {
+      const response = await callClientApi(`admin/database/connections/tenant/${tenantCode}/close`, {
         method: 'POST'
       })
 

@@ -42,10 +42,8 @@ export function useReorderableConfig(componentId: string, userId?: string) {
       setError(null)
 
       // Tentative de chargement depuis l'API
-      const response = await fetch(`/api/ui-preferences/reorderable-list/${componentId}`, {
-        method: 'GET',
-        credentials: 'include'
-      })
+      const { callClientApi } = await import('@/utils/backend-api')
+      const response = await callClientApi(`ui-preferences/reorderable-list/${componentId}`)
 
       if (response.ok) {
         const savedConfig = await response.json()
@@ -99,12 +97,9 @@ export function useReorderableConfig(componentId: string, userId?: string) {
       }
 
       // Sauvegarde via l'API
-      const response = await fetch(`/api/ui-preferences/reorderable-list/${componentId}`, {
+      const { callClientApi } = await import('@/utils/backend-api')
+      const response = await callClientApi(`ui-preferences/reorderable-list/${componentId}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify(updatedConfig)
       })
 

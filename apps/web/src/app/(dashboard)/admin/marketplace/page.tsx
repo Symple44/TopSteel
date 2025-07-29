@@ -13,6 +13,7 @@ import { MarketplaceStats } from './components/marketplace-stats'
 import { ModulePublisher } from './components/module-publisher'
 import { Store, Package, TrendingUp, Settings, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { callClientApi } from '@/utils/backend-api'
 
 interface QuickStats {
   totalModules: number
@@ -31,7 +32,7 @@ export default function MarketplacePage() {
   useEffect(() => {
     const fetchQuickStats = async () => {
       try {
-        const response = await fetch('/api/admin/marketplace/stats')
+        const response = await callClientApi('admin/marketplace/stats')
         if (response.ok) {
           const data = await response.json()
           setQuickStats({

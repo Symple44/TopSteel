@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-// import { DataTable } from '@/components/ui/datatable/DataTable'
+import { DataTable } from '@/components/ui/datatable/DataTable'
+import { ColumnConfig } from '@/components/ui/datatable/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Download, RefreshCw } from 'lucide-react'
@@ -11,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-// import { ColumnDef } from '@tanstack/react-table'
 
 interface DataTablePreviewProps {
   data: any[]
@@ -19,6 +19,25 @@ interface DataTablePreviewProps {
   calculatedFields?: any[]
   layout?: any
   settings?: any
+}
+
+// Convert query builder data types to DataTable types
+const getDataTableType = (dataType: string): ColumnConfig<any>['type'] => {
+  const type = dataType?.toLowerCase() || ''
+  
+  if (type.includes('int') || type.includes('numeric') || type.includes('decimal') || type.includes('float')) {
+    return 'number'
+  }
+  if (type.includes('bool')) {
+    return 'boolean'
+  }
+  if (type.includes('date') && type.includes('time')) {
+    return 'datetime'
+  }
+  if (type.includes('date')) {
+    return 'date'
+  }
+  return 'text'
 }
 
 export function DataTablePreview({
@@ -30,31 +49,22 @@ export function DataTablePreview({
 }: DataTablePreviewProps) {
   const [loading, setLoading] = useState(false)
 
-  const tableColumns = useMemo(() => {
-    // Si pas de données ou de colonnes définies, utiliser les clés du premier objet
-    if (!data || data.length === 0) {
+  // Debug: log the props to see what we're receiving
+  console.log('DataTablePreview props:', {
+    dataLength: data?.length || 0,
+    columnsLength: columns?.length || 0,
+    columns: columns,
+    calculatedFieldsLength: calculatedFields?.length || 0
+  })
+
+  const dataTableColumns = useMemo((): ColumnConfig<any>[] => {
+    // Si pas de colonnes définies, pas d'affichage
+    if (!columns || columns.length === 0) {
+      console.log('No columns available for DataTable')
       return []
     }
 
-    // Si pas de colonnes définies, utiliser toutes les propriétés du premier objet
-    if (columns.length === 0) {
-      const firstRow = data[0]
-      if (!firstRow) return []
-      
-      return Object.keys(firstRow).map(key => ({
-        accessorKey: key,
-        header: key,
-        dataType: typeof firstRow[key],
-        cell: ({ getValue }) => {
-          const value = getValue()
-          return String(value ?? '')
-        },
-        enableSorting: true,
-        enableColumnFilter: true,
-      }))
-    }
-
-    // Traitement normal des colonnes définies
+    // Traitement des colonnes définies par le query builder
     const visibleColumns = columns.filter(col => col.isVisible ?? true)
     const visibleCalculatedFields = calculatedFields.filter(field => field.isVisible ?? true)
     
@@ -62,39 +72,49 @@ export function DataTablePreview({
     const allColumns = [...visibleColumns, ...visibleCalculatedFields]
       .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
 
-    return allColumns.map(col => ({
-      accessorKey: col.alias || col.columnName || col.name,
-      header: col.label || col.columnName || col.name,
-      dataType: col.dataType,
-      format: col.format,
-      cell: ({ getValue }) => {
-        const value = getValue()
-        
-        // Format based on data type and format settings
-        if (col.format) {
-          switch (col.format.type) {
-            case 'currency':
-              return new Intl.NumberFormat('fr-FR', {
-                style: 'currency',
-                currency: 'EUR',
-              }).format(value as number)
-            case 'percentage':
-              return `${(value as number * 100).toFixed(col.format.decimals || 2)}%`
-            case 'number':
-              return (value as number).toFixed(col.format.decimals || 0)
-            case 'date':
-              return new Date(value as string).toLocaleDateString('fr-FR')
-            default:
-              return String(value)
+    const result = allColumns.map((col, index): ColumnConfig<any> => {
+      const columnId = col.alias || col.columnName || col.name || `col_${index}`
+      
+      const columnConfig: ColumnConfig<any> = {
+        id: columnId,
+        key: columnId as keyof any,
+        title: col.label || col.columnName || col.name || 'Unknown',
+        description: col.description || `Colonne ${col.tableName || ''}.${col.columnName || ''}`,
+        type: getDataTableType(col.dataType),
+        width: 150,
+        sortable: col.isSortable ?? true,
+        searchable: col.isFilterable ?? true,
+        render: (value: any) => {
+          // Format based on data type and format settings
+          if (col.format) {
+            switch (col.format.type) {
+              case 'currency':
+                return new Intl.NumberFormat('fr-FR', {
+                  style: 'currency',
+                  currency: 'EUR',
+                }).format(value as number)
+              case 'percentage':
+                return `${(value as number * 100).toFixed(col.format.decimals || 2)}%`
+              case 'number':
+                return (value as number).toFixed(col.format.decimals || 0)
+              case 'date':
+                return new Date(value as string).toLocaleDateString('fr-FR')
+              default:
+                return String(value ?? '')
+            }
           }
-        }
 
-        return String(value ?? '')
-      },
-      enableSorting: col.isSortable ?? true,
-      enableColumnFilter: col.isFilterable ?? true,
-    }))
-  }, [data, columns, calculatedFields])
+          return String(value ?? '')
+        }
+      }
+      
+      console.log('Created DataTable column:', columnConfig)
+      return columnConfig
+    })
+    
+    console.log('Final DataTable columns:', result)
+    return result
+  }, [columns, calculatedFields])
 
   const handleExport = async (format: string) => {
     // TODO: Implement export functionality
@@ -149,64 +169,51 @@ export function DataTablePreview({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 overflow-hidden">
-        {!data || data.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
+      <CardContent className="flex-1 overflow-hidden p-0">
+        {!columns || columns.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-muted-foreground p-6">
             <div className="text-center">
-              <p className="mb-2">Aucune donnée disponible</p>
-              <p className="text-sm">Sélectionnez des colonnes et cliquez sur "Exécuter"</p>
+              <p className="mb-2">Aucune colonne sélectionnée</p>
+              <p className="text-sm">Sélectionnez des colonnes pour voir l'aperçu des données</p>
             </div>
           </div>
         ) : (
-          <div className="rounded-md border">
-            <table className="w-full caption-bottom text-sm">
-              <thead className="[&_tr]:border-b">
-                <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  {tableColumns.map((column, index) => (
-                  <th
-                    key={index}
-                    className="h-12 px-4 text-left align-middle font-medium text-muted-foreground"
-                  >
-                    <div>
-                      <div>{column.header}</div>
-                      {column.dataType && (
-                        <div className="text-xs font-normal opacity-70">
-                          {column.dataType}
-                        </div>
-                      )}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="[&_tr:last-child]:border-0">
-              {data.slice(0, 10).map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                >
-                  {tableColumns.map((column, colIndex) => (
-                    <td key={colIndex} className="p-4 align-middle">
-                      {column.cell ? column.cell({ getValue: () => row[column.accessorKey] }) : row[column.accessorKey]}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-            </table>
-            {data.length > 10 && (
-              <div className="flex items-center justify-center p-4 text-sm text-muted-foreground">
-                ... et {data.length - 10} lignes supplémentaires
+          <div className="h-full flex flex-col">
+            {/* Afficher les en-têtes même sans données */}
+            <DataTable
+              data={data && data.length > 0 ? data : [
+                // Ligne vide pour afficher les en-têtes
+                Object.fromEntries(dataTableColumns.map(col => [col.id, '']))
+              ]}
+              columns={dataTableColumns}
+              keyField="id"
+              tableId="query-preview"
+              // Configuration pour l'aperçu
+              editable={false}
+              selectable={false}
+              sortable={true}
+              searchable={true}
+              filterable={true}
+              // Interface simplifiée pour l'aperçu
+              height={400}
+              className="border-0"
+              // Pagination pour l'aperçu
+              pagination={{
+                page: 1,
+                total: data?.length || 0,
+                showSizeChanger: true,
+                pageSizeOptions: [10, 25, 50, 100]
+              }}
+            />
+            {/* Message si pas de données mais colonnes sélectionnées */}
+            {(!data || data.length === 0) && (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground bg-muted/20">
+                <div className="text-center p-6">
+                  <p className="mb-2">Colonnes configurées, aucune donnée disponible</p>
+                  <p className="text-sm">Exécutez la requête pour voir les données dans ce tableau</p>
+                </div>
               </div>
             )}
-            <div className="flex items-center justify-between px-4 py-2 border-t">
-              <div className="text-sm text-muted-foreground">
-                {data.length} résultat(s) au total
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Affichage des 10 premiers résultats
-              </div>
-            </div>
           </div>
         )}
       </CardContent>

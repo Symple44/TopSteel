@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { callClientApi } from '@/utils/backend-api'
 
 interface QueryBuilder {
   id: string
@@ -35,7 +36,7 @@ export function QueryBuilderSidebar() {
 
   const fetchQueryBuilders = async () => {
     try {
-      const response = await fetch('/api/query-builder')
+      const response = await callClientApi('query-builder')
       if (response.ok) {
         const result = await response.json()
         // Assurer que nous avons bien un tableau

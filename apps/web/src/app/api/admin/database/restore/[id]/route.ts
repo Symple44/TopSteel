@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     
-    // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/admin/database/restore/${id}`
-    
-    const response = await fetch(apiUrl, {
+    const response = await callBackendFromApi(`admin/database/restore/${id}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         ...(request.headers.get('authorization') && {
           'Authorization': request.headers.get('authorization')!
         }),

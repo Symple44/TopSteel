@@ -1,20 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(req: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get('accessToken')?.value
-    
-    // Appeler directement l'API backend
-    const response = await safeFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menu-raw/tree`, {
-      headers: {
-        'Authorization': accessToken ? `Bearer ${accessToken}` : '',
-        'Content-Type': 'application/json'
-      }
-    })
+    // Appeler directement l'API backend via l'utilitaire harmonisé
+    const response = await callBackendFromApi(req, 'admin/menu-raw/tree')
 
     const data = await response.json()
     

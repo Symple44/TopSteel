@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { BarChart3, TrendingUp, Users, DollarSign, Download, Star, Loader2, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
+import { callClientApi } from '@/utils/backend-api'
 
 interface MarketplaceStats {
   overview: {
@@ -49,7 +50,7 @@ export function MarketplaceStats() {
     const fetchStats = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/admin/marketplace/stats')
+        const response = await callClientApi('admin/marketplace/stats')
         
         if (!response.ok) {
           throw new Error('Erreur lors du chargement des statistiques')

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,14 +8,8 @@ export async function POST(request: NextRequest) {
     // Proxy vers l'API backend
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/backup`
     
-    const response = await safeFetch(apiUrl, {
+    const response = await callBackendFromApi(request, 'admin/database/backup', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(request.headers.get('authorization') && {
-          'Authorization': request.headers.get('authorization')!
-        }),
-      },
       body: JSON.stringify(body)
     })
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(
   request: NextRequest,
@@ -27,11 +26,8 @@ export async function GET(
 
     try {
       // Appeler le vrai backend NestJS
-      const response = await safeFetch(`${apiUrl}/api/v1/admin/roles/${roleId}/permissions`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      const response = await callBackendFromApi(request, `admin/roles/${roleId}/permissions`, {
+        method: 'GET',
         signal: AbortSignal.timeout(5000), // Timeout de 5 secondes
       })
 

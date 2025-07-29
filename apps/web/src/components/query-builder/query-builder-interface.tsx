@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { Button } from '@erp/ui'
 import { Save, Play, Settings, Download, Eye } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { callClientApi } from '@/utils/backend-api'
 import { cn } from '@/lib/utils'
 import { TableSelector } from './table-selector'
 import { ColumnSelector } from './column-selector'
@@ -56,9 +57,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
 
   const fetchAvailableTables = async () => {
     try {
-      const response = await fetch('/api/query-builder/schema/tables', {
-        credentials: 'include'
-      })
+      const response = await callClientApi('query-builder/schema/tables')
       if (response.ok) {
         const result = await response.json()
         // Assurer que nous avons bien un tableau
@@ -74,17 +73,15 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
   const handleSave = async () => {
     setLoading(true)
     try {
-      const url = queryBuilderId === 'new' 
-        ? '/api/query-builder'
-        : `/api/query-builder/${queryBuilderId}`
+      const endpoint = queryBuilderId === 'new' 
+        ? 'query-builder'
+        : `query-builder/${queryBuilderId}`
       
       const method = queryBuilderId === 'new' ? 'POST' : 'PATCH'
       
-      const response = await fetch(url, {
+      const response = await callClientApi(endpoint, {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(queryBuilder),
-        credentials: 'include', // Important pour envoyer les cookies d'authentification
       })
 
       if (response.ok) {
@@ -128,14 +125,12 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/query-builder/${queryBuilderId}/execute`, {
+      const response = await callClientApi(`query-builder/${queryBuilderId}/execute`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           page: 1,
           pageSize: 50,
         }),
-        credentials: 'include', // Important pour envoyer les cookies d'authentification
       })
 
       if (response.ok) {

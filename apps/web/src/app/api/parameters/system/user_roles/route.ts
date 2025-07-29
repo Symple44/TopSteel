@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,12 +17,8 @@ export async function GET(req: NextRequest) {
     // Appeler l'API backend pour récupérer les rôles depuis la base de données
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
     
-    const response = await safeFetch(`${apiUrl}/api/v1/parameters/system/user_roles?language=${language}`, {
+    const response = await callBackendFromApi(req, `parameters/system/user_roles?language=${language}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-      },
     })
 
     // Vérifier si la réponse est JSON

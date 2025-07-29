@@ -9,13 +9,13 @@ import { QueryBuilderPermissionService } from './query-builder-permission.servic
 @Injectable()
 export class QueryBuilderService {
   constructor(
-    @InjectRepository(QueryBuilder)
+    @InjectRepository(QueryBuilder, 'auth')
     private queryBuilderRepository: Repository<QueryBuilder>,
-    @InjectRepository(QueryBuilderColumn)
+    @InjectRepository(QueryBuilderColumn, 'auth')
     private columnRepository: Repository<QueryBuilderColumn>,
-    @InjectRepository(QueryBuilderJoin)
+    @InjectRepository(QueryBuilderJoin, 'auth')
     private joinRepository: Repository<QueryBuilderJoin>,
-    @InjectRepository(QueryBuilderCalculatedField)
+    @InjectRepository(QueryBuilderCalculatedField, 'auth')
     private calculatedFieldRepository: Repository<QueryBuilderCalculatedField>,
     private permissionService: QueryBuilderPermissionService,
   ) {}

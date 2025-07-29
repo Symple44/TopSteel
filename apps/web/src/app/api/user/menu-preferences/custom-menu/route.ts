@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 // Force dynamic pour éviter les problèmes de cache
 export const dynamic = 'force-dynamic'
@@ -44,13 +43,12 @@ export async function GET(request: NextRequest) {
 
     try {
       // Appeler le backend NestJS pour récupérer le menu personnalisé
-      console.log('🔍 Appel API custom-menu vers:', `${apiUrl}/api/v1/user/menu-preferences/custom-menu`)
+      console.log('🔍 Appel API custom-menu vers user/menu-preferences/custom-menu')
       
-      const response = await safeFetch(`${apiUrl}/api/v1/user/menu-preferences/custom-menu`, {
+      const response = await callBackendFromApi('user/menu-preferences/custom-menu', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
       })
       
@@ -162,16 +160,14 @@ export async function POST(request: NextRequest) {
     
     try {
       // Appeler le backend NestJS pour sauvegarder
-      const response = await fetch(`${apiUrl}/api/v1/user/menu-preferences/custom-menu`, {
+      const response = await callBackendFromApi('user/menu-preferences/custom-menu', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           menuItems: menuItems
         }),
-        signal: AbortSignal.timeout(10000),
       })
 
       if (response.ok) {

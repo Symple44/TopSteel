@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@erp/ui'
 import { Input } from '@/components/ui/input'
@@ -9,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Plus, X, Database, Link, Search, AlertTriangle } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { callClientApi } from '@/utils/backend-api'
 
 interface TableSelectorProps {
   availableTables: any[]
@@ -37,7 +39,9 @@ export function TableSelector({
   const [searchTerm, setSearchTerm] = useState('')
   const [showJoinDialog, setShowJoinDialog] = useState(false)
   const [showChangeTableDialog, setShowChangeTableDialog] = useState(false)
+  const [showRemoveJoinDialog, setShowRemoveJoinDialog] = useState(false)
   const [pendingMainTable, setPendingMainTable] = useState('')
+  const [pendingRemoveJoin, setPendingRemoveJoin] = useState<{index: number, join: any, columnsFromTable: any[]} | null>(null)
   const [newJoin, setNewJoin] = useState({
     fromTable: mainTable,
     fromColumn: '',
@@ -50,12 +54,16 @@ export function TableSelector({
   const [toColumnSearch, setToColumnSearch] = useState('')
   const [availableFromColumns, setAvailableFromColumns] = useState<string[]>([])
   const [availableToColumns, setAvailableToColumns] = useState<string[]>([])
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Fonction pour récupérer les colonnes d'une table
   const getTableColumns = async (tableName: string): Promise<string[]> => {
     try {
-      // Ici vous devrez adapter selon votre API
-      const response = await fetch(`/api/tables/${tableName}/columns`)
+      const response = await callClientApi(`tables/${tableName}/columns`)
       if (response.ok) {
         const data = await response.json()
         return data.columns || []
@@ -177,16 +185,59 @@ export function TableSelector({
 
   const handleRemoveJoin = (index: number) => {
     const removedJoin = joins[index]
-    const newJoins = joins.filter((_, i) => i !== index)
-    onJoinsChange(newJoins)
     
-    // Check if the table is still used
+    // Check if the table is still used in other joins
+    const newJoins = joins.filter((_, i) => i !== index)
     const tableStillUsed = newJoins.some(j => j.toTable === removedJoin.toTable) || 
                           removedJoin.toTable === mainTable
     
+    // If table won't be used anymore, check if there are selected columns from this table
     if (!tableStillUsed) {
+      const columnsFromTable = columns.filter(col => {
+        // Check if column is from the table being removed
+        const columnTable = col.table || col.tableName
+        return columnTable === removedJoin.toTable || 
+               (removedJoin.alias && columnTable === removedJoin.alias)
+      })
+      
+      if (columnsFromTable.length > 0) {
+        // Show confirmation dialog instead of window.confirm
+        setPendingRemoveJoin({ index, join: removedJoin, columnsFromTable })
+        setShowRemoveJoinDialog(true)
+        return
+      }
+      
+      // Remove the table from selected tables
       onTablesChange(selectedTables.filter(t => t !== removedJoin.toTable))
     }
+    
+    // Remove the join directly if no columns are affected
+    onJoinsChange(newJoins)
+  }
+
+  const handleConfirmRemoveJoin = () => {
+    if (!pendingRemoveJoin) return
+    
+    const { index, join: removedJoin, columnsFromTable } = pendingRemoveJoin
+    const newJoins = joins.filter((_, i) => i !== index)
+    
+    // Remove columns from the removed table
+    const updatedColumns = columns.filter(col => {
+      const columnTable = col.table || col.tableName
+      return !(columnTable === removedJoin.toTable || 
+              (removedJoin.alias && columnTable === removedJoin.alias))
+    })
+    onColumnsChange(updatedColumns)
+    
+    // Remove the table from selected tables
+    onTablesChange(selectedTables.filter(t => t !== removedJoin.toTable))
+    
+    // Remove the join
+    onJoinsChange(newJoins)
+    
+    // Close dialog and reset state
+    setShowRemoveJoinDialog(false)
+    setPendingRemoveJoin(null)
   }
 
   return (
@@ -235,39 +286,40 @@ export function TableSelector({
           <div>
             <div className="flex items-center justify-between mb-2">
               <Label>Joined Tables</Label>
-              <Dialog open={showJoinDialog} onOpenChange={setShowJoinDialog}>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" disabled={!mainTable} onClick={handleOpenJoinDialog}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Join
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-                  <DialogHeader className="border-b pb-4">
-                    <DialogTitle className="flex items-center gap-2 text-xl">
-                      <Link className="h-6 w-6 text-primary" />
-                      Add Table Join
-                    </DialogTitle>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Create a relationship between two tables by joining them on matching columns
-                    </p>
-                  </DialogHeader>
-                  <div className="space-y-6 py-6 overflow-y-auto flex-1">
+              <Button size="sm" variant="outline" disabled={!mainTable} onClick={handleOpenJoinDialog}>
+                <Plus className="h-4 w-4 mr-1" />
+                Add Join
+              </Button>
+              
+              <Dialog open={showJoinDialog} onOpenChange={(open) => !open && resetJoinDialog()}>
+                <DialogContent forcePortal className="w-full max-w-3xl max-h-[90vh] flex flex-col p-0">
+                    <div className="border-b pb-4 px-6 pt-6">
+                      <h2 className="flex items-center gap-2 text-xl font-semibold">
+                        <Link className="h-6 w-6 text-primary" />
+                        Add Table Join
+                      </h2>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Create a relationship between two tables by joining them on matching columns
+                      </p>
+                    </div>
+                    <div className="space-y-6 py-6 px-6 overflow-y-auto flex-1 relative">
                     {(newJoin.fromTable && newJoin.toTable && newJoin.fromColumn && newJoin.toColumn) && (
                       <div className="p-4 bg-muted/50 rounded-lg border-2 border-dashed">
                         <div className="text-sm font-medium mb-2">Join Preview:</div>
                         <div className="font-mono text-sm text-center">
-                          <span className="px-2 py-1 bg-primary/10 text-primary rounded">
-                            {newJoin.fromTable}
-                          </span>
-                          <span className="mx-2 text-muted-foreground">
-                            {newJoin.joinType} JOIN
-                          </span>
-                          <span className="px-2 py-1 bg-secondary text-secondary-foreground rounded">
-                            {newJoin.toTable}
-                          </span>
-                          <div className="mt-2 text-xs text-muted-foreground">
-                            ON {newJoin.fromTable}.{newJoin.fromColumn} = {newJoin.toTable}.{newJoin.toColumn}
+                          <div className="flex items-center justify-center gap-2 flex-wrap">
+                            <span className="px-2 py-1 bg-primary/10 text-primary rounded truncate max-w-[120px]" title={newJoin.fromTable}>
+                              {newJoin.fromTable}
+                            </span>
+                            <span className="text-muted-foreground whitespace-nowrap">
+                              {newJoin.joinType} JOIN
+                            </span>
+                            <span className="px-2 py-1 bg-secondary text-secondary-foreground rounded truncate max-w-[120px]" title={newJoin.toTable}>
+                              {newJoin.toTable}
+                            </span>
+                          </div>
+                          <div className="mt-2 text-xs text-muted-foreground break-all">
+                            ON <span className="break-all">{newJoin.fromTable}</span>.<span className="break-all">{newJoin.fromColumn}</span> = <span className="break-all">{newJoin.toTable}</span>.<span className="break-all">{newJoin.toColumn}</span>
                           </div>
                         </div>
                       </div>
@@ -285,7 +337,10 @@ export function TableSelector({
                           <SelectContent>
                             {selectedTables.map((table) => (
                               <SelectItem key={table} value={table}>
-                                {table}
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                                  <span className="truncate" title={table}>{table}</span>
+                                </div>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -387,7 +442,10 @@ export function TableSelector({
                                   .filter(t => !selectedTables.includes(t.tableName || t.name))
                                   .map((table) => (
                                     <SelectItem key={table.tableName || table.name} value={table.tableName || table.name}>
-                                      {table.tableName || table.name}
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-secondary rounded-full"></div>
+                                        <span className="truncate" title={table.tableName || table.name}>{table.tableName || table.name}</span>
+                                      </div>
                                     </SelectItem>
                                   ))
                               : []}
@@ -445,7 +503,8 @@ export function TableSelector({
                       />
                     </div>
 
-                    <div className="flex justify-between items-center pt-4 border-t bg-background">
+                    </div>
+                    <div className="flex justify-between items-center pt-4 px-6 pb-6 border-t bg-background sticky bottom-0 z-10">
                       <div className="text-sm text-muted-foreground">
                         {newJoin.fromColumn && newJoin.toColumn && newJoin.toTable && newJoin.fromTable ? 
                           '✓ Ready to create join' : 
@@ -453,7 +512,7 @@ export function TableSelector({
                         }
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setShowJoinDialog(false)}>
+                        <Button variant="outline" onClick={resetJoinDialog}>
                           Cancel
                         </Button>
                         <Button 
@@ -466,7 +525,6 @@ export function TableSelector({
                         </Button>
                       </div>
                     </div>
-                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -478,35 +536,68 @@ export function TableSelector({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {joins.map((join, index) => (
-                    <div key={index} className="p-3 bg-muted rounded-lg border">
+                  {joins.map((join, index) => {
+                    // Check if this join's table has selected columns
+                    const hasSelectedColumns = columns.some(col => {
+                      const columnTable = col.table || col.tableName
+                      return columnTable === join.toTable || 
+                             (join.alias && columnTable === join.alias)
+                    })
+                    
+                    return (
+                    <div key={index} className={`p-3 rounded-lg border ${
+                      hasSelectedColumns 
+                        ? 'bg-amber-50 border-amber-200' 
+                        : 'bg-muted border-border'
+                    }`}>
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Link className="h-4 w-4 text-primary" />
-                          <Badge variant="secondary" className="font-medium">
+                        <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+                          <Link className="h-4 w-4 text-primary flex-shrink-0" />
+                          <Badge variant="secondary" className="font-medium flex-shrink-0">
                             {join.joinType}
                           </Badge>
-                          <span className="font-semibold">{join.toTable}</span>
-                          {join.alias && (
-                            <Badge variant="outline" className="text-xs">
-                              as {join.alias}
-                            </Badge>
-                          )}
+                          <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+                            <span className="font-semibold truncate" title={join.toTable}>
+                              {join.toTable}
+                            </span>
+                            {join.alias && (
+                              <Badge variant="outline" className="text-xs max-w-[80px] overflow-hidden">
+                                <span className="truncate block" title={`as ${join.alias}`}>
+                                  as {join.alias}
+                                </span>
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleRemoveJoin(index)}
-                          className="h-6 w-6 p-0"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          {hasSelectedColumns && (
+                            <div 
+                              className="bg-amber-100 text-amber-700 rounded-full px-2 py-1 text-xs font-medium"
+                              title="Cette table a des colonnes sélectionnées"
+                            >
+                              {columns.filter(col => {
+                                const columnTable = col.table || col.tableName
+                                return columnTable === join.toTable || 
+                                       (join.alias && columnTable === join.alias)
+                              }).length} col.
+                            </div>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleRemoveJoin(index)}
+                            className="h-6 w-6 p-0 flex-shrink-0"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground font-mono bg-background px-2 py-1 rounded">
-                        ON {join.fromTable}.{join.fromColumn} = {join.toTable}.{join.toColumn}
+                      <div className="text-xs text-muted-foreground font-mono bg-background px-2 py-1 rounded break-all">
+                        ON <span className="break-all">{join.fromTable}</span>.<span className="break-all">{join.fromColumn}</span> = <span className="break-all">{join.toTable}</span>.<span className="break-all">{join.toColumn}</span>
                       </div>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </ScrollArea>
@@ -551,6 +642,65 @@ export function TableSelector({
               Confirmer le changement
             </Button>
           </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Dialog de confirmation pour suppression de jointure */}
+    <Dialog open={showRemoveJoinDialog} onOpenChange={setShowRemoveJoinDialog}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-destructive" />
+            Supprimer cette jointure ?
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          {pendingRemoveJoin && (
+            <>
+              <div className="space-y-3">
+                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <p className="text-sm">
+                    La table <strong>"{pendingRemoveJoin.join.toTable}"</strong> est utilisée par{' '}
+                    <strong>{pendingRemoveJoin.columnsFromTable.length} colonne(s)</strong> sélectionnée(s).
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Colonnes concernées :</p>
+                  <div className="flex flex-wrap gap-1">
+                    {pendingRemoveJoin.columnsFromTable.map((col, index) => (
+                      <span 
+                        key={index} 
+                        className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-medium"
+                      >
+                        {col.name || col.columnName}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-sm">
+                  Supprimer cette jointure retirera automatiquement ces colonnes de votre sélection.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  ⚠️ Cette action ne peut pas être annulée.
+                </p>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => {
+                  setShowRemoveJoinDialog(false)
+                  setPendingRemoveJoin(null)
+                }}>
+                  Annuler
+                </Button>
+                <Button 
+                  variant="destructive"
+                  onClick={handleConfirmRemoveJoin}
+                >
+                  Supprimer la jointure
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

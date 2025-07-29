@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Database, Table, Users, Package } from 'lucide-react'
+import { callClientApi } from '@/utils/backend-api'
 
 export default function QueryBuilderTestPage() {
   const router = useRouter()
@@ -151,11 +152,8 @@ export default function QueryBuilderTestPage() {
     }
 
     try {
-      const response = await fetch('/api/query-builder', {
+      const response = await callClientApi('query-builder', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(testQueryBuilder),
       })
 

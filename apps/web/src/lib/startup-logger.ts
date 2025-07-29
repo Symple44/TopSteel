@@ -1,6 +1,5 @@
 import { BackendHealthService } from './backend-health'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callClientApi } from '@/utils/backend-api'
 
 export async function logStartupInfo() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'Non configurée'
@@ -21,7 +20,7 @@ export async function logStartupInfo() {
     console.log('📡 Vérification de la connexion au backend...')
     
     try {
-      const response = await safeFetch('/api/config', {
+      const response = await callClientApi('config', {
         method: 'GET',
         signal: AbortSignal.timeout(3000),
       })
@@ -33,7 +32,7 @@ export async function logStartupInfo() {
       }
     } catch (error) {
       console.error('❌ Backend inaccessible!')
-      console.error(`   URL tentée: /api/config`)
+      console.error(`   URL tentée: config`)
       console.error(`   Erreur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       console.log('\n💡 Vérifiez que:')
       console.log('   1. Le serveur backend est démarré (npm run dev dans apps/api)')

@@ -5,6 +5,7 @@ import { Button } from '@erp/ui'
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface ImageUploadProps {
   category: 'avatar' | 'logo' | 'document'
@@ -67,7 +68,7 @@ export function ImageUpload({
       if (entityType) formData.append('entityType', entityType)
       if (entityId) formData.append('entityId', entityId)
 
-      const response = await fetch('/api/images/upload', {
+      const response = await callClientApi('images/upload', {
         method: 'POST',
         body: formData
       })

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
@@ -44,9 +43,8 @@ export async function GET(
     const { id } = await params
     const backendUrl = `${apiUrl}/api/v1/query-builder/${id}`
 
-    const response = await safeFetch(backendUrl, {
+    const response = await callBackendFromApi(request, `query-builder/${id}`, {
       method: 'GET',
-      headers,
       signal: AbortSignal.timeout(10000)
     })
 
@@ -81,9 +79,8 @@ export async function PATCH(
     const { id } = await params
     const backendUrl = `${apiUrl}/api/v1/query-builder/${id}`
 
-    const response = await safeFetch(backendUrl, {
+    const response = await callBackendFromApi(request, `query-builder/${id}`, {
       method: 'PATCH',
-      headers,
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(10000)
     })
@@ -118,9 +115,8 @@ export async function DELETE(
     const { id } = await params
     const backendUrl = `${apiUrl}/api/v1/query-builder/${id}`
 
-    const response = await safeFetch(backendUrl, {
+    const response = await callBackendFromApi(request, `query-builder/${id}`, {
       method: 'DELETE',
-      headers,
       signal: AbortSignal.timeout(10000)
     })
 

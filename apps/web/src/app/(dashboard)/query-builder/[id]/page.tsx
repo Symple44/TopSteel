@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { QueryBuilderInterface } from '@/components/query-builder/query-builder-interface'
 import { Loader2 } from 'lucide-react'
+import { callClientApi } from '@/utils/backend-api'
 
 export default function QueryBuilderDetailPage() {
   const params = useParams()
@@ -20,7 +21,7 @@ export default function QueryBuilderDetailPage() {
 
   const fetchQueryBuilder = async (id: string) => {
     try {
-      const response = await fetch(`/api/query-builder/${id}`)
+      const response = await callClientApi(`query-builder/${id}`)
       if (response.ok) {
         const data = await response.json()
         setQueryBuilder(data)

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,9 +41,8 @@ export async function GET(request: NextRequest) {
     const backendUrl = `${apiUrl}/api/v1/admin/users${queryString ? `?${queryString}` : ''}`
 
     // Appel vers le backend
-    const response = await safeFetch(backendUrl, {
+    const response = await callBackendFromApi(request, `admin/users${queryString ? `?${queryString}` : ''}`, {
       method: 'GET',
-      headers,
       signal: AbortSignal.timeout(10000) // 10 secondes
     })
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
@@ -81,13 +80,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
-    
     const headers = getAuthHeaders(request)
     const body = await request.json()
-    const backendUrl = `${apiUrl}/api/v1/query-builder`
 
-    const response = await safeFetch(backendUrl, {
+    const response = await callBackendFromApi('query-builder', {
       method: 'POST',
       headers,
       body: JSON.stringify(body),

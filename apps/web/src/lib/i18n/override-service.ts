@@ -4,8 +4,7 @@
  */
 
 import type { Translations } from './types'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface TranslationOverride {
   id: string
@@ -39,11 +38,8 @@ class TranslationOverrideService {
 
   private async fetchOverrides(): Promise<void> {
     try {
-      const response = await safeFetch('/api/translations/overrides', {
+      const response = await callClientApi('translations/overrides', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         // Pas besoin d'authentification pour lire les traductions
       })
 

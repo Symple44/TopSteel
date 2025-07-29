@@ -10,8 +10,7 @@
  * - Authentication automatique
  */
 
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callClientApi, callBackendApi } from '@/utils/backend-api'
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -308,19 +307,23 @@ export class APIClient {
         if (cachedData) return cachedData
       }
 
-      // Préparation de la requête
-      const url = `${this.baseURL}${endpoint}`
-      const headers = this.buildHeaders(config)
-
+      // Préparation de la requête pour l'API unifiée
       const fetchConfig: RequestInit = {
         method: config.method || 'GET',
-        headers,
+        headers: {
+          ...this.buildHeaders(config)
+        },
         ...(config.body ? { body: JSON.stringify(config.body) } : {}),
       }
 
-      // Exécution avec retry et timeout
+      // Exécution avec retry et timeout - Utiliser callClientApi pour les appels côté client
       const operation = async () => {
-        const response = await safeFetch(url, fetchConfig)
+        // Déterminer si on utilise le backend direct ou les routes API Next.js 
+        const useDirectBackend = typeof window === 'undefined' || this.baseURL !== (process.env.NEXT_PUBLIC_API_URL || '/api')
+        
+        const response = useDirectBackend 
+          ? await callBackendApi(endpoint, fetchConfig)
+          : await callClientApi(endpoint, fetchConfig)
 
         if (!response.ok) {
           throw {
@@ -432,16 +435,21 @@ export class APIClient {
       uploadConfig.headers = restHeaders
     }
 
-    const url = `${this.baseURL}${endpoint}`
     const headers = this.buildHeaders(uploadConfig)
-
-    const response = await safeFetch(url, {
+    const fetchConfig: RequestInit = {
       method: 'POST',
       headers: Object.fromEntries(
         Object.entries(headers).filter(([key]) => key !== 'Content-Type')
       ),
       body: formData,
-    })
+    }
+
+    // Déterminer si on utilise le backend direct ou les routes API Next.js
+    const useDirectBackend = typeof window === 'undefined' || this.baseURL !== (process.env.NEXT_PUBLIC_API_URL || '/api')
+    
+    const response = useDirectBackend 
+      ? await callBackendApi(endpoint, fetchConfig)
+      : await callClientApi(endpoint, fetchConfig)
 
     if (!response.ok) {
       throw {

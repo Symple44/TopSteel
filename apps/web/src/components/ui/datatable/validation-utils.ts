@@ -212,10 +212,18 @@ export class ValidationUtils {
       opt.label.toLowerCase() === String(value).toLowerCase()
     )
     
+    console.log('validateSelect:', { 
+      value, 
+      options: column.options.map(o => ({ value: o.value, label: o.label })), 
+      foundOption: option 
+    })
+    
     if (option) {
       return { isValid: true, convertedValue: option.value }
     }
     
+    // Si l'option n'est pas trouvée, on accepte la valeur mais on émet un warning
+    // Cela permet d'avoir des données cohérentes même si les options changent
     return { 
       isValid: true, 
       convertedValue: value,

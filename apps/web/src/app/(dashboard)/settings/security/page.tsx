@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, Button, Badge, Alert, AlertDe
 import { Shield, Smartphone, Key, AlertTriangle, CheckCircle, QrCode, Download, Trash2, Plus, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/hooks'
+import { callClientApi } from '@/utils/backend-api'
 
 interface MFAMethod {
   id: string
@@ -69,15 +70,13 @@ export default function SecuritySettingsPage() {
     try {
       setLoading(true)
       const [statsResponse, methodsResponse] = await Promise.all([
-        fetch('/api/auth/mfa/status'),
-        fetch('/api/auth/mfa/methods')
+        callClientApi('auth/mfa/status'),
+        callClientApi('auth/mfa/methods')
       ])
 
-      if (statsResponse.ok && methodsResponse.ok) {
-        const stats = await statsResponse.json()
-        const methods = await methodsResponse.json()
-        setMFAStats(stats.data)
-        setMFAMethods(methods.data)
+      if (statsResponse.success && methodsResponse.success) {
+        setMFAStats(statsResponse.data)
+        setMFAMethods(methodsResponse.data)
       }
     } catch (error) {
       toast.error(t('security.mfa.loadError'))
@@ -88,15 +87,13 @@ export default function SecuritySettingsPage() {
 
   const handleSetupTOTP = async () => {
     try {
-      const response = await fetch('/api/auth/mfa/setup/totp', {
+      const response = await callClientApi('auth/mfa/setup/totp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        body: {}
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        setTotpSetup(data.data)
+      if (response.success) {
+        setTotpSetup(response.data)
         setSetupDialog({ open: true, type: 'totp' })
       } else {
         toast.error(t('security.mfa.totp.configError'))
@@ -110,16 +107,15 @@ export default function SecuritySettingsPage() {
     if (!totpSetup || !verificationCode) return
 
     try {
-      const response = await fetch('/api/auth/mfa/verify/totp', {
+      const response = await callClientApi('auth/mfa/verify/totp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           mfaId: totpSetup.mfaId,
           token: verificationCode
-        })
+        }
       })
 
-      if (response.ok) {
+      if (response.success) {
         toast.success(t('security.mfa.totp.success'))
         setSetupDialog({ open: false, type: null })
         setTotpSetup(null)
@@ -135,21 +131,19 @@ export default function SecuritySettingsPage() {
 
   const handleSetupWebAuthn = async () => {
     try {
-      const response = await fetch('/api/auth/mfa/setup/webauthn', {
+      const response = await callClientApi('auth/mfa/setup/webauthn', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           userName: t('defaultUserName') || 'TopSteel User'
-        })
+        }
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        setWebauthnSetup(data.data)
+      if (response.success) {
+        setWebauthnSetup(response.data)
         setSetupDialog({ open: true, type: 'webauthn' })
         
         // Trigger WebAuthn registration
-        await startWebAuthnRegistration(data.data.options)
+        await startWebAuthnRegistration(response.data.options)
       } else {
         toast.error(t('security.mfa.webauthn.configError'))
       }
@@ -199,17 +193,16 @@ export default function SecuritySettingsPage() {
     if (!webauthnSetup) return
 
     try {
-      const verifyResponse = await fetch('/api/auth/mfa/verify/webauthn', {
+      const verifyResponse = await callClientApi('auth/mfa/verify/webauthn', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           mfaId: webauthnSetup.mfaId,
           response,
           deviceName: deviceName || ts('security.defaultDevice')
-        })
+        }
       })
 
-      if (verifyResponse.ok) {
+      if (verifyResponse.success) {
         toast.success(t('security.mfa.webauthn.success'))
         setSetupDialog({ open: false, type: null })
         setWebauthnSetup(null)
@@ -225,13 +218,12 @@ export default function SecuritySettingsPage() {
 
   const handleDisableMFA = async (type: 'totp' | 'webauthn') => {
     try {
-      const response = await fetch('/api/auth/mfa/disable', {
+      const response = await callClientApi('auth/mfa/disable', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mfaType: type })
+        body: { mfaType: type }
       })
 
-      if (response.ok) {
+      if (response.success) {
         toast.success(`${type.toUpperCase()} ${ts('security.disabled')}`)
         loadMFAData()
       } else {
@@ -244,11 +236,10 @@ export default function SecuritySettingsPage() {
 
   const handleGetBackupCodes = async () => {
     try {
-      const response = await fetch('/api/auth/mfa/totp/backup-codes')
+      const response = await callClientApi('auth/mfa/totp/backup-codes')
       
-      if (response.ok) {
-        const data = await response.json()
-        setBackupCodes(data.data.codes)
+      if (response.success) {
+        setBackupCodes(response.data.codes)
         setShowBackupCodes(true)
       } else {
         toast.error(t('security.mfa.codesNotAvailable'))

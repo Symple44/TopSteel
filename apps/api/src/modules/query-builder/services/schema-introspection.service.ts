@@ -35,7 +35,7 @@ export interface RelationInfo {
 @Injectable()
 export class SchemaIntrospectionService {
   constructor(
-    @InjectDataSource()
+    @InjectDataSource('tenant')
     private dataSource: DataSource,
   ) {}
 

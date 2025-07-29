@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { toast } from 'sonner'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface UseImageUploadOptions {
   onSuccess?: (result: any) => void
@@ -65,7 +66,7 @@ export function useImageUpload({
         setUploadProgress(prev => Math.min(prev + 10, 90))
       }, 100)
 
-      const response = await fetch('/api/images/upload', {
+      const response = await callClientApi('images/upload', {
         method: 'POST',
         body: formData
       })
@@ -97,7 +98,7 @@ export function useImageUpload({
 
   const deleteImage = useCallback(async (imageId: string) => {
     try {
-      const response = await fetch(`/api/images/upload?imageId=${imageId}&category=${category}`, {
+      const response = await callClientApi(`images/upload?imageId=${imageId}&category=${category}`, {
         method: 'DELETE'
       })
 

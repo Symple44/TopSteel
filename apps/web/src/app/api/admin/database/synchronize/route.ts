@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest) {
   try {
-    // Proxy vers l'API backend
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    // Retirer le /api s'il est déjà dans l'URL
-    const apiBase = baseUrl.replace(/\/api$/, '')
-    const apiUrl = `${apiBase}/api/v1/admin/database/synchronize`
-    
-    const response = await fetch(apiUrl, {
+    const response = await callBackendFromApi('admin/database/synchronize', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         ...(request.headers.get('authorization') && {
           'Authorization': request.headers.get('authorization')!
         }),

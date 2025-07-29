@@ -19,13 +19,13 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') || '100'
     const offset = searchParams.get('offset') || '0'
 
-    // Appeler l'API backend pour récupérer l'historique
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    const apiResponse = await fetch(`${backendUrl}/api/auth/sessions/history?limit=${limit}&offset=${offset}`, {
+    // Importer callBackendFromApi
+    const { callBackendFromApi } = await import('@/utils/backend-api')
+    
+    const apiResponse = await callBackendFromApi(`auth/sessions/history?limit=${limit}&offset=${offset}`, {
       method: 'GET',
       headers: {
         'Authorization': request.headers.get('Authorization') || '',
-        'Content-Type': 'application/json'
       }
     })
 

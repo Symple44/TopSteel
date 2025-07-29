@@ -26,6 +26,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { useTranslation } from '@/lib/i18n'
 import { toast } from 'sonner'
 import ImageUpload from '@/components/ui/image-upload'
+import { callClientApi } from '@/utils/backend-api'
 
 export default function ProfilePage() {
   const { user } = useAuth()
@@ -126,7 +127,7 @@ export default function ProfilePage() {
         }
       } else {
         // En production, appel API réel
-        const response = await fetch('/api/user/profile', {
+        const response = await callClientApi('user/profile', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

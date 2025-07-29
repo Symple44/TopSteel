@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 import {
   Card,
   CardContent,
@@ -134,7 +135,7 @@ export default function GroupManagementPanel() {
 
   const loadGroups = async () => {
     try {
-      const response = await fetch('/api/admin/groups')
+      const response = await callClientApi('admin/groups')
       const data = await response.json()
       if (data.success) {
         setGroups(data.data)
@@ -148,7 +149,7 @@ export default function GroupManagementPanel() {
 
   const loadRoles = async () => {
     try {
-      const response = await fetch('/api/admin/roles')
+      const response = await callClientApi('admin/roles')
       const data = await response.json()
       if (data.success) {
         setRoles(data.data)
@@ -161,14 +162,14 @@ export default function GroupManagementPanel() {
   const loadGroupDetails = async (groupId: string) => {
     try {
       // Charger les utilisateurs du groupe
-      const usersResponse = await fetch(`/api/admin/groups/${groupId}/users`)
+      const usersResponse = await callClientApi(`admin/groups/${groupId}/users`)
       const usersData = await usersResponse.json()
       if (usersData.success) {
         setGroupUsers(usersData.data)
       }
 
       // Charger les rôles du groupe
-      const rolesResponse = await fetch(`/api/admin/groups/${groupId}/roles`)
+      const rolesResponse = await callClientApi(`admin/groups/${groupId}/roles`)
       const rolesData = await rolesResponse.json()
       if (rolesData.success) {
         setGroupRoles(rolesData.data)
@@ -184,7 +185,7 @@ export default function GroupManagementPanel() {
     }
 
     try {
-      const response = await fetch(`/api/admin/groups/${groupId}`, {
+      const response = await callClientApi(`admin/groups/${groupId}`, {
         method: 'DELETE'
       })
       
@@ -511,12 +512,11 @@ function GroupForm({
     
     try {
       const url = group 
-        ? `/api/admin/groups/${group.id}`
-        : '/api/admin/groups'
+        ? `admin/groups/${group.id}`
+        : 'admin/groups'
       
-      const response = await fetch(url, {
+      const response = await callClientApi(url, {
         method: group ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
       
@@ -643,9 +643,8 @@ function GroupDetails({
 
   const handleUpdateRoles = async () => {
     try {
-      const response = await fetch(`/api/admin/groups/${group.id}/roles`, {
+      const response = await callClientApi(`admin/groups/${group.id}/roles`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roleIds: selectedRoles })
       })
       
@@ -659,7 +658,7 @@ function GroupDetails({
 
   const handleRemoveUser = async (userId: string) => {
     try {
-      const response = await fetch(`/api/admin/groups/${group.id}/users/${userId}`, {
+      const response = await callClientApi(`admin/groups/${group.id}/users/${userId}`, {
         method: 'DELETE'
       })
       

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -34,12 +33,8 @@ export async function PATCH(request: NextRequest) {
     
     try {
       // Appeler le vrai backend NestJS
-      const response = await safeFetch(`${apiUrl}/api/v1/users/appearance/me`, {
+      const response = await callBackendFromApi(request, 'users/appearance/me', {
         method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(cleanedBody),
       })
 
@@ -135,11 +130,8 @@ export async function GET(request: NextRequest) {
     
     try {
       // Appeler le vrai backend NestJS
-      const response = await safeFetch(`${apiUrl}/api/v1/users/appearance/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      const response = await callBackendFromApi(request, 'users/appearance/me', {
+        method: 'GET',
       })
 
       if (response.ok) {

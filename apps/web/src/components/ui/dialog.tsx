@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -18,6 +19,7 @@ interface DialogTriggerProps {
 interface DialogContentProps {
   className?: string
   children: React.ReactNode
+  forcePortal?: boolean
 }
 
 interface DialogHeaderProps {
@@ -86,29 +88,53 @@ const DialogTrigger = ({ asChild, children }: DialogTriggerProps) => {
   )
 }
 
-const DialogContent = ({ className, children }: DialogContentProps) => {
+const DialogContent = ({ className, children, forcePortal = false }: DialogContentProps) => {
   const { open, setOpen } = React.useContext(DialogContext)
+  const [mounted, setMounted] = React.useState(false)
+  
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
   
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <div className={cn(
+  const dialogMarkup = (
+    <div 
+      className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setOpen(false)
+        }
+      }}
+    >
+      <div 
+        className={cn(
           'relative w-full max-w-lg max-h-[85vh] overflow-auto rounded-lg border bg-background p-6 shadow-lg',
           className
-        )}>
-          <button
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            onClick={() => setOpen(false)}
-          >
-            <X className="h-4 w-4" />
-          </button>
-          {children}
-        </div>
+        )}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: className?.includes('max-w-') ? undefined : '32rem' // 512px par défaut si pas de max-w- spécifié
+        }}
+      >
+        <button
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          onClick={() => setOpen(false)}
+        >
+          <X className="h-4 w-4" />
+        </button>
+        {children}
       </div>
     </div>
   )
+
+  // Si forcePortal est activé et que nous sommes montés, utiliser createPortal
+  if (forcePortal && mounted && typeof document !== 'undefined') {
+    return createPortal(dialogMarkup, document.body)
+  }
+
+  // Sinon, rendu normal dans le DOM
+  return dialogMarkup
 }
 
 const DialogHeader = ({ className, ...props }: DialogHeaderProps) => (

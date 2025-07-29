@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface UserMenuPreferences {
   id: string
@@ -58,7 +59,7 @@ export function useUserMenuPreferences() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/user/menu-preferences')
+      const response = await callClientApi('user/menu-preferences')
       const data = await response.json()
       
       if (data.success) {
@@ -76,7 +77,7 @@ export function useUserMenuPreferences() {
 
   const updatePreferences = useCallback(async (updates: UpdatePreferencesDto) => {
     try {
-      const response = await fetch('/api/user/menu-preferences', {
+      const response = await callClientApi('user/menu-preferences', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates)
@@ -100,7 +101,7 @@ export function useUserMenuPreferences() {
 
   const resetPreferences = useCallback(async () => {
     try {
-      const response = await fetch('/api/user/menu-preferences/reset', {
+      const response = await callClientApi('user/menu-preferences/reset', {
         method: 'POST'
       })
       
@@ -123,7 +124,7 @@ export function useUserMenuPreferences() {
   // Actions sur les items de menu
   const executeMenuItemAction = useCallback(async (action: MenuItemAction) => {
     try {
-      const response = await fetch('/api/user/menu-preferences/items/action', {
+      const response = await callClientApi('user/menu-preferences/items/action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(action)
@@ -170,7 +171,7 @@ export function useUserMenuPreferences() {
   // Réorganiser les items
   const reorderItems = useCallback(async (items: Array<{ itemId: string; order: number }>) => {
     try {
-      const response = await fetch('/api/user/menu-preferences/items/reorder', {
+      const response = await callClientApi('user/menu-preferences/items/reorder', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items })
@@ -193,7 +194,7 @@ export function useUserMenuPreferences() {
   // Raccourcis
   const addShortcut = useCallback(async (shortcut: { key: string; href: string; title: string }) => {
     try {
-      const response = await fetch('/api/user/menu-preferences/shortcuts', {
+      const response = await callClientApi('user/menu-preferences/shortcuts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(shortcut)
@@ -215,7 +216,7 @@ export function useUserMenuPreferences() {
 
   const removeShortcut = useCallback(async (key: string) => {
     try {
-      const response = await fetch(`/api/user/menu-preferences/shortcuts/${key}`, {
+      const response = await callClientApi(`user/menu-preferences/shortcuts/${key}`, {
         method: 'DELETE'
       })
       
@@ -236,7 +237,7 @@ export function useUserMenuPreferences() {
   // Templates
   const applyTemplate = useCallback(async (templateType: 'minimal' | 'business' | 'admin' | 'developer') => {
     try {
-      const response = await fetch(`/api/user/menu-preferences/templates/${templateType}`, {
+      const response = await callClientApi(`user/menu-preferences/templates/${templateType}`, {
         method: 'POST'
       })
       
@@ -270,7 +271,7 @@ export function useUserMenuPreferences() {
 
   const importPreferences = useCallback(async (importData: any) => {
     try {
-      const response = await fetch('/api/user/menu-preferences/import', {
+      const response = await callClientApi('user/menu-preferences/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(importData)

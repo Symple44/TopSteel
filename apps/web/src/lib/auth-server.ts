@@ -5,12 +5,7 @@
 
 import type { User } from '@erp/domains/core'
 import { NextRequest } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
-
-const INTERNAL_API_BASE = process.env.VERCEL_URL 
-  ? `https://${process.env.VERCEL_URL}` 
-  : 'http://localhost:3005'
+import { callBackendApi, callBackendFromApi } from '@/utils/backend-api'
 
 /**
  * Récupérer le token d'authentification depuis les cookies ou headers
@@ -37,32 +32,26 @@ export function getAuthToken(request: NextRequest): string | null {
 }
 
 /**
- * Faire un appel authentifié vers le backend NestJS
+ * Faire un appel authentifié vers le backend NestJS depuis une route serveur
+ * @deprecated Utiliser callBackendFromApi à la place
  */
 export async function fetchBackend(
   endpoint: string, 
   request: NextRequest,
   options: RequestInit = {}
 ): Promise<Response> {
-  // Utiliser une URL serveur-serveur pour les API routes Next.js
-  const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-  const token = getAuthToken(request)
+  // Nettoyer l'endpoint pour callBackendFromApi
+  const cleanEndpoint = endpoint.startsWith('/api/v1/') 
+    ? endpoint.substring(8) 
+    : endpoint.startsWith('/api/') 
+      ? endpoint.substring(5)
+      : endpoint.startsWith('/') 
+        ? endpoint.substring(1)
+        : endpoint
 
-  // Ajouter le préfixe /api/v1 si l'endpoint ne l'a pas déjà
-  const fullEndpoint = endpoint.startsWith('/api/') ? endpoint : `/api/v1${endpoint}`
+  console.log(`[fetchBackend] DEPRECATED: Use callBackendFromApi instead. Endpoint: ${cleanEndpoint}`)
 
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
-    ...options.headers,
-  }
-
-  console.log(`[fetchBackend] Calling: ${apiUrl}${fullEndpoint}`)
-
-  return fetch(`${apiUrl}${fullEndpoint}`, {
-    ...options,
-    headers,
-  })
+  return callBackendFromApi(request, cleanEndpoint, options)
 }
 
 export const serverAuthService = {
@@ -71,11 +60,10 @@ export const serverAuthService = {
    */
   async validateToken(token: string): Promise<boolean> {
     try {
-      const response = await safeFetch(`${INTERNAL_API_BASE}/api/auth/validate`, {
+      const response = await callBackendApi('auth/validate', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
       })
 
@@ -91,11 +79,10 @@ export const serverAuthService = {
    */
   async getProfile(token: string): Promise<User> {
     try {
-      const response = await safeFetch(`${INTERNAL_API_BASE}/api/auth/profile`, {
+      const response = await callBackendApi('auth/profile', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
       })
 

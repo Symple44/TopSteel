@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 import {
   Dialog,
   DialogContent,
@@ -108,7 +109,7 @@ export default function BulkUserAssignment({
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users?includeGroups=true')
+      const response = await callClientApi('admin/users?includeGroups=true')
       const data = await response.json()
       if (data.success) {
         setUsers(data.data)
@@ -120,7 +121,7 @@ export default function BulkUserAssignment({
 
   const loadGroups = async () => {
     try {
-      const response = await fetch('/api/admin/groups')
+      const response = await callClientApi('admin/groups')
       const data = await response.json()
       if (data.success) {
         setGroups(data.data)
@@ -178,9 +179,8 @@ export default function BulkUserAssignment({
       }
 
       // Appel API pour l'assignation en masse
-      const response = await fetch('/api/admin/groups/bulk-assignment', {
+      const response = await callClientApi('admin/groups/bulk-assignment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ assignments })
       })
 

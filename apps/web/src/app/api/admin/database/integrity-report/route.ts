@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
-    // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/admin/database/integrity-report`
-    
-    const response = await fetch(apiUrl, {
+    const response = await callBackendFromApi('admin/database/integrity-report', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        // Transférer les headers d'authentification si présents
         ...(request.headers.get('authorization') && {
           'Authorization': request.headers.get('authorization')!
         }),

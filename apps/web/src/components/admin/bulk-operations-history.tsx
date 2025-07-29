@@ -97,11 +97,12 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
   const loadHistory = async () => {
     try {
       setLoading(true)
-      const url = userId 
-        ? `/api/admin/users/${userId}/bulk-operations-history?limit=${limit}`
-        : `/api/admin/users/bulk-operations?limit=${limit}`
+      const { callClientApi } = await import('@/utils/backend-api')
+      const endpoint = userId 
+        ? `admin/users/${userId}/bulk-operations-history?limit=${limit}`
+        : `admin/users/bulk-operations?limit=${limit}`
       
-      const response = await fetch(url)
+      const response = await callClientApi(endpoint)
       const data = await response.json()
       
       if (data.success) {

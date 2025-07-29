@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 import {
   Dialog,
   DialogContent,
@@ -188,7 +189,7 @@ export default function BulkProfileManagement({
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users?includeGroups=true&includeRoles=true')
+      const response = await callClientApi('admin/users?includeGroups=true&includeRoles=true')
       const data = await response.json()
       if (data.success) {
         setUsers(data.data)
@@ -200,7 +201,7 @@ export default function BulkProfileManagement({
 
   const loadRoles = async () => {
     try {
-      const response = await fetch('/api/admin/roles')
+      const response = await callClientApi('admin/roles')
       const data = await response.json()
       if (data.success) {
         setRoles(data.data)
@@ -212,7 +213,7 @@ export default function BulkProfileManagement({
 
   const loadGroups = async () => {
     try {
-      const response = await fetch('/api/admin/groups')
+      const response = await callClientApi('admin/groups')
       const data = await response.json()
       if (data.success) {
         setGroups(data.data)
@@ -286,9 +287,8 @@ export default function BulkProfileManagement({
           break
       }
 
-      const response = await fetch('/api/admin/users/bulk-operations', {
+      const response = await callClientApi('admin/users/bulk-operations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(operationData)
       })
 

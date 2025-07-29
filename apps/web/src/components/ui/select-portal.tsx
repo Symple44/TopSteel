@@ -64,33 +64,48 @@ export function SelectPortal({
       height: window.innerHeight
     }
 
+    // Vérifier si on est dans un dialog ou modal
+    const dialogContainer = triggerRef.current.closest('[role="dialog"], .fixed.inset-0')
+    const containerRect = dialogContainer?.getBoundingClientRect()
+
     let x = triggerRect.left
     let y = triggerRect.bottom + 4
 
-    // Ajustements pour rester dans le viewport
-    if (x + contentRect.width > viewport.width - 8) {
-      x = viewport.width - contentRect.width - 8
-    }
-    if (x < 8) x = 8
+    // Ajustements pour rester dans le viewport ou le container parent
+    const maxX = containerRect ? Math.min(viewport.width - 8, containerRect.right - 8) : viewport.width - 8
+    const minX = containerRect ? Math.max(8, containerRect.left + 8) : 8
 
-    if (y + contentRect.height > viewport.height - 8) {
-      // Ouvrir au-dessus si pas de place en dessous
-      y = triggerRect.top - contentRect.height - 4
-      if (y < 8) {
-        y = viewport.height - contentRect.height - 8
-      }
+    if (x + contentRect.width > maxX) {
+      x = maxX - contentRect.width
+    }
+    if (x < minX) x = minX
+
+    // Gestion intelligente de la hauteur
+    const spaceBelow = (containerRect ? containerRect.bottom : viewport.height) - triggerRect.bottom - 8
+    const spaceAbove = triggerRect.top - (containerRect ? containerRect.top : 0) - 8
+    const dropdownHeight = Math.min(contentRect.height, 200) // Hauteur max du dropdown
+
+    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+      // Ouvrir au-dessus
+      y = triggerRect.top - dropdownHeight - 4
+    } else if (spaceBelow < dropdownHeight) {
+      // Pas assez de place, utiliser l'espace disponible
+      y = triggerRect.bottom + 4
+      // Le dropdown aura sa propre scrollbar si nécessaire
     }
 
     setPosition({ x, y })
   }, [])
 
   const handleSelect = (optionValue: string) => {
+    console.log('SelectPortal handleSelect:', { optionValue, options: options.map(o => o.value) })
     onValueChange?.(optionValue)
     setIsOpen(false)
   }
 
   const toggleOpen = () => {
     if (disabled) return
+    console.log('SelectPortal toggle:', { currentIsOpen: isOpen, willBe: !isOpen, options: options.length })
     setIsOpen(!isOpen)
   }
 
@@ -99,6 +114,13 @@ export function SelectPortal({
     if (!isOpen) return
 
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      
+      // Vérifier si le clic est sur un élément avec data-select-portal, data-category-dropdown ou data-pagesize-dropdown
+      if (target.closest('[data-select-portal], [data-category-dropdown], [data-pagesize-dropdown]')) {
+        return
+      }
+      
       if (
         triggerRef.current && 
         contentRef.current &&
@@ -165,8 +187,7 @@ export function SelectPortal({
           'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100',
           'border-gray-200 dark:border-gray-700',
           'p-1',
-          'animate-in fade-in-0 zoom-in-95 duration-200',
-          'max-h-[200px] overflow-y-auto'
+          'animate-in fade-in-0 zoom-in-95 duration-200'
         )}
         data-select-portal
         style={{
@@ -176,11 +197,16 @@ export function SelectPortal({
           opacity: position.x === 0 && position.y === 0 ? 0 : 1,
           transition: 'opacity 150ms ease-in-out',
           backgroundColor: 'white',
-          border: '1px solid #e5e7eb'
+          border: '1px solid #e5e7eb',
+          maxHeight: '240px',
+          overflowY: 'auto',
+          zIndex: 99999 // S'assurer que le dropdown soit au-dessus de tout, y compris les footers sticky
         }}
         data-select-portal
       >
-      {options.map((option) => (
+      {options.map((option) => {
+        console.log('Rendering option:', { value: option.value, label: option.label, currentValue: value })
+        return (
         <div
           key={option.value}
           onClick={() => handleSelect(option.value)}
@@ -203,7 +229,8 @@ export function SelectPortal({
             <Check className="h-4 w-4" />
           )}
         </div>
-      ))}
+        )
+      })}
     </div>,
     document.body
   )

@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ModuleDetailsDialog } from './module-details-dialog'
 import { Search, Star, Download, ExternalLink, Users, ShoppingCart, BarChart3, Zap, Shield, Wrench, DollarSign, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { callClientApi } from '@/utils/backend-api'
 
 interface MarketplaceModule {
   id: string
@@ -78,7 +79,7 @@ export function MarketplaceCatalog() {
     const fetchModules = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/admin/marketplace/modules')
+        const response = await callClientApi('admin/marketplace/modules')
         
         if (!response.ok) {
           throw new Error(t('marketplace.loadingError'))

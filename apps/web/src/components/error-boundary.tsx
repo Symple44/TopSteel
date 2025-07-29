@@ -4,6 +4,7 @@ import { Button } from '@erp/ui'
 import { AlertTriangle, Bug, Home, RefreshCw } from 'lucide-react'
 import type { ErrorInfo, ReactNode } from 'react'
 import React, { Component } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 interface WindowWithGtag extends Window {
   gtag?: (
@@ -132,9 +133,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private async sendErrorToService(errorData: unknown) {
     try {
-      await fetch('/api/errors', {
+      await callClientApi('errors', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(errorData),
       })
     } catch (logError) {

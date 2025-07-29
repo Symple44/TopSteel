@@ -7,6 +7,7 @@ import { ColumnConfig } from '@/components/ui/datatable/types'
 import { Button, Badge, Avatar, AvatarFallback } from '@erp/ui'
 import { UserPlus, Download, Mail, Calendar, Shield, Building, Users, UserCheck, Settings } from 'lucide-react'
 import BulkProfileManagement from '@/components/admin/bulk-profile-management'
+import { callClientApi } from '@/utils/backend-api'
 
 interface User {
   id: string
@@ -282,12 +283,8 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
     try {
       setLoading(true)
       setError(null)
-      const response = await fetch('/api/admin/users?includePermissions=true', {
+      const response = await callClientApi('admin/users?includePermissions=true', {
         method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        }
       })
       const data = await response.json()
       

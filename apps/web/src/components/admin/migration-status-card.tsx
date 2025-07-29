@@ -300,7 +300,8 @@ export default function MigrationStatusCard({
       title="Détails de la migration"
       subtitle={selectedMigration || ''}
       onLoadDetails={async () => {
-        const response = await fetch(`/api/admin/database/migrations/${database}/${selectedMigration}/details`)
+        const { callClientApi } = await import('@/utils/backend-api')
+        const response = await callClientApi(`admin/database/migrations/${database}/${selectedMigration}/details`)
         if (!response.ok) {
           throw new Error('Impossible de charger les détails')
         }

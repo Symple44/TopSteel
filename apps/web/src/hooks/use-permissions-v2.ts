@@ -1,6 +1,7 @@
 import { useAuth } from './use-auth'
 import { useEffect, useState } from 'react'
 import { AccessLevel, Role, RolePermission } from '@/types/permissions'
+import { callClientApi } from '@/utils/backend-api'
 
 // Cache pour éviter les appels API répétés
 let permissionsCache: Map<string, RolePermission[]> = new Map()
@@ -47,12 +48,7 @@ export function usePermissions() {
       }
 
       // Charger depuis l'API backend
-      const response = await fetch(`/api/admin/roles/${user.role}/permissions`, {
-        headers: {
-          'Authorization': `Bearer ${tokens.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      })
+      const response = await callClientApi(`admin/roles/${user.role}/permissions`)
       
       if (!response.ok) {
         if (response.status === 401) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(
   req: NextRequest,
@@ -14,13 +14,8 @@ export async function POST(
     const { id } = await params
 
     // Rediriger vers l'API backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const response = await safeFetch(`${apiUrl}/api/v1/auth/login-societe/${id}`, {
+    const response = await callBackendFromApi(req, `auth/login-societe/${id}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
     })
 
     // Vérifier si la réponse est JSON

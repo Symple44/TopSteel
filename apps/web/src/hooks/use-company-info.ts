@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface CompanyInfo {
   id: string
@@ -27,7 +28,7 @@ export function useCompanyInfo() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/admin/company')
+      const response = await callClientApi('admin/company')
       
       if (!response.ok) {
         // Si l'endpoint n'existe pas encore, utiliser des données par défaut
@@ -87,9 +88,8 @@ export function useCompanyInfo() {
 
   const updateCompanyInfo = useCallback(async (updates: Partial<CompanyInfo>) => {
     try {
-      const response = await fetch('/api/admin/company', {
+      const response = await callClientApi('admin/company', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates)
       })
       

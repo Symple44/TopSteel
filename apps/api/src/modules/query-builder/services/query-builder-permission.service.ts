@@ -7,7 +7,7 @@ import { User } from '../../users/entities/user.entity'
 @Injectable()
 export class QueryBuilderPermissionService {
   constructor(
-    @InjectRepository(QueryBuilderPermission)
+    @InjectRepository(QueryBuilderPermission, 'auth')
     private permissionRepository: Repository<QueryBuilderPermission>,
   ) {}
 

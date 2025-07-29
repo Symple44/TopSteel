@@ -26,6 +26,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DataTablePreview } from './datatable-preview'
 import { toast } from 'sonner'
+import { callClientApi } from '@/utils/backend-api'
 
 interface Table {
   name: string
@@ -83,7 +84,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
 
   const fetchTables = async () => {
     try {
-      const response = await fetch('/api/query-builder/schema/tables')
+      const response = await callClientApi('query-builder/schema/tables')
       if (response.ok) {
         const tables = await response.json()
         setAvailableTables(tables)
@@ -180,36 +181,28 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
 
     setLoading(true)
     try {
-      // Simuler l'exécution avec des données mock
-      const mockData = Array.from({ length: Math.min(limit, 20) }, (_, i) => {
-        const row: any = {}
-        selectedColumns.forEach(col => {
-          const key = col.alias || col.column
-          switch (col.column) {
-            case 'id':
-              row[key] = i + 1
-              break
-            case 'email':
-              row[key] = `user${i + 1}@topsteel.tech`
-              break
-            case 'nom':
-              row[key] = `Nom${i + 1}`
-              break
-            case 'prenom':
-              row[key] = `Prénom${i + 1}`
-              break
-            case 'created_at':
-              row[key] = new Date(Date.now() - Math.random() * 10000000000).toISOString()
-              break
-            default:
-              row[key] = `Value ${i + 1}`
-          }
+      // Exécuter la vraie requête SQL via l'API
+      const response = await callClientApi('query-builder/execute-sql', {
+        method: 'POST',
+        body: JSON.stringify({
+          sql: sql,
+          limit: Math.min(limit, 100) // Limiter à 100 résultats max pour l'aperçu
         })
-        return row
       })
-      
-      setPreviewData(mockData)
-      toast.success('Requête exécutée avec succès')
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('SQL execution result:', result)
+        
+        // Adapter les données selon le format retourné
+        const data = Array.isArray(result) ? result : result.data || result.rows || []
+        setPreviewData(data)
+        toast.success(`Requête exécutée avec succès (${data.length} résultats)`)
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('SQL execution failed:', response.status, errorData)
+        toast.error(`Erreur lors de l'exécution: ${errorData.error || 'Erreur inconnue'}`)
+      }
     } catch (error) {
       console.error('Query execution failed:', error)
       toast.error('Erreur lors de l\'exécution de la requête')
@@ -271,12 +264,11 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
 
     setLoading(true)
     try {
-      const url = queryBuilderId === 'new' ? '/api/query-builder' : `/api/query-builder/${queryBuilderId}`
+      const endpoint = queryBuilderId === 'new' ? 'query-builder' : `query-builder/${queryBuilderId}`
       const method = queryBuilderId === 'new' ? 'POST' : 'PATCH'
       
-      const response = await fetch(url, {
+      const response = await callClientApi(endpoint, {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(queryData)
       })
 
@@ -598,7 +590,18 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                     ) : (
                       <DataTablePreview 
                         data={previewData}
-                        columns={[]}
+                        columns={selectedColumns.map((col, index) => ({
+                          alias: col.alias || `${col.table}.${col.column}`,
+                          columnName: col.column,
+                          tableName: col.table,
+                          label: col.alias || col.column,
+                          dataType: 'text', // TODO: get actual data type from schema
+                          isVisible: true,
+                          isSortable: true,
+                          isFilterable: true,
+                          displayOrder: index,
+                          aggregation: col.aggregation
+                        }))}
                         calculatedFields={[]}
                         layout={{}}
                         settings={{}}

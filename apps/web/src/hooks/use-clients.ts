@@ -449,11 +449,9 @@ export async function fetchClients(
       ...serializeClientsFilters(filters),
     })
 
-    const response = await fetch(`${clientsApiBaseUrl}?${queryParams}`, {
+    const { callClientApi } = await import('@/utils/backend-api')
+    const response = await callClientApi(`clients?${queryParams}`, {
       signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     })
 
     if (!response.ok) {
@@ -491,11 +489,9 @@ export async function fetchClient(id: string, signal?: AbortSignal): Promise<Cli
   }
 
   try {
-    const response = await fetch(`${clientsApiBaseUrl}/${id}`, {
+    const { callClientApi } = await import('@/utils/backend-api')
+    const response = await callClientApi(`clients/${id}`, {
       signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     })
 
     if (!response.ok) {
@@ -522,12 +518,10 @@ export async function createClient(
   const startTime = performance.now()
 
   try {
-    const response = await fetch(clientsApiBaseUrl, {
+    const { callClientApi } = await import('@/utils/backend-api')
+    const response = await callClientApi('clients', {
       method: 'POST',
       signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(clientData),
     })
 
@@ -559,12 +553,10 @@ export async function updateClient(
   const startTime = performance.now()
 
   try {
-    const response = await fetch(`${clientsApiBaseUrl}/${id}`, {
+    const { callClientApi } = await import('@/utils/backend-api')
+    const response = await callClientApi(`clients/${id}`, {
       method: 'PATCH',
       signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(updates),
     })
 
@@ -592,12 +584,10 @@ export async function deleteClient(id: string, signal?: AbortSignal): Promise<vo
   const startTime = performance.now()
 
   try {
-    const response = await fetch(`${clientsApiBaseUrl}/${id}`, {
+    const { callClientApi } = await import('@/utils/backend-api')
+    const response = await callClientApi(`clients/${id}`, {
       method: 'DELETE',
       signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     })
 
     if (!response.ok) {

@@ -17,9 +17,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { sessionId, userId, reason } = body
 
-    // Appeler l'API backend pour forcer la déconnexion
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    const endpoint = sessionId ? '/api/auth/sessions/disconnect-session' : '/api/auth/sessions/disconnect-user'
+    // Importer callBackendFromApi
+    const { callBackendFromApi } = await import('@/utils/backend-api')
+    
+    const endpoint = sessionId ? 'auth/sessions/disconnect-session' : 'auth/sessions/disconnect-user'
     
     const payload = sessionId 
       ? { sessionId, reason: reason || 'Déconnexion administrative' }
@@ -29,11 +30,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'SessionId ou userId requis' }, { status: 400 })
     }
 
-    const apiResponse = await fetch(`${backendUrl}${endpoint}`, {
+    const apiResponse = await callBackendFromApi(endpoint, {
       method: 'POST',
       headers: {
         'Authorization': request.headers.get('Authorization') || '',
-        'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
     })

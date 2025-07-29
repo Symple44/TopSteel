@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, Button, Badge, Alert, AlertDe
 import { Shield, Smartphone, Key, AlertTriangle, CheckCircle, ArrowLeft, Timer } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/hooks'
+import { callClientApi } from '@/utils/backend-api'
 
 interface MFAVerificationProps {
   userId: string
@@ -64,7 +65,7 @@ export default function MFAVerification({
   const initiateMFASession = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/auth/mfa/initiate', {
+      const response = await callClientApi('auth/mfa/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -142,7 +143,7 @@ export default function MFAVerification({
 
     try {
       setLoading(true)
-      const response = await fetch('/api/auth/mfa/verify', {
+      const response = await callClientApi('auth/mfa/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

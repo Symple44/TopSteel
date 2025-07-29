@@ -36,9 +36,17 @@ const nextConfig = {
   // Transpile workspace packages for Next.js 15
   transpilePackages: ['@erp/ui', '@erp/utils', '@erp/types', '@erp/domains', '@erp/api-client'],
   
-  // API rewrites temporarily disabled to debug errors
+  // API rewrites - proxy vers le backend NestJS
   async rewrites() {
-    return []
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
+    
+    return [
+      // Proxy tous les appels API vers le backend NestJS avec versioning
+      {
+        source: '/api/backend/:path*',
+        destination: `${apiUrl}/api/v1/:path*`
+      }
+    ]
   },
   
   // Disable static generation to avoid context issues during build
@@ -190,6 +198,8 @@ const nextConfig = {
         'asynckit': false,
         'es-set-tostringtag': false,
         'hasown': false,
+        // Exclure undici côté client (uniquement pour Node.js)
+        'undici': false,
         // Fix Socket.IO client dependencies avec polyfills
         'debug': path.resolve(import.meta.dirname, './src/utils/debug-polyfill.js'),
         'socket.io-parser': path.resolve(import.meta.dirname, './src/utils/socket-io-parser-polyfill.js'),

@@ -7,6 +7,7 @@ import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
 // import { io, type Socket } from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
+import { callClientApi } from '@/utils/backend-api'
 
 // ===== TYPES ET INTERFACES =====
 
@@ -185,7 +186,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
+      const response = await callClientApi(`notifications/${notificationId}/read`, {
         method: 'POST',
       })
       if (response.ok) {
@@ -198,7 +199,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   const markAllAsRead = useCallback(async () => {
     try {
-      const response = await fetch('/api/notifications/mark-all-read', {
+      const response = await callClientApi('notifications/mark-all-read', {
         method: 'POST',
       })
       if (response.ok) {
@@ -211,7 +212,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   const deleteNotification = useCallback(async (notificationId: string) => {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}`, {
+      const response = await callClientApi(`notifications/${notificationId}`, {
         method: 'DELETE',
       })
       if (response.ok) {
@@ -224,7 +225,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   const deleteAll = useCallback(async () => {
     try {
-      const response = await fetch('/api/notifications', {
+      const response = await callClientApi('notifications', {
         method: 'DELETE',
       })
       if (response.ok) {
@@ -246,7 +247,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     
     dispatch({ type: 'SET_LOADING', payload: true })
     try {
-      const response = await fetch('/api/notifications')
+      const response = await callClientApi('notifications')
       if (response.ok) {
         const data = await response.json()
         dispatch({ type: 'SET_NOTIFICATIONS', payload: data.data || [] })

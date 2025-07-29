@@ -21,9 +21,11 @@ import {
   Hash,
   Type,
   Calendar,
-  ToggleLeft
+  ToggleLeft,
+  X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { callClientApi } from '@/utils/backend-api'
 
 interface Column {
   id?: string
@@ -49,7 +51,7 @@ interface ColumnSelectorProps {
   onLayoutChange: (layout: any) => void
 }
 
-const DraggableColumn = ({ column, index, moveColumn, toggleVisibility, selected, onSelect }: any) => {
+const DraggableColumn = ({ column, index, moveColumn, toggleVisibility, onRemove, selected, onSelect }: any) => {
   // Temporairement désactivé le drag & drop
   const isDragging = false
 
@@ -103,17 +105,29 @@ const DraggableColumn = ({ column, index, moveColumn, toggleVisibility, selected
           {column.isFilterable && <Filter className="h-3 w-3 text-muted-foreground" />}
           {column.isSortable && <ArrowUpDown className="h-3 w-3 text-muted-foreground" />}
         </div>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => toggleVisibility(index)}
-        >
-          {column.isVisible ? (
-            <Eye className="h-4 w-4" />
-          ) : (
-            <EyeOff className="h-4 w-4 text-muted-foreground" />
-          )}
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => toggleVisibility(index)}
+            className="h-6 w-6 p-0"
+          >
+            {column.isVisible ? (
+              <Eye className="h-3 w-3" />
+            ) : (
+              <EyeOff className="h-3 w-3 text-muted-foreground" />
+            )}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => onRemove(index)}
+            className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+            title="Supprimer cette colonne"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
       </div>
     </div>
   )
@@ -151,7 +165,7 @@ export function ColumnSelector({
       const allColumns = []
       
       for (const table of tables) {
-        const response = await fetch(`/api/query-builder/schema/tables/${table}/columns`)
+        const response = await callClientApi(`query-builder/schema/tables/${table}/columns`)
         if (response.ok) {
           const result = await response.json()
           // Assurer que nous avons bien un tableau
@@ -341,6 +355,7 @@ export function ColumnSelector({
                     index={index}
                     moveColumn={moveColumn}
                     toggleVisibility={toggleColumnVisibility}
+                    onRemove={removeColumn}
                     selected={false}
                     onSelect={() => {}}
                   />

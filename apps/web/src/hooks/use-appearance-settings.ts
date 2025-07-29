@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTheme } from 'next-themes'
 import { translator } from '@/lib/i18n/translator'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface AppearanceSettings {
   theme: 'light' | 'dark' | 'vibrant' | 'system'
@@ -409,29 +410,7 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
 
         // Essayer de charger depuis l'API pour mise à jour
         try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-          
-          // Récupérer le token d'authentification
-          const authData = typeof window !== 'undefined' ? localStorage.getItem('topsteel-tokens') : null
-          const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-          }
-          
-          if (authData) {
-            try {
-              const tokens = JSON.parse(authData)
-              if (tokens.accessToken) {
-                headers['Authorization'] = `Bearer ${tokens.accessToken}`
-              }
-            } catch {
-              // Ignore token parsing errors
-            }
-          }
-          
-          const response = await fetch('/api/users/appearance/me', {
-            headers,
-            credentials: 'include',
-          })
+          const response = await callClientApi('users/appearance/me')
           
           if (response.ok) {
             const apiResponse = await response.json()
@@ -536,29 +515,8 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
     try {
       // Essayer de sauvegarder sur l'API d'abord
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-        
-        // Récupérer le token d'authentification
-        const authData = typeof window !== 'undefined' ? localStorage.getItem('topsteel-tokens') : null
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-        }
-        
-        if (authData) {
-          try {
-            const tokens = JSON.parse(authData)
-            if (tokens.accessToken) {
-              headers['Authorization'] = `Bearer ${tokens.accessToken}`
-            }
-          } catch {
-            // Ignore token parsing errors
-          }
-        }
-        
-        const response = await fetch('/api/users/appearance/me', {
+        const response = await callClientApi('users/appearance/me', {
           method: 'PATCH',
-          headers,
-          credentials: 'include',
           body: JSON.stringify(currentSettings),
         })
         

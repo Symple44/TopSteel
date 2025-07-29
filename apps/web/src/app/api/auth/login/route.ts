@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     
     // Rediriger vers l'API backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const response = await safeFetch(`${apiUrl}/api/v1/auth/login`, {
+    const response = await callBackendFromApi(req, 'auth/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(body),
     })
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,15 +8,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Authorization header required' }, { status: 401 })
     }
 
-    // Rediriger vers l'API backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    
-    const response = await safeFetch(`${apiUrl}/api/v1/auth/societes`, {
+    // Rediriger vers l'API backend via l'utilitaire harmonisé
+    const response = await callBackendFromApi(req, 'auth/societes', {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
     })
 
     // Vérifier si la réponse est JSON

@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     
-    // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/admin/database/backups/${id}/download`
-    
-    const response = await fetch(apiUrl, {
+    const response = await callBackendFromApi(`admin/database/backups/${id}/download`, {
       method: 'GET',
       headers: {
         ...(request.headers.get('authorization') && {

@@ -1,15 +1,12 @@
 // Debug spécifique pour les préférences de menu
 
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callClientApi } from '@/utils/backend-api'
 
 export async function debugMenuPreferences() {
   
   const menuEndpoints = [
-    '/api/user/menu-preferences/custom-menu',
-    '/api/admin/menu-raw/configurations/active',
-    'http://127.0.0.1:3002/api/v1/user/menu-preferences/custom-menu',
-    'http://127.0.0.1:3002/api/v1/admin/menu-raw/configurations/active'
+    'user/menu-preferences/custom-menu',
+    'admin/menu-raw/configurations/active'
   ]
   
   for (const endpoint of menuEndpoints) {
@@ -26,7 +23,7 @@ export async function debugMenuPreferences() {
         const config = configurations[i]
         
         try {
-          const response = await safeFetch(endpoint, config)
+          const response = await callClientApi(endpoint, config)
           const data = await response.json()
           
           

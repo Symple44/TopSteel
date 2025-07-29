@@ -18,6 +18,7 @@ import { authService } from '@/services/auth.service'
 import { toast } from 'sonner'
 import { getApproximateTabCount } from '@/lib/tab-detection'
 import { useTranslation } from '@/lib/i18n/hooks'
+import { callClientApi } from '@/utils/backend-api'
 
 // Interface pour les données de rôle
 interface RoleData {
@@ -82,40 +83,61 @@ const loadRolesFromParameters = async (language: string = 'fr', forceReload: boo
   }
 
   try {
-    const response = await fetch(`/api/parameters/system/user_roles?language=${language}`)
+    const response = await callClientApi(`parameters/system/user_roles?language=${language}`)
     if (response.ok) {
       const data = await response.json()
       
       // Vérifier la structure de la réponse
       let rolesList = []
       
+      console.log('🔍 Structure de la réponse des rôles:', { data, type: typeof data, keys: Object.keys(data || {}) })
+      
       if (Array.isArray(data)) {
         // Réponse directe en tableau
         rolesList = data
+        console.log('✅ Rôles trouvés: format tableau direct')
       } else if (data.data && Array.isArray(data.data)) {
-        // Réponse avec data wrapper
+        // Réponse avec data wrapper (cas de l'API backend)
         rolesList = data.data
+        console.log('✅ Rôles trouvés: format data wrapper, nombre:', data.data.length)
       } else if (data.success && data.data && Array.isArray(data.data)) {
         // Réponse avec success + data wrapper
         rolesList = data.data
+        console.log('✅ Rôles trouvés: format success + data wrapper')
       } else if (data.success && Array.isArray(data.roles)) {
         // Autre format possible
         rolesList = data.roles
+        console.log('✅ Rôles trouvés: format success + roles')
       } else if (typeof data === 'object' && data !== null) {
         // Si c'est un objet, vérifier s'il contient des rôles
         const possibleArrays = Object.values(data).filter(Array.isArray)
         if (possibleArrays.length > 0) {
           rolesList = possibleArrays[0] as any[]
+          console.log('✅ Rôles trouvés: premier tableau trouvé dans l\'objet, nombre:', rolesList.length)
         }
       }
       
       if (!Array.isArray(rolesList) || rolesList.length === 0) {
-        console.warn('Aucun rôle trouvé dans la réponse, utilisation des rôles par défaut:', data)
-        // Utiliser des rôles par défaut
-        rolesList = [
-          { key: 'ADMIN', value: 'Administrateur', icon: '🔧', color: 'orange', order: 1 },
-          { key: 'USER', value: 'Utilisateur', icon: '👤', color: 'blue', order: 2 }
-        ]
+        console.warn('❌ Aucun rôle trouvé dans la réponse, utilisation des rôles par défaut:', data)
+        
+        // Si la réponse semble être des rôles par défaut de la route Next.js (array direct)
+        if (Array.isArray(data) && data.some(item => item.id && item.name)) {
+          console.log('🔄 Conversion des rôles par défaut Next.js')
+          rolesList = data.map((role: any) => ({
+            key: role.id,
+            value: role.name,
+            icon: '👤',
+            color: 'blue',
+            order: 999,
+            description: role.description
+          }))
+        } else {
+          // Utiliser des rôles hardcodés en dernier recours
+          rolesList = [
+            { key: 'ADMIN', value: 'Administrateur', icon: '🔧', color: 'orange', order: 1 },
+            { key: 'USER', value: 'Utilisateur', icon: '👤', color: 'blue', order: 2 }
+          ]
+        }
       }
       
       // Mapper les données du backend vers le format attendu
@@ -506,9 +528,9 @@ export default function CompanySelector({
                     }`}>
                       <Building2 className="h-4 w-4" />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 max-w-full">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className={`text-sm font-semibold transition-colors truncate ${
+                        <h4 className={`text-sm font-semibold transition-colors truncate pr-2 ${
                           selectedCompanyId === company.id 
                             ? 'text-primary' 
                             : 'text-foreground group-hover:text-primary'
@@ -516,27 +538,35 @@ export default function CompanySelector({
                           {company.nom}
                         </h4>
                         {selectedCompanyId === company.id && (
-                          <div className="bg-primary text-primary-foreground rounded-full p-1 shadow-sm">
+                          <div className="bg-primary text-primary-foreground rounded-full p-1 shadow-sm flex-shrink-0">
                             <Check className="h-3 w-3" />
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors mb-2">
-                        <span className="font-medium">Code:</span> {company.code} • 
-                        <span className="font-medium ml-1">Rôle:</span> {company.role}
-                      </p>
-                      <div className="flex items-center space-x-2 text-xs">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs transition-all ${
+                      <div className="text-xs text-muted-foreground group-hover:text-foreground transition-colors mb-2">
+                        <div className="flex items-center gap-1 mb-1">
+                          <span className="font-medium">Code:</span> 
+                          <span className="truncate">{company.code}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="font-medium">Rôle:</span> 
+                          <span className="truncate">{company.role}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs transition-all flex-shrink-0 border ${
                           selectedCompanyId === company.id
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-green-50 text-green-600 group-hover:bg-green-100 group-hover:text-green-700'
+                            ? 'bg-green-100 text-green-700 border-green-200'
+                            : 'bg-green-50 text-green-600 border-green-100 group-hover:bg-green-100 group-hover:text-green-700 group-hover:border-green-200'
                         }`}>
                           ✓ ACTIF
                         </span>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs transition-all ${
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs transition-all flex-shrink-0 border max-w-[150px] ${
                           getRoleStyleSync(company.role, selectedCompanyId === company.id)
                         }`}>
-                          {getRoleDisplaySync(company.role, t)}
+                          <span className="truncate">
+                            {getRoleDisplaySync(company.role, t)}
+                          </span>
                         </span>
                       </div>
                     </div>

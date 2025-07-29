@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,13 +11,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Appeler l'API backend pour récupérer le statut MFA
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const apiResponse = await safeFetch(`${backendUrl}/api/auth/mfa/status`, {
+    const apiResponse = await callBackendFromApi(request, 'auth/mfa/status', {
       method: 'GET',
-      headers: {
-        'Authorization': request.headers.get('Authorization') || '',
-        'Content-Type': 'application/json'
-      }
     })
 
     if (!apiResponse.ok) {

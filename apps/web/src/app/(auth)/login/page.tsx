@@ -23,6 +23,8 @@ export default function LoginPage() {
 		resetMFA,
 		requiresCompanySelection,
 		selectCompany,
+		isAuthenticated,
+		isLoading: authLoading,
 	} = useAuth();
 	const { t } = useTranslation("auth");
 	const [formData, setFormData] = React.useState({
@@ -34,6 +36,28 @@ export default function LoginPage() {
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [mfaCode, setMfaCode] = React.useState("");
 	const [selectedMfaMethod, setSelectedMfaMethod] = React.useState("");
+	const [isRedirecting, setIsRedirecting] = React.useState(false);
+
+	// 🔧 FIX: Gestion automatique de la redirection basée sur les états
+	React.useEffect(() => {
+		console.log("🔍 État auth:", { 
+			isAuthenticated, 
+			authLoading, 
+			mfaRequired: mfa.required, 
+			requiresCompanySelection, 
+			isLoading 
+		});
+		
+		// Si l'utilisateur est authentifié, n'a pas besoin de MFA ni de sélection de société
+		if (isAuthenticated && !authLoading && !mfa.required && !requiresCompanySelection && !isLoading && !isRedirecting) {
+			const redirectTo = searchParams.get("redirect") || "/dashboard";
+			console.log("🔄 Auto-redirection vers:", redirectTo);
+			setIsRedirecting(true);
+			router.push(redirectTo);
+		}
+	}, [isAuthenticated, authLoading, mfa.required, requiresCompanySelection, isLoading, isRedirecting, router, searchParams]);
+
+	// Note: Le useEffect principal gère déjà tous les cas de redirection
 
 	const handleInputChange = (field: string, value: string | boolean) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -56,35 +80,16 @@ export default function LoginPage() {
 		try {
 			await login(formData.identifier, formData.password, formData.rememberMe);
 
-			// Vérifier si MFA est requis après le login
-			// L'état MFA sera mis à jour automatiquement par le hook useAuth
+			// 🔧 FIX: Ne pas essayer de rediriger immédiatement
+			// Les états MFA et requiresCompanySelection seront mis à jour par useAuth
+			// et la redirection sera gérée par les useEffect ci-dessous
+			
+			toast({
+				title: t("loginSuccess"),
+				description: t("welcomeToTopSteel"),
+				variant: "success",
+			});
 
-			// Si pas de MFA requis, vérifier si sélection de société requise
-			if (!mfa.required) {
-				// Attendre un peu pour que l'état soit mis à jour
-				setTimeout(() => {
-					// Si sélection de société pas requise, rediriger
-					if (!requiresCompanySelection) {
-						toast({
-							title: t("loginSuccess"),
-							description: t("welcomeToTopSteel"),
-							variant: "success",
-						});
-
-						// Obtenir le paramètre redirect depuis l'URL
-						const redirectTo = searchParams.get("redirect") || "/dashboard";
-						router.push(redirectTo);
-					}
-					// Sinon, le composant CompanySelector s'affichera automatiquement
-				}, 100);
-			} else {
-				// MFA required - interface will be automatically updated
-				toast({
-					title: t("mfaTitle"),
-					description: t("mfaSubtitle"),
-					variant: "default",
-				});
-			}
 		} catch (error) {
 			toast({
 				title: t("loginError"),
@@ -120,9 +125,7 @@ export default function LoginPage() {
 				variant: "success",
 			});
 
-			// Obtenir le paramètre redirect depuis l'URL
-			const redirectTo = searchParams.get("redirect") || "/dashboard";
-			router.push(redirectTo);
+			// 🔧 FIX: La redirection sera gérée automatiquement par useEffect
 		} catch (error) {
 			toast({
 				title: t("mfaError"),
@@ -148,10 +151,23 @@ export default function LoginPage() {
 			variant: "success",
 		});
 
-		// Obtenir le paramètre redirect depuis l'URL
-		const redirectTo = searchParams.get("redirect") || "/dashboard";
-		router.push(redirectTo);
+		// 🔧 FIX: La redirection sera gérée automatiquement par useEffect
+		// Une fois la société sélectionnée, requiresCompanySelection passera à false
 	};
+
+	// 🔧 Afficher un loading pendant la redirection
+	if (isRedirecting || (isAuthenticated && !authLoading && !mfa.required && !requiresCompanySelection)) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-background p-4">
+				<div className="text-center">
+					<div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center mb-4 shadow-lg animate-pulse">
+						<Building2 className="h-8 w-8 text-primary-foreground" />
+					</div>
+					<p className="text-muted-foreground">Redirection en cours...</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-background p-4">

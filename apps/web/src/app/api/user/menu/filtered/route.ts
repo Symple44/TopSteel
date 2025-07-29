@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,11 +12,8 @@ export async function GET(req: NextRequest) {
     }
 
     // Récupérer le profil utilisateur pour obtenir les rôles et permissions
-    const userResponse = await safeFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/auth/profile`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      }
+    const userResponse = await callBackendFromApi(req, 'auth/profile', {
+      method: 'GET',
     })
 
     if (!userResponse.ok) {
@@ -30,12 +26,8 @@ export async function GET(req: NextRequest) {
     const userPermissions = userData.permissions || []
 
     // Appeler l'API backend pour récupérer le menu filtré pour cet utilisateur
-    const response = await safeFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menu-raw/filtered-menu`, {
+    const response = await callBackendFromApi(req, 'admin/menu-raw/filtered-menu', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         userId,
         userRoles,

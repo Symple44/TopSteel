@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { AdminGuard } from '@/components/auth/admin-guard'
 import { Role } from '@/hooks/use-permissions'
+import { callClientApi } from '@/utils/backend-api'
 import {
   Card,
   CardContent,
@@ -161,14 +162,9 @@ function SessionsManagementContent() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [onlineResponse, historyResponse] = await Promise.all([
-        fetch('/api/admin/sessions/online'),
-        fetch('/api/admin/sessions/history?limit=100')
-      ])
-      
       const [onlineData, historyData] = await Promise.all([
-        onlineResponse.json(),
-        historyResponse.json()
+        callClientApi('admin/sessions/online'),
+        callClientApi('admin/sessions/history?limit=100')
       ])
 
       if (onlineData.success) {
@@ -207,13 +203,12 @@ function SessionsManagementContent() {
     }
 
     try {
-      const response = await fetch('/api/admin/sessions/disconnect', {
+      const response = await callClientApi('admin/sessions/disconnect', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, userId })
       })
 
-      if (response.ok) {
+      if (response.success) {
         loadData() // Recharger les données
       }
     } catch (error) {
@@ -613,8 +608,7 @@ function UserConnectionHistory({ userId }: { userId: string }) {
 
   const loadUserHistory = async () => {
     try {
-      const response = await fetch(`/api/admin/sessions/user/${userId}/history`)
-      const data = await response.json()
+      const data = await callClientApi(`admin/sessions/user/${userId}/history`)
       if (data.success) {
         setHistory(data.data)
       }

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { apiClient } from '@/lib/api-client'
+import { callClientApi } from '@/utils/backend-api'
 
 interface SystemParameter {
   id: string
@@ -34,7 +35,7 @@ export function useSystemParameters(): UseSystemParametersReturn {
   const { data: parametersList, isLoading, error } = useQuery({
     queryKey: ['system-parameters'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/system-parameters')
+      const response = await callClientApi('admin/system-parameters')
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -51,11 +52,8 @@ export function useSystemParameters(): UseSystemParametersReturn {
   // Update multiple parameters
   const updateMutation = useMutation({
     mutationFn: async (updates: Array<{ key: string; value: string }>) => {
-      const response = await fetch('/api/admin/system-parameters', {
+      const response = await callClientApi('admin/system-parameters', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(updates),
       })
       if (!response.ok) {
@@ -127,11 +125,11 @@ export function useSystemParametersByCategory(category?: string) {
   return useQuery({
     queryKey: ['system-parameters', 'by-category', category],
     queryFn: async () => {
-      const url = category 
-        ? `/api/admin/system-parameters?category=${category}`
-        : '/api/admin/system-parameters/by-category'
+      const endpoint = category 
+        ? `admin/system-parameters?category=${category}`
+        : 'admin/system-parameters/by-category'
       
-      const response = await fetch(url)
+      const response = await callClientApi(endpoint)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }

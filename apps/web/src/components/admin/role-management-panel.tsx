@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 import {
   Button,
   Card,
@@ -79,7 +80,7 @@ export default function RoleManagementPanel() {
 
   const loadRoles = async () => {
     try {
-      const response = await fetch('/api/admin/roles')
+      const response = await callClientApi('admin/roles')
       const data = await response.json()
       if (data.success) {
         // Ajouter des statistiques mockées
@@ -100,7 +101,7 @@ export default function RoleManagementPanel() {
 
   const loadModules = async () => {
     try {
-      const response = await fetch('/api/admin/modules?includePermissions=true')
+      const response = await callClientApi('admin/modules?includePermissions=true')
       const data = await response.json()
       if (data.success) {
         setModules(data.data)
@@ -116,7 +117,7 @@ export default function RoleManagementPanel() {
     }
 
     try {
-      const response = await fetch(`/api/admin/roles?id=${roleId}`, {
+      const response = await callClientApi(`admin/roles?id=${roleId}`, {
         method: 'DELETE'
       })
       
@@ -329,9 +330,8 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null, onSave: () =>
       const method = role ? 'PUT' : 'POST'
       const body = role ? { id: role.id, ...formData } : formData
       
-      const response = await fetch('/api/admin/roles', {
+      const response = await callClientApi('admin/roles', {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       })
       
@@ -480,7 +480,7 @@ function PermissionEditor({ role, modules, onSave }: {
     if (!role) return
     
     try {
-      const response = await fetch(`/api/admin/roles/${role.id}/permissions`)
+      const response = await callClientApi(`admin/roles/${role.id}/permissions`)
       const data = await response.json()
       if (data.success) {
         setPermissions(data.data.rolePermissions)
@@ -506,9 +506,8 @@ function PermissionEditor({ role, modules, onSave }: {
     if (!role) return
     
     try {
-      const response = await fetch(`/api/admin/roles/${role.id}/permissions`, {
+      const response = await callClientApi(`admin/roles/${role.id}/permissions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ permissions })
       })
       

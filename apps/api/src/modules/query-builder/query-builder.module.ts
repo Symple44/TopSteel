@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { QueryBuilderController } from './controllers/query-builder.controller'
+import { SqlExecutorController } from './controllers/sql-executor.controller'
 import { QueryBuilderService } from './services/query-builder.service'
 import { QueryBuilderExecutorService } from './services/query-builder-executor.service'
 import { QueryBuilderPermissionService } from './services/query-builder-permission.service'
 import { SchemaIntrospectionService } from './services/schema-introspection.service'
+import { DatabaseCoreModule } from '../database-core/database-core.module'
 import {
   QueryBuilder,
   QueryBuilderColumn,
@@ -15,15 +17,19 @@ import {
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      QueryBuilder,
-      QueryBuilderColumn,
-      QueryBuilderJoin,
-      QueryBuilderCalculatedField,
-      QueryBuilderPermission,
-    ]),
+    DatabaseCoreModule, // Pour accéder aux DataSources
+    TypeOrmModule.forFeature(
+      [
+        QueryBuilder,
+        QueryBuilderColumn,
+        QueryBuilderJoin,
+        QueryBuilderCalculatedField,
+        QueryBuilderPermission,
+      ],
+      'auth' // Les entités QueryBuilder sont dans la base auth
+    ),
   ],
-  controllers: [QueryBuilderController],
+  controllers: [QueryBuilderController, SqlExecutorController],
   providers: [
     QueryBuilderService,
     QueryBuilderExecutorService,

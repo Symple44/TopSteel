@@ -24,19 +24,10 @@ export function useHierarchicalPreferences(
       setLoading(true)
       setError(null)
 
+      const { callClientApi } = await import('@/utils/backend-api')
       const [preferencesResponse, orderResponse] = await Promise.all([
-        fetch(`/api/datatable/hierarchical-preferences/${tableId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }),
-        fetch(`/api/datatable/hierarchy-order/${tableId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+        callClientApi(`datatable/hierarchical-preferences/${tableId}`),
+        callClientApi(`datatable/hierarchy-order/${tableId}`)
       ])
 
       if (preferencesResponse.ok) {
@@ -73,11 +64,9 @@ export function useHierarchicalPreferences(
   // Sauvegarder les préférences
   const savePreferences = useCallback(async (newConfig: HierarchicalDatatableConfig) => {
     try {
-      const response = await fetch(`/api/datatable/hierarchical-preferences/${tableId}`, {
+      const { callClientApi } = await import('@/utils/backend-api')
+      const response = await callClientApi(`datatable/hierarchical-preferences/${tableId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(newConfig),
       })
 
@@ -96,11 +85,9 @@ export function useHierarchicalPreferences(
   // Sauvegarder l'ordre hiérarchique
   const saveHierarchyOrder = useCallback(async (items: HierarchyOrderItem[]) => {
     try {
-      const response = await fetch(`/api/datatable/hierarchy-order/${tableId}`, {
+      const { callClientApi } = await import('@/utils/backend-api')
+      const response = await callClientApi(`datatable/hierarchy-order/${tableId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ items }),
       })
 

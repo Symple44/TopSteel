@@ -4,8 +4,7 @@
  * Fichier: apps/web/src/lib/business-metrics.ts
  */
 
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callClientApi } from '@/utils/backend-api'
 
 // ===== TYPES =====
 interface BusinessEvent {
@@ -320,11 +319,8 @@ class BusinessMetrics {
     if (!this.isClient) return
 
     try {
-      const response = await safeFetch('/api/metrics', {
+      const response = await callClientApi('metrics', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ events }),
       })
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(
   request: NextRequest,
@@ -11,14 +11,8 @@ export async function GET(
     // Proxy vers l'API backend
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/${database}/${migrationName}/details`
     
-    const response = await safeFetch(apiUrl, {
+    const response = await callBackendFromApi(request, `admin/database/migrations/${database}/${migrationName}/details`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(request.headers.get('authorization') && {
-          'Authorization': request.headers.get('authorization')!
-        }),
-      },
       signal: AbortSignal.timeout(10000)
     })
 

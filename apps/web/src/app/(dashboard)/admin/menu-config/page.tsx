@@ -46,6 +46,7 @@ import {
   Check,
   AlertTriangle
 } from 'lucide-react'
+import { callClientApi } from '@/utils/backend-api'
 // Fonction utilitaire pour formater les dates
 const formatDate = (date: string | Date) => {
   const d = new Date(date)
@@ -82,7 +83,7 @@ export default function MenuConfigurationPage() {
 
   const loadConfigurations = async () => {
     try {
-      const response = await fetch('/api/admin/menu-config')
+      const response = await callClientApi('admin/menu-config')
       const data = await response.json()
       if (data.success) {
         setConfigurations(data.data)
@@ -100,7 +101,7 @@ export default function MenuConfigurationPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/menu-config/${configId}/activate`, {
+      const response = await callClientApi(`admin/menu-config/${configId}/activate`, {
         method: 'POST'
       })
       
@@ -120,7 +121,7 @@ export default function MenuConfigurationPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/menu-config/${configId}`, {
+      const response = await callClientApi(`admin/menu-config/${configId}`, {
         method: 'DELETE'
       })
       
@@ -142,7 +143,7 @@ export default function MenuConfigurationPage() {
 
   const handleCreateDefault = async () => {
     try {
-      const response = await fetch('/api/admin/menu-config/default', {
+      const response = await callClientApi('admin/menu-config/default', {
         method: 'POST'
       })
       
@@ -392,9 +393,8 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
     e.preventDefault()
     
     try {
-      const response = await fetch('/api/admin/menu-config', {
+      const response = await callClientApi('admin/menu-config', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
           items: [] // Commencer avec un menu vide
@@ -484,7 +484,7 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
     if (!config) return
 
     try {
-      const response = await fetch(`/api/admin/menu-config/tree?configId=${config.id}`)
+      const response = await callClientApi(`admin/menu-config/tree?configId=${config.id}`)
       const data = await response.json()
       if (data.success) {
         setMenuTree(data.data)
@@ -543,7 +543,7 @@ function MenuPreview() {
 
   const loadCurrentMenu = async () => {
     try {
-      const response = await fetch('/api/admin/menu-config/tree/filtered')
+      const response = await callClientApi('admin/menu-config/tree/filtered')
       const data = await response.json()
       if (data.success) {
         setMenuTree(data.data)

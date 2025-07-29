@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface PageItem {
   id: string
@@ -48,7 +49,7 @@ export function useAvailablePages() {
       setError(null)
       
       // Appel API pour récupérer les pages disponibles
-      const response = await fetch('/api/user/menu-preferences/available-pages')
+      const response = await callClientApi('user/menu-preferences/available-pages')
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)

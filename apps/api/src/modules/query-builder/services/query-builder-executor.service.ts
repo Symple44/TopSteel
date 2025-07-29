@@ -23,7 +23,7 @@ export interface QueryExecutionResult {
 @Injectable()
 export class QueryBuilderExecutorService {
   constructor(
-    @InjectDataSource()
+    @InjectDataSource('tenant')
     private dataSource: DataSource,
     private permissionService: QueryBuilderPermissionService,
   ) {}

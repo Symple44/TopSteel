@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,12 +12,8 @@ export async function GET(req: NextRequest) {
     }
 
     // Appeler l'API backend pour récupérer la configuration active
-    const response = await safeFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menu-raw/configurations/active`, {
+    const response = await callBackendFromApi(req, 'admin/menu-raw/configurations/active', {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      }
     })
 
     if (!response.ok) {

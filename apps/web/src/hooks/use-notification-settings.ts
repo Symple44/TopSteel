@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface NotificationSettings {
   email: boolean
@@ -83,29 +84,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
         
         // Essayer de charger depuis l'API d'abord
         try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-          
-          // Récupérer le token d'authentification
-          const authData = typeof window !== 'undefined' ? localStorage.getItem('topsteel-tokens') : null
-          const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-          }
-          
-          if (authData) {
-            try {
-              const tokens = JSON.parse(authData)
-              if (tokens.accessToken) {
-                headers['Authorization'] = `Bearer ${tokens.accessToken}`
-              }
-            } catch {
-              // Ignore token parsing errors
-            }
-          }
-          
-          const response = await fetch(`${apiUrl}/api/v1/users/notifications/me`, {
-            headers,
-            credentials: 'include',
-          })
+          const response = await callClientApi('users/notifications/me')
           
           if (response.ok) {
             const apiSettings = await response.json()
@@ -165,29 +144,8 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
     try {
       // Essayer de sauvegarder sur l'API d'abord
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-        
-        // Récupérer le token d'authentification
-        const authData = typeof window !== 'undefined' ? localStorage.getItem('topsteel-tokens') : null
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-        }
-        
-        if (authData) {
-          try {
-            const tokens = JSON.parse(authData)
-            if (tokens.accessToken) {
-              headers['Authorization'] = `Bearer ${tokens.accessToken}`
-            }
-          } catch {
-            // Ignore token parsing errors
-          }
-        }
-        
-        const response = await fetch(`${apiUrl}/users/notifications/me`, {
+        const response = await callClientApi('users/notifications/me', {
           method: 'PATCH',
-          headers,
-          credentials: 'include',
           body: JSON.stringify(settings),
         })
         

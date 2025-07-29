@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { safeFetch } from '@/utils/fetch-safe'
-import '@/utils/init-ip-config'
+import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,13 +15,8 @@ export async function POST(req: NextRequest) {
     const token = authHeader.substring(7)
     
     // Rediriger vers l'API backend pour invalider le token
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const response = await safeFetch(`${apiUrl}/api/v1/auth/logout`, {
+    const response = await callBackendFromApi(req, 'auth/logout', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
     })
 
     if (!response.ok) {

@@ -2,6 +2,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 // Types mis à jour pour web-vitals v5.x
 interface WebVitalsMetrics {
@@ -45,10 +46,9 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
         if (navigator.sendBeacon) {
           navigator.sendBeacon('/api/analytics/vitals', JSON.stringify(metric))
         } else {
-          fetch('/api/analytics/vitals', {
+          callClientApi('analytics/vitals', {
             method: 'POST',
             body: JSON.stringify(metric),
-            headers: { 'Content-Type': 'application/json' },
             keepalive: true,
           }).catch((err) => console.warn('Analytics failed:', err))
         }
