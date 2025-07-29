@@ -143,7 +143,28 @@ export function TableSelector({
       onTablesChange([...selectedTables, newJoin.toTable])
     }
     
+    resetJoinDialog()
+  }
+
+  const resetJoinDialog = () => {
     setShowJoinDialog(false)
+    setNewJoin({
+      fromTable: mainTable,
+      fromColumn: '',
+      toTable: '',
+      toColumn: '',
+      joinType: 'INNER',
+      alias: '',
+    })
+    setFromColumnSearch('')
+    setToColumnSearch('')
+    setAvailableFromColumns([])
+    setAvailableToColumns([])
+  }
+
+  const handleOpenJoinDialog = () => {
+    setShowJoinDialog(true)
+    // Réinitialiser le formulaire avec la table principale actuelle
     setNewJoin({
       fromTable: mainTable,
       fromColumn: '',
@@ -216,7 +237,7 @@ export function TableSelector({
               <Label>Joined Tables</Label>
               <Dialog open={showJoinDialog} onOpenChange={setShowJoinDialog}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" disabled={!mainTable}>
+                  <Button size="sm" variant="outline" disabled={!mainTable} onClick={handleOpenJoinDialog}>
                     <Plus className="h-4 w-4 mr-1" />
                     Add Join
                   </Button>
