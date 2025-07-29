@@ -14,26 +14,49 @@ import {
 // import { ColumnDef } from '@tanstack/react-table'
 
 interface DataTablePreviewProps {
-  data: any
-  columns: any[]
-  calculatedFields: any[]
-  layout: any
-  settings: any
+  data: any[]
+  columns?: any[]
+  calculatedFields?: any[]
+  layout?: any
+  settings?: any
 }
 
 export function DataTablePreview({
-  data,
-  columns,
-  calculatedFields,
-  layout,
-  settings,
+  data = [],
+  columns = [],
+  calculatedFields = [],
+  layout = {},
+  settings = {},
 }: DataTablePreviewProps) {
   const [loading, setLoading] = useState(false)
 
   const tableColumns = useMemo(() => {
-    // Filtrer les colonnes visibles
-    const visibleColumns = columns.filter(col => col.isVisible)
-    const visibleCalculatedFields = calculatedFields.filter(field => field.isVisible)
+    // Si pas de données ou de colonnes définies, utiliser les clés du premier objet
+    if (!data || data.length === 0) {
+      return []
+    }
+
+    // Si pas de colonnes définies, utiliser toutes les propriétés du premier objet
+    if (columns.length === 0) {
+      const firstRow = data[0]
+      if (!firstRow) return []
+      
+      return Object.keys(firstRow).map(key => ({
+        accessorKey: key,
+        header: key,
+        dataType: typeof firstRow[key],
+        cell: ({ getValue }) => {
+          const value = getValue()
+          return String(value ?? '')
+        },
+        enableSorting: true,
+        enableColumnFilter: true,
+      }))
+    }
+
+    // Traitement normal des colonnes définies
+    const visibleColumns = columns.filter(col => col.isVisible ?? true)
+    const visibleCalculatedFields = calculatedFields.filter(field => field.isVisible ?? true)
     
     // Trier par displayOrder
     const allColumns = [...visibleColumns, ...visibleCalculatedFields]
@@ -41,7 +64,7 @@ export function DataTablePreview({
 
     return allColumns.map(col => ({
       accessorKey: col.alias || col.columnName || col.name,
-      header: col.label || col.columnName,
+      header: col.label || col.columnName || col.name,
       dataType: col.dataType,
       format: col.format,
       cell: ({ getValue }) => {
@@ -71,7 +94,7 @@ export function DataTablePreview({
       enableSorting: col.isSortable ?? true,
       enableColumnFilter: col.isFilterable ?? true,
     }))
-  }, [columns, calculatedFields])
+  }, [data, columns, calculatedFields])
 
   const handleExport = async (format: string) => {
     // TODO: Implement export functionality
@@ -127,18 +150,11 @@ export function DataTablePreview({
         </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
-        {!data && columns.length === 0 ? (
+        {!data || data.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             <div className="text-center">
-              <p className="mb-2">Aucune colonne sélectionnée</p>
-              <p className="text-sm">Sélectionnez des colonnes dans l'onglet Design</p>
-            </div>
-          </div>
-        ) : !data ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
-            <div className="text-center">
-              <p className="mb-2">Aucune donnée à afficher</p>
-              <p className="text-sm">Cliquez sur "Execute" pour charger les données</p>
+              <p className="mb-2">Aucune donnée disponible</p>
+              <p className="text-sm">Sélectionnez des colonnes et cliquez sur "Exécuter"</p>
             </div>
           </div>
         ) : (
@@ -164,7 +180,7 @@ export function DataTablePreview({
               </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
-              {(data.data || []).slice(0, 10).map((row, rowIndex) => (
+              {data.slice(0, 10).map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
                   className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
@@ -178,20 +194,20 @@ export function DataTablePreview({
               ))}
             </tbody>
             </table>
-            {(data.data || []).length > 10 && (
+            {data.length > 10 && (
               <div className="flex items-center justify-center p-4 text-sm text-muted-foreground">
-              ... et {(data.data || []).length - 10} lignes supplémentaires
-            </div>
-          )}
-          <div className="flex items-center justify-between px-4 py-2 border-t">
-            <div className="text-sm text-muted-foreground">
-              {data.total || 0} résultat(s) au total
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Page {data.page || 1} sur {Math.ceil((data.total || 0) / (data.pageSize || 50))}
+                ... et {data.length - 10} lignes supplémentaires
+              </div>
+            )}
+            <div className="flex items-center justify-between px-4 py-2 border-t">
+              <div className="text-sm text-muted-foreground">
+                {data.length} résultat(s) au total
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Affichage des 10 premiers résultats
+              </div>
             </div>
           </div>
-        </div>
         )}
       </CardContent>
     </Card>

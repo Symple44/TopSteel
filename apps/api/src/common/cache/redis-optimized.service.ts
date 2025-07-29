@@ -10,12 +10,26 @@ export class OptimizedCacheService {
     this.redis = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
       port: Number.parseInt(process.env.REDIS_PORT || '6379'),
-      lazyConnect: true,
+      db: Number.parseInt(process.env.REDIS_DB || '0'),
+      lazyConnect: false,  // Connexion immédiate
       connectTimeout: 10000,
       commandTimeout: 5000,
-      enableOfflineQueue: false,
+      enableOfflineQueue: true,  // Permettre la queue offline
       maxRetriesPerRequest: 3,
-      family: 4,
+      family: 4
+    })
+
+    // Gérer les événements de connexion
+    this.redis.on('connect', () => {
+      this.logger.log('✅ Connexion Redis établie')
+    })
+
+    this.redis.on('error', (error) => {
+      this.logger.error('❌ Erreur Redis:', error.message)
+    })
+
+    this.redis.on('close', () => {
+      this.logger.warn('⚠️ Connexion Redis fermée')
     })
   }
 

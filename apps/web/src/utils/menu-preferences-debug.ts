@@ -1,5 +1,8 @@
 // Debug spécifique pour les préférences de menu
 
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
+
 export async function debugMenuPreferences() {
   
   const menuEndpoints = [
@@ -23,7 +26,7 @@ export async function debugMenuPreferences() {
         const config = configurations[i]
         
         try {
-          const response = await fetch(endpoint, config)
+          const response = await safeFetch(endpoint, config)
           const data = await response.json()
           
           

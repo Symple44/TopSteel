@@ -5,6 +5,7 @@ import { UserMenuPreferenceService } from './services/user-menu-preference.servi
 import { PageSyncService } from './services/page-sync.service'
 import { UserMenuPreferenceController } from './controllers/user-menu-preference.controller'
 import { AvailablePagesController } from './controllers/available-pages.controller'
+import { OptimizedCacheService } from '../../common/cache/redis-optimized.service'
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { AvailablePagesController } from './controllers/available-pages.controll
   ],
   providers: [
     UserMenuPreferenceService,
-    PageSyncService
+    PageSyncService,
+    OptimizedCacheService
   ],
   exports: [
     UserMenuPreferenceService,

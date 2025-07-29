@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, memo, useCallback, useEffect } from 'react'
 import { DataTable } from '@/components/ui/datatable/DataTable'
 import { ColumnConfig } from '@/components/ui/datatable/types'
 import { Badge, Button } from '@erp/ui'
@@ -28,7 +28,7 @@ interface TranslationDataTableProps {
   onDuplicate?: (entry: TranslationEntry) => void
 }
 
-export function TranslationDataTable({
+export const TranslationDataTable = memo(function TranslationDataTable({
   entries,
   loading,
   onEdit,
@@ -40,6 +40,17 @@ export function TranslationDataTable({
   onDuplicate
 }: TranslationDataTableProps) {
 
+  // État de pagination local
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // Réajuster la page courante si nécessaire quand les données changent
+  useEffect(() => {
+    const maxPage = Math.ceil(entries.length / 50) // Default page size
+    if (currentPage > maxPage && maxPage > 0) {
+      setCurrentPage(maxPage)
+    }
+  }, [entries.length, currentPage])
+
   // Obtenir la liste des namespaces uniques pour les filtres
   const namespaces = useMemo(() => {
     const uniqueNamespaces = [...new Set(entries.map(entry => entry.namespace))]
@@ -48,7 +59,14 @@ export function TranslationDataTable({
 
   // Obtenir la liste des catégories uniques pour les filtres  
   const categories = useMemo(() => {
-    const uniqueCategories = [...new Set(entries.map(entry => entry.category).filter(Boolean))]
+    const allCategories = entries.map(entry => entry.category).filter(cat => cat != null && cat !== '')
+    const uniqueCategories = [...new Set(allCategories)]
+    console.log('Categories calculation:', {
+      totalEntries: entries.length,
+      allCategories: allCategories.slice(0, 10),
+      uniqueCategories,
+      hasAdministration: uniqueCategories.includes('Administration')
+    })
     return uniqueCategories.sort()
   }, [entries])
 
@@ -92,11 +110,18 @@ export function TranslationDataTable({
         width: 120,
         sortable: true,
         editable: true,
-        options: categories.map(cat => ({
-          value: cat,
-          label: cat,
-          color: '#10b981'
-        })),
+        options: (() => {
+          const opts = [
+            { value: '', label: '(Aucune catégorie)', color: '#6b7280' },
+            ...categories.map(cat => ({
+              value: cat,
+              label: cat,
+              color: '#10b981'
+            }))
+          ]
+          console.log('Category options for select:', opts.map(o => o.value))
+          return opts
+        })(),
         render: (value) => <CategoryCell value={value} />
       },
       {
@@ -160,7 +185,7 @@ export function TranslationDataTable({
     ]
   }, [namespaces, categories])
 
-  const handleCellEdit = (value: any, row: TranslationEntry, column: ColumnConfig<TranslationEntry>) => {
+  const handleCellEdit = useCallback((value: any, row: TranslationEntry, column: ColumnConfig<TranslationEntry>) => {
     if (column.id.startsWith('translation_')) {
       // Éditer une traduction spécifique
       const languageCode = column.id.replace('translation_', '')
@@ -184,27 +209,31 @@ export function TranslationDataTable({
       }
       onCellEdit?.(value, updatedRow, column)
     }
-  }
+  }, [onCellEdit])
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     onCreate?.()
-  }
+  }, [onCreate])
 
-  const handleDelete = (rows: TranslationEntry[]) => {
+  const handleDelete = useCallback((rows: TranslationEntry[]) => {
     onDelete?.(rows)
-  }
+  }, [onDelete])
 
-  const handleEdit = (row: TranslationEntry) => {
+  const handleEdit = useCallback((row: TranslationEntry) => {
     onEdit(row)
-  }
+  }, [onEdit])
 
-  const handleDuplicate = (row: TranslationEntry) => {
+  const handleDuplicate = useCallback((row: TranslationEntry) => {
     onDuplicate?.(row)
-  }
+  }, [onDuplicate])
 
-  const handleExport = (rows: TranslationEntry[]) => {
+  const handleExport = useCallback((rows: TranslationEntry[]) => {
     onExport?.(rows)
-  }
+  }, [onExport])
+
+  const handlePaginationChange = useCallback(({ page, pageSize: newPageSize }: { page: number, pageSize: number, total: number }) => {
+    setCurrentPage(page)
+  }, [])
 
   return (
     <DataTable
@@ -233,18 +262,16 @@ export function TranslationDataTable({
       // Callbacks
       onCellEdit={handleCellEdit}
       loading={loading}
-      // Configuration personnalisée avec pagination activée
-      pagination={true}
-      config={{
-        enableColumnReorder: true,
-        enableColumnResize: true,
-        enableDensityToggle: true,
-        enableFullscreen: true,
-        pageSize: 25,
-        pageSizeOptions: [10, 25, 50, 100]
+      // Configuration personnalisée avec pagination activée et optimisée pour de gros datasets
+      pagination={{
+        page: currentPage,
+        total: entries.length,
+        showSizeChanger: true,
+        pageSizeOptions: [25, 50, 100, 200] // Options adaptées pour de gros volumes
       }}
+      onPaginationChange={handlePaginationChange}
     />
   )
-}
+})
 
 export default TranslationDataTable

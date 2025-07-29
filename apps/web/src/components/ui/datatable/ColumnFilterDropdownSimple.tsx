@@ -87,7 +87,15 @@ export function ColumnFilterDropdownSimple<T = any>({
     })
 
     // Gérer le scroll et le resize
-    const handleScrollOrResize = () => {
+    const handleScrollOrResize = (event?: Event) => {
+      // Ne pas fermer si le scroll vient du dropdown lui-même
+      if (event && event.target && dropdownRef.current) {
+        const target = event.target as Element
+        if (dropdownRef.current.contains(target)) {
+          return
+        }
+      }
+      
       // Option 1: Repositionner
       // positionDropdown()
       

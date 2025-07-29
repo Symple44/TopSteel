@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,7 +18,7 @@ export async function GET(req: NextRequest) {
     
     // Valider avec le backend
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const response = await fetch(`${apiUrl}/api/v1/auth/validate`, {
+    const response = await safeFetch(`${apiUrl}/api/v1/auth/validate`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

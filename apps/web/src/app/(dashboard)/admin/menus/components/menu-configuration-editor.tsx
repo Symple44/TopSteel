@@ -113,9 +113,9 @@ export function MenuConfigurationEditor({
         apiClient.get('/admin/permissions')
       ])
       
-      setAvailableGroups(groupsResponse.data?.data || [])
-      setAvailableRoles(rolesResponse.data?.data || [])
-      setAvailablePermissions(permissionsResponse.data?.data || [])
+      setAvailableGroups((groupsResponse as any)?.data?.data || [])
+      setAvailableRoles((rolesResponse as any)?.data?.data || [])
+      setAvailablePermissions((permissionsResponse as any)?.data?.data || [])
     } catch (error) {
       console.error('Erreur lors du chargement des données de droits:', error)
       // Utiliser des données par défaut en cas d'erreur

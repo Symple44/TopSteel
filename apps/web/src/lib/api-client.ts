@@ -10,6 +10,9 @@
  * - Authentication automatique
  */
 
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
+
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   headers?: Record<string, string>
@@ -317,7 +320,7 @@ export class APIClient {
 
       // Exécution avec retry et timeout
       const operation = async () => {
-        const response = await fetch(url, fetchConfig)
+        const response = await safeFetch(url, fetchConfig)
 
         if (!response.ok) {
           throw {
@@ -432,7 +435,7 @@ export class APIClient {
     const url = `${this.baseURL}${endpoint}`
     const headers = this.buildHeaders(uploadConfig)
 
-    const response = await fetch(url, {
+    const response = await safeFetch(url, {
       method: 'POST',
       headers: Object.fromEntries(
         Object.entries(headers).filter(([key]) => key !== 'Content-Type')

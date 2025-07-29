@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function POST(request: NextRequest) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
@@ -17,7 +19,7 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const response = await fetch(`${apiUrl}/api/v1/user/menu-preferences/reset`, {
+    const response = await safeFetch(`${apiUrl}/api/v1/user/menu-preferences/reset`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

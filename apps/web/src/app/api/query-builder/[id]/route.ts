@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
@@ -42,7 +44,7 @@ export async function GET(
     const { id } = await params
     const backendUrl = `${apiUrl}/api/v1/query-builder/${id}`
 
-    const response = await fetch(backendUrl, {
+    const response = await safeFetch(backendUrl, {
       method: 'GET',
       headers,
       signal: AbortSignal.timeout(10000)
@@ -79,7 +81,7 @@ export async function PATCH(
     const { id } = await params
     const backendUrl = `${apiUrl}/api/v1/query-builder/${id}`
 
-    const response = await fetch(backendUrl, {
+    const response = await safeFetch(backendUrl, {
       method: 'PATCH',
       headers,
       body: JSON.stringify(body),
@@ -116,7 +118,7 @@ export async function DELETE(
     const { id } = await params
     const backendUrl = `${apiUrl}/api/v1/query-builder/${id}`
 
-    const response = await fetch(backendUrl, {
+    const response = await safeFetch(backendUrl, {
       method: 'DELETE',
       headers,
       signal: AbortSignal.timeout(10000)

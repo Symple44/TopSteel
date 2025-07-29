@@ -48,6 +48,7 @@ import { UsersModule } from '../users/users.module'
 
 // Import de l'entité UserMenuPreference du MenuModule
 import { UserMenuPreference } from '../menu/entities/user-menu-preference.entity'
+import { OptimizedCacheService } from '../../common/cache/redis-optimized.service'
 
 @Module({
   imports: [
@@ -82,7 +83,8 @@ import { UserMenuPreference } from '../menu/entities/user-menu-preference.entity
     DatabaseBackupService,
     DatabaseStatsService,
     DatabaseEnumFixService,
-    AdminRolesService  // Réactivé pour AdminRolesController
+    AdminRolesService,  // Réactivé pour AdminRolesController
+    OptimizedCacheService  // Service de cache REDIS
   ],
   exports: [
     SystemParametersService,

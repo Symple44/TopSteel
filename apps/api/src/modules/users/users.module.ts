@@ -4,11 +4,12 @@ import { User } from './entities/user.entity'
 import { UserSettings } from './entities/user-settings.entity'
 import { UsersController } from './users.controller'
 import { UsersService } from './users.service'
+import { OptimizedCacheService } from '../../common/cache/redis-optimized.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, UserSettings], 'auth')],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, OptimizedCacheService],
   exports: [UsersService, TypeOrmModule],
 })
 export class UsersModule {}

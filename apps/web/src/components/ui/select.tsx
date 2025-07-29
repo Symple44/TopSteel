@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SelectProps {
@@ -39,10 +39,24 @@ const SelectContext = React.createContext<{
 
 const Select = ({ value, onValueChange, children }: SelectProps) => {
   const [open, setOpen] = React.useState(false)
+  const selectRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setOpen(false)
+      }
+    }
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [open])
 
   return (
     <SelectContext.Provider value={{ value, onValueChange, open, setOpen }}>
-      <div className="relative">
+      <div ref={selectRef} className="relative">
         {children}
       </div>
     </SelectContext.Provider>
@@ -87,8 +101,8 @@ const SelectContent = ({ children }: SelectContentProps) => {
   if (!open) return null
 
   return (
-    <div className="absolute top-full left-0 z-50 min-w-[8rem] w-full mt-1 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
-      <div className="p-1">
+    <div className="absolute top-full left-0 z-50 min-w-[8rem] w-full mt-1 overflow-hidden rounded-md border border-border bg-background text-foreground shadow-lg">
+      <div className="p-1 max-h-60 overflow-y-auto">
         {children}
       </div>
     </div>
@@ -97,13 +111,15 @@ const SelectContent = ({ children }: SelectContentProps) => {
 
 const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
   ({ className, children, value, ...props }, ref) => {
-    const { onValueChange, setOpen } = React.useContext(SelectContext)
+    const { value: selectedValue, onValueChange, setOpen } = React.useContext(SelectContext)
+    const isSelected = selectedValue === value
     
     return (
       <div
         ref={ref}
         className={cn(
-          'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+          'relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-colors',
+          isSelected && 'bg-accent text-accent-foreground',
           className
         )}
         onClick={() => {
@@ -112,6 +128,9 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
         }}
         {...props}
       >
+        <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+          {isSelected && <Check className="h-4 w-4" />}
+        </span>
         {children}
       </div>
     )

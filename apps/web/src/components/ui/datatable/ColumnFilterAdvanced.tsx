@@ -18,7 +18,9 @@ interface ColumnFilterAdvancedProps<T = any> {
   column: {
     id: string
     title: string
-    type?: 'text' | 'number' | 'date' | 'boolean'
+    type?: 'text' | 'number' | 'date' | 'boolean' | 'select' | 'richtext'
+    key?: keyof T | string
+    getValue?: (row: T) => any
   }
   data: T[]
   currentSort?: 'asc' | 'desc' | null
@@ -45,6 +47,7 @@ export function ColumnFilterAdvanced<T = any>({
   const [selectedValues, setSelectedValues] = useState<Set<string>>(new Set())
   const [numberRange, setNumberRange] = useState({ min: '', max: '' })
   const [dateRange, setDateRange] = useState({ start: '', end: '' })
+  const [showOnlySelected, setShowOnlySelected] = useState(false)
 
   // Initialiser les valeurs sélectionnées à partir des filtres actuels
   useEffect(() => {
@@ -72,7 +75,15 @@ export function ColumnFilterAdvanced<T = any>({
     if (column.type) return column.type
     
     // Analyser les données pour déterminer le type
-    const sample = data.slice(0, 10).map(item => (item as any)[column.id]).filter(v => v != null)
+    const sample = data.slice(0, 10).map(item => {
+      // Utiliser getValue si défini, sinon utiliser la clé de la colonne
+      if (typeof column.getValue === 'function') {
+        return column.getValue(item)
+      } else {
+        return (item as any)[column.key || column.id]
+      }
+    }).filter(v => v != null)
+    
     if (sample.length === 0) return 'text'
     
     const firstValue = sample[0]
@@ -82,19 +93,53 @@ export function ColumnFilterAdvanced<T = any>({
     return 'text'
   }, [column, data])
 
-  // Extraire les valeurs uniques pour les filtres texte
+  // Extraire les valeurs uniques pour les filtres texte et select
   const uniqueValues = useMemo(() => {
-    if (columnType !== 'text') return []
+    if (columnType !== 'text' && columnType !== 'select' && columnType !== 'boolean' && columnType !== 'richtext') return []
     
     const values = new Set<string>()
+    let hasEmptyValues = false
+    
     data.forEach(item => {
-      const value = (item as any)[column.id]
-      if (value != null) {
-        values.add(String(value))
+      // Utiliser getValue si défini, sinon utiliser la clé de la colonne
+      let value
+      if (typeof column.getValue === 'function') {
+        value = column.getValue(item)
+      } else {
+        value = (item as any)[column.key || column.id]
+      }
+      
+      // Gérer les valeurs null/undefined/vides
+      if (value == null || (typeof value === 'string' && value.trim() === '')) {
+        hasEmptyValues = true
+      } else {
+        // Pour les booléens, convertir en texte lisible
+        if (columnType === 'boolean') {
+          values.add(value ? 'Oui' : 'Non')
+        } else {
+          let stringValue = String(value)
+          // Pour les richtext, nettoyer les balises HTML pour l'affichage dans le filtre
+          if (columnType === 'richtext' && stringValue.includes('<')) {
+            stringValue = stringValue.replace(/<[^>]*>/g, '').trim()
+          }
+          // Ajouter la valeur si elle n'est pas vide après nettoyage
+          if (stringValue.trim()) {
+            values.add(stringValue)
+          } else {
+            hasEmptyValues = true
+          }
+        }
       }
     })
-    return Array.from(values).sort()
-  }, [data, column.id, columnType])
+    
+    // Ajouter l'option pour les valeurs vides s'il y en a
+    const result = Array.from(values).sort()
+    if (hasEmptyValues) {
+      result.unshift('(Vide)') // Ajouter au début de la liste
+    }
+    
+    return result
+  }, [data, column, columnType])
 
   // Calculer les min/max pour les filtres numériques
   const numberBounds = useMemo(() => {
@@ -175,7 +220,14 @@ export function ColumnFilterAdvanced<T = any>({
     })
 
     // Gérer le scroll et le resize
-    const handleScrollOrResize = () => {
+    const handleScrollOrResize = (event?: Event) => {
+      // Ne pas fermer si le scroll vient du dropdown lui-même
+      if (event && event.target && dropdownRef.current) {
+        const target = event.target as Element
+        if (dropdownRef.current.contains(target)) {
+          return
+        }
+      }
       setIsOpen(false)
     }
 
@@ -196,7 +248,7 @@ export function ColumnFilterAdvanced<T = any>({
   const handleApplyFilter = () => {
     let filter = null
     
-    if (columnType === 'text' && selectedValues.size > 0) {
+    if ((columnType === 'text' || columnType === 'select' || columnType === 'boolean' || columnType === 'richtext') && selectedValues.size > 0) {
       filter = { type: 'values', values: Array.from(selectedValues) }
     } else if (columnType === 'number' && (numberRange.min || numberRange.max)) {
       filter = { 
@@ -213,6 +265,7 @@ export function ColumnFilterAdvanced<T = any>({
     }
     
     onFilter(filter)
+    setShowOnlySelected(false) // Réinitialiser l'affichage
     setIsOpen(false)
   }
 
@@ -220,6 +273,7 @@ export function ColumnFilterAdvanced<T = any>({
     setSelectedValues(new Set())
     setNumberRange({ min: '', max: '' })
     setDateRange({ start: '', end: '' })
+    setShowOnlySelected(false) // Réinitialiser l'affichage
     onFilter(null)
     setIsOpen(false)
   }
@@ -235,16 +289,24 @@ export function ColumnFilterAdvanced<T = any>({
   }
 
   const toggleAll = () => {
-    if (selectedValues.size === uniqueValues.length) {
+    if (showOnlySelected) {
+      // En mode "Sélectionnés", désélectionner tout
       setSelectedValues(new Set())
     } else {
-      setSelectedValues(new Set(uniqueValues))
+      // En mode "Tous", basculer entre tout sélectionner ou tout désélectionner
+      if (selectedValues.size === uniqueValues.length) {
+        setSelectedValues(new Set())
+      } else {
+        setSelectedValues(new Set(uniqueValues))
+      }
     }
   }
 
-  const filteredValues = uniqueValues.filter(value =>
-    value.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredValues = uniqueValues.filter(value => {
+    const matchesSearch = value.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSelection = showOnlySelected ? selectedValues.has(value) : true
+    return matchesSearch && matchesSelection
+  })
 
   // Détecter si un filtre est réellement appliqué (pas juste défini)
   const isFiltered = React.useMemo(() => {
@@ -339,7 +401,10 @@ export function ColumnFilterAdvanced<T = any>({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleSort(null)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleSort(null)
+                }}
                 className="px-2"
                 title="Supprimer le tri"
               >
@@ -350,7 +415,7 @@ export function ColumnFilterAdvanced<T = any>({
 
           {/* Contenu du filtre selon le type */}
           <div className="p-3 max-h-96 overflow-y-auto">
-            {columnType === 'text' && (
+            {(columnType === 'text' || columnType === 'select' || columnType === 'boolean' || columnType === 'richtext') && (
               <>
                 {/* Barre de recherche */}
                 <div className="relative mb-3" onClick={(e) => e.stopPropagation()}>
@@ -366,18 +431,53 @@ export function ColumnFilterAdvanced<T = any>({
                   />
                 </div>
 
+                {/* Options d'affichage */}
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex gap-1">
+                    <Button
+                      variant={!showOnlySelected ? "default" : "ghost"}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowOnlySelected(false)
+                      }}
+                      className="text-xs h-6 px-2"
+                    >
+                      Tous
+                    </Button>
+                    <Button
+                      variant={showOnlySelected ? "default" : "ghost"}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowOnlySelected(true)
+                      }}
+                      className="text-xs h-6 px-2"
+                      disabled={selectedValues.size === 0}
+                    >
+                      Sélectionnés ({selectedValues.size})
+                    </Button>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {filteredValues.length} affichés
+                  </span>
+                </div>
+
                 {/* Actions de sélection */}
                 <div className="flex justify-between items-center mb-2">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={toggleAll}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      toggleAll()
+                    }}
                     className="text-xs"
                   >
-                    {selectedValues.size === filteredValues.length ? 'Désélectionner tout' : 'Sélectionner tout'}
+                    {showOnlySelected ? 'Désélectionner tout' : (selectedValues.size === uniqueValues.length ? 'Désélectionner tout' : 'Sélectionner tout')}
                   </Button>
                   <span className="text-xs text-muted-foreground">
-                    {selectedValues.size} / {filteredValues.length}
+                    {selectedValues.size} sélectionnés
                   </span>
                 </div>
 
@@ -387,12 +487,19 @@ export function ColumnFilterAdvanced<T = any>({
                     <label
                       key={value}
                       className="flex items-center gap-2 p-1 hover:bg-muted/50 rounded cursor-pointer"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <Checkbox
                         checked={selectedValues.has(value)}
                         onCheckedChange={() => toggleValue(value)}
+                        onClick={(e) => e.stopPropagation()}
                       />
-                      <span className="text-sm truncate flex-1">{value}</span>
+                      <span 
+                        className={`text-sm truncate flex-1 ${value === '(Vide)' ? 'italic text-muted-foreground' : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {value === '(Vide)' ? '(Vide - Non traduit)' : value}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -477,7 +584,10 @@ export function ColumnFilterAdvanced<T = any>({
             <Button
               variant="outline"
               size="sm"
-              onClick={handleClearFilter}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleClearFilter()
+              }}
               className="flex-1"
             >
               <X className="h-3 w-3 mr-1" />
@@ -486,7 +596,10 @@ export function ColumnFilterAdvanced<T = any>({
             <Button
               variant="default"
               size="sm"
-              onClick={handleApplyFilter}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleApplyFilter()
+              }}
               className="flex-1"
             >
               <Check className="h-3 w-3 mr-1" />

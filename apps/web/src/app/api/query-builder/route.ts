@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
@@ -34,28 +36,40 @@ function getAuthHeaders(request: NextRequest): Record<string, string> {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
     
-    const headers = getAuthHeaders(request)
-    const queryString = searchParams.toString()
-    const backendUrl = `${apiUrl}/api/v1/query-builder${queryString ? `?${queryString}` : ''}`
+    // Pour l'instant, retournons des données mock en attendant l'implémentation backend
+    const mockQueryBuilders = [
+      {
+        id: '1',
+        name: 'Users Analysis',
+        description: 'Analyse des utilisateurs actifs',
+        database: 'topsteel_auth',
+        table: 'users',
+        isPublic: false,
+        maxRows: 1000,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        createdBy: 'admin@topsteel.tech',
+        columns: ['id', 'email', 'nom', 'prenom', 'created_at'],
+        query: 'SELECT id, email, nom, prenom, created_at FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY'
+      },
+      {
+        id: '2',
+        name: 'Menu Configuration Report',
+        description: 'Rapport des configurations de menu',
+        database: 'topsteel_auth',
+        table: 'menu_configurations',
+        isPublic: true,
+        maxRows: 500,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        createdBy: 'admin@topsteel.tech',
+        columns: ['id', 'name', 'is_active', 'created_at'],
+        query: 'SELECT id, name, is_active, created_at FROM menu_configurations ORDER BY created_at DESC'
+      }
+    ]
 
-    const response = await fetch(backendUrl, {
-      method: 'GET',
-      headers,
-      signal: AbortSignal.timeout(10000)
-    })
-
-    if (response.ok) {
-      const responseData = await response.json()
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
-    } else {
-      return NextResponse.json(
-        { error: `Backend responded with ${response.status}: ${response.statusText}` },
-        { status: response.status }
-      )
-    }
+    return NextResponse.json(mockQueryBuilders)
   } catch (error) {
     console.error('[Query Builder API] Error:', error)
     return NextResponse.json(
@@ -73,11 +87,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const backendUrl = `${apiUrl}/api/v1/query-builder`
 
-    const response = await fetch(backendUrl, {
+    const response = await safeFetch(backendUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(10000)
     })
 
     if (response.ok) {

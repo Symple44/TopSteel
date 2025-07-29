@@ -1,11 +1,15 @@
 import { Controller, Get, Post, Body, Param, Query, UseGuards, Req } from '@nestjs/common'
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'
 import { MenuRawService } from '../services/menu-raw.service'
+import { OptimizedCacheService } from '../../../common/cache/redis-optimized.service'
 
 @Controller('admin/menu-raw')
 @UseGuards(JwtAuthGuard)
 export class MenuRawController {
-  constructor(private readonly menuRawService: MenuRawService) {}
+  constructor(
+    private readonly menuRawService: MenuRawService,
+    private readonly cacheService: OptimizedCacheService
+  ) {}
 
   @Get('configurations')
   async getAllConfigurations() {
@@ -18,6 +22,14 @@ export class MenuRawController {
 
   @Get('configurations/active')
   async getActiveConfiguration() {
+    const cacheKey = 'menu:active-configuration'
+    
+    // Vérifier le cache d'abord
+    const cachedResult = await this.cacheService.get(cacheKey)
+    if (cachedResult) {
+      return cachedResult
+    }
+    
     const config = await this.menuRawService.findActiveConfiguration()
     if (!config) {
       return {
@@ -28,13 +40,18 @@ export class MenuRawController {
     }
     
     const menuTree = await this.menuRawService.getMenuTree(config.id)
-    return {
+    const result = {
       success: true,
       data: {
         configuration: config,
         menuTree
       }
     }
+    
+    // Mettre en cache pour 10 minutes (600 secondes)
+    await this.cacheService.set(cacheKey, result, 600)
+    
+    return result
   }
 
   @Get('tree')

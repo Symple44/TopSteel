@@ -3,13 +3,17 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'
 import { UserMenuPreferenceService } from '../services/user-menu-preference.service'
 import { UserMenuPreference } from '../entities/user-menu-preference.entity'
+import { OptimizedCacheService } from '../../../common/cache/redis-optimized.service'
 
 @ApiTags('User Menu Preferences')
 @Controller('user/menu-preferences')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class UserMenuPreferenceController {
-  constructor(private readonly userMenuPreferenceService: UserMenuPreferenceService) {}
+  constructor(
+    private readonly userMenuPreferenceService: UserMenuPreferenceService,
+    private readonly cacheService: OptimizedCacheService
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Récupérer les préférences de menu de l\'utilisateur' })
@@ -364,6 +368,10 @@ export class UserMenuPreferenceController {
       // Sauvegarder le menu personnalisé dans les métadonnées utilisateur
       const result = await this.userMenuPreferenceService.saveCustomMenu(userId, menuItems)
       
+      // Invalider le cache après la mise à jour
+      const cacheKey = `user:custom-menu:${userId}`
+      await this.cacheService.invalidatePattern(`${cacheKey}*`)
+      
       return {
         success: true,
         data: result,
@@ -382,14 +390,32 @@ export class UserMenuPreferenceController {
   @ApiOperation({ summary: 'Récupérer le menu personnalisé complet' })
   async getCustomMenu(@Request() req): Promise<{ success: boolean; data: any[]; error?: string }> {
     const userId = req.user.id
+    const cacheKey = `user:custom-menu:${userId}`
     
     try {
+      const cachedResult = await this.cacheService.get<{ success: boolean; data: any[]; error?: string }>(cacheKey)
+      if (cachedResult) {
+        return cachedResult
+      }
+      
       const customMenu = await this.userMenuPreferenceService.getCustomMenu(userId)
       
-      return {
+      console.log(`📦 Controller getCustomMenu - Menu récupéré:`, {
+        userId,
+        customMenuType: typeof customMenu,
+        isArray: Array.isArray(customMenu),
+        length: Array.isArray(customMenu) ? customMenu.length : 'N/A',
+        firstItem: Array.isArray(customMenu) && customMenu.length > 0 ? customMenu[0] : null
+      })
+      
+      const result = {
         success: true,
         data: customMenu || [],
       }
+      
+      await this.cacheService.set(cacheKey, result, 300)
+      
+      return result
     } catch (error) {
       console.error('Erreur lors de la récupération du menu personnalisé:', error)
       return {

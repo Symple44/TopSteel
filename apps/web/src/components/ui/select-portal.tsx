@@ -159,27 +159,27 @@ export function SelectPortal({
 
   const selectContent = isOpen && typeof document !== 'undefined' && createPortal(
     <div
-      ref={contentRef}
-      className={cn(
-        'fixed z-[99999] min-w-[8rem] overflow-hidden rounded-md border shadow-lg',
-        'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100',
-        'border-gray-200 dark:border-gray-700',
-        'p-1',
-        'animate-in fade-in-0 zoom-in-95 duration-200',
-        'max-h-[200px] overflow-y-auto'
-      )}
-      data-select-portal
-      style={{
-        left: position.x,
-        top: position.y,
-        width: triggerRef.current?.offsetWidth || 'auto',
-        opacity: position.x === 0 && position.y === 0 ? 0 : 1,
-        transition: 'opacity 150ms ease-in-out',
-        backgroundColor: 'white',
-        border: '1px solid #e5e7eb'
-      }}
-      data-select-portal
-    >
+        ref={contentRef}
+        className={cn(
+          'fixed z-[99999] min-w-[8rem] overflow-hidden rounded-md border shadow-lg',
+          'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100',
+          'border-gray-200 dark:border-gray-700',
+          'p-1',
+          'animate-in fade-in-0 zoom-in-95 duration-200',
+          'max-h-[200px] overflow-y-auto'
+        )}
+        data-select-portal
+        style={{
+          left: position.x,
+          top: position.y,
+          width: triggerRef.current?.offsetWidth || 'auto',
+          opacity: position.x === 0 && position.y === 0 ? 0 : 1,
+          transition: 'opacity 150ms ease-in-out',
+          backgroundColor: 'white',
+          border: '1px solid #e5e7eb'
+        }}
+        data-select-portal
+      >
       {options.map((option) => (
         <div
           key={option.value}

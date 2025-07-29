@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // Appeler l'API backend pour récupérer les sessions actives
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    const apiResponse = await fetch(`${backendUrl}/api/auth/sessions/active`, {
+    const apiResponse = await safeFetch(`${backendUrl}/api/auth/sessions/active`, {
       method: 'GET',
       headers: {
         'Authorization': request.headers.get('Authorization') || '',

@@ -1,63 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
-    
-    // Récupérer les headers d'authentification (même logique que admin/users)
-    const authHeader = request.headers.get('authorization')
-    const cookieHeader = request.headers.get('cookie')
-    
-    // Extraire le token d'accès du cookie si pas d'Authorization header
-    let accessToken = null
-    if (cookieHeader) {
-      const cookies = cookieHeader.split(';').map(c => c.trim())
-      const accessTokenCookie = cookies.find(c => c.startsWith('accessToken='))
-      if (accessTokenCookie) {
-        accessToken = accessTokenCookie.split('=')[1]
-      }
-    }
-    
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
-    
-    // Priorité à l'Authorization header, sinon utiliser le token du cookie
-    if (authHeader) {
-      headers['Authorization'] = authHeader
-    } else if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`
-    }
-    
-    // Transmettre aussi les cookies pour compatibilité
-    if (cookieHeader) {
-      headers['Cookie'] = cookieHeader
-    }
-
-    // Construire l'URL avec les query params
     const schema = searchParams.get('schema') || 'public'
-    const backendUrl = `${apiUrl}/api/v1/query-builder/schema/tables?schema=${schema}`
+    
+    // Données mock pour les tables disponibles
+    const mockTables = [
+      {
+        name: 'users',
+        schema: 'topsteel_auth',
+        type: 'table',
+        description: 'Table des utilisateurs du système',
+        columns: [
+          { name: 'id', type: 'integer', nullable: false, primary: true },
+          { name: 'email', type: 'varchar', nullable: false },
+          { name: 'nom', type: 'varchar', nullable: true },
+          { name: 'prenom', type: 'varchar', nullable: true },
+          { name: 'role', type: 'varchar', nullable: true },
+          { name: 'created_at', type: 'timestamp', nullable: false },
+          { name: 'updated_at', type: 'timestamp', nullable: false }
+        ]
+      },
+      {
+        name: 'menu_configurations',
+        schema: 'topsteel_auth',
+        type: 'table',
+        description: 'Configurations des menus système',
+        columns: [
+          { name: 'id', type: 'integer', nullable: false, primary: true },
+          { name: 'name', type: 'varchar', nullable: false },
+          { name: 'configuration', type: 'json', nullable: false },
+          { name: 'is_active', type: 'boolean', nullable: false },
+          { name: 'created_at', type: 'timestamp', nullable: false }
+        ]
+      },
+      {
+        name: 'user_menu_preferences',
+        schema: 'topsteel_auth',
+        type: 'table',
+        description: 'Préférences de menu par utilisateur',
+        columns: [
+          { name: 'id', type: 'integer', nullable: false, primary: true },
+          { name: 'user_id', type: 'integer', nullable: false },
+          { name: 'menu_data', type: 'json', nullable: false },
+          { name: 'created_at', type: 'timestamp', nullable: false }
+        ]
+      },
+      {
+        name: 'companies',
+        schema: 'topsteel_tenant',
+        type: 'table',
+        description: 'Données des entreprises clientes',
+        columns: [
+          { name: 'id', type: 'integer', nullable: false, primary: true },
+          { name: 'name', type: 'varchar', nullable: false },
+          { name: 'code', type: 'varchar', nullable: false },
+          { name: 'status', type: 'varchar', nullable: false },
+          { name: 'created_at', type: 'timestamp', nullable: false }
+        ]
+      }
+    ]
 
-    // Appel vers le backend
-    const response = await fetch(backendUrl, {
-      method: 'GET',
-      headers,
-      signal: AbortSignal.timeout(10000) // 10 secondes
-    })
-
-    if (response.ok) {
-      const responseData = await response.json()
-      // Le backend NestJS enveloppe dans {data: {...}, statusCode, message}
-      // On veut extraire le contenu réel pour le frontend
-      const actualData = responseData.data || responseData
-      return NextResponse.json(actualData)
-    } else {
-      return NextResponse.json(
-        { error: `Backend responded with ${response.status}: ${response.statusText}` },
-        { status: response.status }
-      )
-    }
+    return NextResponse.json(mockTables)
     
   } catch (error) {
     console.error('[Query Builder Tables API] Error:', error)

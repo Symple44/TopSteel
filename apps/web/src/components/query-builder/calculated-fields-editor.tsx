@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Button } from '@erp/ui'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -168,23 +168,37 @@ export function CalculatedFieldsEditor({
                   onChange={(e) => setFormData({ ...formData, expression: e.target.value })}
                   placeholder="[quantity] * [unit_price]"
                   rows={4}
-                  className="font-mono"
+                  className="font-mono text-sm"
                 />
-                <div className="mt-2">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Available columns (click to insert):
-                  </p>
+                <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Calculator className="h-4 w-4" />
+                    <p className="text-sm font-medium">
+                      Available columns (click to insert):
+                    </p>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {columns.map((col) => (
                       <Badge
                         key={col.alias}
                         variant="outline"
-                        className="cursor-pointer hover:bg-accent"
+                        className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
                         onClick={() => handleInsertColumn(col.alias)}
                       >
                         {col.label}
+                        <span className="ml-1 text-xs opacity-70">({col.dataType})</span>
                       </Badge>
                     ))}
+                  </div>
+                  <div className="mt-3 text-xs text-muted-foreground">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <strong>Math functions:</strong> +, -, *, /, %, ROUND(), ABS()
+                      </div>
+                      <div>
+                        <strong>Text functions:</strong> CONCAT(), UPPER(), LOWER(), LENGTH()
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -214,25 +228,35 @@ export function CalculatedFieldsEditor({
           </Card>
         ) : (
           fields.map((field, index) => (
-            <Card key={index}>
-              <CardContent className="p-4">
+            <Card key={index} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-semibold">{field.label}</h4>
-                      <Badge variant="secondary">{field.name}</Badge>
-                      <Badge variant="outline">{field.dataType}</Badge>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Calculator className="h-4 w-4 text-primary" />
+                      <h4 className="font-semibold text-lg">{field.label}</h4>
+                      <Badge variant="secondary" className="font-mono text-xs">
+                        {field.name}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {field.dataType}
+                      </Badge>
                     </div>
                     {field.description && (
-                      <p className="text-sm text-muted-foreground mb-2">
+                      <p className="text-sm text-muted-foreground mb-3 italic">
                         {field.description}
                       </p>
                     )}
-                    <div className="bg-muted p-2 rounded text-sm font-mono">
-                      {field.expression}
+                    <div className="bg-muted/80 p-3 rounded-lg border border-border">
+                      <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">
+                        Expression:
+                      </div>
+                      <div className="text-sm font-mono text-foreground">
+                        {field.expression}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 ml-4">
+                  <div className="flex items-center gap-1 ml-4">
                     <Button
                       size="sm"
                       variant="ghost"

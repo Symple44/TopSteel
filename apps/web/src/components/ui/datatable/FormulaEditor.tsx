@@ -254,7 +254,7 @@ export function FormulaEditor<T>({
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent disablePortal>
                   <SelectItem value="all">Toutes les fonctions</SelectItem>
                   <SelectItem value="math">Mathématiques</SelectItem>
                   <SelectItem value="text">Texte</SelectItem>

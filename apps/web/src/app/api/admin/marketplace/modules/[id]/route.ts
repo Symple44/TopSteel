@@ -1,23 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthServer } from '@/lib/auth-server'
+import { fetchBackend } from '@/lib/auth-server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authServer = await getAuthServer()
-    
-    if (!authServer) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
-    }
-
-    const response = await fetch(`${process.env.API_URL}/marketplace/modules/${params.id}`, {
-      headers: {
-        'Authorization': `Bearer ${authServer.accessToken}`,
-        'Content-Type': 'application/json'
-      }
-    })
+    const { id } = await params
+    const response = await fetchBackend(`/marketplace/modules/${id}`, request)
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -39,23 +29,14 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authServer = await getAuthServer()
-    
-    if (!authServer) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
-    }
-
+    const { id } = await params
     const body = await request.json()
 
-    const response = await fetch(`${process.env.API_URL}/marketplace/modules/${params.id}/install`, {
+    const response = await fetchBackend(`/marketplace/modules/${id}/install`, request, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authServer.accessToken}`,
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(body)
     })
 

@@ -1,5 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextResponse, NextRequest } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export interface AuthResult {
   token: string | null
@@ -64,7 +66,7 @@ export class AuthHelper {
     }
 
     try {
-      const response = await fetch(url, {
+      const response = await safeFetch(url, {
         ...options,
         headers
       })

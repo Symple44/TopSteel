@@ -161,6 +161,7 @@ export interface DataTableConfig<T = any> {
   onRowDoubleClick?: (row: T) => void
   onCellEdit?: (value: any, row: T, column: ColumnConfig<T>) => void
   onSelectionChange?: (selection: SelectionState) => void
+  onPaginationChange?: (pagination: { page: number; pageSize: number; total: number }) => void
   
   // Style
   className?: string

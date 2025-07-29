@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
+
+// Force dynamic pour éviter les problèmes de cache
+export const dynamic = 'force-dynamic'
 
 interface UserMenuItem {
   id: string
@@ -40,12 +45,13 @@ export async function GET(request: NextRequest) {
     try {
       // Appeler le backend NestJS pour récupérer le menu personnalisé
       console.log('🔍 Appel API custom-menu vers:', `${apiUrl}/api/v1/user/menu-preferences/custom-menu`)
-      const response = await fetch(`${apiUrl}/api/v1/user/menu-preferences/custom-menu`, {
+      
+      const response = await safeFetch(`${apiUrl}/api/v1/user/menu-preferences/custom-menu`, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        signal: AbortSignal.timeout(10000),
       })
       
       console.log('📡 Réponse API custom-menu:', {
@@ -58,10 +64,24 @@ export async function GET(request: NextRequest) {
         const data = await response.json()
         
         // Log pour debug des traductions au chargement
+        console.log('📥 API: Réponse brute:', {
+          hasData: !!data,
+          dataType: typeof data,
+          hasDataProperty: !!data?.data,
+          dataPropertyType: typeof data?.data,
+          isDataArray: Array.isArray(data?.data),
+          directIsArray: Array.isArray(data),
+          keys: data ? Object.keys(data) : []
+        })
+        
+        // Déterminer où se trouvent les données du menu
+        const menuItems = data?.data || data || []
+        const isArray = Array.isArray(menuItems)
+        
         console.log('📥 API: Chargement des données menu:', {
-          itemsCount: data?.data?.length,
-          itemsWithTranslations: data?.data?.filter((item: any) => item.titleTranslations && Object.keys(item.titleTranslations).length > 0).length,
-          sampleItem: data?.data?.find((item: any) => item.titleTranslations && Object.keys(item.titleTranslations).length > 0)
+          itemsCount: isArray ? menuItems.length : 0,
+          itemsWithTranslations: isArray ? menuItems.filter((item: any) => item.titleTranslations && Object.keys(item.titleTranslations).length > 0).length : 0,
+          sampleItem: isArray ? menuItems.find((item: any) => item.titleTranslations && Object.keys(item.titleTranslations).length > 0) : null
         })
         
         return NextResponse.json(data)

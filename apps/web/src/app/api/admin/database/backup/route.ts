@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
     // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/admin/database/backup`
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/backup`
     
-    const response = await fetch(apiUrl, {
+    const response = await safeFetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

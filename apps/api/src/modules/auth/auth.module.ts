@@ -26,6 +26,7 @@ import { MFASession } from './entities/mfa-session.entity'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { JwtEnhancedStrategy } from './strategies/jwt-enhanced.strategy'
 import { LocalStrategy } from './strategies/local.strategy'
+import { OptimizedCacheService } from '../../common/cache/redis-optimized.service'
 
 @Module({
   imports: [
@@ -72,7 +73,8 @@ import { LocalStrategy } from './strategies/local.strategy'
     WebAuthnService,
     MFAService,
     RolesGuard,
-    TenantGuard
+    TenantGuard,
+    OptimizedCacheService  // Service de cache REDIS
   ],
   exports: [
     AuthService, 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 // import { useDrag, useDrop } from 'react-dnd' // Temporairement désactivé
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Button } from '@erp/ui'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
@@ -250,7 +250,7 @@ export function ColumnSelector({
             <Button 
               onClick={handleAddColumns}
               disabled={selectedColumns.size === 0}
-              className="w-full"
+              className="w-full bg-primary text-white hover:bg-primary/90 font-medium"
             >
               Add Selected Columns ({selectedColumns.size})
             </Button>

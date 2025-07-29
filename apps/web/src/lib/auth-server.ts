@@ -5,6 +5,8 @@
 
 import type { User } from '@erp/domains/core'
 import { NextRequest } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 const INTERNAL_API_BASE = process.env.VERCEL_URL 
   ? `https://${process.env.VERCEL_URL}` 
@@ -69,7 +71,7 @@ export const serverAuthService = {
    */
   async validateToken(token: string): Promise<boolean> {
     try {
-      const response = await fetch(`${INTERNAL_API_BASE}/api/auth/validate`, {
+      const response = await safeFetch(`${INTERNAL_API_BASE}/api/auth/validate`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -89,7 +91,7 @@ export const serverAuthService = {
    */
   async getProfile(token: string): Promise<User> {
     try {
-      const response = await fetch(`${INTERNAL_API_BASE}/api/auth/profile`, {
+      const response = await safeFetch(`${INTERNAL_API_BASE}/api/auth/profile`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

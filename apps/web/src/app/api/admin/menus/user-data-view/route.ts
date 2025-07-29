@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +15,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
 
     // Appeler l'API backend pour ajouter la vue au menu utilisateur
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menus/user-data-view`, {
+    const response = await safeFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/admin/menus/user-data-view`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import {
   ColumnConfig,
   DataTableConfig,
@@ -41,11 +42,6 @@ import { RichTextEditor } from './RichTextEditor'
 import {
   Button,
   Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Checkbox,
   Badge
 } from '@erp/ui'
@@ -53,6 +49,7 @@ import { DropdownPortal, DropdownItem, DropdownSeparator } from '@/components/ui
 import {
   ChevronUp,
   ChevronDown,
+  Check,
   Search,
   Filter,
   Download,
@@ -69,7 +66,9 @@ import {
   Palette,
   Network,
   ChevronRight,
-  LayoutGrid
+  LayoutGrid,
+  Copy,
+  Clipboard
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
@@ -98,6 +97,7 @@ export function DataTable<T = any>({
   onRowDoubleClick,
   onCellEdit,
   onSelectionChange,
+  onPaginationChange,
   className,
   height,
   striped = true,
@@ -127,6 +127,8 @@ export function DataTable<T = any>({
     column: string
   } | null>(null)
   const [focusedCell, setFocusedCell] = useState<{row: number, column: string} | null>(null)
+  const [pageSizeDropdownOpen, setPageSizeDropdownOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [clipboardData, setClipboardData] = useState<string[][] | null>(null)
   const [showPastePreview, setShowPastePreview] = useState(false)
   const [showExportDialog, setShowExportDialog] = useState(false)
@@ -173,6 +175,7 @@ export function DataTable<T = any>({
   // Refs
   const tableRef = useRef<HTMLTableElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const pageSizeDropdownTriggerRef = useRef<HTMLButtonElement>(null)
   
   // Drag & Drop pour les colonnes
   const {
@@ -221,7 +224,30 @@ export function DataTable<T = any>({
       
       // Filtre par valeurs multiples (checkbox)
       if (filterValue.type === 'values' && Array.isArray(filterValue.values)) {
-        return filterValue.values.includes(String(value))
+        // Vérifier si le filtre inclut les valeurs vides
+        const includesEmpty = filterValue.values.includes('(Vide)')
+        
+        // Vérifier si la valeur actuelle est vide
+        const isEmpty = value == null || (typeof value === 'string' && value.trim() === '') ||
+                        (typeof value === 'string' && value.includes('<') && value.replace(/<[^>]*>/g, '').trim() === '')
+        
+        if (isEmpty && includesEmpty) {
+          return true
+        }
+        
+        if (!isEmpty) {
+          // Pour les booléens, convertir la valeur en texte lisible pour la comparaison
+          let stringValue = String(value)
+          if (typeof value === 'boolean') {
+            stringValue = value ? 'Oui' : 'Non'
+          } else if (typeof value === 'string' && value.includes('<')) {
+            // Pour les richtext, nettoyer les balises HTML pour la comparaison
+            stringValue = value.replace(/<[^>]*>/g, '').trim()
+          }
+          return filterValue.values.includes(stringValue)
+        }
+        
+        return false
       }
       
       // Filtre par plage numérique
@@ -355,7 +381,9 @@ export function DataTable<T = any>({
     // Appliquer les filtres
     filters.forEach(filter => {
       result = result.filter(row => {
-        const value = (row as any)[filter.column]
+        // Trouver la colonne correspondante pour utiliser getValue si défini
+        const column = orderedColumns.find(col => col.id === filter.column)
+        const value = column?.getValue ? column.getValue(row) : (row as any)[column?.key || filter.column]
         return applyFilter(value, filter)
       })
     })
@@ -388,14 +416,36 @@ export function DataTable<T = any>({
     // Appliquer le tri
     sortConfig.forEach(sort => {
       result.sort((a, b) => {
-        const aVal = (a as any)[sort.column]
-        const bVal = (b as any)[sort.column]
+        // Trouver la colonne correspondante pour utiliser getValue si défini
+        const column = orderedColumns.find(col => col.id === sort.column)
+        
+        let aVal, bVal
+        if (column?.getValue) {
+          aVal = column.getValue(a)
+          bVal = column.getValue(b)
+        } else {
+          aVal = (a as any)[column?.key || sort.column]
+          bVal = (b as any)[column?.key || sort.column]
+        }
+        
+        // Gérer les valeurs null/undefined
+        if (aVal == null && bVal == null) return 0
+        if (aVal == null) return sort.direction === 'desc' ? 1 : -1
+        if (bVal == null) return sort.direction === 'desc' ? -1 : 1
+        
+        // Pour les chaînes, nettoyer les balises HTML si nécessaire
+        if (typeof aVal === 'string' && aVal.includes('<')) {
+          aVal = aVal.replace(/<[^>]*>/g, '').trim()
+        }
+        if (typeof bVal === 'string' && bVal.includes('<')) {
+          bVal = bVal.replace(/<[^>]*>/g, '').trim()
+        }
         
         if (aVal === bVal) return 0
         
-        // Logique de tri simple et fiable (même que les en-têtes)
-        if (aVal < bVal) return sort.direction === 'desc' ? -1 : 1
-        if (aVal > bVal) return sort.direction === 'desc' ? 1 : -1
+        // Logique de tri simple et fiable
+        if (aVal < bVal) return sort.direction === 'desc' ? 1 : -1
+        if (aVal > bVal) return sort.direction === 'desc' ? -1 : 1
         return 0
       })
     })
@@ -443,6 +493,82 @@ export function DataTable<T = any>({
   
   // Hook pour les vues alternatives
   const dataViews = useDataViews(dataWithFormulas, orderedColumns, keyField)
+  
+  // État de pagination
+  const paginationConfig = typeof pagination === 'object' ? pagination : null
+  const [internalCurrentPage, setInternalCurrentPage] = useState(paginationConfig?.page || 1)
+  const [internalPageSize, setInternalPageSize] = useState(paginationConfig?.pageSize || 50)
+  const pageSize = paginationConfig?.pageSize || internalPageSize
+  const pageSizeOptions = paginationConfig?.pageSizeOptions || [10, 25, 50, 100]
+  
+  
+  // Utiliser les props si disponibles, sinon l'état interne
+  const currentPage = paginationConfig?.page || internalCurrentPage
+  
+  // Fonction pour changer de page
+  const handlePageChange = useCallback((page: number) => {
+    if (paginationConfig?.page !== undefined && onPaginationChange) {
+      // Si contrôlé par le parent, notifier le parent
+      onPaginationChange({
+        page,
+        pageSize,
+        total: dataWithFormulas.length
+      })
+    } else {
+      // Sinon utiliser l'état interne
+      setInternalCurrentPage(page)
+    }
+  }, [paginationConfig?.page, onPaginationChange, pageSize, dataWithFormulas.length])
+  
+  // Alias pour compatibilité avec le code existant
+  const setCurrentPage = handlePageChange
+
+  // Synchroniser l'état interne avec les props quand elles changent
+  useEffect(() => {
+    if (paginationConfig?.page !== undefined) {
+      setInternalCurrentPage(paginationConfig.page)
+    }
+    if (paginationConfig?.pageSize !== undefined) {
+      setInternalPageSize(paginationConfig.pageSize)
+    }
+  }, [paginationConfig?.page, paginationConfig?.pageSize])
+  
+  // Calculer les données paginées
+  const paginatedData = useMemo(() => {
+    if (!pagination) return dataWithFormulas
+    
+    const startIndex = (currentPage - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    return dataWithFormulas.slice(startIndex, endIndex)
+  }, [dataWithFormulas, pagination, currentPage, pageSize])
+  
+  // Calculer les informations de pagination
+  const paginationInfo = useMemo(() => {
+    if (!pagination) return null
+    
+    const totalItems = dataWithFormulas.length
+    const totalPages = Math.ceil(totalItems / pageSize)
+    const startIndex = (currentPage - 1) * pageSize + 1
+    const endIndex = Math.min(currentPage * pageSize, totalItems)
+    
+    return {
+      currentPage,
+      totalPages,
+      pageSize,
+      totalItems,
+      startIndex,
+      endIndex,
+      hasNextPage: currentPage < totalPages,
+      hasPrevPage: currentPage > 1
+    }
+  }, [dataWithFormulas.length, currentPage, pageSize, pagination])
+  
+  // Réinitialiser la page quand les données changent
+  useEffect(() => {
+    if (pagination && paginationInfo && currentPage > paginationInfo.totalPages) {
+      setCurrentPage(1)
+    }
+  }, [dataWithFormulas.length, pagination, paginationInfo, currentPage])
   
   // Mémoriser les statistiques pour éviter les recalculs
   const tableStats = useMemo(() => {
@@ -635,6 +761,8 @@ export function DataTable<T = any>({
     },
     
     onSelectAll: () => {
+      // En mode pagination, sélectionner toutes les données visibles (dataWithFormulas)
+      // ou seulement la page courante selon le comportement souhaité
       const allRowKeys = dataWithFormulas.map((row, index) => (row as any)[keyField] || index)
       setSelection({
         selectedRows: new Set(allRowKeys),
@@ -1012,6 +1140,26 @@ export function DataTable<T = any>({
     document.addEventListener('paste', handlePasteEvent)
     return () => document.removeEventListener('paste', handlePasteEvent)
   }, [handlePaste])
+
+  // Fermer le dropdown de pagination au clic externe
+  useEffect(() => {
+    if (pageSizeDropdownOpen) {
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Element
+        if (!target.closest('[data-pagesize-dropdown]')) {
+          setPageSizeDropdownOpen(false)
+        }
+      }
+      
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [pageSizeDropdownOpen])
+
+  // Marquer le composant comme monté pour les portals
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   // Early returns pour les états spéciaux
   if (loading) {
@@ -1157,8 +1305,8 @@ export function DataTable<T = any>({
       `}</style>
       
       {/* Barre d'outils */}
-      <div className="flex items-center justify-between mb-4 gap-2 datatable-toolbar">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-3 gap-2 datatable-toolbar">
+        <div className="flex items-center gap-1.5">
           {/* Recherche */}
           {searchable && (
             <div className="relative">
@@ -1183,10 +1331,11 @@ export function DataTable<T = any>({
           
           {/* Actions */}
           {actions?.create && (
-            <Button onClick={actions.create} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Ajouter
-            </Button>
+            <TooltipSimple content="Ajouter un élément">
+              <Button onClick={actions.create} size="sm" className="h-7 w-7 p-0">
+                <Plus className="h-3 w-3" />
+              </Button>
+            </TooltipSimple>
           )}
           
           {/* Bouton éditeur rich text */}
@@ -1194,22 +1343,24 @@ export function DataTable<T = any>({
             const column = orderedColumns.find(c => c.id === focusedCell.column)
             if (column?.type === 'richtext' && editable && column.editable) {
               return (
-                <Button 
-                  onClick={() => {
-                    const row = dataWithFormulas[focusedCell.row]
-                    const cellValue = column.getValue ? column.getValue(row) : (row as any)[column.key]
-                    setRichTextEditor({
-                      row: focusedCell.row,
-                      column: focusedCell.column,
-                      value: cellValue || ''
-                    })
-                  }}
-                  size="sm"
-                  variant="outline"
-                >
-                  <Type className="h-4 w-4 mr-2" />
-                  Éditeur Rich Text
-                </Button>
+                <TooltipSimple content="Ouvrir l'éditeur Rich Text">
+                  <Button 
+                    onClick={() => {
+                      const row = dataWithFormulas[focusedCell.row]
+                      const cellValue = column.getValue ? column.getValue(row) : (row as any)[column.key]
+                      setRichTextEditor({
+                        row: focusedCell.row,
+                        column: focusedCell.column,
+                        value: cellValue || ''
+                      })
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className="h-7 w-7 p-0"
+                  >
+                    <Type className="h-3 w-3" />
+                  </Button>
+                </TooltipSimple>
               )
             }
             return null
@@ -1218,54 +1369,74 @@ export function DataTable<T = any>({
           
           {selection.selectedRows.size > 0 && (
             <>
-              <Button onClick={handleCopySelection} variant="outline" size="sm">
-                Copier ({selection.selectedRows.size})
-              </Button>
+              <TooltipSimple content={`Copier ${selection.selectedRows.size} élément(s) sélectionné(s)`}>
+                <Button onClick={handleCopySelection} variant="outline" size="sm" className="h-7 w-7 p-0">
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </TooltipSimple>
               
               {actions?.delete && (
-                <Button
-                  onClick={() => {
-                    const selectedData = dataWithFormulas.filter((_, index) => 
-                      selection.selectedRows.has((dataWithFormulas[index] as any)[keyField])
-                    )
-                    actions.delete(selectedData)
-                  }}
-                  variant="destructive"
-                  size="sm"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Supprimer ({selection.selectedRows.size})
-                </Button>
+                <TooltipSimple content={`Supprimer ${selection.selectedRows.size} élément(s) sélectionné(s)`}>
+                  <Button
+                    onClick={() => {
+                      const selectedData = dataWithFormulas.filter((_, index) => 
+                        selection.selectedRows.has((dataWithFormulas[index] as any)[keyField])
+                      )
+                      actions.delete(selectedData)
+                    }}
+                    variant="destructive"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </TooltipSimple>
               )}
             </>
           )}
           
           {editable && (
-            <Button onClick={handlePaste} variant="outline" size="sm">
-              Coller
-            </Button>
+            <TooltipSimple content="Coller depuis le presse-papiers">
+              <Button onClick={handlePaste} variant="outline" size="sm" className="h-7 w-7 p-0">
+                <Clipboard className="h-3 w-3" />
+              </Button>
+            </TooltipSimple>
           )}
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {/* Règles de couleurs */}
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setShowColorRuleManager(true)}
-          >
-            <Palette className="h-4 w-4 mr-2" />
-            Couleurs {colorRuleSystem.activeRules > 0 ? `(${colorRuleSystem.activeRules})` : ''}
-          </Button>
+          <TooltipSimple content={`Gestion des règles de couleurs ${colorRuleSystem.activeRules > 0 ? `(${colorRuleSystem.activeRules} actives)` : ''}`}>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowColorRuleManager(true)}
+              className="h-7 w-7 p-0 relative"
+            >
+              <Palette className="h-3 w-3" />
+              {colorRuleSystem.activeRules > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                  {colorRuleSystem.activeRules}
+                </span>
+              )}
+            </Button>
+          </TooltipSimple>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowTreeGroupingPanel(true)}
-          >
-            <Network className="h-4 w-4 mr-2" />
-            Grouper {treeGrouping.isGrouped ? `(${treeGrouping.groupingColumns.length})` : ''}
-          </Button>
+          <TooltipSimple content={`Groupement en arbre ${treeGrouping.isGrouped ? `(${treeGrouping.groupingColumns.length} colonnes groupées)` : ''}`}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTreeGroupingPanel(true)}
+              className="h-7 w-7 p-0 relative"
+            >
+              <Network className="h-3 w-3" />
+              {treeGrouping.isGrouped && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                  {treeGrouping.groupingColumns.length}
+                </span>
+              )}
+            </Button>
+          </TooltipSimple>
 
           {/* Sélecteur de vues */}
           <ViewSelector
@@ -1281,10 +1452,11 @@ export function DataTable<T = any>({
           <DropdownPortal
             align="end"
             trigger={
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Exporter
-              </Button>
+              <TooltipSimple content="Options d'export">
+                <Button variant="outline" size="sm" className="h-7 w-7 p-0">
+                  <Download className="h-3 w-3" />
+                </Button>
+              </TooltipSimple>
             }
           >
             <DropdownItem onClick={() => handleExport('xlsx')}>
@@ -1503,7 +1675,7 @@ export function DataTable<T = any>({
           </thead>
           
           <tbody>
-            {(treeGrouping.isGrouped ? treeGrouping.tree.flatList : dataWithFormulas).map((item, itemIndex) => {
+            {(treeGrouping.isGrouped ? treeGrouping.tree.flatList : paginatedData).map((item, itemIndex) => {
               // Si c'est un nœud de groupe
               if (treeGrouping.isGroupNode(item)) {
                 const groupNode = item
@@ -1656,14 +1828,14 @@ export function DataTable<T = any>({
                         align="end"
                         side="bottom"
                         trigger={
-                          <Button variant="ghost" size="sm" onClick={() => console.log('Action button clicked for row:', row)}>
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-1">
+                            <MoreHorizontal className="h-3 w-3" />
                           </Button>
                         }
                       >
                         {actions.edit && (
                           <DropdownItem onClick={() => actions.edit!(row)}>
-                            <Edit className="h-4 w-4 mr-2" />
+                            <Edit className="h-3 w-3 mr-2" />
                             Modifier
                           </DropdownItem>
                         )}
@@ -1672,7 +1844,7 @@ export function DataTable<T = any>({
                             onClick={() => actions.delete!([row])}
                             className="text-red-600 hover:text-red-700"
                           >
-                            <Trash2 className="h-4 w-4 mr-2" />
+                            <Trash2 className="h-3 w-3 mr-2" />
                             Supprimer
                           </DropdownItem>
                         )}
@@ -1742,8 +1914,8 @@ export function DataTable<T = any>({
       </div>
       
       {/* Statistiques et Pagination */}
-      <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span>
             {tableStats.hasFilters && tableStats.visibleRows !== tableStats.totalRows 
               ? `${tableStats.visibleRows} sur ${tableStats.totalRows} résultats`
@@ -1762,10 +1934,88 @@ export function DataTable<T = any>({
           )}
         </div>
         
-        {pagination && (
-          <div>
-            {/* TODO: Implémenter la pagination complète */}
-            <span className="text-xs text-muted-foreground">Pagination à venir</span>
+        {pagination && paginationInfo && (
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {paginationInfo.startIndex}-{paginationInfo.endIndex} sur {paginationInfo.totalItems}
+              </span>
+              <div data-pagesize-dropdown className="flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground">Lignes:</span>
+                <div className="relative">
+                  <button
+                    ref={pageSizeDropdownTriggerRef}
+                    type="button"
+                    onClick={() => setPageSizeDropdownOpen(!pageSizeDropdownOpen)}
+                    className="flex items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-2 py-1 text-xs shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 w-14 h-6"
+                  >
+                    <span className="block truncate text-left">
+                      {paginationConfig?.pageSize || internalPageSize}
+                    </span>
+                    <ChevronDown className="h-3 w-3 opacity-50" />
+                  </button>
+                  
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(1)}
+                disabled={!paginationInfo.hasPrevPage}
+                className="h-6 px-2 text-xs"
+              >
+                Premier
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={!paginationInfo.hasPrevPage}
+                className="h-6 px-2 text-xs"
+              >
+                Préc.
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                <span className="text-xs">Page</span>
+                <Input
+                  type="number"
+                  min="1"
+                  max={paginationInfo.totalPages}
+                  value={currentPage}
+                  onChange={(e) => {
+                    const page = parseInt(e.target.value)
+                    if (page >= 1 && page <= paginationInfo.totalPages) {
+                      setCurrentPage(page)
+                    }
+                  }}
+                  className="w-12 h-6 text-center text-xs"
+                />
+                <span className="text-xs">sur {paginationInfo.totalPages}</span>
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={!paginationInfo.hasNextPage}
+                className="h-6 px-2 text-xs"
+              >
+                Suiv.
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(paginationInfo.totalPages)}
+                disabled={!paginationInfo.hasNextPage}
+                className="h-6 px-2 text-xs"
+              >
+                Dernier
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -1911,6 +2161,76 @@ export function DataTable<T = any>({
         }
         viewType={editingViewType}
       />
+
+      {/* PageSize Dropdown Portal */}
+      {pageSizeDropdownOpen && mounted && pageSizeDropdownTriggerRef.current && (() => {
+        const triggerRect = pageSizeDropdownTriggerRef.current!.getBoundingClientRect()
+        const dropdownHeight = Math.min(pageSizeOptions.length * 40 + 8, 240) // 40px par option + padding, max 240px
+        const viewportHeight = window.innerHeight
+        const spaceBelow = viewportHeight - triggerRect.bottom
+        const spaceAbove = triggerRect.top
+        
+        // Déterminer si on affiche en dessous ou au-dessus
+        const showAbove = spaceBelow < dropdownHeight + 10 && spaceAbove > spaceBelow
+        
+        const style: React.CSSProperties = {
+          left: triggerRect.left,
+          width: Math.max(triggerRect.width, 64),
+          maxHeight: showAbove ? Math.min(240, spaceAbove - 10) : Math.min(240, spaceBelow - 10)
+        }
+        
+        if (showAbove) {
+          style.bottom = viewportHeight - triggerRect.top + 4
+        } else {
+          style.top = triggerRect.bottom + 4
+        }
+        
+        return createPortal(
+          <div 
+            data-pagesize-dropdown
+            className="fixed z-[99999] bg-background border border-border rounded-md shadow-xl overflow-auto min-w-[64px]"
+            style={style}
+          >
+            {pageSizeOptions.map(size => (
+              <button
+                key={size}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  
+                  const newPageSize = size
+                  // Recalculer la page courante pour maintenir la position approximative
+                  const currentFirstItem = (currentPage - 1) * pageSize + 1
+                  const newPage = Math.ceil(currentFirstItem / newPageSize)
+                  
+                  // Toujours notifier le parent du changement de pagination
+                  onPaginationChange?.({
+                    page: newPage,
+                    pageSize: newPageSize,
+                    total: paginationInfo.totalItems
+                  })
+                  
+                  // Si pas de contrôle parent, mettre à jour l'état interne
+                  if (!paginationConfig?.page) {
+                    setInternalCurrentPage(newPage)
+                  }
+                  
+                  // Toujours mettre à jour la taille de page interne
+                  setInternalPageSize(newPageSize)
+                  
+                  setPageSizeDropdownOpen(false)
+                }}
+                className="flex w-full items-center px-2 py-1.5 text-xs hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+              >
+                <Check className={`mr-1.5 h-3 w-3 ${(paginationConfig?.pageSize || internalPageSize) === size ? 'opacity-100' : 'opacity-0'}`} />
+                {size}
+              </button>
+            ))}
+          </div>,
+          document.body
+        )
+      })()}
     </div>
   )
 }

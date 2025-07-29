@@ -3,10 +3,10 @@ import { safeFetch } from '@/utils/fetch-safe'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { database: string; migrationName: string } }
+  { params }: { params: Promise<{ database: string; migrationName: string }> }
 ) {
   try {
-    const { database, migrationName } = params
+    const { database, migrationName } = await params
     
     // Proxy vers l'API backend
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/${database}/${migrationName}/details`

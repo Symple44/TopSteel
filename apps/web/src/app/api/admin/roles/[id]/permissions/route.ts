@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function GET(
   request: NextRequest,
@@ -25,7 +27,7 @@ export async function GET(
 
     try {
       // Appeler le vrai backend NestJS
-      const response = await fetch(`${apiUrl}/api/v1/admin/roles/${roleId}/permissions`, {
+      const response = await safeFetch(`${apiUrl}/api/v1/admin/roles/${roleId}/permissions`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

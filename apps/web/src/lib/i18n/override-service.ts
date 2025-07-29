@@ -4,6 +4,8 @@
  */
 
 import type { Translations } from './types'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export interface TranslationOverride {
   id: string
@@ -37,7 +39,7 @@ class TranslationOverrideService {
 
   private async fetchOverrides(): Promise<void> {
     try {
-      const response = await fetch('/api/translations/overrides', {
+      const response = await safeFetch('/api/translations/overrides', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

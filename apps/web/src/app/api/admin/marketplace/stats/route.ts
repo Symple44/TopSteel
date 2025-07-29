@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthServer } from '@/lib/auth-server'
+import { fetchBackend } from '@/lib/auth-server'
 
 export async function GET(request: NextRequest) {
   try {
-    const authServer = await getAuthServer()
-    
-    if (!authServer) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
-    }
-
     // Récupérer les statistiques depuis l'API backend
-    const response = await fetch(`${process.env.API_URL}/marketplace/stats/overview`, {
-      headers: {
-        'Authorization': `Bearer ${authServer.accessToken}`,
-        'Content-Type': 'application/json'
-      }
-    })
+    const response = await fetchBackend('/marketplace/stats/overview', request)
 
     if (!response.ok) {
       throw new Error(`Erreur API: ${response.status}`)

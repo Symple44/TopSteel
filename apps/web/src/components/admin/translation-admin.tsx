@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { TranslationDataTable } from './TranslationDataTable'
 import {
   Card,
@@ -10,11 +11,6 @@ import {
   Button,
   Input,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Tabs,
   TabsContent,
   TabsList,
@@ -47,7 +43,9 @@ import {
   Hash,
   Tag,
   Clock,
-  User
+  User,
+  ChevronDown,
+  Check
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
@@ -69,15 +67,7 @@ export default function TranslationAdmin() {
   const { t } = useTranslation('admin')
   const { current: currentLanguage } = useLanguage()
   
-  // Debounced stats update pour éviter les recalculs excessifs
-  const debouncedStatsUpdate = useCallback(
-    useDebouncedValue(() => {
-      setStats(calculateTranslationStats(entries))
-    }, 500),
-    [entries]
-  )
-  
-  // États
+  // États - moved before the callback to avoid initialization order issues
   const [entries, setEntries] = useState<TranslationEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage.code)
@@ -85,11 +75,40 @@ export default function TranslationAdmin() {
   const [editingEntry, setEditingEntry] = useState<TranslationEntry | null>(null)
   const [importDialog, setImportDialog] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const dropdownTriggerRef = useRef<HTMLButtonElement>(null)
+  
+  // Debounced stats update pour éviter les recalculs excessifs
+  const debouncedStatsUpdate = useCallback(() => {
+    const timer = setTimeout(() => {
+      setStats(calculateTranslationStats(entries))
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [entries])
   
   // Charger les traductions au montage
   useEffect(() => {
+    setMounted(true)
     loadTranslations()
   }, [])
+
+  // Fermer le dropdown de catégorie quand on clique ailleurs
+  useEffect(() => {
+    if (categoryDropdownOpen) {
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Element
+        if (!target.closest('[data-category-dropdown]')) {
+          setCategoryDropdownOpen(false)
+        }
+      }
+      
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [categoryDropdownOpen])
+
+
   
   const loadTranslations = async () => {
     setLoading(true)
@@ -105,14 +124,16 @@ export default function TranslationAdmin() {
     }
   }
   
-  // Mémoriser les calculs coûteux
+  // Mémoriser les calculs coûteux - recalculer seulement quand les entrées changent
   const memoizedStats = useMemo(() => {
-    return stats ? calculateTranslationStats(entries) : null
-  }, [entries, stats])
+    return calculateTranslationStats(entries)
+  }, [entries])
   
   // Gérer l'édition
   const handleEdit = (entry: TranslationEntry) => {
+    console.log('handleEdit called with:', entry)
     setEditingEntry({ ...entry })
+    setCategoryDropdownOpen(false)
   }
   
   const handleSave = async () => {
@@ -399,21 +420,36 @@ export default function TranslationAdmin() {
         </CardContent>
       </Card>
       
-      {/* Dialog d'édition */}
-      <Dialog open={!!editingEntry} onOpenChange={() => setEditingEntry(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Éditer la traduction</DialogTitle>
-            <DialogDescription>
-              Modifiez les traductions pour chaque langue
-            </DialogDescription>
-          </DialogHeader>
-          
-          {editingEntry && (
+      {/* Dialog d'édition - Version personnalisée fonctionnelle */}
+      {editingEntry && (
+        <div 
+          className="fixed inset-0 z-[9999] bg-black/80"
+          onClick={() => {
+            setEditingEntry(null)
+            setCategoryDropdownOpen(false)
+          }}
+        >
+          <div 
+            className="fixed left-[50%] top-[50%] z-[10000] grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+              <h2 className="text-lg font-semibold leading-none tracking-tight">
+                Éditer la traduction
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Modifiez les traductions pour chaque langue
+              </p>
+            </div>
+            
+            {/* Content */}
             <div className="space-y-4">
               <div>
-                <Label>Clé</Label>
-                <code className="text-sm font-mono bg-muted px-3 py-2 rounded block">
+                <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Clé
+                </Label>
+                <code className="text-sm font-mono bg-muted px-3 py-2 rounded block mt-1">
                   {editingEntry.fullKey}
                 </code>
               </div>
@@ -423,7 +459,7 @@ export default function TranslationAdmin() {
               <div className="space-y-4">
                 {SUPPORTED_LANGUAGES.map(lang => (
                   <div key={lang.code}>
-                    <Label className="flex items-center gap-2 mb-2">
+                    <Label className="flex items-center gap-2 mb-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       <span className="text-lg">{lang.flag}</span>
                       <span>{lang.name}</span>
                     </Label>
@@ -438,26 +474,37 @@ export default function TranslationAdmin() {
                       })}
                       placeholder={`Traduction en ${lang.nativeName}...`}
                       rows={3}
+                      className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
                 ))}
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Catégorie</Label>
-                  <Input
-                    value={editingEntry.category || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingEntry({
-                      ...editingEntry,
-                      category: e.target.value
-                    })}
-                    placeholder="Catégorie..."
-                  />
+                <div data-category-dropdown className="relative">
+                  <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Catégorie
+                  </Label>
+                  <div className="relative mt-1">
+                    <button
+                      ref={dropdownTriggerRef}
+                      type="button"
+                      onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                      className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span className="block truncate text-left">
+                        {editingEntry.category || '(Aucune catégorie)'}
+                      </span>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </button>
+                    
+                  </div>
                 </div>
                 
                 <div>
-                  <Label>Description</Label>
+                  <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Description
+                  </Label>
                   <Input
                     value={editingEntry.description || ''}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingEntry({
@@ -465,23 +512,98 @@ export default function TranslationAdmin() {
                       description: e.target.value
                     })}
                     placeholder="Description..."
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
                   />
                 </div>
               </div>
             </div>
-          )}
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingEntry(null)}>
-              Annuler
-            </Button>
-            <Button onClick={handleSave}>
-              <Save className="h-4 w-4 mr-2" />
-              Sauvegarder
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            
+            {/* Footer */}
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setEditingEntry(null)
+                  setCategoryDropdownOpen(false)
+                }}
+                className="mt-2 sm:mt-0"
+              >
+                Annuler
+              </Button>
+              <Button onClick={handleSave}>
+                <Save className="h-4 w-4 mr-2" />
+                Sauvegarder
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Category Dropdown Portal */}
+      {categoryDropdownOpen && mounted && dropdownTriggerRef.current && (() => {
+        const triggerRect = dropdownTriggerRef.current!.getBoundingClientRect()
+        const uniqueCategories = Array.from(new Set(entries.map(entry => entry.category).filter(Boolean))).sort()
+        const dropdownHeight = Math.min((uniqueCategories.length + 1) * 40 + 8, 240) // +1 pour "(Aucune catégorie)"
+        const viewportHeight = window.innerHeight
+        const spaceBelow = viewportHeight - triggerRect.bottom
+        const spaceAbove = triggerRect.top
+        
+        // Déterminer si on affiche en dessous ou au-dessus
+        const showAbove = spaceBelow < dropdownHeight + 10 && spaceAbove > spaceBelow
+        
+        const style: React.CSSProperties = {
+          left: triggerRect.left,
+          width: Math.max(triggerRect.width, 200),
+          maxHeight: showAbove ? Math.min(240, spaceAbove - 10) : Math.min(240, spaceBelow - 10)
+        }
+        
+        if (showAbove) {
+          style.bottom = viewportHeight - triggerRect.top + 4
+        } else {
+          style.top = triggerRect.bottom + 4
+        }
+        
+        return createPortal(
+          <div 
+            data-category-dropdown
+            className="fixed z-[99999] bg-background border border-border rounded-md shadow-xl overflow-auto min-w-[200px]"
+            style={style}
+          >
+          <button
+            type="button"
+            onClick={() => {
+              setEditingEntry({
+                ...editingEntry,
+                category: ''
+              })
+              setCategoryDropdownOpen(false)
+            }}
+            className="flex w-full items-center px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+          >
+            <Check className={`mr-2 h-4 w-4 ${!editingEntry.category ? 'opacity-100' : 'opacity-0'}`} />
+            (Aucune catégorie)
+          </button>
+          {Array.from(new Set(entries.map(entry => entry.category).filter(Boolean))).sort().map(category => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => {
+                setEditingEntry({
+                  ...editingEntry,
+                  category: category
+                })
+                setCategoryDropdownOpen(false)
+              }}
+              className="flex w-full items-center px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+            >
+              <Check className={`mr-2 h-4 w-4 ${editingEntry.category === category ? 'opacity-100' : 'opacity-0'}`} />
+              {category}
+            </button>
+          ))}
+          </div>,
+          document.body
+        )
+      })()}
       
       {/* Dialog d'import */}
       <Dialog open={importDialog} onOpenChange={setImportDialog}>

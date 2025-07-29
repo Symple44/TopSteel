@@ -140,7 +140,8 @@
       "Bash(./cleanup-ports.bat)",
       "Bash(npx typeorm-ts-node-commonjs migration:generate:*)",
       "Bash(turbo dev:*)",
-      "Bash(npx typeorm query:*)"
+      "Bash(npx typeorm query:*)",
+      "Bash(redis-cli:*)"
     ],
     "deny": []
   }

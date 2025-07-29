@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
@@ -43,11 +45,10 @@ export async function POST(
     const { id } = await params
     const backendUrl = `${apiUrl}/api/v1/query-builder/${id}/execute`
 
-    const response = await fetch(backendUrl, {
+    const response = await safeFetch(backendUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(30000) // 30 secondes pour les exécutions de requêtes
     })
 
     if (response.ok) {

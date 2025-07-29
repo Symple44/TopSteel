@@ -12,13 +12,17 @@ import { RolesGuard } from '../../auth/guards/roles.guard'
 import { UserRole } from '../../users/entities/user.entity'
 import { UsersService } from '../../users/users.service'
 import { UserQueryDto } from '../../users/dto/user-query.dto'
+import { OptimizedCacheService } from '../../../common/cache/redis-optimized.service'
 
 @Controller('admin/users')
 @ApiTags('🔧 Admin - Users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class AdminUsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly cacheService: OptimizedCacheService
+  ) {}
 
   @Get()
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER)
@@ -29,6 +33,15 @@ export class AdminUsersController {
   @ApiQuery({ name: 'includePermissions', required: false, type: Boolean, description: 'Inclure les permissions dans la réponse' })
   @ApiResponse({ status: 200, description: 'Liste des utilisateurs récupérée avec succès' })
   async findAllUsers(@Query() query: UserQueryDto & { includePermissions?: boolean }) {
+    // Créer une clé de cache basée sur les paramètres de requête
+    const cacheKey = `admin:users:${JSON.stringify(query)}`
+    
+    // Vérifier le cache d'abord
+    const cachedResult = await this.cacheService.get(cacheKey)
+    if (cachedResult) {
+      return cachedResult
+    }
+    
     const users = await this.usersService.findAll(query)
     
     // Adapter les données pour correspondre à l'interface frontend
@@ -52,7 +65,7 @@ export class AdminUsersController {
       permissions: [] // TODO: Récupérer les vraies permissions si nécessaire
     }))
     
-    return {
+    const result = {
       success: true,
       data: formattedUsers,
       meta: {
@@ -60,6 +73,11 @@ export class AdminUsersController {
         includePermissions: query.includePermissions || false
       }
     }
+    
+    // Mettre en cache pour 2 minutes (120 secondes)
+    await this.cacheService.set(cacheKey, result, 120)
+    
+    return result
   }
 
   @Get('stats')

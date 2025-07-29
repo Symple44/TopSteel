@@ -168,7 +168,7 @@ export function ExportDialog<T>({
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent disablePortal>
                     <SelectItem value="xlsx">
                       <div className="flex items-center gap-2">
                         {getFormatIcon('xlsx')}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { Button } from '@/components/ui/button'
+import { Button } from '@erp/ui'
 import { Save, Play, Settings, Download, Eye } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
@@ -239,9 +239,11 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
                   selectedTables={selectedTables}
                   mainTable={queryBuilder.mainTable}
                   joins={queryBuilder.joins}
+                  columns={queryBuilder.columns}
                   onMainTableChange={(table) => updateQueryBuilder({ mainTable: table })}
                   onJoinsChange={(joins) => updateQueryBuilder({ joins })}
                   onTablesChange={setSelectedTables}
+                  onColumnsChange={(columns) => updateQueryBuilder({ columns })}
                 />
               </div>
               <div className="flex-1">

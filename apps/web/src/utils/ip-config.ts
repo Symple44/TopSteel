@@ -1,5 +1,14 @@
 // Utilitaire pour la configuration et détection automatique IP
-import { createConnection } from 'net'
+let createConnection: any = null
+
+// Import conditionnel côté serveur uniquement
+if (typeof window === 'undefined') {
+  try {
+    createConnection = require('net').createConnection
+  } catch (error) {
+    console.warn('Module net non disponible')
+  }
+}
 
 export type IPVersion = 'auto' | 'ipv4' | 'ipv6'
 
@@ -14,6 +23,11 @@ interface IPConfig {
  * Teste la connectivité vers un host:port
  */
 async function testConnection(host: string, port: number, timeout = 2000): Promise<boolean> {
+  // Côté client, retourner true par défaut (pas de test de connectivité)
+  if (typeof window !== 'undefined' || !createConnection) {
+    return true
+  }
+  
   return new Promise((resolve) => {
     const socket = createConnection({ host, port })
     const timer = setTimeout(() => {

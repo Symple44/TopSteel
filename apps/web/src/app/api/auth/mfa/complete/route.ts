@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeFetch } from '@/utils/fetch-safe'
+import '@/utils/init-ip-config'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     // Appeler l'API backend pour finaliser la connexion après MFA
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    const apiResponse = await fetch(`${backendUrl}/api/auth/mfa/complete`, {
+    const apiResponse = await safeFetch(`${backendUrl}/api/auth/mfa/complete`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

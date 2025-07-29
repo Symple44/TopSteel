@@ -10,6 +10,7 @@ import {
 import { CustomSelect } from './CustomSelect'
 import { SimpleModal } from './SimpleModal'
 import { DropdownPortal, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown-portal'
+import { TooltipSimple } from '@/components/ui/tooltip-simple'
 import {
   Table,
   Kanban,
@@ -67,19 +68,15 @@ export function ViewSelector<T = any>({
       <DropdownPortal
         align="end"
         trigger={
-          <Button variant="outline" size="sm">
-            {(() => {
-              const currentViewConfig = availableViews.find(v => v.type === currentView)
-              const IconComponent = currentViewConfig ? VIEW_ICONS[currentViewConfig.type] : Table
-              return (
-                <>
-                  <IconComponent className="h-4 w-4 mr-2" />
-                  Affichage
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </>
-              )
-            })()}
-          </Button>
+          <TooltipSimple content={`Mode d'affichage: ${availableViews.find(v => v.type === currentView)?.name || 'Tableau'}`}>
+            <Button variant="outline" size="sm" className="h-7 w-7 p-0">
+              {(() => {
+                const currentViewConfig = availableViews.find(v => v.type === currentView)
+                const IconComponent = currentViewConfig ? VIEW_ICONS[currentViewConfig.type] : Table
+                return <IconComponent className="h-3 w-3" />
+              })()}
+            </Button>
+          </TooltipSimple>
         }
       >
         {availableViews.map(view => {

@@ -30,8 +30,8 @@
       "es": "Esta sección estará disponible pronto"
     },
     "category": "Administration",
-    "createdAt": "2025-07-28T09:55:50.637Z",
-    "updatedAt": "2025-07-28T09:56:26.390Z",
+    "createdAt": "2025-07-28T20:55:51.946Z",
+    "updatedAt": "2025-07-28T20:56:03.501Z",
     "isModified": true,
     "updatedBy": "admin@topsteel.tech"
   },
@@ -48,6 +48,22 @@
     "category": "Administration",
     "createdAt": "2025-07-28T09:55:50.637Z",
     "updatedAt": "2025-07-28T09:56:41.809Z",
+    "isModified": true,
+    "updatedBy": "admin@topsteel.tech"
+  },
+  "admin.authentication.methods": {
+    "id": "admin.authentication.methods",
+    "namespace": "admin",
+    "key": "authentication.methods",
+    "fullKey": "admin.authentication.methods",
+    "translations": {
+      "fr": "Méthodes d'authentification",
+      "en": "Authentication Methods",
+      "es": "Métodos de autenticación"
+    },
+    "category": "Administration",
+    "createdAt": "2025-07-28T16:52:37.738Z",
+    "updatedAt": "2025-07-28T16:53:45.648Z",
     "isModified": true,
     "updatedBy": "admin@topsteel.tech"
   }

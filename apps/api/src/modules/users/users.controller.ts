@@ -26,13 +26,17 @@ import { UpdateNotificationSettingsDto, GetNotificationSettingsResponseDto } fro
 import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { UserRole } from './entities/user.entity'
 import { UsersService } from './users.service'
+import { OptimizedCacheService } from '../../common/cache/redis-optimized.service'
 
 @Controller('users')
 @ApiTags('👤 Users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly cacheService: OptimizedCacheService
+  ) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
@@ -86,11 +90,25 @@ export class UsersController {
     type: GetAppearanceSettingsResponseDto 
   })
   async getMyAppearanceSettings(@CurrentUser() user: any): Promise<GetAppearanceSettingsResponseDto> {
+    const cacheKey = `user:appearance:${user.id}`
+    
+    // Vérifier le cache d'abord
+    const cachedResult = await this.cacheService.get<GetAppearanceSettingsResponseDto>(cacheKey)
+    if (cachedResult) {
+      return cachedResult
+    }
+    
     const settings = await this.usersService.getUserSettings(user.id)
     if (!settings?.preferences?.appearance) {
       throw new Error('Paramètres d\'apparence non trouvés')
     }
-    return new GetAppearanceSettingsResponseDto(settings.preferences.appearance)
+    
+    const result = new GetAppearanceSettingsResponseDto(settings.preferences.appearance)
+    
+    // Mettre en cache pour 10 minutes (600 secondes)
+    await this.cacheService.set(cacheKey, result, 600)
+    
+    return result
   }
 
   @Patch('appearance/me')
@@ -107,7 +125,17 @@ export class UsersController {
     const updatedSettings = await this.usersService.updateUserSettings(user.id, {
       preferences: { appearance: updateDto }
     })
-    return new GetAppearanceSettingsResponseDto(updatedSettings.preferences.appearance)
+    
+    // Invalider le cache après la mise à jour
+    const cacheKey = `user:appearance:${user.id}`
+    await this.cacheService.invalidatePattern(cacheKey)
+    
+    const result = new GetAppearanceSettingsResponseDto(updatedSettings.preferences.appearance)
+    
+    // Remettre en cache la nouvelle valeur
+    await this.cacheService.set(cacheKey, result, 600)
+    
+    return result
   }
 
   // Endpoints spécialisés pour les notifications (DOIVENT être avant :id)

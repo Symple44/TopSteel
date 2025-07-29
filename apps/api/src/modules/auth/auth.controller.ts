@@ -11,13 +11,15 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { Roles } from './decorators/roles.decorator'
 import { RolesGuard } from './guards/roles.guard'
 import { SessionInvalidationService } from './services/session-invalidation.service'
+import { OptimizedCacheService } from '../../common/cache/redis-optimized.service'
 
 @ApiTags('🔐 Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly sessionInvalidationService: SessionInvalidationService
+    private readonly sessionInvalidationService: SessionInvalidationService,
+    private readonly cacheService: OptimizedCacheService
   ) {}
 
   @Public()
@@ -146,7 +148,20 @@ export class AuthController {
     description: 'Obtenir la liste des sociétés auxquelles l\'utilisateur a accès',
   })
   async getUserSocietes(@CurrentUser() user: User) {
-    return this.authService.getUserSocietes(user.id)
+    const cacheKey = `auth:societes:${user.id}`
+    
+    // Vérifier le cache d'abord
+    const cachedResult = await this.cacheService.get(cacheKey)
+    if (cachedResult) {
+      return cachedResult
+    }
+    
+    const result = await this.authService.getUserSocietes(user.id)
+    
+    // Mettre en cache pour 5 minutes (300 secondes)
+    await this.cacheService.set(cacheKey, result, 300)
+    
+    return result
   }
 
   @ThrottleAuth()

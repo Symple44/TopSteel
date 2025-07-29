@@ -66,8 +66,15 @@ export function ColumnFilterDropdown<T = any>({
       }
     }
 
-    function handleScroll() {
+    function handleScroll(event: Event) {
       if (isOpen) {
+        // Ne pas fermer si le scroll vient du dropdown lui-même
+        if (event.target && containerRef.current) {
+          const target = event.target as Element
+          if (containerRef.current.contains(target)) {
+            return
+          }
+        }
         setIsOpen(false)
       }
     }
@@ -253,7 +260,10 @@ export function ColumnFilterDropdown<T = any>({
                 <button
                   key={value}
                   type="button"
-                  onClick={() => handleValueToggle(value)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleValueToggle(value)
+                  }}
                   className="flex items-center w-full px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   <div className="flex items-center justify-center w-4 h-4 mr-2 border border-border rounded">

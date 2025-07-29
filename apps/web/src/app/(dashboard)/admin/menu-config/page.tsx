@@ -68,7 +68,7 @@ interface MenuConfiguration {
 
 export default function MenuConfigurationPage() {
   const { t } = useTranslation('admin')
-  const [configurations, setConfigurations] = useState<MenuConfiguration[]>([]
+  const [configurations, setConfigurations] = useState<MenuConfiguration[]>([])
   const [selectedConfig, setSelectedConfig] = useState<MenuConfiguration | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
