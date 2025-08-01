@@ -53,7 +53,7 @@ export const en = {
     changePhoto: 'Change photo',
     reset: 'Reset',
     resetToDefaults: 'Reset to Defaults',
-    
+
     // System pages
     pageNotFound: 'Page not found',
     pageNotFoundMessage: 'The page you are looking for does not exist or has been moved.',
@@ -81,7 +81,7 @@ export const en = {
     loginButton: 'Sign in',
     registerButton: 'Sign up',
     alreadyHaveAccount: 'Already have an account?',
-    dontHaveAccount: 'Don\'t have an account?',
+    dontHaveAccount: "Don't have an account?",
     loginSuccess: 'Login successful',
     loginError: 'Login error',
     invalidCredentials: 'Invalid email or password',
@@ -91,7 +91,7 @@ export const en = {
     disableTwoFactor: 'Disable two-factor authentication',
     googleAuth: 'Sign in with Google',
     microsoftAuth: 'Sign in with Microsoft',
-    
+
     // Forgot Password
     forgotPasswordTitle: 'Forgot Password',
     forgotPasswordSubtitle: 'Enter your email to receive a recovery link',
@@ -103,26 +103,27 @@ export const en = {
     sendRecoveryLink: 'Send recovery link',
     sendingInProgress: 'Sending...',
     securityNotice: 'Security:',
-    securityNoticeText: 'If you don\'t receive the email, check that the address is correct or contact your administrator.',
+    securityNoticeText:
+      "If you don't receive the email, check that the address is correct or contact your administrator.",
     needHelp: 'Need help?',
     contactSupport: 'Contact support',
     emailSentToast: 'A recovery email has been sent to your address',
-    
+
     // Validation messages
     enterEmail: 'Please enter your email address',
     enterValidEmail: 'Please enter a valid email address',
-    
+
     // Security messages
     accessDenied: 'Access denied',
     mustBeLoggedIn: 'You must be logged in to access this page.',
     insufficientPermissions: 'Insufficient permissions',
-    insufficientRoles: 'You don\'t have the required roles to access this page.',
-    insufficientPermissionsText: 'You don\'t have the required permissions to access this page.',
+    insufficientRoles: "You don't have the required roles to access this page.",
+    insufficientPermissionsText: "You don't have the required permissions to access this page.",
     requiredRoles: 'Required roles:',
     requiredPermissions: 'Required permissions:',
     verifyingAuthentication: 'Verifying authentication...',
     back: 'Back',
-    
+
     // MFA
     mfaTitle: 'Two-Factor Authentication',
     mfaSubtitle: 'Please enter your verification code',
@@ -156,7 +157,7 @@ export const en = {
     smsCodePlaceholder: '123456',
     verifySmsCode: 'Verify SMS code',
     backupCodesUsed: '{count} recovery code(s) used',
-    
+
     // Login page
     fillAllFields: 'Please fill in all fields',
     welcomeToTopSteel: 'Welcome to TopSteel ERP',
@@ -177,7 +178,7 @@ export const en = {
     terms: 'Terms',
     allRightsReserved: 'All rights reserved',
     specializedERPSystem: 'Specialized ERP system for the metallurgical industry',
-    
+
     // Register page
     fillRequiredFields: 'Please fill in all required fields',
     passwordsDoNotMatch: 'Passwords do not match',
@@ -215,11 +216,11 @@ export const en = {
     generalSettings: 'General settings',
     soundNotifications: 'Sound notifications',
     notificationSettings: 'Notification Settings',
-    
+
     // Unauthorized
     unauthorizedTitle: 'Unauthorized access',
     unauthorizedMessage: 'You must be logged in to access this page.',
-    
+
     // Security MFA
     security: {
       mfa: {
@@ -230,13 +231,13 @@ export const en = {
         codesNotAvailable: 'Recovery codes not available',
         codesError: 'Error retrieving codes',
         codesCopied: 'Codes copied to clipboard',
-        
+
         totp: {
           configError: 'Error configuring TOTP',
           success: 'TOTP activated successfully!',
-          invalidCode: 'Invalid TOTP code'
+          invalidCode: 'Invalid TOTP code',
         },
-        
+
         webauthn: {
           configError: 'Error configuring WebAuthn',
           notSupportedError: 'WebAuthn not supported or connection error',
@@ -244,12 +245,12 @@ export const en = {
           registrationFailed: 'WebAuthn registration failed',
           registrationError: 'Error during WebAuthn registration',
           success: 'WebAuthn configured successfully!',
-          verificationError: 'Error during WebAuthn verification'
-        }
-      }
+          verificationError: 'Error during WebAuthn verification',
+        },
+      },
     },
     defaultUserName: 'TopSteel User',
-    
+
     firstName: 'First Name',
     lastName: 'Last Name',
     company: 'Company',
@@ -436,7 +437,7 @@ export const en = {
       executed: 'Executed',
       pending: 'Pending',
     },
-    company: {
+    companyConfig: {
       title: 'Company Configuration',
       subtitle: 'Configure your company information',
       logoUpdated: 'Company logo updated successfully',
@@ -461,7 +462,7 @@ export const en = {
       active: 'Active',
       realModules: 'Real modules available',
       publishModule: 'Publish Module',
-      categories: {
+      categoriesMarketplace: {
         hr: 'Human Resources',
         procurement: 'Procurement & Sourcing',
         analytics: 'Analytics & BI',
@@ -470,7 +471,7 @@ export const en = {
         reporting: 'Reporting',
         quality: 'Quality',
         maintenance: 'Maintenance',
-        finance: 'Finance'
+        finance: 'Finance',
       },
       loadingError: 'Error loading modules',
       loadingErrorMessage: 'Unable to load modules',
@@ -505,14 +506,14 @@ export const en = {
         status: {
           active: 'Active',
           inactive: 'Inactive',
-          error: 'Error'
+          error: 'Error',
         },
         actions: {
           configure: 'Configure',
           activate: 'Activate',
           deactivate: 'Deactivate',
           update: 'Update',
-          uninstall: 'Uninstall'
+          uninstall: 'Uninstall',
         },
         installedOn: 'Installed on',
         by: 'by',
@@ -524,7 +525,7 @@ export const en = {
         mostUsedFeatures: 'Most used features',
         usages: 'usages',
         close: 'Close',
-        openModule: 'Open module'
+        openModule: 'Open module',
       },
       pricing: {
         free: 'Free',
@@ -533,10 +534,10 @@ export const en = {
         month: 'month',
         commission: 'Commission on savings',
         usageBased: 'Usage-based',
-        onRequest: 'Price on request'
+        onRequest: 'Price on request',
       },
     },
-    common: {
+    commonAdmin: {
       save: 'Save',
       reset: 'Reset',
       cancel: 'Cancel',
@@ -620,7 +621,7 @@ export const en = {
         status: 'Status',
         roles: 'Roles',
         groups: 'Groups',
-        lastLogin: 'Last Login'
+        lastLogin: 'Last Login',
       },
       loadingError: 'Error loading users',
       connectionError: 'Server connection error',
@@ -635,18 +636,17 @@ export const en = {
       fullName: 'Full name',
       notProvided: 'Not provided',
       lastConnection: 'Last login',
-      noGroupsAssigned: 'No groups assigned',
       companiesAndRights: 'Companies and rights',
       rightsManagement: 'Rights management by company',
       rightsManagementDescription: 'Manage user access and permissions for each company',
       modificationHistory: 'Modification history',
-      generalInfo: 'General information',
-      refresh: 'Refresh'
+      refresh: 'Refresh',
     },
     menuConfig: {
       title: 'Menu Configuration',
       description: 'Manage menu configurations and customize navigation',
-      confirmActivate: 'Are you sure you want to activate this configuration? The current configuration will be deactivated.',
+      confirmActivate:
+        'Are you sure you want to activate this configuration? The current configuration will be deactivated.',
       confirmDelete: 'Are you sure you want to delete this configuration?',
       loadingConfigurations: 'Loading configurations...',
       defaultMenu: 'Default menu',
@@ -657,8 +657,9 @@ export const en = {
       system: 'System',
       custom: 'Custom',
       noConfigurations: 'No menu configurations found',
-      noConfigurationsDescription: 'Start by creating a new menu configuration or use the default menu.',
-      activeConfiguration: 'Active Configuration', 
+      noConfigurationsDescription:
+        'Start by creating a new menu configuration or use the default menu.',
+      activeConfiguration: 'Active Configuration',
       configurations: 'Configurations',
       preview: 'Preview',
       settings: 'Settings',
@@ -670,7 +671,6 @@ export const en = {
       createdAt: 'Created on',
       updatedAt: 'Updated on',
       name: 'Name',
-      description: 'Description',
       form: {
         namePlaceholder: 'Configuration name',
         descriptionPlaceholder: 'Configuration description (optional)',
@@ -678,37 +678,15 @@ export const en = {
         create: 'Create',
         save: 'Save',
         creating: 'Creating...',
-        saving: 'Saving...'
+        saving: 'Saving...',
       },
       editor: {
         advancedEditorSoon: 'The advanced menu editor will be available in a future version.',
         exportImportInfo: 'For now, you can export/import configurations.',
-        close: 'Close'
+        close: 'Close',
       },
-      preview: {
-        loadingPreview: 'Loading preview...',
-        noItems: 'No items in this configuration',
-        createItems: 'Add items via the configuration editor'
-      },
-      editor: {
-        editConfiguration: 'Edit Configuration',
-        newConfiguration: 'New Configuration',
-        configurationName: 'Configuration name',
-        configurationNamePlaceholder: 'Ex: Production Menu, Sales Menu...',
-        configurationDescription: 'Description',
-        configurationDescriptionPlaceholder: 'Describe this configuration...',
-        menuItems: 'Menu Items',
-        addMenuItem: 'Add menu item',
-        noMenuItems: 'No menu items configured',
-        addFirstMenuItem: 'Add your first menu item',
-        loadingRightsData: 'Loading rights data...',
-        newMenuItem: 'New item',
-        cancel: 'Cancel',
-        save: 'Save',
-        saving: 'Saving...'
-      }
     },
-    marketplace: {
+    marketplaceModule: {
       title: 'Module Marketplace',
       description: 'Discover and install modules to extend your ERP functionality',
       settings: 'Settings',
@@ -727,7 +705,7 @@ export const en = {
       update: 'Update',
       details: 'Details',
     },
-    
+
     menus: {
       noMenuItems: 'No menu items to display',
       noMenuItemsConfigured: 'No menu items configured',
@@ -749,7 +727,7 @@ export const en = {
     profit: 'Profit',
     orders: 'Orders',
     deliveries: 'Deliveries',
-    
+
     // Dashboard specific
     thisWeek: 'This week',
     reports: 'Reports',
@@ -773,7 +751,7 @@ export const en = {
     launchProductionOrder: 'Launch a new production order',
     newQuote: 'New quote',
     createQuoteForClient: 'Create a quote for a client',
-    
+
     // Activities
     newProjectCreated: 'New project created',
     productionOrderCompleted: 'Production order completed',
@@ -826,14 +804,14 @@ export const en = {
     timeout: 'Request timeout',
     tryAgain: 'Try again',
     contactSupport: 'Contact support',
-    
+
     // Error pages
     title: 'Error',
     unexpected: 'An unexpected error occurred.',
     unexpectedDetailed: 'An unexpected error occurred. Please try again.',
     dashboardError: 'Dashboard issue',
     dashboardMessage: 'An error occurred while loading the dashboard.',
-    
+
     // Backend errors
     backend: {
       unavailable: 'Server unavailable',
@@ -850,8 +828,8 @@ export const en = {
       checkServer: 'Check that the API server is running',
       checkPort: 'Confirm that port {port} is accessible',
       checkNetwork: 'Check your network connection',
-      checkLogs: 'Check server logs for more details'
-    }
+      checkLogs: 'Check server logs for more details',
+    },
   },
 
   success: {
@@ -932,7 +910,6 @@ export const en = {
       'Europe/London': 'London (GMT+0)',
       'America/New_York': 'New York (GMT-5)',
     },
-    appearance: 'Appearance',
     theme: 'Theme',
     currentTheme: 'Current theme',
     themeAutoSave: 'Theme is automatically saved',
@@ -998,7 +975,7 @@ export const en = {
         folder: 'Folder',
         program: 'Program',
         link: 'Link',
-        dataView: 'Data View'
+        dataView: 'Data View',
       },
       iconCategories: {
         navigation: 'Navigation & Structure',
@@ -1008,7 +985,7 @@ export const en = {
         production: 'Production & Stock',
         communication: 'Communication',
         actions: 'Actions & States',
-        finance: 'Finance & Technical'
+        finance: 'Finance & Technical',
       },
       folderEmpty: 'Empty folder',
       dropHere: 'Drop here!',
@@ -1023,20 +1000,10 @@ export const en = {
         icon: 'Icon: Click on the icon to open selectors',
         colors: 'Colors: 16 colors available + default color',
         icons: 'Icons: 38 icons organized by category',
-        shortcuts: 'Shortcuts: Ctrl+S (save), Ctrl+R (reset), Escape (close)'
+        shortcuts: 'Shortcuts: Ctrl+S (save), Ctrl+R (reset), Escape (close)',
       },
       defaultColor: 'Default color',
       clickToApply: '{name} - Click to apply',
-      iconCategories: {
-        navigation: 'Navigation & Structure',
-        security: 'Administration & Security',
-        enterprise: 'Enterprise & Organization',
-        data: 'Data & Reports',
-        production: 'Production & Stock',
-        communication: 'Communication',
-        actions: 'Actions & States',
-        finance: 'Finance & Technical'
-      },
       colors: {
         blue: 'Blue',
         green: 'Green',
@@ -1052,7 +1019,7 @@ export const en = {
         indigo: 'Indigo',
         emerald: 'Emerald',
         lime: 'Lime',
-        amber: 'Amber'
+        amber: 'Amber',
       },
       savingInProgress: 'Saving in progress...',
       savedSuccessfully: 'Menu saved successfully',
@@ -1064,7 +1031,6 @@ export const en = {
       queryBuilderId: 'Query Builder ID',
       container: 'Container',
       items: 'item(s)',
-      title: 'Title',
     },
     security: {
       title: 'Security',
@@ -1086,12 +1052,15 @@ export const en = {
       notConfigured: 'TOTP not configured. Enable this method to improve your account security.',
       configure: 'Configure TOTP',
       webauthnKeys: 'WebAuthn / Security Keys',
-      totpDescription: 'Use an authenticator app like Google Authenticator, Authy, or 1Password to generate verification codes.',
-      webauthnDescription: 'Use biometrics (fingerprint, facial recognition) or physical security keys (YubiKey, etc.).',
+      totpDescription:
+        'Use an authenticator app like Google Authenticator, Authy, or 1Password to generate verification codes.',
+      webauthnDescription:
+        'Use biometrics (fingerprint, facial recognition) or physical security keys (YubiKey, etc.).',
       deviceAdded: 'Added on',
       removeDevice: 'Remove',
       addNewKey: 'Add new key',
-      webauthnNotConfigured: 'WebAuthn not configured. This method offers the best possible security.',
+      webauthnNotConfigured:
+        'WebAuthn not configured. This method offers the best possible security.',
       configureWebauthn: 'Configure WebAuthn',
       totpSetupTitle: 'TOTP Configuration',
       totpSetupDescription: 'Scan the QR code with your authenticator app',
@@ -1103,10 +1072,11 @@ export const en = {
       cancel: 'Cancel',
       verifyAndActivate: 'Verify and Activate',
       webauthnSetupTitle: 'WebAuthn Configuration',
-      webauthnSetupDescription: 'Configure a security key or use your device\'s biometrics',
+      webauthnSetupDescription: "Configure a security key or use your device's biometrics",
       deviceNameLabel: 'Device name (optional):',
       deviceNamePlaceholder: 'My iPhone, My YubiKey...',
-      webauthnInstructions: 'Follow your browser\'s instructions to register your security key or use biometrics.',
+      webauthnInstructions:
+        "Follow your browser's instructions to register your security key or use biometrics.",
       backupCodesTitle: 'Recovery codes',
       backupCodesDescription: 'Use these codes if you lose access to your authenticator',
       backupCodesSecure: 'Keep these codes safe. Each code can only be used once.',
@@ -1123,7 +1093,7 @@ export const en = {
       usageBased: 'Usage based',
       priceOnRequest: 'Price on request',
       defaultDevice: 'WebAuthn Device',
-    }
+    },
   },
 
   roles: {
@@ -1181,7 +1151,8 @@ export const en = {
     code: 'Code',
     lines: 'lines',
     linesSelected: 'line(s) selected',
-    clickLineNumbers: 'Click line numbers to select • Ctrl+Click for multi-selection • Shift+Click for range',
+    clickLineNumbers:
+      'Click line numbers to select • Ctrl+Click for multi-selection • Shift+Click for range',
     lineTooltip: 'Line {number} - Click: select, Ctrl+Click: multi-selection, Shift+Click: range',
   },
 

@@ -13,7 +13,15 @@ export interface SystemParameter {
   key: string
   value: string
   type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON' | 'ENUM'
-  category: 'GENERAL' | 'COMPTABILITE' | 'PROJETS' | 'PRODUCTION' | 'ACHATS' | 'STOCKS' | 'NOTIFICATION' | 'SECURITY'
+  category:
+    | 'GENERAL'
+    | 'COMPTABILITE'
+    | 'PROJETS'
+    | 'PRODUCTION'
+    | 'ACHATS'
+    | 'STOCKS'
+    | 'NOTIFICATION'
+    | 'SECURITY'
   description: string
   defaultValue?: string
   isEditable: boolean
@@ -66,25 +74,19 @@ export class SystemParametersApiClient extends BaseApiClient {
   // ===== CRUD OPERATIONS =====
 
   async create(data: CreateSystemParameterDto): Promise<SystemParameter> {
-    const response: AxiosResponse<SystemParameter> = await this.http.post(
-      this.basePath,
-      data
-    )
+    const response: AxiosResponse<SystemParameter> = await this.http.post(this.basePath, data)
     return response.data
   }
 
   async findAll(query?: SystemParameterQueryDto): Promise<SystemParameter[]> {
-    const response: AxiosResponse<SystemParameter[]> = await this.http.get(
-      this.basePath,
-      { params: query }
-    )
+    const response: AxiosResponse<SystemParameter[]> = await this.http.get(this.basePath, {
+      params: query,
+    })
     return response.data
   }
 
   async findByKey(key: string): Promise<SystemParameter> {
-    const response: AxiosResponse<SystemParameter> = await this.http.get(
-      `${this.basePath}/${key}`
-    )
+    const response: AxiosResponse<SystemParameter> = await this.http.get(`${this.basePath}/${key}`)
     return response.data
   }
 
@@ -104,10 +106,7 @@ export class SystemParametersApiClient extends BaseApiClient {
   }
 
   async updateMultiple(updates: Array<{ key: string; value: string }>): Promise<SystemParameter[]> {
-    const response: AxiosResponse<SystemParameter[]> = await this.http.patch(
-      this.basePath,
-      updates
-    )
+    const response: AxiosResponse<SystemParameter[]> = await this.http.patch(this.basePath, updates)
     return response.data
   }
 
@@ -141,7 +140,7 @@ export class SystemParametersApiClient extends BaseApiClient {
   async getNumberValue(key: string): Promise<number> {
     const parameter = await this.findByKey(key)
     const value = parseFloat(parameter.value || parameter.defaultValue || '0')
-    return isNaN(value) ? 0 : value
+    return Number.isNaN(value) ? 0 : value
   }
 
   async getBooleanValue(key: string): Promise<boolean> {

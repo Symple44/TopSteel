@@ -3,7 +3,7 @@
  * Client de base pour tous les domaines métier
  */
 
-import { HttpClient, type ApiConfig, type AuthToken } from './http-client'
+import { type ApiConfig, type AuthToken, HttpClient } from './http-client'
 
 export interface ApiClientConfig extends ApiConfig {
   readonly apiKey?: string
@@ -35,7 +35,7 @@ export abstract class BaseApiClient {
 
   protected buildQueryParams(params: Record<string, any>): Record<string, string> {
     const cleanParams: Record<string, string> = {}
-    
+
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined && value !== null && value !== '') {
         if (Array.isArray(value)) {
@@ -47,7 +47,7 @@ export abstract class BaseApiClient {
         }
       }
     }
-    
+
     return cleanParams
   }
 
@@ -62,15 +62,15 @@ export abstract class BaseApiClient {
    */
   createContextKey(domain: string, resource?: string, id?: string | number): string[] {
     const parts = [domain]
-    
+
     if (resource) {
       parts.push(resource)
     }
-    
+
     if (id !== undefined) {
       parts.push(this.normalizeId(id))
     }
-    
+
     return parts
   }
 }

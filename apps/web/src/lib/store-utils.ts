@@ -89,25 +89,19 @@ export function createRobustStore<
             const item = localStorage.getItem(key)
 
             return item ? JSON.parse(item) : null
-          } catch (error) {
-            console.warn(`Erreur lecture storage pour ${key}:`, error)
-
+          } catch (_error) {
             return null
           }
         },
         setItem: (key: string, value: unknown) => {
           try {
             localStorage.setItem(key, JSON.stringify(value))
-          } catch (error) {
-            console.warn(`Erreur écriture storage pour ${key}:`, error)
-          }
+          } catch (_error) {}
         },
         removeItem: (key: string) => {
           try {
             localStorage.removeItem(key)
-          } catch (error) {
-            console.warn(`Erreur suppression storage pour ${key}:`, error)
-          }
+          } catch (_error) {}
         },
       },
       partialize: (state: unknown) => {
@@ -116,9 +110,8 @@ export function createRobustStore<
 
         return persistedState
       },
-      onRehydrateStorage: () => (state, error) => {
+      onRehydrateStorage: () => (_state, error) => {
         if (error) {
-          console.warn(`Erreur réhydratation store ${name}:`, error)
         } else {
         }
       },
@@ -371,16 +364,14 @@ function addMonitoring(store: unknown, name: string) {
  */
 export function safeSerialize(data: unknown): string | null {
   try {
-    return JSON.stringify(data, (key, value) => {
+    return JSON.stringify(data, (_key, value) => {
       if (typeof value === 'function') return undefined
       if (value instanceof Date) return value.toISOString()
       if (value instanceof Error) return { name: value.name, message: value.message }
 
       return value
     })
-  } catch (error) {
-    console.warn('Erreur lors de la sérialisation:', error)
-
+  } catch (_error) {
     return null
   }
 }
@@ -390,7 +381,7 @@ export function safeSerialize(data: unknown): string | null {
  */
 export function safeDeserialize<T>(data: string): T | null {
   try {
-    return JSON.parse(data, (key, value) => {
+    return JSON.parse(data, (_key, value) => {
       // Reconstituer les dates
       if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
         return new Date(value)
@@ -398,9 +389,7 @@ export function safeDeserialize<T>(data: string): T | null {
 
       return value
     })
-  } catch (error) {
-    console.warn('Erreur lors de la désérialisation:', error)
-
+  } catch (_error) {
     return null
   }
 }
@@ -450,25 +439,21 @@ function logStoreStateChange(
 
   // Log console en développement
   if (process.env.NODE_ENV === 'development') {
-    console.group(`🔄 [${storeName}] ${action}`)
     if (prevState) {
     }
     if (event.duration) {
     }
-    console.groupEnd()
   }
 
   // Notifier les subscribers
   for (const callback of storeMonitorSubscribers) {
     try {
       callback(event)
-    } catch (error) {
-      console.error('Erreur dans subscriber du monitor:', error)
-    }
+    } catch (_error) {}
   }
 }
 
-function logStoreAccess(storeName: string, state: unknown) {
+function logStoreAccess(storeName: string, _state: unknown) {
   if (!storeMonitorEnabled) return
 
   const key = `${storeName}-access`

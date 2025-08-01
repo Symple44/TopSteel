@@ -1,3 +1,4 @@
+import type { Meta } from '@storybook/react'
 import { Label } from '../../components/forms/label'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/layout/card'
 import { Button } from '../../components/primitives/button'
@@ -11,8 +12,6 @@ import {
   SelectValue,
 } from '../../components/primitives/select'
 import { Textarea } from '../../components/primitives/textarea'
-
-import type { Meta } from '@storybook/react'
 
 const meta: Meta = {
   title: '07-Forms/Form Components',

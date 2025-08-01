@@ -19,17 +19,16 @@ class SyncChecker {
   addIssue(issue: Omit<SyncIssue, 'timestamp'>) {
     const newIssue: SyncIssue = {
       ...issue,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
-    
+
     this.issues.push(newIssue)
-    console.warn(`[SyncChecker] ${issue.severity.toUpperCase()}: ${issue.message}`, issue.details)
-    
+
     // Envoyer le toast si un callback est configuré
     if (this.toastCallback) {
       this.toastCallback(newIssue)
     }
-    
+
     // Auto-nettoyer les anciens problèmes (garder seulement les 10 derniers)
     if (this.issues.length > 10) {
       this.issues = this.issues.slice(-10)
@@ -51,15 +50,12 @@ class SyncChecker {
         type: 'menu',
         severity: 'medium',
         message: `Désynchronisation du menu détectée dans ${context}`,
-        details: { expected: expectedCount, actual: actualCount, context }
+        details: { expected: expectedCount, actual: actualCount, context },
       })
     }
   }
 
-  checkDatabaseConnection() {
-    // Maintenant la DB est correctement configurée avec TypeORM
-    console.log('[SyncChecker] Base de données connectée avec TypeORM')
-  }
+  checkDatabaseConnection() {}
 
   checkStorageConsistency(storageType: string, expectedData: any, actualData: any) {
     if (JSON.stringify(expectedData) !== JSON.stringify(actualData)) {
@@ -67,7 +63,7 @@ class SyncChecker {
         type: 'storage',
         severity: 'medium',
         message: `Incohérence détectée dans ${storageType}`,
-        details: { expected: expectedData, actual: actualData, storageType }
+        details: { expected: expectedData, actual: actualData, storageType },
       })
     }
   }

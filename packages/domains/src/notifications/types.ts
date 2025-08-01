@@ -2,15 +2,15 @@
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error'
 
-export type NotificationCategory = 
-  | 'system' 
-  | 'stock' 
-  | 'projet' 
-  | 'production' 
-  | 'maintenance' 
-  | 'qualite' 
-  | 'facturation' 
-  | 'sauvegarde' 
+export type NotificationCategory =
+  | 'system'
+  | 'stock'
+  | 'projet'
+  | 'production'
+  | 'maintenance'
+  | 'qualite'
+  | 'facturation'
+  | 'sauvegarde'
   | 'utilisateur'
 
 export type NotificationPriority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'
@@ -39,32 +39,32 @@ export interface Notification {
   title: string
   message: string
   priority: NotificationPriority
-  
+
   // Métadonnées
   source?: string
   entityType?: string
   entityId?: string
   data?: Record<string, any>
   metadata?: NotificationMetadata
-  
+
   // Destinataires
   recipientType: RecipientType
   recipientId?: string
-  
+
   // Actions
   actionUrl?: string
   actionLabel?: string
   actionType?: 'primary' | 'secondary'
   actions?: NotificationAction[]
-  
+
   // Gestion temporelle
   createdAt: string
   expiresAt?: string
-  
+
   // Paramètres d'affichage
   persistent: boolean
   autoRead: boolean
-  
+
   // État de lecture
   isRead?: boolean
   readAt?: string
@@ -80,19 +80,19 @@ export interface NotificationRead {
 export interface NotificationSettings {
   id: string
   userId: string
-  
+
   // Paramètres généraux
   enableSound: boolean
   enableToast: boolean
   enableBrowser: boolean
   enableEmail: boolean
-  
+
   // Paramètres par catégorie
   categories: Record<NotificationCategory, boolean>
-  
+
   // Paramètres par priorité
   priorities: Record<string, boolean>
-  
+
   // Paramètres d'horaires
   schedules: {
     workingHours: {
@@ -105,7 +105,7 @@ export interface NotificationSettings {
       days: number[]
     }
   }
-  
+
   createdAt: string
   updatedAt: string
 }
@@ -115,20 +115,20 @@ export interface NotificationTemplate {
   name: string
   type: NotificationType
   category: NotificationCategory
-  
+
   // Templates avec variables
   titleTemplate: string
   messageTemplate: string
-  
+
   priority: NotificationPriority
   persistent: boolean
   actionUrlTemplate?: string
   actionLabel?: string
-  
+
   // Métadonnées
   variables?: Record<string, string>
   description?: string
-  
+
   createdAt: string
   updatedAt: string
 }
@@ -156,25 +156,25 @@ export interface CreateNotificationRequest {
   title: string
   message: string
   priority?: NotificationPriority
-  
+
   // Métadonnées optionnelles
   source?: string
   entityType?: string
   entityId?: string
   data?: Record<string, any>
-  
+
   // Destinataires
   recipientType?: RecipientType
   recipientId?: string
-  
+
   // Actions
   actionUrl?: string
   actionLabel?: string
   actionType?: 'primary' | 'secondary'
-  
+
   // Gestion temporelle
   expiresAt?: string
-  
+
   // Paramètres d'affichage
   persistent?: boolean
   autoRead?: boolean
@@ -253,26 +253,34 @@ export interface NotificationError {
 export interface NotificationService {
   // CRUD notifications
   createNotification(request: CreateNotificationRequest): Promise<Notification>
-  getNotifications(filters?: NotificationFilters, userId?: string): Promise<NotificationListResponse>
+  getNotifications(
+    filters?: NotificationFilters,
+    userId?: string
+  ): Promise<NotificationListResponse>
   getNotificationById(id: string): Promise<Notification>
   updateNotification(id: string, request: UpdateNotificationRequest): Promise<Notification>
   deleteNotification(id: string): Promise<void>
-  
+
   // Gestion des lectures
   markAsRead(notificationId: string, userId: string): Promise<void>
   markAllAsRead(userId: string): Promise<void>
-  
+
   // Paramètres utilisateur
   getUserSettings(userId: string): Promise<NotificationSettings>
-  updateUserSettings(userId: string, settings: Partial<NotificationSettings>): Promise<NotificationSettings>
-  
+  updateUserSettings(
+    userId: string,
+    settings: Partial<NotificationSettings>
+  ): Promise<NotificationSettings>
+
   // Templates
-  createNotificationFromTemplate(request: CreateNotificationFromTemplateRequest): Promise<Notification>
+  createNotificationFromTemplate(
+    request: CreateNotificationFromTemplateRequest
+  ): Promise<Notification>
   getTemplates(): Promise<NotificationTemplate[]>
-  
+
   // Statistiques
   getUserStats(userId: string): Promise<NotificationStats>
-  
+
   // Nettoyage
   cleanExpiredNotifications(): Promise<number>
 }

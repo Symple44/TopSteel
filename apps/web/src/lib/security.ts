@@ -149,7 +149,11 @@ export function auditSecurity(): SecurityAuditReport {
   // Vérifications côté client
   if (typeof window !== 'undefined') {
     // HTTPS
-    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    if (
+      location.protocol !== 'https:' &&
+      location.hostname !== 'localhost' &&
+      location.hostname !== '127.0.0.1'
+    ) {
       issues.push('Application non servie en HTTPS')
     }
 
@@ -187,19 +191,13 @@ export function auditSecurity(): SecurityAuditReport {
 /**
  * Logger sécurisé
  */
-export function logSecurityEvent(event: string, details: Record<string, unknown> = {}) {
-  const sanitizedDetails = Object.fromEntries(
+export function logSecurityEvent(_event: string, details: Record<string, unknown> = {}) {
+  const _sanitizedDetails = Object.fromEntries(
     Object.entries(details).map(([key, value]) => [
       key,
       typeof value === 'string' ? maskSensitiveData(value) : value,
     ])
   )
-
-  console.warn('🔐 Security Event:', {
-    event,
-    timestamp: new Date().toISOString(),
-    details: sanitizedDetails,
-  })
 }
 
 /**

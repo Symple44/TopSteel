@@ -1,8 +1,22 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardHeader, CardTitle, CardContent, Button, Badge, Alert, AlertDescription, Tabs, TabsContent, TabsList, TabsTrigger, Input, Label } from '@erp/ui'
-import { Shield, Smartphone, Key, AlertTriangle, CheckCircle, ArrowLeft, Timer } from 'lucide-react'
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@erp/ui'
+import { AlertTriangle, ArrowLeft, Key, Shield, Smartphone, Timer } from 'lucide-react'
+import type React from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
@@ -24,12 +38,12 @@ interface MFASession {
   challenge?: any
 }
 
-export default function MFAVerification({ 
-  userId, 
-  email, 
-  availableMethods, 
-  onSuccess, 
-  onBack 
+export default function MFAVerification({
+  userId,
+  email,
+  availableMethods,
+  onSuccess,
+  onBack,
 }: MFAVerificationProps) {
   const { t } = useTranslation('auth')
   const [selectedMethod, setSelectedMethod] = useState<string>(availableMethods[0]?.type || 'totp')
@@ -55,12 +69,15 @@ export default function MFAVerification({
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [onBack])
+  }, [onBack, t])
 
   useEffect(() => {
     // Initiate MFA session when method changes
     initiateMFASession()
-  }, [selectedMethod])
+  }, [
+    // Initiate MFA session when method changes
+    initiateMFASession,
+  ])
 
   const initiateMFASession = async () => {
     try {
@@ -69,14 +86,14 @@ export default function MFAVerification({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mfaType: selectedMethod
-        })
+          mfaType: selectedMethod,
+        }),
       })
 
       if (response.ok) {
         const data = await response.json()
         setMFASession(data.data)
-        
+
         // Si c'est WebAuthn, déclencher automatiquement l'authentification
         if (selectedMethod === 'webauthn' && data.data.challenge) {
           await startWebAuthnAuthentication(data.data.challenge)
@@ -84,7 +101,7 @@ export default function MFAVerification({
       } else {
         toast.error(t('mfaSessionError'))
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('mfaSessionError'))
     } finally {
       setLoading(false)
@@ -100,9 +117,9 @@ export default function MFAVerification({
       }
 
       // Get credentials
-      const credential = await navigator.credentials.get({
-        publicKey: options
-      }) as PublicKeyCredential
+      const credential = (await navigator.credentials.get({
+        publicKey: options,
+      })) as PublicKeyCredential
 
       if (!credential) {
         toast.error(t('webauthnError'))
@@ -115,20 +132,42 @@ export default function MFAVerification({
         rawId: credential.id,
         type: credential.type,
         response: {
-          clientDataJSON: btoa(String.fromCharCode(...new Uint8Array((credential.response as AuthenticatorAssertionResponse).clientDataJSON))),
-          authenticatorData: btoa(String.fromCharCode(...new Uint8Array((credential.response as AuthenticatorAssertionResponse).authenticatorData))),
-          signature: btoa(String.fromCharCode(...new Uint8Array((credential.response as AuthenticatorAssertionResponse).signature))),
-          userHandle: (credential.response as AuthenticatorAssertionResponse).userHandle ? 
-            btoa(String.fromCharCode(...new Uint8Array((credential.response as AuthenticatorAssertionResponse).userHandle!))) : null
-        }
+          clientDataJSON: btoa(
+            String.fromCharCode(
+              ...new Uint8Array(
+                (credential.response as AuthenticatorAssertionResponse).clientDataJSON
+              )
+            )
+          ),
+          authenticatorData: btoa(
+            String.fromCharCode(
+              ...new Uint8Array(
+                (credential.response as AuthenticatorAssertionResponse).authenticatorData
+              )
+            )
+          ),
+          signature: btoa(
+            String.fromCharCode(
+              ...new Uint8Array((credential.response as AuthenticatorAssertionResponse).signature)
+            )
+          ),
+          userHandle: (credential.response as AuthenticatorAssertionResponse).userHandle
+            ? btoa(
+                String.fromCharCode(
+                  ...new Uint8Array(
+                    (credential.response as AuthenticatorAssertionResponse).userHandle!
+                  )
+                )
+              )
+            : null,
+        },
       }
 
       // Verify authentication
       await verifyMFA(undefined, response)
-    } catch (error) {
-      console.error('WebAuthn error:', error)
+    } catch (_error) {
       toast.error(t('webauthnError'))
-      setAttempts(prev => prev + 1)
+      setAttempts((prev) => prev + 1)
     }
   }
 
@@ -149,28 +188,28 @@ export default function MFAVerification({
         body: JSON.stringify({
           sessionToken: mfaSession.sessionToken,
           code,
-          webauthnResponse
-        })
+          webauthnResponse,
+        }),
       })
 
       if (response.ok) {
         const data = await response.json()
         toast.success(t('mfaVerificationSuccessful'))
-        
+
         if (data.data.backupCodesUsed && data.data.backupCodesUsed > 0) {
           toast.info(t('backupCodesUsed', { count: data.data.backupCodesUsed }))
         }
-        
+
         onSuccess(data.data.sessionToken)
       } else {
         const errorData = await response.json()
         toast.error(errorData.error || t('invalidMfaCode'))
-        setAttempts(prev => prev + 1)
+        setAttempts((prev) => prev + 1)
         setVerificationCode('')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('mfaVerificationFailed'))
-      setAttempts(prev => prev + 1)
+      setAttempts((prev) => prev + 1)
     } finally {
       setLoading(false)
     }
@@ -191,19 +230,27 @@ export default function MFAVerification({
 
   const getMethodIcon = (method: string) => {
     switch (method) {
-      case 'totp': return <Smartphone className="w-4 h-4" />
-      case 'webauthn': return <Key className="w-4 h-4" />
-      case 'sms': return <Smartphone className="w-4 h-4" />
-      default: return <Shield className="w-4 h-4" />
+      case 'totp':
+        return <Smartphone className="w-4 h-4" />
+      case 'webauthn':
+        return <Key className="w-4 h-4" />
+      case 'sms':
+        return <Smartphone className="w-4 h-4" />
+      default:
+        return <Shield className="w-4 h-4" />
     }
   }
 
   const getMethodName = (method: string) => {
     switch (method) {
-      case 'totp': return t('totpMethod')
-      case 'webauthn': return t('webauthnMethod')
-      case 'sms': return t('smsMethod')
-      default: return method.toUpperCase()
+      case 'totp':
+        return t('totpMethod')
+      case 'webauthn':
+        return t('webauthnMethod')
+      case 'sms':
+        return t('smsMethod')
+      default:
+        return method.toUpperCase()
     }
   }
 
@@ -221,7 +268,9 @@ export default function MFAVerification({
         </p>
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Timer className="w-4 h-4" />
-          <span>{t('timeRemaining')} {formatTime(timeLeft)}</span>
+          <span>
+            {t('timeRemaining')} {formatTime(timeLeft)}
+          </span>
         </div>
       </CardHeader>
 
@@ -233,7 +282,11 @@ export default function MFAVerification({
             <Tabs value={selectedMethod} onValueChange={setSelectedMethod}>
               <TabsList className="grid w-full grid-cols-2">
                 {availableMethods.map((method) => (
-                  <TabsTrigger key={method.type} value={method.type} className="flex items-center gap-2">
+                  <TabsTrigger
+                    key={method.type}
+                    value={method.type}
+                    className="flex items-center gap-2"
+                  >
                     {getMethodIcon(method.type)}
                     <span className="hidden sm:inline">{getMethodName(method.type)}</span>
                   </TabsTrigger>
@@ -263,7 +316,9 @@ export default function MFAVerification({
                 type="text"
                 placeholder={t('verificationCodePlaceholder')}
                 value={verificationCode}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVerificationCode(e.target.value.replace(/\s/g, ''))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setVerificationCode(e.target.value.replace(/\s/g, ''))
+                }
                 maxLength={12}
                 className="text-center text-lg tracking-widest"
                 autoComplete="one-time-code"
@@ -274,10 +329,14 @@ export default function MFAVerification({
               </p>
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading || (!verificationCode || (verificationCode.length !== 6 && !verificationCode.includes('-')))}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={
+                loading ||
+                !verificationCode ||
+                (verificationCode.length !== 6 && !verificationCode.includes('-'))
+              }
             >
               {loading ? t('verifying') : t('verify')}
             </Button>
@@ -289,9 +348,7 @@ export default function MFAVerification({
           <div className="space-y-4 text-center">
             <div className="p-6 border-2 border-dashed border-muted-foreground/50 rounded-lg">
               <Key className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                {t('webauthnUseDevice')}
-              </p>
+              <p className="text-sm text-muted-foreground">{t('webauthnUseDevice')}</p>
             </div>
 
             {loading ? (
@@ -300,7 +357,10 @@ export default function MFAVerification({
                 <span className="text-sm">{t('mfaSessionStarting')}</span>
               </div>
             ) : (
-              <Button onClick={() => startWebAuthnAuthentication(mfaSession?.challenge)} className="w-full">
+              <Button
+                onClick={() => startWebAuthnAuthentication(mfaSession?.challenge)}
+                className="w-full"
+              >
                 <Key className="w-4 h-4 mr-2" />
                 {t('retryAuthentication')}
               </Button>
@@ -313,9 +373,7 @@ export default function MFAVerification({
           <div className="space-y-4">
             <Alert>
               <Smartphone className="w-4 h-4" />
-              <AlertDescription>
-                {t('smsCodeSent')}
-              </AlertDescription>
+              <AlertDescription>{t('smsCodeSent')}</AlertDescription>
             </Alert>
 
             <form onSubmit={handleSubmitTOTP} className="space-y-4">
@@ -326,7 +384,9 @@ export default function MFAVerification({
                   type="text"
                   placeholder={t('smsCodePlaceholder')}
                   value={verificationCode}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVerificationCode(e.target.value.replace(/\s/g, ''))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setVerificationCode(e.target.value.replace(/\s/g, ''))
+                  }
                   maxLength={6}
                   className="text-center text-lg tracking-widest"
                   autoComplete="one-time-code"
@@ -334,9 +394,9 @@ export default function MFAVerification({
                 />
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full"
                 disabled={loading || verificationCode.length !== 6}
               >
                 {loading ? t('verifying') : t('verifySmsCode')}

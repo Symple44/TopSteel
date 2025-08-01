@@ -1,11 +1,8 @@
 'use client'
 
-import React from 'react'
-
 import type { MaterialOrder, OrdrePriorite, OrdreStatut } from '@erp/domains/production'
 import { MaterialStatus } from '@erp/domains/production'
 import { Badge, Button, Card, CardContent } from '@erp/ui'
-
 import { AlertTriangle, Package, Plus } from 'lucide-react'
 
 // Interface pour les matériaux (compatible avec MaterialOrder)

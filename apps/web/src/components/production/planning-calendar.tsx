@@ -129,7 +129,7 @@ export function PlanningCalendar({
           ))}
 
           {/* Jours du mois */}
-          {days.map((day, index) => {
+          {days.map((day, _index) => {
             const dayEvents = getEventsForDate(day.date)
             const isToday = day.date.toDateString() === new Date().toDateString()
 

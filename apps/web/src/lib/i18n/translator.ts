@@ -1,7 +1,7 @@
-import { translations as baseTranslations } from './translations'
-import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES } from './types'
-import type { Language, Translations } from './types'
 import { overrideService } from './override-service'
+import { translations as baseTranslations } from './translations'
+import type { Language, Translations } from './types'
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES } from './types'
 
 class Translator {
   private currentLanguage: string = DEFAULT_LANGUAGE
@@ -27,7 +27,7 @@ class Translator {
   }
 
   private isValidLanguage(lang: string): boolean {
-    return SUPPORTED_LANGUAGES.some(l => l.code === lang)
+    return SUPPORTED_LANGUAGES.some((l) => l.code === lang)
   }
 
   private detectBrowserLanguage(): string {
@@ -49,7 +49,7 @@ class Translator {
   }
 
   private notifyListeners(): void {
-    this.listeners.forEach(listener => listener())
+    this.listeners.forEach((listener) => listener())
   }
 
   public subscribe(listener: () => void): () => void {
@@ -69,14 +69,13 @@ class Translator {
       }
     } else if (this.isValidLanguage(langCode)) {
       this.currentLanguage = langCode
-      
+
       // Persist to localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('topsteel-language', langCode)
         this.updateDocumentDirection()
       }
     } else {
-      console.warn(`Language '${langCode}' is not supported`)
       return
     }
 
@@ -88,7 +87,10 @@ class Translator {
   }
 
   public getLanguageInfo(): Language {
-    return SUPPORTED_LANGUAGES.find(lang => lang.code === this.currentLanguage) || SUPPORTED_LANGUAGES[0]
+    return (
+      SUPPORTED_LANGUAGES.find((lang) => lang.code === this.currentLanguage) ||
+      SUPPORTED_LANGUAGES[0]
+    )
   }
 
   public getSupportedLanguages(): Language[] {
@@ -105,12 +107,10 @@ class Translator {
       await overrideService.loadOverrides()
       this.translations = overrideService.applyOverrides(baseTranslations)
       this.overridesLoaded = true
-      
+
       // Notifier les listeners que les traductions ont été mises à jour
       this.notifyListeners()
-    } catch (error) {
-      console.error('Failed to load translation overrides:', error)
-    }
+    } catch (_error) {}
   }
 
   /**
@@ -137,8 +137,6 @@ class Translator {
           if (value && typeof value === 'object' && fallbackKey in value) {
             value = value[fallbackKey]
           } else {
-            // Return key if translation not found
-            console.warn(`Translation not found for key: ${key}`)
             return key
           }
         }
@@ -147,7 +145,6 @@ class Translator {
     }
 
     if (typeof value !== 'string') {
-      console.warn(`Translation key '${key}' does not resolve to a string`)
       return key
     }
 
@@ -169,12 +166,12 @@ class Translator {
   public plural(key: string, count: number, params?: Record<string, string | number>): string {
     const pluralKey = count === 1 ? `${key}_one` : `${key}_other`
     const translation = this.translate(pluralKey, { ...params, count })
-    
+
     // If plural key doesn't exist, fallback to base key
     if (translation === pluralKey) {
       return this.translate(key, { ...params, count })
     }
-    
+
     return translation
   }
 

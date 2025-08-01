@@ -17,11 +17,11 @@ export default defineConfig({
   sourcemap: true,
   target: 'es2022',
   external: [
-    'react', 
-    'react-dom', 
-    '@elastic/elasticsearch', 
-    '@elastic/transport', 
-    'apache-arrow', 
+    'react',
+    'react-dom',
+    '@elastic/elasticsearch',
+    '@elastic/transport',
+    'apache-arrow',
     'sharp',
     'fs',
     'path',
@@ -31,13 +31,13 @@ export default defineConfig({
     'buffer',
     'os',
     'worker_threads',
-    'child_process'
+    'child_process',
   ],
   // Configuration spécifique pour éviter les problèmes avec Sharp
   noExternal: [],
   splitting: false,
   // Configuration pour exclure Sharp du bundle
   define: {
-    'process.env.NODE_ENV': '"production"'
-  }
+    'process.env.NODE_ENV': '"production"',
+  },
 })

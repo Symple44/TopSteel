@@ -25,7 +25,7 @@ export function useTabSync(options: TabSyncOptions = {}) {
     if (typeof window === 'undefined') return
 
     const channel = new BroadcastChannel(channelName)
-    
+
     const handleBroadcastMessage = (event: MessageEvent<TabSyncEvent>) => {
       if (onMessage) {
         onMessage(event.data)
@@ -33,7 +33,7 @@ export function useTabSync(options: TabSyncOptions = {}) {
     }
 
     channel.addEventListener('message', handleBroadcastMessage)
-    
+
     return () => {
       channel.removeEventListener('message', handleBroadcastMessage)
       channel.close()
@@ -49,7 +49,7 @@ export function useTabSync(options: TabSyncOptions = {}) {
     const channel = new BroadcastChannel(channelName)
     channel.postMessage({
       ...event,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     })
     channel.close()
   }
@@ -63,14 +63,19 @@ export function useTabSync(options: TabSyncOptions = {}) {
 export function useAuthTabSync(onAuthEvent: (event: TabSyncEvent) => void) {
   const { broadcast } = useTabSync({
     channelName: 'topsteel-auth',
-    onMessage: onAuthEvent
+    onMessage: onAuthEvent,
   })
 
   const notifyCompanyChange = (data: { company: any; user: any; tokens: any }) => {
     broadcast({ type: 'COMPANY_CHANGED', data })
   }
 
-  const notifyLogin = (data: { user: any; tokens: any; company?: any; requiresCompanySelection?: boolean }) => {
+  const notifyLogin = (data: {
+    user: any
+    tokens: any
+    company?: any
+    requiresCompanySelection?: boolean
+  }) => {
     broadcast({ type: 'USER_LOGIN', data })
   }
 
@@ -86,6 +91,6 @@ export function useAuthTabSync(onAuthEvent: (event: TabSyncEvent) => void) {
     notifyCompanyChange,
     notifyLogin,
     notifyLogout,
-    notifyTokenRefresh
+    notifyTokenRefresh,
   }
 }

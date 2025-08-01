@@ -1,29 +1,42 @@
 'use client'
 
-import { useState } from 'react'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Badge,
   Textarea,
-  Switch
 } from '@erp/ui'
-import { Plus, Trash2, Filter, Code, Eye } from 'lucide-react'
+import { Code, Eye, Filter, Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 
 interface Condition {
   id: string
   field: string
-  operator: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'starts_with' | 'ends_with' | 'greater_than' | 'less_than' | 'greater_equal' | 'less_equal' | 'in' | 'not_in' | 'is_null' | 'is_not_null' | 'regex'
+  operator:
+    | 'equals'
+    | 'not_equals'
+    | 'contains'
+    | 'not_contains'
+    | 'starts_with'
+    | 'ends_with'
+    | 'greater_than'
+    | 'less_than'
+    | 'greater_equal'
+    | 'less_equal'
+    | 'in'
+    | 'not_in'
+    | 'is_null'
+    | 'is_not_null'
+    | 'regex'
   value: string | number | string[] | boolean
   type: 'string' | 'number' | 'boolean' | 'array' | 'date'
   logic?: 'AND' | 'OR'
@@ -45,7 +58,7 @@ interface ConditionBuilderProps {
 const AVAILABLE_FIELDS = {
   user: [
     { value: 'userId', label: 'ID Utilisateur', type: 'string' },
-    { value: 'username', label: 'Nom d\'utilisateur', type: 'string' },
+    { value: 'username', label: "Nom d'utilisateur", type: 'string' },
     { value: 'email', label: 'Email', type: 'string' },
     { value: 'role', label: 'Rôle', type: 'string' },
     { value: 'department', label: 'Département', type: 'string' },
@@ -98,11 +111,11 @@ const AVAILABLE_FIELDS = {
     { value: 'service', label: 'Service', type: 'string' },
     { value: 'level', label: 'Niveau', type: 'string' },
     { value: 'message', label: 'Message', type: 'string' },
-    { value: 'errorCode', label: 'Code d\'erreur', type: 'string' },
+    { value: 'errorCode', label: "Code d'erreur", type: 'string' },
     { value: 'component', label: 'Composant', type: 'string' },
     { value: 'severity', label: 'Sévérité', type: 'string' },
     { value: 'timestamp', label: 'Horodatage', type: 'date' },
-  ]
+  ],
 }
 
 const OPERATORS = {
@@ -116,7 +129,7 @@ const OPERATORS = {
     { value: 'in', label: 'dans la liste' },
     { value: 'not_in', label: 'pas dans la liste' },
     { value: 'is_null', label: 'est vide' },
-    { value: 'is_not_null', label: 'n\'est pas vide' },
+    { value: 'is_not_null', label: "n'est pas vide" },
     { value: 'regex', label: 'correspond à (regex)' },
   ],
   number: [
@@ -129,7 +142,7 @@ const OPERATORS = {
     { value: 'in', label: 'dans la liste' },
     { value: 'not_in', label: 'pas dans la liste' },
     { value: 'is_null', label: 'est vide' },
-    { value: 'is_not_null', label: 'n\'est pas vide' },
+    { value: 'is_not_null', label: "n'est pas vide" },
   ],
   boolean: [
     { value: 'equals', label: 'égal à' },
@@ -143,11 +156,15 @@ const OPERATORS = {
     { value: 'greater_equal', label: 'après ou égal à' },
     { value: 'less_equal', label: 'avant ou égal à' },
     { value: 'is_null', label: 'est vide' },
-    { value: 'is_not_null', label: 'n\'est pas vide' },
-  ]
+    { value: 'is_not_null', label: "n'est pas vide" },
+  ],
 }
 
-export default function ConditionBuilder({ triggerType, conditions, onChange }: ConditionBuilderProps) {
+export default function ConditionBuilder({
+  triggerType,
+  conditions,
+  onChange,
+}: ConditionBuilderProps) {
   const [showPreview, setShowPreview] = useState(false)
 
   const addCondition = () => {
@@ -157,25 +174,25 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
       operator: 'equals',
       value: '',
       type: 'string',
-      logic: conditions.length > 0 ? 'AND' : undefined
+      logic: conditions.length > 0 ? 'AND' : undefined,
     }
     onChange([...conditions, newCondition])
   }
 
   const updateCondition = (id: string, updates: Partial<Condition>) => {
-    const updated = conditions.map(condition => 
+    const updated = conditions.map((condition) =>
       condition.id === id ? { ...condition, ...updates } : condition
     )
     onChange(updated)
   }
 
   const removeCondition = (id: string) => {
-    onChange(conditions.filter(condition => condition.id !== id))
+    onChange(conditions.filter((condition) => condition.id !== id))
   }
 
   const getFieldType = (fieldValue: string): 'string' | 'number' | 'boolean' | 'date' => {
-    const field = AVAILABLE_FIELDS[triggerType]?.find(f => f.value === fieldValue)
-    return field?.type as any || 'string'
+    const field = AVAILABLE_FIELDS[triggerType]?.find((f) => f.value === fieldValue)
+    return (field?.type as any) || 'string'
   }
 
   const renderValueInput = (condition: Condition) => {
@@ -191,7 +208,9 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
       return (
         <Select
           value={condition.value.toString()}
-          onValueChange={(value: string) => updateCondition(condition.id, { value: value === 'true' })}
+          onValueChange={(value: string) =>
+            updateCondition(condition.id, { value: value === 'true' })
+          }
         >
           <SelectTrigger className="w-32">
             <SelectValue />
@@ -208,7 +227,9 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
       return (
         <Textarea
           value={Array.isArray(condition.value) ? condition.value.join('\n') : condition.value}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateCondition(condition.id, { value: e.target.value.split('\n').filter(Boolean) })}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            updateCondition(condition.id, { value: e.target.value.split('\n').filter(Boolean) })
+          }
           placeholder="Une valeur par ligne"
           className="w-48"
           rows={3}
@@ -221,7 +242,9 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
         <Input
           type="number"
           value={condition.value}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCondition(condition.id, { value: parseFloat(e.target.value) || 0 })}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateCondition(condition.id, { value: parseFloat(e.target.value) || 0 })
+          }
           className="w-32"
           placeholder="0"
         />
@@ -233,7 +256,9 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
         <Input
           type="datetime-local"
           value={condition.value}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCondition(condition.id, { value: e.target.value })}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateCondition(condition.id, { value: e.target.value })
+          }
           className="w-48"
         />
       )
@@ -242,7 +267,9 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
     return (
       <Input
         value={condition.value}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCondition(condition.id, { value: e.target.value })}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          updateCondition(condition.id, { value: e.target.value })
+        }
         className="w-48"
         placeholder="Valeur"
       />
@@ -250,9 +277,11 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
   }
 
   const generateConditionText = (condition: Condition): string => {
-    const field = AVAILABLE_FIELDS[triggerType]?.find(f => f.value === condition.field)
-    const operator = OPERATORS[getFieldType(condition.field)]?.find(o => o.value === condition.operator)
-    
+    const field = AVAILABLE_FIELDS[triggerType]?.find((f) => f.value === condition.field)
+    const operator = OPERATORS[getFieldType(condition.field)]?.find(
+      (o) => o.value === condition.operator
+    )
+
     if (!field || !operator) return ''
 
     let valueText = ''
@@ -270,11 +299,13 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
   const generatePreviewText = (): string => {
     if (conditions.length === 0) return 'Aucune condition définie'
 
-    return conditions.map((condition, index) => {
-      const conditionText = generateConditionText(condition)
-      const logicText = index > 0 ? ` ${condition.logic} ` : ''
-      return `${logicText}${conditionText}`
-    }).join('')
+    return conditions
+      .map((condition, index) => {
+        const conditionText = generateConditionText(condition)
+        const logicText = index > 0 ? ` ${condition.logic} ` : ''
+        return `${logicText}${conditionText}`
+      })
+      .join('')
   }
 
   return (
@@ -286,11 +317,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
             <span>Conditions de déclenchement</span>
           </CardTitle>
           <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPreview(!showPreview)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowPreview(!showPreview)}>
               <Eye className="h-4 w-4 mr-2" />
               Aperçu
             </Button>
@@ -308,9 +335,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
               <Code className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Aperçu de la condition :</span>
             </div>
-            <code className="text-sm text-blue-600">
-              {generatePreviewText()}
-            </code>
+            <code className="text-sm text-blue-600">{generatePreviewText()}</code>
           </div>
         )}
 
@@ -327,7 +352,9 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
                 {index > 0 && (
                   <Select
                     value={condition.logic}
-                    onValueChange={(value: string) => updateCondition(condition.id, { logic: value as any })}
+                    onValueChange={(value: string) =>
+                      updateCondition(condition.id, { logic: value as any })
+                    }
                   >
                     <SelectTrigger className="w-20">
                       <SelectValue />
@@ -341,12 +368,14 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
 
                 <Select
                   value={condition.field}
-                  onValueChange={(value: string) => updateCondition(condition.id, { 
-                    field: value,
-                    type: getFieldType(value),
-                    operator: 'equals',
-                    value: ''
-                  })}
+                  onValueChange={(value: string) =>
+                    updateCondition(condition.id, {
+                      field: value,
+                      type: getFieldType(value),
+                      operator: 'equals',
+                      value: '',
+                    })
+                  }
                 >
                   <SelectTrigger className="w-48">
                     <SelectValue placeholder="Champ" />
@@ -362,10 +391,12 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
 
                 <Select
                   value={condition.operator}
-                  onValueChange={(value: string) => updateCondition(condition.id, { 
-                    operator: value as any,
-                    value: ['is_null', 'is_not_null'].includes(value) ? '' : condition.value
-                  })}
+                  onValueChange={(value: string) =>
+                    updateCondition(condition.id, {
+                      operator: value as any,
+                      value: ['is_null', 'is_not_null'].includes(value) ? '' : condition.value,
+                    })
+                  }
                 >
                   <SelectTrigger className="w-48">
                     <SelectValue placeholder="Opérateur" />
@@ -381,11 +412,7 @@ export default function ConditionBuilder({ triggerType, conditions, onChange }: 
 
                 {renderValueInput(condition)}
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => removeCondition(condition.id)}
-                >
+                <Button variant="outline" size="sm" onClick={() => removeCondition(condition.id)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>

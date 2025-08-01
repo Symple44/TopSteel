@@ -1,6 +1,5 @@
 'use client'
 
-import { formatCurrency, formatDate } from '@/lib/utils'
 import type { StoreProjet } from '@erp/types'
 import {
   Badge,
@@ -18,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from '@erp/ui'
-
 import {
   Calculator,
   CheckCircle,
@@ -32,6 +30,7 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { formatCurrency, formatDate } from '@/lib/utils'
 
 interface ProjetDevisTabProps {
   projet: StoreProjet

@@ -14,11 +14,8 @@ export async function initializeElasticsearch(): Promise<boolean> {
 
 async function performInitialization(): Promise<boolean> {
   try {
-    console.log('Initializing Elasticsearch...')
-
     // Vérifier si Elasticsearch est configuré
     if (!process.env.ELASTICSEARCH_URL && process.env.NODE_ENV === 'production') {
-      console.warn('Elasticsearch URL not configured, skipping initialization')
       return false
     }
 
@@ -29,24 +26,18 @@ async function performInitialization(): Promise<boolean> {
     // Vérifier la connexion
     const isConnected = await elasticsearchClient.isConnected()
     if (!isConnected) {
-      console.warn('Elasticsearch not available, skipping migrations')
       return false
     }
 
-    console.log('Elasticsearch connected, running migrations...')
-
     // Lancer les migrations
     const success = await migrationService.runAllMigrations()
-    
+
     if (success) {
-      console.log('Elasticsearch initialization completed successfully')
     } else {
-      console.warn('Elasticsearch initialization completed with warnings')
     }
 
     return success
-  } catch (error) {
-    console.error('Elasticsearch initialization failed:', error)
+  } catch (_error) {
     return false
   }
 }

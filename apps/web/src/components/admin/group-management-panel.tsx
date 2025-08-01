@@ -1,15 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { callClientApi } from '@/utils/backend-api'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  Avatar,
+  AvatarFallback,
   Badge,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -17,12 +17,12 @@ import {
   DialogTrigger,
   Input,
   Label,
-  Textarea,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -33,34 +33,33 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-  Switch,
-  Avatar,
-  AvatarFallback,
-  Checkbox
+  Textarea,
 } from '@erp/ui'
-import { PermissionHide } from '@/components/auth/permission-guard'
-import BulkUserAssignment from './bulk-user-assignment'
-import { 
-  Users,
-  Shield,
-  Plus,
-  Edit,
-  Trash2,
+import {
   Building,
-  Briefcase,
+  Edit,
   FolderOpen,
+  Plus,
   Settings,
-  UserPlus,
+  Shield,
+  Trash2,
   UserMinus,
-  UsersIcon
+  UserPlus,
+  Users,
+  UsersIcon,
 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { PermissionHide } from '@/components/auth/permission-guard'
+import { callClientApi } from '@/utils/backend-api'
+import BulkUserAssignment from './bulk-user-assignment'
+
 // Fonction utilitaire pour formater les dates
 const formatDate = (date: string | Date) => {
   const d = new Date(date)
   return d.toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: 'short',
-    year: 'numeric'
+    year: 'numeric',
   })
 }
 
@@ -97,21 +96,21 @@ const GROUP_TYPE_LABELS = {
   DEPARTMENT: 'Département',
   TEAM: 'Équipe',
   PROJECT: 'Projet',
-  CUSTOM: 'Personnalisé'
+  CUSTOM: 'Personnalisé',
 }
 
 const GROUP_TYPE_ICONS = {
   DEPARTMENT: Building,
   TEAM: Users,
   PROJECT: FolderOpen,
-  CUSTOM: Settings
+  CUSTOM: Settings,
 }
 
 const GROUP_TYPE_COLORS = {
   DEPARTMENT: 'bg-blue-100 text-blue-800',
   TEAM: 'bg-green-100 text-green-800',
   PROJECT: 'bg-purple-100 text-purple-800',
-  CUSTOM: 'bg-gray-100 text-gray-800'
+  CUSTOM: 'bg-gray-100 text-gray-800',
 }
 
 export default function GroupManagementPanel() {
@@ -126,38 +125,35 @@ export default function GroupManagementPanel() {
   const [activeTab, setActiveTab] = useState('groups')
   const [loading, setLoading] = useState(true)
   const [isBulkAssignmentOpen, setIsBulkAssignmentOpen] = useState(false)
-  const [bulkAssignmentGroup, setBulkAssignmentGroup] = useState<Group | null>(null)
+  const [bulkAssignmentGroup, setBulkAssignmentGroup] = useState<Group | undefined>(undefined)
 
-  useEffect(() => {
-    loadGroups()
-    loadRoles()
-  }, [])
-
-  const loadGroups = async () => {
+  const loadGroups = useCallback(async () => {
     try {
       const response = await callClientApi('admin/groups')
       const data = await response.json()
       if (data.success) {
         setGroups(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des groupes:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const loadRoles = async () => {
+  const loadRoles = useCallback(async () => {
     try {
       const response = await callClientApi('admin/roles')
       const data = await response.json()
       if (data.success) {
         setRoles(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des rôles:', error)
-    }
-  }
+    } catch (_error) {}
+  }, [])
+
+  useEffect(() => {
+    loadGroups()
+    loadRoles()
+  }, [loadGroups, loadRoles])
 
   const loadGroupDetails = async (groupId: string) => {
     try {
@@ -174,9 +170,7 @@ export default function GroupManagementPanel() {
       if (rolesData.success) {
         setGroupRoles(rolesData.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des détails:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleDeleteGroup = async (groupId: string) => {
@@ -186,15 +180,13 @@ export default function GroupManagementPanel() {
 
     try {
       const response = await callClientApi(`admin/groups/${groupId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
-      
+
       if (response.ok) {
         loadGroups()
       }
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
-    }
+    } catch (_error) {}
   }
 
   const openDetailDialog = async (group: Group) => {
@@ -204,16 +196,19 @@ export default function GroupManagementPanel() {
   }
 
   const openBulkAssignment = (group?: Group) => {
-    setBulkAssignmentGroup(group || null)
+    setBulkAssignmentGroup(group || undefined)
     setIsBulkAssignmentOpen(true)
   }
 
   // Regrouper les groupes par type
-  const groupsByType = groups.reduce((acc, group) => {
-    if (!acc[group.type]) acc[group.type] = []
-    acc[group.type].push(group)
-    return acc
-  }, {} as Record<string, Group[]>)
+  const groupsByType = groups.reduce(
+    (acc, group) => {
+      if (!acc[group.type]) acc[group.type] = []
+      acc[group.type].push(group)
+      return acc
+    },
+    {} as Record<string, Group[]>
+  )
 
   if (loading) {
     return (
@@ -238,10 +233,7 @@ export default function GroupManagementPanel() {
         </div>
         <div className="flex gap-2">
           <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
-            <Button
-              variant="outline"
-              onClick={() => openBulkAssignment()}
-            >
+            <Button variant="outline" onClick={() => openBulkAssignment()}>
               <UsersIcon className="h-4 w-4 mr-2" />
               Assignation en masse
             </Button>
@@ -258,12 +250,12 @@ export default function GroupManagementPanel() {
                 <DialogHeader>
                   <DialogTitle>Créer un nouveau groupe</DialogTitle>
                 </DialogHeader>
-                <GroupForm 
+                <GroupForm
                   roles={roles}
                   onSave={() => {
                     setIsCreateDialogOpen(false)
                     loadGroups()
-                  }} 
+                  }}
                 />
               </DialogContent>
             </Dialog>
@@ -353,13 +345,13 @@ export default function GroupManagementPanel() {
           <DialogHeader>
             <DialogTitle>Modifier le groupe: {selectedGroup?.name}</DialogTitle>
           </DialogHeader>
-          <GroupForm 
+          <GroupForm
             group={selectedGroup}
             roles={roles}
             onSave={() => {
               setIsEditDialogOpen(false)
               loadGroups()
-            }} 
+            }}
           />
         </DialogContent>
       </Dialog>
@@ -370,7 +362,7 @@ export default function GroupManagementPanel() {
           <DialogHeader>
             <DialogTitle>Détails du groupe: {selectedGroup?.name}</DialogTitle>
           </DialogHeader>
-          <GroupDetails 
+          <GroupDetails
             group={selectedGroup}
             users={groupUsers}
             roles={groupRoles}
@@ -397,13 +389,13 @@ export default function GroupManagementPanel() {
 }
 
 // Composant pour afficher une carte de groupe
-function GroupCard({ 
-  group, 
-  onEdit, 
-  onDelete, 
+function GroupCard({
+  group,
+  onEdit,
+  onDelete,
   onViewDetails,
-  onBulkAssignment 
-}: { 
+  onBulkAssignment,
+}: {
   group: Group
   onEdit: () => void
   onDelete: () => void
@@ -411,14 +403,18 @@ function GroupCard({
   onBulkAssignment: () => void
 }) {
   const Icon = GROUP_TYPE_ICONS[group.type]
-  
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
-            <div className={`p-2 rounded-lg ${GROUP_TYPE_COLORS[group.type].replace('text-', 'bg-').replace('-800', '-100')}`}>
-              <Icon className={`h-6 w-6 ${GROUP_TYPE_COLORS[group.type].replace('bg-', 'text-').replace('-100', '-600')}`} />
+            <div
+              className={`p-2 rounded-lg ${GROUP_TYPE_COLORS[group.type].replace('text-', 'bg-').replace('-800', '-100')}`}
+            >
+              <Icon
+                className={`h-6 w-6 ${GROUP_TYPE_COLORS[group.type].replace('bg-', 'text-').replace('-100', '-600')}`}
+              />
             </div>
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
@@ -426,7 +422,7 @@ function GroupCard({
                 <Badge className={GROUP_TYPE_COLORS[group.type]}>
                   {GROUP_TYPE_LABELS[group.type]}
                 </Badge>
-                <Badge variant={group.isActive ? "default" : "secondary"}>
+                <Badge variant={group.isActive ? 'default' : 'secondary'}>
                   {group.isActive ? 'Actif' : 'Inactif'}
                 </Badge>
               </div>
@@ -447,11 +443,7 @@ function GroupCard({
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onViewDetails}
-            >
+            <Button variant="outline" size="sm" onClick={onViewDetails}>
               Détails
             </Button>
             <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
@@ -465,20 +457,12 @@ function GroupCard({
               </Button>
             </PermissionHide>
             <PermissionHide permission={undefined} roles={['SUPER_ADMIN', 'ADMIN']}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onEdit}
-              >
+              <Button variant="outline" size="sm" onClick={onEdit}>
                 <Edit className="h-4 w-4" />
               </Button>
             </PermissionHide>
             <PermissionHide permission={undefined} roles={['SUPER_ADMIN']}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onDelete}
-              >
+              <Button variant="outline" size="sm" onClick={onDelete}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </PermissionHide>
@@ -490,42 +474,38 @@ function GroupCard({
 }
 
 // Composant pour créer/éditer un groupe
-function GroupForm({ 
-  group, 
+function GroupForm({
+  group,
   roles,
-  onSave 
-}: { 
+  onSave,
+}: {
   group?: Group | null
   roles: Role[]
-  onSave: () => void 
+  onSave: () => void
 }) {
   const [formData, setFormData] = useState({
     name: group?.name || '',
     description: group?.description || '',
-    type: group?.type || 'TEAM' as 'DEPARTMENT' | 'TEAM' | 'PROJECT' | 'CUSTOM',
+    type: group?.type || ('TEAM' as 'DEPARTMENT' | 'TEAM' | 'PROJECT' | 'CUSTOM'),
     isActive: group?.isActive ?? true,
-    roleIds: [] as string[]
+    roleIds: [] as string[],
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     try {
-      const url = group 
-        ? `admin/groups/${group.id}`
-        : 'admin/groups'
-      
+      const url = group ? `admin/groups/${group.id}` : 'admin/groups'
+
       const response = await callClientApi(url, {
         method: group ? 'PUT' : 'POST',
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       })
-      
+
       if (response.ok) {
         onSave()
       }
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-    }
+    } catch (_error) {}
   }
 
   return (
@@ -535,28 +515,34 @@ function GroupForm({
         <Input
           id="name"
           value={formData.name}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setFormData((prev) => ({ ...prev, name: e.target.value }))
+          }
           placeholder="Ex: Équipe commerciale..."
           required
         />
       </div>
-      
+
       <div>
         <Label htmlFor="description">Description</Label>
         <Textarea
           id="description"
           value={formData.description}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            setFormData((prev) => ({ ...prev, description: e.target.value }))
+          }
           placeholder="Décrivez le rôle et les responsabilités de ce groupe..."
           required
         />
       </div>
-      
+
       <div>
         <Label htmlFor="type">Type de groupe</Label>
         <Select
           value={formData.type}
-          onValueChange={(value: string) => setFormData(prev => ({ ...prev, type: value as typeof formData.type }))}
+          onValueChange={(value: string) =>
+            setFormData((prev) => ({ ...prev, type: value as typeof formData.type }))
+          }
         >
           <SelectTrigger>
             <SelectValue />
@@ -585,9 +571,12 @@ function GroupForm({
                   checked={formData.roleIds.includes(role.id)}
                   onCheckedChange={(checked: boolean) => {
                     if (checked) {
-                      setFormData(prev => ({ ...prev, roleIds: [...prev.roleIds, role.id] }))
+                      setFormData((prev) => ({ ...prev, roleIds: [...prev.roleIds, role.id] }))
                     } else {
-                      setFormData(prev => ({ ...prev, roleIds: prev.roleIds.filter(id => id !== role.id) }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        roleIds: prev.roleIds.filter((id) => id !== role.id),
+                      }))
                     }
                   }}
                 />
@@ -600,43 +589,43 @@ function GroupForm({
           </div>
         </div>
       )}
-      
+
       <div className="flex items-center space-x-2">
         <Switch
           id="isActive"
           checked={formData.isActive}
-          onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, isActive: checked }))}
+          onCheckedChange={(checked: boolean) =>
+            setFormData((prev) => ({ ...prev, isActive: checked }))
+          }
         />
         <Label htmlFor="isActive">Groupe actif</Label>
       </div>
-      
+
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
           Annuler
         </Button>
-        <Button type="submit">
-          {group ? 'Modifier' : 'Créer'}
-        </Button>
+        <Button type="submit">{group ? 'Modifier' : 'Créer'}</Button>
       </div>
     </form>
   )
 }
 
 // Composant pour afficher les détails d'un groupe
-function GroupDetails({ 
-  group, 
-  users, 
+function GroupDetails({
+  group,
+  users,
   roles,
   allRoles,
-  onRefresh 
-}: { 
+  onRefresh,
+}: {
   group: Group | null
   users: GroupUser[]
   roles: Role[]
   allRoles: Role[]
   onRefresh: () => void
 }) {
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(roles.map(r => r.id))
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(roles.map((r) => r.id))
   const [isAddUserOpen, setIsAddUserOpen] = useState(false)
 
   if (!group) return null
@@ -645,29 +634,25 @@ function GroupDetails({
     try {
       const response = await callClientApi(`admin/groups/${group.id}/roles`, {
         method: 'PUT',
-        body: JSON.stringify({ roleIds: selectedRoles })
+        body: JSON.stringify({ roleIds: selectedRoles }),
       })
-      
+
       if (response.ok) {
         onRefresh()
       }
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour des rôles:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleRemoveUser = async (userId: string) => {
     try {
       const response = await callClientApi(`admin/groups/${group.id}/users/${userId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
-      
+
       if (response.ok) {
         onRefresh()
       }
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
-    }
+    } catch (_error) {}
   }
 
   return (
@@ -745,25 +730,21 @@ function GroupDetails({
                       <div className="flex items-center space-x-3">
                         <Avatar>
                           <AvatarFallback>
-                            {user.firstName[0]}{user.lastName[0]}
+                            {user.firstName[0]}
+                            {user.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{user.firstName} {user.lastName}</p>
+                          <p className="font-medium">
+                            {user.firstName} {user.lastName}
+                          </p>
                           <p className="text-sm text-muted-foreground">{user.email}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      {formatDate(user.assignedAt)}
-                    </TableCell>
+                    <TableCell>{formatDate(user.assignedAt)}</TableCell>
                     <TableCell>{user.assignedBy}</TableCell>
-                    <TableCell>
-                      {user.expiresAt 
-                        ? formatDate(user.expiresAt)
-                        : '-'
-                      }
-                    </TableCell>
+                    <TableCell>{user.expiresAt ? formatDate(user.expiresAt) : '-'}</TableCell>
                     <TableCell>
                       <Button
                         variant="ghost"
@@ -799,14 +780,17 @@ function GroupDetails({
             <CardContent className="p-4">
               <div className="space-y-2">
                 {allRoles.map((role) => (
-                  <div key={role.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                  <div
+                    key={role.id}
+                    className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded"
+                  >
                     <Checkbox
                       checked={selectedRoles.includes(role.id)}
                       onCheckedChange={(checked: boolean) => {
                         if (checked) {
                           setSelectedRoles([...selectedRoles, role.id])
                         } else {
-                          setSelectedRoles(selectedRoles.filter(id => id !== role.id))
+                          setSelectedRoles(selectedRoles.filter((id) => id !== role.id))
                         }
                       }}
                     />

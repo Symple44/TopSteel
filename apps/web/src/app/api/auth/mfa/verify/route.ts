@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest) {
@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
         userId,
         mfaType,
         code,
-        webauthnResponse
-      })
+        webauthnResponse,
+      }),
     })
 
     if (!apiResponse.ok) {
@@ -37,13 +37,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: verificationData.data
+      data: verificationData.data,
     })
-  } catch (error) {
-    console.error('Erreur lors de la vérification MFA:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

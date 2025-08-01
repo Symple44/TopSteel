@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { fetchBackend } from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
@@ -19,16 +19,20 @@ export async function POST(request: NextRequest) {
 
     for (let i = 0; i < assignments.length; i += batchSize) {
       const batch = assignments.slice(i, i + batchSize)
-      
+
       const batchPromises = batch.map(async (assignment) => {
         try {
-          const response = await fetchBackend(`/admin/groups/${assignment.groupId}/users`, request, {
-            method: 'POST',
-            body: JSON.stringify({
-              userId: assignment.userId,
-              expiresAt: assignment.expiresAt
-            })
-          })
+          const response = await fetchBackend(
+            `/admin/groups/${assignment.groupId}/users`,
+            request,
+            {
+              method: 'POST',
+              body: JSON.stringify({
+                userId: assignment.userId,
+                expiresAt: assignment.expiresAt,
+              }),
+            }
+          )
 
           if (response.ok) {
             const data = await response.json()
@@ -36,7 +40,7 @@ export async function POST(request: NextRequest) {
               success: true,
               groupId: assignment.groupId,
               userId: assignment.userId,
-              data: data?.data
+              data: data?.data,
             }
           } else {
             const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
@@ -44,7 +48,7 @@ export async function POST(request: NextRequest) {
               success: false,
               groupId: assignment.groupId,
               userId: assignment.userId,
-              error: errorData.error || `HTTP ${response.status}`
+              error: errorData.error || `HTTP ${response.status}`,
             }
           }
         } catch (error) {
@@ -52,7 +56,7 @@ export async function POST(request: NextRequest) {
             success: false,
             groupId: assignment.groupId,
             userId: assignment.userId,
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
           }
         }
       })
@@ -61,8 +65,8 @@ export async function POST(request: NextRequest) {
       results.push(...batchResults)
     }
 
-    const successCount = results.filter(r => r.success).length
-    const errorCount = results.filter(r => !r.success).length
+    const successCount = results.filter((r) => r.success).length
+    const errorCount = results.filter((r) => !r.success).length
 
     return NextResponse.json({
       success: true,
@@ -70,19 +74,16 @@ export async function POST(request: NextRequest) {
         total: assignments.length,
         successful: successCount,
         failed: errorCount,
-        results: results
+        results: results,
       },
-      message: `${successCount} assignations réussies, ${errorCount} échecs`
+      message: `${successCount} assignations réussies, ${errorCount} échecs`,
     })
-
   } catch (error) {
-    console.error('Erreur lors de l\'assignation en masse:', error)
-    
     return NextResponse.json(
       {
         success: false,
-        error: 'Erreur lors de l\'assignation en masse',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: "Erreur lors de l'assignation en masse",
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     )

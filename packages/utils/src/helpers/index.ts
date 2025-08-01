@@ -5,29 +5,29 @@
 
 // ===== ARRAY UTILITIES =====
 export {
+  chunk,
+  filterBy,
   groupBy,
   groupByMap,
+  groupByMultiple,
   groupByPartial,
+  partition,
   sortBy,
-  filterBy,
-  chunk,
   unique,
   uniqueBy,
   uniqueByMap,
-  groupByMultiple,
-  partition,
 } from './array'
 
 // ===== STRING UTILITIES =====
 export {
   capitalize,
+  formatFileSize,
+  formatInitials,
+  generateReference,
+  removeAccents,
+  sanitizeFilename,
   slugify,
   truncate,
-  formatInitials,
-  removeAccents,
   validateEmail,
   validatePhone,
-  formatFileSize,
-  generateReference,
-  sanitizeFilename,
 } from './string'

@@ -1,13 +1,19 @@
 'use client'
 
+import { AlertTriangle, Check, Clock, Download, Star, Users } from 'lucide-react'
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
-import { Star, Download, ExternalLink, Check, AlertTriangle, Clock, Users } from 'lucide-react'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@erp/ui/primitives'
+import { Separator } from '@erp/ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { toast } from '@/hooks/use-toast'
 
 interface ModuleDetailsDialogProps {
@@ -41,11 +47,12 @@ const MOCK_RATINGS = [
   {
     id: '1',
     rating: 5,
-    comment: 'Excellent module, nous a fait économiser beaucoup de temps sur le recrutement. L\'intégration avec Indeed fonctionne parfaitement.',
+    comment:
+      "Excellent module, nous a fait économiser beaucoup de temps sur le recrutement. L'intégration avec Indeed fonctionne parfaitement.",
     author: 'Marie D.',
     company: 'Métallerie Bordeaux',
     date: '2024-01-15',
-    helpful: 12
+    helpful: 12,
   },
   {
     id: '2',
@@ -54,7 +61,7 @@ const MOCK_RATINGS = [
     author: 'Pierre M.',
     company: 'Steel Works Lyon',
     date: '2024-01-10',
-    helpful: 8
+    helpful: 8,
   },
   {
     id: '3',
@@ -63,8 +70,8 @@ const MOCK_RATINGS = [
     author: 'Sophie L.',
     company: 'Fer & Acier Nice',
     date: '2024-01-05',
-    helpful: 15
-  }
+    helpful: 15,
+  },
 ]
 
 const MOCK_FEATURES = [
@@ -74,14 +81,14 @@ const MOCK_FEATURES = [
   'Notifications en temps réel des nouvelles candidatures',
   'Interface de gestion centralisée',
   'Export des données vers Excel/CSV',
-  'Intégration avec le système de notifications TopSteel'
+  'Intégration avec le système de notifications TopSteel',
 ]
 
 const MOCK_REQUIREMENTS = [
   'TopSteel ERP v2.0 ou supérieur',
   'Module Notifications activé',
   'Connexion Internet stable',
-  'Droits administrateur pour l\'installation'
+  "Droits administrateur pour l'installation",
 ]
 
 export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetailsDialogProps) {
@@ -89,13 +96,13 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
 
   const handleInstall = async () => {
     setIsInstalling(true)
-    
+
     // Simulation d'installation
     setTimeout(() => {
       setIsInstalling(false)
       toast({
         title: 'Installation réussie',
-        description: `Le module ${module.displayName} a été installé avec succès.`
+        description: `Le module ${module.displayName} a été installé avec succès.`,
       })
       onOpenChange(false)
     }, 3000)
@@ -107,13 +114,14 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
         return 'Gratuit'
       case 'ONE_TIME':
         return `${pricing.amount}${pricing.currency} (paiement unique)`
-      case 'SUBSCRIPTION':
+      case 'SUBSCRIPTION': {
         const period = pricing.period === 'YEAR' ? 'an' : 'mois'
         return `${pricing.amount}${pricing.currency}/${period}`
+      }
       case 'COMMISSION':
         return 'Commission sur les économies réalisées'
       case 'USAGE_BASED':
-        return 'Facturation basée sur l\'usage'
+        return "Facturation basée sur l'usage"
       default:
         return 'Prix sur demande'
     }
@@ -163,9 +171,7 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
           <TabsContent value="overview" className="space-y-4">
             <div>
               <h3 className="text-lg font-semibold mb-2">Description</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {module.description}
-              </p>
+              <p className="text-muted-foreground leading-relaxed">{module.description}</p>
             </div>
 
             <Separator />
@@ -176,13 +182,9 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
                   <CardTitle className="text-base">Tarification</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold mb-2">
-                    {formatPrice(module.pricing)}
-                  </div>
+                  <div className="text-2xl font-bold mb-2">{formatPrice(module.pricing)}</div>
                   {module.pricing.description && (
-                    <p className="text-sm text-muted-foreground">
-                      {module.pricing.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{module.pricing.description}</p>
                   )}
                 </CardContent>
               </Card>
@@ -213,8 +215,8 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
             <div>
               <h3 className="text-lg font-semibold mb-4">Fonctionnalités principales</h3>
               <div className="grid gap-3">
-                {MOCK_FEATURES.map((feature, index) => (
-                  <div key={index} className="flex items-start gap-3">
+                {MOCK_FEATURES.map((feature) => (
+                  <div key={feature} className="flex items-start gap-3">
                     <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                     <span className="text-sm">{feature}</span>
                   </div>
@@ -227,8 +229,8 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
             <div>
               <h3 className="text-lg font-semibold mb-4">Prérequis système</h3>
               <div className="grid gap-3">
-                {MOCK_REQUIREMENTS.map((requirement, index) => (
-                  <div key={index} className="flex items-start gap-3">
+                {MOCK_REQUIREMENTS.map((requirement) => (
+                  <div key={requirement} className="flex items-start gap-3">
                     <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
                     <span className="text-sm">{requirement}</span>
                   </div>
@@ -241,8 +243,8 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
             <div>
               <h3 className="text-lg font-semibold mb-4">Installation</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                L'installation de ce module prendra environ 5-10 minutes et nécessitera un redémarrage 
-                des services. Vos données existantes ne seront pas affectées.
+                L'installation de ce module prendra environ 5-10 minutes et nécessitera un
+                redémarrage des services. Vos données existantes ne seront pas affectées.
               </p>
               <div className="flex items-center gap-2 text-sm text-amber-600">
                 <Clock className="h-4 w-4" />
@@ -270,7 +272,7 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
                         <div className="flex">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
-                              key={star}
+                              key={`star-${rating.id}-${star}`}
                               className={`h-3 w-3 ${
                                 star <= rating.rating
                                   ? 'fill-yellow-400 text-yellow-400'
@@ -280,19 +282,18 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
                           ))}
                         </div>
                         <span className="font-medium text-sm">{rating.author}</span>
-                        <span className="text-xs text-muted-foreground">
-                          • {rating.company}
-                        </span>
+                        <span className="text-xs text-muted-foreground">• {rating.company}</span>
                       </div>
                       <span className="text-xs text-muted-foreground">
                         {new Date(rating.date).toLocaleDateString('fr-FR')}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {rating.comment}
-                    </p>
+                    <p className="text-sm text-muted-foreground mb-2">{rating.comment}</p>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <button className="flex items-center gap-1 hover:text-foreground">
+                      <button
+                        type="button"
+                        className="flex items-center gap-1 hover:text-foreground"
+                      >
                         <Users className="h-3 w-3" />
                         {rating.helpful} personnes ont trouvé cet avis utile
                       </button>
@@ -308,12 +309,12 @@ export function ModuleDetailsDialog({ module, open, onOpenChange }: ModuleDetail
           <div className="text-sm text-muted-foreground">
             En installant ce module, vous acceptez les conditions d'utilisation.
           </div>
-          
+
           <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Fermer
             </Button>
-            
+
             {module.isInstalled ? (
               <Button disabled>
                 <Check className="mr-2 h-4 w-4" />

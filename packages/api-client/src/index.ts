@@ -3,25 +3,24 @@
  * Client API centralisé pour l'ERP TopSteel
  */
 
-// ===== CORE =====
-export * from './core'
-
+export * from './admin'
+export * from './auth'
 // ===== DOMAIN CLIENTS =====
 export * from './clients'
+// ===== CORE =====
+export * from './core'
+export * from './inventory'
 export * from './projects'
 export * from './quotes'
-export * from './inventory'
-export * from './auth'
 export * from './users'
-export * from './admin'
 
 // ===== MAIN API CLIENT =====
 
-import type { ApiClientConfig } from './core'
+import { SystemParametersApiClient } from './admin'
 import { ClientApiClient } from './clients'
+import type { ApiClientConfig } from './core'
 import { ProjectApiClient } from './projects'
 import { UserSettingsApiClient } from './users'
-import { SystemParametersApiClient } from './admin'
 
 export class ERPApiClient {
   public readonly clients: ClientApiClient
@@ -60,15 +59,15 @@ export class ERPApiClient {
    */
   createContextKey(domain: string, resource?: string, id?: string | number): string[] {
     const parts = [domain]
-    
+
     if (resource) {
       parts.push(resource)
     }
-    
+
     if (id !== undefined) {
       parts.push(String(id))
     }
-    
+
     return parts
   }
 }

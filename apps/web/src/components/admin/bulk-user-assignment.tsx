@@ -1,54 +1,41 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { callClientApi } from '@/utils/backend-api'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Button,
-  Input,
-  Checkbox,
+  Avatar,
+  AvatarFallback,
   Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Separator,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-  Avatar,
-  AvatarFallback,
-  Label,
-  Separator
 } from '@erp/ui'
-import { 
-  Search,
-  Users,
-  UserPlus,
-  Filter,
-  Download,
-  Upload,
-  Check,
-  X,
-  ArrowRight,
-  Building,
-  Mail,
-  Calendar
-} from 'lucide-react'
+import { ArrowRight, Building, Calendar, Check, Filter, Mail, Search, UserPlus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { callClientApi } from '@/utils/backend-api'
 
 interface User {
   id: string
@@ -77,16 +64,18 @@ interface BulkUserAssignmentProps {
   onAssignmentComplete: () => void
 }
 
-export default function BulkUserAssignment({ 
-  isOpen, 
-  onClose, 
-  targetGroup, 
-  onAssignmentComplete 
+export default function BulkUserAssignment({
+  isOpen,
+  onClose,
+  targetGroup,
+  onAssignmentComplete,
 }: BulkUserAssignmentProps) {
   const [users, setUsers] = useState<User[]>([])
   const [groups, setGroups] = useState<Group[]>([])
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [selectedGroups, setSelectedGroups] = useState<string[]>(targetGroup ? [targetGroup.id] : [])
+  const [selectedGroups, setSelectedGroups] = useState<string[]>(
+    targetGroup ? [targetGroup.id] : []
+  )
   const [searchTerm, setSearchTerm] = useState('')
   const [departmentFilter, setDepartmentFilter] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
@@ -99,7 +88,7 @@ export default function BulkUserAssignment({
       loadUsers()
       loadGroups()
     }
-  }, [isOpen])
+  }, [isOpen, loadGroups, loadUsers])
 
   useEffect(() => {
     if (targetGroup) {
@@ -114,9 +103,7 @@ export default function BulkUserAssignment({
       if (data.success) {
         setUsers(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des utilisateurs:', error)
-    }
+    } catch (_error) {}
   }
 
   const loadGroups = async () => {
@@ -126,30 +113,29 @@ export default function BulkUserAssignment({
       if (data.success) {
         setGroups(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des groupes:', error)
-    }
+    } catch (_error) {}
   }
 
   // Filtrage des utilisateurs
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
       user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    
+
     const matchesDepartment = !departmentFilter || user.department === departmentFilter
     const matchesRole = !roleFilter || user.role === roleFilter
-    
-    const matchesGroupFilter = !showOnlyUnassigned || 
-      !user.currentGroups?.some(groupId => selectedGroups.includes(groupId))
+
+    const matchesGroupFilter =
+      !showOnlyUnassigned ||
+      !user.currentGroups?.some((groupId) => selectedGroups.includes(groupId))
 
     return matchesSearch && matchesDepartment && matchesRole && matchesGroupFilter
   })
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedUsers(filteredUsers.map(user => user.id))
+      setSelectedUsers(filteredUsers.map((user) => user.id))
     } else {
       setSelectedUsers([])
     }
@@ -159,7 +145,7 @@ export default function BulkUserAssignment({
     if (checked) {
       setSelectedUsers([...selectedUsers, userId])
     } else {
-      setSelectedUsers(selectedUsers.filter(id => id !== userId))
+      setSelectedUsers(selectedUsers.filter((id) => id !== userId))
     }
   }
 
@@ -167,13 +153,13 @@ export default function BulkUserAssignment({
     setLoading(true)
     try {
       const assignments = []
-      
+
       for (const groupId of selectedGroups) {
         for (const userId of selectedUsers) {
           assignments.push({
             groupId,
             userId,
-            assignedAt: new Date().toISOString()
+            assignedAt: new Date().toISOString(),
           })
         }
       }
@@ -181,7 +167,7 @@ export default function BulkUserAssignment({
       // Appel API pour l'assignation en masse
       const response = await callClientApi('admin/groups/bulk-assignment', {
         method: 'POST',
-        body: JSON.stringify({ assignments })
+        body: JSON.stringify({ assignments }),
       })
 
       if (response.ok) {
@@ -190,15 +176,14 @@ export default function BulkUserAssignment({
         setSelectedUsers([])
         setSelectedGroups(targetGroup ? [targetGroup.id] : [])
       }
-    } catch (error) {
-      console.error('Erreur lors de l\'assignation en masse:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
   }
 
-  const departments = [...new Set(users.map(u => u.department).filter(Boolean))]
-  const roles = [...new Set(users.map(u => u.role).filter(Boolean))]
+  const departments = [...new Set(users.map((u) => u.department).filter(Boolean))]
+  const roles = [...new Set(users.map((u) => u.role).filter(Boolean))]
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -207,11 +192,7 @@ export default function BulkUserAssignment({
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
             Assignation en masse d'utilisateurs
-            {targetGroup && (
-              <Badge variant="outline">
-                vers {targetGroup.name}
-              </Badge>
-            )}
+            {targetGroup && <Badge variant="outline">vers {targetGroup.name}</Badge>}
           </DialogTitle>
         </DialogHeader>
 
@@ -221,10 +202,16 @@ export default function BulkUserAssignment({
               <TabsTrigger value="select-users">
                 1. Sélectionner Utilisateurs ({selectedUsers.length})
               </TabsTrigger>
-              <TabsTrigger value="select-groups" disabled={!targetGroup && selectedUsers.length === 0}>
+              <TabsTrigger
+                value="select-groups"
+                disabled={!targetGroup && selectedUsers.length === 0}
+              >
                 2. Sélectionner Groupes ({selectedGroups.length})
               </TabsTrigger>
-              <TabsTrigger value="review" disabled={selectedUsers.length === 0 || selectedGroups.length === 0}>
+              <TabsTrigger
+                value="review"
+                disabled={selectedUsers.length === 0 || selectedGroups.length === 0}
+              >
                 3. Révision & Confirmation
               </TabsTrigger>
             </TabsList>
@@ -247,7 +234,9 @@ export default function BulkUserAssignment({
                         <Input
                           placeholder="Nom, prénom, email..."
                           value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setSearchTerm(e.target.value)
+                          }
                           className="pl-8"
                         />
                       </div>
@@ -260,8 +249,10 @@ export default function BulkUserAssignment({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">Tous les départements</SelectItem>
-                          {departments.map(dept => (
-                            <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                          {departments.map((dept) => (
+                            <SelectItem key={dept} value={dept}>
+                              {dept}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -274,8 +265,10 @@ export default function BulkUserAssignment({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">Tous les rôles</SelectItem>
-                          {roles.map(role => (
-                            <SelectItem key={role} value={role}>{role}</SelectItem>
+                          {roles.map((role) => (
+                            <SelectItem key={role} value={role}>
+                              {role}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -300,12 +293,12 @@ export default function BulkUserAssignment({
               <Card className="flex-1 overflow-hidden">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>
-                      Utilisateurs ({filteredUsers.length})
-                    </CardTitle>
+                    <CardTitle>Utilisateurs ({filteredUsers.length})</CardTitle>
                     <div className="flex items-center gap-2">
                       <Checkbox
-                        checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                        checked={
+                          selectedUsers.length === filteredUsers.length && filteredUsers.length > 0
+                        }
                         onCheckedChange={handleSelectAll}
                       />
                       <span className="text-sm">Tout sélectionner</span>
@@ -330,18 +323,23 @@ export default function BulkUserAssignment({
                           <TableCell>
                             <Checkbox
                               checked={selectedUsers.includes(user.id)}
-                              onCheckedChange={(checked) => handleUserSelect(user.id, checked)}
+                              onCheckedChange={(checked: boolean) =>
+                                handleUserSelect(user.id, checked)
+                              }
                             />
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center space-x-3">
                               <Avatar>
                                 <AvatarFallback>
-                                  {user.firstName[0]}{user.lastName[0]}
+                                  {user.firstName[0]}
+                                  {user.lastName[0]}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <p className="font-medium">{user.firstName} {user.lastName}</p>
+                                <p className="font-medium">
+                                  {user.firstName} {user.lastName}
+                                </p>
                                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                                   <Mail className="h-3 w-3" />
                                   {user.email}
@@ -358,14 +356,12 @@ export default function BulkUserAssignment({
                             )}
                           </TableCell>
                           <TableCell>
-                            {user.role && (
-                              <Badge variant="secondary">{user.role}</Badge>
-                            )}
+                            {user.role && <Badge variant="secondary">{user.role}</Badge>}
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
-                              {user.currentGroups?.map(groupId => {
-                                const group = groups.find(g => g.id === groupId)
+                              {user.currentGroups?.map((groupId) => {
+                                const group = groups.find((g) => g.id === groupId)
                                 return group ? (
                                   <Badge key={groupId} variant="outline" className="text-xs">
                                     {group.name}
@@ -399,14 +395,17 @@ export default function BulkUserAssignment({
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {groups.map((group) => (
-                        <div key={group.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                        <div
+                          key={group.id}
+                          className="flex items-center space-x-3 p-3 border rounded-lg"
+                        >
                           <Checkbox
                             checked={selectedGroups.includes(group.id)}
-                            onCheckedChange={(checked) => {
+                            onCheckedChange={(checked: boolean) => {
                               if (checked) {
                                 setSelectedGroups([...selectedGroups, group.id])
                               } else {
-                                setSelectedGroups(selectedGroups.filter(id => id !== group.id))
+                                setSelectedGroups(selectedGroups.filter((id) => id !== group.id))
                               }
                             }}
                           />
@@ -426,7 +425,7 @@ export default function BulkUserAssignment({
                   </CardContent>
                 </Card>
               )}
-              
+
               {targetGroup && (
                 <Card>
                   <CardHeader>
@@ -456,10 +455,12 @@ export default function BulkUserAssignment({
                 <CardContent>
                   <div className="space-y-6">
                     <div>
-                      <h4 className="font-medium mb-2">Utilisateurs sélectionnés ({selectedUsers.length})</h4>
+                      <h4 className="font-medium mb-2">
+                        Utilisateurs sélectionnés ({selectedUsers.length})
+                      </h4>
                       <div className="flex flex-wrap gap-2">
-                        {selectedUsers.map(userId => {
-                          const user = users.find(u => u.id === userId)
+                        {selectedUsers.map((userId) => {
+                          const user = users.find((u) => u.id === userId)
                           return user ? (
                             <Badge key={userId} variant="outline">
                               {user.firstName} {user.lastName}
@@ -472,10 +473,12 @@ export default function BulkUserAssignment({
                     <Separator />
 
                     <div>
-                      <h4 className="font-medium mb-2">Groupes de destination ({selectedGroups.length})</h4>
+                      <h4 className="font-medium mb-2">
+                        Groupes de destination ({selectedGroups.length})
+                      </h4>
                       <div className="flex flex-wrap gap-2">
-                        {selectedGroups.map(groupId => {
-                          const group = groups.find(g => g.id === groupId)
+                        {selectedGroups.map((groupId) => {
+                          const group = groups.find((g) => g.id === groupId)
                           return group ? (
                             <Badge key={groupId} variant="outline">
                               {group.name}
@@ -490,7 +493,8 @@ export default function BulkUserAssignment({
                     <div className="bg-muted/30 p-4 rounded-lg">
                       <p className="font-medium">Résumé de l'opération :</p>
                       <p className="text-sm text-muted-foreground">
-                        {selectedUsers.length} utilisateur(s) seront ajoutés à {selectedGroups.length} groupe(s).
+                        {selectedUsers.length} utilisateur(s) seront ajoutés à{' '}
+                        {selectedGroups.length} groupe(s).
                         <br />
                         Total d'assignations : {selectedUsers.length * selectedGroups.length}
                       </p>
@@ -506,7 +510,7 @@ export default function BulkUserAssignment({
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
-          
+
           <div className="flex gap-2">
             {activeTab === 'select-users' && selectedUsers.length > 0 && (
               <Button onClick={() => setActiveTab('select-groups')}>
@@ -514,16 +518,16 @@ export default function BulkUserAssignment({
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             )}
-            
+
             {activeTab === 'select-groups' && selectedGroups.length > 0 && (
               <Button onClick={() => setActiveTab('review')}>
                 Suivant : Révision
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             )}
-            
+
             {activeTab === 'review' && (
-              <Button 
+              <Button
                 onClick={handleBulkAssignment}
                 disabled={loading}
                 className="bg-green-600 hover:bg-green-700"

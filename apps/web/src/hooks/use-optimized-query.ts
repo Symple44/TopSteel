@@ -46,9 +46,7 @@ export function useOptimizedMutation<TData, TVariables>(
         }
       }
     },
-    onError: (error) => {
-      console.error('Mutation error:', error)
-    },
+    onError: (_error) => {},
   })
 }
 
@@ -113,7 +111,6 @@ export function useSmartMutation<TData, TVariables>(
       options?.onSuccess?.(data)
     },
     onError: (error) => {
-      console.error('Mutation error:', error)
       options?.onError?.(error)
     },
     retry: (failureCount, error: unknown) => {

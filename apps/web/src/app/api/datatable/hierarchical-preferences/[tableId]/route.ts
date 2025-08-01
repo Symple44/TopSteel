@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
 
 // Types pour les préférences hiérarchiques
@@ -55,7 +55,7 @@ const defaultConfig: HierarchicalDatatableConfig = {
     maxDepth: 10,
     allowNesting: true,
     defaultExpanded: true,
-    expandedNodes: []
+    expandedNodes: [],
   },
   reorderConfig: {
     enableDragDrop: true,
@@ -63,7 +63,7 @@ const defaultConfig: HierarchicalDatatableConfig = {
     preserveHierarchy: true,
     autoExpand: true,
     dragHandleVisible: true,
-    dropIndicatorStyle: 'line'
+    dropIndicatorStyle: 'line',
   },
   displayConfig: {
     showLevelIndicators: true,
@@ -71,14 +71,14 @@ const defaultConfig: HierarchicalDatatableConfig = {
     indentSize: 24,
     levelColors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
     compactMode: false,
-    collapsibleGroups: true
+    collapsibleGroups: true,
   },
   hierarchyFilters: {
     showOnlyLevels: [],
     hideEmptyParents: false,
     filterPreservesHierarchy: true,
-    searchInChildren: true
-  }
+    searchInChildren: true,
+  },
 }
 
 // GET - Récupérer les préférences hiérarchiques pour une table
@@ -102,16 +102,12 @@ export async function GET(
       table_id: tableId,
       ...defaultConfig,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     }
 
     return NextResponse.json(mockPreferences)
-  } catch (error) {
-    console.error('Erreur lors de la récupération des préférences hiérarchiques:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -127,14 +123,11 @@ export async function PUT(
     }
 
     const { tableId } = await params
-    const updates = await request.json() as Partial<HierarchicalDatatableConfig>
+    const updates = (await request.json()) as Partial<HierarchicalDatatableConfig>
 
     // Valider les données
     if (!updates || typeof updates !== 'object') {
-      return NextResponse.json(
-        { error: 'Données invalides' }, 
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Données invalides' }, { status: 400 })
     }
 
     // Simuler la mise à jour en base de données
@@ -145,18 +138,12 @@ export async function PUT(
       table_id: tableId,
       ...defaultConfig,
       ...updates,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     }
 
-    console.log(`Préférences hiérarchiques mises à jour pour ${tableId}:`, updates)
-
     return NextResponse.json(updatedPreferences)
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour des préférences hiérarchiques:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -172,7 +159,7 @@ export async function POST(
     }
 
     const { tableId } = await params
-    const config = await request.json() as HierarchicalDatatableConfig
+    const config = (await request.json()) as HierarchicalDatatableConfig
 
     // Simuler la création en base de données
     // En production, remplacer par une vraie requête DB
@@ -182,18 +169,12 @@ export async function POST(
       table_id: tableId,
       ...config,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     }
 
-    console.log(`Nouvelles préférences hiérarchiques créées pour ${tableId}:`, config)
-
     return NextResponse.json(newPreferences, { status: 201 })
-  } catch (error) {
-    console.error('Erreur lors de la création des préférences hiérarchiques:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -210,16 +191,8 @@ export async function DELETE(
 
     const { tableId } = await params
 
-    // Simuler la suppression en base de données
-    // En production, remplacer par une vraie requête DB
-    console.log(`Préférences hiérarchiques supprimées pour la table ${tableId}`)
-
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Erreur lors de la suppression des préférences hiérarchiques:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

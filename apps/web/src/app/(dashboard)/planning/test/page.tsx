@@ -1,146 +1,148 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
 
 // Données fictives de planning
 const planningData = [
   {
     id: 1,
-    projet: "Structure métallique - Bâtiment A",
-    client: "Construction ABC",
-    dateDebut: "20 Jan",
-    dateFin: "15 Fév 2025",
+    projet: 'Structure métallique - Bâtiment A',
+    client: 'Construction ABC',
+    dateDebut: '20 Jan',
+    dateFin: '15 Fév 2025',
     progression: 45,
-    statut: "en_cours",
-    equipe: ["Jean Dupont", "Marie Martin", "Pierre Durand"],
+    statut: 'en_cours',
+    equipe: ['Jean Dupont', 'Marie Martin', 'Pierre Durand'],
     taches: [
-      { id: 1, nom: "Découpe des poutres", progression: 100, statut: "termine" },
-      { id: 2, nom: "Assemblage structure principale", progression: 60, statut: "en_cours" },
-      { id: 3, nom: "Soudure des joints", progression: 20, statut: "en_cours" },
-      { id: 4, nom: "Traitement anti-corrosion", progression: 0, statut: "a_faire" },
-      { id: 5, nom: "Contrôle qualité", progression: 0, statut: "a_faire" }
+      { id: 1, nom: 'Découpe des poutres', progression: 100, statut: 'termine' },
+      { id: 2, nom: 'Assemblage structure principale', progression: 60, statut: 'en_cours' },
+      { id: 3, nom: 'Soudure des joints', progression: 20, statut: 'en_cours' },
+      { id: 4, nom: 'Traitement anti-corrosion', progression: 0, statut: 'a_faire' },
+      { id: 5, nom: 'Contrôle qualité', progression: 0, statut: 'a_faire' },
     ],
     materiaux: [
-      { nom: "Poutre HEA 200", quantite: 50, unite: "m", disponible: true },
-      { nom: "Plaque acier 10mm", quantite: 200, unite: "m²", disponible: true },
-      { nom: "Boulons M20", quantite: 500, unite: "pcs", disponible: false }
-    ]
+      { nom: 'Poutre HEA 200', quantite: 50, unite: 'm', disponible: true },
+      { nom: 'Plaque acier 10mm', quantite: 200, unite: 'm²', disponible: true },
+      { nom: 'Boulons M20', quantite: 500, unite: 'pcs', disponible: false },
+    ],
   },
   {
     id: 2,
-    projet: "Passerelle piétonne",
-    client: "Ville de Nantes",
-    dateDebut: "1 Fév",
-    dateFin: "30 Mar 2025",
+    projet: 'Passerelle piétonne',
+    client: 'Ville de Nantes',
+    dateDebut: '1 Fév',
+    dateFin: '30 Mar 2025',
     progression: 15,
-    statut: "en_cours",
-    equipe: ["Sophie Lambert", "Thomas Bernard"],
+    statut: 'en_cours',
+    equipe: ['Sophie Lambert', 'Thomas Bernard'],
     taches: [
-      { id: 1, nom: "Étude et conception", progression: 100, statut: "termine" },
-      { id: 2, nom: "Approvisionnement matériaux", progression: 40, statut: "en_cours" },
-      { id: 3, nom: "Fabrication éléments", progression: 10, statut: "en_cours" },
-      { id: 4, nom: "Assemblage en atelier", progression: 0, statut: "a_faire" },
-      { id: 5, nom: "Installation sur site", progression: 0, statut: "a_faire" }
+      { id: 1, nom: 'Étude et conception', progression: 100, statut: 'termine' },
+      { id: 2, nom: 'Approvisionnement matériaux', progression: 40, statut: 'en_cours' },
+      { id: 3, nom: 'Fabrication éléments', progression: 10, statut: 'en_cours' },
+      { id: 4, nom: 'Assemblage en atelier', progression: 0, statut: 'a_faire' },
+      { id: 5, nom: 'Installation sur site', progression: 0, statut: 'a_faire' },
     ],
     materiaux: [
-      { nom: "Tube carré 100x100", quantite: 80, unite: "m", disponible: true },
-      { nom: "Tôle striée 5mm", quantite: 50, unite: "m²", disponible: true },
-      { nom: "Garde-corps normé", quantite: 40, unite: "m", disponible: true }
-    ]
+      { nom: 'Tube carré 100x100', quantite: 80, unite: 'm', disponible: true },
+      { nom: 'Tôle striée 5mm', quantite: 50, unite: 'm²', disponible: true },
+      { nom: 'Garde-corps normé', quantite: 40, unite: 'm', disponible: true },
+    ],
   },
   {
     id: 3,
-    projet: "Escalier hélicoïdal",
-    client: "Entreprise XYZ",
-    dateDebut: "15 Jan",
-    dateFin: "31 Jan 2025",
+    projet: 'Escalier hélicoïdal',
+    client: 'Entreprise XYZ',
+    dateDebut: '15 Jan',
+    dateFin: '31 Jan 2025',
     progression: 85,
-    statut: "en_cours",
-    equipe: ["Luc Moreau", "Claire Petit"],
+    statut: 'en_cours',
+    equipe: ['Luc Moreau', 'Claire Petit'],
     taches: [
-      { id: 1, nom: "Calcul et dimensionnement", progression: 100, statut: "termine" },
-      { id: 2, nom: "Fabrication limon central", progression: 100, statut: "termine" },
-      { id: 3, nom: "Fabrication marches", progression: 100, statut: "termine" },
-      { id: 4, nom: "Assemblage", progression: 80, statut: "en_cours" },
-      { id: 5, nom: "Finition et peinture", progression: 20, statut: "en_cours" }
+      { id: 1, nom: 'Calcul et dimensionnement', progression: 100, statut: 'termine' },
+      { id: 2, nom: 'Fabrication limon central', progression: 100, statut: 'termine' },
+      { id: 3, nom: 'Fabrication marches', progression: 100, statut: 'termine' },
+      { id: 4, nom: 'Assemblage', progression: 80, statut: 'en_cours' },
+      { id: 5, nom: 'Finition et peinture', progression: 20, statut: 'en_cours' },
     ],
     materiaux: [
-      { nom: "Tube Ø200 ép.10", quantite: 6, unite: "m", disponible: true },
-      { nom: "Tôle pliée 4mm", quantite: 30, unite: "m²", disponible: true },
-      { nom: "Main courante inox", quantite: 15, unite: "m", disponible: true }
-    ]
+      { nom: 'Tube Ø200 ép.10', quantite: 6, unite: 'm', disponible: true },
+      { nom: 'Tôle pliée 4mm', quantite: 30, unite: 'm²', disponible: true },
+      { nom: 'Main courante inox', quantite: 15, unite: 'm', disponible: true },
+    ],
   },
   {
     id: 4,
-    projet: "Charpente industrielle",
-    client: "Logistique Express",
-    dateDebut: "1 Mar",
-    dateFin: "30 Mai 2025",
+    projet: 'Charpente industrielle',
+    client: 'Logistique Express',
+    dateDebut: '1 Mar',
+    dateFin: '30 Mai 2025',
     progression: 0,
-    statut: "planifie",
-    equipe: ["À définir"],
+    statut: 'planifie',
+    equipe: ['À définir'],
     taches: [
-      { id: 1, nom: "Relevé sur site", progression: 0, statut: "a_faire" },
-      { id: 2, nom: "Étude technique", progression: 0, statut: "a_faire" },
-      { id: 3, nom: "Fabrication fermes", progression: 0, statut: "a_faire" },
-      { id: 4, nom: "Fabrication pannes", progression: 0, statut: "a_faire" },
-      { id: 5, nom: "Montage sur site", progression: 0, statut: "a_faire" }
+      { id: 1, nom: 'Relevé sur site', progression: 0, statut: 'a_faire' },
+      { id: 2, nom: 'Étude technique', progression: 0, statut: 'a_faire' },
+      { id: 3, nom: 'Fabrication fermes', progression: 0, statut: 'a_faire' },
+      { id: 4, nom: 'Fabrication pannes', progression: 0, statut: 'a_faire' },
+      { id: 5, nom: 'Montage sur site', progression: 0, statut: 'a_faire' },
     ],
     materiaux: [
-      { nom: "IPE 300", quantite: 200, unite: "m", disponible: false },
-      { nom: "HEA 240", quantite: 150, unite: "m", disponible: false },
-      { nom: "Cornière 80x80", quantite: 100, unite: "m", disponible: false }
-    ]
+      { nom: 'IPE 300', quantite: 200, unite: 'm', disponible: false },
+      { nom: 'HEA 240', quantite: 150, unite: 'm', disponible: false },
+      { nom: 'Cornière 80x80', quantite: 100, unite: 'm', disponible: false },
+    ],
   },
   {
     id: 5,
-    projet: "Rénovation pont roulant",
-    client: "Industrie Métallurgique SA",
-    dateDebut: "10 Jan",
-    dateFin: "25 Jan 2025",
+    projet: 'Rénovation pont roulant',
+    client: 'Industrie Métallurgique SA',
+    dateDebut: '10 Jan',
+    dateFin: '25 Jan 2025',
     progression: 100,
-    statut: "termine",
-    equipe: ["Michel Roux", "David Garcia"],
+    statut: 'termine',
+    equipe: ['Michel Roux', 'David Garcia'],
     taches: [
-      { id: 1, nom: "Diagnostic structure", progression: 100, statut: "termine" },
-      { id: 2, nom: "Remplacement rails", progression: 100, statut: "termine" },
-      { id: 3, nom: "Révision mécanismes", progression: 100, statut: "termine" },
-      { id: 4, nom: "Tests de charge", progression: 100, statut: "termine" },
-      { id: 5, nom: "Certification", progression: 100, statut: "termine" }
+      { id: 1, nom: 'Diagnostic structure', progression: 100, statut: 'termine' },
+      { id: 2, nom: 'Remplacement rails', progression: 100, statut: 'termine' },
+      { id: 3, nom: 'Révision mécanismes', progression: 100, statut: 'termine' },
+      { id: 4, nom: 'Tests de charge', progression: 100, statut: 'termine' },
+      { id: 5, nom: 'Certification', progression: 100, statut: 'termine' },
     ],
     materiaux: [
-      { nom: "Rail de roulement", quantite: 40, unite: "m", disponible: true },
-      { nom: "Galets de roulement", quantite: 8, unite: "pcs", disponible: true },
-      { nom: "Câble acier Ø20", quantite: 100, unite: "m", disponible: true }
-    ]
-  }
+      { nom: 'Rail de roulement', quantite: 40, unite: 'm', disponible: true },
+      { nom: 'Galets de roulement', quantite: 8, unite: 'pcs', disponible: true },
+      { nom: 'Câble acier Ø20', quantite: 100, unite: 'm', disponible: true },
+    ],
+  },
 ]
 
 const statusConfig: Record<string, { label: string; color: string }> = {
-  planifie: { label: "Planifié", color: "bg-gray-500" },
-  en_cours: { label: "En cours", color: "bg-blue-500" },
-  termine: { label: "Terminé", color: "bg-green-500" },
-  en_retard: { label: "En retard", color: "bg-red-500" }
+  planifie: { label: 'Planifié', color: 'bg-gray-500' },
+  en_cours: { label: 'En cours', color: 'bg-blue-500' },
+  termine: { label: 'Terminé', color: 'bg-green-500' },
+  en_retard: { label: 'En retard', color: 'bg-red-500' },
 }
 
 const taskStatusConfig: Record<string, { label: string; color: string }> = {
-  a_faire: { label: "À faire", color: "text-gray-600" },
-  en_cours: { label: "En cours", color: "text-blue-600" },
-  termine: { label: "Terminé", color: "text-green-600" }
+  a_faire: { label: 'À faire', color: 'text-gray-600' },
+  en_cours: { label: 'En cours', color: 'text-blue-600' },
+  termine: { label: 'Terminé', color: 'text-green-600' },
 }
 
 export default function TestPlanningPage() {
-  const [selectedProject, setSelectedProject] = useState<any>(null)
+  const [selectedProject, setSelectedProject] = useState<(typeof projets)[0] | null>(null)
   const [viewMode, setViewMode] = useState('list') // 'list', 'gantt', 'calendar'
 
   const getProgressBarColor = (progress: number) => {
-    if (progress === 100) return "bg-green-500"
-    if (progress >= 60) return "bg-blue-500"
-    if (progress >= 30) return "bg-yellow-500"
-    return "bg-red-500"
+    if (progress === 100) return 'bg-green-500'
+    if (progress >= 60) return 'bg-blue-500'
+    if (progress >= 30) return 'bg-yellow-500'
+    return 'bg-red-500'
   }
 
   return (
@@ -242,7 +244,7 @@ export default function TestPlanningPage() {
                     <span className="font-medium">{projet.progression}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
+                    <div
                       className={`h-3 rounded-full transition-all ${getProgressBarColor(projet.progression)}`}
                       style={{ width: `${projet.progression}%` }}
                     ></div>
@@ -253,8 +255,8 @@ export default function TestPlanningPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">👥 Équipe:</span>
                   <div className="flex gap-1">
-                    {projet.equipe.map((membre, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
+                    {projet.equipe.map((membre) => (
+                      <Badge key={membre} variant="secondary" className="text-xs">
                         {membre}
                       </Badge>
                     ))}
@@ -268,10 +270,11 @@ export default function TestPlanningPage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {projet.taches.map((tache) => (
-                      <div key={tache.id} className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded">
-                        <span className={taskStatusConfig[tache.statut].color}>
-                          {tache.nom}
-                        </span>
+                      <div
+                        key={tache.id}
+                        className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded"
+                      >
+                        <span className={taskStatusConfig[tache.statut].color}>{tache.nom}</span>
                         <Badge variant="outline" className="text-xs">
                           {tache.progression}%
                         </Badge>
@@ -286,12 +289,18 @@ export default function TestPlanningPage() {
                     <span className="text-sm font-medium">📦 Matériaux critiques</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {projet.materiaux.filter(m => !m.disponible).map((materiau, idx) => (
-                      <Badge key={idx} variant="destructive" className="text-xs">
-                        ⚠️ {materiau.nom} - {materiau.quantite} {materiau.unite}
-                      </Badge>
-                    ))}
-                    {projet.materiaux.filter(m => !m.disponible).length === 0 && (
+                    {projet.materiaux
+                      .filter((m) => !m.disponible)
+                      .map((materiau) => (
+                        <Badge
+                          key={`${materiau.nom}-${materiau.quantite}`}
+                          variant="destructive"
+                          className="text-xs"
+                        >
+                          ⚠️ {materiau.nom} - {materiau.quantite} {materiau.unite}
+                        </Badge>
+                      ))}
+                    {projet.materiaux.filter((m) => !m.disponible).length === 0 && (
                       <Badge variant="secondary" className="text-xs text-green-700 bg-green-100">
                         ✅ Tous les matériaux disponibles
                       </Badge>
@@ -300,11 +309,7 @@ export default function TestPlanningPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedProject(projet)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setSelectedProject(projet)}>
                     Voir détails
                   </Button>
                 </div>
@@ -325,19 +330,17 @@ export default function TestPlanningPage() {
             <div className="space-y-4">
               {planningData.map((projet) => (
                 <div key={projet.id} className="flex items-center gap-4">
-                  <div className="w-48 text-sm font-medium truncate">
-                    {projet.projet}
-                  </div>
+                  <div className="w-48 text-sm font-medium truncate">{projet.projet}</div>
                   <div className="flex-1 relative h-10 bg-gray-100 rounded">
-                    <div 
+                    <div
                       className={`absolute h-full rounded ${statusConfig[projet.statut].color}`}
                       style={{
                         left: '10%',
                         width: '40%',
-                        opacity: 0.8
+                        opacity: 0.8,
                       }}
                     >
-                      <div 
+                      <div
                         className="h-full bg-white bg-opacity-50"
                         style={{ width: `${projet.progression}%` }}
                       ></div>
@@ -369,7 +372,7 @@ export default function TestPlanningPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-7 gap-2">
-              {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(jour => (
+              {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((jour) => (
                 <div key={jour} className="text-center text-sm font-medium p-2">
                   {jour}
                 </div>

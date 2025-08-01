@@ -1,8 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { AuthHelper } from '@/lib/auth-helper'
+import { type NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+export async function GET(_request: NextRequest) {
+  const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   try {
     // Route stub pour éviter les erreurs 500 sur menu-config filtré
     const standardMenuTree = [
@@ -16,7 +15,7 @@ export async function GET(request: NextRequest) {
         level: 0,
         parentId: null,
         hasChildren: false,
-        isExpanded: true
+        isExpanded: true,
       },
       {
         id: 'admin',
@@ -28,7 +27,7 @@ export async function GET(request: NextRequest) {
         level: 0,
         parentId: null,
         hasChildren: true,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'admin-company',
@@ -40,7 +39,7 @@ export async function GET(request: NextRequest) {
         level: 1,
         parentId: 'admin',
         hasChildren: false,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'admin-roles',
@@ -52,7 +51,7 @@ export async function GET(request: NextRequest) {
         level: 1,
         parentId: 'admin',
         hasChildren: false,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'admin-database',
@@ -64,7 +63,7 @@ export async function GET(request: NextRequest) {
         level: 1,
         parentId: 'admin',
         hasChildren: false,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'admin-translations',
@@ -76,7 +75,7 @@ export async function GET(request: NextRequest) {
         level: 1,
         parentId: 'admin',
         hasChildren: false,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'admin-notifications',
@@ -88,7 +87,7 @@ export async function GET(request: NextRequest) {
         level: 1,
         parentId: 'admin',
         hasChildren: true,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'admin-notifications-rules',
@@ -100,7 +99,7 @@ export async function GET(request: NextRequest) {
         level: 2,
         parentId: 'admin-notifications',
         hasChildren: false,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'planning',
@@ -112,7 +111,7 @@ export async function GET(request: NextRequest) {
         level: 0,
         parentId: null,
         hasChildren: true,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'planning-test',
@@ -124,7 +123,7 @@ export async function GET(request: NextRequest) {
         level: 1,
         parentId: 'planning',
         hasChildren: false,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'settings',
@@ -136,7 +135,7 @@ export async function GET(request: NextRequest) {
         level: 0,
         parentId: null,
         hasChildren: true,
-        isExpanded: false
+        isExpanded: false,
       },
       {
         id: 'settings-menu',
@@ -148,25 +147,24 @@ export async function GET(request: NextRequest) {
         level: 1,
         parentId: 'settings',
         hasChildren: false,
-        isExpanded: false
-      }
+        isExpanded: false,
+      },
     ]
 
     const response = {
       success: true,
       data: standardMenuTree,
-      message: 'Menu standard récupéré avec succès'
+      message: 'Menu standard récupéré avec succès',
     }
 
     return NextResponse.json(response, { status: 200 })
-
   } catch (error) {
     // Error loading menu tree (silenced)
     return NextResponse.json(
       {
         success: false,
         message: 'Error loading menu tree',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     )

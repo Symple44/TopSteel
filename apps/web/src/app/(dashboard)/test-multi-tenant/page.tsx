@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
+export const dynamic = 'force-dynamic'
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { ShieldCheck, ShieldAlert, Database, Lock, AlertTriangle } from 'lucide-react'
+import { Database, Lock, ShieldAlert, ShieldCheck } from 'lucide-react'
+import { useState } from 'react'
+import { Alert, AlertDescription, AlertTitle } from '@erp/ui'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import { Textarea } from '@erp/ui/primitives'
 import { callClientApi } from '@/utils/backend-api'
 
 export default function TestMultiTenantPage() {
@@ -28,7 +30,7 @@ export default function TestMultiTenantPage() {
     {
       name: 'Accès table système',
       sql: 'SELECT * FROM topsteel_auth.users',
-      description: 'Tentative d\'accès à la table users',
+      description: "Tentative d'accès à la table users",
       expected: 'blocked',
     },
     {
@@ -40,7 +42,7 @@ export default function TestMultiTenantPage() {
     {
       name: 'Accès information_schema',
       sql: 'SELECT * FROM information_schema.tables',
-      description: 'Tentative d\'accès aux métadonnées',
+      description: "Tentative d'accès aux métadonnées",
       expected: 'blocked',
     },
     {
@@ -54,13 +56,13 @@ export default function TestMultiTenantPage() {
   const fetchTables = async () => {
     setLoading(true)
     setError(null)
-    
+
     try {
       const response = await callClientApi('query-builder/schema/tables')
-      
+
       if (response.ok) {
         const responseData = await response.json()
-        
+
         let tables = []
         if (Array.isArray(responseData)) {
           tables = responseData
@@ -70,20 +72,23 @@ export default function TestMultiTenantPage() {
             schema: table.schemaName,
             type: 'table',
             description: table.comment || `Table ${table.tableName}`,
-            columns: []
+            columns: [],
           }))
         } else {
           setError('Format de données inattendu')
           return
         }
-        
+
         setTables(tables)
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
         setError(`Erreur ${response.status}: ${errorData.error}`)
       }
     } catch (err) {
-      setError('Erreur lors de la récupération des tables: ' + (err instanceof Error ? err.message : 'Unknown'))
+      setError(
+        'Erreur lors de la récupération des tables: ' +
+          (err instanceof Error ? err.message : 'Unknown')
+      )
     } finally {
       setLoading(false)
     }
@@ -95,16 +100,14 @@ export default function TestMultiTenantPage() {
       const response = await callClientApi(`query-builder/schema/tables/${tableName}/columns`)
       if (response.ok) {
         const columns = await response.json()
-        
-        setTables(prevTables => 
-          prevTables.map(table => 
-            table.name === tableName 
-              ? { ...table, columns: columns.data || columns }
-              : table
+
+        setTables((prevTables) =>
+          prevTables.map((table) =>
+            table.name === tableName ? { ...table, columns: columns.data || columns } : table
           )
         )
       }
-    } catch (err) {
+    } catch (_err) {
       // Silently handle errors - user will see loading state stop
     } finally {
       setLoadingColumns(null)
@@ -139,7 +142,7 @@ export default function TestMultiTenantPage() {
           error: data.error,
         })
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Erreur de connexion')
       setResults({
         status: 'error',
@@ -188,11 +191,7 @@ export default function TestMultiTenantPage() {
                 placeholder="Entrez votre requête SQL..."
                 className="font-mono text-sm h-32"
               />
-              <Button 
-                onClick={() => executeSql()} 
-                disabled={loading}
-                className="w-full"
-              >
+              <Button onClick={() => executeSql()} disabled={loading} className="w-full">
                 {loading ? 'Exécution...' : 'Exécuter la requête'}
               </Button>
 
@@ -208,13 +207,11 @@ export default function TestMultiTenantPage() {
                 <Alert>
                   <ShieldCheck className="h-4 w-4" />
                   <AlertTitle>Succès</AlertTitle>
-                  <AlertDescription>
-                    {results.count} résultats retournés
-                  </AlertDescription>
+                  <AlertDescription>{results.count} résultats retournés</AlertDescription>
                 </Alert>
               )}
 
-              {results && results.data && (
+              {results?.data && (
                 <div className="mt-4 overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -233,7 +230,10 @@ export default function TestMultiTenantPage() {
                       {results.data.slice(0, 10).map((row: any, idx: number) => (
                         <tr key={idx}>
                           {Object.values(row).map((value: any, i: number) => (
-                            <td key={i} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td
+                              key={i}
+                              className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                            >
                               {String(value)}
                             </td>
                           ))}
@@ -266,9 +266,7 @@ export default function TestMultiTenantPage() {
                       <div className="flex-1">
                         <h3 className="font-semibold">{test.name}</h3>
                         <p className="text-sm text-muted-foreground">{test.description}</p>
-                        <code className="text-xs bg-muted p-1 rounded mt-1 block">
-                          {test.sql}
-                        </code>
+                        <code className="text-xs bg-muted p-1 rounded mt-1 block">{test.sql}</code>
                       </div>
                       <Badge variant={test.expected === 'success' ? 'default' : 'destructive'}>
                         {test.expected === 'success' ? 'Autorisé' : 'Bloqué'}
@@ -298,9 +296,7 @@ export default function TestMultiTenantPage() {
                     <Database className="h-5 w-5" />
                     Tables Accessibles
                   </CardTitle>
-                  <CardDescription>
-                    Liste des tables disponibles pour votre tenant
-                  </CardDescription>
+                  <CardDescription>Liste des tables disponibles pour votre tenant</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -308,7 +304,6 @@ export default function TestMultiTenantPage() {
               <Button onClick={fetchTables} disabled={loading} className="mb-4">
                 {loading ? 'Chargement...' : 'Charger les tables'}
               </Button>
-
 
               {error && (
                 <div className="mb-4 p-3 border border-red-200 rounded bg-red-50 text-red-700">
@@ -322,11 +317,16 @@ export default function TestMultiTenantPage() {
                     Affichage de {tables.length} tables
                   </div>
                   {tables.map((table, idx) => (
-                    <div key={idx} className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
+                    <div
+                      key={idx}
+                      className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold text-gray-900">{table.name}</h3>
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-1 text-xs bg-gray-100 rounded">{table.schema}</span>
+                          <span className="px-2 py-1 text-xs bg-gray-100 rounded">
+                            {table.schema}
+                          </span>
                           <button
                             className="px-2 py-1 text-xs border rounded hover:bg-gray-50"
                             onClick={() => loadTableColumns(table.name)}
@@ -338,7 +338,9 @@ export default function TestMultiTenantPage() {
                       </div>
                       <p className="text-sm text-gray-600 mb-2">{table.description}</p>
                       <div className="flex items-center gap-2 text-sm">
-                        {['clients', 'fournisseurs', 'materiaux', 'stocks', 'commandes'].includes(table.name) ? (
+                        {['clients', 'fournisseurs', 'materiaux', 'stocks', 'commandes'].includes(
+                          table.name
+                        ) ? (
                           <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
                             🛡️ Multi-tenant
                           </span>
@@ -348,7 +350,9 @@ export default function TestMultiTenantPage() {
                           </span>
                         )}
                         <span className="text-gray-500">
-                          {table.columns?.length > 0 ? `${table.columns.length} colonnes` : 'Colonnes non chargées'}
+                          {table.columns?.length > 0
+                            ? `${table.columns.length} colonnes`
+                            : 'Colonnes non chargées'}
                         </span>
                       </div>
 
@@ -361,20 +365,22 @@ export default function TestMultiTenantPage() {
                             {table.columns.map((col: any, colIdx: number) => {
                               const isPrimaryKey = col.isPrimaryKey || col.primary
                               const isForeignKey = col.isForeignKey || col.foreign
-                              const isCompanyId = (col.columnName === 'company_id' || col.name === 'company_id')
-                              
+                              const isCompanyId =
+                                col.columnName === 'company_id' || col.name === 'company_id'
+
                               return (
-                                <div 
-                                  key={colIdx} 
+                                <div
+                                  key={colIdx}
                                   className={`
                                     inline-flex items-center gap-1 px-2 py-1 rounded text-xs border
-                                    ${isPrimaryKey 
-                                      ? 'bg-blue-100 border-blue-300 text-blue-800' 
-                                      : isForeignKey 
-                                        ? 'bg-purple-100 border-purple-300 text-purple-800'
-                                        : isCompanyId
-                                          ? 'bg-green-100 border-green-300 text-green-800'
-                                          : 'bg-white border-gray-200 text-gray-700'
+                                    ${
+                                      isPrimaryKey
+                                        ? 'bg-blue-100 border-blue-300 text-blue-800'
+                                        : isForeignKey
+                                          ? 'bg-purple-100 border-purple-300 text-purple-800'
+                                          : isCompanyId
+                                            ? 'bg-green-100 border-green-300 text-green-800'
+                                            : 'bg-white border-gray-200 text-gray-700'
                                     }
                                   `}
                                 >
@@ -385,16 +391,33 @@ export default function TestMultiTenantPage() {
                                     ({col.dataType || col.type})
                                   </span>
                                   {isPrimaryKey && (
-                                    <span className="ml-1 text-blue-600 font-bold" title="Clé primaire">🔑</span>
+                                    <span
+                                      className="ml-1 text-blue-600 font-bold"
+                                      title="Clé primaire"
+                                    >
+                                      🔑
+                                    </span>
                                   )}
                                   {isForeignKey && (
-                                    <span className="ml-1 text-purple-600 font-bold" title="Clé étrangère">🔗</span>
+                                    <span
+                                      className="ml-1 text-purple-600 font-bold"
+                                      title="Clé étrangère"
+                                    >
+                                      🔗
+                                    </span>
                                   )}
                                   {isCompanyId && (
-                                    <span className="ml-1 text-green-600 font-bold" title="Isolation multi-tenant">🛡️</span>
+                                    <span
+                                      className="ml-1 text-green-600 font-bold"
+                                      title="Isolation multi-tenant"
+                                    >
+                                      🛡️
+                                    </span>
                                   )}
                                   {col.nullable === false && !isPrimaryKey && (
-                                    <span className="ml-1 text-red-500 text-xs" title="Non-null">*</span>
+                                    <span className="ml-1 text-red-500 text-xs" title="Non-null">
+                                      *
+                                    </span>
                                   )}
                                 </div>
                               )
@@ -404,9 +427,13 @@ export default function TestMultiTenantPage() {
                             <span className="font-medium">Légende:</span>
                             <span className="ml-2">🔑 Clé primaire</span>
                             <span className="ml-2">🔗 Clé étrangère</span>
-                            {['clients', 'fournisseurs', 'materiaux', 'stocks', 'commandes'].includes(table.name) && (
-                              <span className="ml-2">🛡️ Multi-tenant</span>
-                            )}
+                            {[
+                              'clients',
+                              'fournisseurs',
+                              'materiaux',
+                              'stocks',
+                              'commandes',
+                            ].includes(table.name) && <span className="ml-2">🛡️ Multi-tenant</span>}
                             <span className="ml-2">* Obligatoire</span>
                           </div>
                         </div>

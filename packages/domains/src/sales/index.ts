@@ -12,8 +12,8 @@ export * from './quotes'
 export type {
   // Quotes
   Quote,
-  QuoteStatut,
-  QuoteType,
   QuoteItem,
   QuoteStats,
+  QuoteStatut,
+  QuoteType,
 } from './quotes'

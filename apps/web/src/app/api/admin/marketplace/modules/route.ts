@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { fetchBackend } from '@/lib/auth-server'
 
 export async function GET(request: NextRequest) {
@@ -10,10 +10,9 @@ export async function GET(request: NextRequest) {
     }
 
     const modules = await response.json()
-    
+
     return NextResponse.json(modules)
-  } catch (error) {
-    console.error('Erreur lors de la récupération des modules:', error)
+  } catch (_error) {
     return NextResponse.json(
       { error: 'Erreur lors de la récupération des modules' },
       { status: 500 }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
 import { callBackendFromApi } from '@/utils/backend-api'
 
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     // Appeler l'API backend pour configurer TOTP
     const apiResponse = await callBackendFromApi(request, 'auth/mfa/setup/totp', {
       method: 'POST',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     })
 
     if (!apiResponse.ok) {
@@ -30,13 +30,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: setupData.data
+      data: setupData.data,
     })
-  } catch (error) {
-    console.error('Erreur lors de la configuration TOTP:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

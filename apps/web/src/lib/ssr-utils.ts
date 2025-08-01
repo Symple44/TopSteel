@@ -110,7 +110,6 @@ export class BrowserAPIManager {
 
   private handleError(error: Error, context: string): void {
     if (this.config.enableDebugLogs) {
-      console.warn(`SSR-Safe Error in ${context}:`, error)
     }
     this.config.errorCallback?.(error, context)
   }
@@ -269,8 +268,7 @@ export function useHydrationSafe<T>(
       if (mounted) {
         try {
           setValue(clientValue())
-        } catch (error) {
-          console.warn('Error in useHydrationSafe:', error)
+        } catch (_error) {
           setValue(serverValue)
         }
       }
@@ -319,8 +317,7 @@ export function useSSRSafeLocalStorage<T>(
       if (item !== null) {
         setStoredValue(serializer.deserialize(item))
       }
-    } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error)
+    } catch (_error) {
     } finally {
       setIsLoaded(true)
     }
@@ -331,9 +328,7 @@ export function useSSRSafeLocalStorage<T>(
     try {
       setStoredValue(value)
       api.setToStorage(key, serializer.serialize(value))
-    } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error)
-    }
+    } catch (_error) {}
   }
 
   return [storedValue, setValue, isLoaded]
@@ -356,7 +351,6 @@ export function clientSide<T>(
   } catch (error) {
     onError?.(error as Error)
     if (isDev) {
-      console.warn('Error in clientSide function:', error)
     }
 
     return fallback
@@ -378,7 +372,6 @@ export function serverSide<T>(
   } catch (error) {
     onError?.(error as Error)
     if (isDev) {
-      console.warn('Error in serverSide function:', error)
     }
 
     return fallback
@@ -388,12 +381,11 @@ export function serverSide<T>(
 /**
  * Wrapper pour les fonctions potentiellement problématiques
  */
-export function safeExecute<T>(fn: () => T, fallback: T, context?: string): T {
+export function safeExecute<T>(fn: () => T, fallback: T, _context?: string): T {
   try {
     return fn()
-  } catch (error) {
+  } catch (_error) {
     if (isDev) {
-      console.warn(`Safe execute error${context ? ` in ${context}` : ''}:`, error)
     }
 
     return fallback

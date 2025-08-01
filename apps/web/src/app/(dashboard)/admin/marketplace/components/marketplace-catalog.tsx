@@ -1,17 +1,34 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { ModuleDetailsDialog } from './module-details-dialog'
-import { Search, Star, Download, ExternalLink, Users, ShoppingCart, BarChart3, Zap, Shield, Wrench, DollarSign, Loader2 } from 'lucide-react'
+import {
+  BarChart3,
+  DollarSign,
+  Download,
+  Loader2,
+  Search,
+  Shield,
+  ShoppingCart,
+  Star,
+  Users,
+  Wrench,
+  Zap,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui/primitives'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui/primitives'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
+import { ModuleDetailsDialog } from './module-details-dialog'
 
 interface MarketplaceModule {
   id: string
@@ -45,14 +62,14 @@ const CATEGORY_ICONS = {
   INTEGRATION: Zap,
   QUALITY: Shield,
   MAINTENANCE: Wrench,
-  FINANCE: DollarSign
+  FINANCE: DollarSign,
 }
 
 // CATEGORY_LABELS sera remplacé par les traductions dans le composant
 
 export function MarketplaceCatalog() {
   const { t } = useTranslation('admin')
-  
+
   const getCategoryLabel = (category: string) => {
     const categoryLabels = {
       HR: t('marketplace.categories.hr'),
@@ -61,11 +78,11 @@ export function MarketplaceCatalog() {
       INTEGRATION: t('marketplace.categories.integration'),
       QUALITY: t('marketplace.categories.quality'),
       MAINTENANCE: t('marketplace.categories.maintenance'),
-      FINANCE: t('marketplace.categories.finance')
+      FINANCE: t('marketplace.categories.finance'),
     }
     return categoryLabels[category as keyof typeof categoryLabels] || category
   }
-  
+
   const [modules, setModules] = useState<MarketplaceModule[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -80,15 +97,14 @@ export function MarketplaceCatalog() {
       try {
         setLoading(true)
         const response = await callClientApi('admin/marketplace/modules')
-        
+
         if (!response.ok) {
           throw new Error(t('marketplace.loadingError'))
         }
-        
+
         const data = await response.json()
         setModules(data)
       } catch (err) {
-        console.error('Erreur lors du chargement des modules:', err)
         setError(err instanceof Error ? err.message : t('common.unknownError'))
         toast.error(t('marketplace.loadingErrorMessage'))
       } finally {
@@ -97,13 +113,14 @@ export function MarketplaceCatalog() {
     }
 
     fetchModules()
-  }, [])
+  }, [t])
 
-  const filteredModules = modules.filter(module => {
-    const matchesSearch = searchQuery === '' || 
+  const filteredModules = modules.filter((module) => {
+    const matchesSearch =
+      searchQuery === '' ||
       module.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       module.description.toLowerCase().includes(searchQuery.toLowerCase())
-    
+
     const matchesCategory = selectedCategory === 'all' || module.category === selectedCategory
 
     return matchesSearch && matchesCategory
@@ -120,9 +137,13 @@ export function MarketplaceCatalog() {
         return t('marketplace.installedModules.pricing.free')
       case 'ONE_TIME':
         return `${pricing.amount}${pricing.currency} (${t('marketplace.installedModules.pricing.oneTime')})`
-      case 'SUBSCRIPTION':
-        const period = pricing.period === 'YEAR' ? t('marketplace.installedModules.pricing.year') : t('marketplace.installedModules.pricing.month')
+      case 'SUBSCRIPTION': {
+        const period =
+          pricing.period === 'YEAR'
+            ? t('marketplace.installedModules.pricing.year')
+            : t('marketplace.installedModules.pricing.month')
         return `${pricing.amount}${pricing.currency}/${period}`
+      }
       case 'COMMISSION':
         return t('marketplace.installedModules.pricing.commission')
       case 'USAGE_BASED':
@@ -168,7 +189,7 @@ export function MarketplaceCatalog() {
             className="pl-10"
           />
         </div>
-        
+
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder={t('marketplace.allCategories')} />
@@ -190,8 +211,8 @@ export function MarketplaceCatalog() {
       {/* Grille des modules */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredModules.map((module) => (
-          <Card 
-            key={module.id} 
+          <Card
+            key={module.id}
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02]"
             onClick={() => handleModuleClick(module)}
           >
@@ -213,12 +234,12 @@ export function MarketplaceCatalog() {
                 )}
               </div>
             </CardHeader>
-            
+
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground line-clamp-2">
                 {module.shortDescription || module.description}
               </p>
-              
+
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1">
@@ -231,25 +252,21 @@ export function MarketplaceCatalog() {
                     <span>{module.downloadCount.toLocaleString()}</span>
                   </div>
                 </div>
-                
+
                 <Badge variant="outline" className="text-xs">
                   {getCategoryLabel(module.category)}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center justify-between pt-2 border-t">
-                <div className="font-medium text-sm">
-                  {formatPrice(module.pricing)}
-                </div>
-                
+                <div className="font-medium text-sm">{formatPrice(module.pricing)}</div>
+
                 {module.isInstalled ? (
                   <Button size="sm" variant="outline" disabled>
                     {t('marketplace.installed')}
                   </Button>
                 ) : (
-                  <Button size="sm">
-                    {t('marketplace.viewDetails')}
-                  </Button>
+                  <Button size="sm">{t('marketplace.viewDetails')}</Button>
                 )}
               </div>
             </CardContent>

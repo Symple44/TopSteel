@@ -1,52 +1,53 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { AdminGuard } from '@/components/auth/admin-guard'
-import { Role } from '@/hooks/use-permissions'
-import { callClientApi } from '@/utils/backend-api'
+// Disable static generation due to client-side hooks
+export const dynamic = 'force-dynamic'
+
 import {
+  Alert,
+  AlertDescription,
+  Avatar,
+  AvatarFallback,
+  Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Badge,
-  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Avatar,
-  AvatarFallback,
-  Alert,
-  AlertDescription
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@erp/ui'
-import { PermissionHide } from '@/components/auth/permission-guard'
-import { 
-  Users,
-  Monitor,
-  LogOut,
-  User,
-  Search,
-  RefreshCw,
-  Eye,
-  History,
-  MapPin,
+import {
+  AlertTriangle,
   Clock,
-  Shield,
-  AlertTriangle
+  History,
+  LogOut,
+  MapPin,
+  Monitor,
+  RefreshCw,
+  Search,
+  User,
+  Users,
 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { AdminGuard } from '@/components/auth/admin-guard'
+import { PermissionHide } from '@/components/auth/permission-guard'
+import type { Role } from '@/hooks/use-permissions'
+import { callClientApi } from '@/utils/backend-api'
 
 // Fonction utilitaire pour formater les dates
 const formatDateTime = (date: string | Date) => {
@@ -56,7 +57,7 @@ const formatDateTime = (date: string | Date) => {
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -64,10 +65,10 @@ const formatDuration = (start: string | Date) => {
   const now = new Date()
   const startTime = new Date(start)
   const diffMs = now.getTime() - startTime.getTime()
-  
+
   const hours = Math.floor(diffMs / (1000 * 60 * 60))
   const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
-  
+
   if (hours > 0) {
     return `${hours}h ${minutes}m`
   }
@@ -123,7 +124,7 @@ interface ConnectionHistory {
 
 export default function SessionsManagementPage() {
   return (
-    <AdminGuard 
+    <AdminGuard
       requiredRoles={['SUPER_ADMIN', 'ADMIN'] as Role[]}
       requiredPermissions={['SYSTEM_ADMIN']}
       showUnauthorized={true}
@@ -145,10 +146,31 @@ function SessionsManagementContent() {
   const [activeTab, setActiveTab] = useState<'online' | 'history'>('online')
   const [autoRefresh, setAutoRefresh] = useState(true)
 
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true)
+      const [onlineData, historyData] = await Promise.all([
+        callClientApi('admin/sessions/online'),
+        callClientApi('admin/sessions/history?limit=100'),
+      ])
+
+      if ((onlineData as { success?: boolean; data?: OnlineUser[] }).success) {
+        setOnlineUsers((onlineData as { data: OnlineUser[] }).data)
+      }
+
+      if ((historyData as { success?: boolean; data?: ConnectionHistoryEntry[] }).success) {
+        setConnectionHistory((historyData as { data: ConnectionHistoryEntry[] }).data)
+      }
+    } catch (_error) {
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   // Charger les données
   useEffect(() => {
     loadData()
-    
+
     // Auto-refresh toutes les 30 secondes
     const interval = setInterval(() => {
       if (autoRefresh) {
@@ -157,39 +179,19 @@ function SessionsManagementContent() {
     }, 30000)
 
     return () => clearInterval(interval)
-  }, [autoRefresh])
-
-  const loadData = async () => {
-    try {
-      setLoading(true)
-      const [onlineData, historyData] = await Promise.all([
-        callClientApi('admin/sessions/online'),
-        callClientApi('admin/sessions/history?limit=100')
-      ])
-
-      if (onlineData.success) {
-        setOnlineUsers(onlineData.data)
-      }
-      
-      if (historyData.success) {
-        setConnectionHistory(historyData.data)
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des sessions:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [autoRefresh, loadData])
 
   // Filtrer les utilisateurs en ligne
-  const filteredOnlineUsers = onlineUsers.filter(user => {
-    const matchesSearch = searchTerm === '' || 
+  const filteredOnlineUsers = onlineUsers.filter((user) => {
+    const matchesSearch =
+      searchTerm === '' ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
-    
+
     const matchesRole = filterRole === 'all' || user.role === filterRole
-    
-    const matchesStatus = filterStatus === 'all' ||
+
+    const matchesStatus =
+      filterStatus === 'all' ||
       (filterStatus === 'active' && !user.isIdle) ||
       (filterStatus === 'idle' && user.isIdle) ||
       (filterStatus === 'warning' && user.warningCount > 0)
@@ -205,15 +207,13 @@ function SessionsManagementContent() {
     try {
       const response = await callClientApi('admin/sessions/disconnect', {
         method: 'POST',
-        body: JSON.stringify({ sessionId, userId })
+        body: JSON.stringify({ sessionId, userId }),
       })
 
-      if (response.success) {
+      if ((response as { success?: boolean }).success) {
         loadData() // Recharger les données
       }
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleViewProfile = (user: OnlineUser) => {
@@ -248,8 +248,8 @@ function SessionsManagementContent() {
           </p>
         </div>
         <div className="flex space-x-2">
-          <Button 
-            variant={autoRefresh ? "default" : "outline"} 
+          <Button
+            variant={autoRefresh ? 'default' : 'outline'}
             onClick={() => setAutoRefresh(!autoRefresh)}
             size="sm"
           >
@@ -280,7 +280,7 @@ function SessionsManagementContent() {
               <Users className="h-5 w-5 text-blue-600" />
               <h3 className="text-sm font-medium text-muted-foreground">Actifs</h3>
             </div>
-            <p className="text-2xl font-bold mt-2">{onlineUsers.filter(u => !u.isIdle).length}</p>
+            <p className="text-2xl font-bold mt-2">{onlineUsers.filter((u) => !u.isIdle).length}</p>
           </CardContent>
         </Card>
         <Card>
@@ -289,7 +289,7 @@ function SessionsManagementContent() {
               <Clock className="h-5 w-5 text-orange-600" />
               <h3 className="text-sm font-medium text-muted-foreground">Inactifs</h3>
             </div>
-            <p className="text-2xl font-bold mt-2">{onlineUsers.filter(u => u.isIdle).length}</p>
+            <p className="text-2xl font-bold mt-2">{onlineUsers.filter((u) => u.isIdle).length}</p>
           </CardContent>
         </Card>
         <Card>
@@ -298,7 +298,9 @@ function SessionsManagementContent() {
               <AlertTriangle className="h-5 w-5 text-red-600" />
               <h3 className="text-sm font-medium text-muted-foreground">Alertes</h3>
             </div>
-            <p className="text-2xl font-bold mt-2">{onlineUsers.filter(u => u.warningCount > 0).length}</p>
+            <p className="text-2xl font-bold mt-2">
+              {onlineUsers.filter((u) => u.warningCount > 0).length}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -335,7 +337,9 @@ function SessionsManagementContent() {
                     <Input
                       placeholder="Rechercher par nom ou email..."
                       value={searchTerm}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setSearchTerm(e.target.value)
+                      }
                       className="pl-10"
                     />
                   </div>
@@ -391,39 +395,42 @@ function SessionsManagementContent() {
                         <div className="flex items-center space-x-3">
                           <Avatar>
                             <AvatarFallback>
-                              {user.firstName[0]}{user.lastName[0]}
+                              {user.firstName[0]}
+                              {user.lastName[0]}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{user.firstName} {user.lastName}</p>
+                            <p className="font-medium">
+                              {user.firstName} {user.lastName}
+                            </p>
                             <p className="text-sm text-muted-foreground">{user.email}</p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">
-                          {user.role}
-                        </Badge>
+                        <Badge variant="outline">{user.role}</Badge>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
                           <p>{formatDateTime(user.loginTime)}</p>
-                          <p className="text-muted-foreground">Durée: {formatDuration(user.loginTime)}</p>
+                          <p className="text-muted-foreground">
+                            Durée: {formatDuration(user.loginTime)}
+                          </p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
                           <p>Dernière: {formatDateTime(user.lastActivity)}</p>
-                          <p className="text-muted-foreground">
-                            IP: {user.ipAddress}
-                          </p>
+                          <p className="text-muted-foreground">IP: {user.ipAddress}</p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm flex items-center">
                           <MapPin className="h-3 w-3 mr-1" />
                           {user.location ? (
-                            <span>{user.location.city}, {user.location.country}</span>
+                            <span>
+                              {user.location.city}, {user.location.country}
+                            </span>
                           ) : (
                             <span className="text-muted-foreground">Non déterminée</span>
                           )}
@@ -437,9 +444,13 @@ function SessionsManagementContent() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <Badge 
+                          <Badge
                             variant={user.isIdle ? 'secondary' : 'default'}
-                            className={user.isIdle ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}
+                            className={
+                              user.isIdle
+                                ? 'bg-orange-100 text-orange-800'
+                                : 'bg-green-100 text-green-800'
+                            }
                           >
                             {user.isIdle ? 'Inactif' : 'Actif'}
                           </Badge>
@@ -520,11 +531,14 @@ function SessionsManagementContent() {
                       <div className="flex items-center space-x-3">
                         <Avatar>
                           <AvatarFallback>
-                            {session.firstName[0]}{session.lastName[0]}
+                            {session.firstName[0]}
+                            {session.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{session.firstName} {session.lastName}</p>
+                          <p className="font-medium">
+                            {session.firstName} {session.lastName}
+                          </p>
                           <p className="text-sm text-muted-foreground">{session.email}</p>
                         </div>
                       </div>
@@ -539,17 +553,22 @@ function SessionsManagementContent() {
                       {session.logoutTime ? (
                         <span className="text-sm">{formatDateTime(session.logoutTime)}</span>
                       ) : (
-                        <Badge variant="default" className="bg-green-100 text-green-800">En cours</Badge>
+                        <Badge variant="default" className="bg-green-100 text-green-800">
+                          En cours
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell>
-                      {session.duration || (session.status === 'active' ? formatDuration(session.loginTime) : '-')}
+                      {session.duration ||
+                        (session.status === 'active' ? formatDuration(session.loginTime) : '-')}
                     </TableCell>
                     <TableCell>
                       <div className="text-sm flex items-center">
                         <MapPin className="h-3 w-3 mr-1" />
                         {session.location ? (
-                          <span>{session.location.city}, {session.location.country}</span>
+                          <span>
+                            {session.location.city}, {session.location.country}
+                          </span>
                         ) : (
                           <span className="text-muted-foreground">Non déterminée</span>
                         )}
@@ -562,14 +581,20 @@ function SessionsManagementContent() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant={
-                          session.status === 'active' ? 'default' :
-                          session.status === 'forced_logout' ? 'destructive' : 'secondary'
+                          session.status === 'active'
+                            ? 'default'
+                            : session.status === 'forced_logout'
+                              ? 'destructive'
+                              : 'secondary'
                         }
                       >
-                        {session.status === 'active' ? 'Actif' :
-                         session.status === 'forced_logout' ? 'Déconnexion forcée' : 'Terminé'}
+                        {session.status === 'active'
+                          ? 'Actif'
+                          : session.status === 'forced_logout'
+                            ? 'Déconnexion forcée'
+                            : 'Terminé'}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -586,7 +611,9 @@ function SessionsManagementContent() {
           {selectedUser && (
             <>
               <DialogHeader>
-                <DialogTitle>Historique de connexion - {selectedUser.firstName} {selectedUser.lastName}</DialogTitle>
+                <DialogTitle>
+                  Historique de connexion - {selectedUser.firstName} {selectedUser.lastName}
+                </DialogTitle>
               </DialogHeader>
               <UserConnectionHistory userId={selectedUser.userId} />
             </>
@@ -602,22 +629,22 @@ function UserConnectionHistory({ userId }: { userId: string }) {
   const [history, setHistory] = useState<ConnectionHistory[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadUserHistory()
-  }, [userId])
-
-  const loadUserHistory = async () => {
+  const loadUserHistory = useCallback(async () => {
     try {
-      const data = await callClientApi(`admin/sessions/user/${userId}/history`)
+      const response = await callClientApi(`admin/sessions/user/${userId}/history`)
+      const data = await response.json()
       if (data.success) {
         setHistory(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement de l\'historique:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [userId])
+
+  useEffect(() => {
+    loadUserHistory()
+  }, [loadUserHistory])
 
   if (loading) {
     return <div className="text-center py-4">Chargement de l'historique...</div>
@@ -637,11 +664,13 @@ function UserConnectionHistory({ userId }: { userId: string }) {
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">Cette semaine</div>
             <div className="text-2xl font-bold">
-              {history.filter(h => {
-                const weekAgo = new Date()
-                weekAgo.setDate(weekAgo.getDate() - 7)
-                return new Date(h.loginTime) > weekAgo
-              }).length}
+              {
+                history.filter((h) => {
+                  const weekAgo = new Date()
+                  weekAgo.setDate(weekAgo.getDate() - 7)
+                  return new Date(h.loginTime) > weekAgo
+                }).length
+              }
             </div>
           </CardContent>
         </Card>
@@ -649,19 +678,19 @@ function UserConnectionHistory({ userId }: { userId: string }) {
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">Déconnexions forcées</div>
             <div className="text-2xl font-bold text-red-600">
-              {history.filter(h => h.status === 'forced_logout').length}
+              {history.filter((h) => h.status === 'forced_logout').length}
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Alerte si déconnexions suspectes */}
-      {history.filter(h => h.status === 'forced_logout').length > 3 && (
+      {history.filter((h) => h.status === 'forced_logout').length > 3 && (
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            Cet utilisateur a subi plusieurs déconnexions forcées récemment. 
-            Cela pourrait indiquer un problème de sécurité.
+            Cet utilisateur a subi plusieurs déconnexions forcées récemment. Cela pourrait indiquer
+            un problème de sécurité.
           </AlertDescription>
         </Alert>
       )}
@@ -672,22 +701,26 @@ function UserConnectionHistory({ userId }: { userId: string }) {
           <div key={session.id} className="flex items-center justify-between p-3 border rounded-lg">
             <div className="flex-1">
               <div className="flex items-center space-x-2">
-                <div className="text-sm font-medium">
-                  {formatDateTime(session.loginTime)}
-                </div>
-                <Badge 
+                <div className="text-sm font-medium">{formatDateTime(session.loginTime)}</div>
+                <Badge
                   variant={
-                    session.status === 'active' ? 'default' :
-                    session.status === 'forced_logout' ? 'destructive' : 'secondary'
+                    session.status === 'active'
+                      ? 'default'
+                      : session.status === 'forced_logout'
+                        ? 'destructive'
+                        : 'secondary'
                   }
                   className="text-xs"
                 >
-                  {session.status === 'active' ? 'En cours' :
-                   session.status === 'forced_logout' ? 'Forcée' : 'Normale'}
+                  {session.status === 'active'
+                    ? 'En cours'
+                    : session.status === 'forced_logout'
+                      ? 'Forcée'
+                      : 'Normale'}
                 </Badge>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                IP: {session.ipAddress} • 
+                IP: {session.ipAddress} •
                 {session.location && ` ${session.location.city}, ${session.location.country} • `}
                 {session.deviceInfo.browser} ({session.deviceInfo.os})
                 {session.duration && ` • Durée: ${session.duration}`}

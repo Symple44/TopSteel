@@ -15,20 +15,16 @@ export async function GET() {
       credentials: {
         email: 'admin@topsteel.tech',
         password: 'TopSteel44!',
-        role: 'ADMIN'
-      }
+        role: 'ADMIN',
+      },
     },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   }
 
-  // Log au démarrage
-  console.log(`   Frontend: ${config.frontend.url}`)
-  console.log(`   Backend: ${config.backend.url}`)
-  
-  return NextResponse.json(config, { 
+  return NextResponse.json(config, {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
-    }
+    },
   })
 }

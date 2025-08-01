@@ -1,20 +1,18 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Badge } from '@erp/ui'
-import { 
-  AlertTriangle, 
-  AlertCircle, 
-  CheckCircle2, 
-  Info,
-  X,
+import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import {
+  AlertCircle,
+  AlertTriangle,
   Bell,
   BellOff,
+  CheckCircle2,
   Clock,
-  Database
+  Database,
+  Info,
+  X,
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface SystemAlert {
   id: string
@@ -34,10 +32,10 @@ interface SystemAlertsPanelProps {
   autoRefresh?: boolean
 }
 
-export default function SystemAlertsPanel({ 
-  alerts = [], 
+export default function SystemAlertsPanel({
+  alerts = [],
   maxAlerts = 10,
-  autoRefresh = true 
+  autoRefresh = true,
 }: SystemAlertsPanelProps) {
   const [currentAlerts, setCurrentAlerts] = useState<SystemAlert[]>([])
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true)
@@ -50,63 +48,76 @@ export default function SystemAlertsPanel({
 
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case 'error': return <AlertTriangle className="w-4 h-4 text-red-600" />
-      case 'warning': return <AlertCircle className="w-4 h-4 text-yellow-600" />
-      case 'success': return <CheckCircle2 className="w-4 h-4 text-green-600" />
-      case 'info': return <Info className="w-4 h-4 text-blue-600" />
-      default: return <Info className="w-4 h-4 text-gray-600" />
+      case 'error':
+        return <AlertTriangle className="w-4 h-4 text-red-600" />
+      case 'warning':
+        return <AlertCircle className="w-4 h-4 text-yellow-600" />
+      case 'success':
+        return <CheckCircle2 className="w-4 h-4 text-green-600" />
+      case 'info':
+        return <Info className="w-4 h-4 text-blue-600" />
+      default:
+        return <Info className="w-4 h-4 text-gray-600" />
     }
   }
 
   const getAlertBadgeVariant = (type: string) => {
     switch (type) {
-      case 'error': return 'destructive'
-      case 'warning': return 'warning'
-      case 'success': return 'success'
-      case 'info': return 'default'
-      default: return 'secondary'
+      case 'error':
+        return 'destructive'
+      case 'warning':
+        return 'warning'
+      case 'success':
+        return 'success'
+      case 'info':
+        return 'default'
+      default:
+        return 'secondary'
     }
   }
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'border-l-red-600'
-      case 'high': return 'border-l-red-400'
-      case 'medium': return 'border-l-yellow-400'
-      case 'low': return 'border-l-blue-400'
-      default: return 'border-l-gray-400'
+      case 'critical':
+        return 'border-l-red-600'
+      case 'high':
+        return 'border-l-red-400'
+      case 'medium':
+        return 'border-l-yellow-400'
+      case 'low':
+        return 'border-l-blue-400'
+      default:
+        return 'border-l-gray-400'
     }
   }
 
-  const getSourceIcon = (source: string) => {
+  const getSourceIcon = (_source: string) => {
     return <Database className="w-3 h-3" />
   }
 
   const markAsRead = (alertId: string) => {
-    setCurrentAlerts(prev => 
-      prev.map(alert => 
-        alert.id === alertId ? { ...alert, isRead: true } : alert
-      )
+    setCurrentAlerts((prev) =>
+      prev.map((alert) => (alert.id === alertId ? { ...alert, isRead: true } : alert))
     )
   }
 
   const dismissAlert = (alertId: string) => {
-    setCurrentAlerts(prev => prev.filter(alert => alert.id !== alertId))
+    setCurrentAlerts((prev) => prev.filter((alert) => alert.id !== alertId))
   }
 
   const markAllAsRead = () => {
-    setCurrentAlerts(prev => prev.map(alert => ({ ...alert, isRead: true })))
+    setCurrentAlerts((prev) => prev.map((alert) => ({ ...alert, isRead: true })))
   }
 
   const clearAllAlerts = () => {
     setCurrentAlerts([])
   }
 
-  const filteredAlerts = currentAlerts.filter(alert => 
-    selectedFilter === 'all' || alert.type === selectedFilter
+  const filteredAlerts = currentAlerts.filter(
+    (alert) => selectedFilter === 'all' || alert.type === selectedFilter
   )
 
-  const unreadCount = currentAlerts.filter(alert => !alert.isRead).length
+  const unreadCount = currentAlerts.filter((alert) => !alert.isRead).length
 
   return (
     <Card className="w-full">
@@ -122,9 +133,7 @@ export default function SystemAlertsPanel({
                 </Badge>
               )}
             </CardTitle>
-            <CardDescription>
-              Monitoring des événements et alertes du système
-            </CardDescription>
+            <CardDescription>Monitoring des événements et alertes du système</CardDescription>
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -132,10 +141,11 @@ export default function SystemAlertsPanel({
               variant="outline"
               onClick={() => setIsNotificationsEnabled(!isNotificationsEnabled)}
             >
-              {isNotificationsEnabled ? 
-                <Bell className="w-4 h-4" /> : 
+              {isNotificationsEnabled ? (
+                <Bell className="w-4 h-4" />
+              ) : (
                 <BellOff className="w-4 h-4" />
-              }
+              )}
             </Button>
             <Button size="sm" variant="outline" onClick={markAllAsRead}>
               Marquer tout lu
@@ -164,7 +174,7 @@ export default function SystemAlertsPanel({
               {filter === 'info' && 'Informations'}
               {filter !== 'all' && (
                 <span className="ml-1">
-                  ({currentAlerts.filter(a => a.type === filter).length})
+                  ({currentAlerts.filter((a) => a.type === filter).length})
                 </span>
               )}
             </Button>
@@ -181,24 +191,27 @@ export default function SystemAlertsPanel({
             </div>
           ) : (
             filteredAlerts.map((alert) => (
-              <div 
-                key={alert.id} 
+              <div
+                key={alert.id}
                 className={`flex items-start space-x-3 p-3 border-l-4 rounded-lg ${getSeverityColor(alert.severity)} ${
                   alert.isRead ? 'bg-muted/50' : 'bg-background'
                 } hover:bg-muted/30 transition-colors`}
               >
-                <div className="flex-shrink-0 mt-1">
-                  {getAlertIcon(alert.type)}
-                </div>
-                
+                <div className="flex-shrink-0 mt-1">{getAlertIcon(alert.type)}</div>
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <h4 className={`text-sm font-medium ${alert.isRead ? 'text-muted-foreground' : ''}`}>
+                        <h4
+                          className={`text-sm font-medium ${alert.isRead ? 'text-muted-foreground' : ''}`}
+                        >
                           {alert.title}
                         </h4>
-                        <Badge variant={getAlertBadgeVariant(alert.type) as any} className="text-xs">
+                        <Badge
+                          variant={getAlertBadgeVariant(alert.type) as any}
+                          className="text-xs"
+                        >
                           {alert.type}
                         </Badge>
                         <div className="flex items-center space-x-1 text-xs text-muted-foreground">
@@ -206,7 +219,9 @@ export default function SystemAlertsPanel({
                           <span>{alert.source.toUpperCase()}</span>
                         </div>
                       </div>
-                      <p className={`text-sm ${alert.isRead ? 'text-muted-foreground' : 'text-foreground'}`}>
+                      <p
+                        className={`text-sm ${alert.isRead ? 'text-muted-foreground' : 'text-foreground'}`}
+                      >
                         {alert.message}
                       </p>
                       <div className="flex items-center space-x-2 text-xs text-muted-foreground">
@@ -217,7 +232,7 @@ export default function SystemAlertsPanel({
                         </Badge>
                       </div>
                     </div>
-                    
+
                     <div className="flex space-x-1">
                       {!alert.isRead && (
                         <Button

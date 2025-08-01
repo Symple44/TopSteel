@@ -1,26 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Badge } from '@erp/ui'
-import { 
-  Server, 
-  Wifi, 
-  WifiOff, 
-  Eye, 
-  Trash2,
-  RefreshCw,
-  Plus,
-  Settings,
+import { Badge, Button, Card, CardContent } from '@erp/ui'
+import {
   Activity,
-  Clock,
-  Database,
   AlertTriangle,
   CheckCircle2,
+  Clock,
+  Database,
+  Eye,
+  HardDrive,
+  Plus,
+  RefreshCw,
+  Server,
+  Settings,
+  Trash2,
   Users,
-  HardDrive
+  Wifi,
+  WifiOff,
 } from 'lucide-react'
+import { useState } from 'react'
 
 interface ConnectionInfo {
   tenant: string
@@ -47,35 +45,63 @@ export default function ConnectionManagementPanel({
   onViewDetails,
   onCloseConnection,
   onRefresh,
-  isLoading = false
+  isLoading = false,
 }: ConnectionManagementPanelProps) {
   const [selectedConnection, setSelectedConnection] = useState<string>('')
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
+  const [_viewMode, _setViewMode] = useState<'list' | 'grid'>('list')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'idle' | 'error'>('all')
 
   const getStatusIcon = (connection: ConnectionInfo) => {
     if (!connection.isInitialized) {
       return <WifiOff className="w-4 h-4 text-red-600" />
     }
-    
+
     switch (connection.status) {
-      case 'active': return <Wifi className="w-4 h-4 text-green-600" />
-      case 'idle': return <Wifi className="w-4 h-4 text-yellow-600" />
-      case 'error': return <WifiOff className="w-4 h-4 text-red-600" />
-      default: return <Wifi className="w-4 h-4 text-blue-600" />
+      case 'active':
+        return <Wifi className="w-4 h-4 text-green-600" />
+      case 'idle':
+        return <Wifi className="w-4 h-4 text-yellow-600" />
+      case 'error':
+        return <WifiOff className="w-4 h-4 text-red-600" />
+      default:
+        return <Wifi className="w-4 h-4 text-blue-600" />
     }
   }
 
   const getStatusBadge = (connection: ConnectionInfo) => {
     if (!connection.isInitialized) {
-      return <Badge variant="destructive" className="text-xs">Non initialisée</Badge>
+      return (
+        <Badge variant="destructive" className="text-xs">
+          Non initialisée
+        </Badge>
+      )
     }
-    
+
     switch (connection.status) {
-      case 'active': return <Badge variant="success" className="text-xs">Active</Badge>
-      case 'idle': return <Badge variant="warning" className="text-xs">Inactive</Badge>
-      case 'error': return <Badge variant="destructive" className="text-xs">Erreur</Badge>
-      default: return <Badge variant="default" className="text-xs">Connectée</Badge>
+      case 'active':
+        return (
+          <Badge variant="success" className="text-xs">
+            Active
+          </Badge>
+        )
+      case 'idle':
+        return (
+          <Badge variant="warning" className="text-xs">
+            Inactive
+          </Badge>
+        )
+      case 'error':
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Erreur
+          </Badge>
+        )
+      default:
+        return (
+          <Badge variant="default" className="text-xs">
+            Connectée
+          </Badge>
+        )
     }
   }
 
@@ -88,18 +114,18 @@ export default function ConnectionManagementPanel({
 
   const formatDuration = (dateString?: string) => {
     if (!dateString) return 'N/A'
-    
+
     const diff = Date.now() - new Date(dateString).getTime()
     const minutes = Math.floor(diff / 60000)
     const hours = Math.floor(minutes / 60)
     const days = Math.floor(hours / 24)
-    
+
     if (days > 0) return `${days}j ${hours % 24}h`
     if (hours > 0) return `${hours}h ${minutes % 60}m`
     return `${minutes}m`
   }
 
-  const filteredConnections = connections.filter(conn => {
+  const filteredConnections = connections.filter((conn) => {
     if (filterStatus === 'all') return true
     if (filterStatus === 'active') return conn.isInitialized && conn.status === 'active'
     if (filterStatus === 'idle') return conn.isInitialized && conn.status === 'idle'
@@ -121,9 +147,8 @@ export default function ConnectionManagementPanel({
           <h3 className="text-lg font-semibold">Gestion des Connexions</h3>
           <p className="text-sm text-muted-foreground">
             {connections.length} connexion{connections.length !== 1 ? 's' : ''} tenant
-            {filteredConnections.length !== connections.length && 
-              ` (${filteredConnections.length} affiché${filteredConnections.length !== 1 ? 's' : ''})`
-            }
+            {filteredConnections.length !== connections.length &&
+              ` (${filteredConnections.length} affiché${filteredConnections.length !== 1 ? 's' : ''})`}
           </p>
         </div>
         <div className="flex items-center space-x-2">
@@ -141,23 +166,24 @@ export default function ConnectionManagementPanel({
                 {filter === 'idle' && 'Inactives'}
                 {filter === 'error' && 'Erreurs'}
                 <span className="ml-1">
-                  ({filter === 'all' ? connections.length : 
-                    connections.filter(c => 
-                      filter === 'active' ? c.isInitialized && c.status === 'active' :
-                      filter === 'idle' ? c.isInitialized && c.status === 'idle' :
-                      filter === 'error' ? !c.isInitialized || c.status === 'error' : true
-                    ).length
-                  })
+                  (
+                  {filter === 'all'
+                    ? connections.length
+                    : connections.filter((c) =>
+                        filter === 'active'
+                          ? c.isInitialized && c.status === 'active'
+                          : filter === 'idle'
+                            ? c.isInitialized && c.status === 'idle'
+                            : filter === 'error'
+                              ? !c.isInitialized || c.status === 'error'
+                              : true
+                      ).length}
+                  )
                 </span>
               </Button>
             ))}
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onRefresh}
-            disabled={isLoading}
-          >
+          <Button size="sm" variant="outline" onClick={onRefresh} disabled={isLoading}>
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
@@ -171,7 +197,7 @@ export default function ConnectionManagementPanel({
               <Server className="w-4 h-4 text-blue-600" />
               <div>
                 <div className="text-2xl font-bold">
-                  {connections.filter(c => c.isInitialized).length}
+                  {connections.filter((c) => c.isInitialized).length}
                 </div>
                 <div className="text-xs text-muted-foreground">Initialisées</div>
               </div>
@@ -185,7 +211,7 @@ export default function ConnectionManagementPanel({
               <Activity className="w-4 h-4 text-green-600" />
               <div>
                 <div className="text-2xl font-bold">
-                  {connections.filter(c => c.status === 'active').length}
+                  {connections.filter((c) => c.status === 'active').length}
                 </div>
                 <div className="text-xs text-muted-foreground">Actives</div>
               </div>
@@ -226,16 +252,19 @@ export default function ConnectionManagementPanel({
       {filteredConnections.length > 0 ? (
         <div className="space-y-3">
           {filteredConnections.map((connection, index) => (
-            <Card key={index} className={`hover:shadow-md transition-shadow ${
-              selectedConnection === connection.tenant ? 'ring-2 ring-blue-500' : ''
-            }`}>
+            <Card
+              key={index}
+              className={`hover:shadow-md transition-shadow ${
+                selectedConnection === connection.tenant ? 'ring-2 ring-blue-500' : ''
+              }`}
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
                       <Database className="w-5 h-5 text-blue-600" />
                     </div>
-                    
+
                     <div className="space-y-1">
                       <div className="flex items-center space-x-3">
                         <h4 className="font-semibold">
@@ -249,7 +278,7 @@ export default function ConnectionManagementPanel({
                         {getStatusIcon(connection)}
                         {getStatusBadge(connection)}
                       </div>
-                      
+
                       <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                         {connection.createdAt && (
                           <span className="flex items-center space-x-1">
@@ -257,7 +286,7 @@ export default function ConnectionManagementPanel({
                             <span>Créé: {formatDuration(connection.createdAt)}</span>
                           </span>
                         )}
-                        
+
                         {connection.lastActivity && (
                           <span className="flex items-center space-x-1">
                             <Activity className="w-3 h-3" />
@@ -273,22 +302,26 @@ export default function ConnectionManagementPanel({
                     <div className="hidden md:flex items-center space-x-4 text-sm">
                       {connection.queryCount !== undefined && (
                         <div className="text-center">
-                          <div className={`font-mono ${getStatsColor(connection.queryCount, 1000)}`}>
+                          <div
+                            className={`font-mono ${getStatsColor(connection.queryCount, 1000)}`}
+                          >
                             {connection.queryCount}
                           </div>
                           <div className="text-xs text-muted-foreground">Requêtes</div>
                         </div>
                       )}
-                      
+
                       {connection.activeQueries !== undefined && (
                         <div className="text-center">
-                          <div className={`font-mono ${getStatsColor(connection.activeQueries, 10)}`}>
+                          <div
+                            className={`font-mono ${getStatsColor(connection.activeQueries, 10)}`}
+                          >
                             {connection.activeQueries}
                           </div>
                           <div className="text-xs text-muted-foreground">Actives</div>
                         </div>
                       )}
-                      
+
                       {connection.poolSize !== undefined && (
                         <div className="text-center">
                           <div className={`font-mono ${getStatsColor(connection.poolSize, 20)}`}>
@@ -313,7 +346,7 @@ export default function ConnectionManagementPanel({
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
-                      
+
                       <Button
                         size="sm"
                         variant="outline"
@@ -384,10 +417,9 @@ export default function ConnectionManagementPanel({
           <CardContent className="text-center py-12">
             <Server className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">
-              {connections.length === 0 ? 
-                'Aucune connexion tenant active' : 
-                'Aucune connexion ne correspond aux filtres'
-              }
+              {connections.length === 0
+                ? 'Aucune connexion tenant active'
+                : 'Aucune connexion ne correspond aux filtres'}
             </p>
             {connections.length === 0 && (
               <Button size="sm" className="mt-4">

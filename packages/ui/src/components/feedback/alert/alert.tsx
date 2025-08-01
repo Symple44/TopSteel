@@ -8,9 +8,9 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       default: 'bg-background text-foreground border-border',
       destructive: 'bg-destructive/15 text-destructive border-destructive/30',
       warning: 'bg-yellow-50 text-yellow-800 border-yellow-200',
-      success: 'bg-green-50 text-green-800 border-green-200'
+      success: 'bg-green-50 text-green-800 border-green-200',
     }
-    
+
     return (
       <div
         ref={ref}

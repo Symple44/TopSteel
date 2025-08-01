@@ -62,32 +62,32 @@ export interface Quote extends BaseEntity {
   readonly reference?: string
   readonly type: QuoteType
   readonly statut: QuoteStatut
-  
+
   // Relations
   readonly clientId: string
   readonly projetId?: string
   readonly commercialId: string
-  
+
   // Contenu
   readonly objet: string
   readonly description?: string
   readonly items: QuoteItem[]
-  
+
   // Financier
   readonly totals: QuoteTotals
   readonly tauxTVA: number
   readonly devise: string
-  
+
   // Conditions
   readonly terms: QuoteTerms
   readonly notes?: string
-  
+
   // Dates
   readonly dateCreation: Date
   readonly dateEnvoi?: Date
   readonly dateValidite: Date
   readonly dateReponse?: Date
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date

@@ -1,15 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { callClientApi } from '@/utils/backend-api'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Badge,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -17,44 +15,33 @@ import {
   DialogTrigger,
   Input,
   Label,
-  Textarea,
   Switch,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Separator
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Textarea,
 } from '@erp/ui'
-import { PermissionHide } from '@/components/auth/permission-guard'
-import { 
-  Plus, 
-  Edit, 
-  Trash2,
-  Shield,
-  Users,
-  Settings,
-  Eye,
-  Lock,
-  Unlock,
-  Info
-} from 'lucide-react'
-import { 
-  Role, 
-  Module, 
-  Permission,
-  AccessLevel,
-  ACCESS_LEVEL_LABELS,
-  ACCESS_LEVEL_COLORS,
-  MODULE_CATEGORY_LABELS,
-  MODULE_CATEGORY_COLORS
-} from '@/types/permissions'
+import { Edit, Eye, Lock, Plus, Settings, Shield, Trash2, Users } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import GroupManagementPanel from '@/components/admin/group-management-panel'
+import { PermissionHide } from '@/components/auth/permission-guard'
+import {
+  ACCESS_LEVEL_COLORS,
+  ACCESS_LEVEL_LABELS,
+  type AccessLevel,
+  MODULE_CATEGORY_COLORS,
+  MODULE_CATEGORY_LABELS,
+  type Module,
+  type Role,
+} from '@/types/permissions'
+import { callClientApi } from '@/utils/backend-api'
 
 interface RoleWithStats extends Role {
   userCount?: number
@@ -72,13 +59,7 @@ export default function RoleManagementPanel() {
   const [activeTab, setActiveTab] = useState('roles')
   const [loading, setLoading] = useState(true)
 
-  // Charger les données initiales
-  useEffect(() => {
-    loadRoles()
-    loadModules()
-  }, [])
-
-  const loadRoles = async () => {
+  const loadRoles = useCallback(async () => {
     try {
       const response = await callClientApi('admin/roles')
       const data = await response.json()
@@ -88,28 +69,31 @@ export default function RoleManagementPanel() {
           ...role,
           userCount: Math.floor(Math.random() * 20) + 1,
           moduleCount: Math.floor(Math.random() * 10) + 3,
-          permissionCount: Math.floor(Math.random() * 30) + 10
+          permissionCount: Math.floor(Math.random() * 30) + 10,
         }))
         setRoles(rolesWithStats)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des rôles:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const loadModules = async () => {
+  const loadModules = useCallback(async () => {
     try {
       const response = await callClientApi('admin/modules?includePermissions=true')
       const data = await response.json()
       if (data.success) {
         setModules(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des modules:', error)
-    }
-  }
+    } catch (_error) {}
+  }, [])
+
+  // Charger les données initiales
+  useEffect(() => {
+    loadRoles()
+    loadModules()
+  }, [loadModules, loadRoles])
 
   const handleDeleteRole = async (roleId: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce rôle ?')) {
@@ -118,15 +102,13 @@ export default function RoleManagementPanel() {
 
     try {
       const response = await callClientApi(`admin/roles?id=${roleId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
-      
+
       if (response.ok) {
         loadRoles()
       }
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
-    }
+    } catch (_error) {}
   }
 
   const openPermissionDialog = (role: RoleWithStats) => {
@@ -167,11 +149,11 @@ export default function RoleManagementPanel() {
               <DialogHeader>
                 <DialogTitle>Créer un nouveau rôle</DialogTitle>
               </DialogHeader>
-              <RoleForm 
+              <RoleForm
                 onSave={() => {
                   setIsCreateDialogOpen(false)
                   loadRoles()
-                }} 
+                }}
               />
             </DialogContent>
           </Dialog>
@@ -205,7 +187,7 @@ export default function RoleManagementPanel() {
                               Système
                             </Badge>
                           )}
-                          <Badge variant={role.isActive ? "default" : "secondary"}>
+                          <Badge variant={role.isActive ? 'default' : 'secondary'}>
                             {role.isActive ? 'Actif' : 'Inactif'}
                           </Badge>
                         </div>
@@ -285,12 +267,12 @@ export default function RoleManagementPanel() {
           <DialogHeader>
             <DialogTitle>Modifier le rôle: {selectedRole?.name}</DialogTitle>
           </DialogHeader>
-          <RoleForm 
+          <RoleForm
             role={selectedRole}
             onSave={() => {
               setIsEditDialogOpen(false)
               loadRoles()
-            }} 
+            }}
           />
         </DialogContent>
       </Dialog>
@@ -301,13 +283,13 @@ export default function RoleManagementPanel() {
           <DialogHeader>
             <DialogTitle>Permissions du rôle: {selectedRole?.name}</DialogTitle>
           </DialogHeader>
-          <PermissionEditor 
+          <PermissionEditor
             role={selectedRole}
             modules={modules}
             onSave={() => {
               setIsPermissionDialogOpen(false)
               loadRoles()
-            }} 
+            }}
           />
         </DialogContent>
       </Dialog>
@@ -316,31 +298,29 @@ export default function RoleManagementPanel() {
 }
 
 // Composant pour créer/éditer un rôle
-function RoleForm({ role, onSave }: { role?: RoleWithStats | null, onSave: () => void }) {
+function RoleForm({ role, onSave }: { role?: RoleWithStats | null; onSave: () => void }) {
   const [formData, setFormData] = useState({
     name: role?.name || '',
     description: role?.description || '',
-    isActive: role?.isActive ?? true
+    isActive: role?.isActive ?? true,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     try {
       const method = role ? 'PUT' : 'POST'
       const body = role ? { id: role.id, ...formData } : formData
-      
+
       const response = await callClientApi('admin/roles', {
         method,
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       })
-      
+
       if (response.ok) {
         onSave()
       }
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-    }
+    } catch (_error) {}
   }
 
   return (
@@ -350,39 +330,43 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null, onSave: () =>
         <Input
           id="name"
           value={formData.name}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setFormData((prev) => ({ ...prev, name: e.target.value }))
+          }
           placeholder="Ex: Deviseur, Superviseur..."
           required
         />
       </div>
-      
+
       <div>
         <Label htmlFor="description">Description</Label>
         <Textarea
           id="description"
           value={formData.description}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            setFormData((prev) => ({ ...prev, description: e.target.value }))
+          }
           placeholder="Décrivez les responsabilités de ce rôle..."
           required
         />
       </div>
-      
+
       <div className="flex items-center space-x-2">
         <Switch
           id="isActive"
           checked={formData.isActive}
-          onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, isActive: checked }))}
+          onCheckedChange={(checked: boolean) =>
+            setFormData((prev) => ({ ...prev, isActive: checked }))
+          }
         />
         <Label htmlFor="isActive">Rôle actif</Label>
       </div>
-      
+
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
           Annuler
         </Button>
-        <Button type="submit">
-          {role ? 'Modifier' : 'Créer'}
-        </Button>
+        <Button type="submit">{role ? 'Modifier' : 'Créer'}</Button>
       </div>
     </form>
   )
@@ -390,11 +374,14 @@ function RoleForm({ role, onSave }: { role?: RoleWithStats | null, onSave: () =>
 
 // Composant pour afficher les modules
 function ModulesView({ modules }: { modules: Module[] }) {
-  const groupedModules = modules.reduce((acc, module) => {
-    if (!acc[module.category]) acc[module.category] = []
-    acc[module.category].push(module)
-    return acc
-  }, {} as Record<string, Module[]>)
+  const groupedModules = modules.reduce(
+    (acc, module) => {
+      if (!acc[module.category]) acc[module.category] = []
+      acc[module.category].push(module)
+      return acc
+    },
+    {} as Record<string, Module[]>
+  )
 
   return (
     <div className="space-y-6">
@@ -402,7 +389,9 @@ function ModulesView({ modules }: { modules: Module[] }) {
         <Card key={category}>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Badge className={MODULE_CATEGORY_COLORS[category as keyof typeof MODULE_CATEGORY_COLORS]}>
+              <Badge
+                className={MODULE_CATEGORY_COLORS[category as keyof typeof MODULE_CATEGORY_COLORS]}
+              >
                 {MODULE_CATEGORY_LABELS[category as keyof typeof MODULE_CATEGORY_LABELS]}
               </Badge>
               <span>({categoryModules.length} modules)</span>
@@ -447,9 +436,7 @@ function PermissionsView() {
         <div className="space-y-4">
           {Object.entries(ACCESS_LEVEL_LABELS).map(([level, label]) => (
             <div key={level} className="flex items-center space-x-3">
-              <Badge className={ACCESS_LEVEL_COLORS[level as AccessLevel]}>
-                {label}
-              </Badge>
+              <Badge className={ACCESS_LEVEL_COLORS[level as AccessLevel]}>{label}</Badge>
               <span className="text-sm text-muted-foreground">
                 {getAccessLevelDescription(level as AccessLevel)}
               </span>
@@ -462,61 +449,58 @@ function PermissionsView() {
 }
 
 // Composant pour éditer les permissions d'un rôle
-function PermissionEditor({ role, modules, onSave }: { 
-  role: RoleWithStats | null, 
-  modules: Module[],
-  onSave: () => void 
+function PermissionEditor({
+  role,
+  modules,
+  onSave,
+}: {
+  role: RoleWithStats | null
+  modules: Module[]
+  onSave: () => void
 }) {
   const [permissions, setPermissions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (role) {
-      loadPermissions()
-    }
-  }, [role])
-
-  const loadPermissions = async () => {
+  const loadPermissions = useCallback(async () => {
     if (!role) return
-    
+
     try {
       const response = await callClientApi(`admin/roles/${role.id}/permissions`)
       const data = await response.json()
       if (data.success) {
         setPermissions(data.data.rolePermissions)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des permissions:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [role])
+
+  useEffect(() => {
+    if (role) {
+      loadPermissions()
+    }
+  }, [role, loadPermissions])
 
   const updatePermission = (permissionId: string, accessLevel: AccessLevel, isGranted: boolean) => {
-    setPermissions(prev => 
-      prev.map(p => 
-        p.permissionId === permissionId 
-          ? { ...p, accessLevel, isGranted }
-          : p
-      )
+    setPermissions((prev) =>
+      prev.map((p) => (p.permissionId === permissionId ? { ...p, accessLevel, isGranted } : p))
     )
   }
 
   const handleSave = async () => {
     if (!role) return
-    
+
     try {
       const response = await callClientApi(`admin/roles/${role.id}/permissions`, {
         method: 'POST',
-        body: JSON.stringify({ permissions })
+        body: JSON.stringify({ permissions }),
       })
-      
+
       if (response.ok) {
         onSave()
       }
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-    }
+    } catch (_error) {}
   }
 
   if (loading) {
@@ -528,11 +512,11 @@ function PermissionEditor({ role, modules, onSave }: {
       <div className="text-sm text-muted-foreground">
         Configurez les permissions pour le rôle <strong>{role?.name}</strong>
       </div>
-      
+
       <div className="space-y-6">
         {modules.map((module) => {
-          const modulePermissions = permissions.filter(p => p.moduleId === module.id)
-          
+          const modulePermissions = permissions.filter((p) => p.moduleId === module.id)
+
           return (
             <Card key={module.id}>
               <CardHeader>
@@ -560,18 +544,32 @@ function PermissionEditor({ role, modules, onSave }: {
                         <TableCell>
                           <select
                             value={permission.accessLevel}
-                            onChange={(e) => updatePermission(permission.permissionId, e.target.value as AccessLevel, permission.isGranted)}
+                            onChange={(e) =>
+                              updatePermission(
+                                permission.permissionId,
+                                e.target.value as AccessLevel,
+                                permission.isGranted
+                              )
+                            }
                             className="border rounded px-2 py-1"
                           >
                             {Object.entries(ACCESS_LEVEL_LABELS).map(([level, label]) => (
-                              <option key={level} value={level}>{label}</option>
+                              <option key={level} value={level}>
+                                {label}
+                              </option>
                             ))}
                           </select>
                         </TableCell>
                         <TableCell>
                           <Switch
                             checked={permission.isGranted}
-                            onCheckedChange={(checked: boolean) => updatePermission(permission.permissionId, permission.accessLevel, checked)}
+                            onCheckedChange={(checked: boolean) =>
+                              updatePermission(
+                                permission.permissionId,
+                                permission.accessLevel,
+                                checked
+                              )
+                            }
                           />
                         </TableCell>
                       </TableRow>
@@ -583,14 +581,12 @@ function PermissionEditor({ role, modules, onSave }: {
           )
         })}
       </div>
-      
+
       <div className="flex justify-end space-x-2">
         <Button variant="outline" onClick={onSave}>
           Annuler
         </Button>
-        <Button onClick={handleSave}>
-          Sauvegarder
-        </Button>
+        <Button onClick={handleSave}>Sauvegarder</Button>
       </div>
     </div>
   )
@@ -603,11 +599,17 @@ function GroupsView() {
 
 function getAccessLevelDescription(level: AccessLevel): string {
   switch (level) {
-    case 'BLOCKED': return 'Aucun accès au module'
-    case 'READ': return 'Consultation uniquement'
-    case 'WRITE': return 'Lecture et modification'
-    case 'DELETE': return 'Lecture, modification et suppression'
-    case 'ADMIN': return 'Accès administrateur complet'
-    default: return ''
+    case 'BLOCKED':
+      return 'Aucun accès au module'
+    case 'READ':
+      return 'Consultation uniquement'
+    case 'WRITE':
+      return 'Lecture et modification'
+    case 'DELETE':
+      return 'Lecture, modification et suppression'
+    case 'ADMIN':
+      return 'Accès administrateur complet'
+    default:
+      return ''
   }
 }

@@ -64,10 +64,6 @@ export function usePerformanceMonitor(componentName: string) {
 
           // Log si c'est lent
           if (duration > 16) {
-            // Plus de 1 frame à 60fps
-            console.warn(
-              `🐌 Opération lente dans ${componentName}.${measureName}: ${duration.toFixed(2)}ms`
-            )
           }
 
           return duration
@@ -497,7 +493,6 @@ export function useSelectorPerformanceMonitor() {
 
         // Log si c'est lent
         if (duration > 1) {
-          console.warn(`🐌 Sélecteur lent "${name}": ${duration.toFixed(2)}ms`)
         }
 
         return result
@@ -514,8 +509,6 @@ export function useSelectorPerformanceMonitor() {
 
         metrics.errors++
         metricsRef.current.set(name, metrics)
-
-        console.error(`❌ Erreur dans le sélecteur "${name}":`, error)
         throw error
       }
     }
@@ -577,17 +570,13 @@ export function useMemoryLeakDetector(componentName: string) {
           const growth = recent[recent.length - 1].memory - recent[0].memory
 
           if (growth > 50 * 1024 * 1024) {
-            // 50MB de croissance
-            console.warn(
-              `🚨 Fuite mémoire potentielle détectée dans ${componentName}: +${(growth / 1024 / 1024).toFixed(2)}MB`
-            )
           }
         }
       }
     }, 10000) // Vérifier toutes les 10 secondes
 
     return () => clearInterval(interval)
-  }, [componentName])
+  }, [])
 
   const getMemoryStats = useCallback(() => {
     if (memorySnapshotsRef.current.length === 0) return null

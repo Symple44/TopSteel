@@ -79,19 +79,13 @@ export function createRateLimiter(maxCalls: number, windowMs: number) {
 /**
  * Logger sécurisé
  */
-export function logSecurityEvent(event: string, details: Record<string, unknown> = {}) {
-  const sanitizedDetails = Object.fromEntries(
+export function logSecurityEvent(_event: string, details: Record<string, unknown> = {}) {
+  const _sanitizedDetails = Object.fromEntries(
     Object.entries(details).map(([key, value]) => [
       key,
       typeof value === 'string' ? maskSensitiveData(value) : value,
     ])
   )
-
-  console.warn('🔐 Security Event:', {
-    event,
-    timestamp: new Date().toISOString(),
-    details: sanitizedDetails,
-  })
 }
 
 /**

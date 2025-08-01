@@ -43,7 +43,7 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
   }
 
   const getQualityBadge = (qualite: string) => {
-    const baseClasses = 'px-2 py-1 rounded-full text-xs font-medium'
+    const _baseClasses = 'px-2 py-1 rounded-full text-xs font-medium'
 
     switch (qualite) {
       case 'EXCELLENTE':
@@ -60,7 +60,7 @@ export function ChutesTable({ chutes, onView, onEdit, onDelete, onSearch }: Chut
   }
 
   const getStatusBadge = (statut: string) => {
-    const baseClasses = 'px-2 py-1 rounded-full text-xs font-medium'
+    const _baseClasses = 'px-2 py-1 rounded-full text-xs font-medium'
 
     switch (statut) {
       case 'DISPONIBLE':

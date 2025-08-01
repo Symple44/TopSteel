@@ -41,7 +41,7 @@ interface WithClientOnlyOptions {
   forceRemount?: boolean
 }
 
-interface SafeComponentProps<T extends Record<string, unknown> = Record<string, unknown>> {
+interface SafeComponentProps<_T extends Record<string, unknown> = Record<string, unknown>> {
   isClient?: boolean
   isHydrated?: boolean
 }
@@ -97,9 +97,7 @@ class HydrationManager {
     for (const listener of this._listeners) {
       try {
         listener()
-      } catch (error) {
-        console.error('Erreur dans listener hydratation:', error)
-      }
+      } catch (_error) {}
     }
   }
 
@@ -162,8 +160,7 @@ export function ClientOnly({
         setIsHydrating(false)
         onMount?.()
       })
-      .catch((error) => {
-        console.error("Erreur pendant l'hydratation:", error)
+      .catch((_error) => {
         setHasMounted(true)
         setIsHydrating(false)
       })
@@ -350,8 +347,7 @@ export function useBrowserAPI<T>(getter: () => T, fallback: T): T {
     if (isClient) {
       try {
         setValue(getter())
-      } catch (error) {
-        console.error('Erreur accès API browser:', error)
+      } catch (_error) {
         setValue(fallback)
       }
     }

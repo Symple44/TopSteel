@@ -1,79 +1,72 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
   const authHeader = request.headers.get('authorization')
   const cookieHeader = request.headers.get('cookie')
-  
+
   let accessToken = null
   if (cookieHeader) {
-    const cookies = cookieHeader.split(';').map(c => c.trim())
-    const accessTokenCookie = cookies.find(c => c.startsWith('accessToken='))
+    const cookies = cookieHeader.split(';').map((c) => c.trim())
+    const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
     if (accessTokenCookie) {
       accessToken = accessTokenCookie.split('=')[1]
     }
   }
-  
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   }
-  
+
   if (authHeader) {
-    headers['Authorization'] = authHeader
+    headers.Authorization = authHeader
   } else if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`
+    headers.Authorization = `Bearer ${accessToken}`
   }
-  
+
   if (cookieHeader) {
-    headers['Cookie'] = cookieHeader
+    headers.Cookie = cookieHeader
   }
-  
+
   return headers
 }
 
 // Route de développement qui appelle directement le backend sans vérification stricte
 export async function GET(request: NextRequest) {
-  console.log('[Tables Dev API] Route called')
-  
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
+    const _apiUrl =
+      process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
     const headers = getAuthHeaders(request)
     const { searchParams } = new URL(request.url)
     const schema = searchParams.get('schema') || 'public'
 
-    console.log('[Tables Dev API] Config:', { apiUrl, schema })
-    console.log('[Tables Dev API] Headers:', headers)
-    console.log('[Tables Dev API] Calling backend for schema tables...')
-
     // Essayer d'appeler le backend directement
     try {
-      const response = await callBackendFromApi(`query-builder/schema/tables?schema=${schema}`, {
-        method: 'GET',
-        headers,
-      })
+      const response = await callBackendFromApi(
+        request,
+        `query-builder/schema/tables?schema=${schema}`,
+        {
+          method: 'GET',
+          headers,
+        }
+      )
 
       if (response.ok) {
         const tables = await response.json()
-        console.log('[Tables Dev API] Backend returned', tables?.length || 'unknown', 'tables')
         return NextResponse.json(tables)
       } else {
-        console.warn('[Tables Dev API] Backend error:', response.status)
         // Fallback sur des données mockées
       }
-    } catch (backendError) {
-      console.warn('[Tables Dev API] Backend not available:', backendError)
+    } catch (_backendError) {
       // Fallback sur des données mockées
     }
-
-    // 🏢 Données mockées multi-tenant pour le développement
-    console.log('[Tables Dev API] Using mock data')
     const mockTables = [
       {
         name: 'clients',
         schema: 'topsteel_tenant',
         type: 'table',
-        description: 'Clients de l\'entreprise',
+        description: "Clients de l'entreprise",
         columns: [
           { name: 'id', type: 'integer', nullable: false, primary: true },
           { name: 'company_id', type: 'integer', nullable: false },
@@ -90,14 +83,14 @@ export async function GET(request: NextRequest) {
           { name: 'contact_principal', type: 'varchar', nullable: true },
           { name: 'actif', type: 'boolean', nullable: false },
           { name: 'created_at', type: 'timestamp', nullable: false },
-          { name: 'updated_at', type: 'timestamp', nullable: false }
-        ]
+          { name: 'updated_at', type: 'timestamp', nullable: false },
+        ],
       },
       {
         name: 'fournisseurs',
         schema: 'topsteel_tenant',
         type: 'table',
-        description: 'Fournisseurs de l\'entreprise',
+        description: "Fournisseurs de l'entreprise",
         columns: [
           { name: 'id', type: 'integer', nullable: false, primary: true },
           { name: 'company_id', type: 'integer', nullable: false },
@@ -111,14 +104,14 @@ export async function GET(request: NextRequest) {
           { name: 'contact_principal', type: 'varchar', nullable: true },
           { name: 'actif', type: 'boolean', nullable: false },
           { name: 'created_at', type: 'timestamp', nullable: false },
-          { name: 'updated_at', type: 'timestamp', nullable: false }
-        ]
+          { name: 'updated_at', type: 'timestamp', nullable: false },
+        ],
       },
       {
         name: 'materiaux',
         schema: 'topsteel_tenant',
         type: 'table',
-        description: 'Matériaux de l\'entreprise',
+        description: "Matériaux de l'entreprise",
         columns: [
           { name: 'id', type: 'integer', nullable: false, primary: true },
           { name: 'company_id', type: 'integer', nullable: false },
@@ -133,14 +126,14 @@ export async function GET(request: NextRequest) {
           { name: 'stock_minimum', type: 'decimal', nullable: false },
           { name: 'actif', type: 'boolean', nullable: false },
           { name: 'created_at', type: 'timestamp', nullable: false },
-          { name: 'updated_at', type: 'timestamp', nullable: false }
-        ]
+          { name: 'updated_at', type: 'timestamp', nullable: false },
+        ],
       },
       {
         name: 'stocks',
         schema: 'topsteel_tenant',
         type: 'table',
-        description: 'Stocks de l\'entreprise',
+        description: "Stocks de l'entreprise",
         columns: [
           { name: 'id', type: 'integer', nullable: false, primary: true },
           { name: 'company_id', type: 'integer', nullable: false },
@@ -153,14 +146,14 @@ export async function GET(request: NextRequest) {
           { name: 'valeur_stock', type: 'decimal', nullable: false },
           { name: 'actif', type: 'boolean', nullable: false },
           { name: 'created_at', type: 'timestamp', nullable: false },
-          { name: 'updated_at', type: 'timestamp', nullable: false }
-        ]
+          { name: 'updated_at', type: 'timestamp', nullable: false },
+        ],
       },
       {
         name: 'commandes',
         schema: 'topsteel_tenant',
         type: 'table',
-        description: 'Commandes de l\'entreprise',
+        description: "Commandes de l'entreprise",
         columns: [
           { name: 'id', type: 'integer', nullable: false, primary: true },
           { name: 'company_id', type: 'integer', nullable: false },
@@ -174,16 +167,12 @@ export async function GET(request: NextRequest) {
           { name: 'montant_ttc', type: 'decimal', nullable: false },
           { name: 'notes', type: 'text', nullable: true },
           { name: 'created_at', type: 'timestamp', nullable: false },
-          { name: 'updated_at', type: 'timestamp', nullable: false }
-        ]
-      }
+          { name: 'updated_at', type: 'timestamp', nullable: false },
+        ],
+      },
     ]
-
-    console.log('[Tables Dev API] Returning', mockTables.length, 'mock tables')
     return NextResponse.json(mockTables)
-
   } catch (error) {
-    console.error('[Tables Dev API] Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to get tables' },
       { status: 500 }

@@ -1,19 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Badge } from '@erp/ui'
-import { Progress } from '@erp/ui'
-import { 
-  Activity, 
-  Wifi, 
-  WifiOff, 
-  TrendingUp, 
-  TrendingDown, 
+import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Progress } from '@erp/ui'
+import {
+  Activity,
+  AlertTriangle,
   Database,
   Timer,
-  AlertTriangle
+  TrendingDown,
+  TrendingUp,
+  Wifi,
+  WifiOff,
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface DatabaseMetrics {
   database: string
@@ -32,7 +30,10 @@ interface MonitoringCardProps {
   variant?: 'auth' | 'shared' | 'tenant'
 }
 
-export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: MonitoringCardProps) {
+export default function DatabaseMonitoringCard({
+  metrics,
+  variant = 'tenant',
+}: MonitoringCardProps) {
   const [previousResponseTime, setPreviousResponseTime] = useState<number | null>(null)
   const [trend, setTrend] = useState<'up' | 'down' | 'stable'>('stable')
 
@@ -52,37 +53,51 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
     }
   }, [metrics.responseTime, previousResponseTime])
 
-  const getStatusColor = (status: string) => {
+  const _getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-600'
-      case 'degraded': return 'text-yellow-600'
-      case 'unhealthy': return 'text-red-600'
-      default: return 'text-gray-600'
+      case 'healthy':
+        return 'text-green-600'
+      case 'degraded':
+        return 'text-yellow-600'
+      case 'unhealthy':
+        return 'text-red-600'
+      default:
+        return 'text-gray-600'
     }
   }
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'healthy': return 'success'
-      case 'degraded': return 'warning'
-      case 'unhealthy': return 'destructive'
-      default: return 'default'
+      case 'healthy':
+        return 'success'
+      case 'degraded':
+        return 'warning'
+      case 'unhealthy':
+        return 'destructive'
+      default:
+        return 'default'
     }
   }
 
   const getVariantIcon = () => {
     switch (variant) {
-      case 'auth': return <Database className="w-5 h-5 text-blue-600" />
-      case 'shared': return <Database className="w-5 h-5 text-purple-600" />
-      case 'tenant': return <Database className="w-5 h-5 text-orange-600" />
+      case 'auth':
+        return <Database className="w-5 h-5 text-blue-600" />
+      case 'shared':
+        return <Database className="w-5 h-5 text-purple-600" />
+      case 'tenant':
+        return <Database className="w-5 h-5 text-orange-600" />
     }
   }
 
   const getVariantColor = () => {
     switch (variant) {
-      case 'auth': return 'border-l-blue-500'
-      case 'shared': return 'border-l-purple-500'
-      case 'tenant': return 'border-l-orange-500'
+      case 'auth':
+        return 'border-l-blue-500'
+      case 'shared':
+        return 'border-l-purple-500'
+      case 'tenant':
+        return 'border-l-orange-500'
     }
   }
 
@@ -98,9 +113,12 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
 
   const getTrendIcon = () => {
     switch (trend) {
-      case 'up': return <TrendingUp className="w-3 h-3 text-red-500" />
-      case 'down': return <TrendingDown className="w-3 h-3 text-green-500" />
-      default: return null
+      case 'up':
+        return <TrendingUp className="w-3 h-3 text-red-500" />
+      case 'down':
+        return <TrendingDown className="w-3 h-3 text-green-500" />
+      default:
+        return null
     }
   }
 
@@ -114,9 +132,7 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
               <CardTitle className="text-sm font-semibold uppercase tracking-wider">
                 {metrics.database}
               </CardTitle>
-              <CardDescription className="text-xs">
-                Base de données {variant}
-              </CardDescription>
+              <CardDescription className="text-xs">Base de données {variant}</CardDescription>
             </div>
           </div>
           <Badge variant={getStatusBadgeVariant(metrics.status) as any} className="text-xs">
@@ -124,7 +140,7 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Status de connexion */}
         <div className="flex items-center justify-between">
@@ -150,14 +166,9 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
                 <span className="text-sm font-medium">Latence</span>
                 {getTrendIcon()}
               </div>
-              <span className="text-sm font-mono">
-                {metrics.responseTime}ms
-              </span>
+              <span className="text-sm font-mono">{metrics.responseTime}ms</span>
             </div>
-            <Progress 
-              value={Math.min((metrics.responseTime / 100) * 100, 100)} 
-              className="h-1"
-            />
+            <Progress value={Math.min((metrics.responseTime / 100) * 100, 100)} className="h-1" />
           </div>
         )}
 
@@ -168,9 +179,7 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
               <Activity className="w-4 h-4 text-purple-600" />
               <span className="text-sm font-medium">Connexions actives</span>
             </div>
-            <span className="text-sm font-mono">
-              {metrics.activeConnections}
-            </span>
+            <span className="text-sm font-mono">{metrics.activeConnections}</span>
           </div>
         )}
 
@@ -178,9 +187,7 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
         {metrics.uptime !== undefined && (
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">Uptime</span>
-            <span className="text-sm font-mono">
-              {formatUptime(metrics.uptime)}
-            </span>
+            <span className="text-sm font-mono">{formatUptime(metrics.uptime)}</span>
           </div>
         )}
 
@@ -188,9 +195,7 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
         {metrics.queryCount !== undefined && (
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">Requêtes/min</span>
-            <span className="text-sm font-mono">
-              {metrics.queryCount}
-            </span>
+            <span className="text-sm font-mono">{metrics.queryCount}</span>
           </div>
         )}
 
@@ -210,9 +215,7 @@ export default function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: 
             <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
             <div className="space-y-1">
               <p className="text-sm font-medium text-red-800 dark:text-red-200">Erreur détectée</p>
-              <p className="text-xs text-red-600 dark:text-red-300 break-words">
-                {metrics.error}
-              </p>
+              <p className="text-xs text-red-600 dark:text-red-300 break-words">{metrics.error}</p>
             </div>
           </div>
         )}

@@ -46,10 +46,10 @@ export function useUserSettings() {
         const authData = localStorage.getItem('topsteel-auth')
         if (authData) {
           const userData = JSON.parse(authData)
-          
+
           // Récupérer la langue sauvegardée ou utiliser 'fr' par défaut
           const savedLanguage = localStorage.getItem('topsteel-language') || 'fr'
-          
+
           return {
             profile: {
               firstName: userData.profile?.prenom || '',
@@ -89,7 +89,7 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (profile: Partial<UserSettings['profile']>) => 
+    mutationFn: (profile: Partial<UserSettings['profile']>) =>
       apiClient.patch<UserSettings>('/user/profile', profile),
     onSuccess: (updatedSettings: UserSettings) => {
       queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
@@ -105,14 +105,14 @@ export function useUpdateCompany() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (company: Partial<UserSettings['company']>) => 
+    mutationFn: (company: Partial<UserSettings['company']>) =>
       apiClient.patch<UserSettings>('/user/settings', { company }),
     onSuccess: (updatedSettings: UserSettings) => {
       queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
-      toast.success('Informations de l\'entreprise mises à jour')
+      toast.success("Informations de l'entreprise mises à jour")
     },
     onError: () => {
-      toast.error('Erreur lors de la mise à jour des informations de l\'entreprise')
+      toast.error("Erreur lors de la mise à jour des informations de l'entreprise")
     },
   })
 }
@@ -128,13 +128,13 @@ export function useUpdatePreferences() {
         if (authData) {
           const userData = JSON.parse(authData)
           // Simuler la sauvegarde des préférences
-          await new Promise(resolve => setTimeout(resolve, 500))
-          
+          await new Promise((resolve) => setTimeout(resolve, 500))
+
           // Synchroniser avec le système i18n si la langue change
           if (preferences.language) {
             localStorage.setItem('topsteel-language', preferences.language)
           }
-          
+
           // Retourner les données mises à jour
           return {
             profile: {
@@ -169,12 +169,12 @@ export function useUpdatePreferences() {
     },
     onSuccess: (updatedSettings: UserSettings) => {
       queryClient.setQueryData(QUERY_KEYS.userSettings, updatedSettings)
-      
+
       // Synchroniser avec le système i18n
       if (updatedSettings.preferences.language) {
         localStorage.setItem('topsteel-language', updatedSettings.preferences.language)
       }
-      
+
       toast.success('Préférences mises à jour avec succès')
     },
     onError: () => {
@@ -194,11 +194,11 @@ export function useUpdateNotifications() {
         if (authData) {
           const userData = JSON.parse(authData)
           // Simuler la sauvegarde des notifications
-          await new Promise(resolve => setTimeout(resolve, 500))
-          
+          await new Promise((resolve) => setTimeout(resolve, 500))
+
           // Récupérer la langue sauvegardée
           const savedLanguage = localStorage.getItem('topsteel-language') || 'fr'
-          
+
           // Retourner les données mises à jour
           return {
             profile: {

@@ -1,39 +1,27 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { DataTable } from '@/components/ui/datatable/DataTable'
-import { apiClient } from '@/lib/api-client'
-import { toast } from '@/hooks/use-toast'
 import {
   Badge,
   Button,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
   Switch,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  Checkbox,
-  Label
 } from '@erp/ui'
-import { 
-  Building,
-  Shield,
-  MapPin,
-  Save,
-  UserPlus,
-  UserMinus,
-  Settings,
-  Eye,
-  Edit,
-  Trash
-} from 'lucide-react'
-import type { ColumnConfig } from '@/components/ui/datatable/types'
+import { Building, MapPin, Save, Settings } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { AdvancedDataTable, type ColumnConfig } from '@erp/ui'
+import { toast } from '@/hooks/use-toast'
+import { apiClient } from '@/lib/api-client'
 
 interface CompanyAccess {
   id: string
@@ -66,7 +54,7 @@ const roleOptions = [
   { value: 'MANAGER', label: 'Manager', color: 'bg-blue-100 text-blue-800' },
   { value: 'USER', label: 'Utilisateur', color: 'bg-green-100 text-green-800' },
   { value: 'VIEWER', label: 'Observateur', color: 'bg-purple-100 text-purple-800' },
-  { value: 'GUEST', label: 'Invité', color: 'bg-gray-100 text-gray-800' }
+  { value: 'GUEST', label: 'Invité', color: 'bg-gray-100 text-gray-800' },
 ]
 
 const availablePermissions = [
@@ -81,33 +69,29 @@ const availablePermissions = [
   { value: 'PROJECT_DELETE', label: 'Supprimer les projets', category: 'Projets' },
   { value: 'INVOICE_VIEW', label: 'Voir les factures', category: 'Facturation' },
   { value: 'INVOICE_EDIT', label: 'Modifier les factures', category: 'Facturation' },
-  { value: 'INVOICE_DELETE', label: 'Supprimer les factures', category: 'Facturation' }
+  { value: 'INVOICE_DELETE', label: 'Supprimer les factures', category: 'Facturation' },
 ]
 
 export function UserCompaniesDataTable({ userId }: Props) {
   const [data, setData] = useState<CompanyAccess[]>([])
   const [loading, setLoading] = useState(true)
-  const [allCompanies, setAllCompanies] = useState<any[]>([])
+  const [_allCompanies, setAllCompanies] = useState<{ id: string; name: string }[]>([])
   const [selectedCompany, setSelectedCompany] = useState<CompanyAccess | null>(null)
   const [isPermissionsDialogOpen, setIsPermissionsDialogOpen] = useState(false)
   const [editingPermissions, setEditingPermissions] = useState<string[]>([])
 
-  useEffect(() => {
-    loadData()
-  }, [userId])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true)
       // Charger les accès actuels de l'utilisateur
       const userAccess = await apiClient.get<CompanyAccess[]>(`/societes/users/${userId}/companies`)
-      
+
       // Charger toutes les sociétés
-      const allSocietes = await apiClient.get<any[]>('/societes')
-      
+      const allSocietes = await apiClient.get<{ id: string; name: string }[]>('/societes')
+
       // Créer une entrée pour chaque société (même sans accès)
-      const fullData = allSocietes.map(societe => {
-        const existingAccess = userAccess.find(access => access.societeId === societe.id)
+      const fullData = allSocietes.map((societe) => {
+        const existingAccess = userAccess.find((access) => access.societeId === societe.id)
         if (existingAccess) {
           return existingAccess
         } else {
@@ -124,24 +108,27 @@ export function UserCompaniesDataTable({ userId }: Props) {
             isActive: false,
             isDefault: false,
             createdAt: '',
-            updatedAt: ''
+            updatedAt: '',
           }
         }
       })
-      
+
       setAllCompanies(allSocietes)
       setData(fullData)
-    } catch (error) {
-      console.error('Erreur lors du chargement des données:', error)
+    } catch (_error) {
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les sociétés',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
     }
-  }
+  }, [userId])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   const handleRoleChange = async (companyAccess: CompanyAccess, newRole: string) => {
     try {
@@ -150,27 +137,26 @@ export function UserCompaniesDataTable({ userId }: Props) {
         await apiClient.post(`/societes/${companyAccess.societeId}/users`, {
           userId: userId,
           role: newRole,
-          isActive: true
+          isActive: true,
         })
       } else {
         // Mettre à jour l'accès existant
         await apiClient.patch(`/societes/users/${companyAccess.id}`, {
-          role: newRole
+          role: newRole,
         })
       }
-      
+
       toast({
         title: 'Succès',
-        description: 'Le rôle a été mis à jour'
+        description: 'Le rôle a été mis à jour',
       })
-      
+
       await loadData()
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du rôle:', error)
+    } catch (_error) {
       toast({
         title: 'Erreur',
         description: 'Impossible de mettre à jour le rôle',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     }
   }
@@ -182,27 +168,26 @@ export function UserCompaniesDataTable({ userId }: Props) {
         await apiClient.post(`/societes/${companyAccess.societeId}/users`, {
           userId: userId,
           role: 'USER',
-          isActive: true
+          isActive: true,
         })
       } else {
         // Toggle l'état actif
         await apiClient.patch(`/societes/users/${companyAccess.id}`, {
-          isActive: !companyAccess.isActive
+          isActive: !companyAccess.isActive,
         })
       }
-      
+
       toast({
         title: 'Succès',
-        description: companyAccess.isActive ? 'Accès désactivé' : 'Accès activé'
+        description: companyAccess.isActive ? 'Accès désactivé' : 'Accès activé',
       })
-      
+
       await loadData()
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de l\'accès:', error)
+    } catch (_error) {
       toast({
         title: 'Erreur',
-        description: 'Impossible de mettre à jour l\'accès',
-        variant: 'destructive'
+        description: "Impossible de mettre à jour l'accès",
+        variant: 'destructive',
       })
     }
   }
@@ -210,21 +195,20 @@ export function UserCompaniesDataTable({ userId }: Props) {
   const handleDefaultToggle = async (companyAccess: CompanyAccess) => {
     try {
       await apiClient.post(`/societes/users/${userId}/default-societe`, {
-        societeId: companyAccess.societeId
+        societeId: companyAccess.societeId,
       })
-      
+
       toast({
         title: 'Succès',
-        description: 'Société par défaut mise à jour'
+        description: 'Société par défaut mise à jour',
       })
-      
+
       await loadData()
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la société par défaut:', error)
+    } catch (_error) {
       toast({
         title: 'Erreur',
         description: 'Impossible de mettre à jour la société par défaut',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     }
   }
@@ -245,28 +229,27 @@ export function UserCompaniesDataTable({ userId }: Props) {
           userId: userId,
           role: selectedCompany.role || 'USER',
           permissions: editingPermissions,
-          isActive: true
+          isActive: true,
         })
       } else {
         // Mettre à jour les permissions
         await apiClient.patch(`/societes/users/${selectedCompany.id}/permissions`, {
-          permissions: editingPermissions
+          permissions: editingPermissions,
         })
       }
-      
+
       toast({
         title: 'Succès',
-        description: 'Les permissions ont été mises à jour'
+        description: 'Les permissions ont été mises à jour',
       })
-      
+
       setIsPermissionsDialogOpen(false)
       await loadData()
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour des permissions:', error)
+    } catch (_error) {
       toast({
         title: 'Erreur',
         description: 'Impossible de mettre à jour les permissions',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     }
   }
@@ -293,7 +276,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
             </p>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: 'isActive',
@@ -307,7 +290,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
           onCheckedChange={() => handleActiveToggle(row)}
           className="data-[state=checked]:bg-green-600"
         />
-      )
+      ),
     },
     {
       id: 'role',
@@ -320,14 +303,14 @@ export function UserCompaniesDataTable({ userId }: Props) {
       render: (_, row) => (
         <Select
           value={row.role}
-          onValueChange={(value) => handleRoleChange(row, value)}
+          onValueChange={(value: string) => handleRoleChange(row, value)}
           disabled={!row.isActive}
         >
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {roleOptions.map(option => (
+            {roleOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 <span className={`px-2 py-1 rounded-md text-xs font-medium ${option.color}`}>
                   {option.label}
@@ -336,7 +319,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
             ))}
           </SelectContent>
         </Select>
-      )
+      ),
     },
     {
       id: 'permissions',
@@ -358,7 +341,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
             <Settings className="h-4 w-4" />
           </Button>
         </div>
-      )
+      ),
     },
     {
       id: 'isDefault',
@@ -373,7 +356,7 @@ export function UserCompaniesDataTable({ userId }: Props) {
           disabled={!row.isActive}
           className="data-[state=checked]:bg-blue-600"
         />
-      )
+      ),
     },
     {
       id: 'lastAccess',
@@ -382,26 +365,23 @@ export function UserCompaniesDataTable({ userId }: Props) {
       type: 'date',
       sortable: true,
       width: 150,
-      render: (value, row) => {
+      render: (_value, row) => {
         if (!row.updatedAt || row.id.startsWith('new-')) {
           return <span className="text-gray-400">Jamais</span>
         }
         return new Date(row.updatedAt).toLocaleDateString('fr-FR')
-      }
-    }
+      },
+    },
   ]
 
   return (
     <>
-      <DataTable
+      <AdvancedDataTable
         columns={columns}
         data={data}
         loading={loading}
         searchable={true}
-        searchPlaceholder="Rechercher une société..."
-        emptyStateTitle="Aucune société trouvée"
-        emptyStateDescription="L'utilisateur n'a accès à aucune société pour le moment"
-        rowKey="id"
+        keyField="id"
         className="border rounded-lg"
       />
 
@@ -409,37 +389,40 @@ export function UserCompaniesDataTable({ userId }: Props) {
       <Dialog open={isPermissionsDialogOpen} onOpenChange={setIsPermissionsDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>
-              Gérer les permissions pour {selectedCompany?.societe.nom}
-            </DialogTitle>
+            <DialogTitle>Gérer les permissions pour {selectedCompany?.societe.nom}</DialogTitle>
             <DialogDescription>
               Sélectionnez les permissions spécifiques pour cette société
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6 py-4">
             {Object.entries(
-              availablePermissions.reduce((acc, perm) => {
-                if (!acc[perm.category]) acc[perm.category] = []
-                acc[perm.category].push(perm)
-                return acc
-              }, {} as Record<string, typeof availablePermissions>)
+              availablePermissions.reduce(
+                (acc, perm) => {
+                  if (!acc[perm.category]) acc[perm.category] = []
+                  acc[perm.category].push(perm)
+                  return acc
+                },
+                {} as Record<string, typeof availablePermissions>
+              )
             ).map(([category, perms]) => (
               <div key={category}>
                 <h4 className="font-medium text-gray-900 mb-3">{category}</h4>
                 <div className="space-y-2">
-                  {perms.map(perm => (
+                  {perms.map((perm) => (
                     <Label
                       key={perm.value}
                       className="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50"
                     >
                       <Checkbox
                         checked={editingPermissions.includes(perm.value)}
-                        onCheckedChange={(checked) => {
+                        onCheckedChange={(checked: boolean) => {
                           if (checked) {
                             setEditingPermissions([...editingPermissions, perm.value])
                           } else {
-                            setEditingPermissions(editingPermissions.filter(p => p !== perm.value))
+                            setEditingPermissions(
+                              editingPermissions.filter((p) => p !== perm.value)
+                            )
                           }
                         }}
                       />
@@ -450,12 +433,9 @@ export function UserCompaniesDataTable({ userId }: Props) {
               </div>
             ))}
           </div>
-          
+
           <div className="flex justify-end space-x-2 pt-4 border-t">
-            <Button
-              variant="outline"
-              onClick={() => setIsPermissionsDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setIsPermissionsDialogOpen(false)}>
               Annuler
             </Button>
             <Button onClick={handleSavePermissions}>

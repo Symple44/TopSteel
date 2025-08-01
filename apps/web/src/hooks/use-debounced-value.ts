@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 /**
  * Hook pour debouncer une valeur
@@ -46,7 +46,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     return () => {
       clearTimeout(timer)
     }
-  }, [...deps, delay])
+  }, [...deps, delay, callback])
 
   return debouncedCallback || callback
 }

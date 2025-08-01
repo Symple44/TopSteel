@@ -1,12 +1,12 @@
 'use client'
 
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
 import type { Notification } from '@erp/domains/notifications'
 import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
 // import { io, type Socket } from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
+import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
 import { callClientApi } from '@/utils/backend-api'
 
 // ===== TYPES ET INTERFACES =====
@@ -59,7 +59,17 @@ interface NotificationsProviderProps {
 // ===== ACTIONS =====
 
 interface NotificationsAction {
-  type: 'SET_NOTIFICATIONS' | 'ADD_NOTIFICATION' | 'MARK_AS_READ' | 'MARK_ALL_AS_READ' | 'DELETE_NOTIFICATION' | 'DELETE_ALL' | 'UPDATE_SETTINGS' | 'SET_CONNECTED' | 'SET_LOADING' | 'SET_ERROR'
+  type:
+    | 'SET_NOTIFICATIONS'
+    | 'ADD_NOTIFICATION'
+    | 'MARK_AS_READ'
+    | 'MARK_ALL_AS_READ'
+    | 'DELETE_NOTIFICATION'
+    | 'DELETE_ALL'
+    | 'UPDATE_SETTINGS'
+    | 'SET_CONNECTED'
+    | 'SET_LOADING'
+    | 'SET_ERROR'
   payload?: any
 }
 
@@ -94,7 +104,10 @@ const initialState: NotificationsState = {
   error: null,
 }
 
-function notificationsReducer(state: NotificationsState, action: NotificationsAction): NotificationsState {
+function notificationsReducer(
+  state: NotificationsState,
+  action: NotificationsAction
+): NotificationsState {
   switch (action.type) {
     case 'SET_NOTIFICATIONS':
       return {
@@ -106,12 +119,12 @@ function notificationsReducer(state: NotificationsState, action: NotificationsAc
       return {
         ...state,
         notifications: [action.payload, ...state.notifications],
-        unreadCount: !action.payload.readAt ? state.unreadCount + 1 : state.unreadCount,
+        unreadCount: action.payload.readAt ? state.unreadCount : state.unreadCount + 1,
       }
     case 'MARK_AS_READ':
       return {
         ...state,
-        notifications: state.notifications.map(n => 
+        notifications: state.notifications.map((n) =>
           n.id === action.payload ? { ...n, readAt: new Date().toISOString() } : n
         ),
         unreadCount: Math.max(0, state.unreadCount - 1),
@@ -119,16 +132,20 @@ function notificationsReducer(state: NotificationsState, action: NotificationsAc
     case 'MARK_ALL_AS_READ':
       return {
         ...state,
-        notifications: state.notifications.map(n => ({ ...n, readAt: new Date().toISOString() })),
+        notifications: state.notifications.map((n) => ({ ...n, readAt: new Date().toISOString() })),
         unreadCount: 0,
       }
-    case 'DELETE_NOTIFICATION':
-      const deletedNotification = state.notifications.find(n => n.id === action.payload)
+    case 'DELETE_NOTIFICATION': {
+      const deletedNotification = state.notifications.find((n) => n.id === action.payload)
       return {
         ...state,
-        notifications: state.notifications.filter(n => n.id !== action.payload),
-        unreadCount: deletedNotification && !deletedNotification.readAt ? state.unreadCount - 1 : state.unreadCount,
+        notifications: state.notifications.filter((n) => n.id !== action.payload),
+        unreadCount:
+          deletedNotification && !deletedNotification.readAt
+            ? state.unreadCount - 1
+            : state.unreadCount,
       }
+    }
     case 'DELETE_ALL':
       return {
         ...state,
@@ -176,11 +193,28 @@ export function useNotifications(): NotificationsContextType {
 
 export function NotificationsProvider({ children }: NotificationsProviderProps) {
   const [state, dispatch] = useReducer(notificationsReducer, initialState)
-  const { user } = useAuth()
-  const { toast } = useToast()
+
+  // Safe check for auth context
+  let user = null
+  let _toast = null
+
+  try {
+    const authContext = useAuth()
+    user = authContext?.user || null
+  } catch (_error) {
+    // Auth context not available yet
+  }
+
+  try {
+    const toastContext = useToast()
+    _toast = toastContext?.toast || (() => {})
+  } catch (_error) {
+    // Toast context not available yet
+    _toast = () => {}
+  }
   const socketRef = useRef<Socket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const reconnectAttempts = useRef(0)
+  const _reconnectAttempts = useRef(0)
 
   // ===== ACTIONS =====
 
@@ -192,7 +226,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       if (response.ok) {
         dispatch({ type: 'MARK_AS_READ', payload: notificationId })
       }
-    } catch (error) {
+    } catch (_error) {
       // Error marking as read (silenced)
     }
   }, [])
@@ -205,7 +239,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       if (response.ok) {
         dispatch({ type: 'MARK_ALL_AS_READ' })
       }
-    } catch (error) {
+    } catch (_error) {
       // Error marking all as read (silenced)
     }
   }, [])
@@ -218,7 +252,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       if (response.ok) {
         dispatch({ type: 'DELETE_NOTIFICATION', payload: notificationId })
       }
-    } catch (error) {
+    } catch (_error) {
       // Error deleting notification (silenced)
     }
   }, [])
@@ -231,20 +265,26 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       if (response.ok) {
         dispatch({ type: 'DELETE_ALL' })
       }
-    } catch (error) {
+    } catch (_error) {
       // Error deleting all notifications (silenced)
     }
   }, [])
 
-  const updateSettings = useCallback((settings: Partial<NotificationSettings>) => {
-    dispatch({ type: 'UPDATE_SETTINGS', payload: settings })
-    // Sauvegarder dans localStorage
-    localStorage.setItem('notificationSettings', JSON.stringify({ ...state.settings, ...settings }))
-  }, [state.settings])
+  const updateSettings = useCallback(
+    (settings: Partial<NotificationSettings>) => {
+      dispatch({ type: 'UPDATE_SETTINGS', payload: settings })
+      // Sauvegarder dans localStorage
+      localStorage.setItem(
+        'notificationSettings',
+        JSON.stringify({ ...state.settings, ...settings })
+      )
+    },
+    [state.settings]
+  )
 
   const refreshNotifications = useCallback(async () => {
     if (!user) return
-    
+
     dispatch({ type: 'SET_LOADING', payload: true })
     try {
       const response = await callClientApi('notifications')
@@ -252,7 +292,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         const data = await response.json()
         dispatch({ type: 'SET_NOTIFICATIONS', payload: data.data || [] })
       }
-    } catch (error) {
+    } catch (_error) {
       // Error refreshing notifications (silenced)
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false })
@@ -262,28 +302,28 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   // ===== WEBSOCKET CONNECTION =====
 
   const connectWebSocket = useCallback(async () => {
-    if (!user || socketRef.current?.readyState === WebSocket.OPEN) return
+    if (!user || socketRef.current?.connected === true) return
 
     // Temporairement désactiver WebSocket - utiliser polling à la place
     // WebSocket disabled, using polling (log silenced)
-    
+
     dispatch({ type: 'SET_CONNECTED', payload: true })
     dispatch({ type: 'SET_ERROR', payload: null })
-    
+
     // Simuler une connexion réussie
     const mockSocket = {
       connected: true,
       readyState: WebSocket.OPEN,
-      emit: (event, data) => {
+      emit: (_event: string, _data?: any) => {
         // Mock emit (silenced)
       },
       disconnect: () => {
         // Mock disconnect (silenced)
-      }
+      },
     }
-    
-    socketRef.current = mockSocket
-    
+
+    socketRef.current = mockSocket as any
+
     // Démarrer le polling pour les notifications
     const pollNotifications = () => {
       if (socketRef.current?.connected) {
@@ -291,7 +331,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         setTimeout(pollNotifications, 5000) // Poll toutes les 5 secondes
       }
     }
-    
+
     pollNotifications()
 
     /* 
@@ -354,7 +394,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       }
     */
 
-      /*
+    /*
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data)
@@ -414,7 +454,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       dispatch({ type: 'SET_ERROR', payload: 'Impossible de créer la connexion WebSocket' })
     }
     */
-  }, [user, state.settings, toast])
+  }, [user])
 
   // ===== EFFECTS =====
 
@@ -437,7 +477,11 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   // Demander permission pour notifications browser
   useEffect(() => {
-    if (state.settings.enableBrowser && 'Notification' in window && Notification.permission === 'default') {
+    if (
+      state.settings.enableBrowser &&
+      'Notification' in window &&
+      Notification.permission === 'default'
+    ) {
       Notification.requestPermission()
     }
   }, [state.settings.enableBrowser])
@@ -449,7 +493,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       try {
         const settings = JSON.parse(savedSettings)
         dispatch({ type: 'UPDATE_SETTINGS', payload: settings })
-      } catch (error) {
+      } catch (_error) {
         // Error loading settings (silenced)
       }
     }
@@ -475,8 +519,6 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   }
 
   return (
-    <NotificationsContext.Provider value={contextValue}>
-      {children}
-    </NotificationsContext.Provider>
+    <NotificationsContext.Provider value={contextValue}>{children}</NotificationsContext.Provider>
   )
 }

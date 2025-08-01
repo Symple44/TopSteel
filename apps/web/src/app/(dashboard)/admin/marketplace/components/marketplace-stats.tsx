@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Button } from '@/components/ui/button'
-import { BarChart3, TrendingUp, Users, DollarSign, Download, Star, Loader2, AlertTriangle } from 'lucide-react'
+import { AlertTriangle, BarChart3, Download, Loader2, Star } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import { Progress } from '@erp/ui'
 import { callClientApi } from '@/utils/backend-api'
 
 interface MarketplaceStats {
@@ -28,7 +27,7 @@ const CATEGORY_LABELS = {
   INTEGRATION: 'Intégrations',
   QUALITY: 'Qualité',
   MAINTENANCE: 'Maintenance',
-  FINANCE: 'Finance'
+  FINANCE: 'Finance',
 }
 
 const CATEGORY_COLORS = {
@@ -38,7 +37,7 @@ const CATEGORY_COLORS = {
   INTEGRATION: 'bg-orange-500',
   QUALITY: 'bg-red-500',
   MAINTENANCE: 'bg-yellow-500',
-  FINANCE: 'bg-pink-500'
+  FINANCE: 'bg-pink-500',
 }
 
 export function MarketplaceStats() {
@@ -51,15 +50,14 @@ export function MarketplaceStats() {
       try {
         setLoading(true)
         const response = await callClientApi('admin/marketplace/stats')
-        
+
         if (!response.ok) {
           throw new Error('Erreur lors du chargement des statistiques')
         }
-        
+
         const data = await response.json()
         setStats(data)
       } catch (err) {
-        console.error('Erreur:', err)
         setError(err instanceof Error ? err.message : 'Erreur inconnue')
         toast.error('Impossible de charger les statistiques')
       } finally {
@@ -83,9 +81,7 @@ export function MarketplaceStats() {
     return (
       <div className="text-center py-12">
         <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-        <p className="text-muted-foreground mb-4">
-          {error || 'Aucune statistique disponible'}
-        </p>
+        <p className="text-muted-foreground mb-4">{error || 'Aucune statistique disponible'}</p>
         <p className="text-sm text-muted-foreground">
           Les statistiques s'afficheront automatiquement quand des modules seront utilisés
         </p>
@@ -97,7 +93,10 @@ export function MarketplaceStats() {
   }
 
   const { overview, categoryBreakdown } = stats
-  const totalCategoryModules = Object.values(categoryBreakdown).reduce((sum, count) => sum + count, 0)
+  const totalCategoryModules = Object.values(categoryBreakdown).reduce(
+    (sum, count) => sum + count,
+    0
+  )
 
   return (
     <div className="space-y-6">
@@ -125,9 +124,7 @@ export function MarketplaceStats() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{overview.totalDownloads.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              +12% ce mois
-            </p>
+            <p className="text-xs text-muted-foreground">+12% ce mois</p>
           </CardContent>
         </Card>
 
@@ -158,9 +155,7 @@ export function MarketplaceStats() {
       <Card>
         <CardHeader>
           <CardTitle>Répartition par Catégorie</CardTitle>
-          <CardDescription>
-            Distribution des modules par domaine fonctionnel
-          </CardDescription>
+          <CardDescription>Distribution des modules par domaine fonctionnel</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -170,7 +165,9 @@ export function MarketplaceStats() {
                 <div key={category} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${CATEGORY_COLORS[category as keyof typeof CATEGORY_COLORS]}`} />
+                      <div
+                        className={`w-3 h-3 rounded-full ${CATEGORY_COLORS[category as keyof typeof CATEGORY_COLORS]}`}
+                      />
                       <span>{CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS]}</span>
                     </div>
                     <span className="font-medium">{count} modules</span>

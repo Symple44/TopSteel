@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { apiClient } from '@/lib/api-client'
 import { callClientApi } from '@/utils/backend-api'
@@ -8,7 +8,16 @@ interface SystemParameter {
   key: string
   value: string
   type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON' | 'ENUM'
-  category: 'GENERAL' | 'COMPTABILITE' | 'PROJETS' | 'PRODUCTION' | 'ACHATS' | 'STOCKS' | 'NOTIFICATION' | 'SECURITY' | 'ELASTICSEARCH'
+  category:
+    | 'GENERAL'
+    | 'COMPTABILITE'
+    | 'PROJETS'
+    | 'PRODUCTION'
+    | 'ACHATS'
+    | 'STOCKS'
+    | 'NOTIFICATION'
+    | 'SECURITY'
+    | 'ELASTICSEARCH'
   description: string
   defaultValue?: string
   isEditable: boolean
@@ -32,7 +41,11 @@ export function useSystemParameters(): UseSystemParametersReturn {
   const [pendingUpdates, setPendingUpdates] = useState<Record<string, string>>({})
 
   // Fetch all system parameters
-  const { data: parametersList, isLoading, error } = useQuery({
+  const {
+    data: parametersList,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['system-parameters'],
     queryFn: async () => {
       const response = await callClientApi('admin/system-parameters')
@@ -44,10 +57,13 @@ export function useSystemParameters(): UseSystemParametersReturn {
   })
 
   // Convert parameters list to key-value object
-  const parameters = parametersList?.reduce((acc: Record<string, string>, param) => {
-    acc[param.key] = pendingUpdates[param.key] ?? param.value
-    return acc
-  }, {} as Record<string, string>)
+  const parameters = parametersList?.reduce(
+    (acc: Record<string, string>, param: any) => {
+      acc[param.key] = pendingUpdates[param.key] ?? param.value
+      return acc
+    },
+    {} as Record<string, string>
+  )
 
   // Update multiple parameters
   const updateMutation = useMutation({
@@ -69,7 +85,7 @@ export function useSystemParameters(): UseSystemParametersReturn {
 
   // Update a single parameter locally
   const updateParameter = (key: string, value: string) => {
-    setPendingUpdates(prev => ({ ...prev, [key]: value }))
+    setPendingUpdates((prev) => ({ ...prev, [key]: value }))
   }
 
   // Save all pending updates
@@ -78,7 +94,7 @@ export function useSystemParameters(): UseSystemParametersReturn {
       key,
       value,
     }))
-    
+
     if (updates.length > 0) {
       await updateMutation.mutateAsync(updates)
     }
@@ -87,26 +103,20 @@ export function useSystemParameters(): UseSystemParametersReturn {
   // Reset parameters to defaults
   const resetToDefaults = async () => {
     if (!parametersList) {
-      console.log('No parameters list available for reset')
       return
     }
-    
-    console.log('All parameters for reset:', parametersList)
-    
+
     const updates = parametersList
-      .filter(param => param.defaultValue !== undefined)
-      .map(param => ({
+      .filter((param: any) => param.defaultValue !== undefined)
+      .map((param: any) => ({
         key: param.key,
         value: param.defaultValue || '',
       }))
-    
-    console.log('Resetting parameters to defaults:', updates)
-    
+
     if (updates.length === 0) {
-      console.log('No parameters to reset')
       return
     }
-    
+
     await updateMutation.mutateAsync(updates)
   }
 
@@ -125,10 +135,10 @@ export function useSystemParametersByCategory(category?: string) {
   return useQuery({
     queryKey: ['system-parameters', 'by-category', category],
     queryFn: async () => {
-      const endpoint = category 
+      const endpoint = category
         ? `admin/system-parameters?category=${category}`
         : 'admin/system-parameters/by-category'
-      
+
       const response = await callClientApi(endpoint)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

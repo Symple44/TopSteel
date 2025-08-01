@@ -1,24 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Stockage temporaire - en production, utiliser une base de données
 let notifications: any[] = []
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const body = await request.json()
 
     // Trouver la notification
-    const notificationIndex = notifications.findIndex(n => n.id === id)
-    
+    const notificationIndex = notifications.findIndex((n) => n.id === id)
+
     if (notificationIndex === -1) {
-      return NextResponse.json(
-        { error: 'Notification not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
     }
 
     // Mettre à jour la notification
@@ -28,20 +22,14 @@ export async function PATCH(
       updatedAt: new Date().toISOString(),
     }
 
-
     return NextResponse.json(notifications[notificationIndex])
-
-  } catch (error) {
-    console.error('Error updating notification:', error)
-    return NextResponse.json(
-      { error: 'Failed to update notification' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Failed to update notification' }, { status: 500 })
   }
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -49,23 +37,14 @@ export async function DELETE(
 
     // Supprimer la notification
     const initialLength = notifications.length
-    notifications = notifications.filter(n => n.id !== id)
+    notifications = notifications.filter((n) => n.id !== id)
 
     if (notifications.length === initialLength) {
-      return NextResponse.json(
-        { error: 'Notification not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
     }
 
-
     return NextResponse.json({ success: true })
-
-  } catch (error) {
-    console.error('Error deleting notification:', error)
-    return NextResponse.json(
-      { error: 'Failed to delete notification' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Failed to delete notification' }, { status: 500 })
   }
 }

@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useToast } from '@erp/ui'
+import { useToast } from '@/hooks/use-toast'
 import { syncChecker } from '@/lib/sync-checker'
 
 export function useSyncNotifications() {
-  const { addToast } = useToast()
+  const { toast } = useToast()
 
   useEffect(() => {
     // Configurer le callback pour les notifications de sync
@@ -13,20 +13,20 @@ export function useSyncNotifications() {
       const severityToType = {
         low: 'default' as const,
         medium: 'warning' as const,
-        high: 'error' as const,
+        high: 'destructive' as const,
       }
 
-      addToast({
+      toast({
         title: 'Problème de synchronisation',
         description: issue.message,
-        type: severityToType[issue.severity],
+        variant: severityToType[issue.severity],
         duration: issue.severity === 'high' ? 8000 : 5000, // Plus long pour les erreurs critiques
       })
     })
 
     // Cleanup function pour éviter les fuites mémoire
     return () => {
-      syncChecker.setToastCallback(null)
+      syncChecker.setToastCallback(undefined as any)
     }
-  }, [addToast])
+  }, [toast])
 }

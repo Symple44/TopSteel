@@ -96,7 +96,6 @@ export {
 
 // ===== HOOKS NOTIFICATIONS =====
 export {
-  useCreateNotification,
   useFilteredNotifications,
   useNotifications,
   useNotificationsActions,
@@ -222,9 +221,7 @@ export const storeHelpers = {
         },
         monitor: StoreMonitor.getStats(),
       }
-    } catch (error) {
-      console.error('Erreur lors de la récupération des stats:', error)
-
+    } catch (_error) {
       return null
     }
   },
@@ -286,9 +283,7 @@ export const storeHelpers = {
       useAppStore.getState().reset()
       useAuthStore.getState().reset()
       useProjetStore.getState().reset()
-    } catch (error) {
-      console.error('❌ Erreur lors de la réinitialisation des stores:', error)
-    }
+    } catch (_error) {}
   },
 
   /**
@@ -296,8 +291,6 @@ export const storeHelpers = {
    */
   debugStoresState: () => {
     if (process.env.NODE_ENV === 'development') {
-      console.group('🔍 Debug Stores State')
-      console.groupEnd()
     }
   },
 }

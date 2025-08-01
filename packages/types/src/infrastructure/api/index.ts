@@ -3,11 +3,10 @@
  * Export des types pour la couche API
  */
 
-// Types pour les réponses
-export * from './responses'
+// Types pour le filtrage
+export * from './filters'
 
 // Types pour les requêtes
 export * from './requests'
-
-// Types pour le filtrage
-export * from './filters'
+// Types pour les réponses
+export * from './responses'

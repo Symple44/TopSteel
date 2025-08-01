@@ -10,31 +10,31 @@ export * from './metallurgy'
 
 export const BUSINESS_CONSTANTS = {
   VAT_RATES: {
-    STANDARD: 0.20,
-    REDUCED: 0.10,
+    STANDARD: 0.2,
+    REDUCED: 0.1,
     SUPER_REDUCED: 0.055,
     ZERO: 0,
   },
-  
+
   PAYMENT_TERMS: {
     IMMEDIATE: 0,
     NET_30: 30,
     NET_60: 60,
     NET_90: 90,
   },
-  
+
   CURRENCY: {
     DEFAULT: 'EUR',
     SYMBOL: '€',
     DECIMAL_PLACES: 2,
   },
-  
+
   QUOTE_VALIDITY: {
     STANDARD: 30, // jours
     EXPRESS: 7,
     CUSTOM: 60,
   },
-  
+
   PROJECT_PHASES: {
     STUDY: 'ETUDE',
     DESIGN: 'CONCEPTION',
@@ -42,13 +42,13 @@ export const BUSINESS_CONSTANTS = {
     DELIVERY: 'LIVRAISON',
     COMPLETED: 'TERMINE',
   },
-  
+
   QUALITY_STANDARDS: {
     ISO_9001: 'ISO 9001',
     EN_1090: 'EN 1090',
     CE_MARKING: 'Marquage CE',
   },
-  
+
   STOCK_THRESHOLDS: {
     CRITICAL: 5,
     LOW: 10,
@@ -62,13 +62,13 @@ export const UI_CONSTANTS = {
     DEFAULT_PAGE_SIZE: 25,
     PAGE_SIZE_OPTIONS: [10, 25, 50, 100],
   },
-  
+
   DEBOUNCE_DELAY: {
     SEARCH: 300,
     AUTO_SAVE: 1000,
     VALIDATION: 500,
   },
-  
+
   MAX_FILE_SIZE: {
     IMAGE: 5 * 1024 * 1024, // 5MB
     DOCUMENT: 10 * 1024 * 1024, // 10MB

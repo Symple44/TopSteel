@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { apiClient } from '@/lib/api-client'
 import { Save, X } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import { Textarea } from '@erp/ui/primitives'
+import { apiClient } from '@/lib/api-client'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { MenuItemEditor } from './menu-item-editor'
 
 interface Group {
@@ -83,41 +83,35 @@ export function MenuConfigurationEditor({
   configuration,
   menuTypes,
   onSave,
-  onCancel
+  onCancel,
 }: MenuConfigurationEditorProps) {
   const { t } = useTranslation('admin')
   const [formData, setFormData] = useState({
     name: configuration?.name || '',
-    description: configuration?.description || ''
+    description: configuration?.description || '',
   })
   const [menuItems, setMenuItems] = useState<MenuItem[]>(configuration?.items || [])
   const [saving, setSaving] = useState(false)
-  
+
   // États pour les données de droits
   const [availableGroups, setAvailableGroups] = useState<Group[]>([])
   const [availableRoles, setAvailableRoles] = useState<Role[]>([])
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([])
   const [rightsLoading, setRightsLoading] = useState(true)
 
-  // Charger les données de droits au montage
-  useEffect(() => {
-    loadRightsData()
-  }, [])
-
-  const loadRightsData = async () => {
+  const loadRightsData = useCallback(async () => {
     setRightsLoading(true)
     try {
       const [groupsResponse, rolesResponse, permissionsResponse] = await Promise.all([
         apiClient.get('/admin/groups'),
         apiClient.get('/admin/roles'),
-        apiClient.get('/admin/permissions')
+        apiClient.get('/admin/permissions'),
       ])
-      
-      setAvailableGroups((groupsResponse as any)?.data?.data || [])
-      setAvailableRoles((rolesResponse as any)?.data?.data || [])
-      setAvailablePermissions((permissionsResponse as any)?.data?.data || [])
-    } catch (error) {
-      console.error('Erreur lors du chargement des données de droits:', error)
+
+      setAvailableGroups(groupsResponse?.data?.data || [])
+      setAvailableRoles(rolesResponse?.data?.data || [])
+      setAvailablePermissions(permissionsResponse?.data?.data || [])
+    } catch (_error) {
       // Utiliser des données par défaut en cas d'erreur
       setAvailableGroups([])
       setAvailableRoles([])
@@ -125,7 +119,12 @@ export function MenuConfigurationEditor({
     } finally {
       setRightsLoading(false)
     }
-  }
+  }, [])
+
+  // Charger les données de droits au montage
+  useEffect(() => {
+    loadRightsData()
+  }, [loadRightsData])
 
   const handleSave = async () => {
     setSaving(true)
@@ -133,7 +132,7 @@ export function MenuConfigurationEditor({
       const configData = {
         name: formData.name,
         description: formData.description,
-        items: menuItems
+        items: menuItems,
       }
 
       if (configuration?.id) {
@@ -145,8 +144,7 @@ export function MenuConfigurationEditor({
       }
 
       onSave(configData as MenuConfiguration)
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
+    } catch (_error) {
     } finally {
       setSaving(false)
     }
@@ -159,7 +157,7 @@ export function MenuConfigurationEditor({
       icon: 'Play',
       orderIndex: menuItems.length,
       isVisible: true,
-      children: []
+      children: [],
     }
     setMenuItems([...menuItems, newItem])
   }
@@ -197,7 +195,9 @@ export function MenuConfigurationEditor({
       <Card>
         <CardHeader>
           <CardTitle>
-            {configuration ? t('menuConfig.editor.editConfiguration') : t('menuConfig.editor.newConfiguration')}
+            {configuration
+              ? t('menuConfig.editor.editConfiguration')
+              : t('menuConfig.editor.newConfiguration')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -238,7 +238,9 @@ export function MenuConfigurationEditor({
           {rightsLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="text-muted-foreground mt-2">{t('menuConfig.editor.loadingRightsData')}</p>
+              <p className="text-muted-foreground mt-2">
+                {t('menuConfig.editor.loadingRightsData')}
+              </p>
             </div>
           ) : menuItems.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
@@ -249,14 +251,15 @@ export function MenuConfigurationEditor({
             <div className="space-y-4">
               {menuItems.map((item, index) => (
                 <MenuItemEditor
-                  key={index}
+                  key={item.id || `menu-item-${index}`}
                   item={item}
-                  index={index}
                   menuTypes={menuTypes}
                   onUpdate={(updatedItem) => updateMenuItem(index, updatedItem)}
                   onDelete={() => deleteMenuItem(index)}
                   onMoveUp={index > 0 ? () => moveMenuItem(index, 'up') : undefined}
-                  onMoveDown={index < menuItems.length - 1 ? () => moveMenuItem(index, 'down') : undefined}
+                  onMoveDown={
+                    index < menuItems.length - 1 ? () => moveMenuItem(index, 'down') : undefined
+                  }
                   availableGroups={availableGroups}
                   availableRoles={availableRoles}
                   availablePermissions={availablePermissions}

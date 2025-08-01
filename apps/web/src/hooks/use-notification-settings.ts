@@ -3,7 +3,7 @@
  * Fichier: apps/web/src/hooks/use-notification-settings.ts
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '@/utils/backend-api'
 
 export interface NotificationSettings {
@@ -52,20 +52,20 @@ const defaultSettings: NotificationSettings = {
     taskReminders: false,
     weeklyReports: true,
     securityAlerts: true,
-    maintenanceNotice: false
+    maintenanceNotice: false,
   },
   pushTypes: {
     enabled: true,
     sound: true,
     urgent: true,
     normal: false,
-    quiet: true
+    quiet: true,
   },
   quietHours: {
     enabled: true,
     start: '22:00',
-    end: '07:00'
-  }
+    end: '07:00',
+  },
 }
 
 // Clé pour le localStorage
@@ -81,11 +81,11 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
     const loadSettings = async () => {
       try {
         setIsLoading(true)
-        
+
         // Essayer de charger depuis l'API d'abord
         try {
           const response = await callClientApi('users/notifications/me')
-          
+
           if (response.ok) {
             const apiSettings = await response.json()
             setSettings(apiSettings)
@@ -94,10 +94,10 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(apiSettings))
             return
           }
-        } catch (apiError) {
+        } catch (_apiError) {
           // API unavailable, using localStorage
         }
-        
+
         // Fallback vers le localStorage
         const localSettings = localStorage.getItem(STORAGE_KEY)
         if (localSettings) {
@@ -109,9 +109,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
           setSettings(defaultSettings)
           setSavedSettings(defaultSettings)
         }
-        
-      } catch (error) {
-        console.error('Erreur lors du chargement des paramètres de notification:', error)
+      } catch (_error) {
         // En cas d'erreur, utiliser les paramètres par défaut
         setSettings(defaultSettings)
         setSavedSettings(defaultSettings)
@@ -125,19 +123,22 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
 
   // Mettre à jour un paramètre principal
   const updateSetting = useCallback((key: keyof NotificationSettings, value: any) => {
-    setSettings(prev => ({ ...prev, [key]: value }))
+    setSettings((prev) => ({ ...prev, [key]: value }))
   }, [])
 
   // Mettre à jour un paramètre imbriqué
-  const updateNestedSetting = useCallback((category: keyof NotificationSettings, key: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [key]: value
-      }
-    }))
-  }, [])
+  const updateNestedSetting = useCallback(
+    (category: keyof NotificationSettings, key: string, value: any) => {
+      setSettings((prev) => ({
+        ...prev,
+        [category]: {
+          ...(prev[category] as any),
+          [key]: value,
+        },
+      }))
+    },
+    []
+  )
 
   // Sauvegarder les paramètres
   const saveSettings = useCallback(async () => {
@@ -148,7 +149,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
           method: 'PATCH',
           body: JSON.stringify(settings),
         })
-        
+
         if (response.ok) {
           const updatedSettings = await response.json()
           setSavedSettings(updatedSettings)
@@ -159,17 +160,15 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
         } else {
           // Server save failed, using local storage
         }
-      } catch (apiError) {
+      } catch (_apiError) {
         // API unavailable, using local storage
       }
-      
+
       // Fallback vers localStorage
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
       setSavedSettings(settings)
       // Notification settings saved locally
-      
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde des paramètres:', error)
+    } catch (_error) {
       throw new Error('Impossible de sauvegarder les paramètres')
     }
   }, [settings])
@@ -189,6 +188,6 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
     saveSettings,
     resetSettings,
     isLoading,
-    hasUnsavedChanges
+    hasUnsavedChanges,
   }
 }

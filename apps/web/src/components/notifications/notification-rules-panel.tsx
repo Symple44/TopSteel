@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Badge,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -21,34 +20,31 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Textarea,
+  Separator,
   Switch,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-  Separator
+  Textarea,
 } from '@erp/ui'
-import { PermissionGuard, PermissionHide } from '@/components/auth/permission-guard'
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Play, 
-  Pause, 
-  AlertTriangle, 
-  User, 
-  Package, 
-  Mail, 
-  FileText,
-  Settings,
-  Database,
-  Wrench,
+import {
   CheckCircle,
-  XCircle,
   Clock,
-  Filter
+  Database,
+  Edit,
+  FileText,
+  Filter,
+  Mail,
+  Package,
+  Plus,
+  Settings,
+  Trash2,
+  User,
+  XCircle,
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { PermissionHide } from '@/components/auth/permission-guard'
 
 // Types pour les règles de notification
 interface NotificationRule {
@@ -133,7 +129,7 @@ const AVAILABLE_EVENTS = {
     { value: 'system_update', label: 'Mise à jour système' },
     { value: 'system_error', label: 'Erreur système' },
     { value: 'database_error', label: 'Erreur base de données' },
-  ]
+  ],
 }
 
 const CATEGORY_ICONS = {
@@ -172,47 +168,46 @@ export default function NotificationRulesPanel() {
       {
         id: '1',
         name: 'Alerte Stock Critique',
-        description: 'Notifier quand le stock d\'un matériau passe sous le seuil critique',
+        description: "Notifier quand le stock d'un matériau passe sous le seuil critique",
         isActive: true,
         trigger: {
           type: 'stock',
           event: 'stock_low',
-          source: 'inventory-service'
+          source: 'inventory-service',
         },
         conditions: [
           { field: 'quantity', operator: 'less_than', value: 10 },
-          { field: 'category', operator: 'in', value: ['metal', 'steel'] }
+          { field: 'category', operator: 'in', value: ['metal', 'steel'] },
         ],
         notification: {
           type: 'warning',
           category: 'stock',
           titleTemplate: 'Stock critique: {{material_name}}',
-          messageTemplate: 'Le stock de {{material_name}} est maintenant de {{quantity}} unités (seuil: {{threshold}})',
+          messageTemplate:
+            'Le stock de {{material_name}} est maintenant de {{quantity}} unités (seuil: {{threshold}})',
           priority: 'HIGH',
           recipientType: 'role',
           recipientIds: ['stock_manager', 'admin'],
           actionUrl: '/stock/materials/{{material_id}}',
           actionLabel: 'Voir le stock',
           persistent: true,
-          expiresIn: 24
+          expiresIn: 24,
         },
         createdAt: '2024-01-15T10:30:00Z',
         lastTriggered: '2024-01-16T14:22:00Z',
-        triggerCount: 15
+        triggerCount: 15,
       },
       {
         id: '2',
         name: 'Nouveau Projet',
-        description: 'Notifier l\'équipe quand un nouveau projet est créé',
+        description: "Notifier l'équipe quand un nouveau projet est créé",
         isActive: true,
         trigger: {
           type: 'project',
           event: 'project_created',
-          source: 'project-service'
+          source: 'project-service',
         },
-        conditions: [
-          { field: 'priority', operator: 'in', value: ['HIGH', 'URGENT'] }
-        ],
+        conditions: [{ field: 'priority', operator: 'in', value: ['HIGH', 'URGENT'] }],
         notification: {
           type: 'info',
           category: 'projet',
@@ -224,11 +219,11 @@ export default function NotificationRulesPanel() {
           actionUrl: '/projets/{{project_id}}',
           actionLabel: 'Voir le projet',
           persistent: true,
-          expiresIn: 48
+          expiresIn: 48,
         },
         createdAt: '2024-01-10T09:15:00Z',
         lastTriggered: '2024-01-16T11:45:00Z',
-        triggerCount: 8
+        triggerCount: 8,
       },
       {
         id: '3',
@@ -238,46 +233,44 @@ export default function NotificationRulesPanel() {
         trigger: {
           type: 'user',
           event: 'password_changed',
-          source: 'auth-service'
+          source: 'auth-service',
         },
-        conditions: [
-          { field: 'role', operator: 'in', value: ['admin', 'manager'] }
-        ],
+        conditions: [{ field: 'role', operator: 'in', value: ['admin', 'manager'] }],
         notification: {
           type: 'info',
           category: 'utilisateur',
           titleTemplate: 'Mot de passe modifié',
-          messageTemplate: 'L\'utilisateur {{username}} a modifié son mot de passe',
+          messageTemplate: "L'utilisateur {{username}} a modifié son mot de passe",
           priority: 'LOW',
           recipientType: 'role',
           recipientIds: ['admin'],
           persistent: false,
-          expiresIn: 6
+          expiresIn: 6,
         },
         createdAt: '2024-01-12T16:20:00Z',
-        triggerCount: 3
-      }
+        triggerCount: 3,
+      },
     ]
     setRules(mockRules)
   }, [])
 
   const handleToggleRule = (ruleId: string) => {
-    setRules(rules.map(rule => 
-      rule.id === ruleId ? { ...rule, isActive: !rule.isActive } : rule
-    ))
+    setRules(
+      rules.map((rule) => (rule.id === ruleId ? { ...rule, isActive: !rule.isActive } : rule))
+    )
   }
 
   const handleDeleteRule = (ruleId: string) => {
-    setRules(rules.filter(rule => rule.id !== ruleId))
+    setRules(rules.filter((rule) => rule.id !== ruleId))
   }
 
   const getEventLabel = (trigger: EventTrigger) => {
     const events = AVAILABLE_EVENTS[trigger.type]
-    const event = events.find(e => e.value === trigger.event)
+    const event = events.find((e) => e.value === trigger.event)
     return event?.label || trigger.event
   }
 
-  const IconComponent = CATEGORY_ICONS[selectedRule?.trigger.type || 'system']
+  const _IconComponent = CATEGORY_ICONS[selectedRule?.trigger.type || 'system']
 
   return (
     <div className="space-y-6">
@@ -285,7 +278,8 @@ export default function NotificationRulesPanel() {
         <div>
           <h2 className="text-2xl font-bold">Règles de Notification</h2>
           <p className="text-muted-foreground">
-            Créez des règles automatiques pour générer des notifications basées sur des événements système
+            Créez des règles automatiques pour générer des notifications basées sur des événements
+            système
           </p>
         </div>
         <PermissionHide permission="NOTIFICATION_RULES" roles={['ADMIN', 'MANAGER']}>
@@ -296,13 +290,13 @@ export default function NotificationRulesPanel() {
                 Nouvelle règle
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Créer une nouvelle règle</DialogTitle>
-            </DialogHeader>
-            <RuleForm onSave={() => setIsCreateDialogOpen(false)} />
-          </DialogContent>
-        </Dialog>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Créer une nouvelle règle</DialogTitle>
+              </DialogHeader>
+              <RuleForm onSave={() => setIsCreateDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
         </PermissionHide>
       </div>
 
@@ -332,7 +326,7 @@ export default function NotificationRulesPanel() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant={rule.isActive ? "default" : "secondary"}>
+                      <Badge variant={rule.isActive ? 'default' : 'secondary'}>
                         {rule.isActive ? (
                           <>
                             <CheckCircle className="h-3 w-3 mr-1" />
@@ -384,11 +378,10 @@ export default function NotificationRulesPanel() {
                         <div className="flex flex-wrap gap-2">
                           {rule.conditions.map((condition, index) => (
                             <Badge key={index} variant="outline" className="text-xs">
-                              {condition.field} {condition.operator} {
-                                Array.isArray(condition.value) 
-                                  ? condition.value.join(', ') 
-                                  : condition.value
-                              }
+                              {condition.field} {condition.operator}{' '}
+                              {Array.isArray(condition.value)
+                                ? condition.value.join(', ')
+                                : condition.value}
                             </Badge>
                           ))}
                         </div>
@@ -409,7 +402,10 @@ export default function NotificationRulesPanel() {
                         )}
                       </div>
                       <div className="flex items-center space-x-2">
-                        <PermissionHide permission="NOTIFICATION_RULES" roles={['ADMIN', 'MANAGER']}>
+                        <PermissionHide
+                          permission="NOTIFICATION_RULES"
+                          roles={['ADMIN', 'MANAGER']}
+                        >
                           <Button
                             variant="outline"
                             size="sm"
@@ -457,9 +453,7 @@ export default function NotificationRulesPanel() {
           <Card>
             <CardHeader>
               <CardTitle>Templates de notification</CardTitle>
-              <CardDescription>
-                Gérez vos templates de notification réutilisables
-              </CardDescription>
+              <CardDescription>Gérez vos templates de notification réutilisables</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">Fonctionnalité à venir...</p>
@@ -475,10 +469,7 @@ export default function NotificationRulesPanel() {
             <DialogTitle>Modifier la règle</DialogTitle>
           </DialogHeader>
           {selectedRule && (
-            <RuleForm 
-              rule={selectedRule} 
-              onSave={() => setIsEditDialogOpen(false)} 
-            />
+            <RuleForm rule={selectedRule} onSave={() => setIsEditDialogOpen(false)} />
           )}
         </DialogContent>
       </Dialog>
@@ -528,7 +519,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder="Ex: Alerte stock critique"
               />
             </div>
@@ -538,11 +531,11 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
                 <Switch
                   id="isActive"
                   checked={formData.isActive}
-                  onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, isActive: checked }))}
+                  onCheckedChange={(checked: boolean) =>
+                    setFormData((prev) => ({ ...prev, isActive: checked }))
+                  }
                 />
-                <Label htmlFor="isActive">
-                  {formData.isActive ? 'Actif' : 'Inactif'}
-                </Label>
+                <Label htmlFor="isActive">{formData.isActive ? 'Actif' : 'Inactif'}</Label>
               </div>
             </div>
           </div>
@@ -551,7 +544,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setFormData((prev) => ({ ...prev, description: e.target.value }))
+              }
               placeholder="Décrivez quand cette règle doit s'activer..."
               rows={3}
             />
@@ -564,7 +559,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Label htmlFor="triggerType">Type d'événement</Label>
               <Select
                 value={formData.triggerType}
-                onValueChange={(value: string) => setFormData(prev => ({ ...prev, triggerType: value as any, triggerEvent: '' }))}
+                onValueChange={(value: string) =>
+                  setFormData((prev) => ({ ...prev, triggerType: value as any, triggerEvent: '' }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez un type" />
@@ -583,17 +580,21 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Label htmlFor="triggerEvent">Événement</Label>
               <Select
                 value={formData.triggerEvent}
-                onValueChange={(value: string) => setFormData(prev => ({ ...prev, triggerEvent: value }))}
+                onValueChange={(value: string) =>
+                  setFormData((prev) => ({ ...prev, triggerEvent: value }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez un événement" />
                 </SelectTrigger>
                 <SelectContent>
-                  {AVAILABLE_EVENTS[formData.triggerType as keyof typeof AVAILABLE_EVENTS]?.map((event) => (
-                    <SelectItem key={event.value} value={event.value}>
-                      {event.label}
-                    </SelectItem>
-                  ))}
+                  {AVAILABLE_EVENTS[formData.triggerType as keyof typeof AVAILABLE_EVENTS]?.map(
+                    (event) => (
+                      <SelectItem key={event.value} value={event.value}>
+                        {event.label}
+                      </SelectItem>
+                    )
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -622,7 +623,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Label htmlFor="notificationType">Type de notification</Label>
               <Select
                 value={formData.notificationType}
-                onValueChange={(value: string) => setFormData(prev => ({ ...prev, notificationType: value as any }))}
+                onValueChange={(value: string) =>
+                  setFormData((prev) => ({ ...prev, notificationType: value as any }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -639,7 +642,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Label htmlFor="priority">Priorité</Label>
               <Select
                 value={formData.priority}
-                onValueChange={(value: string) => setFormData(prev => ({ ...prev, priority: value as any }))}
+                onValueChange={(value: string) =>
+                  setFormData((prev) => ({ ...prev, priority: value as any }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -658,7 +663,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
             <Input
               id="titleTemplate"
               value={formData.titleTemplate}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, titleTemplate: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData((prev) => ({ ...prev, titleTemplate: e.target.value }))
+              }
               placeholder="Ex: Stock critique: {{material_name}}"
             />
             <p className="text-xs text-muted-foreground">
@@ -670,7 +677,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
             <Textarea
               id="messageTemplate"
               value={formData.messageTemplate}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, messageTemplate: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setFormData((prev) => ({ ...prev, messageTemplate: e.target.value }))
+              }
               placeholder="Ex: Le stock de {{material_name}} est maintenant de {{quantity}} unités"
               rows={3}
             />
@@ -681,7 +690,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Input
                 id="actionUrl"
                 value={formData.actionUrl}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, actionUrl: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData((prev) => ({ ...prev, actionUrl: e.target.value }))
+                }
                 placeholder="Ex: /stock/materials/{{material_id}}"
               />
             </div>
@@ -690,7 +701,9 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Input
                 id="actionLabel"
                 value={formData.actionLabel}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, actionLabel: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData((prev) => ({ ...prev, actionLabel: e.target.value }))
+                }
                 placeholder="Ex: Voir le stock"
               />
             </div>
@@ -704,9 +717,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
         <Button variant="outline" onClick={onSave}>
           Annuler
         </Button>
-        <Button onClick={handleSave}>
-          {rule ? 'Modifier' : 'Créer'} la règle
-        </Button>
+        <Button onClick={handleSave}>{rule ? 'Modifier' : 'Créer'} la règle</Button>
       </div>
     </div>
   )

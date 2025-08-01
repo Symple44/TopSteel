@@ -1,32 +1,30 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { 
-  Play, 
-  Save, 
-  Download, 
-  Database, 
-  Table2, 
-  Columns, 
-  Filter, 
-  SortAsc,
-  Plus,
-  X,
-  Eye,
+import {
   Code,
-  Settings
+  Columns,
+  Database,
+  Download,
+  Eye,
+  Play,
+  Plus,
+  Save,
+  Settings,
+  Table2,
+  X,
 } from 'lucide-react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DataTablePreview } from './datatable-preview'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import { ScrollArea } from '@erp/ui'
+import { Separator } from '@erp/ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { callClientApi } from '@/utils/backend-api'
+import { DataTablePreview } from './datatable-preview'
 
 interface Table {
   name: string
@@ -80,7 +78,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
     if (initialData) {
       loadInitialData()
     }
-  }, [])
+  }, [fetchTables, initialData, loadInitialData])
 
   const fetchTables = async () => {
     try {
@@ -89,17 +87,14 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
         const tables = await response.json()
         setAvailableTables(tables)
       } else {
-        console.error('Failed to fetch tables:', response.status, response.statusText)
       }
-    } catch (error) {
-      console.error('Failed to fetch tables:', error)
-    }
+    } catch (_error) {}
   }
 
   const loadInitialData = () => {
     // Charger les données initiales si édition d'un query existant
     if (initialData?.mainTable) {
-      const table = availableTables.find(t => t.name === initialData.mainTable)
+      const table = availableTables.find((t) => t.name === initialData.mainTable)
       if (table) {
         setSelectedTable(table)
       }
@@ -115,10 +110,10 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
     }
 
     let sql = 'SELECT '
-    
+
     // Colonnes
-    const columnParts = selectedColumns.map(col => {
-      let part = `${col.table ? col.table + '.' : ''}${col.column}`
+    const columnParts = selectedColumns.map((col) => {
+      let part = `${col.table ? `${col.table}.` : ''}${col.column}`
       if (col.aggregation) {
         part = `${col.aggregation}(${part})`
       }
@@ -127,23 +122,23 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
       }
       return part
     })
-    
+
     sql += columnParts.join(', ')
     sql += `\nFROM ${selectedTable.name}`
 
     // Filtres
     if (filters.length > 0) {
       sql += '\nWHERE '
-      const filterParts = filters.map(filter => {
+      const filterParts = filters.map((filter) => {
         const operators = {
           equals: '=',
           not_equals: '!=',
           contains: 'LIKE',
           starts_with: 'LIKE',
           greater_than: '>',
-          less_than: '<'
+          less_than: '<',
         }
-        
+
         let value = filter.value
         if (filter.operator === 'contains') {
           value = `'%${value}%'`
@@ -152,7 +147,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
         } else if (typeof value === 'string') {
           value = `'${value}'`
         }
-        
+
         return `${filter.column} ${operators[filter.operator]} ${value}`
       })
       sql += filterParts.join(' AND ')
@@ -186,26 +181,23 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
         method: 'POST',
         body: JSON.stringify({
           sql: sql,
-          limit: Math.min(limit, 100) // Limiter à 100 résultats max pour l'aperçu
-        })
+          limit: Math.min(limit, 100), // Limiter à 100 résultats max pour l'aperçu
+        }),
       })
 
       if (response.ok) {
         const result = await response.json()
-        console.log('SQL execution result:', result)
-        
+
         // Adapter les données selon le format retourné
         const data = Array.isArray(result) ? result : result.data || result.rows || []
         setPreviewData(data)
         toast.success(`Requête exécutée avec succès (${data.length} résultats)`)
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        console.error('SQL execution failed:', response.status, errorData)
         toast.error(`Erreur lors de l'exécution: ${errorData.error || 'Erreur inconnue'}`)
       }
-    } catch (error) {
-      console.error('Query execution failed:', error)
-      toast.error('Erreur lors de l\'exécution de la requête')
+    } catch (_error) {
+      toast.error("Erreur lors de l'exécution de la requête")
     } finally {
       setLoading(false)
     }
@@ -214,7 +206,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
   const addColumn = (table: Table, column: Column) => {
     const newColumn: SelectedColumn = {
       table: table.name,
-      column: column.name
+      column: column.name,
     }
     setSelectedColumns([...selectedColumns, newColumn])
   }
@@ -225,11 +217,11 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
 
   const addFilter = () => {
     if (selectedColumns.length === 0) return
-    
+
     const newFilter: Filter = {
       column: selectedColumns[0].column,
       operator: 'equals',
-      value: ''
+      value: '',
     }
     setFilters([...filters, newFilter])
   }
@@ -259,17 +251,18 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
       sortBy,
       sortOrder,
       limit,
-      sql: generateSQL()
+      sql: generateSQL(),
     }
 
     setLoading(true)
     try {
-      const endpoint = queryBuilderId === 'new' ? 'query-builder' : `query-builder/${queryBuilderId}`
+      const endpoint =
+        queryBuilderId === 'new' ? 'query-builder' : `query-builder/${queryBuilderId}`
       const method = queryBuilderId === 'new' ? 'POST' : 'PATCH'
-      
+
       const response = await callClientApi(endpoint, {
         method,
-        body: JSON.stringify(queryData)
+        body: JSON.stringify(queryData),
       })
 
       if (response.ok) {
@@ -281,8 +274,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
       } else {
         throw new Error('Save failed')
       }
-    } catch (error) {
-      console.error('Save failed:', error)
+    } catch (_error) {
       toast.error('Erreur lors de la sauvegarde')
     } finally {
       setLoading(false)
@@ -293,7 +285,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
     if (selectedColumns.length > 0) {
       generateSQL()
     }
-  }, [selectedColumns, filters, sortBy, sortOrder, limit])
+  }, [selectedColumns, generateSQL])
 
   return (
     <div className="h-full flex flex-col">
@@ -467,9 +459,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                   </CardHeader>
                   <CardContent>
                     {filters.length === 0 ? (
-                      <p className="text-muted-foreground text-sm">
-                        Aucun filtre défini
-                      </p>
+                      <p className="text-muted-foreground text-sm">Aucun filtre défini</p>
                     ) : (
                       <div className="space-y-3">
                         {filters.map((filter, index) => (
@@ -588,7 +578,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                         <p>Cliquez sur "Exécuter" pour voir l'aperçu</p>
                       </div>
                     ) : (
-                      <DataTablePreview 
+                      <DataTablePreview
                         data={previewData}
                         columns={selectedColumns.map((col, index) => ({
                           alias: col.alias || `${col.table}.${col.column}`,
@@ -600,7 +590,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                           isSortable: true,
                           isFilterable: true,
                           displayOrder: index,
-                          aggregation: col.aggregation
+                          aggregation: col.aggregation,
                         }))}
                         calculatedFields={[]}
                         layout={{}}

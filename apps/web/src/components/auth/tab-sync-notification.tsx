@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Building, RefreshCw, LogOut, AlertCircle } from 'lucide-react'
-import { useAuth } from '@/hooks/use-auth'
+import { AlertCircle, Building, LogOut, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { Button } from '@erp/ui/primitives'
+import { useAuth } from '@/hooks/use-auth'
 import { getTabId } from '@/lib/tab-id'
 
 interface TabSyncNotificationProps {
@@ -16,9 +16,9 @@ interface TabSyncNotificationProps {
 export default function TabSyncNotification({ enabled = true }: TabSyncNotificationProps) {
   const { company, user, isAuthenticated } = useAuth()
   const router = useRouter()
-  const [lastCompanyId, setLastCompanyId] = useState<string | null>(null)
-  const [lastUserId, setLastUserId] = useState<string | null>(null)
-  
+  const [_lastCompanyId, setLastCompanyId] = useState<string | null>(null)
+  const [_lastUserId, setLastUserId] = useState<string | null>(null)
+
   // Identifiant unique pour cet onglet (partagé globalement)
   const tabId = useRef<string>(getTabId())
 
@@ -26,15 +26,15 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
     if (!enabled || typeof window === 'undefined') return
 
     const channel = new BroadcastChannel('topsteel-auth')
-    
+
     const handleMessage = (event: MessageEvent) => {
       const { type, data, tabId: senderTabId } = event.data
-      
+
       // Ignorer les messages de notre propre onglet
       if (senderTabId === tabId.current) {
         return
       }
-      
+
       switch (type) {
         case 'COMPANY_CHANGED':
           // Notifier seulement si on est sur une société différente
@@ -129,7 +129,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
     }
 
     channel.addEventListener('message', handleMessage)
-    
+
     return () => {
       channel.removeEventListener('message', handleMessage)
       channel.close()

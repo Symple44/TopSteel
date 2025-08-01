@@ -1,10 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { fetchBackend } from '@/lib/auth-server'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const response = await fetchBackend(`/marketplace/modules/${id}`, request)
@@ -18,26 +15,19 @@ export async function GET(
 
     const module = await response.json()
     return NextResponse.json(module)
-  } catch (error) {
-    console.error('Erreur lors de la récupération du module:', error)
-    return NextResponse.json(
-      { error: 'Erreur lors de la récupération du module' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur lors de la récupération du module' }, { status: 500 })
   }
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const body = await request.json()
 
     const response = await fetchBackend(`/marketplace/modules/${id}/install`, request, {
       method: 'POST',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     })
 
     if (!response.ok) {
@@ -47,11 +37,7 @@ export async function POST(
 
     const result = await response.json()
     return NextResponse.json(result)
-  } catch (error) {
-    console.error('Erreur lors de l\'installation du module:', error)
-    return NextResponse.json(
-      { error: 'Erreur lors de l\'installation du module' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: "Erreur lors de l'installation du module" }, { status: 500 })
   }
 }

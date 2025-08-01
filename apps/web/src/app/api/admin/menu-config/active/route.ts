@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Configuration du menu standard définie par les administrateurs
     // Ce menu est identique pour tous les utilisateurs en mode standard
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
           orderIndex: 0,
           isVisible: true,
           depth: 0,
-          children: []
+          children: [],
         },
         {
           id: 'query-builder',
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
           orderIndex: 1,
           isVisible: true,
           depth: 0,
-          children: []
+          children: [],
         },
         {
           id: 'administration',
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
               isVisible: true,
               depth: 1,
               roles: ['SUPER_ADMIN', 'ADMIN'],
-              children: []
+              children: [],
             },
             {
               id: 'admin-roles',
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
               isVisible: true,
               depth: 1,
               roles: ['SUPER_ADMIN', 'ADMIN'],
-              children: []
+              children: [],
             },
             {
               id: 'admin-users',
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
               isVisible: true,
               depth: 1,
               roles: ['SUPER_ADMIN', 'ADMIN'],
-              children: []
+              children: [],
             },
             {
               id: 'admin-sessions',
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
               isVisible: true,
               depth: 1,
               roles: ['SUPER_ADMIN', 'ADMIN'],
-              children: []
+              children: [],
             },
             {
               id: 'admin-translations',
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
               isVisible: true,
               depth: 1,
               roles: ['SUPER_ADMIN', 'ADMIN'],
-              children: []
+              children: [],
             },
             {
               id: 'admin-datatable-test',
@@ -127,9 +127,9 @@ export async function GET(request: NextRequest) {
               isVisible: true,
               depth: 1,
               roles: ['SUPER_ADMIN', 'ADMIN'],
-              children: []
-            }
-          ]
+              children: [],
+            },
+          ],
         },
         {
           id: 'settings',
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
               orderIndex: 0,
               isVisible: true,
               depth: 1,
-              children: []
+              children: [],
             },
             {
               id: 'settings-menu',
@@ -164,28 +164,26 @@ export async function GET(request: NextRequest) {
               orderIndex: 1,
               isVisible: true,
               depth: 1,
-              children: []
-            }
-          ]
-        }
-      ]
+              children: [],
+            },
+          ],
+        },
+      ],
     }
 
     const response = {
       success: true,
       data: standardMenuConfig,
-      message: 'Configuration de menu standard récupérée avec succès'
+      message: 'Configuration de menu standard récupérée avec succès',
     }
 
     return NextResponse.json(response, { status: 200 })
-
   } catch (error) {
-    console.error('Erreur lors du chargement de la configuration de menu standard:', error)
     return NextResponse.json(
       {
         success: false,
         message: 'Erreur lors du chargement de la configuration de menu',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     )

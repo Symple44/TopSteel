@@ -1,24 +1,24 @@
 // Exports pour le module de notifications
-export * from './types'
-export * from './service'
 
+export * from './service'
 // Re-exports pour compatibilité
 export { NotificationDatabaseService } from './service'
-export type { 
-  Notification,
-  NotificationSettings,
-  NotificationTemplate,
-  NotificationStats,
+export type {
+  CreateNotificationFromTemplateRequest,
   CreateNotificationRequest,
-  UpdateNotificationRequest,
+  Notification,
+  NotificationAction,
+  NotificationCategory,
   NotificationFilters,
   NotificationListResponse,
-  CreateNotificationFromTemplateRequest,
-  NotificationService,
-  NotificationCategory,
+  NotificationMetadata,
   NotificationPriority,
+  NotificationService,
+  NotificationSettings,
+  NotificationStats,
+  NotificationTemplate,
   NotificationType,
   RecipientType,
-  NotificationAction,
-  NotificationMetadata
+  UpdateNotificationRequest,
 } from './types'
+export * from './types'

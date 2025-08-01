@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('accessToken')?.value
-    
+
     if (!accessToken) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     // Appeler l'API backend pour ajouter la vue au menu utilisateur
     const response = await callBackendFromApi(req, 'admin/menus/user-data-view', {
       method: 'POST',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     })
 
     if (!response.ok) {
@@ -27,17 +27,17 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: responseData.data
+      data: responseData.data,
     })
-
   } catch (error: any) {
-    console.error('Erreur lors de l\'ajout de la vue au menu:', error)
-    
-    return NextResponse.json({ 
-      success: false, 
-      message: error.response?.data?.message || 'Erreur serveur' 
-    }, { 
-      status: error.response?.status || 500 
-    })
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.response?.data?.message || 'Erreur serveur',
+      },
+      {
+        status: error.response?.status || 500,
+      }
+    )
   }
 }

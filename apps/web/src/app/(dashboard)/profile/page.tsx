@@ -3,30 +3,45 @@
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Badge, Button, Input } from '@erp/ui'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input } from '@erp/ui'
 import {
+  Building2,
   Camera,
+  Clock,
   Eye,
   EyeOff,
+  Loader2,
   Mail,
   MapPin,
   Phone,
+  RotateCcw,
   Save,
   Shield,
   User,
-  Loader2,
-  Building2,
-  Calendar,
-  Clock,
-  RotateCcw,
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { ImageUploadWrapper as ImageUpload } from '@/components/wrappers'
 import { useAuth } from '@/hooks/use-auth'
 import { useTranslation } from '@/lib/i18n'
-import { toast } from 'sonner'
-import ImageUpload from '@/components/ui/image-upload'
 import { callClientApi } from '@/utils/backend-api'
+
+interface ExtendedUser {
+  id?: string
+  email?: string
+  prenom?: string
+  nom?: string
+  role?: string
+  permissions?: string[]
+  acronyme?: string
+  telephone?: string
+  poste?: string
+  departement?: string
+  adresse?: string
+  ville?: string
+  codePostal?: string
+  pays?: string
+}
 
 export default function ProfilePage() {
   const { user } = useAuth()
@@ -39,7 +54,10 @@ export default function ProfilePage() {
   // Fonction pour générer automatiquement l'acronyme
   const generateAcronym = (prenom: string, nom: string) => {
     const prenomInitial = prenom.charAt(0).toUpperCase()
-    const nomInitials = nom.split(' ').map(part => part.charAt(0).toUpperCase()).join('')
+    const nomInitials = nom
+      .split(' ')
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('')
     return `${prenomInitial}${nomInitials}`.substring(0, 5)
   }
 
@@ -69,20 +87,21 @@ export default function ProfilePage() {
   // Synchroniser les données quand l'utilisateur change
   useEffect(() => {
     if (user) {
+      const extendedUser = user as ExtendedUser
       setProfileData({
-        acronyme: user.profile?.acronyme || '',
-        prenom: user.profile?.prenom || '',
-        nom: user.profile?.nom || '',
-        email: user.email || '',
-        telephone: user.profile?.telephone || '',
-        poste: user.profile?.poste || '',
-        departement: user.profile?.departement || '',
-        adresse: user.profile?.adresse || '',
-        ville: user.profile?.ville || '',
-        codePostal: user.profile?.codePostal || '',
-        pays: user.profile?.pays || 'France',
-        role: user.role || '',
-        permissions: user.permissions || [],
+        acronyme: extendedUser.acronyme || '',
+        prenom: extendedUser.prenom || '',
+        nom: extendedUser.nom || '',
+        email: extendedUser.email || '',
+        telephone: extendedUser.telephone || '',
+        poste: extendedUser.poste || '',
+        departement: extendedUser.departement || '',
+        adresse: extendedUser.adresse || '',
+        ville: extendedUser.ville || '',
+        codePostal: extendedUser.codePostal || '',
+        pays: extendedUser.pays || 'France',
+        role: extendedUser.role || '',
+        permissions: extendedUser.permissions || [],
       })
     }
   }, [user])
@@ -98,8 +117,8 @@ export default function ProfilePage() {
       // En développement, mettre à jour directement les données mock
       if (process.env.NODE_ENV === 'development') {
         // Simulation d'un appel API
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+
         // Mettre à jour les données dans le localStorage
         const authData = localStorage.getItem('topsteel-auth')
         if (authData) {
@@ -121,7 +140,7 @@ export default function ProfilePage() {
           userData.nom = profileData.nom
           userData.prenom = profileData.prenom
           localStorage.setItem('topsteel-auth', JSON.stringify(userData))
-          
+
           // Déclencher un événement pour que les autres composants se mettent à jour
           window.dispatchEvent(new Event('user-profile-updated'))
         }
@@ -134,14 +153,14 @@ export default function ProfilePage() {
           },
           body: JSON.stringify(profileData),
         })
-        
+
         if (!response.ok) {
           throw new Error('Erreur lors de la sauvegarde')
         }
       }
-      
+
       toast.success(t('success.updated'))
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('errors.general'))
     } finally {
       setIsLoading(false)
@@ -157,14 +176,14 @@ export default function ProfilePage() {
     setIsLoading(true)
     try {
       // Simulation d'un appel API
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       toast.success(t('success.passwordChanged'))
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       })
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('errors.passwords.updateFailed'))
     } finally {
       setIsLoading(false)
@@ -174,20 +193,21 @@ export default function ProfilePage() {
   const handleReset = async () => {
     if (window.confirm(t('errors.reset.confirmText'))) {
       if (user) {
+        const extendedUser = user as ExtendedUser
         setProfileData({
-          acronyme: user.profile?.acronyme || '',
-          prenom: user.profile?.prenom || '',
-          nom: user.profile?.nom || '',
-          email: user.email || '',
-          telephone: user.profile?.telephone || '',
-          poste: user.profile?.poste || '',
-          departement: user.profile?.departement || '',
-          adresse: user.profile?.adresse || '',
-          ville: user.profile?.ville || '',
-          codePostal: user.profile?.codePostal || '',
-          pays: user.profile?.pays || 'France',
-          role: user.role || '',
-          permissions: user.permissions || [],
+          acronyme: extendedUser.acronyme || '',
+          prenom: extendedUser.prenom || '',
+          nom: extendedUser.nom || '',
+          email: extendedUser.email || '',
+          telephone: extendedUser.telephone || '',
+          poste: extendedUser.poste || '',
+          departement: extendedUser.departement || '',
+          adresse: extendedUser.adresse || '',
+          ville: extendedUser.ville || '',
+          codePostal: extendedUser.codePostal || '',
+          pays: extendedUser.pays || 'France',
+          role: extendedUser.role || '',
+          permissions: extendedUser.permissions || [],
         })
         toast.success(t('errors.reset.success'))
       }
@@ -213,7 +233,7 @@ export default function ProfilePage() {
                   entityType="user"
                   entityId={user?.id}
                   variant="avatar"
-                  onUploadSuccess={(result) => {
+                  onUploadSuccess={(_result) => {
                     toast.success(t('success.photoUpdated'))
                     // Vous pouvez ici mettre à jour l'état local ou recharger les données utilisateur
                   }}
@@ -221,9 +241,7 @@ export default function ProfilePage() {
                     toast.error(error)
                   }}
                 />
-                <p className="text-sm text-muted-foreground mt-2">
-                  {t('photoFormat')}
-                </p>
+                <p className="text-sm text-muted-foreground mt-2">{t('photoFormat')}</p>
               </CardContent>
             </Card>
 
@@ -242,7 +260,12 @@ export default function ProfilePage() {
                     <div className="flex space-x-2">
                       <Input
                         value={profileData.acronyme}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, acronyme: e.target.value.toUpperCase() }))}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setProfileData((prev) => ({
+                            ...prev,
+                            acronyme: e.target.value.toUpperCase(),
+                          }))
+                        }
                         placeholder="JDO"
                         maxLength={5}
                         className="uppercase flex-1"
@@ -253,7 +276,7 @@ export default function ProfilePage() {
                         size="sm"
                         onClick={() => {
                           const generated = generateAcronym(profileData.prenom, profileData.nom)
-                          setProfileData(prev => ({ ...prev, acronyme: generated }))
+                          setProfileData((prev) => ({ ...prev, acronyme: generated }))
                         }}
                         disabled={!profileData.prenom || !profileData.nom}
                         className="whitespace-nowrap"
@@ -261,25 +284,31 @@ export default function ProfilePage() {
                         Auto
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t('acronymDesc')}
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('acronymDesc')}</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">{t('firstName')}</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      {t('firstName')}
+                    </label>
                     <Input
                       value={profileData.prenom}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, prenom: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, prenom: e.target.value }))
+                      }
                       placeholder={t('firstName')}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">{t('lastName')}</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      {t('lastName')}
+                    </label>
                     <Input
                       value={profileData.nom}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, nom: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, nom: e.target.value }))
+                      }
                       placeholder={t('lastName')}
                     />
                   </div>
@@ -294,7 +323,9 @@ export default function ProfilePage() {
                     <Input
                       type="email"
                       value={profileData.email}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, email: e.target.value }))
+                      }
                       placeholder={t('email')}
                     />
                   </div>
@@ -307,7 +338,9 @@ export default function ProfilePage() {
                     <Input
                       type="tel"
                       value={profileData.telephone}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, telephone: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, telephone: e.target.value }))
+                      }
                       placeholder="+33 1 23 45 67 89"
                     />
                   </div>
@@ -321,16 +354,22 @@ export default function ProfilePage() {
                     </label>
                     <Input
                       value={profileData.poste}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, poste: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, poste: e.target.value }))
+                      }
                       placeholder="Directeur technique"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">{t('department')}</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      {t('department')}
+                    </label>
                     <Input
                       value={profileData.departement}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, departement: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, departement: e.target.value }))
+                      }
                       placeholder="Production"
                     />
                   </div>
@@ -343,35 +382,49 @@ export default function ProfilePage() {
                   </label>
                   <Input
                     value={profileData.adresse}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, adresse: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setProfileData((prev) => ({ ...prev, adresse: e.target.value }))
+                    }
                     placeholder="123 Rue de l'Industrie"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">{t('city')}</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      {t('city')}
+                    </label>
                     <Input
                       value={profileData.ville}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, ville: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, ville: e.target.value }))
+                      }
                       placeholder="Lyon"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">{t('postalCode')}</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      {t('postalCode')}
+                    </label>
                     <Input
                       value={profileData.codePostal}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, codePostal: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, codePostal: e.target.value }))
+                      }
                       placeholder="69000"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">{t('country')}</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      {t('country')}
+                    </label>
                     <Input
                       value={profileData.pays}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileData(prev => ({ ...prev, pays: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfileData((prev) => ({ ...prev, pays: e.target.value }))
+                      }
                       placeholder="France"
                     />
                   </div>
@@ -380,19 +433,17 @@ export default function ProfilePage() {
                 <div className="border-t pt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">{t('role')}</label>
-                      <Input
-                        value={profileData.role}
-                        disabled
-                        className="bg-muted"
-                      />
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {t('roleChangeContact')}
-                      </p>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        {t('role')}
+                      </label>
+                      <Input value={profileData.role} disabled className="bg-muted" />
+                      <p className="text-sm text-muted-foreground mt-1">{t('roleChangeContact')}</p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">{t('permissions')}</label>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        {t('permissions')}
+                      </label>
                       <div className="flex flex-wrap gap-2">
                         {profileData.permissions.map((permission) => (
                           <Badge key={permission} variant="secondary">
@@ -426,7 +477,7 @@ export default function ProfilePage() {
                         month: 'long',
                         day: 'numeric',
                         hour: '2-digit',
-                        minute: '2-digit'
+                        minute: '2-digit',
                       })}
                     </div>
                   </div>
@@ -457,11 +508,13 @@ export default function ProfilePage() {
                     {t('currentPassword')}
                   </label>
                   <div className="relative">
-                    <Input 
-                      type={showPassword ? 'text' : 'password'} 
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={passwordData.currentPassword}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setPasswordData((prev) => ({ ...prev, currentPassword: e.target.value }))
+                      }
                     />
                     <button
                       type="button"
@@ -476,28 +529,37 @@ export default function ProfilePage() {
                   <label className="block text-sm font-medium text-foreground mb-2">
                     {t('newPassword')}
                   </label>
-                  <Input 
-                    type="password" 
+                  <Input
+                    type="password"
                     placeholder="••••••••"
                     value={passwordData.newPassword}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setPasswordData((prev) => ({ ...prev, newPassword: e.target.value }))
+                    }
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     {t('confirmNewPassword')}
                   </label>
-                  <Input 
-                    type="password" 
+                  <Input
+                    type="password"
                     placeholder="••••••••"
                     value={passwordData.confirmPassword}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setPasswordData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                    }
                   />
                 </div>
                 <div className="flex justify-end">
-                  <Button 
+                  <Button
                     onClick={handleChangePassword}
-                    disabled={isLoading || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                    disabled={
+                      isLoading ||
+                      !passwordData.currentPassword ||
+                      !passwordData.newPassword ||
+                      !passwordData.confirmPassword
+                    }
                     className="flex items-center"
                   >
                     {isLoading ? (
@@ -519,9 +581,7 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{t('twoFactorDisabled')}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {t('twoFactorDescription')}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{t('twoFactorDescription')}</p>
                   </div>
                   <Button variant="outline" disabled>
                     {t('enable2FA')}
@@ -540,7 +600,8 @@ export default function ProfilePage() {
                     <div>
                       <p className="font-medium text-foreground">{t('currentSession')}</p>
                       <p className="text-sm text-muted-foreground">
-                        {navigator.userAgent.includes('Chrome') ? 'Chrome' : t('browser')} • {new Date().toLocaleString()}
+                        {navigator.userAgent.includes('Chrome') ? 'Chrome' : t('browser')} •{' '}
+                        {new Date().toLocaleString()}
                       </p>
                     </div>
                     <Badge variant="default" className="bg-green-100 text-green-800">

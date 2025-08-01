@@ -4,8 +4,12 @@
  */
 
 import { useCallback, useMemo } from 'react'
+import {
+  getTemplateById,
+  predefinedTemplates,
+  type Template,
+} from '@/lib/templates/predefined-templates'
 import { useAppearanceSettings } from './use-appearance-settings'
-import { Template, predefinedTemplates, getTemplateById } from '@/lib/templates/predefined-templates'
 
 interface UseTemplatesReturn {
   templates: Template[]
@@ -25,31 +29,37 @@ export function useTemplates(): UseTemplatesReturn {
   /**
    * Vérifie si un template spécifique est actuellement appliqué
    */
-  const isTemplateApplied = useCallback((templateId: string): boolean => {
-    const template = getTemplateById(templateId)
-    if (!template) return false
+  const isTemplateApplied = useCallback(
+    (templateId: string): boolean => {
+      const template = getTemplateById(templateId)
+      if (!template) return false
 
-    return Object.entries(template.settings).every(
-      ([key, value]) => settings[key as keyof typeof settings] === value
-    )
-  }, [settings])
+      return Object.entries(template.settings).every(
+        ([key, value]) => settings[key as keyof typeof settings] === value
+      )
+    },
+    [settings]
+  )
 
   /**
    * Calcule un score de correspondance entre les settings actuels et un template
    * Score de 0 à 100, 100 = correspondance parfaite
    */
-  const getTemplateScore = useCallback((template: Template): number => {
-    const totalSettings = Object.keys(template.settings).length
-    let matchingSettings = 0
+  const getTemplateScore = useCallback(
+    (template: Template): number => {
+      const totalSettings = Object.keys(template.settings).length
+      let matchingSettings = 0
 
-    Object.entries(template.settings).forEach(([key, value]) => {
-      if (settings[key as keyof typeof settings] === value) {
-        matchingSettings++
-      }
-    })
+      Object.entries(template.settings).forEach(([key, value]) => {
+        if (settings[key as keyof typeof settings] === value) {
+          matchingSettings++
+        }
+      })
 
-    return Math.round((matchingSettings / totalSettings) * 100)
-  }, [settings])
+      return Math.round((matchingSettings / totalSettings) * 100)
+    },
+    [settings]
+  )
 
   /**
    * Trouve le template qui correspond le mieux aux settings actuels
@@ -58,7 +68,7 @@ export function useTemplates(): UseTemplatesReturn {
     let bestMatch: Template | null = null
     let bestScore = 0
 
-    predefinedTemplates.forEach(template => {
+    predefinedTemplates.forEach((template) => {
       const score = getTemplateScore(template)
       if (score === 100) {
         // Correspondance parfaite trouvée
@@ -79,16 +89,14 @@ export function useTemplates(): UseTemplatesReturn {
    * Template actuellement appliqué (correspondance parfaite uniquement)
    */
   const currentTemplate = useMemo((): Template | null => {
-    return predefinedTemplates.find(template => 
-      isTemplateApplied(template.id)
-    ) || null
+    return predefinedTemplates.find((template) => isTemplateApplied(template.id)) || null
   }, [isTemplateApplied])
 
   /**
    * Applique un template en mettant à jour tous ses paramètres
    */
-  const applyTemplate = useCallback(async (template: Template): Promise<void> => {
-    try {
+  const applyTemplate = useCallback(
+    async (template: Template): Promise<void> => {
       // Appliquer tous les paramètres du template
       Object.entries(template.settings).forEach(([key, value]) => {
         updateSetting(key as keyof typeof template.settings, value)
@@ -96,11 +104,9 @@ export function useTemplates(): UseTemplatesReturn {
 
       // Sauvegarder les paramètres
       await saveSettings()
-    } catch (error) {
-      console.error('Erreur lors de l\'application du template:', error)
-      throw error
-    }
-  }, [updateSetting, saveSettings])
+    },
+    [updateSetting, saveSettings]
+  )
 
   return {
     templates: predefinedTemplates,
@@ -108,7 +114,7 @@ export function useTemplates(): UseTemplatesReturn {
     isTemplateApplied,
     applyTemplate,
     findMatchingTemplate,
-    getTemplateScore
+    getTemplateScore,
   }
 }
 
@@ -122,40 +128,47 @@ export function useTemplateRecommendations() {
   /**
    * Recommande des templates basés sur les préférences actuelles
    */
-  const getRecommendations = useCallback((maxResults: number = 4): Template[] => {
-    // Créer une liste de templates avec leurs scores
-    const templatesWithScores = predefinedTemplates.map(template => ({
-      template,
-      score: getTemplateScore(template)
-    }))
+  const getRecommendations = useCallback(
+    (maxResults: number = 4): Template[] => {
+      // Créer une liste de templates avec leurs scores
+      const templatesWithScores = predefinedTemplates.map((template) => ({
+        template,
+        score: getTemplateScore(template),
+      }))
 
-    // Trier par score décroissant et prendre les meilleurs
-    return templatesWithScores
-      .sort((a, b) => b.score - a.score)
-      .slice(0, maxResults)
-      .map(item => item.template)
-  }, [getTemplateScore])
+      // Trier par score décroissant et prendre les meilleurs
+      return templatesWithScores
+        .sort((a, b) => b.score - a.score)
+        .slice(0, maxResults)
+        .map((item) => item.template)
+    },
+    [getTemplateScore]
+  )
 
   /**
    * Recommande des templates similaires à celui actuellement utilisé
    */
-  const getSimilarTemplates = useCallback((currentTemplateId: string, maxResults: number = 3): Template[] => {
-    const currentTemplate = getTemplateById(currentTemplateId)
-    if (!currentTemplate) return []
+  const getSimilarTemplates = useCallback(
+    (currentTemplateId: string, maxResults: number = 3): Template[] => {
+      const currentTemplate = getTemplateById(currentTemplateId)
+      if (!currentTemplate) return []
 
-    return predefinedTemplates
-      .filter(template => template.id !== currentTemplateId)
-      .filter(template => 
-        // Templates de la même catégorie ou avec des paramètres similaires
-        template.category === currentTemplate.category ||
-        template.settings.theme === currentTemplate.settings.theme ||
-        template.settings.accentColor === currentTemplate.settings.accentColor
-      )
-      .slice(0, maxResults)
-  }, [])
+      return predefinedTemplates
+        .filter((template) => template.id !== currentTemplateId)
+        .filter(
+          (template) =>
+            // Templates de la même catégorie ou avec des paramètres similaires
+            template.category === currentTemplate.category ||
+            template.settings.theme === currentTemplate.settings.theme ||
+            template.settings.accentColor === currentTemplate.settings.accentColor
+        )
+        .slice(0, maxResults)
+    },
+    []
+  )
 
   return {
     getRecommendations,
-    getSimilarTemplates
+    getSimilarTemplates,
   }
 }

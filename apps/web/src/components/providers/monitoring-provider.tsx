@@ -1,11 +1,11 @@
 // apps/web/src/components/providers/monitoring-provider.tsx
 'use client'
 
-import { useWebVitals } from '@/hooks/use-web-vitals'
-import { useBusinessMetrics } from '@/lib/business-metrics'
 import { Button } from '@erp/ui'
 import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useWebVitals } from '@/hooks/use-web-vitals'
+import { useBusinessMetrics } from '@/lib/business-metrics'
 
 interface MonitoringProviderProps {
   children: React.ReactNode
@@ -151,9 +151,7 @@ function MonitoringCore({ children }: { children: React.ReactNode }) {
         })
 
         perfObserver.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] })
-      } catch (e) {
-        console.warn('Performance Observer not supported:', e)
-      }
+      } catch (_e) {}
     }
 
     // Cleanup function
@@ -199,8 +197,6 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
     <ErrorBoundary
       FallbackComponent={ErrorFallback}
       onError={(error, errorInfo) => {
-        console.error('React Error Boundary:', error, errorInfo)
-
         // Envoyer l'erreur au service de monitoring
         if (typeof window !== 'undefined') {
           try {
@@ -216,9 +212,7 @@ export function MonitoringProvider({ children }: MonitoringProviderProps) {
                 source: 'error_boundary',
               })
             }
-          } catch (e) {
-            console.warn('Could not track error:', e)
-          }
+          } catch (_e) {}
         }
       }}
       onReset={() => {}}

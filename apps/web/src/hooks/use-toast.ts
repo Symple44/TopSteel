@@ -252,11 +252,11 @@ export function useToastWithPromise() {
         error?: string | ((error: Error) => string)
       }
     ): Promise<T> => {
-      let toastId: string | undefined
+      let _toastId: string | undefined
 
       // Toast de chargement
       if (messages.loading) {
-        toastId = `promise-${Date.now()}`
+        _toastId = `promise-${Date.now()}`
         toast({
           title: messages.loading,
           variant: 'default',
@@ -305,13 +305,17 @@ export function useToastWithPromise() {
 // Simple toast function for compatibility with admin components
 import { toast as sonnerToast } from 'sonner'
 
-export function toast({ title, description, variant = 'default' }: {
+export function toast({
+  title,
+  description,
+  variant = 'default',
+}: {
   title: string
   description?: string
   variant?: 'default' | 'destructive' | 'success'
 }) {
   const message = title && description ? `${title}\n${description}` : title
-  
+
   switch (variant) {
     case 'success':
       sonnerToast.success(message)

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const publicRoutes = [
@@ -20,59 +20,63 @@ const publicRoutes = [
 ]
 
 // Routes API qui nécessitent une authentification
-const protectedApiRoutes = [
-  '/api/user',
-  '/api/admin',
-  '/api/notifications',
-]
+const protectedApiRoutes = ['/api/user', '/api/admin', '/api/notifications']
 
 export function middleware(request: NextRequest) {
   // Temporarily disable middleware to debug OpenTelemetry issues
   return NextResponse.next()
-  
+
   const { pathname } = request.nextUrl
-  
+
   // Vérifier si c'est une route publique
-  const isPublicRoute = publicRoutes.some(route => 
-    pathname.startsWith(route) || pathname === route
+  const isPublicRoute = publicRoutes.some(
+    (route) => pathname.startsWith(route) || pathname === route
   )
-  
+
   if (isPublicRoute) {
     return NextResponse.next()
   }
-  
+
   // Vérifier si c'est une route API protégée
-  const isProtectedApiRoute = protectedApiRoutes.some(route => 
-    pathname.startsWith(route)
-  )
-  
+  const isProtectedApiRoute = protectedApiRoutes.some((route) => pathname.startsWith(route))
+
   // Récupérer le token depuis les cookies
   const token = request.cookies.get('accessToken')?.value
-  
+
   // Pour les routes API protégées
   if (isProtectedApiRoute) {
     if (!token) {
       return NextResponse.json(
-        { 
+        {
           success: false,
           message: 'Authentification requise',
-          requiresAuth: true
+          requiresAuth: true,
         },
         { status: 401 }
       )
     }
-    
+
     // Vérifier si le token est expiré (basique)
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]))
+      if (!token) {
+        throw new Error('Token is undefined')
+      }
+
+      // Vérifier le format JWT
+      const tokenParts = token?.split('.')
+      if (tokenParts.length !== 3) {
+        throw new Error('Invalid token format')
+      }
+
+      const payload = JSON.parse(atob(tokenParts[1]))
       const now = Math.floor(Date.now() / 1000)
-      
+
       if (payload.exp && payload.exp < now) {
         return NextResponse.json(
-          { 
+          {
             success: false,
             message: 'Token expiré',
-            requiresAuth: true
+            requiresAuth: true,
           },
           { status: 401 }
         )
@@ -82,7 +86,7 @@ export function middleware(request: NextRequest) {
       // Le backend vérifiera la validité
     }
   }
-  
+
   // Pour les pages (non-API)
   if (!pathname.startsWith('/api')) {
     if (!token) {
@@ -90,7 +94,7 @@ export function middleware(request: NextRequest) {
       if (pathname === '/login') {
         return NextResponse.next()
       }
-      
+
       // Rediriger vers la page de login
       const url = request.nextUrl.clone()
       url.pathname = '/login'
@@ -98,7 +102,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
   }
-  
+
   return NextResponse.next()
 }
 

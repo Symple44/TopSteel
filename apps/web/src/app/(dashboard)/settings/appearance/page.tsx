@@ -6,26 +6,30 @@
 'use client'
 
 import React from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { useRouter } from 'next/navigation'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
-import { useToastShortcuts } from '@/hooks/use-toast'
+
+// Disable static generation due to client-side hooks
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { TemplateSelector } from '@/components/settings/template-selector'
 import {
-  Palette,
+  ArrowLeft,
+  Eye,
+  Globe,
+  Layout,
+  Maximize,
   Monitor,
   Moon,
+  Palette,
   Sun,
-  Globe,
   Type,
-  Layout,
-  Eye,
-  ArrowLeft,
-  Check,
-  Maximize,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { TemplateSelector } from '@/components/settings/template-selector'
+import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
+import { useAuth } from '@/hooks/use-auth'
+import { useToastShortcuts } from '@/hooks/use-toast'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function AppearanceSettingsPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth()
@@ -33,7 +37,7 @@ export default function AppearanceSettingsPage() {
   const { t } = useTranslation('settings')
   const { t: tc } = useTranslation('common')
   const { success, error } = useToastShortcuts()
-  
+
   // Hook pour gérer les préférences d'apparence
   const {
     settings,
@@ -41,33 +45,35 @@ export default function AppearanceSettingsPage() {
     saveSettings,
     resetSettings,
     isLoading: settingsLoading,
-    hasUnsavedChanges
+    hasUnsavedChanges,
   } = useAppearanceSettings()
-  
+
   // Vérifier l'authentification
   React.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login?redirect=/settings/appearance')
     }
   }, [isAuthenticated, authLoading, router])
-  
+
   // Sauvegarde automatique lorsque les paramètres changent
   React.useEffect(() => {
     if (hasUnsavedChanges && !settingsLoading) {
       const timeoutId = setTimeout(async () => {
         try {
           await saveSettings()
-          success('Paramètres sauvegardés', 'Vos préférences d\'apparence ont été mises à jour avec succès')
-        } catch (saveError) {
-          console.error('Erreur lors de la sauvegarde:', saveError)
-          error('Erreur de sauvegarde', 'Impossible de sauvegarder vos préférences d\'apparence')
+          success(
+            'Paramètres sauvegardés',
+            "Vos préférences d'apparence ont été mises à jour avec succès"
+          )
+        } catch (_saveError) {
+          error('Erreur de sauvegarde', "Impossible de sauvegarder vos préférences d'apparence")
         }
       }, 1000) // Attendre 1 seconde après le dernier changement
-      
+
       return () => clearTimeout(timeoutId)
     }
-  }, [settings, hasUnsavedChanges, saveSettings, success, error, settingsLoading])
-  
+  }, [hasUnsavedChanges, saveSettings, success, error, settingsLoading])
+
   // Afficher un loader si pas encore authentifié ou si les paramètres chargent
   if (authLoading || !isAuthenticated || settingsLoading) {
     return (
@@ -80,7 +86,7 @@ export default function AppearanceSettingsPage() {
     )
   }
 
-  const handleReset = () => {
+  const _handleReset = () => {
     if (confirm(t('appearance.resetConfirm'))) {
       resetSettings()
     }
@@ -90,14 +96,14 @@ export default function AppearanceSettingsPage() {
     { id: 'vibrant', label: 'Coloré', icon: Palette, description: 'Thème coloré moderne' },
     { id: 'light', label: 'Clair', icon: Sun, description: 'Interface claire' },
     { id: 'dark', label: 'Sombre', icon: Moon, description: 'Interface sombre' },
-    { id: 'system', label: 'Système', icon: Monitor, description: 'Suit les paramètres système' }
+    { id: 'system', label: 'Système', icon: Monitor, description: 'Suit les paramètres système' },
   ]
 
   const languages = [
     { id: 'fr', label: 'Français', flag: '🇫🇷' },
     { id: 'en', label: 'English', flag: '🇺🇸' },
     { id: 'es', label: 'Español', flag: '🇪🇸' },
-    { id: 'de', label: 'Deutsch', flag: '🇩🇪' }
+    { id: 'de', label: 'Deutsch', flag: '🇩🇪' },
   ]
 
   const accentColors = [
@@ -112,35 +118,30 @@ export default function AppearanceSettingsPage() {
     { id: 'yellow', label: 'Jaune', color: 'bg-yellow-500' },
     { id: 'emerald', label: 'Émeraude', color: 'bg-emerald-500' },
     { id: 'rose', label: 'Rose vif', color: 'bg-rose-500' },
-    { id: 'cyan', label: 'Cyan', color: 'bg-cyan-500' }
+    { id: 'cyan', label: 'Cyan', color: 'bg-cyan-500' },
   ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50/30 to-pink-50/30">
       <div className="px-4 sm:px-6 lg:px-8 py-12">
-        
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => router.back()}
             className="mb-4 text-slate-600 hover:text-slate-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('appearance.back')}
           </Button>
-          
+
           <div className="flex items-center mb-6">
             <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg mr-4">
               <Palette className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">
-                {t('appearance.title')}
-              </h1>
-              <p className="text-slate-600">
-                {t('appearance.subtitle')}
-              </p>
+              <h1 className="text-3xl font-bold text-slate-900">{t('appearance.title')}</h1>
+              <p className="text-slate-600">{t('appearance.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -164,21 +165,22 @@ export default function AppearanceSettingsPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {themes.map((themeOption) => (
-                  <div
+                  <button
                     key={themeOption.id}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                      settings.theme === themeOption.id 
-                        ? 'border-indigo-500 bg-indigo-50' 
+                    type="button"
+                    className={`w-full text-left p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      settings.theme === themeOption.id
+                        ? 'border-indigo-500 bg-indigo-50'
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
-                    onClick={() => updateSetting('theme', themeOption.id as any)}
+                    onClick={() => updateSetting('theme', themeOption.id)}
                   >
                     <div className="flex items-center mb-2">
                       <themeOption.icon className="h-5 w-5 mr-2 text-slate-600" />
                       <span className="font-medium text-slate-800">{themeOption.label}</span>
                     </div>
                     <p className="text-sm text-slate-600">{themeOption.description}</p>
-                  </div>
+                  </button>
                 ))}
               </div>
             </CardContent>
@@ -195,18 +197,19 @@ export default function AppearanceSettingsPage() {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {languages.map((lang) => (
-                  <div
+                  <button
                     key={lang.id}
-                    className={`p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
-                      settings.language === lang.id 
-                        ? 'border-blue-500 bg-blue-50' 
+                    type="button"
+                    className={`w-full p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
+                      settings.language === lang.id
+                        ? 'border-blue-500 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
                     onClick={() => updateSetting('language', lang.id)}
                   >
                     <div className="text-2xl mb-1">{lang.flag}</div>
                     <span className="text-sm font-medium text-slate-800">{lang.label}</span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </CardContent>
@@ -223,18 +226,19 @@ export default function AppearanceSettingsPage() {
             <CardContent>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
                 {accentColors.map((color) => (
-                  <div
+                  <button
                     key={color.id}
-                    className={`p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
-                      settings.accentColor === color.id 
-                        ? 'border-slate-400 bg-slate-50' 
+                    type="button"
+                    className={`w-full p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
+                      settings.accentColor === color.id
+                        ? 'border-slate-400 bg-slate-50'
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
-                    onClick={() => updateSetting('accentColor', color.id as any)}
+                    onClick={() => updateSetting('accentColor', color.id)}
                   >
                     <div className={`w-8 h-8 ${color.color} rounded-full mx-auto mb-1`}></div>
                     <span className="text-xs font-medium text-slate-800">{color.label}</span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </CardContent>
@@ -253,7 +257,7 @@ export default function AppearanceSettingsPage() {
                 {[
                   { id: 'small', label: 'Petite', sample: 'text-sm' },
                   { id: 'medium', label: 'Moyenne', sample: 'text-base' },
-                  { id: 'large', label: 'Grande', sample: 'text-lg' }
+                  { id: 'large', label: 'Grande', sample: 'text-lg' },
                 ].map((size) => (
                   <label key={size.id} className="flex items-center space-x-3 cursor-pointer">
                     <input
@@ -284,11 +288,18 @@ export default function AppearanceSettingsPage() {
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { id: 'compact', label: 'Compacte', description: 'Plus d\'éléments visibles' },
+                  { id: 'compact', label: 'Compacte', description: "Plus d'éléments visibles" },
                   { id: 'comfortable', label: 'Confortable', description: 'Équilibre optimal' },
-                  { id: 'spacious', label: 'Espacée', description: 'Plus d\'espace entre les éléments' }
+                  {
+                    id: 'spacious',
+                    label: 'Espacée',
+                    description: "Plus d'espace entre les éléments",
+                  },
                 ].map((densityOption) => (
-                  <label key={densityOption.id} className="flex items-center space-x-3 cursor-pointer">
+                  <label
+                    key={densityOption.id}
+                    className="flex items-center space-x-3 cursor-pointer"
+                  >
                     <input
                       type="radio"
                       name="density"
@@ -318,10 +329,21 @@ export default function AppearanceSettingsPage() {
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { id: 'compact', label: 'Compact', description: 'Largeur limitée pour une meilleure lisibilité' },
-                  { id: 'full', label: 'Pleine largeur', description: 'Utilise toute la largeur de l\'écran' }
+                  {
+                    id: 'compact',
+                    label: 'Compact',
+                    description: 'Largeur limitée pour une meilleure lisibilité',
+                  },
+                  {
+                    id: 'full',
+                    label: 'Pleine largeur',
+                    description: "Utilise toute la largeur de l'écran",
+                  },
                 ].map((widthOption) => (
-                  <label key={widthOption.id} className="flex items-center space-x-3 cursor-pointer">
+                  <label
+                    key={widthOption.id}
+                    className="flex items-center space-x-3 cursor-pointer"
+                  >
                     <input
                       type="radio"
                       name="contentWidth"
@@ -339,7 +361,6 @@ export default function AppearanceSettingsPage() {
               </div>
             </CardContent>
           </Card>
-
         </div>
       </div>
     </div>

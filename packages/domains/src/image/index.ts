@@ -14,8 +14,7 @@ export async function createImageService() {
   try {
     const { ImageService } = await import('./service')
     return new ImageService()
-  } catch (error) {
-    console.error('Failed to load ImageService:', error)
+  } catch (_error) {
     throw new Error('ImageService is not available in this environment')
   }
 }

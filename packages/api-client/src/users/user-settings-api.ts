@@ -79,7 +79,10 @@ export class UserSettingsApiClient extends BaseApiClient {
    * Mettre à jour les paramètres d'un utilisateur (Admin/Manager uniquement)
    */
   async updateUserSettings(userId: string, settings: UpdateUserSettingsDto): Promise<UserSettings> {
-    const response = await this.http.patch<UserSettings>(`${this.endpoint}/${userId}/settings`, settings)
+    const response = await this.http.patch<UserSettings>(
+      `${this.endpoint}/${userId}/settings`,
+      settings
+    )
     return response.data
   }
 
@@ -108,8 +111,8 @@ export class UserSettingsApiClient extends BaseApiClient {
    * Mettre à jour seulement les paramètres de notification
    */
   async updateNotifications(notifications: Partial<NotificationSettings>): Promise<UserSettings> {
-    return this.updateMySettings({ 
-      preferences: { notifications: notifications as any } 
+    return this.updateMySettings({
+      preferences: { notifications: notifications as any },
     })
   }
 }

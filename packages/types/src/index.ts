@@ -1,68 +1,65 @@
 /**
- * 📦 @erp/types - EXPORTS PRINCIPAUX  
+ * 📦 @erp/types - EXPORTS PRINCIPAUX
  * Types et interfaces pour l'ERP TopSteel (legacy et spécifiques app)
  */
 
 // ===== EXPORTS MODULAIRES =====
 export * from './core'
+export * from './cross-cutting'
 export * from './infrastructure'
 // export * from './domains' // DEPRECATED: Types migrés vers @erp/domains
 export * from './ui'
-export * from './cross-cutting'
 
 // ===== RE-EXPORTS ESSENTIELS =====
-
-// Core utilities
-export type {
-  DeepPartial,
-  DeepRequired,
-  KeysOfType,
-  Except,
-  Merge,
-  PartialBy,
-  RequiredBy,
-  Indexable,
-  AnyFunction,
-  Constructor,
-  EnumValues,
-  PromiseType,
-  ArrayElement,
-  Nullable,
-  Optional
-} from './core/utilities'
 
 // Common types
 export type {
   Address,
+  Color,
   Contact,
   Currency,
-  Unit,
-  Color,
-  Size,
+  GenericStatus,
   Position,
-  GenericStatus
+  Size,
+  Unit,
 } from './core/common'
-
-// Store types (app-specific)
+// Core utilities
 export type {
-  BaseStoreState,
-  BaseStoreActions,
-  InitialState,
-  StoreConfig,
-  StoreCreator,
-  AppStore,
-  AppState,
-  AppStoreActions,
-  ProjetStore,
-  ProjetState,
-  ProjetStoreActions
-} from './infrastructure/stores'
-
+  AnyFunction,
+  ArrayElement,
+  Constructor,
+  DeepPartial,
+  DeepRequired,
+  EnumValues,
+  Except,
+  Indexable,
+  KeysOfType,
+  Merge,
+  Nullable,
+  Optional,
+  PartialBy,
+  PromiseType,
+  RequiredBy,
+} from './core/utilities'
 // API types
 export type {
   ApiResponse,
+  ErrorResponse,
   PaginationMetaDto,
   PaginationResultDto,
-  ErrorResponse,
-  SuccessResponse
+  SuccessResponse,
 } from './infrastructure/api'
+// Store types (app-specific)
+export type {
+  AppState,
+  AppStore,
+  AppStoreActions,
+  BaseStoreActions,
+  BaseStoreState,
+  InitialState,
+  ProjetState,
+  ProjetStore,
+  ProjetStoreActions,
+  StoreConfig,
+  StoreCreator,
+} from './infrastructure/stores'

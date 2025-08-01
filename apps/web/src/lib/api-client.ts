@@ -10,7 +10,7 @@
  * - Authentication automatique
  */
 
-import { callClientApi, callBackendApi } from '@/utils/backend-api'
+import { callBackendApi, callClientApi } from '@/utils/backend-api'
 
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -235,7 +235,7 @@ export class APIClient {
   /**
    * Gestion des erreurs
    */
-  private handleError(error: unknown, endpoint: string): never {
+  private handleError(error: unknown, _endpoint: string): never {
     this.metrics.errors++
 
     const errorDetails: APIErrorDetails = {
@@ -245,13 +245,6 @@ export class APIClient {
       timestamp: Date.now(),
       requestId: (error as { requestId?: string }).requestId || `req_${Date.now()}`,
     }
-
-    // Log simple (sans dépendance externe)
-    console.error(`🔴 API Error [${endpoint}]:`, {
-      code: errorDetails.code,
-      message: errorDetails.message,
-      timestamp: new Date(errorDetails.timestamp).toISOString(),
-    })
 
     throw new APIError(errorDetails)
   }
@@ -311,17 +304,19 @@ export class APIClient {
       const fetchConfig: RequestInit = {
         method: config.method || 'GET',
         headers: {
-          ...this.buildHeaders(config)
+          ...this.buildHeaders(config),
         },
         ...(config.body ? { body: JSON.stringify(config.body) } : {}),
       }
 
       // Exécution avec retry et timeout - Utiliser callClientApi pour les appels côté client
       const operation = async () => {
-        // Déterminer si on utilise le backend direct ou les routes API Next.js 
-        const useDirectBackend = typeof window === 'undefined' || this.baseURL !== (process.env.NEXT_PUBLIC_API_URL || '/api')
-        
-        const response = useDirectBackend 
+        // Déterminer si on utilise le backend direct ou les routes API Next.js
+        const useDirectBackend =
+          typeof window === 'undefined' ||
+          this.baseURL !== (process.env.NEXT_PUBLIC_API_URL || '/api')
+
+        const response = useDirectBackend
           ? await callBackendApi(endpoint, fetchConfig)
           : await callClientApi(endpoint, fetchConfig)
 
@@ -445,9 +440,10 @@ export class APIClient {
     }
 
     // Déterminer si on utilise le backend direct ou les routes API Next.js
-    const useDirectBackend = typeof window === 'undefined' || this.baseURL !== (process.env.NEXT_PUBLIC_API_URL || '/api')
-    
-    const response = useDirectBackend 
+    const useDirectBackend =
+      typeof window === 'undefined' || this.baseURL !== (process.env.NEXT_PUBLIC_API_URL || '/api')
+
+    const response = useDirectBackend
       ? await callBackendApi(endpoint, fetchConfig)
       : await callClientApi(endpoint, fetchConfig)
 
@@ -503,23 +499,21 @@ export class APIClient {
    */
   createContextKey(domain: string, resource?: string, id?: string | number): string[] {
     const parts = [domain]
-    
+
     if (resource) {
       parts.push(resource)
     }
-    
+
     if (id !== undefined) {
       parts.push(String(id))
     }
-    
+
     return parts
   }
 }
 
 // ✅ INSTANCE GLOBALE EXPORTÉE
-export const apiClient = new APIClient(
-  process.env.NEXT_PUBLIC_API_URL || '/api'
-)
+export const apiClient = new APIClient(process.env.NEXT_PUBLIC_API_URL || '/api')
 
 // ✅ TYPES EXPORTÉS
 export type { APIErrorDetails, APIMetrics, RequestConfig }

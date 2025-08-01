@@ -1,39 +1,39 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  Badge,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
 } from '@erp/ui'
-import { 
-  History,
-  Calendar,
-  User,
-  CheckCircle,
-  XCircle,
-  Info,
-  Shield,
-  Users,
+import {
   Building,
+  Calendar,
+  CheckCircle,
   Eye,
+  History,
+  Info,
   Key,
-  RefreshCw
+  RefreshCw,
+  Shield,
+  User,
+  Users,
+  XCircle,
 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface BulkOperation {
   id: string
@@ -48,36 +48,36 @@ interface BulkOperation {
 }
 
 const OPERATION_LABELS = {
-  'assign_roles': 'Attribution de rôles',
-  'remove_roles': 'Suppression de rôles',
-  'assign_groups': 'Attribution de groupes',
-  'remove_groups': 'Suppression de groupes',
-  'activate': 'Activation de comptes',
-  'deactivate': 'Désactivation de comptes',
-  'reset_password': 'Réinitialisation de mots de passe',
-  'update_department': 'Changement de département'
+  assign_roles: 'Attribution de rôles',
+  remove_roles: 'Suppression de rôles',
+  assign_groups: 'Attribution de groupes',
+  remove_groups: 'Suppression de groupes',
+  activate: 'Activation de comptes',
+  deactivate: 'Désactivation de comptes',
+  reset_password: 'Réinitialisation de mots de passe',
+  update_department: 'Changement de département',
 }
 
 const OPERATION_ICONS = {
-  'assign_roles': <Shield className="h-4 w-4" />,
-  'remove_roles': <Shield className="h-4 w-4" />,
-  'assign_groups': <Users className="h-4 w-4" />,
-  'remove_groups': <Users className="h-4 w-4" />,
-  'activate': <Eye className="h-4 w-4" />,
-  'deactivate': <Eye className="h-4 w-4" />,
-  'reset_password': <Key className="h-4 w-4" />,
-  'update_department': <Building className="h-4 w-4" />
+  assign_roles: <Shield className="h-4 w-4" />,
+  remove_roles: <Shield className="h-4 w-4" />,
+  assign_groups: <Users className="h-4 w-4" />,
+  remove_groups: <Users className="h-4 w-4" />,
+  activate: <Eye className="h-4 w-4" />,
+  deactivate: <Eye className="h-4 w-4" />,
+  reset_password: <Key className="h-4 w-4" />,
+  update_department: <Building className="h-4 w-4" />,
 }
 
 const OPERATION_COLORS = {
-  'assign_roles': 'bg-blue-100 text-blue-800',
-  'remove_roles': 'bg-red-100 text-red-800',
-  'assign_groups': 'bg-green-100 text-green-800',
-  'remove_groups': 'bg-orange-100 text-orange-800',
-  'activate': 'bg-emerald-100 text-emerald-800',
-  'deactivate': 'bg-gray-100 text-gray-800',
-  'reset_password': 'bg-purple-100 text-purple-800',
-  'update_department': 'bg-yellow-100 text-yellow-800'
+  assign_roles: 'bg-blue-100 text-blue-800',
+  remove_roles: 'bg-red-100 text-red-800',
+  assign_groups: 'bg-green-100 text-green-800',
+  remove_groups: 'bg-orange-100 text-orange-800',
+  activate: 'bg-emerald-100 text-emerald-800',
+  deactivate: 'bg-gray-100 text-gray-800',
+  reset_password: 'bg-purple-100 text-purple-800',
+  update_department: 'bg-yellow-100 text-yellow-800',
 }
 
 interface BulkOperationsHistoryProps {
@@ -88,32 +88,31 @@ interface BulkOperationsHistoryProps {
 export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperationsHistoryProps) {
   const [operations, setOperations] = useState<BulkOperation[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedOperation, setSelectedOperation] = useState<BulkOperation | null>(null)
+  const [_selectedOperation, setSelectedOperation] = useState<BulkOperation | null>(null)
 
-  useEffect(() => {
-    loadHistory()
-  }, [userId, limit])
-
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     try {
       setLoading(true)
       const { callClientApi } = await import('@/utils/backend-api')
-      const endpoint = userId 
+      const endpoint = userId
         ? `admin/users/${userId}/bulk-operations-history?limit=${limit}`
         : `admin/users/bulk-operations?limit=${limit}`
-      
+
       const response = await callClientApi(endpoint)
       const data = await response.json()
-      
+
       if (data.success) {
         setOperations(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement de l\'historique:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [userId, limit])
+
+  useEffect(() => {
+    loadHistory()
+  }, [loadHistory])
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -123,7 +122,7 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
     const diffDays = Math.floor(diffHours / 24)
 
     if (diffHours < 1) {
-      return 'Il y a moins d\'une heure'
+      return "Il y a moins d'une heure"
     } else if (diffHours < 24) {
       return `Il y a ${diffHours} heure${diffHours > 1 ? 's' : ''}`
     } else if (diffDays < 7) {
@@ -134,7 +133,7 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
         month: 'short',
         year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       })
     }
   }
@@ -173,7 +172,7 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
             Historique des opérations en masse
-            {userId && " (cet utilisateur)"}
+            {userId && ' (cet utilisateur)'}
           </CardTitle>
           <Button variant="outline" size="sm" onClick={loadHistory}>
             <RefreshCw className="h-4 w-4 mr-2" />
@@ -204,12 +203,15 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
                 <TableRow key={operation.id}>
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      <div className={`p-1 rounded ${OPERATION_COLORS[operation.operation as keyof typeof OPERATION_COLORS]?.replace('text-', 'bg-').replace('-800', '-100')}`}>
+                      <div
+                        className={`p-1 rounded ${OPERATION_COLORS[operation.operation as keyof typeof OPERATION_COLORS]?.replace('text-', 'bg-').replace('-800', '-100')}`}
+                      >
                         {OPERATION_ICONS[operation.operation as keyof typeof OPERATION_ICONS]}
                       </div>
                       <div>
                         <p className="font-medium">
-                          {OPERATION_LABELS[operation.operation as keyof typeof OPERATION_LABELS] || operation.operation}
+                          {OPERATION_LABELS[operation.operation as keyof typeof OPERATION_LABELS] ||
+                            operation.operation}
                         </p>
                         {operation.reason && (
                           <p className="text-sm text-muted-foreground truncate max-w-xs">
@@ -236,8 +238,8 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
                           <span className="text-sm font-medium">{operation.failedCount}</span>
                         </div>
                       )}
-                      <Badge 
-                        variant={getSuccessRate(operation) === 100 ? "default" : "secondary"}
+                      <Badge
+                        variant={getSuccessRate(operation) === 100 ? 'default' : 'secondary'}
                         className="text-xs"
                       >
                         {getSuccessRate(operation)}%
@@ -259,8 +261,8 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
                   <TableCell>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
                           onClick={() => setSelectedOperation(operation)}
                         >
@@ -277,13 +279,25 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground">Type d'opération</p>
-                              <Badge className={OPERATION_COLORS[operation.operation as keyof typeof OPERATION_COLORS]}>
-                                {OPERATION_LABELS[operation.operation as keyof typeof OPERATION_LABELS] || operation.operation}
+                              <p className="text-sm font-medium text-muted-foreground">
+                                Type d'opération
+                              </p>
+                              <Badge
+                                className={
+                                  OPERATION_COLORS[
+                                    operation.operation as keyof typeof OPERATION_COLORS
+                                  ]
+                                }
+                              >
+                                {OPERATION_LABELS[
+                                  operation.operation as keyof typeof OPERATION_LABELS
+                                ] || operation.operation}
                               </Badge>
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground">Date et heure</p>
+                              <p className="text-sm font-medium text-muted-foreground">
+                                Date et heure
+                              </p>
                               <p className="font-medium">
                                 {new Date(operation.performedAt).toLocaleString('fr-FR')}
                               </p>
@@ -297,23 +311,31 @@ export default function BulkOperationsHistory({ userId, limit = 20 }: BulkOperat
                             </div>
                             <div>
                               <p className="text-sm font-medium text-muted-foreground">Réussies</p>
-                              <p className="text-2xl font-bold text-green-600">{operation.successCount}</p>
+                              <p className="text-2xl font-bold text-green-600">
+                                {operation.successCount}
+                              </p>
                             </div>
                             <div>
                               <p className="text-sm font-medium text-muted-foreground">Échecs</p>
-                              <p className="text-2xl font-bold text-red-600">{operation.failedCount}</p>
+                              <p className="text-2xl font-bold text-red-600">
+                                {operation.failedCount}
+                              </p>
                             </div>
                           </div>
 
                           {operation.reason && (
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground mb-2">Raison</p>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">
+                                Raison
+                              </p>
                               <p className="p-3 bg-muted rounded-lg">{operation.reason}</p>
                             </div>
                           )}
 
                           <div>
-                            <p className="text-sm font-medium text-muted-foreground mb-2">Effectué par</p>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">
+                              Effectué par
+                            </p>
                             <div className="flex items-center space-x-2">
                               <User className="h-4 w-4" />
                               <span>{operation.performedBy}</span>

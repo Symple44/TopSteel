@@ -38,9 +38,10 @@ export interface ProjetState extends BaseStoreState {
  */
 export interface ProjetStoreActions extends BaseStoreActions {
   // Actions de données
-  fetchProjets: (options?: { force?: boolean; filters?: StoreProjetFilters }) => Promise<
-    StoreProjet[]
-  >
+  fetchProjets: (options?: {
+    force?: boolean
+    filters?: StoreProjetFilters
+  }) => Promise<StoreProjet[]>
   createProjet: (
     projet: Omit<StoreProjet, 'id' | 'createdAt' | 'updatedAt'>
   ) => Promise<StoreProjet | null>

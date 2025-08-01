@@ -16,8 +16,8 @@
 
 'use client'
 
-import React from 'react'
 import type { ReactNode } from 'react'
+import React from 'react'
 
 // =============================================
 // TYPES ET INTERFACES
@@ -153,9 +153,7 @@ function getStoredTheme(): Theme | null {
     if (typeof window === 'undefined') return null
 
     return (localStorage.getItem(DEFAULT_STORAGE_KEY) as Theme) || null
-  } catch (error) {
-    console.warn('Theme storage get error:', error)
-
+  } catch (_error) {
     return null
   }
 }
@@ -166,9 +164,7 @@ function setStoredTheme(theme: Theme): boolean {
     localStorage.setItem(DEFAULT_STORAGE_KEY, theme)
 
     return true
-  } catch (error) {
-    console.warn('Theme storage set error:', error)
-
+  } catch (_error) {
     return false
   }
 }
@@ -179,9 +175,7 @@ function removeStoredTheme(): boolean {
     localStorage.removeItem(DEFAULT_STORAGE_KEY)
 
     return true
-  } catch (error) {
-    console.warn('Theme storage remove error:', error)
-
+  } catch (_error) {
     return false
   }
 }
@@ -220,9 +214,7 @@ function applyTheme(theme: ResolvedTheme, attribute: string, colors: ThemeColors
         detail: { theme, colors },
       })
     )
-  } catch (error) {
-    console.error('Theme application error:', error)
-  }
+  } catch (_error) {}
 }
 
 // Theme metrics functions
@@ -349,8 +341,6 @@ export function ThemeProvider({
   const setTheme = React.useCallback(
     (newTheme: Theme) => {
       if (!['light', 'dark', 'system'].includes(newTheme)) {
-        console.warn(`Invalid theme: ${newTheme}`)
-
         return
       }
 
@@ -375,8 +365,7 @@ export function ThemeProvider({
         if (enableMetrics) {
           ThemeMetricsCollector.recordThemeChange()
         }
-      } catch (error) {
-        console.error('Failed to set theme:', error)
+      } catch (_error) {
         if (enableMetrics) {
           ThemeMetricsCollector.recordError()
         }
@@ -409,8 +398,7 @@ export function ThemeProvider({
       }
 
       setIsHydrated(true)
-    } catch (error) {
-      console.error('Theme hydration error:', error)
+    } catch (_error) {
       if (enableMetrics) {
         ThemeMetricsCollector.recordError()
       }
@@ -550,9 +538,7 @@ export function useThemeDebug(): {
   const { theme, resolvedTheme, toggleTheme } = useTheme()
 
   const logMetrics = React.useCallback(() => {
-    const metrics = ThemeMetricsCollector.getMetrics()
-
-    console.table(metrics)
+    const _metrics = ThemeMetricsCollector.getMetrics()
   }, [])
 
   const resetMetrics = React.useCallback(() => {

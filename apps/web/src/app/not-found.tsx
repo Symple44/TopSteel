@@ -5,6 +5,9 @@
 
 'use client'
 
+// Disable static generation due to client-side hooks
+export const dynamic = 'force-dynamic'
+
 import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function NotFound() {
@@ -15,9 +18,7 @@ export default function NotFound() {
         <div className="space-y-2">
           <h1 className="text-9xl font-bold">404</h1>
           <h2 className="text-2xl font-semibold">{t('pageNotFound')}</h2>
-          <p className="max-w-md">
-            {t('pageNotFoundMessage')}
-          </p>
+          <p className="max-w-md">{t('pageNotFoundMessage')}</p>
         </div>
 
         <div className="space-y-4">

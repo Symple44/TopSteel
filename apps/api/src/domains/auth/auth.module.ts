@@ -1,0 +1,118 @@
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { JwtModule } from '@nestjs/jwt'
+import { PassportModule } from '@nestjs/passport'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
+import { DatabaseCoreModule } from '../../features/database-core/database-core.module'
+import { ParametersModule } from '../../features/parameters/parameters.module'
+import { SocietesModule } from '../../features/societes/societes.module'
+import { UsersModule } from '../users/users.module'
+import { AuthController } from './auth.controller'
+import { AuthService } from './auth.service'
+import { AuthRepositoryProviders } from './core/providers/auth-repository.providers'
+import { AuthCoreService } from './core/services/auth-core.service'
+import { UserSession } from './core/entities/user-session.entity'
+import { UserMFA } from './core/entities/user-mfa.entity'
+import { MFASession } from './core/entities/mfa-session.entity'
+import { UserSocieteRole } from './core/entities/user-societe-role.entity'
+import { Role } from './core/entities/role.entity'
+import { Permission } from './core/entities/permission.entity'
+import { RolePermission } from './core/entities/role-permission.entity'
+import { Societe } from '../../features/societes/entities/societe.entity'
+import { SocieteUser } from '../../features/societes/entities/societe-user.entity'
+import { MFAController } from './external/controllers/mfa.controller'
+import { SessionsController } from './external/controllers/sessions.controller'
+import { RolesGuard } from './security/guards/roles.guard'
+import { TenantGuard } from './security/guards/tenant.guard'
+import { GeolocationService } from './services/geolocation.service'
+import { JwtUtilsService } from './services/jwt-utils.service'
+import { MFAService } from './services/mfa.service'
+import { SessionInvalidationService } from './services/session-invalidation.service'
+import { SessionRedisService } from './services/session-redis.service'
+import { TOTPService } from './services/totp.service'
+import { UserSocieteRolesService } from './services/user-societe-roles.service'
+import { WebAuthnService } from './services/webauthn.service'
+import { JwtStrategy } from './security/strategies/jwt.strategy'
+import { JwtEnhancedStrategy } from './security/strategies/jwt-enhanced.strategy'
+import { LocalStrategy } from './security/strategies/local.strategy'
+
+@Module({
+  imports: [
+    ConfigModule,
+    DatabaseCoreModule,
+    ParametersModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('jwt.secret')
+        const issuer = configService.get<string>('jwt.issuer')
+        const audience = configService.get<string>('jwt.audience')
+
+        if (!secret) {
+          throw new Error('JWT secret is required')
+        }
+
+        return {
+          secret,
+          signOptions: {
+            expiresIn: '24h',
+            ...(issuer && { issuer }),
+            ...(audience && { audience }),
+          },
+        }
+      },
+      inject: [ConfigService],
+    }),
+    // Repositories pour les entités auth avec connexion 'auth'
+    TypeOrmModule.forFeature([
+      UserSession, 
+      UserMFA, 
+      MFASession, 
+      UserSocieteRole, 
+      Role, 
+      Permission, 
+      RolePermission, 
+      Societe, 
+      SocieteUser
+    ], 'auth'),
+    UsersModule,
+    SocietesModule,
+  ],
+  controllers: [AuthController, SessionsController, MFAController],
+  providers: [
+    AuthService,
+    AuthCoreService, // Service principal
+    ...AuthRepositoryProviders, // Providers pour injection d'interfaces
+    LocalStrategy,
+    JwtStrategy,
+    JwtEnhancedStrategy,
+    JwtUtilsService,
+    SessionInvalidationService,
+    SessionRedisService,
+    GeolocationService,
+    TOTPService,
+    WebAuthnService,
+    MFAService,
+    RolesGuard,
+    TenantGuard,
+    OptimizedCacheService, // Service de cache REDIS
+    UserSocieteRolesService, // Service pour la nouvelle structure de rôles
+  ],
+  exports: [
+    AuthService,
+    AuthCoreService, // Export du service principal
+    JwtUtilsService,
+    SessionInvalidationService,
+    SessionRedisService,
+    GeolocationService,
+    TOTPService,
+    WebAuthnService,
+    MFAService,
+    RolesGuard,
+    TenantGuard,
+    UserSocieteRolesService,
+  ],
+})
+export class AuthModule {}

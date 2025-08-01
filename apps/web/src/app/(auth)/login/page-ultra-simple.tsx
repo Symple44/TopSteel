@@ -5,12 +5,12 @@ export default function LoginPageUltraSimple() {
       <p>Ultra simple login page - no client components, no CSS</p>
       <form>
         <div>
-          <label>Email:</label>
-          <input type="email" placeholder="admin@topsteel.tech" />
+          <label htmlFor="email">Email:</label>
+          <input id="email" type="email" placeholder="admin@topsteel.tech" />
         </div>
         <div>
-          <label>Password:</label>
-          <input type="password" placeholder="TopSteel44!" />
+          <label htmlFor="password">Password:</label>
+          <input id="password" type="password" placeholder="TopSteel44!" />
         </div>
         <button type="submit">Login</button>
       </form>

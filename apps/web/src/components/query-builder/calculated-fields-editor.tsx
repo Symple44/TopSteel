@@ -1,15 +1,27 @@
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@erp/ui'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, Edit2, Trash2, Calculator } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
+import { Calculator, Edit2, Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Badge } from '@erp/ui'
+import { Card, CardContent } from '@erp/ui'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@erp/ui/primitives'
+import { Input } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui/primitives'
+import { Textarea } from '@erp/ui/primitives'
 
 interface CalculatedField {
   id?: string
@@ -60,12 +72,12 @@ export function CalculatedFieldsEditor({
     if (!formData.name || !formData.label || !formData.expression) return
 
     const newField: CalculatedField = {
-      ...formData as CalculatedField,
+      ...(formData as CalculatedField),
       displayOrder: editingField ? editingField.displayOrder : fields.length,
     }
 
     if (editingField) {
-      const index = fields.findIndex(f => f === editingField)
+      const index = fields.findIndex((f) => f === editingField)
       const newFields = [...fields]
       newFields[index] = newField
       onFieldsChange(newFields)
@@ -88,7 +100,7 @@ export function CalculatedFieldsEditor({
   const handleInsertColumn = (columnAlias: string) => {
     setFormData({
       ...formData,
-      expression: (formData.expression || '') + `[${columnAlias}]`,
+      expression: `${formData.expression || ''}[${columnAlias}]`,
     })
   }
 
@@ -110,9 +122,7 @@ export function CalculatedFieldsEditor({
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>
-                {editingField ? 'Edit' : 'Add'} Calculated Field
-              </DialogTitle>
+              <DialogTitle>{editingField ? 'Edit' : 'Add'} Calculated Field</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -173,9 +183,7 @@ export function CalculatedFieldsEditor({
                 <div className="mt-3 p-3 bg-muted/50 rounded-lg">
                   <div className="flex items-center gap-2 mb-3">
                     <Calculator className="h-4 w-4" />
-                    <p className="text-sm font-medium">
-                      Available columns (click to insert):
-                    </p>
+                    <p className="text-sm font-medium">Available columns (click to insert):</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {columns.map((col) => (
@@ -207,9 +215,7 @@ export function CalculatedFieldsEditor({
                 <Button variant="outline" onClick={() => setShowDialog(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSave}>
-                  {editingField ? 'Update' : 'Create'} Field
-                </Button>
+                <Button onClick={handleSave}>{editingField ? 'Update' : 'Create'} Field</Button>
               </div>
             </div>
           </DialogContent>
@@ -251,24 +257,14 @@ export function CalculatedFieldsEditor({
                       <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">
                         Expression:
                       </div>
-                      <div className="text-sm font-mono text-foreground">
-                        {field.expression}
-                      </div>
+                      <div className="text-sm font-mono text-foreground">{field.expression}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 ml-4">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleEdit(field)}
-                    >
+                    <Button size="sm" variant="ghost" onClick={() => handleEdit(field)}>
                       <Edit2 className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDelete(index)}
-                    >
+                    <Button size="sm" variant="ghost" onClick={() => handleDelete(index)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

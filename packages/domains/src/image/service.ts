@@ -1,10 +1,9 @@
-import { randomUUID } from 'crypto'
-import { promises as fs } from 'fs'
-import path from 'path'
-import { createHash } from 'crypto'
-import { ImageMetadata, ImageVariant, UploadConfig, UploadResult, DEFAULT_CONFIGS } from './types'
+import { createHash, randomUUID } from 'node:crypto'
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
 import { elasticsearchClient } from '../search/elasticsearch-client'
 import { imageElasticsearchService } from './elasticsearch-service'
+import { DEFAULT_CONFIGS, type ImageMetadata, type ImageVariant, type UploadResult } from './types'
 
 export class ImageService {
   private uploadDir: string
@@ -18,7 +17,7 @@ export class ImageService {
   private async ensureDirectory(dirPath: string): Promise<void> {
     try {
       await fs.mkdir(dirPath, { recursive: true })
-    } catch (error) {
+    } catch (_error) {
       // Directory already exists
     }
   }
@@ -33,10 +32,9 @@ export class ImageService {
       const metadata = await sharp.default(buffer).metadata()
       return {
         width: metadata.width || 0,
-        height: metadata.height || 0
+        height: metadata.height || 0,
       }
-    } catch (error) {
-      console.error('Sharp not available, using fallback dimensions:', error)
+    } catch (_error) {
       return { width: 0, height: 0 }
     }
   }
@@ -48,10 +46,11 @@ export class ImageService {
   ): Promise<{ width: number; height: number; size: number }> {
     try {
       const sharp = await import('sharp')
-      const result = await sharp.default(buffer)
+      const result = await sharp
+        .default(buffer)
         .resize(variant.width, variant.height, {
           fit: 'cover',
-          position: 'center'
+          position: 'center',
         })
         .jpeg({ quality: 90 })
         .toFile(outputPath)
@@ -59,16 +58,15 @@ export class ImageService {
       return {
         width: result.width,
         height: result.height,
-        size: result.size
+        size: result.size,
       }
-    } catch (error) {
-      console.error('Sharp not available, cannot generate variant:', error)
+    } catch (_error) {
       // Fallback: save original file as variant
       await fs.writeFile(outputPath, buffer)
       return {
         width: variant.width,
         height: variant.height,
-        size: buffer.length
+        size: buffer.length,
       }
     }
   }
@@ -88,7 +86,7 @@ export class ImageService {
     } = {}
   ): Promise<UploadResult> {
     const config = DEFAULT_CONFIGS[category]
-    
+
     // Validation
     if (file.length > config.maxSize) {
       throw new Error(`File size exceeds maximum allowed size of ${config.maxSize} bytes`)
@@ -130,12 +128,12 @@ export class ImageService {
       alt: options.alt,
       description: options.description,
       entityType: options.entityType,
-      entityId: options.entityId
+      entityId: options.entityId,
     }
 
     const variants: ImageVariant[] = []
     const urls: any = {
-      original: `${this.baseUrl}/${category}/original/${fileName}`
+      original: `${this.baseUrl}/${category}/original/${fileName}`,
     }
 
     // Génération des variantes si nécessaire
@@ -143,12 +141,12 @@ export class ImageService {
       for (const [variantName, variantConfig] of Object.entries(config.variants)) {
         const variantDir = path.join(categoryDir, variantName)
         await this.ensureDirectory(variantDir)
-        
+
         const variantFileName = `${imageId}_${variantName}${extension}`
         const variantPath = path.join(variantDir, variantFileName)
-        
+
         const variantResult = await this.generateVariant(file, variantConfig, variantPath)
-        
+
         const variant: ImageVariant = {
           id: randomUUID(),
           imageId,
@@ -157,9 +155,9 @@ export class ImageService {
           width: variantResult.width,
           height: variantResult.height,
           size: variantResult.size,
-          path: variantPath
+          path: variantPath,
         }
-        
+
         variants.push(variant)
         urls[variantName] = `${this.baseUrl}/${category}/${variantName}/${variantFileName}`
       }
@@ -171,26 +169,26 @@ export class ImageService {
     return {
       metadata,
       variants,
-      urls
+      urls,
     }
   }
 
   async deleteImage(imageId: string, category: string): Promise<void> {
     const categoryDir = path.join(this.uploadDir, 'images', category)
-    
+
     // Suppression de toutes les variantes
     const variants = ['original', 'thumbnail', 'medium', 'large']
-    
+
     for (const variant of variants) {
       const variantDir = path.join(categoryDir, variant)
       try {
         const files = await fs.readdir(variantDir)
-        const imageFiles = files.filter(file => file.startsWith(imageId))
-        
+        const imageFiles = files.filter((file) => file.startsWith(imageId))
+
         for (const file of imageFiles) {
           await fs.unlink(path.join(variantDir, file))
         }
-      } catch (error) {
+      } catch (_error) {
         // Directory or file doesn't exist
       }
     }
@@ -199,19 +197,19 @@ export class ImageService {
     await this.removeFromElasticsearch(imageId)
   }
 
-  private async indexToElasticsearch(metadata: ImageMetadata, variants: ImageVariant[]): Promise<void> {
+  private async indexToElasticsearch(
+    metadata: ImageMetadata,
+    variants: ImageVariant[]
+  ): Promise<void> {
     try {
       const isConnected = await elasticsearchClient.isConnected()
       if (!isConnected) {
-        console.warn('Elasticsearch not available, skipping indexing')
         return
       }
 
       const document = imageElasticsearchService.toElasticsearchDocument(metadata, variants)
       await elasticsearchClient.indexDocument('images', metadata.id, document)
-      console.log(`Indexed image ${metadata.id} to Elasticsearch`)
-    } catch (error) {
-      console.error('Failed to index image to Elasticsearch:', error)
+    } catch (_error) {
       // Ne pas faire échouer l'upload si l'indexation échoue
     }
   }
@@ -224,19 +222,16 @@ export class ImageService {
       }
 
       await elasticsearchClient.deleteDocument('images', imageId)
-      console.log(`Removed image ${imageId} from Elasticsearch`)
-    } catch (error) {
-      console.error('Failed to remove image from Elasticsearch:', error)
-    }
+    } catch (_error) {}
   }
 
-  async getImageMetadata(imageId: string): Promise<ImageMetadata | null> {
+  async getImageMetadata(_imageId: string): Promise<ImageMetadata | null> {
     // Cette méthode devra être implémentée avec la base de données
     // Pour l'instant, retourne null
     return null
   }
 
-  async searchImages(query: {
+  async searchImages(_query: {
     category?: string
     entityType?: string
     entityId?: string

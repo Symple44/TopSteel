@@ -1,4 +1,6 @@
 'use client'
+export const dynamic = 'force-dynamic'
+
 import { useTranslation } from '@/lib/i18n/hooks'
 // import { Button } from '@erp/ui'
 /**
@@ -14,7 +16,7 @@ export default function GlobalError({
   reset: () => void
 }) {
   const { t } = useTranslation('errors')
-  
+
   return (
     <html lang="fr">
       <body>
@@ -23,9 +25,7 @@ export default function GlobalError({
             <div className="space-y-2">
               <h1 className="text-6xl font-bold text-destructive">{t('title')}</h1>
               <h2 className="text-2xl font-semibold">{t('general')}</h2>
-              <p className="text-muted-foreground max-w-md">
-                {t('unexpectedDetailed')}
-              </p>
+              <p className="text-muted-foreground max-w-md">{t('unexpectedDetailed')}</p>
             </div>
 
             <div className="space-y-4">

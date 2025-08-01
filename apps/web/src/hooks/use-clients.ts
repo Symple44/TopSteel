@@ -278,7 +278,7 @@ export const ClientsCache = {
 // =============================================
 
 // Module-level constants and state
-const clientsApiBaseUrl = '/api/clients'
+const _clientsApiBaseUrl = '/api/clients'
 const clientsAbortControllers = new Map<string, AbortController>()
 
 // Module-level utility functions
@@ -713,7 +713,6 @@ export function useClients(
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
           setError(createClientsError(err))
-          console.error('Erreur lors du chargement des clients:', err)
         }
       } finally {
         setLoading(false)
@@ -794,7 +793,7 @@ export function useClients(
     async (id: string): Promise<void> => {
       try {
         // Optimistic update
-        const clientToDelete = clients.find((c) => c.id === id)
+        const _clientToDelete = clients.find((c) => c.id === id)
 
         setClients((prev) => prev.filter((client) => client.id !== id))
         setTotalClients((prev) => prev - 1)

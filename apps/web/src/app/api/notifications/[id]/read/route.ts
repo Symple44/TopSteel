@@ -1,23 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Stockage temporaire - en production, utiliser une base de données
-let notifications: any[] = []
+const notifications: any[] = []
 
 export async function PATCH(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
 
     // Trouver la notification
-    const notificationIndex = notifications.findIndex(n => n.id === id)
-    
+    const notificationIndex = notifications.findIndex((n) => n.id === id)
+
     if (notificationIndex === -1) {
-      return NextResponse.json(
-        { error: 'Notification not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
     }
 
     // Marquer comme lue
@@ -27,14 +24,8 @@ export async function PATCH(
       readAt: new Date().toISOString(),
     }
 
-
     return NextResponse.json(notifications[notificationIndex])
-
-  } catch (error) {
-    console.error('Error marking notification as read:', error)
-    return NextResponse.json(
-      { error: 'Failed to mark notification as read' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Failed to mark notification as read' }, { status: 500 })
   }
 }

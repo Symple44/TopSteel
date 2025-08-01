@@ -1,7 +1,7 @@
-import { fr } from './fr'
+import type { Translations } from '../types'
 import { en } from './en'
 import { es } from './es'
-import type { Translations } from '../types'
+import { fr } from './fr'
 
 export const translations: Translations = {
   fr,

@@ -100,13 +100,6 @@ export class ErrorBoundary extends Component<Props, State> {
       userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Server',
     }
 
-    // Console pour développement
-    console.group(`🚨 ErrorBoundary [${this.state.errorId}]`)
-    console.error('Error:', error)
-    console.error('Error Info:', errorInfo)
-    console.error('Full Context:', errorData)
-    console.groupEnd()
-
     // Service de logging en production
     if (process.env.NODE_ENV === 'production') {
       this.sendErrorToService(errorData)
@@ -137,9 +130,7 @@ export class ErrorBoundary extends Component<Props, State> {
         method: 'POST',
         body: JSON.stringify(errorData),
       })
-    } catch (logError) {
-      console.error('Failed to send error to logging service:', logError)
-    }
+    } catch (_logError) {}
   }
 
   private scheduleRetryIfApplicable(error: Error) {
@@ -319,9 +310,8 @@ export function withErrorBoundary<T extends object>(
 
 // Hook pour déclencher des erreurs en développement
 export function useErrorHandler() {
-  return (error: Error, errorInfo?: string) => {
+  return (error: Error, _errorInfo?: string) => {
     if (process.env.NODE_ENV === 'development') {
-      console.error('Manual error triggered:', error, errorInfo)
     }
     throw error
   }

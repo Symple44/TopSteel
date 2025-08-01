@@ -3,18 +3,9 @@
  * Gestion des appels API pour les projets
  */
 
+import type { Projet, ProjetFilters, ProjetPriorite, ProjetStatut, ProjetType } from '@erp/domains'
 import { BaseApiClient } from '../core/base-api-client'
 import type { RequestOptions } from '../core/http-client'
-import type { 
-  Projet, 
-  ProjetFilters
-} from '@erp/domains'
-
-import { 
-  ProjetStatut,
-  ProjetType,
-  ProjetPriorite 
-} from '@erp/domains'
 
 export interface ProjetStats {
   total: number
@@ -130,13 +121,17 @@ export class ProjectApiClient extends BaseApiClient {
       ...filters,
     })
 
-    const response = await this.http.get<Projet[]>(`${this.endpoint}/search`, { params } as RequestOptions)
+    const response = await this.http.get<Projet[]>(`${this.endpoint}/search`, {
+      params,
+    } as RequestOptions)
     return response.data
   }
 
   async getProjetStats(filters?: ProjetFilters): Promise<ProjetStats> {
     const params = this.buildQueryParams(filters || {})
-    const response = await this.http.get<ProjetStats>(`${this.endpoint}/stats`, { params } as RequestOptions)
+    const response = await this.http.get<ProjetStats>(`${this.endpoint}/stats`, {
+      params,
+    } as RequestOptions)
     return response.data
   }
 
@@ -193,19 +188,26 @@ export class ProjectApiClient extends BaseApiClient {
 
   async changeProjetStatus(id: string, newStatus: ProjetStatut): Promise<OperationResult<Projet>> {
     return this.http.executeOperation(async () => {
-      return this.http.patch<Projet>(`${this.endpoint}/${this.normalizeId(id)}/status`, { statut: newStatus })
+      return this.http.patch<Projet>(`${this.endpoint}/${this.normalizeId(id)}/status`, {
+        statut: newStatus,
+      })
     })
   }
 
   async assignResponsable(id: string, responsableId: string): Promise<OperationResult<Projet>> {
     return this.http.executeOperation(async () => {
-      return this.http.patch<Projet>(`${this.endpoint}/${this.normalizeId(id)}/assign-responsable`, { responsableId })
+      return this.http.patch<Projet>(
+        `${this.endpoint}/${this.normalizeId(id)}/assign-responsable`,
+        { responsableId }
+      )
     })
   }
 
   async updateProjetProgress(id: string, progress: number): Promise<OperationResult<Projet>> {
     return this.http.executeOperation(async () => {
-      return this.http.patch<Projet>(`${this.endpoint}/${this.normalizeId(id)}/progress`, { avancement: progress })
+      return this.http.patch<Projet>(`${this.endpoint}/${this.normalizeId(id)}/progress`, {
+        avancement: progress,
+      })
     })
   }
 

@@ -1,37 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { ReorderableListConfig } from '@/components/ui/reorderable-list/reorderable-list-theme'
+import { type NextRequest, NextResponse } from 'next/server'
+import type { ReorderableListConfig } from '@erp/ui'
 
 // Mock database - À remplacer par votre vraie base de données
 const mockDB = new Map<string, ReorderableListConfig>()
 
 // GET - Récupérer la configuration d'un composant
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ componentId: string }> }
 ) {
   try {
     const { componentId } = await params
-    
+
     // TODO: Récupérer l'utilisateur depuis la session/JWT
     const userId = 'mock-user-id' // À remplacer par la vraie logique d'auth
-    
+
     const configKey = `${userId}-${componentId}`
     const config = mockDB.get(configKey)
-    
+
     if (!config) {
-      return NextResponse.json(
-        { error: 'Configuration non trouvée' }, 
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Configuration non trouvée' }, { status: 404 })
     }
-    
+
     return NextResponse.json(config)
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la configuration:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -42,36 +35,33 @@ export async function POST(
 ) {
   try {
     const { componentId } = await params
-    const body = await request.json() as ReorderableListConfig
-    
+    const body = (await request.json()) as ReorderableListConfig
+
     // Validation basique
     if (!body || !body.componentId || body.componentId !== componentId) {
-      return NextResponse.json(
-        { error: 'Données invalides' }, 
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Données invalides' }, { status: 400 })
     }
-    
+
     // TODO: Récupérer l'utilisateur depuis la session/JWT
     const userId = 'mock-user-id' // À remplacer par la vraie logique d'auth
-    
+
     // Enrichir avec les métadonnées
     const config: ReorderableListConfig = {
       ...body,
       userId,
       componentId,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }
-    
+
     // Si pas d'ID, c'est une création
     if (!config.id) {
       config.id = `${componentId}-${userId}-${Date.now()}`
       config.createdAt = new Date()
     }
-    
+
     const configKey = `${userId}-${componentId}`
     mockDB.set(configKey, config)
-    
+
     // TODO: Sauvegarder en base de données
     /*
     const savedConfig = await db.uiPreferences.upsert({
@@ -90,44 +80,33 @@ export async function POST(
       create: config
     })
     */
-    
+
     return NextResponse.json(config)
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde de la configuration:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
 // DELETE - Supprimer la configuration (reset)
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ componentId: string }> }
 ) {
   try {
     const { componentId } = await params
-    
+
     // TODO: Récupérer l'utilisateur depuis la session/JWT
     const userId = 'mock-user-id'
-    
+
     const configKey = `${userId}-${componentId}`
     const deleted = mockDB.delete(configKey)
-    
+
     if (!deleted) {
-      return NextResponse.json(
-        { error: 'Configuration non trouvée' }, 
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Configuration non trouvée' }, { status: 404 })
     }
-    
+
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Erreur lors de la suppression de la configuration:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

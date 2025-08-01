@@ -1,23 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest) {
   try {
     // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/run`
-    
+    const _apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/run`
+
     const response = await callBackendFromApi(request, 'admin/database/migrations/run', {
       method: 'POST',
     })
 
     if (!response.ok) {
-      console.error('API Error:', response.status, response.statusText)
-      
       // Simuler une réponse d'erreur
       return NextResponse.json(
-        { 
-          success: false, 
-          message: 'API backend non disponible - impossible d\'exécuter les migrations' 
+        {
+          success: false,
+          message: "API backend non disponible - impossible d'exécuter les migrations",
         },
         { status: 503 }
       )
@@ -25,14 +23,12 @@ export async function POST(request: NextRequest) {
 
     const responseData = await response.json()
     return NextResponse.json(responseData.data || responseData)
-  } catch (error) {
-    console.error('Erreur lors de l\'exécution des migrations:', error)
-    
+  } catch (_error) {
     // Simuler une réponse d'erreur
     return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Erreur interne - impossible d\'exécuter les migrations' 
+      {
+        success: false,
+        message: "Erreur interne - impossible d'exécuter les migrations",
       },
       { status: 500 }
     )

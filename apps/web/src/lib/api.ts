@@ -1,13 +1,18 @@
 // apps/web/src/lib/api.ts - Client API pour Zustand stores
 import { ERPApiClient } from '@erp/api-client'
-import { Client, ClientType, type Projet, type ProjetFilters } from '@erp/domains/core'
-import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/domains/core'
+import {
+  type Projet,
+  type ProjetFilters,
+  ProjetPriorite,
+  ProjetStatut,
+  ProjetType,
+} from '@erp/domains/core'
 
 // Configuration API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
 
 // Instance du client API
-const apiClient = new ERPApiClient({
+const _apiClient = new ERPApiClient({
   baseURL: API_BASE_URL,
   timeout: 30000,
 })
@@ -214,8 +219,7 @@ export const api = {
         }
 
         return filteredProjets
-      } catch (error) {
-        console.error('Erreur lors de la récupération des projets:', error)
+      } catch (_error) {
         throw new Error('Impossible de récupérer les projets')
       }
     },
@@ -228,8 +232,7 @@ export const api = {
         const projets = await this.getAll()
 
         return projets.find((p) => p.id === id) || null
-      } catch (error) {
-        console.error('Erreur lors de la récupération du projet:', error)
+      } catch (_error) {
         throw new Error('Impossible de récupérer le projet')
       }
     },
@@ -288,8 +291,7 @@ export const api = {
         }
 
         return newProjet
-      } catch (error) {
-        console.error('Erreur lors de la création du projet:', error)
+      } catch (_error) {
         throw new Error('Impossible de créer le projet')
       }
     },
@@ -312,18 +314,16 @@ export const api = {
         }
 
         return updatedProjet
-      } catch (error) {
-        console.error('Erreur lors de la mise à jour du projet:', error)
+      } catch (_error) {
         throw new Error('Impossible de mettre à jour le projet')
       }
     },
 
-    async delete(id: string): Promise<void> {
+    async delete(_id: string): Promise<void> {
       try {
         // Simulation d'appel API
         await new Promise((resolve) => setTimeout(resolve, 100))
-      } catch (error) {
-        console.error('Erreur lors de la suppression du projet:', error)
+      } catch (_error) {
         throw new Error('Impossible de supprimer le projet')
       }
     },
@@ -334,15 +334,15 @@ export const api = {
    */
   createContextKey(domain: string, resource?: string, id?: string | number): string[] {
     const parts = [domain]
-    
+
     if (resource) {
       parts.push(resource)
     }
-    
+
     if (id !== undefined) {
       parts.push(String(id))
     }
-    
+
     return parts
   },
 }

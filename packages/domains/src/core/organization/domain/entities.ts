@@ -81,15 +81,15 @@ export interface Organization extends BaseEntity {
   readonly raisonSociale: string
   readonly nomCommercial?: string
   readonly legalInfo: LegalInfo
-  
+
   // Contact principal
   readonly adresseSiege: OrganizationAddress
   readonly contact: OrganizationContact
-  
+
   // Structure
   readonly sites: Site[]
   readonly departements: Departement[]
-  
+
   // Configuration
   readonly settings: {
     timezone: string
@@ -101,7 +101,7 @@ export interface Organization extends BaseEntity {
       daysPerWeek: number
     }
   }
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date

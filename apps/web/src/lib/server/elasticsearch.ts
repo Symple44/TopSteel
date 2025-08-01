@@ -18,8 +18,7 @@ export async function getImageElasticsearchService() {
   try {
     const { imageElasticsearchService } = await import('@erp/domains/server')
     return imageElasticsearchService
-  } catch (error) {
-    console.error('Failed to load image service:', error)
+  } catch (_error) {
     // Retourner un service mock si l'import échoue
     return {
       toElasticsearchDocument: () => ({}),

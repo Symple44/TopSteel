@@ -3,47 +3,39 @@
 import { callClientApi } from '@/utils/backend-api'
 
 export async function debugMenuPreferences() {
-  
   const menuEndpoints = [
     'user/menu-preferences/custom-menu',
-    'admin/menu-raw/configurations/active'
+    'admin/menu-raw/configurations/active',
   ]
-  
+
   for (const endpoint of menuEndpoints) {
-    
     try {
       // Test avec différentes configurations
       const configurations = [
         { method: 'GET', headers: { 'Content-Type': 'application/json' } },
-        { method: 'GET', headers: { 'Accept': 'application/json' } },
-        { method: 'GET' }
+        { method: 'GET', headers: { Accept: 'application/json' } },
+        { method: 'GET' },
       ]
-      
+
       for (let i = 0; i < configurations.length; i++) {
         const config = configurations[i]
-        
+
         try {
-          const response = await callClientApi(endpoint, config)
+          const response = await callClientApi(endpoint, config as RequestInit)
           const data = await response.json()
-          
-          
+
           // Vérifier la structure des données
           if (data && typeof data === 'object') {
             if (data.data) {
             }
           }
-        } catch (error: any) {
-          
-          if (error?.message?.includes('CLIENT')) {
+        } catch (error: unknown) {
+          if (error instanceof Error && error.message.includes('CLIENT')) {
           }
         }
       }
-    } catch (error: any) {
-    }
-    
-    console.log('---')
+    } catch (_error: unknown) {}
   }
-  
 }
 
 // Test automatique

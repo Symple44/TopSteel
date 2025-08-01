@@ -35,10 +35,10 @@ export function parse(url) {
       pathname: '/',
       search: '',
       query: '',
-      hash: ''
+      hash: '',
     }
   }
-  
+
   try {
     const parsed = new URL(url)
     return {
@@ -48,10 +48,9 @@ export function parse(url) {
       pathname: parsed.pathname,
       search: parsed.search,
       query: parsed.search.replace('?', ''),
-      hash: parsed.hash
+      hash: parsed.hash,
     }
-  } catch (error) {
-    console.warn('URL parse error:', error)
+  } catch (_error) {
     return {
       protocol: 'http',
       hostname: '127.0.0.1',
@@ -59,7 +58,7 @@ export function parse(url) {
       pathname: '/',
       search: '',
       query: '',
-      hash: ''
+      hash: '',
     }
   }
 }
@@ -74,28 +73,16 @@ export class Fetch {
     return fetch(opts.uri || opts.url, {
       method: opts.method || 'GET',
       headers: opts.headers || {},
-      body: opts.data
+      body: opts.data,
     })
   }
 }
 
-export class NodeXHR {
-  constructor() {
-    // Polyfill pour Node.js XMLHttpRequest
-  }
-}
+export class NodeXHR {}
 
-export class XHR {
-  constructor() {
-    // Polyfill pour XMLHttpRequest
-  }
-}
+export class XHR {}
 
-export class NodeWebSocket {
-  constructor() {
-    // Polyfill pour Node.js WebSocket
-  }
-}
+export class NodeWebSocket {}
 
 export class WebSocket {
   constructor(url, protocols) {
@@ -104,11 +91,7 @@ export class WebSocket {
   }
 }
 
-export class WebTransport {
-  constructor() {
-    // Polyfill pour WebTransport
-  }
-}
+export class WebTransport {}
 
 export class Socket {
   constructor(opts = {}) {
@@ -126,48 +109,39 @@ export class Socket {
   open() {
     if (this.readyState === 'open') return this
     this.readyState = 'opening'
-    
+
     // Simuler l'ouverture
     setTimeout(() => {
       this.readyState = 'open'
       this.emit('open')
     }, 100)
-    
+
     return this
   }
 
   close() {
     if (this.readyState === 'closed') return this
     this.readyState = 'closing'
-    
+
     setTimeout(() => {
       this.readyState = 'closed'
       this.emit('close')
     }, 100)
-    
+
     return this
   }
 
-  send(data) {
+  send(_data) {
     if (this.readyState !== 'open') return
-    // Simuler l'envoi
-    console.log('Engine.IO send:', data)
   }
 
-  emit(event, ...args) {
-    // Simuler l'émission d'événements
-    console.log('Engine.IO emit:', event, args)
-  }
+  emit(_event, ..._args) {}
 
-  on(event, callback) {
-    // Simuler l'écoute d'événements
-    console.log('Engine.IO on:', event)
+  on(_event, _callback) {
     return this
   }
 
-  off(event, callback) {
-    // Simuler le retrait d'événements
-    console.log('Engine.IO off:', event)
+  off(_event, _callback) {
     return this
   }
 }
@@ -184,5 +158,5 @@ export default {
   WebTransport,
   installTimerFunctions,
   nextTick,
-  parse
+  parse,
 }

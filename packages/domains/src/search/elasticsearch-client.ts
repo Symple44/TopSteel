@@ -23,13 +23,13 @@ export class ElasticsearchClient {
       node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
       maxRetries: 3,
       requestTimeout: 30000,
-      ...config
+      ...config,
     }
 
     if (process.env.ELASTICSEARCH_USERNAME && process.env.ELASTICSEARCH_PASSWORD) {
       this.config.auth = {
         username: process.env.ELASTICSEARCH_USERNAME,
-        password: process.env.ELASTICSEARCH_PASSWORD
+        password: process.env.ELASTICSEARCH_PASSWORD,
       }
     }
   }
@@ -45,10 +45,10 @@ export class ElasticsearchClient {
     try {
       const client = this.getClient()
       const response = await client.ping(undefined, {
-        requestTimeout: timeout
+        requestTimeout: timeout,
       })
       return response === true
-    } catch (error) {
+    } catch (_error) {
       // Ne pas logger l'erreur complète pour éviter le spam dans les logs
       // Juste indiquer qu'Elasticsearch n'est pas disponible
       return false
@@ -63,42 +63,42 @@ export class ElasticsearchClient {
   }> {
     try {
       const client = this.getClient()
-      
+
       // Test de connexion rapide
       const pingResponse = await client.ping(undefined, {
-        requestTimeout: timeout
+        requestTimeout: timeout,
       })
-      
+
       if (pingResponse !== true) {
         return {
           connected: false,
-          error: 'Ping failed'
+          error: 'Ping failed',
         }
       }
 
       // Si la connexion fonctionne, récupérer les infos du cluster
       try {
         const infoResponse = await client.info(undefined, {
-          requestTimeout: timeout
+          requestTimeout: timeout,
         })
-        
+
         return {
           connected: true,
           version: infoResponse.version?.number,
-          clusterName: infoResponse.cluster_name
+          clusterName: infoResponse.cluster_name,
         }
-      } catch (infoError) {
+      } catch (_infoError) {
         // Connexion OK mais impossible de récupérer les infos
         return {
           connected: true,
-          error: 'Cannot retrieve cluster info'
+          error: 'Cannot retrieve cluster info',
         }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       return {
         connected: false,
-        error: errorMessage
+        error: errorMessage,
       }
     }
   }
@@ -106,25 +106,21 @@ export class ElasticsearchClient {
   async createIndex(indexName: string, mapping: any): Promise<boolean> {
     try {
       const client = this.getClient()
-      
+
       // Vérifier si l'index existe déjà
       const exists = await client.indices.exists({ index: indexName })
-      
+
       if (exists) {
-        console.log(`Index ${indexName} already exists`)
         return true
       }
 
       // Créer l'index avec le mapping
       await client.indices.create({
         index: indexName,
-        body: mapping
+        body: mapping,
       })
-
-      console.log(`Index ${indexName} created successfully`)
       return true
-    } catch (error) {
-      console.error(`Failed to create index ${indexName}:`, error)
+    } catch (_error) {
       return false
     }
   }
@@ -133,10 +129,8 @@ export class ElasticsearchClient {
     try {
       const client = this.getClient()
       await client.indices.delete({ index: indexName })
-      console.log(`Index ${indexName} deleted successfully`)
       return true
-    } catch (error) {
-      console.error(`Failed to delete index ${indexName}:`, error)
+    } catch (_error) {
       return false
     }
   }
@@ -147,11 +141,10 @@ export class ElasticsearchClient {
       await client.index({
         index: indexName,
         id,
-        body: document
+        body: document,
       })
       return true
-    } catch (error) {
-      console.error(`Failed to index document ${id}:`, error)
+    } catch (_error) {
       return false
     }
   }
@@ -163,12 +156,11 @@ export class ElasticsearchClient {
         index: indexName,
         id,
         body: {
-          doc: document
-        }
+          doc: document,
+        },
       })
       return true
-    } catch (error) {
-      console.error(`Failed to update document ${id}:`, error)
+    } catch (_error) {
       return false
     }
   }
@@ -178,11 +170,10 @@ export class ElasticsearchClient {
       const client = this.getClient()
       await client.delete({
         index: indexName,
-        id
+        id,
       })
       return true
-    } catch (error) {
-      console.error(`Failed to delete document ${id}:`, error)
+    } catch (_error) {
       return false
     }
   }
@@ -192,11 +183,10 @@ export class ElasticsearchClient {
       const client = this.getClient()
       const response = await client.search({
         index: indexName,
-        body: query
+        body: query,
       })
       return response
     } catch (error) {
-      console.error(`Search failed in index ${indexName}:`, error)
       throw error
     }
   }
@@ -205,17 +195,15 @@ export class ElasticsearchClient {
     try {
       const client = this.getClient()
       const response = await client.bulk({
-        body: operations
+        body: operations,
       })
-      
+
       if (response.errors) {
-        console.error('Bulk operation had errors:', response.errors)
         return false
       }
-      
+
       return true
-    } catch (error) {
-      console.error('Bulk operation failed:', error)
+    } catch (_error) {
       return false
     }
   }

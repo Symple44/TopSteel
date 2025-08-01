@@ -16,7 +16,7 @@ export function useStoreSsr<T>(options: UseStoreSsrOptions<T>) {
     return fallback
   }, [fallback, serverValue])
 
-  const setValue = useCallback((newValue: T) => {}, [])
+  const setValue = useCallback((_newValue: T) => {}, [])
 
   return [value, setValue] as const
 }

@@ -1,8 +1,9 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { Button } from '@erp/ui'
 
-import React from 'react'
 /**
  * Page Dashboard Error - TopSteel ERP
  * Fichier: apps/web/src/app/(dashboard)/error.tsx
@@ -11,7 +12,7 @@ import React from 'react'
 import Link from 'next/link'
 
 export default function DashboardError({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string }

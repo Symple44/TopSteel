@@ -1,30 +1,33 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Button } from '@erp/ui'
-import { Badge } from '@erp/ui'
-import { Input } from '@erp/ui'
-import { Label } from '@erp/ui'
-import { Textarea } from '@erp/ui'
-import { Separator } from '@erp/ui'
-import { 
-  Search, 
-  Database, 
-  RefreshCw, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle,
-  Settings,
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Separator,
+} from '@erp/ui'
+import {
+  AlertTriangle,
+  CheckCircle,
+  Database,
   Loader2,
+  RefreshCw,
+  RotateCcw,
   Save,
+  Search,
   Server,
-  Key,
+  Settings,
   Shield,
-  RotateCcw
+  XCircle,
 } from 'lucide-react'
-import { useTranslation } from '@/lib/i18n'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n'
 import { callClientApi } from '@/utils/backend-api'
 
 interface ElasticsearchStatus {
@@ -32,12 +35,15 @@ interface ElasticsearchStatus {
   error?: string
   version?: string
   clusterName?: string
-  indices: Record<string, {
-    exists: boolean
-    documentCount?: number
-    status: 'healthy' | 'error'
-    error?: string
-  }>
+  indices: Record<
+    string,
+    {
+      exists: boolean
+      documentCount?: number
+      status: 'healthy' | 'error'
+      error?: string
+    }
+  >
 }
 
 interface ElasticsearchConfig {
@@ -64,7 +70,7 @@ export function ElasticsearchAdmin() {
     maxRetries: 3,
     requestTimeout: 30000,
     batchSize: 100,
-    enableLogging: false
+    enableLogging: false,
   })
   const [loading, setLoading] = useState(true)
   const [operationLoading, setOperationLoading] = useState<string | null>(null)
@@ -85,8 +91,7 @@ export function ElasticsearchAdmin() {
       const data = await response.json()
       setStatus(data)
       setLastStatusCheck(now)
-    } catch (error) {
-      console.error('Failed to fetch Elasticsearch status:', error)
+    } catch (_error) {
       toast.error(t('elasticsearch.statusError'))
     } finally {
       setLoading(false)
@@ -95,10 +100,11 @@ export function ElasticsearchAdmin() {
 
   const fetchConfig = async () => {
     try {
-      const response = await callClientApi('admin/system-parameters/by-category?category=ELASTICSEARCH')
+      const response = await callClientApi(
+        'admin/system-parameters/by-category?category=ELASTICSEARCH'
+      )
       const data = await response.json()
-      console.log('Fetched config data:', data)
-      
+
       // Toujours initialiser avec les valeurs par défaut
       const defaultConfig = {
         url: 'http://localhost:9200',
@@ -109,7 +115,7 @@ export function ElasticsearchAdmin() {
         maxRetries: 3,
         requestTimeout: 30000,
         batchSize: 100,
-        enableLogging: false
+        enableLogging: false,
       }
 
       if (data.length > 0) {
@@ -145,19 +151,18 @@ export function ElasticsearchAdmin() {
           }
           return acc
         }, defaultConfig)
-        
-        setConfig(prev => ({ ...prev, ...configFromParams }))
+
+        setConfig((prev) => ({ ...prev, ...configFromParams }))
       } else {
         // Si aucune configuration n'est trouvée, utiliser les valeurs par défaut
-        setConfig(prev => ({ ...prev, ...defaultConfig }))
+        setConfig((prev) => ({ ...prev, ...defaultConfig }))
       }
-    } catch (error) {
-      console.error('Failed to fetch Elasticsearch config:', error)
+    } catch (_error) {
       toast.error(t('elasticsearch.configurationError'))
     }
   }
 
-  const createDefaultParameters = async (defaultConfig: ElasticsearchConfig) => {
+  const _createDefaultParameters = async (defaultConfig: ElasticsearchConfig) => {
     try {
       const updates = [
         { key: 'elasticsearch.url', value: defaultConfig.url },
@@ -168,20 +173,17 @@ export function ElasticsearchAdmin() {
         { key: 'elasticsearch.maxRetries', value: defaultConfig.maxRetries.toString() },
         { key: 'elasticsearch.requestTimeout', value: defaultConfig.requestTimeout.toString() },
         { key: 'elasticsearch.batchSize', value: defaultConfig.batchSize.toString() },
-        { key: 'elasticsearch.enableLogging', value: defaultConfig.enableLogging.toString() }
+        { key: 'elasticsearch.enableLogging', value: defaultConfig.enableLogging.toString() },
       ]
 
       const response = await callClientApi('admin/system-parameters', {
         method: 'PATCH',
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates),
       })
 
       if (!response.ok) {
-        console.error('Failed to create default parameters')
       }
-    } catch (error) {
-      console.error('Error creating default parameters:', error)
-    }
+    } catch (_error) {}
   }
 
   const saveConfig = async () => {
@@ -196,33 +198,26 @@ export function ElasticsearchAdmin() {
         { key: 'elasticsearch.maxRetries', value: config.maxRetries.toString() },
         { key: 'elasticsearch.requestTimeout', value: config.requestTimeout.toString() },
         { key: 'elasticsearch.batchSize', value: config.batchSize.toString() },
-        { key: 'elasticsearch.enableLogging', value: config.enableLogging.toString() }
+        { key: 'elasticsearch.enableLogging', value: config.enableLogging.toString() },
       ]
-
-      console.log('Saving config with updates:', updates)
 
       const response = await callClientApi('admin/system-parameters', {
         method: 'PATCH',
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates),
       })
 
-      console.log('Save response status:', response.status)
-
       if (response.ok) {
-        const result = await response.json()
-        console.log('Save response data:', result)
+        const _result = await response.json()
         toast.success(t('elasticsearch.configurationSaved'))
         setHasConfigChanges(false)
         // Rafraîchir la configuration et le statut pour voir les changements
         await fetchConfig()
         await fetchStatus(true)
       } else {
-        const errorData = await response.json()
-        console.error('Save failed with error:', errorData)
+        const _errorData = await response.json()
         throw new Error(`Erreur lors de la sauvegarde: ${response.status}`)
       }
-    } catch (error) {
-      console.error('Failed to save config:', error)
+    } catch (_error) {
       toast.error(t('elasticsearch.configurationError'))
     } finally {
       setConfigLoading(false)
@@ -242,7 +237,7 @@ export function ElasticsearchAdmin() {
           maxRetries: 3,
           requestTimeout: 30000,
           batchSize: 100,
-          enableLogging: false
+          enableLogging: false,
         }
 
         const updates = [
@@ -254,12 +249,12 @@ export function ElasticsearchAdmin() {
           { key: 'elasticsearch.maxRetries', value: defaultConfig.maxRetries.toString() },
           { key: 'elasticsearch.requestTimeout', value: defaultConfig.requestTimeout.toString() },
           { key: 'elasticsearch.batchSize', value: defaultConfig.batchSize.toString() },
-          { key: 'elasticsearch.enableLogging', value: defaultConfig.enableLogging.toString() }
+          { key: 'elasticsearch.enableLogging', value: defaultConfig.enableLogging.toString() },
         ]
 
         const response = await callClientApi('admin/system-parameters', {
           method: 'PATCH',
-          body: JSON.stringify(updates)
+          body: JSON.stringify(updates),
         })
 
         if (response.ok) {
@@ -271,8 +266,7 @@ export function ElasticsearchAdmin() {
         } else {
           throw new Error(`Erreur lors de la réinitialisation: ${response.status}`)
         }
-      } catch (error) {
-        console.error('Failed to reset config:', error)
+      } catch (_error) {
         toast.error(t('resetError'))
       } finally {
         setConfigLoading(false)
@@ -283,26 +277,25 @@ export function ElasticsearchAdmin() {
   useEffect(() => {
     fetchStatus()
     fetchConfig()
-  }, [])
+  }, [fetchConfig, fetchStatus])
 
   const runMigrations = async () => {
     setOperationLoading('migrate')
     try {
       const response = await callClientApi('admin/elasticsearch', {
         method: 'POST',
-        body: JSON.stringify({ action: 'migrate' })
+        body: JSON.stringify({ action: 'migrate' }),
       })
-      
+
       const result = await response.json()
-      
+
       if (result.success) {
         toast.success(t('elasticsearch.migrationsSuccess'))
         await fetchStatus(true)
       } else {
         toast.error(t('elasticsearch.migrationsError'))
       }
-    } catch (error) {
-      console.error('Migration failed:', error)
+    } catch (_error) {
       toast.error(t('elasticsearch.migrationsError'))
     } finally {
       setOperationLoading(null)
@@ -318,19 +311,18 @@ export function ElasticsearchAdmin() {
     try {
       const response = await callClientApi('admin/elasticsearch', {
         method: 'POST',
-        body: JSON.stringify({ action: 'reset', indexName })
+        body: JSON.stringify({ action: 'reset', indexName }),
       })
-      
+
       const result = await response.json()
-      
+
       if (result.success) {
         toast.success(t('elasticsearch.resetSuccess').replace('{indexName}', indexName))
         await fetchStatus(true)
       } else {
         toast.error(t('elasticsearch.resetError').replace('{indexName}', indexName))
       }
-    } catch (error) {
-      console.error('Reset failed:', error)
+    } catch (_error) {
       toast.error(t('elasticsearch.resetError').replace('{indexName}', indexName))
     } finally {
       setOperationLoading(null)
@@ -399,11 +391,7 @@ export function ElasticsearchAdmin() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Elasticsearch</h2>
         <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={resetToDefaults}
-            disabled={configLoading}
-          >
+          <Button variant="outline" onClick={resetToDefaults} disabled={configLoading}>
             {configLoading ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
@@ -411,10 +399,7 @@ export function ElasticsearchAdmin() {
             )}
             {t('common.reset')}
           </Button>
-          <Button
-            onClick={saveConfig}
-            disabled={!hasConfigChanges || configLoading}
-          >
+          <Button onClick={saveConfig} disabled={!hasConfigChanges || configLoading}>
             {configLoading ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
@@ -444,7 +429,8 @@ export function ElasticsearchAdmin() {
                 {status?.connected && status.version && (
                   <p className="text-xs text-muted-foreground">
                     {t('elasticsearch.version')}: {status.version}
-                    {status.clusterName && ` • ${t('elasticsearch.cluster')}: ${status.clusterName}`}
+                    {status.clusterName &&
+                      ` • ${t('elasticsearch.cluster')}: ${status.clusterName}`}
                   </p>
                 )}
                 {status?.error && !status.connected && (
@@ -455,22 +441,15 @@ export function ElasticsearchAdmin() {
               </div>
               {status && getStatusBadge(status.connected)}
             </div>
-            
+
             <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={() => fetchStatus(true)}
-                disabled={loading}
-              >
+              <Button variant="outline" onClick={() => fetchStatus(true)} disabled={loading}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 {t('elasticsearch.refresh')}
               </Button>
-              
+
               {status?.connected && (
-                <Button 
-                  onClick={runMigrations}
-                  disabled={operationLoading === 'migrate'}
-                >
+                <Button onClick={runMigrations} disabled={operationLoading === 'migrate'}>
                   {operationLoading === 'migrate' ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
@@ -496,20 +475,23 @@ export function ElasticsearchAdmin() {
           <CardContent>
             <div className="space-y-4">
               {Object.entries(status.indices).map(([indexName, indexInfo]) => (
-                <div key={indexName} className="flex items-center justify-between p-4 border rounded-lg">
+                <div
+                  key={indexName}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
                   <div className="flex items-center space-x-4">
                     <div>
                       <p className="font-medium">{indexName}</p>
                       <p className="text-sm text-muted-foreground">
-                        {indexInfo.error || 'Index pour la recherche d\'images'}
+                        {indexInfo.error || "Index pour la recherche d'images"}
                       </p>
                     </div>
                     {getIndexStatusBadge(indexInfo)}
                   </div>
-                  
+
                   <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => resetIndex(indexName)}
                       disabled={operationLoading === `reset-${indexName}`}
@@ -553,7 +535,7 @@ export function ElasticsearchAdmin() {
                   placeholder="http://localhost:9200"
                   value={config.url}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setConfig(prev => ({ ...prev, url: e.target.value }))
+                    setConfig((prev) => ({ ...prev, url: e.target.value }))
                     setHasConfigChanges(true)
                   }}
                 />
@@ -565,7 +547,7 @@ export function ElasticsearchAdmin() {
                   placeholder="topsteel"
                   value={config.indexPrefix}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setConfig(prev => ({ ...prev, indexPrefix: e.target.value }))
+                    setConfig((prev) => ({ ...prev, indexPrefix: e.target.value }))
                     setHasConfigChanges(true)
                   }}
                 />
@@ -588,18 +570,22 @@ export function ElasticsearchAdmin() {
                   id="enable-auth"
                   checked={config.enableAuth}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setConfig(prev => ({ ...prev, enableAuth: e.target.checked }))
+                    setConfig((prev) => ({ ...prev, enableAuth: e.target.checked }))
                     setHasConfigChanges(true)
                   }}
                   className="sr-only"
                 />
-                <div className={`w-11 h-6 rounded-full transition-colors ${config.enableAuth ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${config.enableAuth ? 'translate-x-5' : 'translate-x-0'} mt-0.5`} />
+                <div
+                  className={`w-11 h-6 rounded-full transition-colors ${config.enableAuth ? 'bg-blue-600' : 'bg-gray-300'}`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${config.enableAuth ? 'translate-x-5' : 'translate-x-0'} mt-0.5`}
+                  />
                 </div>
               </label>
               <Label htmlFor="enable-auth">{t('elasticsearch.enableAuth')}</Label>
             </div>
-            
+
             {config.enableAuth && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -608,7 +594,7 @@ export function ElasticsearchAdmin() {
                     id="elasticsearch-username"
                     value={config.username}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      setConfig(prev => ({ ...prev, username: e.target.value }))
+                      setConfig((prev) => ({ ...prev, username: e.target.value }))
                       setHasConfigChanges(true)
                     }}
                   />
@@ -620,7 +606,7 @@ export function ElasticsearchAdmin() {
                     type="password"
                     value={config.password}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      setConfig(prev => ({ ...prev, password: e.target.value }))
+                      setConfig((prev) => ({ ...prev, password: e.target.value }))
                       setHasConfigChanges(true)
                     }}
                   />
@@ -647,7 +633,7 @@ export function ElasticsearchAdmin() {
                   max="10"
                   value={config.maxRetries}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setConfig(prev => ({ ...prev, maxRetries: parseInt(e.target.value) || 3 }))
+                    setConfig((prev) => ({ ...prev, maxRetries: parseInt(e.target.value) || 3 }))
                     setHasConfigChanges(true)
                   }}
                 />
@@ -661,7 +647,10 @@ export function ElasticsearchAdmin() {
                   max="120000"
                   value={config.requestTimeout}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setConfig(prev => ({ ...prev, requestTimeout: parseInt(e.target.value) || 30000 }))
+                    setConfig((prev) => ({
+                      ...prev,
+                      requestTimeout: parseInt(e.target.value) || 30000,
+                    }))
                     setHasConfigChanges(true)
                   }}
                 />
@@ -675,7 +664,7 @@ export function ElasticsearchAdmin() {
                   max="1000"
                   value={config.batchSize}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setConfig(prev => ({ ...prev, batchSize: parseInt(e.target.value) || 100 }))
+                    setConfig((prev) => ({ ...prev, batchSize: parseInt(e.target.value) || 100 }))
                     setHasConfigChanges(true)
                   }}
                 />
@@ -688,13 +677,17 @@ export function ElasticsearchAdmin() {
                   id="enable-logging"
                   checked={config.enableLogging}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setConfig(prev => ({ ...prev, enableLogging: e.target.checked }))
+                    setConfig((prev) => ({ ...prev, enableLogging: e.target.checked }))
                     setHasConfigChanges(true)
                   }}
                   className="sr-only"
                 />
-                <div className={`w-11 h-6 rounded-full transition-colors ${config.enableLogging ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${config.enableLogging ? 'translate-x-5' : 'translate-x-0'} mt-0.5`} />
+                <div
+                  className={`w-11 h-6 rounded-full transition-colors ${config.enableLogging ? 'bg-blue-600' : 'bg-gray-300'}`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${config.enableLogging ? 'translate-x-5' : 'translate-x-0'} mt-0.5`}
+                  />
                 </div>
               </label>
               <Label htmlFor="enable-logging">{t('elasticsearch.enableLogging')}</Label>
@@ -703,9 +696,7 @@ export function ElasticsearchAdmin() {
 
           {/* Unsaved changes indicator */}
           {hasConfigChanges && (
-            <div className="text-sm text-orange-600">
-              {t('elasticsearch.unsavedChanges')}
-            </div>
+            <div className="text-sm text-orange-600">{t('elasticsearch.unsavedChanges')}</div>
           )}
         </CardContent>
       </Card>

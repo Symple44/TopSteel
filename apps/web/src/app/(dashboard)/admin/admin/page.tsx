@@ -1,66 +1,66 @@
 'use client'
 
+import { Card } from '@erp/ui'
+import { Building2, ListChecks, Plug, Search, Settings, Shield, Workflow } from 'lucide-react'
 import { useState } from 'react'
-import { useTranslation } from '@/lib/i18n'
-import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
-import { Button, Card } from '@erp/ui'
-import { Building2, ListChecks, Shield, Workflow, Plug, Settings, Search } from 'lucide-react'
-import { CompanySettings } from '@/components/admin/company-settings'
-import { UnitsAndListsSettings } from '@/components/admin/units-lists-settings'
 import { AuthenticationSettings } from '@/components/admin/authentication-settings'
+import { CompanySettings } from '@/components/admin/company-settings'
 import { ElasticsearchAdmin } from '@/components/admin/elasticsearch-admin'
+import { UnitsAndListsSettings } from '@/components/admin/units-lists-settings'
+import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
+import { useTranslation } from '@/lib/i18n'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'
 
-const getNavigationItems = (t: any) => [
+const getNavigationItems = (t: (key: string) => string) => [
   {
     id: 'company',
     label: t('tabs.company'),
     icon: Building2,
-    description: t('company.title')
+    description: t('company.title'),
   },
   {
     id: 'units',
     label: t('tabs.units'),
     icon: ListChecks,
-    description: t('units.title')
+    description: t('units.title'),
   },
   {
     id: 'authentication',
     label: t('tabs.authentication'),
     icon: Shield,
-    description: t('authentication.title')
+    description: t('authentication.title'),
   },
   {
     id: 'elasticsearch',
     label: 'Elasticsearch',
     icon: Search,
-    description: t('elasticsearch.title')
+    description: t('elasticsearch.title'),
   },
   {
     id: 'workflow',
     label: t('tabs.workflow'),
     icon: Workflow,
-    description: t('workflow.title')
+    description: t('workflow.title'),
   },
   {
     id: 'integrations',
     label: t('tabs.integrations'),
     icon: Plug,
-    description: t('integrations.title')
+    description: t('integrations.title'),
   },
   {
     id: 'advanced',
     label: t('tabs.advanced'),
     icon: Settings,
-    description: t('advanced.title')
-  }
+    description: t('advanced.title'),
+  },
 ]
 
 export default function AdminConfigurationPage() {
   const { t } = useTranslation('admin')
-  const { settings } = useAppearanceSettings()
+  const { settings: _settings } = useAppearanceSettings()
   const [activeSection, setActiveSection] = useState('company')
   const navigationItems = getNavigationItems(t)
 
@@ -107,9 +107,7 @@ export default function AdminConfigurationPage() {
     <div className="p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground mt-2">
-          {t('subtitle')}
-        </p>
+        <p className="text-muted-foreground mt-2">{t('subtitle')}</p>
       </div>
 
       <div className="flex gap-6">
@@ -123,10 +121,11 @@ export default function AdminConfigurationPage() {
               {navigationItems.map((item) => {
                 const Icon = item.icon
                 const isActive = activeSection === item.id
-                
+
                 return (
                   <button
                     key={item.id}
+                    type="button"
                     onClick={() => setActiveSection(item.id)}
                     className={`w-full flex items-start gap-3 p-3 rounded-lg text-left transition-all ${
                       isActive
@@ -137,9 +136,11 @@ export default function AdminConfigurationPage() {
                     <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm">{item.label}</div>
-                      <div className={`text-xs mt-1 ${
-                        isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'
-                      }`}>
+                      <div
+                        className={`text-xs mt-1 ${
+                          isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                        }`}
+                      >
                         {item.description}
                       </div>
                     </div>
@@ -153,9 +154,7 @@ export default function AdminConfigurationPage() {
         {/* Main Content */}
         <div className="flex-1">
           <Card className="p-6">
-            <div className="min-h-[600px]">
-              {renderContent()}
-            </div>
+            <div className="min-h-[600px]">{renderContent()}</div>
           </Card>
         </div>
       </div>

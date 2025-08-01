@@ -1,6 +1,5 @@
 'use client'
 
-import { formatCurrency, formatDate } from '@/lib/utils'
 import { ProjetStatut } from '@erp/domains/core'
 import type { StoreProjet } from '@erp/types'
 import {
@@ -16,9 +15,9 @@ import {
   Separator,
   Textarea,
 } from '@erp/ui'
-
 import { Building2, Calendar, Clock, Edit, Euro, Mail, MapPin, Phone, Save, X } from 'lucide-react'
 import { useState } from 'react'
+import { formatCurrency, formatDate } from '@/lib/utils'
 
 interface ProjetInfoTabProps {
   projet: StoreProjet

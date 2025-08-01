@@ -1,7 +1,0 @@
-export * from './role.entity'
-export * from './permission.entity'
-export * from './module.entity'
-export * from './role-permission.entity'
-export * from './user-role.entity'
-export * from './group.entity'
-export * from './user-group.entity'

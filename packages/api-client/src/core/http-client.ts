@@ -3,7 +3,12 @@
  * Client HTTP centralisé avec intercepteurs et gestion d'erreurs
  */
 
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios'
 
 // Temporary local types until @erp/domains dependency is resolved
 export interface PaginatedResponse<T> {
@@ -62,7 +67,7 @@ export class HttpClient {
       timeout: config.timeout || 30000,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     })
 
@@ -90,9 +95,13 @@ export class HttpClient {
         const originalRequest = error.config
 
         // Handle 401 - try to refresh token
-        if (error.response?.status === 401 && !originalRequest._retry && this.authToken?.refresh_token) {
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          this.authToken?.refresh_token
+        ) {
           originalRequest._retry = true
-          
+
           try {
             await this.refreshAccessToken()
             return this.client(originalRequest)
@@ -127,16 +136,20 @@ export class HttpClient {
       throw new Error('No refresh token available')
     }
 
-    this.refreshTokenPromise = this.post<AuthToken>('/auth/refresh', {
-      refresh_token: this.authToken.refresh_token,
-    }, { skipAuth: true })
-      .then(response => {
+    this.refreshTokenPromise = this.post<AuthToken>(
+      '/auth/refresh',
+      {
+        refresh_token: this.authToken.refresh_token,
+      },
+      { skipAuth: true }
+    )
+      .then((response) => {
         const newToken = response.data
         this.setAuthToken(newToken)
         this.refreshTokenPromise = undefined
         return newToken
       })
-      .catch(error => {
+      .catch((error) => {
         this.refreshTokenPromise = undefined
         throw error
       })
@@ -197,7 +210,7 @@ export class HttpClient {
   // ===== HELPER METHODS =====
 
   async getWithPagination<T>(
-    url: string, 
+    url: string,
     params?: Record<string, any>
   ): Promise<PaginatedResponse<T>> {
     const response = await this.get<PaginatedResponse<T>>(url, { params } as RequestOptions)

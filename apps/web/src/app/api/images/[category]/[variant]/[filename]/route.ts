@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
-import { stat } from 'fs/promises'
+import { promises as fs } from 'node:fs'
+import { stat } from 'node:fs/promises'
+import path from 'node:path'
+import { type NextRequest, NextResponse } from 'next/server'
 
 interface RouteParams {
   category: string
@@ -9,10 +9,7 @@ interface RouteParams {
   filename: string
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<RouteParams> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { category, variant, filename } = await params
 
@@ -35,7 +32,7 @@ export async function GET(
     // Vérification de l'existence du fichier
     try {
       await stat(filePath)
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 })
     }
 
@@ -50,7 +47,7 @@ export async function GET(
       '.png': 'image/png',
       '.webp': 'image/webp',
       '.svg': 'image/svg+xml',
-      '.pdf': 'application/pdf'
+      '.pdf': 'application/pdf',
     }
 
     const mimeType = mimeTypes[ext] || 'application/octet-stream'
@@ -63,11 +60,9 @@ export async function GET(
 
     return new NextResponse(fileBuffer, {
       status: 200,
-      headers
+      headers,
     })
-
-  } catch (error) {
-    console.error('Image serve error:', error)
+  } catch (_error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

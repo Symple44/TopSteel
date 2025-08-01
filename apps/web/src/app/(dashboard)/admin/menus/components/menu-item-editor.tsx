@@ -1,82 +1,36 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { 
-  ChevronUp, 
-  ChevronDown, 
-  Trash2, 
-  GripVertical,
-  Plus,
-  Folder,
-  Play,
+import {
+  BarChart3,
+  ChevronDown,
+  ChevronUp,
   ExternalLink,
-  BarChart3
+  Folder,
+  GripVertical,
+  Play,
+  Plus,
+  Trash2,
 } from 'lucide-react'
+import { useState } from 'react'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardHeader } from '@erp/ui'
+import { Input } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui/primitives'
+import { Switch } from '@erp/ui/primitives'
 import { cn } from '@/lib/utils'
+import type { Group, MenuItem, MenuType, Permission, Role } from '@/types/menu'
 import { MenuItemRightsEditor } from './menu-item-rights-editor'
-
-interface MenuItem {
-  id?: string
-  title: string
-  type: 'M' | 'P' | 'L' | 'D'
-  icon?: string
-  orderIndex: number
-  isVisible: boolean
-  programId?: string
-  externalUrl?: string
-  queryBuilderId?: string
-  children: MenuItem[]
-  // Nouveaux champs pour les droits
-  allowedGroups?: string[]
-  requiredRoles?: string[]
-  requiredPermissions?: string[]
-  inheritFromParent?: boolean
-  isPublic?: boolean
-}
-
-interface MenuType {
-  value: string
-  label: string
-  description: string
-  icon: string
-  canHaveChildren: boolean
-  requiredFields: string[]
-}
-
-interface Group {
-  id: string
-  name: string
-  description: string
-  type: 'DEPARTMENT' | 'TEAM' | 'PROJECT' | 'CUSTOM'
-  isActive: boolean
-}
-
-interface Role {
-  id: string
-  name: string
-  description: string
-  isSystemRole: boolean
-  isActive: boolean
-}
-
-interface Permission {
-  id: string
-  name: string
-  description: string
-  module: string
-  action: string
-}
 
 interface MenuItemEditorProps {
   item: MenuItem
-  index: number
   menuTypes: MenuType[]
   level?: number
   onUpdate: (item: MenuItem) => void
@@ -91,7 +45,6 @@ interface MenuItemEditorProps {
 
 export function MenuItemEditor({
   item,
-  index,
   menuTypes,
   level = 0,
   onUpdate,
@@ -101,16 +54,16 @@ export function MenuItemEditor({
   parentItem,
   availableGroups = [],
   availableRoles = [],
-  availablePermissions = []
+  availablePermissions = [],
 }: MenuItemEditorProps) {
   const [expanded, setExpanded] = useState(true)
 
-  const currentType = menuTypes.find(t => t.value === item.type)
+  const currentType = menuTypes.find((t) => t.value === item.type)
 
-  const handleFieldChange = (field: string, value: any) => {
+  const handleFieldChange = (field: string, value: string | boolean | number | null) => {
     onUpdate({
       ...item,
-      [field]: value
+      [field]: value,
     })
   }
 
@@ -121,7 +74,7 @@ export function MenuItemEditor({
       // Réinitialiser les champs spécifiques selon le type
       programId: newType === 'P' ? item.programId : undefined,
       externalUrl: newType === 'L' ? item.externalUrl : undefined,
-      queryBuilderId: newType === 'D' ? item.queryBuilderId : undefined
+      queryBuilderId: newType === 'D' ? item.queryBuilderId : undefined,
     }
     onUpdate(updatedItem)
   }
@@ -135,12 +88,12 @@ export function MenuItemEditor({
       icon: 'Play',
       orderIndex: item.children.length,
       isVisible: true,
-      children: []
+      children: [],
     }
 
     onUpdate({
       ...item,
-      children: [...item.children, newChild]
+      children: [...item.children, newChild],
     })
   }
 
@@ -149,7 +102,7 @@ export function MenuItemEditor({
     updatedChildren[childIndex] = childItem
     onUpdate({
       ...item,
-      children: updatedChildren
+      children: updatedChildren,
     })
   }
 
@@ -157,7 +110,7 @@ export function MenuItemEditor({
     const updatedChildren = item.children.filter((_, i) => i !== childIndex)
     onUpdate({
       ...item,
-      children: updatedChildren
+      children: updatedChildren,
     })
   }
 
@@ -177,23 +130,28 @@ export function MenuItemEditor({
 
     onUpdate({
       ...item,
-      children: updatedChildren
+      children: updatedChildren,
     })
   }
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'M': return <Folder className="h-4 w-4" />
-      case 'P': return <Play className="h-4 w-4" />
-      case 'L': return <ExternalLink className="h-4 w-4" />
-      case 'D': return <BarChart3 className="h-4 w-4" />
-      default: return <Play className="h-4 w-4" />
+      case 'M':
+        return <Folder className="h-4 w-4" />
+      case 'P':
+        return <Play className="h-4 w-4" />
+      case 'L':
+        return <ExternalLink className="h-4 w-4" />
+      case 'D':
+        return <BarChart3 className="h-4 w-4" />
+      default:
+        return <Play className="h-4 w-4" />
     }
   }
 
   return (
-    <div className={cn("space-y-2", level > 0 && "ml-6 border-l-2 border-muted pl-4")}>
-      <Card className={cn(!item.isVisible && "opacity-60 border-dashed")}>
+    <div className={cn('space-y-2', level > 0 && 'ml-6 border-l-2 border-muted pl-4')}>
+      <Card className={cn(!item.isVisible && 'opacity-60 border-dashed')}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -211,7 +169,9 @@ export function MenuItemEditor({
                 {currentType?.label}
               </Badge>
               {!item.isVisible && (
-                <Badge variant="secondary" className="text-xs">Masqué</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  Masqué
+                </Badge>
               )}
             </div>
 
@@ -359,15 +319,21 @@ export function MenuItemEditor({
                   <div className="space-y-2">
                     {item.children.map((child, childIndex) => (
                       <MenuItemEditor
-                        key={childIndex}
+                        key={child.id || `child-${childIndex}`}
                         item={child}
                         index={childIndex}
                         menuTypes={menuTypes}
                         level={level + 1}
                         onUpdate={(updatedChild) => updateChildItem(childIndex, updatedChild)}
                         onDelete={() => deleteChildItem(childIndex)}
-                        onMoveUp={childIndex > 0 ? () => moveChildItem(childIndex, 'up') : undefined}
-                        onMoveDown={childIndex < item.children.length - 1 ? () => moveChildItem(childIndex, 'down') : undefined}
+                        onMoveUp={
+                          childIndex > 0 ? () => moveChildItem(childIndex, 'up') : undefined
+                        }
+                        onMoveDown={
+                          childIndex < item.children.length - 1
+                            ? () => moveChildItem(childIndex, 'down')
+                            : undefined
+                        }
                         parentItem={item}
                         availableGroups={availableGroups}
                         availableRoles={availableRoles}

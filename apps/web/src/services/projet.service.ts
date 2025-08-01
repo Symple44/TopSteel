@@ -14,12 +14,12 @@ export class ProjetService {
     return []
   }
 
-  async getProjet(id: string): Promise<Projet | null> {
+  async getProjet(_id: string): Promise<Projet | null> {
     // Mock implementation
     return null
   }
 
-  async createProjet(data: Partial<Projet>): Promise<Projet> {
+  async createProjet(_data: Partial<Projet>): Promise<Projet> {
     // Mock implementation
     throw new Error('Not implemented')
   }

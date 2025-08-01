@@ -6,18 +6,18 @@
 // ===== ENTITÉS ET TYPES =====
 export type {
   Notification,
-  NotificationStats,
-  NotificationPreferences,
-  NotificationFilters,
   NotificationAction,
-  NotificationMetadata,
   NotificationDelivery,
+  NotificationFilters,
+  NotificationMetadata,
+  NotificationPreferences,
+  NotificationStats,
 } from './domain/entities'
 
 // ===== ENUMS =====
 export {
-  NotificationType,
-  NotificationPriority,
   NotificationChannel,
+  NotificationPriority,
   NotificationStatus,
+  NotificationType,
 } from './domain/entities'

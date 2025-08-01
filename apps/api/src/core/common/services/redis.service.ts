@@ -1,0 +1,46 @@
+// apps/api/src/common/services/redis.service.ts
+import { Inject, Injectable, Optional } from '@nestjs/common'
+import { Redis } from 'ioredis'
+
+@Injectable()
+export class RedisService {
+  constructor(@Optional() @Inject('REDIS_CLIENT') private readonly _redisClient?: Redis) {}
+
+  async get(key: string): Promise<string | null> {
+    if (!this._redisClient) {
+      return null
+    }
+    return this._redisClient.get(key)
+  }
+
+  async set(key: string, value: string, ttl?: number): Promise<void> {
+    if (!this._redisClient) {
+      return
+    }
+
+    if (ttl) {
+      await this._redisClient.setex(key, ttl, value)
+    } else {
+      await this._redisClient.set(key, value)
+    }
+  }
+
+  async del(key: string): Promise<void> {
+    if (!this._redisClient) {
+      return
+    }
+    await this._redisClient.del(key)
+  }
+
+  async exists(key: string): Promise<boolean> {
+    if (!this._redisClient) {
+      return false
+    }
+    const result = await this._redisClient.exists(key)
+    return result === 1
+  }
+
+  get isConnected(): boolean {
+    return !!this._redisClient && this._redisClient.status === 'ready'
+  }
+}

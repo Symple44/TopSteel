@@ -1,10 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Vérifier l'authentification et les permissions
     const auth = await verifyAuthHelper(request)
@@ -29,18 +26,22 @@ export async function GET(
 
     // Importer callBackendFromApi
     const { callBackendFromApi } = await import('@/utils/backend-api')
-    
-    const apiResponse = await callBackendFromApi(`auth/sessions/user/${userId}/history?limit=${limit}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': request.headers.get('Authorization') || '',
+
+    const apiResponse = await callBackendFromApi(
+      request,
+      `auth/sessions/user/${userId}/history?limit=${limit}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: request.headers.get('Authorization') || '',
+        },
       }
-    })
+    )
 
     if (!apiResponse.ok) {
       const errorData = await apiResponse.json().catch(() => ({ error: 'Erreur API backend' }))
       return NextResponse.json(
-        { error: errorData.error || 'Erreur lors de la récupération de l\'historique utilisateur' },
+        { error: errorData.error || "Erreur lors de la récupération de l'historique utilisateur" },
         { status: apiResponse.status }
       )
     }
@@ -50,13 +51,9 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: historyData.data || historyData,
-      stats: historyData.stats
+      stats: historyData.stats,
     })
-  } catch (error) {
-    console.error('Erreur lors de la récupération de l\'historique utilisateur:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

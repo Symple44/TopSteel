@@ -1,11 +1,17 @@
 'use client'
 
+import { AlertCircle, FileJson, Upload } from 'lucide-react'
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Upload, FileJson, AlertCircle } from 'lucide-react'
+import { Button } from '@erp/ui/primitives'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import { Textarea } from '@erp/ui/primitives'
 import { useToast } from '@/hooks/use-toast'
 
 interface ImportDialogProps {
@@ -34,7 +40,7 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
   const handleImport = () => {
     try {
       const data = JSON.parse(jsonContent)
-      
+
       // Validation basique
       if (!data.name || !data.mainTable) {
         setError('Le JSON doit contenir au minimum "name" et "mainTable"')
@@ -55,12 +61,12 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
           enableSorting: true,
           enableFiltering: true,
           enableExport: true,
-          exportFormats: ['csv', 'excel', 'json']
+          exportFormats: ['csv', 'excel', 'json'],
         },
         columns: data.columns || [],
         joins: data.joins || [],
         calculatedFields: data.calculatedFields || [],
-        layout: data.layout || {}
+        layout: data.layout || {},
       }
 
       onImport(importedData)
@@ -71,7 +77,7 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
       setOpen(false)
       setJsonContent('')
       setError('')
-    } catch (err) {
+    } catch (_err) {
       setError('JSON invalide. Veuillez vérifier le format.')
     }
   }
@@ -107,9 +113,7 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <span className="text-sm text-muted-foreground">
-                ou collez le JSON ci-dessous
-              </span>
+              <span className="text-sm text-muted-foreground">ou collez le JSON ci-dessous</span>
             </div>
           </div>
 
@@ -144,10 +148,7 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
             <Button variant="outline" onClick={() => setOpen(false)}>
               Annuler
             </Button>
-            <Button 
-              onClick={handleImport}
-              disabled={!jsonContent.trim()}
-            >
+            <Button onClick={handleImport} disabled={!jsonContent.trim()}>
               Importer
             </Button>
           </div>

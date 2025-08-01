@@ -111,30 +111,30 @@ export interface Operation extends BaseEntity {
   readonly statut: OperationStatut
   readonly priorite: PrioriteProduction
   readonly ordre: number
-  
+
   // Planning
   readonly schedule: ProductionSchedule
   readonly prerequis: string[] // IDs des opérations prérequises
-  
+
   // Ressources
   readonly machineId?: string
   readonly operateurIds: string[]
   readonly outillage: string[]
-  
+
   // Techniques
   readonly instructions?: string
   readonly parametres: Record<string, any>
   readonly qualite: QualityRequirements
-  
+
   // Suivi
   readonly tempsEstime: number // en heures
   readonly tempsReel?: number // en heures
   readonly avancement: number // 0-100
-  
+
   // Relations
   readonly ordreId: string
   readonly projetId: string
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date
@@ -148,41 +148,41 @@ export interface OrdreFabrication extends BaseEntity {
   readonly statut: OrdreStatut
   readonly priorite: OrdrePriorite
   readonly statutProduction: StatutProduction
-  
+
   // Relations
   readonly projetId: string
   readonly clientId: string
   readonly responsableId: string
-  
+
   // Contenu
   readonly operations: Operation[]
   readonly materiaux: MaterialRequirement[]
   readonly plans: string[]
   readonly specifications?: string
-  
+
   // Planning
   readonly dateCreation: Date
   readonly datePrevue: Date
   readonly dateDebut?: Date
   readonly dateFin?: Date
   readonly delaiProduction: number // en jours
-  
+
   // Quantités
   readonly quantiteCommande: number
   readonly quantiteProduite: number
   readonly quantiteLivree: number
   readonly unite: string
-  
+
   // Coûts
   readonly coutEstime?: number
   readonly coutReel?: number
   readonly tempsPrevuTotal: number // en heures
   readonly tempsReelTotal?: number // en heures
-  
+
   // Qualité
   readonly qualiteRequise: QualityRequirements
   readonly controles: ControleQualite[]
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date
@@ -194,12 +194,12 @@ export interface ControleQualite extends BaseEntity {
   readonly type: string
   readonly statut: QualiteStatut
   readonly description: string
-  
+
   // Relations
   readonly ordreId: string
   readonly operationId?: string
   readonly controleurId: string
-  
+
   // Contrôle
   readonly dateControle: Date
   readonly criteres: Array<{
@@ -209,13 +209,13 @@ export interface ControleQualite extends BaseEntity {
     conforme: boolean
     commentaire?: string
   }>
-  
+
   // Résultats
   readonly conformeGlobal: boolean
   readonly defauts: string[]
   readonly actions: string[]
   readonly certificats: string[]
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date
@@ -228,23 +228,23 @@ export interface MaterialOrder extends BaseEntity {
   readonly quantiteRecue: number
   readonly unite: string
   readonly statut: MaterialStatus
-  
+
   // Relations
   readonly ordreId: string
   readonly fournisseurId?: string
-  
+
   // Commande
   readonly dateCommande?: Date
   readonly dateLivraisonPrevue?: Date
   readonly dateLivraisonReelle?: Date
   readonly prixUnitaire?: number
   readonly montantTotal?: number
-  
+
   // Caractéristiques
   readonly specifications?: Record<string, any>
   readonly certification?: string
   readonly numeroLot?: string
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date

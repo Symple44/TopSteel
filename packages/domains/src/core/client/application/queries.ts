@@ -3,9 +3,9 @@
  * Cas d'usage pour la lecture de données (CQRS)
  */
 
+import type { PaginationOptions } from '../../base'
 import type { Client, ClientStats, ClientWithProjects } from '../domain/entities'
 import type { ClientFilters, ClientSortOptions, PaginatedClients } from '../domain/repositories'
-import type { PaginationOptions } from '../../base'
 
 // ===== REQUÊTES =====
 
@@ -56,16 +56,16 @@ export interface QueryResult<T = unknown> {
 
 export interface IClientQueryHandler {
   getClients(query: GetClientsQuery): Promise<QueryResult<PaginatedClients>>
-  
+
   getClientById(query: GetClientByIdQuery): Promise<QueryResult<Client | ClientWithProjects>>
-  
+
   searchClients(query: SearchClientsQuery): Promise<QueryResult<Client[]>>
-  
+
   getClientStats(query: GetClientStatsQuery): Promise<QueryResult<ClientStats>>
-  
+
   getTopClients(query: GetTopClientsQuery): Promise<QueryResult<Client[]>>
-  
+
   validateClientEmail(email: string, excludeId?: string): Promise<QueryResult<boolean>>
-  
+
   validateClientSiret(siret: string, excludeId?: string): Promise<QueryResult<boolean>>
 }

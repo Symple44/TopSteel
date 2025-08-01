@@ -3,21 +3,19 @@
  * Point d'entrée pour le domaine utilisateur
  */
 
-// ===== DOMAIN LAYER =====
-export * from './domain/entities'
-
 // ===== RE-EXPORTS UTILES =====
 export type {
+  Competence,
   // Entités principales
   User,
-  UserProfile,
   UserPreferences,
-  UserSecurity,
-  UserStats,
-  UserWithActivity,
-  
+  UserProfile,
   // Value Objects & Enums
   UserRole,
+  UserSecurity,
+  UserStats,
   UserStatut,
-  Competence,
+  UserWithActivity,
 } from './domain/entities'
+// ===== DOMAIN LAYER =====
+export * from './domain/entities'

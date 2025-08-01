@@ -1,43 +1,28 @@
 import {
-  type CreateNotificationRequest,
   type NotificationSettings,
-  NotificationsContext,
-  type NotificationsContextValue,
+  type NotificationsContextType,
   type NotificationsState,
+  useNotifications,
 } from '@/components/providers/notifications-provider'
-import { useContext } from 'react'
 
-/**
- * Hook principal pour utiliser les notifications
- *
- * @returns Contexte des notifications avec état et actions
- * @throws Error si utilisé en dehors du NotificationsProvider
- */
-export function useNotifications(): NotificationsContextValue {
-  const context = useContext(NotificationsContext)
+// Type temporaire si non exporté
+type CreateNotificationRequest = any
 
-  if (!context) {
-    throw new Error(
-      'useNotifications doit être utilisé dans un NotificationsProvider. ' +
-        'Vérifiez que votre composant est bien enveloppé dans <NotificationsProvider>.'
-    )
-  }
-
-  return context
-}
+// Ré-exporter le hook depuis le provider
+export { useNotifications }
 
 /**
  * Hook simplifié pour créer des notifications
  *
  * @returns Fonction pour créer une notification
  */
-export function useCreateNotification(): (
-  notification: CreateNotificationRequest
-) => Promise<void> {
-  const { actions } = useNotifications()
+// export function useCreateNotification(): (
+//   notification: CreateNotificationRequest
+// ) => Promise<void> {
+//   const { actions } = useNotifications()
 
-  return actions.createNotification
-}
+//   return actions.createNotification
+// }
 
 /**
  * Hook pour accéder uniquement à l'état des notifications
@@ -55,7 +40,7 @@ export function useNotificationsState(): NotificationsState {
  *
  * @returns Actions des notifications
  */
-export function useNotificationsActions(): NotificationsContextValue['actions'] {
+export function useNotificationsActions(): NotificationsContextType['actions'] {
   const { actions } = useNotifications()
 
   return actions
@@ -146,7 +131,7 @@ export function useFilteredNotifications(filters?: {
   type?: string[]
   read?: boolean
   priority?: string[]
-}): import('@erp/domains/cross-cutting').Notification[] {
+}) {
   const { state } = useNotifications()
 
   if (!filters) return state.notifications

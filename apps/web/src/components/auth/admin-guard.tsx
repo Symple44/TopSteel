@@ -1,12 +1,10 @@
 'use client'
 
-import { useAuth } from '@/hooks/use-auth'
-import { usePermissions } from '@/hooks/use-permissions'
 import { useRouter } from 'next/navigation'
-import { useEffect, ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
+import { useAuth } from '@/hooks/use-auth'
+import { type Role, usePermissions } from '@/hooks/use-permissions'
 import { useTranslation } from '@/lib/i18n/hooks'
-
-import { Role } from '@/hooks/use-permissions'
 
 interface AdminGuardProps {
   children: ReactNode
@@ -25,7 +23,7 @@ export function AdminGuard({
   requiredRoles = ['SUPER_ADMIN', 'ADMIN'] as Role[],
   requiredPermissions = [],
   fallbackPath = '/unauthorized',
-  showUnauthorized = false
+  showUnauthorized = false,
 }: AdminGuardProps) {
   const { user, isAuthenticated, isLoading } = useAuth()
   const { hasPermission, hasAnyRole } = usePermissions()
@@ -33,12 +31,9 @@ export function AdminGuard({
   const router = useRouter()
 
   useEffect(() => {
-    // Attendre que l'authentification soit chargée
-    if (isLoading) return
-
-    // Vérifier l'authentification
-    if (!isAuthenticated || !user) {
-      router.push('/login')
+    // L'AuthGuard se charge déjà de l'authentification de base
+    // On ne vérifie que les rôles et permissions si l'utilisateur est authentifié
+    if (isLoading || !isAuthenticated || !user) {
       return
     }
 
@@ -50,16 +45,26 @@ export function AdminGuard({
 
     // Vérifier les permissions requises
     if (requiredPermissions.length > 0) {
-      const hasRequiredPermissions = requiredPermissions.every(permission => 
+      const hasRequiredPermissions = requiredPermissions.every((permission) =>
         hasPermission(permission as any)
       )
-      
+
       if (!hasRequiredPermissions) {
         router.push(fallbackPath)
         return
       }
     }
-  }, [isAuthenticated, isLoading, user, hasAnyRole, hasPermission, router, requiredRoles, requiredPermissions, fallbackPath])
+  }, [
+    isAuthenticated,
+    isLoading,
+    user,
+    hasAnyRole,
+    hasPermission,
+    router,
+    requiredRoles,
+    requiredPermissions,
+    fallbackPath,
+  ])
 
   // Affichage de chargement
   if (isLoading) {
@@ -70,16 +75,10 @@ export function AdminGuard({
     )
   }
 
-  // Vérification finale avant affichage
+  // L'AuthGuard se charge déjà de vérifier l'authentification
+  // On ne fait que passer si pas authentifié (AuthGuard gère la redirection)
   if (!isAuthenticated || !user) {
-    return showUnauthorized ? (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-destructive mb-2">{t('accessDenied')}</h1>
-          <p className="text-muted-foreground">{t('mustBeLoggedIn')}</p>
-        </div>
-      </div>
-    ) : null
+    return null
   }
 
   // Vérification des rôles
@@ -87,10 +86,10 @@ export function AdminGuard({
     return showUnauthorized ? (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-destructive mb-2">{t('insufficientPermissions')}</h1>
-          <p className="text-muted-foreground">
-            {t('insufficientRoles')}
-          </p>
+          <h1 className="text-2xl font-bold text-destructive mb-2">
+            {t('insufficientPermissions')}
+          </h1>
+          <p className="text-muted-foreground">{t('insufficientRoles')}</p>
           <p className="text-sm text-muted-foreground mt-2">
             {t('requiredRoles')} {requiredRoles.join(', ')}
           </p>
@@ -101,18 +100,18 @@ export function AdminGuard({
 
   // Vérification des permissions
   if (requiredPermissions.length > 0) {
-    const hasRequiredPermissions = requiredPermissions.every(permission => 
+    const hasRequiredPermissions = requiredPermissions.every((permission) =>
       hasPermission(permission as any)
     )
-    
+
     if (!hasRequiredPermissions) {
       return showUnauthorized ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-destructive mb-2">{t('insufficientPermissions')}</h1>
-            <p className="text-muted-foreground">
-              {t('insufficientPermissionsText')}
-            </p>
+            <h1 className="text-2xl font-bold text-destructive mb-2">
+              {t('insufficientPermissions')}
+            </h1>
+            <p className="text-muted-foreground">{t('insufficientPermissionsText')}</p>
             <p className="text-sm text-muted-foreground mt-2">
               {t('requiredPermissions')} {requiredPermissions.join(', ')}
             </p>

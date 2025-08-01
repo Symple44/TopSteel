@@ -16,10 +16,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   target: 'es2022',
-  external: [
-    '@erp/domains',
-    '@erp/utils',
-    'axios',
-    'zod'
-  ],
+  external: ['@erp/domains', '@erp/utils', 'axios', 'zod'],
 })

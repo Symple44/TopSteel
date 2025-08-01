@@ -8,66 +8,62 @@ export * from './base'
 
 // ===== SOUS-DOMAINES CORE =====
 export * from './client'
-export * from './user'
 export * from './organization'
 export * from './project'
+export * from './user'
 
 // ===== RE-EXPORTS PRINCIPAUX =====
 
 // Base types
 export type {
   BaseEntity,
-  ID,
-  Timestamp,
-  PaginationOptions,
-  PaginatedResponse,
-  OperationResult,
   BaseFilters,
+  ID,
+  OperationResult,
+  PaginatedResponse,
+  PaginationOptions,
   SortOptions,
+  Timestamp,
 } from './base'
 
 export type {
   // Client
   Client,
-  ClientType,
-  ClientStatut,
   ClientPriorite,
+  ClientStatut,
+  ClientType,
 } from './client'
-
 export type {
+  Departement,
+  DepartementType,
+  // Organization
+  Organization,
+  Site,
+  SiteType,
+} from './organization'
+export type {
+  // Project
+  Projet,
+  ProjetAdresse,
+  ProjetContact,
+  ProjetDelais,
+  ProjetDocuments,
+  ProjetFilters,
+  ProjetMontants,
+  ProjetSortOptions,
+  ProjetStats,
+  ProjetWithDetails,
+} from './project'
+export {
+  ProjetPriorite,
+  // Project enums
+  ProjetStatut,
+  ProjetType,
+} from './project'
+export type {
+  Competence,
   // User
   User,
   UserRole,
   UserStatut,
-  Competence,
 } from './user'
-
-export type {
-  // Organization
-  Organization,
-  Departement,
-  Site,
-  DepartementType,
-  SiteType,
-} from './organization'
-
-export type {
-  // Project
-  Projet,
-  ProjetStats,
-  ProjetWithDetails,
-  ProjetContact,
-  ProjetAdresse,
-  ProjetDelais,
-  ProjetMontants,
-  ProjetDocuments,
-  ProjetFilters,
-  ProjetSortOptions,
-} from './project'
-
-export {
-  // Project enums
-  ProjetStatut,
-  ProjetType,
-  ProjetPriorite,
-} from './project'

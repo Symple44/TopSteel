@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
 
 export async function POST(request: NextRequest) {
@@ -19,10 +19,12 @@ export async function POST(request: NextRequest) {
 
     // Importer callBackendFromApi
     const { callBackendFromApi } = await import('@/utils/backend-api')
-    
-    const endpoint = sessionId ? 'auth/sessions/disconnect-session' : 'auth/sessions/disconnect-user'
-    
-    const payload = sessionId 
+
+    const endpoint = sessionId
+      ? 'auth/sessions/disconnect-session'
+      : 'auth/sessions/disconnect-user'
+
+    const payload = sessionId
       ? { sessionId, reason: reason || 'Déconnexion administrative' }
       : { userId, reason: reason || 'Déconnexion administrative' }
 
@@ -30,12 +32,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'SessionId ou userId requis' }, { status: 400 })
     }
 
-    const apiResponse = await callBackendFromApi(endpoint, {
+    const apiResponse = await callBackendFromApi(request, endpoint, {
       method: 'POST',
       headers: {
-        'Authorization': request.headers.get('Authorization') || '',
+        Authorization: request.headers.get('Authorization') || '',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
 
     if (!apiResponse.ok) {
@@ -51,13 +53,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: result.message || 'Utilisateur déconnecté avec succès',
-      data: result.data
+      data: result.data,
     })
-  } catch (error) {
-    console.error('Erreur lors de la déconnexion forcée:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

@@ -1,19 +1,16 @@
 'use client'
 
-import React, { useMemo, useState, memo, useCallback, useEffect } from 'react'
-import { DataTable } from '@/components/ui/datatable/DataTable'
-import { ColumnConfig } from '@/components/ui/datatable/types'
-import { Badge, Button } from '@erp/ui'
-import { Clock, Tag, Edit2, Download, Upload, Plus, Trash2, Copy } from 'lucide-react'
-import type { TranslationEntry, TranslationFilter } from '@/lib/i18n/types'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { AdvancedDataTable, type ColumnConfig } from '@erp/ui'
+import type { TranslationEntry } from '@/lib/i18n/types'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
 import {
-  NamespaceCell,
   CategoryCell,
-  StatusCell,
+  DescriptionCell,
   FullKeyCell,
+  NamespaceCell,
+  StatusCell,
   TranslationCell,
-  DescriptionCell
 } from './TranslationCellComponents'
 
 interface TranslationDataTableProps {
@@ -37,9 +34,8 @@ export const TranslationDataTable = memo(function TranslationDataTable({
   onDelete,
   onExport,
   onImport,
-  onDuplicate
+  onDuplicate,
 }: TranslationDataTableProps) {
-
   // État de pagination local
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -53,20 +49,16 @@ export const TranslationDataTable = memo(function TranslationDataTable({
 
   // Obtenir la liste des namespaces uniques pour les filtres
   const namespaces = useMemo(() => {
-    const uniqueNamespaces = [...new Set(entries.map(entry => entry.namespace))]
+    const uniqueNamespaces = [...new Set(entries.map((entry) => entry.namespace))]
     return uniqueNamespaces.sort()
   }, [entries])
 
-  // Obtenir la liste des catégories uniques pour les filtres  
+  // Obtenir la liste des catégories uniques pour les filtres
   const categories = useMemo(() => {
-    const allCategories = entries.map(entry => entry.category).filter(cat => cat != null && cat !== '')
+    const allCategories = entries
+      .map((entry) => entry.category)
+      .filter((cat) => cat != null && cat !== '')
     const uniqueCategories = [...new Set(allCategories)]
-    console.log('Categories calculation:', {
-      totalEntries: entries.length,
-      allCategories: allCategories.slice(0, 10),
-      uniqueCategories,
-      hasAdministration: uniqueCategories.includes('Administration')
-    })
     return uniqueCategories.sort()
   }, [entries])
 
@@ -83,7 +75,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         sortable: true,
         searchable: true,
         locked: true, // Empêcher le déplacement de cette colonne importante
-        render: (value, row) => <FullKeyCell entry={row} />
+        render: (_value, row) => <FullKeyCell entry={row} />,
       },
       {
         id: 'namespace',
@@ -94,12 +86,12 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         width: 150,
         sortable: true,
         searchable: true,
-        options: namespaces.map(ns => ({
+        options: namespaces.map((ns) => ({
           value: ns,
           label: ns,
-          color: '#3b82f6'
+          color: '#3b82f6',
         })),
-        render: (value) => <NamespaceCell value={value} />
+        render: (value) => <NamespaceCell value={value} />,
       },
       {
         id: 'category',
@@ -113,16 +105,17 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         options: (() => {
           const opts = [
             { value: '', label: '(Aucune catégorie)', color: '#6b7280' },
-            ...categories.map(cat => ({
-              value: cat,
-              label: cat,
-              color: '#10b981'
-            }))
+            ...categories
+              .filter((cat) => cat !== undefined)
+              .map((cat) => ({
+                value: cat,
+                label: cat,
+                color: '#10b981',
+              })),
           ]
-          console.log('Category options for select:', opts.map(o => o.value))
           return opts
         })(),
-        render: (value) => <CategoryCell value={value} />
+        render: (value) => <CategoryCell value={value} />,
       },
       {
         id: 'description',
@@ -136,8 +129,8 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         editable: true,
         render: (value) => <DescriptionCell value={value} />,
         validation: {
-          maxLength: 200
-        }
+          maxLength: 200,
+        },
       },
       {
         id: 'isModified',
@@ -147,12 +140,12 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         type: 'boolean',
         width: 100,
         sortable: true,
-        render: (value) => <StatusCell value={value} />
-      }
+        render: (value) => <StatusCell value={value} />,
+      },
     ]
 
     // Ajouter une colonne par langue supportée
-    const languageColumns: ColumnConfig<TranslationEntry>[] = SUPPORTED_LANGUAGES.map(lang => ({
+    const languageColumns: ColumnConfig<TranslationEntry>[] = SUPPORTED_LANGUAGES.map((lang) => ({
       id: `translation_${lang.code}`,
       key: 'id' as keyof TranslationEntry, // Utiliser une propriété existante comme fallback, on s'appuie sur getValue
       title: `${lang.flag} ${lang.nativeName}`,
@@ -162,7 +155,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
       sortable: true,
       editable: true,
       searchable: true,
-      render: (value, row) => {
+      render: (_value, row) => {
         const translation = row.translations[lang.code] || ''
         return <TranslationCell translation={translation} />
       },
@@ -173,70 +166,85 @@ export const TranslationDataTable = memo(function TranslationDataTable({
           }
           return null
         },
-        required: lang.code === 'fr' // Le français est obligatoire
+        required: lang.code === 'fr', // Le français est obligatoire
       },
       // Fonction personnalisée pour obtenir la valeur à éditer
-      getValue: (row) => row.translations[lang.code] || ''
+      getValue: (row) => row.translations[lang.code] || '',
     }))
 
-    return [
-      ...baseColumns,
-      ...languageColumns
-    ]
+    return [...baseColumns, ...languageColumns]
   }, [namespaces, categories])
 
-  const handleCellEdit = useCallback((value: any, row: TranslationEntry, column: ColumnConfig<TranslationEntry>) => {
-    if (column.id.startsWith('translation_')) {
-      // Éditer une traduction spécifique
-      const languageCode = column.id.replace('translation_', '')
-      const updatedRow = {
-        ...row,
-        translations: {
-          ...row.translations,
-          [languageCode]: value
-        },
-        isModified: true,
-        updatedAt: new Date()
+  const handleCellEdit = useCallback(
+    (value: any, row: TranslationEntry, column: ColumnConfig<TranslationEntry>) => {
+      if (column.id.startsWith('translation_')) {
+        // Éditer une traduction spécifique
+        const languageCode = column.id.replace('translation_', '')
+        const updatedRow = {
+          ...row,
+          translations: {
+            ...row.translations,
+            [languageCode]: value,
+          },
+          isModified: true,
+          updatedAt: new Date(),
+        }
+        onCellEdit?.(value, updatedRow, column)
+      } else {
+        // Éditer une autre propriété
+        const updatedRow = {
+          ...row,
+          [column.key]: value,
+          isModified: true,
+          updatedAt: new Date(),
+        }
+        onCellEdit?.(value, updatedRow, column)
       }
-      onCellEdit?.(value, updatedRow, column)
-    } else {
-      // Éditer une autre propriété
-      const updatedRow = {
-        ...row,
-        [column.key]: value,
-        isModified: true,
-        updatedAt: new Date()
-      }
-      onCellEdit?.(value, updatedRow, column)
-    }
-  }, [onCellEdit])
+    },
+    [onCellEdit]
+  )
 
   const handleCreate = useCallback(() => {
     onCreate?.()
   }, [onCreate])
 
-  const handleDelete = useCallback((rows: TranslationEntry[]) => {
-    onDelete?.(rows)
-  }, [onDelete])
+  const handleDelete = useCallback(
+    (rows: TranslationEntry[]) => {
+      onDelete?.(rows)
+    },
+    [onDelete]
+  )
 
-  const handleEdit = useCallback((row: TranslationEntry) => {
-    onEdit(row)
-  }, [onEdit])
+  const handleEdit = useCallback(
+    (row: TranslationEntry) => {
+      onEdit(row)
+    },
+    [onEdit]
+  )
 
-  const handleDuplicate = useCallback((row: TranslationEntry) => {
-    onDuplicate?.(row)
-  }, [onDuplicate])
+  const _handleDuplicate = useCallback(
+    (row: TranslationEntry) => {
+      onDuplicate?.(row)
+    },
+    [onDuplicate]
+  )
 
-  const handleExport = useCallback((rows: TranslationEntry[]) => {
-    onExport?.(rows)
-  }, [onExport])
+  const handleExport = useCallback(
+    (rows: TranslationEntry[]) => {
+      onExport?.(rows)
+    },
+    [onExport]
+  )
 
-  const handlePaginationChange = useCallback(({ page, pageSize: newPageSize }: { page: number, pageSize: number, total: number }) => {
-    setCurrentPage(page)
-  }, [])
+  const handlePaginationChange = useCallback(
+    ({ page, pageSize: newPageSize }: { page: number; pageSize: number; total: number }) => {
+      setCurrentPage(page)
+    },
+    []
+  )
 
   return (
-    <DataTable
+    <AdvancedDataTable
       data={entries}
       columns={columns}
       keyField="id"
@@ -255,9 +263,9 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         create: onCreate ? handleCreate : undefined,
         edit: handleEdit,
         delete: onDelete ? handleDelete : undefined,
-        duplicate: onDuplicate ? handleDuplicate : undefined,
+        // duplicate: onDuplicate ? handleDuplicate : undefined, // Not supported by DataTable
         export: onExport ? handleExport : undefined,
-        import: onImport
+        import: onImport,
       }}
       // Callbacks
       onCellEdit={handleCellEdit}
@@ -265,9 +273,10 @@ export const TranslationDataTable = memo(function TranslationDataTable({
       // Configuration personnalisée avec pagination activée et optimisée pour de gros datasets
       pagination={{
         page: currentPage,
+        pageSize: 25, // Default page size
         total: entries.length,
         showSizeChanger: true,
-        pageSizeOptions: [25, 50, 100, 200] // Options adaptées pour de gros volumes
+        pageSizeOptions: [25, 50, 100, 200], // Options adaptées pour de gros volumes
       }}
       onPaginationChange={handlePaginationChange}
     />

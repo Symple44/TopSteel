@@ -77,19 +77,19 @@ export interface Notification extends BaseEntity {
   readonly message: string
   readonly type: NotificationType
   readonly priority: NotificationPriority
-  
+
   // Destinataire
   readonly userId: string
   readonly userEmail?: string
   readonly userPhone?: string
-  
+
   // Contenu
   readonly content?: {
     html?: string
     data?: Record<string, any>
     attachments?: string[]
   }
-  
+
   // Actions
   readonly actions?: NotificationAction[]
   readonly autoActions?: {
@@ -97,24 +97,24 @@ export interface Notification extends BaseEntity {
     dismissAfter?: number // minutes
     retryFailedAfter?: number // minutes
   }
-  
+
   // Livraison
   readonly channels: NotificationChannel[]
   readonly delivery: NotificationDelivery[]
   readonly scheduledFor?: Date
   readonly expiresAt?: Date
-  
+
   // Métadonnées
   readonly metadata: NotificationMetadata
   readonly template?: string
   readonly locale?: string
-  
+
   // État
   readonly isRead: boolean
   readonly isDismissed: boolean
   readonly readAt?: Date
   readonly dismissedAt?: Date
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date

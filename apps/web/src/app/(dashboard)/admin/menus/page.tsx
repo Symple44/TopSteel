@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+export const dynamic = 'force-dynamic'
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { Badge } from '@/components/ui/badge'
+import { Download, Play, Plus, Settings } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
 import { apiClient } from '@/lib/api-client'
-import { Plus, Settings, Download, Upload, Play, Trash2, Edit } from 'lucide-react'
-import { MenuConfigurationList } from './components/menu-configuration-list'
 import { MenuConfigurationEditor } from './components/menu-configuration-editor'
+import { MenuConfigurationList } from './components/menu-configuration-list'
 import { MenuPreview } from './components/menu-preview'
 
 interface MenuConfiguration {
@@ -20,7 +22,7 @@ interface MenuConfiguration {
   createdAt: string
   updatedAt: string
   createdBy?: string
-  items: MenuItem[]
+  items?: MenuItem[] // Make items optional since it's not always present
 }
 
 interface MenuItem {
@@ -54,10 +56,51 @@ export default function MenuAdminPage() {
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState<'view' | 'edit' | 'create'>('view')
 
+  const loadConfigurations = useCallback(async () => {
+    try {
+      const [configsResponse, activeResponse] = await Promise.all([
+        apiClient.get('/admin/menu-raw/configurations'),
+        apiClient.get('/admin/menu-raw/configurations/active'),
+      ])
+
+      // L'API menu-raw retourne une structure imbriquée: { data: { success: true, data: [...] } }
+      const responseData = configsResponse?.data?.data || configsResponse?.data
+      const configs = Array.isArray(responseData) ? responseData : []
+      setConfigurations(configs)
+      if (activeResponse?.data) {
+        setActiveConfig(activeResponse.data.configuration)
+        if (!selectedConfig) {
+          setSelectedConfig(activeResponse.data.configuration)
+        }
+      }
+    } catch (_error) {
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedConfig])
+
+  const loadMenuTypes = useCallback(async () => {
+    try {
+      const response = await apiClient.get('/admin/menus/menu-types')
+      setMenuTypes(response?.data?.types || [])
+    } catch (_error) {}
+  }, [])
+
+  const loadMenuItems = useCallback(async (configId: string) => {
+    try {
+      const response = await apiClient.get(`/admin/menu-raw/tree?configId=${configId}`)
+      const responseData = response?.data?.data || response?.data
+      const items = Array.isArray(responseData) ? responseData : []
+      setSelectedConfigItems(items)
+    } catch (_error) {
+      setSelectedConfigItems([])
+    }
+  }, [])
+
   useEffect(() => {
     loadConfigurations()
     loadMenuTypes()
-  }, [])
+  }, [loadConfigurations, loadMenuTypes])
 
   // Charger les items quand une configuration est sélectionnée
   useEffect(() => {
@@ -66,60 +109,13 @@ export default function MenuAdminPage() {
     } else {
       setSelectedConfigItems([])
     }
-  }, [selectedConfig])
-
-  const loadConfigurations = async () => {
-    try {
-      const [configsResponse, activeResponse] = await Promise.all([
-        apiClient.get('/admin/menu-raw/configurations'),
-        apiClient.get('/admin/menu-raw/configurations/active')
-      ])
-      
-      // L'API menu-raw retourne une structure imbriquée: { data: { success: true, data: [...] } }
-      const responseData = configsResponse.data?.data || configsResponse.data
-      const configs = Array.isArray(responseData) ? responseData : []
-      setConfigurations(configs)
-      if (activeResponse.data) {
-        setActiveConfig(activeResponse.data.configuration)
-        if (!selectedConfig) {
-          setSelectedConfig(activeResponse.data.configuration)
-        }
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des configurations:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadMenuTypes = async () => {
-    try {
-      const response = await apiClient.get('/admin/menus/menu-types')
-      setMenuTypes(response.data.types)
-    } catch (error) {
-      console.error('Erreur lors du chargement des types de menu:', error)
-    }
-  }
-
-  const loadMenuItems = async (configId: string) => {
-    try {
-      const response = await apiClient.get(`/admin/menu-raw/tree?configId=${configId}`)
-      const responseData = response.data?.data || response.data
-      const items = Array.isArray(responseData) ? responseData : []
-      setSelectedConfigItems(items)
-    } catch (error) {
-      console.error('Erreur lors du chargement des items de menu:', error)
-      setSelectedConfigItems([])
-    }
-  }
+  }, [selectedConfig, loadMenuItems])
 
   const handleActivateConfiguration = async (configId: string) => {
     try {
       await apiClient.post(`/admin/menus/configurations/${configId}/activate`)
       await loadConfigurations()
-    } catch (error) {
-      console.error('Erreur lors de l\'activation:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleDeleteConfiguration = async (configId: string) => {
@@ -133,25 +129,21 @@ export default function MenuAdminPage() {
       if (selectedConfig?.id === configId) {
         setSelectedConfig(null)
       }
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleCreateDefault = async () => {
     try {
       await apiClient.post('/admin/menus/configurations/default')
       await loadConfigurations()
-    } catch (error) {
-      console.error('Erreur lors de la création de la configuration par défaut:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleExportConfig = async (configId: string) => {
     try {
       const response = await apiClient.get(`/admin/menus/configurations/${configId}/export`)
-      const blob = new Blob([JSON.stringify(response.data, null, 2)], { 
-        type: 'application/json' 
+      const blob = new Blob([JSON.stringify(response?.data, null, 2)], {
+        type: 'application/json',
       })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -159,9 +151,7 @@ export default function MenuAdminPage() {
       a.download = `menu-config-${configId}.json`
       a.click()
       URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Erreur lors de l\'export:', error)
-    }
+    } catch (_error) {}
   }
 
   if (loading) {
@@ -177,11 +167,9 @@ export default function MenuAdminPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Gestion des Menus</h1>
-          <p className="text-muted-foreground">
-            Configurez et gérez les menus de l'application
-          </p>
+          <p className="text-muted-foreground">Configurez et gérez les menus de l'application</p>
         </div>
-        
+
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleCreateDefault}>
             <Settings className="h-4 w-4 mr-2" />
@@ -209,7 +197,7 @@ export default function MenuAdminPage() {
                 configurations={configurations}
                 activeConfig={activeConfig}
                 selectedConfig={selectedConfig}
-                onSelect={setSelectedConfig}
+                onSelect={(config: MenuConfiguration) => setSelectedConfig(config)}
                 onActivate={handleActivateConfiguration}
                 onDelete={handleDeleteConfiguration}
                 onExport={handleExportConfig}
@@ -224,10 +212,15 @@ export default function MenuAdminPage() {
 
         {/* Contenu principal */}
         <div className="lg:col-span-3">
-          <Tabs value={editMode} onValueChange={(value) => setEditMode(value as any)}>
+          <Tabs
+            value={editMode}
+            onValueChange={(value: string) => setEditMode(value as 'view' | 'edit' | 'create')}
+          >
             <TabsList>
               <TabsTrigger value="view">Aperçu</TabsTrigger>
-              <TabsTrigger value="edit" disabled={!selectedConfig}>Éditer</TabsTrigger>
+              <TabsTrigger value="edit" disabled={!selectedConfig}>
+                Éditer
+              </TabsTrigger>
               <TabsTrigger value="create">Créer</TabsTrigger>
             </TabsList>
 
@@ -240,29 +233,23 @@ export default function MenuAdminPage() {
                         <div>
                           <CardTitle className="flex items-center gap-2">
                             {selectedConfig.name}
-                            {selectedConfig.isActive && (
-                              <Badge variant="default">Active</Badge>
-                            )}
-                            {selectedConfig.isSystem && (
-                              <Badge variant="secondary">Système</Badge>
-                            )}
+                            {selectedConfig.isActive && <Badge variant="default">Active</Badge>}
+                            {selectedConfig.isSystem && <Badge variant="secondary">Système</Badge>}
                           </CardTitle>
-                          <CardDescription>
-                            {selectedConfig.description}
-                          </CardDescription>
+                          <CardDescription>{selectedConfig.description}</CardDescription>
                         </div>
                         <div className="flex gap-2">
                           {!selectedConfig.isActive && (
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               onClick={() => handleActivateConfiguration(selectedConfig.id)}
                             >
                               <Play className="h-4 w-4 mr-2" />
                               Activer
                             </Button>
                           )}
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => handleExportConfig(selectedConfig.id)}
                           >
@@ -290,9 +277,12 @@ export default function MenuAdminPage() {
             <TabsContent value="edit">
               {selectedConfig && (
                 <MenuConfigurationEditor
-                  configuration={selectedConfig}
+                  configuration={{
+                    ...selectedConfig,
+                    items: selectedConfig.items || selectedConfigItems,
+                  }}
                   menuTypes={menuTypes}
-                  onSave={async (config) => {
+                  onSave={async () => {
                     await loadConfigurations()
                     setEditMode('view')
                   }}
@@ -304,7 +294,7 @@ export default function MenuAdminPage() {
             <TabsContent value="create">
               <MenuConfigurationEditor
                 menuTypes={menuTypes}
-                onSave={async (config) => {
+                onSave={async () => {
                   await loadConfigurations()
                   setEditMode('view')
                 }}

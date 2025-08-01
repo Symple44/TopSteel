@@ -1,91 +1,97 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { TranslationField } from '@/components/ui/translation-field'
-import { getTranslatedTitle } from '@/utils/menu-translations'
-import { translator } from '@/lib/i18n/translator'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { 
-  Save, 
-  RotateCcw, 
-  Plus, 
-  FolderPlus,
-  Link,
-  Search,
-  Eye,
-  Settings,
-  Home,
-  LayoutDashboard,
-  Users,
-  Building,
-  Database,
-  Globe,
-  GripVertical,
-  Trash2,
-  Edit,
-  FolderOpen,
-  ExternalLink,
-  BarChart3,
-  ChevronDown,
-  ChevronRight,
-  // Icônes couramment utilisées dans l'app
-  Shield,
-  Package,
-  Calendar,
-  Mail,
-  FileText,
-  Download,
-  Building2,
-  CheckCircle,
-  AlertTriangle,
-  Upload,
-  Lock,
-  Key,
-  Activity,
-  TrendingUp,
-  CreditCard,
-  Truck,
-  Bell,
-  Monitor,
-  RefreshCw,
-  PieChart,
-  Wrench,
-  Phone,
-  MapPin,
-  User,
-  Briefcase,
-  Check,
-  Loader2,
-  Info,
-  RotateCcw as Reset
-} from 'lucide-react'
+export const dynamic = 'force-dynamic'
+
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  type DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from '@dnd-kit/core'
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
+  useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import {
-  useSortable,
-} from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import {
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  Bell,
+  Briefcase,
+  Building,
+  Building2,
+  Calendar,
+  Check,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  CreditCard,
+  Database,
+  Download,
+  Edit,
+  ExternalLink,
+  Eye,
+  FileText,
+  FolderOpen,
+  FolderPlus,
+  Globe,
+  GripVertical,
+  Home,
+  Info,
+  Key,
+  LayoutDashboard,
+  Link,
+  Loader2,
+  Lock,
+  Mail,
+  MapPin,
+  Monitor,
+  Package,
+  Phone,
+  PieChart,
+  RefreshCw,
+  RotateCcw as Reset,
+  RotateCcw,
+  Save,
+  Search,
+  Settings,
+  // Icônes couramment utilisées dans l'app
+  Shield,
+  Trash2,
+  TrendingUp,
+  Truck,
+  Upload,
+  User,
+  Users,
+  Wrench,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@erp/ui/primitives'
+import { Input } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import { TranslationFieldWrapper as TranslationField } from '@/components/wrappers'
 import { apiClient } from '@/lib/api-client-instance'
+import { useTranslation } from '@/lib/i18n/hooks'
+import { translator } from '@/lib/i18n/translator'
+import { getTranslatedTitle } from '@/utils/menu-translations'
 
 interface MenuItemConfig {
   id: string
@@ -131,20 +137,20 @@ const iconMap: Record<string, any> = {
   Settings,
   Search,
   Eye,
-  
-  // Administration & Sécurité  
+
+  // Administration & Sécurité
   Shield,
   Users,
   User,
   Key,
   Lock,
-  
+
   // Entreprise & Organisation
   Building,
   Building2,
   Globe,
   Briefcase,
-  
+
   // Données & Rapports
   Database,
   BarChart3,
@@ -152,49 +158,75 @@ const iconMap: Record<string, any> = {
   Activity,
   TrendingUp,
   FileText,
-  
+
   // Production & Stock
   Package,
   Wrench,
   Truck,
-  
+
   // Communication & Documents
   Mail,
   Phone,
   Calendar,
   Bell,
-  
+
   // Actions & États
   Download,
   Upload,
   CheckCircle,
   AlertTriangle,
   RefreshCw,
-  
+
   // Finance
   CreditCard,
-  
+
   // Technique
   Monitor,
   ExternalLink,
   MapPin,
-  Check
+  Check,
 }
 
-const getAvailableIcons = () => {
+const _getAvailableIcons = () => {
   return Object.keys(iconMap).sort()
 }
 
 const getIconsByCategory = (t: any) => {
   return {
-    [t('settings.menu.iconCategories.navigation')]: ['Home', 'LayoutDashboard', 'FolderOpen', 'Settings', 'Search', 'Eye'],
+    [t('settings.menu.iconCategories.navigation')]: [
+      'Home',
+      'LayoutDashboard',
+      'FolderOpen',
+      'Settings',
+      'Search',
+      'Eye',
+    ],
     [t('settings.menu.iconCategories.security')]: ['Shield', 'Users', 'User', 'Key', 'Lock'],
     [t('settings.menu.iconCategories.enterprise')]: ['Building', 'Building2', 'Globe', 'Briefcase'],
-    [t('settings.menu.iconCategories.data')]: ['Database', 'BarChart3', 'PieChart', 'Activity', 'TrendingUp', 'FileText'],
+    [t('settings.menu.iconCategories.data')]: [
+      'Database',
+      'BarChart3',
+      'PieChart',
+      'Activity',
+      'TrendingUp',
+      'FileText',
+    ],
     [t('settings.menu.iconCategories.production')]: ['Package', 'Wrench', 'Truck'],
     [t('settings.menu.iconCategories.communication')]: ['Mail', 'Phone', 'Calendar', 'Bell'],
-    [t('settings.menu.iconCategories.actions')]: ['Download', 'Upload', 'CheckCircle', 'AlertTriangle', 'RefreshCw'],
-    [t('settings.menu.iconCategories.finance')]: ['CreditCard', 'Monitor', 'ExternalLink', 'MapPin', 'Check']
+    [t('settings.menu.iconCategories.actions')]: [
+      'Download',
+      'Upload',
+      'CheckCircle',
+      'AlertTriangle',
+      'RefreshCw',
+    ],
+    [t('settings.menu.iconCategories.finance')]: [
+      'CreditCard',
+      'Monitor',
+      'ExternalLink',
+      'MapPin',
+      'Check',
+    ],
   }
 }
 
@@ -205,7 +237,7 @@ const getIconComponent = (iconName: string) => {
 const getAvailableColors = (t: any) => {
   return {
     [t('settings.menu.colors.blue')]: '#3b82f6',
-    [t('settings.menu.colors.green')]: '#10b981', 
+    [t('settings.menu.colors.green')]: '#10b981',
     [t('settings.menu.colors.orange')]: '#f97316',
     [t('settings.menu.colors.red')]: '#ef4444',
     [t('settings.menu.colors.purple')]: '#8b5cf6',
@@ -218,7 +250,7 @@ const getAvailableColors = (t: any) => {
     [t('settings.menu.colors.indigo')]: '#6366f1',
     [t('settings.menu.colors.emerald')]: '#059669',
     [t('settings.menu.colors.lime')]: '#65a30d',
-    [t('settings.menu.colors.amber')]: '#d97706'
+    [t('settings.menu.colors.amber')]: '#d97706',
   }
 }
 
@@ -228,21 +260,21 @@ const getColorStyle = (color?: string) => {
 }
 
 // Composant dossier avec drag & drop natif uniquement
-function FolderMenuItem({ 
-  item, 
-  onRemove, 
+function FolderMenuItem({
+  item,
+  onRemove,
   level = 0,
   onDropInFolder,
   onEdit,
   expandedItems = [],
-  onToggleExpanded 
-}: { 
-  item: UserMenuItem, 
-  onRemove: (id: string) => void,
-  level?: number,
-  onDropInFolder?: (parentId: string, droppedItem: any) => void,
-  onEdit?: (item: UserMenuItem) => void,
-  expandedItems?: string[],
+  onToggleExpanded,
+}: {
+  item: UserMenuItem
+  onRemove: (id: string) => void
+  level?: number
+  onDropInFolder?: (parentId: string, droppedItem: any) => void
+  onEdit?: (item: UserMenuItem) => void
+  expandedItems?: string[]
   onToggleExpanded?: (id: string) => void
 }) {
   const { t } = useTranslation('settings')
@@ -256,17 +288,17 @@ function FolderMenuItem({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     if (onDropInFolder) {
       // D'abord essayer de récupérer depuis dataTransfer
       let draggedData = e.dataTransfer.getData('application/json')
-      
+
       // Si pas de données dans dataTransfer, essayer sessionStorage (fallback)
       if (!draggedData) {
-        draggedData = sessionStorage.getItem('draggedStandardItem')
+        draggedData = sessionStorage.getItem('draggedStandardItem') || ''
         sessionStorage.removeItem('draggedStandardItem')
       }
-      
+
       // Essayer aussi de récupérer depuis un état global
       if (!draggedData) {
         const globalDragData = (window as any).currentDragData
@@ -275,19 +307,19 @@ function FolderMenuItem({
           ;(window as any).currentDragData = null
         }
       }
-      
+
       if (draggedData) {
         try {
           const droppedItem = JSON.parse(draggedData)
           onDropInFolder(item.id, droppedItem)
-        } catch (error) {
+        } catch (_error) {
           // Erreur lors du parsing des données de drag
         }
       } else {
         // Aucune donnée de drag trouvée pour le drop dans le dossier
       }
     }
-    
+
     setIsDragOver(false)
   }
 
@@ -348,11 +380,14 @@ function FolderMenuItem({
               <Badge className={`text-xs ${getTypeBadgeColor(item.type)} text-white`}>
                 {getTypeLabel(item.type, t)}
               </Badge>
-              <Badge variant="outline" className={`text-xs ${
-                isDragOver 
-                  ? 'bg-purple-200 text-purple-800 border-purple-400' 
-                  : 'bg-purple-50 text-purple-700 border-purple-200'
-              }`}>
+              <Badge
+                variant="outline"
+                className={`text-xs ${
+                  isDragOver
+                    ? 'bg-purple-200 text-purple-800 border-purple-400'
+                    : 'bg-purple-50 text-purple-700 border-purple-200'
+                }`}
+              >
                 {isDragOver ? `🎯 ${t('menu.dropHere')}` : t('menu.folderDropHint')}
               </Badge>
             </div>
@@ -367,9 +402,9 @@ function FolderMenuItem({
             )}
           </div>
           <div className="flex gap-1">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="h-6 w-6 p-0"
               onClick={(e) => {
                 e.stopPropagation()
@@ -378,9 +413,9 @@ function FolderMenuItem({
             >
               <Edit className="h-3 w-3" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="h-6 w-6 p-0 text-destructive hover:text-destructive"
               onClick={() => onRemove(item.id)}
             >
@@ -389,11 +424,11 @@ function FolderMenuItem({
           </div>
         </div>
       </div>
-      
+
       {/* Afficher les enfants du dossier seulement si étendu */}
       {hasChildren && isExpanded && (
         <div className="ml-4 border-l-2 border-purple-200 pl-4 space-y-1">
-          {item.children.map((child) => (
+          {item.children.map((child) =>
             child.type === 'M' ? (
               <FolderMenuItem
                 key={child.id}
@@ -415,44 +450,35 @@ function FolderMenuItem({
                 onEdit={onEdit}
               />
             )
-          ))}
+          )}
         </div>
       )}
-      
+
       {/* Debug pour voir si c'est un dossier vide */}
       {(!item.children || item.children.length === 0) && (
-        <div className="ml-4 text-xs text-muted-foreground italic">
-          📁 {t('menu.folderEmpty')}
-        </div>
+        <div className="ml-4 text-xs text-muted-foreground italic">📁 {t('menu.folderEmpty')}</div>
       )}
     </div>
   )
 }
 
 // Composant pour les éléments draggable du menu utilisateur (non-dossiers)
-function SortableUserMenuItem({ 
-  item, 
-  onRemove, 
+function SortableUserMenuItem({
+  item,
+  onRemove,
   level = 0,
   onDropInFolder,
-  onEdit 
-}: { 
-  item: UserMenuItem, 
-  onRemove: (id: string) => void,
-  level?: number,
-  onDropInFolder?: (parentId: string, droppedItem: any) => void,
+  onEdit,
+}: {
+  item: UserMenuItem
+  onRemove: (id: string) => void
+  level?: number
+  onDropInFolder?: (parentId: string, droppedItem: any) => void
   onEdit?: (item: UserMenuItem) => void
 }) {
   const { t } = useTranslation('settings')
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ 
-    id: item.id
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
   })
 
   const style = {
@@ -502,9 +528,9 @@ function SortableUserMenuItem({
             )}
           </div>
           <div className="flex gap-1">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="h-6 w-6 p-0"
               onClick={(e) => {
                 e.stopPropagation()
@@ -513,9 +539,9 @@ function SortableUserMenuItem({
             >
               <Edit className="h-3 w-3" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="h-6 w-6 p-0 text-destructive hover:text-destructive"
               onClick={() => onRemove(item.id)}
             >
@@ -529,42 +555,42 @@ function SortableUserMenuItem({
 }
 
 // Composant pour les éléments de la bibliothèque (read-only)
-function StandardMenuItemDisplay({ 
-  item, 
-  level = 0, 
-  onDragStart, 
-  expanded, 
+function StandardMenuItemDisplay({
+  item,
+  level = 0,
+  onDragStart,
+  expanded,
   onToggleExpanded,
   expandedItems = [],
   onToggleExpandedItem,
-  t
-}: { 
-  item: MenuItemConfig, 
-  level?: number,
-  onDragStart: (item: MenuItemConfig) => void,
-  expanded?: boolean,
-  onToggleExpanded?: () => void,
-  expandedItems?: string[],
-  onToggleExpandedItem?: (id: string) => void,
+  t,
+}: {
+  item: MenuItemConfig
+  level?: number
+  onDragStart: (item: MenuItemConfig) => void
+  expanded?: boolean
+  onToggleExpanded?: () => void
+  expandedItems?: string[]
+  onToggleExpandedItem?: (id: string) => void
   t: any
 }) {
   const Icon = getTypeIcon(item.type)
   const hasChildren = item.children && item.children.length > 0
   const isExpanded = expandedItems.includes(item.id)
-  
+
   const handleItemClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (hasChildren && onToggleExpandedItem) {
       onToggleExpandedItem(item.id)
     }
   }
-  
+
   return (
     <>
       <div
         className={`p-3 mb-2 bg-card border rounded-lg transition-colors ${
-          hasChildren 
-            ? 'cursor-pointer hover:bg-blue-50 border-blue-200' 
+          hasChildren
+            ? 'cursor-pointer hover:bg-blue-50 border-blue-200'
             : 'cursor-move hover:bg-green-50 border-green-200'
         }`}
         style={{ marginLeft: `${level * 20}px` }}
@@ -573,16 +599,18 @@ function StandardMenuItemDisplay({
         onDragStart={(e) => {
           // Empêcher la propagation pour éviter les conflits avec le clic
           e.stopPropagation()
-          
+
           // Fonction récursive pour mapper les enfants lors du drag
           const mapChildrenForDrag = (children: any[], newParentId: string): any[] => {
-            return children.map(child => ({
+            return children.map((child) => ({
               ...child,
               id: `user-child-${child.id}-${Date.now()}`,
               parentId: newParentId,
               orderIndex: child.orderIndex || 0,
               isVisible: child.isVisible !== false,
-              children: Array.isArray(child.children) ? mapChildrenForDrag(child.children, `user-child-${child.id}-${Date.now()}`) : []
+              children: Array.isArray(child.children)
+                ? mapChildrenForDrag(child.children, `user-child-${child.id}-${Date.now()}`)
+                : [],
             }))
           }
 
@@ -592,32 +620,30 @@ function StandardMenuItemDisplay({
             ...item,
             id: newId,
             orderIndex: 0,
-            children: hasChildren ? mapChildrenForDrag(item.children, newId) : [] // Inclure les enfants avec mapping récursif
+            children: hasChildren ? mapChildrenForDrag(item.children, newId) : [], // Inclure les enfants avec mapping récursif
           }
-          
-          
+
           e.dataTransfer.setData('application/json', JSON.stringify(dragData))
           e.dataTransfer.setData('text/plain', item.title)
-          
+
           // Stocker aussi dans sessionStorage comme fallback
           sessionStorage.setItem('draggedStandardItem', JSON.stringify(dragData))
-          
+
           // Stocker aussi dans une variable globale pour les dossiers
           ;(window as any).currentDragData = dragData
-          
+
           onDragStart(item)
         }}
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
             <GripVertical className="h-4 w-4 text-muted-foreground" />
-            {hasChildren && (
-              isExpanded ? (
+            {hasChildren &&
+              (isExpanded ? (
                 <ChevronDown className="h-4 w-4 text-blue-500" />
               ) : (
                 <ChevronRight className="h-4 w-4 text-blue-500" />
-              )
-            )}
+              ))}
           </div>
           <Icon className="h-4 w-4" />
           <div className="flex-1 min-w-0">
@@ -627,12 +653,18 @@ function StandardMenuItemDisplay({
                 {getTypeLabel(item.type, t)}
               </Badge>
               {hasChildren && (
-                <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                <Badge
+                  variant="outline"
+                  className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                >
                   {t('menu.childrenCount').replace('{count}', item.children.length.toString())}
                 </Badge>
               )}
               {!hasChildren && (
-                <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="text-xs bg-green-50 text-green-700 border-green-200"
+                >
                   {t('menu.dragToAdd')}
                 </Badge>
               )}
@@ -649,7 +681,7 @@ function StandardMenuItemDisplay({
           </div>
         </div>
       </div>
-      
+
       {/* Afficher les enfants si déplié */}
       {hasChildren && isExpanded && (
         <div className="space-y-1">
@@ -673,31 +705,46 @@ function StandardMenuItemDisplay({
 // Fonctions utilitaires
 const getTypeLabel = (type: string, t: any) => {
   switch (type) {
-    case 'M': return t('menu.elementTypes.folder')
-    case 'P': return t('menu.elementTypes.program')
-    case 'L': return t('menu.elementTypes.link')
-    case 'D': return t('menu.elementTypes.dataView')
-    default: return type
+    case 'M':
+      return t('menu.elementTypes.folder')
+    case 'P':
+      return t('menu.elementTypes.program')
+    case 'L':
+      return t('menu.elementTypes.link')
+    case 'D':
+      return t('menu.elementTypes.dataView')
+    default:
+      return type
   }
 }
 
 const getTypeBadgeColor = (type: string) => {
   switch (type) {
-    case 'M': return 'bg-blue-500'
-    case 'P': return 'bg-green-500'
-    case 'L': return 'bg-purple-500'
-    case 'D': return 'bg-orange-500'
-    default: return 'bg-gray-500'
+    case 'M':
+      return 'bg-blue-500'
+    case 'P':
+      return 'bg-green-500'
+    case 'L':
+      return 'bg-purple-500'
+    case 'D':
+      return 'bg-orange-500'
+    default:
+      return 'bg-gray-500'
   }
 }
 
 const getTypeIcon = (type: string) => {
   switch (type) {
-    case 'M': return FolderOpen
-    case 'P': return LayoutDashboard
-    case 'L': return ExternalLink
-    case 'D': return BarChart3
-    default: return Settings
+    case 'M':
+      return FolderOpen
+    case 'P':
+      return LayoutDashboard
+    case 'L':
+      return ExternalLink
+    case 'D':
+      return BarChart3
+    default:
+      return Settings
   }
 }
 
@@ -709,11 +756,11 @@ export default function MenuDragDropPage() {
   const [saving, setSaving] = useState(false)
   const [draggedStandardItem, setDraggedStandardItem] = useState<MenuItemConfig | null>(null)
   const [expandedStandardItems, setExpandedStandardItems] = useState<string[]>([])
-  const [isDraggingFromExternal, setIsDraggingFromExternal] = useState(false)
-  
+  const [_isDraggingFromExternal, setIsDraggingFromExternal] = useState(false)
+
   // États pour gérer l'expansion des dossiers dans le menu utilisateur
   const [expandedUserItems, setExpandedUserItems] = useState<string[]>([])
-  
+
   // États pour les modales de création
   const [showCreateFolder, setShowCreateFolder] = useState(false)
   const [showCreateLink, setShowCreateLink] = useState(false)
@@ -721,7 +768,7 @@ export default function MenuDragDropPage() {
   const [newItemTitle, setNewItemTitle] = useState('')
   const [newItemUrl, setNewItemUrl] = useState('')
   const [newItemQueryId, setNewItemQueryId] = useState('')
-  
+
   // États pour la modale d'édition
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingItem, setEditingItem] = useState<UserMenuItem | null>(null)
@@ -731,7 +778,7 @@ export default function MenuDragDropPage() {
   const [editIconColor, setEditIconColor] = useState('')
   const [editUrl, setEditUrl] = useState('')
   const [editQueryId, setEditQueryId] = useState('')
-  
+
   // États pour l'interface simplifiée
   const [showIconSelector, setShowIconSelector] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -747,16 +794,18 @@ export default function MenuDragDropPage() {
   useEffect(() => {
     loadStandardMenu()
     loadUserMenu()
-  }, [])
+  }, [loadStandardMenu, loadUserMenu])
 
   const loadStandardMenu = async () => {
     try {
       const response = await apiClient.get('/admin/menu-raw/configurations/active')
-      if (response.data?.success && response.data?.data) {
-        const menuItems = Array.isArray(response.data.data.menuTree) ? response.data.data.menuTree : []
+      if ((response as any).data?.success && (response as any).data?.data) {
+        const menuItems = Array.isArray((response as any).data.data.menuTree)
+          ? (response as any).data.data.menuTree
+          : []
         setStandardMenu(menuItems)
       }
-    } catch (error) {
+    } catch (_error) {
       // Erreur lors du chargement du menu standard
     } finally {
       setLoading(false)
@@ -775,29 +824,33 @@ export default function MenuDragDropPage() {
       queryBuilderId: item.queryBuilderId,
       orderIndex: typeof item.orderIndex === 'number' ? item.orderIndex : index,
       isVisible: typeof item.isVisible === 'boolean' ? item.isVisible : true,
-      children: Array.isArray(item.children) ? item.children.map((child, childIndex) => 
-        mapMenuItemRecursively(child, childIndex, item.id)
-      ) : [],
+      children: Array.isArray(item.children)
+        ? item.children.map((child: any, childIndex: number) =>
+            mapMenuItemRecursively(child, childIndex, item.id)
+          )
+        : [],
       icon: item.customIcon || item.icon,
       customTitle: item.customTitle,
       customIcon: item.customIcon,
-      customIconColor: item.customIconColor
+      customIconColor: item.customIconColor,
     }
   }
 
   const loadUserMenu = async () => {
     try {
       const response = await apiClient.get('/user/menu-preferences/custom-menu')
-      
-      if (response.data?.success && Array.isArray(response.data.data)) {
+
+      if ((response as any).data?.success && Array.isArray((response as any).data.data)) {
         // Convertir les données API vers le format UserMenuItem requis avec mapping récursif
-        const menuItems = response.data.data.map((item, index) => mapMenuItemRecursively(item, index))
-        
+        const menuItems = (response as any).data.data.map((item: any, index: number) =>
+          mapMenuItemRecursively(item, index)
+        )
+
         setUserMenu(menuItems)
       } else {
         setUserMenu([])
       }
-    } catch (error) {
+    } catch (_error) {
       // Erreur lors du chargement du menu utilisateur
       setUserMenu([])
     }
@@ -807,28 +860,27 @@ export default function MenuDragDropPage() {
     setSaving(true)
     try {
       const response = await apiClient.post('/user/menu-preferences/custom-menu', {
-        menuItems: userMenu
+        menuItems: userMenu,
       })
-      
-      if (response.data?.success) {
-        
+
+      if ((response as any).data?.success) {
         // Envoyer un événement personnalisé pour notifier la sidebar
         const event = new CustomEvent('menuPreferencesChanged', {
           detail: {
             fromCustomizationPage: true,
             savedAt: new Date().toISOString(),
             menuItemsCount: userMenu.length,
-            menuItems: userMenu
-          }
+            menuItems: userMenu,
+          },
         })
         window.dispatchEvent(event)
-        
+
         // Notification de succès (optionnel - vous pouvez ajouter une lib de toast)
         // toast.success('Menu sauvegardé avec succès')
       } else {
         // Erreur lors de la sauvegarde
       }
-    } catch (error) {
+    } catch (_error) {
       // Erreur lors de la sauvegarde
     } finally {
       setSaving(false)
@@ -841,7 +893,7 @@ export default function MenuDragDropPage() {
 
   const createFolder = () => {
     if (!newItemTitle.trim()) return
-    
+
     const newFolder: UserMenuItem = {
       id: `folder-${Date.now()}`,
       title: newItemTitle,
@@ -849,7 +901,7 @@ export default function MenuDragDropPage() {
       orderIndex: userMenu.length,
       isVisible: true,
       children: [],
-      icon: 'FolderOpen'
+      icon: 'FolderOpen',
     }
     setUserMenu([...userMenu, newFolder])
     setNewItemTitle('')
@@ -858,7 +910,7 @@ export default function MenuDragDropPage() {
 
   const createLink = () => {
     if (!newItemTitle.trim() || !newItemUrl.trim()) return
-    
+
     const newLink: UserMenuItem = {
       id: `link-${Date.now()}`,
       title: newItemTitle,
@@ -867,7 +919,7 @@ export default function MenuDragDropPage() {
       orderIndex: userMenu.length,
       isVisible: true,
       children: [],
-      icon: 'ExternalLink'
+      icon: 'ExternalLink',
     }
     setUserMenu([...userMenu, newLink])
     setNewItemTitle('')
@@ -877,7 +929,7 @@ export default function MenuDragDropPage() {
 
   const createQuery = () => {
     if (!newItemTitle.trim() || !newItemQueryId.trim()) return
-    
+
     const newQuery: UserMenuItem = {
       id: `query-${Date.now()}`,
       title: newItemTitle,
@@ -886,7 +938,7 @@ export default function MenuDragDropPage() {
       orderIndex: userMenu.length,
       isVisible: true,
       children: [],
-      icon: 'BarChart3'
+      icon: 'BarChart3',
     }
     setUserMenu([...userMenu, newQuery])
     setNewItemTitle('')
@@ -907,9 +959,9 @@ export default function MenuDragDropPage() {
     // Fonction récursive pour trouver et déplacer un élément dans n'importe quel niveau
     const moveItemRecursively = (items: UserMenuItem[]): UserMenuItem[] => {
       // D'abord essayer de déplacer au niveau racine
-      const activeIndex = items.findIndex(item => item.id === activeId)
-      const overIndex = items.findIndex(item => item.id === overId)
-      
+      const activeIndex = items.findIndex((item) => item.id === activeId)
+      const overIndex = items.findIndex((item) => item.id === overId)
+
       if (activeIndex !== -1 && overIndex !== -1) {
         // Les deux éléments sont au même niveau
         const newItems = arrayMove(items, activeIndex, overIndex)
@@ -918,13 +970,13 @@ export default function MenuDragDropPage() {
         })
         return newItems
       }
-      
+
       // Sinon, chercher dans les enfants
-      return items.map(item => {
+      return items.map((item) => {
         if (item.children && item.children.length > 0) {
-          const activeInChildren = item.children.findIndex(child => child.id === activeId)
-          const overInChildren = item.children.findIndex(child => child.id === overId)
-          
+          const activeInChildren = item.children.findIndex((child) => child.id === activeId)
+          const overInChildren = item.children.findIndex((child) => child.id === overId)
+
           if (activeInChildren !== -1 && overInChildren !== -1) {
             // Les deux sont des enfants du même parent
             const newChildren = arrayMove(item.children, activeInChildren, overInChildren)
@@ -950,68 +1002,66 @@ export default function MenuDragDropPage() {
   }
 
   const handleDropInFolder = (parentId: string, droppedItem: any) => {
-    
     const newUserItem: UserMenuItem = {
       ...droppedItem,
       id: droppedItem.id || `user-${droppedItem.id || droppedItem.title}-${Date.now()}`,
       parentId: parentId,
       orderIndex: 0,
-      children: Array.isArray(droppedItem.children) ? droppedItem.children : []
+      children: Array.isArray(droppedItem.children) ? droppedItem.children : [],
     }
-    
-    
+
     // Ajouter l'élément au dossier parent
     const updateMenuWithNewItem = (items: UserMenuItem[]): UserMenuItem[] => {
-      return items.map(item => {
+      return items.map((item) => {
         if (item.id === parentId) {
           return {
             ...item,
-            children: [...item.children, newUserItem]
+            children: [...item.children, newUserItem],
           }
         }
         if (item.children.length > 0) {
           return {
             ...item,
-            children: updateMenuWithNewItem(item.children)
+            children: updateMenuWithNewItem(item.children),
           }
         }
         return item
       })
     }
-    
+
     setUserMenu(updateMenuWithNewItem(userMenu))
     setIsDraggingFromExternal(false)
   }
 
   const handleUserMenuDrop = (e: React.DragEvent) => {
     e.preventDefault()
-    
+
     // Essayer de récupérer les données depuis dataTransfer
     let draggedData = e.dataTransfer.getData('application/json')
-    
+
     // Fallback vers sessionStorage si nécessaire
     if (!draggedData) {
-      draggedData = sessionStorage.getItem('draggedStandardItem')
+      draggedData = sessionStorage.getItem('draggedStandardItem') || ''
       sessionStorage.removeItem('draggedStandardItem')
     }
-    
+
     if (draggedData) {
       try {
         const droppedItem = JSON.parse(draggedData)
-        
+
         const newUserItem: UserMenuItem = {
           ...droppedItem,
           id: droppedItem.id || `user-${droppedItem.id}-${Date.now()}`,
           orderIndex: userMenu.length,
-          children: Array.isArray(droppedItem.children) ? droppedItem.children : []
+          children: Array.isArray(droppedItem.children) ? droppedItem.children : [],
         }
-        
+
         setUserMenu([...userMenu, newUserItem])
-      } catch (error) {
+      } catch (_error) {
         // Erreur lors du parsing des données de drop
       }
     }
-    
+
     setDraggedStandardItem(null)
     setIsDraggingFromExternal(false)
   }
@@ -1022,7 +1072,7 @@ export default function MenuDragDropPage() {
 
   const removeFromUserMenu = (id: string) => {
     const removeFromItems = (items: UserMenuItem[]): UserMenuItem[] => {
-      return items.filter(item => {
+      return items.filter((item) => {
         if (item.id === id) return false
         if (item.children.length > 0) {
           item.children = removeFromItems(item.children)
@@ -1034,18 +1084,14 @@ export default function MenuDragDropPage() {
   }
 
   const toggleStandardItemExpansion = (itemId: string) => {
-    setExpandedStandardItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
+    setExpandedStandardItems((prev) =>
+      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
     )
   }
 
   const toggleUserItemExpansion = (itemId: string) => {
-    setExpandedUserItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
+    setExpandedUserItems((prev) =>
+      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
     )
   }
 
@@ -1077,7 +1123,7 @@ export default function MenuDragDropPage() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!showEditModal) return
-      
+
       // Escape pour fermer le sélecteur ou la modale (sauf si sauvegarde en cours)
       if (e.key === 'Escape' && !isSaving) {
         if (showIconSelector) {
@@ -1087,19 +1133,19 @@ export default function MenuDragDropPage() {
         }
         return
       }
-      
+
       // Ctrl+S pour sauvegarder (sauf si déjà en cours)
       if (e.ctrlKey && e.key === 's' && !isSaving) {
         e.preventDefault()
         saveItemEdit()
       }
-      
+
       // Ctrl+R pour reset (sauf si sauvegarde en cours)
       if (e.ctrlKey && e.key === 'r' && !isSaving) {
         e.preventDefault()
         resetItemEdit()
       }
-      
+
       // Ctrl+Escape pour forcer la fermeture (urgence)
       if (e.ctrlKey && e.key === 'Escape') {
         e.preventDefault()
@@ -1112,7 +1158,7 @@ export default function MenuDragDropPage() {
       document.addEventListener('keydown', handleKeyDown)
       return () => document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [showEditModal, showIconSelector, isSaving])
+  }, [showEditModal, showIconSelector, isSaving, resetItemEdit, saveItemEdit])
 
   const saveItemEdit = async () => {
     if (!editingItem || isSaving) return
@@ -1121,20 +1167,19 @@ export default function MenuDragDropPage() {
 
     try {
       // Simule un délai de sauvegarde pour montrer l'animation
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise((resolve) => setTimeout(resolve, 800))
 
       const updateItemRecursively = (items: UserMenuItem[]): UserMenuItem[] => {
-        return items.map(item => {
+        return items.map((item) => {
           if (item.id === editingItem.id) {
             const currentLanguage = translator.getCurrentLanguage()
             const updatedTranslations = { ...editTitleTranslations }
-            
+
             // Sauvegarder le titre dans la langue courante
             if (editTitle.trim()) {
               updatedTranslations[currentLanguage] = editTitle.trim()
             }
-            
-            
+
             return {
               ...item,
               customTitle: editTitle.trim() || item.title, // Garder pour compatibilité
@@ -1142,13 +1187,13 @@ export default function MenuDragDropPage() {
               customIcon: editIcon || item.icon,
               customIconColor: editIconColor || undefined,
               externalUrl: editingItem.type === 'L' ? editUrl : item.externalUrl,
-              queryBuilderId: editingItem.type === 'D' ? editQueryId : item.queryBuilderId
+              queryBuilderId: editingItem.type === 'D' ? editQueryId : item.queryBuilderId,
             }
           }
           if (item.children && item.children.length > 0) {
             return {
               ...item,
-              children: updateItemRecursively(item.children)
+              children: updateItemRecursively(item.children),
             }
           }
           return item
@@ -1157,40 +1202,34 @@ export default function MenuDragDropPage() {
 
       const updatedMenu = updateItemRecursively(userMenu)
       setUserMenu(updatedMenu)
-      
+
       // Sauvegarder automatiquement en BDD après modification
       try {
-        console.log('🌍 Sauvegarde des traductions:', {
-          itemId: editingItem.id,
-          translations: updatedTranslations,
-          currentLanguage: translator.getCurrentLanguage(),
-          updatedItem: updatedMenu.find(item => item.id === editingItem.id)
-        })
-        
+        const _currentItem = updatedMenu.find((item) => item.id === editingItem.id)
+
         const response = await apiClient.post('/user/menu-preferences/custom-menu', {
-          menuItems: updatedMenu
+          menuItems: updatedMenu,
         })
-        
-        if (response.data?.success) {
-          
+
+        if ((response as any).data?.success) {
           // Envoyer un événement pour notifier la sidebar
           const event = new CustomEvent('menuPreferencesChanged', {
             detail: {
               fromEdit: true,
               editedItemId: editingItem.id,
               savedAt: new Date().toISOString(),
-              menuItems: updatedMenu
-            }
+              menuItems: updatedMenu,
+            },
           })
           window.dispatchEvent(event)
         } else {
           // Sauvegarde automatique échouée
         }
-      } catch (saveError) {
+      } catch (_saveError) {
         // Erreur lors de la sauvegarde automatique
         // Ne pas bloquer l'interface même si la sauvegarde échoue
       }
-      
+
       // Fermeture avec délai pour voir la confirmation
       setTimeout(() => {
         setShowEditModal(false)
@@ -1204,8 +1243,7 @@ export default function MenuDragDropPage() {
         setShowIconSelector(false)
         setIsSaving(false)
       }, 300)
-      
-    } catch (error) {
+    } catch (_error) {
       // Erreur lors de la sauvegarde
       setIsSaving(false)
     }
@@ -1214,17 +1252,17 @@ export default function MenuDragDropPage() {
   // Fonction récursive pour collecter tous les IDs d'éléments déplaçables (non-dossiers)
   const getAllSortableIds = (items: UserMenuItem[]): string[] => {
     let ids: string[] = []
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       if (item.type !== 'M') {
         ids.push(item.id)
       }
-      
+
       if (item.children && item.children.length > 0) {
         ids = ids.concat(getAllSortableIds(item.children))
       }
     })
-    
+
     return ids
   }
 
@@ -1241,9 +1279,7 @@ export default function MenuDragDropPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('menu.title')}</h1>
-          <p className="text-muted-foreground">
-            {t('menu.subtitle')}
-          </p>
+          <p className="text-muted-foreground">{t('menu.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={resetUserMenu}>
@@ -1265,9 +1301,7 @@ export default function MenuDragDropPage() {
               <Eye className="h-5 w-5" />
               {t('menu.yourCustomMenu')}
             </CardTitle>
-            <CardDescription>
-              {t('menu.menuPreview')}
-            </CardDescription>
+            <CardDescription>{t('menu.menuPreview')}</CardDescription>
             <div className="flex gap-2 flex-wrap">
               <Dialog open={showCreateFolder} onOpenChange={setShowCreateFolder}>
                 <DialogTrigger asChild>
@@ -1279,9 +1313,7 @@ export default function MenuDragDropPage() {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>{t('menu.createNewFolder')}</DialogTitle>
-                    <DialogDescription>
-                      {t('menu.folderDescription')}
-                    </DialogDescription>
+                    <DialogDescription>{t('menu.folderDescription')}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
@@ -1298,9 +1330,7 @@ export default function MenuDragDropPage() {
                     <Button variant="outline" onClick={() => setShowCreateFolder(false)}>
                       {t('menu.cancel')}
                     </Button>
-                    <Button onClick={createFolder}>
-                      {t('menu.create')}
-                    </Button>
+                    <Button onClick={createFolder}>{t('menu.create')}</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -1315,9 +1345,7 @@ export default function MenuDragDropPage() {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>{t('menu.createNewLink')}</DialogTitle>
-                    <DialogDescription>
-                      {t('menu.linkDescription')}
-                    </DialogDescription>
+                    <DialogDescription>{t('menu.linkDescription')}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
@@ -1343,9 +1371,7 @@ export default function MenuDragDropPage() {
                     <Button variant="outline" onClick={() => setShowCreateLink(false)}>
                       {t('menu.cancel')}
                     </Button>
-                    <Button onClick={createLink}>
-                      {t('menu.create')}
-                    </Button>
+                    <Button onClick={createLink}>{t('menu.create')}</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -1360,9 +1386,7 @@ export default function MenuDragDropPage() {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>{t('menu.createNewDataView')}</DialogTitle>
-                    <DialogDescription>
-                      {t('menu.dataViewDescription')}
-                    </DialogDescription>
+                    <DialogDescription>{t('menu.dataViewDescription')}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
@@ -1388,9 +1412,7 @@ export default function MenuDragDropPage() {
                     <Button variant="outline" onClick={() => setShowCreateQuery(false)}>
                       {t('menu.cancel')}
                     </Button>
-                    <Button onClick={createQuery}>
-                      {t('menu.create')}
-                    </Button>
+                    <Button onClick={createQuery}>{t('menu.create')}</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -1401,9 +1423,7 @@ export default function MenuDragDropPage() {
               onDrop={handleUserMenuDrop}
               onDragOver={handleUserMenuDragOver}
               className={`h-full p-4 border-2 border-dashed rounded-lg transition-colors ${
-                draggedStandardItem 
-                  ? 'border-primary bg-primary/5' 
-                  : 'border-muted-foreground/25'
+                draggedStandardItem ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
               }`}
             >
               {userMenu.length === 0 ? (
@@ -1411,24 +1431,25 @@ export default function MenuDragDropPage() {
                   <div className="text-center text-muted-foreground">
                     <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p className="font-medium mb-2">{t('menu.emptyMenu')}</p>
-                    <p className="text-sm">
-                      {t('menu.emptyMenuDescription')}
-                    </p>
+                    <p className="text-sm">{t('menu.emptyMenuDescription')}</p>
                   </div>
                 </div>
               ) : (
                 <div className="h-full overflow-y-auto">
-                  <DndContext 
+                  <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                   >
-                    <SortableContext items={getAllSortableIds(userMenu)} strategy={verticalListSortingStrategy}>
-                      {userMenu.map((item) => (
+                    <SortableContext
+                      items={getAllSortableIds(userMenu)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {userMenu.map((item) =>
                         item.type === 'M' ? (
-                          <FolderMenuItem 
-                            key={item.id} 
-                            item={item} 
+                          <FolderMenuItem
+                            key={item.id}
+                            item={item}
                             onRemove={removeFromUserMenu}
                             onDropInFolder={handleDropInFolder}
                             onEdit={openEditModal}
@@ -1436,15 +1457,15 @@ export default function MenuDragDropPage() {
                             onToggleExpanded={toggleUserItemExpansion}
                           />
                         ) : (
-                          <SortableUserMenuItem 
-                            key={item.id} 
-                            item={item} 
+                          <SortableUserMenuItem
+                            key={item.id}
+                            item={item}
                             onRemove={removeFromUserMenu}
                             onDropInFolder={handleDropInFolder}
                             onEdit={openEditModal}
                           />
                         )
-                      ))}
+                      )}
                     </SortableContext>
                   </DndContext>
                 </div>
@@ -1460,16 +1481,14 @@ export default function MenuDragDropPage() {
               <Database className="h-5 w-5" />
               {t('menu.library')}
             </CardTitle>
-            <CardDescription>
-              {t('menu.libraryDescription')}
-            </CardDescription>
+            <CardDescription>{t('menu.libraryDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 min-h-0">
             <div className="space-y-2 h-full overflow-y-auto">
               {standardMenu.map((item) => (
-                <StandardMenuItemDisplay 
-                  key={item.id} 
-                  item={item} 
+                <StandardMenuItemDisplay
+                  key={item.id}
+                  item={item}
                   onDragStart={handleStandardItemDragStart}
                   expandedItems={expandedStandardItems}
                   onToggleExpandedItem={toggleStandardItemExpansion}
@@ -1482,15 +1501,8 @@ export default function MenuDragDropPage() {
       </div>
 
       {/* Modale d'édition simplifiée */}
-      <Dialog 
-        open={showEditModal} 
-        onOpenChange={(open) => !isSaving && setShowEditModal(open)}
-      >
-        <DialogContent 
-          className="max-w-lg overflow-hidden relative"
-          onPointerDownOutside={(e) => isSaving && e.preventDefault()}
-          onEscapeKeyDown={(e) => isSaving && e.preventDefault()}
-        >
+      <Dialog open={showEditModal} onOpenChange={(open) => !isSaving && setShowEditModal(open)}>
+        <DialogContent className="max-w-lg overflow-hidden relative">
           {/* Overlay de loading */}
           {isSaving && (
             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -1500,21 +1512,27 @@ export default function MenuDragDropPage() {
               </div>
             </div>
           )}
-          <DialogHeader className={`pb-3 border-b transition-opacity duration-300 ${isSaving ? 'opacity-60' : 'opacity-100'}`}>
+          <DialogHeader
+            className={`pb-3 border-b transition-opacity duration-300 ${isSaving ? 'opacity-60' : 'opacity-100'}`}
+          >
             <DialogTitle className="flex items-center gap-2 text-lg">
-              <Edit className={`h-5 w-5 transition-colors duration-300 ${
-                isSaving ? 'text-green-600' : 'text-foreground'
-              }`} />
+              <Edit
+                className={`h-5 w-5 transition-colors duration-300 ${
+                  isSaving ? 'text-green-600' : 'text-foreground'
+                }`}
+              />
               <span className="transition-colors duration-300">
                 {isSaving ? t('menu.savingInProgress') : t('menu.edit')}
               </span>
             </DialogTitle>
           </DialogHeader>
-          
+
           {editingItem && (
-            <div className={`pt-6 space-y-6 transition-all duration-300 ${
-              isSaving ? 'pointer-events-none' : 'pointer-events-auto'
-            }`}>
+            <div
+              className={`pt-6 space-y-6 transition-all duration-300 ${
+                isSaving ? 'pointer-events-none' : 'pointer-events-auto'
+              }`}
+            >
               {/* Interface principale - Icône à gauche, titre à droite */}
               <div className="flex items-center gap-4">
                 {/* Icône cliquable */}
@@ -1525,9 +1543,22 @@ export default function MenuDragDropPage() {
                     className="group relative p-4 border-2 border-dashed rounded-lg hover:border-primary transition-all duration-300 hover:shadow-lg hover:scale-105"
                   >
                     {(() => {
-                      const IconComponent = editIcon ? getIconComponent(editIcon) : (editingItem.customIcon ? getIconComponent(editingItem.customIcon) : getTypeIcon(editingItem.type))
-                      const iconStyle = editIconColor ? { color: editIconColor } : (editingItem.customIconColor ? { color: editingItem.customIconColor } : {})
-                      return <IconComponent className="h-8 w-8 transition-all duration-300" style={iconStyle} />
+                      const IconComponent = editIcon
+                        ? getIconComponent(editIcon)
+                        : editingItem.customIcon
+                          ? getIconComponent(editingItem.customIcon)
+                          : getTypeIcon(editingItem.type)
+                      const iconStyle = editIconColor
+                        ? { color: editIconColor }
+                        : editingItem.customIconColor
+                          ? { color: editingItem.customIconColor }
+                          : {}
+                      return (
+                        <IconComponent
+                          className="h-8 w-8 transition-all duration-300"
+                          style={iconStyle}
+                        />
+                      )
                     })()}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/30 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-lg flex items-center justify-center backdrop-blur-sm">
                       <Edit className="h-4 w-4 text-white drop-shadow-lg" />
@@ -1538,7 +1569,7 @@ export default function MenuDragDropPage() {
                 {/* Titre personnalisable */}
                 <div className="flex-1 space-y-3">
                   <div>
-                    <TranslationField
+                    <TranslationFieldWrapper as TranslationField
                       value={editTitle}
                       onChange={setEditTitle}
                       translations={editTitleTranslations}
@@ -1587,14 +1618,14 @@ export default function MenuDragDropPage() {
                           type="button"
                           onClick={() => setEditIconColor(colorValue)}
                           className={`relative p-2 rounded border-2 transition-all duration-200 hover:scale-110 hover:shadow-lg ${
-                            editIconColor === colorValue 
-                              ? 'border-primary shadow-md ring-2 ring-primary/20' 
+                            editIconColor === colorValue
+                              ? 'border-primary shadow-md ring-2 ring-primary/20'
                               : 'border-border hover:border-primary/50'
                           }`}
                           title={t('menu.clickToApply', { name: colorName })}
                           disabled={isSaving}
                         >
-                          <div 
+                          <div
                             className="w-6 h-6 rounded-full mx-auto"
                             style={{ backgroundColor: colorValue }}
                           />
@@ -1610,9 +1641,9 @@ export default function MenuDragDropPage() {
                         type="button"
                         onClick={() => setEditIconColor('')}
                         className={`p-2 rounded border-2 transition-all text-xs ${
-                          !editIconColor 
-                            ? 'border-primary bg-primary/10' 
-                            : 'border-border hover:bg-accent'
+                          editIconColor
+                            ? 'border-border hover:bg-accent'
+                            : 'border-primary bg-primary/10'
                         }`}
                         title={t('menu.defaultColor')}
                       >
@@ -1640,8 +1671,8 @@ export default function MenuDragDropPage() {
                                   type="button"
                                   onClick={() => setEditIcon(iconName)}
                                   className={`p-2 rounded border transition-colors hover:bg-accent ${
-                                    editIcon === iconName 
-                                      ? 'border-primary bg-primary/10' 
+                                    editIcon === iconName
+                                      ? 'border-primary bg-primary/10'
                                       : 'border-border'
                                   }`}
                                   title={iconName}
@@ -1659,21 +1690,38 @@ export default function MenuDragDropPage() {
               )}
 
               {/* Aperçu amélioré */}
-              <div className={`p-4 rounded-lg transition-all duration-300 ${
-                isSaving 
-                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' 
-                  : 'bg-gradient-to-r from-muted/30 to-muted/60 border border-muted'
-              }`}>
+              <div
+                className={`p-4 rounded-lg transition-all duration-300 ${
+                  isSaving
+                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200'
+                    : 'bg-gradient-to-r from-muted/30 to-muted/60 border border-muted'
+                }`}
+              >
                 <div className="flex items-center gap-3">
                   {(() => {
-                    const IconComponent = editIcon ? getIconComponent(editIcon) : (editingItem.customIcon ? getIconComponent(editingItem.customIcon) : getTypeIcon(editingItem.type))
-                    const previewIconStyle = editIconColor ? { color: editIconColor } : (editingItem.customIconColor ? { color: editingItem.customIconColor } : {})
-                    return <IconComponent className="h-5 w-5 transition-all duration-300" style={previewIconStyle} />
+                    const IconComponent = editIcon
+                      ? getIconComponent(editIcon)
+                      : editingItem.customIcon
+                        ? getIconComponent(editingItem.customIcon)
+                        : getTypeIcon(editingItem.type)
+                    const previewIconStyle = editIconColor
+                      ? { color: editIconColor }
+                      : editingItem.customIconColor
+                        ? { color: editingItem.customIconColor }
+                        : {}
+                    return (
+                      <IconComponent
+                        className="h-5 w-5 transition-all duration-300"
+                        style={previewIconStyle}
+                      />
+                    )
                   })()}
                   <span className="font-medium transition-all duration-300">
                     {editTitle.trim() || editingItem.title}
                   </span>
-                  <Badge className={`text-xs ${getTypeBadgeColor(editingItem.type)} text-white transition-all duration-300`}>
+                  <Badge
+                    className={`text-xs ${getTypeBadgeColor(editingItem.type)} text-white transition-all duration-300`}
+                  >
                     {getTypeLabel(editingItem.type, t)}
                   </Badge>
                   {isSaving && (
@@ -1695,10 +1743,19 @@ export default function MenuDragDropPage() {
                 <div className="space-y-2">
                   <h4 className="font-semibold text-blue-900">Guide d'édition</h4>
                   <ul className="space-y-1 text-blue-800">
-                    <li>• <strong>Icône :</strong> Cliquez sur l'icône pour ouvrir les sélecteurs</li>
-                    <li>• <strong>Couleurs :</strong> 16 couleurs disponibles + couleur par défaut</li>
-                    <li>• <strong>Icônes :</strong> 38 icônes organisées par catégorie</li>
-                    <li>• <strong>Raccourcis :</strong> Ctrl+S (sauver), Ctrl+R (reset), Escape (fermer)</li>
+                    <li>
+                      • <strong>Icône :</strong> Cliquez sur l'icône pour ouvrir les sélecteurs
+                    </li>
+                    <li>
+                      • <strong>Couleurs :</strong> 16 couleurs disponibles + couleur par défaut
+                    </li>
+                    <li>
+                      • <strong>Icônes :</strong> 38 icônes organisées par catégorie
+                    </li>
+                    <li>
+                      • <strong>Raccourcis :</strong> Ctrl+S (sauver), Ctrl+R (reset), Escape
+                      (fermer)
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -1707,7 +1764,7 @@ export default function MenuDragDropPage() {
 
           <DialogFooter className="gap-3 pt-3 border-t bg-muted/20">
             <div className="flex gap-2">
-              <Button 
+              <Button
                 variant="ghost"
                 size="sm"
                 onClick={resetItemEdit}
@@ -1717,9 +1774,9 @@ export default function MenuDragDropPage() {
               >
                 <Reset className="h-4 w-4" />
               </Button>
-              <Button 
+              <Button
                 variant="ghost"
-                size="sm" 
+                size="sm"
                 onClick={() => setShowInfo(!showInfo)}
                 className="transition-all duration-200"
                 title="Informations sur l'édition"
@@ -1727,23 +1784,21 @@ export default function MenuDragDropPage() {
                 <Info className="h-4 w-4" />
               </Button>
             </div>
-            
+
             <div className="flex gap-3 ml-auto">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => !isSaving && setShowEditModal(false)}
                 disabled={isSaving}
                 className="transition-all duration-200 min-w-[100px]"
               >
                 Annuler
               </Button>
-              <Button 
+              <Button
                 onClick={saveItemEdit}
                 disabled={isSaving}
                 className={`transition-all duration-300 min-w-[140px] ${
-                  isSaving 
-                    ? 'bg-green-600 hover:bg-green-700 shadow-lg' 
-                    : 'hover:shadow-md'
+                  isSaving ? 'bg-green-600 hover:bg-green-700 shadow-lg' : 'hover:shadow-md'
                 }`}
               >
                 {isSaving ? (

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { Button, Card, Input, Label, Separator } from '@erp/ui'
-import { Building2, Eye, EyeOff, Lock, Mail, User, ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Building2, Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from '@/lib/i18n/hooks'
 
@@ -29,7 +29,7 @@ export default function RegisterPage() {
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const validateForm = () => {
@@ -85,23 +85,23 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
 
     setIsLoading(true)
 
     try {
       // Simulate account creation
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
       toast({
         title: t('accountCreatedSuccess'),
         description: t('canNowLogin'),
         variant: 'success',
       })
-      
+
       router.push('/login')
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: t('error'),
         description: t('accountCreationError'),
@@ -129,9 +129,7 @@ export default function RegisterPage() {
             {/* Header formulaire */}
             <div className="text-center space-y-2">
               <h2 className="text-xl font-semibold text-gray-900">{t('registration')}</h2>
-              <p className="text-gray-600 text-sm">
-                {t('startFreeTrial')}
-              </p>
+              <p className="text-gray-600 text-sm">{t('startFreeTrial')}</p>
             </div>
 
             {/* Formulaire */}
@@ -211,9 +209,7 @@ export default function RegisterPage() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500">
-                  {t('passwordRequirements')}
-                </p>
+                <p className="text-xs text-gray-500">{t('passwordRequirements')}</p>
               </div>
 
               <div className="space-y-2">
@@ -234,7 +230,11 @@ export default function RegisterPage() {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -252,8 +252,8 @@ export default function RegisterPage() {
                     {t('acceptTermsText')}{' '}
                     <Link href="/terms" className="text-blue-600 hover:underline">
                       {t('termsOfService')}
-                    </Link>
-                    {' '}{t('and')}{' '}
+                    </Link>{' '}
+                    {t('and')}{' '}
                     <Link href="/privacy" className="text-blue-600 hover:underline">
                       {t('privacyPolicy')}
                     </Link>
@@ -261,11 +261,7 @@ export default function RegisterPage() {
                 </label>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? t('creatingAccount') : t('createAccount')}
               </Button>
             </form>
@@ -284,7 +280,7 @@ export default function RegisterPage() {
             {/* Liens */}
             <div className="space-y-4">
               <Separator />
-              
+
               <div className="text-center space-y-2">
                 <p className="text-sm text-gray-600">
                   {t('alreadyHaveAccount')}{' '}
@@ -292,7 +288,7 @@ export default function RegisterPage() {
                     {t('signIn')}
                   </Link>
                 </p>
-                
+
                 <div className="text-xs text-gray-500 space-x-3">
                   <Link href="/support" className="hover:underline">
                     {t('support')}

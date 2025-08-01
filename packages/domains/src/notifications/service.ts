@@ -1,18 +1,14 @@
-import { 
-  Notification, 
-  NotificationSettings, 
-  NotificationTemplate,
-  NotificationStats,
+import type {
+  CreateNotificationFromTemplateRequest,
   CreateNotificationRequest,
-  UpdateNotificationRequest,
+  Notification,
   NotificationFilters,
   NotificationListResponse,
-  CreateNotificationFromTemplateRequest,
   NotificationService,
-  NotificationCategory,
-  NotificationPriority,
-  NotificationType,
-  RecipientType
+  NotificationSettings,
+  NotificationStats,
+  NotificationTemplate,
+  UpdateNotificationRequest,
 } from './types'
 
 // Interface pour la connexion à la base de données
@@ -27,7 +23,7 @@ export class NotificationDatabaseService implements NotificationService {
   async createNotification(request: CreateNotificationRequest): Promise<Notification> {
     const id = this.generateUUID()
     const now = new Date().toISOString()
-    
+
     const sql = `
       INSERT INTO notifications (
         id, type, category, title, message, priority,
@@ -38,7 +34,7 @@ export class NotificationDatabaseService implements NotificationService {
         created_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
-    
+
     const params = [
       id,
       request.type,
@@ -58,15 +54,18 @@ export class NotificationDatabaseService implements NotificationService {
       request.expiresAt || null,
       request.persistent !== false,
       request.autoRead || false,
-      now
+      now,
     ]
-    
+
     await this.db.execute(sql, params)
-    
+
     return this.getNotificationById(id)
   }
 
-  async getNotifications(filters?: NotificationFilters, userId?: string): Promise<NotificationListResponse> {
+  async getNotifications(
+    filters?: NotificationFilters,
+    userId?: string
+  ): Promise<NotificationListResponse> {
     let sql = `
       SELECT 
         n.*,
@@ -76,64 +75,64 @@ export class NotificationDatabaseService implements NotificationService {
       LEFT JOIN notification_reads nr ON n.id = nr.notification_id AND nr.user_id = ?
       WHERE (n.expires_at IS NULL OR n.expires_at > NOW())
     `
-    
+
     const params: any[] = [userId || '']
-    
+
     // Appliquer les filtres
     if (filters?.category && filters.category.length > 0) {
       sql += ` AND n.category IN (${filters.category.map(() => '?').join(', ')})`
       params.push(...filters.category)
     }
-    
+
     if (filters?.type && filters.type.length > 0) {
       sql += ` AND n.type IN (${filters.type.map(() => '?').join(', ')})`
       params.push(...filters.type)
     }
-    
+
     if (filters?.priority && filters.priority.length > 0) {
       sql += ` AND n.priority IN (${filters.priority.map(() => '?').join(', ')})`
       params.push(...filters.priority)
     }
-    
+
     if (filters?.unreadOnly) {
       sql += ` AND nr.id IS NULL`
     }
-    
+
     if (filters?.recipientType) {
       sql += ` AND n.recipient_type = ?`
       params.push(filters.recipientType)
     }
-    
+
     if (filters?.recipientId) {
       sql += ` AND n.recipient_id = ?`
       params.push(filters.recipientId)
     }
-    
+
     if (filters?.source) {
       sql += ` AND n.source = ?`
       params.push(filters.source)
     }
-    
+
     if (filters?.entityType) {
       sql += ` AND n.entity_type = ?`
       params.push(filters.entityType)
     }
-    
+
     if (filters?.entityId) {
       sql += ` AND n.entity_id = ?`
       params.push(filters.entityId)
     }
-    
+
     if (filters?.fromDate) {
       sql += ` AND n.created_at >= ?`
       params.push(filters.fromDate)
     }
-    
+
     if (filters?.toDate) {
       sql += ` AND n.created_at <= ?`
       params.push(filters.toDate)
     }
-    
+
     // Filtrer selon les permissions utilisateur
     if (userId) {
       sql += ` AND (n.recipient_type = 'all' OR 
@@ -143,22 +142,22 @@ export class NotificationDatabaseService implements NotificationService {
                    )))`
       params.push(userId, userId)
     }
-    
+
     // Trier par date (plus récentes en premier)
     sql += ` ORDER BY n.created_at DESC`
-    
+
     const rows = await this.db.query(sql, params)
-    
+
     const notifications = rows.map(this.mapRowToNotification)
-    
+
     // Compter les non lues
-    const unreadCount = notifications.filter(n => !n.isRead).length
-    
+    const unreadCount = notifications.filter((n) => !n.isRead).length
+
     return {
       notifications,
       total: notifications.length,
       unreadCount,
-      hasMore: false // TODO: Implémenter la pagination
+      hasMore: false, // TODO: Implémenter la pagination
     }
   }
 
@@ -172,64 +171,64 @@ export class NotificationDatabaseService implements NotificationService {
       LEFT JOIN notification_reads nr ON n.id = nr.notification_id
       WHERE n.id = ?
     `
-    
+
     const rows = await this.db.query(sql, [id])
-    
+
     if (rows.length === 0) {
       throw new Error(`Notification with id ${id} not found`)
     }
-    
+
     return this.mapRowToNotification(rows[0])
   }
 
   async updateNotification(id: string, request: UpdateNotificationRequest): Promise<Notification> {
     const updates: string[] = []
     const params: any[] = []
-    
+
     if (request.title !== undefined) {
       updates.push('title = ?')
       params.push(request.title)
     }
-    
+
     if (request.message !== undefined) {
       updates.push('message = ?')
       params.push(request.message)
     }
-    
+
     if (request.priority !== undefined) {
       updates.push('priority = ?')
       params.push(request.priority)
     }
-    
+
     if (request.actionUrl !== undefined) {
       updates.push('action_url = ?')
       params.push(request.actionUrl)
     }
-    
+
     if (request.actionLabel !== undefined) {
       updates.push('action_label = ?')
       params.push(request.actionLabel)
     }
-    
+
     if (request.expiresAt !== undefined) {
       updates.push('expires_at = ?')
       params.push(request.expiresAt)
     }
-    
+
     if (request.persistent !== undefined) {
       updates.push('persistent = ?')
       params.push(request.persistent)
     }
-    
+
     if (updates.length === 0) {
       return this.getNotificationById(id)
     }
-    
+
     const sql = `UPDATE notifications SET ${updates.join(', ')} WHERE id = ?`
     params.push(id)
-    
+
     await this.db.execute(sql, params)
-    
+
     return this.getNotificationById(id)
   }
 
@@ -244,7 +243,7 @@ export class NotificationDatabaseService implements NotificationService {
       VALUES (?, ?, ?, NOW())
       ON DUPLICATE KEY UPDATE read_at = NOW()
     `
-    
+
     await this.db.execute(sql, [this.generateUUID(), notificationId, userId])
   }
 
@@ -259,61 +258,64 @@ export class NotificationDatabaseService implements NotificationService {
         AND (n.recipient_type = 'all' OR 
              (n.recipient_type = 'user' AND n.recipient_id = ?))
     `
-    
+
     await this.db.execute(sql, [userId, userId, userId])
   }
 
   async getUserSettings(userId: string): Promise<NotificationSettings> {
     const sql = `SELECT * FROM notification_settings WHERE user_id = ?`
     const rows = await this.db.query(sql, [userId])
-    
+
     if (rows.length === 0) {
       // Créer des paramètres par défaut
       return this.createDefaultSettings(userId)
     }
-    
+
     return this.mapRowToSettings(rows[0])
   }
 
-  async updateUserSettings(userId: string, settings: Partial<NotificationSettings>): Promise<NotificationSettings> {
+  async updateUserSettings(
+    userId: string,
+    settings: Partial<NotificationSettings>
+  ): Promise<NotificationSettings> {
     const updates: string[] = []
     const params: any[] = []
-    
+
     if (settings.enableSound !== undefined) {
       updates.push('enable_sound = ?')
       params.push(settings.enableSound)
     }
-    
+
     if (settings.enableToast !== undefined) {
       updates.push('enable_toast = ?')
       params.push(settings.enableToast)
     }
-    
+
     if (settings.enableBrowser !== undefined) {
       updates.push('enable_browser = ?')
       params.push(settings.enableBrowser)
     }
-    
+
     if (settings.enableEmail !== undefined) {
       updates.push('enable_email = ?')
       params.push(settings.enableEmail)
     }
-    
+
     if (settings.categories !== undefined) {
       updates.push('categories = ?')
       params.push(JSON.stringify(settings.categories))
     }
-    
+
     if (settings.priorities !== undefined) {
       updates.push('priorities = ?')
       params.push(JSON.stringify(settings.priorities))
     }
-    
+
     if (settings.schedules !== undefined) {
       updates.push('schedules = ?')
       params.push(JSON.stringify(settings.schedules))
     }
-    
+
     if (updates.length > 0) {
       const sql = `
         UPDATE notification_settings 
@@ -321,30 +323,33 @@ export class NotificationDatabaseService implements NotificationService {
         WHERE user_id = ?
       `
       params.push(userId)
-      
+
       await this.db.execute(sql, params)
     }
-    
+
     return this.getUserSettings(userId)
   }
 
-  async createNotificationFromTemplate(request: CreateNotificationFromTemplateRequest): Promise<Notification> {
+  async createNotificationFromTemplate(
+    request: CreateNotificationFromTemplateRequest
+  ): Promise<Notification> {
     // Récupérer le template
     const templateSql = `SELECT * FROM notification_templates WHERE name = ?`
     const templateRows = await this.db.query(templateSql, [request.templateName])
-    
+
     if (templateRows.length === 0) {
       throw new Error(`Template ${request.templateName} not found`)
     }
-    
+
     const template = templateRows[0]
-    
+
     // Remplacer les variables dans le template
     const title = this.replaceVariables(template.title_template, request.variables)
     const message = this.replaceVariables(template.message_template, request.variables)
-    const actionUrl = template.action_url_template ? 
-      this.replaceVariables(template.action_url_template, request.variables) : undefined
-    
+    const actionUrl = template.action_url_template
+      ? this.replaceVariables(template.action_url_template, request.variables)
+      : undefined
+
     // Créer la notification
     const notificationRequest: CreateNotificationRequest = {
       type: template.type,
@@ -358,23 +363,23 @@ export class NotificationDatabaseService implements NotificationService {
       actionLabel: template.action_label,
       persistent: template.persistent,
       source: `template:${request.templateName}`,
-      data: request.variables
+      data: request.variables,
     }
-    
+
     return this.createNotification(notificationRequest)
   }
 
   async getTemplates(): Promise<NotificationTemplate[]> {
     const sql = `SELECT * FROM notification_templates ORDER BY name`
     const rows = await this.db.query(sql)
-    
+
     return rows.map(this.mapRowToTemplate)
   }
 
   async getUserStats(userId: string): Promise<NotificationStats> {
     const sql = `SELECT * FROM user_notification_stats WHERE user_id = ?`
     const rows = await this.db.query(sql, [userId])
-    
+
     if (rows.length === 0) {
       return {
         userId,
@@ -389,10 +394,10 @@ export class NotificationDatabaseService implements NotificationService {
         facturationCount: 0,
         sauvegardeCount: 0,
         utilisateurCount: 0,
-        urgentUnreadCount: 0
+        urgentUnreadCount: 0,
       }
     }
-    
+
     return this.mapRowToStats(rows[0])
   }
 
@@ -404,9 +409,9 @@ export class NotificationDatabaseService implements NotificationService {
 
   // Méthodes utilitaires privées
   private generateUUID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0
-      const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
       return v.toString(16)
     })
   }
@@ -439,13 +444,17 @@ export class NotificationDatabaseService implements NotificationService {
         source: row.source,
         entityType: row.entity_type,
         entityId: row.entity_id,
-        userId: row.recipient_type === 'user' ? row.recipient_id : undefined
+        userId: row.recipient_type === 'user' ? row.recipient_id : undefined,
       },
-      actions: row.action_url ? [{
-        url: row.action_url,
-        label: row.action_label || 'Voir',
-        type: row.action_type || 'primary'
-      }] : undefined
+      actions: row.action_url
+        ? [
+            {
+              url: row.action_url,
+              label: row.action_label || 'Voir',
+              type: row.action_type || 'primary',
+            },
+          ]
+        : undefined,
     }
   }
 
@@ -461,7 +470,7 @@ export class NotificationDatabaseService implements NotificationService {
       priorities: row.priorities ? JSON.parse(row.priorities) : {},
       schedules: row.schedules ? JSON.parse(row.schedules) : {},
       createdAt: row.created_at,
-      updatedAt: row.updated_at
+      updatedAt: row.updated_at,
     }
   }
 
@@ -480,7 +489,7 @@ export class NotificationDatabaseService implements NotificationService {
       variables: row.variables ? JSON.parse(row.variables) : {},
       description: row.description,
       createdAt: row.created_at,
-      updatedAt: row.updated_at
+      updatedAt: row.updated_at,
     }
   }
 
@@ -498,14 +507,14 @@ export class NotificationDatabaseService implements NotificationService {
       facturationCount: row.facturation_count || 0,
       sauvegardeCount: row.sauvegarde_count || 0,
       utilisateurCount: row.utilisateur_count || 0,
-      urgentUnreadCount: row.urgent_unread_count || 0
+      urgentUnreadCount: row.urgent_unread_count || 0,
     }
   }
 
   private async createDefaultSettings(userId: string): Promise<NotificationSettings> {
     const id = this.generateUUID()
     const now = new Date().toISOString()
-    
+
     const defaultSettings: NotificationSettings = {
       id,
       userId,
@@ -522,45 +531,50 @@ export class NotificationDatabaseService implements NotificationService {
         qualite: true,
         facturation: true,
         sauvegarde: false,
-        utilisateur: true
+        utilisateur: true,
       },
       priorities: {
         low: false,
         normal: true,
         high: true,
-        urgent: true
+        urgent: true,
       },
       schedules: {
         workingHours: {
           enabled: false,
-          start: "09:00",
-          end: "18:00"
+          start: '09:00',
+          end: '18:00',
         },
         weekdays: {
           enabled: false,
-          days: [1, 2, 3, 4, 5]
-        }
+          days: [1, 2, 3, 4, 5],
+        },
       },
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
     }
-    
+
     const sql = `
       INSERT INTO notification_settings (
         id, user_id, enable_sound, enable_toast, enable_browser, enable_email,
         categories, priorities, schedules, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
-    
+
     await this.db.execute(sql, [
-      id, userId, defaultSettings.enableSound, defaultSettings.enableToast,
-      defaultSettings.enableBrowser, defaultSettings.enableEmail,
+      id,
+      userId,
+      defaultSettings.enableSound,
+      defaultSettings.enableToast,
+      defaultSettings.enableBrowser,
+      defaultSettings.enableEmail,
       JSON.stringify(defaultSettings.categories),
       JSON.stringify(defaultSettings.priorities),
       JSON.stringify(defaultSettings.schedules),
-      now, now
+      now,
+      now,
     ])
-    
+
     return defaultSettings
   }
 

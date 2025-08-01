@@ -1,44 +1,44 @@
-import { NextRequest, NextResponse } from 'next/server'
-import fs from 'fs/promises'
-import path from 'path'
-import { fr } from '@/lib/i18n/translations/fr'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { type NextRequest, NextResponse } from 'next/server'
 import { en } from '@/lib/i18n/translations/en'
 import { es } from '@/lib/i18n/translations/es'
+import { fr } from '@/lib/i18n/translations/fr'
 
 // Fonction pour vérifier l'authentification basique
 function verifyAuth(request: NextRequest): { isValid: boolean; user?: any } {
   try {
     // Récupérer le token depuis les cookies ou l'header
     let token = request.cookies.get('accessToken')?.value
-    
+
     if (!token) {
       const authHeader = request.headers.get('authorization')
       if (authHeader?.startsWith('Bearer ')) {
         token = authHeader.substring(7)
       }
     }
-    
+
     if (!token) {
       return { isValid: false }
     }
-    
+
     // Décoder le JWT (sans vérifier la signature pour simplifier)
     try {
       const payload = JSON.parse(atob(token.split('.')[1]))
       const now = Math.floor(Date.now() / 1000)
-      
+
       if (payload.exp && payload.exp < now) {
         return { isValid: false }
       }
-      
-      return { 
+
+      return {
         isValid: true,
         user: {
           id: payload.sub,
           email: payload.email,
           role: payload.role,
-          roles: payload.roles || [payload.role]
-        }
+          roles: payload.roles || [payload.role],
+        },
       }
     } catch {
       return { isValid: false }
@@ -52,7 +52,7 @@ function verifyAuth(request: NextRequest): { isValid: boolean; user?: any } {
 export async function GET(request: NextRequest) {
   try {
     const auth = verifyAuth(request)
-    
+
     if (!auth.isValid) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
@@ -67,17 +67,17 @@ export async function GET(request: NextRequest) {
     const translations: Record<string, any> = {
       fr,
       en,
-      es
+      es,
     }
 
     // Lire les modifications depuis la base de données ou fichier de configuration
     const overridesPath = path.join(process.cwd(), 'data/translation-overrides.json')
     let overrides: Record<string, any> = {}
-    
+
     try {
       const overridesContent = await fs.readFile(overridesPath, 'utf-8')
       overrides = JSON.parse(overridesContent)
-    } catch (error) {
+    } catch (_error) {
       // Fichier n'existe pas encore, pas de problème
     }
 
@@ -85,15 +85,11 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         translations,
-        overrides
-      }
+        overrides,
+      },
     })
-  } catch (error) {
-    console.error('Erreur lors de la récupération des traductions:', error)
-    return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 })
   }
 }
 
@@ -101,7 +97,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const auth = verifyAuth(request)
-    
+
     if (!auth.isValid) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
@@ -123,18 +119,18 @@ export async function POST(request: NextRequest) {
     const dataDir = path.join(process.cwd(), 'data')
     try {
       await fs.mkdir(dataDir, { recursive: true })
-    } catch (error) {
+    } catch (_error) {
       // Dossier existe déjà
     }
 
     // Lire les modifications existantes
     const overridesPath = path.join(dataDir, 'translation-overrides.json')
     let overrides: Record<string, any> = {}
-    
+
     try {
       const content = await fs.readFile(overridesPath, 'utf-8')
       overrides = JSON.parse(content)
-    } catch (error) {
+    } catch (_error) {
       // Fichier n'existe pas, on commence avec un objet vide
     }
 
@@ -142,7 +138,7 @@ export async function POST(request: NextRequest) {
     overrides[translationEntry.id] = {
       ...translationEntry,
       updatedAt: new Date().toISOString(),
-      updatedBy: auth.user?.email || auth.user?.id || 'unknown'
+      updatedBy: auth.user?.email || auth.user?.id || 'unknown',
     }
 
     // Sauvegarder le fichier
@@ -150,15 +146,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Traduction sauvegardée avec succès'
+      message: 'Traduction sauvegardée avec succès',
     })
-
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde:', error)
-    return NextResponse.json(
-      { error: 'Erreur lors de la sauvegarde' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur lors de la sauvegarde' }, { status: 500 })
   }
 }
 
@@ -166,7 +157,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const auth = verifyAuth(request)
-    
+
     if (!auth.isValid) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
@@ -187,18 +178,18 @@ export async function PUT(request: NextRequest) {
     const dataDir = path.join(process.cwd(), 'data')
     try {
       await fs.mkdir(dataDir, { recursive: true })
-    } catch (error) {
+    } catch (_error) {
       // Dossier existe déjà
     }
 
     // Lire les modifications existantes
     const overridesPath = path.join(dataDir, 'translation-overrides.json')
     let overrides: Record<string, any> = {}
-    
+
     try {
       const content = await fs.readFile(overridesPath, 'utf-8')
       overrides = JSON.parse(content)
-    } catch (error) {
+    } catch (_error) {
       // Fichier n'existe pas
     }
 
@@ -209,11 +200,11 @@ export async function PUT(request: NextRequest) {
     translations.forEach((entry: any) => {
       if (entry.id) {
         const isNew = !overrides[entry.id]
-        
+
         overrides[entry.id] = {
           ...entry,
           updatedAt: new Date().toISOString(),
-          updatedBy: auth.user?.email || auth.user?.id || 'unknown'
+          updatedBy: auth.user?.email || auth.user?.id || 'unknown',
         }
 
         if (isNew) {
@@ -230,14 +221,9 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `Import réussi: ${imported} nouvelles, ${updated} mises à jour`,
-      stats: { imported, updated }
+      stats: { imported, updated },
     })
-
-  } catch (error) {
-    console.error('Erreur lors de l\'import:', error)
-    return NextResponse.json(
-      { error: 'Erreur lors de l\'import' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: "Erreur lors de l'import" }, { status: 500 })
   }
 }

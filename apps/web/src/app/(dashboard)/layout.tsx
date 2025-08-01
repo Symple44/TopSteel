@@ -6,11 +6,11 @@
  * CORRIGÉ - Ne redéfinit plus HTML/BODY
  */
 
-import { AuthGuard } from '@/components/auth/auth-guard'
-import { ConnectionProvider } from '@/contexts/connection-context'
-import { DashboardContent } from '@/components/layout/dashboard-content'
-import { useAuth } from '@/hooks/use-auth'
 import type { ReactNode } from 'react'
+import { AuthGuard } from '@/components/auth/auth-guard'
+import { DashboardContent } from '@/components/layout/dashboard-content'
+import { ConnectionProvider } from '@/contexts/connection-context'
+import { useAuth } from '@/hooks/use-auth'
 
 interface DashboardLayoutProps {
   children: ReactNode
@@ -22,10 +22,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <ConnectionProvider>
       <AuthGuard>
-        <DashboardContent 
-          requiresCompanySelection={requiresCompanySelection}
-          company={company}
-        >
+        <DashboardContent requiresCompanySelection={requiresCompanySelection} company={company}>
           {children}
         </DashboardContent>
       </AuthGuard>

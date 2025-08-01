@@ -3,7 +3,7 @@
  * Fichier: apps/web/src/hooks/use-backend-health.ts
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '@/utils/backend-api'
 
 export interface BackendHealthInfo {
@@ -32,7 +32,7 @@ const initialHealth: BackendHealthInfo = {
   environment: null,
   uptime: null,
   database: 'unknown',
-  activeUsers: null
+  activeUsers: null,
 }
 
 // Cache global simple - une seule vérification au démarrage
@@ -44,7 +44,7 @@ const listeners: Array<(health: BackendHealthInfo) => void> = []
 
 // Fonction pour notifier tous les listeners
 function notifyListeners(health: BackendHealthInfo) {
-  listeners.forEach(listener => listener(health))
+  listeners.forEach((listener) => listener(health))
 }
 
 // Fonction de vérification simplifiée
@@ -54,7 +54,7 @@ async function performHealthCheck(): Promise<BackendHealthInfo> {
   try {
     const response = await callClientApi('health', {
       method: 'GET',
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(8000),
     })
 
     const responseTime = Date.now() - startTime
@@ -69,7 +69,7 @@ async function performHealthCheck(): Promise<BackendHealthInfo> {
         environment: data.environment || 'Unknown',
         uptime: data.uptime || null,
         database: data.database?.connectionStatus === 'connected' ? 'connected' : 'disconnected',
-        activeUsers: data.activeUsers || null
+        activeUsers: data.activeUsers || null,
       }
     } else {
       return {
@@ -81,7 +81,7 @@ async function performHealthCheck(): Promise<BackendHealthInfo> {
         uptime: null,
         database: 'unknown',
         activeUsers: null,
-        error: `HTTP ${response.status}: ${response.statusText}`
+        error: `HTTP ${response.status}: ${response.statusText}`,
       }
     }
   } catch (error) {
@@ -94,7 +94,7 @@ async function performHealthCheck(): Promise<BackendHealthInfo> {
       uptime: null,
       database: 'unknown',
       activeUsers: null,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     }
   }
 }
@@ -102,20 +102,20 @@ async function performHealthCheck(): Promise<BackendHealthInfo> {
 // Initialisation unique au démarrage
 async function initializeHealthCheck(): Promise<void> {
   if (isInitialized) return
-  
+
   isInitialized = true
   cachedHealthState = { ...initialHealth, status: 'checking' }
   notifyListeners(cachedHealthState)
-  
+
   try {
     cachedHealthState = await performHealthCheck()
     notifyListeners(cachedHealthState)
-  } catch (error) {
+  } catch (_error) {
     cachedHealthState = {
       ...initialHealth,
       status: 'error',
       lastCheck: new Date(),
-      error: 'Failed to initialize health check'
+      error: 'Failed to initialize health check',
     }
     notifyListeners(cachedHealthState)
   }
@@ -147,7 +147,7 @@ export function useBackendHealth(): UseBackendHealthReturn {
   return {
     health,
     checkHealth,
-    isChecking
+    isChecking,
   }
 }
 
@@ -160,9 +160,9 @@ export function useBackendStatus() {
     const listener = (newHealth: BackendHealthInfo) => {
       setHealth(newHealth)
     }
-    
+
     listeners.push(listener)
-    
+
     // Initialisation au premier montage seulement
     initializeHealthCheck().then(() => {
       setHealth(cachedHealthState)
@@ -176,17 +176,27 @@ export function useBackendStatus() {
       }
     }
   }, [])
-  
+
   return {
     isOnline: health.status === 'online',
     isOffline: health.status === 'offline',
     isChecking: health.status === 'checking',
     hasError: health.status === 'error',
-    statusColor: health.status === 'online' ? 'bg-emerald-500' : 
-                 health.status === 'offline' ? 'bg-red-500' :
-                 health.status === 'error' ? 'bg-orange-500' : 'bg-gray-500',
-    statusText: health.status === 'online' ? 'ERP Actif' :
-                health.status === 'offline' ? 'ERP Hors ligne' :
-                health.status === 'error' ? 'ERP Erreur' : 'Vérification...'
+    statusColor:
+      health.status === 'online'
+        ? 'bg-emerald-500'
+        : health.status === 'offline'
+          ? 'bg-red-500'
+          : health.status === 'error'
+            ? 'bg-orange-500'
+            : 'bg-gray-500',
+    statusText:
+      health.status === 'online'
+        ? 'ERP Actif'
+        : health.status === 'offline'
+          ? 'ERP Hors ligne'
+          : health.status === 'error'
+            ? 'ERP Erreur'
+            : 'Vérification...',
   }
 }

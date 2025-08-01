@@ -205,9 +205,7 @@ function initializeClientNodeId(): string {
     }
 
     return nodeId
-  } catch (error) {
-    console.warn('Cannot access localStorage, using fallback nodeId')
-
+  } catch (_error) {
     return generateFallbackNodeId()
   }
 }
@@ -259,9 +257,8 @@ export function generateUuid(): string {
     recordIdGeneration(performance.now() - startTime)
 
     return result
-  } catch (error) {
+  } catch (_error) {
     recordIdError()
-    console.error('UUID generation failed:', error)
 
     return generateFallbackUUID()
   }
@@ -330,15 +327,14 @@ export function generateNanoid(length = 12, alphabet?: string): string {
     recordIdGeneration(performance.now() - startTime)
 
     return result
-  } catch (error) {
-    console.warn('NanoID generation failed, using fallback:', error)
+  } catch (_error) {
     recordIdError()
 
     return generateFallbackNanoId(length, defaultAlphabet)
   }
 }
 
-function isSecureCryptoAvailable(): boolean {
+function _isSecureCryptoAvailable(): boolean {
   try {
     if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
       return false
@@ -350,14 +346,12 @@ function isSecureCryptoAvailable(): boolean {
     crypto.getRandomValues(testArray)
 
     return true
-  } catch (error) {
-    console.warn('Crypto.getRandomValues not available:', error)
-
+  } catch (_error) {
     return false
   }
 }
 
-function generateServerNanoId(length: number, alphabet: string): string {
+function generateServerNanoId(length: number, _alphabet: string): string {
   const timestamp = Date.now().toString(36)
   const counter = (++idGeneratorCounter).toString(36).padStart(3, '0')
   const combined = timestamp + counter + idGeneratorNodeId
@@ -442,9 +436,8 @@ export function generateBusinessId(
     recordIdGeneration(performance.now() - startTime)
 
     return result
-  } catch (error) {
+  } catch (_error) {
     recordIdError()
-    console.error('Business ID generation failed:', error)
 
     return `${ID_PREFIXES[prefix]}-FALLBACK-${Date.now()}`
   }
@@ -579,9 +572,8 @@ export function parseId(id: string): ParsedID {
     setInIdCache(id, result)
 
     return result
-  } catch (error) {
+  } catch (_error) {
     recordIdError()
-    console.error('ID parsing failed:', error)
 
     const fallbackResult: ParsedID = {
       raw: id,
@@ -610,9 +602,8 @@ export function validateId(id: string, expectedPrefix?: keyof typeof ID_PREFIXES
     }
 
     return true
-  } catch (error) {
+  } catch (_error) {
     recordIdError()
-    console.error('ID validation failed:', error)
 
     return false
   }
@@ -686,7 +677,6 @@ export function useClientId(prefix?: keyof typeof ID_PREFIXES, config?: Partial<
       const errorMessage = err instanceof Error ? err.message : 'Unknown error'
 
       setError(errorMessage)
-      console.error('useClientId failed:', errorMessage)
 
       // Fallback ID en cas d'erreur
       setId(`fallback-${Date.now()}`)

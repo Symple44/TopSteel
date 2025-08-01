@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    
+
     // Construire l'endpoint avec les query params
     const queryString = searchParams.toString()
     const endpoint = `admin/users${queryString ? `?${queryString}` : ''}`
@@ -21,10 +21,8 @@ export async function GET(request: NextRequest) {
       const actualData = responseData.data || responseData
       return NextResponse.json(actualData)
     } else {
-      // Fallback avec des données mock si le backend n'est pas disponible
-      console.log('[users] Backend error, returning mock data')
       const includeGroups = searchParams.get('includeGroups') === 'true'
-      
+
       const mockUsers = [
         {
           id: '1',
@@ -35,7 +33,7 @@ export async function GET(request: NextRequest) {
           role: 'ADMIN',
           isActive: true,
           lastLogin: '2024-01-15T10:30:00Z',
-          currentGroups: includeGroups ? ['1', '2'] : undefined
+          currentGroups: includeGroups ? ['1', '2'] : undefined,
         },
         {
           id: '2',
@@ -46,7 +44,7 @@ export async function GET(request: NextRequest) {
           role: 'MANAGER',
           isActive: true,
           lastLogin: '2024-01-14T14:20:00Z',
-          currentGroups: includeGroups ? ['2'] : undefined
+          currentGroups: includeGroups ? ['2'] : undefined,
         },
         {
           id: '3',
@@ -57,7 +55,7 @@ export async function GET(request: NextRequest) {
           role: 'USER',
           isActive: true,
           lastLogin: '2024-01-10T09:15:00Z',
-          currentGroups: includeGroups ? [] : undefined
+          currentGroups: includeGroups ? [] : undefined,
         },
         {
           id: '4',
@@ -68,7 +66,7 @@ export async function GET(request: NextRequest) {
           role: 'USER',
           isActive: true,
           lastLogin: '2024-01-12T16:45:00Z',
-          currentGroups: includeGroups ? ['3'] : undefined
+          currentGroups: includeGroups ? ['3'] : undefined,
         },
         {
           id: '5',
@@ -79,8 +77,8 @@ export async function GET(request: NextRequest) {
           role: 'USER',
           isActive: false,
           lastLogin: '2024-01-08T11:20:00Z',
-          currentGroups: includeGroups ? ['1'] : undefined
-        }
+          currentGroups: includeGroups ? ['1'] : undefined,
+        },
       ]
 
       return NextResponse.json({
@@ -89,13 +87,11 @@ export async function GET(request: NextRequest) {
         meta: {
           total: mockUsers.length,
           page: 1,
-          limit: 50
-        }
+          limit: 50,
+        },
       })
     }
-    
   } catch (error) {
-    console.error('[Admin Users API] Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }

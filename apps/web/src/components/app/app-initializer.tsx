@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { AlertTriangle, Loader2, Server } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Server, AlertTriangle } from 'lucide-react'
-import { useBackendHealth, BackendHealthInfo } from '@/hooks/use-backend-health'
+import { useEffect, useState } from 'react'
+import { useBackendHealth } from '@/hooks/use-backend-health'
 import { useStartupLogger } from '@/lib/startup-logger'
 
 interface AppInitializerProps {
@@ -14,7 +14,7 @@ export function AppInitializer({ children }: AppInitializerProps) {
   const router = useRouter()
   const [initState, setInitState] = useState<'checking' | 'success' | 'backend-error'>('checking')
   const { health } = useBackendHealth()
-  
+
   // Active les logs côté client
   useStartupLogger()
 
@@ -47,18 +47,17 @@ export function AppInitializer({ children }: AppInitializerProps) {
             <Server className="h-16 w-16 mx-auto text-blue-600 mb-4" />
             <Loader2 className="h-8 w-8 mx-auto animate-spin text-blue-600" />
           </div>
-          
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Initialisation de TopSteel ERP
-          </h1>
-          
+
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Initialisation de TopSteel ERP</h1>
+
           <div className="space-y-2 text-gray-600">
             <p>Vérification de la connexion au serveur...</p>
             <p className="text-sm">
-              Statut : {health.error || (health.status === 'checking' ? 'Vérification...' : health.status)}
+              Statut :{' '}
+              {health.error || (health.status === 'checking' ? 'Vérification...' : health.status)}
             </p>
           </div>
-          
+
           <div className="mt-8 bg-gray-100 rounded-lg p-4 text-left max-w-md mx-auto">
             <h3 className="font-medium text-gray-900 mb-2">Étapes d'initialisation :</h3>
             <div className="space-y-1 text-sm text-gray-600">
@@ -93,9 +92,7 @@ export function AppInitializer({ children }: AppInitializerProps) {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-lg mx-auto p-8">
           <AlertTriangle className="h-16 w-16 mx-auto text-red-600 mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Redirection en cours...
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Redirection en cours...</h1>
           <p className="text-gray-600">
             Le serveur n'est pas disponible. Redirection vers la page d'erreur.
           </p>

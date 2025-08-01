@@ -4,22 +4,20 @@
  * Fichier: apps/web/src/stores/projet.store.ts
  */
 
-import { StoreUtils } from '@/lib/store-utils'
-import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
 import type {
   InitialState,
   ProjetState,
   ProjetStats,
   ProjetStore,
   ProjetStoreActions,
-  SimpleClient,
-  StoreCreator,
   StoreProjet,
   StoreProjetFilters,
 } from '@erp/types'
+import { ProjetPriorite, ProjetStatut, ProjetType } from '@erp/types'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { StoreUtils } from '@/lib/store-utils'
 
 // ===== ÉTAT INITIAL =====
 
@@ -55,13 +53,13 @@ const initialProjetState: InitialState<ProjetState> = {
 
 // ===== CACHE ET UTILITAIRES =====
 
-const projetCache = StoreUtils.createCache<string, StoreProjet[]>(300000) // 5 minutes
-const statsCache = StoreUtils.createCache<string, ProjetStats>(60000) // 1 minute
+const _projetCache = StoreUtils.createCache<string, StoreProjet[]>(300000) // 5 minutes
+const _statsCache = StoreUtils.createCache<string, ProjetStats>(60000) // 1 minute
 
 // ===== SERVICE API SIMULÉ =====
 
 const projetService = {
-  async fetchProjets(filters?: StoreProjetFilters): Promise<StoreProjet[]> {
+  async fetchProjets(_filters?: StoreProjetFilters): Promise<StoreProjet[]> {
     // Simulation d'appel API
     await new Promise((resolve) => setTimeout(resolve, 500))
 
@@ -175,7 +173,7 @@ const projetService = {
     return updatedProjet
   },
 
-  async deleteProjet(id: string): Promise<boolean> {
+  async deleteProjet(_id: string): Promise<boolean> {
     // Simulation d'appel API
     await new Promise((resolve) => setTimeout(resolve, 300))
     return true

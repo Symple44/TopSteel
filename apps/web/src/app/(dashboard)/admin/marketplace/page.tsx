@@ -1,19 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { Loader2, Package, Settings, Store, TrendingUp } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n/hooks'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { MarketplaceCatalog } from './components/marketplace-catalog'
+import { callClientApi } from '@/utils/backend-api'
 import { InstalledModules } from './components/installed-modules'
+import { MarketplaceCatalog } from './components/marketplace-catalog'
 import { MarketplaceStats } from './components/marketplace-stats'
 import { ModulePublisher } from './components/module-publisher'
-import { Store, Package, TrendingUp, Settings, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { callClientApi } from '@/utils/backend-api'
 
 interface QuickStats {
   totalModules: number
@@ -39,11 +38,10 @@ export default function MarketplacePage() {
             totalModules: data.overview?.totalModules || 0,
             publishedModules: data.overview?.publishedModules || 0,
             totalDownloads: data.overview?.totalDownloads || 0,
-            averageRating: data.overview?.averageRating || 0
+            averageRating: data.overview?.averageRating || 0,
           })
         }
-      } catch (error) {
-        console.error('Erreur lors du chargement des statistiques rapides:', error)
+      } catch (_error) {
       } finally {
         setLoading(false)
       }
@@ -58,9 +56,7 @@ export default function MarketplacePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('marketplace.title')}</h1>
-          <p className="text-muted-foreground">
-            {t('marketplace.description')}
-          </p>
+          <p className="text-muted-foreground">{t('marketplace.description')}</p>
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline">
@@ -74,7 +70,9 @@ export default function MarketplacePage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('marketplace.modulesAvailable')}</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('marketplace.modulesAvailable')}
+            </CardTitle>
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -90,7 +88,7 @@ export default function MarketplacePage() {
             )}
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('marketplace.totalDownloads')}</CardTitle>
@@ -101,18 +99,20 @@ export default function MarketplacePage() {
               <Loader2 className="h-6 w-6 animate-spin" />
             ) : (
               <>
-                <div className="text-2xl font-bold">{quickStats?.totalDownloads?.toLocaleString() || '0'}</div>
-                <p className="text-xs text-muted-foreground">
-                  {tMp('marketplace.totalInstalls')}
-                </p>
+                <div className="text-2xl font-bold">
+                  {quickStats?.totalDownloads?.toLocaleString() || '0'}
+                </div>
+                <p className="text-xs text-muted-foreground">{tMp('marketplace.totalInstalls')}</p>
               </>
             )}
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{tMp('marketplace.averageRating')}</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {tMp('marketplace.averageRating')}
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -130,21 +130,21 @@ export default function MarketplacePage() {
             )}
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{tMp('marketplace.title')}</CardTitle>
             <div className="flex">
               {[1, 2, 3, 4, 5].map((star) => (
-                <div key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400">★</div>
+                <div key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400">
+                  ★
+                </div>
               ))}
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{tMp('marketplace.active')}</div>
-            <p className="text-xs text-muted-foreground">
-              {tMp('marketplace.realModules')}
-            </p>
+            <p className="text-xs text-muted-foreground">{tMp('marketplace.realModules')}</p>
           </CardContent>
         </Card>
       </div>

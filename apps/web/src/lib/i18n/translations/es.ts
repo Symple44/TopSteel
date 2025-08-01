@@ -53,7 +53,7 @@ export const es = {
     changePhoto: 'Cambiar foto',
     reset: 'Restablecer',
     resetToDefaults: 'Restablecer a valores predeterminados',
-    
+
     // Páginas del sistema
     pageNotFound: 'Página no encontrada',
     pageNotFoundMessage: 'La página que buscas no existe o ha sido movida.',
@@ -391,7 +391,9 @@ export const es = {
     code: 'Código',
     lines: 'líneas',
     linesSelected: 'línea(s) seleccionada(s)',
-    clickLineNumbers: 'Haz clic en los números de línea para seleccionar • Ctrl+Clic para multi-selección • Shift+Clic para rango',
-    lineTooltip: 'Línea {number} - Clic: seleccionar, Ctrl+Clic: multi-selección, Shift+Clic: rango',
+    clickLineNumbers:
+      'Haz clic en los números de línea para seleccionar • Ctrl+Clic para multi-selección • Shift+Clic para rango',
+    lineTooltip:
+      'Línea {number} - Clic: seleccionar, Ctrl+Clic: multi-selección, Shift+Clic: rango',
   },
 }

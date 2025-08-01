@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
 
 interface HierarchyOrderItem {
@@ -34,42 +34,38 @@ export async function GET(
         parent_id: null,
         display_order: 1,
         level: 0,
-        path: '1'
+        path: '1',
       },
       {
         item_id: 'item-1-1',
         parent_id: 'item-1',
         display_order: 1,
         level: 1,
-        path: '1.1'
+        path: '1.1',
       },
       {
         item_id: 'item-1-2',
         parent_id: 'item-1',
         display_order: 2,
         level: 1,
-        path: '1.2'
+        path: '1.2',
       },
       {
         item_id: 'item-2',
         parent_id: null,
         display_order: 2,
         level: 0,
-        path: '2'
-      }
+        path: '2',
+      },
     ]
 
     return NextResponse.json({
       table_id: tableId,
       user_id: 'mock-user',
-      items: mockHierarchyOrder
+      items: mockHierarchyOrder,
     })
-  } catch (error) {
-    console.error('Erreur lors de la récupération de l\'ordre hiérarchique:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -89,45 +85,35 @@ export async function PUT(
 
     // Valider les données
     if (!Array.isArray(items)) {
-      return NextResponse.json(
-        { error: 'Format de données invalide' }, 
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Format de données invalide' }, { status: 400 })
     }
 
     // Valider chaque élément
     for (const item of items) {
-      if (!item.item_id || typeof item.display_order !== 'number' || typeof item.level !== 'number') {
-        return NextResponse.json(
-          { error: 'Données d\'élément invalides' }, 
-          { status: 400 }
-        )
+      if (
+        !item.item_id ||
+        typeof item.display_order !== 'number' ||
+        typeof item.level !== 'number'
+      ) {
+        return NextResponse.json({ error: "Données d'élément invalides" }, { status: 400 })
       }
     }
 
     // Générer les chemins hiérarchiques
-    const processedItems = items.map(item => ({
+    const processedItems = items.map((item) => ({
       ...item,
-      path: generatePath(item, items)
+      path: generatePath(item, items),
     }))
-
-    // Simuler la mise à jour en base de données
-    // En production, remplacer par une vraie transaction DB
-    console.log(`Ordre hiérarchique mis à jour pour ${tableId}:`, processedItems)
 
     return NextResponse.json({
       success: true,
       table_id: tableId,
       user_id: 'mock-user',
       items: processedItems,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     })
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour de l\'ordre hiérarchique:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -146,32 +132,32 @@ export async function POST(
     const newItem: Omit<HierarchyOrderItem, 'path'> = await request.json()
 
     // Valider les données
-    if (!newItem.item_id || typeof newItem.display_order !== 'number' || typeof newItem.level !== 'number') {
-      return NextResponse.json(
-        { error: 'Données invalides' }, 
-        { status: 400 }
-      )
+    if (
+      !newItem.item_id ||
+      typeof newItem.display_order !== 'number' ||
+      typeof newItem.level !== 'number'
+    ) {
+      return NextResponse.json({ error: 'Données invalides' }, { status: 400 })
     }
 
     // Simuler l'ajout en base de données
     const processedItem: HierarchyOrderItem = {
       ...newItem,
-      path: newItem.parent_id ? `${newItem.parent_id}.${newItem.display_order}` : `${newItem.display_order}`
+      path: newItem.parent_id
+        ? `${newItem.parent_id}.${newItem.display_order}`
+        : `${newItem.display_order}`,
     }
 
-    console.log(`Nouvel élément ajouté à la hiérarchie ${tableId}:`, processedItem)
-
-    return NextResponse.json({
-      success: true,
-      item: processedItem,
-      created_at: new Date().toISOString()
-    }, { status: 201 })
-  } catch (error) {
-    console.error('Erreur lors de l\'ajout à la hiérarchie:', error)
     return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
+      {
+        success: true,
+        item: processedItem,
+        created_at: new Date().toISOString(),
+      },
+      { status: 201 }
     )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -191,26 +177,15 @@ export async function DELETE(
     const itemId = searchParams.get('itemId')
 
     if (!itemId) {
-      return NextResponse.json(
-        { error: 'ID d\'élément requis' }, 
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "ID d'élément requis" }, { status: 400 })
     }
 
-    // Simuler la suppression en base de données
-    // En production, remplacer par une vraie requête DB qui gère les enfants
-    console.log(`Élément ${itemId} supprimé de la hiérarchie ${tableId}`)
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      deleted_item_id: itemId
+      deleted_item_id: itemId,
     })
-  } catch (error) {
-    console.error('Erreur lors de la suppression de la hiérarchie:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' }, 
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -220,7 +195,7 @@ function generatePath(item: HierarchyOrderItem, allItems: HierarchyOrderItem[]):
     return item.display_order.toString()
   }
 
-  const parent = allItems.find(i => i.item_id === item.parent_id)
+  const parent = allItems.find((i) => i.item_id === item.parent_id)
   if (!parent) {
     return item.display_order.toString()
   }

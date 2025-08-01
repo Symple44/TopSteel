@@ -8,7 +8,7 @@ export const fr = {
       save: 'Sauvegarder',
       cancel: 'Annuler',
       delete: 'Supprimer',
-      edit: 'Modifier'
+      edit: 'Modifier',
     },
     delete: 'Supprimer',
     edit: 'Modifier',
@@ -59,11 +59,11 @@ export const fr = {
     changePhoto: 'Changer la photo',
     reset: 'Réinitialiser',
     resetToDefaults: 'Réinitialiser aux valeurs par défaut',
-    
+
     // Pages système
     pageNotFound: 'Page non trouvée',
-    pageNotFoundMessage: 'La page que vous recherchez n\'existe pas ou a été déplacée.',
-    backHome: 'Retour à l\'accueil',
+    pageNotFoundMessage: "La page que vous recherchez n'existe pas ou a été déplacée.",
+    backHome: "Retour à l'accueil",
   },
 
   translation: {
@@ -85,19 +85,19 @@ export const fr = {
     forgotPassword: 'Mot de passe oublié ?',
     rememberMe: 'Se souvenir de moi',
     loginButton: 'Se connecter',
-    registerButton: 'S\'inscrire',
+    registerButton: "S'inscrire",
     alreadyHaveAccount: 'Vous avez déjà un compte ?',
-    dontHaveAccount: 'Vous n\'avez pas de compte ?',
+    dontHaveAccount: "Vous n'avez pas de compte ?",
     loginSuccess: 'Connexion réussie',
     loginError: 'Erreur de connexion',
     invalidCredentials: 'Email ou mot de passe incorrect',
     accountCreated: 'Compte créé avec succès',
     twoFactorAuth: 'Authentification à deux facteurs',
-    enableTwoFactor: 'Activer l\'authentification à deux facteurs',
-    disableTwoFactor: 'Désactiver l\'authentification à deux facteurs',
+    enableTwoFactor: "Activer l'authentification à deux facteurs",
+    disableTwoFactor: "Désactiver l'authentification à deux facteurs",
     googleAuth: 'Se connecter avec Google',
     microsoftAuth: 'Se connecter avec Microsoft',
-    
+
     // Forgot Password
     forgotPasswordTitle: 'Mot de passe oublié',
     forgotPasswordSubtitle: 'Saisissez votre email pour recevoir un lien de récupération',
@@ -105,35 +105,37 @@ export const fr = {
     emailSentDescription: 'Nous avons envoyé un lien de récupération à',
     checkEmailInbox: 'Vérifiez votre boîte mail',
     checkEmailDetails: '(y compris les spams). Le lien expire dans 24 heures.',
-    resendEmail: 'Renvoyer l\'email',
+    resendEmail: "Renvoyer l'email",
     sendRecoveryLink: 'Envoyer le lien de récupération',
     sendingInProgress: 'Envoi en cours...',
     securityNotice: 'Sécurité :',
-    securityNoticeText: 'Si vous ne recevez pas l\'email, vérifiez que l\'adresse est correcte ou contactez votre administrateur.',
-    needHelp: 'Besoin d\'aide ?',
+    securityNoticeText:
+      "Si vous ne recevez pas l'email, vérifiez que l'adresse est correcte ou contactez votre administrateur.",
+    needHelp: "Besoin d'aide ?",
     contactSupport: 'Contactez le support',
     emailSentToast: 'Un email de récupération a été envoyé à votre adresse',
-    
+
     // Validation messages
     enterEmail: 'Veuillez saisir votre adresse email',
     enterValidEmail: 'Veuillez saisir une adresse email valide',
-    
+
     // Security messages
     accessDenied: 'Accès refusé',
     mustBeLoggedIn: 'Vous devez être connecté pour accéder à cette page.',
     insufficientPermissions: 'Permissions insuffisantes',
-    insufficientRoles: 'Vous n\'avez pas les rôles requis pour accéder à cette page.',
-    insufficientPermissionsText: 'Vous n\'avez pas les permissions requises pour accéder à cette page.',
+    insufficientRoles: "Vous n'avez pas les rôles requis pour accéder à cette page.",
+    insufficientPermissionsText:
+      "Vous n'avez pas les permissions requises pour accéder à cette page.",
     requiredRoles: 'Rôles requis:',
     requiredPermissions: 'Permissions requises:',
-    verifyingAuthentication: 'Vérification de l\'authentification...',
+    verifyingAuthentication: "Vérification de l'authentification...",
     back: 'Retour',
-    
+
     // MFA
     mfaTitle: 'Authentification à deux facteurs',
     mfaSubtitle: 'Veuillez saisir votre code de vérification',
     timeRemaining: 'Temps restant:',
-    authenticationMethod: 'Méthode d\'authentification',
+    authenticationMethod: "Méthode d'authentification",
     totpMethod: 'Authenticator (TOTP)',
     webauthnMethod: 'WebAuthn / Biométrie',
     smsMethod: 'SMS',
@@ -145,7 +147,7 @@ export const fr = {
     cancel: 'Annuler',
     mfaSessionExpired: 'Session MFA expirée',
     mfaSessionStarting: 'Initialisation de la session MFA...',
-    mfaSessionError: 'Erreur lors de l\'initialisation MFA',
+    mfaSessionError: "Erreur lors de l'initialisation MFA",
     webauthnUseDevice: 'Utilisez votre appareil biométrique ou clé de sécurité',
     webauthnTouchDevice: 'Touchez votre dispositif de sécurité ou utilisez la biométrie',
     webauthnError: 'Erreur WebAuthn',
@@ -156,13 +158,13 @@ export const fr = {
     mfaVerificationSuccessful: 'Authentification MFA réussie!',
     connectedAs: 'Connecté en tant que',
     failedAttempts: '{attempts} tentative(s) échouée(s). {remaining} tentative(s) restante(s).',
-    retryAuthentication: 'Réessayer l\'authentification',
+    retryAuthentication: "Réessayer l'authentification",
     smsCodeSent: 'Un code de vérification a été envoyé par SMS à votre numéro enregistré.',
     smsCode: 'Code SMS',
     smsCodePlaceholder: '123456',
     verifySmsCode: 'Vérifier le code SMS',
     backupCodesUsed: '{count} code(s) de récupération utilisé(s)',
-    
+
     // Login page
     fillAllFields: 'Veuillez remplir tous les champs',
     welcomeToTopSteel: 'Bienvenue dans TopSteel ERP',
@@ -182,13 +184,13 @@ export const fr = {
     privacy: 'Confidentialité',
     terms: 'Conditions',
     allRightsReserved: 'Tous droits réservés',
-    specializedERPSystem: 'Système ERP spécialisé pour l\'industrie métallurgique',
-    
+    specializedERPSystem: "Système ERP spécialisé pour l'industrie métallurgique",
+
     // Register page
     fillRequiredFields: 'Veuillez remplir tous les champs obligatoires',
     passwordsDoNotMatch: 'Les mots de passe ne correspondent pas',
     passwordMinLength: 'Le mot de passe doit contenir au moins 8 caractères',
-    acceptTermsError: 'Veuillez accepter les conditions d\'utilisation',
+    acceptTermsError: "Veuillez accepter les conditions d'utilisation",
     createYourAccount: 'Créer votre compte',
     registration: 'Inscription',
     startFreeTrial: 'Démarrez votre essai gratuit de 30 jours',
@@ -199,13 +201,13 @@ export const fr = {
     passwordRequired: 'Mot de passe *',
     confirmPasswordRequired: 'Confirmer le mot de passe *',
     passwordRequirements: 'Au moins 8 caractères avec majuscules, minuscules et chiffres',
-    acceptTermsText: 'J\'accepte les',
-    termsOfService: 'conditions d\'utilisation',
+    acceptTermsText: "J'accepte les",
+    termsOfService: "conditions d'utilisation",
     and: 'et la',
     privacyPolicy: 'politique de confidentialité',
     creatingAccount: 'Création du compte...',
     trialIncludes: '✨ Votre essai inclut :',
-    daysFree: '30 jours d\'essai gratuit',
+    daysFree: "30 jours d'essai gratuit",
     accessAllModules: 'Accès à tous les modules',
     technicalSupport: 'Support technique inclus',
     freeTraining: 'Formation en ligne gratuite',
@@ -221,11 +223,11 @@ export const fr = {
     generalSettings: 'Paramètres généraux',
     soundNotifications: 'Notifications sonores',
     notificationSettings: 'Paramètres de Notifications',
-    
+
     // Non autorisé
     unauthorizedTitle: 'Accès non autorisé',
     unauthorizedMessage: 'Vous devez être connecté pour accéder à cette page.',
-    
+
     // Sécurité MFA
     security: {
       mfa: {
@@ -236,30 +238,30 @@ export const fr = {
         codesNotAvailable: 'Codes de récupération non disponibles',
         codesError: 'Erreur lors de la récupération des codes',
         codesCopied: 'Codes copiés dans le presse-papiers',
-        
+
         totp: {
           configError: 'Erreur lors de la configuration TOTP',
           success: 'TOTP activé avec succès!',
-          invalidCode: 'Code TOTP invalide'
+          invalidCode: 'Code TOTP invalide',
         },
-        
+
         webauthn: {
           configError: 'Erreur lors de la configuration WebAuthn',
           notSupportedError: 'WebAuthn non supporté ou erreur de connexion',
           notSupported: 'WebAuthn non supporté par ce navigateur',
-          registrationFailed: 'Échec de l\'enregistrement WebAuthn',
-          registrationError: 'Erreur lors de l\'enregistrement WebAuthn',
+          registrationFailed: "Échec de l'enregistrement WebAuthn",
+          registrationError: "Erreur lors de l'enregistrement WebAuthn",
           success: 'WebAuthn configuré avec succès!',
-          verificationError: 'Erreur lors de la vérification WebAuthn'
-        }
-      }
+          verificationError: 'Erreur lors de la vérification WebAuthn',
+        },
+      },
     },
     defaultUserName: 'Utilisateur TopSteel',
-    
+
     firstName: 'Prénom',
     lastName: 'Nom',
     company: 'Entreprise',
-    acceptTerms: 'J\'accepte les conditions d\'utilisation',
+    acceptTerms: "J'accepte les conditions d'utilisation",
     createAccount: 'Créer mon compte',
     passwordRecovery: 'Récupération de mot de passe',
     sendResetLink: 'Envoyer le lien de récupération',
@@ -269,7 +271,8 @@ export const fr = {
   admin: {
     title: 'Administration',
     subtitle: 'Centre de contrôle et de configuration du système',
-    description: 'Gérez les utilisateurs, les permissions, les configurations et les paramètres système',
+    description:
+      'Gérez les utilisateurs, les permissions, les configurations et les paramètres système',
     categories: {
       general: 'Général',
       accounting: 'Comptabilité',
@@ -288,15 +291,15 @@ export const fr = {
       integrations: 'Intégrations',
       advanced: 'Avancé',
     },
-    company: {
+    companyForm: {
       title: 'Informations générales et coordonnées',
-      name: 'Nom de l\'entreprise',
+      name: "Nom de l'entreprise",
       siret: 'SIRET',
       vat: 'TVA Intracommunautaire',
       address: 'Adresse',
       phone: 'Téléphone',
       email: 'Email',
-      logo: 'Logo de l\'entreprise',
+      logo: "Logo de l'entreprise",
       uploadLogo: 'Télécharger un logo',
     },
     units: {
@@ -307,17 +310,17 @@ export const fr = {
       productionStatuses: 'Statuts de production',
       paymentTerms: 'Conditions de paiement',
       addItem: 'Ajouter un élément',
-      editItem: 'Modifier l\'élément',
+      editItem: "Modifier l'élément",
       deleteConfirm: 'Êtes-vous sûr de vouloir supprimer cet élément ?',
     },
     authentication: {
       title: 'Sécurité et gestion des utilisateurs',
-      methods: 'Méthodes d\'authentification',
+      methods: "Méthodes d'authentification",
       localAuth: 'Authentification locale',
       googleOAuth: 'Google OAuth',
       microsoftOAuth: 'Microsoft OAuth',
       twoFactor: 'Authentification à deux facteurs',
-      sessionTimeout: 'Délai d\'expiration de session (minutes)',
+      sessionTimeout: "Délai d'expiration de session (minutes)",
       passwordPolicy: 'Politique de mot de passe',
       minLength: 'Longueur minimale',
       requireUppercase: 'Exiger des majuscules',
@@ -335,7 +338,7 @@ export const fr = {
       optional: 'Optionnel',
     },
     saveSuccess: 'Configuration enregistrée avec succès',
-    saveError: 'Erreur lors de l\'enregistrement de la configuration',
+    saveError: "Erreur lors de l'enregistrement de la configuration",
     resetToDefaults: 'Réinitialiser aux valeurs par défaut',
     resetConfirm: 'Êtes-vous sûr de vouloir réinitialiser aux valeurs par défaut ?',
     resetSuccess: 'Paramètres réinitialisés avec succès',
@@ -370,16 +373,17 @@ export const fr = {
       indexActive: 'Actif',
       indexError: 'Erreur',
       reset: 'Réinitialiser',
-      resetConfirm: 'Êtes-vous sûr de vouloir réinitialiser l\'index {indexName} ? Toutes les données seront perdues.',
+      resetConfirm:
+        "Êtes-vous sûr de vouloir réinitialiser l'index {indexName} ? Toutes les données seront perdues.",
       resetSuccess: 'Index {indexName} réinitialisé avec succès',
-      resetError: 'Erreur lors de la réinitialisation de l\'index {indexName}',
+      resetError: "Erreur lors de la réinitialisation de l'index {indexName}",
       configuration: 'Configuration Elasticsearch',
       connection: 'Connexion',
       serverUrl: 'URL du serveur',
       indexPrefix: 'Préfixe des index',
       authentication: 'Authentification',
-      enableAuth: 'Activer l\'authentification',
-      username: 'Nom d\'utilisateur',
+      enableAuth: "Activer l'authentification",
+      username: "Nom d'utilisateur",
       password: 'Mot de passe',
       advancedSettings: 'Paramètres avancés',
       maxRetries: 'Nombre de tentatives',
@@ -407,7 +411,7 @@ export const fr = {
       migrationTenantExecuted: 'Migrations tenant exécutées',
       connectionClosed: 'Connexion fermée',
       error: 'Erreur',
-      overview: 'Vue d\'ensemble',
+      overview: "Vue d'ensemble",
       migrations: 'Migrations',
       connections: 'Connexions',
       tenants: 'Tenants',
@@ -444,12 +448,12 @@ export const fr = {
       pending: 'En attente',
     },
     company: {
-      title: 'Configuration de l\'Entreprise',
+      title: "Configuration de l'Entreprise",
       subtitle: 'Configurez les informations de votre entreprise',
-      logoUpdated: 'Logo d\'entreprise mis à jour avec succès',
-      logoError: 'Erreur lors de l\'upload du logo',
-      logoFormats: 'PNG, JPG, SVG, WebP jusqu\'à 5MB',
-      companyName: 'Nom de l\'entreprise',
+      logoUpdated: "Logo d'entreprise mis à jour avec succès",
+      logoError: "Erreur lors de l'upload du logo",
+      logoFormats: "PNG, JPG, SVG, WebP jusqu'à 5MB",
+      companyName: "Nom de l'entreprise",
       website: 'Site web',
       address: 'Adresse',
       city: 'Ville',
@@ -477,7 +481,7 @@ export const fr = {
         reporting: 'Reporting',
         quality: 'Qualité',
         maintenance: 'Maintenance',
-        finance: 'Finance'
+        finance: 'Finance',
       },
       loadingError: 'Erreur lors du chargement des modules',
       loadingErrorMessage: 'Impossible de charger les modules',
@@ -512,14 +516,14 @@ export const fr = {
         status: {
           active: 'Actif',
           inactive: 'Inactif',
-          error: 'Erreur'
+          error: 'Erreur',
         },
         actions: {
           configure: 'Configurer',
           activate: 'Activer',
           deactivate: 'Désactiver',
           update: 'Mettre à jour',
-          uninstall: 'Désinstaller'
+          uninstall: 'Désinstaller',
         },
         installedOn: 'Installé le',
         by: 'par',
@@ -527,11 +531,11 @@ export const fr = {
         usage: 'Usage mensuel',
         browse: 'Parcourir le catalogue',
         configuration: 'Configuration',
-        configurationDesc: 'Paramètres et statistiques d\'usage du module',
+        configurationDesc: "Paramètres et statistiques d'usage du module",
         mostUsedFeatures: 'Fonctionnalités les plus utilisées',
         usages: 'utilisations',
         close: 'Fermer',
-        openModule: 'Ouvrir le module'
+        openModule: 'Ouvrir le module',
       },
       pricing: {
         free: 'Gratuit',
@@ -540,10 +544,10 @@ export const fr = {
         month: 'mois',
         commission: 'Commission sur économies',
         usageBased: 'Basé sur usage',
-        onRequest: 'Prix sur demande'
+        onRequest: 'Prix sur demande',
       },
     },
-    
+
     modules: {
       generalConfig: {
         title: 'Configuration générale',
@@ -561,17 +565,17 @@ export const fr = {
         title: 'Sessions utilisateurs',
         description: 'Surveiller et gérer les sessions actives',
       },
-      company: {
+      companySettings: {
         title: 'Configuration entreprise',
-        description: 'Informations et paramètres de l\'entreprise',
+        description: "Informations et paramètres de l'entreprise",
       },
       menuConfig: {
         title: 'Configuration des menus',
-        description: 'Personnaliser l\'organisation des menus',
+        description: "Personnaliser l'organisation des menus",
       },
       database: {
         title: 'Base de données',
-        description: 'Outils d\'administration de la base de données',
+        description: "Outils d'administration de la base de données",
       },
       notifications: {
         title: 'Règles de notification',
@@ -595,91 +599,14 @@ export const fr = {
         saveSuccess: 'Traduction sauvegardée',
         loadError: 'Erreur lors du chargement des traductions',
         saveError: 'Erreur lors de la sauvegarde',
-        exportError: 'Erreur lors de l\'export',
-        importError: 'Erreur lors de l\'import',
+        exportError: "Erreur lors de l'export",
+        importError: "Erreur lors de l'import",
       },
-      users: {
-        title: 'Gestion des utilisateurs',
-        createNew: 'Créer un nouvel utilisateur',
-        user: 'Utilisateur',
-        userInfo: 'Informations de l\'utilisateur (nom, prénom, email)',
-        generalInfo: 'Informations générales',
-        active: 'Actif',
-        inactive: 'Inactif',
-        email: 'Email',
-        role: 'Rôle',
-        status: 'Statut',
-        lastLogin: 'Dernière connexion',
-        actions: 'Actions',
-        permissions: 'Permissions',
-        createdAt: 'Date de création',
-        updatedAt: 'Date de modification',
-        details: 'Détails utilisateur',
-        edit: 'Modifier utilisateur',
-        delete: 'Supprimer utilisateur',
-        statistics: 'Statistiques utilisateurs',
-        totalUsers: 'Total utilisateurs',
-        activeUsers: 'Utilisateurs actifs',
-        inactiveUsers: 'Utilisateurs inactifs',
-        recentUsers: 'Nouveaux utilisateurs (7j)',
-        withRoles: 'Avec rôles',
-        withGroups: 'Avec groupes',
-        phone: 'Téléphone',
-        department: 'Département',
-        never: 'Jamais',
-        roles: 'Rôles',
-        groups: 'Groupes',
-        noRoles: 'Aucun rôle',
-        noGroups: 'Aucun groupe',
-        noRolesAssigned: 'Aucun rôle assigné',
-        noGroupsAssigned: 'Aucun groupe assigné',
-        rolesAssigned: 'Rôles assignés à l\'utilisateur',
-        groupsAssigned: 'Groupes auxquels l\'utilisateur appartient',
-        rolesCount: 'Rôles ({count})',
-        groupsCount: 'Groupes ({count})',
-        roleLabel: 'Rôle',
-        groupLabel: 'Groupe',
-        notSpecified: 'Non renseigné',
-        userManagement: 'Gestion des Utilisateurs',
-        userManagementDescription: 'Vue complète des utilisateurs avec DataTable avancé',
-        export: 'Exporter',
-        bulkManagement: 'Gestion en masse',
-        newUser: 'Nouvel utilisateur',
-        exportHeaders: {
-          email: 'Email',
-          lastName: 'Nom',
-          firstName: 'Prénom',
-          department: 'Département',
-          status: 'Statut',
-          roles: 'Rôles',
-          groups: 'Groupes',
-          lastLogin: 'Dernière connexion'
-        },
-        loadingError: 'Erreur lors du chargement des utilisateurs',
-        connectionError: 'Erreur de connexion au serveur',
-        today: 'aujourd\'hui',
-        yesterday: 'Hier à',
-        daysAgo: 'Il y a {days} jours',
-        invalidDate: 'Date invalide',
-        userNotFound: 'Utilisateur non trouvé',
-        globalRoles: 'Rôles globaux',
-        noGlobalRoles: 'Aucun rôle global assigné',
-        personalInfo: 'Informations personnelles',
-        fullName: 'Nom complet',
-        notProvided: 'Non renseigné',
-        lastConnection: 'Dernière connexion',
-        noGroupsAssigned: 'Aucun groupe assigné',
-        companiesAndRights: 'Sociétés et droits',
-        rightsManagement: 'Gestion des droits par société',
-        rightsManagementDescription: 'Gérez les accès et permissions de l\'utilisateur pour chaque société',
-        modificationHistory: 'Historique des modifications',
-        generalInfo: 'Informations générales',
-        refresh: 'Actualiser'
-      },
-      menuConfig: {
+      menuAdmin: {
         title: 'Configuration du Menu',
         description: 'Gérez les configurations de menu et personnalisez la navigation',
-        confirmActivate: 'Êtes-vous sûr de vouloir activer cette configuration ? La configuration actuelle sera désactivée.',
+        confirmActivate:
+          'Êtes-vous sûr de vouloir activer cette configuration ? La configuration actuelle sera désactivée.',
         confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette configuration ?',
         loadingConfigurations: 'Chargement des configurations...',
         defaultMenu: 'Menu par défaut',
@@ -690,10 +617,11 @@ export const fr = {
         system: 'Système',
         custom: 'Personnalisée',
         noConfigurations: 'Aucune configuration de menu trouvée',
-        noConfigurationsDescription: 'Commencez par créer une nouvelle configuration de menu ou utilisez le menu par défaut.',
+        noConfigurationsDescription:
+          'Commencez par créer une nouvelle configuration de menu ou utilisez le menu par défaut.',
         activeConfiguration: 'Configuration Active',
         configurations: 'Configurations',
-        preview: 'Aperçu',
+        previewLabel: 'Aperçu',
         settings: 'Paramètres',
         activate: 'Activer',
         edit: 'Modifier',
@@ -703,7 +631,7 @@ export const fr = {
         createdAt: 'Créé le',
         updatedAt: 'Modifié le',
         name: 'Nom',
-        description: 'Description',
+        descriptionLabel: 'Description',
         form: {
           namePlaceholder: 'Nom de la configuration',
           descriptionPlaceholder: 'Description de la configuration (optionnel)',
@@ -711,21 +639,22 @@ export const fr = {
           create: 'Créer',
           save: 'Sauvegarder',
           creating: 'Création...',
-          saving: 'Sauvegarde...'
+          saving: 'Sauvegarde...',
         },
         editor: {
-          advancedEditorSoon: 'L\'éditeur de menu avancé sera disponible dans une prochaine version.',
+          advancedEditorSoon:
+            "L'éditeur de menu avancé sera disponible dans une prochaine version.",
           exportImportInfo: 'Pour le moment, vous pouvez exporter/importer des configurations.',
-          close: 'Fermer'
+          close: 'Fermer',
         },
         preview: {
-          loadingPreview: 'Chargement de l\'aperçu...',
+          loadingPreview: "Chargement de l'aperçu...",
           noItems: 'Aucun élément dans cette configuration',
-          createItems: 'Ajoutez des éléments via l\'éditeur de configuration'
+          createItems: "Ajoutez des éléments via l'éditeur de configuration",
         },
-        editor: {
+        editorDialog: {
           editConfiguration: 'Modifier la Configuration',
-          newConfiguration: 'Nouvelle Configuration', 
+          newConfiguration: 'Nouvelle Configuration',
           configurationName: 'Nom de la configuration',
           configurationNamePlaceholder: 'Ex: Menu Production, Menu Commercial...',
           configurationDescription: 'Description',
@@ -737,13 +666,14 @@ export const fr = {
           loadingRightsData: 'Chargement des données de droits...',
           newMenuItem: 'Nouvel élément',
           cancel: 'Annuler',
-          save: 'Sauvegarder',  
-          saving: 'Sauvegarde...'
-        }
+          save: 'Sauvegarder',
+          saving: 'Sauvegarde...',
+        },
       },
       marketplace: {
         title: 'Marketplace de Modules',
-        description: 'Découvrez et installez des modules pour étendre les fonctionnalités de votre ERP',
+        description:
+          'Découvrez et installez des modules pour étendre les fonctionnalités de votre ERP',
         settings: 'Paramètres',
         quickStats: 'Statistiques rapides',
         modulesAvailable: 'Modules disponibles',
@@ -763,15 +693,16 @@ export const fr = {
       access: 'Accéder',
       noModules: {
         title: 'Aucun module accessible',
-        description: 'Vous n\'avez pas les permissions nécessaires pour accéder aux modules d\'administration.',
-      }
+        description:
+          "Vous n'avez pas les permissions nécessaires pour accéder aux modules d'administration.",
+      },
     },
-    
+
     menus: {
       noMenuItems: 'Aucun élément de menu à afficher',
       noMenuItemsConfigured: 'Aucun élément de menu configuré',
     },
-    
+
     common: {
       save: 'Sauvegarder',
       reset: 'Réinitialiser',
@@ -784,7 +715,7 @@ export const fr = {
 
   dashboard: {
     title: 'Tableau de bord',
-    overview: 'Vue d\'ensemble de votre activité TopSteel',
+    overview: "Vue d'ensemble de votre activité TopSteel",
     statistics: 'Statistiques',
     recentActivity: 'Activité récente',
     quickActions: 'Actions rapides',
@@ -793,11 +724,11 @@ export const fr = {
     production: 'Production',
     inventory: 'Inventaire',
     sales: 'Ventes',
-    revenue: 'Chiffre d\'affaires',
+    revenue: "Chiffre d'affaires",
     profit: 'Bénéfice',
     orders: 'Commandes',
     deliveries: 'Livraisons',
-    
+
     // Dashboard specific
     thisWeek: 'Cette semaine',
     reports: 'Rapports',
@@ -810,18 +741,18 @@ export const fr = {
     vsLastMonth: '+12% vs mois dernier',
     stockBreaks: 'ruptures',
     annualProgress: 'Progression annuelle',
-    revenueEvolution: 'Évolution du chiffre d\'affaires 2025',
+    revenueEvolution: "Évolution du chiffre d'affaires 2025",
     objective2025: 'Objectif 2025',
     achieved: 'réalisé',
     lastActions: 'Dernières actions',
-    viewAllActivity: 'Voir toute l\'activité',
+    viewAllActivity: "Voir toute l'activité",
     newProject: 'Nouveau projet',
     createNewProject: 'Créer un nouveau projet de métallerie',
     productionOrder: 'Ordre de fabrication',
     launchProductionOrder: 'Lancer un nouvel ordre de fabrication',
     newQuote: 'Nouveau devis',
     createQuoteForClient: 'Créer un devis pour un client',
-    
+
     // Activities
     newProjectCreated: 'Nouveau projet créé',
     productionOrderCompleted: 'Ordre de fabrication terminé',
@@ -830,19 +761,19 @@ export const fr = {
     hoursAgo: 'Il y a {hours} heures',
     dayAgo: 'Il y a {days} jour',
     remainingUnits: '{units} unités restantes',
-    
+
     // Homepage specific
     welcome: 'Bienvenue dans {companyName}',
-    subtitle: 'Plateforme de gestion intégrée pour l\'industrie métallurgique',
+    subtitle: "Plateforme de gestion intégrée pour l'industrie métallurgique",
     description: 'Gérez vos projets, production, stocks et équipes en un seul endroit',
     accessDashboard: 'Accéder au tableau de bord',
-    configureCompany: 'Configurer l\'entreprise',
+    configureCompany: "Configurer l'entreprise",
     quickActionsTitle: 'Actions rapides',
-    
+
     actions: {
       dashboard: {
         title: 'Tableau de bord',
-        description: 'Vue d\'ensemble des activités',
+        description: "Vue d'ensemble des activités",
       },
       newProject: {
         title: 'Nouveau projet',
@@ -864,8 +795,8 @@ export const fr = {
         title: 'Configuration',
         description: 'Paramètres du système',
       },
-      access: 'Accéder'
-    }
+      access: 'Accéder',
+    },
   },
 
   navigation: {
@@ -888,7 +819,7 @@ export const fr = {
     users_management: 'Gestion des utilisateurs',
     roles_management: 'Gestion des rôles',
     groups_management: 'Gestion des groupes',
-    company_settings: 'Configuration de l\'entreprise',
+    company_settings: "Configuration de l'entreprise",
     notifications_management: 'Gestion des notifications',
     menu_configuration: 'Configuration du menu',
     menu_personalization: 'Personnalisation du menu',
@@ -953,7 +884,7 @@ export const fr = {
   datatable: {
     empty: {
       noData: 'Aucune donnée à afficher',
-      noDataDescription: 'Il n\'y a actuellement aucune donnée dans ce tableau.',
+      noDataDescription: "Il n'y a actuellement aucune donnée dans ce tableau.",
       noSearchResults: 'Aucun résultat pour "{searchTerm}"',
       noSearchResultsDescription: 'Essayez de modifier votre recherche ou supprimez les filtres.',
       clearSearch: 'Effacer la recherche',
@@ -985,17 +916,17 @@ export const fr = {
     forbidden: 'Accès interdit',
     notFound: 'Ressource non trouvée',
     serverError: 'Erreur serveur',
-    timeout: 'Délai d\'attente dépassé',
+    timeout: "Délai d'attente dépassé",
     tryAgain: 'Réessayer',
     contactSupport: 'Contacter le support',
-    
+
     // Pages d'erreur
     title: 'Erreur',
-    unexpected: 'Une erreur inattendue s\'est produite.',
-    unexpectedDetailed: 'Une erreur inattendue s\'est produite. Veuillez réessayer.',
+    unexpected: "Une erreur inattendue s'est produite.",
+    unexpectedDetailed: "Une erreur inattendue s'est produite. Veuillez réessayer.",
     dashboardError: 'Problème dans le dashboard',
-    dashboardMessage: 'Une erreur s\'est produite lors du chargement du dashboard.',
-    
+    dashboardMessage: "Une erreur s'est produite lors du chargement du dashboard.",
+
     // Backend errors
     backend: {
       unavailable: 'Serveur indisponible',
@@ -1012,8 +943,8 @@ export const fr = {
       checkServer: 'Vérifiez que le serveur API est démarré',
       checkPort: 'Confirmez que le port {port} est accessible',
       checkNetwork: 'Vérifiez votre connexion réseau',
-      checkLogs: 'Consultez les logs du serveur pour plus de détails'
-    }
+      checkLogs: 'Consultez les logs du serveur pour plus de détails',
+    },
   },
 
   success: {
@@ -1038,7 +969,7 @@ export const fr = {
     email: 'Email',
     phone: 'Téléphone',
     acronym: 'Acronyme',
-    acronymDesc: 'Utilisé pour l\'authentification et l\'affichage',
+    acronymDesc: "Utilisé pour l'authentification et l'affichage",
     position: 'Poste',
     department: 'Département',
     address: 'Adresse',
@@ -1066,24 +997,24 @@ export const fr = {
     currentSession: 'Session actuelle',
     saveProfile: 'Enregistrer le profil',
     browser: 'Navigateur',
-    
+
     // Messages d'erreur et de succès
     errors: {
       general: 'Erreur lors de la mise à jour du profil',
       passwords: {
         mismatch: 'Les mots de passe ne correspondent pas',
-        updateFailed: 'Erreur lors de la modification du mot de passe'
+        updateFailed: 'Erreur lors de la modification du mot de passe',
       },
       reset: {
         confirmText: 'Êtes-vous sûr de vouloir réinitialiser vos informations ?',
-        success: 'Informations réinitialisées'
-      }
+        success: 'Informations réinitialisées',
+      },
     },
     success: {
       updated: 'Profil mis à jour avec succès',
       passwordChanged: 'Mot de passe modifié avec succès',
-      photoUpdated: 'Photo de profil mise à jour'
-    }
+      photoUpdated: 'Photo de profil mise à jour',
+    },
   },
 
   settings: {
@@ -1097,7 +1028,6 @@ export const fr = {
     role: 'Rôle:',
     status: 'Statut:',
     active: 'Actif',
-    notifications: 'Notifications',
     interface: 'Interface',
     notificationPreferences: 'Préférences de notification',
     emailNotifications: 'Notifications par email',
@@ -1121,7 +1051,6 @@ export const fr = {
       'Europe/London': 'Londres (GMT+0)',
       'America/New_York': 'New York (GMT-5)',
     },
-    appearance: 'Apparence',
     theme: 'Thème',
     currentTheme: 'Thème actuel',
     themeAutoSave: 'Le thème est sauvegardé automatiquement',
@@ -1130,11 +1059,11 @@ export const fr = {
     languageUpdateError: 'Erreur lors de la mise à jour de la langue',
     loadingSettings: 'Chargement des paramètres...',
     settingsLoadError: 'Erreur lors du chargement des paramètres',
-    
+
     // Titres de pages spécifiques
     security: {
       title: 'Sécurité',
-      subtitle: 'Gérez vos paramètres de sécurité et d\'authentification à deux facteurs',
+      subtitle: "Gérez vos paramètres de sécurité et d'authentification à deux facteurs",
       overview: 'Aperçu de la sécurité',
       securityLevel: 'Niveau de sécurité',
       noMfaProtection: 'Aucune protection MFA',
@@ -1143,40 +1072,49 @@ export const fr = {
       mfaUsage: 'Utilisations MFA',
       activeMethods: 'Méthodes actives',
       securityKeys: 'Clés de sécurité',
-      recommendMfa: 'Nous recommandons d\'activer l\'authentification à deux facteurs pour sécuriser votre compte.',
+      recommendMfa:
+        "Nous recommandons d'activer l'authentification à deux facteurs pour sécuriser votre compte.",
       enabled: 'Activé',
       configured: 'TOTP configuré',
       lastUsed: 'Dernière utilisation:',
       neverUsed: 'Jamais utilisé',
       backupCodes: 'Codes de récupération',
       disable: 'Désactiver',
-      notConfigured: 'TOTP non configuré. Activez cette méthode pour améliorer la sécurité de votre compte.',
+      notConfigured:
+        'TOTP non configuré. Activez cette méthode pour améliorer la sécurité de votre compte.',
       configure: 'Configurer TOTP',
       webauthnKeys: 'WebAuthn / Clés de sécurité',
-      totpDescription: 'Utilisez une application d\'authentification comme Google Authenticator, Authy, ou 1Password pour générer des codes de vérification.',
-      webauthnDescription: 'Utilisez la biométrie (empreinte, reconnaissance faciale) ou des clés de sécurité physiques (YubiKey, etc.).',
+      totpDescription:
+        "Utilisez une application d'authentification comme Google Authenticator, Authy, ou 1Password pour générer des codes de vérification.",
+      webauthnDescription:
+        'Utilisez la biométrie (empreinte, reconnaissance faciale) ou des clés de sécurité physiques (YubiKey, etc.).',
       deviceAdded: 'Ajouté le',
       removeDevice: 'Supprimer',
       addNewKey: 'Ajouter une nouvelle clé',
-      webauthnNotConfigured: 'WebAuthn non configuré. Cette méthode offre la meilleure sécurité possible.',
+      webauthnNotConfigured:
+        'WebAuthn non configuré. Cette méthode offre la meilleure sécurité possible.',
       configureWebauthn: 'Configurer WebAuthn',
       totpSetupTitle: 'Configuration TOTP',
-      totpSetupDescription: 'Scannez le QR code avec votre application d\'authentification',
+      totpSetupDescription: "Scannez le QR code avec votre application d'authentification",
       manualKey: 'Clé manuelle :',
       verificationCodeLabel: 'Code de vérification :',
       verificationCodePlaceholder: '123456',
       backupCodesLabel: 'Codes de récupération :',
-      backupCodesWarning: 'Conservez ces codes en lieu sûr. Ils ne s\'afficheront qu\'une seule fois.',
+      backupCodesWarning:
+        "Conservez ces codes en lieu sûr. Ils ne s'afficheront qu'une seule fois.",
       cancel: 'Annuler',
       verifyAndActivate: 'Vérifier et Activer',
       webauthnSetupTitle: 'Configuration WebAuthn',
-      webauthnSetupDescription: 'Configurez une clé de sécurité ou utilisez la biométrie de votre appareil',
-      deviceNameLabel: 'Nom de l\'appareil (optionnel) :',
+      webauthnSetupDescription:
+        'Configurez une clé de sécurité ou utilisez la biométrie de votre appareil',
+      deviceNameLabel: "Nom de l'appareil (optionnel) :",
       deviceNamePlaceholder: 'Mon iPhone, Ma YubiKey...',
-      webauthnInstructions: 'Suivez les instructions de votre navigateur pour enregistrer votre clé de sécurité ou utiliser la biométrie.',
+      webauthnInstructions:
+        'Suivez les instructions de votre navigateur pour enregistrer votre clé de sécurité ou utiliser la biométrie.',
       backupCodesTitle: 'Codes de récupération',
-      backupCodesDescription: 'Utilisez ces codes si vous perdez l\'accès à votre authentificateur',
-      backupCodesSecure: 'Conservez ces codes en lieu sûr. Chaque code ne peut être utilisé qu\'une seule fois.',
+      backupCodesDescription: "Utilisez ces codes si vous perdez l'accès à votre authentificateur",
+      backupCodesSecure:
+        "Conservez ces codes en lieu sûr. Chaque code ne peut être utilisé qu'une seule fois.",
       close: 'Fermer',
       copyCodes: 'Copier les codes',
       disabled: 'désactivé',
@@ -1193,7 +1131,7 @@ export const fr = {
     },
     appearance: {
       title: 'Apparence & Langue',
-      subtitle: 'Personnalisez l\'interface et configurez la langue',
+      subtitle: "Personnalisez l'interface et configurez la langue",
       loading: 'Chargement...',
       saveSuccess: 'Préférences sauvegardées avec succès!',
       saveError: 'Erreur lors de la sauvegarde des préférences',
@@ -1202,11 +1140,12 @@ export const fr = {
       back: 'Retour',
       save: 'Sauvegarder',
       saved: 'Sauvegardé',
-      unsavedChanges: 'Vous avez des modifications non sauvegardées. N\'oubliez pas de sauvegarder vos préférences.'
+      unsavedChanges:
+        "Vous avez des modifications non sauvegardées. N'oubliez pas de sauvegarder vos préférences.",
     },
     notifications: {
       title: 'Notifications',
-      subtitle: 'Gérez vos préférences de notification et d\'alertes',
+      subtitle: "Gérez vos préférences de notification et d'alertes",
       loading: 'Chargement...',
       saveSuccess: 'Préférences sauvegardées avec succès!',
       saveError: 'Erreur lors de la sauvegarde des préférences',
@@ -1215,9 +1154,10 @@ export const fr = {
       back: 'Retour',
       save: 'Sauvegarder',
       saved: 'Sauvegardé',
-      unsavedChanges: 'Vous avez des modifications non sauvegardées. N\'oubliez pas de sauvegarder vos préférences.'
+      unsavedChanges:
+        "Vous avez des modifications non sauvegardées. N'oubliez pas de sauvegarder vos préférences.",
     },
-    
+
     modules: {
       menu: {
         title: 'Menu personnalisé',
@@ -1229,11 +1169,11 @@ export const fr = {
       },
       notifications: {
         title: 'Notifications',
-        description: 'Gérer vos préférences de notification et d\'alertes',
+        description: "Gérer vos préférences de notification et d'alertes",
       },
       appearance: {
         title: 'Apparence & Langue',
-        description: 'Personnaliser le thème, l\'interface et la langue',
+        description: "Personnaliser le thème, l'interface et la langue",
       },
       configure: 'Configurer',
     },
@@ -1244,12 +1184,12 @@ export const fr = {
       save: 'Sauvegarder',
       saving: 'Sauvegarde...',
       yourCustomMenu: 'Votre Menu Personnalisé',
-      menuPreview: 'Aperçu de votre menu tel qu\'il apparaîtra dans la sidebar',
+      menuPreview: "Aperçu de votre menu tel qu'il apparaîtra dans la sidebar",
       folder: 'Dossier',
       link: 'Lien',
       dataView: 'Vue Data',
       createNewFolder: 'Créer un nouveau dossier',
-      folderDescription: 'Un dossier peut contenir d\'autres éléments de menu',
+      folderDescription: "Un dossier peut contenir d'autres éléments de menu",
       folderName: 'Nom du dossier',
       folderPlaceholder: 'Mon nouveau dossier',
       createNewLink: 'Créer un nouveau lien',
@@ -1269,28 +1209,29 @@ export const fr = {
       edit: 'Modifier',
       emptyMenu: 'Menu vierge',
       emptyMenuDescription: 'Glissez des éléments depuis la bibliothèque ou créez-en de nouveaux',
-      library: 'Bibliothèque d\'Éléments',
+      library: "Bibliothèque d'Éléments",
       libraryDescription: 'Éléments disponibles du menu standard - glissez pour les ajouter',
       elementTypes: {
         folder: 'Dossier',
         program: 'Programme',
         link: 'Lien',
-        dataView: 'Vue Data'
+        dataView: 'Vue Data',
       },
       folderEmpty: 'Dossier vide',
       dropHere: 'Déposer ici!',
       folderDropHint: 'Dossier - Déposer des éléments ici',
       expandFolder: 'Étendre le dossier',
       collapseFolder: 'Réduire le dossier',
-      childrenCount: '{count} enfant(s) - Cliquer pour déplier / Glisser pour ajouter le menu complet',
+      childrenCount:
+        '{count} enfant(s) - Cliquer pour déplier / Glisser pour ajouter le menu complet',
       dragToAdd: 'Glisser pour ajouter',
       editItem: 'Modifier',
-      editGuide: 'Guide d\'édition',
+      editGuide: "Guide d'édition",
       editInstructions: {
-        icon: 'Icône : Cliquez sur l\'icône pour ouvrir les sélecteurs',
+        icon: "Icône : Cliquez sur l'icône pour ouvrir les sélecteurs",
         colors: 'Couleurs : 16 couleurs disponibles + couleur par défaut',
         icons: 'Icônes : 38 icônes organisées par catégorie',
-        shortcuts: 'Raccourcis : Ctrl+S (sauver), Ctrl+R (reset), Escape (fermer)'
+        shortcuts: 'Raccourcis : Ctrl+S (sauver), Ctrl+R (reset), Escape (fermer)',
       },
       program: 'Programme',
       hidden: 'Masqué',
@@ -1298,7 +1239,7 @@ export const fr = {
       queryBuilderId: 'Query Builder ID',
       container: 'Conteneur',
       items: 'élément(s)',
-      title: 'Titre',
+      itemTitle: 'Titre',
       defaultColor: 'Couleur par défaut',
       clickToApply: '{name} - Cliquer pour appliquer',
       iconCategories: {
@@ -1309,7 +1250,7 @@ export const fr = {
         production: 'Production & Stock',
         communication: 'Communication',
         actions: 'Actions & États',
-        finance: 'Finance & Technique'
+        finance: 'Finance & Technique',
       },
       colors: {
         blue: 'Bleu',
@@ -1326,13 +1267,13 @@ export const fr = {
         indigo: 'Indigo',
         emerald: 'Émeraude',
         lime: 'Lime',
-        amber: 'Ambre'
+        amber: 'Ambre',
       },
       savingInProgress: 'Sauvegarde en cours...',
       savedSuccessfully: 'Menu sauvegardé avec succès',
       errorLoading: 'Erreur lors du chargement',
-      errorSaving: 'Erreur lors de la sauvegarde'
-    }
+      errorSaving: 'Erreur lors de la sauvegarde',
+    },
   },
 
   roles: {
@@ -1374,7 +1315,7 @@ export const fr = {
   },
 
   materials: {
-    steel_grades: 'Grades d\'acier disponibles',
+    steel_grades: "Grades d'acier disponibles",
   },
 
   codeViewer: {
@@ -1390,7 +1331,9 @@ export const fr = {
     code: 'Code',
     lines: 'lignes',
     linesSelected: 'ligne(s) sélectionnée(s)',
-    clickLineNumbers: 'Cliquez sur les numéros de ligne pour sélectionner • Ctrl+Clic pour multi-sélection • Shift+Clic pour plage',
-    lineTooltip: 'Ligne {number} - Clic: sélectionner, Ctrl+Clic: multi-sélection, Shift+Clic: plage',
+    clickLineNumbers:
+      'Cliquez sur les numéros de ligne pour sélectionner • Ctrl+Clic pour multi-sélection • Shift+Clic pour plage',
+    lineTooltip:
+      'Ligne {number} - Clic: sélectionner, Ctrl+Clic: multi-sélection, Shift+Clic: plage',
   },
 }

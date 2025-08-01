@@ -45,5 +45,5 @@ export default {
   protocol,
   PacketType,
   Encoder,
-  Decoder
+  Decoder,
 }

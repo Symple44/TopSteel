@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { Database, Package, Table, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Database, Table, Users, Package } from 'lucide-react'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { callClientApi } from '@/utils/backend-api'
 
 export default function QueryBuilderTestPage() {
@@ -116,7 +117,7 @@ export default function QueryBuilderTestPage() {
           fromColumn: 'categoryId',
           toTable: 'test_categories',
           toColumn: 'id',
-          joinType: 'INNER' as any,
+          joinType: 'INNER' as 'INNER' | 'LEFT' | 'RIGHT' | 'FULL',
           alias: 'category',
           order: 1,
         },
@@ -139,7 +140,8 @@ export default function QueryBuilderTestPage() {
           name: 'margin_percentage',
           label: 'Margin %',
           description: 'Profit margin percentage',
-          expression: '(([test_products.price] - [test_products.cost]) / [test_products.price]) * 100',
+          expression:
+            '(([test_products.price] - [test_products.cost]) / [test_products.price]) * 100',
           dataType: 'number',
           isVisible: true,
           displayOrder: 8,
@@ -161,11 +163,8 @@ export default function QueryBuilderTestPage() {
         const created = await response.json()
         router.push(`/query-builder/${created.id}`)
       } else {
-        console.error('Failed to create test query builder')
       }
-    } catch (error) {
-      console.error('Error creating test query builder:', error)
-    }
+    } catch (_error) {}
   }
 
   return (
@@ -209,9 +208,7 @@ export default function QueryBuilderTestPage() {
                 <Users className="h-8 w-8 text-purple-500" />
                 <div>
                   <h3 className="font-semibold">test_orders</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Commandes et lignes de commande
-                  </p>
+                  <p className="text-sm text-muted-foreground">Commandes et lignes de commande</p>
                 </div>
               </div>
             </CardContent>
@@ -223,30 +220,14 @@ export default function QueryBuilderTestPage() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  ✅ Sélection interactive des tables
-                </li>
-                <li className="flex items-center gap-2">
-                  ✅ Configuration des jointures
-                </li>
-                <li className="flex items-center gap-2">
-                  ✅ Drag & drop des colonnes
-                </li>
-                <li className="flex items-center gap-2">
-                  ✅ Champs calculés personnalisés
-                </li>
-                <li className="flex items-center gap-2">
-                  ✅ Prévisualisation SQL
-                </li>
-                <li className="flex items-center gap-2">
-                  ✅ Exécution et affichage DataTable
-                </li>
-                <li className="flex items-center gap-2">
-                  ✅ Configuration des permissions
-                </li>
-                <li className="flex items-center gap-2">
-                  ✅ Export multi-formats
-                </li>
+                <li className="flex items-center gap-2">✅ Sélection interactive des tables</li>
+                <li className="flex items-center gap-2">✅ Configuration des jointures</li>
+                <li className="flex items-center gap-2">✅ Drag & drop des colonnes</li>
+                <li className="flex items-center gap-2">✅ Champs calculés personnalisés</li>
+                <li className="flex items-center gap-2">✅ Prévisualisation SQL</li>
+                <li className="flex items-center gap-2">✅ Exécution et affichage DataTable</li>
+                <li className="flex items-center gap-2">✅ Configuration des permissions</li>
+                <li className="flex items-center gap-2">✅ Export multi-formats</li>
               </ul>
             </CardContent>
           </Card>
@@ -264,11 +245,22 @@ export default function QueryBuilderTestPage() {
         <div className="mt-8 p-4 bg-muted rounded-lg">
           <h3 className="font-semibold mb-2">Structure du Query Builder de Test</h3>
           <div className="text-sm space-y-1">
-            <p><strong>Table principale :</strong> test_products</p>
-            <p><strong>Jointure :</strong> INNER JOIN test_categories ON test_products.categoryId = test_categories.id</p>
-            <p><strong>Colonnes :</strong> SKU, Nom, Catégorie, Prix, Stock, Statut</p>
-            <p><strong>Champs calculés :</strong> Marge (prix - coût), Marge % ((prix - coût) / prix)</p>
-            <p><strong>Limite :</strong> 500 lignes max</p>
+            <p>
+              <strong>Table principale :</strong> test_products
+            </p>
+            <p>
+              <strong>Jointure :</strong> INNER JOIN test_categories ON test_products.categoryId =
+              test_categories.id
+            </p>
+            <p>
+              <strong>Colonnes :</strong> SKU, Nom, Catégorie, Prix, Stock, Statut
+            </p>
+            <p>
+              <strong>Champs calculés :</strong> Marge (prix - coût), Marge % ((prix - coût) / prix)
+            </p>
+            <p>
+              <strong>Limite :</strong> 500 lignes max
+            </p>
           </div>
         </div>
       </div>

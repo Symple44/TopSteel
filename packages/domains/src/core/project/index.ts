@@ -6,20 +6,20 @@
 // ===== ENTITÉS ET TYPES =====
 export type {
   Projet,
-  ProjetStats,
-  ProjetWithDetails,
-  ProjetContact,
   ProjetAdresse,
+  ProjetContact,
   ProjetDelais,
-  ProjetMontants,
   ProjetDocuments,
   ProjetFilters,
+  ProjetMontants,
   ProjetSortOptions,
+  ProjetStats,
+  ProjetWithDetails,
 } from './domain/entities'
 
 // ===== ENUMS =====
 export {
+  ProjetPriorite,
   ProjetStatut,
   ProjetType,
-  ProjetPriorite,
 } from './domain/entities'

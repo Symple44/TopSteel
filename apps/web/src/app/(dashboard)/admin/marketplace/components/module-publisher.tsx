@@ -1,16 +1,28 @@
 'use client'
 
+import { Eye, Plus, X } from 'lucide-react'
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Upload, Plus, X, Eye, Code, Settings, DollarSign } from 'lucide-react'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@erp/ui/primitives'
+import { Input } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui/primitives'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
+import { Textarea } from '@erp/ui/primitives'
 import { toast } from '@/hooks/use-toast'
 
 interface ModuleForm {
@@ -58,11 +70,11 @@ const INITIAL_FORM: ModuleForm = {
     amount: 0,
     currency: 'EUR',
     period: 'MONTH',
-    description: ''
+    description: '',
   },
   dependencies: [],
   permissions: [],
-  menuConfiguration: []
+  menuConfiguration: [],
 }
 
 const CATEGORIES = [
@@ -72,7 +84,7 @@ const CATEGORIES = [
   { value: 'INTEGRATION', label: 'Intégrations' },
   { value: 'QUALITY', label: 'Qualité' },
   { value: 'MAINTENANCE', label: 'Maintenance' },
-  { value: 'FINANCE', label: 'Finance' }
+  { value: 'FINANCE', label: 'Finance' },
 ]
 
 const PRICING_TYPES = [
@@ -80,14 +92,14 @@ const PRICING_TYPES = [
   { value: 'ONE_TIME', label: 'Paiement unique' },
   { value: 'SUBSCRIPTION', label: 'Abonnement' },
   { value: 'COMMISSION', label: 'Commission' },
-  { value: 'USAGE_BASED', label: 'Basé sur usage' }
+  { value: 'USAGE_BASED', label: 'Basé sur usage' },
 ]
 
 const MENU_TYPES = [
   { value: 'FOLDER', label: 'Dossier' },
   { value: 'PROGRAM', label: 'Programme' },
   { value: 'LINK', label: 'Lien externe' },
-  { value: 'DATA_VIEW', label: 'Vue de données' }
+  { value: 'DATA_VIEW', label: 'Vue de données' },
 ]
 
 export function ModulePublisher() {
@@ -96,31 +108,34 @@ export function ModulePublisher() {
   const [showPreview, setShowPreview] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
 
-  const handleInputChange = (field: keyof ModuleForm, value: any) => {
-    setForm(prev => ({ ...prev, [field]: value }))
+  const handleInputChange = (
+    field: keyof ModuleForm,
+    value: string | number | boolean | string[]
+  ) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handlePricingChange = (field: string, value: any) => {
-    setForm(prev => ({
+  const handlePricingChange = (field: string, value: string | number) => {
+    setForm((prev) => ({
       ...prev,
-      pricing: { ...prev.pricing, [field]: value }
+      pricing: { ...prev.pricing, [field]: value },
     }))
   }
 
   const addDependency = () => {
     const dependency = prompt('Clé du module requis:')
     if (dependency && !form.dependencies.includes(dependency)) {
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
-        dependencies: [...prev.dependencies, dependency]
+        dependencies: [...prev.dependencies, dependency],
       }))
     }
   }
 
   const removeDependency = (index: number) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      dependencies: prev.dependencies.filter((_, i) => i !== index)
+      dependencies: prev.dependencies.filter((_, i) => i !== index),
     }))
   }
 
@@ -129,27 +144,27 @@ export function ModulePublisher() {
       moduleId: form.moduleKey.toUpperCase(),
       action: 'VIEW',
       name: '',
-      description: ''
+      description: '',
     }
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      permissions: [...prev.permissions, permission]
+      permissions: [...prev.permissions, permission],
     }))
   }
 
   const updatePermission = (index: number, field: string, value: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      permissions: prev.permissions.map((perm, i) => 
+      permissions: prev.permissions.map((perm, i) =>
         i === index ? { ...perm, [field]: value } : perm
-      )
+      ),
     }))
   }
 
   const removePermission = (index: number) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      permissions: prev.permissions.filter((_, i) => i !== index)
+      permissions: prev.permissions.filter((_, i) => i !== index),
     }))
   }
 
@@ -158,27 +173,27 @@ export function ModulePublisher() {
       title: '',
       type: 'PROGRAM',
       icon: '',
-      programId: ''
+      programId: '',
     }
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      menuConfiguration: [...prev.menuConfiguration, menuItem]
+      menuConfiguration: [...prev.menuConfiguration, menuItem],
     }))
   }
 
   const updateMenuItem = (index: number, field: string, value: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      menuConfiguration: prev.menuConfiguration.map((item, i) => 
+      menuConfiguration: prev.menuConfiguration.map((item, i) =>
         i === index ? { ...item, [field]: value } : item
-      )
+      ),
     }))
   }
 
   const removeMenuItem = (index: number) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      menuConfiguration: prev.menuConfiguration.filter((_, i) => i !== index)
+      menuConfiguration: prev.menuConfiguration.filter((_, i) => i !== index),
     }))
   }
 
@@ -187,19 +202,19 @@ export function ModulePublisher() {
       toast({
         title: 'Erreur de validation',
         description: 'Veuillez remplir tous les champs obligatoires.',
-        variant: 'destructive'
+        variant: 'destructive',
       })
       return
     }
 
     setIsPublishing(true)
-    
+
     // Simulation de publication
     setTimeout(() => {
       setIsPublishing(false)
       toast({
         title: 'Module publié',
-        description: `${form.displayName} a été publié avec succès sur la marketplace.`
+        description: `${form.displayName} a été publié avec succès sur la marketplace.`,
       })
       setForm(INITIAL_FORM)
       setActiveTab('basic')
@@ -209,7 +224,7 @@ export function ModulePublisher() {
   const handleSaveDraft = () => {
     toast({
       title: 'Brouillon sauvegardé',
-      description: 'Votre module a été sauvegardé en tant que brouillon.'
+      description: 'Votre module a été sauvegardé en tant que brouillon.',
     })
   }
 
@@ -249,9 +264,7 @@ export function ModulePublisher() {
           <Card>
             <CardHeader>
               <CardTitle>Informations de Base</CardTitle>
-              <CardDescription>
-                Décrivez votre module et ses fonctionnalités
-              </CardDescription>
+              <CardDescription>Décrivez votre module et ses fonctionnalités</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
@@ -303,7 +316,10 @@ export function ModulePublisher() {
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="category">Catégorie *</Label>
-                  <Select value={form.category} onValueChange={(value) => handleInputChange('category', value)}>
+                  <Select
+                    value={form.category}
+                    onValueChange={(value) => handleInputChange('category', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionnez une catégorie" />
                     </SelectTrigger>
@@ -334,9 +350,7 @@ export function ModulePublisher() {
                     value={form.icon}
                     onChange={(e) => handleInputChange('icon', e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Nom d'icône Lucide React
-                  </p>
+                  <p className="text-xs text-muted-foreground">Nom d'icône Lucide React</p>
                 </div>
               </div>
             </CardContent>
@@ -347,15 +361,13 @@ export function ModulePublisher() {
           <Card>
             <CardHeader>
               <CardTitle>Modèle Tarifaire</CardTitle>
-              <CardDescription>
-                Définissez comment votre module sera facturé
-              </CardDescription>
+              <CardDescription>Définissez comment votre module sera facturé</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Type de tarification</Label>
-                <Select 
-                  value={form.pricing.type} 
+                <Select
+                  value={form.pricing.type}
                   onValueChange={(value) => handlePricingChange('type', value)}
                 >
                   <SelectTrigger>
@@ -384,8 +396,8 @@ export function ModulePublisher() {
 
                   <div className="space-y-2">
                     <Label>Devise</Label>
-                    <Select 
-                      value={form.pricing.currency} 
+                    <Select
+                      value={form.pricing.currency}
                       onValueChange={(value) => handlePricingChange('currency', value)}
                     >
                       <SelectTrigger>
@@ -403,8 +415,8 @@ export function ModulePublisher() {
               {form.pricing.type === 'SUBSCRIPTION' && (
                 <div className="space-y-2">
                   <Label>Période</Label>
-                  <Select 
-                    value={form.pricing.period} 
+                  <Select
+                    value={form.pricing.period}
                     onValueChange={(value) => handlePricingChange('period', value)}
                   >
                     <SelectTrigger>
@@ -452,7 +464,7 @@ export function ModulePublisher() {
 
               <div className="space-y-3">
                 {form.permissions.map((permission, index) => (
-                  <Card key={index}>
+                  <Card key={`permission-${permission.action}-${index}`}>
                     <CardContent className="pt-4">
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
@@ -483,8 +495,8 @@ export function ModulePublisher() {
                             onChange={(e) => updatePermission(index, 'description', e.target.value)}
                             rows={2}
                           />
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => removePermission(index)}
                           >
@@ -510,9 +522,7 @@ export function ModulePublisher() {
           <Card>
             <CardHeader>
               <CardTitle>Configuration Menu</CardTitle>
-              <CardDescription>
-                Définissez les éléments de menu pour votre module
-              </CardDescription>
+              <CardDescription>Définissez les éléments de menu pour votre module</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
@@ -527,7 +537,7 @@ export function ModulePublisher() {
 
               <div className="space-y-3">
                 {form.menuConfiguration.map((item, index) => (
-                  <Card key={index}>
+                  <Card key={`menu-item-${item.title}-${index}`}>
                     <CardContent className="pt-4">
                       <div className="grid gap-4 md:grid-cols-3">
                         <div className="space-y-2">
@@ -541,8 +551,8 @@ export function ModulePublisher() {
 
                         <div className="space-y-2">
                           <Label>Type</Label>
-                          <Select 
-                            value={item.type} 
+                          <Select
+                            value={item.type}
                             onValueChange={(value) => updateMenuItem(index, 'type', value)}
                           >
                             <SelectTrigger>
@@ -577,8 +587,8 @@ export function ModulePublisher() {
                             onChange={(e) => updateMenuItem(index, 'programId', e.target.value)}
                           />
                         </div>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => removeMenuItem(index)}
                           className="mt-7"
@@ -604,9 +614,7 @@ export function ModulePublisher() {
           <Card>
             <CardHeader>
               <CardTitle>Paramètres Avancés</CardTitle>
-              <CardDescription>
-                Dépendances et configuration technique
-              </CardDescription>
+              <CardDescription>Dépendances et configuration technique</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -617,23 +625,25 @@ export function ModulePublisher() {
                     Ajouter dépendance
                   </Button>
                 </div>
-                
+
                 <div className="flex flex-wrap gap-2">
                   {form.dependencies.map((dep, index) => (
-                    <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                    <Badge
+                      key={`dep-${dep}`}
+                      variant="secondary"
+                      className="flex items-center gap-1"
+                    >
                       {dep}
-                      <X 
-                        className="h-3 w-3 cursor-pointer" 
+                      <X
+                        className="h-3 w-3 cursor-pointer"
                         onClick={() => removeDependency(index)}
                       />
                     </Badge>
                   ))}
                 </div>
-                
+
                 {form.dependencies.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    Aucune dépendance définie
-                  </p>
+                  <p className="text-sm text-muted-foreground">Aucune dépendance définie</p>
                 )}
               </div>
 
@@ -658,7 +668,7 @@ export function ModulePublisher() {
               Aperçu de votre module tel qu'il apparaîtra dans la marketplace
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-semibold">{form.displayName || 'Nom du module'}</h3>
@@ -666,19 +676,19 @@ export function ModulePublisher() {
                 par {form.publisher} • v{form.version}
               </p>
             </div>
-            
+
             <p className="text-sm">
               {form.shortDescription || form.description || 'Description du module...'}
             </p>
-            
+
             <div className="flex items-center gap-4">
-              {form.category && (
-                <Badge variant="outline">{form.category}</Badge>
-              )}
+              {form.category && <Badge variant="outline">{form.category}</Badge>}
               <span className="text-sm font-medium">
-                {form.pricing.type === 'FREE' ? 'Gratuit' : 
-                 form.pricing.type === 'SUBSCRIPTION' ? `${form.pricing.amount}€/${form.pricing.period === 'MONTH' ? 'mois' : 'an'}` :
-                 'Prix sur demande'}
+                {form.pricing.type === 'FREE'
+                  ? 'Gratuit'
+                  : form.pricing.type === 'SUBSCRIPTION'
+                    ? `${form.pricing.amount}€/${form.pricing.period === 'MONTH' ? 'mois' : 'an'}`
+                    : 'Prix sur demande'}
               </span>
             </div>
           </div>

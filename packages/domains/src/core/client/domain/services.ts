@@ -4,7 +4,7 @@
  */
 
 import type { Client } from './entities'
-import { ClientType, ClientPriorite } from './entities'
+import { ClientPriorite, ClientType } from './entities'
 
 // ===== SERVICES MÉTIER =====
 
@@ -14,7 +14,7 @@ export class ClientBusinessService {
    */
   static calculateClientScore(client: Client): number {
     let score = 0
-    
+
     // Score basé sur le type
     switch (client.type) {
       case ClientType.PROFESSIONNEL:
@@ -27,7 +27,7 @@ export class ClientBusinessService {
         score += 20
         break
     }
-    
+
     // Score basé sur la priorité
     switch (client.priorite) {
       case ClientPriorite.VIP:
@@ -43,14 +43,14 @@ export class ClientBusinessService {
         score += 0
         break
     }
-    
+
     // Score basé sur le chiffre d'affaire
     if (client.chiffreAffaire) {
       if (client.chiffreAffaire > 100000) score += 30
       else if (client.chiffreAffaire > 50000) score += 20
       else if (client.chiffreAffaire > 10000) score += 10
     }
-    
+
     // Score basé sur l'activité récente
     if (client.dateDernierProjet) {
       const daysSinceLastProject = Math.floor(
@@ -60,10 +60,10 @@ export class ClientBusinessService {
       else if (daysSinceLastProject < 90) score += 10
       else if (daysSinceLastProject < 365) score += 5
     }
-    
+
     return Math.min(score, 100) // Cap à 100
   }
-  
+
   /**
    * Détermine si un client est éligible pour une remise
    */
@@ -74,22 +74,22 @@ export class ClientBusinessService {
       (client.nombreProjets !== undefined && client.nombreProjets > 5)
     )
   }
-  
+
   /**
    * Calcule le pourcentage de remise autorisé
    */
   static calculateDiscountPercentage(client: Client): number {
-    if (!this.isEligibleForDiscount(client)) return 0
-    
+    if (!ClientBusinessService.isEligibleForDiscount(client)) return 0
+
     let discount = 0
-    
+
     if (client.priorite === ClientPriorite.VIP) discount += 15
     if (client.chiffreAffaire !== undefined && client.chiffreAffaire > 100000) discount += 10
     if (client.nombreProjets !== undefined && client.nombreProjets > 10) discount += 5
-    
+
     return Math.min(discount, 25) // Cap à 25%
   }
-  
+
   /**
    * Détermine le délai de paiement recommandé
    */

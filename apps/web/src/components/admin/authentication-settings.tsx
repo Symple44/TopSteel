@@ -1,10 +1,22 @@
 'use client'
 
-import { useTranslation } from '@/lib/i18n'
-import { Card, Input, Label, Switch, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Button } from '@erp/ui'
-import { Shield, Key, Globe, RotateCcw, Save } from 'lucide-react'
-import { useSystemParameters } from '@/hooks/use-system-parameters'
+import {
+  Button,
+  Card,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Separator,
+  Switch,
+} from '@erp/ui'
+import { Globe, Key, RotateCcw, Save, Shield } from 'lucide-react'
 import { toast } from 'sonner'
+import { useSystemParameters } from '@/hooks/use-system-parameters'
+import { useTranslation } from '@/lib/i18n'
 
 export function AuthenticationSettings() {
   const { t } = useTranslation('admin')
@@ -22,7 +34,7 @@ export function AuthenticationSettings() {
     try {
       await saveParameters()
       toast.success(t('saveSuccess'))
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('saveError'))
     }
   }
@@ -32,7 +44,7 @@ export function AuthenticationSettings() {
       try {
         await resetToDefaults()
         toast.success(t('resetSuccess'))
-      } catch (error) {
+      } catch (_error) {
         toast.error(t('resetError'))
       }
     }
@@ -60,15 +72,11 @@ export function AuthenticationSettings() {
           <Key className="h-5 w-5" />
           {t('authentication.methods')}
         </h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label htmlFor="local-auth">{t('authentication.localAuth')}</Label>
-            <Switch
-              id="local-auth"
-              checked={true}
-              disabled
-            />
+            <Switch id="local-auth" checked={true} disabled />
           </div>
 
           <Separator />
@@ -79,10 +87,12 @@ export function AuthenticationSettings() {
               <Switch
                 id="google-oauth"
                 checked={parameters?.GOOGLE_OAUTH_ENABLED === 'true'}
-                onCheckedChange={(checked: boolean) => handleSwitchChange('GOOGLE_OAUTH_ENABLED', checked)}
+                onCheckedChange={(checked: boolean) =>
+                  handleSwitchChange('GOOGLE_OAUTH_ENABLED', checked)
+                }
               />
             </div>
-            
+
             {parameters?.GOOGLE_OAUTH_ENABLED === 'true' && (
               <div className="ml-6 space-y-4">
                 <div className="space-y-2">
@@ -91,17 +101,23 @@ export function AuthenticationSettings() {
                     id="google-client-id"
                     type="text"
                     value={parameters?.GOOGLE_OAUTH_CLIENT_ID || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('GOOGLE_OAUTH_CLIENT_ID', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange('GOOGLE_OAUTH_CLIENT_ID', e.target.value)
+                    }
                     placeholder="xxxx.apps.googleusercontent.com"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="google-client-secret">{t('authentication.googleClientSecret')}</Label>
+                  <Label htmlFor="google-client-secret">
+                    {t('authentication.googleClientSecret')}
+                  </Label>
                   <Input
                     id="google-client-secret"
                     type="password"
                     value={parameters?.GOOGLE_OAUTH_CLIENT_SECRET || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('GOOGLE_OAUTH_CLIENT_SECRET', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange('GOOGLE_OAUTH_CLIENT_SECRET', e.target.value)
+                    }
                     placeholder="GOCSPX-xxxx"
                   />
                 </div>
@@ -117,29 +133,39 @@ export function AuthenticationSettings() {
               <Switch
                 id="microsoft-oauth"
                 checked={parameters?.MICROSOFT_OAUTH_ENABLED === 'true'}
-                onCheckedChange={(checked: boolean) => handleSwitchChange('MICROSOFT_OAUTH_ENABLED', checked)}
+                onCheckedChange={(checked: boolean) =>
+                  handleSwitchChange('MICROSOFT_OAUTH_ENABLED', checked)
+                }
               />
             </div>
-            
+
             {parameters?.MICROSOFT_OAUTH_ENABLED === 'true' && (
               <div className="ml-6 space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="microsoft-client-id">{t('authentication.microsoftClientId')}</Label>
+                  <Label htmlFor="microsoft-client-id">
+                    {t('authentication.microsoftClientId')}
+                  </Label>
                   <Input
                     id="microsoft-client-id"
                     type="text"
                     value={parameters?.MICROSOFT_OAUTH_CLIENT_ID || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('MICROSOFT_OAUTH_CLIENT_ID', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange('MICROSOFT_OAUTH_CLIENT_ID', e.target.value)
+                    }
                     placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="microsoft-client-secret">{t('authentication.microsoftClientSecret')}</Label>
+                  <Label htmlFor="microsoft-client-secret">
+                    {t('authentication.microsoftClientSecret')}
+                  </Label>
                   <Input
                     id="microsoft-client-secret"
                     type="password"
                     value={parameters?.MICROSOFT_OAUTH_CLIENT_SECRET || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('MICROSOFT_OAUTH_CLIENT_SECRET', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange('MICROSOFT_OAUTH_CLIENT_SECRET', e.target.value)
+                    }
                     placeholder="xxxxxxxxxxxx"
                   />
                 </div>
@@ -155,14 +181,16 @@ export function AuthenticationSettings() {
           <Shield className="h-5 w-5" />
           {t('authentication.twoFactor')}
         </h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label htmlFor="2fa-enabled">{t('authentication.twoFactor')}</Label>
             <Switch
               id="2fa-enabled"
               checked={parameters?.TWO_FACTOR_ENABLED === 'true'}
-              onCheckedChange={(checked: boolean) => handleSwitchChange('TWO_FACTOR_ENABLED', checked)}
+              onCheckedChange={(checked: boolean) =>
+                handleSwitchChange('TWO_FACTOR_ENABLED', checked)
+              }
             />
           </div>
 
@@ -193,7 +221,7 @@ export function AuthenticationSettings() {
           <Globe className="h-5 w-5" />
           {t('authentication.passwordPolicy')}
         </h3>
-        
+
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
@@ -202,7 +230,9 @@ export function AuthenticationSettings() {
                 id="session-timeout"
                 type="number"
                 value={parameters?.SESSION_TIMEOUT_MINUTES || '480'}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('SESSION_TIMEOUT_MINUTES', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange('SESSION_TIMEOUT_MINUTES', e.target.value)
+                }
                 min="1"
               />
             </div>
@@ -213,7 +243,9 @@ export function AuthenticationSettings() {
                 id="max-login-attempts"
                 type="number"
                 value={parameters?.MAX_LOGIN_ATTEMPTS || '5'}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('MAX_LOGIN_ATTEMPTS', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange('MAX_LOGIN_ATTEMPTS', e.target.value)
+                }
                 min="1"
               />
             </div>
@@ -224,7 +256,9 @@ export function AuthenticationSettings() {
                 id="password-min-length"
                 type="number"
                 value={parameters?.PASSWORD_MIN_LENGTH || '8'}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('PASSWORD_MIN_LENGTH', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange('PASSWORD_MIN_LENGTH', e.target.value)
+                }
                 min="1"
               />
             </div>
@@ -252,10 +286,14 @@ export function AuthenticationSettings() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="jwt-refresh-expires-in">{t('authentication.jwtRefreshExpiresIn')}</Label>
+              <Label htmlFor="jwt-refresh-expires-in">
+                {t('authentication.jwtRefreshExpiresIn')}
+              </Label>
               <Select
                 value={parameters?.JWT_REFRESH_EXPIRES_IN || '7d'}
-                onValueChange={(value: string) => handleInputChange('JWT_REFRESH_EXPIRES_IN', value)}
+                onValueChange={(value: string) =>
+                  handleInputChange('JWT_REFRESH_EXPIRES_IN', value)
+                }
               >
                 <SelectTrigger id="jwt-refresh-expires-in">
                   <SelectValue />
@@ -278,7 +316,9 @@ export function AuthenticationSettings() {
               <Switch
                 id="require-uppercase"
                 checked={parameters?.PASSWORD_REQUIRE_UPPERCASE === 'true'}
-                onCheckedChange={(checked: boolean) => handleSwitchChange('PASSWORD_REQUIRE_UPPERCASE', checked)}
+                onCheckedChange={(checked: boolean) =>
+                  handleSwitchChange('PASSWORD_REQUIRE_UPPERCASE', checked)
+                }
               />
             </div>
 
@@ -287,7 +327,9 @@ export function AuthenticationSettings() {
               <Switch
                 id="require-lowercase"
                 checked={parameters?.PASSWORD_REQUIRE_LOWERCASE === 'true'}
-                onCheckedChange={(checked: boolean) => handleSwitchChange('PASSWORD_REQUIRE_LOWERCASE', checked)}
+                onCheckedChange={(checked: boolean) =>
+                  handleSwitchChange('PASSWORD_REQUIRE_LOWERCASE', checked)
+                }
               />
             </div>
 
@@ -296,7 +338,9 @@ export function AuthenticationSettings() {
               <Switch
                 id="require-numbers"
                 checked={parameters?.PASSWORD_REQUIRE_NUMBERS === 'true'}
-                onCheckedChange={(checked: boolean) => handleSwitchChange('PASSWORD_REQUIRE_NUMBERS', checked)}
+                onCheckedChange={(checked: boolean) =>
+                  handleSwitchChange('PASSWORD_REQUIRE_NUMBERS', checked)
+                }
               />
             </div>
 
@@ -305,7 +349,9 @@ export function AuthenticationSettings() {
               <Switch
                 id="require-special"
                 checked={parameters?.PASSWORD_REQUIRE_SPECIAL === 'true'}
-                onCheckedChange={(checked: boolean) => handleSwitchChange('PASSWORD_REQUIRE_SPECIAL', checked)}
+                onCheckedChange={(checked: boolean) =>
+                  handleSwitchChange('PASSWORD_REQUIRE_SPECIAL', checked)
+                }
               />
             </div>
           </div>

@@ -51,24 +51,24 @@ export interface Client extends BaseEntity {
   readonly nom: string
   readonly type: ClientType
   readonly siret?: string
-  
+
   // Contact
   readonly email: string
   readonly telephone: string
   readonly contact: ClientContact
   readonly adresse: ClientAddress
-  
+
   // Business
   readonly statut: ClientStatut
   readonly priorite: ClientPriorite
   readonly source?: string
   readonly notes?: string
-  
+
   // Métriques
   readonly chiffreAffaire?: number
   readonly nombreProjets?: number
   readonly dateDernierProjet?: Date
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date

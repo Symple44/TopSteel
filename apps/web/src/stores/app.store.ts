@@ -5,7 +5,6 @@
  * Fichier: apps/web/src/stores/app.store.ts
  */
 
-import { StoreUtils } from '@/lib/store-utils'
 import type {
   AppState,
   AppStore,
@@ -14,6 +13,7 @@ import type {
   StoreCreator,
   StoreUser,
 } from '@erp/types'
+import { StoreUtils } from '@/lib/store-utils'
 
 // ===== ÉTAT INITIAL STRICTEMENT TYPÉ =====
 
@@ -419,8 +419,6 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
     const currentState = get()
 
     if (!currentState.sync?.isOnline) {
-      console.warn('Synchronisation impossible: hors ligne')
-
       return
     }
 
@@ -450,12 +448,10 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
         }
         state.lastUpdate = Date.now()
       })
-
-      console.error('Erreur de synchronisation:', error)
     }
   },
 
-  resolveConflict: (conflictId, resolution) => {
+  resolveConflict: (_conflictId, _resolution) => {
     set((state) => {
       if (state.sync) {
         state.sync.conflictsCount = Math.max(0, state.sync.conflictsCount - 1)

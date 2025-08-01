@@ -2,6 +2,7 @@
 
 import type { Projet } from '@erp/domains/core'
 import * as UI from '@erp/ui'
+
 const Badge = UI.Badge
 const Button = UI.Button
 const Card = UI.Card
@@ -125,13 +126,13 @@ export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps
     return matchesSearch && matchesCategory && matchesType
   })
 
-  const handleDownload = (document: Document) => {}
+  const handleDownload = (_document: Document) => {}
 
-  const handleView = (document: Document) => {}
+  const handleView = (_document: Document) => {}
 
-  const handleEdit = (document: Document) => {}
+  const handleEdit = (_document: Document) => {}
 
-  const handleDelete = (document: Document) => {}
+  const handleDelete = (_document: Document) => {}
 
   return (
     <div className="space-y-6">

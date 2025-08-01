@@ -12,7 +12,7 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   info: 1,
   warn: 2,
   error: 3,
-  silent: 4
+  silent: 4,
 }
 
 const currentLogLevel = LOG_LEVELS[logLevel as LogLevel] || LOG_LEVELS.warn
@@ -22,40 +22,34 @@ class Logger {
     return LOG_LEVELS[level] >= currentLogLevel
   }
 
-  debug(...args: any[]) {
+  debug(..._args: any[]) {
     if (this.shouldLog('debug')) {
-      console.debug('[DEBUG]', ...args)
     }
   }
 
-  info(...args: any[]) {
+  info(..._args: any[]) {
     if (this.shouldLog('info')) {
-      console.info('[INFO]', ...args)
     }
   }
 
-  warn(...args: any[]) {
+  warn(..._args: any[]) {
     if (this.shouldLog('warn')) {
-      console.warn('[WARN]', ...args)
     }
   }
 
-  error(...args: any[]) {
+  error(..._args: any[]) {
     if (this.shouldLog('error')) {
-      console.error('[ERROR]', ...args)
     }
   }
 
   // Helpers spécialisés
-  auth(...args: any[]) {
+  auth(..._args: any[]) {
     if (this.shouldLog('debug')) {
-      console.debug('[AUTH]', ...args)
     }
   }
 
-  api(...args: any[]) {
+  api(..._args: any[]) {
     if (this.shouldLog('debug')) {
-      console.debug('[API]', ...args)
     }
   }
 }

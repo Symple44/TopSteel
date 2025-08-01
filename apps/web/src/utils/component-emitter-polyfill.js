@@ -7,7 +7,7 @@ export class Emitter {
   }
 
   on(event, fn) {
-    (this.callbacks[event] = this.callbacks[event] || []).push(fn)
+    ;(this.callbacks[event] = this.callbacks[event] || []).push(fn)
     return this
   }
 
@@ -23,7 +23,7 @@ export class Emitter {
 
   off(event, fn) {
     if (!this.callbacks[event]) return this
-    
+
     if (!fn) {
       delete this.callbacks[event]
       return this
@@ -47,7 +47,7 @@ export class Emitter {
   emit(event, ...args) {
     const callbacks = this.callbacks[event]
     if (callbacks) {
-      callbacks.forEach(fn => fn.apply(this, args))
+      callbacks.forEach((fn) => fn.apply(this, args))
     }
     return this
   }

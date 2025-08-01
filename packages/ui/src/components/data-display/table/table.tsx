@@ -7,11 +7,7 @@ interface TableProps extends React.HTMLAttributes<HTMLTableElement>, TableVarian
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, variant, size, ...props }, ref) => (
     <div className="relative w-full overflow-auto">
-      <table
-        ref={ref}
-        className={cn(tableVariants({ variant, size }), className)}
-        {...props}
-      />
+      <table ref={ref} className={cn(tableVariants({ variant, size }), className)} {...props} />
     </div>
   )
 )

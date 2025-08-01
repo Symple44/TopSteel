@@ -21,7 +21,7 @@ export class ElasticsearchMigrationService {
       indexName: 'images',
       mapping: imageElasticsearchMapping,
       version: '1.0.0',
-      description: 'Initial images index with metadata and variants'
+      description: 'Initial images index with metadata and variants',
     })
   }
 
@@ -30,38 +30,28 @@ export class ElasticsearchMigrationService {
   }
 
   async runAllMigrations(): Promise<boolean> {
-    console.log('Starting Elasticsearch migrations...')
-    
     // Vérifier la connexion
     const isConnected = await elasticsearchClient.isConnected()
     if (!isConnected) {
-      console.warn('Elasticsearch not available, skipping migrations')
       return false
     }
 
     let allSuccess = true
 
-    for (const [indexName, config] of this.migrations) {
-      console.log(`Running migration for ${indexName} (v${config.version})`)
-      
+    for (const [_indexName, config] of this.migrations) {
       try {
         const success = await this.runMigration(config)
-        if (!success) {
-          console.error(`Migration failed for ${indexName}`)
-          allSuccess = false
+        if (success) {
         } else {
-          console.log(`Migration completed for ${indexName}`)
+          allSuccess = false
         }
-      } catch (error) {
-        console.error(`Migration error for ${indexName}:`, error)
+      } catch (_error) {
         allSuccess = false
       }
     }
 
     if (allSuccess) {
-      console.log('All Elasticsearch migrations completed successfully')
     } else {
-      console.warn('Some Elasticsearch migrations failed')
     }
 
     return allSuccess
@@ -71,15 +61,14 @@ export class ElasticsearchMigrationService {
     try {
       // Créer l'index avec le mapping
       const success = await elasticsearchClient.createIndex(config.indexName, config.mapping)
-      
+
       if (success) {
         // Enregistrer la version de migration
         await this.recordMigration(config)
       }
-      
+
       return success
-    } catch (error) {
-      console.error(`Migration failed for ${config.indexName}:`, error)
+    } catch (_error) {
       return false
     }
   }
@@ -90,7 +79,7 @@ export class ElasticsearchMigrationService {
         indexName: config.indexName,
         version: config.version,
         description: config.description,
-        appliedAt: new Date().toISOString()
+        appliedAt: new Date().toISOString(),
       }
 
       await elasticsearchClient.indexDocument(
@@ -98,23 +87,18 @@ export class ElasticsearchMigrationService {
         `${config.indexName}_${config.version}`,
         migrationDoc
       )
-    } catch (error) {
-      console.warn('Failed to record migration:', error)
-    }
+    } catch (_error) {}
   }
 
   async resetIndex(indexName: string): Promise<boolean> {
     const config = this.migrations.get(indexName)
     if (!config) {
-      console.error(`No migration config found for ${indexName}`)
       return false
     }
 
-    console.log(`Resetting index ${indexName}...`)
-    
     // Supprimer l'index existant
     await elasticsearchClient.deleteIndex(indexName)
-    
+
     // Recréer avec le mapping actuel
     return await this.runMigration(config)
   }
@@ -129,22 +113,22 @@ export class ElasticsearchMigrationService {
           aggs: {
             total_docs: {
               value_count: {
-                field: '_id'
-              }
-            }
-          }
+                field: '_id',
+              },
+            },
+          },
         })
 
         health[indexName] = {
           exists: true,
           documentCount: stats.hits?.total?.value || 0,
-          status: 'healthy'
+          status: 'healthy',
         }
       } catch (error) {
         health[indexName] = {
           exists: false,
           error: error instanceof Error ? error.message : String(error),
-          status: 'error'
+          status: 'error',
         }
       }
     }

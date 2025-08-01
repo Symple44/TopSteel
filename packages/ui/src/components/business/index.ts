@@ -5,30 +5,26 @@
 
 // Dialogs métier
 export * from './dialogs'
+export * from './erp-info-modal'
 
 // Affichage métier
 export * from './displays'
-
-// Tables spécialisées
-export * from './tables'
-
-// Formulaires métier
-export * from './forms'
-
-// Upload et documents
-export * from './uploads'
-
+export * from './company-logo'
 // Filtres et recherche
 export * from './filters'
 
-// Notifications métier
-export * from './notifications'
-
+// Formulaires métier
+export * from './forms'
 // Composants métallurgie
 export * from './metallurgy'
-
-// Workflow et processus
-export * from './workflows'
-
+// Notifications métier
+export * from './notifications'
 // Projet
 export * from './projet-card'
+// Tables spécialisées
+export * from './tables'
+// Upload et documents
+export * from './uploads'
+export * from './image-upload'
+// Workflow et processus
+export * from './workflows'

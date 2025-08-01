@@ -3,8 +3,8 @@
  * Fichier: apps/web/src/hooks/use-appearance-settings.ts
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTheme } from 'next-themes'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { translator } from '@/lib/i18n/translator'
 import { callClientApi } from '@/utils/backend-api'
 
@@ -14,7 +14,19 @@ export interface AppearanceSettings {
   fontSize: 'small' | 'medium' | 'large'
   sidebarWidth: 'compact' | 'normal' | 'wide'
   density: 'compact' | 'comfortable' | 'spacious'
-  accentColor: 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'red' | 'teal' | 'indigo' | 'yellow' | 'emerald' | 'rose' | 'cyan'
+  accentColor:
+    | 'blue'
+    | 'green'
+    | 'purple'
+    | 'orange'
+    | 'pink'
+    | 'red'
+    | 'teal'
+    | 'indigo'
+    | 'yellow'
+    | 'emerald'
+    | 'rose'
+    | 'cyan'
   contentWidth: 'compact' | 'full'
 }
 
@@ -34,7 +46,7 @@ const defaultSettings: AppearanceSettings = {
   sidebarWidth: 'normal',
   density: 'comfortable',
   accentColor: 'blue',
-  contentWidth: 'compact' // Compact par défaut comme actuellement
+  contentWidth: 'compact', // Compact par défaut comme actuellement
 }
 
 // Clé pour le localStorage
@@ -54,38 +66,43 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
   // Appliquer les paramètres au DOM
   const applySettings = useCallback((newSettings: AppearanceSettings) => {
     const root = document.documentElement
-    
+
     // Appliquer la langue au document ET au système i18n
     root.setAttribute('lang', newSettings.language || 'fr')
-    
+
     // Synchroniser avec le système i18n
     if (translator.getCurrentLanguage() !== newSettings.language) {
       translator.setLanguage(newSettings.language)
     }
-    
+
     // Appliquer la taille de police
-    root.style.setProperty('--font-size-multiplier', 
-      newSettings.fontSize === 'small' ? '0.875' :
-      newSettings.fontSize === 'large' ? '1.125' : '1'
+    root.style.setProperty(
+      '--font-size-multiplier',
+      newSettings.fontSize === 'small' ? '0.875' : newSettings.fontSize === 'large' ? '1.125' : '1'
     )
-    
+
     // Appliquer la densité
-    root.style.setProperty('--density-multiplier',
-      newSettings.density === 'compact' ? '0.75' :
-      newSettings.density === 'spacious' ? '1.25' : '1'
+    root.style.setProperty(
+      '--density-multiplier',
+      newSettings.density === 'compact' ? '0.75' : newSettings.density === 'spacious' ? '1.25' : '1'
     )
-    
+
     // Appliquer la largeur de sidebar
-    root.style.setProperty('--sidebar-width',
-      newSettings.sidebarWidth === 'compact' ? '200px' :
-      newSettings.sidebarWidth === 'wide' ? '320px' : '260px'
+    root.style.setProperty(
+      '--sidebar-width',
+      newSettings.sidebarWidth === 'compact'
+        ? '200px'
+        : newSettings.sidebarWidth === 'wide'
+          ? '320px'
+          : '260px'
     )
-    
+
     // Appliquer la largeur du contenu
-    root.style.setProperty('--content-max-width',
+    root.style.setProperty(
+      '--content-max-width',
       newSettings.contentWidth === 'full' ? 'none' : '1200px'
     )
-    
+
     // Appliquer la couleur d'accent (via CSS custom properties)
     const accentColors = {
       blue: '217 91% 60%',
@@ -99,14 +116,14 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
       yellow: '48 96% 53%',
       emerald: '160 84% 39%',
       rose: '330 81% 60%',
-      cyan: '188 94% 59%'
+      cyan: '188 94% 59%',
     }
-    
+
     if (accentColors[newSettings.accentColor]) {
       // Appliquer la couleur d'accent comme couleur primaire
       root.style.setProperty('--primary', accentColors[newSettings.accentColor])
       root.style.setProperty('--accent-color', `hsl(${accentColors[newSettings.accentColor]})`)
-      
+
       // Ajuster la couleur de texte primaire selon la luminosité
       const luminosityMap = {
         blue: '220 13% 98%',
@@ -120,11 +137,14 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
         yellow: '48 20% 15%', // Texte sombre pour jaune
         emerald: '160 20% 98%',
         rose: '330 20% 98%',
-        cyan: '188 20% 15%' // Texte sombre pour cyan
+        cyan: '188 20% 15%', // Texte sombre pour cyan
       }
-      
-      root.style.setProperty('--primary-foreground', luminosityMap[newSettings.accentColor] || '0 0% 98%')
-      
+
+      root.style.setProperty(
+        '--primary-foreground',
+        luminosityMap[newSettings.accentColor] || '0 0% 98%'
+      )
+
       // Créer ou mettre à jour une feuille de style pour forcer les couleurs
       let accentStyleElement = document.getElementById('topsteel-accent-styles')
       if (!accentStyleElement) {
@@ -132,7 +152,7 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
         accentStyleElement.id = 'topsteel-accent-styles'
         document.head.appendChild(accentStyleElement)
       }
-      
+
       // Générer les styles dynamiques pour la couleur d'accent
       accentStyleElement.textContent = `
         /* Couleurs d'accent personnalisées - plus douces */
@@ -337,46 +357,45 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
     // Appliquer les classes CSS pour la densité
     document.body.classList.remove('density-compact', 'density-comfortable', 'density-spacious')
     document.body.classList.add(`density-${newSettings.density}`)
-    
+
     // Appliquer les classes CSS pour la taille de police
     document.body.classList.remove('font-small', 'font-medium', 'font-large')
     document.body.classList.add(`font-${newSettings.fontSize}`)
-    
+
     // Appliquer les classes CSS pour la largeur du contenu
     document.body.classList.remove('content-compact', 'content-full')
     document.body.classList.add(`content-${newSettings.contentWidth}`)
-    
   }, [])
 
   // Charger les paramètres au démarrage
   useEffect(() => {
     if (hasInitialized.current || isLoadingRef.current) return // Éviter les rechargements multiples
-    
+
     const loadSettings = async () => {
       try {
         setIsLoading(true)
         isLoadingRef.current = true
-        
+
         // Charger d'abord depuis localStorage pour éviter le flash de thème par défaut
         const localSettings = localStorage.getItem(STORAGE_KEY)
         const themeFromNextThemes = localStorage.getItem(THEME_STORAGE_KEY)
         const languageFromI18n = translator.getCurrentLanguage()
-        
+
         let initialSettings = defaultSettings
         if (localSettings) {
           try {
             const parsedSettings = JSON.parse(localSettings) as AppearanceSettings
-            
+
             // Si next-themes a un thème différent, utiliser celui de next-themes
             if (themeFromNextThemes && themeFromNextThemes !== parsedSettings.theme) {
               parsedSettings.theme = themeFromNextThemes as AppearanceSettings['theme']
             }
-            
+
             // Synchroniser avec la langue du système i18n si différente
             if (languageFromI18n && languageFromI18n !== parsedSettings.language) {
               parsedSettings.language = languageFromI18n
             }
-            
+
             initialSettings = parsedSettings
             setSettings(parsedSettings)
             setSavedSettings(parsedSettings)
@@ -385,9 +404,10 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
             setTheme(parsedSettings.theme)
             applySettings(parsedSettings)
             lastAppliedSettings.current = parsedSettings
-          } catch (error) {
+          } catch (_error) {
             // Erreur de parsing, utiliser défaut ou thème de next-themes
-            const fallbackTheme = (themeFromNextThemes as AppearanceSettings['theme']) || defaultSettings.theme
+            const fallbackTheme =
+              (themeFromNextThemes as AppearanceSettings['theme']) || defaultSettings.theme
             const fallbackSettings = { ...defaultSettings, theme: fallbackTheme }
             setTheme(fallbackSettings.theme)
             applySettings(fallbackSettings)
@@ -395,10 +415,10 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
           }
         } else {
           // Pas de localStorage, vérifier si next-themes a un thème ou si i18n a une langue
-          const fallbackSettings = { 
-            ...defaultSettings, 
+          const fallbackSettings = {
+            ...defaultSettings,
             theme: (themeFromNextThemes as AppearanceSettings['theme']) || defaultSettings.theme,
-            language: languageFromI18n || defaultSettings.language
+            language: languageFromI18n || defaultSettings.language,
           }
           setSettings(fallbackSettings)
           setSavedSettings(fallbackSettings)
@@ -411,28 +431,37 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
         // Essayer de charger depuis l'API pour mise à jour
         try {
           const response = await callClientApi('users/appearance/me')
-          
+
           if (response.ok) {
             const apiResponse = await response.json()
-            
+
             // Extraire les paramètres d'apparence de la structure de réponse API
             let apiSettings = defaultSettings
-            if (apiResponse.success && apiResponse.data && apiResponse.data.preferences && apiResponse.data.preferences.appearance) {
+            if (
+              apiResponse.success &&
+              apiResponse.data &&
+              apiResponse.data.preferences &&
+              apiResponse.data.preferences.appearance
+            ) {
               apiSettings = apiResponse.data.preferences.appearance
             } else if (apiResponse.data && typeof apiResponse.data === 'object') {
               // Fallback si la structure est différente
               apiSettings = { ...defaultSettings, ...apiResponse.data }
             }
-            
+
             // Valider et corriger les valeurs invalides de l'API
-            if (apiSettings.theme === 'undefined' || apiSettings.theme === undefined || !apiSettings.theme) {
+            if (
+              (apiSettings.theme as any) === 'undefined' ||
+              apiSettings.theme === undefined ||
+              !apiSettings.theme
+            ) {
               apiSettings.theme = defaultSettings.theme
             }
-            
+
             // Seulement mettre à jour si les données API sont différentes de localStorage
             const currentSettingsJson = JSON.stringify(initialSettings)
             const apiSettingsJson = JSON.stringify(apiSettings)
-            
+
             if (apiSettingsJson !== currentSettingsJson) {
               setSettings(apiSettings)
               setSavedSettings(apiSettings)
@@ -444,13 +473,11 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
             }
             return
           }
-        } catch (apiError) {
+        } catch (_apiError) {
           // API unavailable, already loaded from localStorage above
           // Ne pas recharger depuis localStorage car déjà fait ci-dessus
         }
-        
-      } catch (error) {
-        console.error('Erreur lors du chargement des paramètres d\'apparence:', error)
+      } catch (_error) {
         // En cas d'erreur, utiliser les paramètres par défaut
         setSettings(defaultSettings)
         setSavedSettings(defaultSettings)
@@ -466,11 +493,14 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
     }
 
     loadSettings()
-  }, []) // Supprimer la dépendance setTheme qui causait la boucle
+  }, [applySettings, setTheme]) // Supprimer la dépendance setTheme qui causait la boucle
 
   // Appliquer les changements de settings de manière asynchrone
   useEffect(() => {
-    if (hasInitialized.current && JSON.stringify(settings) !== JSON.stringify(lastAppliedSettings.current)) {
+    if (
+      hasInitialized.current &&
+      JSON.stringify(settings) !== JSON.stringify(lastAppliedSettings.current)
+    ) {
       setTheme(settings.theme)
       applySettings(settings)
       // Synchroniser avec next-themes localStorage
@@ -482,32 +512,32 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
   // Écouter les changements du translator i18n
   useEffect(() => {
     if (!hasInitialized.current) return
-    
+
     const unsubscribe = translator.subscribe(() => {
       const currentLang = translator.getCurrentLanguage()
       if (currentLang !== settings.language) {
         // La langue du translator a changé, synchroniser les settings
-        setSettings(prevSettings => ({
+        setSettings((prevSettings) => ({
           ...prevSettings,
-          language: currentLang
+          language: currentLang,
         }))
       }
     })
-    
+
     return unsubscribe
   }, [settings.language])
 
   // Mettre à jour un paramètre
-  const updateSetting = useCallback(<K extends keyof AppearanceSettings>(
-    key: K, 
-    value: AppearanceSettings[K]
-  ) => {
-    setSettings(prevSettings => {
-      const newSettings = { ...prevSettings, [key]: value }
-      settingsRef.current = newSettings // Synchroniser la ref
-      return newSettings
-    })
-  }, [])
+  const updateSetting = useCallback(
+    <K extends keyof AppearanceSettings>(key: K, value: AppearanceSettings[K]) => {
+      setSettings((prevSettings) => {
+        const newSettings = { ...prevSettings, [key]: value }
+        settingsRef.current = newSettings // Synchroniser la ref
+        return newSettings
+      })
+    },
+    []
+  )
 
   // Sauvegarder les paramètres
   const saveSettings = useCallback(async () => {
@@ -519,19 +549,24 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
           method: 'PATCH',
           body: JSON.stringify(currentSettings),
         })
-        
+
         if (response.ok) {
           const apiResponse = await response.json()
-          
+
           // Extraire les paramètres d'apparence mis à jour de la structure de réponse API
           let updatedSettings = currentSettings
-          if (apiResponse.success && apiResponse.data && apiResponse.data.preferences && apiResponse.data.preferences.appearance) {
+          if (
+            apiResponse.success &&
+            apiResponse.data &&
+            apiResponse.data.preferences &&
+            apiResponse.data.preferences.appearance
+          ) {
             updatedSettings = apiResponse.data.preferences.appearance
           } else if (apiResponse.data && typeof apiResponse.data === 'object') {
             // Fallback si la structure est différente
             updatedSettings = { ...currentSettings, ...apiResponse.data }
           }
-          
+
           setSavedSettings(updatedSettings)
           // Mettre à jour le cache local
           localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedSettings))
@@ -542,19 +577,17 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
         } else {
           // Server save failed, using local storage
         }
-      } catch (apiError) {
+      } catch (_apiError) {
         // API unavailable, using local storage
       }
-      
+
       // Fallback vers localStorage
       localStorage.setItem(STORAGE_KEY, JSON.stringify(currentSettings))
       // Synchroniser le thème avec next-themes
       localStorage.setItem(THEME_STORAGE_KEY, currentSettings.theme)
       setSavedSettings(currentSettings)
       // Settings saved locally
-      
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde des paramètres:', error)
+    } catch (_error) {
       throw new Error('Impossible de sauvegarder les paramètres')
     }
   }, []) // Pas de dépendance sur settings pour éviter les re-renders
@@ -577,7 +610,7 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
     saveSettings,
     resetSettings,
     isLoading,
-    hasUnsavedChanges
+    hasUnsavedChanges,
   }
 }
 
@@ -593,8 +626,7 @@ export function useCurrentAppearanceSettings() {
       } else {
         setSettings(defaultSettings)
       }
-    } catch (error) {
-      console.error('Erreur lors de la lecture des paramètres:', error)
+    } catch (_error) {
       setSettings(defaultSettings)
     }
   }, [])

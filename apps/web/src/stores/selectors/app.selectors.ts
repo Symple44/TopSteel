@@ -4,9 +4,9 @@
  * Fichier: apps/web/src/stores/selectors/app.selectors.ts
  */
 
-import { createMemoizedSelector, createOptimizedSelectors } from '@/lib/optimized-selectors'
 import { ProjetStatut } from '@erp/domains/core'
 import type { AppState, StoreProjet } from '@erp/types'
+import { createMemoizedSelector, createOptimizedSelectors } from '@/lib/optimized-selectors'
 import { useAppStore } from '../app.store'
 
 // ===== CRÉATION DES SÉLECTEURS OPTIMISÉS TYPÉS =====
@@ -171,8 +171,8 @@ export const useProjectsCount = () =>
  * Sélecteur pour les projets avec filtres appliqués
  */
 export const useFilteredProjets = () => {
-  const projets = useProjets()
-  const filters = useProjectFilters()
+  const _projets = useProjets()
+  const _filters = useProjectFilters()
 
   return selectors.useMemoized(
     (state: AppState) => {

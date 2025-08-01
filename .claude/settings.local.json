@@ -141,7 +141,11 @@
       "Bash(npx typeorm-ts-node-commonjs migration:generate:*)",
       "Bash(turbo dev:*)",
       "Bash(npx typeorm query:*)",
-      "Bash(redis-cli:*)"
+      "Bash(redis-cli:*)",
+      "Bash(npx typeorm-ts-node-commonjs migration:run:*)",
+      "Bash(npx typeorm-ts-node-commonjs migration:create:*)",
+      "Bash(NEXT_TELEMETRY_DISABLED=1 npm run build)",
+      "Bash(python:*)"
     ],
     "deny": []
   }

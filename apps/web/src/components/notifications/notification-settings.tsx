@@ -1,34 +1,34 @@
 'use client'
 
-import { useNotifications } from '@/components/providers/notifications-provider'
-import { Button, Label, Switch, Separator, Badge } from '@erp/ui'
-import { useTranslation } from '@/lib/i18n'
-
-import { 
-  Mail, 
-  Monitor, 
-  Volume2, 
-  Settings2, 
-  Bell,
+import { Label, Separator, Switch } from '@erp/ui'
+import {
   AlertTriangle,
+  Bell,
   CheckCircle,
-  Info,
-  X,
   Clock,
-  Factory,
-  Package,
-  FileText,
-  Users,
   Database,
-  Wrench
+  Factory,
+  FileText,
+  Info,
+  Mail,
+  Monitor,
+  Package,
+  Settings2,
+  Users,
+  Volume2,
+  Wrench,
+  X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useNotifications } from '@/components/providers/notifications-provider'
+import { useTranslation } from '@/lib/i18n'
 
 export function NotificationSettings() {
   const { state, actions } = useNotifications()
   const { t } = useTranslation('settings')
-  const [activeTab, setActiveTab] = useState<'general' | 'categories' | 'priority' | 'schedule'>('general')
-
+  const [activeTab, setActiveTab] = useState<'general' | 'categories' | 'priority' | 'schedule'>(
+    'general'
+  )
 
   const categoryIcons = {
     system: Settings2,
@@ -99,7 +99,9 @@ export function NotificationSettings() {
               </div>
               <Switch
                 checked={state.settings.enableSound}
-                onCheckedChange={(checked: boolean) => actions.updateSettings({ enableSound: checked })}
+                onCheckedChange={(checked: boolean) =>
+                  actions.updateSettings({ enableSound: checked })
+                }
               />
             </div>
 
@@ -108,12 +110,16 @@ export function NotificationSettings() {
                 <Bell className="h-4 w-4" />
                 <div>
                   <Label>Notifications toast</Label>
-                  <p className="text-sm text-muted-foreground">Afficher les notifications en popup</p>
+                  <p className="text-sm text-muted-foreground">
+                    Afficher les notifications en popup
+                  </p>
                 </div>
               </div>
               <Switch
                 checked={state.settings.enableToast}
-                onCheckedChange={(checked: boolean) => actions.updateSettings({ enableToast: checked })}
+                onCheckedChange={(checked: boolean) =>
+                  actions.updateSettings({ enableToast: checked })
+                }
               />
             </div>
 
@@ -122,7 +128,9 @@ export function NotificationSettings() {
                 <Monitor className="h-4 w-4" />
                 <div>
                   <Label>Notifications navigateur</Label>
-                  <p className="text-sm text-muted-foreground">Notifications système du navigateur</p>
+                  <p className="text-sm text-muted-foreground">
+                    Notifications système du navigateur
+                  </p>
                 </div>
               </div>
               <Switch
@@ -138,7 +146,9 @@ export function NotificationSettings() {
                 <Mail className="h-4 w-4" />
                 <div>
                   <Label>Notifications email</Label>
-                  <p className="text-sm text-muted-foreground">Recevoir des notifications par email</p>
+                  <p className="text-sm text-muted-foreground">
+                    Recevoir des notifications par email
+                  </p>
                 </div>
               </div>
               <Switch
@@ -168,7 +178,9 @@ export function NotificationSettings() {
                     </div>
                   </div>
                   <Switch
-                    checked={state.settings.categories[key as keyof typeof state.settings.categories]}
+                    checked={
+                      state.settings.categories[key as keyof typeof state.settings.categories]
+                    }
                     onCheckedChange={(checked: boolean) =>
                       actions.updateSettings({
                         categories: {
@@ -266,15 +278,12 @@ export function NotificationSettings() {
       </div>
 
       {/* Contenu de l'onglet */}
-      <div className="min-h-[300px]">
-        {renderTabContent()}
-      </div>
+      <div className="min-h-[300px]">{renderTabContent()}</div>
 
       <Separator />
 
       {/* Actions */}
       <div className="space-y-4">
-
         <div className="text-xs text-muted-foreground space-y-1">
           <p>
             <strong>Note:</strong> Les notifications navigateur nécessitent votre autorisation.

@@ -5,73 +5,66 @@
 
 // ===== DOMAINES PRINCIPAUX =====
 export * from './core'
-export * from './sales'
-export * from './production'
 export * from './cross-cutting'
-export * from './search'
-
 // Export conditionnel pour les images (côté serveur uniquement)
 export type * from './image/types'
+export * from './production'
+export * from './sales'
+export * from './search'
 
 // ===== RE-EXPORTS ESSENTIELS =====
 
 // Core types
 export type {
   Client,
-  ClientType,
-  ClientStatut,
   ClientPriorite,
+  ClientStatut,
+  ClientType,
+  Competence,
+  Departement,
+  Organization,
+  Site,
   User,
   UserRole,
   UserStatut,
-  Competence,
-  Organization,
-  Departement,
-  Site,
 } from './core'
-
-// Sales types
-export type {
-  Quote,
-  QuoteStatut,
-  QuoteType,
-  QuoteItem,
-} from './sales'
-
-// Production types
-export type {
-  OrdreFabrication,
-  Operation,
-  ControleQualite,
-  MaterialOrder,
-  ProductionStats,
-} from './production'
-
-export {
-  OrdreStatut,
-  OrdrePriorite,
-  StatutProduction,
-  TypeOperation,
-  OperationStatut,
-  PrioriteProduction,
-  QualiteStatut,
-  MaterialStatus,
-} from './production'
-
+// ===== SERVICES MÉTIER =====
+export { ClientBusinessService } from './core/client/domain/services'
 // Cross-cutting types
 export type {
   Notification,
-  NotificationStats,
-  NotificationPreferences,
   NotificationFilters,
+  NotificationPreferences,
+  NotificationStats,
 } from './cross-cutting'
-
 export {
-  NotificationType,
-  NotificationPriority,
   NotificationChannel,
+  NotificationPriority,
   NotificationStatus,
+  NotificationType,
 } from './cross-cutting'
-
-// ===== SERVICES MÉTIER =====
-export { ClientBusinessService } from './core/client/domain/services'
+// Production types
+export type {
+  ControleQualite,
+  MaterialOrder,
+  Operation,
+  OrdreFabrication,
+  ProductionStats,
+} from './production'
+export {
+  MaterialStatus,
+  OperationStatut,
+  OrdrePriorite,
+  OrdreStatut,
+  PrioriteProduction,
+  QualiteStatut,
+  StatutProduction,
+  TypeOperation,
+} from './production'
+// Sales types
+export type {
+  Quote,
+  QuoteItem,
+  QuoteStatut,
+  QuoteType,
+} from './sales'

@@ -6,19 +6,19 @@ export async function GET() {
     {
       id: 'M',
       name: 'Dossier',
-      description: 'Conteneur pour organiser d\'autres éléments de menu',
+      description: "Conteneur pour organiser d'autres éléments de menu",
       icon: 'Folder',
       allowsChildren: true,
-      hasUrl: false
+      hasUrl: false,
     },
     {
       id: 'P',
       name: 'Programme',
-      description: 'Page ou fonctionnalité de l\'application',
+      description: "Page ou fonctionnalité de l'application",
       icon: 'FileText',
       allowsChildren: false,
       hasUrl: true,
-      urlField: 'programId'
+      urlField: 'programId',
     },
     {
       id: 'L',
@@ -27,7 +27,7 @@ export async function GET() {
       icon: 'ExternalLink',
       allowsChildren: false,
       hasUrl: true,
-      urlField: 'externalUrl'
+      urlField: 'externalUrl',
     },
     {
       id: 'D',
@@ -36,14 +36,14 @@ export async function GET() {
       icon: 'Database',
       allowsChildren: false,
       hasUrl: true,
-      urlField: 'queryBuilderId'
-    }
+      urlField: 'queryBuilderId',
+    },
   ]
 
   return NextResponse.json({
     success: true,
     data: {
-      types: menuTypes
-    }
+      types: menuTypes,
+    },
   })
 }

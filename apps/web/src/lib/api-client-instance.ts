@@ -1,6 +1,6 @@
 /**
  * Instance du client API avec gestion de connexion
- * 
+ *
  * Ce fichier exporte l'instance améliorée du client API
  * sans créer de dépendance circulaire
  */

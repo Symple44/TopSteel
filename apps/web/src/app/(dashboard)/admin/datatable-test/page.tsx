@@ -1,107 +1,102 @@
 'use client'
 
-import React from 'react'
+export const dynamic = 'force-dynamic'
+
 import '@/styles/datatable-demo.css'
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from '@erp/ui'
-import { DataTableExample } from '@/components/ui/datatable/DataTableExample'
-import { SimpleDataTableExample } from '@/components/ui/datatable/SimpleExample'
-import { HierarchicalDataTableExample } from '@/components/ui/datatable/HierarchicalDataTableExample'
-import { DropdownTest } from '@/components/ui/dropdown-test'
-import { useTranslation } from '@/lib/i18n/hooks'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import {
-  Table,
-  Sparkles,
-  Database,
-  Zap,
-  Copy,
-  Settings,
   ArrowUpRight,
   CheckCircle,
-  TrendingUp,
-  Users,
-  FileSpreadsheet,
+  Copy,
+  Database,
   Edit3,
+  FileSpreadsheet,
+  Settings,
+  Sparkles,
+  Table,
+  TreePine,
+  TrendingUp,
   Type,
-  TreePine
+  Users,
+  Zap,
 } from 'lucide-react'
-
+import { DataTableExample, HierarchicalDataTableExample, SimpleDataTableExample } from '@erp/ui'
+// import { DropdownTest } from '@/components/ui/dropdown-test'
 export default function DataTableTestPage() {
-  const { t } = useTranslation('admin')
-
   const features = [
     {
       icon: <Edit3 className="h-5 w-5" />,
-      title: "Édition Inline",
-      description: "Modification directe des cellules avec validation en temps réel",
-      gradient: "from-emerald-500 to-teal-600"
+      title: 'Édition Inline',
+      description: 'Modification directe des cellules avec validation en temps réel',
+      gradient: 'from-emerald-500 to-teal-600',
     },
     {
       icon: <Copy className="h-5 w-5" />,
-      title: "Copier-Coller Excel",
-      description: "Import/export de données depuis/vers Excel avec validation",
-      gradient: "from-blue-500 to-indigo-600"
+      title: 'Copier-Coller Excel',
+      description: 'Import/export de données depuis/vers Excel avec validation',
+      gradient: 'from-blue-500 to-indigo-600',
     },
     {
       icon: <Settings className="h-5 w-5" />,
-      title: "Colonnes Configurables",
-      description: "Réorganisation par drag & drop et sauvegarde des préférences",
-      gradient: "from-purple-500 to-pink-600"
+      title: 'Colonnes Configurables',
+      description: 'Réorganisation par drag & drop et sauvegarde des préférences',
+      gradient: 'from-purple-500 to-pink-600',
     },
     {
       icon: <Zap className="h-5 w-5" />,
-      title: "Formules Excel",
-      description: "Calculs automatiques avec références de cellules",
-      gradient: "from-orange-500 to-red-500"
+      title: 'Formules Excel',
+      description: 'Calculs automatiques avec références de cellules',
+      gradient: 'from-orange-500 to-red-500',
     },
     {
       icon: <Database className="h-5 w-5" />,
-      title: "Tri & Filtrage",
-      description: "Recherche avancée et tri multi-colonnes",
-      gradient: "from-cyan-500 to-blue-600"
+      title: 'Tri & Filtrage',
+      description: 'Recherche avancée et tri multi-colonnes',
+      gradient: 'from-cyan-500 to-blue-600',
     },
     {
       icon: <FileSpreadsheet className="h-5 w-5" />,
-      title: "Validation Avancée",
-      description: "Contrôles de saisie personnalisés par type de données",
-      gradient: "from-violet-500 to-purple-600"
+      title: 'Validation Avancée',
+      description: 'Contrôles de saisie personnalisés par type de données',
+      gradient: 'from-violet-500 to-purple-600',
     },
     {
       icon: <Type className="h-5 w-5" />,
-      title: "Éditeur Rich Text",
-      description: "Formatage de texte avancé avec HTML pour les commentaires",
-      gradient: "from-pink-500 to-rose-600"
-    }
+      title: 'Éditeur Rich Text',
+      description: 'Formatage de texte avancé avec HTML pour les commentaires',
+      gradient: 'from-pink-500 to-rose-600',
+    },
   ]
 
   const stats = [
     {
-      label: "Types de colonnes",
-      value: "10",
-      description: "Text, Number, Date, Boolean, Select, RichText...",
+      label: 'Types de colonnes',
+      value: '10',
+      description: 'Text, Number, Date, Boolean, Select, RichText...',
       icon: <Table className="h-6 w-6" />,
-      gradient: "from-emerald-500 to-teal-600"
+      gradient: 'from-emerald-500 to-teal-600',
     },
     {
-      label: "Fonctions Excel",
-      value: "12+",
-      description: "SUM, IF, MAX, MIN, AVERAGE...",
+      label: 'Fonctions Excel',
+      value: '12+',
+      description: 'SUM, IF, MAX, MIN, AVERAGE...',
       icon: <Sparkles className="h-6 w-6" />,
-      gradient: "from-blue-500 to-indigo-600"
+      gradient: 'from-blue-500 to-indigo-600',
     },
     {
-      label: "Validations",
-      value: "8",
-      description: "Pattern, Min/Max, Custom...",
+      label: 'Validations',
+      value: '8',
+      description: 'Pattern, Min/Max, Custom...',
       icon: <CheckCircle className="h-6 w-6" />,
-      gradient: "from-purple-500 to-pink-600"
+      gradient: 'from-purple-500 to-pink-600',
     },
     {
-      label: "Performance",
-      value: "1000+",
-      description: "Lignes traitées efficacement",
+      label: 'Performance',
+      value: '1000+',
+      description: 'Lignes traitées efficacement',
       icon: <TrendingUp className="h-6 w-6" />,
-      gradient: "from-orange-500 to-red-500"
-    }
+      gradient: 'from-orange-500 to-red-500',
+    },
   ]
 
   return (
@@ -135,21 +130,18 @@ export default function DataTableTestPage() {
 
         {/* Statistics Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
-            <Card key={index} className={`group border-0 bg-gradient-to-br ${stat.gradient} text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 fade-in-up`}>
+          {stats.map((stat) => (
+            <Card
+              key={stat.label}
+              className={`group border-0 bg-gradient-to-br ${stat.gradient} text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 fade-in-up`}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white/90">
-                  {stat.label}
-                </CardTitle>
-                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                  {stat.icon}
-                </div>
+                <CardTitle className="text-sm font-medium text-white/90">{stat.label}</CardTitle>
+                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">{stat.icon}</div>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold mb-1 stat-counter">{stat.value}</div>
-                <p className="text-xs text-white/80">
-                  {stat.description}
-                </p>
+                <p className="text-xs text-white/80">{stat.description}</p>
               </CardContent>
             </Card>
           ))}
@@ -165,12 +157,14 @@ export default function DataTableTestPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {features.map((feature, index) => (
-                <div 
-                  key={index}
+              {features.map((feature) => (
+                <div
+                  key={feature.title}
                   className="group p-6 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-100 hover:shadow-lg transition-all duration-300 hover:scale-105 feature-card fade-in-up"
                 >
-                  <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.gradient} text-white mb-4 group-hover:scale-110 transition-transform`}>
+                  <div
+                    className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.gradient} text-white mb-4 group-hover:scale-110 transition-transform`}
+                  >
                     {feature.icon}
                   </div>
                   <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-slate-900">
@@ -194,14 +188,13 @@ export default function DataTableTestPage() {
                   <Settings className="h-6 w-6 mr-3 text-purple-600" />
                   Test Dropdowns
                 </CardTitle>
-                <p className="text-slate-600 mt-2">
-                  Test des composants DropdownPortal
-                </p>
+                <p className="text-slate-600 mt-2">Test des composants DropdownPortal</p>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <DropdownTest />
+            {/* <DropdownTest /> */}
+            <p>DropdownTest component is not available</p>
           </CardContent>
         </Card>
 
@@ -290,27 +283,40 @@ export default function DataTableTestPage() {
               <ul className="space-y-3 text-sm text-emerald-700">
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Édition :</strong> Cliquez sur une cellule pour la modifier inline</span>
+                  <span>
+                    <strong>Édition :</strong> Cliquez sur une cellule pour la modifier inline
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Sélection :</strong> Cochez les lignes et utilisez Ctrl+C pour copier</span>
+                  <span>
+                    <strong>Sélection :</strong> Cochez les lignes et utilisez Ctrl+C pour copier
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Collage :</strong> Ctrl+V pour coller des données depuis Excel</span>
+                  <span>
+                    <strong>Collage :</strong> Ctrl+V pour coller des données depuis Excel
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Colonnes :</strong> Glissez-déposez les en-têtes pour réorganiser</span>
+                  <span>
+                    <strong>Colonnes :</strong> Glissez-déposez les en-têtes pour réorganiser
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Paramètres :</strong> Utilisez le menu "Colonnes" pour personnaliser</span>
+                  <span>
+                    <strong>Paramètres :</strong> Utilisez le menu "Colonnes" pour personnaliser
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Rich Text :</strong> Cliquez sur la colonne Commentaires pour éditer avec formatage</span>
+                  <span>
+                    <strong>Rich Text :</strong> Cliquez sur la colonne Commentaires pour éditer
+                    avec formatage
+                  </span>
                 </li>
               </ul>
             </CardContent>
@@ -327,23 +333,33 @@ export default function DataTableTestPage() {
               <ul className="space-y-3 text-sm text-blue-700">
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Nom :</strong> 2-50 caractères, lettres uniquement (avec regex)</span>
+                  <span>
+                    <strong>Nom :</strong> 2-50 caractères, lettres uniquement (avec regex)
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Âge :</strong> Nombre entre 18 et 65 ans</span>
+                  <span>
+                    <strong>Âge :</strong> Nombre entre 18 et 65 ans
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Email :</strong> Format email valide avec validation custom</span>
+                  <span>
+                    <strong>Email :</strong> Format email valide avec validation custom
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Date :</strong> Ne peut pas être dans le futur</span>
+                  <span>
+                    <strong>Date :</strong> Ne peut pas être dans le futur
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0" />
-                  <span><strong>Total :</strong> Calculé automatiquement (formule : âge × 12)</span>
+                  <span>
+                    <strong>Total :</strong> Calculé automatiquement (formule : âge × 12)
+                  </span>
                 </li>
               </ul>
             </CardContent>

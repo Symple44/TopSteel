@@ -3,21 +3,33 @@
  * Démonstration des composants avec variantes class-variance-authority
  */
 
-import * as React from 'react'
-import { Button } from '../components/primitives/button/Button'
 import { Badge } from '../components/data-display/badge/Badge'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/layout/card/Card'
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/data-display/table/table'
-import { 
-  Sidebar, 
-  SidebarHeader, 
-  SidebarContent, 
-  SidebarFooter, 
-  SidebarNav, 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/data-display/table/table'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../components/layout/card/Card'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarNav,
   SidebarNavItem,
   SidebarSection,
-  SidebarSectionTitle 
+  SidebarSectionTitle,
 } from '../components/layout/sidebar/Sidebar'
+import { Button } from '../components/primitives/button/Button'
 
 export function DesignSystemDemo() {
   return (
@@ -79,7 +91,7 @@ export function DesignSystemDemo() {
           <Button variant="ghost">Ghost</Button>
           <Button variant="link">Link</Button>
         </div>
-        
+
         <div className="mt-4 flex flex-wrap gap-2">
           <Button size="sm">Small</Button>
           <Button size="default">Default</Button>
@@ -102,7 +114,7 @@ export function DesignSystemDemo() {
       {/* Table Variants Demo */}
       <section>
         <h2 className="text-2xl font-bold mb-4">Table Variants</h2>
-        
+
         <h3 className="text-lg font-semibold mb-2">Default Table</h3>
         <Table variant="default">
           <TableHeader>
@@ -115,12 +127,16 @@ export function DesignSystemDemo() {
           <TableBody>
             <TableRow>
               <TableCell>Project A</TableCell>
-              <TableCell><Badge variant="default">Active</Badge></TableCell>
+              <TableCell>
+                <Badge variant="default">Active</Badge>
+              </TableCell>
               <TableCell>€1,500</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Project B</TableCell>
-              <TableCell><Badge variant="secondary">Pending</Badge></TableCell>
+              <TableCell>
+                <Badge variant="secondary">Pending</Badge>
+              </TableCell>
               <TableCell>€2,300</TableCell>
             </TableRow>
           </TableBody>
@@ -139,17 +155,23 @@ export function DesignSystemDemo() {
             <TableRow>
               <TableCell>ACME Corp</TableCell>
               <TableCell>Website Redesign</TableCell>
-              <TableCell><Badge variant="destructive">High</Badge></TableCell>
+              <TableCell>
+                <Badge variant="destructive">High</Badge>
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>TechStart</TableCell>
               <TableCell>Mobile App</TableCell>
-              <TableCell><Badge variant="outline">Medium</Badge></TableCell>
+              <TableCell>
+                <Badge variant="outline">Medium</Badge>
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>GlobalCorp</TableCell>
               <TableCell>ERP Integration</TableCell>
-              <TableCell><Badge variant="default">Low</Badge></TableCell>
+              <TableCell>
+                <Badge variant="default">Low</Badge>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>

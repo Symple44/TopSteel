@@ -1,9 +1,9 @@
 // Socket.IO URL polyfill
 // Polyfill pour gérer les URL dans Socket.IO
 
-export function url(uri, path, loc) {
+export function url(uri, path, _loc) {
   let obj = uri
-  
+
   // Convertir string en objet URL
   if (typeof uri === 'string') {
     try {
@@ -16,14 +16,13 @@ export function url(uri, path, loc) {
         search: parsed.search,
         hash: parsed.hash,
         host: parsed.host,
-        origin: parsed.origin
+        origin: parsed.origin,
       }
-    } catch (error) {
-      console.warn('URL parsing error:', error)
+    } catch (_error) {
       // Utiliser les variables d'environnement pour les valeurs par défaut
       const defaultApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3002'
       const defaultUrl = new URL(defaultApiUrl)
-      
+
       obj = {
         protocol: defaultUrl.protocol,
         hostname: defaultUrl.hostname,
@@ -32,7 +31,7 @@ export function url(uri, path, loc) {
         search: '',
         hash: '',
         host: defaultUrl.host,
-        origin: defaultUrl.origin
+        origin: defaultUrl.origin,
       }
     }
   }
@@ -55,43 +54,43 @@ export function url(uri, path, loc) {
   return {
     ...obj,
     href: finalUrl,
-    toString: () => finalUrl
+    toString: () => finalUrl,
   }
 }
 
 // Fonction pour parser les paramètres d'URL
 export function parseqs(qs) {
   if (!qs || typeof qs !== 'string') return {}
-  
+
   const params = {}
   const pairs = qs.replace(/^\?/, '').split('&')
-  
+
   for (const pair of pairs) {
     const [key, value] = pair.split('=')
     if (key) {
       params[decodeURIComponent(key)] = decodeURIComponent(value || '')
     }
   }
-  
+
   return params
 }
 
 // Fonction pour stringify les paramètres
 export function stringifyqs(obj) {
   if (!obj || typeof obj !== 'object') return ''
-  
+
   const pairs = []
   for (const [key, value] of Object.entries(obj)) {
     if (value !== undefined && value !== null) {
       pairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
     }
   }
-  
+
   return pairs.length ? `?${pairs.join('&')}` : ''
 }
 
 export default {
   url,
   parseqs,
-  stringifyqs
+  stringifyqs,
 }

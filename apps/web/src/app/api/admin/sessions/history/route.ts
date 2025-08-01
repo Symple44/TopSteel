@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
 
 export async function GET(request: NextRequest) {
@@ -21,18 +21,22 @@ export async function GET(request: NextRequest) {
 
     // Importer callBackendFromApi
     const { callBackendFromApi } = await import('@/utils/backend-api')
-    
-    const apiResponse = await callBackendFromApi(`auth/sessions/history?limit=${limit}&offset=${offset}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': request.headers.get('Authorization') || '',
+
+    const apiResponse = await callBackendFromApi(
+      request,
+      `auth/sessions/history?limit=${limit}&offset=${offset}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: request.headers.get('Authorization') || '',
+        },
       }
-    })
+    )
 
     if (!apiResponse.ok) {
       const errorData = await apiResponse.json().catch(() => ({ error: 'Erreur API backend' }))
       return NextResponse.json(
-        { error: errorData.error || 'Erreur lors de la récupération de l\'historique' },
+        { error: errorData.error || "Erreur lors de la récupération de l'historique" },
         { status: apiResponse.status }
       )
     }
@@ -42,13 +46,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: historyData.data || historyData,
-      pagination: historyData.pagination
+      pagination: historyData.pagination,
     })
-  } catch (error) {
-    console.error('Erreur lors de la récupération de l\'historique:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

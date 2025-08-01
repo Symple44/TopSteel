@@ -35,7 +35,7 @@ export function MouvementsTable({
   onFilter,
 }: MouvementsTableProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [typeFilter, setTypeFilter] = useState('')
+  const [_typeFilter, _setTypeFilter] = useState('')
 
   // Mock data si aucune donnée fournie
   const mockMovements: Mouvement[] = [

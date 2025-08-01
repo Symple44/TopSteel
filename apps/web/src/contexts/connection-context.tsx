@@ -1,7 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { ConnectionLostDialog } from '@/components/ui/connection-lost-dialog'
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
+import { ConnectionLostDialogWrapper as ConnectionLostDialog } from '@/components/wrappers'
 import { apiClientEnhanced } from '@/lib/api-client-enhanced'
 
 interface ConnectionContextType {
@@ -40,20 +40,20 @@ export function ConnectionProvider({ children, checkInterval = 60000 }: Connecti
       const healthData = await apiClientEnhanced.get('/health', {
         timeout: 8000, // Timeout de 8 secondes (plus long)
         retry: false, // Pas de retry pour le health check
-        cache: false // Pas de cache pour le health check
+        cache: false, // Pas de cache pour le health check
       })
-      
+
       // Si on reçoit des données, c'est que la connexion fonctionne
       // Peu importe le statut de la base de données dans le health check
-      const connected = healthData ? true : false
+      const connected = !!healthData
       setIsConnected(connected)
-      
+
       if (connected && showConnectionLostDialog) {
         setShowConnectionLostDialog(false)
       }
-      
+
       return connected
-    } catch (error) {
+    } catch (_error) {
       // Erreur réseau = pas de connexion
       setIsConnected(false)
       setShowConnectionLostDialog(true)
@@ -83,7 +83,8 @@ export function ConnectionProvider({ children, checkInterval = 60000 }: Connecti
 
     // Configurer la vérification périodique
     intervalId = setInterval(() => {
-      if (!showConnectionLostDialog) { // Ne pas vérifier si le dialog est déjà affiché
+      if (!showConnectionLostDialog) {
+        // Ne pas vérifier si le dialog est déjà affiché
         checkConnection()
       }
     }, checkInterval)
@@ -117,20 +118,17 @@ export function ConnectionProvider({ children, checkInterval = 60000 }: Connecti
   }
 
   return (
-    <ConnectionContext.Provider 
+    <ConnectionContext.Provider
       value={{
         isConnected,
         isChecking,
         checkConnection,
         setConnectionLost,
-        setConnectionRestored
+        setConnectionRestored,
       }}
     >
       {children}
-      <ConnectionLostDialog 
-        isOpen={showConnectionLostDialog} 
-        onRetry={handleRetry}
-      />
+      <ConnectionLostDialog isOpen={showConnectionLostDialog} onRetry={handleRetry} />
     </ConnectionContext.Provider>
   )
 }

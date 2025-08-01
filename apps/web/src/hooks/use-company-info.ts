@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '@/utils/backend-api'
 
 export interface CompanyInfo {
@@ -27,9 +27,9 @@ export function useCompanyInfo() {
     try {
       setLoading(true)
       setError(null)
-      
+
       const response = await callClientApi('admin/company')
-      
+
       if (!response.ok) {
         // Si l'endpoint n'existe pas encore, utiliser des données par défaut
         if (response.status === 404) {
@@ -38,47 +38,47 @@ export function useCompanyInfo() {
             name: 'TopSteel',
             siret: '12345678901234',
             vat: 'FR12345678901',
-            address: '123 Rue de l\'Industrie',
+            address: "123 Rue de l'Industrie",
             city: 'Paris',
             postalCode: '75001',
             country: 'France',
             phone: '+33 1 23 45 67 89',
             email: 'contact@topsteel.tech',
             website: 'https://topsteel.tech',
-            logo: undefined // Pas de logo par défaut
+            logo: undefined, // Pas de logo par défaut
           })
           return
         }
-        
+
         throw new Error(`Erreur lors du chargement (${response.status})`)
       }
-      
+
       const data = await response.json()
-      
+
       if (data.success) {
         setCompanyInfo(data.data)
       } else {
         throw new Error(data.message || 'Erreur lors du chargement des informations')
       }
-    } catch (err) {
+    } catch (_err) {
       // Error loading company info (silenced)
-      
+
       // En cas d'erreur, utiliser des données par défaut
       setCompanyInfo({
         id: 'main-company',
         name: 'TopSteel',
         siret: '12345678901234',
         vat: 'FR12345678901',
-        address: '123 Rue de l\'Industrie',
+        address: "123 Rue de l'Industrie",
         city: 'Paris',
         postalCode: '75001',
         country: 'France',
         phone: '+33 1 23 45 67 89',
         email: 'contact@topsteel.tech',
         website: 'https://topsteel.tech',
-        logo: undefined
+        logo: undefined,
       })
-      
+
       // Ne pas afficher d'erreur pour ne pas gêner l'utilisateur
       // setError(err instanceof Error ? err.message : 'Erreur de connexion')
     } finally {
@@ -90,15 +90,15 @@ export function useCompanyInfo() {
     try {
       const response = await callClientApi('admin/company', {
         method: 'PUT',
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates),
       })
-      
+
       if (!response.ok) {
         throw new Error(`Erreur lors de la mise à jour (${response.status})`)
       }
-      
+
       const data = await response.json()
-      
+
       if (data.success) {
         setCompanyInfo(data.data)
         return true
@@ -106,7 +106,6 @@ export function useCompanyInfo() {
         throw new Error(data.message || 'Erreur lors de la mise à jour')
       }
     } catch (err) {
-      console.error('Erreur lors de la mise à jour:', err)
       setError(err instanceof Error ? err.message : 'Erreur de connexion')
       return false
     }
@@ -121,6 +120,6 @@ export function useCompanyInfo() {
     loading,
     error,
     loadCompanyInfo,
-    updateCompanyInfo
+    updateCompanyInfo,
   }
 }

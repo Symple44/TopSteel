@@ -1,13 +1,19 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Settings2, Shield, Database, FileSpreadsheet } from 'lucide-react'
+import { Database, FileSpreadsheet, Settings2, Shield } from 'lucide-react'
+import { Badge } from '@erp/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Input } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui/primitives'
+import { Switch } from '@erp/ui/primitives'
+import { Textarea } from '@erp/ui/primitives'
 
 interface QuerySettingsProps {
   settings: any
@@ -47,7 +53,7 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
               placeholder="My Query Builder"
             />
           </div>
-          
+
           <div>
             <Label>Description</Label>
             <Textarea
@@ -103,12 +109,12 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
             <Input
               type="number"
               value={settings.maxRows || ''}
-              onChange={(e) => handleSettingChange('maxRows', e.target.value ? parseInt(e.target.value) : null)}
+              onChange={(e) =>
+                handleSettingChange('maxRows', e.target.value ? parseInt(e.target.value) : null)
+              }
               placeholder="Unlimited"
             />
-            <p className="text-sm text-muted-foreground mt-1">
-              Leave empty for unlimited rows
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">Leave empty for unlimited rows</p>
           </div>
         </CardContent>
       </Card>
@@ -130,7 +136,9 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
             </div>
             <Switch
               checked={settings.settings?.enablePagination ?? true}
-              onCheckedChange={(checked) => handleSettingChange('settings.enablePagination', checked)}
+              onCheckedChange={(checked) =>
+                handleSettingChange('settings.enablePagination', checked)
+              }
             />
           </div>
 
@@ -158,9 +166,7 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
           <div className="flex items-center justify-between">
             <div>
               <Label>Enable Sorting</Label>
-              <p className="text-sm text-muted-foreground">
-                Allow users to sort columns
-              </p>
+              <p className="text-sm text-muted-foreground">Allow users to sort columns</p>
             </div>
             <Switch
               checked={settings.settings?.enableSorting ?? true}
@@ -171,13 +177,13 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
           <div className="flex items-center justify-between">
             <div>
               <Label>Enable Filtering</Label>
-              <p className="text-sm text-muted-foreground">
-                Allow users to filter results
-              </p>
+              <p className="text-sm text-muted-foreground">Allow users to filter results</p>
             </div>
             <Switch
               checked={settings.settings?.enableFiltering ?? true}
-              onCheckedChange={(checked) => handleSettingChange('settings.enableFiltering', checked)}
+              onCheckedChange={(checked) =>
+                handleSettingChange('settings.enableFiltering', checked)
+              }
             />
           </div>
         </CardContent>
@@ -194,9 +200,7 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
           <div className="flex items-center justify-between">
             <div>
               <Label>Enable Export</Label>
-              <p className="text-sm text-muted-foreground">
-                Allow users to export query results
-              </p>
+              <p className="text-sm text-muted-foreground">Allow users to export query results</p>
             </div>
             <Switch
               checked={settings.settings?.enableExport ?? true}
@@ -216,9 +220,13 @@ export function QuerySettings({ settings, onSettingsChange }: QuerySettingsProps
                       variant={isEnabled ? 'default' : 'outline'}
                       className="cursor-pointer"
                       onClick={() => {
-                        const currentFormats = settings.settings?.exportFormats || ['csv', 'excel', 'json']
+                        const currentFormats = settings.settings?.exportFormats || [
+                          'csv',
+                          'excel',
+                          'json',
+                        ]
                         const newFormats = isEnabled
-                          ? currentFormats.filter(f => f !== format)
+                          ? currentFormats.filter((f: any) => f !== format)
                           : [...currentFormats, format]
                         handleSettingChange('settings.exportFormats', newFormats)
                       }}

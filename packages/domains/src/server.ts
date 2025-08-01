@@ -3,9 +3,9 @@
  * Services qui nécessitent des dépendances serveur (Sharp, etc.)
  */
 
+export { ImageElasticsearchService, imageElasticsearchService } from './image/elasticsearch-service'
 // Services d'images (utilisent Sharp, Node.js uniquement)
 export { ImageService, imageService } from './image/service'
-export { ImageElasticsearchService, imageElasticsearchService } from './image/elasticsearch-service'
 export type * from './image/types'
 
 // Services de recherche avec dépendances serveur

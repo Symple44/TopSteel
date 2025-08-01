@@ -3,21 +3,19 @@
  * Point d'entrée pour le domaine organisation
  */
 
-// ===== DOMAIN LAYER =====
-export * from './domain/entities'
-
 // ===== RE-EXPORTS UTILES =====
 export type {
-  // Entités principales
-  Organization,
   Departement,
-  Site,
-  OrganizationStats,
-  
   // Value Objects & Enums
   DepartementType,
-  SiteType,
+  LegalInfo,
+  // Entités principales
+  Organization,
   OrganizationAddress,
   OrganizationContact,
-  LegalInfo,
+  OrganizationStats,
+  Site,
+  SiteType,
 } from './domain/entities'
+// ===== DOMAIN LAYER =====
+export * from './domain/entities'

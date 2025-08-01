@@ -1,17 +1,16 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { DataTable } from '@/components/ui/datatable/DataTable'
-import { ColumnConfig } from '@/components/ui/datatable/types'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Download, RefreshCw } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { AdvancedDataTable, type ColumnConfig } from '@erp/ui'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@erp/ui/primitives'
 
 interface DataTablePreviewProps {
   data: any[]
@@ -24,8 +23,13 @@ interface DataTablePreviewProps {
 // Convert query builder data types to DataTable types
 const getDataTableType = (dataType: string): ColumnConfig<any>['type'] => {
   const type = dataType?.toLowerCase() || ''
-  
-  if (type.includes('int') || type.includes('numeric') || type.includes('decimal') || type.includes('float')) {
+
+  if (
+    type.includes('int') ||
+    type.includes('numeric') ||
+    type.includes('decimal') ||
+    type.includes('float')
+  ) {
     return 'number'
   }
   if (type.includes('bool')) {
@@ -49,32 +53,24 @@ export function DataTablePreview({
 }: DataTablePreviewProps) {
   const [loading, setLoading] = useState(false)
 
-  // Debug: log the props to see what we're receiving
-  console.log('DataTablePreview props:', {
-    dataLength: data?.length || 0,
-    columnsLength: columns?.length || 0,
-    columns: columns,
-    calculatedFieldsLength: calculatedFields?.length || 0
-  })
-
   const dataTableColumns = useMemo((): ColumnConfig<any>[] => {
     // Si pas de colonnes définies, pas d'affichage
     if (!columns || columns.length === 0) {
-      console.log('No columns available for DataTable')
       return []
     }
 
     // Traitement des colonnes définies par le query builder
-    const visibleColumns = columns.filter(col => col.isVisible ?? true)
-    const visibleCalculatedFields = calculatedFields.filter(field => field.isVisible ?? true)
-    
+    const visibleColumns = columns.filter((col) => col.isVisible ?? true)
+    const visibleCalculatedFields = calculatedFields.filter((field) => field.isVisible ?? true)
+
     // Trier par displayOrder
-    const allColumns = [...visibleColumns, ...visibleCalculatedFields]
-      .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+    const allColumns = [...visibleColumns, ...visibleCalculatedFields].sort(
+      (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
+    )
 
     const result = allColumns.map((col, index): ColumnConfig<any> => {
       const columnId = col.alias || col.columnName || col.name || `col_${index}`
-      
+
       const columnConfig: ColumnConfig<any> = {
         id: columnId,
         key: columnId as keyof any,
@@ -94,7 +90,7 @@ export function DataTablePreview({
                   currency: 'EUR',
                 }).format(value as number)
               case 'percentage':
-                return `${(value as number * 100).toFixed(col.format.decimals || 2)}%`
+                return `${((value as number) * 100).toFixed(col.format.decimals || 2)}%`
               case 'number':
                 return (value as number).toFixed(col.format.decimals || 0)
               case 'date':
@@ -105,27 +101,20 @@ export function DataTablePreview({
           }
 
           return String(value ?? '')
-        }
+        },
       }
-      
-      console.log('Created DataTable column:', columnConfig)
       return columnConfig
     })
-    
-    console.log('Final DataTable columns:', result)
     return result
   }, [columns, calculatedFields])
 
-  const handleExport = async (format: string) => {
-    // TODO: Implement export functionality
-    console.log('Export to', format)
-  }
+  const handleExport = async (_format: string) => {}
 
   const handleRefresh = async () => {
     setLoading(true)
     try {
       // TODO: Refetch data
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     } finally {
       setLoading(false)
     }
@@ -137,12 +126,7 @@ export function DataTablePreview({
         <div className="flex items-center justify-between">
           <CardTitle>Data Preview</CardTitle>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={loading}
-            >
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
@@ -156,10 +140,7 @@ export function DataTablePreview({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   {settings.settings?.exportFormats?.map((format: string) => (
-                    <DropdownMenuItem
-                      key={format}
-                      onClick={() => handleExport(format)}
-                    >
+                    <DropdownMenuItem key={format} onClick={() => handleExport(format)}>
                       Export as {format.toUpperCase()}
                     </DropdownMenuItem>
                   ))}
@@ -180,11 +161,15 @@ export function DataTablePreview({
         ) : (
           <div className="h-full flex flex-col">
             {/* Afficher les en-têtes même sans données */}
-            <DataTable
-              data={data && data.length > 0 ? data : [
-                // Ligne vide pour afficher les en-têtes
-                Object.fromEntries(dataTableColumns.map(col => [col.id, '']))
-              ]}
+            <AdvancedDataTable
+              data={
+                data && data.length > 0
+                  ? data
+                  : [
+                      // Ligne vide pour afficher les en-têtes
+                      Object.fromEntries(dataTableColumns.map((col) => [col.id, ''])),
+                    ]
+              }
               columns={dataTableColumns}
               keyField="id"
               tableId="query-preview"
@@ -200,9 +185,10 @@ export function DataTablePreview({
               // Pagination pour l'aperçu
               pagination={{
                 page: 1,
+                pageSize: 10,
                 total: data?.length || 0,
                 showSizeChanger: true,
-                pageSizeOptions: [10, 25, 50, 100]
+                pageSizeOptions: [10, 25, 50, 100],
               }}
             />
             {/* Message si pas de données mais colonnes sélectionnées */}
@@ -210,7 +196,9 @@ export function DataTablePreview({
               <div className="flex-1 flex items-center justify-center text-muted-foreground bg-muted/20">
                 <div className="text-center p-6">
                   <p className="mb-2">Colonnes configurées, aucune donnée disponible</p>
-                  <p className="text-sm">Exécutez la requête pour voir les données dans ce tableau</p>
+                  <p className="text-sm">
+                    Exécutez la requête pour voir les données dans ce tableau
+                  </p>
                 </div>
               </div>
             )}

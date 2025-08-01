@@ -3,7 +3,14 @@
  * Cas d'usage pour les actions de modification (CQRS)
  */
 
-import type { Client, ClientType, ClientStatut, ClientPriorite, ClientContact, ClientAddress } from '../domain/entities'
+import type {
+  Client,
+  ClientAddress,
+  ClientContact,
+  ClientPriorite,
+  ClientStatut,
+  ClientType,
+} from '../domain/entities'
 
 // ===== COMMANDES =====
 
@@ -59,12 +66,12 @@ export interface CommandResult<T = unknown> {
 
 export interface IClientCommandHandler {
   createClient(command: CreateClientCommand): Promise<CommandResult<Client>>
-  
+
   updateClient(command: UpdateClientCommand): Promise<CommandResult<Client>>
-  
+
   changeClientStatus(command: ChangeClientStatusCommand): Promise<CommandResult<Client>>
-  
+
   archiveClient(command: ArchiveClientCommand): Promise<CommandResult<boolean>>
-  
+
   deleteClient(id: string): Promise<CommandResult<boolean>>
 }

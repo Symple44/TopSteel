@@ -1,6 +1,5 @@
 'use client'
 
-import { formatDate } from '@/lib/utils'
 import type { Operation } from '@erp/domains/production'
 import {
   OperationStatut,
@@ -19,7 +18,6 @@ import {
   CardTitle,
   Progress,
 } from '@erp/ui'
-
 import {
   AlertCircle,
   Calendar,
@@ -33,6 +31,7 @@ import {
   User,
 } from 'lucide-react'
 import { useState } from 'react'
+import { formatDate } from '@/lib/utils'
 
 interface ProjetProductionTabProps {
   projet: StoreProjet

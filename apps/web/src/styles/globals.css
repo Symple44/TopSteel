@@ -44,39 +44,39 @@
   /* Arrière-plans principaux - plus doux */
   --background: 220 13% 18%;
   --foreground: 220 9% 98%;
-  
+
   /* Cartes et surfaces - légèrement plus claires que l'arrière-plan */
   --card: 220 13% 21%;
   --card-foreground: 220 9% 98%;
-  
+
   /* Popovers et menus - plus contrastés */
   --popover: 220 13% 21%;
   --popover-foreground: 220 9% 98%;
-  
+
   /* Couleurs primaires - bleu moderne */
   --primary: 217 91% 60%;
   --primary-foreground: 220 13% 98%;
-  
+
   /* Couleurs secondaires - gris moderne */
   --secondary: 220 13% 26%;
   --secondary-foreground: 220 9% 98%;
-  
+
   /* Couleurs muettes - entre background et card */
   --muted: 220 13% 26%;
   --muted-foreground: 220 9% 78%;
-  
+
   /* Couleurs d'accent - pour les survols */
   --accent: 220 13% 26%;
   --accent-foreground: 220 9% 98%;
-  
+
   /* Couleurs destructives - rouge moderne */
   --destructive: 0 72% 51%;
   --destructive-foreground: 220 13% 98%;
-  
+
   /* Bordures et inputs - subtiles */
   --border: 220 13% 28%;
   --input: 220 13% 28%;
-  
+
   /* Ring de focus - bleu vif */
   --ring: 217 91% 60%;
 }
@@ -86,39 +86,39 @@
   /* Arrière-plans avec gradients subtils */
   --background: 270 20% 96%;
   --foreground: 270 15% 9%;
-  
+
   /* Cartes avec effet glassmorphism */
   --card: 270 20% 98%;
   --card-foreground: 270 15% 9%;
-  
+
   /* Popovers avec transparence */
   --popover: 270 20% 98%;
   --popover-foreground: 270 15% 9%;
-  
+
   /* Couleurs primaires - violet/indigo tendance */
   --primary: 270 91% 38%;
   --primary-foreground: 0 0% 100%;
-  
+
   /* Couleurs secondaires - rose/corail */
   --secondary: 340 82% 75%;
   --secondary-foreground: 270 15% 9%;
-  
+
   /* Couleurs muettes - tons neutres chauds */
   --muted: 270 20% 92%;
   --muted-foreground: 270 15% 40%;
-  
+
   /* Couleurs d'accent - orange/amber */
   --accent: 45 86% 68%;
   --accent-foreground: 270 15% 9%;
-  
+
   /* Couleurs destructives - rouge vif moderne */
   --destructive: 0 84% 60%;
   --destructive-foreground: 270 20% 98%;
-  
+
   /* Bordures colorées subtiles */
   --border: 270 20% 82%;
   --input: 270 20% 90%;
-  
+
   /* Ring de focus - couleur primaire */
   --ring: 270 91% 65%;
 }
@@ -209,7 +209,9 @@
 
 .focus-visible\:ring-offset-2:focus-visible {
   outline: none !important;
-  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring)) !important;
+  box-shadow:
+    0 0 0 2px hsl(var(--background)),
+    0 0 0 4px hsl(var(--ring)) !important;
 }
 
 .focus-visible\:outline-none:focus-visible {
@@ -407,7 +409,12 @@ body {
   font-weight: 500 !important;
 }
 
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
   color: hsl(var(--foreground)) !important;
 }
 
@@ -726,7 +733,9 @@ button:hover .menu-chevron,
   color: hsl(var(--primary)) !important;
   border: 1px solid hsl(var(--primary) / 0.25) !important;
   transform: translateX(2px) !important;
-  box-shadow: 0 2px 8px hsl(var(--primary) / 0.25), 0 0 0 1px hsl(var(--primary) / 0.15) !important;
+  box-shadow:
+    0 2px 8px hsl(var(--primary) / 0.25),
+    0 0 0 1px hsl(var(--primary) / 0.15) !important;
 }
 
 .vibrant nav button.menu-item-inactive-sub:hover,
@@ -856,7 +865,9 @@ button:hover .menu-chevron,
   color: hsl(var(--primary)) !important;
   border: 1px solid hsl(var(--primary) / 0.25) !important;
   transform: translateX(2px) !important;
-  box-shadow: 0 2px 8px hsl(var(--primary) / 0.25), 0 0 0 1px hsl(var(--primary) / 0.15) !important;
+  box-shadow:
+    0 2px 8px hsl(var(--primary) / 0.25),
+    0 0 0 1px hsl(var(--primary) / 0.15) !important;
 }
 
 .vibrant .menu-item-hover-sub {
@@ -880,7 +891,9 @@ button:hover .menu-chevron,
 .vibrant .menu-icon-parent-with-active-child {
   background-color: hsl(var(--primary) / 0.18) !important;
   color: hsl(var(--primary)) !important;
-  box-shadow: 0 1px 3px hsl(var(--primary) / 0.25), 0 0 0 1px hsl(var(--primary) / 0.15) !important;
+  box-shadow:
+    0 1px 3px hsl(var(--primary) / 0.25),
+    0 0 0 1px hsl(var(--primary) / 0.15) !important;
   transform: scale(1.02) !important;
 }
 
@@ -956,7 +969,9 @@ button.menu-item-parent-with-active-child,
   background-color: hsl(var(--primary)) !important;
   color: white !important;
   font-weight: 600 !important;
-  box-shadow: 0 2px 8px hsl(var(--primary) / 0.3), 0 0 0 1px hsl(var(--primary) / 0.2) !important;
+  box-shadow:
+    0 2px 8px hsl(var(--primary) / 0.3),
+    0 0 0 1px hsl(var(--primary) / 0.2) !important;
 }
 
 .vibrant .menu-item-active-secondary {
@@ -969,7 +984,9 @@ button.menu-item-parent-with-active-child,
 .vibrant .menu-icon-active {
   background-color: hsl(var(--background)) !important;
   color: hsl(var(--primary)) !important;
-  box-shadow: 0 2px 6px hsl(var(--primary) / 0.4), 0 0 0 1px hsl(var(--primary) / 0.3) !important;
+  box-shadow:
+    0 2px 6px hsl(var(--primary) / 0.4),
+    0 0 0 1px hsl(var(--primary) / 0.3) !important;
   transform: scale(1.05) !important;
 }
 
@@ -983,12 +1000,12 @@ nav button:not([aria-current]):not(.navigation-icon):hover {
 }
 
 nav button[aria-current]:not(.navigation-icon),
-nav button.bg-accent\\/80:not(.navigation-icon) {
+nav button.bg-accent\/80:not(.navigation-icon) {
   background-color: hsl(var(--accent) / 0.8) !important;
   color: hsl(var(--accent-foreground)) !important;
 }
 
-nav button.bg-accent\\/60:not(.navigation-icon) {
+nav button.bg-accent\/60:not(.navigation-icon) {
   background-color: hsl(var(--accent) / 0.6) !important;
   color: hsl(var(--accent-foreground)) !important;
 }
@@ -999,12 +1016,12 @@ nav button.bg-accent\\/60:not(.navigation-icon) {
 }
 
 .dark nav button[aria-current]:not(.navigation-icon),
-.dark nav button.bg-accent\\/80:not(.navigation-icon) {
+.dark nav button.bg-accent\/80:not(.navigation-icon) {
   background-color: hsl(var(--accent) / 0.8) !important;
   color: hsl(var(--accent-foreground)) !important;
 }
 
-.dark nav button.bg-accent\\/60:not(.navigation-icon) {
+.dark nav button.bg-accent\/60:not(.navigation-icon) {
   background-color: hsl(var(--accent) / 0.6) !important;
   color: hsl(var(--accent-foreground)) !important;
 }
@@ -1015,38 +1032,38 @@ nav button.bg-accent\\/60:not(.navigation-icon) {
 }
 
 .vibrant nav button[aria-current]:not(.navigation-icon),
-.vibrant nav button.bg-accent\\/80:not(.navigation-icon) {
+.vibrant nav button.bg-accent\/80:not(.navigation-icon) {
   background-color: hsl(var(--accent) / 0.8) !important;
   color: hsl(var(--accent-foreground)) !important;
 }
 
-.vibrant nav button.bg-accent\\/60:not(.navigation-icon) {
+.vibrant nav button.bg-accent\/60:not(.navigation-icon) {
   background-color: hsl(var(--accent) / 0.6) !important;
   color: hsl(var(--accent-foreground)) !important;
 }
 
 /* Amélioration pour les sous-menus */
-nav button.bg-muted\\/20:not(.navigation-icon) {
+nav button.bg-muted\/20:not(.navigation-icon) {
   background-color: hsl(var(--muted) / 0.2) !important;
 }
 
-nav button.bg-muted\\/20:not(.navigation-icon):hover {
+nav button.bg-muted\/20:not(.navigation-icon):hover {
   background-color: hsl(var(--accent) / 0.3) !important;
 }
 
-.dark nav button.bg-muted\\/20:not(.navigation-icon) {
+.dark nav button.bg-muted\/20:not(.navigation-icon) {
   background-color: hsl(var(--muted) / 0.3) !important;
 }
 
-.dark nav button.bg-muted\\/20:not(.navigation-icon):hover {
+.dark nav button.bg-muted\/20:not(.navigation-icon):hover {
   background-color: hsl(var(--accent) / 0.3) !important;
 }
 
-.vibrant nav button.bg-muted\\/20:not(.navigation-icon) {
+.vibrant nav button.bg-muted\/20:not(.navigation-icon) {
   background-color: hsl(var(--muted) / 0.25) !important;
 }
 
-.vibrant nav button.bg-muted\\/20:not(.navigation-icon):hover {
+.vibrant nav button.bg-muted\/20:not(.navigation-icon):hover {
   background-color: hsl(var(--accent) / 0.35) !important;
 }
 
@@ -1099,7 +1116,12 @@ nav button.bg-muted\\/20:not(.navigation-icon):hover {
 /* Effets de glassmorphisme et gradients pour le thème vibrant */
 .vibrant {
   /* Gradient de fond général */
-  background: linear-gradient(135deg, hsl(270 20% 96%) 0%, hsl(280 25% 94%) 50%, hsl(260 22% 97%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(270 20% 96%) 0%,
+    hsl(280 25% 94%) 50%,
+    hsl(260 22% 97%) 100%
+  );
 }
 
 .vibrant .bg-card {
@@ -1110,7 +1132,12 @@ nav button.bg-muted\\/20:not(.navigation-icon):hover {
 }
 
 .vibrant .bg-background {
-  background: linear-gradient(135deg, hsl(270 20% 96%) 0%, hsl(280 25% 94%) 50%, hsl(260 22% 97%) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    hsl(270 20% 96%) 0%,
+    hsl(280 25% 94%) 50%,
+    hsl(260 22% 97%) 100%
+  ) !important;
 }
 
 .vibrant .bg-accent {
@@ -1124,7 +1151,7 @@ nav button.bg-muted\\/20:not(.navigation-icon):hover {
 
 /* Correction des éléments sélectionnés pour le thème vibrant */
 .vibrant .bg-blue-50,
-.vibrant .bg-indigo-50, 
+.vibrant .bg-indigo-50,
 .vibrant .bg-slate-50 {
   background-color: hsl(var(--primary) / 0.15) !important;
   color: hsl(var(--foreground)) !important;
@@ -1198,11 +1225,15 @@ html[data-theme="vibrant"] .bg-primary:hover,
 
 .vibrant .btn-primary {
   background: linear-gradient(135deg, hsl(270 91% 65%) 0%, hsl(280 95% 60%) 100%) !important;
-  box-shadow: 0 4px 16px hsl(270 91% 65% / 0.3), 0 8px 32px hsl(270 91% 65% / 0.1) !important;
+  box-shadow:
+    0 4px 16px hsl(270 91% 65% / 0.3),
+    0 8px 32px hsl(270 91% 65% / 0.1) !important;
 }
 
 .vibrant .btn-primary:hover {
-  box-shadow: 0 8px 24px hsl(270 91% 65% / 0.4), 0 12px 40px hsl(270 91% 65% / 0.2) !important;
+  box-shadow:
+    0 8px 24px hsl(270 91% 65% / 0.4),
+    0 12px 40px hsl(270 91% 65% / 0.2) !important;
 }
 
 /* Animation et transitions fluides */
@@ -1245,10 +1276,15 @@ html[data-theme="vibrant"] .bg-primary:hover,
 }
 
 .vibrant .sidebar-header::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, hsl(270 91% 65% / 0.1) 0%, hsl(340 82% 75% / 0.1) 50%, hsl(45 86% 68% / 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(270 91% 65% / 0.1) 0%,
+    hsl(340 82% 75% / 0.1) 50%,
+    hsl(45 86% 68% / 0.1) 100%
+  );
   border-radius: 8px;
   pointer-events: none;
 }
@@ -1285,7 +1321,9 @@ html[data-theme="vibrant"] .bg-primary:hover,
 .dark .navigation-icon,
 .dark .sidebar-header .navigation-icon {
   background: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(217 91% 50%) 100%) !important;
-  box-shadow: 0 4px 16px hsl(217 91% 60% / 0.2), 0 0 0 1px hsl(217 91% 70% / 0.2) !important;
+  box-shadow:
+    0 4px 16px hsl(217 91% 60% / 0.2),
+    0 0 0 1px hsl(217 91% 70% / 0.2) !important;
   border: 1px solid hsl(217 91% 65% / 0.2) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1293,7 +1331,9 @@ html[data-theme="vibrant"] .bg-primary:hover,
 .dark .navigation-icon:hover,
 .dark .sidebar-header .navigation-icon:hover {
   background: linear-gradient(135deg, hsl(217 91% 65%) 0%, hsl(217 91% 55%) 100%) !important;
-  box-shadow: 0 6px 20px hsl(217 91% 60% / 0.3), 0 0 0 1px hsl(217 91% 70% / 0.3) !important;
+  box-shadow:
+    0 6px 20px hsl(217 91% 60% / 0.3),
+    0 0 0 1px hsl(217 91% 70% / 0.3) !important;
   transform: scale(1.1) !important;
 }
 
@@ -1336,7 +1376,11 @@ nav button.hover\:bg-accent\/30:hover {
 
 /* Transitions spécifiques pour le mode sombre */
 .dark nav button {
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease !important;
 }
 
 .dark nav button:hover {
@@ -1355,13 +1399,15 @@ nav button.hover\:bg-accent\/30:hover {
 }
 
 /* Transitions pour les badges et indicateurs */
-.badge, .indicator {
+.badge,
+.indicator {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Effet de pulsation subtile pour les éléments actifs */
 @keyframes subtle-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -1383,10 +1429,12 @@ nav button.hover\:bg-accent\/30:hover {
 .bg-gradient-to-br.from-slate-50.via-blue-50\/30.to-purple-50\/30,
 .bg-gradient-to-br.from-blue-50.via-indigo-50\/30.to-purple-50\/30,
 .bg-gradient-to-br.from-yellow-50.via-orange-50\/30.to-red-50\/30 {
-  background: linear-gradient(to bottom right, 
-    hsl(var(--background)) 0%, 
-    hsl(var(--background) / 0.95) 50%, 
-    hsl(var(--background) / 0.9) 100%) !important;
+  background: linear-gradient(
+    to bottom right,
+    hsl(var(--background)) 0%,
+    hsl(var(--background) / 0.95) 50%,
+    hsl(var(--background) / 0.9) 100%
+  ) !important;
 }
 
 /* Mode sombre - dégradés subtils */
@@ -1394,10 +1442,12 @@ nav button.hover\:bg-accent\/30:hover {
 .dark .bg-gradient-to-br.from-slate-50.via-blue-50\/30.to-purple-50\/30,
 .dark .bg-gradient-to-br.from-blue-50.via-indigo-50\/30.to-purple-50\/30,
 .dark .bg-gradient-to-br.from-yellow-50.via-orange-50\/30.to-red-50\/30 {
-  background: linear-gradient(135deg, 
-    hsl(var(--background)) 0%, 
-    hsl(217 91% 15% / 0.3) 50%, 
-    hsl(270 91% 15% / 0.2) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--background)) 0%,
+    hsl(217 91% 15% / 0.3) 50%,
+    hsl(270 91% 15% / 0.2) 100%
+  ) !important;
 }
 
 /* Mode vibrant - dégradés colorés */
@@ -1405,25 +1455,31 @@ nav button.hover\:bg-accent\/30:hover {
 .vibrant .bg-gradient-to-br.from-slate-50.via-blue-50\/30.to-purple-50\/30,
 .vibrant .bg-gradient-to-br.from-blue-50.via-indigo-50\/30.to-purple-50\/30,
 .vibrant .bg-gradient-to-br.from-yellow-50.via-orange-50\/30.to-red-50\/30 {
-  background: linear-gradient(135deg, 
-    hsl(270 20% 96%) 0%, 
-    hsl(280 25% 94%) 50%, 
-    hsl(260 22% 97%) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    hsl(270 20% 96%) 0%,
+    hsl(280 25% 94%) 50%,
+    hsl(260 22% 97%) 100%
+  ) !important;
 }
 
 /* Textes avec dégradés */
 .bg-gradient-to-r.from-slate-900.to-slate-600 {
-  background: linear-gradient(to right, 
-    hsl(var(--foreground)) 0%, 
-    hsl(var(--foreground) / 0.8) 100%) !important;
+  background: linear-gradient(
+    to right,
+    hsl(var(--foreground)) 0%,
+    hsl(var(--foreground) / 0.8) 100%
+  ) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
 }
 
 .dark .bg-gradient-to-r.from-slate-900.to-slate-600 {
-  background: linear-gradient(to right, 
-    hsl(var(--foreground)) 0%, 
-    hsl(var(--foreground) / 0.9) 100%) !important;
+  background: linear-gradient(
+    to right,
+    hsl(var(--foreground)) 0%,
+    hsl(var(--foreground) / 0.9) 100%
+  ) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
 }
@@ -1633,7 +1689,8 @@ nav button.hover\:bg-accent\/30:hover {
 }
 
 @keyframes selected-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 4px 12px hsl(var(--primary) / 0.2);
   }
   50% {
@@ -1742,19 +1799,43 @@ body.font-large {
 }
 
 /* Application de la taille de police */
-body.font-small .text-sm { font-size: calc(0.875rem * var(--font-size-multiplier)) !important; }
-body.font-small .text-base { font-size: calc(1rem * var(--font-size-multiplier)) !important; }
-body.font-small .text-lg { font-size: calc(1.125rem * var(--font-size-multiplier)) !important; }
-body.font-small .text-xl { font-size: calc(1.25rem * var(--font-size-multiplier)) !important; }
-body.font-small .text-2xl { font-size: calc(1.5rem * var(--font-size-multiplier)) !important; }
-body.font-small .text-3xl { font-size: calc(1.875rem * var(--font-size-multiplier)) !important; }
+body.font-small .text-sm {
+  font-size: calc(0.875rem * var(--font-size-multiplier)) !important;
+}
+body.font-small .text-base {
+  font-size: calc(1rem * var(--font-size-multiplier)) !important;
+}
+body.font-small .text-lg {
+  font-size: calc(1.125rem * var(--font-size-multiplier)) !important;
+}
+body.font-small .text-xl {
+  font-size: calc(1.25rem * var(--font-size-multiplier)) !important;
+}
+body.font-small .text-2xl {
+  font-size: calc(1.5rem * var(--font-size-multiplier)) !important;
+}
+body.font-small .text-3xl {
+  font-size: calc(1.875rem * var(--font-size-multiplier)) !important;
+}
 
-body.font-large .text-sm { font-size: calc(0.875rem * var(--font-size-multiplier)) !important; }
-body.font-large .text-base { font-size: calc(1rem * var(--font-size-multiplier)) !important; }
-body.font-large .text-lg { font-size: calc(1.125rem * var(--font-size-multiplier)) !important; }
-body.font-large .text-xl { font-size: calc(1.25rem * var(--font-size-multiplier)) !important; }
-body.font-large .text-2xl { font-size: calc(1.5rem * var(--font-size-multiplier)) !important; }
-body.font-large .text-3xl { font-size: calc(1.875rem * var(--font-size-multiplier)) !important; }
+body.font-large .text-sm {
+  font-size: calc(0.875rem * var(--font-size-multiplier)) !important;
+}
+body.font-large .text-base {
+  font-size: calc(1rem * var(--font-size-multiplier)) !important;
+}
+body.font-large .text-lg {
+  font-size: calc(1.125rem * var(--font-size-multiplier)) !important;
+}
+body.font-large .text-xl {
+  font-size: calc(1.25rem * var(--font-size-multiplier)) !important;
+}
+body.font-large .text-2xl {
+  font-size: calc(1.5rem * var(--font-size-multiplier)) !important;
+}
+body.font-large .text-3xl {
+  font-size: calc(1.875rem * var(--font-size-multiplier)) !important;
+}
 
 /* Classes pour la densité */
 body.density-compact {
@@ -1770,27 +1851,73 @@ body.density-spacious {
 }
 
 /* Application de la densité */
-body.density-compact .p-2 { padding: calc(0.5rem * var(--density-multiplier)) !important; }
-body.density-compact .p-3 { padding: calc(0.75rem * var(--density-multiplier)) !important; }
-body.density-compact .p-4 { padding: calc(1rem * var(--density-multiplier)) !important; }
-body.density-compact .p-6 { padding: calc(1.5rem * var(--density-multiplier)) !important; }
-body.density-compact .py-2 { padding-top: calc(0.5rem * var(--density-multiplier)) !important; padding-bottom: calc(0.5rem * var(--density-multiplier)) !important; }
-body.density-compact .py-3 { padding-top: calc(0.75rem * var(--density-multiplier)) !important; padding-bottom: calc(0.75rem * var(--density-multiplier)) !important; }
-body.density-compact .py-4 { padding-top: calc(1rem * var(--density-multiplier)) !important; padding-bottom: calc(1rem * var(--density-multiplier)) !important; }
-body.density-compact .gap-2 { gap: calc(0.5rem * var(--density-multiplier)) !important; }
-body.density-compact .gap-4 { gap: calc(1rem * var(--density-multiplier)) !important; }
-body.density-compact .gap-6 { gap: calc(1.5rem * var(--density-multiplier)) !important; }
+body.density-compact .p-2 {
+  padding: calc(0.5rem * var(--density-multiplier)) !important;
+}
+body.density-compact .p-3 {
+  padding: calc(0.75rem * var(--density-multiplier)) !important;
+}
+body.density-compact .p-4 {
+  padding: calc(1rem * var(--density-multiplier)) !important;
+}
+body.density-compact .p-6 {
+  padding: calc(1.5rem * var(--density-multiplier)) !important;
+}
+body.density-compact .py-2 {
+  padding-top: calc(0.5rem * var(--density-multiplier)) !important;
+  padding-bottom: calc(0.5rem * var(--density-multiplier)) !important;
+}
+body.density-compact .py-3 {
+  padding-top: calc(0.75rem * var(--density-multiplier)) !important;
+  padding-bottom: calc(0.75rem * var(--density-multiplier)) !important;
+}
+body.density-compact .py-4 {
+  padding-top: calc(1rem * var(--density-multiplier)) !important;
+  padding-bottom: calc(1rem * var(--density-multiplier)) !important;
+}
+body.density-compact .gap-2 {
+  gap: calc(0.5rem * var(--density-multiplier)) !important;
+}
+body.density-compact .gap-4 {
+  gap: calc(1rem * var(--density-multiplier)) !important;
+}
+body.density-compact .gap-6 {
+  gap: calc(1.5rem * var(--density-multiplier)) !important;
+}
 
-body.density-spacious .p-2 { padding: calc(0.5rem * var(--density-multiplier)) !important; }
-body.density-spacious .p-3 { padding: calc(0.75rem * var(--density-multiplier)) !important; }
-body.density-spacious .p-4 { padding: calc(1rem * var(--density-multiplier)) !important; }
-body.density-spacious .p-6 { padding: calc(1.5rem * var(--density-multiplier)) !important; }
-body.density-spacious .py-2 { padding-top: calc(0.5rem * var(--density-multiplier)) !important; padding-bottom: calc(0.5rem * var(--density-multiplier)) !important; }
-body.density-spacious .py-3 { padding-top: calc(0.75rem * var(--density-multiplier)) !important; padding-bottom: calc(0.75rem * var(--density-multiplier)) !important; }
-body.density-spacious .py-4 { padding-top: calc(1rem * var(--density-multiplier)) !important; padding-bottom: calc(1rem * var(--density-multiplier)) !important; }
-body.density-spacious .gap-2 { gap: calc(0.5rem * var(--density-multiplier)) !important; }
-body.density-spacious .gap-4 { gap: calc(1rem * var(--density-multiplier)) !important; }
-body.density-spacious .gap-6 { gap: calc(1.5rem * var(--density-multiplier)) !important; }
+body.density-spacious .p-2 {
+  padding: calc(0.5rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .p-3 {
+  padding: calc(0.75rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .p-4 {
+  padding: calc(1rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .p-6 {
+  padding: calc(1.5rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .py-2 {
+  padding-top: calc(0.5rem * var(--density-multiplier)) !important;
+  padding-bottom: calc(0.5rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .py-3 {
+  padding-top: calc(0.75rem * var(--density-multiplier)) !important;
+  padding-bottom: calc(0.75rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .py-4 {
+  padding-top: calc(1rem * var(--density-multiplier)) !important;
+  padding-bottom: calc(1rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .gap-2 {
+  gap: calc(0.5rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .gap-4 {
+  gap: calc(1rem * var(--density-multiplier)) !important;
+}
+body.density-spacious .gap-6 {
+  gap: calc(1.5rem * var(--density-multiplier)) !important;
+}
 
 /* Classes pour la largeur de sidebar */
 .sidebar-width {
@@ -1820,13 +1947,25 @@ body.content-full {
 }
 
 /* Application de la largeur de contenu aux conteneurs principaux */
-body.content-compact .max-w-4xl { max-width: var(--content-max-width) !important; }
-body.content-compact .max-w-6xl { max-width: var(--content-max-width) !important; }
-body.content-compact .max-w-7xl { max-width: var(--content-max-width) !important; }
+body.content-compact .max-w-4xl {
+  max-width: var(--content-max-width) !important;
+}
+body.content-compact .max-w-6xl {
+  max-width: var(--content-max-width) !important;
+}
+body.content-compact .max-w-7xl {
+  max-width: var(--content-max-width) !important;
+}
 
-body.content-full .max-w-4xl { max-width: none !important; }
-body.content-full .max-w-6xl { max-width: none !important; }
-body.content-full .max-w-7xl { max-width: none !important; }
+body.content-full .max-w-4xl {
+  max-width: none !important;
+}
+body.content-full .max-w-6xl {
+  max-width: none !important;
+}
+body.content-full .max-w-7xl {
+  max-width: none !important;
+}
 
 /* Styles pour les conteneurs de pages */
 body.content-full .page-container,
@@ -1962,7 +2101,9 @@ body.content-compact .dashboard-content {
   background-color: hsl(var(--popover)) !important;
   color: hsl(var(--popover-foreground)) !important;
   border: 1px solid hsl(var(--border)) !important;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
 }
 
 /* Mode sombre pour les dropdowns */
@@ -2012,7 +2153,9 @@ body.content-compact .dashboard-content {
 }
 
 .kanban-card:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
   transform: translateY(-2px);
 }
 
@@ -2031,7 +2174,9 @@ body.content-compact .dashboard-content {
 }
 
 .card-item:hover {
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
   transform: translateY(-2px);
 }
 
@@ -2042,7 +2187,7 @@ body.content-compact .dashboard-content {
 }
 
 .timeline-item::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0.5rem;
   top: 0;
@@ -2136,8 +2281,8 @@ body.content-compact .dashboard-content {
   background-color: hsl(var(--popover)) !important;
   color: hsl(var(--popover-foreground)) !important;
   backdrop-filter: blur(8px) !important;
-  box-shadow: 
-    0 20px 25px -5px rgb(0 0 0 / 0.1), 
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
     0 10px 10px -5px rgb(0 0 0 / 0.04),
     0 0 0 1px rgb(0 0 0 / 0.05) !important;
 }
@@ -2145,8 +2290,8 @@ body.content-compact .dashboard-content {
 .dark .column-filter-dropdown {
   background-color: hsl(var(--popover)) !important;
   color: hsl(var(--popover-foreground)) !important;
-  box-shadow: 
-    0 20px 25px -5px rgb(0 0 0 / 0.4), 
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.4),
     0 10px 10px -5px rgb(0 0 0 / 0.1),
     0 0 0 1px rgb(255 255 255 / 0.05) !important;
 }
@@ -2167,8 +2312,8 @@ body.content-compact .dashboard-content {
   background-color: hsl(var(--background)) !important;
   color: hsl(var(--foreground)) !important;
   border: 1px solid hsl(var(--border)) !important;
-  box-shadow: 
-    0 20px 25px -5px rgb(0 0 0 / 0.25), 
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.25),
     0 10px 10px -5px rgb(0 0 0 / 0.1),
     0 0 0 1px rgb(0 0 0 / 0.05) !important;
   opacity: 1 !important;
@@ -2176,8 +2321,8 @@ body.content-compact .dashboard-content {
 
 .dark .column-filter-advanced {
   background-color: hsl(var(--background)) !important;
-  box-shadow: 
-    0 20px 25px -5px rgb(0 0 0 / 0.5), 
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.5),
     0 10px 10px -5px rgb(0 0 0 / 0.2),
     0 0 0 1px rgb(255 255 255 / 0.1) !important;
 }
@@ -2188,7 +2333,7 @@ body.content-compact .dashboard-content {
 }
 
 .filter-icon-active::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   right: -2px;
@@ -2228,7 +2373,9 @@ body.content-compact .dashboard-content {
   color: hsl(var(--popover-foreground));
   border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 /* Scrollbar personnalisée pour les dropdowns */
@@ -2269,7 +2416,9 @@ body.content-compact .dashboard-content {
   color: hsl(var(--foreground)) !important;
   border: 1px solid hsl(var(--border)) !important;
   border-radius: 0.5rem !important;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
   left: 50% !important;
   top: 50% !important;
   transform: translate(-50%, -50%) !important;
@@ -2299,7 +2448,9 @@ body.content-compact .dashboard-content {
   color: hsl(var(--popover-foreground)) !important;
   border: 1px solid hsl(var(--border)) !important;
   border-radius: calc(var(--radius) - 2px) !important;
-  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.25), 0 10px 10px -5px rgb(0 0 0 / 0.04) !important;
+  box-shadow:
+    0 10px 25px -5px rgb(0 0 0 / 0.25),
+    0 10px 10px -5px rgb(0 0 0 / 0.04) !important;
   max-width: 400px !important;
   max-height: 300px !important;
   overflow-y: auto !important;
@@ -2601,7 +2752,9 @@ body.content-compact .dashboard-content {
   background-color: hsl(var(--popover)) !important;
   color: hsl(var(--popover-foreground)) !important;
   border: 1px solid hsl(var(--border)) !important;
-  box-shadow: 0 4px 6px -1px hsl(var(--foreground) / 0.1), 0 2px 4px -1px hsl(var(--foreground) / 0.06) !important;
+  box-shadow:
+    0 4px 6px -1px hsl(var(--foreground) / 0.1),
+    0 2px 4px -1px hsl(var(--foreground) / 0.06) !important;
 }
 
 /* Items du dropdown */
@@ -2624,7 +2777,9 @@ body.content-compact .dashboard-content {
   background-color: hsl(var(--popover)) !important;
   color: hsl(var(--popover-foreground)) !important;
   border-color: hsl(var(--border)) !important;
-  box-shadow: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -1px hsl(0 0% 0% / 0.2) !important;
+  box-shadow:
+    0 4px 6px -1px hsl(0 0% 0% / 0.3),
+    0 2px 4px -1px hsl(0 0% 0% / 0.2) !important;
 }
 
 .dark [data-dropdown-item] {

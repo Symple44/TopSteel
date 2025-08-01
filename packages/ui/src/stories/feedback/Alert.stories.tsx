@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta } from '@storybook/react'
 import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '../../components/feedback/alert'
 

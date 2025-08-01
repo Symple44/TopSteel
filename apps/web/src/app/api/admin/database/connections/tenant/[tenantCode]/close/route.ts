@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(
@@ -7,22 +7,24 @@ export async function POST(
 ) {
   try {
     const { tenantCode } = await params
-    
+
     // Proxy vers l'API backend
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/connections/tenant/${tenantCode}/close`
-    
-    const response = await callBackendFromApi(request, `admin/database/connections/tenant/${tenantCode}/close`, {
-      method: 'POST',
-    })
+    const _apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/connections/tenant/${tenantCode}/close`
+
+    const response = await callBackendFromApi(
+      request,
+      `admin/database/connections/tenant/${tenantCode}/close`,
+      {
+        method: 'POST',
+      }
+    )
 
     if (!response.ok) {
-      console.error('API Error:', response.status, response.statusText)
-      
       // Simuler une réponse d'erreur
       return NextResponse.json(
-        { 
-          success: false, 
-          message: `API backend non disponible - impossible de fermer la connexion pour le tenant ${tenantCode}` 
+        {
+          success: false,
+          message: `API backend non disponible - impossible de fermer la connexion pour le tenant ${tenantCode}`,
         },
         { status: 503 }
       )
@@ -30,14 +32,12 @@ export async function POST(
 
     const responseData = await response.json()
     return NextResponse.json(responseData.data || responseData)
-  } catch (error) {
-    console.error('Erreur lors de la fermeture de la connexion du tenant:', error)
-    
+  } catch (_error) {
     // Simuler une réponse d'erreur
     return NextResponse.json(
-      { 
-        success: false, 
-        message: `Erreur interne - impossible de fermer la connexion pour le tenant ${(await params).tenantCode}` 
+      {
+        success: false,
+        message: `Erreur interne - impossible de fermer la connexion pour le tenant ${(await params).tenantCode}`,
       },
       { status: 500 }
     )

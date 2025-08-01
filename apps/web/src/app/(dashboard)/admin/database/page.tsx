@@ -1,40 +1,41 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { Button } from '@erp/ui'
-import { Badge } from '@erp/ui'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { Progress } from '@erp/ui'
-import { useToastShortcuts } from '@/hooks/use-toast'
-import { callClientApi } from '@/utils/backend-api'
-import DatabaseMonitoringCard from '@/components/admin/database-monitoring-card'
-import PerformanceMetricsChart from '@/components/admin/performance-metrics-chart'
-import SystemAlertsPanel from '@/components/admin/system-alerts-panel'
-import MigrationStatusCard from '@/components/admin/migration-status-card'
-import ConnectionManagementPanel from '@/components/admin/connection-management-panel'
-import { 
-  Database, 
-  RefreshCw, 
-  CheckCircle2, 
-  XCircle, 
-  AlertCircle,
-  PlayCircle,
-  Settings,
+export const dynamic = 'force-dynamic'
+
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@erp/ui'
+import {
   Activity,
-  Layers,
-  Server,
-  Timer,
-  Users,
+  BarChart3,
+  Database,
   HardDrive,
+  PlayCircle,
+  RefreshCw,
+  TrendingUp,
+  Users,
   Wifi,
   WifiOff,
-  Eye,
-  Trash2,
-  BarChart3,
-  TrendingUp
 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import ConnectionManagementPanel from '@/components/admin/connection-management-panel'
+import DatabaseMonitoringCard from '@/components/admin/database-monitoring-card'
+import MigrationStatusCard from '@/components/admin/migration-status-card'
+import PerformanceMetricsChart from '@/components/admin/performance-metrics-chart'
+import SystemAlertsPanel from '@/components/admin/system-alerts-panel'
+import { useToastShortcuts } from '@/hooks/use-toast'
+import { useTranslation } from '@/lib/i18n/hooks'
+import { callClientApi } from '@/utils/backend-api'
 
 // Types pour la nouvelle architecture multi-tenant
 interface DatabaseHealthStatus {
@@ -74,7 +75,6 @@ interface ConnectionsData {
 }
 
 export default function DatabaseManagementPage() {
-  const { t } = useTranslation('admin')
   const { t: tDb } = useTranslation('admin')
   const [systemHealth, setSystemHealth] = useState<SystemDatabaseHealth | null>(null)
   const [migrationStatuses, setMigrationStatuses] = useState<MigrationStatus[]>([])
@@ -84,29 +84,16 @@ export default function DatabaseManagementPage() {
   const [selectedTenant, setSelectedTenant] = useState<string>('')
   const [tenantHealth, setTenantHealth] = useState<DatabaseHealthStatus | null>(null)
   const [tenantMigrations, setTenantMigrations] = useState<MigrationStatus | null>(null)
-  
-  const { success, error, warning, info } = useToastShortcuts()
 
-  useEffect(() => {
-    loadData()
-    // Actualisation automatique désactivée
-    // const interval = setInterval(loadData, 30000)
-    // return () => clearInterval(interval)
-  }, [])
+  const { success, error } = useToastShortcuts()
 
-  useEffect(() => {
-    if (selectedTenant) {
-      loadTenantData(selectedTenant)
-    }
-  }, [selectedTenant])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true)
     try {
       const [healthResponse, migrationsResponse, connectionsResponse] = await Promise.all([
         callClientApi('admin/database/health'),
         callClientApi('admin/database/migrations/status'),
-        callClientApi('admin/database/connections')
+        callClientApi('admin/database/connections'),
       ])
 
       if (healthResponse.ok) {
@@ -123,19 +110,18 @@ export default function DatabaseManagementPage() {
         const connectionsData = await connectionsResponse.json()
         setConnections(connectionsData)
       }
-    } catch (err) {
-      console.error('Erreur lors du chargement:', err)
+    } catch (_err) {
       error(tDb('database.loadError'), tDb('database.loadErrorMessage'))
     } finally {
       setLoading(false)
     }
-  }
+  }, [error, tDb])
 
-  const loadTenantData = async (tenantCode: string) => {
+  const loadTenantData = useCallback(async (tenantCode: string) => {
     try {
       const [healthResponse, migrationsResponse] = await Promise.all([
         callClientApi(`admin/database/health/tenant/${tenantCode}`),
-        callClientApi(`admin/database/migrations/tenant/${tenantCode}/status`)
+        callClientApi(`admin/database/migrations/tenant/${tenantCode}/status`),
       ])
 
       if (healthResponse.ok) {
@@ -147,29 +133,42 @@ export default function DatabaseManagementPage() {
         const migrationsData = await migrationsResponse.json()
         setTenantMigrations(migrationsData)
       }
-    } catch (err) {
-      console.error('Erreur lors du chargement tenant:', err)
+    } catch (_err) {}
+  }, [])
+
+  useEffect(() => {
+    loadData()
+    // Actualisation automatique désactivée
+    // const interval = setInterval(loadData, 30000)
+    // return () => clearInterval(interval)
+  }, [loadData])
+
+  useEffect(() => {
+    if (selectedTenant) {
+      loadTenantData(selectedTenant)
     }
-  }
+  }, [selectedTenant, loadTenantData])
 
   const handleRunAllMigrations = async () => {
     setLoading(true)
     try {
       const response = await callClientApi('admin/database/migrations/run', {
-        method: 'POST'
+        method: 'POST',
       })
 
       const result = await response.json()
-      
+
       if (response.ok) {
         success(tDb('database.migrationsExecuted'), tDb('database.migrationsSuccess'))
         loadData()
       } else {
-        error(tDb('database.migrationError'), result.message || 'Impossible d\'exécuter les migrations')
+        error(
+          tDb('database.migrationError'),
+          result.message || "Impossible d'exécuter les migrations"
+        )
       }
-    } catch (err) {
-      console.error('Erreur lors des migrations:', err)
-      error(tDb('database.migrationError'), 'Impossible d\'exécuter les migrations')
+    } catch (_err) {
+      error(tDb('database.migrationError'), "Impossible d'exécuter les migrations")
     } finally {
       setLoading(false)
     }
@@ -179,21 +178,26 @@ export default function DatabaseManagementPage() {
     setLoading(true)
     try {
       const response = await callClientApi(`admin/database/migrations/tenant/${tenantCode}/run`, {
-        method: 'POST'
+        method: 'POST',
       })
 
       const result = await response.json()
-      
+
       if (response.ok) {
-        success(tDb('database.migrationTenantExecuted'), `Migrations exécutées pour le tenant ${tenantCode}`)
+        success(
+          tDb('database.migrationTenantExecuted'),
+          `Migrations exécutées pour le tenant ${tenantCode}`
+        )
         loadTenantData(tenantCode)
         loadData()
       } else {
-        error('Erreur de migration tenant', result.message || 'Impossible d\'exécuter les migrations du tenant')
+        error(
+          'Erreur de migration tenant',
+          result.message || "Impossible d'exécuter les migrations du tenant"
+        )
       }
-    } catch (err) {
-      console.error('Erreur lors des migrations tenant:', err)
-      error('Erreur de migration', 'Impossible d\'exécuter les migrations du tenant')
+    } catch (_err) {
+      error('Erreur de migration', "Impossible d'exécuter les migrations du tenant")
     } finally {
       setLoading(false)
     }
@@ -201,9 +205,12 @@ export default function DatabaseManagementPage() {
 
   const handleCloseTenantConnection = async (tenantCode: string) => {
     try {
-      const response = await callClientApi(`admin/database/connections/tenant/${tenantCode}/close`, {
-        method: 'POST'
-      })
+      const response = await callClientApi(
+        `admin/database/connections/tenant/${tenantCode}/close`,
+        {
+          method: 'POST',
+        }
+      )
 
       if (response.ok) {
         success(tDb('database.connectionClosed'), `Connexion fermée pour le tenant ${tenantCode}`)
@@ -211,27 +218,39 @@ export default function DatabaseManagementPage() {
       } else {
         error(tDb('database.error'), 'Impossible de fermer la connexion')
       }
-    } catch (err) {
-      console.error('Erreur lors de la fermeture:', err)
+    } catch (_err) {
       error(tDb('database.error'), 'Impossible de fermer la connexion')
     }
   }
 
-  const getStatusColor = (status: string) => {
+  const _getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-600'
-      case 'degraded': return 'text-yellow-600'
-      case 'unhealthy': return 'text-red-600'
-      default: return 'text-gray-600'
+      case 'healthy':
+        return 'text-green-600'
+      case 'degraded':
+        return 'text-yellow-600'
+      case 'unhealthy':
+        return 'text-red-600'
+      default:
+        return 'text-gray-600'
     }
   }
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (
+    status: string
+  ): 'default' | 'secondary' | 'destructive' | 'outline' => {
     switch (status) {
-      case 'healthy': case 'up-to-date': return 'success'
-      case 'degraded': case 'pending': return 'warning'
-      case 'unhealthy': case 'error': return 'destructive'
-      default: return 'default'
+      case 'healthy':
+      case 'up-to-date':
+        return 'secondary' // Badge doesn't have 'success', use 'secondary' for good status
+      case 'degraded':
+      case 'pending':
+        return 'outline' // Use 'outline' for warning-like status
+      case 'unhealthy':
+      case 'error':
+        return 'destructive'
+      default:
+        return 'default'
     }
   }
 
@@ -255,9 +274,7 @@ export default function DatabaseManagementPage() {
           <Database className="w-8 h-8 text-blue-600" />
           <div>
             <h1 className="text-3xl font-bold">{tDb('database.title')}</h1>
-            <p className="text-muted-foreground mt-1">
-              {tDb('database.subtitle')}
-            </p>
+            <p className="text-muted-foreground mt-1">{tDb('database.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -290,10 +307,14 @@ export default function DatabaseManagementPage() {
                         <span>{tDb('database.systemStatus')}</span>
                       </CardTitle>
                       <CardDescription>
-                        {tDb('database.lastCheck')} {new Date(systemHealth.timestamp).toLocaleString()}
+                        {tDb('database.lastCheck')}{' '}
+                        {new Date(systemHealth.timestamp).toLocaleString()}
                       </CardDescription>
                     </div>
-                    <Badge variant={getStatusBadgeVariant(systemHealth.overallStatus) as any} className="text-lg px-4 py-2">
+                    <Badge
+                      variant={getStatusBadgeVariant(systemHealth.overallStatus)}
+                      className="text-lg px-4 py-2"
+                    >
                       {systemHealth.overallStatus.toUpperCase()}
                     </Badge>
                   </div>
@@ -303,8 +324,10 @@ export default function DatabaseManagementPage() {
                     {/* Auth Database */}
                     <div className="space-y-3 p-4 border rounded-lg">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">AUTH</h3>
-                        <Badge variant={getStatusBadgeVariant(systemHealth.auth.status) as any}>
+                        <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                          AUTH
+                        </h3>
+                        <Badge variant={getStatusBadgeVariant(systemHealth.auth.status)}>
                           {systemHealth.auth.status}
                         </Badge>
                       </div>
@@ -320,7 +343,9 @@ export default function DatabaseManagementPage() {
                         {systemHealth.auth.responseTime && (
                           <div className="flex items-center justify-between text-sm">
                             <span>{tDb('database.responseTime')}</span>
-                            <span className="font-mono">{systemHealth.auth.responseTime.toFixed(2)}ms</span>
+                            <span className="font-mono">
+                              {systemHealth.auth.responseTime.toFixed(2)}ms
+                            </span>
                           </div>
                         )}
                       </div>
@@ -329,8 +354,10 @@ export default function DatabaseManagementPage() {
                     {/* Shared Database */}
                     <div className="space-y-3 p-4 border rounded-lg">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">SHARED</h3>
-                        <Badge variant={getStatusBadgeVariant(systemHealth.shared.status) as any}>
+                        <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                          SHARED
+                        </h3>
+                        <Badge variant={getStatusBadgeVariant(systemHealth.shared.status)}>
                           {systemHealth.shared.status}
                         </Badge>
                       </div>
@@ -346,7 +373,9 @@ export default function DatabaseManagementPage() {
                         {systemHealth.shared.responseTime && (
                           <div className="flex items-center justify-between text-sm">
                             <span>{tDb('database.responseTime')}</span>
-                            <span className="font-mono">{systemHealth.shared.responseTime.toFixed(2)}ms</span>
+                            <span className="font-mono">
+                              {systemHealth.shared.responseTime.toFixed(2)}ms
+                            </span>
                           </div>
                         )}
                       </div>
@@ -355,8 +384,10 @@ export default function DatabaseManagementPage() {
                     {/* Tenant Database */}
                     <div className="space-y-3 p-4 border rounded-lg">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">TENANT</h3>
-                        <Badge variant={getStatusBadgeVariant(systemHealth.tenant.status) as any}>
+                        <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                          TENANT
+                        </h3>
+                        <Badge variant={getStatusBadgeVariant(systemHealth.tenant.status)}>
                           {systemHealth.tenant.status}
                         </Badge>
                       </div>
@@ -372,7 +403,9 @@ export default function DatabaseManagementPage() {
                         {systemHealth.tenant.responseTime && (
                           <div className="flex items-center justify-between text-sm">
                             <span>{tDb('database.responseTime')}</span>
-                            <span className="font-mono">{systemHealth.tenant.responseTime.toFixed(2)}ms</span>
+                            <span className="font-mono">
+                              {systemHealth.tenant.responseTime.toFixed(2)}ms
+                            </span>
                           </div>
                         )}
                       </div>
@@ -385,7 +418,9 @@ export default function DatabaseManagementPage() {
               <div className="grid md:grid-cols-4 gap-4">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{tDb('database.activeTenants')}</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      {tDb('database.activeTenants')}
+                    </CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
@@ -398,25 +433,31 @@ export default function DatabaseManagementPage() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{tDb('database.connections')}</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      {tDb('database.connections')}
+                    </CardTitle>
                     <HardDrive className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
                       {connections ? connections.connections.length : '0'}
                     </div>
-                    <p className="text-xs text-muted-foreground">{tDb('database.connectionsActive')}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {tDb('database.connectionsActive')}
+                    </p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{tDb('database.migrations')}</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      {tDb('database.migrations')}
+                    </CardTitle>
                     <BarChart3 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {migrationStatuses.filter(m => m.status === 'pending').length}
+                      {migrationStatuses.filter((m) => m.status === 'pending').length}
                     </div>
                     <p className="text-xs text-muted-foreground">{tDb('database.pending')}</p>
                   </CardContent>
@@ -424,14 +465,20 @@ export default function DatabaseManagementPage() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{tDb('database.performance')}</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      {tDb('database.performance')}
+                    </CardTitle>
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {(((systemHealth.auth.responseTime || 0) + 
-                         (systemHealth.shared.responseTime || 0) + 
-                         (systemHealth.tenant.responseTime || 0)) / 3).toFixed(2)}ms
+                      {(
+                        ((systemHealth.auth.responseTime || 0) +
+                          (systemHealth.shared.responseTime || 0) +
+                          (systemHealth.tenant.responseTime || 0)) /
+                        3
+                      ).toFixed(2)}
+                      ms
                     </div>
                     <p className="text-xs text-muted-foreground">{tDb('database.averageTime')}</p>
                   </CardContent>
@@ -444,7 +491,7 @@ export default function DatabaseManagementPage() {
                 <div className="space-y-4">
                   <PerformanceMetricsChart data={[]} autoRefresh={false} />
                 </div>
-                
+
                 {/* Alertes système */}
                 <div className="space-y-4">
                   <SystemAlertsPanel alerts={[]} autoRefresh={false} maxAlerts={5} />
@@ -460,7 +507,7 @@ export default function DatabaseManagementPage() {
                       status: systemHealth.auth.status,
                       isConnected: systemHealth.auth.isConnected,
                       responseTime: systemHealth.auth.responseTime,
-                      error: systemHealth.auth.error
+                      error: systemHealth.auth.error,
                     }}
                     variant="auth"
                   />
@@ -470,7 +517,7 @@ export default function DatabaseManagementPage() {
                       status: systemHealth.shared.status,
                       isConnected: systemHealth.shared.isConnected,
                       responseTime: systemHealth.shared.responseTime,
-                      error: systemHealth.shared.error
+                      error: systemHealth.shared.error,
                     }}
                     variant="shared"
                   />
@@ -480,7 +527,7 @@ export default function DatabaseManagementPage() {
                       status: systemHealth.tenant.status,
                       isConnected: systemHealth.tenant.isConnected,
                       responseTime: systemHealth.tenant.responseTime,
-                      error: systemHealth.tenant.error
+                      error: systemHealth.tenant.error,
                     }}
                     variant="tenant"
                   />
@@ -495,9 +542,7 @@ export default function DatabaseManagementPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold">{tDb('database.migrationsManagement')}</h2>
-              <p className="text-muted-foreground">
-                {tDb('database.migrationsDescription')}
-              </p>
+              <p className="text-muted-foreground">{tDb('database.migrationsDescription')}</p>
             </div>
             <Button onClick={handleRunAllMigrations} disabled={loading}>
               <PlayCircle className="w-4 h-4 mr-2" />
@@ -507,7 +552,7 @@ export default function DatabaseManagementPage() {
 
           {/* Cartes de migration améliorées */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {migrationStatuses.map((migration, index) => {
+            {migrationStatuses.map((migration) => {
               // Déterminer le variant basé sur le nom de la base
               let variant: 'auth' | 'shared' | 'tenant' = 'tenant'
               if (migration.database.toLowerCase().includes('auth')) variant = 'auth'
@@ -515,7 +560,7 @@ export default function DatabaseManagementPage() {
 
               return (
                 <MigrationStatusCard
-                  key={index}
+                  key={migration.database}
                   database={migration.database}
                   status={migration.status}
                   executed={migration.executed}
@@ -554,17 +599,21 @@ export default function DatabaseManagementPage() {
                     <div className="text-2xl font-bold text-green-600">
                       {migrationStatuses.reduce((sum, m) => sum + m.executed.length, 0)}
                     </div>
-                    <div className="text-sm text-muted-foreground">{tDb('database.executedMigrations')}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {tDb('database.executedMigrations')}
+                    </div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-yellow-600">
                       {migrationStatuses.reduce((sum, m) => sum + m.pending.length, 0)}
                     </div>
-                    <div className="text-sm text-muted-foreground">{tDb('database.pendingMigrations')}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {tDb('database.pendingMigrations')}
+                    </div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-red-600">
-                      {migrationStatuses.filter(m => m.status === 'error').length}
+                      {migrationStatuses.filter((m) => m.status === 'error').length}
                     </div>
                     <div className="text-sm text-muted-foreground">{tDb('database.errors')}</div>
                   </div>
@@ -590,12 +639,14 @@ export default function DatabaseManagementPage() {
         {/* Connexions */}
         <TabsContent value="connections" className="space-y-4">
           <ConnectionManagementPanel
-            connections={connections?.connections.map(conn => ({
-              tenant: conn.tenant,
-              isInitialized: conn.isInitialized,
-              status: conn.isInitialized ? 'active' as const : 'error' as const,
-              isCurrent: conn.isCurrent
-            })) || []}
+            connections={
+              connections?.connections.map((conn) => ({
+                tenant: conn.tenant,
+                isInitialized: conn.isInitialized,
+                status: conn.isInitialized ? ('active' as const) : ('error' as const),
+                isCurrent: conn.isCurrent,
+              })) || []
+            }
             onViewDetails={(tenant) => setSelectedTenant(tenant)}
             onCloseConnection={handleCloseTenantConnection}
             onRefresh={loadData}
@@ -608,22 +659,22 @@ export default function DatabaseManagementPage() {
           <Card>
             <CardHeader>
               <CardTitle>{tDb('database.tenantsManagement')}</CardTitle>
-              <CardDescription>
-                {tDb('database.selectTenant')}
-              </CardDescription>
+              <CardDescription>{tDb('database.selectTenant')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm font-medium">{tDb('database.selectTenantLabel')}</span>
-                  <select 
-                    value={selectedTenant} 
+                  <select
+                    value={selectedTenant}
                     onChange={(e) => setSelectedTenant(e.target.value)}
                     className="border rounded px-3 py-1"
                   >
                     <option value="">{tDb('database.selectTenantPlaceholder')}</option>
                     {systemHealth?.activeTenants.map((tenant) => (
-                      <option key={tenant} value={tenant}>{tenant}</option>
+                      <option key={tenant} value={tenant}>
+                        {tenant}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -638,7 +689,7 @@ export default function DatabaseManagementPage() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <span>Status</span>
-                            <Badge variant={getStatusBadgeVariant(tenantHealth.status) as any}>
+                            <Badge variant={getStatusBadgeVariant(tenantHealth.status)}>
                               {tenantHealth.status}
                             </Badge>
                           </div>
@@ -653,7 +704,9 @@ export default function DatabaseManagementPage() {
                           {tenantHealth.responseTime && (
                             <div className="flex items-center justify-between">
                               <span>{tDb('database.responseTime')}</span>
-                              <span className="font-mono">{tenantHealth.responseTime.toFixed(2)}ms</span>
+                              <span className="font-mono">
+                                {tenantHealth.responseTime.toFixed(2)}ms
+                              </span>
                             </div>
                           )}
                         </div>
@@ -669,19 +722,25 @@ export default function DatabaseManagementPage() {
                           <div className="flex items-center justify-between">
                             <span>{tDb('database.base')}</span>
                             <span className="font-mono text-sm">
-                              {(tenantHealth as any)?.configuration?.database || `erp_topsteel_${selectedTenant.toLowerCase()}`}
+                              {(tenantHealth as { configuration?: { database?: string } })
+                                ?.configuration?.database ||
+                                `erp_topsteel_${selectedTenant.toLowerCase()}`}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>{tDb('database.pool')}</span>
                             <span className="font-mono">
-                              {(tenantHealth as any)?.configuration?.poolSize || 10} {tDb('database.connectionsLabel')}
+                              {(tenantHealth as { configuration?: { poolSize?: number } })
+                                ?.configuration?.poolSize || 10}{' '}
+                              {tDb('database.connectionsLabel')}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>{tDb('database.timeout')}</span>
                             <span className="font-mono">
-                              {((tenantHealth as any)?.configuration?.connectionTimeout || 30000) / 1000}s
+                              {((tenantHealth as { configuration?: { connectionTimeout?: number } })
+                                ?.configuration?.connectionTimeout || 30000) / 1000}
+                              s
                             </span>
                           </div>
                         </div>
@@ -697,7 +756,7 @@ export default function DatabaseManagementPage() {
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
                               <span>Status</span>
-                              <Badge variant={getStatusBadgeVariant(tenantMigrations.status) as any}>
+                              <Badge variant={getStatusBadgeVariant(tenantMigrations.status)}>
                                 {tenantMigrations.status}
                               </Badge>
                             </div>
@@ -710,7 +769,7 @@ export default function DatabaseManagementPage() {
                               <span>{tenantMigrations.pending.length}</span>
                             </div>
                             {tenantMigrations.pending.length > 0 && (
-                              <Button 
+                              <Button
                                 onClick={() => handleRunTenantMigrations(selectedTenant)}
                                 size="sm"
                                 className="w-full"

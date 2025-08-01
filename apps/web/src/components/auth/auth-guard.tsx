@@ -1,5 +1,38 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useAuth } from '@/hooks/use-auth'
+
+interface AuthGuardProps {
+  children: React.ReactNode
+  requireAuth?: boolean
+  redirectTo?: string
+}
+
+export function AuthGuard({ children, requireAuth = true, redirectTo = '/login' }: AuthGuardProps) {
+  const { isAuthenticated, isLoading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && requireAuth && !isAuthenticated) {
+      router.push(redirectTo)
+    }
+  }, [isAuthenticated, isLoading, requireAuth, redirectTo, router])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (requireAuth && !isAuthenticated) {
+    return null
+  }
+
+  return <>{children}</>
+}
+
+// Ancien AuthGuard pour compatibilité (désactivé)
+/*
 import { useAuth } from '@/hooks/use-auth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -13,22 +46,24 @@ interface AuthGuardProps {
   fallbackUrl?: string
 }
 
-export function AuthGuard({ 
+export function AuthGuardOLD({ 
   children, 
   requiredRoles = [], 
   fallbackUrl = '/login' 
 }: AuthGuardProps) {
-  const { user, isLoading, isAuthenticated, requiresCompanySelection, company } = useAuth()
+  const { user, isLoading, isAuthenticated, requiresCompanySelection, company, mounted } = useAuth()
   const { t } = useTranslation('auth')
   const router = useRouter()
 
   useEffect(() => {
-    // AuthGuard checking state
+    // Don't redirect until after hydration is complete
+    if (!mounted) return
     
     if (!isLoading && !isAuthenticated) {
-      // Redirecting to login - not authenticated
-      // Rediriger vers la page de login si non authentifié
-      router.replace(fallbackUrl)
+      // Add current pathname as redirect parameter
+      const currentPath = window?.location?.pathname || '/dashboard'
+      const redirectUrl = currentPath === '/login' ? fallbackUrl : `${fallbackUrl}?redirect=${encodeURIComponent(currentPath)}`
+      router.replace(redirectUrl)
       return
     }
 
@@ -44,10 +79,10 @@ export function AuthGuard({
         return
       }
     }
-  }, [isLoading, isAuthenticated, user, requiredRoles, router, fallbackUrl])
+  }, [isLoading, isAuthenticated, user, requiredRoles, router, fallbackUrl, mounted])
 
-  // Afficher le loader pendant la vérification
-  if (isLoading) {
+  // Afficher le loader pendant la vérification ou l'hydratation
+  if (isLoading || !mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -107,3 +142,4 @@ export function AuthGuard({
 
   return <>{children}</>
 }
+*/

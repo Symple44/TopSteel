@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(
@@ -6,15 +6,15 @@ export async function GET(
   { params }: { params: Promise<{ tableName: string }> }
 ) {
   const { tableName } = await params
-  
+
   try {
     // Récupérer les paramètres de requête
     const { searchParams } = new URL(request.url)
     const schema = searchParams.get('schema') || 'public'
-    
+
     // Appel au backend via l'utilitaire centralisé
     const response = await callBackendFromApi(
-      request, 
+      request,
       `query-builder/schema/tables/${tableName}/columns?schema=${schema}`
     )
 
@@ -27,9 +27,7 @@ export async function GET(
 
     const columns = await response.json()
     return NextResponse.json(columns)
-    
   } catch (error) {
-    console.error('[Query Builder Table Columns API] Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to fetch columns' },
       { status: 500 }

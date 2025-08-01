@@ -1,18 +1,10 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { 
-  Folder, 
-  Play, 
-  ExternalLink, 
-  BarChart3, 
-  ChevronRight,
-  Eye,
-  EyeOff
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { BarChart3, ChevronRight, ExternalLink, EyeOff, Folder, Play } from 'lucide-react'
+import { Badge } from '@erp/ui'
+import { Card, CardContent } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n/hooks'
+import { cn } from '@/lib/utils'
 
 interface MenuItem {
   id: string
@@ -34,7 +26,7 @@ interface MenuPreviewProps {
 
 export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
   const { t } = useTranslation('admin')
-  
+
   // Vérifier que menuItems est un tableau valide
   if (!Array.isArray(menuItems)) {
     return (
@@ -48,30 +40,60 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'M': return <Folder className="h-4 w-4" />
-      case 'P': return <Play className="h-4 w-4" />
-      case 'L': return <ExternalLink className="h-4 w-4" />
-      case 'D': return <BarChart3 className="h-4 w-4" />
-      default: return <Play className="h-4 w-4" />
+      case 'M':
+        return <Folder className="h-4 w-4" />
+      case 'P':
+        return <Play className="h-4 w-4" />
+      case 'L':
+        return <ExternalLink className="h-4 w-4" />
+      case 'D':
+        return <BarChart3 className="h-4 w-4" />
+      default:
+        return <Play className="h-4 w-4" />
     }
   }
 
   const getTypeBadge = (type: string) => {
     switch (type) {
-      case 'M': return <Badge variant="secondary" className="text-xs">{t('menu.folder')}</Badge>
-      case 'P': return <Badge variant="default" className="text-xs">{t('menu.program')}</Badge>
-      case 'L': return <Badge variant="outline" className="text-xs">{t('menu.link')}</Badge>
-      case 'D': return <Badge variant="destructive" className="text-xs">{t('menu.dataView')}</Badge>
-      default: return null
+      case 'M':
+        return (
+          <Badge variant="secondary" className="text-xs">
+            {t('menu.folder')}
+          </Badge>
+        )
+      case 'P':
+        return (
+          <Badge variant="default" className="text-xs">
+            {t('menu.program')}
+          </Badge>
+        )
+      case 'L':
+        return (
+          <Badge variant="outline" className="text-xs">
+            {t('menu.link')}
+          </Badge>
+        )
+      case 'D':
+        return (
+          <Badge variant="destructive" className="text-xs">
+            {t('menu.dataView')}
+          </Badge>
+        )
+      default:
+        return null
     }
   }
 
-  const getItemUrl = (item: MenuItem) => {
+  const _getItemUrl = (item: MenuItem) => {
     switch (item.type) {
-      case 'P': return item.programId
-      case 'L': return item.externalUrl
-      case 'D': return item.queryBuilderId ? `/query-builder/${item.queryBuilderId}/view` : undefined
-      default: return undefined
+      case 'P':
+        return item.programId
+      case 'L':
+        return item.externalUrl
+      case 'D':
+        return item.queryBuilderId ? `/query-builder/${item.queryBuilderId}/view` : undefined
+      default:
+        return undefined
     }
   }
 
@@ -86,16 +108,16 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
   return (
     <div className="space-y-2">
       {sortedItems.map((item) => (
-        <Card key={item.id} className={cn(
-          "transition-all",
-          !item.isVisible && "opacity-50 border-dashed"
-        )}>
+        <Card
+          key={item.id}
+          className={cn('transition-all', !item.isVisible && 'opacity-50 border-dashed')}
+        >
           <CardContent className="p-4">
             <div className="space-y-3">
               {/* En-tête de l'item */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="flex items-center gap-2"
                     style={{ marginLeft: `${level * 20}px` }}
                   >
@@ -112,7 +134,9 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
                   )}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>{t('menu.order')}: {item.orderIndex}</span>
+                  <span>
+                    {t('menu.order')}: {item.orderIndex}
+                  </span>
                 </div>
               </div>
 
@@ -133,13 +157,17 @@ export function MenuPreview({ menuItems, level = 0 }: MenuPreviewProps) {
                 {item.type === 'D' && item.queryBuilderId && (
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{t('menu.queryBuilderId')}:</span>
-                    <code className="bg-muted px-2 py-1 rounded text-xs">{item.queryBuilderId}</code>
+                    <code className="bg-muted px-2 py-1 rounded text-xs">
+                      {item.queryBuilderId}
+                    </code>
                   </div>
                 )}
                 {item.type === 'M' && (
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{t('menu.container')}</span>
-                    <span>({item.children.length} {t('menu.items')})</span>
+                    <span>
+                      ({item.children.length} {t('menu.items')})
+                    </span>
                   </div>
                 )}
               </div>

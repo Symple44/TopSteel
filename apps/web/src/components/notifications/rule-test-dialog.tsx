@@ -1,26 +1,26 @@
 'use client'
 
-import { useState } from 'react'
 import {
+  Badge,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  Textarea,
   Label,
-  Badge,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
+  Textarea,
 } from '@erp/ui'
-import { AlertCircle, CheckCircle, XCircle, Play, FileText, Eye } from 'lucide-react'
+import { AlertCircle, CheckCircle, Eye, FileText, Play, XCircle } from 'lucide-react'
+import { useState } from 'react'
 
 interface TestResult {
   success: boolean
@@ -69,10 +69,8 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
         setSampleData(data.data)
         setTestData(JSON.stringify(data.data.sampleData, null, 2))
       } else {
-        console.error('Failed to load sample data')
       }
-    } catch (error) {
-      console.error('Error loading sample data:', error)
+    } catch (_error) {
     } finally {
       setLoadingSample(false)
     }
@@ -85,9 +83,9 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
         result: {
           ruleActive: false,
           conditionResult: { result: false, details: {} },
-          message: 'Données de test requises'
+          message: 'Données de test requises',
         },
-        error: 'Veuillez fournir des données de test'
+        error: 'Veuillez fournir des données de test',
       })
       return
     }
@@ -95,7 +93,7 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
     setIsLoading(true)
     try {
       const parsedData = JSON.parse(testData)
-      
+
       const { callClientApi } = await import('@/utils/backend-api')
       const response = await callClientApi(`notifications/rules/${ruleId}/test`, {
         method: 'POST',
@@ -110,9 +108,9 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
         result: {
           ruleActive: false,
           conditionResult: { result: false, details: {} },
-          message: 'Erreur lors du test'
+          message: 'Erreur lors du test',
         },
-        error: error instanceof Error ? error.message : 'Erreur inconnue'
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
       })
     } finally {
       setIsLoading(false)
@@ -191,7 +189,9 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
               <Textarea
                 id="testData"
                 value={testData}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTestData(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setTestData(e.target.value)
+                }
                 placeholder="Entrez vos données de test au format JSON..."
                 className="min-h-[200px] font-mono"
               />
@@ -221,9 +221,7 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      {sampleData.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{sampleData.description}</p>
                     <div className="space-y-2">
                       <Label>Champs disponibles:</Label>
                       <div className="flex flex-wrap gap-2">
@@ -240,7 +238,7 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
                         {JSON.stringify(sampleData.sampleData, null, 2)}
                       </pre>
                     </div>
-                    <Button 
+                    <Button
                       onClick={() => setTestData(JSON.stringify(sampleData.sampleData, null, 2))}
                       variant="outline"
                       size="sm"
@@ -253,7 +251,7 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
             ) : (
               <div className="text-center py-8">
                 <Button onClick={loadSampleData} disabled={loadingSample}>
-                  {loadingSample ? 'Chargement...' : 'Charger les données d\'exemple'}
+                  {loadingSample ? 'Chargement...' : "Charger les données d'exemple"}
                 </Button>
               </div>
             )}
@@ -271,28 +269,28 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <p className="font-medium">{testResult.result.message}</p>
-                    {testResult.error && (
-                      <p className="text-red-600 text-sm">{testResult.error}</p>
-                    )}
+                    {testResult.error && <p className="text-red-600 text-sm">{testResult.error}</p>}
                   </div>
 
                   {testResult.result.conditionResult && (
                     <div className="space-y-2">
                       <h4 className="font-medium">Évaluation des conditions:</h4>
                       <div className="space-y-2">
-                        {Object.entries(testResult.result.conditionResult.details).map(([conditionId, details]: [string, any]) => (
-                          <div key={conditionId} className="flex items-center space-x-2 text-sm">
-                            {details.result ? (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            ) : (
-                              <XCircle className="h-4 w-4 text-red-500" />
-                            )}
-                            <span>{details.condition}</span>
-                            <span className="text-muted-foreground">
-                              (valeur: {JSON.stringify(details.actualValue)})
-                            </span>
-                          </div>
-                        ))}
+                        {Object.entries(testResult.result.conditionResult.details).map(
+                          ([conditionId, details]: [string, any]) => (
+                            <div key={conditionId} className="flex items-center space-x-2 text-sm">
+                              {details.result ? (
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-red-500" />
+                              )}
+                              <span>{details.condition}</span>
+                              <span className="text-muted-foreground">
+                                (valeur: {JSON.stringify(details.actualValue)})
+                              </span>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   )}
@@ -304,10 +302,16 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
                         <CardContent className="pt-4">
                           <div className="space-y-3">
                             <div className="flex items-center space-x-2">
-                              <Badge className={getTypeColor(testResult.result.notificationPreview.type)}>
+                              <Badge
+                                className={getTypeColor(testResult.result.notificationPreview.type)}
+                              >
                                 {testResult.result.notificationPreview.type}
                               </Badge>
-                              <Badge className={getPriorityColor(testResult.result.notificationPreview.priority)}>
+                              <Badge
+                                className={getPriorityColor(
+                                  testResult.result.notificationPreview.priority
+                                )}
+                              >
                                 {testResult.result.notificationPreview.priority}
                               </Badge>
                               <Badge variant="outline">
@@ -315,7 +319,9 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
                               </Badge>
                             </div>
                             <div>
-                              <h5 className="font-medium">{testResult.result.notificationPreview.title}</h5>
+                              <h5 className="font-medium">
+                                {testResult.result.notificationPreview.title}
+                              </h5>
                               <p className="text-sm text-muted-foreground mt-1">
                                 {testResult.result.notificationPreview.message}
                               </p>

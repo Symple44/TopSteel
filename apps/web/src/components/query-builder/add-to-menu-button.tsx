@@ -1,13 +1,27 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { toast } from '@/components/ui/use-toast'
 import { Menu, Plus } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@erp/ui/primitives'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@erp/ui/primitives'
+import { Input } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui/primitives'
+import { toast } from '@/hooks/use-toast'
 import { apiClient } from '@/lib/api-client'
 
 interface AddToMenuButtonProps {
@@ -24,19 +38,19 @@ const iconOptions = [
   { value: 'Database', label: '🗄️ Base de données' },
   { value: 'TrendingUp', label: '📈 Tendance' },
   { value: 'Activity', label: '📊 Activité' },
-  { value: 'FileBarChart', label: '📊 Rapport' }
+  { value: 'FileBarChart', label: '📊 Rapport' },
 ]
 
-export function AddToMenuButton({ 
-  queryBuilderId, 
-  queryBuilderName, 
-  onAddedToMenu 
+export function AddToMenuButton({
+  queryBuilderId,
+  queryBuilderName,
+  onAddedToMenu,
 }: AddToMenuButtonProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     title: queryBuilderName,
-    icon: 'BarChart3'
+    icon: 'BarChart3',
   })
 
   const handleAddToMenu = async () => {
@@ -44,7 +58,7 @@ export function AddToMenuButton({
       toast({
         title: 'Erreur',
         description: 'Le titre est requis',
-        variant: 'destructive'
+        variant: 'destructive',
       })
       return
     }
@@ -54,14 +68,15 @@ export function AddToMenuButton({
       // D'abord, préparer les données pour le menu
       const menuData = await apiClient.post(`/query-builder/${queryBuilderId}/add-to-menu`, {
         title: formData.title,
-        icon: formData.icon
+        icon: formData.icon,
       })
 
       // Ensuite, ajouter au menu personnel de l'utilisateur
+      const menuResult = menuData as any
       await apiClient.post('/admin/menus/user-data-view', {
-        queryBuilderId: menuData.data.queryBuilderId,
-        title: menuData.data.title,
-        icon: menuData.data.icon
+        queryBuilderId: menuResult.data.queryBuilderId,
+        title: menuResult.data.title,
+        icon: menuResult.data.icon,
       })
 
       toast({
@@ -74,13 +89,11 @@ export function AddToMenuButton({
 
       // Déclencher un rafraîchissement du menu
       window.dispatchEvent(new CustomEvent('menuPreferencesChanged'))
-
     } catch (error: any) {
-      console.error('Erreur lors de l\'ajout au menu:', error)
       toast({
         title: 'Erreur',
-        description: error.response?.data?.message || 'Impossible d\'ajouter la vue au menu',
-        variant: 'destructive'
+        description: error.response?.data?.message || "Impossible d'ajouter la vue au menu",
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)

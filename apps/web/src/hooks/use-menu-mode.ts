@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export type MenuMode = 'standard' | 'custom'
 
@@ -23,8 +23,7 @@ export function useMenuMode() {
         const state: MenuModeState = JSON.parse(stored)
         setMode(state.mode)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement du mode menu:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
@@ -35,12 +34,10 @@ export function useMenuMode() {
     try {
       const state: MenuModeState = {
         mode: newMode,
-        lastChanged: new Date().toISOString()
+        lastChanged: new Date().toISOString(),
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde du mode menu:', error)
-    }
+    } catch (_error) {}
   }, [])
 
   // Basculer entre standard et custom
@@ -51,10 +48,13 @@ export function useMenuMode() {
   }, [mode, saveMode])
 
   // Définir un mode spécifique
-  const setMenuMode = useCallback((newMode: MenuMode) => {
-    setMode(newMode)
-    saveMode(newMode)
-  }, [saveMode])
+  const setMenuMode = useCallback(
+    (newMode: MenuMode) => {
+      setMode(newMode)
+      saveMode(newMode)
+    },
+    [saveMode]
+  )
 
   return {
     mode,
@@ -62,6 +62,6 @@ export function useMenuMode() {
     toggleMode,
     setMenuMode,
     isStandard: mode === 'standard',
-    isCustom: mode === 'custom'
+    isCustom: mode === 'custom',
   }
 }

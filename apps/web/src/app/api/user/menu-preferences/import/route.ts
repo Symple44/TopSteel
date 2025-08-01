@@ -1,11 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
-    console.log('Import des préférences:', body)
-    
+
     // Valider les données importées
     if (!body.preferences || !body.version) {
       return NextResponse.json(
@@ -13,26 +11,25 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     // Pour le moment, simuler l'import
     const importedPreferences = {
       ...body.preferences,
       id: '1',
-      userId: 'current-user'
+      userId: 'current-user',
     }
-    
+
     return NextResponse.json({
       success: true,
       data: importedPreferences,
-      message: 'Préférences importées avec succès'
+      message: 'Préférences importées avec succès',
     })
   } catch (error) {
-    console.error('Erreur lors de l\'import:', error)
     return NextResponse.json(
       {
         success: false,
-        message: 'Erreur lors de l\'import',
-        error: error instanceof Error ? error.message : 'Erreur inconnue'
+        message: "Erreur lors de l'import",
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
       },
       { status: 500 }
     )

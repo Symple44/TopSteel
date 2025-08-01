@@ -8,11 +8,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement>, SidebarVari
 
 const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
   ({ className, variant, size, children, ...props }, ref) => (
-    <aside
-      ref={ref}
-      className={cn(sidebarVariants({ variant, size }), className)}
-      {...props}
-    >
+    <aside ref={ref} className={cn(sidebarVariants({ variant, size }), className)} {...props}>
       {children}
     </aside>
   )
@@ -32,33 +28,21 @@ SidebarHeader.displayName = 'SidebarHeader'
 
 const SidebarContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('flex-1 overflow-y-auto p-4', className)}
-      {...props}
-    />
+    <div ref={ref} className={cn('flex-1 overflow-y-auto p-4', className)} {...props} />
   )
 )
 SidebarContent.displayName = 'SidebarContent'
 
 const SidebarFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('border-t p-4', className)}
-      {...props}
-    />
+    <div ref={ref} className={cn('border-t p-4', className)} {...props} />
   )
 )
 SidebarFooter.displayName = 'SidebarFooter'
 
 const SidebarNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
   ({ className, ...props }, ref) => (
-    <nav
-      ref={ref}
-      className={cn('space-y-1', className)}
-      {...props}
-    />
+    <nav ref={ref} className={cn('space-y-1', className)} {...props} />
   )
 )
 SidebarNav.displayName = 'SidebarNav'
@@ -91,11 +75,7 @@ SidebarNavItem.displayName = 'SidebarNavItem'
 
 const SidebarSection = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('space-y-2', className)}
-      {...props}
-    />
+    <div ref={ref} className={cn('space-y-2', className)} {...props} />
   )
 )
 SidebarSection.displayName = 'SidebarSection'
@@ -104,7 +84,10 @@ const SidebarSectionTitle = React.forwardRef<HTMLDivElement, React.HTMLAttribute
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider', className)}
+      className={cn(
+        'px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider',
+        className
+      )}
       {...props}
     />
   )

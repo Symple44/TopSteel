@@ -1,70 +1,34 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Switch } from '@/components/ui/switch'
-import { Separator } from '@/components/ui/separator'
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue
-} from '@/components/ui/select'
-import { 
-  Shield, 
-  Users, 
-  Eye, 
-  EyeOff, 
-  ChevronDown, 
-  ChevronRight,
-  Info,
+import {
   AlertTriangle,
   CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  Info,
+  Settings,
+  Shield,
+  Users,
   XCircle,
-  Settings
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Checkbox } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui/primitives'
+import { Separator } from '@erp/ui'
+import { Switch } from '@erp/ui/primitives'
 import { cn } from '@/lib/utils'
-
-interface Group {
-  id: string
-  name: string
-  description: string
-  type: 'DEPARTMENT' | 'TEAM' | 'PROJECT' | 'CUSTOM'
-  isActive: boolean
-}
-
-interface Role {
-  id: string
-  name: string
-  description: string
-  isSystemRole: boolean
-  isActive: boolean
-}
-
-interface Permission {
-  id: string
-  name: string
-  description: string
-  module: string
-  action: string
-}
-
-interface MenuItem {
-  id?: string
-  title: string
-  type: 'M' | 'P' | 'L' | 'D'
-  // Nouveaux champs pour les droits
-  allowedGroups?: string[]
-  requiredRoles?: string[]
-  requiredPermissions?: string[]
-  inheritFromParent?: boolean
-  isPublic?: boolean
-}
+import type { Group, MenuItem, Permission, Role } from '@/types/menu'
 
 interface MenuItemRightsEditorProps {
   item: MenuItem
@@ -83,10 +47,10 @@ export function MenuItemRightsEditor({
   availablePermissions,
   parentItem,
   onUpdate,
-  className
+  className,
 }: MenuItemRightsEditorProps) {
   const [showAdvanced, setShowAdvanced] = useState(false)
-  const [previewMode, setPreviewMode] = useState<'simple' | 'advanced'>('simple')
+  const [_previewMode, _setPreviewMode] = useState<'simple' | 'advanced'>('simple')
   const [selectedPreviewGroup, setSelectedPreviewGroup] = useState<string>('')
 
   // États locaux pour les droits
@@ -94,7 +58,9 @@ export function MenuItemRightsEditor({
   const [inheritFromParent, setInheritFromParent] = useState(item.inheritFromParent ?? true)
   const [allowedGroups, setAllowedGroups] = useState<string[]>(item.allowedGroups ?? [])
   const [requiredRoles, setRequiredRoles] = useState<string[]>(item.requiredRoles ?? [])
-  const [requiredPermissions, setRequiredPermissions] = useState<string[]>(item.requiredPermissions ?? [])
+  const [requiredPermissions, setRequiredPermissions] = useState<string[]>(
+    item.requiredPermissions ?? []
+  )
 
   // Mettre à jour l'item parent quand les droits changent
   useEffect(() => {
@@ -104,10 +70,18 @@ export function MenuItemRightsEditor({
       inheritFromParent,
       allowedGroups: allowedGroups.length > 0 ? allowedGroups : undefined,
       requiredRoles: requiredRoles.length > 0 ? requiredRoles : undefined,
-      requiredPermissions: requiredPermissions.length > 0 ? requiredPermissions : undefined
+      requiredPermissions: requiredPermissions.length > 0 ? requiredPermissions : undefined,
     }
     onUpdate(updatedItem)
-  }, [isPublic, inheritFromParent, allowedGroups, requiredRoles, requiredPermissions])
+  }, [
+    isPublic,
+    inheritFromParent,
+    allowedGroups,
+    requiredRoles,
+    requiredPermissions,
+    item,
+    onUpdate,
+  ])
 
   // Calculer les droits effectifs (avec héritage)
   const getEffectiveRights = () => {
@@ -116,7 +90,7 @@ export function MenuItemRightsEditor({
         groups: [],
         roles: [],
         permissions: [],
-        isRestricted: false
+        isRestricted: false,
       }
     }
 
@@ -126,7 +100,7 @@ export function MenuItemRightsEditor({
         roles: parentItem.requiredRoles ?? [],
         permissions: parentItem.requiredPermissions ?? [],
         isRestricted: true,
-        inheritedFrom: parentItem.title
+        inheritedFrom: parentItem.title,
       }
     }
 
@@ -134,7 +108,8 @@ export function MenuItemRightsEditor({
       groups: allowedGroups,
       roles: requiredRoles,
       permissions: requiredPermissions,
-      isRestricted: allowedGroups.length > 0 || requiredRoles.length > 0 || requiredPermissions.length > 0
+      isRestricted:
+        allowedGroups.length > 0 || requiredRoles.length > 0 || requiredPermissions.length > 0,
     }
   }
 
@@ -142,7 +117,7 @@ export function MenuItemRightsEditor({
 
   // Simuler l'accès pour un groupe donné
   const simulateAccess = (groupId: string) => {
-    const group = availableGroups.find(g => g.id === groupId)
+    const group = availableGroups.find((g) => g.id === groupId)
     if (!group) return { hasAccess: false, reason: 'Groupe non trouvé' }
 
     if (isPublic) return { hasAccess: true, reason: 'Élément public' }
@@ -158,11 +133,11 @@ export function MenuItemRightsEditor({
     return { hasAccess: false, reason: 'Groupe non autorisé' }
   }
 
-  const handleGroupsChange = (selectedGroups: string[]) => {
+  const _handleGroupsChange = (selectedGroups: string[]) => {
     setAllowedGroups(selectedGroups)
   }
 
-  const handleRolesChange = (selectedRoles: string[]) => {
+  const _handleRolesChange = (selectedRoles: string[]) => {
     setRequiredRoles(selectedRoles)
   }
 
@@ -170,28 +145,44 @@ export function MenuItemRightsEditor({
     if (checked) {
       setRequiredPermissions([...requiredPermissions, permissionId])
     } else {
-      setRequiredPermissions(requiredPermissions.filter(p => p !== permissionId))
+      setRequiredPermissions(requiredPermissions.filter((p) => p !== permissionId))
     }
   }
 
   const getRightsStatusBadge = () => {
     if (isPublic) {
-      return <Badge variant="secondary" className="text-green-700 bg-green-100">🌍 Public</Badge>
+      return (
+        <Badge variant="secondary" className="text-green-700 bg-green-100">
+          🌍 Public
+        </Badge>
+      )
     }
-    
+
     if (effectiveRights.inheritedFrom) {
-      return <Badge variant="outline" className="text-blue-700 bg-blue-50">⬆️ Hérité</Badge>
+      return (
+        <Badge variant="outline" className="text-blue-700 bg-blue-50">
+          ⬆️ Hérité
+        </Badge>
+      )
     }
 
     if (!effectiveRights.isRestricted) {
-      return <Badge variant="outline" className="text-gray-600">🔓 Libre accès</Badge>
+      return (
+        <Badge variant="outline" className="text-gray-600">
+          🔓 Libre accès
+        </Badge>
+      )
     }
 
-    return <Badge variant="default" className="text-orange-700 bg-orange-100">🔐 Restreint</Badge>
+    return (
+      <Badge variant="default" className="text-orange-700 bg-orange-100">
+        🔐 Restreint
+      </Badge>
+    )
   }
 
   return (
-    <Card className={cn("border-l-4 border-l-blue-500", className)}>
+    <Card className={cn('border-l-4 border-l-blue-500', className)}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -229,18 +220,20 @@ export function MenuItemRightsEditor({
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <Label htmlFor="is-public" className="font-medium">Accès Public</Label>
-                {isPublic && <Badge variant="secondary" className="text-xs">Visible par tous</Badge>}
+                <Label htmlFor="is-public" className="font-medium">
+                  Accès Public
+                </Label>
+                {isPublic && (
+                  <Badge variant="secondary" className="text-xs">
+                    Visible par tous
+                  </Badge>
+                )}
               </div>
               <p className="text-sm text-muted-foreground">
                 Cet élément est accessible à tous les utilisateurs
               </p>
             </div>
-            <Switch
-              id="is-public"
-              checked={isPublic}
-              onCheckedChange={setIsPublic}
-            />
+            <Switch checked={isPublic} onCheckedChange={setIsPublic} />
           </div>
 
           {/* Héritage du parent */}
@@ -261,11 +254,7 @@ export function MenuItemRightsEditor({
                   Utiliser les mêmes droits que l'élément parent
                 </p>
               </div>
-              <Switch
-                id="inherit-parent"
-                checked={inheritFromParent}
-                onCheckedChange={setInheritFromParent}
-              />
+              <Switch checked={inheritFromParent} onCheckedChange={setInheritFromParent} />
             </div>
           )}
         </div>
@@ -274,7 +263,7 @@ export function MenuItemRightsEditor({
         {!isPublic && !inheritFromParent && (
           <div className="space-y-4">
             <Separator />
-            
+
             {/* Sélection des groupes */}
             <div className="space-y-3">
               <Label className="flex items-center gap-2 font-medium">
@@ -290,20 +279,16 @@ export function MenuItemRightsEditor({
                 {availableGroups.map((group) => (
                   <div key={group.id} className="flex items-center space-x-2 p-2 rounded border">
                     <Checkbox
-                      id={`group-${group.id}`}
                       checked={allowedGroups.includes(group.id)}
                       onCheckedChange={(checked) => {
                         if (checked) {
                           setAllowedGroups([...allowedGroups, group.id])
                         } else {
-                          setAllowedGroups(allowedGroups.filter(g => g !== group.id))
+                          setAllowedGroups(allowedGroups.filter((g) => g !== group.id))
                         }
                       }}
                     />
-                    <Label 
-                      htmlFor={`group-${group.id}`} 
-                      className="text-sm cursor-pointer flex-1"
-                    >
+                    <Label htmlFor={`group-${group.id}`} className="text-sm cursor-pointer flex-1">
                       <div className="font-medium">{group.name}</div>
                       <div className="text-xs text-muted-foreground">{group.description}</div>
                     </Label>
@@ -330,23 +315,24 @@ export function MenuItemRightsEditor({
                     {availableRoles.map((role) => (
                       <div key={role.id} className="flex items-center space-x-2 p-2 rounded border">
                         <Checkbox
-                          id={`role-${role.id}`}
                           checked={requiredRoles.includes(role.id)}
                           onCheckedChange={(checked) => {
                             if (checked) {
                               setRequiredRoles([...requiredRoles, role.id])
                             } else {
-                              setRequiredRoles(requiredRoles.filter(r => r !== role.id))
+                              setRequiredRoles(requiredRoles.filter((r) => r !== role.id))
                             }
                           }}
                         />
-                        <Label 
-                          htmlFor={`role-${role.id}`} 
+                        <Label
+                          htmlFor={`role-${role.id}`}
                           className="text-sm cursor-pointer flex-1"
                         >
                           {role.name}
                           {role.isSystemRole && (
-                            <Badge variant="secondary" className="ml-1 text-xs">Système</Badge>
+                            <Badge variant="secondary" className="ml-1 text-xs">
+                              Système
+                            </Badge>
                           )}
                         </Label>
                       </div>
@@ -366,23 +352,18 @@ export function MenuItemRightsEditor({
                     )}
                   </Label>
                   <div className="max-h-40 overflow-y-auto border rounded-md">
-                    {availablePermissions.reduce((acc, permission) => {
-                      const module = permission.module
-                      if (!acc[module]) {
-                        acc[module] = []
-                      }
-                      acc[module].push(permission)
-                      return acc
-                    }, {} as Record<string, Permission[]>)}
                     {Object.entries(
-                      availablePermissions.reduce((acc, permission) => {
-                        const module = permission.module
-                        if (!acc[module]) {
-                          acc[module] = []
-                        }
-                        acc[module].push(permission)
-                        return acc
-                      }, {} as Record<string, Permission[]>)
+                      availablePermissions.reduce(
+                        (acc, permission) => {
+                          const module = permission.module
+                          if (!acc[module]) {
+                            acc[module] = []
+                          }
+                          acc[module].push(permission)
+                          return acc
+                        },
+                        {} as Record<string, Permission[]>
+                      )
                     ).map(([module, permissions]) => (
                       <div key={module} className="p-3 border-b last:border-b-0">
                         <h4 className="font-medium text-sm mb-2 text-blue-600">{module}</h4>
@@ -390,14 +371,13 @@ export function MenuItemRightsEditor({
                           {permissions.map((permission) => (
                             <div key={permission.id} className="flex items-center space-x-2">
                               <Checkbox
-                                id={`perm-${permission.id}`}
                                 checked={requiredPermissions.includes(permission.id)}
-                                onCheckedChange={(checked) => 
+                                onCheckedChange={(checked) =>
                                   handlePermissionsChange(permission.id, checked as boolean)
                                 }
                               />
-                              <Label 
-                                htmlFor={`perm-${permission.id}`} 
+                              <Label
+                                htmlFor={`perm-${permission.id}`}
                                 className="text-sm cursor-pointer flex-1"
                               >
                                 {permission.name}
@@ -446,7 +426,7 @@ export function MenuItemRightsEditor({
               <Info className="h-4 w-4 text-blue-500" />
               Droits Effectifs
             </div>
-            
+
             {isPublic && (
               <div className="flex items-center gap-2 text-sm text-green-700">
                 <CheckCircle className="h-4 w-4" />
@@ -464,20 +444,26 @@ export function MenuItemRightsEditor({
             {effectiveRights.groups.length > 0 && (
               <div className="text-sm">
                 <span className="font-medium">Groupes: </span>
-                {effectiveRights.groups.map(groupId => {
-                  const group = availableGroups.find(g => g.id === groupId)
-                  return group?.name
-                }).filter(Boolean).join(', ')}
+                {effectiveRights.groups
+                  .map((groupId) => {
+                    const group = availableGroups.find((g) => g.id === groupId)
+                    return group?.name
+                  })
+                  .filter(Boolean)
+                  .join(', ')}
               </div>
             )}
 
             {effectiveRights.roles.length > 0 && (
               <div className="text-sm">
                 <span className="font-medium">Rôles requis: </span>
-                {effectiveRights.roles.map(roleId => {
-                  const role = availableRoles.find(r => r.id === roleId)
-                  return role?.name
-                }).filter(Boolean).join(', ')}
+                {effectiveRights.roles
+                  .map((roleId) => {
+                    const role = availableRoles.find((r) => r.id === roleId)
+                    return role?.name
+                  })
+                  .filter(Boolean)
+                  .join(', ')}
               </div>
             )}
 
@@ -494,7 +480,7 @@ export function MenuItemRightsEditor({
             <div className="p-3 rounded-lg border">
               {(() => {
                 const access = simulateAccess(selectedPreviewGroup)
-                const group = availableGroups.find(g => g.id === selectedPreviewGroup)
+                const group = availableGroups.find((g) => g.id === selectedPreviewGroup)
                 return (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -505,9 +491,7 @@ export function MenuItemRightsEditor({
                       )}
                       <span className="font-medium">{group?.name}</span>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {access.reason}
-                    </div>
+                    <div className="text-sm text-muted-foreground">{access.reason}</div>
                   </div>
                 )
               })()}

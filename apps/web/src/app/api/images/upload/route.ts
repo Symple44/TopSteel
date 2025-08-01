@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { type NextRequest, NextResponse } from 'next/server'
+import { verifyAuthHelper } from '@/lib/auth-helper'
 import { getImageService } from './image-service'
 
 export const runtime = 'nodejs'
@@ -7,8 +7,8 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     // Vérification de l'authentification
-    const session = await auth()
-    if (!session?.user?.id) {
+    const session = await verifyAuthHelper(request)
+    if (!session.isValid || !session.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -46,17 +46,15 @@ export async function POST(request: NextRequest) {
         entityId,
         alt,
         description,
-        tags: tags ? tags.split(',').map(tag => tag.trim()) : undefined
+        tags: tags ? tags.split(',').map((tag) => tag.trim()) : undefined,
       }
     )
 
     return NextResponse.json({
       success: true,
-      data: result
+      data: result,
     })
-
   } catch (error) {
-    console.error('Upload error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Upload failed' },
       { status: 500 }
@@ -66,8 +64,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const session = await verifyAuthHelper(request)
+    if (!session.isValid || !session.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -83,9 +81,7 @@ export async function DELETE(request: NextRequest) {
     await imageService.deleteImage(imageId, category)
 
     return NextResponse.json({ success: true })
-
   } catch (error) {
-    console.error('Delete error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Delete failed' },
       { status: 500 }

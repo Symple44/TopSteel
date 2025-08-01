@@ -1,7 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+export const dynamic = 'force-dynamic'
+
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function QueryBuilderPage() {
@@ -16,9 +18,7 @@ export default function QueryBuilderPage() {
     <div className="flex items-center justify-center h-full">
       <div className="text-center">
         <h2 className="text-2xl font-semibold mb-2">{t('welcome')}</h2>
-        <p className="text-muted-foreground">
-          {t('selectOrCreate')}
-        </p>
+        <p className="text-muted-foreground">{t('selectOrCreate')}</p>
       </div>
     </div>
   )

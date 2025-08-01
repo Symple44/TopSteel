@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from 'next'
+
+// Force all pages to be dynamic
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { Inter, Poppins } from 'next/font/google'
-import '../styles/globals.css' 
-import { ProvidersSimple } from './providers-simple'
+import '../styles/globals.css'
+import { Providers } from './providers'
 // import { logStartupInfo } from '@/lib/startup-logger'
 
 // Tests désactivés pour réduire les logs
@@ -77,9 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="font-inter antialiased bg-background text-foreground"
         suppressHydrationWarning
       >
-        <ProvidersSimple>
-          {children}
-        </ProvidersSimple>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

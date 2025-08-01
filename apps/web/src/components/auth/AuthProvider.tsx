@@ -1,8 +1,8 @@
 'use client'
 
+import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
 import { useAuth } from '@/hooks/use-auth'
-import { usePathname, useRouter } from 'next/navigation'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -20,12 +20,7 @@ const PUBLIC_ROUTES = [
 ]
 
 // Routes qui nécessitent une authentification mais pas de redirection immédiate
-const PROTECTED_ROUTES = [
-  '/admin',
-  '/dashboard',
-  '/profile',
-  '/settings',
-]
+const PROTECTED_ROUTES = ['/admin', '/dashboard', '/profile', '/settings']
 
 // Routes qui redirigent automatiquement si déjà connecté
 const AUTH_ROUTES = ['/login', '/register']
@@ -36,17 +31,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const pathname = usePathname()
 
   // Fonction de redirection sécurisée
-  const safeRedirect = React.useCallback((url: string) => {
-    try {
-      router.replace(url)
-    } catch (error) {
-      console.error('Redirect failed:', error)
-      // Fallback: utiliser window.location si router.replace échoue
-      if (typeof window !== 'undefined') {
-        window.location.href = url
+  const safeRedirect = React.useCallback(
+    (url: string) => {
+      try {
+        router.replace(url)
+      } catch (_error) {
+        // Fallback: utiliser window.location si router.replace échoue
+        if (typeof window !== 'undefined') {
+          window.location.href = url
+        }
       }
-    }
-  }, [router])
+    },
+    [router]
+  )
 
   // Initialiser la session au démarrage
   React.useEffect(() => {
@@ -115,8 +112,7 @@ export function useRequireAuth() {
     if (!isAuthenticated && !isPublicRoute) {
       try {
         router.replace('/login')
-      } catch (error) {
-        console.error('Redirect failed in useRequireAuth:', error)
+      } catch (_error) {
         if (typeof window !== 'undefined') {
           window.location.href = '/login'
         }
@@ -167,10 +163,10 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
 }
 
 // Composant pour valider les permissions d'accès
-export function RouteGuard({ 
-  children, 
+export function RouteGuard({
+  children,
   requiredPermissions = [],
-  fallbackUrl = '/dashboard' 
+  fallbackUrl = '/dashboard',
 }: {
   children: React.ReactNode
   requiredPermissions?: string[]
@@ -185,8 +181,7 @@ export function RouteGuard({
     if (!isAuthenticated) {
       try {
         router.replace('/login')
-      } catch (error) {
-        console.error('Redirect failed in RouteGuard:', error)
+      } catch (_error) {
         if (typeof window !== 'undefined') {
           window.location.href = '/login'
         }
@@ -195,16 +190,14 @@ export function RouteGuard({
     }
 
     if (requiredPermissions.length > 0 && user) {
-      const hasPermission = requiredPermissions.some(permission => 
-        user.role === permission || 
-        user.permissions?.includes(permission)
+      const hasPermission = requiredPermissions.some(
+        (permission) => user.role === permission || user.permissions?.includes(permission)
       )
 
       if (!hasPermission) {
         try {
           router.replace(fallbackUrl)
-        } catch (error) {
-          console.error('Permission redirect failed:', error)
+        } catch (_error) {
           if (typeof window !== 'undefined') {
             window.location.href = fallbackUrl
           }
@@ -232,9 +225,8 @@ export function RouteGuard({
 
   // Vérifier les permissions si spécifiées
   if (requiredPermissions.length > 0 && user) {
-    const hasPermission = requiredPermissions.some(permission => 
-      user.role === permission || 
-      user.permissions?.includes(permission)
+    const hasPermission = requiredPermissions.some(
+      (permission) => user.role === permission || user.permissions?.includes(permission)
     )
 
     if (!hasPermission) {
@@ -243,7 +235,9 @@ export function RouteGuard({
           <div className="text-center">
             <div className="text-red-600 text-6xl mb-4">🚫</div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Accès refusé</h1>
-            <p className="text-gray-600 mb-4">Vous n'avez pas les permissions nécessaires pour accéder à cette page.</p>
+            <p className="text-gray-600 mb-4">
+              Vous n'avez pas les permissions nécessaires pour accéder à cette page.
+            </p>
             <button
               onClick={() => router.back()}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"

@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Plus, Search, Database, Lock, Unlock, Users } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Badge } from '@/components/ui/badge'
+import { Database, Lock, Plus, Search, Unlock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+import { Badge } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
+import { Input } from '@erp/ui/primitives'
+import { ScrollArea } from '@erp/ui'
 import { cn } from '@/lib/utils'
 import { callClientApi } from '@/utils/backend-api'
 
@@ -30,11 +30,7 @@ export function QueryBuilderSidebar() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchQueryBuilders()
-  }, [])
-
-  const fetchQueryBuilders = async () => {
+  const fetchQueryBuilders = useCallback(async () => {
     try {
       const response = await callClientApi('query-builder')
       if (response.ok) {
@@ -43,18 +39,22 @@ export function QueryBuilderSidebar() {
         const data = Array.isArray(result) ? result : result.data || result.queryBuilders || []
         setQueryBuilders(data)
       }
-    } catch (error) {
-      console.error('Failed to fetch query builders:', error)
+    } catch (_error) {
       setQueryBuilders([]) // Fallback vers tableau vide en cas d'erreur
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const filteredQueryBuilders = Array.isArray(queryBuilders) 
-    ? queryBuilders.filter(qb =>
-        qb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        qb.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    fetchQueryBuilders()
+  }, [fetchQueryBuilders])
+
+  const filteredQueryBuilders = Array.isArray(queryBuilders)
+    ? queryBuilders.filter(
+        (qb) =>
+          qb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          qb.description?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : []
 
@@ -71,11 +71,7 @@ export function QueryBuilderSidebar() {
     <div className="flex flex-col h-full">
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold mb-4">Query Builders</h2>
-        <Button
-          onClick={handleCreate}
-          className="w-full mb-4"
-          size="sm"
-        >
+        <Button onClick={handleCreate} className="w-full mb-4" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Nouveau Query Builder
         </Button>
@@ -93,9 +89,7 @@ export function QueryBuilderSidebar() {
       <ScrollArea className="flex-1">
         <div className="p-2">
           {loading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Chargement...
-            </div>
+            <div className="text-center py-8 text-muted-foreground">Chargement...</div>
           ) : filteredQueryBuilders.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               {searchTerm ? 'Aucun résultat trouvé' : 'Aucun Query Builder créé'}
@@ -103,13 +97,14 @@ export function QueryBuilderSidebar() {
           ) : (
             <div className="space-y-2">
               {filteredQueryBuilders.map((qb) => (
-                <div
+                <button
                   key={qb.id}
+                  type="button"
                   onClick={() => handleSelect(qb.id)}
                   className={cn(
-                    "p-3 rounded-lg cursor-pointer transition-colors",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    selectedId === qb.id && "bg-accent text-accent-foreground"
+                    'w-full text-left p-3 rounded-lg cursor-pointer transition-colors',
+                    'hover:bg-accent hover:text-accent-foreground',
+                    selectedId === qb.id && 'bg-accent text-accent-foreground'
                   )}
                 >
                   <div className="flex items-start justify-between mb-1">
@@ -121,9 +116,7 @@ export function QueryBuilderSidebar() {
                     )}
                   </div>
                   {qb.description && (
-                    <p className="text-sm text-muted-foreground truncate mb-2">
-                      {qb.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground truncate mb-2">{qb.description}</p>
                   )}
                   <div className="flex items-center gap-2 text-xs">
                     <Badge variant="secondary" className="text-xs">
@@ -141,7 +134,7 @@ export function QueryBuilderSidebar() {
                       </Badge>
                     </div>
                   )}
-                </div>
+                </button>
               ))}
             </div>
           )}

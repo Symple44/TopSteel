@@ -2,7 +2,7 @@
 
 import React, { type ReactNode } from 'react'
 import { translator } from './translator'
-import type { Language, I18nContext } from './types'
+import type { I18nContext } from './types'
 
 // Create React Context with fallback
 const I18nReactContext = React.createContext<I18nContext | null>(null)
@@ -13,18 +13,18 @@ interface I18nProviderProps {
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
-  const [, forceUpdate] = React.useReducer(x => x + 1, 0)
-  
+  const [, forceUpdate] = React.useReducer((x) => x + 1, 0)
+
   React.useEffect(() => {
     // S'abonner aux changements du translator
     const unsubscribe = translator.subscribe(() => {
       // Forcer un re-render quand le translator change (langue ou overrides)
       forceUpdate()
     })
-    
+
     return unsubscribe
   }, [])
-  
+
   const contextValue: I18nContext = {
     currentLanguage: translator.getLanguageInfo(),
     setLanguage: async (langCode: string) => {
@@ -36,25 +36,19 @@ export function I18nProvider({ children }: I18nProviderProps) {
     isLoading: false,
   }
 
-  return (
-    <I18nReactContext.Provider value={contextValue}>
-      {children}
-    </I18nReactContext.Provider>
-  )
+  return <I18nReactContext.Provider value={contextValue}>{children}</I18nReactContext.Provider>
 }
 
 // Main hook for translations
 export function useTranslation(namespace?: string) {
   const context = React.useContext(I18nReactContext)
-  
+
   if (!context) {
-    // Provide a fallback translation function
-    console.warn('useTranslation called outside I18nProvider, using fallback')
     const t = (key: string, params?: Record<string, string | number>): string => {
       const fullKey = namespace ? `${namespace}.${key}` : key
       return translator.t(fullKey, params)
     }
-    
+
     return {
       t,
       plural: (key: string, count: number, params?: Record<string, string | number>): string => {
@@ -97,9 +91,8 @@ export function useTranslation(namespace?: string) {
 // Hook for language switching
 export function useLanguage() {
   const context = React.useContext(I18nReactContext)
-  
+
   if (!context) {
-    console.warn('useLanguage called outside I18nProvider, using fallback')
     return {
       current: translator.getLanguageInfo(),
       supported: translator.getSupportedLanguages(),
@@ -150,20 +143,32 @@ export function useFormatting() {
       unitIndex++
     }
 
-    return `${translator.formatNumber(size, { 
-      maximumFractionDigits: unitIndex === 0 ? 0 : 1 
+    return `${translator.formatNumber(size, {
+      maximumFractionDigits: unitIndex === 0 ? 0 : 1,
     })} ${units[unitIndex]}`
   }
 
   const formatRelativeTime = (date: Date): string => {
     const now = new Date()
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-    
+
     if (diffInSeconds < 60) return translator.t('common.justNow') || 'Just now'
-    if (diffInSeconds < 3600) return translator.t('common.minutesAgo', { count: Math.floor(diffInSeconds / 60) }) || `${Math.floor(diffInSeconds / 60)} minutes ago`
-    if (diffInSeconds < 86400) return translator.t('common.hoursAgo', { count: Math.floor(diffInSeconds / 3600) }) || `${Math.floor(diffInSeconds / 3600)} hours ago`
-    if (diffInSeconds < 604800) return translator.t('common.daysAgo', { count: Math.floor(diffInSeconds / 86400) }) || `${Math.floor(diffInSeconds / 86400)} days ago`
-    
+    if (diffInSeconds < 3600)
+      return (
+        translator.t('common.minutesAgo', { count: Math.floor(diffInSeconds / 60) }) ||
+        `${Math.floor(diffInSeconds / 60)} minutes ago`
+      )
+    if (diffInSeconds < 86400)
+      return (
+        translator.t('common.hoursAgo', { count: Math.floor(diffInSeconds / 3600) }) ||
+        `${Math.floor(diffInSeconds / 3600)} hours ago`
+      )
+    if (diffInSeconds < 604800)
+      return (
+        translator.t('common.daysAgo', { count: Math.floor(diffInSeconds / 86400) }) ||
+        `${Math.floor(diffInSeconds / 86400)} days ago`
+      )
+
     return formatDate(date, { year: 'numeric', month: 'short', day: 'numeric' })
   }
 
@@ -181,7 +186,7 @@ export function useFormatting() {
 // Hook for RTL support
 export function useDirection() {
   const { currentLanguage } = useTranslation()
-  
+
   return {
     direction: currentLanguage.direction,
     isRTL: currentLanguage.direction === 'rtl',

@@ -1,12 +1,21 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { DataTable } from '@/components/ui/datatable/DataTable'
-import { ColumnConfig } from '@/components/ui/datatable/types'
-import { Button, Badge, Avatar, AvatarFallback } from '@erp/ui'
-import { UserPlus, Download, Mail, Calendar, Shield, Building, Users, UserCheck, Settings } from 'lucide-react'
+import { Avatar, AvatarFallback, Badge, Button } from '@erp/ui'
+import {
+  Building,
+  Calendar,
+  Download,
+  Mail,
+  Settings,
+  Shield,
+  UserCheck,
+  UserPlus,
+  Users,
+} from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import BulkProfileManagement from '@/components/admin/bulk-profile-management'
+import { AdvancedDataTable, type ColumnConfig } from '@erp/ui'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
 
 interface User {
@@ -41,37 +50,41 @@ interface User {
 }
 
 // We'll need to move this function inside the component to access translations
-const formatDate = (date: string | Date | null | undefined, t: any) => {
+const formatDate = (date: string | Date | null | undefined, t: (key: string) => string) => {
   if (!date) return t('users.never')
   const d = new Date(date)
-  if (isNaN(d.getTime())) return t('users.invalidDate')
-  
+  if (Number.isNaN(d.getTime())) return t('users.invalidDate')
+
   const now = new Date()
   const diff = now.getTime() - d.getTime()
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  
+
   if (days === 0) {
-    return d.toLocaleTimeString('fr-FR', {
+    return `${d.toLocaleTimeString('fr-FR', {
       hour: '2-digit',
-      minute: '2-digit'
-    }) + ` (${t('users.today')})`
+      minute: '2-digit',
+    })} (${t('users.today')})`
   } else if (days === 1) {
-    return t('users.yesterday') + ' ' + d.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return (
+      t('users.yesterday') +
+      ' ' +
+      d.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    )
   } else if (days < 7) {
     return t('users.daysAgo', { days })
   } else {
     return d.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: 'short',
-      year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+      year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
     })
   }
 }
 
-const getColumns = (t: any): ColumnConfig<User>[] => [
+const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
   {
     id: 'user',
     key: 'firstName',
@@ -84,24 +97,25 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
     width: 280,
     // Fonction pour extraire la valeur pour le filtrage/tri
     getValue: (row) => {
-      const fullName = row.firstName || row.lastName 
-        ? `${row.firstName || ''} ${row.lastName || ''}`.trim()
-        : t('users.user')
+      const fullName =
+        row.firstName || row.lastName
+          ? `${row.firstName || ''} ${row.lastName || ''}`.trim()
+          : t('users.user')
       return `${fullName} ${row.email}`
     },
     render: (_, row) => (
       <div className="flex items-center space-x-3">
         <Avatar className="h-9 w-9">
           <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
-            {(row.firstName?.[0] || '').toUpperCase()}{(row.lastName?.[0] || '').toUpperCase()}
+            {(row.firstName?.[0] || '').toUpperCase()}
+            {(row.lastName?.[0] || '').toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div>
           <p className="font-semibold text-foreground">
-            {row.firstName || row.lastName 
+            {row.firstName || row.lastName
               ? `${row.firstName || ''} ${row.lastName || ''}`.trim()
-              : t('users.user')
-            }
+              : t('users.user')}
           </p>
           <p className="text-sm text-muted-foreground flex items-center">
             <Mail className="h-3 w-3 mr-1.5 text-muted-foreground" />
@@ -109,7 +123,7 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
           </p>
         </div>
       </div>
-    )
+    ),
   },
   {
     id: 'roles',
@@ -126,21 +140,21 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
       { value: 'ADMIN', label: 'Admin', color: '#ea580c' },
       { value: 'MANAGER', label: 'Manager', color: '#0ea5e9' },
       { value: 'COMMERCIAL', label: 'Commercial', color: '#10b981' },
-      { value: 'TECHNICIEN', label: 'Technicien', color: '#8b5cf6' }
+      { value: 'TECHNICIEN', label: 'Technicien', color: '#8b5cf6' },
     ],
     // Fonction pour extraire la valeur string pour le filtrage
     getValue: (row) => {
       const roles = Array.isArray(row.roles) ? row.roles : []
-      return roles.map(role => role.name).join(', ')
+      return roles.map((role) => role.name).join(', ')
     },
     render: (_, row) => {
       const roles = Array.isArray(row.roles) ? row.roles : []
       return (
         <div className="flex flex-wrap gap-1.5">
           {roles.map((role) => (
-            <Badge 
-              key={role.id} 
-              variant="outline" 
+            <Badge
+              key={role.id}
+              variant="outline"
               className="text-xs flex items-center font-medium"
             >
               <Shield className="h-3 w-3 mr-1" />
@@ -152,7 +166,7 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
           )}
         </div>
       )
-    }
+    },
   },
   {
     id: 'groups',
@@ -166,16 +180,16 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
     // Fonction pour extraire la valeur string pour le filtrage
     getValue: (row) => {
       const groups = Array.isArray(row.groups) ? row.groups : []
-      return groups.map(group => group.name).join(', ')
+      return groups.map((group) => group.name).join(', ')
     },
     render: (_, row) => {
       const groups = Array.isArray(row.groups) ? row.groups : []
       return (
         <div className="flex flex-wrap gap-1.5">
           {groups.map((group) => (
-            <Badge 
-              key={group.id} 
-              variant="secondary" 
+            <Badge
+              key={group.id}
+              variant="secondary"
               className="text-xs flex items-center font-medium"
             >
               <Building className="h-3 w-3 mr-1" />
@@ -187,7 +201,7 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
           )}
         </div>
       )
-    }
+    },
   },
   {
     id: 'department',
@@ -199,8 +213,10 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
     editable: true,
     width: 150,
     render: (value) => (
-      <span className="text-foreground font-medium">{value || <span className="text-muted-foreground">-</span>}</span>
-    )
+      <span className="text-foreground font-medium">
+        {value || <span className="text-muted-foreground">-</span>}
+      </span>
+    ),
   },
   {
     id: 'lastLogin',
@@ -211,18 +227,18 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
     searchable: false,
     width: 180,
     format: {
-      dateFormat: 'dd/MM/yyyy HH:mm'
+      dateFormat: 'dd/MM/yyyy HH:mm',
     },
     render: (value) => (
       <div className="flex items-center text-sm">
         <div className="flex items-center space-x-1.5">
           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className={value ? "text-foreground font-medium" : "text-muted-foreground"}>
+          <span className={value ? 'text-foreground font-medium' : 'text-muted-foreground'}>
             {formatDate(value, t)}
           </span>
         </div>
       </div>
-    )
+    ),
   },
   {
     id: 'isActive',
@@ -234,13 +250,13 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
     width: 100,
     options: [
       { value: true, label: t('users.active'), color: '#10b981' },
-      { value: false, label: t('users.inactive'), color: '#6b7280' }
+      { value: false, label: t('users.inactive'), color: '#6b7280' },
     ],
     render: (value) => (
       <Badge variant={value ? 'default' : 'secondary'}>
         {value ? t('users.active') : t('users.inactive')}
       </Badge>
-    )
+    ),
   },
   {
     id: 'createdAt',
@@ -251,12 +267,12 @@ const getColumns = (t: any): ColumnConfig<User>[] => [
     searchable: false,
     width: 150,
     format: {
-      dateFormat: 'dd/MM/yyyy'
+      dateFormat: 'dd/MM/yyyy',
     },
     render: (value) => (
       <span className="text-muted-foreground font-medium">{formatDate(value, t)}</span>
-    )
-  }
+    ),
+  },
 ]
 
 interface UsersDataTableProps {
@@ -270,16 +286,11 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isBulkManagementOpen, setIsBulkManagementOpen] = useState(false)
-  
+
   // Create columns with translation support
   const columns = getColumns(t)
 
-  // Charger les utilisateurs
-  useEffect(() => {
-    loadUsers()
-  }, [])
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -287,32 +298,27 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         method: 'GET',
       })
       const data = await response.json()
-      
+
       if (response.ok && data.success && data.data) {
         setUsers(data.data)
       } else {
         setError(t('users.loadingError'))
-        console.error('Erreur API:', {
-          status: response.status,
-          statusText: response.statusText,
-          data
-        })
       }
-    } catch (error) {
+    } catch (_error) {
       setError(t('users.connectionError'))
-      console.error('Erreur lors du chargement des utilisateurs:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [t])
 
-  const handleCellEdit = (newValue: any, row: User, column: ColumnConfig<User>) => {
-    setUsers(prevData => 
-      prevData.map(user => 
-        user.id === row.id 
-          ? { ...user, [column.key]: newValue }
-          : user
-      )
+  // Charger les utilisateurs
+  useEffect(() => {
+    loadUsers()
+  }, [loadUsers])
+
+  const handleCellEdit = (newValue: string | boolean, row: User, column: ColumnConfig<User>) => {
+    setUsers((prevData) =>
+      prevData.map((user) => (user.id === row.id ? { ...user, [column.key]: newValue } : user))
     )
     // Here we could send the update to the server
   }
@@ -330,28 +336,35 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
   }
 
   const handleDelete = (rows: User[]) => {
-    const idsToDelete = rows.map(row => row.id)
-    setUsers(users.filter(user => !idsToDelete.includes(user.id)))
+    const idsToDelete = rows.map((row) => row.id)
+    setUsers(users.filter((user) => !idsToDelete.includes(user.id)))
     // Ici on pourrait envoyer la suppression au serveur
   }
 
   const exportUsers = () => {
-    const headers = [t('users.exportHeaders.email'), t('users.exportHeaders.lastName'), t('users.exportHeaders.firstName'), t('users.exportHeaders.department'), t('users.exportHeaders.status'), t('users.exportHeaders.roles'), t('users.exportHeaders.groups'), t('users.exportHeaders.lastLogin')]
-    const rows = users.map(user => [
+    const headers = [
+      t('users.exportHeaders.email'),
+      t('users.exportHeaders.lastName'),
+      t('users.exportHeaders.firstName'),
+      t('users.exportHeaders.department'),
+      t('users.exportHeaders.status'),
+      t('users.exportHeaders.roles'),
+      t('users.exportHeaders.groups'),
+      t('users.exportHeaders.lastLogin'),
+    ]
+    const rows = users.map((user) => [
       user.email,
       user.lastName || '',
       user.firstName || '',
       user.department || '',
       user.isActive ? t('users.active') : t('users.inactive'),
-      user.roles.map(r => r.name).join(', '),
-      user.groups.map(g => g.name).join(', '),
-      formatDate(user.lastLogin, t)
+      user.roles.map((r) => r.name).join(', '),
+      user.groups.map((g) => g.name).join(', '),
+      formatDate(user.lastLogin, t),
     ])
-    
-    const csv = [headers, ...rows]
-      .map(row => row.map(cell => `"${cell}"`).join(','))
-      .join('\n')
-    
+
+    const csv = [headers, ...rows].map((row) => row.map((cell) => `"${cell}"`).join(',')).join('\n')
+
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -365,10 +378,10 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">{t('users.userManagement')}</h1>
-          <p className="text-muted-foreground/80 text-lg">
-            {t('users.userManagementDescription')}
-          </p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">
+            {t('users.userManagement')}
+          </h1>
+          <p className="text-muted-foreground/80 text-lg">{t('users.userManagementDescription')}</p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" onClick={exportUsers}>
@@ -391,7 +404,9 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('users.totalUsers')}</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('users.totalUsers')}
+              </h3>
               <p className="text-3xl font-bold text-foreground">{users.length}</p>
             </div>
             <div className="p-3 bg-primary rounded-lg">
@@ -399,36 +414,48 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
             </div>
           </div>
         </div>
-        
+
         <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('users.activeUsers')}</h3>
-              <p className="text-3xl font-bold text-foreground">{users.filter(u => u.isActive).length}</p>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('users.activeUsers')}
+              </h3>
+              <p className="text-3xl font-bold text-foreground">
+                {users.filter((u) => u.isActive).length}
+              </p>
             </div>
             <div className="p-3 bg-primary rounded-lg">
               <UserCheck className="h-6 w-6 text-primary-foreground" />
             </div>
           </div>
         </div>
-        
+
         <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('users.withRoles')}</h3>
-              <p className="text-3xl font-bold text-foreground">{users.filter(u => u.roles.length > 0).length}</p>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('users.withRoles')}
+              </h3>
+              <p className="text-3xl font-bold text-foreground">
+                {users.filter((u) => u.roles.length > 0).length}
+              </p>
             </div>
             <div className="p-3 bg-secondary rounded-lg">
               <Shield className="h-6 w-6 text-secondary-foreground" />
             </div>
           </div>
         </div>
-        
+
         <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('users.withGroups')}</h3>
-              <p className="text-3xl font-bold text-foreground">{users.filter(u => u.groups.length > 0).length}</p>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('users.withGroups')}
+              </h3>
+              <p className="text-3xl font-bold text-foreground">
+                {users.filter((u) => u.groups.length > 0).length}
+              </p>
             </div>
             <div className="p-3 bg-secondary rounded-lg">
               <Building className="h-6 w-6 text-secondary-foreground" />
@@ -438,7 +465,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
       </div>
 
       {/* DataTable */}
-      <DataTable
+      <AdvancedDataTable
         data={users}
         columns={columns}
         keyField="id"
@@ -452,7 +479,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate }: UsersDataTableProps
         actions={{
           create: handleCreate,
           edit: handleEdit,
-          delete: handleDelete
+          delete: handleDelete,
         }}
         onCellEdit={handleCellEdit}
         onRowDoubleClick={handleEdit}

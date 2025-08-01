@@ -150,9 +150,7 @@ class BusinessMetrics {
 
       if (this.config.enableDebugLogs) {
       }
-    } catch (error) {
-      console.warn('Erreur envoi batch métrique:', error)
-    }
+    } catch (_error) {}
   }
 
   /**
@@ -317,19 +315,13 @@ class BusinessMetrics {
 
   private async sendToBackend(events: BusinessEvent[]): Promise<void> {
     if (!this.isClient) return
+    const response = await callClientApi('metrics', {
+      method: 'POST',
+      body: JSON.stringify({ events }),
+    })
 
-    try {
-      const response = await callClientApi('metrics', {
-        method: 'POST',
-        body: JSON.stringify({ events }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-    } catch (error) {
-      console.warn('Erreur envoi métrique au backend:', error)
-      throw error
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
   }
 

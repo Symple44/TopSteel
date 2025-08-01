@@ -107,7 +107,6 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       const result = useStore(selector, shallow as EqualityFn<R>)
 
       if (process.env.NODE_ENV === 'development' && debugLabel) {
-        console.debug(`🔍 [${debugLabel}] Shallow selector called`)
       }
 
       return result
@@ -124,7 +123,6 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       const result = useStore(selector, equalityFn)
 
       if (process.env.NODE_ENV === 'development' && debugLabel) {
-        console.debug(`🔍 [${debugLabel}] Deep selector called`)
       }
 
       return result
@@ -137,7 +135,6 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       const result = useStore(selector)
 
       if (process.env.NODE_ENV === 'development' && debugLabel) {
-        console.debug(`🔍 [${debugLabel}] Simple selector called`)
       }
 
       return result
@@ -146,22 +143,21 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
     /**
      * Sélecteur avec valeur par défaut sécurisée
      */
-    useSafe: <R>(selector: StoreSelector<T, R>, defaultValue: R, debugLabel?: string) => {
+    useSafe: <R>(selector: StoreSelector<T, R>, defaultValue: R, _debugLabel?: string) => {
       const safeSelector = useMemo(
         () => (state: T) => {
           try {
             const result = selector(state)
 
             return result ?? defaultValue
-          } catch (error) {
+          } catch (_error) {
             if (process.env.NODE_ENV === 'development') {
-              console.warn(`⚠️ Selector error in ${debugLabel || 'unknown'}:`, error)
             }
 
             return defaultValue
           }
         },
-        [selector, defaultValue, debugLabel]
+        [selector, defaultValue]
       )
 
       return useStore(safeSelector, shallow as EqualityFn<R>)
@@ -186,12 +182,11 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
             return transform(selector(state))
           } catch (error) {
             if (process.env.NODE_ENV === 'development') {
-              console.warn(`⚠️ Transform error in ${debugLabel || 'unknown'}:`, error)
             }
             throw error
           }
         },
-        [selector, transform, debugLabel]
+        [selector, transform]
       )
 
       return useStore(transformedSelector, equalityFn)
@@ -219,9 +214,6 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
       const result = useStore(filteredSelector, shallow as EqualityFn<R>)
 
       if (process.env.NODE_ENV === 'development' && debugLabel) {
-        console.debug(
-          `🔍 [${debugLabel}] Filtered selector: ${Array.isArray(result) ? result.length : 0} items`
-        )
       }
 
       return result
@@ -270,7 +262,6 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
     clearMemoCache: () => {
       clearSelectorMemo()
       if (process.env.NODE_ENV === 'development') {
-        console.debug('🧹 Memo cache cleared')
       }
     },
 
@@ -325,9 +316,8 @@ export function useOptimizedSelector<T, R>(
         const result = selector(state)
 
         return result ?? defaultValue
-      } catch (error) {
+      } catch (_error) {
         if (process.env.NODE_ENV === 'development' && debugLabel) {
-          console.warn(`⚠️ Selector error in ${debugLabel}:`, error)
         }
 
         return defaultValue
@@ -339,7 +329,6 @@ export function useOptimizedSelector<T, R>(
   const result = useStore(safeSelector, finalEqualityFn)
 
   if (process.env.NODE_ENV === 'development' && debugLabel) {
-    console.debug(`🔍 [${debugLabel}] Strategy: ${strategy}, Result:`, result)
   }
 
   return result
@@ -418,7 +407,7 @@ export const selectorDebugUtils = {
   /**
    * Wrapper pour tracer les appels de sélecteur
    */
-  trace: <T, R>(selector: StoreSelector<T, R>, label: string): StoreSelector<T, R> => {
+  trace: <T, R>(selector: StoreSelector<T, R>, _label: string): StoreSelector<T, R> => {
     if (process.env.NODE_ENV !== 'development') {
       return selector
     }
@@ -426,13 +415,7 @@ export const selectorDebugUtils = {
     return (state: T): R => {
       const start = performance.now()
       const result = selector(state)
-      const duration = performance.now() - start
-
-      console.debug(`🔍 [${label}] Duration: ${duration.toFixed(2)}ms`, {
-        state,
-        result,
-        duration,
-      })
+      const _duration = performance.now() - start
 
       return result
     }
@@ -465,8 +448,6 @@ export const selectorDebugUtils = {
         totalTime,
       }
     }
-
-    console.table(results)
 
     return results
   },

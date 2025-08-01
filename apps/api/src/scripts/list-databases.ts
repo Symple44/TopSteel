@@ -1,58 +1,75 @@
-#!/usr/bin/env ts-node
-/**
- * Script pour lister toutes les bases de données
- */
-
+import { join } from 'node:path'
+import { config } from 'dotenv'
 import { DataSource } from 'typeorm'
 
-async function listDatabases() {
-  console.log('📋 Liste des bases de données disponibles...\n')
+// Charger .env.local depuis la racine
+const rootDir = join(__dirname, '../../../../')
+const envLocalPath = join(rootDir, '.env.local')
+config({ path: envLocalPath })
 
-  const dataSource = new DataSource({
+async function listDatabases() {
+  const adminDataSource = new DataSource({
     type: 'postgres',
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT || '5432'),
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
-    database: 'postgres', // Se connecter à la base système
-    logging: false
+    database: 'postgres', // Base admin pour lister les autres
   })
-  
-  try {
-    await dataSource.initialize()
-    console.log('✅ Connexion à PostgreSQL établie')
 
-    const databases = await dataSource.query(`
+  try {
+    console.log('🔌 Connexion à PostgreSQL...')
+    console.log(`   Host: ${process.env.DB_HOST || '127.0.0.1'}`)
+    console.log(`   Port: ${process.env.DB_PORT || '5432'}`)
+    console.log(`   User: ${process.env.DB_USERNAME || 'postgres'}`)
+    
+    await adminDataSource.initialize()
+    console.log('✅ Connecté avec succès!\n')
+
+    // Lister toutes les bases de données
+    const result = await adminDataSource.query(`
       SELECT datname 
       FROM pg_database 
       WHERE datistemplate = false 
       ORDER BY datname
     `)
+
+    console.log('📋 Bases de données disponibles:')
+    console.log('================================')
     
-    console.log('\n📋 Bases de données trouvées:')
-    databases.forEach((db: any) => {
-      const isTopsteel = db.datname.includes('topsteel')
-      const emoji = isTopsteel ? '🏭' : '📊'
-      console.log(`   ${emoji} ${db.datname}`)
+    result.forEach((db: any) => {
+      const dbName = db.datname
+      // Mettre en évidence les bases TopSteel
+      if (dbName.includes('topsteel')) {
+        console.log(`   ✅ ${dbName}`)
+      } else {
+        console.log(`   • ${dbName}`)
+      }
     })
 
-    // Vérifier spécifiquement les bases TopSteel
-    const topsteelDbs = databases.filter((db: any) => db.datname.includes('topsteel'))
-    console.log(`\n🏭 ${topsteelDbs.length} base(s) TopSteel trouvée(s)`)
+    console.log('\n🔍 Bases TopSteel trouvées:')
+    const topsteelDbs = result
+      .filter((db: any) => db.datname.includes('topsteel'))
+      .map((db: any) => db.datname)
+    
+    topsteelDbs.forEach((db: string) => {
+      console.log(`   - ${db}`)
+    })
 
-  } catch (error: any) {
-    console.error('❌ Erreur lors de la liste:', error.message)
-    throw error
+    // Vérifier spécifiquement la base attendue
+    const expectedDb = `erp_topsteel_${process.env.DEFAULT_TENANT_CODE?.toLowerCase() || 'default'}`
+    console.log(`\n🎯 Base attendue: ${expectedDb}`)
+    
+    const exists = topsteelDbs.includes(expectedDb)
+    console.log(`   Statut: ${exists ? '✅ EXISTE' : '❌ MANQUANTE'}`)
+
+  } catch (error) {
+    console.error('❌ Erreur de connexion:', error)
   } finally {
-    if (dataSource.isInitialized) {
-      await dataSource.destroy()
+    if (adminDataSource.isInitialized) {
+      await adminDataSource.destroy()
     }
   }
 }
 
-// Exécuter si appelé directement
-if (require.main === module) {
-  listDatabases().catch(console.error)
-}
-
-export { listDatabases }
+listDatabases().catch(console.error)

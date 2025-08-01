@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Interface pour les paramètres système
 interface SystemParameter {
@@ -6,7 +6,16 @@ interface SystemParameter {
   key: string
   value: string
   type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON' | 'ENUM'
-  category: 'GENERAL' | 'COMPTABILITE' | 'PROJETS' | 'PRODUCTION' | 'ACHATS' | 'STOCKS' | 'NOTIFICATION' | 'SECURITY' | 'ELASTICSEARCH'
+  category:
+    | 'GENERAL'
+    | 'COMPTABILITE'
+    | 'PROJETS'
+    | 'PRODUCTION'
+    | 'ACHATS'
+    | 'STOCKS'
+    | 'NOTIFICATION'
+    | 'SECURITY'
+    | 'ELASTICSEARCH'
   description: string
   defaultValue?: string
   isEditable: boolean
@@ -32,7 +41,6 @@ export async function GET(request: NextRequest) {
     if (category) {
       // Filtrer par catégorie
       const filteredParams = allParameters.filter((p: SystemParameter) => p.category === category)
-      console.log(`Filtered parameters for category ${category}:`, filteredParams)
       return NextResponse.json(filteredParams)
     } else {
       // Grouper par catégorie
@@ -46,11 +54,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(parametersByCategory)
     }
-  } catch (error) {
-    console.error('Error fetching parameters by category:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch parameters by category' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Failed to fetch parameters by category' }, { status: 500 })
   }
 }

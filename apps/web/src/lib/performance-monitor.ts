@@ -64,7 +64,6 @@ export class PerformanceMonitor {
   private ensureClient(): boolean {
     if (!this.isClient) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn('PerformanceMonitor: Attempted to use browser API on server')
       }
 
       return false
@@ -77,7 +76,7 @@ export class PerformanceMonitor {
    * Décorateur pour mesurer les performances de rendu
    */
   static measureRender(componentName: string) {
-    return (target: unknown, propertyName: string, descriptor: PropertyDescriptor) => {
+    return (_target: unknown, propertyName: string, descriptor: PropertyDescriptor) => {
       const method = descriptor.value
 
       descriptor.value = function (...args: unknown[]) {
@@ -91,8 +90,6 @@ export class PerformanceMonitor {
         const duration = end - start
 
         if (duration > 16) {
-          // Plus de 1 frame à 60fps
-          console.warn(`⚠️ ${componentName}.${propertyName} render took ${Math.round(duration)}ms`)
         }
 
         // Enregistrer la métrique
@@ -138,7 +135,6 @@ export class PerformanceMonitor {
 
       // Log des performances lentes
       if (metrics.loadComplete > 3000) {
-        console.warn(`🐌 Slow page load: ${pageName} took ${metrics.loadComplete}ms`)
       }
 
       // Envoyer aux analytics si disponible
@@ -155,9 +151,7 @@ export class PerformanceMonitor {
         pageName,
         ...metrics,
       })
-    } catch (error) {
-      console.error('Error tracking page load:', error)
-    }
+    } catch (_error) {}
   }
 
   /**
@@ -177,8 +171,6 @@ export class PerformanceMonitor {
           const lcpTime = lastEntry.startTime
 
           if (lcpTime > 2500) {
-            // Seuil pour LCP lent
-            console.warn(`🐌 Slow LCP: ${Math.round(lcpTime)}ms`)
           }
 
           // Envoyer aux analytics
@@ -198,9 +190,7 @@ export class PerformanceMonitor {
 
       observer.observe({ type: 'largest-contentful-paint', buffered: true })
       PerformanceMonitor.getInstance().observers.push(observer)
-    } catch (error) {
-      console.error('Error setting up LCP observer:', error)
-    }
+    } catch (_error) {}
   }
 
   /**
@@ -221,8 +211,6 @@ export class PerformanceMonitor {
             entry.startTime - entry.startTime
 
           if (fid > 100) {
-            // Seuil pour FID lent
-            console.warn(`🐌 Slow FID: ${Math.round(fid)}ms`)
           }
 
           // Envoyer aux analytics
@@ -242,9 +230,7 @@ export class PerformanceMonitor {
 
       observer.observe({ type: 'first-input', buffered: true })
       PerformanceMonitor.getInstance().observers.push(observer)
-    } catch (error) {
-      console.error('Error setting up FID observer:', error)
-    }
+    } catch (_error) {}
   }
 
   /**
@@ -268,8 +254,6 @@ export class PerformanceMonitor {
         }
 
         if (clsValue > 0.1) {
-          // Seuil pour CLS problématique
-          console.warn(`🐌 High CLS: ${clsValue.toFixed(3)}`)
         }
 
         // Envoyer aux analytics
@@ -282,9 +266,7 @@ export class PerformanceMonitor {
 
       observer.observe({ type: 'layout-shift', buffered: true })
       PerformanceMonitor.getInstance().observers.push(observer)
-    } catch (error) {
-      console.error('Error setting up CLS observer:', error)
-    }
+    } catch (_error) {}
   }
 
   /**
@@ -302,9 +284,7 @@ export class PerformanceMonitor {
       // Console pour développement
       if (process.env.NODE_ENV === 'development') {
       }
-    } catch (error) {
-      console.error('Error sending analytics:', error)
-    }
+    } catch (_error) {}
   }
 
   /**
@@ -356,7 +336,6 @@ export class PerformanceMonitor {
 
     const metrics = this.metrics.get(name)
     if (!metrics) {
-      console.warn(`Metrics array for ${name} not found`)
       return
     }
 
@@ -389,9 +368,7 @@ export class PerformanceMonitor {
       for (const observer of this.observers) {
         try {
           observer.disconnect()
-        } catch (error) {
-          console.error('Error disconnecting observer:', error)
-        }
+        } catch (_error) {}
       }
     }
 

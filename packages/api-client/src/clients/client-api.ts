@@ -70,6 +70,7 @@ interface OperationResult<T = unknown> {
   error?: string
   validationErrors?: Record<string, string[]>
 }
+
 import { BaseApiClient } from '../core/base-api-client'
 import type { RequestOptions } from '../core/http-client'
 
@@ -126,13 +127,17 @@ export class ClientApiClient extends BaseApiClient {
       ...filters,
     })
 
-    const response = await this.http.get<Client[]>(`${this.endpoint}/search`, { params } as RequestOptions)
+    const response = await this.http.get<Client[]>(`${this.endpoint}/search`, {
+      params,
+    } as RequestOptions)
     return response.data
   }
 
   async getClientStats(filters?: ClientFilters): Promise<ClientStats> {
     const params = this.buildQueryParams(filters || {})
-    const response = await this.http.get<ClientStats>(`${this.endpoint}/stats`, { params } as RequestOptions)
+    const response = await this.http.get<ClientStats>(`${this.endpoint}/stats`, {
+      params,
+    } as RequestOptions)
     return response.data
   }
 
@@ -165,10 +170,9 @@ export class ClientApiClient extends BaseApiClient {
       excludeId,
     })
 
-    const response = await this.http.get<{ exists: boolean }>(
-      `${this.endpoint}/validate/email`,
-      { params } as RequestOptions
-    )
+    const response = await this.http.get<{ exists: boolean }>(`${this.endpoint}/validate/email`, {
+      params,
+    } as RequestOptions)
     return !response.data.exists
   }
 
@@ -178,10 +182,9 @@ export class ClientApiClient extends BaseApiClient {
       excludeId,
     })
 
-    const response = await this.http.get<{ exists: boolean }>(
-      `${this.endpoint}/validate/siret`,
-      { params } as RequestOptions
-    )
+    const response = await this.http.get<{ exists: boolean }>(`${this.endpoint}/validate/siret`, {
+      params,
+    } as RequestOptions)
     return !response.data.exists
   }
 

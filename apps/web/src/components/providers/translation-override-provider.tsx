@@ -22,13 +22,12 @@ export function TranslationOverrideProvider({ children }: TranslationOverridePro
       try {
         // Loading translation overrides
         await translator.loadOverrides()
-        
+
         if (mounted) {
           // Translation overrides loaded
           setIsLoading(false)
         }
       } catch (err) {
-        console.error('[TranslationOverrideProvider] Failed to load translation overrides:', err)
         if (mounted) {
           setError(err instanceof Error ? err.message : 'Failed to load translations')
           setIsLoading(false)
@@ -67,7 +66,6 @@ export function TranslationOverrideProvider({ children }: TranslationOverridePro
 
   // En cas d'erreur, afficher l'app normalement (utiliser les traductions de base)
   if (error) {
-    console.warn('[TranslationOverrideProvider] Using base translations due to error:', error)
   }
 
   return <>{children}</>
@@ -78,14 +76,9 @@ export function TranslationOverrideProvider({ children }: TranslationOverridePro
  */
 export function useRefreshTranslations() {
   const refresh = async () => {
-    try {
-      await translator.refreshOverrides()
-      // Déclencher un événement pour notifier d'autres composants
-      window.dispatchEvent(new Event('translation-updated'))
-    } catch (error) {
-      console.error('Failed to refresh translations:', error)
-      throw error
-    }
+    await translator.refreshOverrides()
+    // Déclencher un événement pour notifier d'autres composants
+    window.dispatchEvent(new Event('translation-updated'))
   }
 
   return refresh

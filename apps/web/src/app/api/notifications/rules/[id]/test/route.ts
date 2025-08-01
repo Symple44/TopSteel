@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Service de test des règles (mockée)
 class RuleTestService {
-  evaluateConditions(conditions: any[], testData: Record<string, any>): { result: boolean; details: Record<string, any> } {
+  evaluateConditions(
+    conditions: any[],
+    testData: Record<string, any>
+  ): { result: boolean; details: Record<string, any> } {
     if (!conditions || conditions.length === 0) {
       return { result: true, details: {} }
     }
@@ -16,7 +19,7 @@ class RuleTestService {
       results[condition.id] = {
         condition: `${condition.field} ${condition.operator} ${JSON.stringify(condition.value)}`,
         result: conditionResult,
-        actualValue: this.getFieldValue(condition.field, testData)
+        actualValue: this.getFieldValue(condition.field, testData),
       }
 
       if (i === 0) {
@@ -115,7 +118,10 @@ class RuleTestService {
     })
   }
 
-  prepareTemplateVariables(testData: Record<string, any>, triggerType: string): Record<string, any> {
+  prepareTemplateVariables(
+    testData: Record<string, any>,
+    triggerType: string
+  ): Record<string, any> {
     const variables = { ...testData }
 
     // Ajouter des variables système
@@ -127,26 +133,28 @@ class RuleTestService {
       case 'stock':
         variables.stock_url = `/stock/materials/${variables.material_id || 'test'}`
         if (variables.quantity && variables.threshold) {
-          variables.threshold_percentage = Math.round((variables.quantity / variables.threshold) * 100)
+          variables.threshold_percentage = Math.round(
+            (variables.quantity / variables.threshold) * 100
+          )
         }
         break
-        
+
       case 'user':
         variables.user_profile_url = `/users/${variables.user_id || 'test'}/profile`
         break
-        
+
       case 'project':
         variables.project_url = `/projets/${variables.project_id || 'test'}`
         break
-        
+
       case 'production':
         variables.machine_url = `/production/machines/${variables.machine_id || 'test'}`
         break
-        
+
       case 'email':
         variables.email_url = `/emails/${variables.email_id || 'test'}`
         break
-        
+
       case 'system':
         variables.system_logs_url = `/admin/logs?component=${variables.component || 'test'}`
         break
@@ -159,7 +167,7 @@ class RuleTestService {
 const ruleTestService = new RuleTestService()
 
 // Stockage temporaire des règles
-let notificationRules: any[] = [
+const notificationRules: any[] = [
   {
     id: '1',
     name: 'Alerte Stock Critique',
@@ -167,24 +175,29 @@ let notificationRules: any[] = [
     trigger: { type: 'stock', event: 'stock_low' },
     conditions: [
       { id: '1', field: 'quantity', operator: 'less_than', value: 10, type: 'number' },
-      { id: '2', field: 'category', operator: 'in', value: ['metal', 'steel'], type: 'string', logic: 'AND' }
+      {
+        id: '2',
+        field: 'category',
+        operator: 'in',
+        value: ['metal', 'steel'],
+        type: 'string',
+        logic: 'AND',
+      },
     ],
     notification: {
       type: 'warning',
       category: 'stock',
       titleTemplate: 'Stock critique: {{material_name}}',
-      messageTemplate: 'Le stock de {{material_name}} est maintenant de {{quantity}} unités (seuil: {{threshold}})',
+      messageTemplate:
+        'Le stock de {{material_name}} est maintenant de {{quantity}} unités (seuil: {{threshold}})',
       priority: 'HIGH',
       actionUrl: '/stock/materials/{{material_id}}',
-      actionLabel: 'Voir le stock'
-    }
-  }
+      actionLabel: 'Voir le stock',
+    },
+  },
 ]
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const { testData } = await request.json()
@@ -197,12 +210,9 @@ export async function POST(
     }
 
     // Trouver la règle
-    const rule = notificationRules.find(r => r.id === id)
+    const rule = notificationRules.find((r) => r.id === id)
     if (!rule) {
-      return NextResponse.json(
-        { success: false, error: 'Règle non trouvée' },
-        { status: 404 }
-      )
+      return NextResponse.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
     }
 
     // Vérifier si la règle est active
@@ -213,8 +223,8 @@ export async function POST(
         result: {
           ruleActive: false,
           conditionResult: { result: false, details: {} },
-          message: 'La règle est désactivée'
-        }
+          message: 'La règle est désactivée',
+        },
       })
     }
 
@@ -227,8 +237,8 @@ export async function POST(
         result: {
           ruleActive: true,
           conditionResult,
-          message: 'Conditions non remplies - notification non générée'
-        }
+          message: 'Conditions non remplies - notification non générée',
+        },
       })
     }
 
@@ -239,7 +249,9 @@ export async function POST(
     const config = rule.notification
     const title = ruleTestService.substituteVariables(config.titleTemplate, templateVariables)
     const message = ruleTestService.substituteVariables(config.messageTemplate, templateVariables)
-    const actionUrl = config.actionUrl ? ruleTestService.substituteVariables(config.actionUrl, templateVariables) : undefined
+    const actionUrl = config.actionUrl
+      ? ruleTestService.substituteVariables(config.actionUrl, templateVariables)
+      : undefined
 
     return NextResponse.json({
       success: true,
@@ -254,14 +266,12 @@ export async function POST(
           category: config.category,
           priority: config.priority,
           actionUrl,
-          actionLabel: config.actionLabel
+          actionLabel: config.actionLabel,
         },
-        message: 'Test réussi - notification serait générée'
-      }
+        message: 'Test réussi - notification serait générée',
+      },
     })
-
-  } catch (error) {
-    console.error('Error testing notification rule:', error)
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Erreur lors du test de la règle' },
       { status: 500 }
@@ -270,20 +280,14 @@ export async function POST(
 }
 
 // Endpoint pour obtenir des exemples de données de test
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
 
     // Trouver la règle
-    const rule = notificationRules.find(r => r.id === id)
+    const rule = notificationRules.find((r) => r.id === id)
     if (!rule) {
-      return NextResponse.json(
-        { success: false, error: 'Règle non trouvée' },
-        { status: 404 }
-      )
+      return NextResponse.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
     }
 
     // Générer des exemples de données selon le type d'événement
@@ -301,7 +305,7 @@ export async function GET(
           unit: 'kg',
           supplier: 'Fournisseur ABC',
           location: 'Entrepôt A',
-          lastUpdate: new Date().toISOString()
+          lastUpdate: new Date().toISOString(),
         }
         break
 
@@ -313,7 +317,7 @@ export async function GET(
           role: 'admin',
           department: 'IT',
           isActive: true,
-          lastLogin: new Date().toISOString()
+          lastLogin: new Date().toISOString(),
         }
         break
 
@@ -328,7 +332,7 @@ export async function GET(
           budget: 50000,
           deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
           completion: 75,
-          created_by: 'admin'
+          created_by: 'admin',
         }
         break
 
@@ -344,7 +348,7 @@ export async function GET(
           error_message: 'Erreur de capteur température',
           error_code: 'TEMP_001',
           estimatedDuration: 120,
-          actualDuration: 45
+          actualDuration: 45,
         }
         break
 
@@ -358,7 +362,7 @@ export async function GET(
           body: 'Bonjour, nous devons modifier notre commande...',
           priority: 'HIGH',
           attachments: true,
-          receivedAt: new Date().toISOString()
+          receivedAt: new Date().toISOString(),
         }
         break
 
@@ -370,14 +374,14 @@ export async function GET(
           errorCode: 'DB_TIMEOUT',
           component: 'auth-service',
           severity: 'HIGH',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         }
         break
 
       default:
         sampleData = {
           example_field: 'example_value',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         }
     }
 
@@ -387,14 +391,12 @@ export async function GET(
         triggerType,
         sampleData,
         availableFields: Object.keys(sampleData),
-        description: `Exemple de données pour un événement de type "${triggerType}"`
-      }
+        description: `Exemple de données pour un événement de type "${triggerType}"`,
+      },
     })
-
-  } catch (error) {
-    console.error('Error getting sample data:', error)
+  } catch (_error) {
     return NextResponse.json(
-      { success: false, error: 'Erreur lors de la récupération des données d\'exemple' },
+      { success: false, error: "Erreur lors de la récupération des données d'exemple" },
       { status: 500 }
     )
   }

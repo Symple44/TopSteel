@@ -92,38 +92,38 @@ export interface Projet extends BaseEntity {
   readonly type: ProjetType
   readonly statut: ProjetStatut
   readonly priorite: ProjetPriorite
-  
+
   // Relations
   readonly clientId: string
   readonly responsableId: string
   readonly commercialId?: string
   readonly equipeIds: string[]
-  
+
   // Détails projet
   readonly adresseLivraison: ProjetAdresse
   readonly contact: ProjetContact
   readonly delais: ProjetDelais
   readonly montants: ProjetMontants
-  
+
   // Contenu technique
   readonly specifications?: string
   readonly materiaux: string[]
   readonly operations: string[]
   readonly documents: ProjetDocuments
-  
+
   // Suivi
   readonly avancement: number // 0-100
   readonly heuresEstimees?: number
   readonly heuresRealisees?: number
   readonly coutEstime?: number
   readonly coutReel?: number
-  
+
   // Métadonnées
   readonly tags: string[]
   readonly notes?: string
   readonly dateValidation?: Date
   readonly dateFacturation?: Date
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date
@@ -152,7 +152,16 @@ export interface ProjetFilters {
 }
 
 export interface ProjetSortOptions {
-  readonly field: 'reference' | 'nom' | 'statut' | 'priorite' | 'dateDebut' | 'dateFin' | 'montantHT' | 'avancement' | 'createdAt'
+  readonly field:
+    | 'reference'
+    | 'nom'
+    | 'statut'
+    | 'priorite'
+    | 'dateDebut'
+    | 'dateFin'
+    | 'montantHT'
+    | 'avancement'
+    | 'createdAt'
   readonly direction: 'asc' | 'desc'
 }
 

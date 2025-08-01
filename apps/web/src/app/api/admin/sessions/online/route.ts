@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { verifyAuthHelper } from '@/lib/auth-helper'
 import { callBackendFromApi } from '@/utils/backend-api'
 
@@ -32,13 +32,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: sessionsData.data || sessionsData
+      data: sessionsData.data || sessionsData,
     })
-  } catch (error) {
-    console.error('Erreur lors de la récupération des utilisateurs en ligne:', error)
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

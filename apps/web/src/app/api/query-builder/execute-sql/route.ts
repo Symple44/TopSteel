@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest) {
@@ -7,15 +7,12 @@ export async function POST(request: NextRequest) {
     const { sql, limit = 100 } = body
 
     if (!sql) {
-      return NextResponse.json(
-        { error: 'SQL query is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'SQL query is required' }, { status: 400 })
     }
 
     // 🔒 Validation SQL basique pour éviter les accès inter-tenant
-    const sqlLower = sql.toLowerCase().trim()
-    
+    const _sqlLower = sql.toLowerCase().trim()
+
     const forbiddenPatterns = [
       /\btopsteel_auth\./i,
       /\buser_societes\b/i,
@@ -29,7 +26,7 @@ export async function POST(request: NextRequest) {
       /\binsert\b/i,
       /\balter\b/i,
       /\bcreate\b/i,
-      /\btruncate\b/i
+      /\btruncate\b/i,
     ]
 
     for (const pattern of forbiddenPatterns) {
@@ -58,9 +55,7 @@ export async function POST(request: NextRequest) {
         { status: response.status }
       )
     }
-
   } catch (error) {
-    console.error('[SQL Execute API] Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }

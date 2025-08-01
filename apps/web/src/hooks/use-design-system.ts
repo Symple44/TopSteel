@@ -14,8 +14,8 @@
  * - Types stricts
  */
 
-import { cn } from '@/lib/utils'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { cn } from '@/lib/utils'
 
 // =============================================
 // TYPES ET INTERFACES
@@ -538,9 +538,7 @@ export function useDesignSystem() {
       }
 
       previousConfigRef.current = config
-    } catch (error) {
-      console.warn('Failed to save design system config:', error)
-    }
+    } catch (_error) {}
   }, [config, isHydrated])
 
   // FIX: Memoized class generators avec dépendances correctes

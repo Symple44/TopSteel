@@ -171,7 +171,7 @@ export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGant
           <div className="flex border-b bg-gray-50">
             <div className="w-64 p-3 border-r font-medium">Tâches</div>
             <div className="flex">
-              {headers.map((header, index) => (
+              {headers.map((header, _index) => (
                 <div
                   key={header.date.toISOString()}
                   className={`p-2 text-center text-sm border-r min-w-[40px] ${

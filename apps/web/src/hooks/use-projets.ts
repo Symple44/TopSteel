@@ -4,9 +4,9 @@
  * Fichier: apps/web/src/hooks/use-projets.ts
  */
 
-import { useProjetStore } from '@/stores/projet.store'
 import type { Projet, ProjetFilters } from '@erp/domains/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useProjetStore } from '@/stores/projet.store'
 
 export const useProjets = (autoFetch = true) => {
   const [mounted, setMounted] = useState(false)
@@ -32,8 +32,7 @@ export const useProjets = (autoFetch = true) => {
       if (fetchProjets) {
         await fetchProjets()
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des projets:', error)
+    } catch (_error) {
     } finally {
       setTimeout(() => {
         if (mounted) {
@@ -225,28 +224,13 @@ export const useProjetsActions = () => {
     error,
     // Helpers avec gestion d'erreur
     createProjetSafe: async (data: Partial<Projet>) => {
-      try {
-        return await createProjet?.(data as Parameters<typeof createProjet>[0])
-      } catch (error) {
-        console.error('Erreur création projet:', error)
-        throw error
-      }
+      return await createProjet?.(data as Parameters<typeof createProjet>[0])
     },
     updateProjetSafe: async (id: string, data: Partial<Projet>) => {
-      try {
-        return await updateProjet?.(id, data)
-      } catch (error) {
-        console.error('Erreur mise à jour projet:', error)
-        throw error
-      }
+      return await updateProjet?.(id, data)
     },
     deleteProjetSafe: async (id: string) => {
-      try {
-        return await deleteProjet?.(id)
-      } catch (error) {
-        console.error('Erreur suppression projet:', error)
-        throw error
-      }
+      return await deleteProjet?.(id)
     },
   }
 }

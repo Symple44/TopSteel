@@ -27,7 +27,7 @@ const mockApi = {
   createContextKey: () => ({ __key: 'disabled' }),
   context: {
     active: () => mockContext,
-    with: (context, fn) => fn(),
+    with: (_context, fn) => fn(),
     bind: () => () => {},
   },
   trace: {
@@ -71,6 +71,6 @@ export const getActiveSpan = mockApi.trace.getActiveSpan
 
 // Context and baggage exports
 export const active = mockApi.context.active
-export const setValue = (key, value, context) => mockContext
-export const getValue = (key, context) => undefined
-export const deleteValue = (key, context) => mockContext
+export const setValue = (_key, _value, _context) => mockContext
+export const getValue = (_key, _context) => undefined
+export const deleteValue = (_key, _context) => mockContext

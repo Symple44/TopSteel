@@ -3,48 +3,43 @@
  * Point d'entrée pour le domaine client
  */
 
-// ===== DOMAIN LAYER =====
-export * from './domain/entities'
-export * from './domain/services'
-export * from './domain/repositories'
-
-// ===== APPLICATION LAYER =====
-export * from './application/commands'
-export * from './application/queries'
-
-// ===== RE-EXPORTS UTILES =====
 export type {
-  // Entités principales
-  Client,
-  ClientContact,
-  ClientAddress,
-  ClientStats,
-  ClientWithProjects,
-  
-  // Value Objects & Enums
-  ClientType,
-  ClientStatut,
-  ClientPriorite,
-} from './domain/entities'
-
-export type {
-  // Repository
-  IClientRepository,
-  ClientFilters,
-  ClientSortOptions,
-  PaginatedClients,
-} from './domain/repositories'
-
-export type {
+  CommandResult,
   // Commands & Queries
   CreateClientCommand,
-  UpdateClientCommand,
   IClientCommandHandler,
-  CommandResult,
+  UpdateClientCommand,
 } from './application/commands'
-
+// ===== APPLICATION LAYER =====
+export * from './application/commands'
 export type {
   GetClientsQuery,
   IClientQueryHandler,
   QueryResult,
 } from './application/queries'
+export * from './application/queries'
+// ===== RE-EXPORTS UTILES =====
+export type {
+  // Entités principales
+  Client,
+  ClientAddress,
+  ClientContact,
+  ClientPriorite,
+  ClientStats,
+  ClientStatut,
+  // Value Objects & Enums
+  ClientType,
+  ClientWithProjects,
+} from './domain/entities'
+// ===== DOMAIN LAYER =====
+export * from './domain/entities'
+
+export type {
+  ClientFilters,
+  ClientSortOptions,
+  // Repository
+  IClientRepository,
+  PaginatedClients,
+} from './domain/repositories'
+export * from './domain/repositories'
+export * from './domain/services'

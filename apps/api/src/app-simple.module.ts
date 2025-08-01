@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { MenuRawService } from './modules/admin/services/menu-raw.service'
-import { MenuRawController } from './modules/admin/controllers/menu-raw.controller'
+import { MenuRawController } from './features/admin/controllers/menu-raw.controller'
+import { MenuRawService } from './features/admin/services/menu-raw.service'
 
 // Configuration simple pour la base AUTH
 @Module({
@@ -15,7 +15,7 @@ import { MenuRawController } from './modules/admin/controllers/menu-raw.controll
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'postgres', 
+      username: 'postgres',
       password: 'postgres',
       database: 'erp_topsteel_auth',
       synchronize: false,

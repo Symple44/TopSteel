@@ -31,7 +31,7 @@ export function detectMultipleTabs(): Promise<boolean> {
       channel.postMessage({
         type: 'TAB_PING',
         tabId,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       })
     }
 
@@ -42,7 +42,7 @@ export function detectMultipleTabs(): Promise<boolean> {
           type: 'TAB_PING_RESPONSE',
           originalTabId: event.data.tabId,
           responderTabId: tabId,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         })
       }
     }
@@ -57,7 +57,7 @@ export function detectMultipleTabs(): Promise<boolean> {
     setTimeout(() => {
       channel.removeEventListener('message', handleMessage)
       channel.removeEventListener('message', handlePing)
-      
+
       if (!hasResponse) {
         channel.close()
         resolve(false)
@@ -82,13 +82,11 @@ export function getApproximateTabCount(): number {
     // Récupérer la liste des onglets actifs depuis localStorage
     const activeTabsData = localStorage.getItem('topsteel-active-tabs')
     const activeTabs = activeTabsData ? JSON.parse(activeTabsData) : {}
-    
+
     // Nettoyer les onglets inactifs (plus de 30 secondes)
     const now = Date.now()
     const cleanedTabs = Object.fromEntries(
-      Object.entries(activeTabs).filter(
-        ([_, timestamp]) => now - (timestamp as number) < 30000
-      )
+      Object.entries(activeTabs).filter(([_, timestamp]) => now - (timestamp as number) < 30000)
     )
 
     // Ajouter/mettre à jour cet onglet
@@ -99,8 +97,7 @@ export function getApproximateTabCount(): number {
     localStorage.setItem('topsteel-active-tabs', JSON.stringify(cleanedTabs))
 
     return Object.keys(cleanedTabs).length
-  } catch (error) {
-    console.warn('Erreur lors du comptage des onglets:', error)
+  } catch (_error) {
     return 1
   }
 }
@@ -121,9 +118,7 @@ export function cleanupTabDetection(): void {
         localStorage.setItem('topsteel-active-tabs', JSON.stringify(activeTabs))
       }
     }
-  } catch (error) {
-    console.warn('Erreur lors du nettoyage de détection d\'onglets:', error)
-  }
+  } catch (_error) {}
 }
 
 /**
@@ -140,14 +135,17 @@ export function useTabCleanup(): void {
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'hidden') {
       // Marquer comme potentiellement fermé après 5 minutes d'inactivité
-      setTimeout(() => {
-        if (document.visibilityState === 'hidden') {
-          cleanupTabDetection()
-        }
-      }, 5 * 60 * 1000)
+      setTimeout(
+        () => {
+          if (document.visibilityState === 'hidden') {
+            cleanupTabDetection()
+          }
+        },
+        5 * 60 * 1000
+      )
     }
   }
-  
+
   document.addEventListener('visibilitychange', handleVisibilityChange)
 }
 
@@ -156,7 +154,7 @@ export function useTabCleanup(): void {
  */
 export function removeTabCleanup(): void {
   if (typeof window === 'undefined') return
-  
+
   window.removeEventListener('beforeunload', cleanupTabDetection)
   window.removeEventListener('pagehide', cleanupTabDetection)
 }

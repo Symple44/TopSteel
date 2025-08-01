@@ -1,15 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
+export const dynamic = 'force-dynamic'
+
 import {
+  Alert,
+  AlertDescription,
+  Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Badge,
-  Button,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -17,7 +19,6 @@ import {
   DialogTrigger,
   Input,
   Label,
-  Textarea,
   Table,
   TableBody,
   TableCell,
@@ -28,32 +29,32 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-  Switch,
-  Alert,
-  AlertDescription
+  Textarea,
 } from '@erp/ui'
-import { PermissionHide } from '@/components/auth/permission-guard'
-import { 
-  Plus,
-  Edit,
-  Trash2,
-  Settings,
-  Download,
-  Upload,
-  Eye,
-  Power,
-  Zap,
+import {
+  AlertTriangle,
   Check,
-  AlertTriangle
+  Download,
+  Edit,
+  Eye,
+  Plus,
+  Power,
+  Settings,
+  Trash2,
+  Zap,
 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from '@/lib/i18n/hooks'
+import type { MenuItem } from '@/types/menu'
 import { callClientApi } from '@/utils/backend-api'
+
 // Fonction utilitaire pour formater les dates
 const formatDate = (date: string | Date) => {
   const d = new Date(date)
   return d.toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: 'short',
-    year: 'numeric'
+    year: 'numeric',
   })
 }
 
@@ -77,23 +78,22 @@ export default function MenuConfigurationPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('configurations')
 
-  useEffect(() => {
-    loadConfigurations()
-  }, [])
-
-  const loadConfigurations = async () => {
+  const loadConfigurations = useCallback(async () => {
     try {
       const response = await callClientApi('admin/menu-config')
       const data = await response.json()
       if (data.success) {
         setConfigurations(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des configurations:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadConfigurations()
+  }, [loadConfigurations])
 
   const handleActivateConfig = async (configId: string) => {
     if (!confirm(t('menuConfig.confirmActivate'))) {
@@ -102,17 +102,15 @@ export default function MenuConfigurationPage() {
 
     try {
       const response = await callClientApi(`admin/menu-config/${configId}/activate`, {
-        method: 'POST'
+        method: 'POST',
       })
-      
+
       if (response.ok) {
         loadConfigurations()
         // Recharger la page pour appliquer le nouveau menu
         window.location.reload()
       }
-    } catch (error) {
-      console.error('Erreur lors de l\'activation:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleDeleteConfig = async (configId: string) => {
@@ -122,40 +120,34 @@ export default function MenuConfigurationPage() {
 
     try {
       const response = await callClientApi(`admin/menu-config/${configId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
-      
+
       if (response.ok) {
         loadConfigurations()
       }
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleExportConfig = async (configId: string) => {
     try {
       window.open(`/api/admin/menu-config/${configId}/export`, '_blank')
-    } catch (error) {
-      console.error('Erreur lors de l\'export:', error)
-    }
+    } catch (_error) {}
   }
 
   const handleCreateDefault = async () => {
     try {
       const response = await callClientApi('admin/menu-config/default', {
-        method: 'POST'
+        method: 'POST',
       })
-      
+
       if (response.ok) {
         loadConfigurations()
       }
-    } catch (error) {
-      console.error('Erreur lors de la création de la configuration par défaut:', error)
-    }
+    } catch (_error) {}
   }
 
-  const activeConfig = configurations.find(c => c.isActive)
+  const activeConfig = configurations.find((c) => c.isActive)
 
   if (loading) {
     return (
@@ -174,9 +166,7 @@ export default function MenuConfigurationPage() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold">{t('menuConfig.title')}</h1>
-          <p className="text-muted-foreground mt-2">
-            {t('menuConfig.description')}
-          </p>
+          <p className="text-muted-foreground mt-2">{t('menuConfig.description')}</p>
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" onClick={handleCreateDefault}>
@@ -184,25 +174,25 @@ export default function MenuConfigurationPage() {
             {t('menuConfig.defaultMenu')}
           </Button>
           {/* <PermissionHide permission="MENU_CREATE" roles={['SUPER_ADMIN']}> */}
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('menuConfig.newConfiguration')}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>{t('menuConfig.createNewConfiguration')}</DialogTitle>
-                </DialogHeader>
-                <MenuConfigForm 
-                  onSave={() => {
-                    setIsCreateDialogOpen(false)
-                    loadConfigurations()
-                  }} 
-                />
-              </DialogContent>
-            </Dialog>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                {t('menuConfig.newConfiguration')}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>{t('menuConfig.createNewConfiguration')}</DialogTitle>
+              </DialogHeader>
+              <MenuConfigForm
+                onSave={() => {
+                  setIsCreateDialogOpen(false)
+                  loadConfigurations()
+                }}
+              />
+            </DialogContent>
+          </Dialog>
           {/* </PermissionHide> */}
         </div>
       </div>
@@ -220,7 +210,9 @@ export default function MenuConfigurationPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="configurations">{t('menuConfig.configurations')} ({configurations.length})</TabsTrigger>
+          <TabsTrigger value="configurations">
+            {t('menuConfig.configurations')} ({configurations.length})
+          </TabsTrigger>
           <TabsTrigger value="preview">{t('menuConfig.preview')}</TabsTrigger>
         </TabsList>
 
@@ -228,9 +220,7 @@ export default function MenuConfigurationPage() {
           <Card>
             <CardHeader>
               <CardTitle>{t('menuConfig.configurations')}</CardTitle>
-              <CardDescription>
-                {t('menuConfig.description')}
-              </CardDescription>
+              <CardDescription>{t('menuConfig.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -269,9 +259,7 @@ export default function MenuConfigurationPage() {
                           {config.isActive ? t('menuConfig.active') : t('menuConfig.inactive')}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        {formatDate(config.createdAt)}
-                      </TableCell>
+                      <TableCell>{formatDate(config.createdAt)}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <Button
@@ -284,16 +272,16 @@ export default function MenuConfigurationPage() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          
+
                           {!config.isActive && (
                             // <PermissionHide permission="MENU_ACTIVATE" roles={['SUPER_ADMIN', 'ADMIN']}>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleActivateConfig(config.id)}
-                              >
-                                <Power className="h-4 w-4" />
-                              </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleActivateConfig(config.id)}
+                            >
+                              <Power className="h-4 w-4" />
+                            </Button>
                             // </PermissionHide>
                           )}
 
@@ -306,28 +294,28 @@ export default function MenuConfigurationPage() {
                           </Button>
 
                           {/* <PermissionHide permission="MENU_UPDATE" roles={['SUPER_ADMIN', 'ADMIN']}> */}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedConfig(config)
-                                setIsEditDialogOpen(true)
-                              }}
-                              disabled={config.isSystem}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedConfig(config)
+                              setIsEditDialogOpen(true)
+                            }}
+                            disabled={config.isSystem}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
                           {/* </PermissionHide> */}
 
                           {/* <PermissionHide permission="MENU_DELETE" roles={['SUPER_ADMIN']}> */}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteConfig(config.id)}
-                              disabled={config.isSystem || config.isActive}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteConfig(config.id)}
+                            disabled={config.isSystem || config.isActive}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                           {/* </PermissionHide> */}
                         </div>
                       </TableCell>
@@ -356,14 +344,16 @@ export default function MenuConfigurationPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t('menuConfig.edit')}: {selectedConfig?.name}</DialogTitle>
+            <DialogTitle>
+              {t('menuConfig.edit')}: {selectedConfig?.name}
+            </DialogTitle>
           </DialogHeader>
-          <MenuConfigEditor 
+          <MenuConfigEditor
             config={selectedConfig}
             onSave={() => {
               setIsEditDialogOpen(false)
               loadConfigurations()
-            }} 
+            }}
           />
         </DialogContent>
       </Dialog>
@@ -372,7 +362,9 @@ export default function MenuConfigurationPage() {
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t('menuConfig.preview')}: {selectedConfig?.name}</DialogTitle>
+            <DialogTitle>
+              {t('menuConfig.preview')}: {selectedConfig?.name}
+            </DialogTitle>
           </DialogHeader>
           <MenuConfigPreview config={selectedConfig} />
         </DialogContent>
@@ -386,27 +378,25 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
   const { t } = useTranslation('admin')
   const [formData, setFormData] = useState({
     name: '',
-    description: ''
+    description: '',
   })
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    
+
     try {
       const response = await callClientApi('admin/menu-config', {
         method: 'POST',
         body: JSON.stringify({
           ...formData,
-          items: [] // Commencer avec un menu vide
-        })
+          items: [], // Commencer avec un menu vide
+        }),
       })
-      
+
       if (response.ok) {
         onSave()
       }
-    } catch (error) {
-      console.error('Erreur lors de la création:', error)
-    }
+    } catch (_error) {}
   }
 
   return (
@@ -416,36 +406,44 @@ function MenuConfigForm({ onSave }: { onSave: () => void }) {
         <Input
           id="name"
           value={formData.name}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setFormData((prev) => ({ ...prev, name: e.target.value }))
+          }
           placeholder={t('menuConfig.form.namePlaceholder')}
           required
         />
       </div>
-      
+
       <div>
         <Label htmlFor="description">{t('menuConfig.description')}</Label>
         <Textarea
           id="description"
           value={formData.description}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            setFormData((prev) => ({ ...prev, description: e.target.value }))
+          }
           placeholder={t('menuConfig.form.descriptionPlaceholder')}
         />
       </div>
-      
+
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onSave}>
           {t('menuConfig.form.cancel')}
         </Button>
-        <Button type="submit">
-          {t('menuConfig.form.create')}
-        </Button>
+        <Button type="submit">{t('menuConfig.form.create')}</Button>
       </div>
     </form>
   )
 }
 
 // Composant pour éditer une configuration (placeholder)
-function MenuConfigEditor({ config, onSave }: { config: MenuConfiguration | null, onSave: () => void }) {
+function MenuConfigEditor({
+  config,
+  onSave,
+}: {
+  config: MenuConfiguration | null
+  onSave: () => void
+}) {
   const { t } = useTranslation('admin')
   if (!config) return null
 
@@ -458,11 +456,9 @@ function MenuConfigEditor({ config, onSave }: { config: MenuConfiguration | null
           {t('menuConfig.editor.exportImportInfo')}
         </AlertDescription>
       </Alert>
-      
+
       <div className="flex justify-end">
-        <Button onClick={onSave}>
-          {t('menuConfig.editor.close')}
-        </Button>
+        <Button onClick={onSave}>{t('menuConfig.editor.close')}</Button>
       </div>
     </div>
   )
@@ -471,16 +467,10 @@ function MenuConfigEditor({ config, onSave }: { config: MenuConfiguration | null
 // Composant pour prévisualiser une configuration
 function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
   const { t } = useTranslation('admin')
-  const [menuTree, setMenuTree] = useState<any[]>([])
+  const [menuTree, setMenuTree] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (config) {
-      loadMenuTree()
-    }
-  }, [config])
-
-  const loadMenuTree = async () => {
+  const loadMenuTree = useCallback(async () => {
     if (!config) return
 
     try {
@@ -489,40 +479,47 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
       if (data.success) {
         setMenuTree(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement de l\'arbre de menu:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [config])
+
+  useEffect(() => {
+    if (config) {
+      loadMenuTree()
+    }
+  }, [config, loadMenuTree])
 
   if (loading) {
     return <div className="text-center py-8">{t('menuConfig.preview.loadingPreview')}</div>
   }
 
-  const renderMenuItem = (item: any, depth: number = 0) => (
+  const renderMenuItem = (item: MenuItem, depth: number = 0) => (
     <div key={item.id} className={`ml-${depth * 4} py-1`}>
       <div className="flex items-center space-x-2">
         <span style={{ marginLeft: `${depth * 16}px` }}>
           {item.icon && <span className="w-4 h-4">📄</span>}
           <span className={depth === 0 ? 'font-semibold' : ''}>{item.title}</span>
           {item.badge && (
-            <Badge variant="outline" className="text-xs">{item.badge}</Badge>
+            <Badge variant="outline" className="text-xs">
+              {item.badge}
+            </Badge>
           )}
         </span>
       </div>
-      {item.children?.map((child: any) => renderMenuItem(child, depth + 1))}
+      {item.children?.map((child) => renderMenuItem(child, depth + 1))}
     </div>
   )
 
   return (
     <div className="space-y-4">
       <div className="bg-gray-50 rounded-lg p-4 border">
-        <h3 className="font-medium mb-3">{t('menuConfig.preview.menuStructure', { fallback: 'Structure du menu' })}</h3>
+        <h3 className="font-medium mb-3">
+          {t('menuConfig.preview.menuStructure', { fallback: 'Structure du menu' })}
+        </h3>
         {menuTree.length > 0 ? (
-          <div className="space-y-1">
-            {menuTree.map(item => renderMenuItem(item))}
-          </div>
+          <div className="space-y-1">{menuTree.map((item) => renderMenuItem(item))}</div>
         ) : (
           <p className="text-muted-foreground">{t('menuConfig.preview.noItems')}</p>
         )}
@@ -534,32 +531,31 @@ function MenuConfigPreview({ config }: { config: MenuConfiguration | null }) {
 // Composant pour prévisualiser le menu actuel
 function MenuPreview() {
   const { t } = useTranslation('admin')
-  const [menuTree, setMenuTree] = useState<any[]>([])
+  const [menuTree, setMenuTree] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadCurrentMenu()
-  }, [])
-
-  const loadCurrentMenu = async () => {
+  const loadCurrentMenu = useCallback(async () => {
     try {
       const response = await callClientApi('admin/menu-config/tree/filtered')
       const data = await response.json()
       if (data.success) {
         setMenuTree(data.data)
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement du menu actuel:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadCurrentMenu()
+  }, [loadCurrentMenu])
 
   if (loading) {
     return <div className="text-center py-8">{t('menuConfig.preview.loadingPreview')}</div>
   }
 
-  const renderMenuItem = (item: any, depth: number = 0) => (
+  const renderMenuItem = (item: MenuItem, depth: number = 0) => (
     <div key={item.id} className="py-2 border-b last:border-b-0">
       <div className="flex items-center space-x-3" style={{ paddingLeft: `${depth * 20}px` }}>
         {item.icon && <span className="w-5 h-5 text-gray-500">📄</span>}
@@ -569,35 +565,43 @@ function MenuPreview() {
               {item.title}
             </span>
             {item.badge && (
-              <Badge variant="outline" className="text-xs">{item.badge}</Badge>
+              <Badge variant="outline" className="text-xs">
+                {item.badge}
+              </Badge>
             )}
           </div>
-          {item.href && (
-            <p className="text-sm text-muted-foreground">{item.href}</p>
-          )}
+          {item.href && <p className="text-sm text-muted-foreground">{item.href}</p>}
         </div>
       </div>
-      {item.children?.map((child: any) => renderMenuItem(child, depth + 1))}
+      {item.children?.map((child) => renderMenuItem(child, depth + 1))}
     </div>
   )
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t('menuConfig.preview.currentNavigationMenu', { fallback: 'Menu de navigation actuel' })}</CardTitle>
+        <CardTitle>
+          {t('menuConfig.preview.currentNavigationMenu', { fallback: 'Menu de navigation actuel' })}
+        </CardTitle>
         <CardDescription>
-          {t('menuConfig.preview.userMenuPreview', { fallback: 'Aperçu du menu tel qu\'il apparaît pour votre utilisateur' })}
+          {t('menuConfig.preview.userMenuPreview', {
+            fallback: "Aperçu du menu tel qu'il apparaît pour votre utilisateur",
+          })}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {menuTree.length > 0 ? (
           <div className="space-y-0 border rounded-lg">
-            {menuTree.map(item => renderMenuItem(item))}
+            {menuTree.map((item) => renderMenuItem(item))}
           </div>
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>{t('menuConfig.preview.noMenuConfigured', { fallback: 'Aucun menu configuré ou accessible' })}</p>
+            <p>
+              {t('menuConfig.preview.noMenuConfigured', {
+                fallback: 'Aucun menu configuré ou accessible',
+              })}
+            </p>
           </div>
         )}
       </CardContent>

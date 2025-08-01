@@ -80,22 +80,22 @@ export interface User extends BaseEntity {
   // Identité
   readonly email: string
   readonly profile: UserProfile
-  
+
   // Autorisation
   readonly role: UserRole
   readonly permissions: string[]
   readonly statut: UserStatut
-  
+
   // Métier
   readonly competences: Competence[]
   readonly departement?: string
   readonly manager?: string
   readonly tauxHoraire?: number
-  
+
   // Personnalisation
   readonly preferences: UserPreferences
   readonly security: UserSecurity
-  
+
   // Audit
   readonly createdAt: Date
   readonly updatedAt: Date

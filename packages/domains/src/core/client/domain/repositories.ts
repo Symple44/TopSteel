@@ -3,8 +3,8 @@
  * Contrats pour l'accès aux données (Domain Driven Design)
  */
 
-import type { Client, ClientStats, ClientWithProjects } from './entities'
 import type { PaginationOptions } from '../../base'
+import type { Client, ClientStats, ClientWithProjects } from './entities'
 
 // ===== FILTRES ET CRITÈRES =====
 
@@ -26,7 +26,6 @@ export interface ClientSortOptions {
   readonly direction: 'asc' | 'desc'
 }
 
-
 // ===== RÉSULTATS PAGINÉS =====
 
 export interface PaginatedClients {
@@ -46,30 +45,30 @@ export interface IClientRepository {
     sort?: ClientSortOptions,
     pagination?: PaginationOptions
   ): Promise<PaginatedClients>
-  
+
   findById(id: string): Promise<Client | null>
-  
+
   findByEmail(email: string): Promise<Client | null>
-  
+
   findBySiret(siret: string): Promise<Client | null>
-  
+
   findWithProjects(id: string): Promise<ClientWithProjects | null>
-  
+
   // Écriture
   create(client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>): Promise<Client>
-  
+
   update(id: string, updates: Partial<Client>): Promise<Client>
-  
+
   delete(id: string): Promise<boolean>
-  
+
   // Statistiques
   getStats(filters?: ClientFilters): Promise<ClientStats>
-  
+
   // Recherche avancée
   search(query: string, filters?: ClientFilters): Promise<Client[]>
-  
+
   // Validation métier
   exists(email: string, excludeId?: string): Promise<boolean>
-  
+
   canDelete(id: string): Promise<boolean>
 }

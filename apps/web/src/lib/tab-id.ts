@@ -8,13 +8,13 @@ const generateTabId = () => {
   if (typeof window === 'undefined') {
     return 'server'
   }
-  
+
   // Vérifier d'abord si on a déjà un ID dans sessionStorage
   const existingId = sessionStorage.getItem('topsteel-tab-id')
   if (existingId) {
     return existingId
   }
-  
+
   // Sinon, générer un nouvel ID
   const newId = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   sessionStorage.setItem('topsteel-tab-id', newId)

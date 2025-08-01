@@ -1,30 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
-    const response = await callBackendFromApi('admin/database/backups', {
+    const response = await callBackendFromApi(request, 'admin/database/backups', {
       method: 'GET',
       headers: {
-        ...(request.headers.get('authorization') && {
-          'Authorization': request.headers.get('authorization')!
-        }),
+        ...(request.headers.get('authorization')
+          ? {
+              Authorization: request.headers.get('authorization') as string,
+            }
+          : {}),
       },
     })
 
     if (!response.ok) {
-      console.error('API Error:', response.status, response.statusText)
       return NextResponse.json(
-        { success: false, error: 'Erreur lors de l\'appel à l\'API' },
+        { success: false, error: "Erreur lors de l'appel à l'API" },
         { status: response.status }
       )
     }
 
     const responseData = await response.json()
     return NextResponse.json(responseData.data || responseData)
-  } catch (error) {
-    console.error('Erreur lors de la récupération des sauvegardes:', error)
-    
+  } catch (_error) {
     // Retourner des données mock si l'API n'est pas disponible
     const mockBackups = {
       success: true,
@@ -35,7 +34,7 @@ export async function GET(request: NextRequest) {
           createdAt: '2024-01-15T14:30:00Z',
           size: '15.2 MB',
           type: 'manual',
-          status: 'completed'
+          status: 'completed',
         },
         {
           id: 'backup-2024-01-14-02-00',
@@ -43,7 +42,7 @@ export async function GET(request: NextRequest) {
           createdAt: '2024-01-14T02:00:00Z',
           size: '14.8 MB',
           type: 'scheduled',
-          status: 'completed'
+          status: 'completed',
         },
         {
           id: 'backup-2024-01-13-02-00',
@@ -51,11 +50,11 @@ export async function GET(request: NextRequest) {
           createdAt: '2024-01-13T02:00:00Z',
           size: '14.5 MB',
           type: 'scheduled',
-          status: 'completed'
-        }
-      ]
+          status: 'completed',
+        },
+      ],
     }
-    
+
     return NextResponse.json(mockBackups)
   }
 }

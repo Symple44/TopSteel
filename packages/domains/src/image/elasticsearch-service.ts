@@ -1,4 +1,4 @@
-import { ImageMetadata, ImageVariant } from './types'
+import type { ImageMetadata, ImageVariant } from './types'
 
 export interface ElasticsearchImageDocument {
   id: string
@@ -51,7 +51,7 @@ export class ImageElasticsearchService {
    * Convertit les métadonnées d'image en document Elasticsearch
    */
   toElasticsearchDocument(
-    metadata: ImageMetadata, 
+    metadata: ImageMetadata,
     variants: ImageVariant[]
   ): ElasticsearchImageDocument {
     // Construction du texte de recherche
@@ -60,14 +60,14 @@ export class ImageElasticsearchService {
       metadata.fileName,
       metadata.alt || '',
       metadata.description || '',
-      ...(metadata.tags || [])
+      ...(metadata.tags || []),
     ].filter(Boolean)
 
     // Suggestions basées sur le nom de fichier et les tags
     const suggestions = [
       metadata.originalName,
       metadata.fileName.replace(/\.[^/.]+$/, ''), // nom sans extension
-      ...(metadata.tags || [])
+      ...(metadata.tags || []),
     ].filter(Boolean)
 
     return {
@@ -78,7 +78,7 @@ export class ImageElasticsearchService {
       size: metadata.size,
       dimensions: {
         width: metadata.width,
-        height: metadata.height
+        height: metadata.height,
       },
       hash: metadata.hash,
       category: metadata.category,
@@ -87,25 +87,28 @@ export class ImageElasticsearchService {
       tags: metadata.tags,
       alt: metadata.alt,
       description: metadata.description,
-      entity: metadata.entityType && metadata.entityId ? {
-        type: metadata.entityType,
-        id: metadata.entityId
-      } : undefined,
-      variants: variants.map(variant => ({
+      entity:
+        metadata.entityType && metadata.entityId
+          ? {
+              type: metadata.entityType,
+              id: metadata.entityId,
+            }
+          : undefined,
+      variants: variants.map((variant) => ({
         variant: variant.variant,
         fileName: variant.fileName,
         dimensions: {
           width: variant.width,
-          height: variant.height
+          height: variant.height,
         },
         size: variant.size,
-        url: `${this.baseUrl}/${metadata.category}/${variant.variant}/${variant.fileName}`
+        url: `${this.baseUrl}/${metadata.category}/${variant.variant}/${variant.fileName}`,
       })),
       searchText: searchParts.join(' '),
       suggest: {
         input: suggestions,
-        weight: this.calculateWeight(metadata)
-      }
+        weight: this.calculateWeight(metadata),
+      },
     }
   }
 
@@ -129,9 +132,11 @@ export class ImageElasticsearchService {
     }
 
     // Poids basé sur la taille (plus grande = plus importante)
-    if (metadata.size > 1024 * 1024) { // > 1MB
+    if (metadata.size > 1024 * 1024) {
+      // > 1MB
       weight += 2
-    } else if (metadata.size > 100 * 1024) { // > 100KB
+    } else if (metadata.size > 100 * 1024) {
+      // > 100KB
       weight += 1
     }
 
@@ -167,7 +172,7 @@ export class ImageElasticsearchService {
       limit = 20,
       offset = 0,
       sortBy = 'relevance',
-      sortOrder = 'desc'
+      sortOrder = 'desc',
     } = params
 
     const must: any[] = []
@@ -180,8 +185,8 @@ export class ImageElasticsearchService {
           query,
           fields: ['searchText^2', 'originalName^3', 'fileName^2', 'alt', 'description', 'tags^2'],
           type: 'best_fields',
-          fuzziness: 'AUTO'
-        }
+          fuzziness: 'AUTO',
+        },
       })
     }
 
@@ -228,16 +233,16 @@ export class ImageElasticsearchService {
       query: {
         bool: {
           must: must.length > 0 ? must : [{ match_all: {} }],
-          filter
-        }
+          filter,
+        },
       },
       highlight: {
         fields: {
           originalName: {},
           alt: {},
-          description: {}
-        }
-      }
+          description: {},
+        },
+      },
     }
 
     // Tri
@@ -245,7 +250,7 @@ export class ImageElasticsearchService {
       const sortField = {
         date: 'uploadedAt',
         size: 'size',
-        name: 'originalName.keyword'
+        name: 'originalName.keyword',
       }[sortBy]
 
       if (sortField) {
@@ -266,10 +271,10 @@ export class ImageElasticsearchService {
           prefix: text,
           completion: {
             field: 'suggest',
-            size: limit
-          }
-        }
-      }
+            size: limit,
+          },
+        },
+      },
     }
   }
 
@@ -283,26 +288,26 @@ export class ImageElasticsearchService {
         categories: {
           terms: {
             field: 'category',
-            size: 10
-          }
+            size: 10,
+          },
         },
         mimeTypes: {
           terms: {
             field: 'mimeType',
-            size: 20
-          }
+            size: 20,
+          },
         },
         tags: {
           terms: {
             field: 'tags',
-            size: 50
-          }
+            size: 50,
+          },
         },
         entityTypes: {
           terms: {
             field: 'entity.type',
-            size: 10
-          }
+            size: 10,
+          },
         },
         sizeRanges: {
           range: {
@@ -310,17 +315,17 @@ export class ImageElasticsearchService {
             ranges: [
               { key: 'small', to: 100000 }, // < 100KB
               { key: 'medium', from: 100000, to: 1000000 }, // 100KB - 1MB
-              { key: 'large', from: 1000000 } // > 1MB
-            ]
-          }
+              { key: 'large', from: 1000000 }, // > 1MB
+            ],
+          },
         },
         uploadedBy: {
           terms: {
             field: 'uploadedBy',
-            size: 20
-          }
-        }
-      }
+            size: 20,
+          },
+        },
+      },
     }
   }
 }

@@ -1,41 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 // Fonction utilitaire pour récupérer l'authentification
 function getAuthHeaders(request: NextRequest): Record<string, string> {
   const authHeader = request.headers.get('authorization')
   const cookieHeader = request.headers.get('cookie')
-  
+
   let accessToken = null
   if (cookieHeader) {
-    const cookies = cookieHeader.split(';').map(c => c.trim())
-    const accessTokenCookie = cookies.find(c => c.startsWith('accessToken='))
+    const cookies = cookieHeader.split(';').map((c) => c.trim())
+    const accessTokenCookie = cookies.find((c) => c.startsWith('accessToken='))
     if (accessTokenCookie) {
       accessToken = accessTokenCookie.split('=')[1]
     }
   }
-  
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   }
-  
+
   if (authHeader) {
-    headers['Authorization'] = authHeader
+    headers.Authorization = authHeader
   } else if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`
+    headers.Authorization = `Bearer ${accessToken}`
   }
-  
+
   if (cookieHeader) {
-    headers['Cookie'] = cookieHeader
+    headers.Cookie = cookieHeader
   }
-  
+
   return headers
 }
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    
+
     // Pour l'instant, retournons des données mock en attendant l'implémentation backend
     const mockQueryBuilders = [
       {
@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
         updatedAt: new Date().toISOString(),
         createdBy: 'admin@topsteel.tech',
         columns: ['id', 'email', 'nom', 'prenom', 'created_at'],
-        query: 'SELECT id, email, nom, prenom, created_at FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY'
+        query:
+          'SELECT id, email, nom, prenom, created_at FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY',
       },
       {
         id: '2',
@@ -64,13 +65,13 @@ export async function GET(request: NextRequest) {
         updatedAt: new Date().toISOString(),
         createdBy: 'admin@topsteel.tech',
         columns: ['id', 'name', 'is_active', 'created_at'],
-        query: 'SELECT id, name, is_active, created_at FROM menu_configurations ORDER BY created_at DESC'
-      }
+        query:
+          'SELECT id, name, is_active, created_at FROM menu_configurations ORDER BY created_at DESC',
+      },
     ]
 
     return NextResponse.json(mockQueryBuilders)
   } catch (error) {
-    console.error('[Query Builder API] Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
     const headers = getAuthHeaders(request)
     const body = await request.json()
 
-    const response = await callBackendFromApi('query-builder', {
+    const response = await callBackendFromApi(request, 'query-builder', {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
@@ -100,7 +101,6 @@ export async function POST(request: NextRequest) {
       )
     }
   } catch (error) {
-    console.error('[Query Builder API] Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Types pour les règles de notification
 interface NotificationRule {
@@ -38,138 +38,155 @@ interface NotificationRule {
 }
 
 // Stockage temporaire - en production, utiliser la base de données
-let notificationRules: NotificationRule[] = [
+const notificationRules: NotificationRule[] = [
   {
     id: '1',
     name: 'Alerte Stock Critique',
-    description: 'Notifier quand le stock d\'un matériau passe sous le seuil critique',
+    description: "Notifier quand le stock d'un matériau passe sous le seuil critique",
     isActive: true,
     trigger: {
       type: 'stock',
       event: 'stock_low',
-      source: 'inventory-service'
+      source: 'inventory-service',
     },
     conditions: [
       { id: '1', field: 'quantity', operator: 'less_than', value: 10, type: 'number' },
-      { id: '2', field: 'category', operator: 'in', value: ['metal', 'steel'], type: 'string', logic: 'AND' }
+      {
+        id: '2',
+        field: 'category',
+        operator: 'in',
+        value: ['metal', 'steel'],
+        type: 'string',
+        logic: 'AND',
+      },
     ],
     notification: {
       type: 'warning',
       category: 'stock',
       titleTemplate: 'Stock critique: {{material_name}}',
-      messageTemplate: 'Le stock de {{material_name}} est maintenant de {{quantity}} unités (seuil: {{threshold}})',
+      messageTemplate:
+        'Le stock de {{material_name}} est maintenant de {{quantity}} unités (seuil: {{threshold}})',
       priority: 'HIGH',
       recipientType: 'role',
       recipientIds: ['stock_manager', 'admin'],
       actionUrl: '/stock/materials/{{material_id}}',
       actionLabel: 'Voir le stock',
       persistent: true,
-      expiresIn: 24
+      expiresIn: 24,
     },
     createdAt: '2024-01-15T10:30:00Z',
     lastTriggered: '2024-01-16T14:22:00Z',
-    triggerCount: 15
+    triggerCount: 15,
   },
   {
     id: '2',
     name: 'Nouveau Projet Prioritaire',
-    description: 'Notifier lors de la création d\'un projet à haute priorité',
+    description: "Notifier lors de la création d'un projet à haute priorité",
     isActive: true,
     trigger: {
       type: 'project',
       event: 'project_created',
-      source: 'project-service'
+      source: 'project-service',
     },
     conditions: [
-      { id: '1', field: 'priority', operator: 'in', value: ['HIGH', 'URGENT'], type: 'string' }
+      { id: '1', field: 'priority', operator: 'in', value: ['HIGH', 'URGENT'], type: 'string' },
     ],
     notification: {
       type: 'info',
       category: 'projet',
       titleTemplate: 'Nouveau projet prioritaire: {{project_name}}',
-      messageTemplate: 'Un nouveau projet "{{project_name}}" ({{priority}}) a été créé par {{created_by}}',
+      messageTemplate:
+        'Un nouveau projet "{{project_name}}" ({{priority}}) a été créé par {{created_by}}',
       priority: 'NORMAL',
       recipientType: 'role',
       recipientIds: ['project_manager', 'team_lead'],
       actionUrl: '/projets/{{project_id}}',
       actionLabel: 'Voir le projet',
       persistent: true,
-      expiresIn: 48
+      expiresIn: 48,
     },
     createdAt: '2024-01-10T09:15:00Z',
     lastTriggered: '2024-01-16T11:45:00Z',
-    triggerCount: 8
+    triggerCount: 8,
   },
   {
     id: '3',
     name: 'Changement Mot de Passe Admin',
-    description: 'Notifier les administrateurs des changements de mot de passe d\'autres admins',
+    description: "Notifier les administrateurs des changements de mot de passe d'autres admins",
     isActive: false,
     trigger: {
       type: 'user',
       event: 'password_changed',
-      source: 'auth-service'
+      source: 'auth-service',
     },
     conditions: [
-      { id: '1', field: 'role', operator: 'in', value: ['admin', 'manager'], type: 'string' }
+      { id: '1', field: 'role', operator: 'in', value: ['admin', 'manager'], type: 'string' },
     ],
     notification: {
       type: 'info',
       category: 'utilisateur',
       titleTemplate: 'Mot de passe modifié - {{username}}',
-      messageTemplate: 'L\'utilisateur {{username}} ({{role}}) a modifié son mot de passe',
+      messageTemplate: "L'utilisateur {{username}} ({{role}}) a modifié son mot de passe",
       priority: 'LOW',
       recipientType: 'role',
       recipientIds: ['admin'],
       persistent: false,
-      expiresIn: 6
+      expiresIn: 6,
     },
     createdAt: '2024-01-12T16:20:00Z',
-    triggerCount: 3
+    triggerCount: 3,
   },
   {
     id: '4',
     name: 'Erreur Machine Critique',
-    description: 'Notification immédiate en cas d\'erreur machine critique',
+    description: "Notification immédiate en cas d'erreur machine critique",
     isActive: true,
     trigger: {
       type: 'production',
       event: 'machine_error',
-      source: 'production-service'
+      source: 'production-service',
     },
     conditions: [
-      { id: '1', field: 'severity', operator: 'equals', value: 'CRITICAL', type: 'string' }
+      { id: '1', field: 'severity', operator: 'equals', value: 'CRITICAL', type: 'string' },
     ],
     notification: {
       type: 'error',
       category: 'production',
       titleTemplate: 'Erreur critique: {{machine_name}}',
-      messageTemplate: 'La machine {{machine_name}} a signalé une erreur critique: {{error_message}}',
+      messageTemplate:
+        'La machine {{machine_name}} a signalé une erreur critique: {{error_message}}',
       priority: 'URGENT',
       recipientType: 'role',
       recipientIds: ['production_manager', 'maintenance_team', 'admin'],
       actionUrl: '/production/machines/{{machine_id}}/diagnostic',
       actionLabel: 'Diagnostic',
       persistent: true,
-      expiresIn: 12
+      expiresIn: 12,
     },
     createdAt: '2024-01-14T08:00:00Z',
     lastTriggered: '2024-01-16T16:30:00Z',
-    triggerCount: 2
+    triggerCount: 2,
   },
   {
     id: '5',
     name: 'Email Important Reçu',
-    description: 'Notifier la réception d\'emails importants',
+    description: "Notifier la réception d'emails importants",
     isActive: true,
     trigger: {
       type: 'email',
       event: 'email_received',
-      source: 'email-service'
+      source: 'email-service',
     },
     conditions: [
       { id: '1', field: 'priority', operator: 'equals', value: 'HIGH', type: 'string' },
-      { id: '2', field: 'from', operator: 'contains', value: '@client-important.com', type: 'string', logic: 'OR' }
+      {
+        id: '2',
+        field: 'from',
+        operator: 'contains',
+        value: '@client-important.com',
+        type: 'string',
+        logic: 'OR',
+      },
     ],
     notification: {
       type: 'info',
@@ -180,14 +197,14 @@ let notificationRules: NotificationRule[] = [
       recipientType: 'role',
       recipientIds: ['admin', 'sales_manager'],
       actionUrl: '/emails/{{email_id}}',
-      actionLabel: 'Lire l\'email',
+      actionLabel: "Lire l'email",
       persistent: true,
-      expiresIn: 72
+      expiresIn: 72,
     },
     createdAt: '2024-01-11T14:45:00Z',
     lastTriggered: '2024-01-16T09:20:00Z',
-    triggerCount: 12
-  }
+    triggerCount: 12,
+  },
 ]
 
 export async function GET(request: NextRequest) {
@@ -202,16 +219,12 @@ export async function GET(request: NextRequest) {
 
     // Filtrer par statut actif
     if (isActive !== null) {
-      filteredRules = filteredRules.filter(rule => 
-        rule.isActive === (isActive === 'true')
-      )
+      filteredRules = filteredRules.filter((rule) => rule.isActive === (isActive === 'true'))
     }
 
     // Filtrer par type de déclencheur
     if (triggerType) {
-      filteredRules = filteredRules.filter(rule => 
-        rule.trigger.type === triggerType
-      )
+      filteredRules = filteredRules.filter((rule) => rule.trigger.type === triggerType)
     }
 
     // Pagination
@@ -225,12 +238,10 @@ export async function GET(request: NextRequest) {
         total,
         limit,
         offset,
-        hasMore: offset + limit < total
-      }
+        hasMore: offset + limit < total,
+      },
     })
-
-  } catch (error) {
-    console.error('Error fetching notification rules:', error)
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Erreur lors de la récupération des règles' },
       { status: 500 }
@@ -241,7 +252,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
+
     // Validation des données requises
     if (!body.name || !body.trigger || !body.notification) {
       return NextResponse.json(
@@ -251,7 +262,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier l'unicité du nom
-    const existingRule = notificationRules.find(rule => rule.name === body.name)
+    const existingRule = notificationRules.find((rule) => rule.name === body.name)
     if (existingRule) {
       return NextResponse.json(
         { success: false, error: 'Une règle avec ce nom existe déjà' },
@@ -269,18 +280,16 @@ export async function POST(request: NextRequest) {
       conditions: body.conditions || [],
       notification: body.notification,
       createdAt: new Date().toISOString(),
-      triggerCount: 0
+      triggerCount: 0,
     }
 
     notificationRules.push(newRule)
 
     return NextResponse.json({
       success: true,
-      data: newRule
+      data: newRule,
     })
-
-  } catch (error) {
-    console.error('Error creating notification rule:', error)
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Erreur lors de la création de la règle' },
       { status: 500 }
@@ -294,23 +303,17 @@ export async function PUT(request: NextRequest) {
     const { id, ...updates } = body
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'ID de la règle requis' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'ID de la règle requis' }, { status: 400 })
     }
 
-    const ruleIndex = notificationRules.findIndex(rule => rule.id === id)
+    const ruleIndex = notificationRules.findIndex((rule) => rule.id === id)
     if (ruleIndex === -1) {
-      return NextResponse.json(
-        { success: false, error: 'Règle non trouvée' },
-        { status: 404 }
-      )
+      return NextResponse.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
     }
 
     // Vérifier l'unicité du nom si modifié
     if (updates.name && updates.name !== notificationRules[ruleIndex].name) {
-      const existingRule = notificationRules.find(rule => rule.name === updates.name)
+      const existingRule = notificationRules.find((rule) => rule.name === updates.name)
       if (existingRule) {
         return NextResponse.json(
           { success: false, error: 'Une règle avec ce nom existe déjà' },
@@ -322,16 +325,14 @@ export async function PUT(request: NextRequest) {
     // Mettre à jour la règle
     notificationRules[ruleIndex] = {
       ...notificationRules[ruleIndex],
-      ...updates
+      ...updates,
     }
 
     return NextResponse.json({
       success: true,
-      data: notificationRules[ruleIndex]
+      data: notificationRules[ruleIndex],
     })
-
-  } catch (error) {
-    console.error('Error updating notification rule:', error)
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Erreur lors de la mise à jour de la règle' },
       { status: 500 }
@@ -345,18 +346,12 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id')
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'ID de la règle requis' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'ID de la règle requis' }, { status: 400 })
     }
 
-    const ruleIndex = notificationRules.findIndex(rule => rule.id === id)
+    const ruleIndex = notificationRules.findIndex((rule) => rule.id === id)
     if (ruleIndex === -1) {
-      return NextResponse.json(
-        { success: false, error: 'Règle non trouvée' },
-        { status: 404 }
-      )
+      return NextResponse.json({ success: false, error: 'Règle non trouvée' }, { status: 404 })
     }
 
     // Supprimer la règle
@@ -364,11 +359,9 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Règle supprimée avec succès'
+      message: 'Règle supprimée avec succès',
     })
-
-  } catch (error) {
-    console.error('Error deleting notification rule:', error)
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Erreur lors de la suppression de la règle' },
       { status: 500 }

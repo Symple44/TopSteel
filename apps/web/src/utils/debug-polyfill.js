@@ -1,15 +1,15 @@
 // Debug polyfill pour Socket.IO
 function createDebug(namespace) {
-  return function debug(...args) {
-    if (typeof window !== 'undefined' && window.localStorage?.getItem('debug')?.includes(namespace)) {
-      console.log(`[${namespace}]`, ...args)
+  return function debug(..._args) {
+    if (
+      typeof window !== 'undefined' &&
+      window.localStorage?.getItem('debug')?.includes(namespace)
+    ) {
     }
   }
 }
 
-createDebug.enabled = function(namespace) {
-  return typeof window !== 'undefined' && 
-         window.localStorage?.getItem('debug')?.includes(namespace)
-}
+createDebug.enabled = (namespace) =>
+  typeof window !== 'undefined' && window.localStorage?.getItem('debug')?.includes(namespace)
 
 export default createDebug

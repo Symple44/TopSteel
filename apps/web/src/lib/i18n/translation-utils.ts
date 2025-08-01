@@ -1,9 +1,9 @@
-import { TranslationEntry, TranslationStats, TranslationExport, TranslationImportResult } from './types'
-import { fr } from './translations/fr'
-import { en } from './translations/en'
-import { es } from './translations/es'
 import * as XLSX from 'xlsx'
 import { callClientApi } from '@/utils/backend-api'
+import { en } from './translations/en'
+import { es } from './translations/es'
+import { fr } from './translations/fr'
+import type { TranslationEntry, TranslationImportResult, TranslationStats } from './types'
 
 // Fonction helper pour vérifier si une traduction est valide
 const isValidTranslation = (value: any): boolean => {
@@ -14,30 +14,30 @@ const isValidTranslation = (value: any): boolean => {
 export const getAllTranslations = (): Record<string, any> => ({
   fr,
   en,
-  es
+  es,
 })
 
 // Convertir les traductions imbriquées en entrées plates
 export const flattenTranslations = (
   translations: Record<string, any>,
-  namespace = '',
-  category = 'general'
+  _namespace = '',
+  _category = 'general'
 ): TranslationEntry[] => {
   const entries: TranslationEntry[] = []
   const languages = Object.keys(translations)
-  
+
   // Récupérer toutes les clés uniques de toutes les langues
   const allKeys = new Set<string>()
-  languages.forEach(lang => {
+  languages.forEach((lang) => {
     extractKeys(translations[lang], '', allKeys)
   })
-  
+
   // Créer une entrée pour chaque clé
-  allKeys.forEach(fullKey => {
+  allKeys.forEach((fullKey) => {
     const parts = fullKey.split('.')
     const ns = parts[0]
     const key = parts.slice(1).join('.')
-    
+
     const entry: TranslationEntry = {
       id: fullKey,
       namespace: ns,
@@ -46,26 +46,26 @@ export const flattenTranslations = (
       translations: {},
       category: determineCategory(ns, key),
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }
-    
+
     // Récupérer la traduction pour chaque langue
-    languages.forEach(lang => {
+    languages.forEach((lang) => {
       const value = getNestedValue(translations[lang], fullKey)
       if (value !== undefined && typeof value === 'string') {
         entry.translations[lang] = value
       }
     })
-    
+
     entries.push(entry)
   })
-  
+
   return entries.sort((a, b) => a.fullKey.localeCompare(b.fullKey))
 }
 
 // Extraire toutes les clés d'un objet imbriqué
 const extractKeys = (obj: any, prefix: string, keys: Set<string>): void => {
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     const fullKey = prefix ? `${prefix}.${key}` : key
     if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
       extractKeys(obj[key], fullKey, keys)
@@ -104,18 +104,19 @@ export const calculateTranslationStats = (entries: TranslationEntry[]): Translat
     total: entries.length,
     translated: {},
     untranslated: {},
-    percentageComplete: {}
+    percentageComplete: {},
   }
-  
-  languages.forEach(lang => {
-    const translated = entries.filter(e => isValidTranslation(e.translations[lang])).length
+
+  languages.forEach((lang) => {
+    const translated = entries.filter((e) => isValidTranslation(e.translations[lang])).length
     const untranslated = entries.length - translated
-    
+
     stats.translated[lang] = translated
     stats.untranslated[lang] = untranslated
-    stats.percentageComplete[lang] = entries.length > 0 ? Math.round((translated / entries.length) * 100) : 0
+    stats.percentageComplete[lang] =
+      entries.length > 0 ? Math.round((translated / entries.length) * 100) : 0
   })
-  
+
   return stats
 }
 
@@ -131,60 +132,62 @@ export const filterTranslations = (
     modified?: boolean
   }
 ): TranslationEntry[] => {
-  return entries.filter(entry => {
+  return entries.filter((entry) => {
     // Filtre de recherche
     if (filter.search) {
       const searchLower = filter.search.toLowerCase()
       const matchKey = entry.fullKey.toLowerCase().includes(searchLower)
-      const matchTranslations = Object.values(entry.translations).some(
-        t => t.toLowerCase().includes(searchLower)
+      const matchTranslations = Object.values(entry.translations).some((t) =>
+        t.toLowerCase().includes(searchLower)
       )
       if (!matchKey && !matchTranslations) return false
     }
-    
+
     // Filtre namespace
     if (filter.namespace && entry.namespace !== filter.namespace) return false
-    
+
     // Filtre catégorie
     if (filter.category && entry.category !== filter.category) return false
-    
+
     // Filtre traductions manquantes
     if (filter.untranslated && filter.language) {
       const hasTranslation = isValidTranslation(entry.translations[filter.language])
       if (hasTranslation) return false
     }
-    
+
     // Filtre traductions modifiées
     if (filter.modified && !entry.isModified) return false
-    
+
     return true
   })
 }
 
 // Exporter les traductions en Excel
 export const exportToExcel = (entries: TranslationEntry[], languages: string[]): Blob => {
-  const data = entries.map(entry => {
+  const data = entries.map((entry) => {
     const row: any = {
       ID: entry.id,
       Namespace: entry.namespace,
       Key: entry.key,
       Category: entry.category || '',
-      Description: entry.description || ''
+      Description: entry.description || '',
     }
-    
-    languages.forEach(lang => {
+
+    languages.forEach((lang) => {
       row[`Translation_${lang}`] = entry.translations[lang] || ''
     })
-    
+
     return row
   })
-  
+
   const ws = XLSX.utils.json_to_sheet(data)
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Translations')
-  
+
   const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-  return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  return new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  })
 }
 
 // Importer les traductions depuis Excel
@@ -198,17 +201,17 @@ export const importFromExcel = async (
     updated: 0,
     skipped: 0,
     errors: [],
-    warnings: []
+    warnings: [],
   }
-  
+
   try {
     const buffer = await file.arrayBuffer()
     const wb = XLSX.read(buffer, { type: 'array' })
     const ws = wb.Sheets[wb.SheetNames[0]]
     const data = XLSX.utils.sheet_to_json(ws)
-    
-    const entriesMap = new Map(existingEntries.map(e => [e.id, e]))
-    
+
+    const entriesMap = new Map(existingEntries.map((e) => [e.id, e]))
+
     data.forEach((row: any, index) => {
       try {
         const id = row.ID
@@ -217,15 +220,15 @@ export const importFromExcel = async (
           result.skipped++
           return
         }
-        
+
         const translations: Record<string, string> = {}
-        Object.keys(row).forEach(key => {
+        Object.keys(row).forEach((key) => {
           if (key.startsWith('Translation_')) {
             const lang = key.replace('Translation_', '')
             translations[lang] = row[key] || ''
           }
         })
-        
+
         if (entriesMap.has(id)) {
           // Mise à jour
           const existing = entriesMap.get(id)!
@@ -243,7 +246,7 @@ export const importFromExcel = async (
             category: row.Category || determineCategory(row.Namespace || '', row.Key || ''),
             description: row.Description || '',
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           }
           entriesMap.set(id, newEntry)
           result.imported++
@@ -252,12 +255,12 @@ export const importFromExcel = async (
         result.errors.push(`Ligne ${index + 2}: ${error}`)
       }
     })
-    
+
     result.success = true
   } catch (error) {
     result.errors.push(`Erreur d'import: ${error}`)
   }
-  
+
   return result
 }
 
@@ -266,17 +269,16 @@ export const saveTranslation = async (entry: TranslationEntry): Promise<boolean>
   try {
     const response = await callClientApi('admin/translations', {
       method: 'POST',
-      body: JSON.stringify({ translationEntry: entry })
+      body: JSON.stringify({ translationEntry: entry }),
     })
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     const result = await response.json()
     return result.success
-  } catch (error) {
-    console.error('Error saving translation:', error)
+  } catch (_error) {
     return false
   }
 }
@@ -285,79 +287,77 @@ export const saveTranslation = async (entry: TranslationEntry): Promise<boolean>
 export const loadTranslationsWithOverrides = async (): Promise<TranslationEntry[]> => {
   // Toujours commencer par les traductions de base (référence)
   const baseTranslations = flattenTranslations(getAllTranslations())
-  
+
   try {
     const response = await callClientApi('admin/translations', {
-      method: 'GET'
+      method: 'GET',
     })
-    
+
     if (!response.ok) {
-      console.warn(`Translation API error: ${response.status} ${response.statusText}`)
       // Retourner les traductions de base si l'API échoue
       return baseTranslations
     }
-    
+
     const result = await response.json()
-    
+
     if (result.success && result.data.overrides) {
       const overrides = result.data.overrides
-      
+
       // Appliquer les overrides aux traductions de base
-      return baseTranslations.map(entry => {
+      return baseTranslations.map((entry) => {
         if (overrides[entry.id]) {
           return {
             ...entry,
             // Fusionner les traductions : base + overrides
             translations: {
               ...entry.translations,
-              ...overrides[entry.id].translations
+              ...overrides[entry.id].translations,
             },
             // Marquer comme modifié si des overrides existent
             isModified: true,
             updatedAt: new Date(overrides[entry.id].updatedAt),
-            updatedBy: overrides[entry.id].updatedBy
+            updatedBy: overrides[entry.id].updatedBy,
           }
         }
         return {
           ...entry,
-          isModified: false
+          isModified: false,
         }
       })
     }
-  } catch (error) {
-    console.error('Error loading translation overrides:', error)
-  }
-  
+  } catch (_error) {}
+
   // Retourner les traductions de base avec un flag non-modifié
-  return baseTranslations.map(entry => ({
+  return baseTranslations.map((entry) => ({
     ...entry,
-    isModified: false
+    isModified: false,
   }))
 }
 
 // Importer des traductions via l'API
-export const bulkImportTranslations = async (translations: TranslationEntry[]): Promise<{
+export const bulkImportTranslations = async (
+  translations: TranslationEntry[]
+): Promise<{
   success: boolean
   message?: string
-  stats?: { imported: number, updated: number }
+  stats?: { imported: number; updated: number }
 }> => {
   try {
     const response = await callClientApi('admin/translations', {
       method: 'PUT',
-      body: JSON.stringify({ translations })
+      body: JSON.stringify({ translations }),
     })
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     const result = await response.json()
     return result
   } catch (error) {
-    console.error('Error importing translations:', error)
     return {
       success: false,
-      message: `Erreur lors de l'import: ${error}`
+      message: `Erreur lors de l'import: ${error}`,
     }
   }
 }

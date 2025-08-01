@@ -8,7 +8,7 @@ import { User } from '../src/modules/users/entities/user.entity'
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication
-  let userRepository
+  let _userRepository
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('AuthController (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe())
     await app.init()
 
-    userRepository = moduleFixture.get(getRepositoryToken(User))
+    _userRepository = moduleFixture.get(getRepositoryToken(User))
   })
 
   afterAll(async () => {

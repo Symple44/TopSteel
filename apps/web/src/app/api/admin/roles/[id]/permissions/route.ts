@@ -1,28 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Vérifier l'authentification
     const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')?.value
-    
+
     if (!token) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Authentification requise'
+          message: 'Authentification requise',
         },
         { status: 401 }
       )
     }
 
     const { id: roleId } = await params
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
     try {
       // Appeler le vrai backend NestJS
@@ -37,7 +34,7 @@ export async function GET(
       } else {
         throw new Error(`Backend error: ${response.status}`)
       }
-    } catch (backendError) {
+    } catch (_backendError) {
       // Si le backend n'est pas disponible, utiliser des données par défaut temporaires
       const fallbackPermissions = [
         {
@@ -45,77 +42,79 @@ export async function GET(
           moduleId: 'users',
           permissionName: 'Read Users',
           isGranted: true,
-          accessLevel: 'ADMIN'
+          accessLevel: 'ADMIN',
         },
         {
           permissionId: 'users.write',
-          moduleId: 'users', 
+          moduleId: 'users',
           permissionName: 'Write Users',
           isGranted: true,
-          accessLevel: 'ADMIN'
+          accessLevel: 'ADMIN',
         },
         {
           permissionId: 'admin.read',
           moduleId: 'admin',
           permissionName: 'Read Admin',
           isGranted: true,
-          accessLevel: 'ADMIN'
+          accessLevel: 'ADMIN',
         },
         {
           permissionId: 'admin.write',
           moduleId: 'admin',
-          permissionName: 'Write Admin', 
+          permissionName: 'Write Admin',
           isGranted: true,
-          accessLevel: 'ADMIN'
+          accessLevel: 'ADMIN',
         },
         {
           permissionId: 'roles.read',
           moduleId: 'roles',
           permissionName: 'Read Roles',
           isGranted: true,
-          accessLevel: 'ADMIN'
+          accessLevel: 'ADMIN',
         },
         {
           permissionId: 'roles.write',
           moduleId: 'roles',
           permissionName: 'Write Roles',
           isGranted: true,
-          accessLevel: 'ADMIN'
+          accessLevel: 'ADMIN',
         },
         {
           permissionId: 'settings.read',
           moduleId: 'settings',
           permissionName: 'Read Settings',
           isGranted: true,
-          accessLevel: 'ADMIN'
+          accessLevel: 'ADMIN',
         },
         {
           permissionId: 'settings.write',
           moduleId: 'settings',
           permissionName: 'Write Settings',
           isGranted: true,
-          accessLevel: 'ADMIN'
-        }
+          accessLevel: 'ADMIN',
+        },
       ]
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          roleId: roleId,
-          roleName: roleId,
-          rolePermissions: fallbackPermissions
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            roleId: roleId,
+            roleName: roleId,
+            rolePermissions: fallbackPermissions,
+          },
+          fallback: true, // Indiquer que ce sont des données de fallback
         },
-        fallback: true // Indiquer que ce sont des données de fallback
-      }, { status: 200 })
+        { status: 200 }
+      )
     }
-
   } catch (error) {
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         message: 'Error loading role permissions',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }, 
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     )
   }

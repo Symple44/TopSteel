@@ -5,26 +5,16 @@
 
 'use client'
 
-import React from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { useRouter } from 'next/navigation'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { useNotificationSettings } from '@/hooks/use-notification-settings'
-import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
+export const dynamic = 'force-dynamic'
+
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import {
-  Bell,
-  Mail,
-  MessageSquare,
-  Smartphone,
-  Volume2,
-  VolumeX,
-  Clock,
-  AlertCircle,
-  Check,
-  Settings,
-  ArrowLeft,
-} from 'lucide-react'
+import { ArrowLeft, Bell, Check, Clock, Mail, Smartphone } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import React from 'react'
+import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
+import { useAuth } from '@/hooks/use-auth'
+import { useNotificationSettings } from '@/hooks/use-notification-settings'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function NotificationsSettingsPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth()
@@ -32,7 +22,7 @@ export default function NotificationsSettingsPage() {
   const router = useRouter()
   const { t } = useTranslation('settings')
   const { t: tc } = useTranslation('common')
-  
+
   // Hook pour gérer les paramètres de notification
   const {
     settings,
@@ -41,16 +31,16 @@ export default function NotificationsSettingsPage() {
     saveSettings,
     resetSettings,
     isLoading: settingsLoading,
-    hasUnsavedChanges
+    hasUnsavedChanges,
   } = useNotificationSettings()
-  
+
   // Vérifier l'authentification
   React.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login?redirect=/settings/notifications')
     }
   }, [isAuthenticated, authLoading, router])
-  
+
   // Afficher un loader si pas encore authentifié ou si les paramètres chargent
   if (authLoading || !isAuthenticated || settingsLoading) {
     return (
@@ -67,8 +57,7 @@ export default function NotificationsSettingsPage() {
     try {
       await saveSettings()
       alert(t('notifications.saveSuccess'))
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
+    } catch (_error) {
       alert(t('notifications.saveError'))
     }
   }
@@ -82,29 +71,24 @@ export default function NotificationsSettingsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50/30 to-red-50/30">
       <div className="px-4 sm:px-6 lg:px-8 py-12">
-        
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => router.back()}
             className="mb-4 text-slate-600 hover:text-slate-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-{t('notifications.back')}
+            {t('notifications.back')}
           </Button>
-          
+
           <div className="flex items-center mb-6">
             <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-xl shadow-lg mr-4">
               <Bell className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">
-                {t('notifications.title')}
-              </h1>
-              <p className="text-slate-600">
-                {t('notifications.subtitle')}
-              </p>
+              <h1 className="text-3xl font-bold text-slate-900">{t('notifications.title')}</h1>
+              <p className="text-slate-600">{t('notifications.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -125,7 +109,7 @@ export default function NotificationsSettingsPage() {
                 taskReminders: 'Rappels de tâches',
                 weeklyReports: 'Rapports hebdomadaires',
                 securityAlerts: 'Alertes de sécurité',
-                maintenanceNotice: 'Avis de maintenance'
+                maintenanceNotice: 'Avis de maintenance',
               }).map(([key, label]) => (
                 <div key={key} className="flex items-center justify-between py-2">
                   <span className="text-slate-700">{label}</span>
@@ -164,7 +148,7 @@ export default function NotificationsSettingsPage() {
                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
                 </label>
               </div>
-              
+
               {settings.pushTypes.enabled && (
                 <>
                   <div className="flex items-center justify-between py-2">
@@ -173,27 +157,33 @@ export default function NotificationsSettingsPage() {
                       <input
                         type="checkbox"
                         checked={settings.pushTypes.sound}
-                        onChange={(e) => updateNestedSetting('pushTypes', 'sound', e.target.checked)}
+                        onChange={(e) =>
+                          updateNestedSetting('pushTypes', 'sound', e.target.checked)
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
                     </label>
                   </div>
-                  
+
                   <div className="space-y-3">
                     <h4 className="font-medium text-slate-700">Types de notifications :</h4>
                     {Object.entries({
                       urgent: 'Notifications urgentes',
                       normal: 'Notifications normales',
-                      quiet: 'Notifications discrètes'
+                      quiet: 'Notifications discrètes',
                     }).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between py-1 pl-4">
                         <span className="text-slate-600 text-sm">{label}</span>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
-                            checked={settings.pushTypes[key as keyof typeof settings.pushTypes] as boolean}
-                            onChange={(e) => updateNestedSetting('pushTypes', key, e.target.checked)}
+                            checked={
+                              settings.pushTypes[key as keyof typeof settings.pushTypes] as boolean
+                            }
+                            onChange={(e) =>
+                              updateNestedSetting('pushTypes', key, e.target.checked)
+                            }
                             className="sr-only peer"
                           />
                           <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
@@ -227,12 +217,18 @@ export default function NotificationsSettingsPage() {
                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                 </label>
               </div>
-              
+
               {settings.quietHours.enabled && (
                 <div className="grid grid-cols-2 gap-4 pl-4">
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Début</label>
+                    <label
+                      htmlFor="quiet-hours-start"
+                      className="block text-sm text-slate-600 mb-1"
+                    >
+                      Début
+                    </label>
                     <input
+                      id="quiet-hours-start"
                       type="time"
                       value={settings.quietHours.start}
                       onChange={(e) => updateNestedSetting('quietHours', 'start', e.target.value)}
@@ -240,8 +236,11 @@ export default function NotificationsSettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Fin</label>
+                    <label htmlFor="quiet-hours-end" className="block text-sm text-slate-600 mb-1">
+                      Fin
+                    </label>
                     <input
+                      id="quiet-hours-end"
                       type="time"
                       value={settings.quietHours.end}
                       onChange={(e) => updateNestedSetting('quietHours', 'end', e.target.value)}
@@ -255,41 +254,35 @@ export default function NotificationsSettingsPage() {
 
           {/* Boutons d'action */}
           <div className="flex justify-between pt-8">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleReset}
               className="px-6 text-red-600 border-red-200 hover:bg-red-50"
             >
-{t('notifications.reset')}
+              {t('notifications.reset')}
             </Button>
-            
+
             <div className="flex space-x-4">
-              <Button 
-                variant="outline" 
-                onClick={() => router.back()}
-                className="px-8"
-              >
-    {t('notifications.back')}
+              <Button variant="outline" onClick={() => router.back()} className="px-8">
+                {t('notifications.back')}
               </Button>
-              <Button 
+              <Button
                 onClick={handleSave}
                 disabled={!hasUnsavedChanges}
                 className={`px-8 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 ${
-                  !hasUnsavedChanges ? 'opacity-50 cursor-not-allowed' : ''
+                  hasUnsavedChanges ? '' : 'opacity-50 cursor-not-allowed'
                 }`}
               >
                 <Check className="h-4 w-4 mr-2" />
-{hasUnsavedChanges ? t('notifications.save') : t('notifications.saved')}
+                {hasUnsavedChanges ? t('notifications.save') : t('notifications.saved')}
               </Button>
             </div>
           </div>
-          
+
           {/* Indicateur de changements non sauvegardés */}
           {hasUnsavedChanges && (
             <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-              <p className="text-sm text-orange-700">
-                ⚠️ {t('notifications.unsavedChanges')}
-              </p>
+              <p className="text-sm text-orange-700">⚠️ {t('notifications.unsavedChanges')}</p>
             </div>
           )}
         </div>

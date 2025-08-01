@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Interface pour les paramètres système
 interface SystemParameter {
@@ -6,7 +6,16 @@ interface SystemParameter {
   key: string
   value: string
   type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON' | 'ENUM'
-  category: 'GENERAL' | 'COMPTABILITE' | 'PROJETS' | 'PRODUCTION' | 'ACHATS' | 'STOCKS' | 'NOTIFICATION' | 'SECURITY' | 'ELASTICSEARCH'
+  category:
+    | 'GENERAL'
+    | 'COMPTABILITE'
+    | 'PROJETS'
+    | 'PRODUCTION'
+    | 'ACHATS'
+    | 'STOCKS'
+    | 'NOTIFICATION'
+    | 'SECURITY'
+    | 'ELASTICSEARCH'
   description: string
   defaultValue?: string
   isEditable: boolean
@@ -171,7 +180,7 @@ const mockParameters: SystemParameter[] = [
     value: '',
     type: 'STRING',
     category: 'ELASTICSEARCH',
-    description: 'Nom d\'utilisateur Elasticsearch',
+    description: "Nom d'utilisateur Elasticsearch",
     defaultValue: '',
     isEditable: true,
     isSecret: false,
@@ -197,7 +206,7 @@ const mockParameters: SystemParameter[] = [
     value: 'false',
     type: 'BOOLEAN',
     category: 'ELASTICSEARCH',
-    description: 'Activer l\'authentification Elasticsearch',
+    description: "Activer l'authentification Elasticsearch",
     defaultValue: 'false',
     isEditable: true,
     isSecret: false,
@@ -249,7 +258,7 @@ const mockParameters: SystemParameter[] = [
     value: '100',
     type: 'NUMBER',
     category: 'ELASTICSEARCH',
-    description: 'Taille des lots pour l\'indexation',
+    description: "Taille des lots pour l'indexation",
     defaultValue: '100',
     isEditable: true,
     isSecret: false,
@@ -276,7 +285,7 @@ const mockParameters: SystemParameter[] = [
     value: 'false',
     type: 'BOOLEAN',
     category: 'SECURITY',
-    description: 'Activer l\'authentification Google OAuth',
+    description: "Activer l'authentification Google OAuth",
     defaultValue: 'false',
     isEditable: true,
     isSecret: false,
@@ -315,7 +324,7 @@ const mockParameters: SystemParameter[] = [
     value: 'false',
     type: 'BOOLEAN',
     category: 'SECURITY',
-    description: 'Activer l\'authentification Microsoft OAuth',
+    description: "Activer l'authentification Microsoft OAuth",
     defaultValue: 'false',
     isEditable: true,
     isSecret: false,
@@ -354,7 +363,7 @@ const mockParameters: SystemParameter[] = [
     value: 'false',
     type: 'BOOLEAN',
     category: 'SECURITY',
-    description: 'Activer l\'authentification à deux facteurs',
+    description: "Activer l'authentification à deux facteurs",
     defaultValue: 'false',
     isEditable: true,
     isSecret: false,
@@ -367,7 +376,7 @@ const mockParameters: SystemParameter[] = [
     value: 'OPTIONAL',
     type: 'ENUM',
     category: 'SECURITY',
-    description: 'Politique d\'application du 2FA',
+    description: "Politique d'application du 2FA",
     defaultValue: 'OPTIONAL',
     isEditable: true,
     isSecret: false,
@@ -469,7 +478,7 @@ const mockParameters: SystemParameter[] = [
 ]
 
 // Stockage temporaire pour les mises à jour (en production, utiliser une base de données)
-let parameters = [...mockParameters]
+const parameters = [...mockParameters]
 
 export async function GET(request: NextRequest) {
   try {
@@ -477,17 +486,13 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category')
 
     if (category) {
-      const filteredParams = parameters.filter(p => p.category === category)
+      const filteredParams = parameters.filter((p) => p.category === category)
       return NextResponse.json(filteredParams)
     }
 
     return NextResponse.json(parameters)
-  } catch (error) {
-    console.error('Error fetching system parameters:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch system parameters' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Failed to fetch system parameters' }, { status: 500 })
   }
 }
 
@@ -495,11 +500,9 @@ export async function PATCH(request: NextRequest) {
   try {
     const updates: Array<{ key: string; value: string }> = await request.json()
 
-    console.log('Received parameter updates:', updates)
-
     // Mettre à jour les paramètres
-    updates.forEach(update => {
-      const paramIndex = parameters.findIndex(p => p.key === update.key)
+    updates.forEach((update) => {
+      const paramIndex = parameters.findIndex((p) => p.key === update.key)
       if (paramIndex !== -1) {
         // Paramètre existant : mettre à jour
         parameters[paramIndex] = {
@@ -507,7 +510,6 @@ export async function PATCH(request: NextRequest) {
           value: update.value,
           updatedAt: new Date().toISOString(),
         }
-        console.log(`Updated parameter ${update.key} to ${update.value}`)
       } else {
         // Paramètre inexistant : créer un nouveau paramètre
         const newParam: SystemParameter = {
@@ -523,32 +525,27 @@ export async function PATCH(request: NextRequest) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
-        
+
         // Ajuster le type selon la clé
         if (update.key.includes('enable') || update.key.includes('Auth')) {
           newParam.type = 'BOOLEAN'
-        } else if (update.key.includes('timeout') || update.key.includes('retries') || update.key.includes('batchSize')) {
+        } else if (
+          update.key.includes('timeout') ||
+          update.key.includes('retries') ||
+          update.key.includes('batchSize')
+        ) {
           newParam.type = 'NUMBER'
         }
-        
+
         parameters.push(newParam)
-        console.log(`Created new parameter ${update.key} with value ${update.value}`)
       }
     })
 
     // Retourner les paramètres mis à jour
-    const updatedParams = parameters.filter(p => 
-      updates.some(update => update.key === p.key)
-    )
-
-    console.log('Updated parameters:', updatedParams)
+    const updatedParams = parameters.filter((p) => updates.some((update) => update.key === p.key))
 
     return NextResponse.json(updatedParams)
-  } catch (error) {
-    console.error('Error updating system parameters:', error)
-    return NextResponse.json(
-      { error: 'Failed to update system parameters' },
-      { status: 500 }
-    )
+  } catch (_error) {
+    return NextResponse.json({ error: 'Failed to update system parameters' }, { status: 500 })
   }
 }

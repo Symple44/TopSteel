@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../feedback'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives'
 import { Button } from '../../../primitives'
 
 interface ProjectTimelineDialogProps {

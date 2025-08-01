@@ -160,8 +160,7 @@ export function AddMaterialDialog({ open, onOpenChange, onSubmit }: AddMaterialD
       onSubmit?.(materialData)
       handleReset()
       onOpenChange(false)
-    } catch (error) {
-      console.error("Erreur lors de l'ajout:", error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }

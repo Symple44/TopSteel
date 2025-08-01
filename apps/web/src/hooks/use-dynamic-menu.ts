@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { usePermissions } from './use-permissions-v2'
-import { useMenuMode } from './use-menu-mode'
+import { useCallback, useEffect, useState } from 'react'
 import { apiClient } from '@/lib/api-client-instance'
 import { translator } from '@/lib/i18n/translator'
+import { useMenuMode } from './use-menu-mode'
+import { usePermissions } from './use-permissions-v2'
 
 // Fonction pour mapper les données du menu personnalisé vers la structure attendue
 function mapCustomMenuItemRecursively(item: any): MenuItemConfig {
@@ -21,12 +21,12 @@ function mapCustomMenuItemRecursively(item: any): MenuItemConfig {
       customIcon: item.customIcon || undefined,
       customColor: item.customIconColor || undefined, // Mapper customIconColor vers customColor
       customBadge: item.customBadge || undefined,
-      customOrder: item.orderIndex || undefined
+      customOrder: item.orderIndex || undefined,
     },
     // Traiter récursivement les enfants
-    children: Array.isArray(item.children) 
-      ? item.children.map(child => mapCustomMenuItemRecursively(child))
-      : []
+    children: Array.isArray(item.children)
+      ? item.children.map((child: any) => mapCustomMenuItemRecursively(child))
+      : [],
   }
 }
 
@@ -89,24 +89,25 @@ export function useDynamicMenu() {
     try {
       setLoading(true)
       setError(null)
-      
+
       // Charger le menu personnalisé depuis l'API
       try {
         const response = await apiClient.get('/user/menu-preferences/custom-menu')
-        
-        if (response.data && response.data.success && Array.isArray(response.data.data)) {
+
+        if ((response as any).data?.success && Array.isArray((response as any).data.data)) {
           // Mapper les données pour inclure les préférences personnalisées dans la structure attendue
-          const menuItems = response.data.data.map(item => mapCustomMenuItemRecursively(item))
+          const menuItems = (response as any).data.data.map((item: any) =>
+            mapCustomMenuItemRecursively(item)
+          )
           setCustomMenu(menuItems)
         } else {
           setCustomMenu([]) // Menu vierge par défaut
         }
-      } catch (prefsError) {
+      } catch (_prefsError) {
         // Si les préférences ne se chargent pas, menu vierge
         setCustomMenu([])
       }
-      
-    } catch (err) {
+    } catch (_err) {
       // Erreur lors du chargement du menu personnalisé
       setCustomMenu([])
     } finally {
@@ -118,20 +119,22 @@ export function useDynamicMenu() {
     try {
       setLoading(true)
       setError(null)
-      
+
       // Pour le menu standard, utiliser la configuration active de la base de données
       // MAIS sans les préférences utilisateur personnalisées
       const response = await apiClient.get('/admin/menu-raw/configurations/active')
-      
-      if (response.data && response.data.success && response.data.data) {
+
+      if ((response as any).data?.success && (response as any).data.data) {
         // Utiliser le menuTree de la configuration active
-        const menuItems = Array.isArray(response.data.data.menuTree) ? response.data.data.menuTree : []
+        const menuItems = Array.isArray((response as any).data.data.menuTree)
+          ? (response as any).data.data.menuTree
+          : []
         setStandardMenu(menuItems)
-        setMenuConfig(response.data.data.configuration)
+        setMenuConfig((response as any).data.data.configuration)
       } else {
         setStandardMenu([])
       }
-    } catch (err) {
+    } catch (_err) {
       // Erreur lors du chargement du menu standard
       setError('Erreur de connexion')
     } finally {
@@ -144,67 +147,80 @@ export function useDynamicMenu() {
     return loadStandardMenu()
   }, [loadStandardMenu])
 
-  const canUserAccessItem = useCallback((item: MenuItemConfig): boolean => {
-    // Si l'item n'est pas visible, ne pas l'afficher
-    if (!item.isVisible) {
-      return false
-    }
+  const canUserAccessItem = useCallback(
+    (item: MenuItemConfig): boolean => {
+      // Si l'item n'est pas visible, ne pas l'afficher
+      if (!item.isVisible) {
+        return false
+      }
 
-    // Si aucune restriction, autoriser l'accès
-    if ((!item.roles || item.roles.length === 0) && (!item.permissions || item.permissions.length === 0)) {
+      // Si aucune restriction, autoriser l'accès
+      if (
+        (!item.roles || item.roles.length === 0) &&
+        (!item.permissions || item.permissions.length === 0)
+      ) {
+        return true
+      }
+
+      // Vérifier les rôles
+      if (item.roles && item.roles.length > 0) {
+        const hasRequiredRole = item.roles.some((role) => hasRole(role))
+        if (!hasRequiredRole) {
+          return false
+        }
+      }
+
+      // Vérifier les permissions
+      if (item.permissions && item.permissions.length > 0) {
+        const hasRequiredPermission = item.permissions.some((permission) =>
+          hasPermission(permission)
+        )
+        if (!hasRequiredPermission) {
+          return false
+        }
+      }
+
+      // Vérifier l'accès au module
+      if (item.moduleId) {
+        const canAccess = canAccessModule(item.moduleId)
+        if (!canAccess) {
+          return false
+        }
+      }
+
       return true
-    }
-
-    // Vérifier les rôles
-    if (item.roles && item.roles.length > 0) {
-      const hasRequiredRole = item.roles.some(role => hasRole(role))
-      if (!hasRequiredRole) {
-        return false
-      }
-    }
-
-    // Vérifier les permissions
-    if (item.permissions && item.permissions.length > 0) {
-      const hasRequiredPermission = item.permissions.some(permission => 
-        hasPermission(permission)
-      )
-      if (!hasRequiredPermission) {
-        return false
-      }
-    }
-
-    // Vérifier l'accès au module
-    if (item.moduleId) {
-      const canAccess = canAccessModule(item.moduleId)
-      if (!canAccess) {
-        return false
-      }
-    }
-
-    return true
-  }, [hasPermission, hasRole, canAccessModule])
+    },
+    [hasPermission, hasRole, canAccessModule]
+  )
 
   // Filtrage côté client pour une meilleure performance
-  const filterMenuByPermissions = useCallback((items: MenuItemConfig[]): MenuItemConfig[] => {
-    // Vérifier que items est bien un tableau
-    if (!Array.isArray(items)) {
-      return []
-    }
-    
-    const filtered = items
-      .filter(item => canUserAccessItem(item))
-      .map(item => ({
-        ...item,
-        children: item.children ? filterMenuByPermissions(item.children) : []
-      }))
-      .filter(item => {
-        // Pour les types de menu du nouveau système, adapter la logique
-        const hasValidLink = item.programId || item.externalUrl || item.queryBuilderId || (item.children && item.children.length > 0)
-        return hasValidLink
-      })
-      
-    return filtered
-  }, [canUserAccessItem])
+  const filterMenuByPermissions = useCallback(
+    (items: MenuItemConfig[]): MenuItemConfig[] => {
+      // Vérifier que items est bien un tableau
+      if (!Array.isArray(items)) {
+        return []
+      }
+
+      const filtered = items
+        .filter((item) => canUserAccessItem(item))
+        .map((item) => ({
+          ...item,
+          children: item.children ? filterMenuByPermissions(item.children) : [],
+        }))
+        .filter((item) => {
+          // Pour les types de menu du nouveau système, adapter la logique
+          const hasValidLink =
+            item.programId ||
+            item.externalUrl ||
+            item.queryBuilderId ||
+            (item.children && item.children.length > 0)
+          return hasValidLink
+        })
+
+      return filtered
+    },
+    [canUserAccessItem]
+  )
 
   // Charger le menu approprié seulement une fois au montage ou au changement de mode
   useEffect(() => {
@@ -215,16 +231,19 @@ export function useDynamicMenu() {
         loadStandardMenu()
       }
     }
-  }, [mode, modeLoading]) // Retirer les fonctions des dépendances pour éviter les re-exécutions
+  }, [mode, modeLoading, loadStandardMenu, loadUserCustomizedMenu]) // Retirer les fonctions des dépendances pour éviter les re-exécutions
 
   // Écouter les changements de préférences de menu
   useEffect(() => {
-    const handleMenuPreferencesChange = async (event: CustomEvent) => {
+    const handleMenuPreferencesChange = async (event: Event) => {
+      const customEvent = event as CustomEvent
       // Si l'événement contient directement les données du menu, les utiliser
-      if (event.detail?.menuItems && mode === 'custom') {
-        const mappedItems = event.detail.menuItems.map(item => mapCustomMenuItemRecursively(item))
+      if (customEvent.detail?.menuItems && mode === 'custom') {
+        const mappedItems = customEvent.detail.menuItems.map((item: any) =>
+          mapCustomMenuItemRecursively(item)
+        )
         setCustomMenu(mappedItems)
-        setRefreshKey(prev => prev + 1)
+        setRefreshKey((prev) => prev + 1)
       } else {
         // Sinon, recharger depuis l'API uniquement si nécessaire
         if (mode === 'custom') {
@@ -232,39 +251,34 @@ export function useDynamicMenu() {
         } else {
           await loadStandardMenu()
         }
-        setRefreshKey(prev => prev + 1)
+        setRefreshKey((prev) => prev + 1)
       }
     }
 
     window.addEventListener('menuPreferencesChanged', handleMenuPreferencesChange)
-    
+
     return () => {
       window.removeEventListener('menuPreferencesChanged', handleMenuPreferencesChange)
     }
-  }, [mode]) // Simplifier les dépendances
+  }, [mode, loadStandardMenu, loadUserCustomizedMenu]) // Simplifier les dépendances
 
   // Effet pour recharger les menus quand la langue change
   useEffect(() => {
     const unsubscribe = translator.subscribe(() => {
       // Forcer un re-render quand la langue change pour mettre à jour les traductions
-      setRefreshKey(prev => prev + 1)
+      setRefreshKey((prev) => prev + 1)
     })
-    
+
     return unsubscribe
   }, [])
 
   // Menu utilisé basé sur le mode sélectionné
   const currentMenu = mode === 'custom' ? customMenu : standardMenu
-  
+
   // Appliquer le filtrage par permissions seulement au menu standard
   // Le menu custom est déjà filtré côté serveur
   // TEMPORAIRE: Désactiver le filtrage pour tester
-  const filteredMenu = mode === 'custom' 
-    ? currentMenu 
-    : currentMenu // Temporairement sans filtrage: filterMenuByPermissions(currentMenu)
-    
-    
-
+  const filteredMenu = mode === 'custom' ? currentMenu : currentMenu // Temporairement sans filtrage: filterMenuByPermissions(currentMenu)
 
   const refreshMenu = useCallback(() => {
     if (mode === 'custom') {
@@ -293,28 +307,28 @@ export function useDynamicMenu() {
     toggleMode,
     setMenuMode,
     isStandard: mode === 'standard',
-    isCustom: mode === 'custom'
+    isCustom: mode === 'custom',
   }
 }
 
 // Hook simplifié pour obtenir uniquement le menu filtré
 export function useMenu() {
   const { filteredMenu, loading, error, refreshMenu } = useDynamicMenu()
-  
+
   return {
     menu: filteredMenu,
     loading,
     error,
-    refreshMenu
+    refreshMenu,
   }
 }
 
 // Utilitaires pour convertir les items de menu en format compatible avec la sidebar existante
 export function convertToNavItems(menuItems: MenuItemConfig[]): any[] {
-  return menuItems.map(item => {
+  return menuItems.map((item) => {
     // Générer l'URL basée sur le type de menu
     let href: string | undefined
-    
+
     switch (item.type) {
       case 'P': // Programme
         href = item.programId || item.href
@@ -325,7 +339,6 @@ export function convertToNavItems(menuItems: MenuItemConfig[]): any[] {
       case 'D': // Vue Data
         href = item.queryBuilderId ? `/query-builder/${item.queryBuilderId}/view` : undefined
         break
-      case 'M': // Dossier - pas de href
       default:
         href = undefined
         break
@@ -344,7 +357,7 @@ export function convertToNavItems(menuItems: MenuItemConfig[]): any[] {
       isFolder: item.type === 'M',
       isProgram: item.type === 'P',
       isLink: item.type === 'L',
-      isDataView: item.type === 'D'
+      isDataView: item.type === 'D',
     }
   })
 }
@@ -352,10 +365,10 @@ export function convertToNavItems(menuItems: MenuItemConfig[]): any[] {
 // Hook pour la compatibilité avec l'ancien système
 export function useNavigation() {
   const { filteredMenu, loading, error } = useDynamicMenu()
-  
+
   return {
     navigation: convertToNavItems(filteredMenu),
     loading,
-    error
+    error,
   }
 }

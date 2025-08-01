@@ -1,4 +1,4 @@
-import { type VariantProps, cva } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 // === BUTTON VARIANTS ===
 export const buttonVariants = cva(
@@ -7,7 +7,8 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-white shadow hover:bg-primary/90 [&:not(:hover)]:text-white',
-        destructive: 'bg-destructive text-white shadow-sm hover:bg-destructive/90 [&:not(:hover)]:text-white',
+        destructive:
+          'bg-destructive text-white shadow-sm hover:bg-destructive/90 [&:not(:hover)]:text-white',
         outline:
           'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
         secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
@@ -39,8 +40,7 @@ export const badgeVariants = cva(
         default: 'border-transparent bg-primary text-white shadow hover:bg-primary/80',
         secondary:
           'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        destructive:
-          'border-transparent bg-destructive text-white shadow hover:bg-destructive/80',
+        destructive: 'border-transparent bg-destructive text-white shadow hover:bg-destructive/80',
         outline: 'text-foreground',
       },
     },
@@ -143,29 +143,26 @@ export const switchVariants = cva(
 export type SwitchVariants = VariantProps<typeof switchVariants>
 
 // === CARD VARIANTS ===
-export const cardVariants = cva(
-  'rounded-lg border bg-card text-card-foreground shadow',
-  {
-    variants: {
-      variant: {
-        default: 'border-border',
-        elevated: 'border-transparent shadow-lg',
-        ghost: 'border-transparent shadow-none',
-        outline: 'border-border shadow-none',
-      },
-      padding: {
-        none: 'p-0',
-        sm: 'p-4',
-        default: 'p-6',
-        lg: 'p-8',
-      },
+export const cardVariants = cva('rounded-lg border bg-card text-card-foreground shadow', {
+  variants: {
+    variant: {
+      default: 'border-border',
+      elevated: 'border-transparent shadow-lg',
+      ghost: 'border-transparent shadow-none',
+      outline: 'border-border shadow-none',
     },
-    defaultVariants: {
-      variant: 'default',
-      padding: 'default',
+    padding: {
+      none: 'p-0',
+      sm: 'p-4',
+      default: 'p-6',
+      lg: 'p-8',
     },
-  }
-)
+  },
+  defaultVariants: {
+    variant: 'default',
+    padding: 'default',
+  },
+})
 
 export type CardVariants = VariantProps<typeof cardVariants>
 
@@ -213,27 +210,24 @@ export const dialogContentVariants = cva(
 export type DialogContentVariants = VariantProps<typeof dialogContentVariants>
 
 // === SIDEBAR VARIANTS ===
-export const sidebarVariants = cva(
-  'flex h-full flex-col overflow-y-auto border-r bg-background',
-  {
-    variants: {
-      variant: {
-        default: 'border-border',
-        floating: 'border-transparent shadow-lg m-2 rounded-lg',
-        inset: 'border-border bg-muted/30',
-      },
-      size: {
-        default: 'w-64',
-        sm: 'w-48',
-        lg: 'w-80',
-        collapsed: 'w-16',
-      },
+export const sidebarVariants = cva('flex h-full flex-col overflow-y-auto border-r bg-background', {
+  variants: {
+    variant: {
+      default: 'border-border',
+      floating: 'border-transparent shadow-lg m-2 rounded-lg',
+      inset: 'border-border bg-muted/30',
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
+    size: {
+      default: 'w-64',
+      sm: 'w-48',
+      lg: 'w-80',
+      collapsed: 'w-16',
     },
-  }
-)
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
+})
 
 export type SidebarVariants = VariantProps<typeof sidebarVariants>

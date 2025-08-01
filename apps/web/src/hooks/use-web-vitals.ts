@@ -50,11 +50,9 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
             method: 'POST',
             body: JSON.stringify(metric),
             keepalive: true,
-          }).catch((err) => console.warn('Analytics failed:', err))
+          }).catch((_err) => {})
         }
-      } catch (err) {
-        console.warn('Analytics error:', err)
-      }
+      } catch (_err) {}
     },
     [enableAnalytics, sampleRate]
   )
@@ -138,8 +136,6 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
         setIsLoading(false)
 
         if (enableConsoleLog) {
-          console.warn('❌ Web Vitals loading failed:', err)
-          console.info('💡 Fallback: Using basic performance metrics')
         }
 
         // Fallback avec Performance API native

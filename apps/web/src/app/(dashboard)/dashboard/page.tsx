@@ -1,12 +1,6 @@
 'use client'
 
-import React from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { useRouter } from 'next/navigation'
-
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { CompanyLogo } from '@/components/ui/company-logo'
 import {
   Activity,
   AlertTriangle,
@@ -22,6 +16,11 @@ import {
   Target,
   TrendingUp,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import React from 'react'
+import { CompanyLogoWrapper as CompanyLogo } from '@/components/wrappers'
+import { useAuth } from '@/hooks/use-auth'
+import { useTranslation } from '@/lib/i18n/hooks'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'
@@ -70,14 +69,14 @@ export default function Dashboard() {
   const [stats, setStats] = React.useState<DashboardStats | null>(null)
   const [activities, setActivities] = React.useState<RecentActivity[]>([])
   const [loading, setLoading] = React.useState(true)
-  
+
   // Vérifier l'authentification
   React.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login?redirect=/dashboard')
     }
   }, [isAuthenticated, authLoading, router])
-  
+
   // Data simulation (to be replaced by API calls)
   React.useEffect(() => {
     const fetchDashboardData = async () => {
@@ -150,15 +149,15 @@ export default function Dashboard() {
     }
 
     fetchDashboardData()
-  }, [])
-  
+  }, [t])
+
   // Afficher un loader si pas encore authentifié
   if (authLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>{t('loading') || 'Vérification de l\'authentification...'}</p>
+          <p>{t('loading') || "Vérification de l'authentification..."}</p>
         </div>
       </div>
     )
@@ -252,7 +251,9 @@ export default function Dashboard() {
           {/* Projets actifs */}
           <Card className="group border-0 bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-emerald-100">{t('activeProjects')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-emerald-100">
+                {t('activeProjects')}
+              </CardTitle>
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <FolderOpen className="h-5 w-5 text-white" />
               </div>
@@ -278,7 +279,9 @@ export default function Dashboard() {
           {/* Chiffre d'affaires */}
           <Card className="group border-0 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-blue-100">{t('monthlyRevenue')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-blue-100">
+                {t('monthlyRevenue')}
+              </CardTitle>
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <Euro className="h-5 w-5 text-white" />
               </div>
@@ -297,7 +300,9 @@ export default function Dashboard() {
           {/* Production */}
           <Card className="group border-0 bg-gradient-to-br from-orange-500 to-red-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-orange-100">{t('occupancyRate')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-orange-100">
+                {t('occupancyRate')}
+              </CardTitle>
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <Factory className="h-5 w-5 text-white" />
               </div>
@@ -316,7 +321,9 @@ export default function Dashboard() {
           {/* Stocks */}
           <Card className="group border-0 bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-100">{t('stockAlerts')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-purple-100">
+                {t('stockAlerts')}
+              </CardTitle>
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <Package className="h-5 w-5 text-white" />
               </div>
@@ -341,9 +348,7 @@ export default function Dashboard() {
                   <CardTitle className="text-xl font-semibold text-slate-800">
                     {t('annualProgress')}
                   </CardTitle>
-                  <p className="text-slate-600 text-sm mt-1">
-                    {t('revenueEvolution')}
-                  </p>
+                  <p className="text-slate-600 text-sm mt-1">{t('revenueEvolution')}</p>
                 </div>
                 <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
                   <Target className="h-5 w-5 text-white" />

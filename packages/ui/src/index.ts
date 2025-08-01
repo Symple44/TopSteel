@@ -1,24 +1,17 @@
 // packages/ui/src/index.ts
 
+// === RE-EXPORTS EXTERNES ===
+export { cva, type VariantProps } from 'class-variance-authority'
+export { type ClassValue, clsx } from 'clsx'
+
+// === DESIGN SYSTEM UNIFIÉ ===
+export * from './design-system'
+
 // === COMPONENTS ===
 export * from './components'
 
-// === UTILS & VARIANTS ===
-export {
-  alertVariants,
-  badgeVariants,
-  buttonVariants,
-  cardVariants,
-  dialogContentVariants,
-  inputVariants,
-  scrollAreaVariants,
-  sidebarVariants,
-  switchVariants,
-  tableVariants,
-} from './lib/design-system'
-export { cn } from './lib/utils'
-
-// === TYPES ===
+// === LEGACY COMPATIBILITY ===
+// Re-export des variants existants pour compatibilité backward
 export type {
   AlertVariants,
   BadgeVariants,
@@ -32,6 +25,18 @@ export type {
   TableVariants,
 } from './lib/design-system'
 
-// === RE-EXPORTS EXTERNES ===
-export { cva, type VariantProps } from 'class-variance-authority'
-export { clsx, type ClassValue } from 'clsx'
+export {
+  alertVariants,
+  badgeVariants,
+  buttonVariants,
+  cardVariants,
+  dialogContentVariants,
+  inputVariants,
+  scrollAreaVariants,
+  sidebarVariants,
+  switchVariants,
+  tableVariants,
+} from './lib/design-system'
+
+// === UTILS ===
+export { cn } from './lib/utils'

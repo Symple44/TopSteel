@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import type React from 'react'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -24,10 +24,10 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
 }
 
 // Composant pour valider les permissions d'accès
-export function RouteGuard({ 
-  children, 
+export function RouteGuard({
+  children,
   requiredPermissions = [],
-  fallbackUrl = '/dashboard' 
+  fallbackUrl = '/dashboard',
 }: {
   children: React.ReactNode
   requiredPermissions?: string[]

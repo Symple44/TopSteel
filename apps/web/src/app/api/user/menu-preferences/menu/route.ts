@@ -1,23 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')?.value
-    
+
     if (!token) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Authentification requise'
+          message: 'Authentification requise',
         },
         { status: 401 }
       )
     }
-    
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+
+    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
     try {
       // Appeler le vrai backend NestJS
@@ -25,16 +25,16 @@ export async function GET(request: NextRequest) {
         method: 'GET',
         signal: AbortSignal.timeout(5000),
       })
-      
+
       if (response.ok) {
         const data = await response.json()
-        
+
         // Gérer les différentes structures de réponse possibles
-        if (data.data && data.data.success) {
+        if (data.data?.success) {
           return NextResponse.json({
             success: data.data.success,
             data: data.data.data,
-            message: data.message || 'Menu récupéré avec succès'
+            message: data.message || 'Menu récupéré avec succès',
           })
         } else if (data.success) {
           return NextResponse.json(data)
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       } else {
         throw new Error(`Backend API error: ${response.status}`)
       }
-    } catch (backendError) {
+    } catch (_backendError) {
       // Fallback uniquement si le backend est indisponible
       // Format conforme à ce qui est attendu par useDynamicMenu
       const defaultCustomMenu = [
@@ -66,8 +66,8 @@ export async function GET(request: NextRequest) {
             isPinned: true,
             customTitle: 'Mon Tableau de bord',
             customIcon: 'Home',
-            customColor: 'purple'
-          }
+            customColor: 'purple',
+          },
         },
         {
           id: 'query-builder-custom',
@@ -84,8 +84,8 @@ export async function GET(request: NextRequest) {
             isVisible: true,
             isFavorite: false,
             isPinned: false,
-            customTitle: 'Mes Requêtes'
-          }
+            customTitle: 'Mes Requêtes',
+          },
         },
         {
           id: 'admin-custom',
@@ -113,14 +113,14 @@ export async function GET(request: NextRequest) {
               children: [],
               userPreferences: {
                 isVisible: true,
-                customTitle: 'Mes Utilisateurs'
-              }
-            }
+                customTitle: 'Mes Utilisateurs',
+              },
+            },
           ],
           userPreferences: {
             isVisible: true,
-            customTitle: 'Config Perso'
-          }
+            customTitle: 'Config Perso',
+          },
         },
         {
           id: 'settings-custom',
@@ -146,22 +146,22 @@ export async function GET(request: NextRequest) {
               children: [],
               userPreferences: {
                 isVisible: true,
-                customTitle: 'Mon Thème'
-              }
-            }
+                customTitle: 'Mon Thème',
+              },
+            },
           ],
           userPreferences: {
             isVisible: true,
-            customTitle: 'Mes Paramètres'
-          }
-        }
+            customTitle: 'Mes Paramètres',
+          },
+        },
       ]
 
       return NextResponse.json({
         success: true,
         data: defaultCustomMenu,
         message: 'Menu personnalisé récupéré avec succès (fallback)',
-        fallback: true
+        fallback: true,
       })
     }
   } catch (error) {
@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         message: 'Erreur lors du chargement du menu',
-        error: error instanceof Error ? error.message : 'Erreur inconnue'
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
       },
       { status: 500 }
     )
@@ -181,20 +181,20 @@ export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')?.value
-    
+
     if (!token) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Authentification requise'
+          message: 'Authentification requise',
         },
         { status: 401 }
       )
     }
 
     const body = await request.json()
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-    
+    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+
     try {
       // Appeler le vrai backend NestJS pour la sauvegarde
       const response = await callBackendFromApi(request, 'user/menu-preferences/menu', {
@@ -209,23 +209,22 @@ export async function POST(request: NextRequest) {
       } else {
         throw new Error(`Backend API error: ${response.status}`)
       }
-    } catch (backendError) {
+    } catch (_backendError) {
       // Fallback : simuler la sauvegarde si backend indisponible
       return NextResponse.json({
         success: true,
         data: body,
         message: 'Préférences de menu sauvegardées (mode fallback)',
-        fallback: true
+        fallback: true,
       })
     }
-    
   } catch (error) {
     // Error saving menu preferences (silenced)
     return NextResponse.json(
       {
         success: false,
         message: 'Erreur lors de la sauvegarde des préférences',
-        error: error instanceof Error ? error.message : 'Erreur inconnue'
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
       },
       { status: 500 }
     )

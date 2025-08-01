@@ -1,6 +1,5 @@
 'use client'
 
-import { formatCurrency, formatDate } from '@/lib/utils'
 import {
   Badge,
   Button,
@@ -11,8 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from '@erp/ui'
-
 import { Download, Edit, Eye } from 'lucide-react'
+import { formatCurrency, formatDate } from '@/lib/utils'
 
 // Données mock pour encaissements
 const mockEncaissements = [

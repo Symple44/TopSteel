@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 const templates = {
   minimal: {
@@ -7,7 +7,7 @@ const templates = {
     showIcons: false,
     showBadges: false,
     allowCollapse: true,
-    theme: 'light'
+    theme: 'light',
   },
   business: {
     useCustomLayout: true,
@@ -15,7 +15,7 @@ const templates = {
     showIcons: true,
     showBadges: true,
     allowCollapse: true,
-    theme: 'auto'
+    theme: 'auto',
   },
   admin: {
     useCustomLayout: true,
@@ -23,7 +23,7 @@ const templates = {
     showIcons: true,
     showBadges: true,
     allowCollapse: false,
-    theme: 'dark'
+    theme: 'dark',
   },
   developer: {
     useCustomLayout: true,
@@ -31,28 +31,23 @@ const templates = {
     showIcons: true,
     showBadges: false,
     allowCollapse: true,
-    theme: 'dark'
-  }
+    theme: 'dark',
+  },
 }
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ template: string }> }
 ) {
   try {
     const { template } = await params
-    
+
     if (!templates[template as keyof typeof templates]) {
-      return NextResponse.json(
-        { success: false, message: 'Template inconnu' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, message: 'Template inconnu' }, { status: 400 })
     }
-    
-    console.log(`Application du template ${template}`)
-    
+
     const templateConfig = templates[template as keyof typeof templates]
-    
+
     const updatedPreferences = {
       id: '1',
       userId: 'current-user',
@@ -61,21 +56,20 @@ export async function POST(
       hiddenItems: [],
       pinnedItems: [],
       customOrder: {},
-      shortcuts: []
+      shortcuts: [],
     }
-    
+
     return NextResponse.json({
       success: true,
       data: updatedPreferences,
-      message: `Template ${template} appliqué`
+      message: `Template ${template} appliqué`,
     })
   } catch (error) {
-    console.error('Erreur lors de l\'application du template:', error)
     return NextResponse.json(
       {
         success: false,
-        message: 'Erreur lors de l\'application du template',
-        error: error instanceof Error ? error.message : 'Erreur inconnue'
+        message: "Erreur lors de l'application du template",
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
       },
       { status: 500 }
     )

@@ -1,48 +1,31 @@
 'use client'
 
-import { useNotifications } from '@/components/providers/notifications-provider'
-import { cn } from '@/lib/utils'
 import type { Notification } from '@erp/domains/notifications'
-import { createPortal } from 'react-dom'
-import { useState, useMemo, useEffect } from 'react'
-
+import { Badge, Button, Input, ScrollArea, Separator } from '@erp/ui'
 import {
-  Badge,
-  Button,
-  ScrollArea,
-  Separator,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@erp/ui'
-
-import { 
-  AlertTriangle, 
-  Bell, 
-  CheckCheck, 
-  Clock, 
-  X, 
-  Search,
-  Filter,
-  Package,
+  Archive,
+  Bell,
+  CheckCheck,
+  ChevronRight,
+  Database,
+  Eye,
   Factory,
   FileText,
-  Users,
-  Database,
-  Wrench,
-  Shield,
   HardDrive,
-  UserPlus,
+  Package,
+  Search,
   Send,
-  Archive,
+  Shield,
   Trash2,
-  ChevronRight,
-  Calendar,
-  Eye
+  UserPlus,
+  Users,
+  Wrench,
+  X,
 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useNotifications } from '@/components/providers/notifications-provider'
+import { cn } from '@/lib/utils'
 
 interface NotificationDashboardV2Props {
   isOpen: boolean
@@ -75,7 +58,9 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
   const [mounted, setMounted] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedPriority, setSelectedPriority] = useState<string>('all')
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'read' | 'unread' | 'archived'>('all')
+  const [selectedStatus, setSelectedStatus] = useState<'all' | 'read' | 'unread' | 'archived'>(
+    'all'
+  )
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
   const [showTransferModal, setShowTransferModal] = useState(false)
@@ -91,19 +76,21 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
     // Filtre par catégorie
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(n => (n.metadata?.category || 'system') === selectedCategory)
+      filtered = filtered.filter((n) => (n.metadata?.category || 'system') === selectedCategory)
     }
 
     // Filtre par priorité
     if (selectedPriority !== 'all') {
-      filtered = filtered.filter(n => (n.priority?.toLowerCase() || 'normal') === selectedPriority)
+      filtered = filtered.filter(
+        (n) => (n.priority?.toLowerCase() || 'normal') === selectedPriority
+      )
     }
 
     // Filtre par statut
     if (selectedStatus === 'read') {
-      filtered = filtered.filter(n => n.readAt)
+      filtered = filtered.filter((n) => n.readAt)
     } else if (selectedStatus === 'unread') {
-      filtered = filtered.filter(n => !n.readAt)
+      filtered = filtered.filter((n) => !n.readAt)
     } else if (selectedStatus === 'archived') {
       // Pour l'instant, aucune notification archivée car la propriété n'existe pas
       filtered = []
@@ -112,14 +99,15 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
     // Filtre par recherche
     if (searchTerm) {
-      filtered = filtered.filter(n => 
-        n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        n.message.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (n) =>
+          n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          n.message.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
-    return filtered.sort((a, b) => 
-      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    return filtered.sort(
+      (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
     )
   }, [state.notifications, selectedCategory, selectedPriority, selectedStatus, searchTerm])
 
@@ -127,7 +115,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
   const categoryCounts = useMemo(() => {
     const activeNotifications = state.notifications
     const counts: Record<string, number> = { all: activeNotifications.length }
-    activeNotifications.forEach(n => {
+    activeNotifications.forEach((n) => {
       const cat = n.metadata?.category || 'system'
       counts[cat] = (counts[cat] || 0) + 1
     })
@@ -139,7 +127,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
     const now = new Date()
     const diff = now.getTime() - d.getTime()
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    
+
     if (days === 0) {
       return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     } else if (days === 1) {
@@ -153,7 +141,6 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
   const handleTransfer = () => {
     if (selectedNotification && transferUserId) {
-      console.log('Transférer notification', selectedNotification.id, 'à l\'utilisateur', transferUserId)
       // TODO: Implémenter l'API de transfert
       setShowTransferModal(false)
       setTransferUserId('')
@@ -163,10 +150,13 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
   if (!isOpen || !mounted) return null
 
   return createPortal(
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" style={{ zIndex: 999999 }} aria-hidden="false">
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+      style={{ zIndex: 999999 }}
+      aria-hidden="false"
+    >
       <div className="flex items-center justify-center h-full p-4">
         <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl h-[85vh] overflow-hidden flex">
-          
           {/* Sidebar des filtres */}
           <div className="w-72 border-r bg-gray-50 flex flex-col">
             <div className="p-4 border-b">
@@ -184,7 +174,9 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                   <Input
                     placeholder="Rechercher..."
                     value={searchTerm}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setSearchTerm(e.target.value)
+                    }
                     className="pl-9"
                   />
                 </div>
@@ -197,7 +189,11 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                   {[
                     { value: 'all', label: 'Toutes', count: state.notifications.length },
                     { value: 'unread', label: 'Non lues', count: state.unreadCount },
-                    { value: 'read', label: 'Lues', count: state.notifications.filter(n => n.readAt).length },
+                    {
+                      value: 'read',
+                      label: 'Lues',
+                      count: state.notifications.filter((n) => n.readAt).length,
+                    },
                     { value: 'archived', label: 'Archivées', count: 0 },
                   ].map((status) => (
                     <button
@@ -205,8 +201,8 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                       onClick={() => setSelectedStatus(status.value as any)}
                       className={cn(
                         'w-full flex items-center justify-between p-2 rounded-lg text-sm transition-colors',
-                        selectedStatus === status.value 
-                          ? 'bg-blue-50 text-blue-700 font-medium' 
+                        selectedStatus === status.value
+                          ? 'bg-blue-50 text-blue-700 font-medium'
                           : 'hover:bg-gray-100'
                       )}
                     >
@@ -228,15 +224,15 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                   {Object.entries(categoryConfig).map(([key, config]) => {
                     const Icon = config.icon
                     const count = categoryCounts[key] || 0
-                    
+
                     return (
                       <button
                         key={key}
                         onClick={() => setSelectedCategory(key)}
                         className={cn(
                           'w-full flex items-center gap-3 p-2 rounded-lg text-sm transition-colors',
-                          selectedCategory === key 
-                            ? 'bg-blue-50 text-blue-700 font-medium' 
+                          selectedCategory === key
+                            ? 'bg-blue-50 text-blue-700 font-medium'
                             : 'hover:bg-gray-100'
                         )}
                       >
@@ -263,14 +259,18 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                       onClick={() => setSelectedPriority(key)}
                       className={cn(
                         'w-full flex items-center justify-between p-2 rounded-lg text-sm transition-colors',
-                        selectedPriority === key 
-                          ? 'bg-blue-50 text-blue-700 font-medium' 
+                        selectedPriority === key
+                          ? 'bg-blue-50 text-blue-700 font-medium'
                           : 'hover:bg-gray-100'
                       )}
                     >
-                      <span className={cn(
-                        key !== 'all' && config.color.includes('bg-') ? `px-2 py-1 rounded-full ${config.color}` : ''
-                      )}>
+                      <span
+                        className={cn(
+                          key !== 'all' && config.color.includes('bg-')
+                            ? `px-2 py-1 rounded-full ${config.color}`
+                            : ''
+                        )}
+                      >
                         {config.label}
                       </span>
                       {selectedPriority === key && (
@@ -300,28 +300,23 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
             <div className="p-4 border-b flex items-center justify-between">
               <div>
                 <h3 className="font-semibold">
-                  {selectedCategory === 'all' ? 'Toutes les notifications' : categoryConfig[selectedCategory as keyof typeof categoryConfig]?.label}
+                  {selectedCategory === 'all'
+                    ? 'Toutes les notifications'
+                    : categoryConfig[selectedCategory as keyof typeof categoryConfig]?.label}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {filteredNotifications.length} notification{filteredNotifications.length !== 1 ? 's' : ''}
+                  {filteredNotifications.length} notification
+                  {filteredNotifications.length !== 1 ? 's' : ''}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 {state.unreadCount > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => actions.markAllAsRead()}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => actions.markAllAsRead()}>
                     <CheckCheck className="h-4 w-4 mr-2" />
                     Tout marquer comme lu
                   </Button>
                 )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onClose}
-                >
+                <Button variant="ghost" size="sm" onClick={onClose}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -338,9 +333,12 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                 <div className="divide-y">
                   {filteredNotifications.map((notification) => {
                     const category = notification.metadata?.category || 'system'
-                    const CategoryIcon = categoryConfig[category as keyof typeof categoryConfig]?.icon || Bell
-                    const categoryColor = categoryConfig[category as keyof typeof categoryConfig]?.color || 'text-gray-600'
-                    
+                    const CategoryIcon =
+                      categoryConfig[category as keyof typeof categoryConfig]?.icon || Bell
+                    const categoryColor =
+                      categoryConfig[category as keyof typeof categoryConfig]?.color ||
+                      'text-gray-600'
+
                     return (
                       <div
                         key={notification.id}
@@ -354,14 +352,16 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                           <div className={cn('mt-1', categoryColor)}>
                             <CategoryIcon className="h-5 w-5" />
                           </div>
-                          
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1">
-                                <h4 className={cn(
-                                  'font-medium',
-                                  !notification.readAt && 'text-blue-900'
-                                )}>
+                                <h4
+                                  className={cn(
+                                    'font-medium',
+                                    !notification.readAt && 'text-blue-900'
+                                  )}
+                                >
                                   {notification.title}
                                 </h4>
                                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">
@@ -372,33 +372,38 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                                 {formatDate(notification.createdAt || new Date())}
                               </span>
                             </div>
-                            
+
                             <div className="flex items-center gap-2 mt-2">
                               <Badge variant="outline" className="text-xs">
-                                {categoryConfig[category as keyof typeof categoryConfig]?.label || 'Système'}
+                                {categoryConfig[category as keyof typeof categoryConfig]?.label ||
+                                  'Système'}
                               </Badge>
-                              
+
                               {notification.priority && notification.priority !== 'NORMAL' && (
-                                <Badge 
+                                <Badge
                                   className={cn(
                                     'text-xs',
-                                    priorityConfig[notification.priority.toLowerCase() as keyof typeof priorityConfig]?.color
+                                    priorityConfig[
+                                      notification.priority.toLowerCase() as keyof typeof priorityConfig
+                                    ]?.color
                                   )}
                                 >
-                                  {priorityConfig[notification.priority.toLowerCase() as keyof typeof priorityConfig]?.label}
+                                  {
+                                    priorityConfig[
+                                      notification.priority.toLowerCase() as keyof typeof priorityConfig
+                                    ]?.label
+                                  }
                                 </Badge>
                               )}
-                              
+
                               {!notification.readAt && (
                                 <div className="h-2 w-2 rounded-full bg-blue-600" />
                               )}
-                              
-                              {false && (
-                                <span className="text-xs text-gray-500">📁</span>
-                              )}
+
+                              {false && <span className="text-xs text-gray-500">📁</span>}
                             </div>
                           </div>
-                          
+
                           <ChevronRight className="h-4 w-4 text-gray-400 mt-2" />
                         </div>
                       </div>
@@ -414,62 +419,75 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
             <div className="w-96 border-l bg-gray-50 flex flex-col">
               <div className="p-4 border-b flex items-center justify-between">
                 <h3 className="font-semibold">Détails</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedNotification(null)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setSelectedNotification(null)}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium text-lg">{selectedNotification.title}</h4>
                     <p className="text-sm text-gray-600 mt-1">{selectedNotification.message}</p>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Date</span>
-                      <span>{new Date(selectedNotification.createdAt || Date.now()).toLocaleString('fr-FR')}</span>
+                      <span>
+                        {new Date(selectedNotification.createdAt || Date.now()).toLocaleString(
+                          'fr-FR'
+                        )}
+                      </span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Catégorie</span>
                       <Badge variant="outline">
-                        {categoryConfig[(selectedNotification.metadata?.category || 'system') as keyof typeof categoryConfig]?.label}
+                        {
+                          categoryConfig[
+                            (selectedNotification.metadata?.category ||
+                              'system') as keyof typeof categoryConfig
+                          ]?.label
+                        }
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Priorité</span>
-                      <Badge className={cn(
-                        priorityConfig[(selectedNotification.priority?.toLowerCase() || 'normal') as keyof typeof priorityConfig]?.color
-                      )}>
-                        {priorityConfig[(selectedNotification.priority?.toLowerCase() || 'normal') as keyof typeof priorityConfig]?.label}
+                      <Badge
+                        className={cn(
+                          priorityConfig[
+                            (selectedNotification.priority?.toLowerCase() ||
+                              'normal') as keyof typeof priorityConfig
+                          ]?.color
+                        )}
+                      >
+                        {
+                          priorityConfig[
+                            (selectedNotification.priority?.toLowerCase() ||
+                              'normal') as keyof typeof priorityConfig
+                          ]?.label
+                        }
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Statut</span>
                       <div className="flex items-center gap-2">
                         <span>{selectedNotification.readAt ? '✅ Lue' : '🔵 Non lue'}</span>
-                        {false && (
-                          <span className="text-gray-500">📁 Archivée</span>
-                        )}
+                        {false && <span className="text-gray-500">📁 Archivée</span>}
                       </div>
                     </div>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div className="space-y-2">
                     <h5 className="text-sm font-medium text-gray-700">Actions</h5>
-                    
+
                     {!selectedNotification.readAt && (
                       <Button
                         variant="outline"
@@ -481,7 +499,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                         Marquer comme lue
                       </Button>
                     )}
-                    
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -491,7 +509,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                       <UserPlus className="h-4 w-4 mr-2" />
                       Transférer à un utilisateur
                     </Button>
-                    
+
                     {true ? (
                       <Button
                         variant="outline"
@@ -513,7 +531,6 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                         onClick={() => {
                           // TODO: Implement unarchive functionality
                           if (selectedNotification) {
-                            console.log('Unarchive notification:', selectedNotification.id)
                           }
                           setSelectedNotification(null)
                         }}
@@ -522,7 +539,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                         Désarchiver
                       </Button>
                     )}
-                    
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -544,38 +561,46 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
       </div>
 
       {/* Modal de transfert */}
-      {showTransferModal && mounted && createPortal(
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center" style={{ zIndex: 999999 }} aria-hidden="false">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Transférer la notification</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Sélectionnez l'utilisateur à qui transférer cette notification.
-            </p>
-            <Input
-              placeholder="ID ou email de l'utilisateur"
-              value={transferUserId}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTransferUserId(e.target.value)}
-              className="mb-4"
-            />
-            <div className="flex justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowTransferModal(false)
-                  setTransferUserId('')
-                }}
-              >
-                Annuler
-              </Button>
-              <Button onClick={handleTransfer}>
-                <Send className="h-4 w-4 mr-2" />
-                Transférer
-              </Button>
+      {showTransferModal &&
+        mounted &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center"
+            style={{ zIndex: 999999 }}
+            aria-hidden="false"
+          >
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-semibold mb-4">Transférer la notification</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Sélectionnez l'utilisateur à qui transférer cette notification.
+              </p>
+              <Input
+                placeholder="ID ou email de l'utilisateur"
+                value={transferUserId}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setTransferUserId(e.target.value)
+                }
+                className="mb-4"
+              />
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowTransferModal(false)
+                    setTransferUserId('')
+                  }}
+                >
+                  Annuler
+                </Button>
+                <Button onClick={handleTransfer}>
+                  <Send className="h-4 w-4 mr-2" />
+                  Transférer
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body
+        )}
     </div>,
     document.body
   )

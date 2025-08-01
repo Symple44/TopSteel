@@ -1,9 +1,6 @@
 'use client'
 
-import { useNotifications } from '@/components/providers/notifications-provider'
-import { cn } from '@/lib/utils'
 import type { Notification } from '@erp/domains/notifications'
-
 import {
   Badge,
   Button,
@@ -12,32 +9,31 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  Input,
   ScrollArea,
   Separator,
-  Input,
 } from '@erp/ui'
-
-import { 
-  AlertTriangle, 
-  Bell, 
-  CheckCheck, 
-  Clock, 
-  Settings, 
-  Trash2, 
-  X, 
-  Search,
-  Filter,
-  Package,
+import {
+  AlertTriangle,
+  Bell,
+  CheckCheck,
+  Clock,
+  Database,
   Factory,
   FileText,
-  Users,
-  Database,
-  Wrench,
-  Shield,
   HardDrive,
-  Zap
+  Package,
+  Search,
+  Settings,
+  Shield,
+  Trash2,
+  Users,
+  Wrench,
+  X,
 } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { useNotifications } from '@/components/providers/notifications-provider'
+import { cn } from '@/lib/utils'
 
 const categoryIcons = {
   system: Database,
@@ -80,7 +76,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedPriority, setSelectedPriority] = useState<string>('all')
-  const [showSettings, setShowSettings] = useState(false)
+  const [_showSettings, setShowSettings] = useState(false)
 
   const getNotificationIcon = (type: string, category: string) => {
     if (type === 'error') return <AlertTriangle className="h-4 w-4 text-red-500" />
@@ -103,12 +99,15 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
   // Grouper les notifications par catégorie
   const notificationsByCategory = useMemo(() => {
-    const grouped = state.notifications.reduce((acc, notification) => {
-      const category = notification.metadata?.category || 'system'
-      if (!acc[category]) acc[category] = []
-      acc[category].push(notification)
-      return acc
-    }, {} as Record<string, Notification[]>)
+    const grouped = state.notifications.reduce(
+      (acc, notification) => {
+        const category = notification.metadata?.category || 'system'
+        if (!acc[category]) acc[category] = []
+        acc[category].push(notification)
+        return acc
+      },
+      {} as Record<string, Notification[]>
+    )
 
     return grouped
   }, [state.notifications])
@@ -119,27 +118,28 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
     // Filtre par catégorie
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(n => (n.metadata?.category || 'system') === selectedCategory)
+      filtered = filtered.filter((n) => (n.metadata?.category || 'system') === selectedCategory)
     }
 
     // Filtre par priorité
     if (selectedPriority !== 'all') {
-      filtered = filtered.filter(n => (n.priority?.toLowerCase() || 'normal') === selectedPriority)
+      filtered = filtered.filter(
+        (n) => (n.priority?.toLowerCase() || 'normal') === selectedPriority
+      )
     }
 
     // Filtre par recherche
     if (searchTerm) {
-      filtered = filtered.filter(n => 
-        n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        n.message.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (n) =>
+          n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          n.message.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
     return filtered
   }, [state.notifications, selectedCategory, selectedPriority, searchTerm])
 
-  console.log('🔔 NotificationDashboard render, isOpen:', isOpen, 'filteredNotifications:', filteredNotifications.length)
-  
   if (!isOpen) return null
 
   return (
@@ -160,10 +160,12 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                 Notifications
               </h2>
               <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-                <div className={cn(
-                  'h-2 w-2 rounded-full',
-                  state.connected ? 'bg-green-500' : 'bg-orange-500'
-                )} />
+                <div
+                  className={cn(
+                    'h-2 w-2 rounded-full',
+                    state.connected ? 'bg-green-500' : 'bg-orange-500'
+                  )}
+                />
                 {state.connected ? 'Temps réel' : 'Déconnecté'}
               </div>
             </div>
@@ -193,7 +195,8 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                 {Object.entries(categoryLabels).map(([key, label]) => {
                   const Icon = categoryIcons[key as keyof typeof categoryIcons]
                   const count = notificationsByCategory[key]?.length || 0
-                  const unreadCount = notificationsByCategory[key]?.filter(n => !n.isRead).length || 0
+                  const unreadCount =
+                    notificationsByCategory[key]?.filter((n) => !n.isRead).length || 0
 
                   return (
                     <button
@@ -210,7 +213,10 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                       </div>
                       <div className="flex items-center gap-1">
                         {unreadCount > 0 && (
-                          <Badge variant="destructive" className="text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center">
+                          <Badge
+                            variant="destructive"
+                            className="text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center"
+                          >
                             {unreadCount}
                           </Badge>
                         )}
@@ -232,40 +238,28 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <h3 className="font-semibold">
-                    {selectedCategory === 'all' 
-                      ? 'Toutes les notifications' 
-                      : categoryLabels[selectedCategory as keyof typeof categoryLabels]
-                    }
+                    {selectedCategory === 'all'
+                      ? 'Toutes les notifications'
+                      : categoryLabels[selectedCategory as keyof typeof categoryLabels]}
                   </h3>
                   <Badge variant="outline">
-                    {filteredNotifications.length} notification{filteredNotifications.length !== 1 ? 's' : ''}
+                    {filteredNotifications.length} notification
+                    {filteredNotifications.length !== 1 ? 's' : ''}
                   </Badge>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   {state.unreadCount > 0 && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => actions.markAllAsRead()}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => actions.markAllAsRead()}>
                       <CheckCheck className="h-4 w-4 mr-2" />
                       Marquer tout comme lu
                     </Button>
                   )}
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setShowSettings(true)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => setShowSettings(true)}>
                     <Settings className="h-4 w-4 mr-2" />
                     Paramètres
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={onClose}
-                  >
+                  <Button variant="ghost" size="sm" onClick={onClose}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -278,12 +272,14 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                   <Input
                     placeholder="Rechercher dans les notifications..."
                     value={searchTerm}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setSearchTerm(e.target.value)
+                    }
                     className="pl-9"
                   />
                 </div>
-                
-                <select 
+
+                <select
                   value={selectedPriority}
                   onChange={(e) => setSelectedPriority(e.target.value)}
                   className="px-3 py-2 border rounded-md text-sm"
@@ -317,7 +313,10 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                     >
                       <div className="flex gap-4">
                         <div className="flex-shrink-0 mt-1">
-                          {getNotificationIcon(notification.type, notification.metadata?.category || '')}
+                          {getNotificationIcon(
+                            notification.type,
+                            notification.metadata?.category || ''
+                          )}
                         </div>
 
                         <div className="flex-1 min-w-0">
@@ -346,14 +345,18 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
                           <div className="flex items-center gap-2 mt-3">
                             <Badge variant="outline" className="text-xs">
-                              {categoryLabels[notification.metadata?.category as keyof typeof categoryLabels] || 'Système'}
+                              {categoryLabels[
+                                notification.metadata?.category as keyof typeof categoryLabels
+                              ] || 'Système'}
                             </Badge>
-                            
+
                             {notification.priority && notification.priority !== 'NORMAL' && (
-                              <Badge 
+                              <Badge
                                 className={cn(
                                   'text-xs',
-                                  priorityColors[notification.priority.toLowerCase() as keyof typeof priorityColors]
+                                  priorityColors[
+                                    notification.priority.toLowerCase() as keyof typeof priorityColors
+                                  ]
                                 )}
                               >
                                 {notification.priority.toLowerCase()}
@@ -380,11 +383,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                   <Trash2 className="h-4 w-4 mr-2" />
                   Effacer tout
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => actions.refreshNotifications()}
-                >
+                <Button variant="ghost" size="sm" onClick={() => actions.refreshNotifications()}>
                   Actualiser
                 </Button>
               </div>

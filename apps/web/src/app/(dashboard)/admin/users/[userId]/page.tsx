@@ -1,38 +1,30 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { AdminGuard } from '@/components/auth/admin-guard'
-import { apiClient } from '@/lib/api-client'
-import { toast } from '@/hooks/use-toast'
-import { useTranslation } from '@/lib/i18n/hooks'
-import { 
-  Card, 
-  CardContent, 
-  CardHeader,
-  CardTitle,
-  Badge,
+export const dynamic = 'force-dynamic'
+
+import {
   Avatar,
   AvatarFallback,
+  Badge,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from '@erp/ui'
-import { 
-  ArrowLeft, 
-  Mail, 
-  Phone, 
-  Building,
-  Shield,
-  Save,
-  RefreshCw,
-  Users,
-  Calendar
-} from 'lucide-react'
-import { UserCompaniesDataTable } from './user-companies-datatable'
+import { ArrowLeft, Building, Calendar, Mail, Phone, RefreshCw, Shield, Users } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 import BulkOperationsHistory from '@/components/admin/bulk-operations-history'
+import { AdminGuard } from '@/components/auth/admin-guard'
+import { toast } from '@/hooks/use-toast'
+import { apiClient } from '@/lib/api-client'
+import { useTranslation } from '@/lib/i18n/hooks'
+import { UserCompaniesDataTable } from './user-companies-datatable'
 
 interface UserDetails {
   id: string
@@ -63,32 +55,31 @@ export default function UserDetailsPage() {
   const params = useParams()
   const router = useRouter()
   const userId = params.userId as string
-  
+
   const [user, setUser] = useState<UserDetails | null>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [_saving, _setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('general')
 
-  useEffect(() => {
-    loadUserDetails()
-  }, [userId])
-
-  const loadUserDetails = async () => {
+  const loadUserDetails = useCallback(async () => {
     try {
       setLoading(true)
       const response = await apiClient.get<UserDetails>(`/admin/users/${userId}`)
       setUser(response)
-    } catch (error) {
-      console.error('Erreur lors du chargement des détails utilisateur:', error)
+    } catch (_error) {
       toast({
         title: t('common.error'),
         description: t('users.loadingError'),
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
     }
-  }
+  }, [userId, t])
+
+  useEffect(() => {
+    loadUserDetails()
+  }, [loadUserDetails])
 
   const handleBack = () => {
     router.push('/admin/users')
@@ -138,35 +129,36 @@ export default function UserDetailsPage() {
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
-                
+
                 <Avatar className="h-12 w-12">
                   <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
                     {(user.firstName?.[0] || '').toUpperCase()}
                     {(user.lastName?.[0] || '').toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                
+
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    {user.firstName || user.lastName 
+                    {user.firstName || user.lastName
                       ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                      : t('users.user')
-                    }
+                      : t('users.user')}
                   </h1>
                   <p className="text-sm text-gray-600 flex items-center">
                     <Mail className="h-4 w-4 mr-1" />
                     {user.email}
                   </p>
                 </div>
-                
-                <Badge 
+
+                <Badge
                   variant={user.isActive ? 'default' : 'secondary'}
-                  className={user.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+                  className={
+                    user.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  }
                 >
                   {user.isActive ? t('users.active') : t('users.inactive')}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -210,13 +202,12 @@ export default function UserDetailsPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t('users.fullName')}</p>
                     <p className="text-gray-900">
-                      {user.firstName || user.lastName 
+                      {user.firstName || user.lastName
                         ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                        : t('users.notProvided')
-                      }
+                        : t('users.notProvided')}
                     </p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t('users.email')}</p>
                     <p className="text-gray-900 flex items-center">
@@ -224,7 +215,7 @@ export default function UserDetailsPage() {
                       {user.email}
                     </p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t('users.phone')}</p>
                     <p className="text-gray-900 flex items-center">
@@ -232,7 +223,7 @@ export default function UserDetailsPage() {
                       {user.phone || t('users.notProvided')}
                     </p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t('users.department')}</p>
                     <p className="text-gray-900 flex items-center">
@@ -240,21 +231,20 @@ export default function UserDetailsPage() {
                       {user.department || t('users.notProvided')}
                     </p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t('users.lastConnection')}</p>
                     <p className="text-gray-900 flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                      {user.lastLogin 
+                      {user.lastLogin
                         ? new Date(user.lastLogin).toLocaleDateString('fr-FR', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric',
                             hour: '2-digit',
-                            minute: '2-digit'
+                            minute: '2-digit',
                           })
-                        : t('users.never')
-                      }
+                        : t('users.never')}
                     </p>
                   </div>
                 </CardContent>
@@ -272,7 +262,10 @@ export default function UserDetailsPage() {
                     {user.roles && user.roles.length > 0 ? (
                       <div className="space-y-2">
                         {user.roles.map((role) => (
-                          <div key={role.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
+                          <div
+                            key={role.id}
+                            className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100"
+                          >
                             <div>
                               <p className="font-medium text-blue-900">{role.name}</p>
                               <p className="text-sm text-blue-600">{role.description}</p>
@@ -297,7 +290,10 @@ export default function UserDetailsPage() {
                     {user.groups && user.groups.length > 0 ? (
                       <div className="space-y-2">
                         {user.groups.map((group) => (
-                          <div key={group.id} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-100">
+                          <div
+                            key={group.id}
+                            className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-100"
+                          >
                             <div>
                               <p className="font-medium text-purple-900">{group.name}</p>
                               <p className="text-sm text-purple-600">{group.type}</p>
@@ -306,7 +302,9 @@ export default function UserDetailsPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-center text-gray-500 py-4">{t('users.noGroupsAssigned')}</p>
+                      <p className="text-center text-gray-500 py-4">
+                        {t('users.noGroupsAssigned')}
+                      </p>
                     )}
                   </CardContent>
                 </Card>

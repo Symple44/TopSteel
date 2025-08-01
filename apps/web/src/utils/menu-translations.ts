@@ -12,17 +12,17 @@ interface TranslatableMenuItem {
  */
 export function getTranslatedTitle(item: TranslatableMenuItem): string {
   const currentLanguage = translator.getCurrentLanguage()
-  
+
   // 1. Vérifier s'il y a une traduction pour la langue courante
-  if (item.titleTranslations && item.titleTranslations[currentLanguage]) {
+  if (item.titleTranslations?.[currentLanguage]) {
     return item.titleTranslations[currentLanguage]
   }
-  
+
   // 2. Utiliser le titre personnalisé si disponible
-  if (item.customTitle && item.customTitle.trim()) {
+  if (item.customTitle?.trim()) {
     return item.customTitle
   }
-  
+
   // 3. Utiliser le titre par défaut
   return item.title
 }
@@ -45,11 +45,11 @@ export function getAvailableTranslations(item: TranslatableMenuItem): Record<str
  * Met à jour les traductions d'un élément de menu
  */
 export function updateItemTranslations(
-  item: TranslatableMenuItem, 
+  item: TranslatableMenuItem,
   translations: Record<string, string>
 ): TranslatableMenuItem {
   return {
     ...item,
-    titleTranslations: translations
+    titleTranslations: translations,
   }
 }

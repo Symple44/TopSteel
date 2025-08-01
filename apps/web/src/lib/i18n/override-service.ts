@@ -3,8 +3,8 @@
  * Charge et applique les modifications de traduction depuis l'API
  */
 
-import type { Translations } from './types'
 import { callClientApi } from '@/utils/backend-api'
+import type { Translations } from './types'
 
 export interface TranslationOverride {
   id: string
@@ -44,7 +44,6 @@ class TranslationOverrideService {
       })
 
       if (!response.ok) {
-        console.warn(`Failed to load translation overrides: ${response.status}`)
         return
       }
 
@@ -52,20 +51,16 @@ class TranslationOverrideService {
       if (data.success && data.overrides) {
         this.overrides = data.overrides
         this.isLoaded = true
-        
+
         // Stocker dans localStorage pour un accès offline
         if (typeof window !== 'undefined') {
           try {
             localStorage.setItem('topsteel-translation-overrides', JSON.stringify(this.overrides))
             localStorage.setItem('topsteel-translation-overrides-timestamp', Date.now().toString())
-          } catch (e) {
-            console.warn('Failed to cache translation overrides:', e)
-          }
+          } catch (_e) {}
         }
       }
-    } catch (error) {
-      console.error('Error loading translation overrides:', error)
-      
+    } catch (_error) {
       // Essayer de charger depuis le cache localStorage
       this.loadFromCache()
     } finally {
@@ -82,19 +77,16 @@ class TranslationOverrideService {
     try {
       const cached = localStorage.getItem('topsteel-translation-overrides')
       const timestamp = localStorage.getItem('topsteel-translation-overrides-timestamp')
-      
+
       if (cached && timestamp) {
         const age = Date.now() - parseInt(timestamp)
         // Utiliser le cache s'il a moins de 24 heures
         if (age < 24 * 60 * 60 * 1000) {
           this.overrides = JSON.parse(cached)
           this.isLoaded = true
-          console.log('Loaded translation overrides from cache')
         }
       }
-    } catch (e) {
-      console.warn('Failed to load translation overrides from cache:', e)
-    }
+    } catch (_e) {}
   }
 
   /**
@@ -112,14 +104,14 @@ class TranslationOverrideService {
     Object.entries(this.overrides).forEach(([overrideId, override]) => {
       // L'ID est le chemin complet de la clé (ex: "common.buttons.save")
       const keys = overrideId.split('.')
-      
+
       // Appliquer l'override pour chaque langue
       Object.entries(override.translations).forEach(([lang, value]) => {
         if (!enhanced[lang]) return
-        
+
         let current = enhanced[lang]
         const lastKey = keys[keys.length - 1]
-        
+
         // Naviguer jusqu'au parent
         for (let i = 0; i < keys.length - 1; i++) {
           const key = keys[i]
@@ -128,7 +120,7 @@ class TranslationOverrideService {
           }
           current = current[key]
         }
-        
+
         // Appliquer la valeur
         current[lastKey] = value
       })
@@ -144,12 +136,12 @@ class TranslationOverrideService {
     this.overrides = {}
     this.isLoaded = false
     this.loadPromise = null
-    
+
     if (typeof window !== 'undefined') {
       localStorage.removeItem('topsteel-translation-overrides')
       localStorage.removeItem('topsteel-translation-overrides-timestamp')
     }
-    
+
     return this.loadOverrides()
   }
 

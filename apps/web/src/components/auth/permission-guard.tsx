@@ -1,7 +1,7 @@
 'use client'
 
-import { ReactNode, ReactElement, isValidElement, cloneElement } from 'react'
-import { usePermissions, type Permission } from '@/hooks/use-permissions'
+import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
+import { type Permission, usePermissions } from '@/hooks/use-permissions'
 
 interface PermissionGuardProps {
   /** Permission(s) requise(s) pour afficher le composant */
@@ -30,7 +30,7 @@ export function PermissionGuard({
   fallback = null,
   mode = 'hide',
   errorMessage,
-  disabledClassName = 'opacity-50 cursor-not-allowed'
+  disabledClassName = 'opacity-50 cursor-not-allowed',
 }: PermissionGuardProps) {
   const { hasPermission, hasAnyPermission, hasAnyRole } = usePermissions()
 
@@ -79,11 +79,15 @@ export function PermissionGuard({
     case 'disable':
       // Désactiver le composant en clonant l'élément avec disabled: true
       if (isValidElement(children)) {
-        return cloneElement(children as ReactElement, {
-          disabled: true as any,
-          className: `${((children as ReactElement).props as any).className || ''} ${disabledClassName}`.trim(),
-          title: errorMessage || 'Vous n\'avez pas les permissions nécessaires'
-        } as any)
+        return cloneElement(
+          children as ReactElement,
+          {
+            disabled: true as any,
+            className:
+              `${((children as ReactElement).props as any).className || ''} ${disabledClassName}`.trim(),
+            title: errorMessage || "Vous n'avez pas les permissions nécessaires",
+          } as any
+        )
       }
       return <>{children}</>
 
@@ -112,17 +116,17 @@ export function PermissionGuard({
 /**
  * Composant pour masquer complètement un élément si les permissions ne sont pas valides
  */
-export function PermissionHide({ permission, roles, children }: {
+export function PermissionHide({
+  permission,
+  roles,
+  children,
+}: {
   permission?: Permission | Permission[]
   roles?: string[]
   children: ReactNode
 }) {
   return (
-    <PermissionGuard
-      permission={permission}
-      roles={roles}
-      mode="hide"
-    >
+    <PermissionGuard permission={permission} roles={roles} mode="hide">
       {children}
     </PermissionGuard>
   )
@@ -131,12 +135,12 @@ export function PermissionHide({ permission, roles, children }: {
 /**
  * Composant pour désactiver un élément si les permissions ne sont pas valides
  */
-export function PermissionDisable({ 
-  permission, 
-  roles, 
-  children, 
+export function PermissionDisable({
+  permission,
+  roles,
+  children,
   errorMessage,
-  disabledClassName 
+  disabledClassName,
 }: {
   permission?: Permission | Permission[]
   roles?: string[]
@@ -160,11 +164,11 @@ export function PermissionDisable({
 /**
  * Composant pour afficher un message d'erreur si les permissions ne sont pas valides
  */
-export function PermissionError({ 
-  permission, 
-  roles, 
-  children, 
-  errorMessage = "Vous n'avez pas les permissions nécessaires pour accéder à cette fonctionnalité."
+export function PermissionError({
+  permission,
+  roles,
+  children,
+  errorMessage = "Vous n'avez pas les permissions nécessaires pour accéder à cette fonctionnalité.",
 }: {
   permission?: Permission | Permission[]
   roles?: string[]

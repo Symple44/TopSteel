@@ -7,7 +7,7 @@ export const mockUsersColumns = [
     isPrimaryKey: true,
     isForeignKey: false,
     isNullable: false,
-    comment: 'Primary key'
+    comment: 'Primary key',
   },
   {
     tableName: 'users',
@@ -16,7 +16,7 @@ export const mockUsersColumns = [
     isPrimaryKey: false,
     isForeignKey: false,
     isNullable: false,
-    comment: 'User email address'
+    comment: 'User email address',
   },
   {
     tableName: 'users',
@@ -25,7 +25,7 @@ export const mockUsersColumns = [
     isPrimaryKey: false,
     isForeignKey: false,
     isNullable: true,
-    comment: 'First name'
+    comment: 'First name',
   },
   {
     tableName: 'users',
@@ -34,7 +34,7 @@ export const mockUsersColumns = [
     isPrimaryKey: false,
     isForeignKey: false,
     isNullable: true,
-    comment: 'Last name'
+    comment: 'Last name',
   },
   {
     tableName: 'users',
@@ -43,7 +43,7 @@ export const mockUsersColumns = [
     isPrimaryKey: false,
     isForeignKey: false,
     isNullable: false,
-    comment: 'User role'
+    comment: 'User role',
   },
   {
     tableName: 'users',
@@ -52,7 +52,7 @@ export const mockUsersColumns = [
     isPrimaryKey: false,
     isForeignKey: false,
     isNullable: false,
-    comment: 'Active status'
+    comment: 'Active status',
   },
   {
     tableName: 'users',
@@ -61,7 +61,7 @@ export const mockUsersColumns = [
     isPrimaryKey: false,
     isForeignKey: false,
     isNullable: true,
-    comment: 'Last login time'
+    comment: 'Last login time',
   },
   {
     tableName: 'users',
@@ -70,6 +70,6 @@ export const mockUsersColumns = [
     isPrimaryKey: false,
     isForeignKey: false,
     isNullable: false,
-    comment: 'Creation timestamp'
-  }
+    comment: 'Creation timestamp',
+  },
 ]
