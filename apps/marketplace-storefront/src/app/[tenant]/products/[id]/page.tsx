@@ -4,15 +4,16 @@ import { api } from '@/lib/api/storefront'
 import type { Metadata } from 'next'
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     tenant: string
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   try {
-    const product = await api.getProduct(params.tenant, params.id)
+    const resolvedParams = await params
+    const product = await api.getProduct(resolvedParams.tenant, resolvedParams.id)
     
     return {
       title: `${product.designation} - Marketplace`,
@@ -33,11 +34,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   try {
-    const product = await api.getProduct(params.tenant, params.id)
+    const resolvedParams = await params
+    const product = await api.getProduct(resolvedParams.tenant, resolvedParams.id)
     
     return (
       <div className="container-marketplace py-8">
-        <ProductDetail product={product} tenant={params.tenant} />
+        <ProductDetail product={product} tenant={resolvedParams.tenant} />
       </div>
     )
   } catch (error) {

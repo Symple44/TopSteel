@@ -2,9 +2,9 @@
 
 export async function testClientError() {
   const testUrls = [
-    'http://127.0.0.1:3002/api/v1/health',
-    'http://127.0.0.1:3002/api/v1/test',
-    'http://localhost:3002/api/v1/health',
+    'http://127.0.0.1:3002/api/health',
+    'http://127.0.0.1:3002/api/test',
+    'http://localhost:3002/api/health',
   ]
 
   for (const url of testUrls) {

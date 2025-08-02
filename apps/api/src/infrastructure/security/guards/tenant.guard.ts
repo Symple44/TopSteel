@@ -15,7 +15,7 @@ import { SocieteUser } from '../../../features/societes/entities/societe-user.en
 export class TenantGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    @InjectRepository(SocieteUser)
+    @InjectRepository(SocieteUser, 'auth')
     private _societeUserRepository: Repository<SocieteUser>,
     private multiTenantConfig: MultiTenantDatabaseConfig,
   ) {}

@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "build": "nest build",
-    "dev": "node dev.js",
+    "dev": "nest start --watch",
     "dev:debug": "nest start --debug --watch",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
@@ -18,9 +18,10 @@
     "test": "vitest",
     "test:cov": "vitest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migration:generate": "npm run typeorm -- migration:generate",
-    "migration:run": "npm run typeorm -- migration:run",
-    "migration:revert": "npm run typeorm -- migration:revert",
+    "migration:generate": "npm run typeorm -- migration:generate -d src/infrastructure/database/data-source.ts",
+    "migration:run": "npm run typeorm -- migration:run -d src/infrastructure/database/data-source.ts",
+    "migration:run:direct": "ts-node -r tsconfig-paths/register src/scripts/run-migration.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/infrastructure/database/data-source.ts",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit"

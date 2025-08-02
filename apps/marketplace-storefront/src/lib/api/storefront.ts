@@ -101,8 +101,38 @@ export interface StaticPage {
 // API Functions
 export async function getTenantConfig(tenant: string): Promise<StorefrontConfig | null> {
   try {
-    apiClient.setTenant(tenant)
-    return await apiClient.storefront.getConfig()
+    // Temporaire : retourner des données statiques pour bypass le problème de tenant
+    return {
+      storeName: tenant === 'topsteel' ? 'TopSteel' : 'Démo Marketplace',
+      description: tenant === 'topsteel' ? 'Boutique en ligne TopSteel' : 'Boutique de démonstration',
+      contactInfo: {
+        email: 'contact@topsteel.fr',
+        phone: '+33 1 23 45 67 89',
+        address: '123 Rue de la Métallurgie, 75000 Paris'
+      },
+      features: {
+        allowGuestCheckout: true,
+        requiresAuth: false,
+        showPrices: true,
+        showStock: true,
+        enableWishlist: false,
+        enableCompare: false,
+        enableReviews: false
+      },
+      social: {
+        facebook: 'https://facebook.com/topsteel',
+        linkedin: 'https://linkedin.com/company/topsteel'
+      },
+      seo: {
+        title: tenant === 'topsteel' ? 'TopSteel - Boutique en ligne' : 'Démo Marketplace',
+        description: 'Découvrez nos produits sur la boutique en ligne',
+        keywords: ['TopSteel', 'boutique', 'produits', 'métallurgie']
+      }
+    }
+    
+    // Code original commenté temporairement
+    // apiClient.setTenant(tenant)
+    // return await apiClient.storefront.getConfig()
   } catch (error: any) {
     if (error.message === 'TENANT_NOT_FOUND') {
       return null

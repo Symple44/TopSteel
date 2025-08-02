@@ -13,7 +13,7 @@ export default defineConfig({
     'business/index': 'src/components/business/index.ts',
     'theme/index': 'src/components/theme/index.ts',
   },
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   splitting: false,
   sourcemap: false,
@@ -27,8 +27,18 @@ export default defineConfig({
     'tailwind-merge',
     'lucide-react',
     'class-variance-authority',
+    'next-themes',
   ],
   treeshake: true,
   minify: false,
+  target: 'esnext',
+  platform: 'neutral',
+  noExternal: [],
+  esbuildOptions(options) {
+    options.jsx = 'automatic'
+    options.jsxImportSource = 'react'
+    options.format = 'esm'
+    options.packages = 'external'
+  },
   tsconfig: './tsconfig.json',
 })

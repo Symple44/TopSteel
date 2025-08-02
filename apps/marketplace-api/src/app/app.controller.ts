@@ -30,11 +30,19 @@ export class AppController {
       return { error: 'No X-Tenant header provided' }
     }
 
+    const nodeEnv = process.env.NODE_ENV
+    const isDev = !nodeEnv || nodeEnv === 'development'
+
     try {
       const tenantContext = await this.tenantResolver.resolveTenantByDomain(tenant)
       return {
         success: true,
         tenant: tenant,
+        debug: {
+          nodeEnv,
+          isDev,
+          shouldUseDemoMode: (tenant === 'demo' || tenant === 'topsteel') && isDev
+        },
         context: {
           societeId: tenantContext.societeId,
           societeName: tenantContext.societe.nom,
@@ -47,8 +55,40 @@ export class AppController {
       return {
         success: false,
         tenant: tenant,
-        error: error.message,
-        stack: error.stack
+        debug: {
+          nodeEnv,
+          isDev,
+          shouldUseDemoMode: (tenant === 'demo' || tenant === 'topsteel') && isDev
+        },
+        error: error.message
+      }
+    }
+  }
+
+  @Get('temp-storefront-config')
+  @ApiOperation({ summary: 'Temporary storefront config for testing' })
+  tempStorefrontConfig() {
+    return {
+      storeName: "TopSteel",
+      description: "Boutique en ligne TopSteel",
+      contactInfo: {
+        email: "contact@topsteel.fr",
+        address: "123 Rue de la Métallurgie, 75000 Paris"
+      },
+      features: {
+        allowGuestCheckout: true,
+        requiresAuth: false,
+        showPrices: true,
+        showStock: true,
+        enableWishlist: false,
+        enableCompare: false,
+        enableReviews: false
+      },
+      social: {},
+      seo: {
+        title: "TopSteel - Boutique en ligne",
+        description: "Découvrez nos produits sur la boutique en ligne de TopSteel",
+        keywords: ["TopSteel", "boutique", "produits", "métallurgie"]
       }
     }
   }

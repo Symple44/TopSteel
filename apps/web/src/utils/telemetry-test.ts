@@ -7,7 +7,7 @@ export async function testOpenTelemetry() {
 
   try {
     // Test 1: Trace d'appel API
-    const apiSpan = traceAPICall('health-check', '/api/v1/health', 'GET')
+    const apiSpan = traceAPICall('health-check', '/api/health', 'GET')
 
     // Simuler une latence
     await new Promise((resolve) => setTimeout(resolve, 100))

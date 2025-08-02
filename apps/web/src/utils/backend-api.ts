@@ -3,7 +3,6 @@ import { safeFetch } from './fetch-safe'
 // Configuration centralisée pour les appels backend
 const BACKEND_CONFIG = {
   baseUrl: process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002',
-  apiVersion: process.env.NEXT_PUBLIC_API_VERSION || 'v1',
   globalPrefix: 'api',
 }
 
@@ -20,8 +19,8 @@ export async function callBackendApi(
     throw new Error(`Expected string endpoint, got ${typeof endpoint}: ${endpoint}`)
   }
 
-  // Construction automatique de l'URL avec préfixe et version
-  const url = `${BACKEND_CONFIG.baseUrl}/${BACKEND_CONFIG.globalPrefix}/${BACKEND_CONFIG.apiVersion}/${endpoint.replace(/^\/+/, '')}`
+  // Construction automatique de l'URL avec préfixe
+  const url = `${BACKEND_CONFIG.baseUrl}/${BACKEND_CONFIG.globalPrefix}/${endpoint.replace(/^\/+/, '')}`
 
   // Configuration par défaut avec credentials
   const defaultOptions: RequestInit = {
@@ -104,7 +103,7 @@ export async function callHealthApi(
 ): Promise<Response> {
   const { timeout = 5000, ...fetchOptions } = options
 
-  const url = `${BACKEND_CONFIG.baseUrl}/${BACKEND_CONFIG.globalPrefix}/${BACKEND_CONFIG.apiVersion}/${endpoint.replace(/^\/+/, '')}`
+  const url = `${BACKEND_CONFIG.baseUrl}/${BACKEND_CONFIG.globalPrefix}/${endpoint.replace(/^\/+/, '')}`
 
   const defaultOptions: RequestInit = {
     credentials: 'include',

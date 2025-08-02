@@ -13,6 +13,7 @@ import { MarketplacePriceRule } from '../../domains/products/entities/marketplac
 import { MarketplaceOrder } from '../../domains/orders/entities/marketplace-order.entity'
 import { MarketplaceOrderItem } from '../../domains/orders/entities/marketplace-order-item.entity'
 import { MarketplaceTheme } from '../../domains/themes/entities/marketplace-theme.entity'
+import { PageTemplate, PageSection, SectionPreset } from '../../domains/page-builder/entities'
 
 @Module({
   imports: [
@@ -43,6 +44,9 @@ import { MarketplaceTheme } from '../../domains/themes/entities/marketplace-them
             MarketplaceOrder,
             MarketplaceOrderItem,
             MarketplaceTheme,
+            PageTemplate,
+            PageSection,
+            SectionPreset,
           ],
         }
       },
@@ -58,6 +62,9 @@ import { MarketplaceTheme } from '../../domains/themes/entities/marketplace-them
       MarketplaceOrder,
       MarketplaceOrderItem,
       MarketplaceTheme,
+      PageTemplate,
+      PageSection,
+      SectionPreset,
     ], 'marketplace'),
   ],
   exports: [TypeOrmModule],

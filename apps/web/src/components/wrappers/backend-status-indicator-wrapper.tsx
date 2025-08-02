@@ -3,7 +3,7 @@
 import { BackendStatusIndicator, BackendConnectionGuard } from '@erp/ui'
 import { useBackendHealth } from '@/hooks/use-backend-health'
 import { useTranslation } from '@/lib/i18n/hooks'
-import type React from 'react'
+import React from 'react'
 
 interface BackendStatusIndicatorWrapperProps {
   showDetails?: boolean

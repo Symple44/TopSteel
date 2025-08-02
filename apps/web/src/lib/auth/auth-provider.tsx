@@ -1,7 +1,6 @@
 'use client'
 
-import type React from 'react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AuthService } from '../../services/auth-service'
 import { AuthAdapter } from './auth-adapter'
 import { AuthContext } from './auth-context'
@@ -55,6 +54,75 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (typeof window !== 'undefined' && !tabId.current) {
       tabId.current = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     }
+  }, [])
+
+  // ===========================================
+  // SYNCHRONISATION MULTI-ONGLETS
+  // ===========================================
+
+  const initializeBroadcastChannel = useCallback(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const config = authStorage.getConfig()
+      broadcastChannel.current = new BroadcastChannel(config.broadcastChannelName)
+
+      broadcastChannel.current.onmessage = (event: MessageEvent<AuthBroadcastEvent>) => {
+        const { type, tabId: senderTabId, data } = event.data
+
+        // Ignorer les messages de ce même onglet
+        if (senderTabId === tabId.current) return
+
+        switch (type) {
+          case 'USER_LOGIN': {
+            // Un autre onglet s'est connecté
+            const { user, tokens, company } = data
+            setAuthState((prev) => ({
+              ...prev,
+              isAuthenticated: true,
+              user,
+              tokens,
+              company: company || null,
+              requiresCompanySelection: !company,
+              mfa: { required: false },
+            }))
+            break
+          }
+
+          case 'USER_LOGOUT':
+            // Un autre onglet s'est déconnecté
+            setAuthState({
+              ...defaultAuthState,
+              isLoading: false,
+              mounted: true,
+            })
+            break
+
+          case 'COMPANY_CHANGED': {
+            // Un autre onglet a changé de société
+            const { user: updatedUser, tokens: updatedTokens, company: newCompany } = data
+            setAuthState((prev) => ({
+              ...prev,
+              user: updatedUser,
+              tokens: updatedTokens,
+              company: newCompany,
+              requiresCompanySelection: false,
+            }))
+            break
+          }
+
+          case 'TOKEN_REFRESH': {
+            // Un autre onglet a rafraîchi les tokens
+            const { tokens: refreshedTokens } = data
+            setAuthState((prev) => ({
+              ...prev,
+              tokens: refreshedTokens,
+            }))
+            break
+          }
+        }
+      }
+    } catch (_error) {}
   }, [])
 
   // ===========================================
@@ -164,75 +232,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isHydrated, // Initialiser la synchronisation multi-onglets
     initializeBroadcastChannel,
   ])
-
-  // ===========================================
-  // SYNCHRONISATION MULTI-ONGLETS
-  // ===========================================
-
-  const initializeBroadcastChannel = useCallback(() => {
-    if (typeof window === 'undefined') return
-
-    try {
-      const config = authStorage.getConfig()
-      broadcastChannel.current = new BroadcastChannel(config.broadcastChannelName)
-
-      broadcastChannel.current.onmessage = (event: MessageEvent<AuthBroadcastEvent>) => {
-        const { type, tabId: senderTabId, data } = event.data
-
-        // Ignorer les messages de ce même onglet
-        if (senderTabId === tabId.current) return
-
-        switch (type) {
-          case 'USER_LOGIN': {
-            // Un autre onglet s'est connecté
-            const { user, tokens, company } = data
-            setAuthState((prev) => ({
-              ...prev,
-              isAuthenticated: true,
-              user,
-              tokens,
-              company: company || null,
-              requiresCompanySelection: !company,
-              mfa: { required: false },
-            }))
-            break
-          }
-
-          case 'USER_LOGOUT':
-            // Un autre onglet s'est déconnecté
-            setAuthState({
-              ...defaultAuthState,
-              isLoading: false,
-              mounted: true,
-            })
-            break
-
-          case 'COMPANY_CHANGED': {
-            // Un autre onglet a changé de société
-            const { user: updatedUser, tokens: updatedTokens, company: newCompany } = data
-            setAuthState((prev) => ({
-              ...prev,
-              user: updatedUser,
-              tokens: updatedTokens,
-              company: newCompany,
-              requiresCompanySelection: false,
-            }))
-            break
-          }
-
-          case 'TOKEN_REFRESH': {
-            // Un autre onglet a rafraîchi les tokens
-            const { tokens: refreshedTokens } = data
-            setAuthState((prev) => ({
-              ...prev,
-              tokens: refreshedTokens,
-            }))
-            break
-          }
-        }
-      }
-    } catch (_error) {}
-  }, [])
 
   const broadcastAuthEvent = useCallback((type: AuthBroadcastEvent['type'], data: any) => {
     if (!broadcastChannel.current) return

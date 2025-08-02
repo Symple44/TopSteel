@@ -23,6 +23,10 @@ import { User } from '../../domains/users/entities/user.entity'
 import { DatabaseCleanupService } from './database-cleanup.service'
 import { DatabasePreSyncService } from './database-pre-sync.service'
 import { DatabaseSyncService } from './database-sync.service'
+// Entités pricing
+import { SectorCoefficient } from '../../modules/pricing/entities/sector-coefficient.entity'
+import { CustomerSectorAssignment } from '../../modules/pricing/entities/customer-sector-assignment.entity'
+import { BTPIndex } from '../../modules/pricing/entities/btp-index.entity'
 
 @Module({
   imports: [
@@ -59,6 +63,11 @@ import { DatabaseSyncService } from './database-sync.service'
           User,
           UserMenuPreference,
           Notifications,
+
+          // Entités pricing
+          SectorCoefficient,
+          CustomerSectorAssignment,
+          BTPIndex,
         ]
 
         return {

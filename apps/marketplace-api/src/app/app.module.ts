@@ -19,10 +19,12 @@ import { CustomersModule } from '../domains/customers/customers.module'
 import { OrdersModule } from '../domains/orders/orders.module'
 import { ThemesModule } from '../domains/themes/themes.module'
 import { StorefrontModule } from '../domains/storefront/storefront.module'
+import { PageBuilderModule } from '../domains/page-builder/page-builder.module'
 
 // Controllers & Services
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { TestSimpleController } from '../test-simple.controller'
 // import { HealthController } from '../infrastructure/health/health.controller' // Disabled for now
 
 @Module({
@@ -70,8 +72,9 @@ import { AppService } from './app.service'
     OrdersModule,
     ThemesModule,
     StorefrontModule,
+    PageBuilderModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, TestSimpleController],
   providers: [AppService],
 })
 export class AppModule {}

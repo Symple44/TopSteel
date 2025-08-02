@@ -8,7 +8,7 @@ import { getTenantConfig } from '@/lib/api/storefront'
 
 interface TenantLayoutProps {
   children: React.ReactNode
-  params: { tenant: string }
+  params: Promise<{ tenant: string }>
 }
 
 export default async function TenantLayout({ 
@@ -51,7 +51,7 @@ export default async function TenantLayout({
   }
 }
 
-export async function generateMetadata({ params }: { params: { tenant: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }) {
   const resolvedParams = await params
   
   try {

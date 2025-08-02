@@ -242,8 +242,9 @@ export interface SimpleTooltipProps {
   delayDuration?: number
   disabled?: boolean
   
-  // Props du trigger
-  trigger: React.ReactNode
+  // Props du trigger - accepte soit trigger soit children
+  trigger?: React.ReactNode
+  children?: React.ReactNode
   triggerClassName?: string
   triggerAsChild?: boolean
   
@@ -271,6 +272,7 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(({
   
   // Props du trigger
   trigger,
+  children,
   triggerClassName,
   triggerAsChild = false,
   
@@ -289,9 +291,12 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(({
   
   ...props
 }, ref) => {
+  // Utiliser children si fourni, sinon trigger
+  const triggerContent = children || trigger
+
   if (!content || disabled) {
     // Si pas de contenu ou désactivé, retourner juste le trigger
-    return <div ref={ref} className={triggerClassName}>{trigger}</div>
+    return <div ref={ref} className={triggerClassName}>{triggerContent}</div>
   }
 
   return (
@@ -305,7 +310,7 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(({
         asChild={triggerAsChild}
         className={triggerClassName}
       >
-        {triggerAsChild ? trigger : <div>{trigger}</div>}
+        {triggerAsChild ? triggerContent : <div>{triggerContent}</div>}
       </TooltipTrigger>
       <TooltipContent
         ref={ref}

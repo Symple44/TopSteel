@@ -135,6 +135,13 @@ export function RichTextEditor({
     }
   }, [initialContent, open])
 
+  const updateContent = useCallback(() => {
+    if (editorRef.current) {
+      const htmlContent = editorRef.current.innerHTML
+      setContent(htmlContent)
+    }
+  }, [])
+
   const executeCommand = useCallback(
     (command: string, value?: string) => {
       document.execCommand(command, false, value)
@@ -143,13 +150,6 @@ export function RichTextEditor({
     },
     [updateContent]
   )
-
-  const updateContent = useCallback(() => {
-    if (editorRef.current) {
-      const htmlContent = editorRef.current.innerHTML
-      setContent(htmlContent)
-    }
-  }, [])
 
   const handleSave = useCallback(() => {
     const sanitizedContent = sanitizeHtml(content)

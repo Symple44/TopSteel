@@ -2,27 +2,30 @@ import { Suspense } from 'react'
 import { SearchResults } from './search-results'
 
 interface SearchPageProps {
-  params: {
+  params: Promise<{
     tenant: string
-  }
-  searchParams: {
+  }>
+  searchParams: Promise<{
     q?: string
     category?: string
     sort?: string
     page?: string
-  }
+  }>
 }
 
-export default function SearchPage({ params, searchParams }: SearchPageProps) {
+export default async function SearchPage({ params, searchParams }: SearchPageProps) {
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  
   return (
     <div className="container-marketplace py-8">
       <Suspense fallback={<SearchSkeleton />}>
         <SearchResults 
-          tenant={params.tenant}
-          query={searchParams.q}
-          category={searchParams.category}
-          sort={searchParams.sort}
-          page={searchParams.page}
+          tenant={resolvedParams.tenant}
+          query={resolvedSearchParams.q}
+          category={resolvedSearchParams.category}
+          sort={resolvedSearchParams.sort}
+          page={resolvedSearchParams.page}
         />
       </Suspense>
     </div>

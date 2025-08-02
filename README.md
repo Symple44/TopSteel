@@ -51,27 +51,38 @@
 - Analyse de performance par technicien
 - Suivi budgétaire et prévisionnel
 
+### 🛒 **Marketplace e-commerce**
+- Boutiques en ligne multi-tenant par société
+- Catalogue produits synchronisé avec l'ERP
+- Système de panier et checkout complet
+- Gestion clients et commandes marketplace
+- Thèmes personnalisables par tenant
+- API dédiée avec isolation des données
+
 ## 🏗️ Architecture technique
 
 ### **Monorepo moderne**
 ```
 TopSteel/
-├── 🌐 apps/web/              # Application frontend Next.js 14
-├── 🔗 apps/api/              # API backend NestJS
+├── 🌐 apps/web/                      # Application frontend Next.js 15
+├── 🔗 apps/api/                      # API backend NestJS
+├── 🛒 apps/marketplace-api/          # API Marketplace multi-tenant
+├── 🏪 apps/marketplace-storefront/   # Storefront e-commerce Next.js 15
 ├── 📦 packages/
-│   ├── ui/                   # Composants UI Design System
-│   ├── types/                # Types TypeScript partagés
-│   ├── utils/                # Utilitaires et validations
-│   └── config/               # Configurations ESLint/Prettier
-├── 🤖 .github/workflows/     # CI/CD GitHub Actions
-├── 📝 scripts/               # Scripts d'automatisation
-└── 🔧 Configuration files
+│   ├── ui/                           # Composants UI Design System
+│   ├── types/                        # Types TypeScript partagés
+│   ├── utils/                        # Utilitaires et validations
+│   └── config/                       # Configurations ESLint/Prettier
+├── 🤖 .github/workflows/             # CI/CD GitHub Actions
+├── 📝 scripts/                       # Scripts d'automatisation
+├── 🔧 .env.local                     # Configuration centralisée
+└── 📚 Documentation complète
 ```
 
 ### **Stack technologique**
 
 #### **Frontend (Next.js)**
-- ⚡ **Next.js 14** - App Router + Server Components
+- ⚡ **Next.js 15** - App Router + Server Components
 - 🎯 **TypeScript** - Typage statique strict
 - 🎨 **Tailwind CSS** - Design system cohérent
 - 🧩 **Radix UI** - Composants accessibles
@@ -143,30 +154,36 @@ createdb erp_topsteel
 
 #### **4. Variables d'environnement**
 ```bash
-# API Backend
-cp apps/api/.env.example apps/api/.env.local
+# Configuration centralisée à la racine
+cp .env.example .env.local
 
-# Frontend Web
-cp apps/web/.env.example apps/web/.env.local
+# Toutes les variables sont maintenant centralisées dans /.env.local
+# Plus besoin de fichiers .env séparés par application
 ```
 
 #### **5. Lancement des services**
 ```bash
-# Démarrer tous les services
+# Démarrer tous les services du monorepo
 pnpm dev
 
+# Démarrer uniquement les apps ERP (recommandé)
+pnpm dev:all
+
 # Ou individuellement
-pnpm dev:api    # API sur http://127.0.0.1:3001
-pnpm dev:web    # Web sur http://127.0.0.1:3000
+pnpm dev:api               # API ERP sur http://127.0.0.1:3002
+pnpm dev:web               # Web ERP sur http://127.0.0.1:3005
+pnpm dev:marketplace       # Marketplace API (3004) + Storefront (3007)
 ```
 
 ## 🛠️ Commandes de développement
 
 ### **Services**
 ```bash
-pnpm dev                    # 🚀 Démarre tous les services
-pnpm dev:web               # 🌐 Frontend uniquement
-pnpm dev:api               # 🔗 API uniquement
+pnpm dev                    # 🚀 Démarre tous les services du monorepo
+pnpm dev:all               # 🎯 Démarre uniquement les apps ERP (@erp/*)
+pnpm dev:web               # 🌐 Frontend ERP uniquement
+pnpm dev:api               # 🔗 API ERP uniquement
+pnpm dev:marketplace       # 🛒 Services Marketplace uniquement
 pnpm start                 # 🏭 Production mode
 ```
 
@@ -211,7 +228,7 @@ pnpm reset                # 🔄 Reset complet (node_modules)
 
 ## 🏭 Modules métier
 
-### **Backend (API NestJS)**
+### **Backend ERP (API NestJS)**
 | Module | Description | Statut |
 |--------|-------------|--------|
 | 🔐 **Auth** | Authentification JWT, refresh tokens | ✅ |
@@ -226,7 +243,18 @@ pnpm reset                # 🔄 Reset complet (node_modules)
 | 📄 **Documents** | GED, templates, génération PDF | 🚧 |
 | 🔔 **Notifications** | Système temps réel, email, SMS | 🚧 |
 
-### **Frontend (Next.js)**
+### **Backend Marketplace (API NestJS)**
+| Module | Description | Statut |
+|--------|-------------|--------|
+| 🛒 **Products** | Catalogue produits, pricing, sync ERP | ✅ |
+| 👥 **Customers** | Gestion clients marketplace | ✅ |
+| 📋 **Orders** | Commandes, checkout, paiements | ✅ |
+| 🎨 **Themes** | Personnalisation par tenant | ✅ |
+| 🏪 **Storefront** | API publique pour boutiques | ✅ |
+| 🔐 **Tenant Guard** | Isolation multi-tenant | ✅ |
+| 🏢 **Auth Integration** | JWT partagé avec ERP | ✅ |
+
+### **Frontend ERP (Next.js)**
 | Page/Module | Route | Description | Statut |
 |-------------|--------|-------------|--------|
 | 🏠 **Dashboard** | `/` | Vue d'ensemble, KPIs, graphiques | ✅ |
@@ -238,60 +266,82 @@ pnpm reset                # 🔄 Reset complet (node_modules)
 | 🧾 **Facturation** | `/facturation/*` | Devis, factures, paiements | 🚧 |
 | ⚙️ **Administration** | `/admin/*` | Configuration, utilisateurs | 🚧 |
 
+### **Frontend Marketplace (Next.js)**
+| Page/Module | Route | Description | Statut |
+|-------------|--------|-------------|--------|
+| 🏪 **Storefront** | `/[tenant]` | Page d'accueil boutique | ✅ |
+| 🛍️ **Catalogue** | `/[tenant]/products` | Liste des produits | ✅ |
+| 📄 **Détail Produit** | `/[tenant]/products/[id]` | Fiche produit complète | ✅ |
+| 🛒 **Panier** | `/[tenant]/cart` | Gestion panier et checkout | ✅ |
+| 🔍 **Recherche** | `/[tenant]/search` | Recherche et filtres | ✅ |
+| 👤 **Compte Client** | `/[tenant]/account` | Profil et commandes | ✅ |
+| 💳 **Checkout** | `/[tenant]/checkout` | Processus de commande | ✅ |
+
 ## 🔧 Configuration avancée
 
-### **Variables d'environnement API**
+### **Configuration centralisée (.env.local)**
 ```bash
-# Application
-NODE_ENV=development
-PORT=3001
-APP_URL=http://127.0.0.1:3001
+# ===== SERVICES PORTS =====
+API_PORT=3002
+WEB_PORT=3005
+MARKETPLACE_API_PORT=3004
+MARKETPLACE_WEB_PORT=3007
 
-# Base de données PostgreSQL
+# ===== BASE DE DONNÉES =====
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=your_password
 DB_NAME=erp_topsteel
-DB_SSL=false
-DB_MAX_CONNECTIONS=100
+DB_AUTH_NAME=erp_topsteel_auth
+DB_SHARED_NAME=erp_topsteel_shared
 
-# Redis (Cache & Queues)
+# ===== MARKETPLACE =====
+MARKETPLACE_DB_NAME=erp_topsteel_marketplace
+NEXT_PUBLIC_MARKETPLACE_API_URL=http://127.0.0.1:3004/api
+NEXT_PUBLIC_MARKETPLACE_URL=http://127.0.0.1:3007
+NEXT_PUBLIC_DEFAULT_TENANT=TOPSTEEL
+
+# ===== REDIS (OPTIONNEL) =====
+REDIS_ENABLED=true
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-REDIS_PASSWORD=
-REDIS_DB=0
-REDIS_TTL=3600
 
-# JWT Authentication
+# ===== JWT SÉCURITÉ =====
 JWT_SECRET=your-super-secret-key
 JWT_EXPIRES_IN=24h
 JWT_REFRESH_SECRET=your-refresh-secret
 JWT_REFRESH_EXPIRES_IN=7d
 
-# Rate Limiting
+# ===== RATE LIMITING =====
 THROTTLE_TTL=60000
-THROTTLE_LIMIT=100
+THROTTLE_LIMIT=500
 
-# Logging
+# ===== LOGS ET DEBUG =====
 LOG_LEVEL=debug
-LOG_FILE=true
+DEBUG=false
 ```
 
-### **Variables d'environnement Web**
+### **URLs publiques et configuration**
 ```bash
-# URLs de base
-NEXT_PUBLIC_API_URL=http://127.0.0.1:3001/api
-NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
+# ===== URLS PUBLIQUES =====
+NEXT_PUBLIC_API_URL=http://127.0.0.1:3002
+NEXT_PUBLIC_APP_URL=http://127.0.0.1:3005
 
-# NextAuth.js
+# ===== NEXTAUTH =====
+NEXTAUTH_URL=http://127.0.0.1:3005
 NEXTAUTH_SECRET=your-nextauth-secret
-NEXTAUTH_URL=http://127.0.0.1:3000
 
-# Services optionnels
-NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn
+# ===== CORS ET FRONTEND =====
+FRONTEND_URL=http://127.0.0.1:3005
+API_CORS_ORIGIN=http://127.0.0.1:3005
+
+# ===== SERVICES EXTERNES =====
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
 UPLOADTHING_SECRET=your-uploadthing-secret
 UPLOADTHING_APP_ID=your-uploadthing-app-id
+NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn
 ```
 
 ## 🛡️ Sécurité et qualité
@@ -353,11 +403,12 @@ docker-compose up -d
 ## 🤖 Automatisation CI/CD
 
 ### **GitHub Actions**
-- ✅ **Build & Tests** automatiques sur chaque PR
-- 🛡️ **Audit de sécurité** continu
+- ✅ **Build & Tests** automatiques sur chaque PR (ERP + Marketplace)
+- 🛡️ **Audit de sécurité** continu sur tous les services
 - 📊 **Analyse de qualité** avec CodeQL
 - 🚀 **Déploiement automatique** staging/production
 - 🔄 **Mise à jour des dépendances** avec Renovate
+- 🛒 **Tests marketplace** intégrés au pipeline
 
 ### **Workflows disponibles**
 - 🚀 **CI/CD Principal** : `.github/workflows/ci.yml`
@@ -373,10 +424,20 @@ docker-compose up -d
 ## 📊 Monitoring et observabilité
 
 ### **URLs de développement**
-- 🌐 **Frontend** : http://127.0.0.1:3000
-- 🔗 **API** : http://127.0.0.1:3001
-- 📚 **Documentation API** : http://127.0.0.1:3001/api/docs
-- ❤️ **Health Check** : http://127.0.0.1:3001/health
+
+#### **ERP Principal**
+- 🌐 **Frontend ERP** : http://127.0.0.1:3005
+- 🔗 **API ERP** : http://127.0.0.1:3002
+- 📚 **Documentation API** : http://127.0.0.1:3002/api/docs
+- ❤️ **Health Check** : http://127.0.0.1:3002/health
+
+#### **Marketplace**
+- 🛒 **API Marketplace** : http://127.0.0.1:3004
+- 🏪 **Storefront** : http://127.0.0.1:3007
+- 📚 **Documentation Marketplace** : http://127.0.0.1:3004/api/docs
+- 🏢 **Demo Tenant** : http://127.0.0.1:3007/TOPSTEEL
+
+#### **Outils de développement**
 - 📖 **Storybook** : http://127.0.0.1:6006
 
 ### **Logs et debugging**
@@ -418,8 +479,9 @@ pnpm analyze
 ## 📚 Documentation
 
 ### **Liens utiles**
-- 📖 **Documentation complète** : [docs.topsteel.tech](https://docs.topsteel.tech)
-- 🔗 **API Reference** : [api.topsteel.tech/docs](https://api.topsteel.tech/docs)
+- 📖 **Documentation ERP** : [docs.topsteel.tech](https://docs.topsteel.tech)
+- 🔗 **API Reference ERP** : [api.topsteel.tech/docs](https://api.topsteel.tech/docs)
+- 🛒 **Documentation Marketplace** : [`apps/MARKETPLACE.md`](apps/MARKETPLACE.md)
 - 🎨 **Design System** : [storybook.topsteel.tech](https://storybook.topsteel.tech)
 - 🐛 **Rapporter un bug** : [GitHub Issues](https://github.com/YOUR_ORG/TopSteel/issues)
 
@@ -428,6 +490,7 @@ pnpm analyze
 - 🔐 [Guide de sécurité](docs/SECURITY.md)
 - 🚀 [Guide de déploiement](docs/DEPLOYMENT.md)
 - 🧪 [Guide des tests](docs/TESTING.md)
+- 🛒 [Documentation Marketplace complète](apps/MARKETPLACE.md)
 
 ## 📄 Licences et crédits
 
@@ -470,6 +533,6 @@ Merci aux équipes qui maintiennent les outils exceptionnels utilisés dans ce p
 [![Powered by Next.js](https://img.shields.io/badge/Powered%20by-Next.js-black)](https://nextjs.org/)
 [![Built with TypeScript](https://img.shields.io/badge/Built%20with-TypeScript-blue)](https://www.typescriptlang.org/)
 
-*Version 1.0.0* • *Dernière mise à jour: Juillet 2025*
+*Version 1.0.0* • *Dernière mise à jour: Janvier 2025*
 
 </div>

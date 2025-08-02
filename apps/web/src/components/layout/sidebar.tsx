@@ -50,7 +50,7 @@ import {
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
 import { ErpInfoModalWrapper as ErpInfoModal } from '@/components/wrappers'
-import { TooltipFixed } from '@erp/ui/primitives'
+import { SimpleTooltip as TooltipFixed } from '@erp/ui/primitives'
 import { useBackendStatus } from '@/hooks/use-backend-health'
 import { useDynamicMenu } from '@/hooks/use-dynamic-menu'
 import { useTranslation } from '@/lib/i18n'

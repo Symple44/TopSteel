@@ -11,22 +11,24 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import {
+import { 
+  Badge, 
+  Button, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@erp/ui/primitives'
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@erp/ui/primitives'
+} from '@erp/ui'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from '@/lib/i18n/hooks'
 

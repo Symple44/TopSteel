@@ -69,7 +69,9 @@
     "script:create-admin-user": "ts-node -r tsconfig-paths/register src/scripts/create-admin-user.ts",
     "script:test-admin-login": "ts-node -r tsconfig-paths/register src/scripts/test-admin-login.ts",
     "marketplace:generate-data": "ts-node -r tsconfig-paths/register src/scripts/generate-marketplace-test-data.ts",
-    "marketplace:test-modules": "ts-node -r tsconfig-paths/register src/scripts/test-marketplace-modules.ts"
+    "marketplace:test-modules": "ts-node -r tsconfig-paths/register src/scripts/test-marketplace-modules.ts",
+    "migration:pricing:run": "ts-node -r tsconfig-paths/register src/scripts/run-sector-pricing-migration.ts",
+    "init:pricing-data": "ts-node -r tsconfig-paths/register src/scripts/init-sector-pricing-data.ts"
   },
   "dependencies": {
     "@azure/identity": "^4.10.2",

@@ -15,7 +15,7 @@ import {
 import { Input } from '../../primitives'
 import { Label } from '../../forms'
 
-export interface Language {
+export interface TranslationLanguage {
   code: string
   name: string
   flag: string
@@ -32,7 +32,7 @@ export interface TranslationFieldProps {
   label?: string
   // Props for integration
   currentLanguage?: string
-  supportedLanguages?: Language[]
+  supportedLanguages?: TranslationLanguage[]
   // Translation props with fallbacks
   fieldTranslations?: {
     translateField?: string
@@ -45,7 +45,7 @@ export interface TranslationFieldProps {
   }
 }
 
-const DEFAULT_LANGUAGES: Language[] = [
+const DEFAULT_LANGUAGES: TranslationLanguage[] = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Español', flag: '🇪🇸' },

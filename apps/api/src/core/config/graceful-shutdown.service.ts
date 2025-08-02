@@ -66,11 +66,38 @@ export class GracefulShutdownService implements OnApplicationShutdown {
     this.logger.log('📝 3/6 - Fermeture des connexions base de données...')
     try {
       if (this.app) {
-        // Fermer les connexions TypeORM si présentes
-        const dataSource = this.app.get('DataSource', { strict: false })
-        if (dataSource?.isInitialized) {
-          await dataSource.destroy()
-          this.logger.log('✅ Connexions base de données fermées')
+        // Essayer de fermer les connexions TypeORM
+        try {
+          const { getConnectionManager } = await import('typeorm')
+          try {
+            const connectionManager = getConnectionManager()
+            const connections = connectionManager.connections?.filter(conn => conn?.isConnected) || []
+            
+            for (const connection of connections) {
+              if (connection?.isConnected) {
+                await connection.close()
+              }
+            }
+            
+            if (connections.length > 0) {
+              this.logger.log('✅ Connexions base de données fermées')
+            }
+          } catch (legacyError) {
+            // Fallback pour les versions plus récentes de TypeORM
+            this.logger.warn('⚠️  Méthode legacy TypeORM non disponible')
+          }
+        } catch (dbError) {
+          // Essayer une approche alternative avec le service de l'app
+          try {
+            const dataSource = this.app.get('CONNECTION', { strict: false }) || 
+                             this.app.get('Database', { strict: false })
+            if (dataSource?.isInitialized) {
+              await dataSource.destroy()
+              this.logger.log('✅ Connexions base de données fermées (alternative)')
+            }
+          } catch (altError) {
+            this.logger.warn('⚠️  Impossible de fermer les connexions BDD automatiquement')
+          }
         }
       }
     } catch (error) {

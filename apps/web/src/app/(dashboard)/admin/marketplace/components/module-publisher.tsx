@@ -2,27 +2,32 @@
 
 import { Eye, Plus, X } from 'lucide-react'
 import { useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import {
+import { 
+  Badge, 
+  Button, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@erp/ui/primitives'
-import { Input } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
-import {
+  Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@erp/ui/primitives'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
-import { Textarea } from '@erp/ui/primitives'
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger,
+  Textarea
+} from '@erp/ui'
 import { toast } from '@/hooks/use-toast'
 
 interface ModuleForm {

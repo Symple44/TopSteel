@@ -3,6 +3,7 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 import { promisify } from 'node:util'
 
+
 const execAsync = promisify(exec)
 const require = createRequire(import.meta.url)
 
@@ -29,23 +30,23 @@ async function _runBiome() {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Transpile workspace packages for Next.js 15
-  transpilePackages: ['@erp/ui', '@erp/utils', '@erp/types', '@erp/domains', '@erp/api-client'],
+  // Transpile workspace packages for Next.js 15 (excluding server external ones)
+  transpilePackages: ['@erp/domains', '@erp/api-client'],
 
   // API rewrites - proxy vers le backend NestJS
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
 
     return [
-      // Proxy tous les appels API vers le backend NestJS avec versioning
+      // Proxy tous les appels API vers le backend NestJS
       {
         source: '/api/backend/:path*',
-        destination: `${apiUrl}/api/v1/:path*`,
+        destination: `${apiUrl}/api/:path*`,
       },
-      // Proxy les appels directs à /api/* vers le backend NestJS avec versioning v1
+      // Proxy les appels directs à /api/* vers le backend NestJS
       {
         source: '/api/:path*',
-        destination: `${apiUrl}/api/v1/:path*`,
+        destination: `${apiUrl}/api/:path*`,
       },
     ]
   },
@@ -83,10 +84,28 @@ const nextConfig = {
   experimental: {
     // Next.js 15 with React 19 support
     reactCompiler: false, // Disable React Compiler for now
+    // Fix for params readonly issue in Next.js 15
+    staleTimes: {
+      dynamic: 0,
+      static: 0,
+    },
+    // Force dynamic rendering to avoid params serialization issues
+    dynamicIO: false,
+    // Disable static optimization that causes params readonly issues
+    ppr: false,
+    // Disable turbo that might cause params readonly issues
+    // turbo: false, // Removed - not a valid option in Next.js 15
+    // Disable optimistic hydration
+    // optimizePackageImports: false, // Should be an array, not boolean
   },
 
+  // Disable static generation completely
+  output: undefined,
+  trailingSlash: false,
+
+
   // External packages for server-side only
-  serverExternalPackages: ['sharp', '@img/sharp-wasm32', '@opentelemetry/api'],
+  serverExternalPackages: ['sharp', '@img/sharp-wasm32', '@opentelemetry/api', '@erp/ui', '@erp/utils', '@erp/types'],
 
   // Disable image optimization during build
   images: {
@@ -100,6 +119,9 @@ const nextConfig = {
       /Module not found: Can't resolve '@img\/sharp-libvips-dev/,
       /Module not found: Can't resolve '@img\/sharp-wasm32/,
     ]
+
+    // Configuration webpack de base
+    config.resolve.alias = config.resolve.alias || {};
     // OpenTelemetry conditionnel basé sur ENABLE_TELEMETRY
     const enableTelemetry = process.env.ENABLE_TELEMETRY === 'true'
     const otelPolyfill = path.resolve(import.meta.dirname, './src/utils/otel-polyfill-universal.js')

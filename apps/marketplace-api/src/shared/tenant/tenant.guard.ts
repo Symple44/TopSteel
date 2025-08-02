@@ -8,18 +8,36 @@ export class TenantGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
     
+    console.log(`TenantGuard: Traitement de la requête vers ${request.url}`)
+    console.log(`TenantGuard: Headers disponibles:`, {
+      host: request.headers.host,
+      'x-tenant': request.headers['x-tenant'],
+      'user-agent': request.headers['user-agent']?.substring(0, 50)
+    })
+    
     // Résoudre tenant depuis header, domaine ou param
     const tenantId = this.extractTenant(request)
     
     if (!tenantId) {
+      console.error('TenantGuard: Aucun tenant trouvé dans la requête')
+      console.error('TenantGuard: Headers disponibles:', request.headers)
       return false
     }
+
+    console.log(`TenantGuard: Résolution du tenant "${tenantId}"`)
 
     try {
       const tenantContext = await this.resolveTenant(request, tenantId)
       request.tenant = tenantContext
+      console.log(`TenantGuard: Tenant "${tenantId}" résolu avec succès`, {
+        societeId: tenantContext.societeId,
+        hasConnection: !!tenantContext.erpTenantConnection,
+        marketplaceEnabled: tenantContext.marketplaceEnabled
+      })
       return true
     } catch (error) {
+      console.error(`TenantGuard: Erreur lors de la résolution du tenant "${tenantId}":`, error.message)
+      console.error(`TenantGuard: Stack trace:`, error.stack)
       return false
     }
   }

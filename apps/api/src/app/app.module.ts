@@ -56,6 +56,8 @@ import { SocietesModule } from '../features/societes/societes.module'
 // Modules métier harmonisés
 // import { NotificationsModule } from '../features/notifications/notifications.module'
 import { UsersModule } from '../domains/users/users.module'
+// Module de pricing sectoriel
+import { PricingModule } from '../modules/pricing/pricing.module'
 // Nouveau module business centralisé (architecture DDD)
 import { BusinessModule } from '../domains/business.module'
 import { RedisModule } from '../core/redis/redis.module'
@@ -109,6 +111,7 @@ import { TestController } from '../api/controllers/test.controller'
     // Modules métier essentiels (activés)
     UsersModule,
     MenuModule,
+    PricingModule,
 
     // Nouveau module business centralisé (architecture DDD)
     BusinessModule,

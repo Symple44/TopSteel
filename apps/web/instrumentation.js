@@ -1,5 +1,5 @@
-// Instrumentation disabled
-// This file exists to prevent Next.js from trying to load OpenTelemetry
+// Instrumentation Next.js - OpenTelemetry désactivé
 export function register() {
-  // Do nothing - instrumentation disabled
+  // Instrumentation OpenTelemetry désactivée
+  console.log('✅ [Instrumentation] Instrumentation Next.js initialisée');
 }

@@ -1,6 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // Retirer output: 'standalone' en mode dev pour éviter les problèmes de ressources statiques
+  // output: 'standalone',
+  
+  // Origines autorisées pour les ressources cross-origin en développement
+  allowedDevOrigins: [
+    'http://localhost:3007', 
+    'http://127.0.0.1:3007', 
+    'https://localhost:3007',
+    'https://127.0.0.1:3007',
+    'localhost:3007', 
+    '127.0.0.1:3007'
+  ],
   
   // Images
   images: {
@@ -14,23 +25,29 @@ const nextConfig = {
         hostname: 'localhost',
       },
     ],
+    // Permettre les SVG et désactiver l'optimisation pour les images démo
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Images non optimisées pour les API locales
+    unoptimized: process.env.NODE_ENV === 'development',
   },
 
   // Environment variables
   env: {
-    MARKETPLACE_API_URL: process.env.MARKETPLACE_API_URL || 'http://localhost:3006/api',
+    MARKETPLACE_API_URL: process.env.MARKETPLACE_API_URL || 'http://localhost:3004/api',
   },
 
-  // Redirect root to tenant resolution
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/storefront',
-        permanent: false,
-      },
-    ]
-  },
+  // Pas de redirection automatique - laisser la page d'accueil gérer la sélection des tenants
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/',
+  //       destination: '/storefront',
+  //       permanent: false,
+  //     },
+  //   ]
+  // },
 
   // Headers for tenant resolution
   async headers() {

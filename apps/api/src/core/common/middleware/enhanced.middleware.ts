@@ -17,13 +17,19 @@ export class EnhancedMiddleware implements NestMiddleware {
     req.requestId = this.generateRequestId()
 
     res.setHeader('X-Request-ID', req.requestId)
-    res.setHeader('X-Response-Time', '0ms')
+
+    // Intercepter writeHead pour ajouter le header de temps de réponse avant l'envoi
+    const originalWriteHead = res.writeHead.bind(res)
+    res.writeHead = function(statusCode: number, statusMessage?: string | any, headers?: any) {
+      const duration = performance.now() - start
+      res.setHeader('X-Response-Time', `${duration.toFixed(2)}ms`)
+      return originalWriteHead(statusCode, statusMessage, headers)
+    }
 
     res.on('finish', () => {
       const duration = performance.now() - start
-      res.setHeader('X-Response-Time', `${duration.toFixed(2)}ms`)
-
       if (duration > 1000) {
+        // Log des requêtes lentes
       }
     })
 

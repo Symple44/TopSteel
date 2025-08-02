@@ -28,3 +28,6 @@ export * from './dropdown-fixed'
 // Re-export commonly used components from other categories
 export { Label } from '../forms/label'
 export { Separator } from '../layout/separator'
+
+// Utility functions needed by primitives
+export { cn } from '../../lib/utils'

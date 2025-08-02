@@ -46,7 +46,8 @@ export function InlineEditor<T = any>({
   const [showValidation, setShowValidation] = useState(false)
   const [showFormulaEditor, setShowFormulaEditor] = useState(false)
 
-  const inputRef = useRef<HTMLInputElement | HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const divRef = useRef<HTMLDivElement>(null)
   const selectRef = useRef<HTMLButtonElement>(null)
 
   // Valider en temps réel
@@ -69,20 +70,17 @@ export function InlineEditor<T = any>({
   useEffect(() => {
     if (autoFocus) {
       setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus()
-
+        if (column.type === 'richtext' && divRef.current) {
+          divRef.current.focus()
           // Pour les contentEditable (rich text), sélectionner tout le contenu différemment
-          if (column.type === 'richtext' && inputRef.current.contentEditable === 'true') {
-            const range = document.createRange()
-            const selection = window.getSelection()
-            range.selectNodeContents(inputRef.current)
-            selection?.removeAllRanges()
-            selection?.addRange(range)
-          } else if ('select' in inputRef.current) {
-            // Pour les inputs normaux
-            inputRef.current.select()
-          }
+          const range = document.createRange()
+          const selection = window.getSelection()
+          range.selectNodeContents(divRef.current)
+          selection?.removeAllRanges()
+          selection?.addRange(range)
+        } else if (inputRef.current) {
+          inputRef.current.focus()
+          inputRef.current.select()
         } else if (selectRef.current) {
           selectRef.current.focus()
         }
@@ -287,7 +285,7 @@ export function InlineEditor<T = any>({
       case 'richtext':
         return (
           <div
-            ref={inputRef}
+            ref={divRef}
             contentEditable
             className={cn(
               'p-2 border border-input bg-transparent rounded-md min-h-[60px] max-h-[120px] overflow-y-auto text-xs shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus:outline-none',

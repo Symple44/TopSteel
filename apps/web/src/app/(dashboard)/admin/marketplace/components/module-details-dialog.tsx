@@ -2,18 +2,24 @@
 
 import { AlertTriangle, Check, Clock, Download, Star, Users } from 'lucide-react'
 import { useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import {
+import { 
+  Badge, 
+  Button, 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@erp/ui/primitives'
-import { Separator } from '@erp/ui'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
+  Separator,
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from '@erp/ui'
 import { toast } from '@/hooks/use-toast'
 
 interface ModuleDetailsDialogProps {

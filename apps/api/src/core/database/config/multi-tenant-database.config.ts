@@ -36,6 +36,10 @@ import { Societe } from '../../../features/societes/entities/societe.entity'
 import { SocieteUser } from '../../../features/societes/entities/societe-user.entity'
 import { User } from '../../../domains/users/entities/user.entity'
 import { UserSettings } from '../../../domains/users/entities/user-settings.entity'
+// Entités pricing
+import { SectorCoefficient } from '../../../modules/pricing/entities/sector-coefficient.entity'
+import { CustomerSectorAssignment } from '../../../modules/pricing/entities/customer-sector-assignment.entity'
+import { BTPIndex } from '../../../modules/pricing/entities/btp-index.entity'
 
 @Injectable()
 export class MultiTenantDatabaseConfig {
@@ -127,6 +131,10 @@ export class MultiTenantDatabaseConfig {
         // Entités marketplace spécifiques au tenant
         ModuleInstallation,
         ModuleRating,
+        // Entités pricing
+        SectorCoefficient,
+        CustomerSectorAssignment,
+        BTPIndex,
       ],
       synchronize: false,
       logging: this.configService.get('DB_LOGGING', false),

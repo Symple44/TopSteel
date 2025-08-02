@@ -14,7 +14,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { buttonVariants } from '../../../lib/design-system'
+import { buttonVariants } from '../../../design-system/variants'
 import { cn } from '../../../lib/utils'
 
 // === VARIANTS POUR INPUT ENRICHI ===

@@ -3,9 +3,7 @@
 import { AlertTriangle, BarChart3, Download, Loader2, Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Progress } from '@erp/ui'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Progress } from '@erp/ui'
 import { callClientApi } from '@/utils/backend-api'
 
 interface MarketplaceStats {

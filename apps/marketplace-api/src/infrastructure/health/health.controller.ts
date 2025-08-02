@@ -7,6 +7,7 @@ import {
   MemoryHealthIndicator,
   DiskHealthIndicator
 } from '@nestjs/terminus'
+import { TenantResolver } from '../../shared/tenant/tenant-resolver.service'
 
 @ApiTags('health')
 @Controller('health')
@@ -16,6 +17,7 @@ export class HealthController {
     private db: TypeOrmHealthIndicator,
     private memory: MemoryHealthIndicator,
     private disk: DiskHealthIndicator,
+    private tenantResolver: TenantResolver,
   ) {}
 
   @Get()
@@ -57,6 +59,34 @@ export class HealthController {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       memory: process.memoryUsage(),
+    }
+  }
+
+  @Get('tenant/topsteel')
+  @ApiOperation({ summary: 'Test topsteel tenant resolution' })
+  async testTopsteelTenant() {
+    try {
+      // Test de résolution du tenant topsteel
+      const tenantContext = await this.tenantResolver.resolveTenantByDomain('topsteel.localhost')
+      
+      return {
+        status: 'success',
+        tenant: {
+          societeId: tenantContext.societeId,
+          nom: tenantContext.societe.nom,
+          hasConnection: !!tenantContext.erpTenantConnection,
+          isInitialized: tenantContext.erpTenantConnection?.isInitialized,
+          marketplaceEnabled: tenantContext.marketplaceEnabled
+        },
+        timestamp: new Date().toISOString()
+      }
+    } catch (error) {
+      return {
+        status: 'error',
+        message: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      }
     }
   }
 }

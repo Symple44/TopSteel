@@ -16,7 +16,7 @@ import {
   Textarea,
 } from '../../primitives'
 import { Calculator, CheckCircle, Info, XCircle } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormulaEngine } from './formula-engine'
 import type { ColumnConfig } from './types'
 
@@ -237,15 +237,7 @@ export function FormulaEditor<T>({
   })
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  useEffect(() => {
-    setFormula(currentFormula)
-  }, [currentFormula])
-
-  useEffect(() => {
-    validateFormula()
-  }, [validateFormula])
-
-  const validateFormula = () => {
+  const validateFormula = useCallback(() => {
     if (!formula.trim()) {
       setValidation({ valid: true })
       return
@@ -292,7 +284,15 @@ export function FormulaEditor<T>({
     } else {
       setValidation({ valid: true })
     }
-  }
+  }, [formula, sampleData, columns])
+
+  useEffect(() => {
+    setFormula(currentFormula)
+  }, [currentFormula])
+
+  useEffect(() => {
+    validateFormula()
+  }, [validateFormula])
 
   const insertFunction = (func: FormulaFunction) => {
     const textarea = textareaRef.current
