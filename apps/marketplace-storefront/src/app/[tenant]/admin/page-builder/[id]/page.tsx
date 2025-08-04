@@ -21,7 +21,7 @@ export default function PageEditorPage({ params }: PageProps) {
     queryFn: async () => {
       if (id === 'new') return null
       const response = await marketplaceApi.get(`/page-builder/templates/${id}`)
-      return response.data
+      return (response as any).data
     }
   })
 
@@ -45,10 +45,10 @@ export default function PageEditorPage({ params }: PageProps) {
 
       if (id === 'new') {
         const response = await marketplaceApi.post('/page-builder/templates', templateData)
-        return response.data
+        return (response as any).data
       } else {
         const response = await marketplaceApi.put(`/page-builder/templates/${id}`, templateData)
-        return response.data
+        return (response as any).data
       }
     },
     onSuccess: (savedTemplate) => {

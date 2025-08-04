@@ -5,13 +5,7 @@ import { Badge } from '@erp/ui'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { Input } from '@erp/ui/primitives'
 import { Label } from '@erp/ui'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@erp/ui/primitives'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
 import { Switch } from '@erp/ui/primitives'
 import { Textarea } from '@erp/ui/primitives'
 

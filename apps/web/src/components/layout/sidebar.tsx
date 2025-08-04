@@ -666,7 +666,12 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
       {/* Modal d'information ERP - Portal pour centre de l'écran */}
       {typeof window !== 'undefined' && (
-        <ErpInfoModalWrapper as ErpInfoModal isOpen={showErpInfo} onClose={() => setShowErpInfo(false)} />
+        <ErpInfoModalWrapper
+          as
+          ErpInfoModal
+          isOpen={showErpInfo}
+          onClose={() => setShowErpInfo(false)}
+        />
       )}
     </div>
   )

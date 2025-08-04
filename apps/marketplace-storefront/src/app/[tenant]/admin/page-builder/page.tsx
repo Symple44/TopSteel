@@ -13,7 +13,7 @@ export default function PageBuilderListPage() {
     queryKey: ['pageTemplates'],
     queryFn: async () => {
       const response = await marketplaceApi.get('/page-builder/templates')
-      return response.data
+      return (response as any).data
     }
   })
 

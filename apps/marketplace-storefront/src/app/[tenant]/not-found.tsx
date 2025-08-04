@@ -25,7 +25,7 @@ export default function NotFound() {
           </Link>
         </div>
 
-        <div className="pt-8 border-t border-border">
+        <div className="pt-8 border-t">
           <p className="text-sm text-muted-foreground">
             Si vous pensez qu'il s'agit d'une erreur, veuillez contacter le support.
           </p>

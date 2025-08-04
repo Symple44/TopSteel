@@ -24,7 +24,7 @@ const PUBLIC_ROUTES = [
 // Routes API publiques
 const PUBLIC_API_ROUTES = [
   '/api/auth/login',
-  '/api/auth/register', 
+  '/api/auth/register',
   '/api/auth/refresh',
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
@@ -36,7 +36,7 @@ const PUBLIC_API_ROUTES = [
 // Routes API protégées (toutes les autres routes API sauf les publiques)
 const PROTECTED_API_PREFIXES = [
   '/api/user',
-  '/api/admin', 
+  '/api/admin',
   '/api/notifications',
   '/api/query-builder',
   '/api/search',
@@ -69,18 +69,14 @@ interface JWTPayload {
  * Vérifie si une route est publique
  */
 function isPublicRoute(pathname: string): boolean {
-  return PUBLIC_ROUTES.some(route => 
-    pathname === route || pathname.startsWith(route)
-  )
+  return PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(route))
 }
 
 /**
  * Vérifie si une route API est publique
  */
 function isPublicApiRoute(pathname: string): boolean {
-  return PUBLIC_API_ROUTES.some(route => 
-    pathname === route || pathname.startsWith(route)
-  )
+  return PUBLIC_API_ROUTES.some((route) => pathname === route || pathname.startsWith(route))
 }
 
 /**
@@ -89,16 +85,18 @@ function isPublicApiRoute(pathname: string): boolean {
 function isProtectedApiRoute(pathname: string): boolean {
   if (!pathname.startsWith('/api')) return false
   if (isPublicApiRoute(pathname)) return false
-  
-  return PROTECTED_API_PREFIXES.some(prefix => 
-    pathname.startsWith(prefix)
-  )
+
+  return PROTECTED_API_PREFIXES.some((prefix) => pathname.startsWith(prefix))
 }
 
 /**
  * Décode et valide un token JWT côté client (validation basique)
  */
-function validateJWTStructure(token: string): { valid: boolean; payload?: JWTPayload; error?: string } {
+function validateJWTStructure(token: string): {
+  valid: boolean
+  payload?: JWTPayload
+  error?: string
+} {
   try {
     const parts = token.split('.')
     if (parts.length !== 3) {
@@ -111,7 +109,7 @@ function validateJWTStructure(token: string): { valid: boolean; payload?: JWTPay
     while (base64.length % 4) {
       base64 += '='
     }
-    
+
     const payload = JSON.parse(atob(base64)) as JWTPayload
 
     // Vérifications basiques obligatoires
@@ -149,12 +147,12 @@ function hasAdminAccess(payload: JWTPayload): boolean {
   if (ADMIN_ROLES.includes(payload.role as any)) {
     return true
   }
-  
+
   // Vérifier dans les rôles multiples (si disponible)
   if (payload.roles && Array.isArray(payload.roles)) {
-    return payload.roles.some(role => ADMIN_ROLES.includes(role as any))
+    return payload.roles.some((role) => ADMIN_ROLES.includes(role as any))
   }
-  
+
   return false
 }
 
@@ -165,19 +163,19 @@ function addUserHeaders(response: NextResponse, payload: JWTPayload): NextRespon
   response.headers.set('x-user-id', payload.sub)
   response.headers.set('x-user-email', payload.email)
   response.headers.set('x-user-role', payload.role)
-  
+
   if (payload.societeId) {
     response.headers.set('x-user-societe-id', payload.societeId)
   }
-  
+
   if (payload.roles && Array.isArray(payload.roles)) {
     response.headers.set('x-user-roles', payload.roles.join(','))
   }
-  
+
   if (payload.permissions && Array.isArray(payload.permissions)) {
     response.headers.set('x-user-permissions', payload.permissions.join(','))
   }
-  
+
   return response
 }
 
@@ -202,16 +200,16 @@ function createApiErrorResponse(message: string, status: number = 401) {
 function createLoginRedirect(request: NextRequest) {
   const loginUrl = request.nextUrl.clone()
   loginUrl.pathname = '/login'
-  
+
   // Conserver la route de destination pour redirection après login
   if (request.nextUrl.pathname !== '/login' && !request.nextUrl.pathname.startsWith('/api')) {
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
   }
-  
+
   // Nettoyer les paramètres sensibles
   loginUrl.searchParams.delete('token')
   loginUrl.searchParams.delete('session')
-  
+
   return NextResponse.redirect(loginUrl)
 }
 
@@ -229,9 +227,9 @@ export function middleware(request: NextRequest) {
   // Pas de token du tout
   if (!accessToken) {
     if (pathname.startsWith('/api')) {
-      return isPublicApiRoute(pathname) 
+      return isPublicApiRoute(pathname)
         ? NextResponse.next()
-        : createApiErrorResponse('Token d\'accès manquant')
+        : createApiErrorResponse("Token d'accès manquant")
     }
     return createLoginRedirect(request)
   }
@@ -241,7 +239,7 @@ export function middleware(request: NextRequest) {
   if (!tokenValidation.valid) {
     if (pathname.startsWith('/api')) {
       return isPublicApiRoute(pathname)
-        ? NextResponse.next() 
+        ? NextResponse.next()
         : createApiErrorResponse(`Token invalide: ${tokenValidation.error}`)
     }
     return createLoginRedirect(request)
@@ -255,7 +253,7 @@ export function middleware(request: NextRequest) {
     if (isPublicApiRoute(pathname)) {
       return NextResponse.next()
     }
-    
+
     // Routes API protégées - ajouter headers utilisateur
     return addUserHeaders(NextResponse.next(), payload!)
   }
@@ -277,7 +275,7 @@ export const config = {
     /*
      * Match toutes les routes sauf:
      * - _next/static (fichiers statiques)
-     * - _next/image (optimisation d'images) 
+     * - _next/image (optimisation d'images)
      * - favicon.ico, robots.txt, sitemap.xml
      * - fichiers publics (.ico, .png, .jpg, .svg, etc.)
      * - _vercel (déploiement Vercel)

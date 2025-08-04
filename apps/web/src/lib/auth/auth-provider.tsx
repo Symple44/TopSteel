@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type React from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AuthService } from '../../services/auth-service'
 import { AuthAdapter } from './auth-adapter'
 import { AuthContext } from './auth-context'

@@ -2,13 +2,13 @@
 
 import { Eye, Plus, X } from 'lucide-react'
 import { useState } from 'react'
-import { 
-  Badge, 
-  Button, 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
   CardTitle,
   Dialog,
   DialogContent,
@@ -22,11 +22,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Tabs, 
-  TabsContent, 
-  TabsList, 
+  Tabs,
+  TabsContent,
+  TabsList,
   TabsTrigger,
-  Textarea
+  Textarea,
 } from '@erp/ui'
 import { toast } from '@/hooks/use-toast'
 

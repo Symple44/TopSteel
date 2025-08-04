@@ -15,7 +15,7 @@ import {
   TabsTrigger,
 } from '@erp/ui'
 import { AlertTriangle, ArrowLeft, Key, Shield, Smartphone, Timer } from 'lucide-react'
-import React from 'react'
+import type React from 'react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/hooks'

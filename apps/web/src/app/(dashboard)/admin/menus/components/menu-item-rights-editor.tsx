@@ -18,13 +18,7 @@ import { Button } from '@erp/ui/primitives'
 import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { Checkbox } from '@erp/ui/primitives'
 import { Label } from '@erp/ui'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@erp/ui/primitives'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
 import { Separator } from '@erp/ui'
 import { Switch } from '@erp/ui/primitives'
 import { cn } from '@/lib/utils'

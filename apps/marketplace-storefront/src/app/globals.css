@@ -1,38 +1,88 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* CSS Custom Properties mapped to Tailwind utilities */
+  --color-background: 0 0% 100%;
+  --color-foreground: 222.2 84% 4.9%;
+  --color-card: 0 0% 100%;
+  --color-card-foreground: 222.2 84% 4.9%;
+  --color-popover: 0 0% 100%;
+  --color-popover-foreground: 222.2 84% 4.9%;
+  --color-primary: 221.2 83.2% 53.3%;
+  --color-primary-foreground: 210 40% 98%;
+  --color-secondary: 210 40% 96%;
+  --color-secondary-foreground: 222.2 84% 4.9%;
+  --color-muted: 210 40% 96%;
+  --color-muted-foreground: 215.4 16.3% 46.9%;
+  --color-accent: 210 40% 96%;
+  --color-accent-foreground: 222.2 84% 4.9%;
+  --color-destructive: 0 84.2% 60.2%;
+  --color-destructive-foreground: 210 40% 98%;
+  --color-border: 214.3 31.8% 91.4%;
+  --color-input: 214.3 31.8% 91.4%;
+  --color-ring: 221.2 83.2% 53.3%;
+  
+  /* Dark mode colors */
+  --color-*-dark: {
+    --color-background: 222.2 84% 4.9%;
+    --color-foreground: 210 40% 98%;
+    --color-card: 222.2 84% 4.9%;
+    --color-card-foreground: 210 40% 98%;
+    --color-popover: 222.2 84% 4.9%;
+    --color-popover-foreground: 210 40% 98%;
+    --color-primary: 217.2 91.2% 59.8%;
+    --color-primary-foreground: 222.2 84% 4.9%;
+    --color-secondary: 217.2 32.6% 17.5%;
+    --color-secondary-foreground: 210 40% 98%;
+    --color-muted: 217.2 32.6% 17.5%;
+    --color-muted-foreground: 215 20.2% 65.1%;
+    --color-accent: 217.2 32.6% 17.5%;
+    --color-accent-foreground: 210 40% 98%;
+    --color-destructive: 0 62.8% 30.6%;
+    --color-destructive-foreground: 210 40% 98%;
+    --color-border: 217.2 32.6% 17.5%;
+    --color-input: 217.2 32.6% 17.5%;
+    --color-ring: 224.3 76.3% 94.1%;
+  }
+  
+  /* Radius */
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+  
+  /* Custom marketplace colors */
+  --color-marketplace-primary: 221.2 83.2% 53.3%;
+  --color-marketplace-secondary: 210 40% 96%;
+  --color-marketplace-accent: 142.1 76.2% 36.3%;
+  --color-marketplace-success: 142.1 76.2% 36.3%;
+  --color-marketplace-warning: 47.9 95.8% 53.1%;
+  --color-marketplace-error: 0 84.2% 60.2%;
+  --color-marketplace-info: 199.6 89.4% 50.4%;
+}
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-    
-    /* Custom marketplace variables */
-    --color-primary: 221.2 83.2% 53.3%;
-    --color-secondary: 210 40% 96%;
-    --color-accent: 142.1 76.2% 36.3%;
-    --color-success: 142.1 76.2% 36.3%;
-    --color-warning: 47.9 95.8% 53.1%;
-    --color-error: 0 84.2% 60.2%;
-    --color-info: 199.6 89.4% 50.4%;
+    /* Fallback CSS variables for compatibility */
+    --background: var(--color-background);
+    --foreground: var(--color-foreground);
+    --card: var(--color-card);
+    --card-foreground: var(--color-card-foreground);
+    --popover: var(--color-popover);
+    --popover-foreground: var(--color-popover-foreground);
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-primary-foreground);
+    --secondary: var(--color-secondary);
+    --secondary-foreground: var(--color-secondary-foreground);
+    --muted: var(--color-muted);
+    --muted-foreground: var(--color-muted-foreground);
+    --accent: var(--color-accent);
+    --accent-foreground: var(--color-accent-foreground);
+    --destructive: var(--color-destructive);
+    --destructive-foreground: var(--color-destructive-foreground);
+    --border: var(--color-border);
+    --input: var(--color-input);
+    --ring: var(--color-ring);
+    --radius: var(--radius-lg);
   }
 
   .dark {
@@ -60,11 +110,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
@@ -74,54 +125,204 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-muted;
+    background-color: hsl(var(--muted));
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/20 rounded-full;
+    background-color: hsl(var(--muted-foreground) / 0.2);
+    border-radius: 9999px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/30;
+    background-color: hsl(var(--muted-foreground) / 0.3);
   }
 }
 
 @layer components {
   /* Product card animations */
   .product-card {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    transition: all 0.3s ease;
+  }
+  
+  .product-card:hover {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transform: translateY(-0.25rem);
   }
   
   /* Button variants */
   .btn-marketplace {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    transition: color 0.15s ease-in-out;
+    ring-offset-color: hsl(var(--background));
+    ring-color: hsl(var(--ring));
+    ring-offset-width: 2px;
+  }
+  
+  .btn-marketplace:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+  
+  .btn-marketplace:disabled {
+    pointer-events: none;
+    opacity: 0.5;
   }
   
   .btn-primary {
-    @apply btn-marketplace bg-primary text-primary-foreground hover:bg-primary/90;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    transition: color 0.15s ease-in-out;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    ring-offset-color: hsl(var(--background));
+    ring-color: hsl(var(--ring));
+    ring-offset-width: 2px;
+  }
+  
+  .btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+  
+  .btn-primary:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+  .btn-primary:hover {
+    background-color: hsl(var(--primary) / 0.9);
   }
   
   .btn-secondary {
-    @apply btn-marketplace bg-secondary text-secondary-foreground hover:bg-secondary/80;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    transition: color 0.15s ease-in-out;
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    ring-offset-color: hsl(var(--background));
+    ring-color: hsl(var(--ring));
+    ring-offset-width: 2px;
+  }
+  
+  .btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+  
+  .btn-secondary:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+  .btn-secondary:hover {
+    background-color: hsl(var(--secondary) / 0.8);
   }
   
   .btn-outline {
-    @apply btn-marketplace border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    transition: color 0.15s ease-in-out;
+    border-width: 1px;
+    border-color: hsl(var(--input));
+    background-color: hsl(var(--background));
+    ring-offset-color: hsl(var(--background));
+    ring-color: hsl(var(--ring));
+    ring-offset-width: 2px;
+  }
+  
+  .btn-outline:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+  
+  .btn-outline:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+  .btn-outline:hover {
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
   }
   
   /* Input styling */
   .input-marketplace {
-    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    display: flex;
+    height: 2.5rem;
+    width: 100%;
+    border-radius: 0.375rem;
+    border-width: 1px;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    border-color: hsl(var(--input));
+    background-color: hsl(var(--background));
+    ring-offset-color: hsl(var(--background));
+    ring-color: hsl(var(--ring));
+    ring-offset-width: 2px;
+  }
+  
+  .input-marketplace:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+  
+  .input-marketplace:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  
+  .input-marketplace::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+  
+  .input-marketplace::-webkit-file-upload-button {
+    border: 0;
+    background: transparent;
+    font-size: 0.875rem;
+    font-weight: 500;
   }
   
   /* Card styling */
   .card-marketplace {
-    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+    border-radius: 0.5rem;
+    border-width: 1px;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
   }
   
   /* Loading spinner */
   .spinner {
-    @apply animate-spin rounded-full border-2 border-muted border-t-primary;
+    animation: spin 1s linear infinite;
+    border-radius: 9999px;
+    border-width: 2px;
+    border-color: hsl(var(--muted));
+    border-top-color: hsl(var(--primary));
   }
   
   /* Gradient backgrounds */
@@ -142,7 +343,25 @@
   
   /* Layout utilities */
   .container-marketplace {
-    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container-marketplace {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-marketplace {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
   
   /* Animation utilities */
@@ -152,5 +371,34 @@
   
   .animate-slide-in {
     animation: slide-in 0.3s ease-out;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

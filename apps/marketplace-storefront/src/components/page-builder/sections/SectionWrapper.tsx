@@ -93,7 +93,7 @@ export function SectionWrapper({
       </div>
 
       {styles.customCSS && (
-        <style jsx>{styles.customCSS}</style>
+        <style jsx>{`${styles.customCSS}`}</style>
       )}
     </section>
   )

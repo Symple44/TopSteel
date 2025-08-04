@@ -32,13 +32,16 @@ class MetallurgyDataInjector {
   constructor() {
     this.scriptsPath = join(__dirname, '.');
     
+    // Utiliser la base de données tenant TOPSTEEL par défaut
+    const dbName = process.env.TENANT_DB_NAME || 'erp_topsteel_topsteel';
+    
     this.dataSource = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432'),
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'erp_topsteel',
+      database: dbName,
       logging: false,
     });
   }
@@ -51,15 +54,9 @@ class MetallurgyDataInjector {
       await this.dataSource.initialize();
       console.log('✅ Connexion base de données établie');
       
-      // Vérification de l'existence d'une société
-      const societyCount = await this.dataSource.query(
-        "SELECT COUNT(*) as count FROM societes WHERE code = 'topsteel'"
-      );
-      
-      if (parseInt(societyCount[0].count) === 0) {
-        console.log('⚠️  Aucune société "topsteel" trouvée. Création en cours...');
-        await this.createDefaultSociety();
-      }
+      // Pour une base tenant, nous assumons que l'ID société sera fourni dans les scripts
+      // La table societes est dans la base auth, pas dans la base tenant
+      console.log('ℹ️  Utilisation de la base tenant - les sociétés sont gérées dans la base auth');
       
     } catch (error) {
       console.error('❌ Erreur connexion base de données:', error);
@@ -77,7 +74,7 @@ class MetallurgyDataInjector {
         status, created_at, updated_at
       ) VALUES (
         gen_random_uuid(),
-        'topsteel',
+        'TOPSTEEL',
         'TopSteel Métallurgie',
         '12345678901234',
         'FR12345678901',

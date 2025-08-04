@@ -9,6 +9,7 @@ import {
 } from 'typeorm'
 import { User } from '../../../users/entities/user.entity'
 import { Role } from './role.entity'
+import { Societe } from '../../../../features/societes/entities/societe.entity'
 
 @Entity('user_societe_roles')
 export class UserSocieteRole {
@@ -82,6 +83,10 @@ export class UserSocieteRole {
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'grantedById' })
   grantedBy?: User
+
+  @ManyToOne(() => Societe, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'societeId' })
+  societe?: Societe
 
   // ===== MÉTHODES STATIQUES DE CRÉATION =====
 

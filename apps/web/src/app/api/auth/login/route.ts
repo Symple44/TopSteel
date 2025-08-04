@@ -4,6 +4,7 @@ import { callBackendFromApi } from '@/utils/backend-api'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
+    console.log('Login attempt for:', body.login)
 
     // Rediriger vers l'API backend
     const response = await callBackendFromApi(req, 'auth/login', {
@@ -31,7 +32,14 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(data)
-  } catch (_error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } catch (error) {
+    console.error('Auth login error:', error)
+    return NextResponse.json(
+      {
+        message: 'Une erreur inattendue est survenue',
+        error: 'Internal server error',
+      },
+      { status: 500 }
+    )
   }
 }

@@ -4,14 +4,15 @@ import { ErpInfoModal, type ErpInfoModalProps } from '@erp/ui/business'
 import { useBackendHealth } from '@/hooks/use-backend-health'
 import { useTranslation } from '@/lib/i18n'
 
-interface ErpInfoModalWrapperProps extends Omit<ErpInfoModalProps, 'health' | 'onCheckHealth' | 'isChecking' | 'translations'> {
+interface ErpInfoModalWrapperProps
+  extends Omit<ErpInfoModalProps, 'health' | 'onCheckHealth' | 'isChecking' | 'translations'> {
   // Override props that we'll handle internally
 }
 
 export function ErpInfoModalWrapper(props: ErpInfoModalWrapperProps) {
   const { health, checkHealth, isChecking } = useBackendHealth()
   const { t } = useTranslation('common')
-  
+
   const translations = {
     title: 'TopSteel ERP',
     systemInfo: 'Informations système',
@@ -34,12 +35,12 @@ export function ErpInfoModalWrapper(props: ErpInfoModalWrapperProps) {
     lastCheck: 'Dernière vérification',
     errorLabel: 'Erreur:',
     trademark: 'TopSteel© ERP',
-    tagline: 'Solide comme votre savoir-faire'
+    tagline: 'Solide comme votre savoir-faire',
   }
-  
+
   return (
-    <ErpInfoModal 
-      {...props} 
+    <ErpInfoModal
+      {...props}
       health={health}
       onCheckHealth={checkHealth}
       isChecking={isChecking}

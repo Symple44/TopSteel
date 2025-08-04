@@ -151,7 +151,8 @@
       "Bash(set NODE_OPTIONS=--max-old-space-size=8192 --require ./src/utils/nextjs-15-params-fix.js)",
       "Bash(set NODE_ENV=development)",
       "Bash(set NODE_OPTIONS=--max-old-space-size=8192 --require ./src/utils/next-runtime-override.js)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"\\dt\")"
     ],
     "deny": []
   }

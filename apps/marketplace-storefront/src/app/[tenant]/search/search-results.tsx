@@ -45,6 +45,7 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
       const mockProducts: Product[] = [
         {
           id: '1',
+          erpArticleId: 'ERP-001',
           reference: 'PROD-001',
           designation: 'Profilé acier inoxydable 304L',
           shortDescription: 'Profilé haute qualité pour applications industrielles',
@@ -58,9 +59,13 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
           images: [
             { url: '/placeholder-product.jpg', alt: 'Profilé acier', isMain: true }
           ],
+          isActive: true,
           isFeatured: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          seo: {
+            title: 'Profilé acier inoxydable 304L',
+            description: 'Profilé haute qualité pour applications industrielles',
+            slug: 'profile-acier-inoxydable-304l'
+          }
         },
         // Add more mock products...
       ]
@@ -120,7 +125,8 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
           filteredProducts.sort((a, b) => b.designation.localeCompare(a.designation))
           break
         case 'newest':
-          filteredProducts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+          // Since Product doesn't have createdAt, use id for sorting
+          filteredProducts.sort((a, b) => b.id.localeCompare(a.id))
           break
         default: // relevance
           // Keep original order for relevance

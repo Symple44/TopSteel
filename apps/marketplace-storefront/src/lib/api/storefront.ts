@@ -146,12 +146,12 @@ export async function getProducts(
   filters: ProductFilters = {}
 ): Promise<ProductListResult> {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.getProducts(filters)
+  return (await apiClient.storefront.getProducts(filters)) as ProductListResult
 }
 
 export async function getProduct(tenant: string, productId: string): Promise<Product> {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.getProduct(productId)
+  return (await apiClient.storefront.getProduct(productId)) as Product
 }
 
 export async function getFeaturedProducts(
@@ -159,12 +159,12 @@ export async function getFeaturedProducts(
   limit = 8
 ): Promise<Product[]> {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.getFeaturedProducts(limit)
+  return (await apiClient.storefront.getFeaturedProducts(limit)) as Product[]
 }
 
 export async function getCategories(tenant: string): Promise<string[]> {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.getCategories()
+  return (await apiClient.storefront.getCategories()) as string[]
 }
 
 export async function getProductsByCategory(
@@ -174,7 +174,7 @@ export async function getProductsByCategory(
   limit = 20
 ): Promise<ProductListResult> {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.getProductsByCategory(category, { page, limit })
+  return (await apiClient.storefront.getProductsByCategory(category, { page, limit })) as ProductListResult
 }
 
 export async function searchProducts(
@@ -183,23 +183,23 @@ export async function searchProducts(
   filters: Omit<ProductFilters, 'search'> = {}
 ): Promise<ProductListResult> {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.searchProducts(query, filters)
+  return (await apiClient.storefront.searchProducts(query, filters)) as ProductListResult
 }
 
 export async function getCurrentTheme(tenant: string) {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.getTheme()
+  return (await apiClient.storefront.getTheme()) as any
 }
 
 export async function getNavigationMenu(tenant: string): Promise<NavigationMenu> {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.getMenu()
+  return (await apiClient.storefront.getMenu()) as NavigationMenu
 }
 
 export async function getStaticPage(tenant: string, slug: string): Promise<StaticPage | null> {
   try {
     apiClient.setTenant(tenant)
-    return await apiClient.storefront.getPage(slug)
+    return (await apiClient.storefront.getPage(slug)) as StaticPage
   } catch (error: any) {
     if (error.response?.status === 404) {
       return null
@@ -210,7 +210,7 @@ export async function getStaticPage(tenant: string, slug: string): Promise<Stati
 
 export async function subscribeToNewsletter(tenant: string, email: string) {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.subscribeNewsletter(email)
+  return (await apiClient.storefront.subscribeNewsletter(email)) as any
 }
 
 export async function sendContactMessage(tenant: string, data: {
@@ -221,5 +221,22 @@ export async function sendContactMessage(tenant: string, data: {
   phone?: string
 }) {
   apiClient.setTenant(tenant)
-  return await apiClient.storefront.sendContactMessage(data)
+  return (await apiClient.storefront.sendContactMessage(data)) as any
+}
+
+// Export des fonctions API pour compatibilité
+export const api = {
+  storefront: {
+    getConfig: getTenantConfig,
+    getProducts: getProducts,
+    getProduct: getProduct,
+    getFeaturedProducts: getFeaturedProducts,
+    getCategories: getCategories,
+    getProductsByCategory: getProductsByCategory,
+    searchProducts: searchProducts,
+    getTheme: getCurrentTheme,
+    getMenu: getNavigationMenu,
+    getPage: getStaticPage,
+  },
+  getProduct: getProduct
 }

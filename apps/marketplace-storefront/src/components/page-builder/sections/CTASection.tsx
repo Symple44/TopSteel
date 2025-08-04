@@ -71,12 +71,12 @@ export function CTASection({ section, isEditing }: SectionProps<CTAContent>) {
         </div>
         
         <div className={`flex flex-wrap gap-4 ${content.layout === 'centered' ? 'justify-center mt-8' : ''}`}>
-          {content.buttons.map((button, index) => (
+          {content.buttons.map((button: any, index: number) => (
             <Link
               key={index}
               href={button.url}
               className={`
-                ${buttonSizes[button.size || 'md']}
+                ${buttonSizes[button.size as keyof typeof buttonSizes || 'md']}
                 rounded-md font-semibold transition-colors
                 ${button.variant === 'primary' ? 'bg-white text-primary hover:bg-gray-100' : ''}
                 ${button.variant === 'secondary' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80' : ''}

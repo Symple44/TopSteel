@@ -9,13 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@erp/ui/primit
 import { Input } from '@erp/ui/primitives'
 import { Label } from '@erp/ui'
 import { ScrollArea } from '@erp/ui'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@erp/ui/primitives'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
 import { callClientApi } from '@/utils/backend-api'
 
 interface TableSelectorProps {
@@ -314,9 +308,7 @@ export function TableSelector({
                 </Button>
 
                 <Dialog open={showJoinDialog} onOpenChange={(open) => !open && resetJoinDialog()}>
-                  <DialogContent
-                    className="w-full max-w-3xl max-h-[90vh] flex flex-col p-0"
-                  >
+                  <DialogContent className="w-full max-w-3xl max-h-[90vh] flex flex-col p-0">
                     <div className="border-b pb-4 px-6 pt-6">
                       <h2 className="flex items-center gap-2 text-xl font-semibold">
                         <Link className="h-6 w-6 text-primary" />

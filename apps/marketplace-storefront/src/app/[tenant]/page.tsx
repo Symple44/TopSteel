@@ -6,7 +6,7 @@ import { NewsletterSection } from '@/components/sections/newsletter-section'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 interface HomePageProps {
-  params: { tenant: string }
+  params: Promise<{ tenant: string }>
 }
 
 export default async function HomePage({ params }: HomePageProps) {

@@ -1,3 +1,3 @@
 export * from './PageRenderer'
 export * from './editor'
-export * from './sections'
+export { SectionRenderer } from './sections'

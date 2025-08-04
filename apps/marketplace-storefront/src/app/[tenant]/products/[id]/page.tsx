@@ -13,7 +13,7 @@ interface ProductPageProps {
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   try {
     const resolvedParams = await params
-    const product = await api.getProduct(resolvedParams.tenant, resolvedParams.id)
+    const product = await api.storefront.getProduct(resolvedParams.tenant, resolvedParams.id)
     
     return {
       title: `${product.designation} - Marketplace`,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 export default async function ProductPage({ params }: ProductPageProps) {
   try {
     const resolvedParams = await params
-    const product = await api.getProduct(resolvedParams.tenant, resolvedParams.id)
+    const product = await api.storefront.getProduct(resolvedParams.tenant, resolvedParams.id)
     
     return (
       <div className="container-marketplace py-8">

@@ -25,7 +25,7 @@ export function SectionRenderer({
   onUpdate,
   onStyleUpdate 
 }: SectionRendererProps) {
-  const Component = sectionComponents[section.type]
+  const Component = sectionComponents[section.type as keyof typeof sectionComponents]
 
   if (!Component) {
     console.warn(`Section type "${section.type}" not implemented`)

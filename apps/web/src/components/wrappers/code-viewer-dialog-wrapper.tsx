@@ -9,7 +9,7 @@ interface CodeViewerDialogWrapperProps extends Omit<CodeViewerDialogProps, 'tran
 
 export function CodeViewerDialogWrapper(props: CodeViewerDialogWrapperProps) {
   const { t } = useTranslation('codeViewer')
-  
+
   const translations = {
     title: t('title'),
     loading: t('loading'),
@@ -24,15 +24,10 @@ export function CodeViewerDialogWrapper(props: CodeViewerDialogWrapperProps) {
     code: t('code'),
     clickLineNumbers: t('clickLineNumbers'),
     lines: t('lines'),
-    lineTooltip: t('lineTooltip')
+    lineTooltip: t('lineTooltip'),
   }
-  
-  return (
-    <CodeViewerDialog 
-      {...props} 
-      translations={translations}
-    />
-  )
+
+  return <CodeViewerDialog {...props} translations={translations} />
 }
 
 export default CodeViewerDialogWrapper

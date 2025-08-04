@@ -1,6 +1,6 @@
 'use client'
 
-import { Component, ErrorInfo, ReactNode } from 'react'
+import { Component, type ErrorInfo, type ReactNode } from 'react'
 
 interface Props {
   children: ReactNode
@@ -20,7 +20,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): State {
     // Vérifie si c'est l'erreur params readonly
-    if (error.message.includes('Cannot assign to read only property \'params\'')) {
+    if (error.message.includes("Cannot assign to read only property 'params'")) {
       console.warn('Erreur params readonly interceptée:', error.message)
       // Force un refresh pour résoudre le problème
       if (typeof window !== 'undefined') {
@@ -29,7 +29,7 @@ export class ErrorBoundary extends Component<Props, State> {
         }, 100)
       }
     }
-    
+
     return { hasError: true, error }
   }
 
@@ -39,7 +39,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      if (this.state.error?.message.includes('Cannot assign to read only property \'params\'')) {
+      if (this.state.error?.message.includes("Cannot assign to read only property 'params'")) {
         return (
           <div className="min-h-screen flex items-center justify-center bg-background p-4">
             <div className="text-center">
@@ -49,20 +49,22 @@ export class ErrorBoundary extends Component<Props, State> {
           </div>
         )
       }
-      
-      return this.props.fallback || (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Une erreur s'est produite</h2>
-            <p className="text-muted-foreground mb-4">Veuillez rafraîchir la page</p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
-            >
-              Rafraîchir
-            </button>
+
+      return (
+        this.props.fallback || (
+          <div className="min-h-screen flex items-center justify-center bg-background p-4">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold mb-2">Une erreur s'est produite</h2>
+              <p className="text-muted-foreground mb-4">Veuillez rafraîchir la page</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+              >
+                Rafraîchir
+              </button>
+            </div>
           </div>
-        </div>
+        )
       )
     }
 

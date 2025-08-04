@@ -1,7 +1,7 @@
 // Composants React pour contrôle d'accès RBAC
 'use client'
 
-import React from 'react'
+import type React from 'react'
 import { useAccessPolicy, usePermission, usePermissions, useRoleLevel } from './rbac-hooks'
 import type { AccessPolicy } from './rbac-types'
 

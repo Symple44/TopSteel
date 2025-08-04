@@ -316,10 +316,30 @@ export class AuthService {
    */
   async getUserCompanies(): Promise<Company[]> {
     try {
-      const response = await callClientApi('auth/user/companies')
+      // Récupérer le token d'accès depuis le stockage
+      const tokens = storage.get<AuthTokens>(STORAGE_KEYS.TOKENS)
+      if (!tokens?.accessToken) {
+        console.warn('No access token available for getUserCompanies')
+        return []
+      }
+
+      const response = await callClientApi('auth/societes', {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        console.error('Failed to get companies:', response.status, response.statusText)
+        return []
+      }
+
       const data = await response.json()
-      return data.success ? data.data : []
-    } catch (_error) {
+      console.log('Companies response:', data)
+      // L'API backend retourne {data: [...], statusCode: 200, message: "Success"}
+      return data.data || data // Si data.data existe, l'utiliser, sinon utiliser data directement
+    } catch (error) {
+      console.error('Error in getUserCompanies:', error)
       return []
     }
   }

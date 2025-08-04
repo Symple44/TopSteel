@@ -11,13 +11,13 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useState } from 'react'
-import { 
-  Badge, 
-  Button, 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
   CardTitle,
   Dialog,
   DialogContent,

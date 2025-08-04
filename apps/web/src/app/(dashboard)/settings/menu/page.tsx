@@ -1569,7 +1569,9 @@ export default function MenuDragDropPage() {
                 {/* Titre personnalisable */}
                 <div className="flex-1 space-y-3">
                   <div>
-                    <TranslationFieldWrapper as TranslationField
+                    <TranslationFieldWrapper
+                      as
+                      TranslationField
                       value={editTitle}
                       onChange={setEditTitle}
                       translations={editTitleTranslations}

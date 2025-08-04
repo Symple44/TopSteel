@@ -9,14 +9,8 @@ interface CompanyLogoWrapperProps extends Omit<CompanyLogoProps, 'companyInfo' |
 
 export function CompanyLogoWrapper(props: CompanyLogoWrapperProps) {
   const { companyInfo, loading } = useCompanyInfo()
-  
-  return (
-    <CompanyLogo 
-      {...props} 
-      companyInfo={companyInfo} 
-      loading={loading}
-    />
-  )
+
+  return <CompanyLogo {...props} companyInfo={companyInfo} loading={loading} />
 }
 
 export default CompanyLogoWrapper

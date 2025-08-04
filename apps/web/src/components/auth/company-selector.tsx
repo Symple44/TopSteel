@@ -2,7 +2,7 @@
 
 import { AlertTriangle, Building2, Check, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@erp/ui/primitives'
 import { Card } from '@erp/ui'
@@ -416,19 +416,7 @@ export default function CompanySelector({
   const [submitting, setSubmitting] = useState(false)
   const [tabCount, setTabCount] = useState(1)
 
-  useEffect(() => {
-    loadCompanies()
-
-    // Détecter le nombre d'onglets ouverts
-    const count = getApproximateTabCount()
-    setTabCount(count)
-
-    // Précharger les rôles depuis l'API des paramètres
-    // Ne plus vider le cache systématiquement, utiliser le cache persistant
-    loadRolesFromParameters('fr', false).catch((_error) => {})
-  }, [loadCompanies])
-
-  const loadCompanies = async () => {
+  const loadCompanies = useCallback(async () => {
     try {
       setLoading(true)
       const data = await authService.getUserCompanies()
@@ -459,7 +447,19 @@ export default function CompanySelector({
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadCompanies()
+
+    // Détecter le nombre d'onglets ouverts
+    const count = getApproximateTabCount()
+    setTabCount(count)
+
+    // Précharger les rôles depuis l'API des paramètres
+    // Ne plus vider le cache systématiquement, utiliser le cache persistant
+    loadRolesFromParameters('fr', false).catch((_error) => {})
+  }, [loadCompanies])
 
   const handleSelectCompany = async () => {
     if (!selectedCompanyId) {

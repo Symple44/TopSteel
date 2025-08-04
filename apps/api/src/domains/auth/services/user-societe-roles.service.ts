@@ -59,7 +59,7 @@ export class UserSocieteRolesService {
         userId,
         isActive: true,
       },
-      relations: ['user'],
+      relations: ['user', 'societe'],
     })
 
     const result: UserSocieteRoleWithPermissions[] = []
@@ -100,10 +100,10 @@ export class UserSocieteRolesService {
       result.push({
         userId: userRole.userId,
         societeId: userRole.societeId,
-        societe: {
-          id: userRole.societeId, // Temporaire - il faut récupérer les infos de la société
-          nom: `Société ${userRole.societeId}`, // Temporaire
-          code: `SOC_${userRole.societeId}`, // Temporaire
+        societe: userRole.societe || {
+          id: userRole.societeId,
+          nom: 'Société inconnue',
+          code: 'UNKNOWN',
         },
         roleType: effectiveRoleType,
         role: undefined, // Plus besoin de charger l'entité Role complète

@@ -71,7 +71,13 @@
     "marketplace:generate-data": "ts-node -r tsconfig-paths/register src/scripts/generate-marketplace-test-data.ts",
     "marketplace:test-modules": "ts-node -r tsconfig-paths/register src/scripts/test-marketplace-modules.ts",
     "migration:pricing:run": "ts-node -r tsconfig-paths/register src/scripts/run-sector-pricing-migration.ts",
-    "init:pricing-data": "ts-node -r tsconfig-paths/register src/scripts/init-sector-pricing-data.ts"
+    "init:pricing-data": "ts-node -r tsconfig-paths/register src/scripts/init-sector-pricing-data.ts",
+    "inject:metallurgy-data": "ts-node -r tsconfig-paths/register src/scripts/inject-metallurgy-data.ts",
+    "inject:metallurgy-clean": "ts-node -r tsconfig-paths/register src/scripts/metallurgy-injection-orchestrator.ts",
+    "cleanup:produits": "ts-node -r tsconfig-paths/register src/scripts/cleanup-legacy-produits.ts",
+    "cleanup:migrations": "ts-node -r tsconfig-paths/register src/scripts/cleanup-migration-history.ts",
+    "migrate:settings-to-auth": "ts-node -r tsconfig-paths/register src/scripts/migrate-system-settings-to-auth.ts",
+    "cleanup:system-settings": "ts-node -r tsconfig-paths/register src/scripts/cleanup-system-settings.ts"
   },
   "dependencies": {
     "@azure/identity": "^4.10.2",

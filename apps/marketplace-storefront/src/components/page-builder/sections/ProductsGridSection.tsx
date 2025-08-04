@@ -22,7 +22,7 @@ export interface ProductsGridContent {
   showPagination?: boolean
 }
 
-export function ProductsGridSection({ section, isEditing }: SectionProps<ProductsGridContent>) {
+export function ProductsGridSection({ section, isEditing, tenant }: SectionProps<ProductsGridContent> & { tenant?: string }) {
   const { content, styles, settings } = section
 
   const { data: products, isLoading } = useQuery({
@@ -43,7 +43,7 @@ export function ProductsGridSection({ section, isEditing }: SectionProps<Product
       }
 
       const response = await marketplaceApi.get('/products', { params })
-      return response.data.data
+      return (response as any).data.data
     }
   })
 
@@ -84,7 +84,7 @@ export function ProductsGridSection({ section, isEditing }: SectionProps<Product
       ) : (
         <div className={`grid ${gridColumns.mobile} ${gridColumns.tablet} ${gridColumns.desktop} gap-6`}>
           {products?.map((product: any) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} tenant={tenant || 'demo'} />
           ))}
         </div>
       )}

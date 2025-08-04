@@ -24,10 +24,10 @@ export function PageRenderer({
       
       if (templateId) {
         const response = await marketplaceApi.get(`/page-templates/${templateId}`)
-        return response.data
+        return (response as any).data
       } else if (slug) {
         const response = await marketplaceApi.get(`/page-templates/by-slug/${slug}`)
-        return response.data
+        return (response as any).data
       }
       
       throw new Error('Template ID or slug required')

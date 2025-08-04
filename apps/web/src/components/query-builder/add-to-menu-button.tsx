@@ -14,13 +14,7 @@ import {
 } from '@erp/ui/primitives'
 import { Input } from '@erp/ui/primitives'
 import { Label } from '@erp/ui'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@erp/ui/primitives'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
 import { toast } from '@/hooks/use-toast'
 import { apiClient } from '@/lib/api-client'
 

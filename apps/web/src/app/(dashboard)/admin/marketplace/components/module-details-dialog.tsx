@@ -2,12 +2,12 @@
 
 import { AlertTriangle, Check, Clock, Download, Star, Users } from 'lucide-react'
 import { useState } from 'react'
-import { 
-  Badge, 
-  Button, 
-  Card, 
-  CardContent, 
-  CardHeader, 
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
   CardTitle,
   Dialog,
   DialogContent,
@@ -15,10 +15,10 @@ import {
   DialogHeader,
   DialogTitle,
   Separator,
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@erp/ui'
 import { toast } from '@/hooks/use-toast'
 

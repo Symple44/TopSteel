@@ -35,7 +35,7 @@ export function TextBlockSection({ section, isEditing }: SectionProps<TextBlockC
       isEditing={isEditing}
       className="py-12 md:py-16"
     >
-      <div className={`${columnsClasses[content.columns || 1]} ${alignmentClasses[content.alignment || 'left']}`}>
+      <div className={`${columnsClasses[content.columns as keyof typeof columnsClasses || 1]} ${alignmentClasses[content.alignment as keyof typeof alignmentClasses || 'left']}`}>
         {content.title && (
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             {content.title}

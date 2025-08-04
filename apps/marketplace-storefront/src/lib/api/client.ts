@@ -111,6 +111,7 @@ class MarketplaceApiClient {
 
 // Instance singleton
 export const apiClient = new MarketplaceApiClient()
+export const marketplaceApi = apiClient
 
 // Hook pour définir le tenant
 export const useTenant = (tenant: string) => {
