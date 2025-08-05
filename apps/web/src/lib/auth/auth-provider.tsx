@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth-service'
 import { AuthAdapter } from './auth-adapter'
 import { AuthContext } from './auth-context'
 import { authStorage } from './auth-storage'
+import { callClientApi } from '../../utils/backend-api'
 import type {
   AuthBroadcastEvent,
   AuthContextType,
@@ -275,15 +276,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const user = AuthAdapter.toAuthUser(extendedUser)
           const tokens = AuthAdapter.toNewAuthTokens(result.tokens as any)
 
-          const storedSession = authStorage.getStoredSession()
-          let company = storedSession.company
+          // Vérifier s'il y a une société par défaut
+          try {
+            const response = await callClientApi('auth/user/default-company', {
+              headers: {
+                Authorization: `Bearer ${tokens.accessToken}`,
+              },
+            })
 
-          // Convertir la société si nécessaire
-          if (company && !(company as any).isActive) {
-            company = AuthAdapter.toNewCompany(company as any) as Company
+            if (response.ok) {
+              const defaultCompanyData = await response.json()
+              if (defaultCompanyData.success && defaultCompanyData.data) {
+                // L'utilisateur a une société par défaut - se connecter automatiquement
+                const companyId = defaultCompanyData.data.id
+                const companySelectResult = await AuthService.selectCompany(companyId, tokens.accessToken)
+                
+                const adaptedUser = AuthAdapter.toAuthUser(AuthAdapter.toExtendedUser(companySelectResult.user as any))
+                const adaptedTokens = AuthAdapter.toNewAuthTokens(companySelectResult.tokens as any)
+                const adaptedCompany = AuthAdapter.toNewCompany(companySelectResult.company as any)
+
+                authStorage.saveSession(adaptedUser, adaptedTokens, adaptedCompany, rememberMe)
+
+                const newState = {
+                  isLoading: false,
+                  isAuthenticated: true,
+                  user: adaptedUser,
+                  tokens: adaptedTokens,
+                  mfa: { required: false },
+                  company: adaptedCompany,
+                  requiresCompanySelection: false,
+                  mounted: true,
+                }
+
+                setAuthState((prev) => ({ ...prev, ...newState }))
+                broadcastAuthEvent('USER_LOGIN', { user: adaptedUser, tokens: adaptedTokens, company: adaptedCompany })
+                return
+              }
+            }
+          } catch (error) {
+            // Si la récupération de la société par défaut échoue (ex: 401 car pas encore de société), continuer normalement
+            // C'est un comportement attendu lors du premier login
+            console.debug('Default company retrieval failed (expected during initial login):', error)
           }
 
-          authStorage.saveSession(user, tokens, company, rememberMe)
+          // Pas de société par défaut - forcer la sélection
+          authStorage.saveSession(user, tokens, null, rememberMe)
 
           const newState = {
             isLoading: false,
@@ -291,15 +328,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
             user,
             tokens,
             mfa: { required: false },
-            company: company || null,
-            requiresCompanySelection: !company,
+            company: null,
+            requiresCompanySelection: true,
             mounted: true,
           }
 
           setAuthState((prev) => ({ ...prev, ...newState }))
-
-          // Notifier les autres onglets
-          broadcastAuthEvent('USER_LOGIN', { user, tokens, company })
+          broadcastAuthEvent('USER_LOGIN', { user, tokens, company: null })
         }
       } catch (error) {
         setAuthState((prev) => ({ ...prev, isLoading: false }))
@@ -330,8 +365,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const user = AuthAdapter.toAuthUser(extendedUser)
         const tokens = AuthAdapter.toNewAuthTokens(rawTokens as any)
 
-        const { company } = authStorage.getStoredSession()
-        authStorage.saveSession(user, tokens, company)
+        // Forcer la sélection de société après MFA aussi
+        authStorage.saveSession(user, tokens, null)
 
         const newState = {
           isLoading: false,
@@ -339,14 +374,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           user,
           tokens,
           mfa: { required: false },
-          company: company || null,
-          requiresCompanySelection: !company,
+          company: null,
+          requiresCompanySelection: true,
           mounted: true,
         }
 
         setAuthState((prev) => ({ ...prev, ...newState }))
 
-        broadcastAuthEvent('USER_LOGIN', { user, tokens, company })
+        broadcastAuthEvent('USER_LOGIN', { user, tokens, company: null })
       } catch (error) {
         setAuthState((prev) => ({ ...prev, isLoading: false }))
         throw error
