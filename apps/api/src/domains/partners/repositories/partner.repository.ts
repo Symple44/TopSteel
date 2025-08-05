@@ -1,6 +1,6 @@
 import type { IBusinessRepository } from '../../core/interfaces/business-service.interface'
-import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
-import { PartnerSearchCriteria } from '../services/partner.service'
+import type { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
+import type { PartnerSearchCriteria } from '../services/partner.service'
 
 /**
  * Interface du repository pour les partenaires (clients/fournisseurs)

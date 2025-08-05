@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedProcess } from '../entities/shared-process.entity'
-import { SharedProcessService } from '../services/shared-process.service'
+import type { SharedProcessService } from '../services/shared-process.service'
 
 @ApiTags('Shared Processes')
 @Controller('shared/processes')

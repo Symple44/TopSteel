@@ -1,6 +1,6 @@
-import { IsString, IsOptional, IsEnum, IsArray, IsObject, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
-import { PageType, PageStatus } from '../entities/page-template.entity'
+import { IsArray, IsEnum, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator'
+import { PageStatus, PageType } from '../entities/page-template.entity'
 
 export class CreatePageSectionDto {
   @IsString()

@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common'
 import type { BusinessEntity } from '@erp/entities'
+import { Injectable, Logger } from '@nestjs/common'
 import {
-  BusinessOperation,
   type BusinessContext,
+  BusinessOperation,
   type IBusinessRepository,
   type IBusinessService,
   type ValidationResult,

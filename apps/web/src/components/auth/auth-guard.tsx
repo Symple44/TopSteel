@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { CompanyLogoWrapper } from '@/components/wrappers/company-logo-wrapper'
 import { useAuth } from '@/hooks/use-auth'
 import { useTranslation } from '@/lib/i18n'
-import { CompanyLogoWrapper } from '@/components/wrappers/company-logo-wrapper'
 
 interface AuthGuardProps {
   children: React.ReactNode

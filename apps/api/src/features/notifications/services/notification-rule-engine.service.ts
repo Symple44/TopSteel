@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import {
   EventStatus,
   ExecutionResult,
@@ -14,18 +14,18 @@ import {
   type RecipientType,
   TriggerType,
 } from '../entities'
-import { NotificationRuleService } from './notification-rule.service'
+import type { NotificationRuleService } from './notification-rule.service'
 
 @Injectable()
 export class NotificationRuleEngineService {
-  private readonly logger = new Logger(NotificationRuleEngineService.name);
+  private readonly logger = new Logger(NotificationRuleEngineService.name)
 
   constructor(
     @InjectRepository(NotificationRule, 'shared')
     private readonly _ruleRepository: Repository<NotificationRule>,
     @InjectRepository(Notifications, 'auth')
     private readonly _notificationRepository: Repository<Notifications>,
-    private readonly ruleService: NotificationRuleService,
+    private readonly ruleService: NotificationRuleService
   ) {}
 
   // ===== TRAITEMENT DES ÉVÉNEMENTS =====

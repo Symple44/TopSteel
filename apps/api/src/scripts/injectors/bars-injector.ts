@@ -3,19 +3,19 @@
  * TopSteel ERP - Clean Architecture
  */
 
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 import { BaseArticleInjector } from '../core/base-article-injector'
 import {
-  ArticleMetallurgie,
-  GlobalInjectionConfig,
-  InjectionLogger,
-  ArticleValidator,
-  PricingCalculator,
   ArticleFamille,
-  ArticleType,
+  type ArticleMetallurgie,
   ArticleStatus,
+  ArticleType,
+  type ArticleValidator,
+  type CaracteristiquesTechniques,
+  type GlobalInjectionConfig,
+  type InjectionLogger,
+  type PricingCalculator,
   UniteStock,
-  CaracteristiquesTechniques,
 } from '../types/article-injection.types'
 
 interface BarSpecification {
@@ -171,7 +171,7 @@ export class BarsInjector extends BaseArticleInjector {
         // Calcul du moment d'inertie selon le type
         if (bar.type === 'ROND' && bar.diametre) {
           const rayon = bar.diametre / 2
-          caracteristiques.momentInertieX = (Math.PI * Math.pow(rayon, 4)) / 4
+          caracteristiques.momentInertieX = (Math.PI * rayon ** 4) / 4
           caracteristiques.momentInertieY = caracteristiques.momentInertieX
           caracteristiques.moduleResistanceX = caracteristiques.momentInertieX / rayon
           caracteristiques.moduleResistanceY = caracteristiques.moduleResistanceX
@@ -181,8 +181,8 @@ export class BarsInjector extends BaseArticleInjector {
           // Moment d'inertie pour section rectangulaire
           const b = bar.largeur / 10 // conversion mm -> cm
           const h = bar.epaisseur / 10 // conversion mm -> cm
-          caracteristiques.momentInertieX = (b * Math.pow(h, 3)) / 12
-          caracteristiques.momentInertieY = (h * Math.pow(b, 3)) / 12
+          caracteristiques.momentInertieX = (b * h ** 3) / 12
+          caracteristiques.momentInertieY = (h * b ** 3) / 12
           caracteristiques.moduleResistanceX = caracteristiques.momentInertieX / (h / 2)
           caracteristiques.moduleResistanceY = caracteristiques.momentInertieY / (b / 2)
           caracteristiques.rayonGirationX = Math.sqrt(caracteristiques.momentInertieX / bar.section)

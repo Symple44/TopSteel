@@ -1,7 +1,7 @@
 // apps/api/src/common/guards/enhanced-throttler.guard.ts
-import { ExecutionContext, Injectable } from '@nestjs/common'
+import { type ExecutionContext, Injectable } from '@nestjs/common'
 import { ThrottlerException, ThrottlerGuard } from '@nestjs/throttler'
-import { Request } from 'express'
+import type { Request } from 'express'
 
 @Injectable()
 export class EnhancedThrottlerGuard extends ThrottlerGuard {

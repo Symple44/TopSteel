@@ -1,11 +1,11 @@
 'use client'
 
-import React from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import React from 'react'
 import { PageBuilderEditor } from '@/components/page-builder'
+import type { BaseSection } from '@/components/page-builder/sections'
 import { marketplaceApi } from '@/lib/api/client'
-import { BaseSection } from '@/components/page-builder/sections'
 
 interface PageProps {
   params: Promise<{ id: string }>

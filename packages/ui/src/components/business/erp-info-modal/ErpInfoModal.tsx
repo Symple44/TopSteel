@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '../../primitives'
 import {
   AlertCircle,
   CheckCircle,
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives'
 
 export interface BackendHealthInfo {
   status: 'online' | 'offline' | 'error' | 'checking'

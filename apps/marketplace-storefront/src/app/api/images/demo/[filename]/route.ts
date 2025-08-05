@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Fonction pour extraire la désignation depuis le nom de fichier
 function extractDesignation(filename: string): string {

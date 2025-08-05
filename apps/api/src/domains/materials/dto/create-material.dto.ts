@@ -1,28 +1,28 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
+  IsObject,
   IsOptional,
   IsString,
-  IsNumber,
-  IsBoolean,
-  IsObject,
-  Min,
   Max,
+  Min,
 } from 'class-validator'
 import {
-  MaterialType,
-  MaterialShape,
-  MaterialStatus,
-  MaterialUnit,
-  StorageMethod,
-  type MaterialDimensions,
-  type MechanicalProperties,
-  type PhysicalProperties,
   type ChemicalProperties,
   type MaterialCertifications,
-  type SupplyInfo,
+  type MaterialDimensions,
+  MaterialShape,
+  MaterialStatus,
+  MaterialType,
+  MaterialUnit,
+  type MechanicalProperties,
+  type PhysicalProperties,
   type ProductionInfo,
+  StorageMethod,
+  type SupplyInfo,
 } from '../entities/material.entity'
 
 /**

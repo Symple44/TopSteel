@@ -1,12 +1,10 @@
 'use client'
 
+import { Badge, ScrollArea } from '@erp/ui'
+import { Button, Input } from '@erp/ui/primitives'
 import { Database, Lock, Plus, Search, Unlock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Input } from '@erp/ui/primitives'
-import { ScrollArea } from '@erp/ui'
 import { cn } from '@/lib/utils'
 import { callClientApi } from '@/utils/backend-api'
 

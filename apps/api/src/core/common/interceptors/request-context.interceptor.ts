@@ -5,7 +5,7 @@ import {
   Injectable,
   type NestInterceptor,
 } from '@nestjs/common'
-import { Observable } from 'rxjs'
+import type { Observable } from 'rxjs'
 import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()

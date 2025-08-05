@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import {
   Calculator,
   Database,
@@ -14,8 +15,6 @@ import {
   Users,
   Zap,
 } from 'lucide-react'
-import { Badge } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 
 export default function QueryBuilderDocsPage() {
   return (

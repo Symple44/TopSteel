@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { type ReactNode, createContext, useContext } from 'react'
+import { createContext, type ReactNode, useContext } from 'react'
 
 interface ParamsContextType {
   params: Record<string, string | string[]>

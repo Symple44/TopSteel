@@ -1,21 +1,21 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Put,
-  Delete,
-  Body,
-  Param,
   Query,
   Req,
   UseGuards,
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { Request } from 'express'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
-import { MarketplaceProductsService } from '../services/marketplace-products.service'
-import { MarketplacePricingEngine } from '../services/marketplace-pricing-engine.service'
+import type { MarketplacePricingEngine } from '../services/marketplace-pricing-engine.service'
+import type { MarketplaceProductsService } from '../services/marketplace-products.service'
 
 @ApiTags('admin-products')
 @Controller('admin/products')
@@ -47,11 +47,8 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get product categories' })
   async getCategories(@Req() req: Request) {
     const { tenant } = req as any
-    
-    return await this.productsService.getCategories(
-      tenant.erpTenantConnection,
-      tenant.societeId
-    )
+
+    return await this.productsService.getCategories(tenant.erpTenantConnection, tenant.societeId)
   }
 
   @Get(':productId')
@@ -135,7 +132,7 @@ export class ProductsController {
   @ApiOperation({ summary: 'Sync products from ERP' })
   async syncProducts(@Req() req: Request) {
     const { tenant } = req as any
-    
+
     // TODO: Implémenter synchronisation des produits depuis l'ERP
     return { message: 'Product sync started', societeId: tenant.societeId }
   }

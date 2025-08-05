@@ -1,13 +1,13 @@
 'use client'
 
-import { Badge } from '../badge'
-import { Button } from '../../primitives/button'
-import { Input } from '../../primitives/input'
 import { Filter, Plus, RotateCcw, ToggleLeft, Trash2, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { DropdownPortal } from '../../primitives/dropdown-portal'
-import { SelectPortal } from '../../primitives/select-portal'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
+import { DropdownPortal } from '../../primitives/dropdown-portal'
+import { Input } from '../../primitives/input'
+import { SelectPortal } from '../../primitives/select-portal'
+import { Badge } from '../badge'
 import type { ColumnConfig } from './types'
 
 export type FilterOperator =

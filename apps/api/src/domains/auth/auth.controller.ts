@@ -10,18 +10,18 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { CurrentUser } from '../../core/common/decorators/current-user.decorator'
 import { Public } from '../../core/common/decorators/public.decorator'
 import { ThrottleAuth } from '../../core/common/decorators/throttle-config.decorator'
-import { User } from '../users/entities/user.entity'
-import { AuthService } from './auth.service'
+import type { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
+import type { User } from '../users/entities/user.entity'
+import type { AuthService } from './auth.service'
 import { Roles } from './decorators/roles.decorator'
-import { ChangePasswordDto } from './external/dto/change-password.dto'
-import { LoginDto, RefreshTokenDto, RegisterDto } from './external/dto/login.dto'
+import type { ChangePasswordDto } from './external/dto/change-password.dto'
+import { type LoginDto, RefreshTokenDto, type RegisterDto } from './external/dto/login.dto'
 import { JwtAuthGuard } from './security/guards/jwt-auth.guard'
 import { RolesGuard } from './security/guards/roles.guard'
-import { SessionInvalidationService } from './services/session-invalidation.service'
+import type { SessionInvalidationService } from './services/session-invalidation.service'
 
 @ApiTags('🔐 Auth')
 @Controller('auth')
@@ -151,21 +151,21 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Récupérer les sociétés disponibles',
-    description: 'Obtenir la liste des sociétés auxquelles l\'utilisateur a accès',
+    description: "Obtenir la liste des sociétés auxquelles l'utilisateur a accès",
   })
   async getUserSocietes(@CurrentUser() user: User) {
     const cacheKey = `auth:societes:${user.id}`
-    
+
     // Vérifier le cache d'abord
     const cachedResult = await this.cacheService.get(cacheKey)
     if (cachedResult) {
       return cachedResult
     }
     const result = await this.authService.getUserSocietes(user.id)
-    
+
     // Mettre en cache pour 5 minutes (300 secondes)
     await this.cacheService.set(cacheKey, result, 300)
-    
+
     return result
   }
 
@@ -247,10 +247,10 @@ export class AuthController {
   })
   async invalidateAllSessions(@CurrentUser() user: User) {
     const affectedUsers = await this.sessionInvalidationService.forceInvalidateAllSessions()
-    return { 
+    return {
       message: 'Toutes les sessions ont été invalidées',
       affectedUsers,
-      invalidatedBy: user.email
+      invalidatedBy: user.email,
     }
   }
 }

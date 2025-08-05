@@ -1,10 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsOptional, IsEnum, IsString, IsNumber, IsBoolean, IsArray, Min } from 'class-validator'
 import { Transform, Type } from 'class-transformer'
+import { IsArray, IsBoolean, IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator'
 import {
-  MaterialType,
   MaterialShape,
   MaterialStatus,
+  MaterialType,
   StorageMethod,
 } from '../entities/material.entity'
 

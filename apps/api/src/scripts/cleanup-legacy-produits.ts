@@ -8,9 +8,9 @@
  * ou: npx ts-node src/scripts/cleanup-legacy-produits.ts
  */
 
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
 import * as readline from 'readline'
+import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
 config()
@@ -145,13 +145,13 @@ async function cleanupLegacyProduits() {
       )
     `)
 
-    if (!finalCheck[0].exists) {
+    if (finalCheck[0].exists) {
+      console.log('\n❌ Erreur: La table existe encore après suppression')
+    } else {
       console.log('\n🎉 NETTOYAGE TERMINÉ AVEC SUCCÈS!')
       console.log('   ✅ Table "produits" complètement supprimée')
       console.log('   ✅ Base de données nettoyée')
       console.log('   ✅ Migration vers "articles" complète')
-    } else {
-      console.log('\n❌ Erreur: La table existe encore après suppression')
     }
   } catch (error) {
     console.error('\n💥 ERREUR lors du nettoyage:', error)

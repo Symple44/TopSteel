@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { DataSource } from 'typeorm'
+import type { ConfigService } from '@nestjs/config'
+import type { DataSource } from 'typeorm'
 import { CreateInitialTables1737178800000 } from '../migrations/1737178800000-CreateInitialTables'
 // Migration désactivée car elle crée des tables métiers non utilisées
 // import { CreateAllTables1737179000000 } from '../migrations/1737179000000-CreateAllTables'

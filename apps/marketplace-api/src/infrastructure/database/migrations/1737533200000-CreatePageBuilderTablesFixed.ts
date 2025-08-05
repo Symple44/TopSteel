@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CreatePageBuilderTablesFixed1737533200000 implements MigrationInterface {
   name = 'CreatePageBuilderTablesFixed1737533200000'

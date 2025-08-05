@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import {
-  SectorCoefficient,
-  SectorType,
-  CoefficientType,
-} from '../entities/sector-coefficient.entity'
+import type { Repository } from 'typeorm'
 import { CustomerSectorAssignment } from '../entities/customer-sector-assignment.entity'
+import {
+  type CoefficientType,
+  SectorCoefficient,
+  type SectorType,
+} from '../entities/sector-coefficient.entity'
 
 export interface PricingContext {
   customerId?: string
@@ -45,9 +45,9 @@ export class SectorPricingService {
   constructor(
     @InjectRepository(SectorCoefficient)
     private sectorCoefficientRepository: Repository<SectorCoefficient>,
-    
+
     @InjectRepository(CustomerSectorAssignment)
-    private customerSectorRepository: Repository<CustomerSectorAssignment>,
+    private customerSectorRepository: Repository<CustomerSectorAssignment>
   ) {}
 
   /**

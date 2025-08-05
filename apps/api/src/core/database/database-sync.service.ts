@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { DataSource } from 'typeorm'
-import { DatabasePreSyncService } from './database-pre-sync.service'
+import type { DataSource } from 'typeorm'
+import type { DatabasePreSyncService } from './database-pre-sync.service'
 
 @Injectable()
 export class DatabaseSyncService {

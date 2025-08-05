@@ -1,7 +1,7 @@
 'use client'
 
-import { SectionProps } from './types'
 import { SectionWrapper } from './SectionWrapper'
+import type { SectionProps } from './types'
 
 export interface TextBlockContent {
   title?: string

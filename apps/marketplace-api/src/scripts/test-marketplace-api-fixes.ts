@@ -4,8 +4,8 @@
  * Script pour tester que les corrections du marketplace-api fonctionnent
  */
 
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
+import { DataSource } from 'typeorm'
 import { Article, ArticleStatus } from '../shared/entities/erp/article.entity'
 import { Societe } from '../shared/entities/erp/societe.entity'
 

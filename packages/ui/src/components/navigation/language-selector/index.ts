@@ -1,1 +1,1 @@
-export { LanguageSelector, type LanguageSelectorProps, type Language } from './LanguageSelector'
+export { type Language, LanguageSelector, type LanguageSelectorProps } from './LanguageSelector'

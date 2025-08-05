@@ -1,9 +1,5 @@
 'use client'
 
-import { Button } from '../../primitives/button'
-import { Input } from '../../primitives/input'
-import { Label } from '../../primitives'
-import { Separator } from '../../primitives'
 import {
   AlignCenter,
   AlignLeft,
@@ -26,6 +22,9 @@ import {
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '../../../lib/utils'
+import { Label, Separator } from '../../primitives'
+import { Button } from '../../primitives/button'
+import { Input } from '../../primitives/input'
 
 // Nettoyage HTML basique pour la sécurité
 const sanitizeHtml = (html: string): string => {

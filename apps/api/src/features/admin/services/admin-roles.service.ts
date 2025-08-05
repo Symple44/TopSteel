@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { Permission } from '../../../domains/auth/core/entities/permission.entity'
 import { Role } from '../../../domains/auth/core/entities/role.entity'
 import { RolePermission } from '../../../domains/auth/core/entities/role-permission.entity'
@@ -13,7 +13,7 @@ export class AdminRolesService {
     @InjectRepository(RolePermission, 'auth')
     private readonly _rolePermissionsRepository: Repository<RolePermission>,
     @InjectRepository(Permission, 'auth')
-    private readonly _permissionsRepository: Repository<Permission>,
+    private readonly _permissionsRepository: Repository<Permission>
   ) {}
 
   async getRolePermissions(roleId: string) {

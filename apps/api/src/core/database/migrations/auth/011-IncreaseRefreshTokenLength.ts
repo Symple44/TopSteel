@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class IncreaseRefreshTokenLength1737919904000 implements MigrationInterface {
   name = 'IncreaseRefreshTokenLength1737919904000'

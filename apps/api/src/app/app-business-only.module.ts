@@ -1,15 +1,12 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-
-// Core modules
-import { DatabaseMultiTenantModule } from '../core/database/database-multi-tenant.module'
-
-// Business modules
-import { BusinessModule } from '../domains/business.module'
-
 // Configuration
 import { appConfig } from '../core/config/app.config'
 import { databaseConfig } from '../core/config/database.config'
+// Core modules
+import { DatabaseMultiTenantModule } from '../core/database/database-multi-tenant.module'
+// Business modules
+import { BusinessModule } from '../domains/business.module'
 
 /**
  * Module principal simplifié pour démontrer l'architecture business multi-tenant

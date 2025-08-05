@@ -5,26 +5,28 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { JwtService } from '@nestjs/jwt'
+import type { ConfigService } from '@nestjs/config'
+import type { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { SocieteUser, UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
-import { SocieteUsersService } from '../../features/societes/services/societe-users.service'
-import { SocietesService } from '../../features/societes/services/societes.service'
-import { User, UserRole } from '../users/entities/user.entity'
-import { UsersService } from '../users/users.service'
-import { LoginDto } from './external/dto/login.dto'
-import { RegisterDto } from './external/dto/register.dto'
+import type { SocieteUsersService } from '../../features/societes/services/societe-users.service'
+import type { SocietesService } from '../../features/societes/services/societes.service'
+import { User } from '../users/entities/user.entity'
+import type { UsersService } from '../users/users.service'
+import { GlobalUserRole, SocieteRoleType } from './core/constants/roles.constants'
 import { UserSession } from './core/entities/user-session.entity'
-import { JwtPayload } from './interfaces/jwt-payload.interface'
-import type { MultiTenantJwtPayload } from './interfaces/jwt-payload.interface'
-import { GeolocationService } from './services/geolocation.service'
-import { MFAService } from './services/mfa.service'
-import { SessionRedisService } from './services/session-redis.service'
-import { UserSocieteRolesService } from './services/user-societe-roles.service'
+import type { LoginDto } from './external/dto/login.dto'
+import type { RegisterDto } from './external/dto/register.dto'
+import type { JwtPayload, MultiTenantJwtPayload } from './interfaces/jwt-payload.interface'
+import type { AuthPerformanceService } from './services/auth-performance.service'
+import type { GeolocationService } from './services/geolocation.service'
+import type { MFAService } from './services/mfa.service'
+import type { SessionRedisService } from './services/session-redis.service'
+import type { UnifiedRolesService } from './services/unified-roles.service'
+import type { UserSocieteRolesService } from './services/user-societe-roles.service'
 
 @Injectable()
 export class AuthService {
@@ -38,6 +40,8 @@ export class AuthService {
     private readonly societesService: SocietesService,
     private readonly societeUsersService: SocieteUsersService,
     private readonly userSocieteRolesService: UserSocieteRolesService,
+    private readonly unifiedRolesService: UnifiedRolesService,
+    private readonly performanceService: AuthPerformanceService,
     @InjectRepository(UserSession, 'auth')
     private readonly _userSessionRepository: Repository<UserSession>
   ) {}
@@ -84,27 +88,66 @@ export class AuthService {
   }
 
   /**
-   * Récupérer les sociétés disponibles pour un utilisateur (nouvelle structure)
+   * Récupérer les sociétés disponibles pour un utilisateur (version unifiée)
    */
   async getUserSocietes(userId: string) {
-    // Option 1: Utiliser la nouvelle structure si elle existe
-    try {
-      if (this.userSocieteRolesService) {
-        const result = await this.getUserSocietesWithNewStructure(userId)
-        return result
-      }
-    } catch (error) {
-      // Continue to fallback
-    }
+    return this.performanceService.trackOperation(
+      'getUserSocietes',
+      async () => {
+        try {
+          // Utiliser le service unifié pour récupérer les rôles
+          const userSocieteInfos = await this.unifiedRolesService.getUserSocieteRoles(userId)
 
-    // Option 2: Fallback sur l'ancienne structure
-    try {
-      const result = await this.getUserSocietesLegacy(userId)
-      return result
-    } catch (error) {
-      // Retourner un tableau vide si tout échoue
-      return []
-    }
+          // Si l'utilisateur est SUPER_ADMIN et n'a pas de rôles spécifiques, récupérer toutes les sociétés
+          const user = await this.usersService.findById(userId)
+          if (user?.role === GlobalUserRole.SUPER_ADMIN && userSocieteInfos.length === 0) {
+            return await this.getSuperAdminAllSocietes(userId)
+          }
+
+          // OPTIMIZED: Use société data from the joined query
+          return userSocieteInfos.map((info) => ({
+            id: info.societeId,
+            nom: info.societe?.nom || 'Société inconnue',
+            code: info.societe?.code || info.societeId,
+            role: info.effectiveRole,
+            isDefault: info.isDefaultSociete,
+            permissions: info.permissions,
+            sites:
+              info.societe?.sites?.map((site) => ({
+                id: site.id,
+                nom: site.nom,
+                code: site.code,
+              })) || [],
+          }))
+        } catch (error) {
+          console.error('Erreur lors de la récupération des sociétés:', error)
+          // Fallback sur l'ancienne méthode si nécessaire
+          return await this.getUserSocietesLegacy(userId)
+        }
+      },
+      { trackQueries: true }
+    )
+  }
+
+  /**
+   * Récupérer toutes les sociétés pour un SUPER_ADMIN
+   */
+  private async getSuperAdminAllSocietes(userId: string) {
+    const allSocietes = await this.societesService.findActive()
+    return allSocietes.map((societe) => ({
+      id: societe.id,
+      nom: societe.nom,
+      code: societe.code,
+      role: 'SUPER_ADMIN',
+      isDefault: false, // SUPER_ADMIN n'a pas de société par défaut
+      permissions: [], // SUPER_ADMIN a toutes les permissions
+      sites:
+        societe.sites?.map((site) => ({
+          id: site.id,
+          nom: site.nom,
+          code: site.code,
+        })) || [],
+    }))
   }
 
   /**
@@ -171,21 +214,42 @@ export class AuthService {
   }
 
   /**
-   * Login avec sélection de société (nouvelle structure avec UserSocieteRole uniquement)
+   * Login avec sélection de société (version unifiée)
    */
   async loginWithSociete(userId: string, societeId: string, siteId?: string, request?: any) {
-    // Utiliser uniquement la nouvelle structure
-    const userRoles = await this.userSocieteRolesService.findUserRolesInSocietes(userId)
-    const userSocieteRole = userRoles.find((ur) => ur.societeId === societeId)
-
-    if (!userSocieteRole || !userSocieteRole.isActive) {
-      throw new UnauthorizedException('Accès non autorisé à cette société')
-    }
-
     // Récupérer les informations complètes de l'utilisateur
     const user = await this.usersService.findById(userId)
     if (!user) {
       throw new UnauthorizedException('Utilisateur non trouvé')
+    }
+
+    // Utiliser le service unifié pour récupérer ou créer le rôle
+    let userSocieteInfo = await this.unifiedRolesService.getUserSocieteRole(userId, societeId)
+
+    // Si pas de rôle trouvé et que l'utilisateur n'est pas SUPER_ADMIN, refuser l'accès
+    if (!userSocieteInfo && user.role !== GlobalUserRole.SUPER_ADMIN) {
+      throw new UnauthorizedException('Accès non autorisé à cette société')
+    }
+
+    // Pour SUPER_ADMIN, le service unifié crée automatiquement un rôle virtuel
+    if (!userSocieteInfo && user.role === GlobalUserRole.SUPER_ADMIN) {
+      userSocieteInfo = {
+        userId: user.id,
+        societeId: societeId,
+        globalRole: GlobalUserRole.SUPER_ADMIN,
+        societeRole: SocieteRoleType.OWNER,
+        effectiveRole: SocieteRoleType.OWNER,
+        isDefaultSociete: false,
+        isActive: true,
+        permissions: [],
+        additionalPermissions: [],
+        restrictedPermissions: [],
+      }
+    }
+
+    // Vérifier que le rôle est actif
+    if (!userSocieteInfo || !userSocieteInfo.isActive) {
+      throw new UnauthorizedException('Accès non autorisé à cette société')
     }
 
     // Récupérer les informations de la société
@@ -197,16 +261,16 @@ export class AuthService {
     // Générer un ID de session unique
     const sessionId = uuidv4()
 
-    // Créer le payload multi-tenant avec la nouvelle structure
+    // Créer le payload multi-tenant avec le système unifié
     const payload: MultiTenantJwtPayload = {
       sub: user.id,
       email: user.email,
-      role: userSocieteRole.roleType || user.role,
+      role: userSocieteInfo.effectiveRole,
       sessionId,
       societeId: societeId,
       societeCode: societe.code,
       siteId: siteId,
-      permissions: userSocieteRole.permissions?.map((p) => p.name) || [],
+      permissions: userSocieteInfo.permissions,
       tenantDatabase: societe.databaseName,
     }
 
@@ -214,21 +278,40 @@ export class AuthService {
     const refreshToken = await this.generateRefreshToken(payload)
 
     // Mettre à jour l'activité utilisateur
-    await this.usersService.updateRefreshToken(user.id, refreshToken)
     await this.usersService.updateLastLogin(user.id)
 
     // Extraire les informations de la requête pour le tracking
     let ipAddress = '0.0.0.0'
     let userAgent = 'Unknown'
-    let _location: any = null
-    let _deviceInfo: any = null
+    let location: any = null
+    let deviceInfo: any = null
 
     if (request) {
       ipAddress = this.geolocationService.extractRealIP(request)
       userAgent = request.headers['user-agent'] || 'Unknown'
-      _location = await this.geolocationService.getLocationFromIP(ipAddress)
-      _deviceInfo = this.geolocationService.parseUserAgent(userAgent)
+      location = await this.geolocationService.getLocationFromIP(ipAddress)
+      deviceInfo = this.geolocationService.parseUserAgent(userAgent)
     }
+
+    // Créer la session en base de données
+    const dbSession = UserSession.createNew(
+      user.id,
+      sessionId,
+      accessToken,
+      ipAddress,
+      userAgent,
+      refreshToken
+    )
+
+    if (location) {
+      dbSession.location = location
+    }
+
+    if (deviceInfo) {
+      dbSession.deviceInfo = deviceInfo
+    }
+
+    await this._userSessionRepository.save(dbSession)
 
     return {
       user: {
@@ -237,6 +320,15 @@ export class AuthService {
         nom: user.nom,
         prenom: user.prenom,
         role: payload.role,
+        // Ajouter les informations de rôle société pour le frontend
+        userSocieteRoles: [
+          {
+            societeId: societeId,
+            roleType: userSocieteInfo.effectiveRole,
+            isDefaultSociete: userSocieteInfo.isDefaultSociete,
+            isActive: userSocieteInfo.isActive,
+          },
+        ],
         societe: {
           id: societe.id,
           nom: societe.nom,
@@ -271,7 +363,8 @@ export class AuthService {
     const accessToken = await this.generateAccessToken(payload)
     const refreshToken = await this.generateRefreshToken(payload)
 
-    await this.usersService.updateRefreshToken(user.id, refreshToken)
+    // Ne plus stocker le refreshToken dans la table users pour permettre le multi-device
+    // await this.usersService.updateRefreshToken(user.id, refreshToken)
     await this.usersService.updateLastLogin(user.id)
 
     // Extraire les informations de la requête pour le tracking
@@ -289,8 +382,8 @@ export class AuthService {
       deviceInfo = this.geolocationService.parseUserAgent(userAgent)
     }
 
-    // Créer la session en base de données - TEMPORAIREMENT DÉSACTIVÉ
-    /* const dbSession = UserSession.createNew(
+    // Créer la session en base de données
+    const dbSession = UserSession.createNew(
       user.id,
       sessionId,
       accessToken,
@@ -307,7 +400,7 @@ export class AuthService {
       dbSession.deviceInfo = deviceInfo
     }
 
-    await this._userSessionRepository.save(dbSession) */
+    await this._userSessionRepository.save(dbSession)
 
     // Ajouter la session à Redis pour le tracking temps réel
     await this.sessionRedisService.addActiveSession({
@@ -411,21 +504,45 @@ export class AuthService {
         secret: refreshSecret,
       })
 
-      const user = await this.usersService.findById(payload.sub)
-      if (!user || user.refreshToken !== refreshToken) {
-        throw new UnauthorizedException('Invalid refresh token')
+      // Vérifier que la session existe et est active
+      const session = await this._userSessionRepository.findOne({
+        where: {
+          sessionId: payload.sessionId,
+          userId: payload.sub,
+          isActive: true,
+          refreshToken: refreshToken,
+        },
+      })
+
+      if (!session) {
+        throw new UnauthorizedException('Invalid or expired session')
       }
 
+      // Vérifier que l'utilisateur existe et est actif
+      const user = await this.usersService.findById(payload.sub)
+      if (!user || !user.actif) {
+        throw new UnauthorizedException('User not found or inactive')
+      }
+
+      // Générer de nouveaux tokens
       const newPayload: JwtPayload = {
         sub: user.id,
         email: user.email,
         role: user.role,
+        sessionId: session.sessionId,
       }
 
       const newAccessToken = await this.generateAccessToken(newPayload)
       const newRefreshToken = await this.generateRefreshToken(newPayload)
 
-      await this.usersService.updateRefreshToken(user.id, newRefreshToken)
+      // Mettre à jour la session avec le nouveau refresh token
+      session.refreshToken = newRefreshToken
+      session.accessToken = newAccessToken
+      session.lastActivity = new Date()
+      await this._userSessionRepository.save(session)
+
+      // Mettre à jour aussi dans Redis
+      await this.sessionRedisService.updateSessionActivity(session.sessionId)
 
       return {
         accessToken: newAccessToken,
@@ -438,7 +555,8 @@ export class AuthService {
   }
 
   async logout(userId: string, sessionId?: string) {
-    await this.usersService.updateRefreshToken(userId, null)
+    // Ne plus mettre à jour le refreshToken dans users car il est maintenant dans sessions
+    // await this.usersService.updateRefreshToken(userId, null)
 
     if (sessionId) {
       // Supprimer la session spécifique de Redis
@@ -457,18 +575,15 @@ export class AuthService {
       // Déconnexion de toutes les sessions de l'utilisateur
       await this.sessionRedisService.forceLogoutUser(userId)
 
-      // Temporairement désactivé car problème avec la structure de table
-      /*
       // Marquer toutes les sessions actives comme terminées
       await this._userSessionRepository.update(
         { userId, status: 'active' },
-        { 
+        {
           status: 'ended',
           logoutTime: new Date(),
-          isActive: false
+          isActive: false,
         }
       )
-      */
     }
   }
 
@@ -779,7 +894,7 @@ export class AuthService {
 
     // Seuls les super admins peuvent contourner MFA en cas d'urgence
     return (
-      user?.role === UserRole.SUPER_ADMIN &&
+      user?.role === GlobalUserRole.SUPER_ADMIN &&
       this.configService.get<boolean>('MFA_EMERGENCY_BYPASS_ENABLED', false)
     )
   }
@@ -797,7 +912,7 @@ export class AuthService {
     try {
       // Vérifier que l'admin a les permissions
       const admin = await this.usersService.findById(adminUserId)
-      if (!admin || ![UserRole.SUPER_ADMIN, UserRole.ADMIN].includes(admin.role)) {
+      if (!admin || ![GlobalUserRole.SUPER_ADMIN, GlobalUserRole.ADMIN].includes(admin.role)) {
         return {
           success: false,
           message: 'Permissions insuffisantes',

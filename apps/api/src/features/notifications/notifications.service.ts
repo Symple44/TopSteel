@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import type { PaginationResultDto } from '../../core/common/dto/base.dto'
-import { CreateNotificationsDto } from './dto/create-notifications.dto'
-import { NotificationsQueryDto } from './dto/notifications-query.dto'
-import { UpdateNotificationsDto } from './dto/update-notifications.dto'
+import type { CreateNotificationsDto } from './dto/create-notifications.dto'
+import type { NotificationsQueryDto } from './dto/notifications-query.dto'
+import type { UpdateNotificationsDto } from './dto/update-notifications.dto'
 import { Notifications } from './entities/notifications.entity'
 
 @Injectable()

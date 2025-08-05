@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { Societe } from '../../../shared/entities/erp/societe.entity'
 import { MarketplaceTheme } from '../../themes/entities/marketplace-theme.entity'
 
@@ -64,9 +64,9 @@ export class StorefrontService {
   constructor(
     @InjectRepository(Societe, 'erpAuth')
     private societeRepo: Repository<Societe>,
-    
+
     @InjectRepository(MarketplaceTheme, 'marketplace')
-    private themeRepo: Repository<MarketplaceTheme>,
+    private themeRepo: Repository<MarketplaceTheme>
   ) {}
 
   async getStorefrontConfig(societeId: string): Promise<StorefrontConfig> {

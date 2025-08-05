@@ -1,8 +1,9 @@
 'use client'
 
-import { Button } from '../../primitives/button'
 import { Check, ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { Button } from '../../primitives/button'
+
 interface SelectOption {
   value: string
   label: string

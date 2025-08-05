@@ -36,13 +36,13 @@ export class MenuConfigurationController {
   }
 
   @Get('tree')
-  @ApiOperation({ summary: 'Obtenir l\'arbre de menu de la configuration active' })
+  @ApiOperation({ summary: "Obtenir l'arbre de menu de la configuration active" })
   @ApiResponse({ status: 200, description: 'Arbre de menu récupéré avec succès' })
   async getMenuTree(@Query('configId') configId?: string) {
     const tree = await this.menuConfigService.getMenuTree(configId)
     return {
       success: true,
-      data: tree
+      data: tree,
     }
   }
 
@@ -76,21 +76,19 @@ export class MenuConfigurationController {
     const config = await this.menuConfigService.findConfigurationById(id)
     return {
       success: true,
-      data: config
+      data: config,
     }
   }
 
   @Post()
   @ApiOperation({ summary: 'Créer une nouvelle configuration de menu' })
   @ApiResponse({ status: 201, description: 'Configuration créée avec succès' })
-  async createConfiguration(
-    @Body() createDto: CreateMenuConfigDto
-  ) {
+  async createConfiguration(@Body() createDto: CreateMenuConfigDto) {
     const config = await this.menuConfigService.createConfiguration(createDto, 'debug-user')
     return {
       success: true,
       data: config,
-      message: 'Configuration de menu créée avec succès'
+      message: 'Configuration de menu créée avec succès',
     }
   }
 
@@ -113,7 +111,7 @@ export class MenuConfigurationController {
     await this.menuConfigService.deleteConfiguration(id)
     return {
       success: true,
-      message: 'Configuration de menu supprimée avec succès'
+      message: 'Configuration de menu supprimée avec succès',
     }
   }
 
@@ -124,7 +122,7 @@ export class MenuConfigurationController {
     await this.menuConfigService.activateConfiguration(id)
     return {
       success: true,
-      message: 'Configuration de menu activée avec succès'
+      message: 'Configuration de menu activée avec succès',
     }
   }
 
@@ -135,21 +133,19 @@ export class MenuConfigurationController {
     const exportData = await this.menuConfigService.exportConfiguration(id)
     return {
       success: true,
-      data: exportData
+      data: exportData,
     }
   }
 
   @Post('import')
   @ApiOperation({ summary: 'Importer une configuration de menu' })
   @ApiResponse({ status: 201, description: 'Configuration importée avec succès' })
-  async importConfiguration(
-    @Body() importData: any
-  ) {
+  async importConfiguration(@Body() importData: any) {
     const config = await this.menuConfigService.importConfiguration(importData, 'debug-user')
     return {
       success: true,
       data: config,
-      message: 'Configuration de menu importée avec succès'
+      message: 'Configuration de menu importée avec succès',
     }
   }
 }

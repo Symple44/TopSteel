@@ -1,7 +1,7 @@
 'use client'
 
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { AdvancedDataTable, type ColumnConfig } from '@erp/ui'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import type { TranslationEntry } from '@/lib/i18n/types'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
 import {

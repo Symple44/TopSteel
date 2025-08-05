@@ -1,9 +1,5 @@
 'use client'
 
-import { Badge } from '../badge'
-import { Button } from '../../primitives/button'
-import { Checkbox } from '../../primitives/checkbox'
-import { Input } from '../../primitives/input'
 import {
   Check,
   ChevronDown,
@@ -28,8 +24,13 @@ import {
 import type React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Button } from '../../primitives/button'
+import { Checkbox } from '../../primitives/checkbox'
 import { DropdownItem, DropdownPortal, DropdownSeparator } from '../../primitives/dropdown-portal'
+import { Input } from '../../primitives/input'
 import { SimpleTooltip } from '../../primitives/tooltip'
+import { Badge } from '../badge'
+
 // Simple debounce hook for internal use
 const useDebouncedValue = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -46,6 +47,7 @@ const useDebouncedValue = (value: string, delay: number) => {
 
   return debouncedValue
 }
+
 import { cn } from '../../../lib/utils'
 import AdvancedFilters, { type AdvancedFilterGroup } from './AdvancedFilters'
 import { type ColorRule, ColorRuleManager } from './ColorRuleManager'

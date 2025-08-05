@@ -3,19 +3,19 @@
  * TopSteel ERP - Clean Architecture
  */
 
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 import { BaseArticleInjector } from '../core/base-article-injector'
 import {
-  ArticleMetallurgie,
-  GlobalInjectionConfig,
-  InjectionLogger,
-  ArticleValidator,
-  PricingCalculator,
   ArticleFamille,
-  ArticleType,
+  type ArticleMetallurgie,
   ArticleStatus,
+  ArticleType,
+  type ArticleValidator,
+  type CaracteristiquesTechniques,
+  type GlobalInjectionConfig,
+  type InjectionLogger,
+  type PricingCalculator,
   UniteStock,
-  CaracteristiquesTechniques,
 } from '../types/article-injection.types'
 
 interface TubeSpecification {
@@ -339,8 +339,7 @@ export class TubesInjector extends BaseArticleInjector {
         if (tube.type === 'ROND' && tube.diametre) {
           const r_ext = tube.diametre / 2
           const r_int = r_ext - tube.epaisseur
-          caracteristiques.momentInertieX =
-            (Math.PI * (Math.pow(r_ext, 4) - Math.pow(r_int, 4))) / 4
+          caracteristiques.momentInertieX = (Math.PI * (r_ext ** 4 - r_int ** 4)) / 4
           caracteristiques.momentInertieY = caracteristiques.momentInertieX
           caracteristiques.moduleResistanceX = caracteristiques.momentInertieX / r_ext
           caracteristiques.moduleResistanceY = caracteristiques.moduleResistanceX
@@ -349,10 +348,8 @@ export class TubesInjector extends BaseArticleInjector {
           const h = tube.hauteur
           const b = tube.largeur
           const t = tube.epaisseur
-          caracteristiques.momentInertieX =
-            (b * Math.pow(h, 3) - (b - 2 * t) * Math.pow(h - 2 * t, 3)) / 12
-          caracteristiques.momentInertieY =
-            (h * Math.pow(b, 3) - (h - 2 * t) * Math.pow(b - 2 * t, 3)) / 12
+          caracteristiques.momentInertieX = (b * h ** 3 - (b - 2 * t) * (h - 2 * t) ** 3) / 12
+          caracteristiques.momentInertieY = (h * b ** 3 - (h - 2 * t) * (b - 2 * t) ** 3) / 12
           caracteristiques.moduleResistanceX = caracteristiques.momentInertieX / (h / 2)
           caracteristiques.moduleResistanceY = caracteristiques.momentInertieY / (b / 2)
         }

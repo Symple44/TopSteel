@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '../../primitives/button'
 import { ChevronDown, ChevronRight, GripVertical } from 'lucide-react'
 import React, { useCallback, useRef, useState } from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
 
 // Types pour les éléments de liste
 export interface ReorderableItem {
@@ -233,7 +233,7 @@ function useDragAndDrop<T extends ReorderableItem>(
                 const newItems = [...currentItems.slice(0, i), ...currentItems.slice(i + 1)]
                 return { newItems, removedItem: removed }
               }
-              const children = currentItems[i].children;
+              const children = currentItems[i].children
               if (children && children.length > 0) {
                 const result = processItems(children as T[])
                 if (result.removedItem) {
@@ -289,7 +289,7 @@ function useDragAndDrop<T extends ReorderableItem>(
               }
 
               // Rechercher récursivement dans les enfants
-              const children = currentItems[i].children;
+              const children = currentItems[i].children
               if (children && children.length > 0) {
                 const result = processLevel(children as T[])
                 if (result.found) {

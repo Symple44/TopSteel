@@ -1,7 +1,7 @@
-import { DataSource } from 'typeorm'
 import * as bcrypt from 'bcrypt'
 import { config } from 'dotenv'
 import { resolve } from 'path'
+import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
 config({ path: resolve(__dirname, '../../../../.env') })

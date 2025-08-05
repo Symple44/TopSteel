@@ -1,14 +1,14 @@
 'use client'
 
-import { Download, Edit, MoreVertical, Play, Trash2 } from 'lucide-react'
 import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@erp/ui/primitives'
+import { Download, Edit, MoreVertical, Play, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface MenuConfiguration {

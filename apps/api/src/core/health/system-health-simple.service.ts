@@ -1,5 +1,5 @@
 import { Injectable, Logger, Optional } from '@nestjs/common'
-import { DatabaseHealthService } from '../../features/database-core/services/database-health.service'
+import type { DatabaseHealthService } from '../../features/database-core/services/database-health.service'
 
 export interface SystemHealth {
   status: 'healthy' | 'degraded' | 'unhealthy'
@@ -10,11 +10,9 @@ export interface SystemHealth {
 
 @Injectable()
 export class SystemHealthService {
-  private readonly logger = new Logger(SystemHealthService.name);
+  private readonly logger = new Logger(SystemHealthService.name)
 
-  constructor(
-    @Optional() private _databaseHealthService?: DatabaseHealthService
-  ) {}
+  constructor(@Optional() private _databaseHealthService?: DatabaseHealthService) {}
 
   async checkSystemHealth(): Promise<SystemHealth> {
     try {

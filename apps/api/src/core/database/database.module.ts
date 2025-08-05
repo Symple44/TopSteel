@@ -2,6 +2,10 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
+import { UserMFA } from '../../domains/auth/core/entities/user-mfa.entity'
+import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
+import { User } from '../../domains/users/entities/user.entity'
 // Entités admin (entities)
 import { MenuConfiguration } from '../../features/admin/entities/menu-configuration.entity'
 import { MenuItem } from '../../features/admin/entities/menu-item.entity'
@@ -13,20 +17,16 @@ import { SystemParameter } from '../../features/admin/entitites/system-parameter
 // Import explicite de TOUTES les entités pour debugging
 // Entités admin (entitites)
 import { SystemSetting } from '../../features/admin/entitites/system-setting.entity'
-import { MFASession } from '../../domains/auth/core/entities/mfa-session.entity'
-import { UserMFA } from '../../domains/auth/core/entities/user-mfa.entity'
-import { UserSession } from '../../domains/auth/core/entities/user-session.entity'
 // Entités métier supprimées pour optimiser le debug
 import { UserMenuPreference } from '../../features/menu/entities/user-menu-preference.entity'
 import { Notifications } from '../../features/notifications/entities/notifications.entity'
-import { User } from '../../domains/users/entities/user.entity'
+import { BTPIndex } from '../../modules/pricing/entities/btp-index.entity'
+import { CustomerSectorAssignment } from '../../modules/pricing/entities/customer-sector-assignment.entity'
+// Entités pricing
+import { SectorCoefficient } from '../../modules/pricing/entities/sector-coefficient.entity'
 import { DatabaseCleanupService } from './database-cleanup.service'
 import { DatabasePreSyncService } from './database-pre-sync.service'
 import { DatabaseSyncService } from './database-sync.service'
-// Entités pricing
-import { SectorCoefficient } from '../../modules/pricing/entities/sector-coefficient.entity'
-import { CustomerSectorAssignment } from '../../modules/pricing/entities/customer-sector-assignment.entity'
-import { BTPIndex } from '../../modules/pricing/entities/btp-index.entity'
 
 @Module({
   imports: [

@@ -1,10 +1,10 @@
 'use client'
 
-import { Badge } from '../../badge'
-import { Button } from '../../../primitives/button'
 import { Calendar, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { Button } from '../../../primitives/button'
 import { DropdownItem, DropdownPortal } from '../../../primitives/dropdown-portal'
+import { Badge } from '../../badge'
 import type { CalendarEvent } from '../use-data-views'
 
 interface CalendarViewProps {

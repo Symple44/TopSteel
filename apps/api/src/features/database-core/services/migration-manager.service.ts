@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
-import { TenantConnectionService } from './tenant-connection.service'
+import type { DataSource } from 'typeorm'
+import type { TenantConnectionService } from './tenant-connection.service'
 
 export interface MigrationStatus {
   database: string
@@ -20,13 +20,13 @@ export interface MigrationResult {
 
 @Injectable()
 export class MigrationManagerService {
-  private readonly logger = new Logger(MigrationManagerService.name);
+  private readonly logger = new Logger(MigrationManagerService.name)
 
   constructor(
     @InjectDataSource('auth') private _authDataSource: DataSource,
     @InjectDataSource('shared') private _sharedDataSource: DataSource,
     @InjectDataSource('tenant') private _tenantDataSource: DataSource,
-    private readonly tenantConnectionService: TenantConnectionService,
+    private readonly tenantConnectionService: TenantConnectionService
   ) {}
 
   /**
@@ -56,11 +56,11 @@ export class MigrationManagerService {
 
       let migrationDir = ''
       if (databaseName === 'auth') {
-        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'auth')
+        migrationDir = path.join(process.cwd(), 'src', 'core', 'database', 'migrations', 'auth')
       } else if (databaseName === 'shared') {
-        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'shared')
+        migrationDir = path.join(process.cwd(), 'src', 'core', 'database', 'migrations', 'shared')
       } else if (databaseName.startsWith('tenant_')) {
-        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'tenant')
+        migrationDir = path.join(process.cwd(), 'src', 'core', 'database', 'migrations', 'tenant')
       }
 
       let allMigrations: string[] = []
@@ -264,11 +264,11 @@ export class MigrationManagerService {
       let migrationDir = ''
 
       if (database === 'auth') {
-        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'auth')
+        migrationDir = path.join(process.cwd(), 'src', 'core', 'database', 'migrations', 'auth')
       } else if (database === 'shared') {
-        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'shared')
+        migrationDir = path.join(process.cwd(), 'src', 'core', 'database', 'migrations', 'shared')
       } else if (database.startsWith('tenant_')) {
-        migrationDir = path.join(process.cwd(), 'src', 'database', 'migrations', 'tenant')
+        migrationDir = path.join(process.cwd(), 'src', 'core', 'database', 'migrations', 'tenant')
       }
 
       // Chercher le fichier qui contient le nom de la migration

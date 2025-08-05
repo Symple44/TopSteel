@@ -8,8 +8,8 @@
  * Usage: npm run cleanup:system-settings
  */
 
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
+import { DataSource } from 'typeorm'
 
 config()
 
@@ -79,13 +79,13 @@ async function cleanupSystemSettings() {
       )
     `)
 
-    if (!finalCheck[0].exists) {
+    if (finalCheck[0].exists) {
+      console.log('\n❌ Erreur: La table existe encore après suppression')
+    } else {
       console.log('\n🎉 NETTOYAGE TERMINÉ AVEC SUCCÈS!')
       console.log('   ✅ Table system_settings complètement supprimée')
       console.log('   ✅ Architecture des paramètres maintenant cohérente')
       console.log('   📍 Paramètres système dans parameters_system (base auth)')
-    } else {
-      console.log('\n❌ Erreur: La table existe encore après suppression')
     }
   } catch (error) {
     console.error('\n💥 ERREUR lors du nettoyage:', error)

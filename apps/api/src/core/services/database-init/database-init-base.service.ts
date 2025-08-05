@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 import { INIT_DATA } from './database-init-data'
 
 @Injectable()

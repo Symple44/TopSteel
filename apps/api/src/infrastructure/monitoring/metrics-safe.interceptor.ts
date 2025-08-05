@@ -6,9 +6,8 @@ import {
   Logger,
   type NestInterceptor,
 } from '@nestjs/common'
-import { Request } from 'express'
-import type { Response } from 'express'
-import { Observable } from 'rxjs'
+import type { Request, Response } from 'express'
+import type { Observable } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
 
 @Injectable()

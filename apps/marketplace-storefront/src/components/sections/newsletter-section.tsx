@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Mail, CheckCircle } from 'lucide-react'
-import { subscribeToNewsletter } from '@/lib/api/storefront'
-import { LoadingSpinner } from '@/components/ui/loading-spinner'
-import { isValidEmail } from '@/lib/utils'
+import { CheckCircle, Mail } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { subscribeToNewsletter } from '@/lib/api/storefront'
+import { isValidEmail } from '@/lib/utils'
 
 interface NewsletterSectionProps {
   tenant: string

@@ -1,7 +1,7 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ProductDetail } from '@/components/product/product-detail'
 import { api } from '@/lib/api/storefront'
-import type { Metadata } from 'next'
 
 interface ProductPageProps {
   params: Promise<{

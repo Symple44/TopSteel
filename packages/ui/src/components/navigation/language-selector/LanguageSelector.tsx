@@ -1,5 +1,6 @@
 'use client'
 
+import { Globe } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -7,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../primitives'
-import { Globe } from 'lucide-react'
 
 export interface Language {
   code: string

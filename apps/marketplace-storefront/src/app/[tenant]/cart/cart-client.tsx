@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
-import Link from 'next/link'
+import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import Image from 'next/image'
-import { ShoppingBag, Trash2, Plus, Minus, ArrowLeft } from 'lucide-react'
-import { useCart } from '@/stores/cart-store'
+import Link from 'next/link'
+import { useEffect } from 'react'
 import { formatPrice } from '@/lib/utils'
+import { useCart } from '@/stores/cart-store'
 
 interface CartClientProps {
   tenant: string

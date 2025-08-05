@@ -2,10 +2,9 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState } from 'react'
-import { Badge } from '@erp/ui'
+import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
 import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import { useState } from 'react'
 
 // Données fictives de planning
 const planningData = [

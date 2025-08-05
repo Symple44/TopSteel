@@ -2,11 +2,19 @@
 
 export const dynamic = 'force-dynamic'
 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
 import { Loader2, Package, Settings, Store, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
 import { InstalledModules } from './components/installed-modules'

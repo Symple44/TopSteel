@@ -1,9 +1,9 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { MarketplaceModule as MarketplaceModuleEntity } from '../entities/marketplace-module.entity'
 // Import des modules réels - Supprimés pour optimiser le debug
-import { MarketplaceService } from './marketplace.service'
+import type { MarketplaceService } from './marketplace.service'
 
 export interface ModuleRegistration {
   moduleClass: any
@@ -13,7 +13,7 @@ export interface ModuleRegistration {
 @Injectable()
 export class ModuleRegistryService implements OnModuleInit {
   private readonly logger = new Logger(ModuleRegistryService.name)
-  private readonly registeredModules = new Map<string, ModuleRegistration>();
+  private readonly registeredModules = new Map<string, ModuleRegistration>()
 
   constructor(
     @InjectRepository(MarketplaceModuleEntity, 'auth')

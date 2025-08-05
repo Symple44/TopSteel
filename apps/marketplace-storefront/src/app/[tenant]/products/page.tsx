@@ -1,8 +1,8 @@
 'use client'
 
 import { Suspense } from 'react'
-import { ProductsGrid } from '@/components/product/products-grid'
 import { ProductsFilters } from '@/components/product/products-filters'
+import { ProductsGrid } from '@/components/product/products-grid'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 interface ProductsPageProps {

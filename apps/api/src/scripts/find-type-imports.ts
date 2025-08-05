@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync } from 'fs'
+import { readdirSync, readFileSync, statSync } from 'fs'
 import { join } from 'path'
 
 function findTypeImports(dir: string, results: string[] = []): string[] {

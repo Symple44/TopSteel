@@ -7,7 +7,7 @@ import { Societe, SocieteStatus } from '../entities/societe.entity'
 export class SocietesService {
   constructor(
     @InjectRepository(Societe, 'auth')
-    private _societeRepository: Repository<Societe>,
+    private _societeRepository: Repository<Societe>
   ) {}
 
   async findAll(): Promise<Societe[]> {

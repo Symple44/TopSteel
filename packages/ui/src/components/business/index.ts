@@ -3,18 +3,19 @@
 // Composants métier réutilisables - Auto-généré
 // ================================================================
 
+export * from './company-logo'
 // Dialogs métier
 export * from './dialogs'
-export * from './erp-info-modal'
 
 // Affichage métier
 export * from './displays'
-export * from './company-logo'
+export * from './erp-info-modal'
 // Filtres et recherche
 export * from './filters'
 
 // Formulaires métier
 export * from './forms'
+export * from './image-upload'
 // Composants métallurgie
 export * from './metallurgy'
 // Notifications métier
@@ -25,6 +26,5 @@ export * from './projet-card'
 export * from './tables'
 // Upload et documents
 export * from './uploads'
-export * from './image-upload'
 // Workflow et processus
 export * from './workflows'

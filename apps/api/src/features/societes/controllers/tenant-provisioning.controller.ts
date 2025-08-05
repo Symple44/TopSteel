@@ -1,6 +1,6 @@
 import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { TenantProvisioningService } from '../services/tenant-provisioning.service'
+import type { TenantProvisioningService } from '../services/tenant-provisioning.service'
 
 @ApiTags('Provisioning')
 @Controller('provisioning')
@@ -12,22 +12,21 @@ export class TenantProvisioningController {
   @ApiResponse({ status: 201, description: 'Société créée avec succès' })
   async createTenant(@Body() data: any) {
     try {
-      
-      const result = await this.tenantProvisioningService.createTenantWithDatabase(data);
+      const result = await this.tenantProvisioningService.createTenantWithDatabase(data)
       return {
         success: true,
         message: 'Société créée avec succès',
-        data: result
-      };
+        data: result,
+      }
     } catch (error: any) {
       throw new HttpException(
         {
           success: false,
           message: 'Erreur lors de la création de la société',
-          error: error?.message || 'Erreur interne'
+          error: error?.message || 'Erreur interne',
         },
         HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      )
     }
   }
 

@@ -1,4 +1,4 @@
-import { type MigrationInterface, QueryRunner, Table } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table } from 'typeorm'
 
 export class CreateParametersTables1737500000012 implements MigrationInterface {
   name = 'CreateParametersTables1737500000012'

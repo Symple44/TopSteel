@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { BusinessService } from '../../core/base/business-service'
 import {
-  BusinessOperation,
   type BusinessContext,
+  BusinessOperation,
   type ValidationResult,
 } from '../../core/interfaces/business-service.interface'
 import { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
-import { IArticleRepository } from '../repositories/article.repository'
+import type { IArticleRepository } from '../repositories/article.repository'
 
 /**
  * Service métier pour la gestion des articles
@@ -63,10 +63,10 @@ export class ArticleService extends BusinessService<Article> {
     const article = new Article()
 
     // Générer une référence automatique si non fournie
-    if (!data.reference) {
-      article.reference = await this.generateReference(data.type!)
-    } else {
+    if (data.reference) {
       article.reference = data.reference
+    } else {
+      article.reference = await this.generateReference(data.type!)
     }
 
     // Informations de base obligatoires

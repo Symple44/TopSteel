@@ -1,5 +1,5 @@
-import { Column, Entity, Index, OneToMany } from 'typeorm'
 import { BusinessEntity } from '@erp/entities'
+import { Column, Entity, Index, OneToMany } from 'typeorm'
 
 export enum PartnerType {
   CLIENT = 'CLIENT',

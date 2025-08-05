@@ -1,9 +1,9 @@
 'use client'
 
-import { Badge } from '../../badge'
-import { Button } from '../../../primitives/button'
 import { MoreHorizontal, Plus } from 'lucide-react'
+import { Button } from '../../../primitives/button'
 import { DropdownItem, DropdownPortal } from '../../../primitives/dropdown-portal'
+import { Badge } from '../../badge'
 import type { Card, KanbanColumn } from '../use-data-views'
 
 interface KanbanViewProps {

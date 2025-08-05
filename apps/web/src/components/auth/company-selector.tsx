@@ -1,19 +1,19 @@
 'use client'
 
-import { AlertTriangle, Building2, Check, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import { Button } from '@erp/ui/primitives'
 import { Card } from '@erp/ui'
-import { Checkbox } from '@erp/ui/primitives'
 import {
+  Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@erp/ui/primitives'
+import { AlertTriangle, Building2, Check, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useAuth } from '@/hooks/use-auth'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { getApproximateTabCount } from '@/lib/tab-detection'
@@ -155,6 +155,7 @@ const loadRolesFromParameters = async (
 // Fonction pour obtenir la traduction d'un rôle
 const getRoleTranslation = (roleKey: string, translator: (key: string) => string): string => {
   const roleMap: Record<string, string> = {
+    OWNER: translator('roles.owner'),
     SUPER_ADMIN: translator('roles.super_admin'),
     ADMIN: translator('roles.admin'),
     MANAGER: translator('roles.manager'),
@@ -164,6 +165,7 @@ const getRoleTranslation = (roleKey: string, translator: (key: string) => string
     OPERATEUR: translator('roles.operator'),
     USER: translator('roles.user'),
     VIEWER: translator('roles.viewer'),
+    GUEST: translator('roles.guest'),
   }
   return roleMap[roleKey] || roleKey
 }
@@ -173,6 +175,11 @@ const getFallbackRoles = (language: string = 'fr'): RoleData[] => {
   // Créer un translator simple pour le fallback
   const fallbackTranslator = (key: string) => {
     const translations: Record<string, Record<string, string>> = {
+      'roles.owner': {
+        fr: 'Propriétaire',
+        en: 'Owner',
+        es: 'Propietario',
+      },
       'roles.super_admin': {
         fr: 'Super Administrateur',
         en: 'Super Administrator',
@@ -186,67 +193,82 @@ const getFallbackRoles = (language: string = 'fr'): RoleData[] => {
       'roles.operator': { fr: 'Opérateur', en: 'Operator', es: 'Operador' },
       'roles.user': { fr: 'Utilisateur', en: 'User', es: 'Usuario' },
       'roles.viewer': { fr: 'Observateur', en: 'Viewer', es: 'Observador' },
+      'roles.guest': { fr: 'Invité', en: 'Guest', es: 'Invitado' },
     }
     return translations[key]?.[language] || key
   }
 
   return [
     {
+      key: 'OWNER',
+      value: fallbackTranslator('roles.owner'),
+      icon: '🏛️',
+      color: 'destructive',
+      order: 1,
+    },
+    {
       key: 'SUPER_ADMIN',
       value: fallbackTranslator('roles.super_admin'),
       icon: '👑',
       color: 'destructive',
-      order: 1,
+      order: 2,
     },
     {
       key: 'ADMIN',
       value: fallbackTranslator('roles.admin'),
       icon: '🔧',
       color: 'orange',
-      order: 2,
+      order: 3,
     },
     {
       key: 'MANAGER',
       value: fallbackTranslator('roles.manager'),
       icon: '📋',
       color: 'purple',
-      order: 3,
+      order: 4,
     },
     {
       key: 'COMMERCIAL',
       value: fallbackTranslator('roles.commercial'),
       icon: '💼',
       color: 'green',
-      order: 4,
+      order: 5,
     },
     {
       key: 'TECHNICIEN',
       value: fallbackTranslator('roles.technician'),
       icon: '🔨',
       color: 'yellow',
-      order: 5,
+      order: 6,
     },
     {
       key: 'COMPTABLE',
       value: fallbackTranslator('roles.accountant'),
       icon: '💰',
       color: 'cyan',
-      order: 6,
+      order: 7,
     },
     {
       key: 'OPERATEUR',
       value: fallbackTranslator('roles.operator'),
       icon: '⚙️',
       color: 'blue',
-      order: 7,
+      order: 8,
     },
-    { key: 'USER', value: fallbackTranslator('roles.user'), icon: '👤', color: 'blue', order: 8 },
+    { key: 'USER', value: fallbackTranslator('roles.user'), icon: '👤', color: 'blue', order: 9 },
     {
       key: 'VIEWER',
       value: fallbackTranslator('roles.viewer'),
       icon: '👁️',
       color: 'gray',
-      order: 9,
+      order: 10,
+    },
+    {
+      key: 'GUEST',
+      value: fallbackTranslator('roles.guest'),
+      icon: '👥',
+      color: 'gray',
+      order: 11,
     },
   ]
 }
@@ -512,19 +534,25 @@ export default function CompanySelector({
       let attempts = 0
       const maxAttempts = 15 // Augmenter le nombre de tentatives
       const checkTokensAndRedirect = () => {
-        const storedTokens = localStorage.getItem('topsteel-tokens')
+        const storedTokens =
+          localStorage.getItem('topsteel_auth_tokens') ||
+          sessionStorage.getItem('topsteel_auth_tokens')
 
         if (storedTokens) {
           try {
-            const tokens = JSON.parse(storedTokens)
-            // Vérifier que les tokens ne sont pas expirés
-            if (tokens.expiresAt && tokens.expiresAt > Date.now()) {
-              console.log('🔍 CompanySelector: Tokens found, redirecting to dashboard')
+            const session = JSON.parse(storedTokens)
+            // Vérifier que la session contient des tokens et qu'ils ne sont pas expirés
+            if (
+              session.tokens &&
+              session.tokens.expiresAt &&
+              session.tokens.expiresAt > Date.now()
+            ) {
+              console.log('🔍 CompanySelector: Valid session found, redirecting to dashboard')
               window.location.href = '/dashboard'
               return
             }
           } catch (error) {
-            console.warn('🔍 CompanySelector: Error parsing tokens:', error)
+            console.warn('🔍 CompanySelector: Error parsing session:', error)
           }
         }
 

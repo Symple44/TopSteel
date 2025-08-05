@@ -1,13 +1,13 @@
 import 'reflect-metadata'
 import { config } from 'dotenv'
 import { DataSource } from 'typeorm'
+import { BTPIndex, BTPIndexType } from '../modules/pricing/entities/btp-index.entity'
+import { CustomerSectorAssignment } from '../modules/pricing/entities/customer-sector-assignment.entity'
 import {
+  CoefficientType,
   SectorCoefficient,
   SectorType,
-  CoefficientType,
 } from '../modules/pricing/entities/sector-coefficient.entity'
-import { CustomerSectorAssignment } from '../modules/pricing/entities/customer-sector-assignment.entity'
-import { BTPIndex, BTPIndexType } from '../modules/pricing/entities/btp-index.entity'
 
 // Charger les variables d'environnement
 config()

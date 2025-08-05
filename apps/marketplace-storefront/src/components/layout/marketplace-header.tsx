@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { Menu, Search, ShoppingCart, User, X } from 'lucide-react'
 import Link from 'next/link'
-import { Search, ShoppingCart, User, Menu, X } from 'lucide-react'
-import { StorefrontConfig } from '@/lib/api/storefront'
-import { useCart } from '@/stores/cart-store'
+import { useState } from 'react'
 import { CartSidebar } from '@/components/cart/cart-sidebar'
+import type { StorefrontConfig } from '@/lib/api/storefront'
 import { cn } from '@/lib/utils'
+import { useCart } from '@/stores/cart-store'
 
 interface MarketplaceHeaderProps {
   tenant: string

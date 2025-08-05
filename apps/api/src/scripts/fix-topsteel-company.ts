@@ -1,6 +1,6 @@
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
 import { join } from 'path'
+import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
 config({ path: join(__dirname, '../../.env') })

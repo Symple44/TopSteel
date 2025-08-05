@@ -1,30 +1,27 @@
+import { CacheModule } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { CacheModule } from '@nestjs/cache-manager'
-import { ThrottlerModule } from '@nestjs/throttler'
 import { ScheduleModule } from '@nestjs/schedule'
-
+import { ThrottlerModule } from '@nestjs/throttler'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { appConfig } from '../config/app.config'
 // Configuration
 import { databaseConfig } from '../config/database.config'
 import { redisConfig } from '../config/redis.config'
-import { appConfig } from '../config/app.config'
-
+import { AuthModule } from '../domains/auth/auth.module'
+import { CustomersModule } from '../domains/customers/customers.module'
+import { OrdersModule } from '../domains/orders/orders.module'
+import { PageBuilderModule } from '../domains/page-builder/page-builder.module'
+import { ProductsModule } from '../domains/products/products.module'
+import { StorefrontModule } from '../domains/storefront/storefront.module'
+import { ThemesModule } from '../domains/themes/themes.module'
 // Modules
 import { DatabaseModule } from '../infrastructure/database/database.module'
 import { TenantModule } from '../shared/tenant/tenant.module'
-import { AuthModule } from '../domains/auth/auth.module'
-import { ProductsModule } from '../domains/products/products.module'
-import { CustomersModule } from '../domains/customers/customers.module'
-import { OrdersModule } from '../domains/orders/orders.module'
-import { ThemesModule } from '../domains/themes/themes.module'
-import { StorefrontModule } from '../domains/storefront/storefront.module'
-import { PageBuilderModule } from '../domains/page-builder/page-builder.module'
-
+import { TestSimpleController } from '../test-simple.controller'
 // Controllers & Services
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { TestSimpleController } from '../test-simple.controller'
 // import { HealthController } from '../infrastructure/health/health.controller' // Disabled for now
 
 @Module({

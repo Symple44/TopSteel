@@ -6,35 +6,32 @@
 
 // ===== EXPORTS PRINCIPAUX =====
 
-// Tokens de design
-export * from './tokens'
+export type {
+  ResolvedTheme,
+  ThemeColorValues,
+  ThemeConfig,
+  ThemeName,
+} from './themes'
 export * from './themes'
-export * from './variants'
-
 // Types principaux
 export type {
-  DesignTokens,
   ColorTokens,
+  DesignTokens,
   SteelColorTokens,
 } from './tokens'
-
+// Tokens de design
+export * from './tokens'
 export type {
-  ThemeName,
-  ResolvedTheme,
-  ThemeConfig,
-  ThemeColorValues,
-} from './themes'
-
-export type {
-  ComponentVariants,
   ComponentSize,
   ComponentVariant,
+  ComponentVariants,
 } from './variants'
+export * from './variants'
 
 // ===== API SIMPLIFIÉE =====
 
+import { applyThemeToDOM, getThemeConfig, themeRegistry } from './themes'
 import { designTokens } from './tokens'
-import { themeRegistry, getThemeConfig, applyThemeToDOM } from './themes'
 import { unifiedVariants } from './variants'
 
 /**
@@ -83,29 +80,28 @@ export const themeNames = Object.keys(themeRegistry) as Array<keyof typeof theme
 
 // ===== COMPATIBILITÉ BACKWARD =====
 
+export type {
+  AlertVariants,
+  BadgeVariants,
+  ButtonVariants,
+  CardVariants,
+  DialogContentVariants,
+  InputVariants,
+  ScrollAreaVariants,
+  SidebarVariants,
+  SwitchVariants,
+  TableVariants,
+} from '../lib/design-system'
 // Re-export des variants existants pour compatibilité
 export {
-  buttonVariants,
-  badgeVariants,
   alertVariants,
-  scrollAreaVariants,
-  inputVariants,
-  switchVariants,
+  badgeVariants,
+  buttonVariants,
   cardVariants,
-  tableVariants,
   dialogContentVariants,
+  inputVariants,
+  scrollAreaVariants,
   sidebarVariants,
-} from '../lib/design-system'
-
-export type {
-  ButtonVariants,
-  BadgeVariants,
-  AlertVariants,
-  ScrollAreaVariants,
-  InputVariants,
-  SwitchVariants,
-  CardVariants,
-  TableVariants,
-  DialogContentVariants,
-  SidebarVariants,
+  switchVariants,
+  tableVariants,
 } from '../lib/design-system'

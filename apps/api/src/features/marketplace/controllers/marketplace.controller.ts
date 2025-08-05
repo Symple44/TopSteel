@@ -149,9 +149,7 @@ export class MarketplaceController {
   // ===== INSTALLATION DE MODULES =====
 
   @Get('installations')
-  async getInstalledModules(
-    @CurrentTenant() tenantId: string
-  ): Promise<ModuleInstallation[]> {
+  async getInstalledModules(@CurrentTenant() tenantId: string): Promise<ModuleInstallation[]> {
     return await this.marketplaceService.getInstalledModules(tenantId)
   }
 
@@ -253,29 +251,32 @@ export class MarketplaceController {
   @Get('stats/tenant')
   async getTenantStats(@CurrentTenant() tenantId: string) {
     const installations = await this.marketplaceService.getInstalledModulesWithDetails(tenantId)
-    
+
     const stats = {
       totalInstalledModules: installations.length,
       recentInstallations: installations
         .sort((a, b) => (b.installedAt?.getTime() || 0) - (a.installedAt?.getTime() || 0))
         .slice(0, 5),
       categoryBreakdown: {} as Record<MarketplaceCategory, number>,
-      oldestInstallation: installations.length > 0 
-        ? installations.reduce((oldest, current) => 
-            current.installedAt! < oldest.installedAt! ? current : oldest
-          ).installedAt
-        : null,
-      newestInstallation: installations.length > 0
-        ? installations.reduce((newest, current) => 
-            current.installedAt! > newest.installedAt! ? current : newest
-          ).installedAt
-        : null
+      oldestInstallation:
+        installations.length > 0
+          ? installations.reduce((oldest, current) =>
+              current.installedAt! < oldest.installedAt! ? current : oldest
+            ).installedAt
+          : null,
+      newestInstallation:
+        installations.length > 0
+          ? installations.reduce((newest, current) =>
+              current.installedAt! > newest.installedAt! ? current : newest
+            ).installedAt
+          : null,
     }
 
     // Calculer la répartition par catégorie des modules installés
-    Object.values(MarketplaceCategory).forEach(category => {
-      stats.categoryBreakdown[category] = installations
-        .filter(inst => inst.module.category === category).length
+    Object.values(MarketplaceCategory).forEach((category) => {
+      stats.categoryBreakdown[category] = installations.filter(
+        (inst) => inst.module.category === category
+      ).length
     })
 
     return stats

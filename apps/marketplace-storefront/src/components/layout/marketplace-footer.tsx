@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { StorefrontConfig } from '@/lib/api/storefront'
+import type { StorefrontConfig } from '@/lib/api/storefront'
 
 interface MarketplaceFooterProps {
   tenant: string

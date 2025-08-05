@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState } from 'react'
-import { usePersistedTableSettings } from '@erp/ui'
 import type { ColumnConfig, SelectionState } from '@erp/ui'
+import { usePersistedTableSettings } from '@erp/ui'
+import { useCallback, useMemo, useState } from 'react'
 
 interface UseDataTableOptions<T> {
   tableId?: string

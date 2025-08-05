@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class AddStatusColumnToUserSessions1721852100000 implements MigrationInterface {
   name = 'AddStatusColumnToUserSessions1721852100000'

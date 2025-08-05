@@ -1,18 +1,18 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import type {
   CreateSystemParameterDto,
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import { ParameterCategory, SystemParameter } from './entitites/system-parameter.entity'
+import { type ParameterCategory, SystemParameter } from './entitites/system-parameter.entity'
 
 @Injectable()
 export class SystemParametersService {
   constructor(
     @InjectRepository(SystemParameter, 'auth')
-    private readonly _systemParameterRepository: Repository<SystemParameter>,
+    private readonly _systemParameterRepository: Repository<SystemParameter>
   ) {}
 
   async create(createDto: CreateSystemParameterDto): Promise<SystemParameter> {

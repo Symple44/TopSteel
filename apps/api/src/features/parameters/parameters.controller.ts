@@ -1,7 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../domains/auth/security/guards/jwt-auth.guard'
-import { ParameterService } from './services/parameter.service'
+import type { ParameterService } from './services/parameter.service'
 
 @Controller('parameters')
 @ApiTags('🔧 Parameters')
@@ -19,7 +19,7 @@ export class ParametersController {
       data: roles,
       statusCode: 200,
       message: 'Success',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
   }
 

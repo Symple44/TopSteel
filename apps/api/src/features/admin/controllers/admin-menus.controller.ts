@@ -50,10 +50,10 @@ export class AdminMenusController {
   async getConfiguration(@Param('id') id: string) {
     const config = await this.menuConfigService.findConfigurationById(id)
     const menuTree = await this.menuConfigService.getMenuTree(id)
-    
+
     return {
       configuration: config,
-      menuTree
+      menuTree,
     }
   }
 
@@ -238,11 +238,7 @@ export class AdminMenusController {
 
   @Post('filtered-menu')
   async getFilteredMenuForUser(
-    @Body() body: {
-      userId: string
-      userRoles: string[]
-      userPermissions: string[]
-    }
+    @Body() body: { userId: string; userRoles: string[]; userPermissions: string[] }
   ) {
     return await this.menuConfigService.getFilteredMenuForUser(
       body.userId,

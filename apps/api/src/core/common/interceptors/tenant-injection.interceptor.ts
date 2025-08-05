@@ -4,7 +4,7 @@ import {
   Injectable,
   type NestInterceptor,
 } from '@nestjs/common'
-import { Observable } from 'rxjs'
+import type { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Repository } from 'typeorm'
 

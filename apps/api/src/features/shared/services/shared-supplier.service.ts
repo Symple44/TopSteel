@@ -7,7 +7,7 @@ import { SharedSupplier } from '../entities/shared-supplier.entity'
 export class SharedSupplierService {
   constructor(
     @InjectRepository(SharedSupplier, 'shared')
-    private _sharedSupplierRepository: Repository<SharedSupplier>,
+    private _sharedSupplierRepository: Repository<SharedSupplier>
   ) {}
 
   async findAll(): Promise<SharedSupplier[]> {

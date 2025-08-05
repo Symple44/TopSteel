@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, Package } from 'lucide-react'
-import { getCategories } from '@/lib/api/storefront'
+import Link from 'next/link'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { getCategories } from '@/lib/api/storefront'
 import { slugify } from '@/lib/utils'
 
 interface CategoriesSectionProps {

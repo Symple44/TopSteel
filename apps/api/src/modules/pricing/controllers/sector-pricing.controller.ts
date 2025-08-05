@@ -1,29 +1,29 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseUUIDPipe,
   Post,
   Put,
-  Delete,
-  Body,
-  Param,
   Query,
   UseGuards,
-  ParseUUIDPipe,
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
+import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
+import { CustomerSectorAssignment } from '../entities/customer-sector-assignment.entity'
 import {
-  SectorPricingService,
-  PricingContext,
-  PricingResult,
-} from '../services/sector-pricing.service'
-import {
+  CoefficientType,
   SectorCoefficient,
   SectorType,
-  CoefficientType,
 } from '../entities/sector-coefficient.entity'
-import { CustomerSectorAssignment } from '../entities/customer-sector-assignment.entity'
-import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
-import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
+import {
+  PricingContext,
+  type PricingResult,
+  type SectorPricingService,
+} from '../services/sector-pricing.service'
 
 // DTOs
 export class CreateSectorCoefficientDto {

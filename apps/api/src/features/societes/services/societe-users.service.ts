@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, type Repository } from 'typeorm'
-import { SocieteUser, UserSocieteRole } from '../entities/societe-user.entity'
+import { SocieteUser, type UserSocieteRole } from '../entities/societe-user.entity'
 
 @Injectable()
 export class SocieteUsersService {
   constructor(
     @InjectRepository(SocieteUser, 'auth')
-    private _societeUserRepository: Repository<SocieteUser>,
+    private _societeUserRepository: Repository<SocieteUser>
   ) {}
 
   async findAll(): Promise<SocieteUser[]> {

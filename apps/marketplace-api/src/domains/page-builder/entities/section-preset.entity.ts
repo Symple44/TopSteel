@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm'
-import { SectionType, SectionContent, SectionStyles, PresetCategory } from './types'
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import { PresetCategory, type SectionContent, type SectionStyles, SectionType } from './types'
 
 @Entity('marketplace_section_presets')
 export class SectionPreset {

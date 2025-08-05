@@ -1,20 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import {
   Material,
+  MaterialShape,
   MaterialStatus,
   MaterialType,
-  MaterialShape,
   StorageMethod,
 } from '../entities/material.entity'
-import {
+import type { MaterialSearchCriteria, MaterialStatistics } from '../services/material.service'
+import type {
   IMaterialRepository,
   MaterialAdvancedFilters,
   MechanicalPropertiesFilters,
 } from './material.repository'
-import { MaterialSearchCriteria } from '../services/material.service'
-import type { MaterialStatistics } from '../services/material.service'
 
 /**
  * Implémentation concrète du repository Material avec TypeORM

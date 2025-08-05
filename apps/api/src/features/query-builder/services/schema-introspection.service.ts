@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 
 export interface TableInfo {
   tableName: string
@@ -36,7 +36,7 @@ export interface RelationInfo {
 export class SchemaIntrospectionService {
   constructor(
     @InjectDataSource('tenant')
-    private _dataSource: DataSource,
+    private _dataSource: DataSource
   ) {}
 
   async getTables(schemaName: string = 'public'): Promise<TableInfo[]> {

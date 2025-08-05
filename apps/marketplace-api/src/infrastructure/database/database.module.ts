@@ -1,19 +1,17 @@
 import { Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigService } from '@nestjs/config'
-
-// Entités ERP (lecture seule)
-import { Societe } from '../../shared/entities/erp/societe.entity'
-import { Article } from '../../shared/entities/erp/article.entity'
-
+import { TypeOrmModule } from '@nestjs/typeorm'
 // Entités Marketplace
 import { MarketplaceCustomer } from '../../domains/customers/entities/marketplace-customer.entity'
-import { MarketplaceProduct } from '../../domains/products/entities/marketplace-product.entity'
-import { MarketplacePriceRule } from '../../domains/products/entities/marketplace-price-rule.entity'
 import { MarketplaceOrder } from '../../domains/orders/entities/marketplace-order.entity'
 import { MarketplaceOrderItem } from '../../domains/orders/entities/marketplace-order-item.entity'
+import { PageSection, PageTemplate, SectionPreset } from '../../domains/page-builder/entities'
+import { MarketplacePriceRule } from '../../domains/products/entities/marketplace-price-rule.entity'
+import { MarketplaceProduct } from '../../domains/products/entities/marketplace-product.entity'
 import { MarketplaceTheme } from '../../domains/themes/entities/marketplace-theme.entity'
-import { PageTemplate, PageSection, SectionPreset } from '../../domains/page-builder/entities'
+import { Article } from '../../shared/entities/erp/article.entity'
+// Entités ERP (lecture seule)
+import { Societe } from '../../shared/entities/erp/societe.entity'
 
 @Module({
   imports: [

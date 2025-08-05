@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { PageTemplate, PageSection, SectionPreset } from './entities'
-import { PageBuilderService } from './services/page-builder.service'
-import { PageBuilderController } from './controllers/page-builder.controller'
 import { TenantModule } from '../../shared/tenant/tenant.module'
+import { PageBuilderController } from './controllers/page-builder.controller'
+import { PageSection, PageTemplate, SectionPreset } from './entities'
+import { PageBuilderService } from './services/page-builder.service'
 
 @Module({
   imports: [

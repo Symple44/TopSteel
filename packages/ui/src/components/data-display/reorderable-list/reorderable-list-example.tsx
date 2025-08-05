@@ -1,11 +1,11 @@
 // Exemple d'intégration du ThemedReorderableList dans la page menu
 'use client'
 
-import { Badge } from '../badge'
-import { Button } from '../../primitives/button'
 import { Eye, EyeOff, Star } from 'lucide-react'
 import React from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
+import { Badge } from '../badge'
 import { ThemedReorderableList } from './themed-reorderable-list'
 
 // Type d'exemple basé sur MenuItem existant

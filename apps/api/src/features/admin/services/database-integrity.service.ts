@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 
 export interface TableInfo {
   name: string
@@ -26,11 +26,11 @@ export interface DatabaseIntegrityReport {
 
 @Injectable()
 export class DatabaseIntegrityService {
-  private readonly logger = new Logger(DatabaseIntegrityService.name);
+  private readonly logger = new Logger(DatabaseIntegrityService.name)
 
   constructor(
     @InjectDataSource('auth')
-    private readonly _dataSource: DataSource,
+    private readonly _dataSource: DataSource
   ) {}
 
   /**

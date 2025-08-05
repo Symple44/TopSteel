@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class MigrateProduitsToArticles1738000001000 implements MigrationInterface {
   name = 'MigrateProduitsToArticles1738000001000'

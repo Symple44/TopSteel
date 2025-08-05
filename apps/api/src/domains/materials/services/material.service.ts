@@ -1,21 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { BusinessService } from '../../core/base/business-service'
 import {
-  BusinessOperation,
   type BusinessContext,
+  BusinessOperation,
   type ValidationResult,
 } from '../../core/interfaces/business-service.interface'
 import {
   Material,
+  MaterialShape,
   MaterialStatus,
   MaterialType,
-  MaterialShape,
   StorageMethod,
 } from '../entities/material.entity'
-import { IMaterialRepository } from '../repositories/material.repository'
 import type {
-  MaterialStockAlert,
+  IMaterialRepository,
   MaterialCompatibilityAnalysis,
+  MaterialStockAlert,
 } from '../repositories/material.repository'
 
 /**
@@ -73,10 +73,10 @@ export class MaterialService extends BusinessService<Material> {
     const material = new Material()
 
     // Générer une référence automatique si non fournie
-    if (!data.reference) {
-      material.reference = await this.generateReference(data.type!, data.forme!)
-    } else {
+    if (data.reference) {
       material.reference = data.reference
+    } else {
+      material.reference = await this.generateReference(data.type!, data.forme!)
     }
 
     // Informations de base obligatoires

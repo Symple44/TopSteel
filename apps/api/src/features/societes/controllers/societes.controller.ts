@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CreateTenantDto } from '../dto/create-tenant.dto'
+import type { CreateTenantDto } from '../dto/create-tenant.dto'
 import type { Societe } from '../entities/societe.entity'
-import { SocietesService } from '../services/societes.service'
-import {
+import type { SocietesService } from '../services/societes.service'
+import type {
   TenantProvisioningResult,
   TenantProvisioningService,
 } from '../services/tenant-provisioning.service'
@@ -69,12 +69,13 @@ export class SocietesController {
   }
 
   @Post('provision-tenant')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Créer une nouvelle société avec sa base de données dédiée',
-    description: 'Crée une société complète avec provisioning automatique de sa base de données et des migrations'
+    description:
+      'Crée une société complète avec provisioning automatique de sa base de données et des migrations',
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Société et base de données créées avec succès',
     type: 'object',
     schema: {
@@ -82,13 +83,15 @@ export class SocietesController {
         success: { type: 'boolean' },
         databaseName: { type: 'string' },
         message: { type: 'string' },
-        error: { type: 'string' }
-      }
-    }
+        error: { type: 'string' },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   @ApiResponse({ status: 409, description: 'Société ou base de données existe déjà' })
-  async provisionTenant(@Body() createTenantDto: CreateTenantDto): Promise<TenantProvisioningResult> {
+  async provisionTenant(
+    @Body() createTenantDto: CreateTenantDto
+  ): Promise<TenantProvisioningResult> {
     return this.tenantProvisioningService.createTenantWithDatabase(createTenantDto)
   }
 
@@ -121,12 +124,13 @@ export class SocietesController {
   }
 
   @Delete(':id/destroy-tenant')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Supprimer complètement une société et sa base de données',
-    description: 'ATTENTION: Supprime définitivement la société et toutes ses données. Cette action est irréversible!'
+    description:
+      'ATTENTION: Supprime définitivement la société et toutes ses données. Cette action est irréversible!',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Société et base de données supprimées avec succès',
     type: 'object',
     schema: {
@@ -134,9 +138,9 @@ export class SocietesController {
         success: { type: 'boolean' },
         databaseName: { type: 'string' },
         message: { type: 'string' },
-        error: { type: 'string' }
-      }
-    }
+        error: { type: 'string' },
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Société non trouvée' })
   async destroyTenant(@Param('id') id: string): Promise<TenantProvisioningResult> {

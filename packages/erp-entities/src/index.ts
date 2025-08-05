@@ -1,6 +1,7 @@
 // Base entities
-export * from './base/multi-tenant.entity'
+
 export * from './base/business-entity'
+export * from './base/multi-tenant.entity'
 
 // Company entities
 export * from './companies/societe.entity'

@@ -1,1 +1,1 @@
-export { CompanyLogo, type CompanyLogoProps, type CompanyInfo } from './CompanyLogo'
+export { type CompanyInfo, CompanyLogo, type CompanyLogoProps } from './CompanyLogo'

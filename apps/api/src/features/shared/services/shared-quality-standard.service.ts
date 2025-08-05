@@ -7,7 +7,7 @@ import { SharedQualityStandard } from '../entities/shared-quality-standard.entit
 export class SharedQualityStandardService {
   constructor(
     @InjectRepository(SharedQualityStandard, 'shared')
-    private _sharedQualityStandardRepository: Repository<SharedQualityStandard>,
+    private _sharedQualityStandardRepository: Repository<SharedQualityStandard>
   ) {}
 
   async findAll(): Promise<SharedQualityStandard[]> {

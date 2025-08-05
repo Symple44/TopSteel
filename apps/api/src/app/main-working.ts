@@ -6,10 +6,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import compression from 'compression'
 import { config } from 'dotenv'
 import helmet from 'helmet'
-import { AppModule } from './app.module'
 import { HttpExceptionFilter } from '../core/common/filters/http-exception.filter'
 import { LoggingInterceptor } from '../core/common/interceptors/logging.interceptor'
 import { TransformInterceptor } from '../core/common/interceptors/transform.interceptor'
+import { AppModule } from './app.module'
 
 // Chargement des variables d'environnement
 config({ path: '.env.local', quiet: true })

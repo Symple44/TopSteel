@@ -3,10 +3,10 @@ import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 // Module multi-tenant est nécessaire pour MultiTenantDatabaseConfig
 import { DatabaseMultiTenantModule } from '../../core/database/database-multi-tenant.module'
-import { NotificationSettings } from '../notifications/entities/notification-settings.entity'
 // Entités utilisées par TenantInitializationService
 import { User } from '../../domains/users/entities/user.entity'
 import { UserSettings } from '../../domains/users/entities/user-settings.entity'
+import { NotificationSettings } from '../notifications/entities/notification-settings.entity'
 import { SitesController } from './controllers/sites.controller'
 import { SocieteUsersController } from './controllers/societe-users.controller'
 // Controllers

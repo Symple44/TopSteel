@@ -1,6 +1,6 @@
 export {
-  BackendStatusIndicator,
   BackendConnectionGuard,
-  type HealthStatus,
   type BackendConnectionGuardProps,
+  BackendStatusIndicator,
+  type HealthStatus,
 } from './BackendStatusIndicator'

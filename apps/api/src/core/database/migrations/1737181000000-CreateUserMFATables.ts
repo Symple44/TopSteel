@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CreateUserMFATables1737181000000 implements MigrationInterface {
   name = 'CreateUserMFATables1737181000000'

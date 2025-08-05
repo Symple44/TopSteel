@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, Grid, List, SortAsc } from 'lucide-react'
-import { getProducts, ProductFilters } from '@/lib/api/storefront'
-import { ProductCard } from './product-card'
+import { useState } from 'react'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { getProducts, type ProductFilters } from '@/lib/api/storefront'
 import { cn } from '@/lib/utils'
+import { ProductCard } from './product-card'
 
 interface ProductsGridProps {
   tenant: string

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { Plus, Eye, Save, Undo, Redo, Settings } from 'lucide-react'
-import { SectionRenderer, BaseSection, SectionType } from '../sections'
+import { Eye, Plus, Redo, Save, Settings, Undo } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { cn } from '@/lib/utils'
+import { type BaseSection, SectionRenderer, type SectionType } from '../sections'
 import { SectionLibrary } from './SectionLibrary'
 import { SectionSettings } from './SectionSettings'
-import { cn } from '@/lib/utils'
 
 interface PageBuilderEditorProps {
   initialSections?: BaseSection[]

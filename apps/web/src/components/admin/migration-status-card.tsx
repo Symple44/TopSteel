@@ -1,5 +1,7 @@
 'use client'
 
+import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Progress } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
 import {
   AlertCircle,
   CheckCircle2,
@@ -15,11 +17,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
 import { CodeViewerDialogWrapper as CodeViewerDialog } from '@/components/wrappers'
-import { Progress } from '@erp/ui'
 
 interface MigrationFile {
   name: string

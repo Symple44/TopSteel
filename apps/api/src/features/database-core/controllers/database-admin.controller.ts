@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Post, Request } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { DatabaseHealthSimpleService } from '../services/database-health-simple.service'
-import { MigrationManagerService } from '../services/migration-manager.service'
-import {
+import type { DatabaseHealthSimpleService } from '../services/database-health-simple.service'
+import type { MigrationManagerService } from '../services/migration-manager.service'
+import type {
   ConnectionsResponse,
   TenantConnectionSimpleService,
 } from '../services/tenant-connection-simple.service'
@@ -26,10 +26,10 @@ export class DatabaseAdminController {
   }
 
   @Get('health/tenant/:tenantCode')
-  @ApiOperation({ summary: 'Vérifier la santé d\'un tenant spécifique' })
+  @ApiOperation({ summary: "Vérifier la santé d'un tenant spécifique" })
   async checkTenantHealth(@Param('tenantCode') tenantCode: string) {
     const health = await this.databaseHealthService.checkTenantHealth(tenantCode)
-    
+
     // Ajouter des informations supplémentaires sur la configuration
     const config = {
       database: `erp_topsteel_${tenantCode.toLowerCase()}`,
@@ -38,7 +38,7 @@ export class DatabaseAdminController {
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 5432,
     }
-    
+
     return {
       ...health,
       configuration: config,
@@ -47,7 +47,7 @@ export class DatabaseAdminController {
         idleConnections: 9,
         totalConnections: 10,
         waitingClients: 0,
-      }
+      },
     }
   }
 
@@ -58,7 +58,7 @@ export class DatabaseAdminController {
   }
 
   @Get('migrations/tenant/:tenantCode/status')
-  @ApiOperation({ summary: 'Obtenir le statut des migrations d\'un tenant' })
+  @ApiOperation({ summary: "Obtenir le statut des migrations d'un tenant" })
   async getTenantMigrationStatus(@Param('tenantCode') tenantCode: string) {
     return this.migrationManagerService.getTenantMigrationStatus(tenantCode)
   }
@@ -84,18 +84,18 @@ export class DatabaseAdminController {
   @ApiOperation({ summary: 'Lister les connexions actives' })
   async getActiveConnections(@Request() req: any): Promise<ConnectionsResponse> {
     const connections = this.tenantConnectionService.getActiveConnections()
-    
+
     // Ajouter la connexion du tenant actuel si l'utilisateur est connecté à une société
     const currentUser = req.user
     if (currentUser?.societeCode) {
       const currentTenantKey = currentUser.societeCode.toLowerCase()
-      const isAlreadyListed = connections.some(conn => 
-        conn.tenant.toLowerCase() === currentTenantKey
+      const isAlreadyListed = connections.some(
+        (conn) => conn.tenant.toLowerCase() === currentTenantKey
       )
-      
+
       if (isAlreadyListed) {
         // Marquer la connexion actuelle
-        connections.forEach(conn => {
+        connections.forEach((conn) => {
           if (conn.tenant.toLowerCase() === currentTenantKey) {
             conn.isCurrent = true
           }
@@ -104,11 +104,11 @@ export class DatabaseAdminController {
         connections.push({
           tenant: currentUser.societeCode,
           isInitialized: true,
-          isCurrent: true
+          isCurrent: true,
         })
       }
     }
-    
+
     return {
       connections,
       currentTenant: currentUser?.societeCode || null,
@@ -117,7 +117,7 @@ export class DatabaseAdminController {
   }
 
   @Post('connections/tenant/:tenantCode/close')
-  @ApiOperation({ summary: 'Fermer la connexion d\'un tenant' })
+  @ApiOperation({ summary: "Fermer la connexion d'un tenant" })
   async closeTenantConnection(@Param('tenantCode') tenantCode: string) {
     await this.tenantConnectionService.closeTenantConnection(tenantCode)
     return {

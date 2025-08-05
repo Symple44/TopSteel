@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { TypeOrmModuleOptions } from '@nestjs/typeorm'
+import type { ConfigService } from '@nestjs/config'
+import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { DataSource, type DataSourceOptions } from 'typeorm'
 import { Group } from '../../../domains/auth/core/entities/group.entity'
 import { MFASession } from '../../../domains/auth/core/entities/mfa-session.entity'
@@ -13,15 +13,17 @@ import { UserMFA } from '../../../domains/auth/core/entities/user-mfa.entity'
 import { UserRole } from '../../../domains/auth/core/entities/user-role.entity'
 import { UserSession } from '../../../domains/auth/core/entities/user-session.entity'
 import { UserSocieteRole } from '../../../domains/auth/core/entities/user-societe-role.entity'
+import { Article } from '../../../domains/inventory/entities/article.entity'
+import { Material } from '../../../domains/materials/entities/material.entity'
+import { Partner } from '../../../domains/partners/entities/partner.entity'
+import { User } from '../../../domains/users/entities/user.entity'
+import { UserSettings } from '../../../domains/users/entities/user-settings.entity'
 // Entités métier (bases sociétés) - Supprimées pour optimiser
 // Entités marketplace
 import { MarketplaceModule as MarketplaceModuleEntity } from '../../../features/marketplace/entities/marketplace-module.entity'
 import { ModuleInstallation } from '../../../features/marketplace/entities/module-installation.entity'
 import { ModuleRating } from '../../../features/marketplace/entities/module-rating.entity'
 import { UserMenuPreference } from '../../../features/menu/entities/user-menu-preference.entity'
-import { Article } from '../../../domains/inventory/entities/article.entity'
-import { Material } from '../../../domains/materials/entities/material.entity'
-import { Partner } from '../../../domains/partners/entities/partner.entity'
 import { Notifications } from '../../../features/notifications/entities/notifications.entity'
 import { ParameterApplication } from '../../../features/parameters/entities/parameter-application.entity'
 import { ParameterClient } from '../../../features/parameters/entities/parameter-client.entity'
@@ -34,12 +36,10 @@ import { Site } from '../../../features/societes/entities/site.entity'
 // Entités d'authentification (base auth)
 import { Societe } from '../../../features/societes/entities/societe.entity'
 import { SocieteUser } from '../../../features/societes/entities/societe-user.entity'
-import { User } from '../../../domains/users/entities/user.entity'
-import { UserSettings } from '../../../domains/users/entities/user-settings.entity'
+import { BTPIndex } from '../../../modules/pricing/entities/btp-index.entity'
+import { CustomerSectorAssignment } from '../../../modules/pricing/entities/customer-sector-assignment.entity'
 // Entités pricing
 import { SectorCoefficient } from '../../../modules/pricing/entities/sector-coefficient.entity'
-import { CustomerSectorAssignment } from '../../../modules/pricing/entities/customer-sector-assignment.entity'
-import { BTPIndex } from '../../../modules/pricing/entities/btp-index.entity'
 
 @Injectable()
 export class MultiTenantDatabaseConfig {
@@ -87,7 +87,7 @@ export class MultiTenantDatabaseConfig {
       ],
       synchronize: false, // Toujours false en production
       logging: this.configService.get('DB_LOGGING', false),
-      migrations: ['src/database/migrations/auth/*{.ts,.js}'],
+      migrations: ['src/core/database/migrations/auth/*{.ts,.js}'],
       migrationsRun: false,
     }
   }
@@ -106,7 +106,7 @@ export class MultiTenantDatabaseConfig {
       entities: SharedEntities,
       synchronize: false,
       logging: this.configService.get('DB_LOGGING', false),
-      migrations: ['src/database/migrations/shared/*{.ts,.js}'],
+      migrations: ['src/core/database/migrations/shared/*{.ts,.js}'],
       migrationsRun: false,
     }
   }
@@ -138,7 +138,7 @@ export class MultiTenantDatabaseConfig {
       ],
       synchronize: false,
       logging: this.configService.get('DB_LOGGING', false),
-      migrations: [`src/database/migrations/tenant/*{.ts,.js}`],
+      migrations: [`src/core/database/migrations/tenant/*{.ts,.js}`],
       migrationsRun: false,
     }
   }

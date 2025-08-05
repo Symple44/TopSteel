@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { DataSource } from 'typeorm'
+import type { ConfigService } from '@nestjs/config'
+import type { DataSource } from 'typeorm'
 
 @Injectable()
 export class SeederService {

@@ -1,6 +1,6 @@
 // Re-export shared entities from the @erp/entities package
 export {
   Societe,
-  SocieteStatus,
   SocietePlan,
+  SocieteStatus,
 } from '@erp/entities'

@@ -1,13 +1,12 @@
 'use client'
 
-import Link from 'next/link'
+import { Eye, Package, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
-import { ShoppingCart, Eye, Package } from 'lucide-react'
-import { Product } from '@/lib/api/storefront'
-import { formatPrice, truncateText } from '@/lib/utils'
-import { cn } from '@/lib/utils'
-import { useCart } from '@/stores/cart-store'
+import Link from 'next/link'
 import { toast } from 'sonner'
+import type { Product } from '@/lib/api/storefront'
+import { cn, formatPrice, truncateText } from '@/lib/utils'
+import { useCart } from '@/stores/cart-store'
 
 interface ProductCardProps {
   product: Product

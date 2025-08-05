@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { MenuConfiguration } from '../entities/menu-configuration.entity'
 import { MenuItem, MenuItemType } from '../entities/menu-item.entity'
 import { MenuItemPermission } from '../entities/menu-item-permission.entity'
@@ -61,7 +61,7 @@ export class MenuConfigurationService {
     @InjectRepository(MenuItemPermission, 'auth')
     private readonly _permissionRepository: Repository<MenuItemPermission>,
     @InjectRepository(MenuItemRole, 'auth')
-    private readonly _roleRepository: Repository<MenuItemRole>,
+    private readonly _roleRepository: Repository<MenuItemRole>
   ) {}
 
   // ===== GESTION DES CONFIGURATIONS =====

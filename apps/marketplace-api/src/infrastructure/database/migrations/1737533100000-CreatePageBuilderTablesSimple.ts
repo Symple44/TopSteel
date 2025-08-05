@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CreatePageBuilderTablesSimple1737533100000 implements MigrationInterface {
   name = 'CreatePageBuilderTablesSimple1737533100000'

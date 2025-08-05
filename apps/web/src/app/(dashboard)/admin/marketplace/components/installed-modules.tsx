@@ -1,17 +1,6 @@
 'use client'
 
 import {
-  Activity,
-  Calendar,
-  ExternalLink,
-  MoreVertical,
-  Power,
-  RefreshCw,
-  Settings,
-  Trash2,
-} from 'lucide-react'
-import { useState } from 'react'
-import {
   Badge,
   Button,
   Card,
@@ -29,6 +18,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@erp/ui'
+import {
+  Activity,
+  Calendar,
+  ExternalLink,
+  MoreVertical,
+  Power,
+  RefreshCw,
+  Settings,
+  Trash2,
+} from 'lucide-react'
+import { useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from '@/lib/i18n/hooks'
 

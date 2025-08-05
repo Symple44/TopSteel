@@ -1,10 +1,10 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { SectionProps } from './types'
-import { SectionWrapper } from './SectionWrapper'
 import { ProductCard } from '@/components/product/product-card'
 import { marketplaceApi } from '@/lib/api/client'
+import { SectionWrapper } from './SectionWrapper'
+import type { SectionProps } from './types'
 
 export interface ProductsGridContent {
   title?: string

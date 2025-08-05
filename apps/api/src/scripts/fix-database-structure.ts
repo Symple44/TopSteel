@@ -5,8 +5,8 @@
  * Résout les problèmes de colonnes manquantes (societeId, createdAt, etc.)
  */
 
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
+import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
 config()
@@ -51,7 +51,51 @@ async function fixDatabaseStructure() {
       );
     `)
 
-    if (!articlesTableExists[0].exists) {
+    if (articlesTableExists[0].exists) {
+      console.log('✅ Table articles trouvée')
+
+      // Vérifier si la colonne societe_id existe
+      const societeIdColumnExists = await connection.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'articles'
+          AND column_name = 'societe_id'
+        );
+      `)
+
+      if (societeIdColumnExists[0].exists) {
+        console.log('✅ Colonne societe_id présente')
+      } else {
+        console.log('❌ Colonne societe_id manquante. Ajout...')
+        await connection.query(`
+          ALTER TABLE articles ADD COLUMN IF NOT EXISTS societe_id UUID NOT NULL DEFAULT uuid_generate_v4();
+          CREATE INDEX IF NOT EXISTS idx_articles_societe_id ON articles (societe_id);
+        `)
+        console.log('✅ Colonne societe_id ajoutée')
+      }
+
+      // Vérifier si les colonnes marketplace existent
+      const marketplaceColumnExists = await connection.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_schema = 'public' 
+          AND table_name = 'articles'
+          AND column_name = 'is_marketplace_enabled'
+        );
+      `)
+
+      if (marketplaceColumnExists[0].exists) {
+        console.log('✅ Colonnes marketplace présentes')
+      } else {
+        console.log('❌ Colonnes marketplace manquantes. Ajout...')
+        await connection.query(`
+          ALTER TABLE articles ADD COLUMN IF NOT EXISTS is_marketplace_enabled BOOLEAN DEFAULT false;
+          ALTER TABLE articles ADD COLUMN IF NOT EXISTS marketplace_settings JSONB NULL;
+        `)
+        console.log('✅ Colonnes marketplace ajoutées')
+      }
+    } else {
       console.log('❌ Table articles introuvable. Exécution de la migration...')
 
       // Créer la table articles avec la structure correcte
@@ -158,50 +202,6 @@ async function fixDatabaseStructure() {
       `)
 
       console.log('✅ Table articles créée avec succès')
-    } else {
-      console.log('✅ Table articles trouvée')
-
-      // Vérifier si la colonne societe_id existe
-      const societeIdColumnExists = await connection.query(`
-        SELECT EXISTS (
-          SELECT FROM information_schema.columns 
-          WHERE table_schema = 'public' 
-          AND table_name = 'articles'
-          AND column_name = 'societe_id'
-        );
-      `)
-
-      if (!societeIdColumnExists[0].exists) {
-        console.log('❌ Colonne societe_id manquante. Ajout...')
-        await connection.query(`
-          ALTER TABLE articles ADD COLUMN IF NOT EXISTS societe_id UUID NOT NULL DEFAULT uuid_generate_v4();
-          CREATE INDEX IF NOT EXISTS idx_articles_societe_id ON articles (societe_id);
-        `)
-        console.log('✅ Colonne societe_id ajoutée')
-      } else {
-        console.log('✅ Colonne societe_id présente')
-      }
-
-      // Vérifier si les colonnes marketplace existent
-      const marketplaceColumnExists = await connection.query(`
-        SELECT EXISTS (
-          SELECT FROM information_schema.columns 
-          WHERE table_schema = 'public' 
-          AND table_name = 'articles'
-          AND column_name = 'is_marketplace_enabled'
-        );
-      `)
-
-      if (!marketplaceColumnExists[0].exists) {
-        console.log('❌ Colonnes marketplace manquantes. Ajout...')
-        await connection.query(`
-          ALTER TABLE articles ADD COLUMN IF NOT EXISTS is_marketplace_enabled BOOLEAN DEFAULT false;
-          ALTER TABLE articles ADD COLUMN IF NOT EXISTS marketplace_settings JSONB NULL;
-        `)
-        console.log('✅ Colonnes marketplace ajoutées')
-      } else {
-        console.log('✅ Colonnes marketplace présentes')
-      }
     }
 
     // Vérifier la table societes dans la base auth
@@ -215,7 +215,9 @@ async function fixDatabaseStructure() {
       );
     `)
 
-    if (!societeTableExists[0].exists) {
+    if (societeTableExists[0].exists) {
+      console.log('✅ Table societes trouvée')
+    } else {
       console.log('❌ Table societes introuvable. Création...')
       await connection.query(`
         DO $$
@@ -263,8 +265,6 @@ async function fixDatabaseStructure() {
         CREATE INDEX IF NOT EXISTS idx_societes_status ON societes (status);
       `)
       console.log('✅ Table societes créée')
-    } else {
-      console.log('✅ Table societes trouvée')
     }
 
     // Insérer une société de test TopSteel si elle n'existe pas
@@ -275,7 +275,9 @@ async function fixDatabaseStructure() {
       );
     `)
 
-    if (!topsteelExists[0].exists) {
+    if (topsteelExists[0].exists) {
+      console.log('✅ Société TopSteel existe')
+    } else {
       console.log('❌ Société TopSteel manquante. Création...')
       await connection.query(`
         INSERT INTO societes (
@@ -292,8 +294,6 @@ async function fixDatabaseStructure() {
         );
       `)
       console.log('✅ Société TopSteel créée')
-    } else {
-      console.log('✅ Société TopSteel existe')
     }
 
     console.log('\n🎉 Correction de la structure de base de données terminée avec succès !')

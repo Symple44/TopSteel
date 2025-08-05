@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { ParameterApplication } from '../entities/parameter-application.entity'
 import { ParameterClient } from '../entities/parameter-client.entity'
 import { ParameterScope, ParameterSystem, ParameterType } from '../entities/parameter-system.entity'
@@ -10,14 +10,14 @@ export class ParameterService {
   private readonly logger = new Logger(ParameterService.name)
   private rolesCache: ParameterSystem[] | null = null
   private cacheExpiry: number = 0
-  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private readonly CACHE_TTL = 5 * 60 * 1000 // 5 minutes
   constructor(
     @InjectRepository(ParameterSystem, 'auth')
     private readonly _systemRepo: Repository<ParameterSystem>,
     @InjectRepository(ParameterApplication, 'auth')
     private readonly _appRepo: Repository<ParameterApplication>,
     @InjectRepository(ParameterClient, 'auth')
-    private readonly _clientRepo: Repository<ParameterClient>,
+    private readonly _clientRepo: Repository<ParameterClient>
   ) {}
 
   /**
@@ -167,6 +167,23 @@ export class ParameterService {
     const defaultRoles = [
       {
         group: 'user_roles',
+        key: 'OWNER',
+        value: 'Propriétaire',
+        type: ParameterType.ENUM,
+        scope: ParameterScope.AUTH,
+        description: 'Propriétaire de la société - Accès complet',
+        translationKey: 'roles.owner',
+        isReadonly: true,
+        metadata: {
+          icon: '🏛️',
+          color: 'destructive',
+          order: 1,
+          category: 'administration',
+          permissions: ['*'],
+        },
+      },
+      {
+        group: 'user_roles',
         key: 'SUPER_ADMIN',
         value: 'Super Administrateur',
         type: ParameterType.ENUM,
@@ -177,7 +194,7 @@ export class ParameterService {
         metadata: {
           icon: '👑',
           color: 'destructive',
-          order: 1,
+          order: 2,
           category: 'administration',
           permissions: ['*'],
         },

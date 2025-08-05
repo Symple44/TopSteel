@@ -8,8 +8,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets'
-import { Socket } from 'socket.io'
-import type { Server } from 'socket.io'
+import type { Server, Socket } from 'socket.io'
 
 @Injectable()
 @WebSocketGateway({

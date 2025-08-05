@@ -3,12 +3,10 @@
 // === RE-EXPORTS EXTERNES ===
 export { cva, type VariantProps } from 'class-variance-authority'
 export { type ClassValue, clsx } from 'clsx'
-
-// === DESIGN SYSTEM UNIFIÉ ===
-export * from './design-system'
-
 // === COMPONENTS ===
 export * from './components'
+// === DESIGN SYSTEM UNIFIÉ ===
+export * from './design-system'
 
 // === LEGACY COMPATIBILITY ===
 // Re-export des variants existants pour compatibilité backward

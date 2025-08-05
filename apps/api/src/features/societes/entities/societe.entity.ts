@@ -1,10 +1,10 @@
-import { OneToMany, Entity } from 'typeorm'
+import { Entity, OneToMany } from 'typeorm'
 import { Site } from './site.entity'
 
 // Re-export shared entities from the @erp/entities package
 export {
-  SocieteStatus,
   SocietePlan,
+  SocieteStatus,
 } from '@erp/entities'
 
 // Import the base class for extending with relationships

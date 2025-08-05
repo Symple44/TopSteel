@@ -1,9 +1,9 @@
 'use client'
 
-import { BackendStatusIndicator, BackendConnectionGuard } from '@erp/ui'
+import { BackendConnectionGuard, BackendStatusIndicator } from '@erp/ui'
+import type React from 'react'
 import { useBackendHealth } from '@/hooks/use-backend-health'
 import { useTranslation } from '@/lib/i18n/hooks'
-import type React from 'react'
 
 interface BackendStatusIndicatorWrapperProps {
   showDetails?: boolean

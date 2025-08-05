@@ -1,8 +1,8 @@
 'use client'
 
+import { Code, Eye, Layout, Palette, X } from 'lucide-react'
 import { useState } from 'react'
-import { X, Palette, Layout, Eye, Code } from 'lucide-react'
-import { BaseSection, SectionStyles, SectionSettings as Settings } from '../sections'
+import type { BaseSection, SectionStyles, SectionSettings as Settings } from '../sections'
 
 interface SectionSettingsProps {
   section: BaseSection

@@ -274,6 +274,42 @@ export const es = {
     profit: 'Beneficio',
     orders: 'Pedidos',
     deliveries: 'Entregas',
+
+    // Homepage specific
+    welcome: 'Bienvenido a {{companyName}}',
+    subtitle: 'Plataforma de gestión integrada para la industria metalúrgica',
+    description: 'Gestiona tus proyectos, producción, inventario y equipos en un solo lugar',
+    accessDashboard: 'Acceder al panel',
+    configureCompany: 'Configurar empresa',
+    quickActionsTitle: 'Acciones rápidas',
+
+    actions: {
+      dashboard: {
+        title: 'Panel de control',
+        description: 'Vista general de actividades',
+      },
+      newProject: {
+        title: 'Nuevo proyecto',
+        description: 'Crear un nuevo proyecto',
+      },
+      production: {
+        title: 'Producción',
+        description: 'Gestionar órdenes de producción',
+      },
+      inventory: {
+        title: 'Inventario',
+        description: 'Verificar niveles de stock',
+      },
+      users: {
+        title: 'Usuarios',
+        description: 'Gestionar equipos',
+      },
+      configuration: {
+        title: 'Configuración',
+        description: 'Ajustes del sistema',
+      },
+      access: 'Acceder',
+    },
   },
 
   navigation: {
@@ -410,6 +446,7 @@ export const es = {
   },
 
   roles: {
+    owner: 'Propietario',
     super_admin: 'Super Administrador',
     admin: 'Administrador',
     manager: 'Gerente',
@@ -419,6 +456,7 @@ export const es = {
     operator: 'Operador',
     user: 'Usuario',
     viewer: 'Observador',
+    guest: 'Invitado',
   },
 
   status: {
@@ -483,9 +521,8 @@ export const es = {
     connectedTo: 'Conectado a {{name}}',
     cannotConnect: 'No se puede conectar a esta empresa',
     syncError: 'Error de sincronización, por favor reconéctese',
-    changeAffects: 'Cambio en {{count}} pestaña{{count, plural, one {} other {s}}}',
-    changeAffectsMultiple:
-      'Afectará todas las pestañas abiertas ({{count}} detectada{{count, plural, one {} other {s}}}).',
+    changeAffects: 'Cambio en {{count}} pestaña(s)',
+    changeAffectsMultiple: 'Afectará todas las pestañas abiertas ({{count}} detectada(s)).',
     setAsDefault: 'Establecer como empresa predeterminada',
     chooseSociety: 'Elija la empresa con la que desea trabajar.',
     code: 'Código',

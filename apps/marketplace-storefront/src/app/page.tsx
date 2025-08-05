@@ -1,5 +1,5 @@
+import { ArrowRight, ShoppingBag, Sparkles, Store } from 'lucide-react'
 import Link from 'next/link'
-import { ShoppingBag, Store, ArrowRight, Sparkles } from 'lucide-react'
 
 export default function RootPage() {
   // In a real application, this would come from an API

@@ -7,7 +7,7 @@ import { SharedDataRegistry } from '../entities/shared-data-registry.entity'
 export class SharedDataRegistryService {
   constructor(
     @InjectRepository(SharedDataRegistry, 'auth')
-    private _sharedDataRegistryRepository: Repository<SharedDataRegistry>,
+    private _sharedDataRegistryRepository: Repository<SharedDataRegistry>
   ) {}
 
   async findAll(): Promise<SharedDataRegistry[]> {

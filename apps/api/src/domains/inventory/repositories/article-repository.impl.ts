@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
-import { IArticleRepository, ArticleAdvancedFilters } from './article.repository'
-import { ArticleSearchCriteria } from '../services/article.service'
-import type { ArticleStatistics } from '../services/article.service'
+import type { ArticleSearchCriteria, ArticleStatistics } from '../services/article.service'
+import type { ArticleAdvancedFilters, IArticleRepository } from './article.repository'
 
 /**
  * Implémentation concrète du repository Article avec TypeORM

@@ -1,21 +1,6 @@
 'use client'
 
 import {
-  BarChart3,
-  DollarSign,
-  Download,
-  Loader2,
-  Search,
-  Shield,
-  ShoppingCart,
-  Star,
-  Users,
-  Wrench,
-  Zap,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import {
   Badge,
   Button,
   Card,
@@ -30,6 +15,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@erp/ui'
+import {
+  BarChart3,
+  DollarSign,
+  Download,
+  Loader2,
+  Search,
+  Shield,
+  ShoppingCart,
+  Star,
+  Users,
+  Wrench,
+  Zap,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
 import { ModuleDetailsDialog } from './module-details-dialog'

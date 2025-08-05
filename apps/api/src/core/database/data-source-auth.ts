@@ -24,7 +24,7 @@ export const authDataSourceOptions: DataSourceOptions = {
     'src/modules/parameters/entities/*.entity{.ts,.js}',
     'src/modules/shared/entities/shared-data-registry.entity{.ts,.js}',
   ],
-  migrations: ['src/database/migrations/auth/*{.ts,.js}'],
+  migrations: ['src/core/database/migrations/auth/*{.ts,.js}'],
   migrationsRun: false,
   synchronize: false,
   logging: configService.get('NODE_ENV') === 'development',

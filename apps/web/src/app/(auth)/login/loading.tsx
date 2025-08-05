@@ -1,8 +1,8 @@
 'use client'
 
 import { Building2 } from 'lucide-react'
-import { useTranslation } from '@/lib/i18n'
 import { CompanyLogoWrapper } from '@/components/wrappers/company-logo-wrapper'
+import { useTranslation } from '@/lib/i18n'
 
 // Composant de loading pendant l'hydratation client
 export default function LoginLoading() {

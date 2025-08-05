@@ -1,13 +1,17 @@
 'use client'
 
+import { Badge, Card, CardContent, CardHeader, CardTitle, Label } from '@erp/ui'
+import {
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+  Textarea,
+} from '@erp/ui/primitives'
 import { Database, FileSpreadsheet, Settings2, Shield } from 'lucide-react'
-import { Badge } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Input } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
-import { Switch } from '@erp/ui/primitives'
-import { Textarea } from '@erp/ui/primitives'
 
 interface QuerySettingsProps {
   settings: any

@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CreateSectorPricingTables1737540000000 implements MigrationInterface {
   name = 'CreateSectorPricingTables1737540000000'

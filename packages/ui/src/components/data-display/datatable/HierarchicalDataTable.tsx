@@ -1,10 +1,10 @@
 'use client'
 
-import { Button } from '../../primitives/button'
 import { ChevronDown, ChevronRight, Eye, GripVertical, Minus, Plus, Settings } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useState } from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
 import { RenderUtils } from './render-utils'
 import type { ColumnConfig } from './types'
 import {

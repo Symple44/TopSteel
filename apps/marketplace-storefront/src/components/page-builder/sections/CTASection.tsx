@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { SectionProps } from './types'
 import { SectionWrapper } from './SectionWrapper'
+import type { SectionProps } from './types'
 
 export interface CTAContent {
   title: string

@@ -1,10 +1,10 @@
 import { Controller, Get, HttpException, HttpStatus, Post } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { DatabaseHealthService } from '../services/health.service'
-import { MigrationService } from '../services/migration.service'
-import { SeederService } from '../services/seeder.service'
-import { DatabaseStartupService } from '../services/startup.service'
+import type { DatabaseHealthService } from '../services/health.service'
+import type { MigrationService } from '../services/migration.service'
+import type { SeederService } from '../services/seeder.service'
+import type { DatabaseStartupService } from '../services/startup.service'
 
 // Remarque: Ajouter un guard d'authentification admin pour sécuriser ces endpoints
 // import { AdminGuard } from '../guards/admin.guard'

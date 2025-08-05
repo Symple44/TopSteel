@@ -7,7 +7,7 @@ import { Site } from '../entities/site.entity'
 export class SitesService {
   constructor(
     @InjectRepository(Site, 'auth')
-    private _siteRepository: Repository<Site>,
+    private _siteRepository: Repository<Site>
   ) {}
 
   async findAll(): Promise<Site[]> {

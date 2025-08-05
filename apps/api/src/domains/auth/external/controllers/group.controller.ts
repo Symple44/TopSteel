@@ -13,8 +13,7 @@ import {
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
-import { CreateGroupDto, GroupService } from '../../services/group.service'
-import type { UpdateGroupDto } from '../../services/group.service'
+import type { CreateGroupDto, GroupService, UpdateGroupDto } from '../../services/group.service'
 
 @Controller('admin/groups')
 @UseGuards(JwtAuthGuard, RolesGuard)

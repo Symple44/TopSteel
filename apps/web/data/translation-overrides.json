@@ -66,5 +66,21 @@
     "updatedAt": "2025-07-28T16:53:45.648Z",
     "isModified": true,
     "updatedBy": "admin@topsteel.tech"
+  },
+  "actions.disconnect": {
+    "id": "actions.disconnect",
+    "namespace": "actions",
+    "key": "disconnect",
+    "fullKey": "actions.disconnect",
+    "translations": {
+      "fr": "Se déconnecter",
+      "en": "Disconnect",
+      "es": "Desconectar"
+    },
+    "category": "Autre",
+    "createdAt": "2025-08-05T14:35:08.203Z",
+    "updatedAt": "2025-08-05T14:35:26.069Z",
+    "isModified": true,
+    "updatedBy": "admin@topsteel.tech"
   }
 }

@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 
 @Injectable()
 export class DatabaseCleanupService {
-  private readonly logger = new Logger(DatabaseCleanupService.name);
+  private readonly logger = new Logger(DatabaseCleanupService.name)
 
   constructor(
     @InjectDataSource()

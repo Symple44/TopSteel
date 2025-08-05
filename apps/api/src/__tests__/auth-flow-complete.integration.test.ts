@@ -1,5 +1,5 @@
 // apps/api/src/__tests__/auth-flow-complete.integration.test.ts
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * Test d'intégration complet du flux d'authentification TopSteel ERP

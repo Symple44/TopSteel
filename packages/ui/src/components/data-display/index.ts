@@ -4,8 +4,8 @@ export * from './badge'
 export * from './data-table'
 export {
   DataTable as AdvancedDataTable,
-  HierarchicalDataTable,
   DataTableExample,
+  HierarchicalDataTable,
   HierarchicalDataTableExample,
   SimpleDataTableExample,
 } from './datatable'

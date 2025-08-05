@@ -3,15 +3,15 @@
  * TopSteel ERP - Clean Architecture
  */
 
-import { DataSource, QueryRunner } from 'typeorm'
-import {
+import type { DataSource, QueryRunner } from 'typeorm'
+import type {
+  ArticleFamille,
   ArticleMetallurgie,
-  InjectionResult,
+  ArticleValidator,
   GlobalInjectionConfig,
   InjectionLogger,
-  ArticleValidator,
+  InjectionResult,
   PricingCalculator,
-  ArticleFamille,
 } from '../types/article-injection.types'
 
 export abstract class BaseArticleInjector {

@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { Site } from '../entities/site.entity'
-import { SitesService } from '../services/sites.service'
+import type { SitesService } from '../services/sites.service'
 
 @ApiTags('Sites')
 @Controller('sites')
@@ -17,13 +17,13 @@ export class SitesController {
   }
 
   @Get('by-societe/:societeId')
-  @ApiOperation({ summary: 'Récupérer les sites d\'une société' })
+  @ApiOperation({ summary: "Récupérer les sites d'une société" })
   async findBySociete(@Param('societeId') societeId: string): Promise<Site[]> {
     return this.sitesService.findBySociete(societeId)
   }
 
   @Get('principal/:societeId')
-  @ApiOperation({ summary: 'Récupérer le site principal d\'une société' })
+  @ApiOperation({ summary: "Récupérer le site principal d'une société" })
   async findPrincipal(@Param('societeId') societeId: string): Promise<Site | null> {
     return this.sitesService.findPrincipal(societeId)
   }

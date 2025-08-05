@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { Heart, LogOut, Mail, MapPin, Package, Phone, Settings, User } from 'lucide-react'
 import Link from 'next/link'
-import { User, Mail, Phone, MapPin, Package, Heart, Settings, LogOut } from 'lucide-react'
+import { useState } from 'react'
 
 interface AccountClientProps {
   tenant: string

@@ -4,11 +4,11 @@
  */
 
 import {
-  ArticleValidator,
-  ArticleMetallurgie,
-  CaracteristiquesTechniques,
   ArticleFamille,
-  InjectionLogger,
+  type ArticleMetallurgie,
+  type ArticleValidator,
+  type CaracteristiquesTechniques,
+  type InjectionLogger,
 } from '../types/article-injection.types'
 
 export class ArticleValidatorService implements ArticleValidator {
@@ -224,15 +224,15 @@ export class ArticleValidatorService implements ArticleValidator {
     // Pour cornières (angles), l'épaisseur suffit
     // Pour poutres (IPE, HEA), épaisseur d'âme et d'aile requises
     const isAngle = caracteristiques.specifications?.typeProfile === 'ANGLE'
-    if (!isAngle) {
-      if (!caracteristiques.epaisseurAme || !caracteristiques.epaisseurAile) {
-        this.logger.warn("Profilé sans épaisseur d'âme ou d'aile")
-        return false
-      }
-    } else {
+    if (isAngle) {
       // Pour les cornières, vérifier l'épaisseur générale
       if (!caracteristiques.epaisseur) {
         this.logger.warn('Cornière sans épaisseur')
+        return false
+      }
+    } else {
+      if (!caracteristiques.epaisseurAme || !caracteristiques.epaisseurAile) {
+        this.logger.warn("Profilé sans épaisseur d'âme ou d'aile")
         return false
       }
     }

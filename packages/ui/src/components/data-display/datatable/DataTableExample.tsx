@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '../../primitives/button'
 import { useState } from 'react'
+import { Button } from '../../primitives/button'
 import { DataTable } from './DataTable'
 import type { ColumnConfig } from './types'
 

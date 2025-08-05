@@ -19,6 +19,18 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Label } from '@erp/ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+} from '@erp/ui/primitives'
 import {
   Activity,
   AlertTriangle,
@@ -73,20 +85,6 @@ import {
   Wrench,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@erp/ui/primitives'
-import { Input } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
 import { TranslationFieldWrapper as TranslationField } from '@/components/wrappers'
 import { apiClient } from '@/lib/api-client-instance'
 import { useTranslation } from '@/lib/i18n/hooks'
@@ -791,12 +789,8 @@ export default function MenuDragDropPage() {
     })
   )
 
-  useEffect(() => {
-    loadStandardMenu()
-    loadUserMenu()
-  }, [loadStandardMenu, loadUserMenu])
-
-  const loadStandardMenu = async () => {
+  // Définir loadStandardMenu avant de l'utiliser dans useEffect
+  const loadStandardMenu = useCallback(async () => {
     try {
       const response = await apiClient.get('/admin/menu-raw/configurations/active')
       if ((response as any).data?.success && (response as any).data?.data) {
@@ -810,7 +804,7 @@ export default function MenuDragDropPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   // Fonction récursive pour mapper les éléments de menu
   const mapMenuItemRecursively = (item: any, index: number, parentId?: string): UserMenuItem => {
@@ -836,7 +830,7 @@ export default function MenuDragDropPage() {
     }
   }
 
-  const loadUserMenu = async () => {
+  const loadUserMenu = useCallback(async () => {
     try {
       const response = await apiClient.get('/user/menu-preferences/custom-menu')
 
@@ -854,7 +848,12 @@ export default function MenuDragDropPage() {
       // Erreur lors du chargement du menu utilisateur
       setUserMenu([])
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadStandardMenu()
+    loadUserMenu()
+  }, [loadStandardMenu, loadUserMenu])
 
   const saveUserMenu = async () => {
     setSaving(true)
@@ -1119,47 +1118,6 @@ export default function MenuDragDropPage() {
     setEditQueryId(editingItem.queryBuilderId || '')
   }
 
-  // Raccourcis clavier optimisés
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!showEditModal) return
-
-      // Escape pour fermer le sélecteur ou la modale (sauf si sauvegarde en cours)
-      if (e.key === 'Escape' && !isSaving) {
-        if (showIconSelector) {
-          setShowIconSelector(false)
-        } else {
-          setShowEditModal(false)
-        }
-        return
-      }
-
-      // Ctrl+S pour sauvegarder (sauf si déjà en cours)
-      if (e.ctrlKey && e.key === 's' && !isSaving) {
-        e.preventDefault()
-        saveItemEdit()
-      }
-
-      // Ctrl+R pour reset (sauf si sauvegarde en cours)
-      if (e.ctrlKey && e.key === 'r' && !isSaving) {
-        e.preventDefault()
-        resetItemEdit()
-      }
-
-      // Ctrl+Escape pour forcer la fermeture (urgence)
-      if (e.ctrlKey && e.key === 'Escape') {
-        e.preventDefault()
-        setShowEditModal(false)
-        setIsSaving(false)
-      }
-    }
-
-    if (showEditModal) {
-      document.addEventListener('keydown', handleKeyDown)
-      return () => document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [showEditModal, showIconSelector, isSaving, resetItemEdit, saveItemEdit])
-
   const saveItemEdit = async () => {
     if (!editingItem || isSaving) return
 
@@ -1248,6 +1206,47 @@ export default function MenuDragDropPage() {
       setIsSaving(false)
     }
   }
+
+  // Raccourcis clavier optimisés
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!showEditModal) return
+
+      // Escape pour fermer le sélecteur ou la modale (sauf si sauvegarde en cours)
+      if (e.key === 'Escape' && !isSaving) {
+        if (showIconSelector) {
+          setShowIconSelector(false)
+        } else {
+          setShowEditModal(false)
+        }
+        return
+      }
+
+      // Ctrl+S pour sauvegarder (sauf si déjà en cours)
+      if (e.ctrlKey && e.key === 's' && !isSaving) {
+        e.preventDefault()
+        saveItemEdit()
+      }
+
+      // Ctrl+R pour reset (sauf si sauvegarde en cours)
+      if (e.ctrlKey && e.key === 'r' && !isSaving) {
+        e.preventDefault()
+        resetItemEdit()
+      }
+
+      // Ctrl+Escape pour forcer la fermeture (urgence)
+      if (e.ctrlKey && e.key === 'Escape') {
+        e.preventDefault()
+        setShowEditModal(false)
+        setIsSaving(false)
+      }
+    }
+
+    if (showEditModal) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [showEditModal, showIconSelector, isSaving, resetItemEdit, saveItemEdit])
 
   // Fonction récursive pour collecter tous les IDs d'éléments déplaçables (non-dossiers)
   const getAllSortableIds = (items: UserMenuItem[]): string[] => {

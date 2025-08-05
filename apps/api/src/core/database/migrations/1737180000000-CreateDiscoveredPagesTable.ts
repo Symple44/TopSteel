@@ -1,4 +1,4 @@
-import { type MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table, TableIndex } from 'typeorm'
 
 export class CreateDiscoveredPagesTable1737180000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

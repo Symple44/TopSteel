@@ -1,11 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight } from 'lucide-react'
-import { getFeaturedProducts } from '@/lib/api/storefront'
+import Link from 'next/link'
 import { ProductCard } from '@/components/product/product-card'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { getFeaturedProducts } from '@/lib/api/storefront'
 
 interface FeaturedProductsProps {
   tenant: string

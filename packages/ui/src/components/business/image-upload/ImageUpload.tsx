@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '../../primitives'
 import { Image as ImageIcon, Loader2, Upload, X } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives'
 
 export interface ImageUploadProps {
   category: 'avatar' | 'logo' | 'document'

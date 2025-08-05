@@ -14,13 +14,13 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
-import type { User } from '../../users/entities/user.entity'
 import type { BusinessContext } from '../../core/interfaces/business-service.interface'
-import { CreatePartnerDto } from '../dto/create-partner.dto'
-import { PartnerFiltersDto } from '../dto/partner-filters.dto'
-import { UpdatePartnerDto } from '../dto/update-partner.dto'
+import type { User } from '../../users/entities/user.entity'
+import type { CreatePartnerDto } from '../dto/create-partner.dto'
+import type { PartnerFiltersDto } from '../dto/partner-filters.dto'
+import type { UpdatePartnerDto } from '../dto/update-partner.dto'
 import type { Partner } from '../entities/partner.entity'
-import { PartnerService, type PartnerStatistics } from '../services/partner.service'
+import type { PartnerService, PartnerStatistics } from '../services/partner.service'
 
 /**
  * Contrôleur REST pour la gestion des partenaires (clients/fournisseurs)
@@ -267,7 +267,7 @@ export class PartnerController {
     description: 'Exporter la liste des partenaires selon des critères',
   })
   async exportPartners(
-    @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF', filters?: any },
+    @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: any },
     @CurrentUser() user: User
   ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
@@ -288,7 +288,7 @@ export class PartnerController {
     description: 'Importer une liste de partenaires depuis un fichier',
   })
   async importPartners(
-    @Body() importData: { data: any[], options?: { skipErrors?: boolean, dryRun?: boolean } },
+    @Body() importData: { data: any[]; options?: { skipErrors?: boolean; dryRun?: boolean } },
     @CurrentUser() user: User
   ): Promise<{
     imported: number

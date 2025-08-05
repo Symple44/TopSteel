@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { SectionType, BaseSection } from './types'
+import { type BaseSection, SectionType } from './types'
 
 // Import dynamique des composants de sections
 const sectionComponents = {

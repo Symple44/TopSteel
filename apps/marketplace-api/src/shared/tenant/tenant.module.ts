@@ -1,8 +1,8 @@
-import { Module, Global } from '@nestjs/common'
+import { Global, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { TenantResolver } from './tenant-resolver.service'
-import { TenantGuard } from './tenant.guard'
 import { Societe } from '../entities/erp/societe.entity'
+import { TenantGuard } from './tenant.guard'
+import { TenantResolver } from './tenant-resolver.service'
 
 @Global()
 @Module({

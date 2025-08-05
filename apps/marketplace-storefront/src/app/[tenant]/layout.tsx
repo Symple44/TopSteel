@@ -1,8 +1,8 @@
-import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
-import { MarketplaceHeader } from '@/components/layout/marketplace-header'
-import { MarketplaceFooter } from '@/components/layout/marketplace-footer'
+import { Suspense } from 'react'
 import { CartSidebar } from '@/components/cart/cart-sidebar'
+import { MarketplaceFooter } from '@/components/layout/marketplace-footer'
+import { MarketplaceHeader } from '@/components/layout/marketplace-header'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { getTenantConfig } from '@/lib/api/storefront'
 

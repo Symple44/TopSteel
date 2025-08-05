@@ -1,23 +1,23 @@
 import {
+  Body,
   Controller,
   Get,
+  Param,
+  ParseUUIDPipe,
   Post,
   Put,
-  Body,
-  Param,
   Query,
   UseGuards,
-  ParseUUIDPipe,
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import {
-  BTPIndexService,
-  IndexedPricingContext,
-  IndexedPricingResult,
-} from '../services/btp-index.service'
-import { BTPIndex, BTPIndexType } from '../entities/btp-index.entity'
-import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
+import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
+import { BTPIndex, type BTPIndexType } from '../entities/btp-index.entity'
+import {
+  type BTPIndexService,
+  IndexedPricingContext,
+  type IndexedPricingResult,
+} from '../services/btp-index.service'
 
 // DTOs
 export class CreateBTPIndexDto {
@@ -151,9 +151,7 @@ export class BTPIndexController {
   @Post('setup-defaults')
   @ApiOperation({ summary: 'Créer les indices BTP par défaut' })
   @ApiResponse({ status: 201, description: 'Indices BTP créés', type: [BTPIndex] })
-  async setupDefaultIndices(
-    @CurrentTenant() tenantId: string
-  ): Promise<BTPIndex[]> {
+  async setupDefaultIndices(@CurrentTenant() tenantId: string): Promise<BTPIndex[]> {
     return await this.btpIndexService.createDefaultBTPIndices(tenantId)
   }
 

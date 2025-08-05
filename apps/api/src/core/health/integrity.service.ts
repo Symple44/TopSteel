@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
-import { SessionRedisService } from '../../domains/auth/services/session-redis.service'
+import type { DataSource } from 'typeorm'
+import type { SessionRedisService } from '../../domains/auth/services/session-redis.service'
 
 @Injectable()
 export class IntegrityService {
-  private readonly logger = new Logger(IntegrityService.name);
+  private readonly logger = new Logger(IntegrityService.name)
 
   constructor(
     @InjectDataSource('auth')

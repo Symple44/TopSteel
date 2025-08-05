@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
-import { Repository } from 'typeorm'
-import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
-import { NotificationSettings } from '../../notifications/entities/notification-settings.entity'
+import type { Repository } from 'typeorm'
+import type { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
 import { User, UserRole as UserRoleEnum } from '../../../domains/users/entities/user.entity'
 import { UserSettings } from '../../../domains/users/entities/user-settings.entity'
-import { Societe } from '../entities/societe.entity'
+import { NotificationSettings } from '../../notifications/entities/notification-settings.entity'
+import type { Societe } from '../entities/societe.entity'
 import { SocieteUser, UserSocieteRole } from '../entities/societe-user.entity'
 
 export interface DefaultUserConfig {
@@ -20,19 +20,19 @@ export interface DefaultUserConfig {
 
 @Injectable()
 export class TenantInitializationService {
-  private readonly logger = new Logger(TenantInitializationService.name);
+  private readonly logger = new Logger(TenantInitializationService.name)
 
   constructor(
     private readonly configService: ConfigService,
     private readonly multiTenantConfig: MultiTenantDatabaseConfig,
     @InjectRepository(User, 'auth')
     private readonly _userRepository: Repository<User>,
-    @InjectRepository(UserSettings, 'auth') 
+    @InjectRepository(UserSettings, 'auth')
     private readonly _userSettingsRepository: Repository<UserSettings>,
     @InjectRepository(NotificationSettings, 'auth')
     private readonly _notificationSettingsRepository: Repository<NotificationSettings>,
     @InjectRepository(SocieteUser, 'auth')
-    private readonly _societeUserRepository: Repository<SocieteUser>,
+    private readonly _societeUserRepository: Repository<SocieteUser>
   ) {}
 
   /**

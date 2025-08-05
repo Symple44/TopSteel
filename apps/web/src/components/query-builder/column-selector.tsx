@@ -1,6 +1,8 @@
 'use client'
 
-import { Button } from '@erp/ui'
+// import { useDrag, useDrop } from 'react-dnd' // Temporairement désactivé
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, ScrollArea } from '@erp/ui'
+import { Checkbox, Input } from '@erp/ui/primitives'
 import {
   ArrowUpDown,
   Calendar,
@@ -17,12 +19,6 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Badge } from '@erp/ui'
-// import { useDrag, useDrop } from 'react-dnd' // Temporairement désactivé
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Checkbox } from '@erp/ui/primitives'
-import { Input } from '@erp/ui/primitives'
-import { ScrollArea } from '@erp/ui'
 import { cn } from '@/lib/utils'
 import { callClientApi } from '@/utils/backend-api'
 

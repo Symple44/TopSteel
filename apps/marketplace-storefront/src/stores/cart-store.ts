@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Product } from '@/lib/api/storefront'
+import type { Product } from '@/lib/api/storefront'
 
 export interface CartItem {
   id: string

@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsOptional, IsEnum, IsString, IsNumber, IsBoolean, IsArray, Min } from 'class-validator'
 import { Transform, Type } from 'class-transformer'
-import { PartnerType, PartnerStatus, PartnerCategory } from '../entities/partner.entity'
+import { IsArray, IsBoolean, IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator'
+import { PartnerCategory, PartnerStatus, PartnerType } from '../entities/partner.entity'
 
 /**
  * DTO pour les filtres de recherche de partenaires

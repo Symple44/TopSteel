@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '../../primitives/button'
 import { X } from 'lucide-react'
 import type React from 'react'
 import { useEffect } from 'react'
+import { Button } from '../../primitives/button'
 
 interface SimpleModalProps {
   open: boolean

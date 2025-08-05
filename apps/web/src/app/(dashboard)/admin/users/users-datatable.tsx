@@ -1,6 +1,13 @@
 'use client'
 
-import { Avatar, AvatarFallback, Badge, Button } from '@erp/ui'
+import {
+  AdvancedDataTable,
+  Avatar,
+  AvatarFallback,
+  Badge,
+  Button,
+  type ColumnConfig,
+} from '@erp/ui'
 import {
   Building,
   Calendar,
@@ -14,7 +21,6 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import BulkProfileManagement from '@/components/admin/bulk-profile-management'
-import { AdvancedDataTable, type ColumnConfig } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
 

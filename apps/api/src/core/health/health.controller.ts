@@ -1,16 +1,16 @@
 import { Controller, Get } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import {
-  DiskHealthIndicator,
+  type DiskHealthIndicator,
   HealthCheck,
-  HealthCheckService,
-  MemoryHealthIndicator,
-  TypeOrmHealthIndicator,
+  type HealthCheckService,
+  type MemoryHealthIndicator,
+  type TypeOrmHealthIndicator,
 } from '@nestjs/terminus'
-import { IntegrityService } from './integrity.service'
-import { SystemHealthService } from './system-health-simple.service'
-import { CircuitBreakerHealthIndicator } from '../../infrastructure/monitoring/circuit-breaker-health.indicator'
-import { MultiTenantDatabaseConfig } from '../database/config/multi-tenant-database.config'
+import type { CircuitBreakerHealthIndicator } from '../../infrastructure/monitoring/circuit-breaker-health.indicator'
+import type { MultiTenantDatabaseConfig } from '../database/config/multi-tenant-database.config'
+import type { IntegrityService } from './integrity.service'
+import type { SystemHealthService } from './system-health-simple.service'
 
 @Controller('health')
 export class HealthController {

@@ -1,6 +1,21 @@
 'use client'
 
 import {
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Label,
+  ScrollArea,
+  Separator,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@erp/ui'
+import { Button, Input } from '@erp/ui/primitives'
+import {
   Code,
   Columns,
   Database,
@@ -15,14 +30,6 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Input } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
-import { ScrollArea } from '@erp/ui'
-import { Separator } from '@erp/ui'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { callClientApi } from '@/utils/backend-api'
 import { DataTablePreview } from './datatable-preview'
 

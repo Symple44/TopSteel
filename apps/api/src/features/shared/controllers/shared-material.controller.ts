@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CommonDatabase } from '../../../core/common/decorators/tenant.decorator'
 import type { SharedMaterial } from '../entities/shared-material.entity'
-import { SharedMaterialService } from '../services/shared-material.service'
+import type { SharedMaterialService } from '../services/shared-material.service'
 
 @ApiTags('Shared Materials')
 @Controller('shared/materials')

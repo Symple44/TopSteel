@@ -1,18 +1,18 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Put,
-  Delete,
-  Body,
-  Param,
   Query,
-  UseGuards,
   Request,
+  UseGuards,
 } from '@nestjs/common'
-import { PageBuilderService } from '../services/page-builder.service'
-import { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
 import { TenantGuard } from '../../../shared/guards/tenant.guard'
+import type { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
+import type { PageBuilderService } from '../services/page-builder.service'
 
 @Controller('page-builder')
 @UseGuards(TenantGuard)

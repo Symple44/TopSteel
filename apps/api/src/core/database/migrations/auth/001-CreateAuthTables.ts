@@ -1,4 +1,4 @@
-import { type MigrationInterface, QueryRunner, Table } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table } from 'typeorm'
 
 export class CreateAuthTables1737000001000 implements MigrationInterface {
   name = 'CreateAuthTables1737000001000'

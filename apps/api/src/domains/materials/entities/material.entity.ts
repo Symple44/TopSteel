@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 import { BusinessEntity } from '@erp/entities'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 /**
  * Types de matériaux supportés

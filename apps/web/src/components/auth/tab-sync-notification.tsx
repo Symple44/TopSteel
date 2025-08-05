@@ -1,10 +1,10 @@
 'use client'
 
+import { Button } from '@erp/ui/primitives'
 import { AlertCircle, Building, LogOut, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@erp/ui/primitives'
 import { useAuth } from '@/hooks/use-auth'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { getTabId } from '@/lib/tab-id'

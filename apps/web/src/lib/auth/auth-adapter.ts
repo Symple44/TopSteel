@@ -25,11 +25,11 @@ export class AuthAdapter {
       societeId: usr.societeId || existingUser.societeId || '',
       roleId: usr.roleId,
       role: {
-        id: usr.roleId || `role-${existingUser.role}`,
-        code: existingUser.role?.toUpperCase() || 'USER',
-        name: AuthAdapter.getRoleDisplayName(existingUser.role || 'user'),
-        description: `Rôle ${existingUser.role}`,
-        level: AuthAdapter.getRoleLevel(existingUser.role || 'user'),
+        id: usr.roleId || `role-${usr.roleType || existingUser.role}`,
+        code: usr.roleType?.toUpperCase() || existingUser.role?.toUpperCase() || 'USER',
+        name: AuthAdapter.getRoleDisplayName(usr.roleType || existingUser.role || 'user'),
+        description: `Rôle ${usr.roleType || existingUser.role}`,
+        level: AuthAdapter.getRoleLevel(usr.roleType || existingUser.role || 'user'),
         permissions: AuthAdapter.convertPermissionsFromStrings(existingUser.permissions || []),
         isSystemRole: true,
         isActive: true,
@@ -46,19 +46,21 @@ export class AuthAdapter {
       updatedAt: usr.updatedAt || new Date().toISOString(),
     }))
 
-    // Si pas de rôles société, créer un rôle par défaut
-    if (convertedRoles.length === 0 && existingUser.societeId) {
+    // Si pas de rôles société, créer un rôle par défaut basé sur le rôle global
+    if (convertedRoles.length === 0) {
+      // Utiliser le rôle global de l'utilisateur
+      const globalRole = existingUser.role || 'USER'
       convertedRoles.push({
         id: `${existingUser.id}-default`,
         userId: existingUser.id,
-        societeId: existingUser.societeId,
-        roleId: `role-${existingUser.role}`,
+        societeId: existingUser.societeId || 'default',
+        roleId: `role-${globalRole}`,
         role: {
-          id: `role-${existingUser.role}`,
-          code: existingUser.role?.toUpperCase() || 'USER',
-          name: AuthAdapter.getRoleDisplayName(existingUser.role || 'user'),
-          description: `Rôle ${existingUser.role}`,
-          level: AuthAdapter.getRoleLevel(existingUser.role || 'user'),
+          id: `role-${globalRole}`,
+          code: globalRole.toUpperCase(),
+          name: AuthAdapter.getRoleDisplayName(globalRole),
+          description: `Rôle ${globalRole}`,
+          level: AuthAdapter.getRoleLevel(globalRole),
           permissions: AuthAdapter.convertPermissionsFromStrings(existingUser.permissions || []),
           isSystemRole: true,
           isActive: true,
@@ -75,8 +77,8 @@ export class AuthAdapter {
     return {
       id: existingUser.id,
       email: existingUser.email,
-      firstName: existingUser.prenom || existingUser.nom.split(' ')[0] || '',
-      lastName: existingUser.nom.split(' ').slice(1).join(' ') || existingUser.nom,
+      firstName: existingUser.prenom || '',
+      lastName: existingUser.nom || '',
       isActive: true,
       defaultRoleId: `role-${existingUser.role}`,
       defaultRole: convertedRoles[0]?.role,
@@ -174,10 +176,10 @@ export class AuthAdapter {
 
     return {
       id: extendedUser.id,
-      nom: `${extendedUser.firstName} ${extendedUser.lastName}`.trim(),
+      nom: extendedUser.lastName || extendedUser.firstName,
       prenom: extendedUser.firstName,
       email: extendedUser.email,
-      role: primaryRole?.role.code.toLowerCase() || 'user',
+      role: primaryRole?.role.code || 'USER',
       permissions: extendedUser.effectivePermissions?.map((p) => p.code) || [],
       societeId: primarySociete,
       societeCode: undefined, // À récupérer depuis les données société
@@ -194,10 +196,10 @@ export class AuthAdapter {
 
     return {
       id: extendedUser.id,
-      nom: `${extendedUser.firstName} ${extendedUser.lastName}`.trim(),
+      nom: extendedUser.lastName || extendedUser.firstName,
       prenom: extendedUser.firstName,
       email: extendedUser.email,
-      role: primaryRole?.role.code.toLowerCase() || 'user',
+      role: primaryRole?.role.code || 'USER',
       permissions: extendedUser.effectivePermissions?.map((p) => p.code) || [],
       isActive: extendedUser.isActive,
       createdAt: extendedUser.createdAt,

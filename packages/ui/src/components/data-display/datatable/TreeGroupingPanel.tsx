@@ -1,8 +1,5 @@
 'use client'
 
-import { Badge } from '../badge'
-import { Button } from '../../primitives/button'
-import { Separator } from '../../primitives'
 import {
   ArrowDown,
   ArrowUp,
@@ -18,6 +15,9 @@ import {
 } from 'lucide-react'
 import type React from 'react'
 import { useState } from 'react'
+import { Separator } from '../../primitives'
+import { Button } from '../../primitives/button'
+import { Badge } from '../badge'
 import { SimpleModal } from './SimpleModal'
 import type { ColumnConfig } from './types'
 import type { TreeGroupingConfig } from './use-tree-grouping'

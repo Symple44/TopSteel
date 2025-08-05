@@ -1,8 +1,8 @@
 'use client'
 
-import { Button } from '../../primitives/button'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
 
 interface DataTableErrorProps {
   error: string

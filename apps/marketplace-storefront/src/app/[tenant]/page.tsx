@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
-import { HeroSection } from '@/components/sections/hero-section'
-import { FeaturedProducts } from '@/components/sections/featured-products'
 import { CategoriesSection } from '@/components/sections/categories-section'
+import { FeaturedProducts } from '@/components/sections/featured-products'
+import { HeroSection } from '@/components/sections/hero-section'
 import { NewsletterSection } from '@/components/sections/newsletter-section'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 

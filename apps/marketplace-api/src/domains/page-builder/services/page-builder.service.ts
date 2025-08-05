@@ -1,18 +1,18 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { PageTemplate, PageSection, SectionPreset } from '../entities'
-import { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
+import type { Repository } from 'typeorm'
+import type { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
+import { PageSection, PageTemplate, SectionPreset } from '../entities'
 
 @Injectable()
 export class PageBuilderService {
   constructor(
     @InjectRepository(PageTemplate, 'marketplace')
     private pageTemplateRepository: Repository<PageTemplate>,
-    
+
     @InjectRepository(PageSection, 'marketplace')
     private pageSectionRepository: Repository<PageSection>,
-    
+
     @InjectRepository(SectionPreset, 'marketplace')
     private sectionPresetRepository: Repository<SectionPreset>
   ) {}

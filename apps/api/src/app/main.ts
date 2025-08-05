@@ -8,15 +8,15 @@ import compression from 'compression'
 import { config } from 'dotenv'
 import express from 'express'
 import helmet from 'helmet'
-import { AppModule } from './app.module'
 import { HttpExceptionFilter } from '../core/common/filters/http-exception.filter'
-import { EnhancedThrottlerGuard } from '../infrastructure/security/guards/enhanced-throttler.guard'
 import { LoggingInterceptor } from '../core/common/interceptors/logging.interceptor'
-import { MetricsSafeInterceptor } from '../infrastructure/monitoring/metrics-safe.interceptor'
 import { TransformInterceptor } from '../core/common/interceptors/transform.interceptor'
 import { EnhancedServerManager } from '../core/config/enhanced-server-manager'
 import { GracefulShutdownService } from '../core/config/graceful-shutdown.service'
 import { listenWithPortFallback } from '../core/config/port-helper'
+import { MetricsSafeInterceptor } from '../infrastructure/monitoring/metrics-safe.interceptor'
+import { EnhancedThrottlerGuard } from '../infrastructure/security/guards/enhanced-throttler.guard'
+import { AppModule } from './app.module'
 
 // ============================================================================
 // CHARGEMENT VARIABLES D'ENVIRONNEMENT MONOREPO

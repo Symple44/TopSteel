@@ -1,1 +1,1 @@
-export { ErpInfoModal, type ErpInfoModalProps, type BackendHealthInfo } from './ErpInfoModal'
+export { type BackendHealthInfo, ErpInfoModal, type ErpInfoModalProps } from './ErpInfoModal'

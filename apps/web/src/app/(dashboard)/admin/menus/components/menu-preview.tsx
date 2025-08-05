@@ -1,8 +1,7 @@
 'use client'
 
+import { Badge, Card, CardContent } from '@erp/ui'
 import { BarChart3, ChevronRight, ExternalLink, EyeOff, Folder, Play } from 'lucide-react'
-import { Badge } from '@erp/ui'
-import { Card, CardContent } from '@erp/ui'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { cn } from '@/lib/utils'
 

@@ -1,14 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+  IsBoolean,
+  IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsString,
-  IsEmail,
-  IsBoolean,
-  IsObject,
 } from 'class-validator'
-import { PartnerType, PartnerStatus, PartnerCategory } from '../entities/partner.entity'
+import { PartnerCategory, PartnerStatus, PartnerType } from '../entities/partner.entity'
 
 /**
  * DTO pour la création d'un partenaire

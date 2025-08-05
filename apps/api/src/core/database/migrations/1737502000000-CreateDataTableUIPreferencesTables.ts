@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CreateDataTableUIPreferencesTables1737502000000 implements MigrationInterface {
   name = 'CreateDataTableUIPreferencesTables1737502000000'

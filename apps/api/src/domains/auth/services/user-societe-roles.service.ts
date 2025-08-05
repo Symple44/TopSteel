@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { ParameterService } from '../../../features/parameters/services/parameter.service'
+import type { Repository } from 'typeorm'
+import type { ParameterService } from '../../../features/parameters/services/parameter.service'
 import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
@@ -48,7 +48,7 @@ export class UserSocieteRolesService {
     private _permissionRepository: Repository<Permission>,
     @InjectRepository(RolePermission, 'auth')
     private _rolePermissionRepository: Repository<RolePermission>,
-    private parameterService: ParameterService,
+    private parameterService: ParameterService
   ) {}
 
   /**

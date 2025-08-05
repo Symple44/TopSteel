@@ -1,13 +1,13 @@
 import { Controller, Get } from '@nestjs/common'
-import { ApiTags, ApiOperation } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import {
-  HealthCheckService,
+  type DiskHealthIndicator,
   HealthCheck,
-  TypeOrmHealthIndicator,
-  MemoryHealthIndicator,
-  DiskHealthIndicator,
+  type HealthCheckService,
+  type MemoryHealthIndicator,
+  type TypeOrmHealthIndicator,
 } from '@nestjs/terminus'
-import { TenantResolver } from '../../shared/tenant/tenant-resolver.service'
+import type { TenantResolver } from '../../shared/tenant/tenant-resolver.service'
 
 @ApiTags('health')
 @Controller('health')

@@ -1,6 +1,6 @@
-import { Injectable, Logger, NestMiddleware, UnauthorizedException } from '@nestjs/common'
-import { NextFunction, Request, Response } from 'express'
-import { JwtService } from '@nestjs/jwt'
+import { Injectable, Logger, type NestMiddleware, UnauthorizedException } from '@nestjs/common'
+import type { JwtService } from '@nestjs/jwt'
+import type { NextFunction, Request, Response } from 'express'
 
 interface JwtPayload {
   sub: string
@@ -143,7 +143,7 @@ export class TokenVersionMiddleware implements NestMiddleware {
    * Utile en cas de compromission de sécurité
    */
   static invalidateAllTokens(): void {
-    this.resetServerStartTime()
+    TokenVersionMiddleware.resetServerStartTime()
     Logger.log('Tous les tokens existants ont été invalidés', 'TokenVersionMiddleware')
   }
 }

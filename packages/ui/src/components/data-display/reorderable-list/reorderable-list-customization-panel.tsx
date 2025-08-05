@@ -1,13 +1,13 @@
 'use client'
 
-import { Badge } from '../badge'
-import { Button } from '../../primitives/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../../layout/card'
-import { Switch } from '../../primitives/switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../navigation/tabs'
 import { Eye, Layout, Palette, RotateCcw, Save, Settings, Zap } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '../../../lib/utils'
+import { Card, CardContent, CardHeader, CardTitle } from '../../layout/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../navigation/tabs'
+import { Button } from '../../primitives/button'
+import { Switch } from '../../primitives/switch'
+import { Badge } from '../badge'
 import type { ReorderableListConfig } from './reorderable-list-theme'
 import { defaultThemes } from './reorderable-list-themes'
 

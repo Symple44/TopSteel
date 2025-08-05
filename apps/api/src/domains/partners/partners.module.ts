@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { PartnerController } from './controllers/partner.controller'
 import { Partner } from './entities/partner.entity'
-import { PartnerRepositoryImpl } from './repositories/partner-repository.impl'
 import { IPartnerRepository } from './repositories/partner.repository'
+import { PartnerRepositoryImpl } from './repositories/partner-repository.impl'
 import { PartnerService } from './services/partner.service'
 
 /**

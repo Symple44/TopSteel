@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 
 interface ExecuteSqlDto {
@@ -24,7 +24,7 @@ export class SqlExecutorController {
     @InjectDataSource('tenant')
     private _tenantDataSource: DataSource,
     @InjectDataSource('auth')
-    private _authDataSource: DataSource,
+    private _authDataSource: DataSource
   ) {}
 
   @Post()

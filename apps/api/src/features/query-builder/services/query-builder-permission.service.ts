@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { type PermissionType, QueryBuilderPermission } from '../entities'
 
 @Injectable()
 export class QueryBuilderPermissionService {
   constructor(
     @InjectRepository(QueryBuilderPermission, 'auth')
-    private _permissionRepository: Repository<QueryBuilderPermission>,
+    private _permissionRepository: Repository<QueryBuilderPermission>
   ) {}
 
   async checkPermission(

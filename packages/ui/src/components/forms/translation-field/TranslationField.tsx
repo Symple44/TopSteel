@@ -2,8 +2,9 @@
 
 import { Globe, Languages } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from '../../primitives'
+import { Label } from '../../forms'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -11,9 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Input,
 } from '../../primitives'
-import { Input } from '../../primitives'
-import { Label } from '../../forms'
 
 export interface TranslationLanguage {
   code: string

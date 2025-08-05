@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
-import { MFAService } from '../../services/mfa.service'
+import type { MFAService } from '../../services/mfa.service'
 
 interface SetupTOTPDto {
   phoneNumber?: string
@@ -60,10 +60,10 @@ export class MFAController {
     try {
       const userId = req.user.sub
       const stats = await this.mfaService.getMFAStats(userId)
-      
+
       return {
         success: true,
-        data: stats
+        data: stats,
       }
     } catch (_error) {
       throw new HttpException(
@@ -81,32 +81,36 @@ export class MFAController {
     try {
       const userId = req.user.sub
       const methods = await this.mfaService.getUserMFAMethods(userId)
-      
+
       // Masquer les données sensibles
-      const safeMethods = methods.map(method => ({
+      const safeMethods = methods.map((method) => ({
         id: method.id,
         type: method.type,
         isEnabled: method.isEnabled,
         isVerified: method.isVerified,
         lastUsedAt: method.lastUsedAt,
         createdAt: method.createdAt,
-        deviceInfo: method.type === 'webauthn' ? {
-          credentialsCount: method.getActiveWebAuthnCredentials()?.length || 0,
-          credentials: method.getActiveWebAuthnCredentials()?.map(cred => ({
-            id: `${cred.credentialId.substring(0, 8)}...`,
-            deviceName: cred.deviceName,
-            createdAt: cred.createdAt
-          })) || []
-        } : undefined,
+        deviceInfo:
+          method.type === 'webauthn'
+            ? {
+                credentialsCount: method.getActiveWebAuthnCredentials()?.length || 0,
+                credentials:
+                  method.getActiveWebAuthnCredentials()?.map((cred) => ({
+                    id: `${cred.credentialId.substring(0, 8)}...`,
+                    deviceName: cred.deviceName,
+                    createdAt: cred.createdAt,
+                  })) || [],
+              }
+            : undefined,
         metadata: {
           usageCount: method.metadata?.usageCount || 0,
-          lastUsed: method.metadata?.lastUsed
-        }
+          lastUsed: method.metadata?.lastUsed,
+        },
       }))
-      
+
       return {
         success: true,
-        data: safeMethods
+        data: safeMethods,
       }
     } catch (_error) {
       throw new HttpException(
@@ -290,18 +294,18 @@ export class MFAController {
         body.code,
         body.webauthnResponse
       )
-      
+
       if (!result.success) {
         throw new HttpException(result.error!, HttpStatus.BAD_REQUEST)
       }
-      
+
       return {
         success: true,
         data: {
           sessionToken: result.sessionToken,
-          backupCodesUsed: result.backupCodesUsed
+          backupCodesUsed: result.backupCodesUsed,
         },
-        message: 'MFA vérifiée avec succès'
+        message: 'MFA vérifiée avec succès',
       }
     } catch (error) {
       if (error instanceof HttpException) {
@@ -390,22 +394,22 @@ export class MFAController {
   async getBackupCodes(@Request() req: any) {
     try {
       const userId = req.user.sub
-      
+
       const methods = await this.mfaService.getUserMFAMethods(userId)
-      const totpMethod = methods.find(m => m.type === 'totp' && m.isVerified)
-      
+      const totpMethod = methods.find((m) => m.type === 'totp' && m.isVerified)
+
       if (!totpMethod || !totpMethod.backupCodes) {
         throw new HttpException('Codes de récupération non trouvés', HttpStatus.NOT_FOUND)
       }
-      
+
       const backupCodes = this.mfaService.totpService.decryptBackupCodes(totpMethod.backupCodes)
-      
+
       return {
         success: true,
         data: {
           codes: backupCodes,
-          warning: 'Conservez ces codes en lieu sûr. Ils ne s\'afficheront qu\'une seule fois.'
-        }
+          warning: "Conservez ces codes en lieu sûr. Ils ne s'afficheront qu'une seule fois.",
+        },
       }
     } catch (error) {
       if (error instanceof HttpException) {
@@ -425,27 +429,27 @@ export class MFAController {
   async regenerateBackupCodes(@Request() req: any) {
     try {
       const userId = req.user.sub
-      
+
       const methods = await this.mfaService.getUserMFAMethods(userId)
-      const totpMethod = methods.find(m => m.type === 'totp' && m.isVerified)
-      
+      const totpMethod = methods.find((m) => m.type === 'totp' && m.isVerified)
+
       if (!totpMethod) {
         throw new HttpException('TOTP non configuré', HttpStatus.NOT_FOUND)
       }
-      
+
       // Générer de nouveaux codes
       const newBackupCodes = this.mfaService.totpService.generateBackupCodes()
       const encryptedCodes = this.mfaService.totpService.encryptBackupCodes(newBackupCodes)
-      
+
       totpMethod.backupCodes = encryptedCodes
       await this.mfaService.userMFARepository.save(totpMethod)
-      
+
       return {
         success: true,
         data: {
-          codes: newBackupCodes
+          codes: newBackupCodes,
         },
-        message: 'Nouveaux codes de récupération générés'
+        message: 'Nouveaux codes de récupération générés',
       }
     } catch (error) {
       if (error instanceof HttpException) {

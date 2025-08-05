@@ -1,7 +1,7 @@
 import { Controller, Get, Headers } from '@nestjs/common'
-import { ApiTags, ApiOperation } from '@nestjs/swagger'
-import { AppService } from './app.service'
-import { TenantResolver } from '../shared/tenant/tenant-resolver.service'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import type { TenantResolver } from '../shared/tenant/tenant-resolver.service'
+import type { AppService } from './app.service'
 
 @ApiTags('health')
 @Controller()
@@ -41,15 +41,15 @@ export class AppController {
         debug: {
           nodeEnv,
           isDev,
-          shouldUseDemoMode: (tenant === 'demo' || tenant === 'topsteel') && isDev
+          shouldUseDemoMode: (tenant === 'demo' || tenant === 'topsteel') && isDev,
         },
         context: {
           societeId: tenantContext.societeId,
           societeName: tenantContext.societe.nom,
           databaseName: tenantContext.societe.databaseName,
           marketplaceEnabled: tenantContext.marketplaceEnabled,
-          connectionInitialized: tenantContext.erpTenantConnection.isInitialized
-        }
+          connectionInitialized: tenantContext.erpTenantConnection.isInitialized,
+        },
       }
     } catch (error) {
       return {
@@ -58,9 +58,9 @@ export class AppController {
         debug: {
           nodeEnv,
           isDev,
-          shouldUseDemoMode: (tenant === 'demo' || tenant === 'topsteel') && isDev
+          shouldUseDemoMode: (tenant === 'demo' || tenant === 'topsteel') && isDev,
         },
-        error: error.message
+        error: error.message,
       }
     }
   }

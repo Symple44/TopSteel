@@ -10,18 +10,12 @@ import {
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm'
+// Import du nouveau système de rôles unifié
+import { GlobalUserRole } from '../../auth/core/constants/roles.constants'
 
-export enum UserRole {
-  SUPER_ADMIN = 'SUPER_ADMIN',
-  ADMIN = 'ADMIN',
-  MANAGER = 'MANAGER',
-  COMMERCIAL = 'COMMERCIAL',
-  TECHNICIEN = 'TECHNICIEN',
-  COMPTABLE = 'COMPTABLE',
-  OPERATEUR = 'OPERATEUR',
-  USER = 'USER',
-  VIEWER = 'VIEWER',
-}
+// Alias pour compatibilité
+export const UserRole = GlobalUserRole
+export type UserRole = GlobalUserRole
 
 @Entity('users')
 export class User {

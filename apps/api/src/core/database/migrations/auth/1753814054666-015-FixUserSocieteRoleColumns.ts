@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class FixUserSocieteRoleColumns1753814054666 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

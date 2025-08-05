@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
-import { Request } from 'express'
+import type { Request } from 'express'
 import { ExtractJwt, Strategy, type StrategyOptionsWithRequest } from 'passport-jwt'
 import { TokenVersionMiddleware } from '../../../../infrastructure/middleware/token-version.middleware'
 

@@ -4,7 +4,7 @@
  * Support des 3 thèmes : light, dark, vibrant + system
  */
 
-import { ChevronDownIcon, MoonIcon, SunIcon, SparklesIcon, MonitorIcon } from 'lucide-react'
+import { ChevronDownIcon, MonitorIcon, MoonIcon, SparklesIcon, SunIcon } from 'lucide-react'
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
 import { Button } from '../../primitives/button'
@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../primitives/dropdown'
-import { useTheme, type Theme } from '../theme-provider'
+import { type Theme, useTheme } from '../theme-provider'
 
 // ===== TYPES =====
 

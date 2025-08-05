@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '../../primitives/button'
 import { Package, Plus, Search, X } from 'lucide-react'
 import type React from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../primitives/button'
 
 interface DataTableEmptyProps {
   title?: string

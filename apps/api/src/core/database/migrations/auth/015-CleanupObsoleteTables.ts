@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CleanupObsoleteTables1737500000015 implements MigrationInterface {
   name = 'CleanupObsoleteTables1737500000015'

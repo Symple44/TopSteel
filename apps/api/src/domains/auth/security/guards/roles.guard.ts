@@ -1,5 +1,5 @@
-import { type CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
+import { type CanActivate, type ExecutionContext, Injectable } from '@nestjs/common'
+import type { Reflector } from '@nestjs/core'
 
 @Injectable()
 export class RolesGuard implements CanActivate {

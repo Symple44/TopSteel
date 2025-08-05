@@ -4,8 +4,8 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
-import { callClientApi } from '@/utils/backend-api'
 import { useTranslation } from '@/lib/i18n'
+import { callClientApi } from '@/utils/backend-api'
 
 export interface BackendHealthInfo {
   status: 'online' | 'offline' | 'checking' | 'error'

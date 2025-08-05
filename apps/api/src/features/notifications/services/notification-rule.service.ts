@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import {
   ConditionOperator,
   EventStatus,
@@ -19,7 +19,7 @@ export class NotificationRuleService {
     @InjectRepository(NotificationRuleExecution)
     public readonly _executionRepository: Repository<NotificationRuleExecution>,
     @InjectRepository(NotificationEvent)
-    public readonly _eventRepository: Repository<NotificationEvent>,
+    public readonly _eventRepository: Repository<NotificationEvent>
   ) {}
 
   // ===== GESTION DES RÈGLES =====

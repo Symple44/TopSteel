@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { ChevronDown, Filter, Grid, List, Search } from 'lucide-react'
 import Link from 'next/link'
-import { Search, Filter, Grid, List, ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { ProductCard } from '@/components/product/product-card'
-import { api } from '@/lib/api/storefront'
-import { Product } from '@/lib/api/storefront'
+import { api, type Product } from '@/lib/api/storefront'
 import { cn } from '@/lib/utils'
 
 interface SearchResultsProps {

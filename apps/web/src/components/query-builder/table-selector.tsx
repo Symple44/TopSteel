@@ -1,15 +1,20 @@
 'use client'
 
-import { Button } from '@erp/ui'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Label, ScrollArea } from '@erp/ui'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@erp/ui/primitives'
 import { AlertTriangle, Database, Link, Plus, Search, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@erp/ui/primitives'
-import { Input } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
-import { ScrollArea } from '@erp/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
 import { callClientApi } from '@/utils/backend-api'
 
 interface TableSelectorProps {

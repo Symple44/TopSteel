@@ -1,4 +1,4 @@
-import { type MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table, TableIndex } from 'typeorm'
 
 export class CreateUserMenuPreferenceTable1737894800000 implements MigrationInterface {
   name = 'CreateUserMenuPreferenceTable1737894800000'

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Article } from './entities/article.entity'
-import { ArticleService } from './services/article.service'
 import { ArticleRepositoryImpl } from './repositories/article-repository.impl'
+import { ArticleService } from './services/article.service'
 
 /**
  * Module pour la gestion des articles/inventaire

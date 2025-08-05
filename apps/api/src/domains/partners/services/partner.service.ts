@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { BusinessService } from '../../core/base/business-service'
 import {
-  BusinessOperation,
   type BusinessContext,
+  BusinessOperation,
   type ValidationResult,
 } from '../../core/interfaces/business-service.interface'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
-import { IPartnerRepository } from '../repositories/partner.repository'
+import type { IPartnerRepository } from '../repositories/partner.repository'
 
 /**
  * Service métier pour la gestion des partenaires (clients/fournisseurs)
@@ -63,10 +63,10 @@ export class PartnerService extends BusinessService<Partner> {
     const partner = new Partner()
 
     // Générer un code automatique si non fourni
-    if (!data.code) {
-      partner.code = await this.generatePartnerCode(data.type!)
-    } else {
+    if (data.code) {
       partner.code = data.code
+    } else {
+      partner.code = await this.generatePartnerCode(data.type!)
     }
 
     // Informations de base obligatoires

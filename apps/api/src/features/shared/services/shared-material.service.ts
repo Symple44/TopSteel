@@ -7,7 +7,7 @@ import { SharedMaterial } from '../entities/shared-material.entity'
 export class SharedMaterialService {
   constructor(
     @InjectRepository(SharedMaterial, 'shared')
-    private _sharedMaterialRepository: Repository<SharedMaterial>,
+    private _sharedMaterialRepository: Repository<SharedMaterial>
   ) {}
 
   async findAll(): Promise<SharedMaterial[]> {

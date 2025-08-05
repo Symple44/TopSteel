@@ -1,5 +1,16 @@
 'use client'
 
+import { Badge, Card, CardContent, CardHeader, CardTitle, Label, Separator } from '@erp/ui'
+import {
+  Button,
+  Checkbox,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+} from '@erp/ui/primitives'
 import {
   AlertTriangle,
   CheckCircle,
@@ -13,14 +24,6 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Checkbox } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
-import { Separator } from '@erp/ui'
-import { Switch } from '@erp/ui/primitives'
 import { cn } from '@/lib/utils'
 import type { Group, MenuItem, Permission, Role } from '@/types/menu'
 

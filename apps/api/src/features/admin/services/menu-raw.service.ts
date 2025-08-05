@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 
 export interface MenuConfigurationData {
   id: string
@@ -52,8 +52,7 @@ export class MenuRawService {
   constructor(
     @InjectDataSource('auth')
     private readonly _dataSource: DataSource
-  ) {
-  }
+  ) {}
 
   async findAllConfigurations(): Promise<MenuConfigurationData[]> {
     const result = await this._dataSource.query(`

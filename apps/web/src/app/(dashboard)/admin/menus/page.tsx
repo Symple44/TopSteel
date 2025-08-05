@@ -2,12 +2,21 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
+import {
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
 import { Download, Play, Plus, Settings } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
 import { apiClient } from '@/lib/api-client'
 import { MenuConfigurationEditor } from './components/menu-configuration-editor'
 import { MenuConfigurationList } from './components/menu-configuration-list'

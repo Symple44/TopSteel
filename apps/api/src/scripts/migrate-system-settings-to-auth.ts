@@ -11,9 +11,9 @@
  * Usage: npm run migrate:settings-to-auth
  */
 
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
 import * as readline from 'readline'
+import { DataSource } from 'typeorm'
 
 config()
 
@@ -173,7 +173,7 @@ async function migrateSystemSettingsToAuth() {
       try {
         // Mapper les types
         let paramType: ParameterSystem['type'] = 'STRING'
-        let finalValue = setting.value
+        const finalValue = setting.value
 
         switch (setting.type.toLowerCase()) {
           case 'array':

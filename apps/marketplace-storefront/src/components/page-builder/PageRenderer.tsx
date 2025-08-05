@@ -1,8 +1,8 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { SectionRenderer, BaseSection } from './sections'
 import { marketplaceApi } from '@/lib/api/client'
+import { type BaseSection, SectionRenderer } from './sections'
 
 interface PageRendererProps {
   templateId?: string

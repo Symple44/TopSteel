@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common'
-import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import { MenuRawService } from '../services/menu-raw.service'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { MenuRawService } from '../services/menu-raw.service'
 
 @Controller('admin/menu-raw')
 @UseGuards(JwtAuthGuard)
@@ -59,27 +59,23 @@ export class MenuRawController {
     const tree = await this.menuRawService.getMenuTree(configId)
     return {
       success: true,
-      data: tree
+      data: tree,
     }
   }
 
   @Post('filtered-menu')
   async getFilteredMenuForUser(
-    @Body() body: {
-      userId: string
-      userRoles: string[]
-      userPermissions: string[]
-    }
+    @Body() body: { userId: string; userRoles: string[]; userPermissions: string[] }
   ) {
     const filteredMenu = await this.menuRawService.getFilteredMenuForUser(
       body.userId,
       body.userRoles,
       body.userPermissions
     )
-    
+
     return {
       success: true,
-      data: filteredMenu
+      data: filteredMenu,
     }
   }
 

@@ -1,25 +1,25 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
+  HttpCode,
+  HttpStatus,
   Param,
+  Post,
   Query,
   Req,
   UseGuards,
-  HttpCode,
-  HttpStatus,
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger'
-import { Request } from 'express'
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
-import {
+import type { MarketplaceCustomersService } from '../../customers/services/marketplace-customers.service'
+import type {
   MarketplaceProductsService,
   ProductFilters,
 } from '../../products/services/marketplace-products.service'
-import { MarketplaceCustomersService } from '../../customers/services/marketplace-customers.service'
-import { StorefrontService } from '../services/storefront.service'
+import type { StorefrontService } from '../services/storefront.service'
 
 @ApiTags('storefront')
 @Controller('storefront')
@@ -69,15 +69,15 @@ export class StorefrontController {
   @ApiOperation({ summary: 'Health check for this tenant' })
   async health(@Req() req: Request) {
     const { tenant } = req as any
-    
+
     if (!tenant) {
       return {
         status: 'error',
         message: 'Aucun tenant trouvé dans la requête',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
     }
-    
+
     return {
       status: 'healthy',
       tenant: {
@@ -85,9 +85,9 @@ export class StorefrontController {
         nom: tenant.societe?.nom,
         marketplaceEnabled: tenant.marketplaceEnabled,
         hasConnection: !!tenant.erpTenantConnection,
-        isInitialized: tenant.erpTenantConnection?.isInitialized
+        isInitialized: tenant.erpTenantConnection?.isInitialized,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
   }
 
@@ -97,11 +97,11 @@ export class StorefrontController {
   async getStorefrontConfig(@Req() req: Request) {
     // Temporarily return static config for testing
     return {
-      storeName: "TopSteel",
-      description: "Boutique en ligne TopSteel",
+      storeName: 'TopSteel',
+      description: 'Boutique en ligne TopSteel',
       contactInfo: {
-        email: "contact@topsteel.fr",
-        address: "123 Rue de la Métallurgie, 75000 Paris"
+        email: 'contact@topsteel.fr',
+        address: '123 Rue de la Métallurgie, 75000 Paris',
       },
       features: {
         allowGuestCheckout: true,
@@ -110,14 +110,14 @@ export class StorefrontController {
         showStock: true,
         enableWishlist: false,
         enableCompare: false,
-        enableReviews: false
+        enableReviews: false,
       },
       social: {},
       seo: {
-        title: "TopSteel - Boutique en ligne",
-        description: "Découvrez nos produits sur la boutique en ligne de TopSteel",
-        keywords: ["TopSteel", "boutique", "produits", "métallurgie"]
-      }
+        title: 'TopSteel - Boutique en ligne',
+        description: 'Découvrez nos produits sur la boutique en ligne de TopSteel',
+        keywords: ['TopSteel', 'boutique', 'produits', 'métallurgie'],
+      },
     }
   }
 
@@ -234,11 +234,11 @@ export class StorefrontController {
   @ApiOperation({ summary: 'Get product categories' })
   async getCategories(@Req() req: Request) {
     const { tenant } = req as any
-    
+
     if (!tenant) {
       throw new Error('Tenant non disponible')
     }
-    
+
     return await this.productsService.getCategories(
       tenant.erpTenantConnection || null,
       tenant.societeId
@@ -339,12 +339,12 @@ export class StorefrontController {
   async sendContactMessage(
     @Req() req: Request,
     @Body() body: {
-    name: string
-    email: string
-    subject: string
-    message: string
-    phone?: string
-  }
+      name: string
+      email: string
+      subject: string
+      message: string
+      phone?: string
+    }
   ) {
     const { tenant } = req as any
 
@@ -355,7 +355,7 @@ export class StorefrontController {
   @ApiOperation({ summary: 'Get current theme configuration' })
   async getTheme(@Req() req: Request) {
     const { tenant } = req as any
-    
+
     return await this.storefrontService.getCurrentTheme(tenant.societeId)
   }
 
@@ -363,7 +363,7 @@ export class StorefrontController {
   @ApiOperation({ summary: 'Get navigation menu' })
   async getMenu(@Req() req: Request) {
     const { tenant } = req as any
-    
+
     return await this.storefrontService.getNavigationMenu(tenant.societeId)
   }
 

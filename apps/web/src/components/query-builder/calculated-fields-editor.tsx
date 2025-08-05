@@ -1,15 +1,22 @@
 'use client'
 
-import { Button } from '@erp/ui'
+import { Badge, Button, Card, CardContent, Label } from '@erp/ui'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
+} from '@erp/ui/primitives'
 import { Calculator, Edit2, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Card, CardContent } from '@erp/ui'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@erp/ui/primitives'
-import { Input } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
-import { Textarea } from '@erp/ui/primitives'
 
 interface CalculatedField {
   id?: string

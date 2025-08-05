@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
+import { Toaster } from 'sonner'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { TenantProvider } from '@/components/providers/tenant-provider'
-import { Toaster } from 'sonner'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })

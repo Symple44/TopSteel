@@ -1,5 +1,10 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
-import { TenantResolver } from '../tenant/tenant-resolver.service'
+import {
+  type CanActivate,
+  type ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common'
+import type { TenantResolver } from '../tenant/tenant-resolver.service'
 
 @Injectable()
 export class TenantGuard implements CanActivate {

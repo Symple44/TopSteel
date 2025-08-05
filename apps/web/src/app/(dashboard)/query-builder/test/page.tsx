@@ -2,10 +2,10 @@
 
 export const dynamic = 'force-dynamic'
 
+import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Button } from '@erp/ui/primitives'
 import { Database, Package, Table, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { callClientApi } from '@/utils/backend-api'
 
 export default function QueryBuilderTestPage() {

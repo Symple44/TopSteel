@@ -8,10 +8,10 @@
  * ou: npx ts-node src/scripts/inject-metallurgy-data.ts
  */
 
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
-import { readFileSync, existsSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import { join } from 'path'
+import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
 config()

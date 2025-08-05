@@ -1,7 +1,5 @@
 'use client'
 
-import { Eye, Plus, X } from 'lucide-react'
-import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -28,6 +26,8 @@ import {
   TabsTrigger,
   Textarea,
 } from '@erp/ui'
+import { Eye, Plus, X } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 
 interface ModuleForm {

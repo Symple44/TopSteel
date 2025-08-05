@@ -4,10 +4,10 @@
  */
 
 import {
-  PricingCalculator,
-  CaracteristiquesTechniques,
   ArticleFamille,
-  InjectionLogger,
+  type CaracteristiquesTechniques,
+  type InjectionLogger,
+  type PricingCalculator,
 } from '../types/article-injection.types'
 
 interface MaterialPricing {

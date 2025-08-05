@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CreateTestProductsTable1737501000000 implements MigrationInterface {
   name = 'CreateTestProductsTable1737501000000'

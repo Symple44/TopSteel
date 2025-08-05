@@ -1,27 +1,27 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
   Body,
-  Param,
-  Req,
-  UseGuards,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { Request } from 'express'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
-import {
-  MarketplaceCustomersService,
+import type { CustomerAddress } from '../entities/marketplace-customer.entity'
+import type {
   CreateCustomerDto,
-  UpdateCustomerDto,
   CustomerLoginDto,
+  MarketplaceCustomersService,
+  UpdateCustomerDto,
 } from '../services/marketplace-customers.service'
-import { CustomerAddress } from '../entities/marketplace-customer.entity'
 
 @ApiTags('customers')
 @Controller('customers')
@@ -69,13 +69,13 @@ export class CustomersController {
   @HttpCode(HttpStatus.CREATED)
   async createGuest(
     @Req() req: Request,
-    @Body() body: { 
-    email: string
-    firstName?: string
-    lastName?: string
-    company?: string
-    phone?: string
-  }
+    @Body() body: {
+      email: string
+      firstName?: string
+      lastName?: string
+      company?: string
+      phone?: string
+    }
   ) {
     const { tenant } = req as any
 
@@ -254,7 +254,7 @@ export class CustomersController {
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() body: { token: string; newPassword: string }) {
     await this.customersService.resetPassword(body.token, body.newPassword)
-    
+
     return { message: 'Mot de passe réinitialisé avec succès' }
   }
 

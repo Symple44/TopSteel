@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn, TableForeignKey } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, TableColumn, TableForeignKey } from 'typeorm'
 
 export class MigrateCompleteProduitsToArticles1738000002000 implements MigrationInterface {
   name = 'MigrateCompleteProduitsToArticles1738000002000'

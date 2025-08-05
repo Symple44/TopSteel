@@ -12,25 +12,25 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { CurrentUser } from '../../core/common/decorators/current-user.decorator'
 import { Roles } from '../../core/common/decorators/roles.decorator'
+import type { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { JwtAuthGuard } from '../auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/security/guards/roles.guard'
 import {
   GetAppearanceSettingsResponseDto,
   type UpdateAppearanceSettingsDto,
 } from './dto/appearance-settings.dto'
-import { CreateUserDto } from './dto/create-user.dto'
+import type { CreateUserDto } from './dto/create-user.dto'
 import {
   GetNotificationSettingsResponseDto,
   type UpdateNotificationSettingsDto,
 } from './dto/notification-settings.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
-import { UserQueryDto } from './dto/user-query.dto'
+import type { UpdateUserDto } from './dto/update-user.dto'
+import type { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
+import type { UserQueryDto } from './dto/user-query.dto'
 import { UserRole } from './entities/user.entity'
-import { UsersService } from './users.service'
+import type { UsersService } from './users.service'
 
 @Controller('users')
 @ApiTags('👤 Users')
@@ -83,31 +83,33 @@ export class UsersController {
 
   // Endpoints spécialisés pour les préférences d'apparence (DOIVENT être avant :id)
   @Get('appearance/me')
-  @ApiOperation({ summary: 'Récupérer mes préférences d\'apparence' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Préférences d\'apparence récupérées avec succès',
-    type: GetAppearanceSettingsResponseDto 
+  @ApiOperation({ summary: "Récupérer mes préférences d'apparence" })
+  @ApiResponse({
+    status: 200,
+    description: "Préférences d'apparence récupérées avec succès",
+    type: GetAppearanceSettingsResponseDto,
   })
-  async getMyAppearanceSettings(@CurrentUser() user: any): Promise<GetAppearanceSettingsResponseDto> {
+  async getMyAppearanceSettings(
+    @CurrentUser() user: any
+  ): Promise<GetAppearanceSettingsResponseDto> {
     const cacheKey = `user:appearance:${user.id}`
-    
+
     // Vérifier le cache d'abord
     const cachedResult = await this.cacheService.get<GetAppearanceSettingsResponseDto>(cacheKey)
     if (cachedResult) {
       return cachedResult
     }
-    
+
     const settings = await this.usersService.getUserSettings(user.id)
     if (!settings?.preferences?.appearance) {
-      throw new Error('Paramètres d\'apparence non trouvés')
+      throw new Error("Paramètres d'apparence non trouvés")
     }
-    
+
     const result = new GetAppearanceSettingsResponseDto(settings.preferences.appearance)
-    
+
     // Mettre en cache pour 10 minutes (600 secondes)
     await this.cacheService.set(cacheKey, result, 600)
-    
+
     return result
   }
 
@@ -141,12 +143,14 @@ export class UsersController {
   // Endpoints spécialisés pour les notifications (DOIVENT être avant :id)
   @Get('notifications/me')
   @ApiOperation({ summary: 'Récupérer mes préférences de notification' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Préférences de notification récupérées avec succès',
-    type: GetNotificationSettingsResponseDto 
+    type: GetNotificationSettingsResponseDto,
   })
-  async getMyNotificationSettings(@CurrentUser() user: any): Promise<GetNotificationSettingsResponseDto> {
+  async getMyNotificationSettings(
+    @CurrentUser() user: any
+  ): Promise<GetNotificationSettingsResponseDto> {
     const settings = await this.usersService.getUserSettings(user.id)
     return new GetNotificationSettingsResponseDto(settings.preferences.notifications)
   }
@@ -192,7 +196,7 @@ export class UsersController {
 
   @Get(':id/settings')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Récupérer les paramètres d\'un utilisateur (Admin/Manager)' })
+  @ApiOperation({ summary: "Récupérer les paramètres d'un utilisateur (Admin/Manager)" })
   @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
   async getUserSettings(@Param('id') id: string) {
     return this.usersService.getUserSettings(id)

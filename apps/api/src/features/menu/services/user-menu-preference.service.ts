@@ -1,15 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { UserMenuPreference } from '../entities/user-menu-preference.entity'
 
 @Injectable()
 export class UserMenuPreferenceService {
-  private readonly logger = new Logger(UserMenuPreferenceService.name);
+  private readonly logger = new Logger(UserMenuPreferenceService.name)
 
   constructor(
     @InjectRepository(UserMenuPreference, 'auth')
-    private readonly _userMenuPreferenceRepository: Repository<UserMenuPreference>,
+    private readonly _userMenuPreferenceRepository: Repository<UserMenuPreference>
   ) {}
 
   /**

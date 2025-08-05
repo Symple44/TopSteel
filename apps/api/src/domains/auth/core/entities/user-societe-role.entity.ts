@@ -7,9 +7,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { Societe } from '../../../../features/societes/entities/societe.entity'
 import { User } from '../../../users/entities/user.entity'
 import { Role } from './role.entity'
-import { Societe } from '../../../../features/societes/entities/societe.entity'
 
 @Entity('user_societe_roles')
 export class UserSocieteRole {
@@ -70,6 +70,9 @@ export class UserSocieteRole {
 
   @UpdateDateColumn()
   updatedAt: Date
+
+  @Column({ name: 'deleted_at', nullable: true, type: 'timestamp' })
+  deletedAt?: Date
 
   // Relations
   @ManyToOne(() => User, { onDelete: 'CASCADE' })

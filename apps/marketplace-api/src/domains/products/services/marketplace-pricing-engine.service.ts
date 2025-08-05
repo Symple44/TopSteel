@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { MarketplacePriceRule, AdjustmentType } from '../entities/marketplace-price-rule.entity'
+import type { Repository } from 'typeorm'
+import { AdjustmentType, MarketplacePriceRule } from '../entities/marketplace-price-rule.entity'
 
 export interface PriceCalculationContext {
   customerId?: string
@@ -32,7 +32,7 @@ export interface PriceCalculationResult {
 export class MarketplacePricingEngine {
   constructor(
     @InjectRepository(MarketplacePriceRule, 'marketplace')
-    private priceRuleRepo: Repository<MarketplacePriceRule>,
+    private priceRuleRepo: Repository<MarketplacePriceRule>
   ) {}
 
   async calculatePrice(

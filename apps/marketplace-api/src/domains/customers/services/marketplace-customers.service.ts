@@ -1,13 +1,13 @@
 import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
   BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
-import { MarketplaceCustomer, CustomerAddress } from '../entities/marketplace-customer.entity'
+import type { Repository } from 'typeorm'
+import { type CustomerAddress, MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 
 export interface CreateCustomerDto {
   email: string
@@ -39,7 +39,7 @@ export interface CustomerLoginDto {
 export class MarketplaceCustomersService {
   constructor(
     @InjectRepository(MarketplaceCustomer, 'marketplace')
-    private customerRepo: Repository<MarketplaceCustomer>,
+    private customerRepo: Repository<MarketplaceCustomer>
   ) {}
 
   async createCustomer(

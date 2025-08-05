@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { Group } from '../core/entities/group.entity'
 import { Role } from '../core/entities/role.entity'
 import { UserGroup } from '../core/entities/user-group.entity'
@@ -44,7 +44,7 @@ export class GroupService {
     @InjectRepository(UserGroup, 'auth')
     private readonly _userGroupRepository: Repository<UserGroup>,
     @InjectRepository(Role, 'auth')
-    private readonly _roleRepository: Repository<Role>,
+    private readonly _roleRepository: Repository<Role>
   ) {}
 
   // ===== GESTION DES GROUPES =====

@@ -1,6 +1,6 @@
 // apps/api/src/common/services/redis.service.ts
 import { Inject, Injectable, Optional } from '@nestjs/common'
-import { Redis } from 'ioredis'
+import type { Redis } from 'ioredis'
 
 @Injectable()
 export class RedisService {

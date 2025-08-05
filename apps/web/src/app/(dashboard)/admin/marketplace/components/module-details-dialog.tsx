@@ -1,7 +1,5 @@
 'use client'
 
-import { AlertTriangle, Check, Clock, Download, Star, Users } from 'lucide-react'
-import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -20,6 +18,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@erp/ui'
+import { AlertTriangle, Check, Clock, Download, Star, Users } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 
 interface ModuleDetailsDialogProps {

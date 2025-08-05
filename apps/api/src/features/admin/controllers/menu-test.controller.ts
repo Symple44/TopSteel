@@ -1,13 +1,13 @@
 import { Controller, Get } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { MenuConfigurationSimple } from '../entities/menu-configuration-simple.entity'
 
 @Controller('admin/menu-test')
 export class MenuTestController {
   constructor(
     @InjectRepository(MenuConfigurationSimple, 'auth')
-    private readonly _configRepository: Repository<MenuConfigurationSimple>,
+    private readonly _configRepository: Repository<MenuConfigurationSimple>
   ) {}
 
   @Get('simple')

@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class UpdateParametersTablesForI18n1737600000000 implements MigrationInterface {
   name = 'UpdateParametersTablesForI18n1737600000000'

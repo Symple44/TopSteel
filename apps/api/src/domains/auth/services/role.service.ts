@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
@@ -50,7 +50,7 @@ export class RoleService {
     @InjectRepository(UserRole, 'auth')
     private readonly _userRoleRepository: Repository<UserRole>,
     @InjectRepository(Permission, 'auth')
-    private readonly _permissionRepository: Repository<Permission>,
+    private readonly _permissionRepository: Repository<Permission>
   ) {}
 
   // ===== GESTION DES RÔLES =====

@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class AddDeletedByIdColumns1737500003000 implements MigrationInterface {
   name = 'AddDeletedByIdColumns1737500003000'

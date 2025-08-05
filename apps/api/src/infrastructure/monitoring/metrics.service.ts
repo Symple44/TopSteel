@@ -1,32 +1,32 @@
 // apps/api/src/common/services/metrics.service.ts
 import { Injectable, Logger, Optional } from '@nestjs/common'
 import { InjectMetric } from '@willsoto/nestjs-prometheus'
-import { Counter, Gauge, Histogram } from 'prom-client'
+import type { Counter, Gauge, Histogram } from 'prom-client'
 
 @Injectable()
 export class MetricsService {
-  private readonly logger = new Logger(MetricsService.name);
+  private readonly logger = new Logger(MetricsService.name)
 
   constructor(
     @Optional()
     @InjectMetric('topsteel_auth_failures_total')
     private readonly _authFailuresCounter?: Counter<string>,
-    
+
     @Optional()
     @InjectMetric('topsteel_db_connections_active')
     private readonly _dbConnectionsGauge?: Gauge<string>,
-    
+
     @Optional()
     @InjectMetric('topsteel_cache_operations_total')
     private readonly _cacheOperationsCounter?: Counter<string>,
-    
+
     @Optional()
     @InjectMetric('topsteel_upload_size_bytes')
     private readonly _uploadSizeHistogram?: Histogram<string>,
-    
+
     @Optional()
     @InjectMetric('topsteel_active_sessions')
-    private readonly _activeSessionsGauge?: Gauge<string>,
+    private readonly _activeSessionsGauge?: Gauge<string>
   ) {}
 
   // Métriques d'authentification

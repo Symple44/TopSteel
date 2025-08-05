@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives'
-import { Button } from '../../../primitives'
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../primitives'
 
 interface AddPaymentDialogProps {
   open: boolean

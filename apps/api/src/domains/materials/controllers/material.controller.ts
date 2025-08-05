@@ -14,21 +14,21 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '../../auth/security/guards/jwt-auth.guard'
-import type { User } from '../../users/entities/user.entity'
 import type { BusinessContext } from '../../core/interfaces/business-service.interface'
-import { CreateMaterialDto } from '../dto/create-material.dto'
-import { MaterialFiltersDto, InventoryFiltersDto } from '../dto/material-filters.dto'
-import { UpdateMaterialDto } from '../dto/update-material.dto'
+import type { User } from '../../users/entities/user.entity'
+import type { CreateMaterialDto } from '../dto/create-material.dto'
+import type { InventoryFiltersDto, MaterialFiltersDto } from '../dto/material-filters.dto'
+import type { UpdateMaterialDto } from '../dto/update-material.dto'
 import type { Material } from '../entities/material.entity'
-import {
-  MaterialService,
-  type MaterialStatistics,
-  type MaterialStockValorisation,
-} from '../services/material.service'
 import type {
-  MaterialStockAlert,
   MaterialCompatibilityAnalysis,
+  MaterialStockAlert,
 } from '../repositories/material.repository'
+import type {
+  MaterialService,
+  MaterialStatistics,
+  MaterialStockValorisation,
+} from '../services/material.service'
 
 /**
  * Contrôleur REST pour la gestion des matériaux industriels
@@ -231,7 +231,7 @@ export class MaterialController {
   })
   async effectuerInventaire(
     @Param('id') id: string,
-    @Body() body: { stockPhysiqueReel: number, commentaire?: string },
+    @Body() body: { stockPhysiqueReel: number; commentaire?: string },
     @CurrentUser() user: User
   ): Promise<Material> {
     const context: BusinessContext = {
@@ -260,7 +260,7 @@ export class MaterialController {
   })
   async marquerObsolete(
     @Param('id') id: string,
-    @Body() body: { remplacePar?: string, raison?: string },
+    @Body() body: { remplacePar?: string; raison?: string },
     @CurrentUser() user: User
   ): Promise<Material> {
     const context: BusinessContext = {
@@ -284,7 +284,7 @@ export class MaterialController {
   })
   async dupliquerMaterial(
     @Param('id') id: string,
-    @Body() body: { nouvelleReference: string, modifications?: Partial<Material> },
+    @Body() body: { nouvelleReference: string; modifications?: Partial<Material> },
     @CurrentUser() user: User
   ): Promise<Material> {
     const context: BusinessContext = {
@@ -333,11 +333,9 @@ export class MaterialController {
   @Get(':id/compatibilite')
   @ApiOperation({
     summary: 'Analyser la compatibilité',
-    description: 'Analyser la compatibilité d\'un matériau avec les autres'
+    description: "Analyser la compatibilité d'un matériau avec les autres",
   })
-  async analyserCompatibilite(
-    @Param('id') id: string
-  ): Promise<MaterialCompatibilityAnalysis> {
+  async analyserCompatibilite(@Param('id') id: string): Promise<MaterialCompatibilityAnalysis> {
     return await this.materialService.analyserCompatibilite(id)
   }
 
@@ -347,7 +345,7 @@ export class MaterialController {
   @Get('analyses/valorisation')
   @ApiOperation({
     summary: 'Valorisation du stock',
-    description: 'Calculer la valeur totale du stock de matériaux'
+    description: 'Calculer la valeur totale du stock de matériaux',
   })
   async calculerValorisationStock(
     @Query('type') type?: string
@@ -404,7 +402,7 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Recherche par propriétés mécaniques',
-    description: 'Trouver des matériaux selon leurs propriétés mécaniques'
+    description: 'Trouver des matériaux selon leurs propriétés mécaniques',
   })
   async searchByMechanicalProperties(
     @Body() criteria: {
@@ -426,7 +424,7 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Recherche par dimensions',
-    description: 'Trouver des matériaux selon leurs dimensions'
+    description: 'Trouver des matériaux selon leurs dimensions',
   })
   async searchByDimensions(
     @Body() criteria: {
@@ -451,11 +449,9 @@ export class MaterialController {
   @Get('inventaire/par-emplacement')
   @ApiOperation({
     summary: 'Inventaire par emplacement',
-    description: 'Récupérer les matériaux d\'un emplacement pour inventaire'
+    description: "Récupérer les matériaux d'un emplacement pour inventaire",
   })
-  async getMaterialsParEmplacement(
-    @Query('emplacement') emplacement: string
-  ): Promise<Material[]> {
+  async getMaterialsParEmplacement(@Query('emplacement') emplacement: string): Promise<Material[]> {
     return await this.materialService.searchMaterials({ emplacement } as any)
   }
 
@@ -465,11 +461,9 @@ export class MaterialController {
   @Get('inventaire/sans-mouvement')
   @ApiOperation({
     summary: 'Matériaux sans mouvement',
-    description: 'Récupérer les matériaux sans mouvement depuis X jours'
+    description: 'Récupérer les matériaux sans mouvement depuis X jours',
   })
-  async getMaterialsSansMouvement(
-    @Query() filters: InventoryFiltersDto
-  ): Promise<Material[]> {
+  async getMaterialsSansMouvement(@Query() filters: InventoryFiltersDto): Promise<Material[]> {
     // Cette méthode nécessiterait une implémentation spécifique dans le service
     return await this.materialService.searchMaterials(filters as any)
   }
@@ -486,7 +480,7 @@ export class MaterialController {
     description: 'Exporter la liste des matériaux selon des critères',
   })
   async exportMaterials(
-    @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF', filters?: any },
+    @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: any },
     @CurrentUser() user: User
   ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
@@ -506,7 +500,7 @@ export class MaterialController {
     description: 'Importer une liste de matériaux depuis un fichier',
   })
   async importMaterials(
-    @Body() importData: { data: any[], options?: { skipErrors?: boolean, dryRun?: boolean } },
+    @Body() importData: { data: any[]; options?: { skipErrors?: boolean; dryRun?: boolean } },
     @CurrentUser() user: User
   ): Promise<{
     imported: number

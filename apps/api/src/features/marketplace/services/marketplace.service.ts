@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { In, type Repository } from 'typeorm'
-import { MenuRawService } from '../../admin/services/menu-raw.service'
+import type { MenuRawService } from '../../admin/services/menu-raw.service'
 import {
   type MarketplaceCategory,
   MarketplaceModule as MarketplaceModuleEntity,

@@ -1,2 +1,2 @@
-export { DropdownFixed } from './DropdownFixed'
 export type { DropdownFixedProps } from './DropdownFixed'
+export { DropdownFixed } from './DropdownFixed'

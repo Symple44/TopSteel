@@ -89,16 +89,16 @@ export default function TranslationAdmin() {
   // Charger les traductions au montage - une seule fois
   useEffect(() => {
     let cancelled = false
-    
+
     const init = async () => {
       setMounted(true)
       if (!cancelled) {
         await loadTranslations()
       }
     }
-    
+
     init()
-    
+
     return () => {
       cancelled = true
     }

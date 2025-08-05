@@ -5,12 +5,12 @@
  * Teste les requêtes qui causaient des erreurs auparavant
  */
 
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
+import { DataSource } from 'typeorm'
 import {
   Article,
-  ArticleType,
   ArticleStatus,
+  ArticleType,
   UniteStock,
 } from '../domains/inventory/entities/article.entity'
 

@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Search, X, Filter, ChevronDown } from 'lucide-react'
+import { ChevronDown, Filter, Search, X } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { getCategories } from '@/lib/api/storefront'
-import { formatPrice } from '@/lib/utils'
-import { cn } from '@/lib/utils'
+import { cn, formatPrice } from '@/lib/utils'
 
 interface ProductsFiltersProps {
   tenant: string
@@ -127,7 +126,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               }}
               className={cn(
                 'w-full text-left px-3 py-2 text-sm rounded transition-colors',
-                !selectedCategory ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                selectedCategory ? 'hover:bg-muted' : 'bg-primary text-primary-foreground'
               )}
             >
               Toutes les catégories

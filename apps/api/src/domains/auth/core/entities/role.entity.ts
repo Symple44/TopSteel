@@ -17,23 +17,23 @@ export class Role extends CommonEntity {
   @Column({ type: 'text', nullable: true })
   description?: string
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'societe_id', type: 'uuid', nullable: true })
   @Index()
   societeId?: string
 
   @ManyToOne(() => Societe, { nullable: true })
-  @JoinColumn({ name: 'societeId' })
+  @JoinColumn({ name: 'societe_id' })
   societe?: Societe
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ name: 'parent_role_type', type: 'varchar', length: 50, nullable: true })
   @Index()
   parentRoleType?: string
 
   @ManyToOne(() => ParameterSystem, { nullable: true })
-  @JoinColumn({ name: 'parentRoleType', referencedColumnName: 'key' })
+  @JoinColumn({ name: 'parent_role_type', referencedColumnName: 'key' })
   parentRole?: ParameterSystem
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ name: 'actif', type: 'boolean', default: true })
   @Index()
   isActive!: boolean
 
@@ -52,10 +52,10 @@ export class Role extends CommonEntity {
   )
   userRoles!: UserRole[]
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ name: 'sort_order', type: 'int', default: 0 })
   priority!: number // Plus élevé = plus de priorité
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ name: 'isSystemRole', type: 'boolean', default: false })
   isSystemRole!: boolean // Pour compatibilité avec les services existants
 
   // Méthodes pour compatibilité

@@ -12,7 +12,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common'
-import { AuthService } from '../../auth.service'
+import type { AuthService } from '../../auth.service'
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
@@ -222,15 +222,15 @@ export class SessionsController {
   async cleanupExpiredSessions(@Request() req: any) {
     try {
       const result = await this.authService.cleanupExpiredSessions()
-      
+
       return {
         success: true,
         message: 'Nettoyage terminé avec succès',
         data: {
           redisCleanedCount: result.redisCleanedCount,
           databaseCleanedCount: result.databaseCleanedCount,
-          totalCleaned: result.redisCleanedCount + result.databaseCleanedCount
-        }
+          totalCleaned: result.redisCleanedCount + result.databaseCleanedCount,
+        },
       }
     } catch (_error) {
       throw new HttpException(
@@ -247,23 +247,23 @@ export class SessionsController {
   async updateActivity(@Request() req: any) {
     try {
       const sessionId = req.user.sessionId
-      
+
       if (!sessionId) {
         throw new HttpException('Session ID manquant', HttpStatus.BAD_REQUEST)
       }
-      
+
       await this.authService.updateSessionActivity(sessionId)
-      
+
       return {
         success: true,
-        message: 'Activité mise à jour'
+        message: 'Activité mise à jour',
       }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error
       }
       throw new HttpException(
-        'Erreur lors de la mise à jour d\'activité',
+        "Erreur lors de la mise à jour d'activité",
         HttpStatus.INTERNAL_SERVER_ERROR
       )
     }
@@ -277,11 +277,11 @@ export class SessionsController {
     try {
       const userId = req.user.sub
       const sessions = await this.authService.getUserConnectionHistory(userId, 10)
-      
+
       return {
         success: true,
-        data: sessions.filter(s => s.status === 'active'),
-        total: sessions.filter(s => s.status === 'active').length
+        data: sessions.filter((s) => s.status === 'active'),
+        total: sessions.filter((s) => s.status === 'active').length,
       }
     } catch (_error) {
       throw new HttpException(

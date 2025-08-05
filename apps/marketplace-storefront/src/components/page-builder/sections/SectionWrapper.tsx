@@ -1,8 +1,8 @@
 'use client'
 
-import { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { SectionStyles, SectionSettings } from './types'
+import type { SectionSettings, SectionStyles } from './types'
 
 interface SectionWrapperProps {
   children: ReactNode

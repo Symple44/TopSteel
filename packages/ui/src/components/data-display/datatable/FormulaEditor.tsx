@@ -1,5 +1,7 @@
 'use client'
 
+import { Calculator, CheckCircle, Info, XCircle } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   Dialog,
@@ -15,8 +17,6 @@ import {
   SelectValue,
   Textarea,
 } from '../../primitives'
-import { Calculator, CheckCircle, Info, XCircle } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormulaEngine } from './formula-engine'
 import type { ColumnConfig } from './types'
 

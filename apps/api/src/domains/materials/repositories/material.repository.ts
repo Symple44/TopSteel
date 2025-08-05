@@ -1,13 +1,12 @@
 import type { IBusinessRepository } from '../../core/interfaces/business-service.interface'
-import {
+import type {
   Material,
+  MaterialShape,
   MaterialStatus,
   MaterialType,
-  MaterialShape,
   StorageMethod,
 } from '../entities/material.entity'
-import { MaterialSearchCriteria } from '../services/material.service'
-import type { MaterialStatistics } from '../services/material.service'
+import type { MaterialSearchCriteria, MaterialStatistics } from '../services/material.service'
 
 /**
  * Interface du repository pour les matériaux

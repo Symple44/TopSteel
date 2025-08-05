@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { pageDiscoveryService } from '../../../core/services/page-discovery.service'
 import { DiscoveredPage } from '../entities/discovered-page.entity'
 

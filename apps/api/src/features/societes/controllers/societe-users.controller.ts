@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import { SocieteUsersService } from '../services/societe-users.service'
-import { SocietesService } from '../services/societes.service'
+import type { SocieteUsersService } from '../services/societe-users.service'
+import type { SocietesService } from '../services/societes.service'
 
 @ApiTags('Societes - Users')
 @ApiBearerAuth()
@@ -23,7 +23,7 @@ export class SocieteUsersController {
       data: userAccess,
       statusCode: 200,
       message: 'Success',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
   }
 
@@ -36,7 +36,7 @@ export class SocieteUsersController {
       data: users,
       statusCode: 200,
       message: 'Success',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
   }
 
@@ -126,7 +126,7 @@ export class SocieteUsersController {
     return {
       statusCode: 200,
       message: 'Access revoked successfully',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
   }
 

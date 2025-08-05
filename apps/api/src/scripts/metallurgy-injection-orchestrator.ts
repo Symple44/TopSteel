@@ -8,31 +8,30 @@
  * ou: npx ts-node src/scripts/metallurgy-injection-orchestrator.ts
  */
 
-import { DataSource } from 'typeorm'
 import { config } from 'dotenv'
 import { existsSync, readFileSync } from 'fs'
 import { join } from 'path'
-
-// Services
-import { InjectionLoggerService } from './services/injection-logger.service'
-import { ArticleValidatorService } from './services/article-validator.service'
-import { PricingCalculatorService } from './services/pricing-calculator.service'
+import { DataSource } from 'typeorm'
+import { AnglesInjector } from './injectors/angles-injector'
+import { BarsInjector } from './injectors/bars-injector'
+import { HeaHebProfilesInjector } from './injectors/hea-heb-profiles-injector'
 
 // Injecteurs
 import { IpeProfilesInjector } from './injectors/ipe-profiles-injector'
-import { HeaHebProfilesInjector } from './injectors/hea-heb-profiles-injector'
-import { UpnProfilesInjector } from './injectors/upn-profiles-injector'
 import { IpnProfilesInjector } from './injectors/ipn-profiles-injector'
-import { AnglesInjector } from './injectors/angles-injector'
-import { BarsInjector } from './injectors/bars-injector'
-import { TubesInjector } from './injectors/tubes-injector'
 import { SheetsInjector } from './injectors/sheets-injector'
 import { ShsRhsProfilesInjector } from './injectors/shs-rhs-profiles-injector'
 import { TSectionsInjector } from './injectors/t-sections-injector'
+import { TubesInjector } from './injectors/tubes-injector'
+import { UpnProfilesInjector } from './injectors/upn-profiles-injector'
 import { ZProfilesInjector } from './injectors/z-profiles-injector'
+import { ArticleValidatorService } from './services/article-validator.service'
+// Services
+import { InjectionLoggerService } from './services/injection-logger.service'
+import { PricingCalculatorService } from './services/pricing-calculator.service'
 
 // Types
-import {
+import type {
   GlobalInjectionConfig,
   InjectionResult,
   SystemParameter,

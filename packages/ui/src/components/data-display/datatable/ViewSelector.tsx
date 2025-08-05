@@ -1,13 +1,12 @@
 'use client'
 
-import { Button } from '../../primitives/button'
-import { Label } from '../../primitives'
-import { Separator } from '../../primitives'
 import { Calendar, Clock, Grid3x3, Kanban, Settings, Table } from 'lucide-react'
 import React, { useState } from 'react'
+import { cn } from '../../../lib/utils'
+import { Label, Separator } from '../../primitives'
+import { Button } from '../../primitives/button'
 import { DropdownItem, DropdownPortal, DropdownSeparator } from '../../primitives/dropdown-portal'
 import { SimpleTooltip } from '../../primitives/tooltip'
-import { cn } from '../../../lib/utils'
 import { CustomSelect } from './CustomSelect'
 import { SimpleModal } from './SimpleModal'
 import type { ColumnConfig } from './types'
@@ -59,6 +58,7 @@ export function ViewSelector<T = any>({
         trigger={
           <SimpleTooltip
             content={`Mode d'affichage: ${availableViews.find((v) => v.type === currentView)?.name || 'Tableau'}`}
+            triggerAsChild={true}
           >
             <Button variant="outline" size="sm" className="h-7 w-7 p-0">
               {(() => {

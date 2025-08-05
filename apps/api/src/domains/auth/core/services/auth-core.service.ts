@@ -2,11 +2,11 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { SocieteStatus } from '../../../../features/societes/entities/societe.entity'
 import type { LoginDto } from '../../external/dto/login.dto'
-import {
+import type {
   ISocieteRepository,
   ISocieteUserRepository,
 } from '../interfaces/societe-repository.interface'
-import { IUserRepository } from '../interfaces/user-repository.interface'
+import type { IUserRepository } from '../interfaces/user-repository.interface'
 import {
   SOCIETE_REPOSITORY_TOKEN,
   SOCIETE_USER_REPOSITORY_TOKEN,
@@ -25,7 +25,7 @@ export class AuthCoreService {
     @Inject(SOCIETE_REPOSITORY_TOKEN)
     private readonly societeRepository: ISocieteRepository,
     @Inject(SOCIETE_USER_REPOSITORY_TOKEN)
-    private readonly societeUserRepository: ISocieteUserRepository,
+    private readonly societeUserRepository: ISocieteUserRepository
   ) {}
 
   /**

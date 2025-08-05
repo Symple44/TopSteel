@@ -1,12 +1,11 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, DataSource, Between, In, Like } from 'typeorm'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
-import { Cache } from 'cache-manager'
-
-import { MarketplaceProduct } from '../entities/marketplace-product.entity'
+import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import type { Cache } from 'cache-manager'
+import { Between, type DataSource, In, Like, type Repository } from 'typeorm'
 import { Article, ArticleStatus } from '../../../shared/entities/erp/article.entity'
-import { MarketplacePricingEngine } from './marketplace-pricing-engine.service'
+import { MarketplaceProduct } from '../entities/marketplace-product.entity'
+import type { MarketplacePricingEngine } from './marketplace-pricing-engine.service'
 
 export interface ProductFilters {
   search?: string
@@ -55,11 +54,11 @@ export class MarketplaceProductsService {
   constructor(
     @InjectRepository(MarketplaceProduct, 'marketplace')
     private marketplaceProductRepo: Repository<MarketplaceProduct>,
-    
+
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
-    
-    private pricingEngine: MarketplacePricingEngine,
+
+    private pricingEngine: MarketplacePricingEngine
   ) {}
 
   async getProducts(
@@ -89,7 +88,7 @@ export class MarketplaceProductsService {
     try {
       // Construire requête articles ERP
       const articlesRepo = erpConnection.getRepository(Article)
-      let articlesQuery = articlesRepo
+      const articlesQuery = articlesRepo
         .createQueryBuilder('article')
         .where('article.societeId = :societeId', { societeId })
         .andWhere('article.status = :status', { status: ArticleStatus.ACTIF })

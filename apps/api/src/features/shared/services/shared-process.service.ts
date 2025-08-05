@@ -7,7 +7,7 @@ import { SharedProcess } from '../entities/shared-process.entity'
 export class SharedProcessService {
   constructor(
     @InjectRepository(SharedProcess, 'shared')
-    private _sharedProcessRepository: Repository<SharedProcess>,
+    private _sharedProcessRepository: Repository<SharedProcess>
   ) {}
 
   async findAll(): Promise<SharedProcess[]> {

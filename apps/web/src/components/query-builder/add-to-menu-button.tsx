@@ -1,9 +1,8 @@
 'use client'
 
-import { Menu, Plus } from 'lucide-react'
-import { useState } from 'react'
-import { Button } from '@erp/ui/primitives'
+import { Label } from '@erp/ui'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -11,10 +10,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@erp/ui/primitives'
-import { Input } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
+import { Menu, Plus } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { apiClient } from '@/lib/api-client'
 

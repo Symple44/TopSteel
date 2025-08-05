@@ -21,7 +21,7 @@ import type {
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import { SystemParametersService } from './system-parameters.service'
+import type { SystemParametersService } from './system-parameters.service'
 
 @Controller('admin/system-parameters')
 @ApiTags('🔧 System Parameters')
@@ -77,9 +77,7 @@ export class SystemParametersController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Mettre à jour plusieurs paramètres en une fois' })
   @ApiResponse({ status: 200, description: 'Paramètres mis à jour avec succès' })
-  async updateMultiple(
-    @Body() updates: Array<{ key: string; value: string }>
-  ) {
+  async updateMultiple(@Body() updates: Array<{ key: string; value: string }>) {
     return this.systemParametersService.updateMultiple(updates)
   }
 
@@ -122,10 +120,19 @@ export class SystemParametersController {
   async getEnums(@Param('category') category: string) {
     const enumMappings: Record<string, string[]> = {
       'project-statuses': await this.systemParametersService.getJsonValue('PROJECT_STATUSES', []),
-      'production-statuses': await this.systemParametersService.getJsonValue('PRODUCTION_STATUSES', []),
-      'material-categories': await this.systemParametersService.getJsonValue('MATERIAL_CATEGORIES', []),
+      'production-statuses': await this.systemParametersService.getJsonValue(
+        'PRODUCTION_STATUSES',
+        []
+      ),
+      'material-categories': await this.systemParametersService.getJsonValue(
+        'MATERIAL_CATEGORIES',
+        []
+      ),
       'stock-units': await this.systemParametersService.getJsonValue('STOCK_UNITS', []),
-      'payment-terms': await this.systemParametersService.getJsonValue('SUPPLIER_PAYMENT_TERMS', []),
+      'payment-terms': await this.systemParametersService.getJsonValue(
+        'SUPPLIER_PAYMENT_TERMS',
+        []
+      ),
     }
 
     return enumMappings[category] || []

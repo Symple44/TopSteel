@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
-import { QueryBuilder } from '../entities'
-import type { QueryBuilderCalculatedField } from '../entities'
-import { QueryBuilderPermissionService } from './query-builder-permission.service'
+import type { DataSource } from 'typeorm'
+import type { QueryBuilder, QueryBuilderCalculatedField } from '../entities'
+import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 export interface QueryExecutionParams {
   page?: number
@@ -26,7 +25,7 @@ export class QueryBuilderExecutorService {
   constructor(
     @InjectDataSource('tenant')
     private _dataSource: DataSource,
-    private readonly permissionService: QueryBuilderPermissionService,
+    private readonly permissionService: QueryBuilderPermissionService
   ) {}
 
   async executeQuery(

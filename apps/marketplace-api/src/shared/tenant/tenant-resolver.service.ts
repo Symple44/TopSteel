@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, DataSource } from 'typeorm'
+import { DataSource, type Repository } from 'typeorm'
 import { Societe, SocieteStatus } from '../entities/erp/societe.entity'
 
 export interface TenantContext {
@@ -12,11 +12,11 @@ export interface TenantContext {
 
 @Injectable()
 export class TenantResolver {
-  private tenantConnections = new Map<string, DataSource>();
+  private tenantConnections = new Map<string, DataSource>()
 
   constructor(
     @InjectRepository(Societe, 'erpAuth')
-    private societeRepository: Repository<Societe>,
+    private societeRepository: Repository<Societe>
   ) {}
 
   async resolveTenantByDomain(domain: string): Promise<TenantContext> {
@@ -247,7 +247,6 @@ export class TenantResolver {
         } catch (error) {
           console.log(`TenantResolver: Échec de connexion à "${dbName}": ${error.message}`)
           lastError = error
-          continue
         }
       }
 

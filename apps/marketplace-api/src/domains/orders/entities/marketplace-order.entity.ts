@@ -1,13 +1,13 @@
 import {
   Column,
-  Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
-  JoinColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
 import { MarketplaceOrderItem } from './marketplace-order-item.entity'

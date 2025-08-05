@@ -1,24 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
 import {
-  ShoppingCart,
-  Heart,
-  Share2,
-  Package,
-  Truck,
-  Shield,
+  Check,
   ChevronLeft,
   ChevronRight,
-  Plus,
+  Heart,
   Minus,
-  Check,
+  Package,
+  Plus,
+  Share2,
+  Shield,
+  ShoppingCart,
+  Truck,
 } from 'lucide-react'
-import { Product } from '@/lib/api/storefront'
-import { formatPrice, cn } from '@/lib/utils'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useState } from 'react'
 import { toast } from 'sonner'
+import type { Product } from '@/lib/api/storefront'
+import { cn, formatPrice } from '@/lib/utils'
 import { useCart } from '@/stores/cart-store'
 
 interface ProductDetailProps {

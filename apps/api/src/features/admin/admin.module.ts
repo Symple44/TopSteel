@@ -6,17 +6,24 @@ import { SystemParameter } from './entitites/system-parameter.entity'
 // import { UserMenuPreferences } from './entities/user-menu-preferences.entity'
 // import { UserMenuItemPreference } from './entities/user-menu-item-preference.entity'
 
-import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
+// Import du module auth
+import { AuthModule } from '../../domains/auth/auth.module'
 import { Permission } from '../../domains/auth/core/entities/permission.entity'
 // Auth entities
 import { Role } from '../../domains/auth/core/entities/role.entity'
 import { RolePermission } from '../../domains/auth/core/entities/role-permission.entity'
-// Import du MenuModule pour accéder à PageSyncService
-import { MenuModule } from '../menu/menu.module'
 // Import du module users
 import { UsersModule } from '../../domains/users/users.module'
+import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
+// Import du MenuModule pour accéder à PageSyncService
+import { MenuModule } from '../menu/menu.module'
+// Import du module societes
+import { SocietesModule } from '../societes/societes.module'
+import { AdminMFAController } from './controllers/admin-mfa.controller'
 import { AdminRolesController } from './controllers/admin-roles.controller'
+import { AdminSocietesController } from './controllers/admin-societes.controller'
 import { AdminUsersController } from './controllers/admin-users.controller'
+import { AuthPerformanceController } from './controllers/auth-performance.controller'
 import { DatabaseIntegrityController } from './controllers/database-integrity.controller'
 import { MenuRawController } from './controllers/menu-raw.controller'
 import { PageSyncController } from './controllers/page-sync.controller'
@@ -36,6 +43,8 @@ import { SystemParametersService } from './system-parameters.service'
   imports: [
     UsersModule,
     MenuModule,
+    SocietesModule,
+    AuthModule,
     TypeOrmModule.forFeature([SystemParameter], 'auth'),
     // TypeOrmModule.forFeature([
     // Toutes les entités de menu causent des problèmes TypeScript
@@ -50,6 +59,9 @@ import { SystemParametersService } from './system-parameters.service'
     PageSyncController,
     AdminUsersController,
     AdminRolesController, // Réactivé pour l'endpoint permissions
+    AdminSocietesController, // Gestion multi-société
+    AuthPerformanceController, // Monitoring des performances
+    AdminMFAController, // Gestion MFA
     // AdminMenusController,  // Dépend d'entités TypeORM problématiques
     // MenuTestController,  // Dépend d'entités TypeORM problématiques
     MenuRawController, // Service de menu avec requêtes SQL brutes

@@ -6,10 +6,9 @@ import {
   type NestInterceptor,
 } from '@nestjs/common'
 import { InjectMetric } from '@willsoto/nestjs-prometheus'
-import { Request } from 'express'
-import type { Response } from 'express'
-import { Counter, Histogram } from 'prom-client'
-import { Observable } from 'rxjs'
+import type { Request, Response } from 'express'
+import type { Counter, Histogram } from 'prom-client'
+import type { Observable } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
 
 @Injectable()
@@ -17,9 +16,9 @@ export class MetricsInterceptor implements NestInterceptor {
   constructor(
     @InjectMetric('topsteel_http_requests_total')
     private readonly _httpRequestsCounter: Counter<string>,
-    
+
     @InjectMetric('topsteel_http_request_duration_seconds')
-    private readonly _httpRequestDuration: Histogram<string>,
+    private readonly _httpRequestDuration: Histogram<string>
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {

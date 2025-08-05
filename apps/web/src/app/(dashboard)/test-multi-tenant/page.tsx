@@ -2,14 +2,24 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@erp/ui'
+import { Button, Textarea } from '@erp/ui/primitives'
 import { Database, Lock, ShieldAlert, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
-import { Alert, AlertDescription, AlertTitle } from '@erp/ui'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
-import { Textarea } from '@erp/ui/primitives'
 import { callClientApi } from '@/utils/backend-api'
 
 export default function TestMultiTenantPage() {

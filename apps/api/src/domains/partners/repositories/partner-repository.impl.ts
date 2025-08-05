@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
-import { IPartnerRepository, PartnerRepositoryStats } from './partner.repository'
-import { PartnerSearchCriteria } from '../services/partner.service'
+import type { PartnerSearchCriteria } from '../services/partner.service'
+import type { IPartnerRepository, PartnerRepositoryStats } from './partner.repository'
 
 /**
  * Implémentation concrète du repository Partner avec TypeORM

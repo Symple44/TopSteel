@@ -818,6 +818,42 @@ export const en = {
     hoursAgo: '{hours} hours ago',
     dayAgo: '{days} day ago',
     remainingUnits: '{units} units remaining',
+
+    // Homepage specific
+    welcome: 'Welcome to {{companyName}}',
+    subtitle: 'Integrated management platform for the metallurgical industry',
+    description: 'Manage your projects, production, inventory and teams in one place',
+    accessDashboard: 'Access dashboard',
+    configureCompany: 'Configure company',
+    quickActionsTitle: 'Quick actions',
+
+    actions: {
+      dashboard: {
+        title: 'Dashboard',
+        description: 'Overview of activities',
+      },
+      newProject: {
+        title: 'New project',
+        description: 'Create a new project',
+      },
+      production: {
+        title: 'Production',
+        description: 'Manage production orders',
+      },
+      inventory: {
+        title: 'Inventory',
+        description: 'Check stock levels',
+      },
+      users: {
+        title: 'Users',
+        description: 'Manage teams',
+      },
+      configuration: {
+        title: 'Configuration',
+        description: 'System settings',
+      },
+      access: 'Access',
+    },
   },
 
   navigation: {
@@ -1162,6 +1198,7 @@ export const en = {
   },
 
   roles: {
+    owner: 'Owner',
     super_admin: 'Super Administrator',
     admin: 'Administrator',
     manager: 'Manager',
@@ -1171,6 +1208,7 @@ export const en = {
     operator: 'Operator',
     user: 'User',
     viewer: 'Viewer',
+    guest: 'Guest',
   },
 
   status: {
@@ -1326,7 +1364,7 @@ export const en = {
     connectedTo: 'Connected to {{name}}',
     cannotConnect: 'Unable to connect to this company',
     syncError: 'Synchronization error, please reconnect',
-    changeAffects: 'Change on {{count}} tab{{count, plural, one {} other {s}}}',
+    changeAffects: 'Change on {{count}} tab(s)',
     changeAffectsMultiple: 'Will affect all open tabs ({{count}} detected).',
     setAsDefault: 'Set as default company',
     chooseSociety: 'Choose the company you want to work with.',

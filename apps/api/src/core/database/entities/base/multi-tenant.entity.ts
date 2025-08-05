@@ -20,7 +20,9 @@ export abstract class BaseEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date
 
-  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  // Temporairement désactivé - à réactiver après migration complète
+  // @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  @Column({ name: 'deleted_at', nullable: true, type: 'timestamp' })
   deletedAt?: Date
 
   @VersionColumn({ default: 1 })

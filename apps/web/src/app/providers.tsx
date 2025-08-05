@@ -1,12 +1,12 @@
 'use client'
 
+import { TooltipProvider } from '@erp/ui'
 import { QueryClient } from '@tanstack/react-query'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import dynamic from 'next/dynamic'
 import { Toaster } from 'sonner'
-import { TooltipProvider } from '@erp/ui'
-import { I18nProvider } from '@/lib/i18n'
 import { NotificationsProvider } from '@/components/providers/notifications-provider'
+import { I18nProvider } from '@/lib/i18n'
 
 const ThemeProvider = dynamic(() => import('next-themes').then((mod) => mod.ThemeProvider), {
   ssr: false,

@@ -3,7 +3,17 @@
 export const dynamic = 'force-dynamic'
 
 import '@/styles/datatable-demo.css'
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  DataTableExample,
+  HierarchicalDataTableExample,
+  SimpleDataTableExample,
+} from '@erp/ui'
 import {
   ArrowUpRight,
   CheckCircle,
@@ -20,7 +30,6 @@ import {
   Users,
   Zap,
 } from 'lucide-react'
-import { DataTableExample, HierarchicalDataTableExample, SimpleDataTableExample } from '@erp/ui'
 // import { DropdownTest } from '@/components/ui/dropdown-test'
 export default function DataTableTestPage() {
   const features = [

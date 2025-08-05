@@ -3,19 +3,19 @@
  * TopSteel ERP - Clean Architecture
  */
 
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 import { BaseArticleInjector } from '../core/base-article-injector'
 import {
-  ArticleMetallurgie,
-  GlobalInjectionConfig,
-  InjectionLogger,
-  ArticleValidator,
-  PricingCalculator,
   ArticleFamille,
-  ArticleType,
+  type ArticleMetallurgie,
   ArticleStatus,
+  ArticleType,
+  type ArticleValidator,
+  type CaracteristiquesTechniques,
+  type GlobalInjectionConfig,
+  type InjectionLogger,
+  type PricingCalculator,
   UniteStock,
-  CaracteristiquesTechniques,
 } from '../types/article-injection.types'
 
 interface IpnSpecification {

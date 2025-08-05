@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { ArrowLeft, CreditCard, Lock, Mail, MapPin, Phone, ShoppingBag, User } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, User, Mail, Phone, MapPin, CreditCard, ShoppingBag, Lock } from 'lucide-react'
-import { useCart } from '@/stores/cart-store'
-import { formatPrice, cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { cn, formatPrice } from '@/lib/utils'
+import { useCart } from '@/stores/cart-store'
 
 interface CheckoutClientProps {
   tenant: string

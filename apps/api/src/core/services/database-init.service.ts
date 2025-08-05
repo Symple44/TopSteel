@@ -1,11 +1,11 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
-import { MenuConfigurationService } from '../../features/admin/services/menu-configuration.service'
+import * as bcrypt from 'bcrypt'
+import type { DataSource } from 'typeorm'
+import type { MenuConfigurationService } from '../../features/admin/services/menu-configuration.service'
+import type { DatabaseSyncService } from '../database/database-sync.service'
 import { DatabaseInitBaseService } from './database-init/database-init-base.service'
 import { INIT_DATA } from './database-init/database-init-data'
-import { DatabaseSyncService } from '../database/database-sync.service'
-import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class DatabaseInitService extends DatabaseInitBaseService implements OnModuleInit {

@@ -1,5 +1,4 @@
-import { QueryRunner } from 'typeorm'
-import type { MigrationInterface } from 'typeorm'
+import type { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class AddCommercialPermissions1753820000016 implements MigrationInterface {
   name = 'AddCommercialPermissions1753820000016'
@@ -9,35 +8,35 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
       const granularPermissions = [
         // VENTES - Accès complet
         {
-          nom: 'VENTES_CREATE',
+          name: 'VENTES_CREATE',
           module: 'ventes',
           action: 'create',
           description: 'Créer des ventes',
           category: 'commercial',
         },
         {
-          nom: 'VENTES_READ',
+          name: 'VENTES_READ',
           module: 'ventes',
           action: 'read',
           description: 'Consulter les ventes',
           category: 'commercial',
         },
         {
-          nom: 'VENTES_UPDATE',
+          name: 'VENTES_UPDATE',
           module: 'ventes',
           action: 'update',
           description: 'Modifier les ventes',
           category: 'commercial',
         },
         {
-          nom: 'VENTES_DELETE',
+          name: 'VENTES_DELETE',
           module: 'ventes',
           action: 'delete',
           description: 'Supprimer les ventes',
           category: 'commercial',
         },
         {
-          nom: 'VENTES_EXPORT',
+          name: 'VENTES_EXPORT',
           module: 'ventes',
           action: 'export',
           description: 'Exporter les ventes',
@@ -46,35 +45,35 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
 
         // CLIENTS - Accès complet avec restrictions configurables
         {
-          nom: 'CLIENTS_CREATE',
+          name: 'CLIENTS_CREATE',
           module: 'clients',
           action: 'create',
           description: 'Créer des clients',
           category: 'commercial',
         },
         {
-          nom: 'CLIENTS_READ',
+          name: 'CLIENTS_READ',
           module: 'clients',
           action: 'read',
           description: 'Consulter les clients',
           category: 'commercial',
         },
         {
-          nom: 'CLIENTS_UPDATE',
+          name: 'CLIENTS_UPDATE',
           module: 'clients',
           action: 'update',
           description: 'Modifier les clients',
           category: 'commercial',
         },
         {
-          nom: 'CLIENTS_DELETE',
+          name: 'CLIENTS_DELETE',
           module: 'clients',
           action: 'delete',
           description: 'Supprimer les clients',
           category: 'commercial',
         },
         {
-          nom: 'CLIENTS_EXPORT',
+          name: 'CLIENTS_EXPORT',
           module: 'clients',
           action: 'export',
           description: 'Exporter les clients',
@@ -83,28 +82,28 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
 
         // ACHATS - Lecture seule
         {
-          nom: 'ACHATS_READ',
+          name: 'ACHATS_READ',
           module: 'achats',
           action: 'read',
           description: 'Consulter les achats',
           category: 'operational',
         },
         {
-          nom: 'ACHATS_CREATE',
+          name: 'ACHATS_CREATE',
           module: 'achats',
           action: 'create',
           description: 'Créer des achats',
           category: 'operational',
         },
         {
-          nom: 'ACHATS_UPDATE',
+          name: 'ACHATS_UPDATE',
           module: 'achats',
           action: 'update',
           description: 'Modifier les achats',
           category: 'operational',
         },
         {
-          nom: 'ACHATS_DELETE',
+          name: 'ACHATS_DELETE',
           module: 'achats',
           action: 'delete',
           description: 'Supprimer les achats',
@@ -113,49 +112,49 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
 
         // DEVIS - Accès complet
         {
-          nom: 'DEVIS_CREATE',
+          name: 'DEVIS_CREATE',
           module: 'devis',
           action: 'create',
           description: 'Créer des devis',
           category: 'commercial',
         },
         {
-          nom: 'DEVIS_READ',
+          name: 'DEVIS_READ',
           module: 'devis',
           action: 'read',
           description: 'Consulter les devis',
           category: 'commercial',
         },
         {
-          nom: 'DEVIS_UPDATE',
+          name: 'DEVIS_UPDATE',
           module: 'devis',
           action: 'update',
           description: 'Modifier les devis',
           category: 'commercial',
         },
         {
-          nom: 'DEVIS_DELETE',
+          name: 'DEVIS_DELETE',
           module: 'devis',
           action: 'delete',
           description: 'Supprimer les devis',
           category: 'commercial',
         },
         {
-          nom: 'DEVIS_EXPORT',
+          name: 'DEVIS_EXPORT',
           module: 'devis',
           action: 'export',
           description: 'Exporter les devis',
           category: 'commercial',
         },
         {
-          nom: 'DEVIS_APPROVE',
+          name: 'DEVIS_APPROVE',
           module: 'devis',
           action: 'approve',
           description: 'Approuver les devis',
           category: 'commercial',
         },
         {
-          nom: 'DEVIS_CONVERT',
+          name: 'DEVIS_CONVERT',
           module: 'devis',
           action: 'convert',
           description: 'Convertir devis en commande',
@@ -164,14 +163,14 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
 
         // RAPPORTS COMMERCIAUX
         {
-          nom: 'REPORTS_COMMERCIAL_READ',
+          name: 'REPORTS_COMMERCIAL_READ',
           module: 'reports',
           action: 'read',
           description: 'Consulter rapports commerciaux',
           category: 'reporting',
         },
         {
-          nom: 'REPORTS_COMMERCIAL_EXPORT',
+          name: 'REPORTS_COMMERCIAL_EXPORT',
           module: 'reports',
           action: 'export',
           description: 'Exporter rapports commerciaux',
@@ -180,28 +179,28 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
 
         // MENUS SPÉCIALISÉS
         {
-          nom: 'MENU_CLIENTS_ACCESS',
+          name: 'MENU_CLIENTS_ACCESS',
           module: 'menu',
           action: 'access',
           description: 'Accès au menu clients',
           category: 'navigation',
         },
         {
-          nom: 'MENU_VENTES_ACCESS',
+          name: 'MENU_VENTES_ACCESS',
           module: 'menu',
           action: 'access',
           description: 'Accès au menu ventes',
           category: 'navigation',
         },
         {
-          nom: 'MENU_DEVIS_ACCESS',
+          name: 'MENU_DEVIS_ACCESS',
           module: 'menu',
           action: 'access',
           description: 'Accès au menu devis',
           category: 'navigation',
         },
         {
-          nom: 'MENU_ACHATS_READ_ONLY',
+          name: 'MENU_ACHATS_READ_ONLY',
           module: 'menu',
           action: 'read',
           description: 'Accès lecture seule menu achats',
@@ -210,14 +209,14 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
 
         // GESTION DES DONNÉES PAR SOCIÉTÉ
         {
-          nom: 'DATA_SCOPE_COMPANY',
+          name: 'DATA_SCOPE_COMPANY',
           module: 'data',
           action: 'scope',
           description: 'Accès aux données de la société uniquement',
           category: 'security',
         },
         {
-          nom: 'DATA_SCOPE_OWN_RECORDS',
+          name: 'DATA_SCOPE_OWN_RECORDS',
           module: 'data',
           action: 'scope',
           description: 'Priorité sur ses propres enregistrements',
@@ -229,18 +228,18 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
         // Vérifier si la permission existe déjà
         const existing = await queryRunner.query(
           `
-          SELECT id FROM permissions WHERE nom = $1
+          SELECT id FROM permissions WHERE name = $1
         `,
-          [perm.nom]
+          [perm.name]
         )
 
         if (existing.length === 0) {
           await queryRunner.query(
             `
-            INSERT INTO permissions (nom, description, module, action, is_global, category, sort_order)
-            VALUES ($1, $2, $3, $4, true, $5, 0)
+            INSERT INTO permissions (nom, name, description, resource, action, is_global, category, sort_order)
+            VALUES ($1, $1, $2, $3, $4, true, $5, 0)
           `,
-            [perm.nom, perm.description, perm.module, perm.action, perm.category]
+            [perm.name, perm.description, perm.module, perm.action, perm.category]
           )
         }
       }
@@ -292,7 +291,7 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
           FROM roles r
           CROSS JOIN permissions p
           WHERE r.parent_role_type = 'COMMERCIAL'
-          AND p.nom = $1
+          AND p.name = $1
           AND NOT EXISTS (
             SELECT 1 FROM role_permissions rp 
             WHERE rp.role_id = r.id AND rp.permission_id = p.id
@@ -339,7 +338,7 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
           `
           UPDATE permissions 
           SET metadata = $2
-          WHERE nom = $1
+          WHERE name = $1
         `,
           [condConfig.permission, JSON.stringify(condConfig.conditions)]
         )
@@ -347,11 +346,12 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
 
       // Créer des exemples de permissions spécifiques par société pour les commerciaux
       await queryRunner.query(`
-        INSERT INTO permissions (nom, description, module, action, is_global, societe_id, category)
+        INSERT INTO permissions (nom, name, description, resource, action, is_global, societe_id, category)
         SELECT 
           'CLIENTS_ADVANCED_EXPORT_' || s.id as nom,
+          'CLIENTS_ADVANCED_EXPORT_' || s.id as name,
           'Export avancé clients pour ' || s.nom as description,
-          'clients' as module,
+          'clients' as resource,
           'export' as action,
           false as is_global,
           s.id as societe_id,
@@ -359,7 +359,7 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
         FROM societes s
         WHERE NOT EXISTS (
           SELECT 1 FROM permissions p 
-          WHERE p.nom = 'CLIENTS_ADVANCED_EXPORT_' || s.id
+          WHERE p.name = 'CLIENTS_ADVANCED_EXPORT_' || s.id
         )
       `)
 
@@ -422,13 +422,13 @@ export class AddCommercialPermissions1753820000016 implements MigrationInterface
       ]
 
       for (const permName of permissionsToDelete) {
-        await queryRunner.query(`DELETE FROM permissions WHERE nom = $1`, [permName])
+        await queryRunner.query(`DELETE FROM permissions WHERE name = $1`, [permName])
       }
 
       // Supprimer les permissions spécifiques par société
       await queryRunner.query(`
         DELETE FROM permissions 
-        WHERE nom LIKE 'CLIENTS_ADVANCED_EXPORT_%' 
+        WHERE name LIKE 'CLIENTS_ADVANCED_EXPORT_%' 
         AND is_global = false
       `)
 

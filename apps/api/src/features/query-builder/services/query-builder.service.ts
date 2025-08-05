@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
+import type { Repository } from 'typeorm'
+import type { CreateQueryBuilderDto } from '../dto/create-query-builder.dto'
 import type { UpdateQueryBuilderDto } from '../dto/update-query-builder.dto'
 import {
   QueryBuilder,
@@ -9,7 +9,7 @@ import {
   QueryBuilderColumn,
   QueryBuilderJoin,
 } from '../entities'
-import { QueryBuilderPermissionService } from './query-builder-permission.service'
+import type { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 @Injectable()
 export class QueryBuilderService {
@@ -22,7 +22,7 @@ export class QueryBuilderService {
     private _joinRepository: Repository<QueryBuilderJoin>,
     @InjectRepository(QueryBuilderCalculatedField, 'auth')
     private _calculatedFieldRepository: Repository<QueryBuilderCalculatedField>,
-    private readonly permissionService: QueryBuilderPermissionService,
+    private readonly permissionService: QueryBuilderPermissionService
   ) {}
 
   async create(createDto: CreateQueryBuilderDto, userId: string): Promise<QueryBuilder> {

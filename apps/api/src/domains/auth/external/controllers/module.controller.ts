@@ -1,9 +1,9 @@
 import { Controller, Get, HttpStatus, Query, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { Roles } from '../../decorators/roles.decorator'
+import type { Repository } from 'typeorm'
 import { Module, ModuleCategory } from '../../core/entities/module.entity'
+import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
 

@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '../../primitives/button'
 import { ArrowDown, ArrowUp, Filter } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Button } from '../../primitives/button'
 
 interface ColumnFilterDropdownSimpleProps<T = any> {
   column: {

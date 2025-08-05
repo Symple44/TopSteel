@@ -821,7 +821,7 @@ export const fr = {
     remainingUnits: '{units} unités restantes',
 
     // Homepage specific
-    welcome: 'Bienvenue dans {companyName}',
+    welcome: 'Bienvenue dans {{companyName}}',
     subtitle: "Plateforme de gestion intégrée pour l'industrie métallurgique",
     description: 'Gérez vos projets, production, stocks et équipes en un seul endroit',
     accessDashboard: 'Accéder au tableau de bord',
@@ -1360,6 +1360,7 @@ export const fr = {
   },
 
   roles: {
+    owner: 'Propriétaire',
     super_admin: 'Super Administrateur',
     admin: 'Administrateur',
     manager: 'Manager',
@@ -1369,6 +1370,7 @@ export const fr = {
     operator: 'Opérateur',
     user: 'Utilisateur',
     viewer: 'Observateur',
+    guest: 'Invité',
   },
 
   status: {
@@ -1433,9 +1435,8 @@ export const fr = {
     connectedTo: 'Connecté à {{name}}',
     cannotConnect: 'Impossible de se connecter à cette société',
     syncError: 'Erreur de synchronisation, veuillez vous reconnecter',
-    changeAffects: 'Changement sur {{count}} onglet{{count, plural, one {} other {s}}}',
-    changeAffectsMultiple:
-      'Affectera tous les onglets ouverts ({{count}} détecté{{count, plural, one {} other {s}}}).',
+    changeAffects: 'Changement sur {{count}} onglet(s)',
+    changeAffectsMultiple: 'Affectera tous les onglets ouverts ({{count}} détecté(s)).',
     setAsDefault: 'Définir comme société par défaut',
     chooseSociety: 'Choisissez la société sur laquelle vous souhaitez travailler.',
     code: 'Code',

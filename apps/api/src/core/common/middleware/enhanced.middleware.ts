@@ -1,7 +1,6 @@
 import { performance } from 'node:perf_hooks'
 import { Injectable, type NestMiddleware } from '@nestjs/common'
-import { NextFunction, Response } from 'express'
-import type { Request } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 
 interface ExtendedRequest extends Request {
   startTime?: number
@@ -20,7 +19,7 @@ export class EnhancedMiddleware implements NestMiddleware {
 
     // Intercepter writeHead pour ajouter le header de temps de réponse avant l'envoi
     const originalWriteHead = res.writeHead.bind(res)
-    res.writeHead = function (statusCode: number, statusMessage?: string | any, headers?: any) {
+    res.writeHead = (statusCode: number, statusMessage?: string | any, headers?: any) => {
       const duration = performance.now() - start
       res.setHeader('X-Response-Time', `${duration.toFixed(2)}ms`)
       return originalWriteHead(statusCode, statusMessage, headers)

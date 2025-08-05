@@ -7,9 +7,9 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react'
 import * as React from 'react'
+import type { DropdownItemVariants, DropdownVariants } from '../../../design-system/variants'
+import { dropdownItemVariants, dropdownVariants } from '../../../design-system/variants'
 import { cn } from '../../../lib/utils'
-import { dropdownVariants, dropdownItemVariants } from '../../../design-system/variants'
-import type { DropdownVariants, DropdownItemVariants } from '../../../design-system/variants'
 
 // ===== TYPES UNIFIÉS =====
 

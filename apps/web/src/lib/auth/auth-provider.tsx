@@ -3,10 +3,10 @@
 import type React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AuthService } from '../../services/auth-service'
+import { callClientApi } from '../../utils/backend-api'
 import { AuthAdapter } from './auth-adapter'
 import { AuthContext } from './auth-context'
 import { authStorage } from './auth-storage'
-import { callClientApi } from '../../utils/backend-api'
 import type {
   AuthBroadcastEvent,
   AuthContextType,
@@ -143,7 +143,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // Convertir l'utilisateur existant vers le nouveau format si nécessaire
         if (user && !(user as any).societeRoles) {
-          const extendedUser = AuthAdapter.toExtendedUser(user as any)
+          const extendedUser = AuthAdapter.toExtendedUser(
+            user as any,
+            (user as any).userSocieteRoles || (user as any).societeRoles || []
+          )
           user = AuthAdapter.toAuthUser(extendedUser)
         }
 
@@ -285,18 +288,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
               method: 'GET',
             })
 
-            console.log('🔍 AuthProvider: Default company response status:', response.status)
-
             if (response.ok) {
               const defaultCompanyData = await response.json()
-              console.log('🔍 AuthProvider: Default company data:', defaultCompanyData)
 
               if (defaultCompanyData.success && defaultCompanyData.data) {
-                console.log(
-                  '🔍 AuthProvider: Found default company, auto-selecting:',
-                  defaultCompanyData.data.id
-                )
-
                 // L'utilisateur a une société par défaut - se connecter automatiquement
                 const companyId = defaultCompanyData.data.id
                 const companySelectResult = await AuthService.selectCompany(
@@ -304,10 +299,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
                   tokens.accessToken
                 )
 
-                console.log('🔍 AuthProvider: Company selection result:', companySelectResult)
-
                 const adaptedUser = AuthAdapter.toAuthUser(
-                  AuthAdapter.toExtendedUser(companySelectResult.user as any)
+                  AuthAdapter.toExtendedUser(
+                    companySelectResult.user as any,
+                    (companySelectResult.user as any).userSocieteRoles ||
+                      (companySelectResult.user as any).societeRoles ||
+                      []
+                  )
                 )
                 const adaptedTokens = AuthAdapter.toNewAuthTokens(companySelectResult.tokens as any)
                 const adaptedCompany = AuthAdapter.toNewCompany(companySelectResult.company as any)
@@ -325,7 +323,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                   mounted: true,
                 }
 
-                console.log('🔍 AuthProvider: Setting auth state with default company:', newState)
                 setAuthState((prev) => ({ ...prev, ...newState }))
                 broadcastAuthEvent('USER_LOGIN', {
                   user: adaptedUser,
@@ -335,9 +332,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
                 // IMPORTANT: Rediriger immédiatement vers le dashboard après avoir défini la société par défaut
                 if (typeof window !== 'undefined') {
-                  console.log(
-                    '🔍 AuthProvider: Redirecting to dashboard after default company selection...'
-                  )
                   setTimeout(() => {
                     window.location.href = '/dashboard'
                   }, 100) // Petit délai pour s'assurer que l'état est bien mis à jour

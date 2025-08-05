@@ -5,7 +5,7 @@ import { User } from '../../users/entities/user.entity'
 
 @Injectable()
 export class SessionInvalidationService implements OnModuleInit {
-  private readonly logger = new Logger(SessionInvalidationService.name);
+  private readonly logger = new Logger(SessionInvalidationService.name)
 
   constructor(
     @InjectRepository(User, 'auth')

@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, ShoppingBag } from 'lucide-react'
-import { getTenantConfig } from '@/lib/api/storefront'
+import Link from 'next/link'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { getTenantConfig } from '@/lib/api/storefront'
 
 interface HeroSectionProps {
   tenant: string

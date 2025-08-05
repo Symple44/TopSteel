@@ -1,12 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { DatabaseBackupService } from '../services/database-backup.service'
-import { DatabaseEnumFixService } from '../services/database-enum-fix.service'
-import {
+import type { DatabaseBackupService } from '../services/database-backup.service'
+import type { DatabaseEnumFixService } from '../services/database-enum-fix.service'
+import type {
   DatabaseIntegrityReport,
   DatabaseIntegrityService,
 } from '../services/database-integrity.service'
-import { DatabaseStatsService } from '../services/database-stats.service'
+import type { DatabaseStatsService } from '../services/database-stats.service'
 
 @ApiTags('Database Management')
 @Controller('admin/database')
@@ -98,19 +98,25 @@ export class DatabaseIntegrityController {
 
   @Post('backup')
   @ApiOperation({ summary: 'Créer une sauvegarde de la base de données' })
-  async createBackup(@Body() options: { type?: string; compress?: boolean; includeMedia?: boolean }): Promise<{ success: boolean; message: string; data?: any }> {
+  async createBackup(
+    @Body() options: { type?: string; compress?: boolean; includeMedia?: boolean }
+  ): Promise<{ success: boolean; message: string; data?: any }> {
     return await this.databaseBackupService.createBackup(options)
   }
 
   @Post('restore/:id')
   @ApiOperation({ summary: 'Restaurer une sauvegarde' })
-  async restoreBackup(@Param('id') backupId: string): Promise<{ success: boolean; message: string }> {
+  async restoreBackup(
+    @Param('id') backupId: string
+  ): Promise<{ success: boolean; message: string }> {
     return await this.databaseBackupService.restoreBackup(backupId)
   }
 
   @Delete('backups/:id')
   @ApiOperation({ summary: 'Supprimer une sauvegarde' })
-  async deleteBackup(@Param('id') backupId: string): Promise<{ success: boolean; message: string }> {
+  async deleteBackup(
+    @Param('id') backupId: string
+  ): Promise<{ success: boolean; message: string }> {
     return await this.databaseBackupService.deleteBackup(backupId)
   }
 

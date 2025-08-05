@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
-import { TenantConnectionService } from './tenant-connection.service'
+import type { DataSource } from 'typeorm'
+import type { TenantConnectionService } from './tenant-connection.service'
 
 export interface DatabaseHealthStatus {
   database: string
@@ -26,7 +26,7 @@ export class DatabaseHealthService {
     @InjectDataSource('auth') private _authDataSource: DataSource,
     @InjectDataSource('shared') private _sharedDataSource: DataSource,
     @InjectDataSource('tenant') private _tenantDataSource: DataSource,
-    private tenantConnectionService: TenantConnectionService,
+    private tenantConnectionService: TenantConnectionService
   ) {}
 
   /**

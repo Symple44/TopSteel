@@ -6,9 +6,9 @@
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import * as React from 'react'
-import { cn } from '../../../lib/utils'
-import { tooltipVariants } from '../../../design-system/variants'
 import type { TooltipVariants } from '../../../design-system/variants'
+import { tooltipVariants } from '../../../design-system/variants'
+import { cn } from '../../../lib/utils'
 
 // ===== TYPES UNIFIÉS =====
 
@@ -299,11 +299,13 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
 
     // Auto-detect si on doit utiliser asChild
     // Si triggerAsChild n'est pas explicitement défini, on détecte automatiquement
-    const shouldUseAsChild = triggerAsChild !== undefined ? triggerAsChild : 
-      React.isValidElement(triggerContent) && 
-      (triggerContent.type === 'button' || 
-       (typeof triggerContent.type === 'function' && 
-        (triggerContent.type as any).displayName?.includes('Button')))
+    const shouldUseAsChild =
+      triggerAsChild !== undefined
+        ? triggerAsChild
+        : React.isValidElement(triggerContent) &&
+          (triggerContent.type === 'button' ||
+            (typeof triggerContent.type === 'function' &&
+              (triggerContent.type as any).displayName?.includes('Button')))
 
     if (!content || disabled) {
       // Si pas de contenu ou désactivé, retourner juste le trigger

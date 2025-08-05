@@ -1,8 +1,6 @@
 import type { IBusinessRepository } from '../../core/interfaces/business-service.interface'
-import { ArticleStatus, ArticleType } from '../entities/article.entity'
-import type { Article } from '../entities/article.entity'
-import { ArticleSearchCriteria } from '../services/article.service'
-import type { ArticleStatistics } from '../services/article.service'
+import type { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
+import type { ArticleSearchCriteria, ArticleStatistics } from '../services/article.service'
 
 /**
  * Interface du repository pour les articles

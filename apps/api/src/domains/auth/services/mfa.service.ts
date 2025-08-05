@@ -1,13 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
+import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { User } from '../../users/entities/user.entity'
+import { GlobalUserRole } from '../core/constants/roles.constants'
 import { MFASession } from '../core/entities/mfa-session.entity'
 import { UserMFA } from '../core/entities/user-mfa.entity'
-import { GeolocationService } from './geolocation.service'
-import { TOTPService } from './totp.service'
-import { WebAuthnService } from './webauthn.service'
+import type { GeolocationService } from './geolocation.service'
+import type { TOTPService } from './totp.service'
+import type { WebAuthnService } from './webauthn.service'
 
 interface MFASetupResult {
   success: boolean
@@ -28,30 +31,205 @@ interface MFAVerificationResult {
 
 @Injectable()
 export class MFAService {
-  private readonly logger = new Logger(MFAService.name);
+  private readonly logger = new Logger(MFAService.name)
+  private readonly MFA_CACHE_TTL = 300 // 5 minutes
 
   constructor(
     @InjectRepository(UserMFA, 'auth')
     public readonly userMFARepository: Repository<UserMFA>,
     @InjectRepository(MFASession, 'auth')
     public readonly mfaSessionRepository: Repository<MFASession>,
+    @InjectRepository(User, 'auth')
+    private readonly userRepository: Repository<User>,
     public readonly totpService: TOTPService,
     private readonly webauthnService: WebAuthnService,
     private readonly geolocationService: GeolocationService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly cacheService: OptimizedCacheService
   ) {}
 
   /**
-   * Vérifier si un utilisateur a MFA activé
+   * Vérifier si un utilisateur a MFA activé ou requis
    */
-  async hasMFAEnabled(_userId: string): Promise<boolean> {
-    // Temporairement désactivé à cause de problèmes de schema DB
-    return false
+  async hasMFAEnabled(userId: string): Promise<boolean> {
+    const cacheKey = `mfa_enabled:${userId}`
 
-    /* const mfaRecords = await this.userMFARepository.find({
-      where: { userId, isEnabled: true, isVerified: true }
-    })
-    return mfaRecords.length > 0 */
+    // Try cache first
+    const cached = await this.cacheService.getWithMetrics<boolean>(cacheKey)
+    if (cached !== null) {
+      return cached
+    }
+
+    try {
+      // Get user to check role
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        select: ['id', 'role'],
+      })
+
+      if (!user) {
+        return false
+      }
+
+      // SUPER_ADMIN policy: MFA is optional but recommended
+      if (user.role === GlobalUserRole.SUPER_ADMIN) {
+        const mfaRecords = await this.userMFARepository.find({
+          where: { userId, isEnabled: true, isVerified: true },
+        })
+        const hasMFA = mfaRecords.length > 0
+
+        // Cache result for SUPER_ADMIN
+        await this.cacheService.setWithGroup(cacheKey, hasMFA, `user:${userId}`, this.MFA_CACHE_TTL)
+        return hasMFA
+      }
+
+      // For other roles, check if MFA is required by policy
+      const isMFARequired = await this.isMFARequiredForRole(user.role as GlobalUserRole)
+
+      if (isMFARequired) {
+        // MFA is required - check if user has it enabled
+        const mfaRecords = await this.userMFARepository.find({
+          where: { userId, isEnabled: true, isVerified: true },
+        })
+        const hasMFA = mfaRecords.length > 0
+
+        // Cache result
+        await this.cacheService.setWithGroup(cacheKey, hasMFA, `user:${userId}`, this.MFA_CACHE_TTL)
+        return hasMFA
+      }
+
+      // MFA not required for this role
+      const mfaRecords = await this.userMFARepository.find({
+        where: { userId, isEnabled: true, isVerified: true },
+      })
+      const hasMFA = mfaRecords.length > 0
+
+      // Cache result
+      await this.cacheService.setWithGroup(cacheKey, hasMFA, `user:${userId}`, this.MFA_CACHE_TTL)
+      return hasMFA
+    } catch (error) {
+      this.logger.error(`Error checking MFA status for user ${userId}:`, error)
+      return false
+    }
+  }
+
+  /**
+   * Vérifier si MFA est requis pour un rôle donné
+   */
+  async isMFARequiredForRole(role: GlobalUserRole): Promise<boolean> {
+    // MFA policy based on role hierarchy
+    const mfaRequiredRoles = [
+      GlobalUserRole.SUPER_ADMIN, // Optional but recommended
+      GlobalUserRole.ADMIN, // Required
+      GlobalUserRole.MANAGER, // Required for managers
+    ]
+
+    return mfaRequiredRoles.includes(role)
+  }
+
+  /**
+   * Vérifier si l'utilisateur peut bypasser MFA (SUPER_ADMIN in trusted environment)
+   */
+  async canBypassMFA(userId: string, ipAddress?: string, userAgent?: string): Promise<boolean> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        select: ['id', 'role'],
+      })
+
+      if (!user || user.role !== GlobalUserRole.SUPER_ADMIN) {
+        return false
+      }
+
+      // Check if it's from a trusted environment (same network, recognized device)
+      const isTrustedEnvironment = await this.isTrustedEnvironment(userId, ipAddress, userAgent)
+
+      if (isTrustedEnvironment) {
+        this.logger.log(`SUPER_ADMIN ${userId} bypassing MFA from trusted environment`)
+        return true
+      }
+
+      return false
+    } catch (error) {
+      this.logger.error(`Error checking MFA bypass for user ${userId}:`, error)
+      return false
+    }
+  }
+
+  /**
+   * Vérifier si l'environnement est de confiance
+   */
+  private async isTrustedEnvironment(
+    userId: string,
+    ipAddress?: string,
+    userAgent?: string
+  ): Promise<boolean> {
+    if (!ipAddress || !userAgent) {
+      return false
+    }
+
+    try {
+      // Check geolocation trust
+      const location = await this.geolocationService.getLocationFromIP(ipAddress)
+
+      // For now, consider local networks as trusted
+      const isLocalNetwork =
+        ipAddress.startsWith('192.168.') ||
+        ipAddress.startsWith('10.') ||
+        ipAddress.startsWith('172.')
+
+      if (isLocalNetwork) {
+        return true
+      }
+
+      // Check if this IP/device combination has been used recently
+      const cacheKey = `trusted_device:${userId}:${this.hashDevice(ipAddress, userAgent)}`
+      const isTrusted = await this.cacheService.get(cacheKey)
+
+      return !!isTrusted
+    } catch (error) {
+      this.logger.error('Error checking trusted environment:', error)
+      return false
+    }
+  }
+
+  /**
+   * Marquer un appareil comme de confiance
+   */
+  async markDeviceAsTrusted(
+    userId: string,
+    ipAddress: string,
+    userAgent: string,
+    trustDurationDays = 30
+  ): Promise<void> {
+    const cacheKey = `trusted_device:${userId}:${this.hashDevice(ipAddress, userAgent)}`
+    const ttl = trustDurationDays * 24 * 60 * 60 // Convert to seconds
+
+    await this.cacheService.set(
+      cacheKey,
+      {
+        trustedAt: new Date().toISOString(),
+        ipAddress,
+        userAgent,
+        location: await this.geolocationService.getLocationFromIP(ipAddress),
+      },
+      ttl
+    )
+
+    this.logger.log(`Device marked as trusted for user ${userId} for ${trustDurationDays} days`)
+  }
+
+  /**
+   * Créer un hash de l'appareil
+   */
+  private hashDevice(ipAddress: string, userAgent: string): string {
+    // Simple hash - in production, use proper crypto hashing
+    const crypto = require('crypto')
+    return crypto
+      .createHash('sha256')
+      .update(`${ipAddress}:${userAgent}`)
+      .digest('hex')
+      .substring(0, 16)
   }
 
   /**
@@ -634,6 +812,284 @@ export class MFAService {
     } catch (error) {
       this.logger.error('Erreur lors du nettoyage des sessions MFA:', error)
       return 0
+    }
+  }
+
+  // ===== ENHANCED MFA FLOW FOR AUTHENTICATION =====
+
+  /**
+   * Initier le processus MFA lors de l'authentification
+   */
+  async initiateMFAForLogin(
+    userId: string,
+    ipAddress?: string,
+    userAgent?: string
+  ): Promise<{
+    requiresMFA: boolean
+    canBypass: boolean
+    sessionToken?: string
+    availableMethods?: string[]
+    trustDevice?: boolean
+  }> {
+    try {
+      // Check if user can bypass MFA (SUPER_ADMIN in trusted environment)
+      const canBypass = await this.canBypassMFA(userId, ipAddress, userAgent)
+
+      if (canBypass) {
+        this.logger.log(`User ${userId} bypassing MFA - trusted environment`)
+        return {
+          requiresMFA: false,
+          canBypass: true,
+          trustDevice: true,
+        }
+      }
+
+      // Check if MFA is enabled/required
+      const hasMFA = await this.hasMFAEnabled(userId)
+      const isRequired = await this.isMFARequiredForUser(userId)
+
+      if (!hasMFA && !isRequired) {
+        return {
+          requiresMFA: false,
+          canBypass: false,
+        }
+      }
+
+      // Get available MFA methods
+      const methods = await this.getUserMFAMethods(userId)
+      const activeMethods = methods.filter((m) => m.isEnabled && m.isVerified)
+
+      if (activeMethods.length === 0 && isRequired) {
+        // Force MFA setup for required users
+        return {
+          requiresMFA: true,
+          canBypass: false,
+          availableMethods: ['setup_required'],
+        }
+      }
+
+      // Create MFA session
+      const sessionToken = uuidv4()
+      const mfaSession = MFASession.create(
+        userId,
+        sessionToken,
+        activeMethods[0]?.type || 'totp',
+        10, // 10 minutes
+        ipAddress,
+        userAgent
+      )
+
+      await this.mfaSessionRepository.save(mfaSession)
+
+      return {
+        requiresMFA: true,
+        canBypass: false,
+        sessionToken,
+        availableMethods: activeMethods.map((m) => m.type),
+        trustDevice: false,
+      }
+    } catch (error) {
+      this.logger.error(`Error initiating MFA for user ${userId}:`, error)
+      return {
+        requiresMFA: false,
+        canBypass: false,
+      }
+    }
+  }
+
+  /**
+   * Vérifier MFA lors de l'authentification
+   */
+  async verifyMFAForLogin(
+    sessionToken: string,
+    code: string,
+    mfaType: 'totp' | 'sms' | 'webauthn' = 'totp',
+    trustDevice: boolean = false,
+    ipAddress?: string,
+    userAgent?: string
+  ): Promise<{
+    success: boolean
+    userId?: string
+    error?: string
+    deviceTrusted?: boolean
+  }> {
+    try {
+      // Find MFA session
+      const mfaSession = await this.mfaSessionRepository.findOne({
+        where: { sessionToken, status: 'pending' },
+      })
+
+      if (!mfaSession || !mfaSession.isValid()) {
+        return {
+          success: false,
+          error: 'Session MFA invalide ou expirée',
+        }
+      }
+
+      // Rate limiting
+      if (mfaSession.isRateLimited()) {
+        return {
+          success: false,
+          error: 'Trop de tentatives. Réessayez plus tard.',
+        }
+      }
+
+      // Get user MFA method
+      const mfaMethod = await this.userMFARepository.findOne({
+        where: {
+          userId: mfaSession.userId,
+          type: mfaType,
+          isEnabled: true,
+          isVerified: true,
+        },
+      })
+
+      if (!mfaMethod) {
+        return {
+          success: false,
+          error: 'Méthode MFA non trouvée',
+        }
+      }
+
+      // Verify based on type
+      let isValid = false
+
+      if (mfaType === 'totp' && mfaMethod.secret) {
+        isValid = await this.totpService.verifyToken(code, mfaMethod.secret)
+      } else if (mfaType === 'sms') {
+        // SMS verification logic would go here
+        isValid = false // TODO: Implement SMS verification
+      }
+
+      if (!isValid) {
+        mfaSession.incrementAttempts()
+        mfaMethod.markFailedAttempt()
+
+        await this.mfaSessionRepository.save(mfaSession)
+        await this.userMFARepository.save(mfaMethod)
+
+        return {
+          success: false,
+          error: 'Code MFA invalide',
+        }
+      }
+
+      // Success - mark as verified
+      mfaSession.markAsVerified()
+      mfaMethod.markAsUsed()
+      mfaMethod.resetFailedAttempts()
+
+      await this.mfaSessionRepository.save(mfaSession)
+      await this.userMFARepository.save(mfaMethod)
+
+      // Trust device if requested
+      let deviceTrusted = false
+      if (trustDevice && ipAddress && userAgent) {
+        await this.markDeviceAsTrusted(mfaSession.userId, ipAddress, userAgent)
+        deviceTrusted = true
+      }
+
+      // Invalidate MFA cache
+      await this.invalidateMFACache(mfaSession.userId)
+
+      return {
+        success: true,
+        userId: mfaSession.userId,
+        deviceTrusted,
+      }
+    } catch (error) {
+      this.logger.error(`Error verifying MFA:`, error)
+      return {
+        success: false,
+        error: 'Erreur lors de la vérification MFA',
+      }
+    }
+  }
+
+  /**
+   * Vérifier si MFA est requis pour un utilisateur spécifique
+   */
+  async isMFARequiredForUser(userId: string): Promise<boolean> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        select: ['id', 'role'],
+      })
+
+      if (!user) {
+        return false
+      }
+
+      return await this.isMFARequiredForRole(user.role as GlobalUserRole)
+    } catch (error) {
+      this.logger.error(`Error checking MFA requirement for user ${userId}:`, error)
+      return false
+    }
+  }
+
+  /**
+   * Invalider le cache MFA pour un utilisateur
+   */
+  async invalidateMFACache(userId: string): Promise<void> {
+    await this.cacheService.invalidateGroup(`user:${userId}`)
+    await this.cacheService.invalidatePattern(`mfa_*:${userId}`)
+  }
+
+  /**
+   * Obtenir l'état complet MFA pour l'administration
+   */
+  async getAdminMFAStatus(): Promise<{
+    totalUsers: number
+    usersWithMFA: number
+    usersByRole: Record<string, { total: number; withMFA: number }>
+    mfaMethodDistribution: Record<string, number>
+  }> {
+    try {
+      // Get all users with their roles
+      const users = await this.userRepository.find({
+        select: ['id', 'role'],
+      })
+
+      // Get all MFA records
+      const mfaRecords = await this.userMFARepository.find({
+        where: { isEnabled: true, isVerified: true },
+      })
+
+      const usersWithMFA = new Set(mfaRecords.map((m) => m.userId))
+
+      // Group by role
+      const usersByRole: Record<string, { total: number; withMFA: number }> = {}
+      for (const user of users) {
+        const role = user.role || 'unknown'
+        if (!usersByRole[role]) {
+          usersByRole[role] = { total: 0, withMFA: 0 }
+        }
+        usersByRole[role].total++
+        if (usersWithMFA.has(user.id)) {
+          usersByRole[role].withMFA++
+        }
+      }
+
+      // Method distribution
+      const mfaMethodDistribution: Record<string, number> = {}
+      for (const record of mfaRecords) {
+        mfaMethodDistribution[record.type] = (mfaMethodDistribution[record.type] || 0) + 1
+      }
+
+      return {
+        totalUsers: users.length,
+        usersWithMFA: usersWithMFA.size,
+        usersByRole,
+        mfaMethodDistribution,
+      }
+    } catch (error) {
+      this.logger.error('Error getting admin MFA status:', error)
+      return {
+        totalUsers: 0,
+        usersWithMFA: 0,
+        usersByRole: {},
+        mfaMethodDistribution: {},
+      }
     }
   }
 }

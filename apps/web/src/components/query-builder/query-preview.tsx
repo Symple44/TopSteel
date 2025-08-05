@@ -1,8 +1,7 @@
 'use client'
 
+import { Card, CardContent, CardHeader, CardTitle, ScrollArea } from '@erp/ui'
 import { Code } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { ScrollArea } from '@erp/ui'
 
 interface QueryPreviewProps {
   queryBuilder: any

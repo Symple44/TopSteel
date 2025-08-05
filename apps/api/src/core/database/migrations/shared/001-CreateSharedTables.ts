@@ -1,4 +1,4 @@
-import { type MigrationInterface, QueryRunner, Table } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table } from 'typeorm'
 
 export class CreateSharedTables1737000002000 implements MigrationInterface {
   name = 'CreateSharedTables1737000002000'

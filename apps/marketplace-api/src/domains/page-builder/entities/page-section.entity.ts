@@ -1,14 +1,14 @@
 import {
   Column,
-  Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
+  Entity,
   JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import { PageTemplate } from './page-template.entity'
-import { SectionType, SectionContent, SectionStyles } from './types'
+import { type SectionContent, type SectionStyles, SectionType } from './types'
 
 @Entity('marketplace_page_sections')
 export class PageSection {

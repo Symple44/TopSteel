@@ -1,8 +1,8 @@
 // Re-export shared entities from the @erp/entities package
 export {
   Article,
-  ArticleType,
   ArticleStatus,
-  UniteStock,
+  ArticleType,
   MethodeValorisationStock,
+  UniteStock,
 } from '@erp/entities'

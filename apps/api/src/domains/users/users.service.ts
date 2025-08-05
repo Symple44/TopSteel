@@ -1,11 +1,11 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { CreateUserDto } from './dto/create-user.dto'
+import type { Repository } from 'typeorm'
+import type { CreateUserDto } from './dto/create-user.dto'
 import { GetUserSettingsResponseDto } from './dto/get-user-settings.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
+import type { UpdateUserDto } from './dto/update-user.dto'
 import type { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
-import { UserQueryDto } from './dto/user-query.dto'
+import type { UserQueryDto } from './dto/user-query.dto'
 import { User, UserRole } from './entities/user.entity'
 import { UserSettings } from './entities/user-settings.entity'
 
@@ -15,7 +15,7 @@ export class UsersService {
     @InjectRepository(User, 'auth')
     private readonly _repository: Repository<User>,
     @InjectRepository(UserSettings, 'auth')
-    private readonly _userSettingsRepository: Repository<UserSettings>,
+    private readonly _userSettingsRepository: Repository<UserSettings>
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {

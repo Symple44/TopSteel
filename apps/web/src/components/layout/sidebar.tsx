@@ -2,6 +2,7 @@
 'use client'
 
 import { Badge, Button, Separator } from '@erp/ui'
+import { SimpleTooltip as TooltipFixed } from '@erp/ui/primitives'
 import {
   Activity,
   BarChart3,
@@ -50,7 +51,6 @@ import {
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
 import { ErpInfoModalWrapper as ErpInfoModal } from '@/components/wrappers'
-import { SimpleTooltip as TooltipFixed } from '@erp/ui/primitives'
 import { useBackendStatus } from '@/hooks/use-backend-health'
 import { useDynamicMenu } from '@/hooks/use-dynamic-menu'
 import { useTranslation } from '@/lib/i18n'
@@ -166,6 +166,13 @@ const getNavigation = (t: any): NavItem[] => [
         icon: Table,
         gradient: 'from-violet-500 to-purple-600',
         roles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        title: 'Gestion des Sociétés',
+        href: '/admin/societes',
+        icon: Building2,
+        gradient: 'from-blue-500 to-indigo-600',
+        roles: ['SUPER_ADMIN'],
       },
     ],
   },

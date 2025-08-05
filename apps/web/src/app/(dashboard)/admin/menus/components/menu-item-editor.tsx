@@ -1,5 +1,16 @@
 'use client'
 
+import { Badge, Card, CardContent, CardHeader, Label } from '@erp/ui'
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+} from '@erp/ui/primitives'
 import {
   BarChart3,
   ChevronDown,
@@ -12,13 +23,6 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useState } from 'react'
-import { Badge } from '@erp/ui'
-import { Button } from '@erp/ui/primitives'
-import { Card, CardContent, CardHeader } from '@erp/ui'
-import { Input } from '@erp/ui/primitives'
-import { Label } from '@erp/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp/ui/primitives'
-import { Switch } from '@erp/ui/primitives'
 import { cn } from '@/lib/utils'
 import type { Group, MenuItem, MenuType, Permission, Role } from '@/types/menu'
 import { MenuItemRightsEditor } from './menu-item-rights-editor'
