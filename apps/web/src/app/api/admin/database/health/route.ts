@@ -3,7 +3,6 @@ import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
-
     // Récupérer les headers d'authentification
     const authHeader = request.headers.get('authorization')
     const cookieHeader = request.headers.get('cookie')

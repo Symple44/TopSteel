@@ -15,7 +15,7 @@ import { MultiTenantDatabaseConfig } from '../database/config/multi-tenant-datab
 @Controller('health')
 export class HealthController {
   private startTime = Date.now()
-  
+
   constructor(
     private health: HealthCheckService,
     private db: TypeOrmHealthIndicator,
@@ -37,7 +37,7 @@ export class HealthController {
         () => this.checkMultiTenantDatabase('shared'),
         // Seuils mémoire plus réalistes pour une application moderne
         () => this.memory.checkHeap('memory_heap', 512 * 1024 * 1024), // 512MB au lieu de 150MB
-        () => this.memory.checkRSS('memory_rss', 512 * 1024 * 1024),   // 512MB au lieu de 150MB
+        () => this.memory.checkRSS('memory_rss', 512 * 1024 * 1024), // 512MB au lieu de 150MB
       ]
 
       // Désactiver le check disque en développement car souvent problématique
@@ -58,7 +58,7 @@ export class HealthController {
       const isSharedDatabaseConnected = healthResult.details?.database_shared?.status === 'up'
       const activeUsers = await this.getActiveUsersCount()
       const version = await this.getApplicationVersion()
-      
+
       return {
         ...healthResult,
         // Informations spécifiques pour le modal
@@ -68,18 +68,18 @@ export class HealthController {
         database: {
           auth: {
             status: healthResult.details?.database_auth?.status || 'unknown',
-            connectionStatus: isAuthDatabaseConnected ? 'connected' : 'disconnected'
+            connectionStatus: isAuthDatabaseConnected ? 'connected' : 'disconnected',
           },
           shared: {
             status: healthResult.details?.database_shared?.status || 'not_configured',
-            connectionStatus: isSharedDatabaseConnected ? 'connected' : 'not_configured'
+            connectionStatus: isSharedDatabaseConnected ? 'connected' : 'not_configured',
           },
           // Status global (ok si au moins auth fonctionne)
           status: isAuthDatabaseConnected ? 'up' : 'down',
-          connectionStatus: isAuthDatabaseConnected ? 'connected' : 'disconnected'
+          connectionStatus: isAuthDatabaseConnected ? 'connected' : 'disconnected',
         },
         activeUsers,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
     } catch (error) {
       // En cas d'erreur, retourner des informations basiques
@@ -92,10 +92,10 @@ export class HealthController {
         uptime: this.formatUptime(Date.now() - this.startTime),
         database: {
           status: 'down',
-          connectionStatus: 'disconnected'
+          connectionStatus: 'disconnected',
         },
         activeUsers: null,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
     }
   }
@@ -159,9 +159,7 @@ export class HealthController {
   @Get('circuit-breakers')
   @HealthCheck()
   async checkCircuitBreakers() {
-    return this.health.check([
-      () => this.circuitBreaker.check(),
-    ])
+    return this.health.check([() => this.circuitBreaker.check()])
   }
 
   /**
@@ -171,7 +169,7 @@ export class HealthController {
     try {
       let config
       const key = `database_${type}`
-      
+
       if (type === 'auth') {
         config = this.multiTenantConfig.getAuthDatabaseConfig()
       } else {
@@ -187,7 +185,7 @@ export class HealthController {
         username: config.username,
         password: config.password,
         database: config.database,
-        entities: []
+        entities: [],
       })
 
       await testConnection.initialize()
@@ -197,15 +195,15 @@ export class HealthController {
       return {
         [key]: {
           status: 'up',
-          message: `${type} database is connected`
-        }
+          message: `${type} database is connected`,
+        },
       }
     } catch (error) {
       return {
         [`database_${type}`]: {
           status: 'down',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
       }
     }
   }
@@ -222,8 +220,8 @@ export class HealthController {
         summary: {
           authConnected: authCheck.database_auth?.status === 'up',
           sharedConnected: sharedCheck.database_shared?.status === 'up',
-          multiTenantReady: authCheck.database_auth?.status === 'up'
-        }
+          multiTenantReady: authCheck.database_auth?.status === 'up',
+        },
       }
     } catch (error) {
       return {
@@ -233,8 +231,8 @@ export class HealthController {
         summary: {
           authConnected: false,
           sharedConnected: false,
-          multiTenantReady: false
-        }
+          multiTenantReady: false,
+        },
       }
     }
   }

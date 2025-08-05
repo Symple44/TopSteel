@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, Between } from 'typeorm'
 import { BTPIndex, BTPIndexType } from '../entities/btp-index.entity'
-import { SectorCoefficient, SectorType, CoefficientType } from '../entities/sector-coefficient.entity'
+import {
+  SectorCoefficient,
+  SectorType,
+  CoefficientType,
+} from '../entities/sector-coefficient.entity'
 
 export interface IndexedPricingContext {
   basePrice: number
@@ -60,22 +64,13 @@ export class BTPIndexService {
     societeId: string,
     context: IndexedPricingContext
   ): Promise<IndexedPricingResult> {
-    
     // 1. Récupérer l'indice de référence (date de contrat ou actuel)
     const referenceDate = context.contractDate || new Date()
-    const baseIndex = await this.getIndexForDate(
-      societeId, 
-      context.indexType, 
-      referenceDate
-    )
+    const baseIndex = await this.getIndexForDate(societeId, context.indexType, referenceDate)
 
     // 2. Récupérer l'indice de livraison (date de livraison ou actuel)
     const deliveryDate = context.deliveryDate || new Date()
-    const currentIndex = await this.getIndexForDate(
-      societeId,
-      context.indexType,
-      deliveryDate
-    )
+    const currentIndex = await this.getIndexForDate(societeId, context.indexType, deliveryDate)
 
     if (!baseIndex || !currentIndex) {
       throw new Error(`Indice ${context.indexType} non trouvé pour les dates spécifiées`)
@@ -94,7 +89,7 @@ export class BTPIndexService {
 
     if (context.indexationClause) {
       const clause = context.indexationClause
-      
+
       // Seuil de déclenchement
       if (clause.threshold && Math.abs(indexVariationPercent) < clause.threshold) {
         applicableVariation = 0
@@ -103,17 +98,17 @@ export class BTPIndexService {
         // Répartition
         if (clause.sharing && clause.sharing < 1) {
           applicableVariation = indexVariationPercent * clause.sharing
-          finalCoefficient = 1 + (applicableVariation / 100)
+          finalCoefficient = 1 + applicableVariation / 100
         }
-        
+
         // Plafonnement
         if (clause.cappingMin !== undefined && applicableVariation < clause.cappingMin) {
           cappedVariation = clause.cappingMin
-          finalCoefficient = 1 + (cappedVariation / 100)
+          finalCoefficient = 1 + cappedVariation / 100
         }
         if (clause.cappingMax !== undefined && applicableVariation > clause.cappingMax) {
           cappedVariation = clause.cappingMax
-          finalCoefficient = 1 + (cappedVariation / 100)
+          finalCoefficient = 1 + cappedVariation / 100
         }
       }
     }
@@ -135,15 +130,17 @@ export class BTPIndexService {
         currentIndexValue: currentIndex.indexValue,
         contractDate: context.contractDate,
         deliveryDate: context.deliveryDate,
-        indexPeriod: currentIndex.getFormattedPeriod()
+        indexPeriod: currentIndex.getFormattedPeriod(),
       },
-      indexationClause: context.indexationClause ? {
-        threshold: context.indexationClause.threshold || 0,
-        variation: indexVariationPercent,
-        applicableVariation,
-        sharing: context.indexationClause.sharing || 1,
-        cappedVariation
-      } : undefined
+      indexationClause: context.indexationClause
+        ? {
+            threshold: context.indexationClause.threshold || 0,
+            variation: indexVariationPercent,
+            applicableVariation,
+            sharing: context.indexationClause.sharing || 1,
+            cappedVariation,
+          }
+        : undefined,
     }
   }
 
@@ -155,7 +152,6 @@ export class BTPIndexService {
     indexType: BTPIndexType,
     date: Date
   ): Promise<BTPIndex | null> {
-    
     const year = date.getFullYear()
     const month = date.getMonth() + 1
 
@@ -166,9 +162,9 @@ export class BTPIndexService {
         indexType,
         year,
         month,
-        isOfficial: true
+        isOfficial: true,
       },
-      order: { publicationDate: 'DESC' }
+      order: { publicationDate: 'DESC' },
     })
 
     // Si pas trouvé, chercher le mois précédent
@@ -182,9 +178,9 @@ export class BTPIndexService {
           indexType,
           year: prevYear,
           month: prevMonth,
-          isOfficial: true
+          isOfficial: true,
         },
-        order: { publicationDate: 'DESC' }
+        order: { publicationDate: 'DESC' },
       })
     }
 
@@ -194,22 +190,18 @@ export class BTPIndexService {
   /**
    * Obtenir le dernier indice publié
    */
-  async getLatestIndex(
-    societeId: string,
-    indexType: BTPIndexType
-  ): Promise<BTPIndex | null> {
-    
+  async getLatestIndex(societeId: string, indexType: BTPIndexType): Promise<BTPIndex | null> {
     return await this.btpIndexRepository.findOne({
       where: {
         societeId,
         indexType,
-        isOfficial: true
+        isOfficial: true,
       },
-      order: { 
+      order: {
         year: 'DESC',
         month: 'DESC',
-        publicationDate: 'DESC'
-      }
+        publicationDate: 'DESC',
+      },
     })
   }
 
@@ -231,15 +223,14 @@ export class BTPIndexService {
     indexMetadata?: any
     metadata?: any
   }): Promise<BTPIndex> {
-    
     // Vérifier si l'indice existe déjà
     const existing = await this.btpIndexRepository.findOne({
       where: {
         societeId: data.societeId,
         indexType: data.indexType,
         year: data.year,
-        month: data.month
-      }
+        month: data.month,
+      },
     })
 
     let index: BTPIndex
@@ -248,16 +239,12 @@ export class BTPIndexService {
       // Mettre à jour
       const oldValue = existing.indexValue
       Object.assign(existing, data)
-      
+
       // Ajouter une révision si la valeur change
       if (oldValue !== data.indexValue) {
-        existing.addRevision(
-          oldValue,
-          data.indexValue,
-          'Mise à jour officielle'
-        )
+        existing.addRevision(oldValue, data.indexValue, 'Mise à jour officielle')
       }
-      
+
       index = await this.btpIndexRepository.save(existing)
     } else {
       // Créer nouveau
@@ -282,13 +269,14 @@ export class BTPIndexService {
         indexType: index.indexType,
         year: index.month === 1 ? index.year - 1 : index.year,
         month: index.month === 1 ? 12 : index.month - 1,
-        isOfficial: true
-      }
+        isOfficial: true,
+      },
     })
 
     if (prevMonthIndex) {
       index.previousValue = prevMonthIndex.indexValue
-      index.monthlyVariation = ((index.indexValue - prevMonthIndex.indexValue) / prevMonthIndex.indexValue) * 100
+      index.monthlyVariation =
+        ((index.indexValue - prevMonthIndex.indexValue) / prevMonthIndex.indexValue) * 100
     }
 
     // Variation annuelle
@@ -298,12 +286,13 @@ export class BTPIndexService {
         indexType: index.indexType,
         year: index.year - 1,
         month: index.month,
-        isOfficial: true
-      }
+        isOfficial: true,
+      },
     })
 
     if (prevYearIndex) {
-      index.yearlyVariation = ((index.indexValue - prevYearIndex.indexValue) / prevYearIndex.indexValue) * 100
+      index.yearlyVariation =
+        ((index.indexValue - prevYearIndex.indexValue) / prevYearIndex.indexValue) * 100
     }
 
     // Alertes automatiques
@@ -327,18 +316,17 @@ export class BTPIndexService {
     fromDate: Date,
     toDate: Date
   ): Promise<BTPIndex[]> {
-    
     return await this.btpIndexRepository.find({
       where: {
         societeId,
         indexType,
         isOfficial: true,
-        publicationDate: Between(fromDate, toDate)
+        publicationDate: Between(fromDate, toDate),
       },
       order: {
         year: 'ASC',
-        month: 'ASC'
-      }
+        month: 'ASC',
+      },
     })
   }
 
@@ -355,13 +343,13 @@ export class BTPIndexService {
         indexType: BTPIndexType.ACIER_BTP,
         indexName: 'Indice BTP - Acier',
         indexCode: 'ACIER_BTP',
-        indexValue: 125.40,
+        indexValue: 125.4,
         indexMetadata: {
           source: 'INSEE',
           methodology: 'Prix de marché acier construction',
           baseYear: 2015,
-          frequency: 'monthly' as const
-        }
+          frequency: 'monthly' as const,
+        },
       },
       {
         indexType: BTPIndexType.BT01,
@@ -372,21 +360,21 @@ export class BTPIndexService {
           source: 'FFB',
           methodology: 'Coûts gros œuvre bâtiment',
           baseYear: 2015,
-          frequency: 'monthly' as const
-        }
+          frequency: 'monthly' as const,
+        },
       },
       {
         indexType: BTPIndexType.TP01A,
         indexName: 'Indice TP01A - Terrassements',
         indexCode: 'TP01A',
-        indexValue: 122.30,
+        indexValue: 122.3,
         indexMetadata: {
           source: 'INSEE',
           methodology: 'Coûts terrassements généraux',
           baseYear: 2015,
-          frequency: 'monthly' as const
-        }
-      }
+          frequency: 'monthly' as const,
+        },
+      },
     ]
 
     const createdIndices: BTPIndex[] = []
@@ -400,9 +388,9 @@ export class BTPIndexService {
         publicationDate: new Date(),
         applicationDate: new Date(),
         isOfficial: true,
-        isProvisional: false
+        isProvisional: false,
       })
-      
+
       createdIndices.push(index)
     }
 
@@ -412,27 +400,39 @@ export class BTPIndexService {
   /**
    * Obtenir tous les types d'indices disponibles
    */
-  getAvailableIndexTypes(): Array<{ value: BTPIndexType, label: string, category: string }> {
+  getAvailableIndexTypes(): Array<{ value: BTPIndexType; label: string; category: string }> {
     return [
       // Indices matériaux
       { value: BTPIndexType.ACIER_BTP, label: 'Acier BTP', category: 'Matériaux' },
       { value: BTPIndexType.BETON, label: 'Béton', category: 'Matériaux' },
       { value: BTPIndexType.BITUME, label: 'Bitume', category: 'Matériaux' },
       { value: BTPIndexType.CARBURANT, label: 'Carburant', category: 'Matériaux' },
-      
+
       // Indices bâtiment
       { value: BTPIndexType.BT01, label: 'BT01 - Gros œuvre', category: 'Bâtiment' },
       { value: BTPIndexType.BT02, label: 'BT02 - Clos et couvert', category: 'Bâtiment' },
       { value: BTPIndexType.BT03, label: 'BT03 - Second œuvre', category: 'Bâtiment' },
-      { value: BTPIndexType.BT04, label: 'BT04 - Corps d\'état techniques', category: 'Bâtiment' },
+      { value: BTPIndexType.BT04, label: "BT04 - Corps d'état techniques", category: 'Bâtiment' },
       { value: BTPIndexType.BT05, label: 'BT05 - Finitions', category: 'Bâtiment' },
       { value: BTPIndexType.BT06, label: 'BT06 - Équipements', category: 'Bâtiment' },
-      
+
       // Indices travaux publics
-      { value: BTPIndexType.TP01A, label: 'TP01A - Terrassements généraux', category: 'Travaux Publics' },
-      { value: BTPIndexType.TP02A, label: 'TP02A - Assainissement et VRD', category: 'Travaux Publics' },
-      { value: BTPIndexType.TP03A, label: 'TP03A - Construction de chaussées', category: 'Travaux Publics' },
-      { value: BTPIndexType.TP04A, label: 'TP04A - Ouvrages d\'art', category: 'Travaux Publics' }
+      {
+        value: BTPIndexType.TP01A,
+        label: 'TP01A - Terrassements généraux',
+        category: 'Travaux Publics',
+      },
+      {
+        value: BTPIndexType.TP02A,
+        label: 'TP02A - Assainissement et VRD',
+        category: 'Travaux Publics',
+      },
+      {
+        value: BTPIndexType.TP03A,
+        label: 'TP03A - Construction de chaussées',
+        category: 'Travaux Publics',
+      },
+      { value: BTPIndexType.TP04A, label: "TP04A - Ouvrages d'art", category: 'Travaux Publics' },
     ]
   }
 }

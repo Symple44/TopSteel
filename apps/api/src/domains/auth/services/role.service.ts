@@ -233,7 +233,9 @@ export class RoleService {
     await this._rolePermissionRepository.delete({ roleId: (role as any).id })
 
     // Ajouter les nouvelles permissions - utiliser l'ID réel du rôle
-    const rolePermissions = permissions.map((p) => RolePermission.create((role as any).id, p.permissionId))
+    const rolePermissions = permissions.map((p) =>
+      RolePermission.create((role as any).id, p.permissionId)
+    )
 
     await this._rolePermissionRepository.save(rolePermissions)
   }

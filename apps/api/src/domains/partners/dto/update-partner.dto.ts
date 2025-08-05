@@ -9,7 +9,7 @@ import { CreatePartnerDto } from './create-partner.dto'
 export class UpdatePartnerDto extends PartialType(CreatePartnerDto) {
   @ApiPropertyOptional({
     description: 'Raison de la modification',
-    example: 'Mise à jour des coordonnées suite à déménagement'
+    example: 'Mise à jour des coordonnées suite à déménagement',
   })
   @IsOptional()
   @IsString()

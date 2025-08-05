@@ -35,8 +35,8 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     return await this.repository.find({
       where: {
         type: types.length === 1 ? types[0] : undefined,
-        status
-      }
+        status,
+      },
     })
   }
 
@@ -78,50 +78,52 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
 
   async searchByCriteria(criteria: PartnerSearchCriteria): Promise<Partner[]> {
     const query = this.repository.createQueryBuilder('partner')
-    
+
     if (criteria.type?.length) {
       query.andWhere('partner.type IN (:...types)', { types: criteria.type })
     }
-    
+
     if (criteria.status?.length) {
       query.andWhere('partner.status IN (:...statuses)', { statuses: criteria.status })
     }
-    
+
     if (criteria.category?.length) {
       query.andWhere('partner.category IN (:...categories)', { categories: criteria.category })
     }
-    
+
     if (criteria.denomination) {
-      query.andWhere('partner.denomination ILIKE :denomination', { denomination: `%${criteria.denomination}%` })
+      query.andWhere('partner.denomination ILIKE :denomination', {
+        denomination: `%${criteria.denomination}%`,
+      })
     }
-    
+
     if (criteria.email) {
       query.andWhere('partner.email ILIKE :email', { email: `%${criteria.email}%` })
     }
-    
+
     if (criteria.ville) {
       query.andWhere('partner.ville ILIKE :ville', { ville: `%${criteria.ville}%` })
     }
-    
+
     if (criteria.codePostal) {
       query.andWhere('partner.codePostal = :codePostal', { codePostal: criteria.codePostal })
     }
-    
+
     // Pagination
     if (criteria.limit) {
       query.limit(criteria.limit)
     }
-    
+
     if (criteria.page && criteria.limit) {
       query.offset((criteria.page - 1) * criteria.limit)
     }
-    
+
     return await query.getMany()
   }
 
   async findActivePartners(): Promise<Partner[]> {
     return await this.repository.find({
-      where: { status: PartnerStatus.ACTIF }
+      where: { status: PartnerStatus.ACTIF },
     })
   }
 
@@ -146,14 +148,16 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     return false
   }
 
-  async findWithFilters(filters: any): Promise<{ items: Partner[], total: number, page: number, limit: number }> {
+  async findWithFilters(
+    filters: any
+  ): Promise<{ items: Partner[]; total: number; page: number; limit: number }> {
     // TODO: Implémenter la pagination avancée
     const items = await this.repository.find()
     return {
       items,
       total: items.length,
       page: 1,
-      limit: 10
+      limit: 10,
     }
   }
 
@@ -172,42 +176,54 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   async searchByText(searchText: string, limit?: number): Promise<Partner[]> {
     const query = this.repository
       .createQueryBuilder('partner')
-      .where('(partner.denomination ILIKE :text OR partner.code ILIKE :text OR partner.email ILIKE :text)', 
-             { text: `%${searchText}%` })
-    
+      .where(
+        '(partner.denomination ILIKE :text OR partner.code ILIKE :text OR partner.email ILIKE :text)',
+        { text: `%${searchText}%` }
+      )
+
     if (limit) {
       query.limit(limit)
     }
-    
+
     return await query.getMany()
   }
 
   async getPartnerStats(): Promise<PartnerRepositoryStats> {
     const totalPartenaires = await this.repository.count()
-    
+
     // Implémentation basique - peut être améliorée avec des requêtes optimisées
     return {
       totalPartenaires,
       repartitionParType: {
         [PartnerType.CLIENT]: await this.repository.count({ where: { type: PartnerType.CLIENT } }),
-        [PartnerType.FOURNISSEUR]: await this.repository.count({ where: { type: PartnerType.FOURNISSEUR } }),
-        [PartnerType.MIXTE]: await this.repository.count({ where: { type: PartnerType.MIXTE } })
+        [PartnerType.FOURNISSEUR]: await this.repository.count({
+          where: { type: PartnerType.FOURNISSEUR },
+        }),
+        [PartnerType.MIXTE]: await this.repository.count({ where: { type: PartnerType.MIXTE } }),
       },
       repartitionParStatus: {
-        [PartnerStatus.ACTIF]: await this.repository.count({ where: { status: PartnerStatus.ACTIF } }),
-        [PartnerStatus.INACTIF]: await this.repository.count({ where: { status: PartnerStatus.INACTIF } }),
-        [PartnerStatus.SUSPENDU]: await this.repository.count({ where: { status: PartnerStatus.SUSPENDU } }),
-        [PartnerStatus.PROSPECT]: await this.repository.count({ where: { status: PartnerStatus.PROSPECT } })
+        [PartnerStatus.ACTIF]: await this.repository.count({
+          where: { status: PartnerStatus.ACTIF },
+        }),
+        [PartnerStatus.INACTIF]: await this.repository.count({
+          where: { status: PartnerStatus.INACTIF },
+        }),
+        [PartnerStatus.SUSPENDU]: await this.repository.count({
+          where: { status: PartnerStatus.SUSPENDU },
+        }),
+        [PartnerStatus.PROSPECT]: await this.repository.count({
+          where: { status: PartnerStatus.PROSPECT },
+        }),
       },
       repartitionParCategorie: {}, // TODO: Implémenter si nécessaire
       repartitionGeographique: {
         parVille: {},
         parDepartement: {},
-        parRegion: {}
+        parRegion: {},
       },
       tendanceCreation: [],
       moyenneAnciennete: 0,
-      tauxActivite: 0
+      tauxActivite: 0,
     }
   }
 
@@ -221,7 +237,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   async findRecentlyModified(nbJours: number): Promise<Partner[]> {
     const date = new Date()
     date.setDate(date.getDate() - nbJours)
-    
+
     return await this.repository
       .createQueryBuilder('partner')
       .where('partner.updatedAt > :date', { date })
@@ -230,19 +246,21 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
 
   async findPotentialDuplicates(partner: Partner): Promise<Partner[]> {
     const query = this.repository.createQueryBuilder('partner')
-    
+
     if (partner.siret) {
       query.orWhere('partner.siret = :siret', { siret: partner.siret })
     }
-    
+
     if (partner.email) {
       query.orWhere('partner.email = :email', { email: partner.email })
     }
-    
+
     if (partner.denomination) {
-      query.orWhere('partner.denomination ILIKE :denomination', { denomination: `%${partner.denomination}%` })
+      query.orWhere('partner.denomination ILIKE :denomination', {
+        denomination: `%${partner.denomination}%`,
+      })
     }
-    
+
     return await query.getMany()
   }
 
@@ -251,8 +269,8 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
       where: {
         type: PartnerType.FOURNISSEUR,
         fournisseurPrefere: true,
-        status: PartnerStatus.ACTIF
-      }
+        status: PartnerStatus.ACTIF,
+      },
     })
   }
 
@@ -260,10 +278,10 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     // TODO: Implémenter avec les données de chiffre d'affaires réelles
     const partners = await this.repository.find({
       where: { type: PartnerType.CLIENT },
-      take: limit
+      take: limit,
     })
-    
-    return partners.map(partner => {
+
+    return partners.map((partner) => {
       const result = Object.assign(partner, { chiffreAffaires: 0 })
       return result as Partner & { chiffreAffaires: number }
     })

@@ -12,7 +12,11 @@ interface CategoriesSectionProps {
 }
 
 export function CategoriesSection({ tenant }: CategoriesSectionProps) {
-  const { data: categories, isLoading, error } = useQuery({
+  const {
+    data: categories,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['categories', tenant],
     queryFn: () => getCategories(tenant),
   })
@@ -42,23 +46,17 @@ export function CategoriesSection({ tenant }: CategoriesSectionProps) {
     <section className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-4xl font-bold">
-          Nos catégories
-        </h2>
+        <h2 className="text-3xl md:text-4xl font-bold">Nos catégories</h2>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Explorez notre gamme complète de produits organisés par catégories 
-          pour faciliter votre recherche
+          Explorez notre gamme complète de produits organisés par catégories pour faciliter votre
+          recherche
         </p>
       </div>
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayCategories.map((category) => (
-          <CategoryCard
-            key={category}
-            category={category}
-            tenant={tenant}
-          />
+          <CategoryCard key={category} category={category} tenant={tenant} />
         ))}
       </div>
 
@@ -120,11 +118,11 @@ function CategoryCard({ category, tenant }: CategoryCardProps) {
 // Fonction pour obtenir une icône spécifique par catégorie
 function getCategoryIcon(category: string) {
   const iconMap: Record<string, React.ComponentType<any>> = {
-    'métaux': Package,
-    'acier': Package,
-    'aluminium': Package,
-    'inox': Package,
-    'default': Package,
+    métaux: Package,
+    acier: Package,
+    aluminium: Package,
+    inox: Package,
+    default: Package,
   }
 
   const normalizedCategory = category.toLowerCase()

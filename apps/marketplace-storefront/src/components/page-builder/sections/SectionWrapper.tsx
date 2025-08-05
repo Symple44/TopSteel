@@ -19,7 +19,7 @@ export function SectionWrapper({
   settings = {},
   isEditing = false,
   onEdit,
-  className
+  className,
 }: SectionWrapperProps) {
   const computeStyles = (): CSSProperties => {
     const computed: CSSProperties = {}
@@ -60,8 +60,8 @@ export function SectionWrapper({
 
   const containerClasses = {
     'full-width': 'w-full',
-    'boxed': 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
-    'custom': ''
+    boxed: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+    custom: '',
   }
 
   const containerClass = containerClasses[settings.container || 'boxed']
@@ -87,14 +87,10 @@ export function SectionWrapper({
           </button>
         </div>
       )}
-      
-      <div className={containerClass}>
-        {children}
-      </div>
 
-      {styles.customCSS && (
-        <style jsx>{`${styles.customCSS}`}</style>
-      )}
+      <div className={containerClass}>{children}</div>
+
+      {styles.customCSS && <style jsx>{`${styles.customCSS}`}</style>}
     </section>
   )
 }

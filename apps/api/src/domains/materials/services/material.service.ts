@@ -1,9 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { BusinessService } from '../../core/base/business-service'
-import { BusinessOperation, type BusinessContext, type ValidationResult } from '../../core/interfaces/business-service.interface'
-import { Material, MaterialStatus, MaterialType, MaterialShape, StorageMethod } from '../entities/material.entity'
+import {
+  BusinessOperation,
+  type BusinessContext,
+  type ValidationResult,
+} from '../../core/interfaces/business-service.interface'
+import {
+  Material,
+  MaterialStatus,
+  MaterialType,
+  MaterialShape,
+  StorageMethod,
+} from '../entities/material.entity'
 import { IMaterialRepository } from '../repositories/material.repository'
-import type { MaterialStockAlert, MaterialCompatibilityAnalysis } from '../repositories/material.repository'
+import type {
+  MaterialStockAlert,
+  MaterialCompatibilityAnalysis,
+} from '../repositories/material.repository'
 
 /**
  * Service métier pour la gestion des matériaux industriels
@@ -20,13 +33,18 @@ export class MaterialService extends BusinessService<Material> {
   /**
    * Valider les règles métier spécifiques aux matériaux
    */
-  async validateBusinessRules(entity: Material, operation: BusinessOperation): Promise<ValidationResult> {
-    const errors: Array<{field: string, message: string, code: string}> = []
-    const warnings: Array<{field: string, message: string, code: string}> = []
+  async validateBusinessRules(
+    entity: Material,
+    operation: BusinessOperation
+  ): Promise<ValidationResult> {
+    const errors: Array<{ field: string; message: string; code: string }> = []
+    const warnings: Array<{ field: string; message: string; code: string }> = []
 
     // 1. Validation de base de l'entité
     const entityErrors = entity.validate()
-    errors.push(...entityErrors.map(msg => ({ field: 'general', message: msg, code: 'VALIDATION_ERROR' })))
+    errors.push(
+      ...entityErrors.map((msg) => ({ field: 'general', message: msg, code: 'VALIDATION_ERROR' }))
+    )
 
     // 2. Règles métier spécifiques selon l'opération
     switch (operation) {
@@ -44,7 +62,7 @@ export class MaterialService extends BusinessService<Material> {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     }
   }
 
@@ -53,7 +71,7 @@ export class MaterialService extends BusinessService<Material> {
    */
   protected async buildEntity(data: Partial<Material>): Promise<Material> {
     const material = new Material()
-    
+
     // Générer une référence automatique si non fournie
     if (!data.reference) {
       material.reference = await this.generateReference(data.type!, data.forme!)
@@ -130,11 +148,11 @@ export class MaterialService extends BusinessService<Material> {
     const oldValues = { ...existing }
 
     // Appliquer les mises à jour (sauf référence qui ne peut pas changer)
-    Object.keys(updates).forEach(key => {
+    Object.keys(updates).forEach((key) => {
       if (key !== 'reference' && updates[key] !== undefined) {
         const oldValue = existing[key]
         existing[key] = updates[key]
-        
+
         // Ajouter à l'historique si la valeur a changé
         if (oldValue !== updates[key]) {
           existing.ajouterModificationHistorique(key, oldValue, updates[key], 'SYSTEM')
@@ -181,10 +199,14 @@ export class MaterialService extends BusinessService<Material> {
    */
   async getMaterialsAReapprovisionner(): Promise<Array<Material & { quantiteACommander: number }>> {
     const materials = await this.getMaterialsSousStockMini()
-    
-    return materials.map(material => Object.assign(material, {
-      quantiteACommander: material.calculerQuantiteACommander()
-    })).filter(item => item.quantiteACommander > 0)
+
+    return materials
+      .map((material) =>
+        Object.assign(material, {
+          quantiteACommander: material.calculerQuantiteACommander(),
+        })
+      )
+      .filter((item) => item.quantiteACommander > 0)
   }
 
   /**
@@ -214,12 +236,12 @@ export class MaterialService extends BusinessService<Material> {
   async creerCommandeReapprovisionnement(
     fournisseurId: string,
     context?: BusinessContext
-  ): Promise<{ materials: Material[], quantitesTotales: number }> {
+  ): Promise<{ materials: Material[]; quantitesTotales: number }> {
     const materialsAReapprovisionner = await this.getMaterialsAReapprovisionner()
-    
+
     // Filtrer par fournisseur
     const materialsFournisseur = materialsAReapprovisionner.filter(
-      item => item.informationsApprovisionnement?.fournisseurPrincipalId === fournisseurId
+      (item) => item.informationsApprovisionnement?.fournisseurPrincipalId === fournisseurId
     )
 
     if (materialsFournisseur.length === 0) {
@@ -227,14 +249,17 @@ export class MaterialService extends BusinessService<Material> {
     }
 
     const quantitesTotales = materialsFournisseur.reduce(
-      (sum, item) => sum + item.quantiteACommander, 0
+      (sum, item) => sum + item.quantiteACommander,
+      0
     )
 
-    this.logger.log(`Commande de réapprovisionnement créée: ${materialsFournisseur.length} matériaux, ${quantitesTotales} unités`)
+    this.logger.log(
+      `Commande de réapprovisionnement créée: ${materialsFournisseur.length} matériaux, ${quantitesTotales} unités`
+    )
 
     return {
       materials: materialsFournisseur,
-      quantitesTotales
+      quantitesTotales,
     }
   }
 
@@ -274,7 +299,9 @@ export class MaterialService extends BusinessService<Material> {
 
     const updatedMaterial = await this.repository.save(material)
 
-    this.logger.log(`Inventaire effectué sur ${material.reference}: ${ancienStock} → ${stockPhysiqueReel} (écart: ${ecart})`)
+    this.logger.log(
+      `Inventaire effectué sur ${material.reference}: ${ancienStock} → ${stockPhysiqueReel} (écart: ${ecart})`
+    )
 
     return updatedMaterial
   }
@@ -289,8 +316,19 @@ export class MaterialService extends BusinessService<Material> {
     }
 
     const allMaterials = await this.materialRepository.findByStatus(MaterialStatus.ACTIF)
-    const compatibleMaterials: Array<{materialId: string, reference: string, nom: string, scoreCompatibilite: number, raisons: string[]}> = []
-    const incompatibleMaterials: Array<{materialId: string, reference: string, nom: string, raisons: string[]}> = []
+    const compatibleMaterials: Array<{
+      materialId: string
+      reference: string
+      nom: string
+      scoreCompatibilite: number
+      raisons: string[]
+    }> = []
+    const incompatibleMaterials: Array<{
+      materialId: string
+      reference: string
+      nom: string
+      raisons: string[]
+    }> = []
 
     for (const otherMaterial of allMaterials) {
       if (otherMaterial.id === materialId) continue
@@ -309,22 +347,24 @@ export class MaterialService extends BusinessService<Material> {
           reference: otherMaterial.reference,
           nom: otherMaterial.nom,
           scoreCompatibilite: Math.min(100, score),
-          raisons: this.getCompatibilityReasons(material, otherMaterial)
+          raisons: this.getCompatibilityReasons(material, otherMaterial),
         })
       } else {
         incompatibleMaterials.push({
           materialId: otherMaterial.id,
           reference: otherMaterial.reference,
           nom: otherMaterial.nom,
-          raisons: this.getIncompatibilityReasons(material, otherMaterial)
+          raisons: this.getIncompatibilityReasons(material, otherMaterial),
         })
       }
     }
 
     return {
       materialId,
-      compatibleMaterials: compatibleMaterials.sort((a, b) => b.scoreCompatibilite - a.scoreCompatibilite),
-      incompatibleMaterials
+      compatibleMaterials: compatibleMaterials.sort(
+        (a, b) => b.scoreCompatibilite - a.scoreCompatibilite
+      ),
+      incompatibleMaterials,
     }
   }
 
@@ -333,7 +373,7 @@ export class MaterialService extends BusinessService<Material> {
    */
   async calculerValorisationStock(type?: MaterialType): Promise<MaterialStockValorisation> {
     let materials: Material[]
-    
+
     if (type) {
       materials = await this.materialRepository.findByType(type)
     } else {
@@ -349,10 +389,10 @@ export class MaterialService extends BusinessService<Material> {
       materialsEnRupture: 0,
       materialsSousStockMini: 0,
       materialsStockageSpecial: 0,
-      materialsDangereux: 0
+      materialsDangereux: 0,
     }
 
-    materials.forEach(material => {
+    materials.forEach((material) => {
       const valeurMaterial = material.getValeurStock()
       valorisation.valeurTotale += valeurMaterial
 
@@ -448,10 +488,12 @@ export class MaterialService extends BusinessService<Material> {
     }
 
     material.marquerObsolete(remplacePar, raison)
-    
+
     const updatedMaterial = await this.repository.save(material)
 
-    this.logger.log(`Matériau ${material.reference} marqué comme obsolète${remplacePar ? `, remplacé par ${remplacePar}` : ''}`)
+    this.logger.log(
+      `Matériau ${material.reference} marqué comme obsolète${remplacePar ? `, remplacé par ${remplacePar}` : ''}`
+    )
 
     return updatedMaterial
   }
@@ -478,14 +520,15 @@ export class MaterialService extends BusinessService<Material> {
         emplacement: material.emplacement,
         methodeStockage: material.methodeStockage,
         dangereux: material.dangereux,
-        dateAlerte: new Date()
+        dateAlerte: new Date(),
       })
     }
 
     // Matériaux sous stock minimum
     const sousStockMini = await this.getMaterialsSousStockMini()
     for (const material of sousStockMini) {
-      if (!material.estEnRupture()) { // Éviter les doublons
+      if (!material.estEnRupture()) {
+        // Éviter les doublons
         alertes.push({
           materialId: material.id,
           reference: material.reference,
@@ -499,13 +542,13 @@ export class MaterialService extends BusinessService<Material> {
           emplacement: material.emplacement,
           methodeStockage: material.methodeStockage,
           dangereux: material.dangereux,
-          dateAlerte: new Date()
+          dateAlerte: new Date(),
         })
       }
     }
 
     return alertes.sort((a, b) => {
-      const niveauOrder = { 'CRITICAL': 3, 'WARNING': 2, 'INFO': 1 }
+      const niveauOrder = { CRITICAL: 3, WARNING: 2, INFO: 1 }
       return niveauOrder[b.niveau] - niveauOrder[a.niveau]
     })
   }
@@ -514,11 +557,19 @@ export class MaterialService extends BusinessService<Material> {
    * Méthodes privées
    */
 
-  private async validateCreationRules(entity: Material, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateCreationRules(
+    entity: Material,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Vérifier l'unicité de la référence
     const existingByRef = await this.materialRepository.findByReference(entity.reference)
     if (existingByRef) {
-      errors.push({ field: 'reference', message: 'Cette référence existe déjà', code: 'REFERENCE_DUPLICATE' })
+      errors.push({
+        field: 'reference',
+        message: 'Cette référence existe déjà',
+        code: 'REFERENCE_DUPLICATE',
+      })
     }
 
     // Vérifier que le fournisseur existe si spécifié
@@ -534,27 +585,47 @@ export class MaterialService extends BusinessService<Material> {
     this.validateDimensionsConsistency(entity, warnings)
   }
 
-  private async validateUpdateRules(entity: Material, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateUpdateRules(
+    entity: Material,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Un matériau avec des mouvements de stock ne peut pas changer d'unité
     const hasStockMovements = await this.materialRepository.hasStockMovements(entity.id)
     if (hasStockMovements) {
-      warnings.push({ field: 'unite', message: 'Ce matériau a des mouvements de stock', code: 'HAS_MOVEMENTS' })
+      warnings.push({
+        field: 'unite',
+        message: 'Ce matériau a des mouvements de stock',
+        code: 'HAS_MOVEMENTS',
+      })
     }
 
     // Vérifier la cohérence des dimensions
     this.validateDimensionsConsistency(entity, warnings)
   }
 
-  private async validateDeletionRules(entity: Material, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateDeletionRules(
+    entity: Material,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Interdire la suppression si le matériau a du stock
     if ((entity.stockPhysique || 0) > 0) {
-      errors.push({ field: 'general', message: 'Impossible de supprimer un matériau avec du stock', code: 'HAS_STOCK' })
+      errors.push({
+        field: 'general',
+        message: 'Impossible de supprimer un matériau avec du stock',
+        code: 'HAS_STOCK',
+      })
     }
 
     // Interdire la suppression si le matériau a des mouvements
     const hasMovements = await this.materialRepository.hasStockMovements(entity.id)
     if (hasMovements) {
-      errors.push({ field: 'general', message: 'Impossible de supprimer un matériau avec des mouvements', code: 'HAS_MOVEMENTS' })
+      errors.push({
+        field: 'general',
+        message: 'Impossible de supprimer un matériau avec des mouvements',
+        code: 'HAS_MOVEMENTS',
+      })
     }
   }
 
@@ -566,19 +637,31 @@ export class MaterialService extends BusinessService<Material> {
     switch (entity.forme) {
       case MaterialShape.TUBE:
         if (!dim.diametre && !dim.diametreExterieur) {
-          warnings.push({ field: 'dimensions', message: 'Un tube devrait avoir un diamètre défini', code: 'MISSING_DIAMETER' })
+          warnings.push({
+            field: 'dimensions',
+            message: 'Un tube devrait avoir un diamètre défini',
+            code: 'MISSING_DIAMETER',
+          })
         }
         break
-      
+
       case MaterialShape.PLAQUE:
         if (!dim.longueur || !dim.largeur || !dim.epaisseur) {
-          warnings.push({ field: 'dimensions', message: 'Une plaque devrait avoir longueur, largeur et épaisseur', code: 'MISSING_DIMENSIONS' })
+          warnings.push({
+            field: 'dimensions',
+            message: 'Une plaque devrait avoir longueur, largeur et épaisseur',
+            code: 'MISSING_DIMENSIONS',
+          })
         }
         break
-      
+
       case MaterialShape.BARRE:
         if (!dim.longueur) {
-          warnings.push({ field: 'dimensions', message: 'Une barre devrait avoir une longueur définie', code: 'MISSING_LENGTH' })
+          warnings.push({
+            field: 'dimensions',
+            message: 'Une barre devrait avoir une longueur définie',
+            code: 'MISSING_LENGTH',
+          })
         }
         break
     }
@@ -587,13 +670,14 @@ export class MaterialService extends BusinessService<Material> {
     if (entity.densite && dim.longueur && dim.largeur && dim.epaisseur && entity.poidsUnitaire) {
       const volumeCalcule = (dim.longueur / 1000) * (dim.largeur / 1000) * (dim.epaisseur / 1000) // m³
       const poidsCalcule = volumeCalcule * entity.densite * 1000 // kg
-      const ecartPourcentage = Math.abs(poidsCalcule - entity.poidsUnitaire) / entity.poidsUnitaire * 100
-      
+      const ecartPourcentage =
+        (Math.abs(poidsCalcule - entity.poidsUnitaire) / entity.poidsUnitaire) * 100
+
       if (ecartPourcentage > 10) {
-        warnings.push({ 
-          field: 'poidsUnitaire', 
-          message: `Incohérence entre poids déclaré (${entity.poidsUnitaire}kg) et poids calculé (${poidsCalcule.toFixed(2)}kg)`, 
-          code: 'WEIGHT_INCONSISTENCY' 
+        warnings.push({
+          field: 'poidsUnitaire',
+          message: `Incohérence entre poids déclaré (${entity.poidsUnitaire}kg) et poids calculé (${poidsCalcule.toFixed(2)}kg)`,
+          code: 'WEIGHT_INCONSISTENCY',
         })
       }
     }
@@ -610,7 +694,7 @@ export class MaterialService extends BusinessService<Material> {
       [MaterialType.LAITON]: 'LA',
       [MaterialType.PLASTIQUE]: 'PL',
       [MaterialType.COMPOSITE]: 'CO',
-      [MaterialType.AUTRE]: 'AU'
+      [MaterialType.AUTRE]: 'AU',
     }
 
     const formePrefixes = {
@@ -626,31 +710,31 @@ export class MaterialService extends BusinessService<Material> {
       [MaterialShape.CORNIERE]: 'CN',
       [MaterialShape.U]: 'U',
       [MaterialShape.T]: 'T',
-      [MaterialShape.AUTRE]: 'AU'
+      [MaterialShape.AUTRE]: 'AU',
     }
 
     const typePrefix = typePrefixes[type] || 'MT'
     const formePrefix = formePrefixes[forme] || 'XX'
     const count = await this.materialRepository.countByType(type)
-    
+
     return `${typePrefix}-${formePrefix}-${(count + 1).toString().padStart(6, '0')}`
   }
 
   private getCompatibilityReasons(material1: Material, material2: Material): string[] {
     const reasons: string[] = []
-    
+
     if (material1.type === material2.type) {
       reasons.push('Même type de matériau')
     }
-    
+
     if (material1.forme === material2.forme) {
       reasons.push('Même forme')
     }
-    
+
     if (material1.methodeStockage === material2.methodeStockage) {
       reasons.push('Même méthode de stockage')
     }
-    
+
     if (material1.dangereux === material2.dangereux) {
       reasons.push('Même niveau de dangerosité')
     }
@@ -660,11 +744,11 @@ export class MaterialService extends BusinessService<Material> {
 
   private getIncompatibilityReasons(material1: Material, material2: Material): string[] {
     const reasons: string[] = []
-    
+
     if (material1.dangereux !== material2.dangereux) {
       reasons.push('Niveaux de dangerosité différents')
     }
-    
+
     if (material1.methodeStockage !== material2.methodeStockage) {
       reasons.push('Méthodes de stockage incompatibles')
     }

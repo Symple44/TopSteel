@@ -7,7 +7,7 @@ export {
   HierarchicalDataTable,
   DataTableExample,
   HierarchicalDataTableExample,
-  SimpleDataTableExample
+  SimpleDataTableExample,
 } from './datatable'
 export * from './progress'
 export * from './reorderable-list'

@@ -55,17 +55,20 @@ import { PageTemplate, PageSection, SectionPreset } from '../../domains/page-bui
 
     // Exports pour les autres modules
     TypeOrmModule.forFeature([Societe], 'erpAuth'),
-    TypeOrmModule.forFeature([
-      MarketplaceCustomer,
-      MarketplaceProduct,
-      MarketplacePriceRule,
-      MarketplaceOrder,
-      MarketplaceOrderItem,
-      MarketplaceTheme,
-      PageTemplate,
-      PageSection,
-      SectionPreset,
-    ], 'marketplace'),
+    TypeOrmModule.forFeature(
+      [
+        MarketplaceCustomer,
+        MarketplaceProduct,
+        MarketplacePriceRule,
+        MarketplaceOrder,
+        MarketplaceOrderItem,
+        MarketplaceTheme,
+        PageTemplate,
+        PageSection,
+        SectionPreset,
+      ],
+      'marketplace'
+    ),
   ],
   exports: [TypeOrmModule],
 })

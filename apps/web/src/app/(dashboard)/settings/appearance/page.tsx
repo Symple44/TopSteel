@@ -66,7 +66,10 @@ export default function AppearanceSettingsPage() {
             t('settingsEnhanced.appearance.messages.saveSuccessDesc')
           )
         } catch (_saveError) {
-          error(t('settingsEnhanced.appearance.messages.saveError'), t('settingsEnhanced.appearance.messages.saveErrorDesc'))
+          error(
+            t('settingsEnhanced.appearance.messages.saveError'),
+            t('settingsEnhanced.appearance.messages.saveErrorDesc')
+          )
         }
       }, 1000) // Attendre 1 seconde après le dernier changement
 
@@ -93,10 +96,30 @@ export default function AppearanceSettingsPage() {
   }
 
   const themes = [
-    { id: 'vibrant', label: t('settingsEnhanced.appearance.themes.vibrant'), icon: Palette, description: t('settingsEnhanced.appearance.themes.vibrantDesc') },
-    { id: 'light', label: t('settingsEnhanced.appearance.themes.light'), icon: Sun, description: t('settingsEnhanced.appearance.themes.lightDesc') },
-    { id: 'dark', label: t('settingsEnhanced.appearance.themes.dark'), icon: Moon, description: t('settingsEnhanced.appearance.themes.darkDesc') },
-    { id: 'system', label: t('settingsEnhanced.appearance.themes.system'), icon: Monitor, description: t('settingsEnhanced.appearance.themes.systemDesc') },
+    {
+      id: 'vibrant',
+      label: t('settingsEnhanced.appearance.themes.vibrant'),
+      icon: Palette,
+      description: t('settingsEnhanced.appearance.themes.vibrantDesc'),
+    },
+    {
+      id: 'light',
+      label: t('settingsEnhanced.appearance.themes.light'),
+      icon: Sun,
+      description: t('settingsEnhanced.appearance.themes.lightDesc'),
+    },
+    {
+      id: 'dark',
+      label: t('settingsEnhanced.appearance.themes.dark'),
+      icon: Moon,
+      description: t('settingsEnhanced.appearance.themes.darkDesc'),
+    },
+    {
+      id: 'system',
+      label: t('settingsEnhanced.appearance.themes.system'),
+      icon: Monitor,
+      description: t('settingsEnhanced.appearance.themes.systemDesc'),
+    },
   ]
 
   const languages = [
@@ -108,14 +131,34 @@ export default function AppearanceSettingsPage() {
 
   const accentColors = [
     { id: 'blue', label: t('settingsEnhanced.appearance.accentColors.blue'), color: 'bg-blue-500' },
-    { id: 'green', label: t('settingsEnhanced.appearance.accentColors.green'), color: 'bg-green-500' },
-    { id: 'purple', label: t('settingsEnhanced.appearance.accentColors.purple'), color: 'bg-purple-500' },
-    { id: 'orange', label: t('settingsEnhanced.appearance.accentColors.orange'), color: 'bg-orange-500' },
+    {
+      id: 'green',
+      label: t('settingsEnhanced.appearance.accentColors.green'),
+      color: 'bg-green-500',
+    },
+    {
+      id: 'purple',
+      label: t('settingsEnhanced.appearance.accentColors.purple'),
+      color: 'bg-purple-500',
+    },
+    {
+      id: 'orange',
+      label: t('settingsEnhanced.appearance.accentColors.orange'),
+      color: 'bg-orange-500',
+    },
     { id: 'pink', label: t('settingsEnhanced.appearance.accentColors.pink'), color: 'bg-pink-500' },
     { id: 'red', label: t('settingsEnhanced.appearance.accentColors.red'), color: 'bg-red-500' },
     { id: 'teal', label: 'Sarcelle', color: 'bg-teal-500' },
-    { id: 'indigo', label: t('settingsEnhanced.appearance.accentColors.indigo'), color: 'bg-indigo-500' },
-    { id: 'yellow', label: t('settingsEnhanced.appearance.accentColors.yellow'), color: 'bg-yellow-500' },
+    {
+      id: 'indigo',
+      label: t('settingsEnhanced.appearance.accentColors.indigo'),
+      color: 'bg-indigo-500',
+    },
+    {
+      id: 'yellow',
+      label: t('settingsEnhanced.appearance.accentColors.yellow'),
+      color: 'bg-yellow-500',
+    },
     { id: 'emerald', label: 'Émeraude', color: 'bg-emerald-500' },
     { id: 'rose', label: 'Rose vif', color: 'bg-rose-500' },
     { id: 'cyan', label: 'Cyan', color: 'bg-cyan-500' },
@@ -255,9 +298,21 @@ export default function AppearanceSettingsPage() {
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { id: 'small', label: t('settingsEnhanced.appearance.fontSizes.small'), sample: 'text-sm' },
-                  { id: 'medium', label: t('settingsEnhanced.appearance.fontSizes.medium'), sample: 'text-base' },
-                  { id: 'large', label: t('settingsEnhanced.appearance.fontSizes.large'), sample: 'text-lg' },
+                  {
+                    id: 'small',
+                    label: t('settingsEnhanced.appearance.fontSizes.small'),
+                    sample: 'text-sm',
+                  },
+                  {
+                    id: 'medium',
+                    label: t('settingsEnhanced.appearance.fontSizes.medium'),
+                    sample: 'text-base',
+                  },
+                  {
+                    id: 'large',
+                    label: t('settingsEnhanced.appearance.fontSizes.large'),
+                    sample: 'text-lg',
+                  },
                 ].map((size) => (
                   <label key={size.id} className="flex items-center space-x-3 cursor-pointer">
                     <input
@@ -288,8 +343,16 @@ export default function AppearanceSettingsPage() {
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { id: 'compact', label: t('settingsEnhanced.appearance.densities.compact'), description: "Plus d'éléments visibles" },
-                  { id: 'comfortable', label: t('settingsEnhanced.appearance.densities.comfortable'), description: 'Équilibre optimal' },
+                  {
+                    id: 'compact',
+                    label: t('settingsEnhanced.appearance.densities.compact'),
+                    description: "Plus d'éléments visibles",
+                  },
+                  {
+                    id: 'comfortable',
+                    label: t('settingsEnhanced.appearance.densities.comfortable'),
+                    description: 'Équilibre optimal',
+                  },
                   {
                     id: 'spacious',
                     label: t('settingsEnhanced.appearance.densities.spacious'),

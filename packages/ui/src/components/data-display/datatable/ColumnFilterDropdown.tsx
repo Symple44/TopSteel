@@ -230,8 +230,8 @@ export function ColumnFilterDropdown<T = any>({
               <div className="flex gap-2">
                 <Button variant="ghost" size="sm" onClick={handleSelectAll} className="text-xs">
                   {selectedValues.length === filteredValues.length
-                    ? (translations?.clear || 'Clear')
-                    : (translations?.selectAll || 'Select All')}
+                    ? translations?.clear || 'Clear'
+                    : translations?.selectAll || 'Select All'}
                 </Button>
                 <div className="flex-1" />
                 <span className="text-xs text-muted-foreground">

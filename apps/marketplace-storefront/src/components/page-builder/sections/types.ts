@@ -24,7 +24,7 @@ export enum SectionType {
   TEAM = 'team',
   BRANDS = 'brands',
   BLOG_POSTS = 'blog_posts',
-  STATISTICS = 'statistics'
+  STATISTICS = 'statistics',
 }
 
 export interface SectionStyles {

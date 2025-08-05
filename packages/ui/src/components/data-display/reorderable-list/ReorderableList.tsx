@@ -233,8 +233,8 @@ function useDragAndDrop<T extends ReorderableItem>(
                 const newItems = [...currentItems.slice(0, i), ...currentItems.slice(i + 1)]
                 return { newItems, removedItem: removed }
               }
-              if (currentItems[i].children && currentItems[i].children?.length > 0) {
-                const result = processItems(currentItems[i].children as T[])
+              if (currentItems[i].children && currentItems[i].children.length > 0) {
+                const result = processItems(currentItems[i].children! as T[])
                 if (result.removedItem) {
                   const newItems = [...currentItems]
                   newItems[i] = { ...newItems[i], children: result.newItems }
@@ -288,8 +288,8 @@ function useDragAndDrop<T extends ReorderableItem>(
               }
 
               // Rechercher récursivement dans les enfants
-              if (currentItems[i].children && currentItems[i].children?.length > 0) {
-                const result = processLevel(currentItems[i].children as T[])
+              if (currentItems[i].children && currentItems[i].children.length > 0) {
+                const result = processLevel(currentItems[i].children! as T[])
                 if (result.found) {
                   const newItems = [...currentItems]
                   newItems[i] = { ...newItems[i], children: result.items }
@@ -644,7 +644,7 @@ function SortableItem<T extends ReorderableItem>({
                 style={{
                   left: `${level * 24 - 12}px`,
                   top: '100%',
-                  height: `${item.children?.length * 80}px`,
+                  height: `${(item.children?.length || 0) * 80}px`,
                   zIndex: 1,
                 }}
               />

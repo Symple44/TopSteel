@@ -18,14 +18,8 @@ import { CustomersModule } from '../customers/customers.module'
     ProductsModule,
     CustomersModule,
   ],
-  providers: [
-    StorefrontService,
-  ],
-  controllers: [
-    StorefrontController,
-  ],
-  exports: [
-    StorefrontService,
-  ],
+  providers: [StorefrontService],
+  controllers: [StorefrontController],
+  exports: [StorefrontService],
 })
 export class StorefrontModule {}

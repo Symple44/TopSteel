@@ -69,11 +69,11 @@ export class AppController {
   @ApiOperation({ summary: 'Temporary storefront config for testing' })
   tempStorefrontConfig() {
     return {
-      storeName: "TopSteel",
-      description: "Boutique en ligne TopSteel",
+      storeName: 'TopSteel',
+      description: 'Boutique en ligne TopSteel',
       contactInfo: {
-        email: "contact@topsteel.fr",
-        address: "123 Rue de la Métallurgie, 75000 Paris"
+        email: 'contact@topsteel.fr',
+        address: '123 Rue de la Métallurgie, 75000 Paris',
       },
       features: {
         allowGuestCheckout: true,
@@ -82,14 +82,14 @@ export class AppController {
         showStock: true,
         enableWishlist: false,
         enableCompare: false,
-        enableReviews: false
+        enableReviews: false,
       },
       social: {},
       seo: {
-        title: "TopSteel - Boutique en ligne",
-        description: "Découvrez nos produits sur la boutique en ligne de TopSteel",
-        keywords: ["TopSteel", "boutique", "produits", "métallurgie"]
-      }
+        title: 'TopSteel - Boutique en ligne',
+        description: 'Découvrez nos produits sur la boutique en ligne de TopSteel',
+        keywords: ['TopSteel', 'boutique', 'produits', 'métallurgie'],
+      },
     }
   }
 }

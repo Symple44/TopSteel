@@ -7,7 +7,7 @@ import { callClientApi } from '@/utils/backend-api'
 
 // Clés de stockage - doivent correspondre à auth-storage.ts
 export const STORAGE_KEYS = {
-  AUTH: 'topsteel_auth_tokens',  // Même clé que tokenStorageKey dans auth-storage.ts
+  AUTH: 'topsteel_auth_tokens', // Même clé que tokenStorageKey dans auth-storage.ts
   TOKENS: 'topsteel_auth_tokens',
   COMPANY: 'topsteel-company',
 } as const
@@ -325,11 +325,11 @@ export class AuthService {
       // Utiliser authStorage pour récupérer la session (comme fait par auth-provider)
       const { authStorage } = await import('@/lib/auth/auth-storage')
       const session = authStorage.getStoredSession()
-      
+
       if (!session?.tokens?.accessToken) {
         return []
       }
-      
+
       const tokens = session.tokens
 
       const response = await callClientApi('auth/societes', {

@@ -31,12 +31,7 @@ export function CartSidebar({ tenant }: CartSidebarProps) {
   return (
     <>
       {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40"
-          onClick={toggleCart}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 bg-black/50 z-40" onClick={toggleCart} />}
 
       {/* Sidebar */}
       <div
@@ -51,10 +46,7 @@ export function CartSidebar({ tenant }: CartSidebarProps) {
             <ShoppingBag className="w-5 h-5" />
             Panier ({totalItems})
           </h2>
-          <button
-            onClick={toggleCart}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-          >
+          <button onClick={toggleCart} className="p-2 hover:bg-muted rounded-lg transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -150,12 +142,7 @@ function CartItem({ item, onUpdateQuantity, onRemove, tenant }: CartItemProps) {
       {/* Image */}
       <div className="relative w-16 h-16 bg-muted rounded overflow-hidden flex-shrink-0">
         {mainImage ? (
-          <Image
-            src={mainImage.url}
-            alt={product.designation}
-            fill
-            className="object-cover"
-          />
+          <Image src={mainImage.url} alt={product.designation} fill className="object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <ShoppingBag className="w-6 h-6 text-muted-foreground" />
@@ -173,16 +160,12 @@ function CartItem({ item, onUpdateQuantity, onRemove, tenant }: CartItemProps) {
           >
             {product.designation}
           </Link>
-          
-          <p className="text-xs text-muted-foreground font-mono">
-            Réf: {product.reference}
-          </p>
+
+          <p className="text-xs text-muted-foreground font-mono">Réf: {product.reference}</p>
 
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold">
-              {formatPrice(totalPrice)}
-            </div>
-            
+            <div className="text-sm font-semibold">{formatPrice(totalPrice)}</div>
+
             {unitPrice !== (product.calculatedPrice || product.basePrice) && (
               <div className="text-xs text-muted-foreground">
                 Prix unitaire: {formatPrice(unitPrice)}
@@ -201,9 +184,7 @@ function CartItem({ item, onUpdateQuantity, onRemove, tenant }: CartItemProps) {
             >
               <Minus className="w-3 h-3" />
             </button>
-            <span className="px-2 py-1 text-sm min-w-[2rem] text-center">
-              {quantity}
-            </span>
+            <span className="px-2 py-1 text-sm min-w-[2rem] text-center">{quantity}</span>
             <button
               onClick={() => onUpdateQuantity(quantity + 1)}
               className="p-1 hover:bg-muted transition-colors"

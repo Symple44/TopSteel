@@ -7,15 +7,7 @@ import { MaterialsModule } from './materials/materials.module'
  * Module central pour tous les domaines métier
  */
 @Module({
-  imports: [
-    PartnersModule,
-    InventoryModule,
-    MaterialsModule,
-  ],
-  exports: [
-    PartnersModule,
-    InventoryModule,
-    MaterialsModule,
-  ]
+  imports: [PartnersModule, InventoryModule, MaterialsModule],
+  exports: [PartnersModule, InventoryModule, MaterialsModule],
 })
 export class BusinessModule {}

@@ -4,21 +4,21 @@ import { BusinessEntity } from '@erp/entities'
 export enum PartnerType {
   CLIENT = 'CLIENT',
   FOURNISSEUR = 'FOURNISSEUR',
-  MIXTE = 'MIXTE' // Client et fournisseur
+  MIXTE = 'MIXTE', // Client et fournisseur
 }
 
 export enum PartnerStatus {
   ACTIF = 'ACTIF',
   INACTIF = 'INACTIF',
   SUSPENDU = 'SUSPENDU',
-  PROSPECT = 'PROSPECT' // Pour les clients potentiels
+  PROSPECT = 'PROSPECT', // Pour les clients potentiels
 }
 
 export enum PartnerCategory {
   PARTICULIER = 'PARTICULIER',
   ENTREPRISE = 'ENTREPRISE',
   ADMINISTRATION = 'ADMINISTRATION',
-  ASSOCIATION = 'ASSOCIATION'
+  ASSOCIATION = 'ASSOCIATION',
 }
 
 /**
@@ -197,15 +197,15 @@ export class Partner extends BusinessEntity {
 
     // Validations de format
     if (this.email && !this.isValidEmail(this.email)) {
-      errors.push('L\'adresse email n\'est pas valide')
+      errors.push("L'adresse email n'est pas valide")
     }
 
     if (this.siret && !this.isValidSiret(this.siret)) {
-      errors.push('Le numéro SIRET n\'est pas valide')
+      errors.push("Le numéro SIRET n'est pas valide")
     }
 
     if (this.numeroTVA && !this.isValidTVA(this.numeroTVA)) {
-      errors.push('Le numéro de TVA n\'est pas valide')
+      errors.push("Le numéro de TVA n'est pas valide")
     }
 
     // Validations métier
@@ -306,7 +306,7 @@ export class Partner extends BusinessEntity {
     this.notes.historiqueNotes.push({
       date: new Date().toISOString(),
       auteur,
-      contenu: `${titre}: ${contenu}`
+      contenu: `${titre}: ${contenu}`,
     })
     this.markAsModified()
   }

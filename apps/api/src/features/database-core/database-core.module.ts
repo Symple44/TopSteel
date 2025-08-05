@@ -16,7 +16,10 @@ import { TenantConnectionSimpleService } from './services/tenant-connection-simp
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([User, UserMenuPreference, DiscoveredPage, Societe, SocieteUser], 'auth'),
+    TypeOrmModule.forFeature(
+      [User, UserMenuPreference, DiscoveredPage, Societe, SocieteUser],
+      'auth'
+    ),
     TypeOrmModule.forFeature([], 'shared'),
   ],
   controllers: [DatabaseAdminController],

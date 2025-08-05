@@ -83,22 +83,18 @@ export class ConsolidatedSecurityMiddleware implements NestMiddleware {
     const referer = req.get('Referer') || ''
 
     // Détecter les User-Agents suspects
-    const suspiciousUAs = [
-      /sqlmap/i,
-      /nikto/i,
-      /nmap/i,
-      /burp/i,
-      /scanner/i,
-    ]
+    const suspiciousUAs = [/sqlmap/i, /nikto/i, /nmap/i, /burp/i, /scanner/i]
 
-    return suspiciousUAs.some((pattern) => pattern.test(userAgent)) ||
-           suspiciousUAs.some((pattern) => pattern.test(referer))
+    return (
+      suspiciousUAs.some((pattern) => pattern.test(userAgent)) ||
+      suspiciousUAs.some((pattern) => pattern.test(referer))
+    )
   }
 
   private getSafeHeaders(req: Request): Record<string, string> {
     return {
       'user-agent': req.get('User-Agent') || 'unknown',
-      'referer': req.get('Referer') || 'none',
+      referer: req.get('Referer') || 'none',
       'x-forwarded-for': req.get('X-Forwarded-For') || 'none',
     }
   }

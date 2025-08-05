@@ -286,21 +286,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
             })
 
             console.log('🔍 AuthProvider: Default company response status:', response.status)
-            
+
             if (response.ok) {
               const defaultCompanyData = await response.json()
               console.log('🔍 AuthProvider: Default company data:', defaultCompanyData)
-              
+
               if (defaultCompanyData.success && defaultCompanyData.data) {
-                console.log('🔍 AuthProvider: Found default company, auto-selecting:', defaultCompanyData.data.id)
-                
+                console.log(
+                  '🔍 AuthProvider: Found default company, auto-selecting:',
+                  defaultCompanyData.data.id
+                )
+
                 // L'utilisateur a une société par défaut - se connecter automatiquement
                 const companyId = defaultCompanyData.data.id
-                const companySelectResult = await AuthService.selectCompany(companyId, tokens.accessToken)
-                
+                const companySelectResult = await AuthService.selectCompany(
+                  companyId,
+                  tokens.accessToken
+                )
+
                 console.log('🔍 AuthProvider: Company selection result:', companySelectResult)
-                
-                const adaptedUser = AuthAdapter.toAuthUser(AuthAdapter.toExtendedUser(companySelectResult.user as any))
+
+                const adaptedUser = AuthAdapter.toAuthUser(
+                  AuthAdapter.toExtendedUser(companySelectResult.user as any)
+                )
                 const adaptedTokens = AuthAdapter.toNewAuthTokens(companySelectResult.tokens as any)
                 const adaptedCompany = AuthAdapter.toNewCompany(companySelectResult.company as any)
 
@@ -319,16 +327,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
                 console.log('🔍 AuthProvider: Setting auth state with default company:', newState)
                 setAuthState((prev) => ({ ...prev, ...newState }))
-                broadcastAuthEvent('USER_LOGIN', { user: adaptedUser, tokens: adaptedTokens, company: adaptedCompany })
-                
+                broadcastAuthEvent('USER_LOGIN', {
+                  user: adaptedUser,
+                  tokens: adaptedTokens,
+                  company: adaptedCompany,
+                })
+
                 // IMPORTANT: Rediriger immédiatement vers le dashboard après avoir défini la société par défaut
                 if (typeof window !== 'undefined') {
-                  console.log('🔍 AuthProvider: Redirecting to dashboard after default company selection...')
+                  console.log(
+                    '🔍 AuthProvider: Redirecting to dashboard after default company selection...'
+                  )
                   setTimeout(() => {
                     window.location.href = '/dashboard'
                   }, 100) // Petit délai pour s'assurer que l'état est bien mis à jour
                 }
-                
+
                 return
               } else {
                 console.log('🔍 AuthProvider: No default company found in response data')
@@ -339,7 +353,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
           } catch (error) {
             // Si la récupération de la société par défaut échoue (ex: 401 car pas encore de société), continuer normalement
             // C'est un comportement attendu lors du premier login
-            console.debug('Default company retrieval failed (expected during initial login):', error)
+            console.debug(
+              'Default company retrieval failed (expected during initial login):',
+              error
+            )
           }
 
           // Pas de société par défaut ou erreur - forcer la sélection (tokens déjà sauvegardés)

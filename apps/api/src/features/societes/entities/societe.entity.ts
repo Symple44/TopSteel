@@ -4,7 +4,7 @@ import { Site } from './site.entity'
 // Re-export shared entities from the @erp/entities package
 export {
   SocieteStatus,
-  SocietePlan
+  SocietePlan,
 } from '@erp/entities'
 
 // Import the base class for extending with relationships

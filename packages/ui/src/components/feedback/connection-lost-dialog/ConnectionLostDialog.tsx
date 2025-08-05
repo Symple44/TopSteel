@@ -29,17 +29,18 @@ interface ConnectionLostDialogProps {
   }
 }
 
-export function ConnectionLostDialog({ 
-  isOpen, 
+export function ConnectionLostDialog({
+  isOpen,
   onRetry,
   onGoToLogin,
-  translations = {}
+  translations = {},
 }: ConnectionLostDialogProps) {
   const [isRetrying, setIsRetrying] = useState(false)
 
   const t = {
     title: translations.title || 'Connexion perdue',
-    connectionInterrupted: translations.connectionInterrupted || 'La connexion avec le serveur a été interrompue.',
+    connectionInterrupted:
+      translations.connectionInterrupted || 'La connexion avec le serveur a été interrompue.',
     possibleReasons: translations.possibleReasons || 'Cela peut être dû à :',
     serverRestart: translations.serverRestart || 'Un redémarrage du serveur',
     networkLoss: translations.networkLoss || 'Une perte de connexion réseau',
@@ -47,7 +48,9 @@ export function ConnectionLostDialog({
     retrying: translations.retrying || 'Reconnexion en cours...',
     retry: translations.retry || 'Réessayer',
     backToLogin: translations.backToLogin || 'Retour à la connexion',
-    contactAdmin: translations.contactAdmin || 'Si le problème persiste, contactez votre administrateur système.',
+    contactAdmin:
+      translations.contactAdmin ||
+      'Si le problème persiste, contactez votre administrateur système.',
   }
 
   const handleRetry = async () => {
@@ -128,9 +131,7 @@ export function ConnectionLostDialog({
           )}
         </div>
 
-        <p className="text-xs text-center text-muted-foreground pt-2">
-          {t.contactAdmin}
-        </p>
+        <p className="text-xs text-center text-muted-foreground pt-2">{t.contactAdmin}</p>
       </DialogContent>
     </Dialog>
   )

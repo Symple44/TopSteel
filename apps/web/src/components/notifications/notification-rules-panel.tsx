@@ -377,7 +377,11 @@ export default function NotificationRulesPanel() {
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {rule.conditions.map((condition, index) => (
-                            <Badge key={`${condition.field}-${condition.operator}-${index}`} variant="outline" className="text-xs">
+                            <Badge
+                              key={`${condition.field}-${condition.operator}-${index}`}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {condition.field} {condition.operator}{' '}
                               {Array.isArray(condition.value)
                                 ? condition.value.join(', ')

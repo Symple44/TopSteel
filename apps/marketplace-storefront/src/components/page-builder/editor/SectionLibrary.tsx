@@ -14,7 +14,7 @@ const sectionCategories = [
     sections: [
       { type: SectionType.HERO, name: 'Section Héros', icon: '🎯' },
       { type: SectionType.BANNER, name: 'Bannière', icon: '📢' },
-    ]
+    ],
   },
   {
     name: 'Produits',
@@ -22,25 +22,25 @@ const sectionCategories = [
       { type: SectionType.PRODUCTS_GRID, name: 'Grille de produits', icon: '📦' },
       { type: SectionType.PRODUCTS_CAROUSEL, name: 'Carrousel de produits', icon: '🎠' },
       { type: SectionType.CATEGORIES, name: 'Catégories', icon: '📂' },
-    ]
+    ],
   },
   {
     name: 'Contenu',
     sections: [
       { type: SectionType.TEXT_BLOCK, name: 'Bloc de texte', icon: '📝' },
-      { type: SectionType.IMAGE_GALLERY, name: 'Galerie d\'images', icon: '🖼️' },
+      { type: SectionType.IMAGE_GALLERY, name: "Galerie d'images", icon: '🖼️' },
       { type: SectionType.VIDEO, name: 'Vidéo', icon: '🎥' },
       { type: SectionType.FAQ, name: 'FAQ', icon: '❓' },
       { type: SectionType.TESTIMONIALS, name: 'Témoignages', icon: '💬' },
-    ]
+    ],
   },
   {
-    name: 'Appels à l\'action',
+    name: "Appels à l'action",
     sections: [
       { type: SectionType.CTA, name: 'Call to Action', icon: '🎯' },
       { type: SectionType.NEWSLETTER, name: 'Newsletter', icon: '✉️' },
       { type: SectionType.CONTACT_FORM, name: 'Formulaire de contact', icon: '📧' },
-    ]
+    ],
   },
   {
     name: 'Fonctionnalités',
@@ -49,7 +49,7 @@ const sectionCategories = [
       { type: SectionType.PRICING_TABLE, name: 'Tableau de prix', icon: '💰' },
       { type: SectionType.STATISTICS, name: 'Statistiques', icon: '📊' },
       { type: SectionType.TEAM, name: 'Équipe', icon: '👥' },
-    ]
+    ],
   },
   {
     name: 'Mise en page',
@@ -58,8 +58,8 @@ const sectionCategories = [
       { type: SectionType.DIVIDER, name: 'Séparateur', icon: '➖' },
       { type: SectionType.TABS, name: 'Onglets', icon: '📑' },
       { type: SectionType.ACCORDION, name: 'Accordéon', icon: '🎹' },
-    ]
-  }
+    ],
+  },
 ]
 
 export function SectionLibrary({ onSelect, onClose }: SectionLibraryProps) {
@@ -68,10 +68,7 @@ export function SectionLibrary({ onSelect, onClose }: SectionLibraryProps) {
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-semibold">Bibliothèque de sections</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>

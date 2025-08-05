@@ -1,10 +1,10 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
-  Index
+  Index,
 } from 'typeorm'
 
 export interface ColorPalette {
@@ -199,7 +199,7 @@ export class MarketplaceTheme {
   getCompiledCSS(): string {
     const cssVariables = this.generateCSSVariables()
     const customCSS = this.customCSS || ''
-    
+
     return `
       :root {
         ${cssVariables}
@@ -211,7 +211,7 @@ export class MarketplaceTheme {
 
   private generateCSSVariables(): string {
     const variables: string[] = []
-    
+
     // Couleurs
     if (this.colors) {
       variables.push(`--color-primary: ${this.colors.primary}`)
@@ -225,38 +225,38 @@ export class MarketplaceTheme {
       variables.push(`--color-warning: ${this.colors.warning}`)
       variables.push(`--color-error: ${this.colors.error}`)
     }
-    
+
     // Typographie
     if (this.typography) {
       variables.push(`--font-family-primary: ${this.typography.fontFamily?.primary}`)
       if (this.typography.fontFamily?.secondary) {
         variables.push(`--font-family-secondary: ${this.typography.fontFamily.secondary}`)
       }
-      
+
       Object.entries(this.typography.fontSize || {}).forEach(([key, value]) => {
         variables.push(`--font-size-${key}: ${value}`)
       })
-      
+
       Object.entries(this.typography.fontWeight || {}).forEach(([key, value]) => {
         variables.push(`--font-weight-${key}: ${value}`)
       })
     }
-    
+
     // Layout
     if (this.layout) {
       variables.push(`--container-max-width: ${this.layout.containerMaxWidth}`)
       variables.push(`--header-height: ${this.layout.headerHeight}`)
       variables.push(`--footer-height: ${this.layout.footerHeight}`)
-      
+
       Object.entries(this.layout.borderRadius || {}).forEach(([key, value]) => {
         variables.push(`--border-radius-${key}: ${value}`)
       })
-      
+
       Object.entries(this.layout.spacing || {}).forEach(([key, value]) => {
         variables.push(`--spacing-${key}: ${value}`)
       })
     }
-    
+
     return variables.join(';\n  ')
   }
 

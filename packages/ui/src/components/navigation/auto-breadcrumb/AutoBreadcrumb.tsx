@@ -13,10 +13,10 @@ export interface AutoBreadcrumbProps {
   className?: string
 }
 
-export function AutoBreadcrumb({ 
-  pathname, 
+export function AutoBreadcrumb({
+  pathname,
   translateSegment = (segment) => segment.charAt(0).toUpperCase() + segment.slice(1),
-  className
+  className,
 }: AutoBreadcrumbProps) {
   // Générer les éléments du breadcrumb basés sur l'URL
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
@@ -54,7 +54,7 @@ export function AutoBreadcrumb({
   }
 
   return (
-    <div className={className || "mb-6"}>
+    <div className={className || 'mb-6'}>
       <Breadcrumb items={breadcrumbs} showHome={true} />
     </div>
   )

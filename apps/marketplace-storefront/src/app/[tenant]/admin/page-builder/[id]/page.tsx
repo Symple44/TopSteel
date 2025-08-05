@@ -22,7 +22,7 @@ export default function PageEditorPage({ params }: PageProps) {
       if (id === 'new') return null
       const response = await marketplaceApi.get(`/page-builder/templates/${id}`)
       return (response as any).data
-    }
+    },
   })
 
   const saveMutation = useMutation({
@@ -33,14 +33,14 @@ export default function PageEditorPage({ params }: PageProps) {
         pageType: template?.pageType || 'custom',
         status: template?.status || 'draft',
         description: template?.description || '',
-        sections: sections.map(section => ({
+        sections: sections.map((section) => ({
           type: section.type,
           name: section.name,
           content: section.content,
           styles: section.styles,
           responsive: section.responsive,
-          settings: section.settings
-        }))
+          settings: section.settings,
+        })),
       }
 
       if (id === 'new') {
@@ -54,11 +54,11 @@ export default function PageEditorPage({ params }: PageProps) {
     onSuccess: (savedTemplate) => {
       queryClient.invalidateQueries({ queryKey: ['pageTemplates'] })
       queryClient.invalidateQueries({ queryKey: ['pageTemplate', id] })
-      
+
       if (id === 'new') {
         router.push(`/admin/page-builder/${savedTemplate.id}`)
       }
-    }
+    },
   })
 
   const handleSave = (sections: BaseSection[]) => {

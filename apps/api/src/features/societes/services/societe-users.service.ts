@@ -24,7 +24,7 @@ export class SocieteUsersService {
       .select([
         'su.id',
         'su.userId',
-        'su.societeId', 
+        'su.societeId',
         'su.role',
         'su.actif',
         'su.isDefault',
@@ -32,7 +32,7 @@ export class SocieteUsersService {
         'su.restrictedPermissions',
         'societe.id',
         'societe.nom',
-        'societe.code'
+        'societe.code',
       ])
       .where('su.userId = :userId', { userId })
       .andWhere('su.deletedAt IS NULL')

@@ -9,8 +9,10 @@ interface AccountClientProps {
 }
 
 export default function AccountClient({ tenant }: AccountClientProps) {
-  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'settings'>('profile')
-  
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'settings'>(
+    'profile'
+  )
+
   // Mock user data - in real app, this would come from auth context
   const user = {
     id: '1',
@@ -31,42 +33,52 @@ export default function AccountClient({ tenant }: AccountClientProps) {
       id: 'CMD-001',
       date: new Date('2024-01-20'),
       status: 'delivered',
-      total: 1250.00,
+      total: 1250.0,
       itemsCount: 3,
     },
     {
       id: 'CMD-002',
       date: new Date('2024-01-18'),
       status: 'shipped',
-      total: 850.00,
+      total: 850.0,
       itemsCount: 2,
     },
     {
       id: 'CMD-003',
       date: new Date('2024-01-15'),
       status: 'processing',
-      total: 2100.00,
+      total: 2100.0,
       itemsCount: 5,
     },
   ]
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'delivered': return 'Livrée'
-      case 'shipped': return 'Expédiée'
-      case 'processing': return 'En cours'
-      case 'cancelled': return 'Annulée'
-      default: return status
+      case 'delivered':
+        return 'Livrée'
+      case 'shipped':
+        return 'Expédiée'
+      case 'processing':
+        return 'En cours'
+      case 'cancelled':
+        return 'Annulée'
+      default:
+        return status
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'delivered': return 'text-green-600 bg-green-100'
-      case 'shipped': return 'text-blue-600 bg-blue-100'
-      case 'processing': return 'text-orange-600 bg-orange-100'
-      case 'cancelled': return 'text-red-600 bg-red-100'
-      default: return 'text-gray-600 bg-gray-100'
+      case 'delivered':
+        return 'text-green-600 bg-green-100'
+      case 'shipped':
+        return 'text-blue-600 bg-blue-100'
+      case 'processing':
+        return 'text-orange-600 bg-orange-100'
+      case 'cancelled':
+        return 'text-red-600 bg-red-100'
+      default:
+        return 'text-gray-600 bg-gray-100'
     }
   }
 
@@ -89,44 +101,42 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                 <button
                   onClick={() => setActiveTab('profile')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                    activeTab === 'profile' 
-                      ? 'bg-primary text-primary-foreground' 
+                    activeTab === 'profile'
+                      ? 'bg-primary text-primary-foreground'
                       : 'hover:bg-muted'
                   }`}
                 >
                   <User className="w-5 h-5" />
                   Profil
                 </button>
-                
+
                 <button
                   onClick={() => setActiveTab('orders')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                    activeTab === 'orders' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'hover:bg-muted'
+                    activeTab === 'orders' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                   }`}
                 >
                   <Package className="w-5 h-5" />
                   Mes commandes
                 </button>
-                
+
                 <button
                   onClick={() => setActiveTab('favorites')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                    activeTab === 'favorites' 
-                      ? 'bg-primary text-primary-foreground' 
+                    activeTab === 'favorites'
+                      ? 'bg-primary text-primary-foreground'
                       : 'hover:bg-muted'
                   }`}
                 >
                   <Heart className="w-5 h-5" />
                   Favoris
                 </button>
-                
+
                 <button
                   onClick={() => setActiveTab('settings')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                    activeTab === 'settings' 
-                      ? 'bg-primary text-primary-foreground' 
+                    activeTab === 'settings'
+                      ? 'bg-primary text-primary-foreground'
                       : 'hover:bg-muted'
                   }`}
                 >
@@ -151,9 +161,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                 <div className="bg-background border rounded-lg p-6">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold">Informations personnelles</h2>
-                    <button className="btn-outline text-sm">
-                      Modifier
-                    </button>
+                    <button className="btn-outline text-sm">Modifier</button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -184,7 +192,9 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                         </label>
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4 text-muted-foreground" />
-                          <span>{user.firstName} {user.lastName}</span>
+                          <span>
+                            {user.firstName} {user.lastName}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -205,7 +215,9 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                           <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
                           <div>
                             <div>{user.address}</div>
-                            <div>{user.postalCode} {user.city}</div>
+                            <div>
+                              {user.postalCode} {user.city}
+                            </div>
                             <div>{user.country}</div>
                           </div>
                         </div>
@@ -215,11 +227,13 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                         <label className="block text-sm font-medium text-muted-foreground mb-1">
                           Membre depuis
                         </label>
-                        <span>{user.createdAt.toLocaleDateString('fr-FR', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}</span>
+                        <span>
+                          {user.createdAt.toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -243,11 +257,13 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                                 {order.date.toLocaleDateString('fr-FR')}
                               </div>
                             </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
+                            >
                               {getStatusLabel(order.status)}
                             </span>
                           </div>
-                          
+
                           <div className="text-right">
                             <div className="font-semibold">{order.total.toFixed(2)} €</div>
                             <div className="text-sm text-muted-foreground">
@@ -257,13 +273,9 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                         </div>
 
                         <div className="flex gap-2">
-                          <button className="btn-outline text-sm">
-                            Voir les détails
-                          </button>
+                          <button className="btn-outline text-sm">Voir les détails</button>
                           {order.status === 'delivered' && (
-                            <button className="btn-outline text-sm">
-                              Commander à nouveau
-                            </button>
+                            <button className="btn-outline text-sm">Commander à nouveau</button>
                           )}
                         </div>
                       </div>
@@ -271,10 +283,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                   </div>
 
                   <div className="text-center mt-8">
-                    <Link
-                      href={`/${tenant}/products`}
-                      className="btn-primary"
-                    >
+                    <Link href={`/${tenant}/products`} className="btn-primary">
                       Continuer mes achats
                     </Link>
                   </div>
@@ -286,7 +295,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
               <div className="space-y-6">
                 <div className="bg-background border rounded-lg p-6">
                   <h2 className="text-xl font-semibold mb-6">Mes favoris</h2>
-                  
+
                   <div className="text-center py-12 space-y-4">
                     <Heart className="w-16 h-16 text-muted-foreground mx-auto" />
                     <div className="space-y-2">
@@ -295,10 +304,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                         Ajoutez des produits à vos favoris pour les retrouver facilement.
                       </p>
                     </div>
-                    <Link
-                      href={`/${tenant}/products`}
-                      className="btn-primary"
-                    >
+                    <Link href={`/${tenant}/products`} className="btn-primary">
                       Découvrir nos produits
                     </Link>
                   </div>
@@ -317,7 +323,9 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                       <div className="space-y-3">
                         <label className="flex items-center gap-3 cursor-pointer">
                           <input type="checkbox" defaultChecked className="rounded border-input" />
-                          <span className="text-sm">Recevoir les notifications de commande par email</span>
+                          <span className="text-sm">
+                            Recevoir les notifications de commande par email
+                          </span>
                         </label>
                         <label className="flex items-center gap-3 cursor-pointer">
                           <input type="checkbox" defaultChecked className="rounded border-input" />
@@ -333,9 +341,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                     <div className="border-t pt-6">
                       <h3 className="font-semibold mb-3">Sécurité</h3>
                       <div className="space-y-3">
-                        <button className="btn-outline text-sm">
-                          Changer mon mot de passe
-                        </button>
+                        <button className="btn-outline text-sm">Changer mon mot de passe</button>
                       </div>
                     </div>
 

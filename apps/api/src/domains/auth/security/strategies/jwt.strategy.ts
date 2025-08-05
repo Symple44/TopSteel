@@ -34,7 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     // Retourner l'utilisateur sans le mot de passe
     const { password, ...result } = user
-    
+
     // Si c'est un token multi-tenant, ajouter les informations de société
     if ('societeId' in payload) {
       return {
@@ -43,7 +43,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         societeCode: payload.societeCode,
         permissions: payload.permissions,
         tenantDatabase: payload.tenantDatabase,
-        siteId: payload.siteId
+        siteId: payload.siteId,
       }
     }
 

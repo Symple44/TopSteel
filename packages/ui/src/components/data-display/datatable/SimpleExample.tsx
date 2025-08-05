@@ -120,8 +120,8 @@ export function SimpleDataTableExample() {
 
       <div className="p-4 border rounded-lg bg-gray-50">
         <p className="text-sm text-gray-600">
-          This component is temporarily disabled because it depends on app-specific hooks.
-          To use this component, implement the required data management logic.
+          This component is temporarily disabled because it depends on app-specific hooks. To use
+          this component, implement the required data management logic.
         </p>
       </div>
 

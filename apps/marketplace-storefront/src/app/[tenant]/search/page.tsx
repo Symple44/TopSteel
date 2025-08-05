@@ -16,11 +16,11 @@ interface SearchPageProps {
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
   const resolvedParams = await params
   const resolvedSearchParams = await searchParams
-  
+
   return (
     <div className="container-marketplace py-8">
       <Suspense fallback={<SearchSkeleton />}>
-        <SearchResults 
+        <SearchResults
           tenant={resolvedParams.tenant}
           query={resolvedSearchParams.q}
           category={resolvedSearchParams.category}

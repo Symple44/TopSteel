@@ -1,7 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsOptional, IsEnum, IsString, IsNumber, IsBoolean, IsArray, Min } from 'class-validator'
 import { Transform, Type } from 'class-transformer'
-import { MaterialType, MaterialShape, MaterialStatus, StorageMethod } from '../entities/material.entity'
+import {
+  MaterialType,
+  MaterialShape,
+  MaterialStatus,
+  StorageMethod,
+} from '../entities/material.entity'
 
 /**
  * DTO pour les filtres de recherche de matériaux
@@ -11,52 +16,52 @@ export class MaterialFiltersDto {
     description: 'Types de matériaux à filtrer',
     enum: MaterialType,
     isArray: true,
-    example: [MaterialType.ACIER, MaterialType.INOX]
+    example: [MaterialType.ACIER, MaterialType.INOX],
   })
   @IsOptional()
   @IsArray()
   @IsEnum(MaterialType, { each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   type?: MaterialType[]
 
   @ApiPropertyOptional({
     description: 'Formes de matériaux à filtrer',
     enum: MaterialShape,
     isArray: true,
-    example: [MaterialShape.PLAQUE, MaterialShape.TUBE]
+    example: [MaterialShape.PLAQUE, MaterialShape.TUBE],
   })
   @IsOptional()
   @IsArray()
   @IsEnum(MaterialShape, { each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   forme?: MaterialShape[]
 
   @ApiPropertyOptional({
     description: 'Statuts à filtrer',
     enum: MaterialStatus,
     isArray: true,
-    example: [MaterialStatus.ACTIF]
+    example: [MaterialStatus.ACTIF],
   })
   @IsOptional()
   @IsArray()
   @IsEnum(MaterialStatus, { each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   status?: MaterialStatus[]
 
   @ApiPropertyOptional({
     description: 'Nuances à filtrer',
     isArray: true,
-    example: ['S235JR', 'S355J2']
+    example: ['S235JR', 'S355J2'],
   })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   nuance?: string[]
 
   @ApiPropertyOptional({
     description: 'Recherche textuelle dans le nom',
-    example: 'acier'
+    example: 'acier',
   })
   @IsOptional()
   @IsString()
@@ -64,7 +69,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche par référence (partielle)',
-    example: 'AC-PL'
+    example: 'AC-PL',
   })
   @IsOptional()
   @IsString()
@@ -72,7 +77,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche par marque',
-    example: 'ArcelorMittal'
+    example: 'ArcelorMittal',
   })
   @IsOptional()
   @IsString()
@@ -80,7 +85,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'ID du fournisseur principal',
-    example: 'uuid-fournisseur'
+    example: 'uuid-fournisseur',
   })
   @IsOptional()
   @IsString()
@@ -89,7 +94,7 @@ export class MaterialFiltersDto {
   @ApiPropertyOptional({
     description: 'Condition de stock',
     enum: ['rupture', 'sous_mini', 'normal', 'surstock'],
-    example: 'sous_mini'
+    example: 'sous_mini',
   })
   @IsOptional()
   @IsString()
@@ -97,7 +102,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Filtrer les matériaux dangereux',
-    example: true
+    example: true,
   })
   @IsOptional()
   @IsBoolean()
@@ -107,7 +112,7 @@ export class MaterialFiltersDto {
   @ApiPropertyOptional({
     description: 'Inclure les matériaux obsolètes',
     example: false,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -116,7 +121,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Stock physique minimum',
-    example: 0
+    example: 0,
   })
   @IsOptional()
   @IsNumber()
@@ -126,7 +131,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Stock physique maximum',
-    example: 1000
+    example: 1000,
   })
   @IsOptional()
   @IsNumber()
@@ -136,7 +141,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Prix minimum',
-    example: 100
+    example: 100,
   })
   @IsOptional()
   @IsNumber()
@@ -146,7 +151,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Prix maximum',
-    example: 5000
+    example: 5000,
   })
   @IsOptional()
   @IsNumber()
@@ -156,7 +161,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Poids minimum (kg)',
-    example: 1
+    example: 1,
   })
   @IsOptional()
   @IsNumber()
@@ -166,7 +171,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Poids maximum (kg)',
-    example: 1000
+    example: 1000,
   })
   @IsOptional()
   @IsNumber()
@@ -176,7 +181,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Longueur minimum (mm)',
-    example: 1000
+    example: 1000,
   })
   @IsOptional()
   @IsNumber()
@@ -186,7 +191,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Longueur maximum (mm)',
-    example: 6000
+    example: 6000,
   })
   @IsOptional()
   @IsNumber()
@@ -196,7 +201,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Largeur minimum (mm)',
-    example: 500
+    example: 500,
   })
   @IsOptional()
   @IsNumber()
@@ -206,7 +211,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Largeur maximum (mm)',
-    example: 2000
+    example: 2000,
   })
   @IsOptional()
   @IsNumber()
@@ -216,7 +221,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Épaisseur minimum (mm)',
-    example: 2
+    example: 2,
   })
   @IsOptional()
   @IsNumber()
@@ -226,7 +231,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Épaisseur maximum (mm)',
-    example: 50
+    example: 50,
   })
   @IsOptional()
   @IsNumber()
@@ -236,7 +241,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Diamètre minimum (mm)',
-    example: 10
+    example: 10,
   })
   @IsOptional()
   @IsNumber()
@@ -246,7 +251,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Diamètre maximum (mm)',
-    example: 300
+    example: 300,
   })
   @IsOptional()
   @IsNumber()
@@ -258,17 +263,17 @@ export class MaterialFiltersDto {
     description: 'Méthodes de stockage',
     enum: StorageMethod,
     isArray: true,
-    example: [StorageMethod.STANDARD, StorageMethod.VERTICAL]
+    example: [StorageMethod.STANDARD, StorageMethod.VERTICAL],
   })
   @IsOptional()
   @IsArray()
   @IsEnum(StorageMethod, { each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   methodeStockage?: StorageMethod[]
 
   @ApiPropertyOptional({
     description: 'Filtrer par emplacement de stockage',
-    example: 'A-01'
+    example: 'A-01',
   })
   @IsOptional()
   @IsString()
@@ -277,28 +282,28 @@ export class MaterialFiltersDto {
   @ApiPropertyOptional({
     description: 'Certifications requises',
     isArray: true,
-    example: ['CE', 'ISO 9001']
+    example: ['CE', 'ISO 9001'],
   })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   certifications?: string[]
 
   @ApiPropertyOptional({
     description: 'Normes requises',
     isArray: true,
-    example: ['EN 10025-2', 'NF A35-501']
+    example: ['EN 10025-2', 'NF A35-501'],
   })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   normes?: string[]
 
   @ApiPropertyOptional({
     description: 'Limite élastique minimum (MPa)',
-    example: 200
+    example: 200,
   })
   @IsOptional()
   @IsNumber()
@@ -308,7 +313,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Limite élastique maximum (MPa)',
-    example: 500
+    example: 500,
   })
   @IsOptional()
   @IsNumber()
@@ -318,7 +323,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Résistance à la traction minimum (MPa)',
-    example: 300
+    example: 300,
   })
   @IsOptional()
   @IsNumber()
@@ -328,7 +333,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Résistance à la traction maximum (MPa)',
-    example: 600
+    example: 600,
   })
   @IsOptional()
   @IsNumber()
@@ -338,7 +343,7 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche textuelle globale',
-    example: 'acier plaque'
+    example: 'acier plaque',
   })
   @IsOptional()
   @IsString()
@@ -346,8 +351,16 @@ export class MaterialFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Champ de tri',
-    enum: ['reference', 'nom', 'type', 'forme', 'stockPhysique', 'prixUnitaire', 'dateCreationFiche'],
-    example: 'reference'
+    enum: [
+      'reference',
+      'nom',
+      'type',
+      'forme',
+      'stockPhysique',
+      'prixUnitaire',
+      'dateCreationFiche',
+    ],
+    example: 'reference',
   })
   @IsOptional()
   @IsString()
@@ -356,7 +369,7 @@ export class MaterialFiltersDto {
   @ApiPropertyOptional({
     description: 'Ordre de tri',
     enum: ['ASC', 'DESC'],
-    example: 'ASC'
+    example: 'ASC',
   })
   @IsOptional()
   @IsString()
@@ -365,7 +378,7 @@ export class MaterialFiltersDto {
   @ApiPropertyOptional({
     description: 'Numéro de page (1-based)',
     example: 1,
-    default: 1
+    default: 1,
   })
   @IsOptional()
   @IsNumber()
@@ -374,9 +387,9 @@ export class MaterialFiltersDto {
   page?: number
 
   @ApiPropertyOptional({
-    description: 'Nombre d\'éléments par page',
+    description: "Nombre d'éléments par page",
     example: 20,
-    default: 20
+    default: 20,
   })
   @IsOptional()
   @IsNumber()
@@ -393,7 +406,7 @@ export class InventoryFiltersDto {
     description: 'Date de dernier mouvement minimum',
     type: 'string',
     format: 'date-time',
-    example: '2024-01-01T00:00:00Z'
+    example: '2024-01-01T00:00:00Z',
   })
   @IsOptional()
   @Type(() => Date)
@@ -403,7 +416,7 @@ export class InventoryFiltersDto {
     description: 'Date de dernier mouvement maximum',
     type: 'string',
     format: 'date-time',
-    example: '2024-12-31T23:59:59Z'
+    example: '2024-12-31T23:59:59Z',
   })
   @IsOptional()
   @Type(() => Date)
@@ -413,7 +426,7 @@ export class InventoryFiltersDto {
     description: 'Date de dernier inventaire minimum',
     type: 'string',
     format: 'date-time',
-    example: '2024-01-01T00:00:00Z'
+    example: '2024-01-01T00:00:00Z',
   })
   @IsOptional()
   @Type(() => Date)
@@ -423,7 +436,7 @@ export class InventoryFiltersDto {
     description: 'Date de dernier inventaire maximum',
     type: 'string',
     format: 'date-time',
-    example: '2024-12-31T23:59:59Z'
+    example: '2024-12-31T23:59:59Z',
   })
   @IsOptional()
   @Type(() => Date)
@@ -431,7 +444,7 @@ export class InventoryFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Nombre de jours sans mouvement',
-    example: 90
+    example: 90,
   })
   @IsOptional()
   @IsNumber()
@@ -441,7 +454,7 @@ export class InventoryFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Âge du stock en jours',
-    example: 180
+    example: 180,
   })
   @IsOptional()
   @IsNumber()
@@ -451,7 +464,7 @@ export class InventoryFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Valeur de stock minimum',
-    example: 1000
+    example: 1000,
   })
   @IsOptional()
   @IsNumber()
@@ -461,7 +474,7 @@ export class InventoryFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Valeur de stock maximum',
-    example: 50000
+    example: 50000,
   })
   @IsOptional()
   @IsNumber()

@@ -7,21 +7,21 @@ export class TenantGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
-    
+
     try {
       // Extraire le tenant depuis les headers, params ou domaine
       const tenantCode = this.extractTenantFromRequest(request)
-      
+
       if (!tenantCode) {
         throw new UnauthorizedException('Tenant non spécifié')
       }
 
       // Résoudre le contexte tenant
       const tenantContext = await this.tenantResolver.resolveTenantByDomain(tenantCode)
-      
+
       // Ajouter le contexte à la requête
       request.tenant = tenantContext
-      
+
       return true
     } catch (error) {
       throw new UnauthorizedException(`Erreur de résolution tenant: ${error.message}`)
@@ -56,21 +56,21 @@ export class TenantGuard implements CanActivate {
   private extractTenantFromHost(host: string): string {
     // Exemple: topsteel.marketplace.com -> topsteel
     // ou marketplace-topsteel.com -> topsteel
-    
+
     const parts = host.split('.')
-    
+
     // Si c'est un sous-domaine
     if (parts.length >= 3 && parts[0] !== 'www') {
       return parts[0]
     }
-    
+
     // Si c'est dans le nom de domaine principal
     const mainDomain = parts[0]
     if (mainDomain.includes('-')) {
       const domainParts = mainDomain.split('-')
       return domainParts[0]
     }
-    
+
     // Fallback : utiliser le domaine principal
     return mainDomain
   }

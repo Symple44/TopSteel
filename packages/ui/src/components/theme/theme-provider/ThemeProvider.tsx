@@ -130,12 +130,7 @@ interface ThemeProviderContentProps {
 }
 
 function ThemeProviderContent({ children, themes }: ThemeProviderContentProps) {
-  const {
-    theme,
-    resolvedTheme,
-    setTheme,
-    systemTheme,
-  } = useNextTheme()
+  const { theme, resolvedTheme, setTheme, systemTheme } = useNextTheme()
 
   // Appliquer les CSS variables pour le thème actuel
   React.useEffect(() => {
@@ -160,11 +155,7 @@ function ThemeProviderContent({ children, themes }: ThemeProviderContentProps) {
     systemTheme: (systemTheme || 'light') as ResolvedTheme,
   }
 
-  return (
-    <ThemeContext.Provider value={contextValue}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>
 }
 
 // ===== EXPORTS =====

@@ -47,7 +47,10 @@ function saveToStorage<T>(key: string, value: T): void {
     localStorage.setItem(key, JSON.stringify(value))
   } catch (error) {
     // Seulement signaler les erreurs critiques de sauvegarde (quota dépassé, etc.)
-    if (error instanceof Error && (error.name === 'QuotaExceededError' || error.message.includes('quota'))) {
+    if (
+      error instanceof Error &&
+      (error.name === 'QuotaExceededError' || error.message.includes('quota'))
+    ) {
       syncChecker.addIssue({
         type: 'storage',
         severity: 'high',
@@ -81,7 +84,10 @@ export const menuStorage = {
       try {
         const stored = loadFromStorage(SELECTED_PAGES_KEY, {})
         // Seulement vérifier si les données sont différentes de manière significative
-        if (Object.keys(stored).length > 0 && JSON.stringify(memorySelectedPages) !== JSON.stringify(stored)) {
+        if (
+          Object.keys(stored).length > 0 &&
+          JSON.stringify(memorySelectedPages) !== JSON.stringify(stored)
+        ) {
           syncChecker.checkStorageConsistency('selected-pages', memorySelectedPages, stored)
         }
       } catch (error) {
@@ -105,7 +111,10 @@ export const menuStorage = {
       try {
         const stored = loadFromStorage(USER_PREFERENCES_KEY, {})
         // Seulement vérifier si les données sont différentes de manière significative
-        if (Object.keys(stored).length > 0 && JSON.stringify(memoryPreferences) !== JSON.stringify(stored)) {
+        if (
+          Object.keys(stored).length > 0 &&
+          JSON.stringify(memoryPreferences) !== JSON.stringify(stored)
+        ) {
           syncChecker.checkStorageConsistency('user-preferences', memoryPreferences, stored)
         }
       } catch (error) {

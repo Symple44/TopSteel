@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   try {
     const resolvedParams = await params
     const product = await api.storefront.getProduct(resolvedParams.tenant, resolvedParams.id)
-    
+
     return {
       title: `${product.designation} - Marketplace`,
       description: product.shortDescription || product.description?.substring(0, 160),
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   } catch (error) {
     return {
       title: 'Produit non trouvé - Marketplace',
-      description: 'Le produit demandé n\'a pas été trouvé.',
+      description: "Le produit demandé n'a pas été trouvé.",
     }
   }
 }
@@ -36,7 +36,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   try {
     const resolvedParams = await params
     const product = await api.storefront.getProduct(resolvedParams.tenant, resolvedParams.id)
-    
+
     return (
       <div className="container-marketplace py-8">
         <ProductDetail product={product} tenant={resolvedParams.tenant} />

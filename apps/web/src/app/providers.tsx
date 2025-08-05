@@ -44,9 +44,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         >
           <TooltipProvider>
             <AuthProvider>
-              <NotificationsProvider>
-                {children}
-              </NotificationsProvider>
+              <NotificationsProvider>{children}</NotificationsProvider>
             </AuthProvider>
           </TooltipProvider>
           <Toaster position="top-right" />

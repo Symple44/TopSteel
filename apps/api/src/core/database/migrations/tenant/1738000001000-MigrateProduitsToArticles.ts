@@ -7,20 +7,22 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
     // Vérifier que la table produits existe et contient des données
     const produitsExists = await queryRunner.hasTable('produits')
     if (!produitsExists) {
-      console.log('Table produits n\'existe pas, migration ignorée')
+      console.log("Table produits n'existe pas, migration ignorée")
       return
     }
 
     const articlesExists = await queryRunner.hasTable('articles')
     if (!articlesExists) {
-      throw new Error('Table articles n\'existe pas. Exécutez d\'abord la migration CreateArticlesTable')
+      throw new Error(
+        "Table articles n'existe pas. Exécutez d'abord la migration CreateArticlesTable"
+      )
     }
 
     // Compter les produits existants
     const produitCount = await queryRunner.query(
       'SELECT COUNT(*) as count FROM produits WHERE deleted_at IS NULL'
     )
-    
+
     if (parseInt(produitCount[0].count) === 0) {
       console.log('Aucun produit à migrer')
       return
@@ -28,9 +30,11 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
 
     // Compter les articles existants
     const articleCount = await queryRunner.query('SELECT COUNT(*) as count FROM articles')
-    
+
     if (parseInt(articleCount[0].count) > 0) {
-      console.warn(`ATTENTION: La table articles contient déjà ${articleCount[0].count} enregistrements`)
+      console.warn(
+        `ATTENTION: La table articles contient déjà ${articleCount[0].count} enregistrements`
+      )
       console.warn('Migration des produits continuée, mais risque de doublons sur les références')
     }
 
@@ -189,7 +193,9 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
       `SELECT COUNT(*) as count FROM articles WHERE metadonnees->>'origine_migration' = 'produits'`
     )
 
-    console.log(`Migration terminée: ${migratedCount[0].count} articles migrés depuis la table produits`)
+    console.log(
+      `Migration terminée: ${migratedCount[0].count} articles migrés depuis la table produits`
+    )
 
     // Créer une vue pour la compatibilité ascendante
     await queryRunner.query(`
@@ -247,7 +253,9 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
 
     console.log('Statistiques de migration par type/famille:')
     stats.forEach((stat: any) => {
-      console.log(`  ${stat.type}/${stat.famille}: ${stat.nombre} articles (prix moyen: ${stat.prix_moyen}€)`)
+      console.log(
+        `  ${stat.type}/${stat.famille}: ${stat.nombre} articles (prix moyen: ${stat.prix_moyen}€)`
+      )
     })
   }
 

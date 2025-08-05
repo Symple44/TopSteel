@@ -9,17 +9,15 @@ import { MaterialRepositoryImpl } from './repositories/material-repository.impl'
  * Module pour la gestion des matériaux industriels
  */
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Material], 'tenant')
-  ],
+  imports: [TypeOrmModule.forFeature([Material], 'tenant')],
   controllers: [MaterialController],
   providers: [
     MaterialService,
     {
       provide: 'IMaterialRepository',
-      useClass: MaterialRepositoryImpl
-    }
+      useClass: MaterialRepositoryImpl,
+    },
   ],
-  exports: [MaterialService]
+  exports: [MaterialService],
 })
 export class MaterialsModule {}

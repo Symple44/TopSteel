@@ -10,17 +10,15 @@ import { PartnerService } from './services/partner.service'
  * Module pour la gestion des partenaires (clients/fournisseurs)
  */
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Partner], 'tenant')
-  ],
+  imports: [TypeOrmModule.forFeature([Partner], 'tenant')],
   controllers: [PartnerController],
   providers: [
     PartnerService,
     {
       provide: 'IPartnerRepository',
-      useClass: PartnerRepositoryImpl
-    }
+      useClass: PartnerRepositoryImpl,
+    },
   ],
-  exports: [PartnerService]
+  exports: [PartnerService],
 })
 export class PartnersModule {}

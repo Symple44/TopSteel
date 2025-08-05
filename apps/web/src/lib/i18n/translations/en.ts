@@ -58,7 +58,7 @@ export const en = {
     unauthorizedTitle: 'Unauthorized access',
     unauthorizedMessage: 'You must be logged in to access this page.',
     loginButton: 'Sign in',
-    
+
     // Notifications
     soundNotifications: 'Sound notifications',
 
@@ -66,7 +66,7 @@ export const en = {
     backend: {
       status: {
         online: 'Online',
-        offline: 'Offline', 
+        offline: 'Offline',
         error: 'Error',
         checking: 'Checking...',
         retry: 'Retry',
@@ -1314,7 +1314,7 @@ export const en = {
   },
 
   // === NEW TRANSLATIONS ADDED ===
-  
+
   // Company & Multi-tab management
   companies: {
     select: 'Select a company',
@@ -1346,7 +1346,6 @@ export const en = {
     connectionDetected: 'Connection detected',
     loginInOtherTab: 'Login performed in another tab',
   },
-
 
   // Settings enhancements
   settingsEnhanced: {

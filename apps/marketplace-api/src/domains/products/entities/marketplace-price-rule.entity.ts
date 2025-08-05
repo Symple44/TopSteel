@@ -1,19 +1,19 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
   Index,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
 } from 'typeorm'
 import { MarketplaceProduct } from './marketplace-product.entity'
 
 export enum AdjustmentType {
   PERCENTAGE = 'PERCENTAGE',
-  FIXED_AMOUNT = 'FIXED_AMOUNT', 
-  FIXED_PRICE = 'FIXED_PRICE'
+  FIXED_AMOUNT = 'FIXED_AMOUNT',
+  FIXED_PRICE = 'FIXED_PRICE',
 }
 
 export interface PricingCondition {
@@ -86,50 +86,53 @@ export class MarketplacePriceRule {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => MarketplaceProduct, product => product.priceRules)
+  @ManyToOne(
+    () => MarketplaceProduct,
+    (product) => product.priceRules
+  )
   @JoinColumn({ name: 'productId' })
   product!: MarketplaceProduct
 
   // Méthodes utilitaires
   isValid(date: Date = new Date()): boolean {
     if (!this.isActive) return false
-    
+
     if (this.validFrom && date < this.validFrom) return false
     if (this.validUntil && date > this.validUntil) return false
-    
+
     if (this.usageLimit && this.usageCount >= this.usageLimit) return false
-    
+
     return true
   }
 
   canBeApplied(context: any): boolean {
     if (!this.isValid()) return false
-    
-    return this.conditions.every(condition => this.evaluateCondition(condition, context))
+
+    return this.conditions.every((condition) => this.evaluateCondition(condition, context))
   }
 
   private evaluateCondition(condition: PricingCondition, context: any): boolean {
     const contextValue = condition.field ? context[condition.field] : context[condition.type]
-    
+
     switch (condition.operator) {
       case 'equals':
         return contextValue === condition.value
-      
+
       case 'in':
         return Array.isArray(condition.value) && condition.value.includes(contextValue)
-      
+
       case 'between':
         return contextValue >= condition.value[0] && contextValue <= condition.value[1]
-      
+
       case 'greater_than':
         return contextValue > condition.value
-      
+
       case 'less_than':
         return contextValue < condition.value
-      
+
       case 'contains':
         return String(contextValue).toLowerCase().includes(String(condition.value).toLowerCase())
-      
+
       default:
         return false
     }
@@ -139,13 +142,13 @@ export class MarketplacePriceRule {
     switch (this.adjustmentType) {
       case AdjustmentType.PERCENTAGE:
         return basePrice * (1 + this.adjustmentValue / 100)
-      
+
       case AdjustmentType.FIXED_AMOUNT:
         return basePrice + this.adjustmentValue
-      
+
       case AdjustmentType.FIXED_PRICE:
         return this.adjustmentValue
-      
+
       default:
         return basePrice
     }

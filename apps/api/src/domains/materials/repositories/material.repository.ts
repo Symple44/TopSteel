@@ -1,5 +1,11 @@
 import type { IBusinessRepository } from '../../core/interfaces/business-service.interface'
-import { Material, MaterialStatus, MaterialType, MaterialShape, StorageMethod } from '../entities/material.entity'
+import {
+  Material,
+  MaterialStatus,
+  MaterialType,
+  MaterialShape,
+  StorageMethod,
+} from '../entities/material.entity'
 import { MaterialSearchCriteria } from '../services/material.service'
 import type { MaterialStatistics } from '../services/material.service'
 
@@ -50,7 +56,9 @@ export interface IMaterialRepository extends IBusinessRepository<Material> {
   /**
    * Trouver les matériaux selon une condition de stock
    */
-  findByStockCondition(condition: 'rupture' | 'sous_mini' | 'normal' | 'surstock'): Promise<Material[]>
+  findByStockCondition(
+    condition: 'rupture' | 'sous_mini' | 'normal' | 'surstock'
+  ): Promise<Material[]>
 
   /**
    * Vérifier si un matériau a des mouvements de stock
@@ -96,9 +104,12 @@ export interface IMaterialRepository extends IBusinessRepository<Material> {
    * Obtenir les matériaux par dimensions approximatives
    */
   findByDimensions(
-    longueurMin?: number, longueurMax?: number,
-    largeurMin?: number, largeurMax?: number,
-    epaisseurMin?: number, epaisseurMax?: number
+    longueurMin?: number,
+    longueurMax?: number,
+    largeurMin?: number,
+    largeurMax?: number,
+    epaisseurMin?: number,
+    epaisseurMax?: number
   ): Promise<Material[]>
 
   /**
@@ -139,17 +150,21 @@ export interface IMaterialRepository extends IBusinessRepository<Material> {
   /**
    * Obtenir les matériaux par composition chimique
    */
-  findByChemicalComposition(element: string, minPercentage?: number, maxPercentage?: number): Promise<Material[]>
+  findByChemicalComposition(
+    element: string,
+    minPercentage?: number,
+    maxPercentage?: number
+  ): Promise<Material[]>
 
   /**
    * Obtenir la valorisation du stock par type
    */
-  getStockValuationByType(): Promise<Record<MaterialType, { quantite: number, valeur: number }>>
+  getStockValuationByType(): Promise<Record<MaterialType, { quantite: number; valeur: number }>>
 
   /**
    * Obtenir la valorisation du stock par forme
    */
-  getStockValuationByShape(): Promise<Record<MaterialShape, { quantite: number, valeur: number }>>
+  getStockValuationByShape(): Promise<Record<MaterialShape, { quantite: number; valeur: number }>>
 
   /**
    * Obtenir les mouvements de stock récents pour un matériau
@@ -159,7 +174,10 @@ export interface IMaterialRepository extends IBusinessRepository<Material> {
   /**
    * Obtenir les matériaux les plus utilisés
    */
-  getMostUsedMaterials(limit: number, periode?: { debut: Date, fin: Date }): Promise<Array<Material & { quantiteUtilisee: number }>>
+  getMostUsedMaterials(
+    limit: number,
+    periode?: { debut: Date; fin: Date }
+  ): Promise<Array<Material & { quantiteUtilisee: number }>>
 
   /**
    * Obtenir les matériaux à rotation lente
@@ -204,15 +222,20 @@ export interface IMaterialRepository extends IBusinessRepository<Material> {
   /**
    * Obtenir les statistiques d'utilisation par période
    */
-  getUsageStatsByPeriod(debut: Date, fin: Date): Promise<Array<{
-    materialId: string
-    reference: string
-    nom: string
-    quantiteEntree: number
-    quantiteSortie: number
-    quantiteStock: number
-    valeurStock: number
-  }>>
+  getUsageStatsByPeriod(
+    debut: Date,
+    fin: Date
+  ): Promise<
+    Array<{
+      materialId: string
+      reference: string
+      nom: string
+      quantiteEntree: number
+      quantiteSortie: number
+      quantiteStock: number
+      valeurStock: number
+    }>
+  >
 }
 
 /**
@@ -292,7 +315,7 @@ export enum MaterialSearchField {
   NUANCE = 'nuance',
   QUALITE = 'qualite',
   MARQUE = 'marque',
-  MODELE = 'modele'
+  MODELE = 'modele',
 }
 
 export enum MaterialSortField {
@@ -307,7 +330,7 @@ export enum MaterialSortField {
   VALEUR_STOCK = 'valeurStock',
   DATE_CREATION = 'dateCreationFiche',
   DATE_DERNIER_MOUVEMENT = 'dateDerniereSortie',
-  DATE_DERNIER_INVENTAIRE = 'dateDernierInventaire'
+  DATE_DERNIER_INVENTAIRE = 'dateDernierInventaire',
 }
 
 /**
@@ -350,7 +373,7 @@ export interface PhysicalPropertiesFilters {
  * Filtres pour les propriétés chimiques
  */
 export interface ChemicalPropertiesFilters {
-  composition?: Record<string, { min?: number, max?: number }>
+  composition?: Record<string, { min?: number; max?: number }>
   resistanceCorrosion?: string[]
   traitementThermique?: string[]
   traitementSurface?: string[]

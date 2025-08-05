@@ -148,7 +148,7 @@ export enum PartnerSortField {
   CREATED_AT = 'createdAt',
   UPDATED_AT = 'updatedAt',
   VILLE = 'ville',
-  CHIFFRE_AFFAIRES = 'chiffreAffaires'
+  CHIFFRE_AFFAIRES = 'chiffreAffaires',
 }
 
 /**

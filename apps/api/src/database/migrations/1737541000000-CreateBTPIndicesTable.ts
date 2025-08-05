@@ -37,18 +37,12 @@ export class CreateBTPIndicesTable1737541000000 implements MigrationInterface {
     `)
 
     // Create indexes for btp_indices
-    await queryRunner.query(
-      `CREATE INDEX "IDX_btp_indices_tenantId" ON "btp_indices" ("tenantId")`
-    )
+    await queryRunner.query(`CREATE INDEX "IDX_btp_indices_tenantId" ON "btp_indices" ("tenantId")`)
     await queryRunner.query(
       `CREATE INDEX "IDX_btp_indices_indexType" ON "btp_indices" ("indexType")`
     )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_btp_indices_year" ON "btp_indices" ("year")`
-    )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_btp_indices_month" ON "btp_indices" ("month")`
-    )
+    await queryRunner.query(`CREATE INDEX "IDX_btp_indices_year" ON "btp_indices" ("year")`)
+    await queryRunner.query(`CREATE INDEX "IDX_btp_indices_month" ON "btp_indices" ("month")`)
     await queryRunner.query(
       `CREATE INDEX "IDX_btp_indices_isOfficial" ON "btp_indices" ("isOfficial")`
     )

@@ -1,29 +1,29 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  Index
+  Index,
 } from 'typeorm'
 import { PageSection } from './page-section.entity'
 
 export enum PageType {
   HOME = 'home',
-  CATEGORY = 'category', 
+  CATEGORY = 'category',
   PRODUCT = 'product',
   CUSTOM = 'custom',
   LANDING = 'landing',
   ABOUT = 'about',
-  CONTACT = 'contact'
+  CONTACT = 'contact',
 }
 
 export enum PageStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
   SCHEDULED = 'scheduled',
-  ARCHIVED = 'archived'
+  ARCHIVED = 'archived',
 }
 
 @Entity('marketplace_page_templates')
@@ -40,17 +40,17 @@ export class PageTemplate {
   @Column({ type: 'varchar', length: 255 })
   slug!: string
 
-  @Column({ 
-    type: 'varchar', 
+  @Column({
+    type: 'varchar',
     length: 50,
-    default: 'custom'
+    default: 'custom',
   })
   pageType!: string
 
-  @Column({ 
-    type: 'varchar', 
+  @Column({
+    type: 'varchar',
     length: 50,
-    default: 'draft'
+    default: 'draft',
   })
   status!: string
 
@@ -77,10 +77,14 @@ export class PageTemplate {
     backgroundImage?: string
   }
 
-  @OneToMany(() => PageSection, section => section.pageTemplate, {
-    cascade: true,
-    eager: true
-  })
+  @OneToMany(
+    () => PageSection,
+    (section) => section.pageTemplate,
+    {
+      cascade: true,
+      eager: true,
+    }
+  )
   sections!: PageSection[]
 
   @Column({ type: 'timestamp', nullable: true })

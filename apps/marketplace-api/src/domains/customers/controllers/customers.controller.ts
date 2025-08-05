@@ -1,30 +1,33 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Put, 
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
   Delete,
-  Body, 
-  Param, 
-  Req, 
+  Body,
+  Param,
+  Req,
   UseGuards,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
-import { MarketplaceCustomersService, CreateCustomerDto, UpdateCustomerDto, CustomerLoginDto } from '../services/marketplace-customers.service'
+import {
+  MarketplaceCustomersService,
+  CreateCustomerDto,
+  UpdateCustomerDto,
+  CustomerLoginDto,
+} from '../services/marketplace-customers.service'
 import { CustomerAddress } from '../entities/marketplace-customer.entity'
 
 @ApiTags('customers')
 @Controller('customers')
 @UseGuards(TenantGuard)
 export class CustomersController {
-  constructor(
-    private customersService: MarketplaceCustomersService,
-  ) {}
+  constructor(private customersService: MarketplaceCustomersService) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register new customer account' })
@@ -33,11 +36,8 @@ export class CustomersController {
   @HttpCode(HttpStatus.CREATED)
   async register(@Req() req: Request, @Body() createDto: CreateCustomerDto) {
     const { tenant } = req as any
-    
-    const customer = await this.customersService.createCustomer(
-      tenant.societeId,
-      createDto
-    )
+
+    const customer = await this.customersService.createCustomer(tenant.societeId, createDto)
 
     // Ne pas retourner le mot de passe hashé
     const { passwordHash, ...customerData } = customer
@@ -51,15 +51,12 @@ export class CustomersController {
   @HttpCode(HttpStatus.OK)
   async login(@Req() req: Request, @Body() loginDto: CustomerLoginDto) {
     const { tenant } = req as any
-    
-    const customer = await this.customersService.authenticateCustomer(
-      tenant.societeId,
-      loginDto
-    )
+
+    const customer = await this.customersService.authenticateCustomer(tenant.societeId, loginDto)
 
     // TODO: Générer JWT token
     const { passwordHash, ...customerData } = customer
-    
+
     return {
       customer: customerData,
       // token: jwt.sign({ customerId: customer.id, societeId: tenant.societeId }, JWT_SECRET)
@@ -70,15 +67,18 @@ export class CustomersController {
   @ApiOperation({ summary: 'Create guest customer for checkout' })
   @ApiResponse({ status: 201, description: 'Guest customer created' })
   @HttpCode(HttpStatus.CREATED)
-  async createGuest(@Req() req: Request, @Body() body: { 
+  async createGuest(
+    @Req() req: Request,
+    @Body() body: { 
     email: string
     firstName?: string
     lastName?: string
     company?: string
     phone?: string
-  }) {
+  }
+  ) {
     const { tenant } = req as any
-    
+
     const customer = await this.customersService.createGuestCustomer(
       tenant.societeId,
       body.email,
@@ -95,10 +95,10 @@ export class CustomersController {
   @ApiResponse({ status: 404, description: 'Customer not found' })
   async getProfile(@Req() req: Request, @Param('customerId') customerId: string) {
     const { tenant } = req as any
-    
+
     const customer = await this.customersService.findById(customerId, tenant.societeId)
     const { passwordHash, ...customerData } = customer
-    
+
     return customerData
   }
 
@@ -112,7 +112,7 @@ export class CustomersController {
     @Body() updateDto: UpdateCustomerDto
   ) {
     const { tenant } = req as any
-    
+
     const customer = await this.customersService.updateCustomer(
       customerId,
       tenant.societeId,
@@ -134,12 +134,8 @@ export class CustomersController {
     @Body() address: Omit<CustomerAddress, 'id'>
   ) {
     const { tenant } = req as any
-    
-    const customer = await this.customersService.addAddress(
-      customerId,
-      tenant.societeId,
-      address
-    )
+
+    const customer = await this.customersService.addAddress(customerId, tenant.societeId, address)
 
     return customer.addresses
   }
@@ -155,7 +151,7 @@ export class CustomersController {
     @Body() updates: Partial<CustomerAddress>
   ) {
     const { tenant } = req as any
-    
+
     const customer = await this.customersService.updateAddress(
       customerId,
       tenant.societeId,
@@ -176,7 +172,7 @@ export class CustomersController {
     @Param('addressId') addressId: string
   ) {
     const { tenant } = req as any
-    
+
     const customer = await this.customersService.removeAddress(
       customerId,
       tenant.societeId,
@@ -200,7 +196,7 @@ export class CustomersController {
     }
   ) {
     const { tenant } = req as any
-    
+
     const customer = await this.customersService.convertGuestToAccount(
       customerId,
       tenant.societeId,
@@ -227,7 +223,7 @@ export class CustomersController {
     }
   ) {
     const { tenant } = req as any
-    
+
     await this.customersService.updatePassword(
       customerId,
       tenant.societeId,
@@ -244,10 +240,12 @@ export class CustomersController {
   @HttpCode(HttpStatus.OK)
   async requestPasswordReset(@Req() req: Request, @Body() body: { email: string }) {
     const { tenant } = req as any
-    
+
     await this.customersService.requestPasswordReset(tenant.societeId, body.email)
-    
-    return { message: 'Si un compte existe avec cet email, un lien de réinitialisation a été envoyé' }
+
+    return {
+      message: 'Si un compte existe avec cet email, un lien de réinitialisation a été envoyé',
+    }
   }
 
   @Post('password/reset')
@@ -265,12 +263,12 @@ export class CustomersController {
   @ApiResponse({ status: 200, description: 'Email check result' })
   async checkEmail(@Req() req: Request, @Param('email') email: string) {
     const { tenant } = req as any
-    
+
     const customer = await this.customersService.findByEmail(tenant.societeId, email)
-    
+
     return {
       exists: !!customer,
-      hasAccount: customer?.hasAccount || false
+      hasAccount: customer?.hasAccount || false,
     }
   }
 }

@@ -4,19 +4,19 @@ import { NextRequest, NextResponse } from 'next/server'
 function extractDesignation(filename: string): string {
   // Retirer l'extension
   const nameWithoutExt = filename.replace(/\.(jpg|jpeg|png|webp|svg)$/i, '')
-  
+
   // Remplacer les tirets/underscores par des espaces et capitaliser
   return nameWithoutExt
     .replace(/[-_]/g, ' ')
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ')
 }
 
 // Générateur d'image SVG générique avec la désignation de l'article
 function generateGenericProductSVG(filename: string): string {
   const designation = extractDesignation(filename)
-  
+
   return `
     <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -55,10 +55,7 @@ function generateGenericProductSVG(filename: string): string {
   `
 }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ filename: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ filename: string }> }) {
   const { filename } = await params
 
   // Générer l'image SVG générique avec la désignation

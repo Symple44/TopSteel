@@ -9,9 +9,7 @@ import { PageSyncService } from './services/page-sync.service'
 import { UserMenuPreferenceService } from './services/user-menu-preference.service'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UserMenuPreference, DiscoveredPage], 'auth'),
-  ],
+  imports: [TypeOrmModule.forFeature([UserMenuPreference, DiscoveredPage], 'auth')],
   controllers: [UserMenuPreferenceController, AvailablePagesController],
   providers: [UserMenuPreferenceService, PageSyncService, OptimizedCacheService],
   exports: [UserMenuPreferenceService, PageSyncService],

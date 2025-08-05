@@ -4,5 +4,5 @@ export {
   ArticleType,
   ArticleStatus,
   UniteStock,
-  MethodeValorisationStock
+  MethodeValorisationStock,
 } from '@erp/entities'

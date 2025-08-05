@@ -188,7 +188,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
           className="w-full h-10 border rounded-md"
         />
       </div>
-      
+
       <div>
         <label className="block text-sm font-medium mb-2">Image de fond</label>
         <input
@@ -206,9 +206,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
           <input
             type="text"
             value={section.styles.padding?.top || ''}
-            onChange={(e) => updateStyles({ 
-              padding: { ...section.styles.padding, top: e.target.value }
-            })}
+            onChange={(e) =>
+              updateStyles({
+                padding: { ...section.styles.padding, top: e.target.value },
+              })
+            }
             className="w-full p-2 border rounded-md"
             placeholder="ex: 20px"
           />
@@ -218,9 +220,11 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
           <input
             type="text"
             value={section.styles.padding?.bottom || ''}
-            onChange={(e) => updateStyles({ 
-              padding: { ...section.styles.padding, bottom: e.target.value }
-            })}
+            onChange={(e) =>
+              updateStyles({
+                padding: { ...section.styles.padding, bottom: e.target.value },
+              })
+            }
             className="w-full p-2 border rounded-md"
             placeholder="ex: 20px"
           />
@@ -305,10 +309,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
     <div className="fixed inset-y-0 right-0 w-96 bg-white border-l shadow-xl z-40 overflow-hidden">
       <div className="flex items-center justify-between p-6 border-b">
         <h3 className="text-lg font-semibold">Paramètres de section</h3>
-        <button
-          onClick={onClose}
-          className="p-1 hover:bg-gray-100 rounded"
-        >
+        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
           <X className="w-5 h-5" />
         </button>
       </div>

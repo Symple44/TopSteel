@@ -7,17 +7,17 @@ const nextConfig = {
   experimental: {
     outputFileTracingRoot: path.join(process.cwd(), '../../'),
   },
-  
+
   // Origines autorisées pour les ressources cross-origin en développement
   allowedDevOrigins: [
-    'http://localhost:3007', 
-    'http://127.0.0.1:3007', 
+    'http://localhost:3007',
+    'http://127.0.0.1:3007',
     'https://localhost:3007',
     'https://127.0.0.1:3007',
-    'localhost:3007', 
-    '127.0.0.1:3007'
+    'localhost:3007',
+    '127.0.0.1:3007',
   ],
-  
+
   // Images
   images: {
     remotePatterns: [

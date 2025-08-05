@@ -3,7 +3,7 @@
 /**
  * Script de nettoyage direct de la table system_settings
  * TopSteel ERP - Clean Architecture
- * 
+ *
  * Supprime la table system_settings devenue obsolète après migration vers auth
  * Usage: npm run cleanup:system-settings
  */
@@ -42,7 +42,7 @@ async function cleanupSystemSettings() {
     `)
 
     if (!tableExists[0].exists) {
-      console.log('ℹ️  La table system_settings n\'existe déjà plus.')
+      console.log("ℹ️  La table system_settings n'existe déjà plus.")
       return
     }
 
@@ -52,7 +52,9 @@ async function cleanupSystemSettings() {
 
     if (count[0].count > 0) {
       // Afficher le contenu avant suppression
-      const content = await dataSource.query('SELECT category, key FROM system_settings ORDER BY category, key')
+      const content = await dataSource.query(
+        'SELECT category, key FROM system_settings ORDER BY category, key'
+      )
       console.log('\n📋 Contenu à supprimer:')
       content.forEach((row: any, index: number) => {
         console.log(`   ${index + 1}. ${row.category}.${row.key}`)
@@ -85,7 +87,6 @@ async function cleanupSystemSettings() {
     } else {
       console.log('\n❌ Erreur: La table existe encore après suppression')
     }
-
   } catch (error) {
     console.error('\n💥 ERREUR lors du nettoyage:', error)
     throw error

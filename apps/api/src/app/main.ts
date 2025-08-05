@@ -223,10 +223,7 @@ async function bootstrap() {
       .addTag('🧾 Facturation', 'Facturation et comptabilité')
       .addTag('📄 Documents', 'Gestion électronique de documents')
       .addTag('🔔 Notifications', 'Système de notifications')
-      .addServer(
-        `${process.env.API_URL || `http://127.0.0.1:${port}`}/api`,
-        'API TopSteel ERP'
-      )
+      .addServer(`${process.env.API_URL || `http://127.0.0.1:${port}`}/api`, 'API TopSteel ERP')
       .build()
 
     // Génération du document Swagger

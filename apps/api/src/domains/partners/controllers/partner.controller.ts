@@ -9,7 +9,7 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
@@ -30,9 +30,7 @@ import { PartnerService, type PartnerStatistics } from '../services/partner.serv
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class PartnerController {
-  constructor(
-    private readonly partnerService: PartnerService
-  ) {}
+  constructor(private readonly partnerService: PartnerService) {}
 
   /**
    * Créer un nouveau partenaire
@@ -41,11 +39,11 @@ export class PartnerController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Créer un partenaire',
-    description: 'Créer un nouveau client ou fournisseur avec validation métier'
+    description: 'Créer un nouveau client ou fournisseur avec validation métier',
   })
   @ApiResponse({
     status: 201,
-    description: 'Partenaire créé avec succès'
+    description: 'Partenaire créé avec succès',
   })
   async createPartner(
     @Body() createDto: CreatePartnerDto,
@@ -55,7 +53,7 @@ export class PartnerController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.partnerService.create(createDto, context)
@@ -67,7 +65,7 @@ export class PartnerController {
   @Get()
   @ApiOperation({
     summary: 'Lister les partenaires',
-    description: 'Récupérer les partenaires avec filtres et pagination'
+    description: 'Récupérer les partenaires avec filtres et pagination',
   })
   async getPartners(
     @Query() filters: PartnerFiltersDto,
@@ -82,17 +80,14 @@ export class PartnerController {
   @Get(':id')
   @ApiOperation({
     summary: 'Récupérer un partenaire',
-    description: 'Récupérer les détails d\'un partenaire'
+    description: "Récupérer les détails d'un partenaire",
   })
-  async getPartner(
-    @Param('id') id: string,
-    @CurrentUser() user: User
-  ): Promise<Partner | null> {
+  async getPartner(@Param('id') id: string, @CurrentUser() user: User): Promise<Partner | null> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.partnerService.findById(id, context)
@@ -104,7 +99,7 @@ export class PartnerController {
   @Patch(':id')
   @ApiOperation({
     summary: 'Mettre à jour un partenaire',
-    description: 'Modifier un partenaire existant'
+    description: 'Modifier un partenaire existant',
   })
   async updatePartner(
     @Param('id') id: string,
@@ -115,7 +110,7 @@ export class PartnerController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.partnerService.update(id, updateDto, context)
@@ -128,17 +123,14 @@ export class PartnerController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Supprimer un partenaire',
-    description: 'Supprimer un partenaire (soft delete)'
+    description: 'Supprimer un partenaire (soft delete)',
   })
-  async deletePartner(
-    @Param('id') id: string,
-    @CurrentUser() user: User
-  ): Promise<void> {
+  async deletePartner(@Param('id') id: string, @CurrentUser() user: User): Promise<void> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     await this.partnerService.delete(id, context)
@@ -150,7 +142,7 @@ export class PartnerController {
   @Get('clients/actifs')
   @ApiOperation({
     summary: 'Lister les clients actifs',
-    description: 'Récupérer tous les clients avec le statut ACTIF'
+    description: 'Récupérer tous les clients avec le statut ACTIF',
   })
   async getClientsActifs(): Promise<Partner[]> {
     return await this.partnerService.getClientsActifs()
@@ -162,7 +154,7 @@ export class PartnerController {
   @Get('fournisseurs/actifs')
   @ApiOperation({
     summary: 'Lister les fournisseurs actifs',
-    description: 'Récupérer tous les fournisseurs avec le statut ACTIF'
+    description: 'Récupérer tous les fournisseurs avec le statut ACTIF',
   })
   async getFournisseursActifs(): Promise<Partner[]> {
     return await this.partnerService.getFournisseursActifs()
@@ -179,17 +171,14 @@ export class PartnerController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Convertir un prospect en client',
-    description: 'Changer le statut d\'un prospect en client actif'
+    description: "Changer le statut d'un prospect en client actif",
   })
-  async convertirProspect(
-    @Param('id') id: string,
-    @CurrentUser() user: User
-  ): Promise<Partner> {
+  async convertirProspect(@Param('id') id: string, @CurrentUser() user: User): Promise<Partner> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.partnerService.convertirProspect(id, context)
@@ -202,7 +191,7 @@ export class PartnerController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Suspendre un partenaire',
-    description: 'Suspendre temporairement un partenaire'
+    description: 'Suspendre temporairement un partenaire',
   })
   async suspendrePartenaire(
     @Param('id') id: string,
@@ -213,7 +202,7 @@ export class PartnerController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.partnerService.suspendrePartenaire(id, body.raison, context)
@@ -226,7 +215,7 @@ export class PartnerController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Fusionner deux partenaires',
-    description: 'Fusionner les données de deux partenaires en cas de doublon'
+    description: 'Fusionner les données de deux partenaires en cas de doublon',
   })
   async fusionnerPartenaires(
     @Param('principalId') principalId: string,
@@ -237,7 +226,7 @@ export class PartnerController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.partnerService.fusionnerPartenaires(principalId, secondaireId, context)
@@ -250,12 +239,9 @@ export class PartnerController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Recherche avancée de partenaires',
-    description: 'Recherche avec critères multiples et filtres avancés'
+    description: 'Recherche avec critères multiples et filtres avancés',
   })
-  async searchAdvanced(
-    @Body() searchCriteria: any,
-    @CurrentUser() user: User
-  ): Promise<Partner[]> {
+  async searchAdvanced(@Body() searchCriteria: any, @CurrentUser() user: User): Promise<Partner[]> {
     return await this.partnerService.searchPartners(searchCriteria)
   }
 
@@ -265,7 +251,7 @@ export class PartnerController {
   @Get('stats/overview')
   @ApiOperation({
     summary: 'Statistiques des partenaires',
-    description: 'Récupérer les statistiques globales des partenaires'
+    description: 'Récupérer les statistiques globales des partenaires',
   })
   async getStatistiques(): Promise<PartnerStatistics> {
     return await this.partnerService.getStatistiques()
@@ -278,17 +264,17 @@ export class PartnerController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Exporter les partenaires',
-    description: 'Exporter la liste des partenaires selon des critères'
+    description: 'Exporter la liste des partenaires selon des critères',
   })
   async exportPartners(
     @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF', filters?: any },
     @CurrentUser() user: User
-  ): Promise<{ url: string, filename: string }> {
+  ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
     // Pour l'exemple, on retourne une URL fictive
     return {
       url: '/exports/partners/export-2024-01-15.csv',
-      filename: `partners-export-${new Date().toISOString().split('T')[0]}.${exportCriteria.format.toLowerCase()}`
+      filename: `partners-export-${new Date().toISOString().split('T')[0]}.${exportCriteria.format.toLowerCase()}`,
     }
   }
 
@@ -299,22 +285,22 @@ export class PartnerController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Importer des partenaires',
-    description: 'Importer une liste de partenaires depuis un fichier'
+    description: 'Importer une liste de partenaires depuis un fichier',
   })
   async importPartners(
     @Body() importData: { data: any[], options?: { skipErrors?: boolean, dryRun?: boolean } },
     @CurrentUser() user: User
-  ): Promise<{ 
-    imported: number,
-    errors: number,
-    warnings: string[],
+  ): Promise<{
+    imported: number
+    errors: number
+    warnings: string[]
     details: any[]
   }> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     // Implémentation de l'import
@@ -322,7 +308,7 @@ export class PartnerController {
       imported: 0,
       errors: 0,
       warnings: [] as string[],
-      details: [] as Array<{ status: string, data: any, error?: string }>
+      details: [] as Array<{ status: string; data: any; error?: string }>,
     }
 
     for (const partnerData of importData.data) {
@@ -334,10 +320,10 @@ export class PartnerController {
         results.details.push({ status: 'success', data: partnerData })
       } catch (error) {
         results.errors++
-        results.details.push({ 
-          status: 'error', 
-          data: partnerData, 
-          error: (error as Error).message 
+        results.details.push({
+          status: 'error',
+          data: partnerData,
+          error: (error as Error).message,
         })
         if (!importData.options?.skipErrors) {
           break
@@ -355,43 +341,46 @@ export class PartnerController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Validation en lot',
-    description: 'Valider plusieurs partenaires selon les règles métier'
+    description: 'Valider plusieurs partenaires selon les règles métier',
   })
   async validateBatch(
     @Body() partnerIds: string[],
     @CurrentUser() user: User
-  ): Promise<Array<{ id: string, valid: boolean, errors: string[] }>> {
+  ): Promise<Array<{ id: string; valid: boolean; errors: string[] }>> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
-    const results: Array<{ id: string, valid: boolean, errors: string[] }> = []
-    
+    const results: Array<{ id: string; valid: boolean; errors: string[] }> = []
+
     for (const partnerId of partnerIds) {
       try {
         const partner = await this.partnerService.findById(partnerId, context)
         if (partner) {
-          const validation = await this.partnerService.validateBusinessRules(partner, 'VALIDATE' as any)
+          const validation = await this.partnerService.validateBusinessRules(
+            partner,
+            'VALIDATE' as any
+          )
           results.push({
             id: partnerId,
             valid: validation.isValid,
-            errors: validation.errors.map(e => e.message)
+            errors: validation.errors.map((e) => e.message),
           })
         } else {
           results.push({
             id: partnerId,
             valid: false,
-            errors: ['Partenaire introuvable']
+            errors: ['Partenaire introuvable'],
           })
         }
       } catch (error) {
         results.push({
           id: partnerId,
           valid: false,
-          errors: [(error as Error).message]
+          errors: [(error as Error).message],
         })
       }
     }

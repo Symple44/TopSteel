@@ -55,7 +55,6 @@ export class UserSocieteRolesService {
    * Récupère les rôles et permissions d'un utilisateur dans toutes ses sociétés
    */
   async findUserRolesInSocietes(userId: string): Promise<UserSocieteRoleWithPermissions[]> {
-    
     // Test avec une requête SQL directe pour debug
     const rawQuery = `
       SELECT 
@@ -65,16 +64,16 @@ export class UserSocieteRolesService {
       LEFT JOIN societes s ON s.id = usr."societeId"
       WHERE usr."userId" = $1 AND usr."isActive" = true
     `
-    
+
     const rawResult = await this._userSocieteRoleRepository.query(rawQuery, [userId])
     console.log('🔍 UserSocieteRolesService: Raw SQL result:', rawResult)
-    
+
     const userRoles = await this._userSocieteRoleRepository
       .createQueryBuilder('usr')
       .leftJoinAndSelect('usr.societe', 'societe')
       .select([
         'usr.id',
-        'usr.userId', 
+        'usr.userId',
         'usr.societeId',
         'usr.roleType',
         'usr.isDefaultSociete',
@@ -83,19 +82,19 @@ export class UserSocieteRolesService {
         'usr.restrictedPermissions',
         'societe.id',
         'societe.nom',
-        'societe.code'
+        'societe.code',
       ])
       .where('usr.userId = :userId', { userId })
       .andWhere('usr.isActive = :isActive', { isActive: true })
       .getMany()
-    
+
     console.log('🔍 UserSocieteRolesService: Found user roles:', userRoles.length)
     console.log('🔍 UserSocieteRolesService: Raw data:', userRoles)
 
     // Si la relation TypeORM ne fonctionne pas, utilisons la requête SQL directe
     if (rawResult && rawResult.length > 0 && userRoles.length === 0) {
       console.log('🔍 UserSocieteRolesService: Using raw SQL result as TypeORM relations failed')
-      
+
       const result: UserSocieteRoleWithPermissions[] = rawResult.map((row: any) => ({
         userId: row.userId,
         societeId: row.societeId,
@@ -112,7 +111,7 @@ export class UserSocieteRolesService {
         restrictedPermissions: [],
         isActive: row.isActive,
       }))
-      
+
       console.log('🔍 UserSocieteRolesService: Returning raw result:', result)
       return result
     }
@@ -297,17 +296,14 @@ export class UserSocieteRolesService {
    */
   async setDefaultSociete(userId: string, societeId: string): Promise<void> {
     // D'abord, enlever le statut par défaut de toutes les sociétés de l'utilisateur
-    await this._userSocieteRoleRepository.update(
-      { userId },
-      { isDefaultSociete: false }
-    )
-    
+    await this._userSocieteRoleRepository.update({ userId }, { isDefaultSociete: false })
+
     // Ensuite, définir la société spécifiée comme par défaut
     const result = await this._userSocieteRoleRepository.update(
       { userId, societeId, isActive: true },
       { isDefaultSociete: true }
     )
-    
+
     if (result.affected === 0) {
       throw new Error(`No active access found for user ${userId} to company ${societeId}`)
     }

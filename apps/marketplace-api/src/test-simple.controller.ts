@@ -26,9 +26,9 @@ export class TestSimpleController {
         seo: {
           title: 'Produit de test simple',
           description: 'Test sans aucune dépendance',
-          slug: 'simple-test-product'
-        }
-      }
+          slug: 'simple-test-product',
+        },
+      },
     ]
   }
 
@@ -38,7 +38,7 @@ export class TestSimpleController {
     return {
       status: 'ok',
       message: 'Controller simple fonctionne',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
   }
 }

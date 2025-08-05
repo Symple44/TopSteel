@@ -64,7 +64,7 @@ export const fr = {
     unauthorizedTitle: 'Accès non autorisé',
     unauthorizedMessage: 'Vous devez être connecté pour accéder à cette page.',
     loginButton: 'Se connecter',
-    
+
     // Notifications
     soundNotifications: 'Notifications sonores',
 
@@ -72,7 +72,7 @@ export const fr = {
     backend: {
       status: {
         online: 'En ligne',
-        offline: 'Hors ligne', 
+        offline: 'Hors ligne',
         error: 'Erreur',
         checking: 'Vérification...',
         retry: 'Réessayer',
@@ -113,7 +113,7 @@ export const fr = {
         retry: 'Réessayer la connexion',
         retrying: 'Reconnexion en cours...',
         backToLogin: 'Retour à la connexion',
-        contactAdmin: 'Contacter l\'administrateur',
+        contactAdmin: "Contacter l'administrateur",
       },
     },
 
@@ -136,7 +136,7 @@ export const fr = {
   auth: {
     login: 'Connexion',
     loading: 'Chargement de la connexion...',
-    verifyingAuthentication: 'Vérification de l\'authentification...',
+    verifyingAuthentication: "Vérification de l'authentification...",
     register: 'Inscription',
     email: 'Adresse email',
     password: 'Mot de passe',
@@ -958,7 +958,7 @@ export const fr = {
     limit: 'Limite',
     results: 'Résultats',
     noResults: 'Aucun résultat',
-    error: 'Erreur lors de l\'exécution',
+    error: "Erreur lors de l'exécution",
     syntax: 'Syntaxe',
     visual: 'Visuel',
     raw: 'Brut',
@@ -1421,7 +1421,7 @@ export const fr = {
   },
 
   // === NOUVELLES TRADUCTIONS AJOUTÉES ===
-  
+
   // Company & Multi-tab management
   companies: {
     select: 'Sélectionner une société',
@@ -1434,7 +1434,8 @@ export const fr = {
     cannotConnect: 'Impossible de se connecter à cette société',
     syncError: 'Erreur de synchronisation, veuillez vous reconnecter',
     changeAffects: 'Changement sur {{count}} onglet{{count, plural, one {} other {s}}}',
-    changeAffectsMultiple: 'Affectera tous les onglets ouverts ({{count}} détecté{{count, plural, one {} other {s}}}).',
+    changeAffectsMultiple:
+      'Affectera tous les onglets ouverts ({{count}} détecté{{count, plural, one {} other {s}}}).',
     setAsDefault: 'Définir comme société par défaut',
     chooseSociety: 'Choisissez la société sur laquelle vous souhaitez travailler.',
     code: 'Code',
@@ -1453,7 +1454,6 @@ export const fr = {
     connectionDetected: 'Connexion détectée',
     loginInOtherTab: 'Connexion effectuée dans un autre onglet',
   },
-
 
   // Settings enhancements
   settingsEnhanced: {
@@ -1501,22 +1501,22 @@ export const fr = {
       sections: {
         theme: 'Thème',
         language: 'Langue',
-        accentColor: 'Couleur d\'accent',
+        accentColor: "Couleur d'accent",
         fontSize: 'Taille de police',
-        density: 'Densité d\'affichage',
+        density: "Densité d'affichage",
         contentWidth: 'Largeur du contenu',
       },
       messages: {
-        saveSuccess: 'Paramètres sauvegardés', 
-        saveSuccessDesc: 'Vos préférences d\'apparence ont été mises à jour avec succès',
+        saveSuccess: 'Paramètres sauvegardés',
+        saveSuccessDesc: "Vos préférences d'apparence ont été mises à jour avec succès",
         saveError: 'Erreur de sauvegarde',
-        saveErrorDesc: 'Impossible de sauvegarder vos préférences d\'apparence',
+        saveErrorDesc: "Impossible de sauvegarder vos préférences d'apparence",
       },
     },
     notifications: {
       sections: {
         email: 'Notifications par email',
-        push: 'Notifications push', 
+        push: 'Notifications push',
         silent: 'Mode silencieux',
         toast: 'Notifications toast',
         browser: 'Notifications navigateur',
@@ -1528,13 +1528,13 @@ export const fr = {
         systemAlerts: 'Alertes système',
         taskReminders: 'Rappels de tâches',
         projectUpdates: 'Mises à jour de projets',
-        inventoryAlerts: 'Alertes d\'inventaire',
+        inventoryAlerts: "Alertes d'inventaire",
         maintenanceNotifications: 'Notifications de maintenance',
       },
       categories: {
         system: 'Système',
         stock: 'Gestion des stocks',
-        projet: 'Projets', 
+        projet: 'Projets',
         maintenance: 'Maintenance',
         client: 'Clients',
         facture: 'Facturation',
@@ -1564,7 +1564,7 @@ export const fr = {
         lastActivity: 'Dernière activité',
         location: 'Localisation',
         browser: 'Navigateur',
-        os: 'Système d\'exploitation',
+        os: "Système d'exploitation",
       },
     },
   },
@@ -1581,7 +1581,7 @@ export const fr = {
       acronym: 'JDO',
       position: 'Directeur technique',
       department: 'Production',
-      address: '123 Rue de l\'Industrie',
+      address: "123 Rue de l'Industrie",
       city: 'Lyon',
       postalCode: '69000',
       country: 'France',
@@ -1630,7 +1630,7 @@ export const fr = {
       searchPlaceholder: 'Rechercher...',
     },
     time: {
-      now: 'À l\'instant',
+      now: "À l'instant",
       minutesAgo: 'Il y a {{count}} min',
       hoursAgo: 'Il y a {{count}}h',
       daysAgo: 'Il y a {{count}}j',
@@ -1676,7 +1676,7 @@ export const fr = {
   // Error messages and boundaries
   errorsEnhanced: {
     boundary: {
-      title: 'Une erreur s\'est produite',
+      title: "Une erreur s'est produite",
       description: 'Veuillez rafraîchir la page',
       refresh: 'Rafraîchir',
       retry: 'Réessayer',
@@ -1684,8 +1684,9 @@ export const fr = {
       reportIssue: 'Signaler le problème',
     },
     monitoring: {
-      title: 'Oops! Une erreur s\'est produite',
-      description: 'Une erreur inattendue s\'est produite dans l\'application. Nos équipes ont été notifiées.',
+      title: "Oops! Une erreur s'est produite",
+      description:
+        "Une erreur inattendue s'est produite dans l'application. Nos équipes ont été notifiées.",
       reloadPage: 'Recharger la page',
     },
     connection: {
@@ -1725,7 +1726,7 @@ export const fr = {
 
   // Templates
   templates: {
-    title: 'Templates d\'Interface',
+    title: "Templates d'Interface",
     description: 'Choisissez un template prédéfini',
     categories: {
       all: 'Tous',
@@ -1754,7 +1755,7 @@ export const fr = {
     description: 'Système ERP spécialisé pour la métallurgie',
   },
 
-  // Navigation enhancements  
+  // Navigation enhancements
   navigationEnhanced: {
     customizeMenu: 'Personnaliser le menu',
     openCustomizationDashboard: 'Ouvrir le tableau de bord de personnalisation',

@@ -3,11 +3,11 @@
  * TopSteel ERP - Clean Architecture
  */
 
-import { 
+import {
   PricingCalculator,
   CaracteristiquesTechniques,
   ArticleFamille,
-  InjectionLogger
+  InjectionLogger,
 } from '../types/article-injection.types'
 
 interface MaterialPricing {
@@ -24,32 +24,32 @@ interface FamilyMargin {
 
 export class PricingCalculatorService implements PricingCalculator {
   private logger: InjectionLogger
-  
+
   // Prix de base matériaux (€/kg)
   private readonly materialPrices: Record<string, MaterialPricing> = {
     // Aciers construction
-    'S235JR': { basePrice: 0.85, complexity: 1.0, availability: 1.0 },
-    'S275JR': { basePrice: 0.92, complexity: 1.1, availability: 1.0 },
-    'S355JR': { basePrice: 1.15, complexity: 1.2, availability: 0.95 },
-    'S460JR': { basePrice: 1.45, complexity: 1.4, availability: 0.90 },
-    
+    S235JR: { basePrice: 0.85, complexity: 1.0, availability: 1.0 },
+    S275JR: { basePrice: 0.92, complexity: 1.1, availability: 1.0 },
+    S355JR: { basePrice: 1.15, complexity: 1.2, availability: 0.95 },
+    S460JR: { basePrice: 1.45, complexity: 1.4, availability: 0.9 },
+
     // Aciers pour profilés creux (JH = Hollow)
-    'S235JH': { basePrice: 0.88, complexity: 1.1, availability: 0.98 },
-    'S275JH': { basePrice: 0.95, complexity: 1.2, availability: 0.98 },
-    'S355JH': { basePrice: 1.18, complexity: 1.3, availability: 0.93 },
-    
+    S235JH: { basePrice: 0.88, complexity: 1.1, availability: 0.98 },
+    S275JH: { basePrice: 0.95, complexity: 1.2, availability: 0.98 },
+    S355JH: { basePrice: 1.18, complexity: 1.3, availability: 0.93 },
+
     // Inox
-    '304': { basePrice: 4.20, complexity: 1.3, availability: 0.95 },
+    '304': { basePrice: 4.2, complexity: 1.3, availability: 0.95 },
     '304L': { basePrice: 4.35, complexity: 1.3, availability: 0.95 },
-    '316': { basePrice: 5.80, complexity: 1.4, availability: 0.90 },
-    '316L': { basePrice: 6.10, complexity: 1.4, availability: 0.90 },
-    '430': { basePrice: 3.50, complexity: 1.2, availability: 0.95 },
-    
+    '316': { basePrice: 5.8, complexity: 1.4, availability: 0.9 },
+    '316L': { basePrice: 6.1, complexity: 1.4, availability: 0.9 },
+    '430': { basePrice: 3.5, complexity: 1.2, availability: 0.95 },
+
     // Aluminium
-    '1050': { basePrice: 2.10, complexity: 1.1, availability: 1.0 },
+    '1050': { basePrice: 2.1, complexity: 1.1, availability: 1.0 },
     '5754': { basePrice: 2.35, complexity: 1.2, availability: 0.95 },
-    '6060': { basePrice: 2.50, complexity: 1.3, availability: 0.95 },
-    '6082': { basePrice: 2.70, complexity: 1.4, availability: 0.90 }
+    '6060': { basePrice: 2.5, complexity: 1.3, availability: 0.95 },
+    '6082': { basePrice: 2.7, complexity: 1.4, availability: 0.9 },
   }
 
   // Marges par famille de produits
@@ -58,7 +58,7 @@ export class PricingCalculatorService implements PricingCalculator {
     [ArticleFamille.TUBES_PROFILES]: { base: 40, min: 30, max: 55 },
     [ArticleFamille.ACIERS_LONGS]: { base: 30, min: 20, max: 45 },
     [ArticleFamille.TOLES_PLAQUES]: { base: 25, min: 18, max: 40 },
-    [ArticleFamille.COUVERTURE_BARDAGE]: { base: 45, min: 35, max: 65 }
+    [ArticleFamille.COUVERTURE_BARDAGE]: { base: 45, min: 35, max: 65 },
   }
 
   constructor(logger: InjectionLogger) {
@@ -90,7 +90,6 @@ export class PricingCalculatorService implements PricingCalculator {
 
       // Arrondir à 2 décimales
       return Math.round(basePrice * 100) / 100
-
     } catch (error) {
       this.logger.error(`Erreur calcul prix de base pour ${material}`, error as Error)
       return 1.0 // Prix de fallback
@@ -120,7 +119,6 @@ export class PricingCalculatorService implements PricingCalculator {
       margin = Math.max(margins.min, Math.min(margins.max, margin))
 
       return Math.round(margin * 100) / 100
-
     } catch (error) {
       this.logger.error(`Erreur calcul marge pour famille ${famille}`, error as Error)
       return 35 // Marge par défaut
@@ -151,9 +149,8 @@ export class PricingCalculatorService implements PricingCalculator {
 
       // Appliquer la remise
       const discountedPrice = price * (1 - discount / 100)
-      
-      return Math.round(discountedPrice * 100) / 100
 
+      return Math.round(discountedPrice * 100) / 100
     } catch (error) {
       this.logger.error('Erreur application remise volume', error as Error)
       return price
@@ -165,7 +162,7 @@ export class PricingCalculatorService implements PricingCalculator {
 
     // Facteur selon le type de produit
     const specs = caracteristiques.specifications || {}
-    
+
     if (specs.typeProfile === 'IPE' || specs.typeProfile === 'HEA' || specs.typeProfile === 'HEB') {
       factor = 1.2 // Profilés laminés plus complexes
     } else if (specs.typeTube === 'CARRE' || specs.typeTube === 'RECTANGULAIRE') {
@@ -223,12 +220,12 @@ export class PricingCalculatorService implements PricingCalculator {
     // Facteur selon le revêtement
     if (caracteristiques.revetement) {
       const revetementFactors: Record<string, number> = {
-        'Brut': 1.0,
-        'Galvanisé': 1.3,
-        'Thermolaqué': 1.5,
-        'Anodisé': 1.4,
-        'Passivé': 1.1,
-        'Peinture': 1.2
+        Brut: 1.0,
+        Galvanisé: 1.3,
+        Thermolaqué: 1.5,
+        Anodisé: 1.4,
+        Passivé: 1.1,
+        Peinture: 1.2,
       }
       factor *= revetementFactors[caracteristiques.revetement] || 1.0
     }
@@ -236,13 +233,13 @@ export class PricingCalculatorService implements PricingCalculator {
     // Facteur selon la finition de surface
     if (caracteristiques.specifications?.etatSurface) {
       const surfaceFactors: Record<string, number> = {
-        'Brute': 1.0,
+        Brute: 1.0,
         '2B': 1.1, // Inox
-        'BA': 1.3, // Inox poli
+        BA: 1.3, // Inox poli
         'Larmée quinze': 1.2,
-        'Gaufrée': 1.15,
-        'Polie': 1.4,
-        'Brossée': 1.2
+        Gaufrée: 1.15,
+        Polie: 1.4,
+        Brossée: 1.2,
       }
       factor *= surfaceFactors[caracteristiques.specifications.etatSurface] || 1.0
     }
@@ -252,7 +249,10 @@ export class PricingCalculatorService implements PricingCalculator {
 
   // Méthodes utilitaires pour l'analyse de prix
 
-  getPriceRange(famille: ArticleFamille, material: string): { min: number; max: number; average: number } {
+  getPriceRange(
+    famille: ArticleFamille,
+    material: string
+  ): { min: number; max: number; average: number } {
     const materialInfo = this.materialPrices[material] || this.materialPrices['S235JR']
     const margins = this.familyMargins[famille]
 

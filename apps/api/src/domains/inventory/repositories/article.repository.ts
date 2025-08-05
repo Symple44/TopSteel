@@ -51,7 +51,9 @@ export interface IArticleRepository extends IBusinessRepository<Article> {
   /**
    * Trouver les articles selon une condition de stock
    */
-  findByStockCondition(condition: 'rupture' | 'sous_mini' | 'normal' | 'surstock'): Promise<Article[]>
+  findByStockCondition(
+    condition: 'rupture' | 'sous_mini' | 'normal' | 'surstock'
+  ): Promise<Article[]>
 
   /**
    * Vérifier si un article a des mouvements de stock
@@ -96,12 +98,21 @@ export interface IArticleRepository extends IBusinessRepository<Article> {
   /**
    * Obtenir les articles par caractéristiques physiques
    */
-  findByDimensions(longueurMin?: number, longueurMax?: number, largeurMin?: number, largeurMax?: number): Promise<Article[]>
+  findByDimensions(
+    longueurMin?: number,
+    longueurMax?: number,
+    largeurMin?: number,
+    largeurMax?: number
+  ): Promise<Article[]>
 
   /**
    * Obtenir les articles par gamme de prix
    */
-  findByPriceRange(prixMin?: number, prixMax?: number, typePrix?: 'achat' | 'vente'): Promise<Article[]>
+  findByPriceRange(
+    prixMin?: number,
+    prixMax?: number,
+    typePrix?: 'achat' | 'vente'
+  ): Promise<Article[]>
 
   /**
    * Obtenir les articles nécessitant un stockage spécial
@@ -126,7 +137,7 @@ export interface IArticleRepository extends IBusinessRepository<Article> {
   /**
    * Obtenir la valorisation du stock par famille
    */
-  getStockValuationByFamily(): Promise<Record<string, { quantite: number, valeur: number }>>
+  getStockValuationByFamily(): Promise<Record<string, { quantite: number; valeur: number }>>
 
   /**
    * Obtenir les mouvements de stock récents pour un article
@@ -136,7 +147,10 @@ export interface IArticleRepository extends IBusinessRepository<Article> {
   /**
    * Obtenir les articles les plus vendus
    */
-  getBestSellers(limit: number, periode?: { debut: Date, fin: Date }): Promise<Array<Article & { quantiteVendue: number }>>
+  getBestSellers(
+    limit: number,
+    periode?: { debut: Date; fin: Date }
+  ): Promise<Array<Article & { quantiteVendue: number }>>
 
   /**
    * Obtenir les articles à rotation lente
@@ -206,7 +220,7 @@ export enum ArticleSearchField {
   MARQUE = 'marque',
   MODELE = 'modele',
   CODE_EAN = 'codeEAN',
-  REFERENCE_FOURNISSEUR = 'referenceFournisseur'
+  REFERENCE_FOURNISSEUR = 'referenceFournisseur',
 }
 
 export enum ArticleSortField {
@@ -221,7 +235,7 @@ export enum ArticleSortField {
   VALEUR_STOCK = 'valeurStock',
   DATE_CREATION = 'dateCreationFiche',
   DATE_DERNIER_MOUVEMENT = 'dateDernierMouvement',
-  DATE_DERNIER_INVENTAIRE = 'dateDernierInventaire'
+  DATE_DERNIER_INVENTAIRE = 'dateDernierInventaire',
 }
 
 /**

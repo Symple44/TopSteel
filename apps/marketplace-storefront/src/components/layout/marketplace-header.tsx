@@ -33,11 +33,7 @@ export function MarketplaceHeader({ tenant, config }: MarketplaceHeaderProps) {
           <div className="flex items-center">
             <Link href={`/${tenant}`} className="flex items-center space-x-2">
               {config.logo ? (
-                <img
-                  src={config.logo}
-                  alt={config.storeName}
-                  className="h-8 w-auto"
-                />
+                <img src={config.logo} alt={config.storeName} className="h-8 w-auto" />
               ) : (
                 <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-sm">
@@ -109,11 +105,7 @@ export function MarketplaceHeader({ tenant, config }: MarketplaceHeaderProps) {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
             >
-              {mobileMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>

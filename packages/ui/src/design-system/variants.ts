@@ -8,7 +8,13 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 // ===== TYPES DE BASE =====
 
-export type ComponentVariant = 'default' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link'
+export type ComponentVariant =
+  | 'default'
+  | 'secondary'
+  | 'destructive'
+  | 'outline'
+  | 'ghost'
+  | 'link'
 export type ComponentSize = 'sm' | 'default' | 'lg' | 'xl'
 
 // ===== COMPOSANTS PRIMITIFS UNIFIÉS =====
@@ -24,7 +30,8 @@ export const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
-        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm',
+        outline:
+          'border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline p-0 h-auto',
@@ -72,10 +79,12 @@ export const dropdownVariants = cva(
         xl: 'min-w-[16rem] text-base',
       },
       align: {
-        start: 'data-[side=top]:slide-in-from-bottom-1 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1',
-        center: 'data-[side=top]:slide-in-from-bottom-2 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2',
+        start:
+          'data-[side=top]:slide-in-from-bottom-1 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1',
+        center:
+          'data-[side=top]:slide-in-from-bottom-2 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2',
         end: 'data-[side=top]:slide-in-from-bottom-1 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1',
-      }
+      },
     },
     defaultVariants: {
       variant: 'default',
@@ -96,14 +105,16 @@ export const dropdownItemVariants = cva(
     variants: {
       variant: {
         default: 'hover:bg-accent hover:text-accent-foreground',
-        destructive: 'text-destructive hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground',
-        success: 'text-success hover:bg-success hover:text-success-foreground focus:bg-success focus:text-success-foreground',
+        destructive:
+          'text-destructive hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground',
+        success:
+          'text-success hover:bg-success hover:text-success-foreground focus:bg-success focus:text-success-foreground',
       },
       size: {
         sm: 'px-1 py-1 text-xs',
         default: 'px-2 py-1.5 text-sm',
         lg: 'px-3 py-2 text-base',
-      }
+      },
     },
     defaultVariants: {
       variant: 'default',
@@ -133,7 +144,7 @@ export const tooltipVariants = cva(
         default: 'px-3 py-1.5 text-xs max-w-xs',
         lg: 'px-4 py-2 text-sm max-w-sm',
         xl: 'px-6 py-3 text-base max-w-md',
-      }
+      },
     },
     defaultVariants: {
       variant: 'default',
@@ -155,14 +166,15 @@ export const notificationVariants = cva(
         default: 'bg-background text-foreground border-border',
         success: 'bg-success/10 text-success-foreground border-success/20 [&>svg]:text-success',
         warning: 'bg-warning/10 text-warning-foreground border-warning/20 [&>svg]:text-warning',
-        destructive: 'bg-destructive/10 text-destructive-foreground border-destructive/20 [&>svg]:text-destructive',
+        destructive:
+          'bg-destructive/10 text-destructive-foreground border-destructive/20 [&>svg]:text-destructive',
         info: 'bg-info/10 text-info-foreground border-info/20 [&>svg]:text-info',
       },
       size: {
         sm: 'p-3 text-sm',
         default: 'p-4 text-sm',
         lg: 'p-6 text-base',
-      }
+      },
     },
     defaultVariants: {
       variant: 'default',
@@ -176,59 +188,53 @@ export type NotificationVariants = VariantProps<typeof notificationVariants>
 /**
  * Variants pour composants de chargement/état
  */
-export const loadingVariants = cva(
-  'inline-flex items-center justify-center',
-  {
-    variants: {
-      variant: {
-        spinner: 'animate-spin rounded-full border-2 border-current border-t-transparent',
-        dots: 'space-x-1',
-        pulse: 'animate-pulse',
-        skeleton: 'animate-pulse rounded bg-muted',
-      },
-      size: {
-        sm: 'h-4 w-4',
-        default: 'h-6 w-6',
-        lg: 'h-8 w-8',
-        xl: 'h-12 w-12',
-      }
+export const loadingVariants = cva('inline-flex items-center justify-center', {
+  variants: {
+    variant: {
+      spinner: 'animate-spin rounded-full border-2 border-current border-t-transparent',
+      dots: 'space-x-1',
+      pulse: 'animate-pulse',
+      skeleton: 'animate-pulse rounded bg-muted',
     },
-    defaultVariants: {
-      variant: 'spinner',
-      size: 'default',
+    size: {
+      sm: 'h-4 w-4',
+      default: 'h-6 w-6',
+      lg: 'h-8 w-8',
+      xl: 'h-12 w-12',
     },
-  }
-)
+  },
+  defaultVariants: {
+    variant: 'spinner',
+    size: 'default',
+  },
+})
 
 export type LoadingVariants = VariantProps<typeof loadingVariants>
 
 /**
  * Variants pour composants de métallurgie TopSteel
  */
-export const metallurgyVariants = cva(
-  'rounded-lg border p-4 font-mono text-sm',
-  {
-    variants: {
-      variant: {
-        specification: 'bg-steel-50 border-steel-200 text-steel-900',
-        calculation: 'bg-blue-50 border-blue-200 text-blue-900',
-        quality: 'bg-green-50 border-green-200 text-green-900',
-        hazard: 'bg-red-50 border-red-200 text-red-900',
-        certification: 'bg-amber-50 border-amber-200 text-amber-900',
-      },
-      priority: {
-        low: 'border-l-4 border-l-steel-300',
-        medium: 'border-l-4 border-l-amber-400',
-        high: 'border-l-4 border-l-red-500',
-        critical: 'border-l-4 border-l-red-600 bg-red-50',
-      }
+export const metallurgyVariants = cva('rounded-lg border p-4 font-mono text-sm', {
+  variants: {
+    variant: {
+      specification: 'bg-steel-50 border-steel-200 text-steel-900',
+      calculation: 'bg-blue-50 border-blue-200 text-blue-900',
+      quality: 'bg-green-50 border-green-200 text-green-900',
+      hazard: 'bg-red-50 border-red-200 text-red-900',
+      certification: 'bg-amber-50 border-amber-200 text-amber-900',
     },
-    defaultVariants: {
-      variant: 'specification',
-      priority: 'low',
+    priority: {
+      low: 'border-l-4 border-l-steel-300',
+      medium: 'border-l-4 border-l-amber-400',
+      high: 'border-l-4 border-l-red-500',
+      critical: 'border-l-4 border-l-red-600 bg-red-50',
     },
-  }
-)
+  },
+  defaultVariants: {
+    variant: 'specification',
+    priority: 'low',
+  },
+})
 
 export type MetallurgyVariants = VariantProps<typeof metallurgyVariants>
 

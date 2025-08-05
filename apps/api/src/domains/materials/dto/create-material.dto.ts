@@ -1,10 +1,20 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsNumber, IsBoolean, IsObject, Min, Max } from 'class-validator'
-import { 
-  MaterialType, 
-  MaterialShape, 
-  MaterialStatus, 
-  MaterialUnit, 
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsObject,
+  Min,
+  Max,
+} from 'class-validator'
+import {
+  MaterialType,
+  MaterialShape,
+  MaterialStatus,
+  MaterialUnit,
   StorageMethod,
   type MaterialDimensions,
   type MechanicalProperties,
@@ -12,7 +22,7 @@ import {
   type ChemicalProperties,
   type MaterialCertifications,
   type SupplyInfo,
-  type ProductionInfo
+  type ProductionInfo,
 } from '../entities/material.entity'
 
 /**
@@ -21,7 +31,7 @@ import {
 export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Référence unique du matériau (générée automatiquement si non fournie)',
-    example: 'AC-PL-000001'
+    example: 'AC-PL-000001',
   })
   @IsOptional()
   @IsString()
@@ -29,7 +39,7 @@ export class CreateMaterialDto {
 
   @ApiProperty({
     description: 'Nom descriptif du matériau',
-    example: 'Plaque acier S235JR'
+    example: 'Plaque acier S235JR',
   })
   @IsNotEmpty()
   @IsString()
@@ -37,7 +47,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Description détaillée du matériau',
-    example: 'Plaque d\'acier de construction selon norme EN 10025-2'
+    example: "Plaque d'acier de construction selon norme EN 10025-2",
   })
   @IsOptional()
   @IsString()
@@ -46,7 +56,7 @@ export class CreateMaterialDto {
   @ApiProperty({
     description: 'Type de matériau',
     enum: MaterialType,
-    example: MaterialType.ACIER
+    example: MaterialType.ACIER,
   })
   @IsEnum(MaterialType)
   type!: MaterialType
@@ -54,7 +64,7 @@ export class CreateMaterialDto {
   @ApiProperty({
     description: 'Forme du matériau',
     enum: MaterialShape,
-    example: MaterialShape.PLAQUE
+    example: MaterialShape.PLAQUE,
   })
   @IsEnum(MaterialShape)
   forme!: MaterialShape
@@ -62,7 +72,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Statut du matériau',
     enum: MaterialStatus,
-    default: MaterialStatus.ACTIF
+    default: MaterialStatus.ACTIF,
   })
   @IsOptional()
   @IsEnum(MaterialStatus)
@@ -70,7 +80,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Nuance du matériau',
-    example: 'S235JR'
+    example: 'S235JR',
   })
   @IsOptional()
   @IsString()
@@ -78,7 +88,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Qualité du matériau',
-    example: 'Qualité commerciale'
+    example: 'Qualité commerciale',
   })
   @IsOptional()
   @IsString()
@@ -86,7 +96,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Marque du matériau',
-    example: 'ArcelorMittal'
+    example: 'ArcelorMittal',
   })
   @IsOptional()
   @IsString()
@@ -94,7 +104,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Modèle du matériau',
-    example: 'Standard'
+    example: 'Standard',
   })
   @IsOptional()
   @IsString()
@@ -111,9 +121,9 @@ export class CreateMaterialDto {
       tolerances: {
         longueur: '±5mm',
         largeur: '±3mm',
-        epaisseur: '±0.5mm'
-      }
-    }
+        epaisseur: '±0.5mm',
+      },
+    },
   })
   @IsOptional()
   @IsObject()
@@ -121,7 +131,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Poids unitaire en kg',
-    example: 157.0
+    example: 157.0,
   })
   @IsOptional()
   @IsNumber()
@@ -130,7 +140,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Densité en g/cm³',
-    example: 7.85
+    example: 7.85,
   })
   @IsOptional()
   @IsNumber()
@@ -140,14 +150,14 @@ export class CreateMaterialDto {
   @ApiProperty({
     description: 'Unité de mesure',
     enum: MaterialUnit,
-    example: MaterialUnit.KG
+    example: MaterialUnit.KG,
   })
   @IsEnum(MaterialUnit)
   unite!: MaterialUnit
 
   @ApiPropertyOptional({
     description: 'Prix unitaire',
-    example: 1250.50
+    example: 1250.5,
   })
   @IsOptional()
   @IsNumber()
@@ -157,7 +167,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Devise',
     example: 'EUR',
-    default: 'EUR'
+    default: 'EUR',
   })
   @IsOptional()
   @IsString()
@@ -166,7 +176,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Stock minimum',
     example: 10.0,
-    default: 0
+    default: 0,
   })
   @IsOptional()
   @IsNumber()
@@ -176,7 +186,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Stock maximum',
     example: 100.0,
-    default: 0
+    default: 0,
   })
   @IsOptional()
   @IsNumber()
@@ -186,7 +196,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Stock physique initial',
     example: 50.0,
-    default: 0
+    default: 0,
   })
   @IsOptional()
   @IsNumber()
@@ -196,7 +206,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Stock réservé initial',
     example: 5.0,
-    default: 0
+    default: 0,
   })
   @IsOptional()
   @IsNumber()
@@ -205,7 +215,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Emplacement de stockage',
-    example: 'A-01-15'
+    example: 'A-01-15',
   })
   @IsOptional()
   @IsString()
@@ -214,7 +224,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Méthode de stockage',
     enum: StorageMethod,
-    default: StorageMethod.STANDARD
+    default: StorageMethod.STANDARD,
   })
   @IsOptional()
   @IsEnum(StorageMethod)
@@ -229,8 +239,8 @@ export class CreateMaterialDto {
       resistanceTraction: 360,
       durete: 120,
       moduleElasticite: 210,
-      allongement: 26
-    }
+      allongement: 26,
+    },
   })
   @IsOptional()
   @IsObject()
@@ -244,8 +254,8 @@ export class CreateMaterialDto {
       densite: 7.85,
       pointFusion: 1530,
       conductiviteThermique: 50,
-      capaciteThermique: 490
-    }
+      capaciteThermique: 490,
+    },
   })
   @IsOptional()
   @IsObject()
@@ -257,15 +267,15 @@ export class CreateMaterialDto {
     additionalProperties: true,
     example: {
       composition: {
-        'Fe': 99.0,
-        'C': 0.17,
-        'Mn': 1.4,
-        'P': 0.035,
-        'S': 0.035
+        Fe: 99.0,
+        C: 0.17,
+        Mn: 1.4,
+        P: 0.035,
+        S: 0.035,
       },
       resistanceCorrosion: 'Faible',
-      traitementThermique: ['Normalisation']
-    }
+      traitementThermique: ['Normalisation'],
+    },
   })
   @IsOptional()
   @IsObject()
@@ -279,15 +289,15 @@ export class CreateMaterialDto {
       normes: ['EN 10025-2', 'NF A35-501'],
       certifications: ['CE'],
       attestations: ['3.1'],
-      classifications: ['S235JR']
-    }
+      classifications: ['S235JR'],
+    },
   })
   @IsOptional()
   @IsObject()
   certifications?: MaterialCertifications
 
   @ApiPropertyOptional({
-    description: 'Informations d\'approvisionnement',
+    description: "Informations d'approvisionnement",
     type: 'object',
     additionalProperties: true,
     example: {
@@ -295,8 +305,8 @@ export class CreateMaterialDto {
       referenceFournisseur: 'REF-FOUR-001',
       delaiLivraison: 15,
       quantiteMiniCommande: 100,
-      quantiteMultiple: 10
-    }
+      quantiteMultiple: 10,
+    },
   })
   @IsOptional()
   @IsObject()
@@ -310,8 +320,8 @@ export class CreateMaterialDto {
       procédésFabrication: ['Laminage à chaud'],
       outilsSpeciaux: ['Cisaille'],
       tempsUsinage: 30,
-      rebuts: 2
-    }
+      rebuts: 2,
+    },
   })
   @IsOptional()
   @IsObject()
@@ -320,7 +330,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Matériau dangereux',
     example: false,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -328,7 +338,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Classe de danger si applicable',
-    example: 'H260'
+    example: 'H260',
   })
   @IsOptional()
   @IsString()
@@ -336,7 +346,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Précautions de manipulation',
-    example: 'Porter des EPI appropriés'
+    example: 'Porter des EPI appropriés',
   })
   @IsOptional()
   @IsString()
@@ -345,7 +355,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({
     description: 'Matériau obsolète',
     example: false,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -353,7 +363,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Référence du matériau de remplacement',
-    example: 'AC-PL-000002'
+    example: 'AC-PL-000002',
   })
   @IsOptional()
   @IsString()
@@ -361,7 +371,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'Notes diverses',
-    example: 'Matériau de qualité supérieure'
+    example: 'Matériau de qualité supérieure',
   })
   @IsOptional()
   @IsString()
@@ -369,7 +379,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional({
     description: 'ID du matériau partagé (référentiel commun)',
-    example: 'uuid-shared-material'
+    example: 'uuid-shared-material',
   })
   @IsOptional()
   @IsString()
@@ -381,8 +391,8 @@ export class CreateMaterialDto {
     additionalProperties: true,
     example: {
       fournisseurSecondaire: 'uuid-autre-fournisseur',
-      notesInternes: 'Matériau testé et approuvé'
-    }
+      notesInternes: 'Matériau testé et approuvé',
+    },
   })
   @IsOptional()
   @IsObject()

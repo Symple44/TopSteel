@@ -41,7 +41,7 @@ export abstract class BusinessEntity extends CommonEntity {
       this.businessMetadata = {
         ...this.businessMetadata,
         lastModifiedBy: userId,
-        lastModifiedAt: new Date().toISOString()
+        lastModifiedAt: new Date().toISOString(),
       }
     }
   }

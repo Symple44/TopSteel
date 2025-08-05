@@ -11,16 +11,13 @@ interface TenantLayoutProps {
   params: Promise<{ tenant: string }>
 }
 
-export default async function TenantLayout({ 
-  children, 
-  params 
-}: TenantLayoutProps) {
+export default async function TenantLayout({ children, params }: TenantLayoutProps) {
   const resolvedParams = await params
-  
+
   try {
     // Resolve tenant and get configuration
     const config = await getTenantConfig(resolvedParams.tenant)
-    
+
     if (!config) {
       notFound()
     }
@@ -30,13 +27,11 @@ export default async function TenantLayout({
         <Suspense fallback={<LoadingSpinner />}>
           <MarketplaceHeader tenant={resolvedParams.tenant} config={config} />
         </Suspense>
-        
+
         <main className="flex-1">
-          <Suspense fallback={<LoadingSpinner />}>
-            {children}
-          </Suspense>
+          <Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
         </main>
-        
+
         <Suspense fallback={<div />}>
           <MarketplaceFooter tenant={resolvedParams.tenant} config={config} />
         </Suspense>
@@ -53,13 +48,14 @@ export default async function TenantLayout({
 
 export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }) {
   const resolvedParams = await params
-  
+
   try {
     const config = await getTenantConfig(resolvedParams.tenant)
-    
+
     return {
       title: config?.seo?.title || `${config?.storeName || 'Marketplace'}`,
-      description: config?.seo?.description || `Boutique en ligne ${config?.storeName || 'Marketplace'}`,
+      description:
+        config?.seo?.description || `Boutique en ligne ${config?.storeName || 'Marketplace'}`,
       keywords: config?.seo?.keywords || [],
     }
   } catch (error) {

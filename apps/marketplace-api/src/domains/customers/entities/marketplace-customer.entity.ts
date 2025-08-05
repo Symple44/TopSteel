@@ -1,11 +1,11 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
   Index,
-  OneToMany
+  OneToMany,
 } from 'typeorm'
 import { MarketplaceOrder } from '../../orders/entities/marketplace-order.entity'
 
@@ -110,7 +110,10 @@ export class MarketplaceCustomer {
   lastLoginAt?: Date
 
   // Relations
-  @OneToMany(() => MarketplaceOrder, order => order.customer)
+  @OneToMany(
+    () => MarketplaceOrder,
+    (order) => order.customer
+  )
   orders!: MarketplaceOrder[]
 
   // Méthodes utilitaires
@@ -126,12 +129,14 @@ export class MarketplaceCustomer {
   }
 
   getDefaultAddress(type: 'billing' | 'shipping'): CustomerAddress | undefined {
-    return this.addresses.find(addr => addr.type === type && addr.isDefault) ||
-           this.addresses.find(addr => addr.type === type)
+    return (
+      this.addresses.find((addr) => addr.type === type && addr.isDefault) ||
+      this.addresses.find((addr) => addr.type === type)
+    )
   }
 
   hasAddress(type: 'billing' | 'shipping'): boolean {
-    return this.addresses.some(addr => addr.type === type)
+    return this.addresses.some((addr) => addr.type === type)
   }
 
   isGuest(): boolean {

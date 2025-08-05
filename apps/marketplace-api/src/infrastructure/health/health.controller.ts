@@ -1,11 +1,11 @@
 import { Controller, Get } from '@nestjs/common'
 import { ApiTags, ApiOperation } from '@nestjs/swagger'
-import { 
-  HealthCheckService, 
-  HealthCheck, 
+import {
+  HealthCheckService,
+  HealthCheck,
   TypeOrmHealthIndicator,
   MemoryHealthIndicator,
-  DiskHealthIndicator
+  DiskHealthIndicator,
 } from '@nestjs/terminus'
 import { TenantResolver } from '../../shared/tenant/tenant-resolver.service'
 
@@ -17,7 +17,7 @@ export class HealthController {
     private db: TypeOrmHealthIndicator,
     private memory: MemoryHealthIndicator,
     private disk: DiskHealthIndicator,
-    private tenantResolver: TenantResolver,
+    private tenantResolver: TenantResolver
   ) {}
 
   @Get()
@@ -28,16 +28,17 @@ export class HealthController {
       // Database connections
       () => this.db.pingCheck('marketplace-db', { connection: 'marketplace' }),
       () => this.db.pingCheck('erp-auth-db', { connection: 'erpAuth' }),
-      
+
       // Memory check
       () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
       () => this.memory.checkRSS('memory_rss', 150 * 1024 * 1024),
-      
+
       // Disk space check
-      () => this.disk.checkStorage('storage', { 
-        thresholdPercent: 0.9, 
-        path: '/' 
-      }),
+      () =>
+        this.disk.checkStorage('storage', {
+          thresholdPercent: 0.9,
+          path: '/',
+        }),
     ])
   }
 
@@ -68,7 +69,7 @@ export class HealthController {
     try {
       // Test de résolution du tenant topsteel
       const tenantContext = await this.tenantResolver.resolveTenantByDomain('topsteel.localhost')
-      
+
       return {
         status: 'success',
         tenant: {
@@ -76,16 +77,16 @@ export class HealthController {
           nom: tenantContext.societe.nom,
           hasConnection: !!tenantContext.erpTenantConnection,
           isInitialized: tenantContext.erpTenantConnection?.isInitialized,
-          marketplaceEnabled: tenantContext.marketplaceEnabled
+          marketplaceEnabled: tenantContext.marketplaceEnabled,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
     } catch (error) {
       return {
         status: 'error',
         message: error.message,
         stack: error.stack,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
     }
   }

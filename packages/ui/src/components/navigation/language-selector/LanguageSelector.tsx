@@ -26,7 +26,7 @@ export function LanguageSelector({
   currentLanguage,
   supportedLanguages,
   onLanguageChange,
-  className
+  className,
 }: LanguageSelectorProps) {
   return (
     <DropdownMenu>

@@ -150,9 +150,7 @@ describe('AuthController (e2e)', () => {
     beforeEach(async () => {
       // Nettoyer les utilisateurs de test précédents
       try {
-        await request(app.getHttpServer())
-          .post('/api/auth/register')
-          .send(testUser)
+        await request(app.getHttpServer()).post('/api/auth/register').send(testUser)
       } catch {
         // Utilisateur peut déjà exister
       }
@@ -242,9 +240,7 @@ describe('AuthController (e2e)', () => {
         prenom: 'Test',
       }
 
-      await request(app.getHttpServer())
-        .post('/api/auth/register')
-        .send(noCompanyUser)
+      await request(app.getHttpServer()).post('/api/auth/register').send(noCompanyUser)
 
       const loginResponse = await request(app.getHttpServer())
         .post('/api/auth/login')

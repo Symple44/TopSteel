@@ -8,7 +8,7 @@
 
 // Tokens de design
 export * from './tokens'
-export * from './themes'  
+export * from './themes'
 export * from './variants'
 
 // Types principaux
@@ -43,15 +43,15 @@ import { unifiedVariants } from './variants'
 export const designSystem = {
   // Tokens de design
   tokens: designTokens,
-  
+
   // Configuration des thèmes
   themes: themeRegistry,
   getTheme: getThemeConfig,
   applyTheme: applyThemeToDOM,
-  
+
   // Variants des composants
   variants: unifiedVariants,
-  
+
   // Métadonnées
   version: '1.0.0',
   name: 'TopSteel Design System',
@@ -86,7 +86,7 @@ export const themeNames = Object.keys(themeRegistry) as Array<keyof typeof theme
 // Re-export des variants existants pour compatibilité
 export {
   buttonVariants,
-  badgeVariants, 
+  badgeVariants,
   alertVariants,
   scrollAreaVariants,
   inputVariants,
@@ -100,7 +100,7 @@ export {
 export type {
   ButtonVariants,
   BadgeVariants,
-  AlertVariants, 
+  AlertVariants,
   ScrollAreaVariants,
   InputVariants,
   SwitchVariants,

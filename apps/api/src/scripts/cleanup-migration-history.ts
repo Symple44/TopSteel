@@ -11,11 +11,11 @@ import { config } from 'dotenv'
 config()
 
 async function cleanupMigrationHistory() {
-  console.log('🧹 NETTOYAGE DE L\'HISTORIQUE DES MIGRATIONS')
+  console.log("🧹 NETTOYAGE DE L'HISTORIQUE DES MIGRATIONS")
   console.log('===========================================\n')
 
   const dbName = process.env.TENANT_DB_NAME || 'erp_topsteel_topsteel'
-  
+
   const dataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
@@ -73,7 +73,6 @@ async function cleanupMigrationHistory() {
     articlesTables.forEach((table: any) => {
       console.log(`   ✅ ${table.table_name}`)
     })
-
   } catch (error) {
     console.error('\n💥 ERREUR:', error)
   } finally {

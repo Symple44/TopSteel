@@ -7,14 +7,14 @@ export enum ArticleType {
   PRODUIT_SEMI_FINI = 'PRODUIT_SEMI_FINI',
   FOURNITURE = 'FOURNITURE',
   CONSOMMABLE = 'CONSOMMABLE',
-  SERVICE = 'SERVICE'
+  SERVICE = 'SERVICE',
 }
 
 export enum ArticleStatus {
   ACTIF = 'ACTIF',
   INACTIF = 'INACTIF',
   OBSOLETE = 'OBSOLETE',
-  EN_COURS_CREATION = 'EN_COURS_CREATION'
+  EN_COURS_CREATION = 'EN_COURS_CREATION',
 }
 
 export enum UniteStock {
@@ -29,14 +29,14 @@ export enum UniteStock {
   LITRE = 'L',
   MILLILITRE = 'ML',
   TONNE = 'T',
-  HEURE = 'H'
+  HEURE = 'H',
 }
 
 export enum MethodeValorisationStock {
   FIFO = 'FIFO', // Premier entré, premier sorti
   LIFO = 'LIFO', // Dernier entré, premier sorti
   CMUP = 'CMUP', // Coût moyen unitaire pondéré
-  PRIX_STANDARD = 'PRIX_STANDARD'
+  PRIX_STANDARD = 'PRIX_STANDARD',
 }
 
 /**
@@ -119,7 +119,12 @@ export class Article extends BusinessEntity {
   stockSecurite?: number // Stock de sécurité
 
   // Valorisation
-  @Column({ name: 'methode_valorisation', type: 'enum', enum: MethodeValorisationStock, default: MethodeValorisationStock.CMUP })
+  @Column({
+    name: 'methode_valorisation',
+    type: 'enum',
+    enum: MethodeValorisationStock,
+    default: MethodeValorisationStock.CMUP,
+  })
   methodeValorisation!: MethodeValorisationStock
 
   @Column({ name: 'prix_achat_standard', type: 'decimal', precision: 12, scale: 4, nullable: true })
@@ -148,10 +153,22 @@ export class Article extends BusinessEntity {
   @Column({ name: 'delai_approvisionnement', type: 'varchar', length: 10, nullable: true })
   delaiApprovisionnement?: string // Ex: "5J", "2S"
 
-  @Column({ name: 'quantite_mini_commande', type: 'decimal', precision: 15, scale: 4, nullable: true })
+  @Column({
+    name: 'quantite_mini_commande',
+    type: 'decimal',
+    precision: 15,
+    scale: 4,
+    nullable: true,
+  })
   quantiteMiniCommande?: number
 
-  @Column({ name: 'quantite_multiple_commande', type: 'decimal', precision: 15, scale: 4, nullable: true })
+  @Column({
+    name: 'quantite_multiple_commande',
+    type: 'decimal',
+    precision: 15,
+    scale: 4,
+    nullable: true,
+  })
   quantiteMultipleCommande?: number // Commande par multiple de X
 
   // Caractéristiques physiques
@@ -272,11 +289,11 @@ export class Article extends BusinessEntity {
     }
 
     if (!this.type) {
-      errors.push('Le type d\'article est requis')
+      errors.push("Le type d'article est requis")
     }
 
     if (!this.uniteStock) {
-      errors.push('L\'unité de stock est requise')
+      errors.push("L'unité de stock est requise")
     }
 
     return errors
@@ -291,7 +308,7 @@ export class Article extends BusinessEntity {
       this.metadonnees = {
         ...this.metadonnees,
         lastModifiedBy: userId,
-        lastModifiedAt: new Date().toISOString()
+        lastModifiedAt: new Date().toISOString(),
       }
     }
   }
@@ -322,7 +339,7 @@ export class Article extends BusinessEntity {
   getPrixVenteTTC(): number {
     if (!this.prixVenteHT) return 0
     if (!this.tauxTVA) return this.prixVenteHT
-    
+
     return this.prixVenteHT * (1 + this.tauxTVA / 100)
   }
 
@@ -339,22 +356,24 @@ export class Article extends BusinessEntity {
    */
   calculerQuantiteACommander(): number {
     if (!this.gereEnStock || !this.stockMini || !this.stockMaxi) return 0
-    
+
     const stockDisponible = this.calculerStockDisponible()
     if (stockDisponible >= this.stockMini) return 0
-    
+
     const quantiteOptimale = this.stockMaxi - stockDisponible
-    
+
     // Respecter la quantité minimum de commande
     if (this.quantiteMiniCommande && quantiteOptimale < this.quantiteMiniCommande) {
       return this.quantiteMiniCommande
     }
-    
+
     // Respecter les multiples de commande
     if (this.quantiteMultipleCommande && this.quantiteMultipleCommande > 0) {
-      return Math.ceil(quantiteOptimale / this.quantiteMultipleCommande) * this.quantiteMultipleCommande
+      return (
+        Math.ceil(quantiteOptimale / this.quantiteMultipleCommande) * this.quantiteMultipleCommande
+      )
     }
-    
+
     return quantiteOptimale
   }
 
@@ -363,36 +382,42 @@ export class Article extends BusinessEntity {
    */
   getValeurStock(): number {
     if (!this.gereEnStock) return 0
-    
+
     const stockDisponible = this.calculerStockDisponible()
     const prixUnitaire = this.prixAchatMoyen || this.prixAchatStandard || 0
-    
+
     return stockDisponible * prixUnitaire
   }
 
   /**
    * Ajouter une modification à l'historique
    */
-  ajouterModificationHistorique(utilisateur: string, champ: string, ancienneValeur: any, nouvelleValeur: any): void {
+  ajouterModificationHistorique(
+    utilisateur: string,
+    champ: string,
+    ancienneValeur: any,
+    nouvelleValeur: any
+  ): void {
     if (!this.metadonnees) {
       this.metadonnees = {}
     }
-    
+
     if (!this.metadonnees.historiqueModifications) {
       this.metadonnees.historiqueModifications = []
     }
-    
+
     this.metadonnees.historiqueModifications.push({
       date: new Date().toISOString(),
       utilisateur,
       champ,
       ancienneValeur,
-      nouvelleValeur
+      nouvelleValeur,
     })
-    
+
     // Limiter l'historique à 100 entrées
     if (this.metadonnees.historiqueModifications.length > 100) {
-      this.metadonnees.historiqueModifications = this.metadonnees.historiqueModifications.slice(-100)
+      this.metadonnees.historiqueModifications =
+        this.metadonnees.historiqueModifications.slice(-100)
     }
   }
 

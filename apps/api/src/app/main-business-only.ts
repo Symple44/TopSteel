@@ -54,12 +54,14 @@ async function bootstrap() {
   // SÉCURITÉ ET MIDDLEWARE
   // ============================================================================
 
-  app.use(helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-    crossOriginOpenerPolicy: { policy: 'same-origin' },
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-  }))
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+      crossOriginOpenerPolicy: { policy: 'same-origin' },
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    })
+  )
 
   app.use(compression())
   app.use(express.json({ limit: '10mb' }))

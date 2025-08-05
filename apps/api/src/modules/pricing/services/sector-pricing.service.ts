@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { SectorCoefficient, SectorType, CoefficientType } from '../entities/sector-coefficient.entity'
+import {
+  SectorCoefficient,
+  SectorType,
+  CoefficientType,
+} from '../entities/sector-coefficient.entity'
 import { CustomerSectorAssignment } from '../entities/customer-sector-assignment.entity'
 
 export interface PricingContext {
@@ -57,11 +61,7 @@ export class SectorPricingService {
   /**
    * Calculer le prix avec coefficients sectoriels
    */
-  async calculateSectorPrice(
-    societeId: string,
-    context: PricingContext
-  ): Promise<PricingResult> {
-    
+  async calculateSectorPrice(societeId: string, context: PricingContext): Promise<PricingResult> {
     // 1. Identifier le secteur du client
     let customerSector: SectorType | undefined
     if (context.customerId) {
@@ -70,8 +70,8 @@ export class SectorPricingService {
 
     // 2. Récupérer les coefficients applicables
     const applicableCoefficients = await this.getApplicableCoefficients(
-      societeId, 
-      customerSector, 
+      societeId,
+      customerSector,
       context
     )
 
@@ -85,7 +85,7 @@ export class SectorPricingService {
     for (const coefficient of applicableCoefficients) {
       const previousPrice = currentPrice
       currentPrice = coefficient.calculateAdjustedPrice(currentPrice, context.quantity)
-      
+
       const adjustment = currentPrice - previousPrice
 
       // Séparer les coûts transport/manutention
@@ -101,7 +101,7 @@ export class SectorPricingService {
         sector: coefficient.sector,
         coefficient: coefficient.coefficient,
         adjustment,
-        description: coefficient.description
+        description: coefficient.description,
       })
 
       appliedRules.push(`${coefficient.sector}_${coefficient.coefficientType}`)
@@ -109,9 +109,8 @@ export class SectorPricingService {
 
     // 4. Calculer le résultat final
     const totalDiscount = Math.max(0, context.basePrice - currentPrice)
-    const totalDiscountPercentage = context.basePrice > 0 
-      ? (totalDiscount / context.basePrice) * 100 
-      : 0
+    const totalDiscountPercentage =
+      context.basePrice > 0 ? (totalDiscount / context.basePrice) * 100 : 0
 
     return {
       basePrice: context.basePrice,
@@ -124,13 +123,13 @@ export class SectorPricingService {
         sectorAdjustments: currentPrice - context.basePrice - transportCosts - handlingCosts,
         transportCosts,
         handlingCosts,
-        finalPrice: currentPrice
+        finalPrice: currentPrice,
       },
       metadata: {
         customerSector,
         calculationDate: new Date(),
-        appliedRules
-      }
+        appliedRules,
+      },
     }
   }
 
@@ -139,12 +138,12 @@ export class SectorPricingService {
    */
   async getCustomerSector(societeId: string, customerId: string): Promise<SectorType | undefined> {
     const assignment = await this.customerSectorRepository.findOne({
-      where: { 
-        societeId, 
-        customerId, 
-        isActive: true 
+      where: {
+        societeId,
+        customerId,
+        isActive: true,
       },
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     })
 
     return assignment?.sector
@@ -168,7 +167,6 @@ export class SectorPricingService {
       metadata?: any
     } = {}
   ): Promise<CustomerSectorAssignment> {
-    
     // Désactiver l'assignation précédente s'il y en a une
     await this.customerSectorRepository.update(
       { societeId, customerId, isActive: true },
@@ -188,10 +186,10 @@ export class SectorPricingService {
         assignedBy: details.assignedBy,
         reason: details.reason,
         automaticAssignment: false,
-        sourceDocument: 'manual_assignment'
+        sourceDocument: 'manual_assignment',
       },
       sectorMetadata: details.sectorMetadata || {},
-      metadata: details.metadata || {}
+      metadata: details.metadata || {},
     })
 
     return await this.customerSectorRepository.save(assignment)
@@ -205,7 +203,6 @@ export class SectorPricingService {
     customerSector: SectorType | undefined,
     context: PricingContext
   ): Promise<SectorCoefficient[]> {
-    
     const query = this.sectorCoefficientRepository
       .createQueryBuilder('coefficient')
       .where('coefficient.societeId = :societeId', { societeId })
@@ -221,7 +218,7 @@ export class SectorPricingService {
     const coefficients = await query.getMany()
 
     // Filtrer selon les conditions spécifiques
-    return coefficients.filter(coefficient => 
+    return coefficients.filter((coefficient) =>
       coefficient.isValidForConditions({
         quantity: context.quantity,
         amount: context.basePrice * context.quantity,
@@ -229,7 +226,7 @@ export class SectorPricingService {
         productCategory: context.productCategory,
         articleFamily: context.articleFamily,
         date: context.date,
-        region: context.region
+        region: context.region,
       })
     )
   }
@@ -249,11 +246,10 @@ export class SectorPricingService {
     metadata?: any
     priority?: number
   }): Promise<SectorCoefficient> {
-    
     const coefficient = this.sectorCoefficientRepository.create({
       ...data,
       isActive: true,
-      priority: data.priority || 0
+      priority: data.priority || 0,
     })
 
     return await this.sectorCoefficientRepository.save(coefficient)
@@ -263,11 +259,10 @@ export class SectorPricingService {
    * Obtenir tous les coefficients d'un tenant
    */
   async getSectorCoefficients(
-    societeId: string, 
+    societeId: string,
     sector?: SectorType,
     coefficientType?: CoefficientType
   ): Promise<SectorCoefficient[]> {
-    
     const query = this.sectorCoefficientRepository
       .createQueryBuilder('coefficient')
       .where('coefficient.societeId = :societeId', { societeId })
@@ -290,11 +285,10 @@ export class SectorPricingService {
    * Obtenir les assignations clients par secteur
    */
   async getCustomerSectorAssignments(
-    societeId: string, 
+    societeId: string,
     sector?: SectorType,
     includeInactive = false
   ): Promise<CustomerSectorAssignment[]> {
-    
     const query = this.customerSectorRepository
       .createQueryBuilder('assignment')
       .where('assignment.societeId = :societeId', { societeId })
@@ -321,21 +315,21 @@ export class SectorPricingService {
         sector: SectorType.BTP,
         sectorName: 'Bâtiment et Travaux Publics',
         coefficientType: CoefficientType.BASE_PRICE,
-        coefficient: 1.10, // +10% sur prix de base
+        coefficient: 1.1, // +10% sur prix de base
         description: 'Coefficient de base BTP (+10%)',
         conditions: {
           minQuantity: 1,
-          articleFamilies: ['POUTRELLES', 'PROFILES', 'TUBES', 'PLATS']
+          articleFamilies: ['POUTRELLES', 'PROFILES', 'TUBES', 'PLATS'],
         },
         parameters: {
           applyToBasePrice: true,
           btpSpecific: {
             applyCOFRAC: true,
             applyBTPCoeff: true,
-            minimumOrder: 500
-          }
+            minimumOrder: 500,
+          },
         },
-        priority: 10
+        priority: 10,
       },
       {
         sector: SectorType.BTP,
@@ -345,12 +339,12 @@ export class SectorPricingService {
         description: 'Remise BTP sur gros volumes',
         conditions: {
           minQuantity: 100,
-          minAmount: 5000
+          minAmount: 5000,
         },
         parameters: {
-          discountType: 'percentage'
+          discountType: 'percentage',
         },
-        priority: 5
+        priority: 5,
       },
       {
         sector: SectorType.BTP,
@@ -361,18 +355,18 @@ export class SectorPricingService {
         conditions: {},
         parameters: {
           calculationMethod: 'fixed',
-          freeThreshold: 2000 // Gratuit au-dessus de 2000€
+          freeThreshold: 2000, // Gratuit au-dessus de 2000€
         },
-        priority: 1
-      }
+        priority: 1,
+      },
     ]
 
     const createdCoefficients: SectorCoefficient[] = []
-    
+
     for (const coeffData of defaultCoefficients) {
       const coefficient = await this.createSectorCoefficient({
         societeId,
-        ...coeffData
+        ...coeffData,
       })
       createdCoefficients.push(coefficient)
     }
@@ -384,21 +378,20 @@ export class SectorPricingService {
    * Mettre à jour un coefficient
    */
   async updateSectorCoefficient(
-    id: string, 
-    societeId: string, 
+    id: string,
+    societeId: string,
     updates: Partial<SectorCoefficient>
   ): Promise<SectorCoefficient> {
-    
     await this.sectorCoefficientRepository.update(
-      { id, societeId }, 
-      { 
+      { id, societeId },
+      {
         ...updates,
-        updatedAt: new Date() 
+        updatedAt: new Date(),
       }
     )
 
     const updated = await this.sectorCoefficientRepository.findOne({
-      where: { id, societeId }
+      where: { id, societeId },
     })
 
     if (!updated) {
@@ -429,7 +422,6 @@ export class SectorPricingService {
       date?: Date
     }
   ): Promise<Array<PricingResult & { productId: string }>> {
-    
     const results: Array<PricingResult & { productId: string }> = []
 
     for (const item of items) {
@@ -440,14 +432,14 @@ export class SectorPricingService {
         productCategory: item.productCategory,
         articleFamily: item.articleFamily,
         weight: item.weight,
-        volume: item.volume
+        volume: item.volume,
       }
 
       const result = await this.calculateSectorPrice(societeId, pricingContext)
-      
+
       results.push({
         ...result,
-        productId: item.productId
+        productId: item.productId,
       })
     }
 

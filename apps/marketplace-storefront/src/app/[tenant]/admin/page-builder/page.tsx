@@ -9,18 +9,24 @@ import { marketplaceApi } from '@/lib/api/client'
 export default function PageBuilderListPage() {
   const [searchTerm, setSearchTerm] = useState('')
 
-  const { data: templates, isLoading, refetch } = useQuery({
+  const {
+    data: templates,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['pageTemplates'],
     queryFn: async () => {
       const response = await marketplaceApi.get('/page-builder/templates')
       return (response as any).data
-    }
+    },
   })
 
-  const filteredTemplates = templates?.filter((template: any) =>
-    template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.slug.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || []
+  const filteredTemplates =
+    templates?.filter(
+      (template: any) =>
+        template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        template.slug.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || []
 
   const handleDelete = async (id: string) => {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce template ?')) {
@@ -36,12 +42,12 @@ export default function PageBuilderListPage() {
   const handleDuplicate = async (template: any) => {
     const newName = prompt('Nom du nouveau template:', `${template.name} (copie)`)
     const newSlug = prompt('Slug du nouveau template:', `${template.slug}-copy`)
-    
+
     if (newName && newSlug) {
       try {
         await marketplaceApi.post(`/page-builder/templates/${template.id}/duplicate`, {
           name: newName,
-          slug: newSlug
+          slug: newSlug,
         })
         refetch()
       } catch (error) {
@@ -79,11 +85,9 @@ export default function PageBuilderListPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">Gestionnaire de pages</h1>
-          <p className="text-gray-600 mt-2">
-            Créez et gérez les pages de votre marketplace
-          </p>
+          <p className="text-gray-600 mt-2">Créez et gérez les pages de votre marketplace</p>
         </div>
-        
+
         <Link
           href="/admin/page-builder/new"
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -134,33 +138,32 @@ export default function PageBuilderListPage() {
                         template.status === 'published'
                           ? 'bg-green-100 text-green-800'
                           : template.status === 'draft'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {template.status === 'published' ? 'Publié' : 
-                       template.status === 'draft' ? 'Brouillon' : template.status}
+                      {template.status === 'published'
+                        ? 'Publié'
+                        : template.status === 'draft'
+                          ? 'Brouillon'
+                          : template.status}
                     </span>
                   </div>
-                  
-                  <p className="text-gray-600 mb-2">
-                    Slug: /{template.slug}
-                  </p>
-                  
+
+                  <p className="text-gray-600 mb-2">Slug: /{template.slug}</p>
+
                   {template.description && (
                     <p className="text-gray-600 mb-2">{template.description}</p>
                   )}
-                  
+
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span>Type: {template.pageType}</span>
                     <span>Sections: {template.sections?.length || 0}</span>
                     <span>Version: {template.version}</span>
-                    <span>
-                      Modifié: {new Date(template.updatedAt).toLocaleDateString()}
-                    </span>
+                    <span>Modifié: {new Date(template.updatedAt).toLocaleDateString()}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/${template.slug}`}
@@ -170,7 +173,7 @@ export default function PageBuilderListPage() {
                   >
                     <Eye className="w-4 h-4" />
                   </Link>
-                  
+
                   <Link
                     href={`/admin/page-builder/${template.id}`}
                     className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded"
@@ -178,7 +181,7 @@ export default function PageBuilderListPage() {
                   >
                     <Edit className="w-4 h-4" />
                   </Link>
-                  
+
                   <button
                     onClick={() => handleDuplicate(template)}
                     className="p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded"
@@ -186,7 +189,7 @@ export default function PageBuilderListPage() {
                   >
                     <Copy className="w-4 h-4" />
                   </button>
-                  
+
                   {template.status === 'draft' && (
                     <button
                       onClick={() => handlePublish(template.id)}
@@ -195,7 +198,7 @@ export default function PageBuilderListPage() {
                       Publier
                     </button>
                   )}
-                  
+
                   <button
                     onClick={() => handleDelete(template.id)}
                     className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"

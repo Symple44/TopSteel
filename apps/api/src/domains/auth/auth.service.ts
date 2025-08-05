@@ -881,15 +881,15 @@ export class AuthService {
   /**
    * Récupérer la société par défaut d'un utilisateur
    */
-  async getDefaultSociete(userId: string): Promise<{ 
-    success: boolean; 
-    data?: { id: string; nom: string; code: string }; 
-    message?: string 
+  async getDefaultSociete(userId: string): Promise<{
+    success: boolean
+    data?: { id: string; nom: string; code: string }
+    message?: string
   }> {
     try {
       const userSocietes = await this.getUserSocietes(userId)
-      const defaultSociete = userSocietes.find(s => s.isDefault)
-      
+      const defaultSociete = userSocietes.find((s) => s.isDefault)
+
       if (!defaultSociete) {
         return {
           success: false,

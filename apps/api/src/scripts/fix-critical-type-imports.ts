@@ -5,7 +5,7 @@ import { join } from 'path'
 const criticalFiles = [
   'features/marketplace/services/marketplace.service.ts',
   'domains/auth/auth.service.ts',
-  'domains/auth/auth.controller.ts', 
+  'domains/auth/auth.controller.ts',
   'domains/auth/services/mfa.service.ts',
   'domains/auth/services/user-societe-roles.service.ts',
   'domains/auth/security/strategies/local.strategy.ts',
@@ -20,38 +20,32 @@ const criticalFiles = [
   'features/shared/shared.controller.ts',
   'core/health/system-health-simple.service.ts',
   'core/health/integrity.service.ts',
-  'core/services/database-startup.service.ts'
+  'core/services/database-startup.service.ts',
 ]
 
 function fixTypeImports(filePath: string) {
   const fullPath = join(__dirname, '..', filePath)
-  
+
   try {
     let content = readFileSync(fullPath, 'utf-8')
     const originalContent = content
-    
+
     // Remplacer les imports type de services/providers
-    content = content.replace(
-      /import type \{ ([^}]+Service[^}]*) \} from/g,
-      'import { $1 } from'
-    )
-    
+    content = content.replace(/import type \{ ([^}]+Service[^}]*) \} from/g, 'import { $1 } from')
+
     content = content.replace(
       /import type \{ ([^}]+Repository[^}]*) \} from/g,
       'import { $1 } from'
     )
-    
-    content = content.replace(
-      /import type \{ ([^}]+Provider[^}]*) \} from/g,
-      'import { $1 } from'
-    )
-    
+
+    content = content.replace(/import type \{ ([^}]+Provider[^}]*) \} from/g, 'import { $1 } from')
+
     // Cas spéciaux pour NestJS
     content = content.replace(
       /import type \{ (ConfigService|JwtService) \} from/g,
       'import { $1 } from'
     )
-    
+
     if (content !== originalContent) {
       writeFileSync(fullPath, content)
       console.log(`✅ Fixed: ${filePath}`)
@@ -63,7 +57,7 @@ function fixTypeImports(filePath: string) {
 
 console.log('Fixing critical type imports...\n')
 
-criticalFiles.forEach(file => {
+criticalFiles.forEach((file) => {
   fixTypeImports(file)
 })
 

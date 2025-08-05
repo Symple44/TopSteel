@@ -11,41 +11,41 @@ export class PartnerFiltersDto {
     description: 'Types de partenaires à filtrer',
     enum: PartnerType,
     isArray: true,
-    example: [PartnerType.CLIENT, PartnerType.FOURNISSEUR]
+    example: [PartnerType.CLIENT, PartnerType.FOURNISSEUR],
   })
   @IsOptional()
   @IsArray()
   @IsEnum(PartnerType, { each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   type?: PartnerType[]
 
   @ApiPropertyOptional({
     description: 'Statuts à filtrer',
     enum: PartnerStatus,
     isArray: true,
-    example: [PartnerStatus.ACTIF]
+    example: [PartnerStatus.ACTIF],
   })
   @IsOptional()
   @IsArray()
   @IsEnum(PartnerStatus, { each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   status?: PartnerStatus[]
 
   @ApiPropertyOptional({
     description: 'Catégories à filtrer',
     enum: PartnerCategory,
     isArray: true,
-    example: [PartnerCategory.ENTREPRISE]
+    example: [PartnerCategory.ENTREPRISE],
   })
   @IsOptional()
   @IsArray()
   @IsEnum(PartnerCategory, { each: true })
-  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   categorie?: PartnerCategory[]
 
   @ApiPropertyOptional({
     description: 'Recherche textuelle dans la dénomination',
-    example: 'ACME'
+    example: 'ACME',
   })
   @IsOptional()
   @IsString()
@@ -53,7 +53,7 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche par code (partielle)',
-    example: 'CLI-'
+    example: 'CLI-',
   })
   @IsOptional()
   @IsString()
@@ -61,7 +61,7 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche par ville',
-    example: 'Paris'
+    example: 'Paris',
   })
   @IsOptional()
   @IsString()
@@ -69,7 +69,7 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche par région',
-    example: 'Île-de-France'
+    example: 'Île-de-France',
   })
   @IsOptional()
   @IsString()
@@ -77,15 +77,15 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche par pays',
-    example: 'France'
+    example: 'France',
   })
   @IsOptional()
   @IsString()
   pays?: string
 
   @ApiPropertyOptional({
-    description: 'Recherche par secteur d\'activité',
-    example: 'Métallurgie'
+    description: "Recherche par secteur d'activité",
+    example: 'Métallurgie',
   })
   @IsOptional()
   @IsString()
@@ -93,7 +93,7 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche par code postal (début)',
-    example: '75'
+    example: '75',
   })
   @IsOptional()
   @IsString()
@@ -101,7 +101,7 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Filtrer les partenaires préférés',
-    example: true
+    example: true,
   })
   @IsOptional()
   @IsBoolean()
@@ -111,7 +111,7 @@ export class PartnerFiltersDto {
   @ApiPropertyOptional({
     description: 'Inclure les partenaires inactifs',
     example: false,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -120,7 +120,7 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Effectif minimum',
-    example: 10
+    example: 10,
   })
   @IsOptional()
   @IsNumber()
@@ -130,7 +130,7 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Effectif maximum',
-    example: 500
+    example: 500,
   })
   @IsOptional()
   @IsNumber()
@@ -139,8 +139,8 @@ export class PartnerFiltersDto {
   effectifMax?: number
 
   @ApiPropertyOptional({
-    description: 'Chiffre d\'affaires minimum',
-    example: 100000
+    description: "Chiffre d'affaires minimum",
+    example: 100000,
   })
   @IsOptional()
   @IsNumber()
@@ -149,8 +149,8 @@ export class PartnerFiltersDto {
   chiffreAffairesMin?: number
 
   @ApiPropertyOptional({
-    description: 'Chiffre d\'affaires maximum',
-    example: 10000000
+    description: "Chiffre d'affaires maximum",
+    example: 10000000,
   })
   @IsOptional()
   @IsNumber()
@@ -160,7 +160,7 @@ export class PartnerFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Recherche textuelle globale',
-    example: 'ACME Dupont'
+    example: 'ACME Dupont',
   })
   @IsOptional()
   @IsString()
@@ -169,7 +169,7 @@ export class PartnerFiltersDto {
   @ApiPropertyOptional({
     description: 'Champ de tri',
     enum: ['code', 'denomination', 'type', 'status', 'ville', 'createdAt'],
-    example: 'denomination'
+    example: 'denomination',
   })
   @IsOptional()
   @IsString()
@@ -178,7 +178,7 @@ export class PartnerFiltersDto {
   @ApiPropertyOptional({
     description: 'Ordre de tri',
     enum: ['ASC', 'DESC'],
-    example: 'ASC'
+    example: 'ASC',
   })
   @IsOptional()
   @IsString()
@@ -187,7 +187,7 @@ export class PartnerFiltersDto {
   @ApiPropertyOptional({
     description: 'Numéro de page (1-based)',
     example: 1,
-    default: 1
+    default: 1,
   })
   @IsOptional()
   @IsNumber()
@@ -196,9 +196,9 @@ export class PartnerFiltersDto {
   page?: number
 
   @ApiPropertyOptional({
-    description: 'Nombre d\'éléments par page',
+    description: "Nombre d'éléments par page",
     example: 20,
-    default: 20
+    default: 20,
   })
   @IsOptional()
   @IsNumber()

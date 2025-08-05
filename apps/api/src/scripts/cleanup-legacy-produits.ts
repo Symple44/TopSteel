@@ -3,7 +3,7 @@
 /**
  * Script de nettoyage de la table legacy 'produits'
  * TopSteel ERP - Clean Architecture
- * 
+ *
  * Usage: npm run cleanup:produits
  * ou: npx ts-node src/scripts/cleanup-legacy-produits.ts
  */
@@ -18,7 +18,7 @@ config()
 async function askConfirmation(question: string): Promise<boolean> {
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   })
 
   return new Promise((resolve) => {
@@ -35,7 +35,7 @@ async function cleanupLegacyProduits() {
 
   // Configuration base de données
   const dbName = process.env.TENANT_DB_NAME || 'erp_topsteel_topsteel'
-  
+
   const dataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
@@ -91,11 +91,13 @@ async function cleanupLegacyProduits() {
     `)
 
     if (fkConstraints.length > 0) {
-      console.log(`\n⚠️  ATTENTION: ${fkConstraints.length} contrainte(s) de clé étrangère référencent cette table:`)
+      console.log(
+        `\n⚠️  ATTENTION: ${fkConstraints.length} contrainte(s) de clé étrangère référencent cette table:`
+      )
       fkConstraints.forEach((fk: any) => {
         console.log(`   - ${fk.table_name}.${fk.column_name} → produits.${fk.foreign_column_name}`)
       })
-      console.log('\n🛑 Suppression annulée pour préserver l\'intégrité des données.')
+      console.log("\n🛑 Suppression annulée pour préserver l'intégrité des données.")
       return
     }
 
@@ -109,7 +111,7 @@ async function cleanupLegacyProduits() {
     const confirmed = await askConfirmation('\n❓ Confirmez-vous la suppression? (y/N): ')
 
     if (!confirmed) {
-      console.log('\n❌ Suppression annulée par l\'utilisateur.')
+      console.log("\n❌ Suppression annulée par l'utilisateur.")
       return
     }
 
@@ -117,7 +119,7 @@ async function cleanupLegacyProduits() {
     if (count > 0) {
       console.log('\n💾 Sauvegarde des données existantes...')
       const data = await dataSource.query('SELECT * FROM produits')
-      
+
       // Créer une table de sauvegarde
       await dataSource.query(`
         CREATE TABLE IF NOT EXISTS produits_backup_${Date.now()} AS 
@@ -151,7 +153,6 @@ async function cleanupLegacyProduits() {
     } else {
       console.log('\n❌ Erreur: La table existe encore après suppression')
     }
-
   } catch (error) {
     console.error('\n💥 ERREUR lors du nettoyage:', error)
     throw error

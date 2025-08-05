@@ -3,11 +3,11 @@
 /**
  * Script de migration des paramètres système vers la base AUTH
  * TopSteel ERP - Clean Architecture
- * 
+ *
  * Problème identifié :
  * - Les paramètres système sont dans system_settings (base tenant)
  * - Ils devraient être dans parameters_system (base auth)
- * 
+ *
  * Usage: npm run migrate:settings-to-auth
  */
 
@@ -49,7 +49,7 @@ interface ParameterSystem {
 async function askConfirmation(question: string): Promise<boolean> {
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   })
 
   return new Promise((resolve) => {
@@ -112,7 +112,7 @@ async function migrateSystemSettingsToAuth() {
     `)
 
     console.log(`📊 Paramètres trouvés dans system_settings: ${systemSettings.length}`)
-    
+
     if (systemSettings.length === 0) {
       console.log('ℹ️  Aucun paramètre à migrer.')
       return
@@ -125,32 +125,42 @@ async function migrateSystemSettingsToAuth() {
     })
 
     // Vérifier les conflits potentiels
-    const conflictChecks = systemSettings.map((s, i) => 
-      `("group" = $${i*2+1} AND key = $${i*2+2})`
-    ).join(' OR ')
-    
-    const existingParams = systemSettings.length > 0 ? await authDataSource.query(`
+    const conflictChecks = systemSettings
+      .map((s, i) => `("group" = $${i * 2 + 1} AND key = $${i * 2 + 2})`)
+      .join(' OR ')
+
+    const existingParams =
+      systemSettings.length > 0
+        ? await authDataSource.query(
+            `
       SELECT "group", key FROM parameters_system 
       WHERE ${conflictChecks}
-    `, systemSettings.flatMap(s => [s.category, s.key])) : []
+    `,
+            systemSettings.flatMap((s) => [s.category, s.key])
+          )
+        : []
 
     if (existingParams.length > 0) {
       console.log('\n⚠️  CONFLITS DÉTECTÉS:')
       existingParams.forEach((param: any) => {
         console.log(`   - ${param.group}.${param.key} existe déjà dans parameters_system`)
       })
-      
-      const continueWithConflicts = await askConfirmation('\n❓ Continuer malgré les conflits? Les paramètres existants seront mis à jour (y/N): ')
+
+      const continueWithConflicts = await askConfirmation(
+        '\n❓ Continuer malgré les conflits? Les paramètres existants seront mis à jour (y/N): '
+      )
       if (!continueWithConflicts) {
-        console.log('\n❌ Migration annulée par l\'utilisateur.')
+        console.log("\n❌ Migration annulée par l'utilisateur.")
         return
       }
     }
 
     // Demander confirmation finale
-    const confirmed = await askConfirmation('\n❓ Confirmer la migration des paramètres vers la base auth? (y/N): ')
+    const confirmed = await askConfirmation(
+      '\n❓ Confirmer la migration des paramètres vers la base auth? (y/N): '
+    )
     if (!confirmed) {
-      console.log('\n❌ Migration annulée par l\'utilisateur.')
+      console.log("\n❌ Migration annulée par l'utilisateur.")
       return
     }
 
@@ -164,7 +174,7 @@ async function migrateSystemSettingsToAuth() {
         // Mapper les types
         let paramType: ParameterSystem['type'] = 'STRING'
         let finalValue = setting.value
-        
+
         switch (setting.type.toLowerCase()) {
           case 'array':
             paramType = 'ARRAY'
@@ -201,13 +211,17 @@ async function migrateSystemSettingsToAuth() {
         }
 
         // Vérifier si le paramètre existe déjà
-        const existingParam = await authDataSource.query(`
+        const existingParam = await authDataSource.query(
+          `
           SELECT id FROM parameters_system WHERE "group" = $1 AND key = $2
-        `, [setting.category, setting.key])
+        `,
+          [setting.category, setting.key]
+        )
 
         if (existingParam.length > 0) {
           // Mettre à jour le paramètre existant
-          await authDataSource.query(`
+          await authDataSource.query(
+            `
             UPDATE parameters_system SET
               value = $1,
               type = $2,
@@ -218,43 +232,47 @@ async function migrateSystemSettingsToAuth() {
               "isActive" = $7,
               "updatedAt" = CURRENT_TIMESTAMP
             WHERE "group" = $8 AND key = $9
-          `, [
-            stringValue,
-            paramType,
-            setting.description || setting.label,
-            setting.metadata || null,
-            arrayValues,
-            objectValues,
-            setting.is_active,
-            setting.category,
-            setting.key
-          ])
+          `,
+            [
+              stringValue,
+              paramType,
+              setting.description || setting.label,
+              setting.metadata || null,
+              arrayValues,
+              objectValues,
+              setting.is_active,
+              setting.category,
+              setting.key,
+            ]
+          )
         } else {
           // Insérer un nouveau paramètre
-          await authDataSource.query(`
+          await authDataSource.query(
+            `
             INSERT INTO parameters_system (
               "group", key, value, type, scope, description, metadata, 
               "arrayValues", "objectValues", "isActive", "isReadonly", "defaultLanguage"
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-          `, [
-            setting.category, // group
-            setting.key,
-            stringValue, // value
-            paramType, // type
-            'SYSTEM', // scope
-            setting.description || setting.label,
-            setting.metadata || null,
-            arrayValues,
-            objectValues,
-            setting.is_active,
-            false, // isReadonly
-            'fr' // defaultLanguage
-          ])
+          `,
+            [
+              setting.category, // group
+              setting.key,
+              stringValue, // value
+              paramType, // type
+              'SYSTEM', // scope
+              setting.description || setting.label,
+              setting.metadata || null,
+              arrayValues,
+              objectValues,
+              setting.is_active,
+              false, // isReadonly
+              'fr', // defaultLanguage
+            ]
+          )
         }
 
         migratedCount++
         console.log(`   ✅ ${setting.category}.${setting.key}`)
-
       } catch (error) {
         errorCount++
         console.log(`   ❌ Erreur ${setting.category}.${setting.key}: ${error}`)
@@ -268,22 +286,25 @@ async function migrateSystemSettingsToAuth() {
     if (migratedCount > 0) {
       console.log(`\n🎉 Migration réussie !`)
       console.log(`   📍 Les paramètres sont maintenant dans parameters_system (base auth)`)
-      
+
       // Proposer de nettoyer system_settings
-      const cleanupConfirmed = await askConfirmation('\n❓ Supprimer les paramètres de system_settings (base tenant)? (y/N): ')
+      const cleanupConfirmed = await askConfirmation(
+        '\n❓ Supprimer les paramètres de system_settings (base tenant)? (y/N): '
+      )
       if (cleanupConfirmed) {
         await tenantDataSource.query('DELETE FROM system_settings')
         console.log('   🗑️  Paramètres supprimés de system_settings')
-        
+
         // Optionnel: supprimer la table si elle est vide
-        const dropTableConfirmed = await askConfirmation('\n❓ Supprimer complètement la table system_settings? (y/N): ')
+        const dropTableConfirmed = await askConfirmation(
+          '\n❓ Supprimer complètement la table system_settings? (y/N): '
+        )
         if (dropTableConfirmed) {
           await tenantDataSource.query('DROP TABLE IF EXISTS system_settings CASCADE')
           console.log('   🗑️  Table system_settings supprimée')
         }
       }
     }
-
   } catch (error) {
     console.error('\n💥 ERREUR lors de la migration:', error)
     throw error

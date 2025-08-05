@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { BusinessService } from '../../core/base/business-service'
-import { BusinessOperation, type BusinessContext, type ValidationResult } from '../../core/interfaces/business-service.interface'
+import {
+  BusinessOperation,
+  type BusinessContext,
+  type ValidationResult,
+} from '../../core/interfaces/business-service.interface'
 import { Partner, PartnerStatus, PartnerType } from '../entities/partner.entity'
 import { IPartnerRepository } from '../repositories/partner.repository'
 
@@ -19,13 +23,18 @@ export class PartnerService extends BusinessService<Partner> {
   /**
    * Valider les règles métier spécifiques aux partenaires
    */
-  async validateBusinessRules(entity: Partner, operation: BusinessOperation): Promise<ValidationResult> {
-    const errors: Array<{field: string, message: string, code: string}> = []
-    const warnings: Array<{field: string, message: string, code: string}> = []
+  async validateBusinessRules(
+    entity: Partner,
+    operation: BusinessOperation
+  ): Promise<ValidationResult> {
+    const errors: Array<{ field: string; message: string; code: string }> = []
+    const warnings: Array<{ field: string; message: string; code: string }> = []
 
     // 1. Validation de base de l'entité
     const entityErrors = entity.validate()
-    errors.push(...entityErrors.map(msg => ({ field: 'general', message: msg, code: 'VALIDATION_ERROR' })))
+    errors.push(
+      ...entityErrors.map((msg) => ({ field: 'general', message: msg, code: 'VALIDATION_ERROR' }))
+    )
 
     // 2. Règles métier spécifiques selon l'opération
     switch (operation) {
@@ -43,7 +52,7 @@ export class PartnerService extends BusinessService<Partner> {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     }
   }
 
@@ -52,7 +61,7 @@ export class PartnerService extends BusinessService<Partner> {
    */
   protected async buildEntity(data: Partial<Partner>): Promise<Partner> {
     const partner = new Partner()
-    
+
     // Générer un code automatique si non fourni
     if (!data.code) {
       partner.code = await this.generatePartnerCode(data.type!)
@@ -71,37 +80,37 @@ export class PartnerService extends BusinessService<Partner> {
     partner.siret = data.siret
     partner.numeroTVA = data.numeroTVA
     partner.codeAPE = data.codeAPE
-    
+
     // Contact
     partner.contactPrincipal = data.contactPrincipal
     partner.telephone = data.telephone
     partner.mobile = data.mobile
     partner.email = data.email
     partner.siteWeb = data.siteWeb
-    
+
     // Adresse
     partner.adresse = data.adresse
     partner.adresseComplement = data.adresseComplement
     partner.codePostal = data.codePostal
     partner.ville = data.ville
     partner.pays = data.pays || 'France'
-    
+
     // Informations commerciales
     partner.conditionsPaiement = data.conditionsPaiement
     partner.modePaiement = data.modePaiement
     partner.plafondCredit = data.plafondCredit
     partner.tauxRemise = data.tauxRemise
     partner.representantCommercial = data.representantCommercial
-    
+
     // Spécifique fournisseurs
     partner.delaiLivraison = data.delaiLivraison
     partner.montantMiniCommande = data.montantMiniCommande
     partner.fournisseurPrefere = data.fournisseurPrefere || false
-    
+
     // Comptabilité
     partner.compteComptableClient = data.compteComptableClient
     partner.compteComptableFournisseur = data.compteComptableFournisseur
-    
+
     // Métadonnées
     partner.notes = data.notes || {}
     partner.donneesTechniques = data.donneesTechniques || {}
@@ -115,14 +124,14 @@ export class PartnerService extends BusinessService<Partner> {
   protected async applyUpdates(existing: Partner, updates: Partial<Partner>): Promise<Partner> {
     // Interdire la modification de certains champs critiques
     const protectedFields = ['code', 'type']
-    protectedFields.forEach(field => {
+    protectedFields.forEach((field) => {
       if (updates[field] !== undefined && updates[field] !== existing[field]) {
         throw new Error(`Le champ ${field} ne peut pas être modifié`)
       }
     })
 
     // Appliquer les mises à jour autorisées
-    Object.keys(updates).forEach(key => {
+    Object.keys(updates).forEach((key) => {
       if (updates[key] !== undefined && !protectedFields.includes(key)) {
         existing[key] = updates[key]
       }
@@ -184,7 +193,11 @@ export class PartnerService extends BusinessService<Partner> {
   /**
    * Suspendre un partenaire
    */
-  async suspendrePartenaire(partnerId: string, raison: string, context?: BusinessContext): Promise<Partner> {
+  async suspendrePartenaire(
+    partnerId: string,
+    raison: string,
+    context?: BusinessContext
+  ): Promise<Partner> {
     const partner = await this.findById(partnerId, context)
     if (!partner) {
       throw new Error('Partenaire introuvable')
@@ -199,17 +212,17 @@ export class PartnerService extends BusinessService<Partner> {
    */
   async getStatistiques(): Promise<PartnerStatistics> {
     const allPartners = await this.partnerRepository.findAll()
-    
+
     const stats: PartnerStatistics = {
       totalPartenaires: allPartners.length,
-      totalClients: allPartners.filter(p => p.isClient()).length,
-      totalFournisseurs: allPartners.filter(p => p.isFournisseur()).length,
-      totalProspects: allPartners.filter(p => p.status === PartnerStatus.PROSPECT).length,
-      partenairesActifs: allPartners.filter(p => p.isActif()).length,
-      partenairesInactifs: allPartners.filter(p => p.status === PartnerStatus.INACTIF).length,
-      partenairesSuspendus: allPartners.filter(p => p.status === PartnerStatus.SUSPENDU).length,
+      totalClients: allPartners.filter((p) => p.isClient()).length,
+      totalFournisseurs: allPartners.filter((p) => p.isFournisseur()).length,
+      totalProspects: allPartners.filter((p) => p.status === PartnerStatus.PROSPECT).length,
+      partenairesActifs: allPartners.filter((p) => p.isActif()).length,
+      partenairesInactifs: allPartners.filter((p) => p.status === PartnerStatus.INACTIF).length,
+      partenairesSuspendus: allPartners.filter((p) => p.status === PartnerStatus.SUSPENDU).length,
       repartitionParCategorie: this.calculerRepartitionCategorie(allPartners),
-      top10ClientsAnciennete: this.getTop10ClientsAnciennete(allPartners)
+      top10ClientsAnciennete: this.getTop10ClientsAnciennete(allPartners),
     }
 
     return stats
@@ -219,7 +232,7 @@ export class PartnerService extends BusinessService<Partner> {
    * Fusionner deux partenaires (en cas de doublons)
    */
   async fusionnerPartenaires(
-    partnerPrincipalId: string, 
+    partnerPrincipalId: string,
     partnerSecondaireId: string,
     context?: BusinessContext
   ): Promise<Partner> {
@@ -244,7 +257,7 @@ export class PartnerService extends BusinessService<Partner> {
     if (partnerSecondaire.notes?.historiqueNotes) {
       if (!partnerPrincipal.notes) partnerPrincipal.notes = {}
       if (!partnerPrincipal.notes.historiqueNotes) partnerPrincipal.notes.historiqueNotes = []
-      
+
       partnerPrincipal.notes.historiqueNotes.push(...partnerSecondaire.notes.historiqueNotes)
     }
 
@@ -267,11 +280,19 @@ export class PartnerService extends BusinessService<Partner> {
    * Méthodes privées
    */
 
-  private async validateCreationRules(entity: Partner, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateCreationRules(
+    entity: Partner,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Vérifier l'unicité du code
     const existingPartner = await this.partnerRepository.findByCode(entity.code)
     if (existingPartner) {
-      errors.push({ field: 'code', message: 'Ce code partenaire existe déjà', code: 'CODE_DUPLICATE' })
+      errors.push({
+        field: 'code',
+        message: 'Ce code partenaire existe déjà',
+        code: 'CODE_DUPLICATE',
+      })
     }
 
     // Vérifier l'unicité du SIRET si fourni
@@ -286,58 +307,84 @@ export class PartnerService extends BusinessService<Partner> {
     if (entity.email) {
       const existingByEmail = await this.partnerRepository.findByEmail(entity.email)
       if (existingByEmail) {
-        warnings.push({ field: 'email', message: 'Cette adresse email existe déjà', code: 'EMAIL_DUPLICATE' })
+        warnings.push({
+          field: 'email',
+          message: 'Cette adresse email existe déjà',
+          code: 'EMAIL_DUPLICATE',
+        })
       }
     }
   }
 
-  private async validateUpdateRules(entity: Partner, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateUpdateRules(
+    entity: Partner,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Un partenaire avec des commandes ne peut pas changer de type
     const hasOrders = await this.partnerRepository.hasActiveOrders(entity.id)
     if (hasOrders) {
-      warnings.push({ field: 'type', message: 'Ce partenaire a des commandes en cours', code: 'HAS_ORDERS' })
+      warnings.push({
+        field: 'type',
+        message: 'Ce partenaire a des commandes en cours',
+        code: 'HAS_ORDERS',
+      })
     }
   }
 
-  private async validateDeletionRules(entity: Partner, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateDeletionRules(
+    entity: Partner,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Interdire la suppression si le partenaire a des commandes
     const hasOrders = await this.partnerRepository.hasActiveOrders(entity.id)
     if (hasOrders) {
-      errors.push({ field: 'general', message: 'Impossible de supprimer un partenaire avec des commandes', code: 'HAS_ORDERS' })
+      errors.push({
+        field: 'general',
+        message: 'Impossible de supprimer un partenaire avec des commandes',
+        code: 'HAS_ORDERS',
+      })
     }
 
     // Interdire la suppression si le partenaire a des factures impayées
     const hasUnpaidInvoices = await this.partnerRepository.hasUnpaidInvoices(entity.id)
     if (hasUnpaidInvoices) {
-      errors.push({ field: 'general', message: 'Impossible de supprimer un partenaire avec des factures impayées', code: 'HAS_UNPAID_INVOICES' })
+      errors.push({
+        field: 'general',
+        message: 'Impossible de supprimer un partenaire avec des factures impayées',
+        code: 'HAS_UNPAID_INVOICES',
+      })
     }
   }
 
   private async generatePartnerCode(type: PartnerType): Promise<string> {
-    const prefix = type === PartnerType.CLIENT ? 'CLI' : 
-                   type === PartnerType.FOURNISSEUR ? 'FOU' : 'MIX'
-    
+    const prefix =
+      type === PartnerType.CLIENT ? 'CLI' : type === PartnerType.FOURNISSEUR ? 'FOU' : 'MIX'
+
     const count = await this.partnerRepository.countByType(type)
     return `${prefix}${(count + 1).toString().padStart(6, '0')}`
   }
 
   private calculerRepartitionCategorie(partners: Partner[]): Record<string, number> {
     const repartition = {}
-    partners.forEach(p => {
+    partners.forEach((p) => {
       repartition[p.category] = (repartition[p.category] || 0) + 1
     })
     return repartition
   }
 
-  private getTop10ClientsAnciennete(partners: Partner[]): Array<{code: string, denomination: string, anciennete: number}> {
+  private getTop10ClientsAnciennete(
+    partners: Partner[]
+  ): Array<{ code: string; denomination: string; anciennete: number }> {
     return partners
-      .filter(p => p.isClient())
+      .filter((p) => p.isClient())
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
       .slice(0, 10)
-      .map(p => ({
+      .map((p) => ({
         code: p.code,
         denomination: p.denomination,
-        anciennete: p.getAnneeAnciennete()
+        anciennete: p.getAnneeAnciennete(),
       }))
   }
 }
@@ -367,5 +414,5 @@ export interface PartnerStatistics {
   partenairesInactifs: number
   partenairesSuspendus: number
   repartitionParCategorie: Record<string, number>
-  top10ClientsAnciennete: Array<{code: string, denomination: string, anciennete: number}>
+  top10ClientsAnciennete: Array<{ code: string; denomination: string; anciennete: number }>
 }

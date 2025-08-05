@@ -6,7 +6,7 @@ import { BusinessEntity } from '@erp/entities'
  */
 export enum MaterialType {
   ACIER = 'ACIER',
-  INOX = 'INOX', 
+  INOX = 'INOX',
   ALUMINIUM = 'ALUMINIUM',
   CUIVRE = 'CUIVRE',
   FONTE = 'FONTE',
@@ -14,7 +14,7 @@ export enum MaterialType {
   LAITON = 'LAITON',
   PLASTIQUE = 'PLASTIQUE',
   COMPOSITE = 'COMPOSITE',
-  AUTRE = 'AUTRE'
+  AUTRE = 'AUTRE',
 }
 
 /**
@@ -33,7 +33,7 @@ export enum MaterialShape {
   CORNIERE = 'CORNIERE',
   U = 'U',
   T = 'T',
-  AUTRE = 'AUTRE'
+  AUTRE = 'AUTRE',
 }
 
 /**
@@ -43,7 +43,7 @@ export enum MaterialStatus {
   ACTIF = 'ACTIF',
   INACTIF = 'INACTIF',
   OBSOLETE = 'OBSOLETE',
-  EN_EVALUATION = 'EN_EVALUATION'
+  EN_EVALUATION = 'EN_EVALUATION',
 }
 
 /**
@@ -56,7 +56,7 @@ export enum MaterialUnit {
   METRE_CARRE = 'm²',
   UNITE = 'unité',
   BARRE = 'barre',
-  PIECE = 'pièce'
+  PIECE = 'pièce',
 }
 
 /**
@@ -70,7 +70,7 @@ export enum StorageMethod {
   EMPILE = 'EMPILE',
   SEPARATEUR = 'SEPARATEUR',
   CONTROLE_HUMIDITE = 'CONTROLE_HUMIDITE',
-  CONTROLE_TEMPERATURE = 'CONTROLE_TEMPERATURE'
+  CONTROLE_TEMPERATURE = 'CONTROLE_TEMPERATURE',
 }
 
 /**
@@ -411,13 +411,18 @@ export class Material extends BusinessEntity {
 
     const stockCible = this.stockMaxi > 0 ? this.stockMaxi : this.stockMini * 2
     const quantiteNecessaire = stockCible - this.calculerStockDisponible()
-    
+
     if (this.informationsApprovisionnement?.quantiteMultiple) {
-      return Math.ceil(quantiteNecessaire / this.informationsApprovisionnement.quantiteMultiple) * 
-             this.informationsApprovisionnement.quantiteMultiple
+      return (
+        Math.ceil(quantiteNecessaire / this.informationsApprovisionnement.quantiteMultiple) *
+        this.informationsApprovisionnement.quantiteMultiple
+      )
     }
 
-    return Math.max(quantiteNecessaire, this.informationsApprovisionnement?.quantiteMiniCommande || 0)
+    return Math.max(
+      quantiteNecessaire,
+      this.informationsApprovisionnement?.quantiteMiniCommande || 0
+    )
   }
 
   /**
@@ -514,9 +519,9 @@ export class Material extends BusinessEntity {
    * Ajouter une modification à l'historique
    */
   ajouterModificationHistorique(
-    champ: string, 
-    ancienneValeur: any, 
-    nouvelleValeur: any, 
+    champ: string,
+    ancienneValeur: any,
+    nouvelleValeur: any,
     utilisateur: string
   ): void {
     if (!this.metadonnees) this.metadonnees = {}
@@ -527,7 +532,7 @@ export class Material extends BusinessEntity {
       utilisateur,
       champ,
       ancienneValeur,
-      nouvelleValeur
+      nouvelleValeur,
     })
 
     // Garder seulement les 100 dernières modifications
@@ -543,7 +548,7 @@ export class Material extends BusinessEntity {
     this.status = MaterialStatus.OBSOLETE
     this.obsolete = true
     if (remplacePar) this.remplacePar = remplacePar
-    
+
     if (!this.metadonnees) this.metadonnees = {}
     this.metadonnees.dateObsolescence = new Date()
     if (raison) this.metadonnees.raisonObsolescence = raison

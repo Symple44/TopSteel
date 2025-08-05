@@ -13,7 +13,7 @@ export default function LoginLoading() {
       <div className="text-center">
         {/* Logo de l'entreprise */}
         <div className="mb-6">
-          <CompanyLogoWrapper 
+          <CompanyLogoWrapper
             size="lg"
             showCompanyName={true}
             fallback={
@@ -23,11 +23,11 @@ export default function LoginLoading() {
             }
           />
         </div>
-        
+
         <p className="text-muted-foreground mb-4">
           {t('auth.loading', 'Chargement de la connexion...')}
         </p>
-        
+
         <div className="inline-flex space-x-1">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>

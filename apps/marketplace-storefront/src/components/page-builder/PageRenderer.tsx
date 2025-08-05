@@ -11,17 +11,17 @@ interface PageRendererProps {
   isPreview?: boolean
 }
 
-export function PageRenderer({ 
-  templateId, 
-  slug, 
+export function PageRenderer({
+  templateId,
+  slug,
   sections: providedSections,
-  isPreview = false 
+  isPreview = false,
 }: PageRendererProps) {
   const { data: template, isLoading } = useQuery({
     queryKey: ['pageTemplate', templateId, slug],
     queryFn: async () => {
       if (providedSections) return { sections: providedSections }
-      
+
       if (templateId) {
         const response = await marketplaceApi.get(`/page-templates/${templateId}`)
         return (response as any).data
@@ -29,10 +29,10 @@ export function PageRenderer({
         const response = await marketplaceApi.get(`/page-templates/by-slug/${slug}`)
         return (response as any).data
       }
-      
+
       throw new Error('Template ID or slug required')
     },
-    enabled: !providedSections && (!!templateId || !!slug)
+    enabled: !providedSections && (!!templateId || !!slug),
   })
 
   if (isLoading) {
@@ -52,12 +52,8 @@ export function PageRenderer({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-            Page en construction
-          </h2>
-          <p className="text-gray-600">
-            Cette page n'a pas encore de contenu configuré.
-          </p>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Page en construction</h2>
+          <p className="text-gray-600">Cette page n'a pas encore de contenu configuré.</p>
         </div>
       </div>
     )
@@ -66,11 +62,7 @@ export function PageRenderer({
   return (
     <div className="min-h-screen">
       {visibleSections.map((section: BaseSection) => (
-        <SectionRenderer
-          key={section.id}
-          section={section}
-          isEditing={false}
-        />
+        <SectionRenderer key={section.id} section={section} isEditing={false} />
       ))}
     </div>
   )

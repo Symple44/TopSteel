@@ -7,15 +7,11 @@ import { TenantModule } from '../../shared/tenant/tenant.module'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      PageTemplate,
-      PageSection,
-      SectionPreset
-    ], 'marketplace'), // Utiliser la connection marketplace
+    TypeOrmModule.forFeature([PageTemplate, PageSection, SectionPreset], 'marketplace'), // Utiliser la connection marketplace
     TenantModule, // Importer le TenantModule pour le TenantGuard
   ],
   controllers: [PageBuilderController],
   providers: [PageBuilderService],
-  exports: [PageBuilderService]
+  exports: [PageBuilderService],
 })
 export class PageBuilderModule {}

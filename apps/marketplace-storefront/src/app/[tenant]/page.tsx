@@ -11,7 +11,7 @@ interface HomePageProps {
 
 export default async function HomePage({ params }: HomePageProps) {
   const resolvedParams = await params
-  
+
   return (
     <div className="space-y-12 pb-12">
       {/* Hero Section */}

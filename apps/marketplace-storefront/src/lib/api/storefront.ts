@@ -104,11 +104,12 @@ export async function getTenantConfig(tenant: string): Promise<StorefrontConfig 
     // Temporaire : retourner des données statiques pour bypass le problème de tenant
     return {
       storeName: tenant === 'topsteel' ? 'TopSteel' : 'Démo Marketplace',
-      description: tenant === 'topsteel' ? 'Boutique en ligne TopSteel' : 'Boutique de démonstration',
+      description:
+        tenant === 'topsteel' ? 'Boutique en ligne TopSteel' : 'Boutique de démonstration',
       contactInfo: {
         email: 'contact@topsteel.fr',
         phone: '+33 1 23 45 67 89',
-        address: '123 Rue de la Métallurgie, 75000 Paris'
+        address: '123 Rue de la Métallurgie, 75000 Paris',
       },
       features: {
         allowGuestCheckout: true,
@@ -117,19 +118,19 @@ export async function getTenantConfig(tenant: string): Promise<StorefrontConfig 
         showStock: true,
         enableWishlist: false,
         enableCompare: false,
-        enableReviews: false
+        enableReviews: false,
       },
       social: {
         facebook: 'https://facebook.com/topsteel',
-        linkedin: 'https://linkedin.com/company/topsteel'
+        linkedin: 'https://linkedin.com/company/topsteel',
       },
       seo: {
         title: tenant === 'topsteel' ? 'TopSteel - Boutique en ligne' : 'Démo Marketplace',
         description: 'Découvrez nos produits sur la boutique en ligne',
-        keywords: ['TopSteel', 'boutique', 'produits', 'métallurgie']
-      }
+        keywords: ['TopSteel', 'boutique', 'produits', 'métallurgie'],
+      },
     }
-    
+
     // Code original commenté temporairement
     // apiClient.setTenant(tenant)
     // return await apiClient.storefront.getConfig()
@@ -142,7 +143,7 @@ export async function getTenantConfig(tenant: string): Promise<StorefrontConfig 
 }
 
 export async function getProducts(
-  tenant: string, 
+  tenant: string,
   filters: ProductFilters = {}
 ): Promise<ProductListResult> {
   apiClient.setTenant(tenant)
@@ -154,10 +155,7 @@ export async function getProduct(tenant: string, productId: string): Promise<Pro
   return (await apiClient.storefront.getProduct(productId)) as Product
 }
 
-export async function getFeaturedProducts(
-  tenant: string, 
-  limit = 8
-): Promise<Product[]> {
+export async function getFeaturedProducts(tenant: string, limit = 8): Promise<Product[]> {
   apiClient.setTenant(tenant)
   return (await apiClient.storefront.getFeaturedProducts(limit)) as Product[]
 }
@@ -174,7 +172,10 @@ export async function getProductsByCategory(
   limit = 20
 ): Promise<ProductListResult> {
   apiClient.setTenant(tenant)
-  return (await apiClient.storefront.getProductsByCategory(category, { page, limit })) as ProductListResult
+  return (await apiClient.storefront.getProductsByCategory(category, {
+    page,
+    limit,
+  })) as ProductListResult
 }
 
 export async function searchProducts(
@@ -213,13 +214,16 @@ export async function subscribeToNewsletter(tenant: string, email: string) {
   return (await apiClient.storefront.subscribeNewsletter(email)) as any
 }
 
-export async function sendContactMessage(tenant: string, data: {
-  name: string
-  email: string
-  subject: string
-  message: string
-  phone?: string
-}) {
+export async function sendContactMessage(
+  tenant: string,
+  data: {
+    name: string
+    email: string
+    subject: string
+    message: string
+    phone?: string
+  }
+) {
   apiClient.setTenant(tenant)
   return (await apiClient.storefront.sendContactMessage(data)) as any
 }
@@ -238,5 +242,5 @@ export const api = {
     getMenu: getNavigationMenu,
     getPage: getStaticPage,
   },
-  getProduct: getProduct
+  getProduct: getProduct,
 }

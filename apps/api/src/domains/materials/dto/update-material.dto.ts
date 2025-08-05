@@ -9,7 +9,7 @@ import { CreateMaterialDto } from './create-material.dto'
 export class UpdateMaterialDto extends PartialType(CreateMaterialDto) {
   @ApiPropertyOptional({
     description: 'Raison de la modification',
-    example: 'Mise à jour des propriétés mécaniques suite aux tests'
+    example: 'Mise à jour des propriétés mécaniques suite aux tests',
   })
   @IsOptional()
   @IsString()

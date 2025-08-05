@@ -5,7 +5,7 @@ import {
   type BusinessContext,
   type IBusinessRepository,
   type IBusinessService,
-  type ValidationResult
+  type ValidationResult,
 } from '../interfaces/business-service.interface'
 
 /**
@@ -27,10 +27,10 @@ export abstract class BusinessService<T extends BusinessEntity> implements IBusi
    */
   async create(data: Partial<T>, context?: BusinessContext): Promise<T> {
     this.logger.log(`Creating new ${this.getEntityName()}`)
-    
+
     // 1. Créer l'entité
     const entity = await this.buildEntity(data)
-    
+
     // 2. Valider les règles métier
     const validation = await this.validateBusinessRules(entity, BusinessOperation.CREATE)
     if (!validation.isValid) {
@@ -145,14 +145,20 @@ export abstract class BusinessService<T extends BusinessEntity> implements IBusi
  * Erreurs métier
  */
 export class BusinessError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(
+    message: string,
+    public code?: string
+  ) {
     super(message)
     this.name = 'BusinessError'
   }
 }
 
 export class BusinessValidationError extends BusinessError {
-  constructor(message: string, public errors: any[]) {
+  constructor(
+    message: string,
+    public errors: any[]
+  ) {
     super(message)
     this.name = 'BusinessValidationError'
   }

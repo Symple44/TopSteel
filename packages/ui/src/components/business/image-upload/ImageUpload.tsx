@@ -46,15 +46,22 @@ export function ImageUpload({
   translations = {},
 }: ImageUploadProps) {
   // Default translations with fallbacks
-  const t = useCallback((key: string) => {
-    const defaultTranslations = {
-      uploading: 'Uploading...',
-      changePhoto: 'Change Photo',
-      remove: 'Remove',
-      upload: 'Upload'
-    }
-    return translations[key as keyof typeof translations] || defaultTranslations[key as keyof typeof defaultTranslations] || key
-  }, [translations])
+  const t = useCallback(
+    (key: string) => {
+      const defaultTranslations = {
+        uploading: 'Uploading...',
+        changePhoto: 'Change Photo',
+        remove: 'Remove',
+        upload: 'Upload',
+      }
+      return (
+        translations[key as keyof typeof translations] ||
+        defaultTranslations[key as keyof typeof defaultTranslations] ||
+        key
+      )
+    },
+    [translations]
+  )
   const [isUploading, setIsUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null)

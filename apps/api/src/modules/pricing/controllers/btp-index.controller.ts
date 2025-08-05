@@ -1,16 +1,20 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Put, 
-  Body, 
-  Param, 
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
   Query,
   UseGuards,
-  ParseUUIDPipe
+  ParseUUIDPipe,
 } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { BTPIndexService, IndexedPricingContext, IndexedPricingResult } from '../services/btp-index.service'
+import {
+  BTPIndexService,
+  IndexedPricingContext,
+  IndexedPricingResult,
+} from '../services/btp-index.service'
 import { BTPIndex, BTPIndexType } from '../entities/btp-index.entity'
 import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
@@ -61,9 +65,7 @@ export class IndexedPricingDto {
 @Controller('pricing/btp-indices')
 @UseGuards(TenantGuard)
 export class BTPIndexController {
-  constructor(
-    private readonly btpIndexService: BTPIndexService
-  ) {}
+  constructor(private readonly btpIndexService: BTPIndexService) {}
 
   @Post()
   @ApiOperation({ summary: 'Créer ou mettre à jour un indice BTP' })
@@ -74,7 +76,7 @@ export class BTPIndexController {
   ): Promise<BTPIndex> {
     return await this.btpIndexService.createOrUpdateIndex({
       societeId: tenantId,
-      ...createDto
+      ...createDto,
     })
   }
 
@@ -89,7 +91,7 @@ export class BTPIndexController {
   ): Promise<BTPIndex[]> {
     // Implementation basique - à améliorer selon besoins
     const query: any = { tenantId }
-    
+
     if (indexType) query.indexType = indexType
     if (year) query.year = year
     if (month) query.month = month
@@ -110,7 +112,7 @@ export class BTPIndexController {
   }
 
   @Get('for-date/:indexType')
-  @ApiOperation({ summary: 'Obtenir l\'indice pour une date donnée' })
+  @ApiOperation({ summary: "Obtenir l'indice pour une date donnée" })
   @ApiResponse({ status: 200, description: 'Indice pour la date', type: BTPIndex })
   async getIndexForDate(
     @CurrentTenant() tenantId: string,
@@ -122,8 +124,8 @@ export class BTPIndexController {
   }
 
   @Get('history/:indexType')
-  @ApiOperation({ summary: 'Obtenir l\'historique d\'un indice' })
-  @ApiResponse({ status: 200, description: 'Historique de l\'indice', type: [BTPIndex] })
+  @ApiOperation({ summary: "Obtenir l'historique d'un indice" })
+  @ApiResponse({ status: 200, description: "Historique de l'indice", type: [BTPIndex] })
   async getIndexHistory(
     @CurrentTenant() tenantId: string,
     @Param('indexType') indexType: BTPIndexType,
@@ -132,13 +134,8 @@ export class BTPIndexController {
   ): Promise<BTPIndex[]> {
     const fromDate = new Date(fromDateStr)
     const toDate = new Date(toDateStr)
-    
-    return await this.btpIndexService.getIndexHistory(
-      tenantId,
-      indexType,
-      fromDate,
-      toDate
-    )
+
+    return await this.btpIndexService.getIndexHistory(tenantId, indexType, fromDate, toDate)
   }
 
   @Post('calculate-indexed-price')
@@ -161,9 +158,9 @@ export class BTPIndexController {
   }
 
   @Get('types')
-  @ApiOperation({ summary: 'Obtenir la liste des types d\'indices BTP disponibles' })
-  @ApiResponse({ status: 200, description: 'Types d\'indices disponibles' })
-  async getIndexTypes(): Promise<Array<{ value: BTPIndexType, label: string, category: string }>> {
+  @ApiOperation({ summary: "Obtenir la liste des types d'indices BTP disponibles" })
+  @ApiResponse({ status: 200, description: "Types d'indices disponibles" })
+  async getIndexTypes(): Promise<Array<{ value: BTPIndexType; label: string; category: string }>> {
     return this.btpIndexService.getAvailableIndexTypes()
   }
 
@@ -180,7 +177,7 @@ export class BTPIndexController {
   }
 
   @Get('dashboard/:indexType')
-  @ApiOperation({ summary: 'Obtenir le tableau de bord d\'un indice' })
+  @ApiOperation({ summary: "Obtenir le tableau de bord d'un indice" })
   @ApiResponse({ status: 200, description: 'Données du tableau de bord' })
   async getIndexDashboard(
     @CurrentTenant() tenantId: string,
@@ -195,7 +192,7 @@ export class BTPIndexController {
     alerts: any[]
   }> {
     const current = await this.btpIndexService.getLatestIndex(tenantId, indexType)
-    
+
     if (!current) {
       return {
         current: null,
@@ -204,7 +201,7 @@ export class BTPIndexController {
         trend: 'stable',
         monthlyVariation: 0,
         yearlyVariation: 0,
-        alerts: []
+        alerts: [],
       }
     }
 
@@ -230,7 +227,7 @@ export class BTPIndexController {
       trend,
       monthlyVariation: current.monthlyVariation || 0,
       yearlyVariation: current.yearlyVariation || 0,
-      alerts: current.metadata?.alerts || []
+      alerts: current.metadata?.alerts || [],
     }
   }
 }

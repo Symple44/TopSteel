@@ -17,7 +17,10 @@ import { Site } from './entities/site.entity'
 import { Societe } from './entities/societe.entity'
 import { SocieteUser } from './entities/societe-user.entity'
 import { SitesService } from './services/sites.service'
-import { SocieteAuthRepositoryService, SocieteUserAuthRepositoryService } from './services/societe-auth-repository.service'
+import {
+  SocieteAuthRepositoryService,
+  SocieteUserAuthRepositoryService,
+} from './services/societe-auth-repository.service'
 import { SocieteUsersService } from './services/societe-users.service'
 // Services
 import { SocietesService } from './services/societes.service'

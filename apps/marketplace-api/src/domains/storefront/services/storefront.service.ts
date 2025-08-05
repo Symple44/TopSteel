@@ -71,7 +71,7 @@ export class StorefrontService {
 
   async getStorefrontConfig(societeId: string): Promise<StorefrontConfig> {
     const societe = await this.societeRepo.findOne({
-      where: { id: societeId }
+      where: { id: societeId },
     })
 
     if (!societe) {
@@ -88,7 +88,7 @@ export class StorefrontService {
       contactInfo: {
         email: societe.email,
         phone: marketplaceConfig.phone,
-        address: `${societe.adresse}, ${societe.codePostal} ${societe.ville}`
+        address: `${societe.adresse}, ${societe.codePostal} ${societe.ville}`,
       },
       features: {
         allowGuestCheckout: marketplaceConfig.allowGuestCheckout ?? true,
@@ -103,14 +103,14 @@ export class StorefrontService {
       seo: {
         title: `${societe.nom} - Boutique en ligne`,
         description: `Découvrez nos produits sur la boutique en ligne de ${societe.nom}`,
-        keywords: [societe.nom, 'boutique', 'produits', 'métallurgie']
-      }
+        keywords: [societe.nom, 'boutique', 'produits', 'métallurgie'],
+      },
     }
   }
 
   async getCurrentTheme(societeId: string): Promise<MarketplaceTheme | null> {
     const theme = await this.themeRepo.findOne({
-      where: { societeId, isActive: true }
+      where: { societeId, isActive: true },
     })
 
     if (!theme) {
@@ -137,16 +137,16 @@ export class StorefrontService {
         text: {
           primary: '#212529',
           secondary: '#6c757d',
-          disabled: '#adb5bd'
+          disabled: '#adb5bd',
         },
         success: '#28a745',
         warning: '#ffc107',
         error: '#dc3545',
-        info: '#17a2b8'
+        info: '#17a2b8',
       },
       typography: {
         fontFamily: {
-          primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+          primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         },
         fontSize: {
           xs: '0.75rem',
@@ -156,20 +156,20 @@ export class StorefrontService {
           xl: '1.25rem',
           '2xl': '1.5rem',
           '3xl': '1.875rem',
-          '4xl': '2.25rem'
+          '4xl': '2.25rem',
         },
         fontWeight: {
           light: 300,
           normal: 400,
           medium: 500,
           semibold: 600,
-          bold: 700
+          bold: 700,
         },
         lineHeight: {
           tight: 1.25,
           normal: 1.5,
-          relaxed: 1.75
-        }
+          relaxed: 1.75,
+        },
       },
       layout: {
         containerMaxWidth: '1200px',
@@ -180,7 +180,7 @@ export class StorefrontService {
           sm: '0.25rem',
           md: '0.375rem',
           lg: '0.5rem',
-          xl: '0.75rem'
+          xl: '0.75rem',
         },
         spacing: {
           xs: '0.25rem',
@@ -188,8 +188,8 @@ export class StorefrontService {
           md: '1rem',
           lg: '1.5rem',
           xl: '2rem',
-          '2xl': '3rem'
-        }
+          '2xl': '3rem',
+        },
       },
       components: {
         buttons: {
@@ -197,69 +197,69 @@ export class StorefrontService {
             backgroundColor: '#007bff',
             color: '#ffffff',
             padding: '0.5rem 1rem',
-            borderRadius: '0.375rem'
+            borderRadius: '0.375rem',
           },
           secondary: {
             backgroundColor: '#6c757d',
             color: '#ffffff',
             padding: '0.5rem 1rem',
-            borderRadius: '0.375rem'
+            borderRadius: '0.375rem',
           },
           outline: {
             backgroundColor: 'transparent',
             color: '#007bff',
             border: '1px solid #007bff',
             padding: '0.5rem 1rem',
-            borderRadius: '0.375rem'
-          }
+            borderRadius: '0.375rem',
+          },
         },
         cards: {
           default: {
             backgroundColor: '#ffffff',
             borderRadius: '0.5rem',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            padding: '1rem'
+            padding: '1rem',
           },
           product: {
             backgroundColor: '#ffffff',
             borderRadius: '0.5rem',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
             padding: '1rem',
-            transition: 'box-shadow 0.2s'
-          }
+            transition: 'box-shadow 0.2s',
+          },
         },
         forms: {
           input: {
             backgroundColor: '#ffffff',
             border: '1px solid #ced4da',
             borderRadius: '0.375rem',
-            padding: '0.5rem 0.75rem'
+            padding: '0.5rem 0.75rem',
           },
           select: {
             backgroundColor: '#ffffff',
             border: '1px solid #ced4da',
             borderRadius: '0.375rem',
-            padding: '0.5rem 0.75rem'
+            padding: '0.5rem 0.75rem',
           },
           checkbox: {
-            accentColor: '#007bff'
-          }
+            accentColor: '#007bff',
+          },
         },
         navigation: {
           header: {
             backgroundColor: '#ffffff',
             borderBottom: '1px solid #e9ecef',
-            padding: '1rem 0'
+            padding: '1rem 0',
           },
           menu: {
             backgroundColor: '#f8f9fa',
-            padding: '0.5rem 0'
+            padding: '0.5rem 0',
           },
           breadcrumb: {
             fontSize: '0.875rem',
-            color: '#6c757d'
-          }
-        }
+            color: '#6c757d',
+          },
+        },
       },
       settings: {
         showBreadcrumbs: true,
@@ -271,8 +271,8 @@ export class StorefrontService {
         enableRTL: false,
         showProductReviews: false,
         showStockStatus: true,
-        showProductCode: true
-      }
+        showProductCode: true,
+      },
     })
 
     return await this.themeRepo.save(defaultTheme)
@@ -289,7 +289,7 @@ export class StorefrontService {
           url: '/',
           type: 'page',
           isActive: true,
-          order: 1
+          order: 1,
         },
         {
           id: '2',
@@ -305,9 +305,9 @@ export class StorefrontService {
               url: '/products',
               type: 'category',
               isActive: true,
-              order: 1
-            }
-          ]
+              order: 1,
+            },
+          ],
         },
         {
           id: '3',
@@ -315,7 +315,7 @@ export class StorefrontService {
           url: '/about',
           type: 'page',
           isActive: true,
-          order: 3
+          order: 3,
         },
         {
           id: '4',
@@ -323,16 +323,16 @@ export class StorefrontService {
           url: '/contact',
           type: 'page',
           isActive: true,
-          order: 4
-        }
-      ]
+          order: 4,
+        },
+      ],
     }
   }
 
   async getPage(societeId: string, slug: string): Promise<StaticPage | null> {
     // Pour l'instant, retourner des pages statiques par défaut
     const defaultPages: Record<string, StaticPage> = {
-      'about': {
+      about: {
         id: 'about',
         slug: 'about',
         title: 'À propos de nous',
@@ -340,19 +340,20 @@ export class StorefrontService {
         metaTitle: 'À propos - Notre boutique',
         metaDescription: 'Découvrez notre histoire et nos valeurs.',
         isPublished: true,
-        publishedAt: new Date()
+        publishedAt: new Date(),
       },
-      'contact': {
+      contact: {
         id: 'contact',
         slug: 'contact',
         title: 'Nous contacter',
-        content: '<h1>Nous contacter</h1><p>N\'hésitez pas à nous contacter pour toute question.</p>',
+        content:
+          "<h1>Nous contacter</h1><p>N'hésitez pas à nous contacter pour toute question.</p>",
         metaTitle: 'Contact - Notre boutique',
         metaDescription: 'Contactez-nous pour toute question ou demande.',
         isPublished: true,
-        publishedAt: new Date()
+        publishedAt: new Date(),
       },
-      'legal': {
+      legal: {
         id: 'legal',
         slug: 'legal',
         title: 'Mentions légales',
@@ -360,9 +361,9 @@ export class StorefrontService {
         metaTitle: 'Mentions légales',
         metaDescription: 'Mentions légales et informations sur notre entreprise.',
         isPublished: true,
-        publishedAt: new Date()
+        publishedAt: new Date(),
       },
-      'privacy': {
+      privacy: {
         id: 'privacy',
         slug: 'privacy',
         title: 'Politique de confidentialité',
@@ -370,24 +371,27 @@ export class StorefrontService {
         metaTitle: 'Politique de confidentialité',
         metaDescription: 'Notre politique de protection des données personnelles.',
         isPublished: true,
-        publishedAt: new Date()
-      }
+        publishedAt: new Date(),
+      },
     }
 
     return defaultPages[slug] || null
   }
 
-  async subscribeNewsletter(societeId: string, email: string): Promise<{ success: boolean; message: string }> {
+  async subscribeNewsletter(
+    societeId: string,
+    email: string
+  ): Promise<{ success: boolean; message: string }> {
     // TODO: Implémenter l'inscription newsletter
     // Pour l'instant, simuler le succès
     return {
       success: true,
-      message: 'Inscription à la newsletter réussie'
+      message: 'Inscription à la newsletter réussie',
     }
   }
 
   async sendContactMessage(
-    societeId: string, 
+    societeId: string,
     message: {
       name: string
       email: string
@@ -399,10 +403,10 @@ export class StorefrontService {
     // TODO: Implémenter l'envoi de message de contact
     // Pour l'instant, simuler le succès
     console.log(`Contact message from ${message.name} (${message.email}): ${message.subject}`)
-    
+
     return {
       success: true,
-      message: 'Message envoyé avec succès'
+      message: 'Message envoyé avec succès',
     }
   }
 }

@@ -15,4 +15,7 @@ if (result.error) {
 }
 
 console.log('DEFAULT_TENANT_CODE:', process.env.DEFAULT_TENANT_CODE)
-console.log('Expected database name:', `erp_topsteel_${process.env.DEFAULT_TENANT_CODE || 'default'}`)
+console.log(
+  'Expected database name:',
+  `erp_topsteel_${process.env.DEFAULT_TENANT_CODE || 'default'}`
+)

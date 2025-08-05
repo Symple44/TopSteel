@@ -58,7 +58,7 @@ export const es = {
     unauthorizedTitle: 'Acceso no autorizado',
     unauthorizedMessage: 'Debes iniciar sesión para acceder a esta página.',
     loginButton: 'Iniciar sesión',
-    
+
     // Notifications
     soundNotifications: 'Notificaciones de sonido',
 
@@ -66,7 +66,7 @@ export const es = {
     backend: {
       status: {
         online: 'En línea',
-        offline: 'Desconectado', 
+        offline: 'Desconectado',
         error: 'Error',
         checking: 'Verificando...',
         retry: 'Reintentar',
@@ -471,7 +471,7 @@ export const es = {
   },
 
   // === NUEVAS TRADUCCIONES AÑADIDAS ===
-  
+
   // Company & Multi-tab management
   companies: {
     select: 'Seleccionar una empresa',
@@ -484,7 +484,8 @@ export const es = {
     cannotConnect: 'No se puede conectar a esta empresa',
     syncError: 'Error de sincronización, por favor reconéctese',
     changeAffects: 'Cambio en {{count}} pestaña{{count, plural, one {} other {s}}}',
-    changeAffectsMultiple: 'Afectará todas las pestañas abiertas ({{count}} detectada{{count, plural, one {} other {s}}}).',
+    changeAffectsMultiple:
+      'Afectará todas las pestañas abiertas ({{count}} detectada{{count, plural, one {} other {s}}}).',
     setAsDefault: 'Establecer como empresa predeterminada',
     chooseSociety: 'Elija la empresa con la que desea trabajar.',
     code: 'Código',
@@ -762,7 +763,8 @@ export const es = {
     },
     monitoring: {
       title: '¡Ups! Ocurrió un error',
-      description: 'Ocurrió un error inesperado en la aplicación. Nuestros equipos han sido notificados.',
+      description:
+        'Ocurrió un error inesperado en la aplicación. Nuestros equipos han sido notificados.',
       reloadPage: 'Recargar página',
     },
     connection: {

@@ -35,10 +35,7 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
           {/* Products Grid */}
           <main className="lg:col-span-3">
             <Suspense fallback={<LoadingSpinner />}>
-              <ProductsGrid 
-                tenant={resolvedParams.tenant} 
-                searchParams={resolvedSearchParams}
-              />
+              <ProductsGrid tenant={resolvedParams.tenant} searchParams={resolvedSearchParams} />
             </Suspense>
           </main>
         </div>

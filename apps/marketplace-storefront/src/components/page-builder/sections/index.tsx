@@ -5,10 +5,14 @@ import { SectionType, BaseSection } from './types'
 
 // Import dynamique des composants de sections
 const sectionComponents = {
-  [SectionType.HERO]: dynamic(() => import('./HeroSection').then(mod => mod.HeroSection)),
-  [SectionType.TEXT_BLOCK]: dynamic(() => import('./TextBlockSection').then(mod => mod.TextBlockSection)),
-  [SectionType.PRODUCTS_GRID]: dynamic(() => import('./ProductsGridSection').then(mod => mod.ProductsGridSection)),
-  [SectionType.CTA]: dynamic(() => import('./CTASection').then(mod => mod.CTASection)),
+  [SectionType.HERO]: dynamic(() => import('./HeroSection').then((mod) => mod.HeroSection)),
+  [SectionType.TEXT_BLOCK]: dynamic(() =>
+    import('./TextBlockSection').then((mod) => mod.TextBlockSection)
+  ),
+  [SectionType.PRODUCTS_GRID]: dynamic(() =>
+    import('./ProductsGridSection').then((mod) => mod.ProductsGridSection)
+  ),
+  [SectionType.CTA]: dynamic(() => import('./CTASection').then((mod) => mod.CTASection)),
   // Ajouter d'autres sections au fur et à mesure
 }
 
@@ -19,11 +23,11 @@ interface SectionRendererProps {
   onStyleUpdate?: (styles: any) => void
 }
 
-export function SectionRenderer({ 
-  section, 
-  isEditing = false, 
+export function SectionRenderer({
+  section,
+  isEditing = false,
   onUpdate,
-  onStyleUpdate 
+  onStyleUpdate,
 }: SectionRendererProps) {
   const Component = sectionComponents[section.type as keyof typeof sectionComponents]
 

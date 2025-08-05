@@ -7,7 +7,11 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
   private tablesWithProduitId = [
     { table: 'stocks', columnName: 'produit_id', fkName: 'FK_stocks_produit' },
     { table: 'ligne_devis', columnName: 'produit_id', fkName: 'FK_ligne_devis_produit' },
-    { table: 'ordre_fabrication', columnName: 'produit_id', fkName: 'FK_ordre_fabrication_produit' }
+    {
+      table: 'ordre_fabrication',
+      columnName: 'produit_id',
+      fkName: 'FK_ordre_fabrication_produit',
+    },
   ]
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -18,12 +22,14 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
     const articlesExists = await queryRunner.hasTable('articles')
 
     if (!produitsExists) {
-      console.log('Table produits n\'existe pas, migration ignorée')
+      console.log("Table produits n'existe pas, migration ignorée")
       return
     }
 
     if (!articlesExists) {
-      throw new Error('Table articles n\'existe pas. Exécutez d\'abord la migration CreateArticlesTable')
+      throw new Error(
+        "Table articles n'existe pas. Exécutez d'abord la migration CreateArticlesTable"
+      )
     }
 
     // 2. Migrer les données de produits vers articles (si pas déjà fait)
@@ -55,11 +61,14 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       // Ajouter la colonne article_id si elle n'existe pas
       const hasArticleId = await queryRunner.hasColumn(tableInfo.table, 'article_id')
       if (!hasArticleId) {
-        await queryRunner.addColumn(tableInfo.table, new TableColumn({
-          name: 'article_id',
-          type: 'uuid',
-          isNullable: true
-        }))
+        await queryRunner.addColumn(
+          tableInfo.table,
+          new TableColumn({
+            name: 'article_id',
+            type: 'uuid',
+            isNullable: true,
+          })
+        )
       }
 
       // Migrer les références produit_id vers article_id
@@ -90,13 +99,16 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       }
 
       // Créer la nouvelle contrainte sur article_id
-      await queryRunner.createForeignKey(tableInfo.table, new TableForeignKey({
-        name: tableInfo.fkName.replace('produit', 'article'),
-        columnNames: ['article_id'],
-        referencedTableName: 'articles',
-        referencedColumnNames: ['id'],
-        onDelete: tableInfo.table === 'ligne_devis' ? 'SET NULL' : 'CASCADE'
-      }))
+      await queryRunner.createForeignKey(
+        tableInfo.table,
+        new TableForeignKey({
+          name: tableInfo.fkName.replace('produit', 'article'),
+          columnNames: ['article_id'],
+          referencedTableName: 'articles',
+          referencedColumnNames: ['id'],
+          onDelete: tableInfo.table === 'ligne_devis' ? 'SET NULL' : 'CASCADE',
+        })
+      )
 
       // Rendre article_id non nullable pour les tables qui l'exigent
       if (tableInfo.table !== 'ligne_devis') {
@@ -106,13 +118,17 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
           WHERE article_id IS NULL 
             AND ${tableInfo.columnName} IS NOT NULL
         `)
-        
+
         // Puis rendre la colonne non nullable
-        await queryRunner.changeColumn(tableInfo.table, 'article_id', new TableColumn({
-          name: 'article_id',
-          type: 'uuid',
-          isNullable: false
-        }))
+        await queryRunner.changeColumn(
+          tableInfo.table,
+          'article_id',
+          new TableColumn({
+            name: 'article_id',
+            type: 'uuid',
+            isNullable: false,
+          })
+        )
       }
 
       // Supprimer l'ancienne colonne produit_id
@@ -189,11 +205,14 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       console.log(`\nRestauration de la table ${tableInfo.table}...`)
 
       // Ajouter la colonne produit_id
-      await queryRunner.addColumn(tableInfo.table, new TableColumn({
-        name: tableInfo.columnName,
-        type: 'uuid',
-        isNullable: true
-      }))
+      await queryRunner.addColumn(
+        tableInfo.table,
+        new TableColumn({
+          name: tableInfo.columnName,
+          type: 'uuid',
+          isNullable: true,
+        })
+      )
 
       // Restaurer les références
       await queryRunner.query(`
@@ -213,13 +232,16 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       }
 
       // Recréer la contrainte sur produit_id
-      await queryRunner.createForeignKey(tableInfo.table, new TableForeignKey({
-        name: tableInfo.fkName,
-        columnNames: [tableInfo.columnName],
-        referencedTableName: 'produits',
-        referencedColumnNames: ['id'],
-        onDelete: tableInfo.table === 'ligne_devis' ? 'SET NULL' : 'CASCADE'
-      }))
+      await queryRunner.createForeignKey(
+        tableInfo.table,
+        new TableForeignKey({
+          name: tableInfo.fkName,
+          columnNames: [tableInfo.columnName],
+          referencedTableName: 'produits',
+          referencedColumnNames: ['id'],
+          onDelete: tableInfo.table === 'ligne_devis' ? 'SET NULL' : 'CASCADE',
+        })
+      )
 
       // Supprimer article_id
       await queryRunner.dropColumn(tableInfo.table, 'article_id')

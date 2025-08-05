@@ -1,10 +1,4 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
-  UpdateDateColumn
-} from 'typeorm'
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm'
 import { SectionType, SectionContent, SectionStyles, PresetCategory } from './types'
 
 @Entity('marketplace_section_presets')
@@ -18,16 +12,16 @@ export class SectionPreset {
   @Column({ type: 'text', nullable: true })
   description?: string
 
-  @Column({ 
-    type: 'varchar', 
-    length: 50
+  @Column({
+    type: 'varchar',
+    length: 50,
   })
   type!: string
 
-  @Column({ 
-    type: 'varchar', 
+  @Column({
+    type: 'varchar',
     length: 50,
-    nullable: true
+    nullable: true,
   })
   category?: string
 

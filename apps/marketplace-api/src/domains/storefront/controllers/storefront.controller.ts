@@ -1,20 +1,23 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Param, 
-  Query, 
-  Req, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  Req,
   UseGuards,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger'
 import { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
-import { MarketplaceProductsService, ProductFilters } from '../../products/services/marketplace-products.service'
+import {
+  MarketplaceProductsService,
+  ProductFilters,
+} from '../../products/services/marketplace-products.service'
 import { MarketplaceCustomersService } from '../../customers/services/marketplace-customers.service'
 import { StorefrontService } from '../services/storefront.service'
 
@@ -25,7 +28,7 @@ export class StorefrontController {
   constructor(
     private productsService: MarketplaceProductsService,
     private customersService: MarketplaceCustomersService,
-    private storefrontService: StorefrontService,
+    private storefrontService: StorefrontService
   ) {}
 
   @Get('test')
@@ -45,8 +48,8 @@ export class StorefrontController {
         reference: 'TEST001',
         designation: 'Produit de test',
         description: 'Test sans dépendances',
-        basePrice: 50.00,
-        calculatedPrice: 50.00,
+        basePrice: 50.0,
+        calculatedPrice: 50.0,
         images: [],
         categories: ['Test'],
         tags: ['test'],
@@ -56,9 +59,9 @@ export class StorefrontController {
         seo: {
           title: 'Produit de test',
           description: 'Test sans dépendances',
-          slug: 'test-product'
-        }
-      }
+          slug: 'test-product',
+        },
+      },
     ]
   }
 
@@ -127,8 +130,18 @@ export class StorefrontController {
   @ApiQuery({ name: 'maxPrice', required: false, type: Number })
   @ApiQuery({ name: 'inStock', required: false, type: Boolean })
   @ApiQuery({ name: 'featured', required: false, type: Boolean })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 20)' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 20)',
+  })
   @ApiQuery({ name: 'sortBy', required: false, enum: ['name', 'price', 'date', 'popularity'] })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'] })
   async getProducts(@Req() req: Request, @Query() query: any) {
@@ -143,16 +156,19 @@ export class StorefrontController {
       search: query.search,
       categories: query.category ? [query.category] : undefined,
       tags: query.tags ? query.tags.split(',') : undefined,
-      priceRange: query.minPrice || query.maxPrice ? {
-        min: parseFloat(query.minPrice) || 0,
-        max: parseFloat(query.maxPrice) || Number.MAX_VALUE
-      } : undefined,
+      priceRange:
+        query.minPrice || query.maxPrice
+          ? {
+              min: parseFloat(query.minPrice) || 0,
+              max: parseFloat(query.maxPrice) || Number.MAX_VALUE,
+            }
+          : undefined,
       inStock: query.inStock === 'true',
       featured: query.featured === 'true',
       limit: Math.min(parseInt(query.limit) || 20, 100),
       offset: ((parseInt(query.page) || 1) - 1) * (parseInt(query.limit) || 20),
       sortBy: query.sortBy || 'name',
-      sortOrder: query.sortOrder || 'ASC'
+      sortOrder: query.sortOrder || 'ASC',
     }
 
     return await this.productsService.getProducts(
@@ -165,7 +181,12 @@ export class StorefrontController {
 
   @Get('products/featured')
   @ApiOperation({ summary: 'Get featured products' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of products (default: 8)' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of products (default: 8)',
+  })
   async getFeaturedProducts(@Req() req: Request, @Query('limit') limit?: string) {
     const { tenant } = req as any
     const customerId = req.headers['x-customer-id'] as string
@@ -190,7 +211,7 @@ export class StorefrontController {
           erpArticleId: 'FALLBACK001',
           reference: 'FALLBACK001',
           designation: 'Produit de démonstration',
-          description: 'Produit de démonstration en cas d\'erreur',
+          description: "Produit de démonstration en cas d'erreur",
           basePrice: 99.99,
           calculatedPrice: 99.99,
           images: [],
@@ -201,10 +222,10 @@ export class StorefrontController {
           isFeatured: true,
           seo: {
             title: 'Produit de démonstration',
-            description: 'Produit de démonstration en cas d\'erreur',
-            slug: 'demo-fallback'
-          }
-        }
+            description: "Produit de démonstration en cas d'erreur",
+            slug: 'demo-fallback',
+          },
+        },
       ]
     }
   }
@@ -308,29 +329,26 @@ export class StorefrontController {
   @HttpCode(HttpStatus.OK)
   async subscribeNewsletter(@Req() req: Request, @Body() body: { email: string }) {
     const { tenant } = req as any
-    
-    return await this.storefrontService.subscribeNewsletter(
-      tenant.societeId,
-      body.email
-    )
+
+    return await this.storefrontService.subscribeNewsletter(tenant.societeId, body.email)
   }
 
   @Post('contact')
   @ApiOperation({ summary: 'Send contact message' })
   @HttpCode(HttpStatus.OK)
-  async sendContactMessage(@Req() req: Request, @Body() body: {
+  async sendContactMessage(
+    @Req() req: Request,
+    @Body() body: {
     name: string
     email: string
     subject: string
     message: string
     phone?: string
-  }) {
+  }
+  ) {
     const { tenant } = req as any
-    
-    return await this.storefrontService.sendContactMessage(
-      tenant.societeId,
-      body
-    )
+
+    return await this.storefrontService.sendContactMessage(tenant.societeId, body)
   }
 
   @Get('theme')
@@ -353,7 +371,7 @@ export class StorefrontController {
   @ApiOperation({ summary: 'Get static page content' })
   async getPage(@Req() req: Request, @Param('slug') slug: string) {
     const { tenant } = req as any
-    
+
     return await this.storefrontService.getPage(tenant.societeId, slug)
   }
 }

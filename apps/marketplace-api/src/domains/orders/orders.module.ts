@@ -9,12 +9,7 @@ import { MarketplaceOrderItem } from './entities/marketplace-order-item.entity'
 // import { OrdersController } from './controllers/orders.controller'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      MarketplaceOrder,
-      MarketplaceOrderItem,
-    ], 'marketplace'),
-  ],
+  imports: [TypeOrmModule.forFeature([MarketplaceOrder, MarketplaceOrderItem], 'marketplace')],
   providers: [
     // MarketplaceOrdersService,
   ],

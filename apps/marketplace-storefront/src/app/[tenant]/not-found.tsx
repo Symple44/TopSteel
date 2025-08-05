@@ -7,9 +7,9 @@ export default function NotFound() {
       <div className="container-marketplace max-w-2xl mx-auto px-4 py-16 text-center space-y-8">
         <div className="space-y-4">
           <ShoppingBag className="w-24 h-24 text-muted-foreground mx-auto" />
-          
+
           <h1 className="text-4xl font-bold">Marketplace non trouvé</h1>
-          
+
           <p className="text-muted-foreground text-lg max-w-md mx-auto">
             La boutique que vous recherchez n'existe pas ou n'est pas encore configurée.
           </p>

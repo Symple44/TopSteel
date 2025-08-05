@@ -1,10 +1,4 @@
-import { 
-  Column, 
-  Entity, 
-  Index,
-  ManyToOne,
-  JoinColumn
-} from 'typeorm'
+import { Column, Entity, Index, ManyToOne, JoinColumn } from 'typeorm'
 import { TenantEntity } from '../../../core/database/entities/base/multi-tenant.entity'
 
 export enum BTPIndexType {
@@ -19,7 +13,7 @@ export enum BTPIndexType {
   TP08A = 'TP08A', // Travaux publics - Travaux maritimes et fluviaux
   TP09A = 'TP09A', // Travaux publics - Fondations spéciales
   TP10A = 'TP10A', // Travaux publics - Travaux ferroviaires
-  
+
   // Indices bâtiment
   BT01 = 'BT01', // Bâtiment - Gros œuvre
   BT02 = 'BT02', // Bâtiment - Clos et couvert
@@ -27,20 +21,20 @@ export enum BTPIndexType {
   BT04 = 'BT04', // Bâtiment - Corps d'état techniques
   BT05 = 'BT05', // Bâtiment - Finitions
   BT06 = 'BT06', // Bâtiment - Équipements
-  
+
   // Indices matières premières
   ACIER_BTP = 'ACIER_BTP', // Indice acier BTP
   BETON = 'BETON', // Indice béton
   BITUME = 'BITUME', // Indice bitume
   CARBURANT = 'CARBURANT', // Indice carburant
-  
+
   // Indices salaires
   SALAIRE_TP = 'SALAIRE_TP', // Salaires travaux publics
   SALAIRE_BAT = 'SALAIRE_BAT', // Salaires bâtiment
-  
+
   // Indices composite
   TP_COMPOSITE = 'TP_COMPOSITE', // Indice composite TP
-  BAT_COMPOSITE = 'BAT_COMPOSITE' // Indice composite bâtiment
+  BAT_COMPOSITE = 'BAT_COMPOSITE', // Indice composite bâtiment
 }
 
 @Entity('btp_indices')
@@ -138,14 +132,16 @@ export class BTPIndex extends TenantEntity {
     const now = new Date()
     const currentYear = now.getFullYear()
     const currentMonth = now.getMonth() + 1
-    
+
     const monthsDiff = (currentYear - this.year) * 12 + (currentMonth - this.month)
     return monthsDiff > maxAgeMonths
   }
 
   hasSignificantVariation(threshold: number = 5): boolean {
-    return Math.abs(this.monthlyVariation || 0) > threshold ||
-           Math.abs(this.yearlyVariation || 0) > threshold
+    return (
+      Math.abs(this.monthlyVariation || 0) > threshold ||
+      Math.abs(this.yearlyVariation || 0) > threshold
+    )
   }
 
   calculateCoefficient(baseIndex: number): number {
@@ -156,26 +152,28 @@ export class BTPIndex extends TenantEntity {
   addRevision(oldValue: number, newValue: number, reason: string): void {
     if (!this.metadata) this.metadata = {}
     if (!this.metadata.revisions) this.metadata.revisions = []
-    
+
     this.metadata.revisions.push({
       date: new Date(),
       oldValue,
       newValue,
-      reason
+      reason,
     })
   }
 
-  addAlert(type: 'high_variation' | 'late_publication' | 'estimation' | 'revision',
-           message: string,
-           severity: 'info' | 'warning' | 'error' = 'info'): void {
+  addAlert(
+    type: 'high_variation' | 'late_publication' | 'estimation' | 'revision',
+    message: string,
+    severity: 'info' | 'warning' | 'error' = 'info'
+  ): void {
     if (!this.metadata) this.metadata = {}
     if (!this.metadata.alerts) this.metadata.alerts = []
-    
+
     this.metadata.alerts.push({
       type,
       message,
       severity,
-      date: new Date()
+      date: new Date(),
     })
   }
 
@@ -183,11 +181,11 @@ export class BTPIndex extends TenantEntity {
     const errors: string[] = []
 
     if (!this.indexType) {
-      errors.push('Le type d\'indice est requis')
+      errors.push("Le type d'indice est requis")
     }
 
     if (!this.year || this.year < 1990 || this.year > new Date().getFullYear() + 1) {
-      errors.push('L\'année doit être comprise entre 1990 et l\'année prochaine')
+      errors.push("L'année doit être comprise entre 1990 et l'année prochaine")
     }
 
     if (!this.month || this.month < 1 || this.month > 12) {
@@ -195,7 +193,7 @@ export class BTPIndex extends TenantEntity {
     }
 
     if (!this.indexValue || this.indexValue <= 0) {
-      errors.push('La valeur de l\'indice doit être positive')
+      errors.push("La valeur de l'indice doit être positive")
     }
 
     if (this.monthlyVariation !== null && this.monthlyVariation !== undefined) {

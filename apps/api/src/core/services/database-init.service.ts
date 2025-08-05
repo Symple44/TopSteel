@@ -23,7 +23,7 @@ export class DatabaseInitService extends DatabaseInitBaseService implements OnMo
   async onModuleInit() {
     try {
       this.logger.log('Initialisation de la base de données...')
-      
+
       // Vérifier la connexion
       const isConnected = await this.checkConnection()
       if (!isConnected) {
@@ -33,7 +33,7 @@ export class DatabaseInitService extends DatabaseInitBaseService implements OnMo
 
       // Utiliser le nouveau service de synchronisation
       await this.databaseSyncService.safeSynchronize()
-      
+
       // TEMPORAIREMENT DÉSACTIVÉ - Les scripts d'initialisation doivent être corrigés
       // pour correspondre aux entités TypeORM réelles
       /*
@@ -56,17 +56,15 @@ export class DatabaseInitService extends DatabaseInitBaseService implements OnMo
       // Créer un utilisateur administrateur par défaut
       await this.createDefaultAdminUser()
       */
-      
+
       this.logger.log('✅ Synchronisation de la base de données terminée avec succès')
-      this.logger.warn('⚠️  Scripts d\'initialisation temporairement désactivés')
+      this.logger.warn("⚠️  Scripts d'initialisation temporairement désactivés")
       this.logger.warn('⚠️  Il faut corriger les scripts pour correspondre aux entités TypeORM')
     } catch (error) {
-      this.logger.error('❌ Erreur lors de l\'initialisation de la base de données:', error)
+      this.logger.error("❌ Erreur lors de l'initialisation de la base de données:", error)
       throw error
     }
   }
-
-
 
   /**
    * Initialise les permissions par rôle
@@ -187,24 +185,23 @@ export class DatabaseInitService extends DatabaseInitBaseService implements OnMo
       const menuConfigs = await this.dataSource.query(`
         SELECT COUNT(*) as count FROM menu_configurations
       `)
-      
+
       if (parseInt(menuConfigs[0]?.count || '0') === 0) {
         this.logger.log('Création de la configuration de menu par défaut...')
         await this.menuConfigService.createDefaultConfiguration()
-        
+
         // Activer la configuration par défaut
         const defaultConfig = await this.dataSource.query(`
           SELECT id FROM menu_configurations WHERE name = 'Configuration par défaut' LIMIT 1
         `)
-        
+
         if (defaultConfig[0]?.id) {
           await this.menuConfigService.activateConfiguration(defaultConfig[0].id)
           this.logger.log('Configuration de menu par défaut activée')
         }
       }
-
     } catch (error) {
-      this.logger.error('Erreur lors de l\'initialisation des données par défaut:', error)
+      this.logger.error("Erreur lors de l'initialisation des données par défaut:", error)
     }
   }
 
@@ -214,64 +211,76 @@ export class DatabaseInitService extends DatabaseInitBaseService implements OnMo
       const userCount = await this.dataSource.query(`
         SELECT COUNT(*) as count FROM users
       `)
-      
+
       if (parseInt(userCount[0]?.count || '0') === 0) {
-        this.logger.log('Création de l\'utilisateur administrateur par défaut...')
-        
+        this.logger.log("Création de l'utilisateur administrateur par défaut...")
+
         // Hasher le mot de passe par défaut
         const defaultPassword = INIT_DATA.defaultAdmin.password
         const hashedPassword = await bcrypt.hash(defaultPassword, 10)
-        
+
         // Créer l'utilisateur admin
-        const adminUser = await this.dataSource.query(`
+        const adminUser = await this.dataSource.query(
+          `
           INSERT INTO users (nom, prenom, email, mot_de_passe, role, actif, created_at, updated_at)
           VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
           RETURNING id
-        `, [
-          INIT_DATA.defaultAdmin.nom,
-          INIT_DATA.defaultAdmin.prenom,
-          INIT_DATA.defaultAdmin.email,
-          hashedPassword,
-          'admin',
-          true
-        ])
-        
+        `,
+          [
+            INIT_DATA.defaultAdmin.nom,
+            INIT_DATA.defaultAdmin.prenom,
+            INIT_DATA.defaultAdmin.email,
+            hashedPassword,
+            'admin',
+            true,
+          ]
+        )
+
         const adminUserId = adminUser[0]?.id
-        
+
         if (adminUserId) {
           // Créer les paramètres utilisateur par défaut
           const userSettings = INIT_DATA.defaultAdmin.userSettings
-          await this.dataSource.query(`
+          await this.dataSource.query(
+            `
             INSERT INTO user_settings (user_id, theme, language, timezone, date_format, time_format, created_at, updated_at)
             VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
             ON CONFLICT (user_id) DO NOTHING
-          `, [
-            adminUserId,
-            userSettings.theme,
-            userSettings.language,
-            userSettings.timezone,
-            userSettings.date_format,
-            userSettings.time_format
-          ])
+          `,
+            [
+              adminUserId,
+              userSettings.theme,
+              userSettings.language,
+              userSettings.timezone,
+              userSettings.date_format,
+              userSettings.time_format,
+            ]
+          )
 
           // Assigner le rôle SUPER_ADMIN à l'utilisateur admin
-          await this.dataSource.query(`
+          await this.dataSource.query(
+            `
             INSERT INTO user_roles (user_id, role_id, assigned_by, is_active, created_at, updated_at)
             SELECT $1, r.id, $1, true, NOW(), NOW()
             FROM roles r
             WHERE r.name = $2
             ON CONFLICT (user_id, role_id) DO NOTHING
-          `, [adminUserId, INIT_DATA.defaultAdmin.role])
+          `,
+            [adminUserId, INIT_DATA.defaultAdmin.role]
+          )
 
           // Assigner l'utilisateur admin au groupe Direction
-          await this.dataSource.query(`
+          await this.dataSource.query(
+            `
             INSERT INTO user_groups (user_id, group_id, assigned_by, is_active, created_at, updated_at)
             SELECT $1, g.id, $1, true, NOW(), NOW()
             FROM groups g
             WHERE g.name = 'Direction'
             ON CONFLICT (user_id, group_id) DO NOTHING
-          `, [adminUserId])
-          
+          `,
+            [adminUserId]
+          )
+
           this.logger.log('Utilisateur administrateur créé avec succès')
           this.logger.log(`Email: ${INIT_DATA.defaultAdmin.email}`)
           this.logger.log(`Mot de passe: ${INIT_DATA.defaultAdmin.password}`)
@@ -280,7 +289,7 @@ export class DatabaseInitService extends DatabaseInitBaseService implements OnMo
         }
       }
     } catch (error) {
-      this.logger.error('Erreur lors de la création de l\'utilisateur administrateur:', error)
+      this.logger.error("Erreur lors de la création de l'utilisateur administrateur:", error)
     }
   }
 }

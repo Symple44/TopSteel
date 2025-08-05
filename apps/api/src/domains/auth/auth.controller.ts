@@ -201,7 +201,7 @@ export class AuthController {
     return this.authService.loginWithSociete(user.id, societeId, body.siteId, request)
   }
 
-  @Post('societe-default/:societeId') 
+  @Post('societe-default/:societeId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)

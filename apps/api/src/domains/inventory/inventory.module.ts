@@ -8,9 +8,7 @@ import { ArticleRepositoryImpl } from './repositories/article-repository.impl'
  * Module pour la gestion des articles/inventaire
  */
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Article], 'tenant')
-  ],
+  imports: [TypeOrmModule.forFeature([Article], 'tenant')],
   controllers: [
     // Le contrôleur sera ajouté quand il sera créé
   ],
@@ -18,9 +16,9 @@ import { ArticleRepositoryImpl } from './repositories/article-repository.impl'
     ArticleService,
     {
       provide: 'IArticleRepository',
-      useClass: ArticleRepositoryImpl
-    }
+      useClass: ArticleRepositoryImpl,
+    },
   ],
-  exports: [ArticleService]
+  exports: [ArticleService],
 })
 export class InventoryModule {}

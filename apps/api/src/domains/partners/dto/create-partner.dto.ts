@@ -1,5 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsEmail, IsBoolean, IsObject } from 'class-validator'
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsEmail,
+  IsBoolean,
+  IsObject,
+} from 'class-validator'
 import { PartnerType, PartnerStatus, PartnerCategory } from '../entities/partner.entity'
 
 /**
@@ -8,7 +16,7 @@ import { PartnerType, PartnerStatus, PartnerCategory } from '../entities/partner
 export class CreatePartnerDto {
   @ApiPropertyOptional({
     description: 'Code unique du partenaire (généré automatiquement si non fourni)',
-    example: 'CLI-000001'
+    example: 'CLI-000001',
   })
   @IsOptional()
   @IsString()
@@ -17,7 +25,7 @@ export class CreatePartnerDto {
   @ApiProperty({
     description: 'Type de partenaire',
     enum: PartnerType,
-    example: PartnerType.CLIENT
+    example: PartnerType.CLIENT,
   })
   @IsEnum(PartnerType)
   type!: PartnerType
@@ -25,7 +33,7 @@ export class CreatePartnerDto {
   @ApiPropertyOptional({
     description: 'Statut du partenaire',
     enum: PartnerStatus,
-    default: PartnerStatus.ACTIF
+    default: PartnerStatus.ACTIF,
   })
   @IsOptional()
   @IsEnum(PartnerStatus)
@@ -33,7 +41,7 @@ export class CreatePartnerDto {
 
   @ApiProperty({
     description: 'Dénomination sociale ou nom',
-    example: 'ACME Corporation'
+    example: 'ACME Corporation',
   })
   @IsNotEmpty()
   @IsString()
@@ -41,7 +49,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Nom commercial',
-    example: 'ACME Shop'
+    example: 'ACME Shop',
   })
   @IsOptional()
   @IsString()
@@ -49,7 +57,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Forme juridique',
-    example: 'SAS'
+    example: 'SAS',
   })
   @IsOptional()
   @IsString()
@@ -57,7 +65,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Numéro SIRET',
-    example: '12345678901234'
+    example: '12345678901234',
   })
   @IsOptional()
   @IsString()
@@ -65,7 +73,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Numéro SIREN',
-    example: '123456789'
+    example: '123456789',
   })
   @IsOptional()
   @IsString()
@@ -73,7 +81,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Code APE/NAF',
-    example: '4661Z'
+    example: '4661Z',
   })
   @IsOptional()
   @IsString()
@@ -81,7 +89,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Numéro de TVA intracommunautaire',
-    example: 'FR12345678901'
+    example: 'FR12345678901',
   })
   @IsOptional()
   @IsString()
@@ -89,15 +97,15 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Adresse principale',
-    example: '123 Rue de la Paix'
+    example: '123 Rue de la Paix',
   })
   @IsOptional()
   @IsString()
   adresse?: string
 
   @ApiPropertyOptional({
-    description: 'Complément d\'adresse',
-    example: 'Bâtiment A, 2ème étage'
+    description: "Complément d'adresse",
+    example: 'Bâtiment A, 2ème étage',
   })
   @IsOptional()
   @IsString()
@@ -105,7 +113,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Code postal',
-    example: '75001'
+    example: '75001',
   })
   @IsOptional()
   @IsString()
@@ -113,7 +121,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Ville',
-    example: 'Paris'
+    example: 'Paris',
   })
   @IsOptional()
   @IsString()
@@ -121,7 +129,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Région',
-    example: 'Île-de-France'
+    example: 'Île-de-France',
   })
   @IsOptional()
   @IsString()
@@ -130,7 +138,7 @@ export class CreatePartnerDto {
   @ApiPropertyOptional({
     description: 'Pays',
     example: 'France',
-    default: 'France'
+    default: 'France',
   })
   @IsOptional()
   @IsString()
@@ -138,7 +146,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Téléphone principal',
-    example: '+33 1 23 45 67 89'
+    example: '+33 1 23 45 67 89',
   })
   @IsOptional()
   @IsString()
@@ -146,7 +154,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Téléphone mobile',
-    example: '+33 6 12 34 56 78'
+    example: '+33 6 12 34 56 78',
   })
   @IsOptional()
   @IsString()
@@ -154,7 +162,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Numéro de fax',
-    example: '+33 1 23 45 67 90'
+    example: '+33 1 23 45 67 90',
   })
   @IsOptional()
   @IsString()
@@ -162,7 +170,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Adresse email principale',
-    example: 'contact@acme-corp.com'
+    example: 'contact@acme-corp.com',
   })
   @IsOptional()
   @IsEmail()
@@ -170,7 +178,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Site web',
-    example: 'https://www.acme-corp.com'
+    example: 'https://www.acme-corp.com',
   })
   @IsOptional()
   @IsString()
@@ -179,15 +187,15 @@ export class CreatePartnerDto {
   @ApiPropertyOptional({
     description: 'Catégorie du partenaire',
     enum: PartnerCategory,
-    example: PartnerCategory.ENTREPRISE
+    example: PartnerCategory.ENTREPRISE,
   })
   @IsOptional()
   @IsEnum(PartnerCategory)
   categorie?: PartnerCategory
 
   @ApiPropertyOptional({
-    description: 'Secteur d\'activité',
-    example: 'Métallurgie'
+    description: "Secteur d'activité",
+    example: 'Métallurgie',
   })
   @IsOptional()
   @IsString()
@@ -195,21 +203,21 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Effectif approximatif',
-    example: 50
+    example: 50,
   })
   @IsOptional()
   effectif?: number
 
   @ApiPropertyOptional({
-    description: 'Chiffre d\'affaires annuel',
-    example: 2500000.00
+    description: "Chiffre d'affaires annuel",
+    example: 2500000.0,
   })
   @IsOptional()
   chiffreAffaires?: number
 
   @ApiPropertyOptional({
     description: 'Contact principal - Civilité',
-    example: 'M.'
+    example: 'M.',
   })
   @IsOptional()
   @IsString()
@@ -217,7 +225,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Contact principal - Nom',
-    example: 'Dupont'
+    example: 'Dupont',
   })
   @IsOptional()
   @IsString()
@@ -225,7 +233,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Contact principal - Prénom',
-    example: 'Jean'
+    example: 'Jean',
   })
   @IsOptional()
   @IsString()
@@ -233,7 +241,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Contact principal - Fonction',
-    example: 'Directeur Commercial'
+    example: 'Directeur Commercial',
   })
   @IsOptional()
   @IsString()
@@ -241,7 +249,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Contact principal - Email',
-    example: 'j.dupont@acme-corp.com'
+    example: 'j.dupont@acme-corp.com',
   })
   @IsOptional()
   @IsEmail()
@@ -249,7 +257,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Contact principal - Téléphone',
-    example: '+33 1 23 45 67 89'
+    example: '+33 1 23 45 67 89',
   })
   @IsOptional()
   @IsString()
@@ -258,7 +266,7 @@ export class CreatePartnerDto {
   @ApiPropertyOptional({
     description: 'Partenaire préféré',
     example: false,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -267,7 +275,7 @@ export class CreatePartnerDto {
   @ApiPropertyOptional({
     description: 'Partenaire actif',
     example: true,
-    default: true
+    default: true,
   })
   @IsOptional()
   @IsBoolean()
@@ -275,7 +283,7 @@ export class CreatePartnerDto {
 
   @ApiPropertyOptional({
     description: 'Notes et commentaires',
-    example: { commentaires: 'Client très fiable, paiement rapide' }
+    example: { commentaires: 'Client très fiable, paiement rapide' },
   })
   @IsOptional()
   @IsObject()
@@ -295,8 +303,8 @@ export class CreatePartnerDto {
     additionalProperties: true,
     example: {
       sourceProspection: 'Site web',
-      commercial: 'Pierre Martin'
-    }
+      commercial: 'Pierre Martin',
+    },
   })
   @IsOptional()
   @IsObject()

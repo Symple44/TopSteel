@@ -24,7 +24,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             retry: false,
           },
         },
-      }),
+      })
   )
 
   return (

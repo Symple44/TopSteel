@@ -1502,7 +1502,12 @@ export function DataTable<T = any>({
 
           {editable && (
             <SimpleTooltip content="Coller depuis le presse-papiers">
-              <Button onClick={() => handlePaste()} variant="outline" size="sm" className="h-7 w-7 p-0">
+              <Button
+                onClick={() => handlePaste()}
+                variant="outline"
+                size="sm"
+                className="h-7 w-7 p-0"
+              >
                 <Clipboard className="h-3 w-3" />
               </Button>
             </SimpleTooltip>

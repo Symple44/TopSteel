@@ -3,7 +3,6 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 import { promisify } from 'node:util'
 
-
 const execAsync = promisify(exec)
 const require = createRequire(import.meta.url)
 
@@ -32,7 +31,7 @@ async function _runBiome() {
 const nextConfig = {
   // Transpile workspace packages for Next.js 15 (excluding server external ones)
   transpilePackages: ['@erp/domains', '@erp/api-client'],
-  
+
   // Production optimizations
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
   experimental: {
@@ -109,9 +108,15 @@ const nextConfig = {
   output: undefined,
   trailingSlash: false,
 
-
   // External packages for server-side only
-  serverExternalPackages: ['sharp', '@img/sharp-wasm32', '@opentelemetry/api', '@erp/ui', '@erp/utils', '@erp/types'],
+  serverExternalPackages: [
+    'sharp',
+    '@img/sharp-wasm32',
+    '@opentelemetry/api',
+    '@erp/ui',
+    '@erp/utils',
+    '@erp/types',
+  ],
 
   // Disable image optimization during build
   images: {
@@ -127,7 +132,7 @@ const nextConfig = {
     ]
 
     // Configuration webpack de base
-    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias = config.resolve.alias || {}
     // OpenTelemetry conditionnel basé sur ENABLE_TELEMETRY
     const enableTelemetry = process.env.ENABLE_TELEMETRY === 'true'
     const otelPolyfill = path.resolve(import.meta.dirname, './src/utils/otel-polyfill-universal.js')

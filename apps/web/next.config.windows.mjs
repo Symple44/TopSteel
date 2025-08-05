@@ -16,7 +16,7 @@ const windowsConfig = {
         ...config.watchOptions,
         poll: 1000,
         aggregateTimeout: 300,
-        ignored: ['**/node_modules/**', '**/.git/**', '**/.next/**']
+        ignored: ['**/node_modules/**', '**/.git/**', '**/.next/**'],
       }
 
       // Désactiver le cache en développement pour économiser la mémoire
@@ -30,7 +30,7 @@ const windowsConfig = {
 
     return config
   },
-  
+
   // Désactiver certaines fonctionnalités gourmandes en mémoire
   experimental: {
     ...baseConfig.experimental,
@@ -39,7 +39,7 @@ const windowsConfig = {
     // Réduire la taille du bundle
     optimizeCss: false,
   },
-  
+
   // Réduire le nombre de pages pré-rendues
   staticPageGenerationTimeout: 60,
 }

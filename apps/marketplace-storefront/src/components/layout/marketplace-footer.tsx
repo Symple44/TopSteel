@@ -17,14 +17,10 @@ export function MarketplaceFooter({ tenant, config }: MarketplaceFooterProps) {
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">{config.storeName}</h3>
             {config.description && (
-              <p className="text-muted-foreground text-sm">
-                {config.description}
-              </p>
+              <p className="text-muted-foreground text-sm">{config.description}</p>
             )}
             {config.contactInfo.address && (
-              <p className="text-muted-foreground text-sm">
-                {config.contactInfo.address}
-              </p>
+              <p className="text-muted-foreground text-sm">{config.contactInfo.address}</p>
             )}
           </div>
 
@@ -163,7 +159,7 @@ export function MarketplaceFooter({ tenant, config }: MarketplaceFooterProps) {
             <p className="text-muted-foreground text-sm">
               © {currentYear} {config.storeName}. Tous droits réservés.
             </p>
-            
+
             <div className="flex space-x-6 text-sm">
               <Link
                 href={`/${tenant}/legal`}

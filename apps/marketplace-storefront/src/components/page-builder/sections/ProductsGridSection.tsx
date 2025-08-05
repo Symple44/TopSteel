@@ -22,14 +22,18 @@ export interface ProductsGridContent {
   showPagination?: boolean
 }
 
-export function ProductsGridSection({ section, isEditing, tenant }: SectionProps<ProductsGridContent> & { tenant?: string }) {
+export function ProductsGridSection({
+  section,
+  isEditing,
+  tenant,
+}: SectionProps<ProductsGridContent> & { tenant?: string }) {
   const { content, styles, settings } = section
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['products', content.source, content.categoryId, content.limit],
     queryFn: async () => {
       const params: any = {
-        limit: content.limit || 12
+        limit: content.limit || 12,
       }
 
       if (content.source === 'category' && content.categoryId) {
@@ -44,13 +48,13 @@ export function ProductsGridSection({ section, isEditing, tenant }: SectionProps
 
       const response = await marketplaceApi.get('/products', { params })
       return (response as any).data.data
-    }
+    },
   })
 
   const gridColumns = {
     mobile: `grid-cols-${content.columns?.mobile || 2}`,
     tablet: `sm:grid-cols-${content.columns?.tablet || 3}`,
-    desktop: `lg:grid-cols-${content.columns?.desktop || 4}`
+    desktop: `lg:grid-cols-${content.columns?.desktop || 4}`,
   }
 
   return (
@@ -63,15 +67,9 @@ export function ProductsGridSection({ section, isEditing, tenant }: SectionProps
       {(content.title || content.subtitle) && (
         <div className="text-center mb-12">
           {content.title && (
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {content.title}
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{content.title}</h2>
           )}
-          {content.subtitle && (
-            <p className="text-lg text-muted-foreground">
-              {content.subtitle}
-            </p>
-          )}
+          {content.subtitle && <p className="text-lg text-muted-foreground">{content.subtitle}</p>}
         </div>
       )}
 
@@ -82,7 +80,9 @@ export function ProductsGridSection({ section, isEditing, tenant }: SectionProps
           ))}
         </div>
       ) : (
-        <div className={`grid ${gridColumns.mobile} ${gridColumns.tablet} ${gridColumns.desktop} gap-6`}>
+        <div
+          className={`grid ${gridColumns.mobile} ${gridColumns.tablet} ${gridColumns.desktop} gap-6`}
+        >
           {products?.map((product: any) => (
             <ProductCard key={product.id} product={product} tenant={tenant || 'demo'} />
           ))}

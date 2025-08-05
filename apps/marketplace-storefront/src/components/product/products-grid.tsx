@@ -25,8 +25,10 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
     search: typeof searchParams.search === 'string' ? searchParams.search : undefined,
     category: typeof searchParams.category === 'string' ? searchParams.category : undefined,
     tags: typeof searchParams.tags === 'string' ? searchParams.tags.split(',') : undefined,
-    minPrice: typeof searchParams.minPrice === 'string' ? parseFloat(searchParams.minPrice) : undefined,
-    maxPrice: typeof searchParams.maxPrice === 'string' ? parseFloat(searchParams.maxPrice) : undefined,
+    minPrice:
+      typeof searchParams.minPrice === 'string' ? parseFloat(searchParams.minPrice) : undefined,
+    maxPrice:
+      typeof searchParams.maxPrice === 'string' ? parseFloat(searchParams.maxPrice) : undefined,
     inStock: searchParams.inStock === 'true',
     featured: searchParams.featured === 'true',
     page: currentPage,
@@ -128,9 +130,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
               onClick={() => setViewMode('grid')}
               className={cn(
                 'p-2 transition-colors',
-                viewMode === 'grid'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-muted'
+                viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
               )}
             >
               <Grid className="w-4 h-4" />
@@ -139,9 +139,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
               onClick={() => setViewMode('list')}
               className={cn(
                 'p-2 transition-colors',
-                viewMode === 'list'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-muted'
+                viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
               )}
             >
               <List className="w-4 h-4" />
@@ -151,12 +149,12 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
       </div>
 
       {/* Products Grid/List */}
-      <div className={cn(
-        'grid gap-6',
-        viewMode === 'grid'
-          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-          : 'grid-cols-1'
-      )}>
+      <div
+        className={cn(
+          'grid gap-6',
+          viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+        )}
+      >
         {data.products.map((product) => (
           <ProductCard
             key={product.id}
@@ -187,16 +185,14 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
                   onClick={() => setCurrentPage(page)}
                   className={cn(
                     'px-3 py-2 text-sm rounded transition-colors',
-                    currentPage === page
-                      ? 'bg-primary text-primary-foreground'
-                      : 'hover:bg-muted'
+                    currentPage === page ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                   )}
                 >
                   {page}
                 </button>
               )
             })}
-            
+
             {totalPages > 5 && (
               <>
                 <span className="px-2 py-2 text-sm">...</span>
@@ -228,10 +224,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
       {/* Load More Button (Alternative to pagination) */}
       {data.hasMore && (
         <div className="text-center pt-8">
-          <button
-            onClick={() => setCurrentPage(currentPage + 1)}
-            className="btn-outline px-6 py-2"
-          >
+          <button onClick={() => setCurrentPage(currentPage + 1)} className="btn-outline px-6 py-2">
             Voir plus de produits
           </button>
         </div>

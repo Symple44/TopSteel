@@ -5,13 +5,7 @@ import type React from 'react'
 import { useEffect, useState } from 'react'
 import { Badge } from '../../data-display'
 import { Button } from '../button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '../dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../dialog'
 
 interface FileDetails {
   name: string
@@ -76,18 +70,21 @@ export function CodeViewerDialog({
       code: 'Code',
       clickLineNumbers: 'Click line numbers to select',
       lines: 'lines',
-      lineTooltip: 'Line {{number}}'
+      lineTooltip: 'Line {{number}}',
     }
-    
-    let translation = translations[key as keyof typeof translations] || defaultTranslations[key as keyof typeof defaultTranslations] || key
-    
+
+    let translation =
+      translations[key as keyof typeof translations] ||
+      defaultTranslations[key as keyof typeof defaultTranslations] ||
+      key
+
     // Simple parameter replacement
     if (params && typeof translation === 'string') {
       Object.entries(params).forEach(([paramKey, value]) => {
         translation = translation.replace(`{{${paramKey}}}`, String(value))
       })
     }
-    
+
     return translation
   }
 

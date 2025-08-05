@@ -27,7 +27,10 @@ import { MetricsService } from '../infrastructure/monitoring/metrics.service'
 import { appConfig } from '../core/config/app.config'
 import { databaseConfig } from '../core/config/database.config'
 import { jwtConfig } from '../core/config/jwt.config'
-import { CUSTOM_METRICS, prometheusAsyncConfig } from '../infrastructure/monitoring/prometheus.config'
+import {
+  CUSTOM_METRICS,
+  prometheusAsyncConfig,
+} from '../infrastructure/monitoring/prometheus.config'
 import { redisConfig } from '../core/config/redis.config'
 import { throttlerAsyncConfig } from '../core/config/throttler.config'
 import { CircuitBreakerHealthIndicator } from '../infrastructure/monitoring/circuit-breaker-health.indicator'
@@ -73,7 +76,7 @@ import { TestController } from '../api/controllers/test.controller'
       load: [appConfig, databaseConfig, jwtConfig, redisConfig],
       expandVariables: true,
     }),
-    
+
     // JWT pour middleware global
     JwtModule.registerAsync({
       useFactory: () => ({
@@ -145,23 +148,15 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // Ordre d'exécution des middleware (du premier au dernier)
     // 1. Sécurité - doit être appliqué en premier
-    consumer
-      .apply(ConsolidatedSecurityMiddleware)
-      .forRoutes('*')
-    
+    consumer.apply(ConsolidatedSecurityMiddleware).forRoutes('*')
+
     // 2. Validation des tokens - après la sécurité de base
-    consumer
-      .apply(TokenVersionMiddleware)
-      .forRoutes('*')
-    
+    consumer.apply(TokenVersionMiddleware).forRoutes('*')
+
     // 3. Métriques et performance - avant le logging
-    consumer
-      .apply(EnhancedMiddleware)
-      .forRoutes('*')
-    
+    consumer.apply(EnhancedMiddleware).forRoutes('*')
+
     // 4. Logging - en dernier pour capturer toutes les informations
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes('*')
+    consumer.apply(LoggerMiddleware).forRoutes('*')
   }
 }

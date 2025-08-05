@@ -16,19 +16,22 @@ async function bootstrap() {
 
   // CORS - En développement, autoriser toutes les origines localhost et 127.0.0.1
   const isDevelopment = process.env.NODE_ENV !== 'production'
-  const corsOrigins = configService.get('MARKETPLACE_CORS_ORIGINS')?.split(',') || configService.get('CORS_ORIGINS')?.split(',') || ['http://localhost:3007']
-  
+  const corsOrigins = configService.get('MARKETPLACE_CORS_ORIGINS')?.split(',') ||
+    configService.get('CORS_ORIGINS')?.split(',') || ['http://localhost:3007']
+
   app.enableCors({
-    origin: isDevelopment ? (origin, callback) => {
-      // En dev, autoriser localhost et 127.0.0.1 sur tous les ports
-      if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-        callback(null, true)
-      } else if (corsOrigins.includes(origin)) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
-      }
-    } : corsOrigins,
+    origin: isDevelopment
+      ? (origin, callback) => {
+          // En dev, autoriser localhost et 127.0.0.1 sur tous les ports
+          if (!origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+            callback(null, true)
+          } else if (corsOrigins.includes(origin)) {
+            callback(null, true)
+          } else {
+            callback(new Error('Not allowed by CORS'))
+          }
+        }
+      : corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant'],
@@ -40,7 +43,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
-    }),
+    })
   )
 
   // API prefix

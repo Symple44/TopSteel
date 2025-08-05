@@ -1,13 +1,13 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
   Index,
   ManyToOne,
   OneToMany,
-  JoinColumn
+  JoinColumn,
 } from 'typeorm'
 import { MarketplaceCustomer } from '../../customers/entities/marketplace-customer.entity'
 import { MarketplaceOrderItem } from './marketplace-order-item.entity'
@@ -19,7 +19,7 @@ export enum OrderStatus {
   SHIPPED = 'SHIPPED',
   DELIVERED = 'DELIVERED',
   CANCELLED = 'CANCELLED',
-  REFUNDED = 'REFUNDED'
+  REFUNDED = 'REFUNDED',
 }
 
 export enum PaymentStatus {
@@ -27,7 +27,7 @@ export enum PaymentStatus {
   PAID = 'PAID',
   FAILED = 'FAILED',
   REFUNDED = 'REFUNDED',
-  PARTIAL_REFUND = 'PARTIAL_REFUND'
+  PARTIAL_REFUND = 'PARTIAL_REFUND',
 }
 
 export interface ShippingAddress {
@@ -152,11 +152,19 @@ export class MarketplaceOrder {
   updatedAt!: Date
 
   // Relations
-  @ManyToOne(() => MarketplaceCustomer, customer => customer.orders, { nullable: true })
+  @ManyToOne(
+    () => MarketplaceCustomer,
+    (customer) => customer.orders,
+    { nullable: true }
+  )
   @JoinColumn({ name: 'customerId' })
   customer?: MarketplaceCustomer
 
-  @OneToMany(() => MarketplaceOrderItem, item => item.order, { cascade: true })
+  @OneToMany(
+    () => MarketplaceOrderItem,
+    (item) => item.order,
+    { cascade: true }
+  )
   items!: MarketplaceOrderItem[]
 
   // Méthodes utilitaires
@@ -180,8 +188,10 @@ export class MarketplaceOrder {
   }
 
   canBeRefunded(): boolean {
-    return this.paymentStatus === PaymentStatus.PAID && 
-           [OrderStatus.DELIVERED, OrderStatus.SHIPPED].includes(this.status)
+    return (
+      this.paymentStatus === PaymentStatus.PAID &&
+      [OrderStatus.DELIVERED, OrderStatus.SHIPPED].includes(this.status)
+    )
   }
 
   getTotalItems(): number {
@@ -189,16 +199,16 @@ export class MarketplaceOrder {
   }
 
   hasDigitalItems(): boolean {
-    return this.items?.some(item => item.isDigital) || false
+    return this.items?.some((item) => item.isDigital) || false
   }
 
   needsShipping(): boolean {
-    return !this.hasDigitalItems() || this.items?.some(item => !item.isDigital) || false
+    return !this.hasDigitalItems() || this.items?.some((item) => !item.isDigital) || false
   }
 
   updateStatus(newStatus: OrderStatus): void {
     this.status = newStatus
-    
+
     if (newStatus === OrderStatus.SHIPPED && !this.shippedAt) {
       this.shippedAt = new Date()
     } else if (newStatus === OrderStatus.DELIVERED && !this.deliveredAt) {

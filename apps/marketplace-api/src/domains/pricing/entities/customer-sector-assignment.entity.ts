@@ -1,12 +1,12 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
   Index,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
 } from 'typeorm'
 import { SectorType } from './sector-coefficient.entity'
 
@@ -89,21 +89,19 @@ export class CustomerSectorAssignment {
   // Méthodes utilitaires
   isValidAssignment(date: Date = new Date()): boolean {
     if (!this.isActive) return false
-    
+
     if (this.validFrom && date < this.validFrom) return false
     if (this.validUntil && date > this.validUntil) return false
-    
+
     return true
   }
 
   needsApproval(): boolean {
-    return this.assignmentDetails.approvalRequired === true && 
-           !this.assignmentDetails.approvedBy
+    return this.assignmentDetails.approvalRequired === true && !this.assignmentDetails.approvedBy
   }
 
   isApproved(): boolean {
-    return !this.assignmentDetails.approvalRequired || 
-           !!this.assignmentDetails.approvedBy
+    return !this.assignmentDetails.approvalRequired || !!this.assignmentDetails.approvedBy
   }
 
   approve(approvedBy: string): void {
@@ -113,7 +111,7 @@ export class CustomerSectorAssignment {
 
   scheduleReview(months: number = 12): void {
     if (!this.metadata) this.metadata = {}
-    
+
     const nextReview = new Date()
     nextReview.setMonth(nextReview.getMonth() + months)
     this.metadata.nextReview = nextReview

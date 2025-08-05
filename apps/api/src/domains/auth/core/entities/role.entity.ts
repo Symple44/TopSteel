@@ -58,7 +58,6 @@ export class Role extends CommonEntity {
   @Column({ type: 'boolean', default: false })
   isSystemRole!: boolean // Pour compatibilité avec les services existants
 
-
   // Méthodes pour compatibilité
   static createSystemRole(name: string, description: string): Role {
     const role = new Role()

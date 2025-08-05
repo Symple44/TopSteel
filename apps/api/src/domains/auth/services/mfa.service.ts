@@ -250,7 +250,8 @@ export class MFAService {
       }
 
       const pendingChallenge = (mfaRecord.metadata as Record<string, unknown>)?.pendingChallenge
-      const challengeExpiry = (mfaRecord.metadata as Record<string, unknown>)?.pendingChallengeExpiry
+      const challengeExpiry = (mfaRecord.metadata as Record<string, unknown>)
+        ?.pendingChallengeExpiry
 
       if (!pendingChallenge || !challengeExpiry) {
         return { success: false, error: 'Challenge WebAuthn manquant' }

@@ -1,18 +1,26 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Put, 
-  Delete, 
-  Body, 
-  Param, 
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
   Query,
   UseGuards,
-  ParseUUIDPipe
+  ParseUUIDPipe,
 } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { SectorPricingService, PricingContext, PricingResult } from '../services/sector-pricing.service'
-import { SectorCoefficient, SectorType, CoefficientType } from '../entities/sector-coefficient.entity'
+import {
+  SectorPricingService,
+  PricingContext,
+  PricingResult,
+} from '../services/sector-pricing.service'
+import {
+  SectorCoefficient,
+  SectorType,
+  CoefficientType,
+} from '../entities/sector-coefficient.entity'
 import { CustomerSectorAssignment } from '../entities/customer-sector-assignment.entity'
 import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
@@ -88,20 +96,22 @@ export class CalculatePriceDto {
 @Controller('pricing/sectors')
 @UseGuards(TenantGuard)
 export class SectorPricingController {
-  constructor(
-    private readonly sectorPricingService: SectorPricingService
-  ) {}
+  constructor(private readonly sectorPricingService: SectorPricingService) {}
 
   @Post('coefficients')
   @ApiOperation({ summary: 'Créer un coefficient sectoriel' })
-  @ApiResponse({ status: 201, description: 'Coefficient créé avec succès', type: SectorCoefficient })
+  @ApiResponse({
+    status: 201,
+    description: 'Coefficient créé avec succès',
+    type: SectorCoefficient,
+  })
   async createCoefficient(
     @CurrentTenant() tenantId: string,
     @Body() createDto: CreateSectorCoefficientDto
   ): Promise<SectorCoefficient> {
     return await this.sectorPricingService.createSectorCoefficient({
       societeId: tenantId,
-      ...createDto
+      ...createDto,
     })
   }
 
@@ -113,11 +123,7 @@ export class SectorPricingController {
     @Query('sector') sector?: SectorType,
     @Query('coefficientType') coefficientType?: CoefficientType
   ): Promise<SectorCoefficient[]> {
-    return await this.sectorPricingService.getSectorCoefficients(
-      tenantId, 
-      sector, 
-      coefficientType
-    )
+    return await this.sectorPricingService.getSectorCoefficients(tenantId, sector, coefficientType)
   }
 
   @Put('coefficients/:id')
@@ -128,11 +134,7 @@ export class SectorPricingController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDto: UpdateSectorCoefficientDto
   ): Promise<SectorCoefficient> {
-    return await this.sectorPricingService.updateSectorCoefficient(
-      id,
-      tenantId,
-      updateDto
-    )
+    return await this.sectorPricingService.updateSectorCoefficient(id, tenantId, updateDto)
   }
 
   @Post('customer-assignments')
@@ -153,14 +155,18 @@ export class SectorPricingController {
         validFrom: assignDto.validFrom,
         validUntil: assignDto.validUntil,
         sectorMetadata: assignDto.sectorMetadata,
-        metadata: assignDto.metadata
+        metadata: assignDto.metadata,
       }
     )
   }
 
   @Get('customer-assignments')
   @ApiOperation({ summary: 'Obtenir les assignations de secteurs clients' })
-  @ApiResponse({ status: 200, description: 'Liste des assignations', type: [CustomerSectorAssignment] })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des assignations',
+    type: [CustomerSectorAssignment],
+  })
   async getCustomerAssignments(
     @CurrentTenant() tenantId: string,
     @Query('sector') sector?: SectorType,
@@ -174,7 +180,7 @@ export class SectorPricingController {
   }
 
   @Get('customer-assignments/:customerId/sector')
-  @ApiOperation({ summary: 'Obtenir le secteur d\'un client' })
+  @ApiOperation({ summary: "Obtenir le secteur d'un client" })
   @ApiResponse({ status: 200, description: 'Secteur du client' })
   async getCustomerSector(
     @CurrentTenant() tenantId: string,
@@ -201,16 +207,12 @@ export class SectorPricingController {
     @CurrentTenant() tenantId: string,
     @Body() bulkDto: BulkPricingRequestDto
   ): Promise<Array<PricingResult & { productId: string }>> {
-    return await this.sectorPricingService.calculateBulkPricing(
-      tenantId,
-      bulkDto.items,
-      {
-        customerId: bulkDto.customerId,
-        customerType: bulkDto.customerType,
-        region: bulkDto.region,
-        date: bulkDto.date
-      }
-    )
+    return await this.sectorPricingService.calculateBulkPricing(tenantId, bulkDto.items, {
+      customerId: bulkDto.customerId,
+      customerType: bulkDto.customerType,
+      region: bulkDto.region,
+      date: bulkDto.date,
+    })
   }
 
   @Post('btp/setup-defaults')
@@ -225,20 +227,20 @@ export class SectorPricingController {
   @Get('sectors')
   @ApiOperation({ summary: 'Obtenir la liste des secteurs disponibles' })
   @ApiResponse({ status: 200, description: 'Liste des secteurs' })
-  async getSectors(): Promise<Array<{ value: string, label: string }>> {
-    return Object.values(SectorType).map(sector => ({
+  async getSectors(): Promise<Array<{ value: string; label: string }>> {
+    return Object.values(SectorType).map((sector) => ({
       value: sector,
-      label: this.getSectorLabel(sector)
+      label: this.getSectorLabel(sector),
     }))
   }
 
   @Get('coefficient-types')
   @ApiOperation({ summary: 'Obtenir la liste des types de coefficients' })
   @ApiResponse({ status: 200, description: 'Liste des types de coefficients' })
-  async getCoefficientTypes(): Promise<Array<{ value: string, label: string }>> {
-    return Object.values(CoefficientType).map(type => ({
+  async getCoefficientTypes(): Promise<Array<{ value: string; label: string }>> {
+    return Object.values(CoefficientType).map((type) => ({
       value: type,
-      label: this.getCoefficientTypeLabel(type)
+      label: this.getCoefficientTypeLabel(type),
     }))
   }
 
@@ -256,7 +258,7 @@ export class SectorPricingController {
       [SectorType.PHARMACEUTIQUE]: 'Pharmaceutique',
       [SectorType.DEFENSE]: 'Défense',
       [SectorType.TRANSPORT]: 'Transport',
-      [SectorType.PARTICULIER]: 'Particulier'
+      [SectorType.PARTICULIER]: 'Particulier',
     }
     return labels[sector] || sector
   }
@@ -267,7 +269,7 @@ export class SectorPricingController {
       [CoefficientType.MARGIN]: 'Marge',
       [CoefficientType.DISCOUNT]: 'Remise',
       [CoefficientType.TRANSPORT]: 'Transport',
-      [CoefficientType.HANDLING]: 'Manutention'
+      [CoefficientType.HANDLING]: 'Manutention',
     }
     return labels[type] || type
   }

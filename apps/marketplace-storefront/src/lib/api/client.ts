@@ -6,7 +6,10 @@ class MarketplaceApiClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_MARKETPLACE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004/api',
+      baseURL:
+        process.env.NEXT_PUBLIC_MARKETPLACE_API_URL ||
+        process.env.NEXT_PUBLIC_API_URL ||
+        'http://localhost:3004/api',
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
@@ -67,20 +70,19 @@ class MarketplaceApiClient {
     getConfig: () => this.get('/storefront/config'),
     getProducts: (params?: any) => this.get('/storefront/products', { params }),
     getProduct: (id: string) => this.get(`/storefront/products/${id}`),
-    getFeaturedProducts: (limit?: number) => 
+    getFeaturedProducts: (limit?: number) =>
       this.get('/storefront/products/featured', { params: { limit } }),
     getCategories: () => this.get('/storefront/products/categories'),
-    getProductsByCategory: (category: string, params?: any) => 
+    getProductsByCategory: (category: string, params?: any) =>
       this.get(`/storefront/products/category/${category}`, { params }),
-    searchProducts: (query: string, params?: any) => 
+    searchProducts: (query: string, params?: any) =>
       this.get('/storefront/search', { params: { q: query, ...params } }),
     getTheme: () => this.get('/storefront/theme'),
     getMenu: () => this.get('/storefront/menu'),
     getPage: (slug: string) => this.get(`/storefront/pages/${slug}`),
-    subscribeNewsletter: (email: string) => 
+    subscribeNewsletter: (email: string) =>
       this.post('/storefront/newsletter/subscribe', { email }),
-    sendContactMessage: (data: any) => 
-      this.post('/storefront/contact', data),
+    sendContactMessage: (data: any) => this.post('/storefront/contact', data),
   }
 
   // Méthodes customers
@@ -89,21 +91,21 @@ class MarketplaceApiClient {
     login: (data: any) => this.post('/customers/login', data),
     createGuest: (data: any) => this.post('/customers/guest', data),
     getProfile: (customerId: string) => this.get(`/customers/profile/${customerId}`),
-    updateProfile: (customerId: string, data: any) => 
+    updateProfile: (customerId: string, data: any) =>
       this.put(`/customers/profile/${customerId}`, data),
-    addAddress: (customerId: string, address: any) => 
+    addAddress: (customerId: string, address: any) =>
       this.post(`/customers/profile/${customerId}/addresses`, address),
-    updateAddress: (customerId: string, addressId: string, data: any) => 
+    updateAddress: (customerId: string, addressId: string, data: any) =>
       this.put(`/customers/profile/${customerId}/addresses/${addressId}`, data),
-    removeAddress: (customerId: string, addressId: string) => 
+    removeAddress: (customerId: string, addressId: string) =>
       this.delete(`/customers/profile/${customerId}/addresses/${addressId}`),
-    convertToAccount: (customerId: string, data: any) => 
+    convertToAccount: (customerId: string, data: any) =>
       this.post(`/customers/profile/${customerId}/convert-to-account`, data),
-    updatePassword: (customerId: string, data: any) => 
+    updatePassword: (customerId: string, data: any) =>
       this.put(`/customers/profile/${customerId}/password`, data),
-    requestPasswordReset: (email: string) => 
+    requestPasswordReset: (email: string) =>
       this.post('/customers/password/reset-request', { email }),
-    resetPassword: (token: string, newPassword: string) => 
+    resetPassword: (token: string, newPassword: string) =>
       this.post('/customers/password/reset', { token, newPassword }),
     checkEmail: (email: string) => this.get(`/customers/check-email/${email}`),
   }

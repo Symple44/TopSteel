@@ -1,14 +1,14 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Put, 
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
   Delete,
-  Body, 
-  Param, 
+  Body,
+  Param,
   Query,
-  Req, 
-  UseGuards
+  Req,
+  UseGuards,
 } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { Request } from 'express'
@@ -24,7 +24,7 @@ import { MarketplacePricingEngine } from '../services/marketplace-pricing-engine
 export class ProductsController {
   constructor(
     private productsService: MarketplaceProductsService,
-    private pricingEngine: MarketplacePricingEngine,
+    private pricingEngine: MarketplacePricingEngine
   ) {}
 
   @Get()
@@ -32,19 +32,15 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'List of marketplace products' })
   async getMarketplaceProducts(@Req() req: Request, @Query() query: any) {
     const { tenant } = req as any
-    
-    return await this.productsService.getProducts(
-      tenant.erpTenantConnection,
-      tenant.societeId,
-      {
-        search: query.search,
-        categories: query.categories?.split(','),
-        limit: parseInt(query.limit) || 50,
-        offset: parseInt(query.offset) || 0,
-        sortBy: query.sortBy || 'name',
-        sortOrder: query.sortOrder || 'ASC'
-      }
-    )
+
+    return await this.productsService.getProducts(tenant.erpTenantConnection, tenant.societeId, {
+      search: query.search,
+      categories: query.categories?.split(','),
+      limit: parseInt(query.limit) || 50,
+      offset: parseInt(query.offset) || 0,
+      sortBy: query.sortBy || 'name',
+      sortOrder: query.sortOrder || 'ASC',
+    })
   }
 
   @Get('categories')
@@ -64,7 +60,7 @@ export class ProductsController {
   @ApiResponse({ status: 404, description: 'Product not found' })
   async getProduct(@Req() req: Request, @Param('productId') productId: string) {
     const { tenant } = req as any
-    
+
     return await this.productsService.getProductById(
       tenant.erpTenantConnection,
       tenant.societeId,
@@ -80,7 +76,7 @@ export class ProductsController {
     @Query() query: any
   ) {
     const { tenant } = req as any
-    
+
     // Récupérer le produit pour avoir le prix de base
     const product = await this.productsService.getProductById(
       tenant.erpTenantConnection,
@@ -88,16 +84,11 @@ export class ProductsController {
       productId
     )
 
-    return await this.pricingEngine.calculatePrice(
-      productId,
-      product.basePrice,
-      query.customerId,
-      {
-        customerGroup: query.customerGroup,
-        quantity: parseInt(query.quantity) || 1,
-        promotionCode: query.promotionCode
-      }
-    )
+    return await this.pricingEngine.calculatePrice(productId, product.basePrice, query.customerId, {
+      customerGroup: query.customerGroup,
+      quantity: parseInt(query.quantity) || 1,
+      promotionCode: query.promotionCode,
+    })
   }
 
   @Get(':productId/pricing/rules')

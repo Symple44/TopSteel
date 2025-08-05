@@ -1,7 +1,7 @@
 import type { User } from '../../../users/entities/user.entity'
 
 /**
- * Interface d'abstraction pour les opérations utilisateur 
+ * Interface d'abstraction pour les opérations utilisateur
  * utilisées par le module d'authentification
  */
 export interface IUserRepository {

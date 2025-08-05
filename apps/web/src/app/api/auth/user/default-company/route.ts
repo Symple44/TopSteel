@@ -11,12 +11,12 @@ export async function GET(req: NextRequest) {
     const data = await response.json()
 
     if (!response.ok) {
-      // Si l'utilisateur n'est pas encore complètement authentifié (401), 
+      // Si l'utilisateur n'est pas encore complètement authentifié (401),
       // retourner une réponse vide au lieu d'une erreur
       if (response.status === 401) {
-        return NextResponse.json({ 
-          success: false, 
-          message: 'No default company set yet' 
+        return NextResponse.json({
+          success: false,
+          message: 'No default company set yet',
         })
       }
       return NextResponse.json(data, { status: response.status })

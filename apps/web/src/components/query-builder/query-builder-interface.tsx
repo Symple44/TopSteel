@@ -266,9 +266,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
             <div className="flex flex-col items-center justify-center h-full">
               <QueryPreview queryBuilder={queryBuilder} />
               <div className="mt-8 text-center">
-                <p className="text-muted-foreground mb-4">
-                  {t('clickExecuteToSeeResults')}
-                </p>
+                <p className="text-muted-foreground mb-4">{t('clickExecuteToSeeResults')}</p>
                 <Button onClick={handleExecute} disabled={loading || !queryBuilder.mainTable}>
                   <Play className="h-4 w-4 mr-2" />
                   {t('execute')}
@@ -298,9 +296,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
                 </span>
               )}
               {!previewData && queryBuilder.mainTable && (
-                <span className="text-sm text-muted-foreground">
-                  {t('clickExecuteToLoadData')}
-                </span>
+                <span className="text-sm text-muted-foreground">{t('clickExecuteToLoadData')}</span>
               )}
             </div>
           </div>

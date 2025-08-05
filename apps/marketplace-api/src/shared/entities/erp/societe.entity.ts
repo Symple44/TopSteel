@@ -2,5 +2,5 @@
 export {
   Societe,
   SocieteStatus,
-  SocietePlan
+  SocietePlan,
 } from '@erp/entities'

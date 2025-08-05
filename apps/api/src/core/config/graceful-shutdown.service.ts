@@ -71,14 +71,15 @@ export class GracefulShutdownService implements OnApplicationShutdown {
           const { getConnectionManager } = await import('typeorm')
           try {
             const connectionManager = getConnectionManager()
-            const connections = connectionManager.connections?.filter(conn => conn?.isConnected) || []
-            
+            const connections =
+              connectionManager.connections?.filter((conn) => conn?.isConnected) || []
+
             for (const connection of connections) {
               if (connection?.isConnected) {
                 await connection.close()
               }
             }
-            
+
             if (connections.length > 0) {
               this.logger.log('✅ Connexions base de données fermées')
             }
@@ -89,8 +90,9 @@ export class GracefulShutdownService implements OnApplicationShutdown {
         } catch (dbError) {
           // Essayer une approche alternative avec le service de l'app
           try {
-            const dataSource = this.app.get('CONNECTION', { strict: false }) || 
-                             this.app.get('Database', { strict: false })
+            const dataSource =
+              this.app.get('CONNECTION', { strict: false }) ||
+              this.app.get('Database', { strict: false })
             if (dataSource?.isInitialized) {
               await dataSource.destroy()
               this.logger.log('✅ Connexions base de données fermées (alternative)')

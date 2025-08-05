@@ -71,7 +71,7 @@ export enum BusinessOperation {
   UPDATE = 'UPDATE',
   DELETE = 'DELETE',
   VALIDATE = 'VALIDATE',
-  PROCESS = 'PROCESS'
+  PROCESS = 'PROCESS',
 }
 
 /**

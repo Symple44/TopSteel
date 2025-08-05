@@ -10,22 +10,9 @@ import { MarketplacePricingEngine } from './services/marketplace-pricing-engine.
 import { ProductsController } from './controllers/products.controller'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      MarketplaceProduct,
-      MarketplacePriceRule,
-    ], 'marketplace'),
-  ],
-  providers: [
-    MarketplaceProductsService,
-    MarketplacePricingEngine,
-  ],
-  controllers: [
-    ProductsController,
-  ],
-  exports: [
-    MarketplaceProductsService,
-    MarketplacePricingEngine,
-  ],
+  imports: [TypeOrmModule.forFeature([MarketplaceProduct, MarketplacePriceRule], 'marketplace')],
+  providers: [MarketplaceProductsService, MarketplacePricingEngine],
+  controllers: [ProductsController],
+  exports: [MarketplaceProductsService, MarketplacePricingEngine],
 })
 export class ProductsModule {}

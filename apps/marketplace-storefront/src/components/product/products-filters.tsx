@@ -15,7 +15,7 @@ interface ProductsFiltersProps {
 export function ProductsFilters({ tenant }: ProductsFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  
+
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '')
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '')
@@ -31,7 +31,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
 
   const updateFilters = (updates: Record<string, string | boolean | null>) => {
     const current = new URLSearchParams(searchParams.toString())
-    
+
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null || value === '' || value === false) {
         current.delete(key)
@@ -53,7 +53,8 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
     router.push(window.location.pathname)
   }
 
-  const hasActiveFilters = searchQuery || selectedCategory || minPrice || maxPrice || inStockOnly || featuredOnly
+  const hasActiveFilters =
+    searchQuery || selectedCategory || minPrice || maxPrice || inStockOnly || featuredOnly
 
   return (
     <div className="space-y-6">
@@ -72,18 +73,17 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               </span>
             )}
           </span>
-          <ChevronDown className={cn(
-            'w-4 h-4 transition-transform',
-            isExpanded && 'rotate-180'
-          )} />
+          <ChevronDown className={cn('w-4 h-4 transition-transform', isExpanded && 'rotate-180')} />
         </button>
       </div>
 
-      <div className={cn(
-        'space-y-6',
-        'lg:block', // Always visible on desktop
-        isExpanded ? 'block' : 'hidden' // Toggle on mobile
-      )}>
+      <div
+        className={cn(
+          'space-y-6',
+          'lg:block', // Always visible on desktop
+          isExpanded ? 'block' : 'hidden' // Toggle on mobile
+        )}
+      >
         {/* Search */}
         <div className="space-y-2">
           <label className="text-sm font-medium">Recherche</label>
@@ -127,9 +127,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               }}
               className={cn(
                 'w-full text-left px-3 py-2 text-sm rounded transition-colors',
-                !selectedCategory
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-muted'
+                !selectedCategory ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
               )}
             >
               Toutes les catégories
@@ -180,7 +178,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               />
             </div>
           </div>
-          
+
           {/* Quick Price Filters */}
           <div className="grid grid-cols-2 gap-2 pt-2">
             <button

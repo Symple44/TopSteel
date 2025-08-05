@@ -1,7 +1,11 @@
 import 'reflect-metadata'
 import { config } from 'dotenv'
 import { DataSource } from 'typeorm'
-import { SectorCoefficient, SectorType, CoefficientType } from '../modules/pricing/entities/sector-coefficient.entity'
+import {
+  SectorCoefficient,
+  SectorType,
+  CoefficientType,
+} from '../modules/pricing/entities/sector-coefficient.entity'
 import { CustomerSectorAssignment } from '../modules/pricing/entities/customer-sector-assignment.entity'
 import { BTPIndex, BTPIndexType } from '../modules/pricing/entities/btp-index.entity'
 
@@ -25,13 +29,13 @@ const TenantDataSource = new DataSource({
 async function initSectorPricingData() {
   try {
     console.log('🔧 Initialisation de la connexion à la database...')
-    
+
     await TenantDataSource.initialize()
     console.log('✅ Connexion établie')
 
     const coefficientRepo = TenantDataSource.getRepository(SectorCoefficient)
     const btpIndexRepo = TenantDataSource.getRepository(BTPIndex)
-    
+
     // Tenant ID par défaut (à adapter selon votre système)
     const defaultTenantId = '00000000-0000-0000-0000-000000000001'
 
@@ -42,27 +46,27 @@ async function initSectorPricingData() {
       sector: SectorType.BTP,
       sectorName: 'Bâtiment et Travaux Publics',
       coefficientType: CoefficientType.BASE_PRICE,
-      coefficient: 1.10,
+      coefficient: 1.1,
       description: 'Coefficient de base BTP (+10% sur prix matériaux)',
       isActive: true,
       priority: 10,
       conditions: {
         minQuantity: 1,
-        articleFamilies: ['POUTRELLES', 'PROFILES', 'TUBES', 'PLATS', 'TOLES']
+        articleFamilies: ['POUTRELLES', 'PROFILES', 'TUBES', 'PLATS', 'TOLES'],
       },
       parameters: {
         applyToBasePrice: true,
         btpSpecific: {
           applyCOFRAC: true,
           applyBTPCoeff: true,
-          minimumOrder: 500
-        }
+          minimumOrder: 500,
+        },
       },
       metadata: {
         createdBy: 'system',
         notes: 'Coefficient standard BTP pour matériaux métallurgiques',
-        internalCode: 'BTP_BASE_001'
-      }
+        internalCode: 'BTP_BASE_001',
+      },
     })
 
     // 2. Remise BTP sur gros volumes (-5%)
@@ -76,16 +80,16 @@ async function initSectorPricingData() {
       priority: 5,
       conditions: {
         minQuantity: 100,
-        minAmount: 5000
+        minAmount: 5000,
       },
       parameters: {
-        discountType: 'percentage'
+        discountType: 'percentage',
       },
       metadata: {
         createdBy: 'system',
         notes: 'Remise accordée aux entreprises BTP sur gros volumes',
-        internalCode: 'BTP_DISC_001'
-      }
+        internalCode: 'BTP_DISC_001',
+      },
     })
 
     // 3. Remise BTP progressive selon quantité
@@ -98,22 +102,22 @@ async function initSectorPricingData() {
       isActive: true,
       priority: 6,
       conditions: {
-        minQuantity: 50
+        minQuantity: 50,
       },
       parameters: {
         discountType: 'progressive',
         progressiveRates: [
-          { minQuantity: 50, rate: 2 },   // 2% à partir de 50 unités
-          { minQuantity: 200, rate: 4 },  // 4% à partir de 200 unités
-          { minQuantity: 500, rate: 7 },  // 7% à partir de 500 unités
-          { minQuantity: 1000, rate: 10 } // 10% à partir de 1000 unités
-        ]
+          { minQuantity: 50, rate: 2 }, // 2% à partir de 50 unités
+          { minQuantity: 200, rate: 4 }, // 4% à partir de 200 unités
+          { minQuantity: 500, rate: 7 }, // 7% à partir de 500 unités
+          { minQuantity: 1000, rate: 10 }, // 10% à partir de 1000 unités
+        ],
       },
       metadata: {
         createdBy: 'system',
         notes: 'Remises dégressives selon volume pour fidéliser les gros clients BTP',
-        internalCode: 'BTP_PROG_001'
-      }
+        internalCode: 'BTP_PROG_001',
+      },
     })
 
     // 4. Frais de transport BTP
@@ -128,13 +132,13 @@ async function initSectorPricingData() {
       conditions: {},
       parameters: {
         calculationMethod: 'fixed',
-        freeThreshold: 2000 // Gratuit au-dessus de 2000€
+        freeThreshold: 2000, // Gratuit au-dessus de 2000€
       },
       metadata: {
         createdBy: 'system',
         notes: 'Transport gratuit pour commandes > 2000€',
-        internalCode: 'BTP_TRANS_001'
-      }
+        internalCode: 'BTP_TRANS_001',
+      },
     })
 
     // 5. Coefficient Industrie (+5%)
@@ -147,16 +151,16 @@ async function initSectorPricingData() {
       isActive: true,
       priority: 8,
       conditions: {
-        minQuantity: 1
+        minQuantity: 1,
       },
       parameters: {
-        applyToBasePrice: true
+        applyToBasePrice: true,
       },
       metadata: {
         createdBy: 'system',
         notes: 'Coefficient standard secteur industriel',
-        internalCode: 'IND_BASE_001'
-      }
+        internalCode: 'IND_BASE_001',
+      },
     })
 
     // 6. Remise Particuliers (-2% sur petites quantités)
@@ -170,16 +174,16 @@ async function initSectorPricingData() {
       priority: 3,
       conditions: {
         maxQuantity: 50,
-        maxAmount: 1000
+        maxAmount: 1000,
       },
       parameters: {
-        discountType: 'percentage'
+        discountType: 'percentage',
       },
       metadata: {
         createdBy: 'system',
         notes: 'Encourager les achats particuliers',
-        internalCode: 'PART_DISC_001'
-      }
+        internalCode: 'PART_DISC_001',
+      },
     })
 
     // Sauvegarder tous les coefficients
@@ -189,13 +193,13 @@ async function initSectorPricingData() {
       btpProgressiveDiscount,
       btpTransport,
       industrieCoeff,
-      particulierDiscount
+      particulierDiscount,
     ]
 
     console.log('💾 Sauvegarde des coefficients...')
     for (const coeff of coefficients) {
       // Assigner le tenantId avant la sauvegarde
-      (coeff as any).tenantId = defaultTenantId
+      ;(coeff as any).tenantId = defaultTenantId
       await coefficientRepo.save(coeff)
       console.log(`   ✅ ${coeff.sector} - ${coeff.coefficientType} (${coeff.coefficient})`)
     }
@@ -204,7 +208,7 @@ async function initSectorPricingData() {
 
     // === CRÉATION DES INDICES BTP ===
     console.log('\n🏗️  Création des indices BTP standards...')
-    
+
     const currentDate = new Date()
     const currentYear = currentDate.getFullYear()
     const currentMonth = currentDate.getMonth() + 1
@@ -221,34 +225,34 @@ async function initSectorPricingData() {
           methodology: 'Prix de marché acier construction',
           baseYear: 2015,
           frequency: 'monthly',
-          components: ['Acier rond', 'Acier plat', 'Poutrelles', 'Tubes']
-        }
+          components: ['Acier rond', 'Acier plat', 'Poutrelles', 'Tubes'],
+        },
       },
       {
         indexType: BTPIndexType.BETON,
         indexName: 'Indice BTP - Béton',
         indexCode: 'BETON',
-        indexValue: 115.20,
+        indexValue: 115.2,
         indexMetadata: {
           source: 'UNICEM',
-          methodology: 'Prix béton prêt à l\'emploi',
+          methodology: "Prix béton prêt à l'emploi",
           baseYear: 2015,
-          frequency: 'monthly'
-        }
+          frequency: 'monthly',
+        },
       },
       {
         indexType: BTPIndexType.BITUME,
         indexName: 'Indice BTP - Bitume',
         indexCode: 'BITUME',
-        indexValue: 142.80,
+        indexValue: 142.8,
         indexMetadata: {
           source: 'USIRF',
           methodology: 'Prix bitume routier',
           baseYear: 2015,
-          frequency: 'monthly'
-        }
+          frequency: 'monthly',
+        },
       },
-      
+
       // Indices bâtiment
       {
         indexType: BTPIndexType.BT01,
@@ -261,38 +265,38 @@ async function initSectorPricingData() {
           baseYear: 2015,
           frequency: 'monthly',
           weightings: {
-            'matériaux': 0.60,
-            'main_oeuvre': 0.35,
-            'matériel': 0.05
-          }
-        }
+            matériaux: 0.6,
+            main_oeuvre: 0.35,
+            matériel: 0.05,
+          },
+        },
       },
       {
         indexType: BTPIndexType.BT02,
         indexName: 'Indice BT02 - Clos et couvert',
         indexCode: 'BT02',
-        indexValue: 121.30,
+        indexValue: 121.3,
         indexMetadata: {
           source: 'FFB',
           methodology: 'Coûts clos et couvert',
           baseYear: 2015,
-          frequency: 'monthly'
-        }
+          frequency: 'monthly',
+        },
       },
-      
+
       // Indices travaux publics
       {
         indexType: BTPIndexType.TP01A,
         indexName: 'Indice TP01A - Terrassements généraux',
         indexCode: 'TP01A',
-        indexValue: 123.90,
+        indexValue: 123.9,
         indexMetadata: {
           source: 'INSEE',
           methodology: 'Coûts terrassements généraux',
           baseYear: 2015,
           frequency: 'monthly',
-          components: ['Carburant', 'Main d\'œuvre', 'Matériel']
-        }
+          components: ['Carburant', "Main d'œuvre", 'Matériel'],
+        },
       },
       {
         indexType: BTPIndexType.TP02A,
@@ -303,41 +307,41 @@ async function initSectorPricingData() {
           source: 'INSEE',
           methodology: 'Coûts assainissement et VRD',
           baseYear: 2015,
-          frequency: 'monthly'
-        }
+          frequency: 'monthly',
+        },
       },
       {
         indexType: BTPIndexType.TP04A,
-        indexName: 'Indice TP04A - Ouvrages d\'art',
+        indexName: "Indice TP04A - Ouvrages d'art",
         indexCode: 'TP04A',
-        indexValue: 126.70,
+        indexValue: 126.7,
         indexMetadata: {
           source: 'INSEE',
-          methodology: 'Coûts ouvrages d\'art',
+          methodology: "Coûts ouvrages d'art",
           baseYear: 2015,
           frequency: 'monthly',
-          components: ['Béton', 'Acier', 'Coffrage', 'Main d\'œuvre']
-        }
+          components: ['Béton', 'Acier', 'Coffrage', "Main d'œuvre"],
+        },
       },
-      
+
       // Indices composites
       {
         indexType: BTPIndexType.TP_COMPOSITE,
         indexName: 'Indice composite Travaux Publics',
         indexCode: 'TP_COMP',
-        indexValue: 122.50,
+        indexValue: 122.5,
         indexMetadata: {
           source: 'INSEE',
           methodology: 'Moyenne pondérée indices TP',
           baseYear: 2015,
           frequency: 'monthly',
           weightings: {
-            'TP01A': 0.25,
-            'TP02A': 0.20,
-            'TP04A': 0.15,
-            'autres': 0.40
-          }
-        }
+            TP01A: 0.25,
+            TP02A: 0.2,
+            TP04A: 0.15,
+            autres: 0.4,
+          },
+        },
       },
       {
         indexType: BTPIndexType.BAT_COMPOSITE,
@@ -350,12 +354,12 @@ async function initSectorPricingData() {
           baseYear: 2015,
           frequency: 'monthly',
           weightings: {
-            'BT01': 0.40,
-            'BT02': 0.30,
-            'BT03': 0.30
-          }
-        }
-      }
+            BT01: 0.4,
+            BT02: 0.3,
+            BT03: 0.3,
+          },
+        },
+      },
     ]
 
     console.log('💾 Sauvegarde des indices BTP...')
@@ -371,36 +375,35 @@ async function initSectorPricingData() {
         tenantId: defaultTenantId,
         indexMetadata: {
           ...indexData.indexMetadata,
-          frequency: indexData.indexMetadata.frequency as 'monthly'
-        }
+          frequency: indexData.indexMetadata.frequency as 'monthly',
+        },
       }
-      
+
       const savedIndex = await btpIndexRepo.save(indexToSave)
       console.log(`   ✅ ${savedIndex.indexType} - ${savedIndex.indexValue}`)
     }
 
     console.log(`\n🎉 ${btpIndices.length} indices BTP créés avec succès !`)
-    
+
     console.log('\n📊 Résumé du système de pricing créé :')
     console.log('   🏗️  BTP : Coefficient +10%, remises volume, transport')
-    console.log('   🏭 Industrie : Coefficient +5%') 
+    console.log('   🏭 Industrie : Coefficient +5%')
     console.log('   👤 Particuliers : Remise -2% sur petites quantités')
     console.log('   📈 Indices BTP : ACIER_BTP, BT01, TP01A, composites, etc.')
-    
+
     console.log('\n💡 Pour utiliser le système :')
     console.log('   1. Assignez des clients aux secteurs via /pricing/sectors/customer-assignments')
     console.log('   2. Calculez des prix sectoriels via /pricing/sectors/calculate')
-    console.log('   3. Utilisez l\'indexation BTP via /pricing/btp-indices/calculate-indexed-price')
+    console.log("   3. Utilisez l'indexation BTP via /pricing/btp-indices/calculate-indexed-price")
     console.log('   4. Consultez les indices via /pricing/btp-indices/dashboard/:indexType')
-    
-    console.log('\n🔧 Exemples d\'usage :')
+
+    console.log("\n🔧 Exemples d'usage :")
     console.log('   - Prix BTP avec coefficient : 1000€ → 1100€ (+10%)')
     console.log('   - Remise volume BTP : 1100€ → 1045€ (-5% si >100 pièces)')
     console.log('   - Indexation acier : Si indice 128.45 → 130.00 (+1.2%)')
     console.log('   - Transport BTP : +150€ (gratuit si >2000€)')
-
   } catch (error) {
-    console.error('❌ Erreur lors de l\'initialisation des données:', error)
+    console.error("❌ Erreur lors de l'initialisation des données:", error)
     process.exit(1)
   } finally {
     if (TenantDataSource.isInitialized) {

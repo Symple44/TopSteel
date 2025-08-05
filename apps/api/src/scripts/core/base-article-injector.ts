@@ -4,14 +4,14 @@
  */
 
 import { DataSource, QueryRunner } from 'typeorm'
-import { 
-  ArticleMetallurgie, 
-  InjectionResult, 
+import {
+  ArticleMetallurgie,
+  InjectionResult,
   GlobalInjectionConfig,
   InjectionLogger,
   ArticleValidator,
   PricingCalculator,
-  ArticleFamille
+  ArticleFamille,
 } from '../types/article-injection.types'
 
 export abstract class BaseArticleInjector {
@@ -51,7 +51,7 @@ export abstract class BaseArticleInjector {
   async inject(): Promise<InjectionResult> {
     const startTime = Date.now()
     const { famille, sousFamille } = this.getFamilleInfo()
-    
+
     this.logger.info(`Début injection ${famille}/${sousFamille}`)
 
     const result: InjectionResult = {
@@ -61,7 +61,7 @@ export abstract class BaseArticleInjector {
       articlesSkipped: 0,
       errors: [],
       duration: 0,
-      examples: []
+      examples: [],
     }
 
     let queryRunner: QueryRunner | null = null
@@ -92,31 +92,33 @@ export abstract class BaseArticleInjector {
       for (let i = 0; i < articles.length; i += batchSize) {
         const batch = articles.slice(i, i + batchSize)
         const batchResult = await this.processBatch(queryRunner, batch)
-        
+
         result.articlesCreated += batchResult.created
         result.articlesSkipped += batchResult.skipped
         result.errors.push(...batchResult.errors)
       }
 
       // Collecter des exemples
-      result.examples = articles.slice(0, 3).map(article => ({
+      result.examples = articles.slice(0, 3).map((article) => ({
         reference: article.reference,
         designation: article.designation,
-        price: article.prixVenteHt || 0
+        price: article.prixVenteHt || 0,
       }))
 
       await queryRunner.commitTransaction()
       this.logger.info(`Injection ${famille}/${sousFamille} terminée avec succès`)
-
     } catch (error) {
       if (queryRunner) {
         await queryRunner.rollbackTransaction()
       }
-      
+
       const errorMessage = error instanceof Error ? error.message : String(error)
       result.errors.push(errorMessage)
-      this.logger.error(`Erreur lors de l'injection ${famille}/${sousFamille}`, error instanceof Error ? error : undefined)
-      
+      this.logger.error(
+        `Erreur lors de l'injection ${famille}/${sousFamille}`,
+        error instanceof Error ? error : undefined
+      )
+
       if (!this.config.skipOnError) {
         throw error
       }
@@ -124,7 +126,7 @@ export abstract class BaseArticleInjector {
       if (queryRunner) {
         await queryRunner.release()
       }
-      
+
       result.duration = Date.now() - startTime
       this.logger.logResult(result)
     }
@@ -136,18 +138,18 @@ export abstract class BaseArticleInjector {
    * Nettoyer les articles existants
    */
   protected async cleanupExistingArticles(
-    queryRunner: QueryRunner, 
-    famille: string, 
+    queryRunner: QueryRunner,
+    famille: string,
     sousFamille: string
   ): Promise<void> {
     this.logger.info(`Nettoyage des articles existants ${famille}/${sousFamille}`)
-    
+
     const result = await queryRunner.query(
       `DELETE FROM articles 
        WHERE societe_id = $1 AND famille = $2 AND sous_famille = $3`,
       [this.config.societeId, famille, sousFamille]
     )
-    
+
     this.logger.info(`${result.affectedRows || result.length || 0} articles supprimés`)
   }
 
@@ -155,7 +157,7 @@ export abstract class BaseArticleInjector {
    * Traiter un lot d'articles
    */
   protected async processBatch(
-    queryRunner: QueryRunner, 
+    queryRunner: QueryRunner,
     articles: ArticleMetallurgie[]
   ): Promise<{ created: number; skipped: number; errors: string[] }> {
     let created = 0
@@ -171,7 +173,10 @@ export abstract class BaseArticleInjector {
         }
 
         // Vérifier si l'article existe déjà
-        if (this.config.validateReferences && await this.articleExists(queryRunner, article.reference)) {
+        if (
+          this.config.validateReferences &&
+          (await this.articleExists(queryRunner, article.reference))
+        ) {
           this.logger.debug(`Article ${article.reference} existe déjà, ignoré`)
           skipped++
           continue
@@ -180,13 +185,12 @@ export abstract class BaseArticleInjector {
         // Insérer l'article
         await this.insertArticle(queryRunner, article)
         created++
-        
-        this.logger.debug(`Article ${article.reference} créé`)
 
+        this.logger.debug(`Article ${article.reference} créé`)
       } catch (error) {
         const errorMessage = `Erreur article ${article.reference}: ${error instanceof Error ? error.message : String(error)}`
         errors.push(errorMessage)
-        
+
         if (!this.config.skipOnError) {
           throw error
         }
@@ -215,7 +219,9 @@ export abstract class BaseArticleInjector {
       return false
     }
 
-    if (!this.validator.validateTechnicalSpecs(article.caracteristiquesTechniques, article.famille)) {
+    if (
+      !this.validator.validateTechnicalSpecs(article.caracteristiquesTechniques, article.famille)
+    ) {
       this.logger.warn(`Spécifications techniques invalides pour: ${article.reference}`)
       return false
     }
@@ -237,7 +243,10 @@ export abstract class BaseArticleInjector {
   /**
    * Insérer un article en base
    */
-  protected async insertArticle(queryRunner: QueryRunner, article: ArticleMetallurgie): Promise<void> {
+  protected async insertArticle(
+    queryRunner: QueryRunner,
+    article: ArticleMetallurgie
+  ): Promise<void> {
     const query = `
       INSERT INTO articles (
         id, reference, designation, description, type, status,
@@ -270,7 +279,7 @@ export abstract class BaseArticleInjector {
       article.prixVenteHt,
       article.tauxMarge,
       JSON.stringify(article.caracteristiquesTechniques),
-      this.config.societeId
+      this.config.societeId,
     ]
 
     await queryRunner.query(query, parameters)
@@ -285,11 +294,11 @@ export abstract class BaseArticleInjector {
         article.caracteristiquesTechniques,
         article.caracteristiquesTechniques.nuance || 'S235JR'
       )
-      
+
       const margin = this.pricingCalculator.calculateMargin(basePrice, article.famille)
       article.tauxMarge = margin
       article.prixVenteHt = basePrice * (1 + margin / 100)
-      
+
       // Arrondir à 2 décimales
       article.prixVenteHt = Math.round(article.prixVenteHt * 100) / 100
     }
@@ -334,8 +343,8 @@ export abstract class BaseArticleInjector {
       recentInjections: recentResult.map((row: any) => ({
         famille: row.famille,
         count: parseInt(row.count),
-        date: new Date(row.date)
-      }))
+        date: new Date(row.date),
+      })),
     }
   }
 }

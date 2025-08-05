@@ -14,38 +14,38 @@ export const colorTokens = {
   // Couleurs de base (light/dark adaptive)
   background: 'hsl(var(--background))',
   foreground: 'hsl(var(--foreground))',
-  
+
   // Couleurs de carte et surfaces
   card: 'hsl(var(--card))',
   cardForeground: 'hsl(var(--card-foreground))',
   popover: 'hsl(var(--popover))',
   popoverForeground: 'hsl(var(--popover-foreground))',
-  
+
   // Couleurs primaires
   primary: 'hsl(var(--primary))',
   primaryForeground: 'hsl(var(--primary-foreground))',
-  
+
   // Couleurs secondaires
   secondary: 'hsl(var(--secondary))',
   secondaryForeground: 'hsl(var(--secondary-foreground))',
-  
+
   // Couleurs muettes
   muted: 'hsl(var(--muted))',
   mutedForeground: 'hsl(var(--muted-foreground))',
-  
+
   // Couleurs d'accent
   accent: 'hsl(var(--accent))',
   accentForeground: 'hsl(var(--accent-foreground))',
-  
+
   // Couleurs destructives
   destructive: 'hsl(var(--destructive))',
   destructiveForeground: 'hsl(var(--destructive-foreground))',
-  
+
   // Couleurs d'interaction
   border: 'hsl(var(--border))',
   input: 'hsl(var(--input))',
   ring: 'hsl(var(--ring))',
-  
+
   // Extensions TopSteel ERP
   success: 'hsl(var(--success))',
   successForeground: 'hsl(var(--success-foreground))',
@@ -61,7 +61,7 @@ export const colorTokens = {
 export const steelColorTokens = {
   steel: {
     50: '#f8fafc',
-    100: '#f1f5f9', 
+    100: '#f1f5f9',
     200: '#e2e8f0',
     300: '#cbd5e1',
     400: '#94a3b8',
@@ -70,21 +70,21 @@ export const steelColorTokens = {
     700: '#334155',
     800: '#1e293b',
     900: '#0f172a',
-  }
+  },
 } as const
 
 // ===== TOKENS D'ESPACEMENT =====
 
 export const spacingTokens = {
   none: '0',
-  xs: '0.25rem',   // 4px
-  sm: '0.5rem',    // 8px
-  md: '1rem',      // 16px
-  lg: '1.5rem',    // 24px
-  xl: '2rem',      // 32px
-  '2xl': '3rem',   // 48px
-  '3xl': '4rem',   // 64px
-  '4xl': '6rem',   // 96px
+  xs: '0.25rem', // 4px
+  sm: '0.5rem', // 8px
+  md: '1rem', // 16px
+  lg: '1.5rem', // 24px
+  xl: '2rem', // 32px
+  '2xl': '3rem', // 48px
+  '3xl': '4rem', // 64px
+  '4xl': '6rem', // 96px
 } as const
 
 // ===== TOKENS DE TAILLE =====
@@ -92,21 +92,21 @@ export const spacingTokens = {
 export const sizeTokens = {
   // Hauteurs communes
   height: {
-    xs: '1.5rem',    // 24px - h-6
-    sm: '2rem',      // 32px - h-8  
-    md: '2.25rem',   // 36px - h-9
-    lg: '2.5rem',    // 40px - h-10
-    xl: '3rem',      // 48px - h-12
+    xs: '1.5rem', // 24px - h-6
+    sm: '2rem', // 32px - h-8
+    md: '2.25rem', // 36px - h-9
+    lg: '2.5rem', // 40px - h-10
+    xl: '3rem', // 48px - h-12
   },
-  
+
   // Largeurs communes
   width: {
-    xs: '4rem',      // 64px
-    sm: '8rem',      // 128px
-    md: '12rem',     // 192px
-    lg: '16rem',     // 256px
-    xl: '20rem',     // 320px
-  }
+    xs: '4rem', // 64px
+    sm: '8rem', // 128px
+    md: '12rem', // 192px
+    lg: '16rem', // 256px
+    xl: '20rem', // 320px
+  },
 } as const
 
 // ===== TOKENS DE RAYON =====
@@ -114,7 +114,7 @@ export const sizeTokens = {
 export const radiusTokens = {
   none: '0',
   sm: 'calc(var(--radius) - 4px)',
-  md: 'calc(var(--radius) - 2px)', 
+  md: 'calc(var(--radius) - 2px)',
   lg: 'var(--radius)',
   xl: 'calc(var(--radius) + 4px)',
   full: '9999px',
@@ -139,7 +139,7 @@ export const typographyTokens = {
     display: ['var(--font-poppins)', 'Poppins', 'ui-sans-serif', 'system-ui'],
     mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace'],
   },
-  
+
   fontSize: {
     xs: ['0.75rem', { lineHeight: '1rem' }],
     sm: ['0.875rem', { lineHeight: '1.25rem' }],
@@ -149,13 +149,13 @@ export const typographyTokens = {
     '2xl': ['1.5rem', { lineHeight: '2rem' }],
     '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
   },
-  
+
   fontWeight: {
     normal: '400',
-    medium: '500', 
+    medium: '500',
     semibold: '600',
     bold: '700',
-  }
+  },
 } as const
 
 // ===== TOKENS D'ANIMATION =====
@@ -163,16 +163,16 @@ export const typographyTokens = {
 export const animationTokens = {
   duration: {
     fast: '150ms',
-    normal: '300ms', 
+    normal: '300ms',
     slow: '500ms',
   },
-  
+
   easing: {
     linear: 'linear',
     easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
-    easeOut: 'cubic-bezier(0, 0, 0.2, 1)', 
+    easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
     easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-  }
+  },
 } as const
 
 // ===== EXPORT UNIFIÉ =====

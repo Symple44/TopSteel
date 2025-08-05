@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { BusinessService } from '../../core/base/business-service'
-import { BusinessOperation, type BusinessContext, type ValidationResult } from '../../core/interfaces/business-service.interface'
+import {
+  BusinessOperation,
+  type BusinessContext,
+  type ValidationResult,
+} from '../../core/interfaces/business-service.interface'
 import { Article, ArticleStatus, ArticleType } from '../entities/article.entity'
 import { IArticleRepository } from '../repositories/article.repository'
 
@@ -19,13 +23,18 @@ export class ArticleService extends BusinessService<Article> {
   /**
    * Valider les règles métier spécifiques aux articles
    */
-  async validateBusinessRules(entity: Article, operation: BusinessOperation): Promise<ValidationResult> {
-    const errors: Array<{field: string, message: string, code: string}> = []
-    const warnings: Array<{field: string, message: string, code: string}> = []
+  async validateBusinessRules(
+    entity: Article,
+    operation: BusinessOperation
+  ): Promise<ValidationResult> {
+    const errors: Array<{ field: string; message: string; code: string }> = []
+    const warnings: Array<{ field: string; message: string; code: string }> = []
 
     // 1. Validation de base de l'entité
     const entityErrors = entity.validate()
-    errors.push(...entityErrors.map(msg => ({ field: 'general', message: msg, code: 'VALIDATION_ERROR' })))
+    errors.push(
+      ...entityErrors.map((msg) => ({ field: 'general', message: msg, code: 'VALIDATION_ERROR' }))
+    )
 
     // 2. Règles métier spécifiques selon l'opération
     switch (operation) {
@@ -43,7 +52,7 @@ export class ArticleService extends BusinessService<Article> {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     }
   }
 
@@ -52,7 +61,7 @@ export class ArticleService extends BusinessService<Article> {
    */
   protected async buildEntity(data: Partial<Article>): Promise<Article> {
     const article = new Article()
-    
+
     // Générer une référence automatique si non fournie
     if (!data.reference) {
       article.reference = await this.generateReference(data.type!)
@@ -136,11 +145,11 @@ export class ArticleService extends BusinessService<Article> {
     const oldValues = { ...existing }
 
     // Appliquer les mises à jour (sauf référence qui ne peut pas changer)
-    Object.keys(updates).forEach(key => {
+    Object.keys(updates).forEach((key) => {
       if (key !== 'reference' && updates[key] !== undefined) {
         const oldValue = existing[key]
         existing[key] = updates[key]
-        
+
         // Ajouter à l'historique si la valeur a changé
         if (oldValue !== updates[key]) {
           existing.ajouterModificationHistorique(key, oldValue, updates[key], 'SYSTEM')
@@ -170,7 +179,7 @@ export class ArticleService extends BusinessService<Article> {
    * Rechercher des articles par critères
    */
   async searchArticles(criteria: ArticleSearchCriteria): Promise<Article[]> {
-    this.logger.log('Recherche d\'articles avec critères', criteria)
+    this.logger.log("Recherche d'articles avec critères", criteria)
     return await this.articleRepository.searchByCriteria(criteria)
   }
 
@@ -193,10 +202,14 @@ export class ArticleService extends BusinessService<Article> {
    */
   async getArticlesAReapprovisionner(): Promise<Array<Article & { quantiteACommander: number }>> {
     const articles = await this.getArticlesSousStockMini()
-    
-    return articles.map(article => Object.assign(article, {
-      quantiteACommander: article.calculerQuantiteACommander()
-    })).filter(item => item.quantiteACommander > 0)
+
+    return articles
+      .map((article) =>
+        Object.assign(article, {
+          quantiteACommander: article.calculerQuantiteACommander(),
+        })
+      )
+      .filter((item) => item.quantiteACommander > 0)
   }
 
   /**
@@ -205,12 +218,12 @@ export class ArticleService extends BusinessService<Article> {
   async creerCommandeReapprovisionnement(
     fournisseurId: string,
     context?: BusinessContext
-  ): Promise<{ articles: Article[], quantitesTotales: number }> {
+  ): Promise<{ articles: Article[]; quantitesTotales: number }> {
     const articlesAReapprovisionner = await this.getArticlesAReapprovisionner()
-    
+
     // Filtrer par fournisseur
     const articlesFournisseur = articlesAReapprovisionner.filter(
-      item => item.fournisseurPrincipalId === fournisseurId
+      (item) => item.fournisseurPrincipalId === fournisseurId
     )
 
     if (articlesFournisseur.length === 0) {
@@ -220,14 +233,17 @@ export class ArticleService extends BusinessService<Article> {
     // Ici vous pourriez créer une commande fournisseur
     // Pour l'exemple, on retourne juste les données
     const quantitesTotales = articlesFournisseur.reduce(
-      (sum, item) => sum + item.quantiteACommander, 0
+      (sum, item) => sum + item.quantiteACommander,
+      0
     )
 
-    this.logger.log(`Commande de réapprovisionnement créée: ${articlesFournisseur.length} articles, ${quantitesTotales} unités`)
+    this.logger.log(
+      `Commande de réapprovisionnement créée: ${articlesFournisseur.length} articles, ${quantitesTotales} unités`
+    )
 
     return {
       articles: articlesFournisseur,
-      quantitesTotales
+      quantitesTotales,
     }
   }
 
@@ -246,7 +262,7 @@ export class ArticleService extends BusinessService<Article> {
     }
 
     if (!article.gereEnStock) {
-      throw new Error('Cet article n\'est pas géré en stock')
+      throw new Error("Cet article n'est pas géré en stock")
     }
 
     const ancienStock = article.stockPhysique || 0
@@ -272,7 +288,9 @@ export class ArticleService extends BusinessService<Article> {
 
     const updatedArticle = await this.repository.save(article)
 
-    this.logger.log(`Inventaire effectué sur ${article.reference}: ${ancienStock} → ${stockPhysiqueReel} (écart: ${ecart})`)
+    this.logger.log(
+      `Inventaire effectué sur ${article.reference}: ${ancienStock} → ${stockPhysiqueReel} (écart: ${ecart})`
+    )
 
     return updatedArticle
   }
@@ -282,7 +300,7 @@ export class ArticleService extends BusinessService<Article> {
    */
   async calculerValorisationStock(famille?: string): Promise<StockValorisation> {
     let articles: Article[]
-    
+
     if (famille) {
       articles = await this.articleRepository.findByFamille(famille)
     } else {
@@ -295,10 +313,10 @@ export class ArticleService extends BusinessService<Article> {
       valeurParFamille: {},
       articlesSansStock: 0,
       articlesEnRupture: 0,
-      articlesSousStockMini: 0
+      articlesSousStockMini: 0,
     }
 
-    articles.forEach(article => {
+    articles.forEach((article) => {
       if (article.gereEnStock) {
         const valeurArticle = article.getValeurStock()
         valorisation.valeurTotale += valeurArticle
@@ -373,11 +391,19 @@ export class ArticleService extends BusinessService<Article> {
    * Méthodes privées
    */
 
-  private async validateCreationRules(entity: Article, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateCreationRules(
+    entity: Article,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Vérifier l'unicité de la référence
     const existingByRef = await this.articleRepository.findByReference(entity.reference)
     if (existingByRef) {
-      errors.push({ field: 'reference', message: 'Cette référence existe déjà', code: 'REFERENCE_DUPLICATE' })
+      errors.push({
+        field: 'reference',
+        message: 'Cette référence existe déjà',
+        code: 'REFERENCE_DUPLICATE',
+      })
     }
 
     // Vérifier l'unicité du code EAN si fourni
@@ -398,24 +424,44 @@ export class ArticleService extends BusinessService<Article> {
     }
   }
 
-  private async validateUpdateRules(entity: Article, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateUpdateRules(
+    entity: Article,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Un article avec des mouvements de stock ne peut pas changer d'unité
     const hasStockMovements = await this.articleRepository.hasStockMovements(entity.id)
     if (hasStockMovements) {
-      warnings.push({ field: 'uniteStock', message: 'Cet article a des mouvements de stock', code: 'HAS_MOVEMENTS' })
+      warnings.push({
+        field: 'uniteStock',
+        message: 'Cet article a des mouvements de stock',
+        code: 'HAS_MOVEMENTS',
+      })
     }
   }
 
-  private async validateDeletionRules(entity: Article, errors: Array<{field: string, message: string, code: string}>, warnings: Array<{field: string, message: string, code: string}>): Promise<void> {
+  private async validateDeletionRules(
+    entity: Article,
+    errors: Array<{ field: string; message: string; code: string }>,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): Promise<void> {
     // Interdire la suppression si l'article a du stock
     if (entity.gereEnStock && (entity.stockPhysique || 0) > 0) {
-      errors.push({ field: 'general', message: 'Impossible de supprimer un article avec du stock', code: 'HAS_STOCK' })
+      errors.push({
+        field: 'general',
+        message: 'Impossible de supprimer un article avec du stock',
+        code: 'HAS_STOCK',
+      })
     }
 
     // Interdire la suppression si l'article a des mouvements
     const hasMovements = await this.articleRepository.hasStockMovements(entity.id)
     if (hasMovements) {
-      errors.push({ field: 'general', message: 'Impossible de supprimer un article avec des mouvements', code: 'HAS_MOVEMENTS' })
+      errors.push({
+        field: 'general',
+        message: 'Impossible de supprimer un article avec des mouvements',
+        code: 'HAS_MOVEMENTS',
+      })
     }
   }
 
@@ -426,12 +472,12 @@ export class ArticleService extends BusinessService<Article> {
       [ArticleType.PRODUIT_SEMI_FINI]: 'PSF',
       [ArticleType.FOURNITURE]: 'FOU',
       [ArticleType.CONSOMMABLE]: 'CON',
-      [ArticleType.SERVICE]: 'SER'
+      [ArticleType.SERVICE]: 'SER',
     }
 
     const prefix = prefixes[type] || 'ART'
     const count = await this.articleRepository.countByType(type)
-    
+
     return `${prefix}-${(count + 1).toString().padStart(6, '0')}`
   }
 }

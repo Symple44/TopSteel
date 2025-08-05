@@ -1,4 +1,9 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common'
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
@@ -43,7 +48,7 @@ export class MarketplaceCustomersService {
   ): Promise<MarketplaceCustomer> {
     // Vérifier si email existe déjà
     const existingCustomer = await this.customerRepo.findOne({
-      where: { societeId, email: createDto.email }
+      where: { societeId, email: createDto.email },
     })
 
     if (existingCustomer) {
@@ -69,14 +74,14 @@ export class MarketplaceCustomersService {
         notifications: {
           orderUpdates: true,
           promotions: false,
-          newProducts: false
+          newProducts: false,
         },
-        ...createDto.preferences
+        ...createDto.preferences,
       },
       metadata: {
         source: 'marketplace',
-        loginCount: 0
-      }
+        loginCount: 0,
+      },
     })
 
     // Hash password si compte avec authentification
@@ -109,13 +114,13 @@ export class MarketplaceCustomersService {
         notifications: {
           orderUpdates: true,
           promotions: false,
-          newProducts: false
-        }
+          newProducts: false,
+        },
       },
       metadata: {
         source: 'marketplace',
-        loginCount: 0
-      }
+        loginCount: 0,
+      },
     })
 
     return await this.customerRepo.save(customer)
@@ -127,7 +132,7 @@ export class MarketplaceCustomersService {
     updateDto: UpdateCustomerDto
   ): Promise<MarketplaceCustomer> {
     const customer = await this.customerRepo.findOne({
-      where: { id: customerId, societeId }
+      where: { id: customerId, societeId },
     })
 
     if (!customer) {
@@ -135,20 +140,20 @@ export class MarketplaceCustomersService {
     }
 
     Object.assign(customer, updateDto)
-    
+
     return await this.customerRepo.save(customer)
   }
 
   async findByEmail(societeId: string, email: string): Promise<MarketplaceCustomer | null> {
     return await this.customerRepo.findOne({
-      where: { societeId, email: email.toLowerCase() }
+      where: { societeId, email: email.toLowerCase() },
     })
   }
 
   async findById(customerId: string, societeId: string): Promise<MarketplaceCustomer> {
     const customer = await this.customerRepo.findOne({
       where: { id: customerId, societeId },
-      relations: ['orders']
+      relations: ['orders'],
     })
 
     if (!customer) {
@@ -163,12 +168,12 @@ export class MarketplaceCustomersService {
     loginDto: CustomerLoginDto
   ): Promise<MarketplaceCustomer> {
     const customer = await this.customerRepo.findOne({
-      where: { 
-        societeId, 
+      where: {
+        societeId,
         email: loginDto.email.toLowerCase(),
         hasAccount: true,
-        isActive: true
-      }
+        isActive: true,
+      },
     })
 
     if (!customer) {
@@ -205,18 +210,18 @@ export class MarketplaceCustomersService {
 
     const newAddress: CustomerAddress = {
       ...address,
-      id: this.generateAddressId()
+      id: this.generateAddressId(),
     }
 
     // Si c'est la première adresse du type, la marquer comme default
-    const existingAddressesOfType = customer.addresses.filter(addr => addr.type === address.type)
+    const existingAddressesOfType = customer.addresses.filter((addr) => addr.type === address.type)
     if (existingAddressesOfType.length === 0) {
       newAddress.isDefault = true
     }
 
     // Si marked as default, remove default from others of same type
     if (newAddress.isDefault) {
-      customer.addresses = customer.addresses.map(addr => 
+      customer.addresses = customer.addresses.map((addr) =>
         addr.type === address.type ? { ...addr, isDefault: false } : addr
       )
     }
@@ -234,7 +239,7 @@ export class MarketplaceCustomersService {
   ): Promise<MarketplaceCustomer> {
     const customer = await this.findById(customerId, societeId)
 
-    const addressIndex = customer.addresses.findIndex(addr => addr.id === addressId)
+    const addressIndex = customer.addresses.findIndex((addr) => addr.id === addressId)
     if (addressIndex === -1) {
       throw new NotFoundException('Adresse non trouvée')
     }
@@ -243,9 +248,9 @@ export class MarketplaceCustomersService {
 
     // Si marked as default, remove default from others of same type
     if (updatedAddress.isDefault) {
-      customer.addresses = customer.addresses.map((addr, index) => 
-        index !== addressIndex && addr.type === updatedAddress.type 
-          ? { ...addr, isDefault: false } 
+      customer.addresses = customer.addresses.map((addr, index) =>
+        index !== addressIndex && addr.type === updatedAddress.type
+          ? { ...addr, isDefault: false }
           : addr
       )
     }
@@ -262,7 +267,7 @@ export class MarketplaceCustomersService {
   ): Promise<MarketplaceCustomer> {
     const customer = await this.findById(customerId, societeId)
 
-    const addressIndex = customer.addresses.findIndex(addr => addr.id === addressId)
+    const addressIndex = customer.addresses.findIndex((addr) => addr.id === addressId)
     if (addressIndex === -1) {
       throw new NotFoundException('Adresse non trouvée')
     }
@@ -272,9 +277,11 @@ export class MarketplaceCustomersService {
 
     // Si c'était l'adresse par défaut, marquer la première restante comme défaut
     if (removedAddress.isDefault) {
-      const remainingAddressesOfType = customer.addresses.filter(addr => addr.type === removedAddress.type)
+      const remainingAddressesOfType = customer.addresses.filter(
+        (addr) => addr.type === removedAddress.type
+      )
       if (remainingAddressesOfType.length > 0) {
-        const firstRemaining = customer.addresses.find(addr => addr.type === removedAddress.type)
+        const firstRemaining = customer.addresses.find((addr) => addr.type === removedAddress.type)
         if (firstRemaining) {
           firstRemaining.isDefault = true
         }
@@ -300,7 +307,7 @@ export class MarketplaceCustomersService {
     customer.hasAccount = true
     customer.passwordHash = await bcrypt.hash(password, 12)
     customer.emailVerified = false
-    
+
     if (firstName) customer.firstName = firstName
     if (lastName) customer.lastName = lastName
 
@@ -316,7 +323,7 @@ export class MarketplaceCustomersService {
     const customer = await this.findById(customerId, societeId)
 
     if (!customer.hasAccount || !customer.passwordHash) {
-      throw new BadRequestException('Client n\'a pas de compte')
+      throw new BadRequestException("Client n'a pas de compte")
     }
 
     const isCurrentPasswordValid = await bcrypt.compare(currentPassword, customer.passwordHash)
@@ -348,10 +355,10 @@ export class MarketplaceCustomersService {
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
     const customer = await this.customerRepo.findOne({
-      where: { 
+      where: {
         resetPasswordToken: token,
-        resetPasswordExpires: { $gt: new Date() } as any
-      }
+        resetPasswordExpires: { $gt: new Date() } as any,
+      },
     })
 
     if (!customer) {

@@ -12,14 +12,7 @@ interface CartClientProps {
 }
 
 export default function CartClient({ tenant }: CartClientProps) {
-  const {
-    items,
-    totalItems,
-    totalPrice,
-    updateQuantity,
-    removeItem,
-    setTenant,
-  } = useCart()
+  const { items, totalItems, totalPrice, updateQuantity, removeItem, setTenant } = useCart()
 
   useEffect(() => {
     setTenant(tenant)
@@ -32,7 +25,7 @@ export default function CartClient({ tenant }: CartClientProps) {
           <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto">
             <ShoppingBag className="w-12 h-12 text-muted-foreground" />
           </div>
-          
+
           <div className="space-y-2">
             <h1 className="text-3xl font-bold">Votre panier est vide</h1>
             <p className="text-muted-foreground">
@@ -40,10 +33,7 @@ export default function CartClient({ tenant }: CartClientProps) {
             </p>
           </div>
 
-          <Link
-            href={`/${tenant}/products`}
-            className="btn-primary inline-flex items-center gap-2"
-          >
+          <Link href={`/${tenant}/products`} className="btn-primary inline-flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
             Continuer mes achats
           </Link>
@@ -63,11 +53,8 @@ export default function CartClient({ tenant }: CartClientProps) {
               {totalItems} article{totalItems > 1 ? 's' : ''} dans votre panier
             </p>
           </div>
-          
-          <Link
-            href={`/${tenant}/products`}
-            className="btn-outline flex items-center gap-2"
-          >
+
+          <Link href={`/${tenant}/products`} className="btn-outline flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
             Continuer mes achats
           </Link>
@@ -91,18 +78,20 @@ export default function CartClient({ tenant }: CartClientProps) {
           <div className="lg:col-span-1">
             <div className="bg-muted/30 rounded-lg p-6 sticky top-24">
               <h2 className="text-lg font-semibold mb-4">Résumé de la commande</h2>
-              
+
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
-                  <span>Sous-total ({totalItems} article{totalItems > 1 ? 's' : ''})</span>
+                  <span>
+                    Sous-total ({totalItems} article{totalItems > 1 ? 's' : ''})
+                  </span>
                   <span>{formatPrice(totalPrice)}</span>
                 </div>
-                
+
                 <div className="flex justify-between text-muted-foreground">
                   <span>Frais de livraison</span>
                   <span>Calculés à l'étape suivante</span>
                 </div>
-                
+
                 <div className="border-t pt-3">
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>
@@ -118,7 +107,7 @@ export default function CartClient({ tenant }: CartClientProps) {
                 >
                   Passer commande
                 </Link>
-                
+
                 <p className="text-xs text-muted-foreground text-center">
                   Taxes et frais de livraison calculés lors du paiement
                 </p>
@@ -147,12 +136,7 @@ function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCard
       {/* Image */}
       <div className="relative w-24 h-24 bg-muted rounded overflow-hidden flex-shrink-0">
         {mainImage ? (
-          <Image
-            src={mainImage.url}
-            alt={product.designation}
-            fill
-            className="object-cover"
-          />
+          <Image src={mainImage.url} alt={product.designation} fill className="object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <ShoppingBag className="w-8 h-8 text-muted-foreground" />
@@ -170,15 +154,11 @@ function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCard
             >
               {product.designation}
             </Link>
-            
-            <p className="text-sm text-muted-foreground font-mono">
-              Réf: {product.reference}
-            </p>
+
+            <p className="text-sm text-muted-foreground font-mono">Réf: {product.reference}</p>
 
             {product.categories.length > 0 && (
-              <p className="text-sm text-muted-foreground">
-                {product.categories[0]}
-              </p>
+              <p className="text-sm text-muted-foreground">{product.categories[0]}</p>
             )}
           </div>
 
@@ -201,9 +181,7 @@ function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCard
               >
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="px-4 py-2 min-w-[3rem] text-center">
-                {quantity}
-              </span>
+              <span className="px-4 py-2 min-w-[3rem] text-center">{quantity}</span>
               <button
                 onClick={() => onUpdateQuantity(quantity + 1)}
                 className="p-2 hover:bg-muted transition-colors"
@@ -213,20 +191,14 @@ function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCard
               </button>
             </div>
 
-            <div className="text-sm text-muted-foreground">
-              {formatPrice(unitPrice)} / unité
-            </div>
+            <div className="text-sm text-muted-foreground">{formatPrice(unitPrice)} / unité</div>
           </div>
 
-          <div className="text-lg font-semibold">
-            {formatPrice(totalPrice)}
-          </div>
+          <div className="text-lg font-semibold">{formatPrice(totalPrice)}</div>
         </div>
 
         {quantity >= (product.stockDisponible || 999) && (
-          <p className="text-sm text-amber-600">
-            Stock maximum atteint
-          </p>
+          <p className="text-sm text-amber-600">Stock maximum atteint</p>
         )}
       </div>
     </div>

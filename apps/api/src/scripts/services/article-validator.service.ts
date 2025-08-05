@@ -3,12 +3,12 @@
  * TopSteel ERP - Clean Architecture
  */
 
-import { 
-  ArticleValidator, 
-  ArticleMetallurgie, 
+import {
+  ArticleValidator,
+  ArticleMetallurgie,
   CaracteristiquesTechniques,
   ArticleFamille,
-  InjectionLogger
+  InjectionLogger,
 } from '../types/article-injection.types'
 
 export class ArticleValidatorService implements ArticleValidator {
@@ -39,9 +39,25 @@ export class ArticleValidatorService implements ArticleValidator {
     }
 
     // Vérifier format cohérent (commence par type de produit)
-    const validPrefixes = ['IPE', 'HEA', 'HEB', 'UPN', 'IPN', 'TUBE', 'TOLE', 'FER', 'BAC', 'L', 'T', 'F', 'SHS', 'RHS', 'Z']
-    const hasValidPrefix = validPrefixes.some(prefix => reference.startsWith(prefix))
-    
+    const validPrefixes = [
+      'IPE',
+      'HEA',
+      'HEB',
+      'UPN',
+      'IPN',
+      'TUBE',
+      'TOLE',
+      'FER',
+      'BAC',
+      'L',
+      'T',
+      'F',
+      'SHS',
+      'RHS',
+      'Z',
+    ]
+    const hasValidPrefix = validPrefixes.some((prefix) => reference.startsWith(prefix))
+
     if (!hasValidPrefix) {
       this.logger.warn(`Référence sans préfixe valide: ${reference}`)
       return false
@@ -71,8 +87,8 @@ export class ArticleValidatorService implements ArticleValidator {
       caracteristiques.largeur,
       caracteristiques.longueur,
       caracteristiques.diametre,
-      caracteristiques.epaisseur
-    ].filter(d => d !== undefined)
+      caracteristiques.epaisseur,
+    ].filter((d) => d !== undefined)
 
     for (const dimension of dimensions) {
       if (dimension! <= 0) {
@@ -91,7 +107,9 @@ export class ArticleValidatorService implements ArticleValidator {
     if (caracteristiques.hauteur && caracteristiques.largeur) {
       // Hauteur généralement >= largeur pour profilés
       if (caracteristiques.hauteur < caracteristiques.largeur / 3) {
-        this.logger.warn(`Rapport hauteur/largeur incohérent: ${caracteristiques.hauteur}/${caracteristiques.largeur}`)
+        this.logger.warn(
+          `Rapport hauteur/largeur incohérent: ${caracteristiques.hauteur}/${caracteristiques.largeur}`
+        )
         return false
       }
     }
@@ -105,7 +123,9 @@ export class ArticleValidatorService implements ArticleValidator {
       )
 
       if (maxDimension > 0 && caracteristiques.epaisseur > maxDimension / 2) {
-        this.logger.warn(`Épaisseur excessive par rapport aux dimensions: ${caracteristiques.epaisseur}`)
+        this.logger.warn(
+          `Épaisseur excessive par rapport aux dimensions: ${caracteristiques.epaisseur}`
+        )
         return false
       }
     }
@@ -129,7 +149,9 @@ export class ArticleValidatorService implements ArticleValidator {
     // Taux de marge cohérent
     if (article.tauxMarge !== undefined) {
       if (article.tauxMarge < 0 || article.tauxMarge > 500) {
-        this.logger.warn(`Taux de marge incohérent: ${article.tauxMarge}% pour ${article.reference}`)
+        this.logger.warn(
+          `Taux de marge incohérent: ${article.tauxMarge}% pour ${article.reference}`
+        )
         return false
       }
     }
@@ -143,37 +165,50 @@ export class ArticleValidatorService implements ArticleValidator {
     }
 
     // Coefficients dans des fourchettes raisonnables
-    if (article.coefficientAchat && (article.coefficientAchat < 0.1 || article.coefficientAchat > 10)) {
-      this.logger.warn(`Coefficient d'achat incohérent: ${article.coefficientAchat} pour ${article.reference}`)
+    if (
+      article.coefficientAchat &&
+      (article.coefficientAchat < 0.1 || article.coefficientAchat > 10)
+    ) {
+      this.logger.warn(
+        `Coefficient d'achat incohérent: ${article.coefficientAchat} pour ${article.reference}`
+      )
       return false
     }
 
-    if (article.coefficientVente && (article.coefficientVente < 0.1 || article.coefficientVente > 10)) {
-      this.logger.warn(`Coefficient de vente incohérent: ${article.coefficientVente} pour ${article.reference}`)
+    if (
+      article.coefficientVente &&
+      (article.coefficientVente < 0.1 || article.coefficientVente > 10)
+    ) {
+      this.logger.warn(
+        `Coefficient de vente incohérent: ${article.coefficientVente} pour ${article.reference}`
+      )
       return false
     }
 
     return true
   }
 
-  validateTechnicalSpecs(caracteristiques: CaracteristiquesTechniques, famille: ArticleFamille): boolean {
+  validateTechnicalSpecs(
+    caracteristiques: CaracteristiquesTechniques,
+    famille: ArticleFamille
+  ): boolean {
     // Validation spécifique par famille
     switch (famille) {
       case ArticleFamille.PROFILES_ACIER:
         return this.validateProfileSpecs(caracteristiques)
-      
+
       case ArticleFamille.TUBES_PROFILES:
         return this.validateTubeSpecs(caracteristiques)
-      
+
       case ArticleFamille.TOLES_PLAQUES:
         return this.validateSheetSpecs(caracteristiques)
-      
+
       case ArticleFamille.ACIERS_LONGS:
         return this.validateBarSpecs(caracteristiques)
-      
+
       case ArticleFamille.COUVERTURE_BARDAGE:
         return this.validateRoofingSpecs(caracteristiques)
-      
+
       default:
         return this.validateGenericSpecs(caracteristiques)
     }
@@ -191,7 +226,7 @@ export class ArticleValidatorService implements ArticleValidator {
     const isAngle = caracteristiques.specifications?.typeProfile === 'ANGLE'
     if (!isAngle) {
       if (!caracteristiques.epaisseurAme || !caracteristiques.epaisseurAile) {
-        this.logger.warn('Profilé sans épaisseur d\'âme ou d\'aile')
+        this.logger.warn("Profilé sans épaisseur d'âme ou d'aile")
         return false
       }
     } else {
@@ -209,11 +244,21 @@ export class ArticleValidatorService implements ArticleValidator {
     }
 
     // Section cohérente avec dimensions (pour poutres uniquement)
-    if (!isAngle && caracteristiques.section && caracteristiques.epaisseurAme && caracteristiques.epaisseurAile) {
-      const sectionApprox = 2 * caracteristiques.largeur * caracteristiques.epaisseurAile +
-                           (caracteristiques.hauteur - 2 * caracteristiques.epaisseurAile) * caracteristiques.epaisseurAme
-      
-      if (Math.abs(caracteristiques.section - sectionApprox / 100) > caracteristiques.section * 0.3) {
+    if (
+      !isAngle &&
+      caracteristiques.section &&
+      caracteristiques.epaisseurAme &&
+      caracteristiques.epaisseurAile
+    ) {
+      const sectionApprox =
+        2 * caracteristiques.largeur * caracteristiques.epaisseurAile +
+        (caracteristiques.hauteur - 2 * caracteristiques.epaisseurAile) *
+          caracteristiques.epaisseurAme
+
+      if (
+        Math.abs(caracteristiques.section - sectionApprox / 100) >
+        caracteristiques.section * 0.3
+      ) {
         this.logger.warn(`Section incohérente avec dimensions calculées pour profilé`)
         return false
       }
@@ -286,7 +331,10 @@ export class ArticleValidatorService implements ArticleValidator {
       }
     } else {
       // Validation générique si pas de type spécifié
-      if (!caracteristiques.diametre && (!caracteristiques.largeur || !caracteristiques.epaisseur)) {
+      if (
+        !caracteristiques.diametre &&
+        (!caracteristiques.largeur || !caracteristiques.epaisseur)
+      ) {
         this.logger.warn('Barre sans dimensions (diamètre ou largeur+épaisseur)')
         return false
       }
@@ -327,7 +375,20 @@ export class ArticleValidatorService implements ArticleValidator {
 
     // Nuance acier valide
     if (caracteristiques.nuance) {
-      const validGrades = ['S235JR', 'S275JR', 'S355JR', 'S460JR', '304', '304L', '316', '316L', '1050', '5754', '6060', '6082']
+      const validGrades = [
+        'S235JR',
+        'S275JR',
+        'S355JR',
+        'S460JR',
+        '304',
+        '304L',
+        '316',
+        '316L',
+        '1050',
+        '5754',
+        '6060',
+        '6082',
+      ]
       if (!validGrades.includes(caracteristiques.nuance)) {
         this.logger.warn(`Nuance inconnue: ${caracteristiques.nuance}`)
         return false

@@ -68,14 +68,10 @@ export async function POST(request: NextRequest) {
     const { selectedPages = [] } = body
 
     // Utiliser directement l'endpoint backend qui gère tout
-    const response = await callBackendFromApi(
-      request,
-      'user/menu-preferences/selected-pages',
-      {
-        method: 'POST',
-        body: JSON.stringify({ selectedPages }),
-      }
-    )
+    const response = await callBackendFromApi(request, 'user/menu-preferences/selected-pages', {
+      method: 'POST',
+      body: JSON.stringify({ selectedPages }),
+    })
 
     if (response.ok) {
       const data = await response.json()

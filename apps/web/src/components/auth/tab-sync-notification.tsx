@@ -49,9 +49,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
                   <p className="text-sm text-muted-foreground">
                     {t('tabSync.nowConnectedTo')} <strong>{data.company.nom}</strong>
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {t('tabSync.refreshToSync')}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('tabSync.refreshToSync')}</p>
                 </div>
                 <Button
                   size="sm"
@@ -78,9 +76,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
                 <LogOut className="h-5 w-5 text-red-500" />
                 <div className="flex-1">
                   <p className="font-medium">{t('tabSync.disconnected')}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {t('tabSync.logoutInOtherTab')}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t('tabSync.logoutInOtherTab')}</p>
                 </div>
                 <Button
                   size="sm"
@@ -106,9 +102,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
                 <AlertCircle className="h-5 w-5 text-green-500" />
                 <div className="flex-1">
                   <p className="font-medium">{t('tabSync.connectionDetected')}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {t('tabSync.loginInOtherTab')}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t('tabSync.loginInOtherTab')}</p>
                 </div>
                 <Button
                   size="sm"

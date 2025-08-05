@@ -117,7 +117,9 @@ export function CustomSelect({
               </button>
             ))}
             {options.length === 0 && (
-              <div className="px-3 py-2 text-sm text-muted-foreground">{translations?.noOptions || 'No options available'}</div>
+              <div className="px-3 py-2 text-sm text-muted-foreground">
+                {translations?.noOptions || 'No options available'}
+              </div>
             )}
           </div>
         </div>

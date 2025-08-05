@@ -1,10 +1,4 @@
-import { 
-  Column, 
-  Entity, 
-  Index,
-  ManyToOne,
-  JoinColumn
-} from 'typeorm'
+import { Column, Entity, Index, ManyToOne, JoinColumn } from 'typeorm'
 import { TenantEntity } from '../../../core/database/entities/base/multi-tenant.entity'
 import { SectorType } from './sector-coefficient.entity'
 
@@ -61,7 +55,7 @@ export class CustomerSectorAssignment extends TenantEntity {
     yearlyVolume?: number // Volume d'affaires annuel estimé
     preferredSuppliers?: string[] // Fournisseurs préférés
     paymentTerms?: string // Conditions de paiement habituelles
-    
+
     // Spécifique BTP
     btpInfo?: {
       siretBtp?: string
@@ -103,21 +97,19 @@ export class CustomerSectorAssignment extends TenantEntity {
   // Méthodes utilitaires
   isValidAssignment(date: Date = new Date()): boolean {
     if (!this.isActive) return false
-    
+
     if (this.validFrom && date < this.validFrom) return false
     if (this.validUntil && date > this.validUntil) return false
-    
+
     return true
   }
 
   needsApproval(): boolean {
-    return this.assignmentDetails.approvalRequired === true && 
-           !this.assignmentDetails.approvedBy
+    return this.assignmentDetails.approvalRequired === true && !this.assignmentDetails.approvedBy
   }
 
   isApproved(): boolean {
-    return !this.assignmentDetails.approvalRequired || 
-           !!this.assignmentDetails.approvedBy
+    return !this.assignmentDetails.approvalRequired || !!this.assignmentDetails.approvedBy
   }
 
   approve(approvedBy: string): void {
@@ -127,7 +119,7 @@ export class CustomerSectorAssignment extends TenantEntity {
 
   scheduleReview(months: number = 12): void {
     if (!this.metadata) this.metadata = {}
-    
+
     const nextReview = new Date()
     nextReview.setMonth(nextReview.getMonth() + months)
     this.metadata.nextReview = nextReview
@@ -139,21 +131,23 @@ export class CustomerSectorAssignment extends TenantEntity {
     this.metadata.lastReview = new Date()
   }
 
-  addAlert(type: 'contract_expiry' | 'volume_decrease' | 'payment_delay' | 'other', 
-           message: string, 
-           severity: 'info' | 'warning' | 'error' = 'info'): void {
+  addAlert(
+    type: 'contract_expiry' | 'volume_decrease' | 'payment_delay' | 'other',
+    message: string,
+    severity: 'info' | 'warning' | 'error' = 'info'
+  ): void {
     if (!this.metadata) this.metadata = {}
     if (!this.metadata.alerts) this.metadata.alerts = []
-    
+
     this.metadata.alerts.push({
       type,
       message,
       severity,
-      createdAt: new Date()
+      createdAt: new Date(),
     })
   }
 
-  getActiveAlerts(): Array<{type: string, message: string, severity: string, createdAt: Date}> {
+  getActiveAlerts(): Array<{ type: string; message: string; severity: string; createdAt: Date }> {
     return this.metadata?.alerts || []
   }
 
@@ -167,13 +161,15 @@ export class CustomerSectorAssignment extends TenantEntity {
 
   hasValidBTPInsurance(): boolean {
     if (!this.isBTPSector()) return true
-    
+
     const btpInfo = this.getBTPInfo()
     if (!btpInfo?.insurance) return false
-    
+
     const now = new Date()
-    return btpInfo.insurance.decennale === true && 
-           btpInfo.insurance.responsabiliteCivile === true &&
-           (!btpInfo.insurance.validUntil || btpInfo.insurance.validUntil > now)
+    return (
+      btpInfo.insurance.decennale === true &&
+      btpInfo.insurance.responsabiliteCivile === true &&
+      (!btpInfo.insurance.validUntil || btpInfo.insurance.validUntil > now)
+    )
   }
 }

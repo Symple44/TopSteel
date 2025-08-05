@@ -228,7 +228,8 @@ export default function TestMultiTenantPage() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {results.data.slice(0, 10).map((row: any, idx: number) => {
-                        const rowId = row.id || Object.values(row).slice(0, 3).join('-') || `row-${idx}`;
+                        const rowId =
+                          row.id || Object.values(row).slice(0, 3).join('-') || `row-${idx}`
                         return (
                           <tr key={rowId}>
                             {Object.entries(row).map(([columnName, value]) => (
@@ -240,7 +241,7 @@ export default function TestMultiTenantPage() {
                               </td>
                             ))}
                           </tr>
-                        );
+                        )
                       })}
                     </tbody>
                   </table>

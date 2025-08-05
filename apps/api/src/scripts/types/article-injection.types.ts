@@ -9,14 +9,14 @@ export enum ArticleType {
   PRODUIT_SEMI_FINI = 'PRODUIT_SEMI_FINI',
   FOURNITURE = 'FOURNITURE',
   CONSOMMABLE = 'CONSOMMABLE',
-  SERVICE = 'SERVICE'
+  SERVICE = 'SERVICE',
 }
 
 export enum ArticleStatus {
   ACTIF = 'ACTIF',
   INACTIF = 'INACTIF',
   OBSOLETE = 'OBSOLETE',
-  EN_COURS_CREATION = 'EN_COURS_CREATION'
+  EN_COURS_CREATION = 'EN_COURS_CREATION',
 }
 
 export enum UniteStock {
@@ -31,7 +31,7 @@ export enum UniteStock {
   L = 'L',
   ML = 'ML',
   T = 'T',
-  H = 'H'
+  H = 'H',
 }
 
 export enum ArticleFamille {
@@ -39,14 +39,14 @@ export enum ArticleFamille {
   TUBES_PROFILES = 'TUBES_PROFILES',
   ACIERS_LONGS = 'ACIERS_LONGS',
   TOLES_PLAQUES = 'TOLES_PLAQUES',
-  COUVERTURE_BARDAGE = 'COUVERTURE_BARDAGE'
+  COUVERTURE_BARDAGE = 'COUVERTURE_BARDAGE',
 }
 
 export enum SteelGrade {
   S235JR = 'S235JR',
   S275JR = 'S275JR',
   S355JR = 'S355JR',
-  S460JR = 'S460JR'
+  S460JR = 'S460JR',
 }
 
 export enum StainlessGrade {
@@ -54,14 +54,14 @@ export enum StainlessGrade {
   INOX_304L = '304L',
   INOX_316 = '316',
   INOX_316L = '316L',
-  INOX_430 = '430'
+  INOX_430 = '430',
 }
 
 export enum AluminumGrade {
   AL_1050 = '1050',
   AL_5754 = '5754',
   AL_6060 = '6060',
-  AL_6082 = '6082'
+  AL_6082 = '6082',
 }
 
 /**
@@ -74,13 +74,13 @@ export interface CaracteristiquesTechniques {
   longueur?: number
   epaisseur?: number
   diametre?: number
-  
+
   // Propriétés physiques
   poids?: number // kg/m ou kg/m²
   section?: number // cm²
   volume?: number // m³
   surface?: number // m²
-  
+
   // Propriétés mécaniques pour profilés
   momentInertieX?: number // cm⁴
   momentInertieY?: number // cm⁴
@@ -88,26 +88,26 @@ export interface CaracteristiquesTechniques {
   moduleResistanceY?: number // cm³
   rayonGirationX?: number // cm
   rayonGirationY?: number // cm
-  
+
   // Spécifications matériau
   nuance?: string
   norme?: string
   limiteElastique?: number // MPa
   resistanceTraction?: number // MPa
   allongement?: number // %
-  
+
   // Propriétés spécifiques
   epaisseurAme?: number // mm
   epaisseurAile?: number // mm
   entraxeOndulation?: number // mm pour bacs
   largeurUtile?: number // mm pour bacs
   porteeAdmissible?: number // m
-  
+
   // Traitements et finitions
   revetement?: string
   traitement?: string
   classeFeu?: string
-  
+
   // Métadonnées
   applications?: string[]
   specifications?: Record<string, any>
@@ -203,7 +203,10 @@ export interface SystemParameter {
 /**
  * Type pour les générateurs d'articles spécialisés
  */
-export type ArticleGenerator = (config: ArticleInjectionConfig, globalConfig: GlobalInjectionConfig) => Promise<ArticleMetallurgie[]>
+export type ArticleGenerator = (
+  config: ArticleInjectionConfig,
+  globalConfig: GlobalInjectionConfig
+) => Promise<ArticleMetallurgie[]>
 
 /**
  * Interface pour les validateurs d'articles
@@ -212,7 +215,10 @@ export interface ArticleValidator {
   validateReference(reference: string): boolean
   validateDimensions(caracteristiques: CaracteristiquesTechniques): boolean
   validatePricing(article: ArticleMetallurgie): boolean
-  validateTechnicalSpecs(caracteristiques: CaracteristiquesTechniques, famille: ArticleFamille): boolean
+  validateTechnicalSpecs(
+    caracteristiques: CaracteristiquesTechniques,
+    famille: ArticleFamille
+  ): boolean
 }
 
 /**

@@ -58,7 +58,7 @@ export default function RootPage() {
                     </span>
                   </div>
                 )}
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -70,9 +70,7 @@ export default function RootPage() {
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground">
-                    {marketplace.description}
-                  </p>
+                  <p className="text-muted-foreground">{marketplace.description}</p>
 
                   {marketplace.status === 'active' ? (
                     <Link
@@ -96,8 +94,8 @@ export default function RootPage() {
           <div className="bg-muted/50 rounded-lg p-8 text-center space-y-4">
             <h3 className="text-2xl font-semibold">Vous êtes un professionnel ?</h3>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Créez votre propre marketplace et vendez vos produits en ligne. 
-              Intégration complète avec votre ERP TopSteel.
+              Créez votre propre marketplace et vendez vos produits en ligne. Intégration complète
+              avec votre ERP TopSteel.
             </p>
             <Link
               href="https://topsteel.fr/contact"

@@ -22,7 +22,7 @@ async function listDatabases() {
     console.log(`   Host: ${process.env.DB_HOST || '127.0.0.1'}`)
     console.log(`   Port: ${process.env.DB_PORT || '5432'}`)
     console.log(`   User: ${process.env.DB_USERNAME || 'postgres'}`)
-    
+
     await adminDataSource.initialize()
     console.log('✅ Connecté avec succès!\n')
 
@@ -36,7 +36,7 @@ async function listDatabases() {
 
     console.log('📋 Bases de données disponibles:')
     console.log('================================')
-    
+
     result.forEach((db: any) => {
       const dbName = db.datname
       // Mettre en évidence les bases TopSteel
@@ -51,7 +51,7 @@ async function listDatabases() {
     const topsteelDbs = result
       .filter((db: any) => db.datname.includes('topsteel'))
       .map((db: any) => db.datname)
-    
+
     topsteelDbs.forEach((db: string) => {
       console.log(`   - ${db}`)
     })
@@ -59,10 +59,9 @@ async function listDatabases() {
     // Vérifier spécifiquement la base attendue
     const expectedDb = `erp_topsteel_${process.env.DEFAULT_TENANT_CODE?.toLowerCase() || 'default'}`
     console.log(`\n🎯 Base attendue: ${expectedDb}`)
-    
+
     const exists = topsteelDbs.includes(expectedDb)
     console.log(`   Statut: ${exists ? '✅ EXISTE' : '❌ MANQUANTE'}`)
-
   } catch (error) {
     console.error('❌ Erreur de connexion:', error)
   } finally {

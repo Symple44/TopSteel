@@ -6,16 +6,8 @@ import { Societe } from '../entities/erp/societe.entity'
 
 @Global()
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Societe], 'erpAuth'),
-  ],
-  providers: [
-    TenantResolver,
-    TenantGuard,
-  ],
-  exports: [
-    TenantResolver,
-    TenantGuard,
-  ],
+  imports: [TypeOrmModule.forFeature([Societe], 'erpAuth')],
+  providers: [TenantResolver, TenantGuard],
+  exports: [TenantResolver, TenantGuard],
 })
 export class TenantModule {}

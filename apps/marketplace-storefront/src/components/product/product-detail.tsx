@@ -3,18 +3,18 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { 
-  ShoppingCart, 
-  Heart, 
-  Share2, 
-  Package, 
-  Truck, 
-  Shield, 
+import {
+  ShoppingCart,
+  Heart,
+  Share2,
+  Package,
+  Truck,
+  Shield,
   ChevronLeft,
   ChevronRight,
   Plus,
   Minus,
-  Check
+  Check,
 } from 'lucide-react'
 import { Product } from '@/lib/api/storefront'
 import { formatPrice, cn } from '@/lib/utils'
@@ -32,23 +32,24 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const { addItem, hasItem, getItemCount } = useCart()
 
-  const images = product.images.length > 0 ? product.images : [
-    { url: '/placeholder-product.jpg', alt: product.designation, isMain: true }
-  ]
+  const images =
+    product.images.length > 0
+      ? product.images
+      : [{ url: '/placeholder-product.jpg', alt: product.designation, isMain: true }]
 
   const hasDiscount = product.calculatedPrice && product.calculatedPrice < product.basePrice
 
   const handleAddToCart = async () => {
     setIsAddingToCart(true)
-    
+
     try {
       addItem(product, quantity)
-      
+
       toast.success('Produit ajouté au panier', {
         description: `${quantity} × ${product.designation}`,
       })
     } catch (error) {
-      toast.error('Erreur lors de l\'ajout au panier')
+      toast.error("Erreur lors de l'ajout au panier")
     } finally {
       setIsAddingToCart(false)
     }
@@ -86,7 +87,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
         {product.categories.length > 0 && (
           <>
             <span>/</span>
-            <Link 
+            <Link
               href={`/${tenant}/products?category=${encodeURIComponent(product.categories[0])}`}
               className="hover:text-foreground"
             >
@@ -110,7 +111,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
               className="object-cover"
               priority
             />
-            
+
             {/* Badges */}
             <div className="absolute top-4 left-4 flex flex-col gap-2">
               {product.isFeatured && (
@@ -141,7 +142,9 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
-                  onClick={() => setSelectedImageIndex(Math.min(images.length - 1, selectedImageIndex + 1))}
+                  onClick={() =>
+                    setSelectedImageIndex(Math.min(images.length - 1, selectedImageIndex + 1))
+                  }
                   className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 hover:bg-background rounded-full flex items-center justify-center transition-colors"
                   disabled={selectedImageIndex === images.length - 1}
                 >
@@ -160,8 +163,8 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                   onClick={() => setSelectedImageIndex(index)}
                   className={cn(
                     'relative aspect-square overflow-hidden rounded border-2 transition-colors',
-                    selectedImageIndex === index 
-                      ? 'border-primary' 
+                    selectedImageIndex === index
+                      ? 'border-primary'
                       : 'border-transparent hover:border-muted-foreground'
                   )}
                 >
@@ -182,9 +185,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
           {/* Header */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground font-mono">
-                Réf: {product.reference}
-              </p>
+              <p className="text-sm text-muted-foreground font-mono">Réf: {product.reference}</p>
               <button
                 onClick={handleShare}
                 className="p-2 hover:bg-muted rounded-lg transition-colors"
@@ -193,10 +194,8 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                 <Share2 className="w-4 h-4" />
               </button>
             </div>
-            
-            <h1 className="text-3xl font-bold">
-              {product.designation}
-            </h1>
+
+            <h1 className="text-3xl font-bold">{product.designation}</h1>
 
             {/* Categories */}
             {product.categories.length > 0 && (
@@ -226,7 +225,11 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                     {formatPrice(product.basePrice)}
                   </span>
                   <span className="bg-destructive text-destructive-foreground px-2 py-1 text-sm font-medium rounded">
-                    -{Math.round(((product.basePrice - product.calculatedPrice!) / product.basePrice) * 100)}%
+                    -
+                    {Math.round(
+                      ((product.basePrice - product.calculatedPrice!) / product.basePrice) * 100
+                    )}
+                    %
                   </span>
                 </>
               ) : (
@@ -235,22 +238,21 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                 </span>
               )}
             </div>
-            
-            <p className="text-sm text-muted-foreground">
-              Prix TTC, hors frais de livraison
-            </p>
+
+            <p className="text-sm text-muted-foreground">Prix TTC, hors frais de livraison</p>
           </div>
 
           {/* Stock Status */}
           <div className="flex items-center gap-2">
-            <div className={cn(
-              'w-3 h-3 rounded-full',
-              product.inStock ? 'bg-green-500' : 'bg-red-500'
-            )} />
-            <span className={cn(
-              'font-medium',
-              product.inStock ? 'text-green-600' : 'text-red-600'
-            )}>
+            <div
+              className={cn(
+                'w-3 h-3 rounded-full',
+                product.inStock ? 'bg-green-500' : 'bg-red-500'
+              )}
+            />
+            <span
+              className={cn('font-medium', product.inStock ? 'text-green-600' : 'text-red-600')}
+            >
               {product.inStock ? 'En stock' : 'Rupture de stock'}
             </span>
             {product.stockDisponible !== undefined && product.inStock && (
@@ -281,7 +283,9 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                     className="w-16 text-center py-2 border-0 focus:outline-none"
                   />
                   <button
-                    onClick={() => setQuantity(Math.min(product.stockDisponible || 999, quantity + 1))}
+                    onClick={() =>
+                      setQuantity(Math.min(product.stockDisponible || 999, quantity + 1))
+                    }
                     className="p-2 hover:bg-muted transition-colors"
                     disabled={quantity >= (product.stockDisponible || 999)}
                   >
@@ -365,7 +369,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
               <div>
                 <h2 className="text-2xl font-bold mb-4">Description</h2>
                 {product.description ? (
-                  <div 
+                  <div
                     className="prose prose-sm max-w-none"
                     dangerouslySetInnerHTML={{ __html: product.description }}
                   />

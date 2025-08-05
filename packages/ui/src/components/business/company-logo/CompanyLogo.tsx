@@ -44,7 +44,9 @@ export function CompanyLogo({
       <div className={cn('flex items-center space-x-3', className)}>
         <div className={cn(sizeClasses[size], 'bg-slate-200 rounded-lg animate-pulse')} />
         {showName && (
-          <div className={cn('h-4 bg-slate-200 rounded w-24 animate-pulse', textSizeClasses[size])} />
+          <div
+            className={cn('h-4 bg-slate-200 rounded w-24 animate-pulse', textSizeClasses[size])}
+          />
         )}
       </div>
     )

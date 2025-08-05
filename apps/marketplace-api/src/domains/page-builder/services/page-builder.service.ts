@@ -17,13 +17,10 @@ export class PageBuilderService {
     private sectionPresetRepository: Repository<SectionPreset>
   ) {}
 
-  async createTemplate(
-    societeId: string, 
-    createDto: CreatePageTemplateDto
-  ): Promise<PageTemplate> {
+  async createTemplate(societeId: string, createDto: CreatePageTemplateDto): Promise<PageTemplate> {
     // Vérifier l'unicité du slug
     const existingTemplate = await this.pageTemplateRepository.findOne({
-      where: { societeId, slug: createDto.slug }
+      where: { societeId, slug: createDto.slug },
     })
 
     if (existingTemplate) {
@@ -39,14 +36,14 @@ export class PageBuilderService {
       metadata: createDto.metadata,
       settings: createDto.settings,
       societeId,
-      version: 1
+      version: 1,
     })
 
     const savedTemplate = await this.pageTemplateRepository.save(template)
 
     // Créer les sections si fournies
     if (createDto.sections && createDto.sections.length > 0) {
-      const sections = createDto.sections.map((sectionDto, index) => 
+      const sections = createDto.sections.map((sectionDto, index) =>
         this.pageSectionRepository.create({
           type: sectionDto.type as any,
           name: sectionDto.name,
@@ -56,7 +53,7 @@ export class PageBuilderService {
           settings: sectionDto.settings,
           pageTemplateId: savedTemplate.id,
           order: index,
-          isVisible: true
+          isVisible: true,
         })
       )
 
@@ -69,7 +66,7 @@ export class PageBuilderService {
   async findTemplateById(id: string): Promise<PageTemplate> {
     const template = await this.pageTemplateRepository.findOne({
       where: { id },
-      relations: ['sections']
+      relations: ['sections'],
     })
 
     if (!template) {
@@ -82,7 +79,7 @@ export class PageBuilderService {
   async findTemplateBySlug(societeId: string, slug: string): Promise<PageTemplate> {
     const template = await this.pageTemplateRepository.findOne({
       where: { societeId, slug },
-      relations: ['sections']
+      relations: ['sections'],
     })
 
     if (!template) {
@@ -96,14 +93,11 @@ export class PageBuilderService {
     return this.pageTemplateRepository.find({
       where: { societeId },
       relations: ['sections'],
-      order: { updatedAt: 'DESC' }
+      order: { updatedAt: 'DESC' },
     })
   }
 
-  async updateTemplate(
-    id: string, 
-    updateDto: UpdatePageTemplateDto
-  ): Promise<PageTemplate> {
+  async updateTemplate(id: string, updateDto: UpdatePageTemplateDto): Promise<PageTemplate> {
     const template = await this.findTemplateById(id)
 
     // Incrémenter la version si le contenu change
@@ -120,7 +114,7 @@ export class PageBuilderService {
       await this.pageSectionRepository.delete({ pageTemplateId: id })
 
       // Créer les nouvelles sections
-      const sections = updateDto.sections.map((sectionDto, index) => 
+      const sections = updateDto.sections.map((sectionDto, index) =>
         this.pageSectionRepository.create({
           type: sectionDto.type as any,
           name: sectionDto.name,
@@ -130,7 +124,7 @@ export class PageBuilderService {
           settings: sectionDto.settings,
           pageTemplateId: id,
           order: index,
-          isVisible: true
+          isVisible: true,
         })
       )
 
@@ -149,15 +143,11 @@ export class PageBuilderService {
     const template = await this.findTemplateById(id)
     template.status = 'published' as any
     template.publishedAt = new Date()
-    
+
     return this.pageTemplateRepository.save(template)
   }
 
-  async duplicateTemplate(
-    id: string,
-    newName: string,
-    newSlug: string
-  ): Promise<PageTemplate> {
+  async duplicateTemplate(id: string, newName: string, newSlug: string): Promise<PageTemplate> {
     const originalTemplate = await this.findTemplateById(id)
 
     const duplicatedTemplate = this.pageTemplateRepository.create({
@@ -170,14 +160,14 @@ export class PageBuilderService {
       settings: originalTemplate.settings,
       societeId: originalTemplate.societeId,
       publishedAt: null,
-      version: 1
+      version: 1,
     })
 
     const savedTemplate = await this.pageTemplateRepository.save(duplicatedTemplate)
 
     // Dupliquer les sections
     if (originalTemplate.sections.length > 0) {
-      const duplicatedSections = originalTemplate.sections.map(section =>
+      const duplicatedSections = originalTemplate.sections.map((section) =>
         this.pageSectionRepository.create({
           type: section.type,
           name: section.name,
@@ -187,7 +177,7 @@ export class PageBuilderService {
           settings: section.settings,
           pageTemplateId: savedTemplate.id,
           order: section.order,
-          isVisible: section.isVisible
+          isVisible: section.isVisible,
         })
       )
 
@@ -205,7 +195,7 @@ export class PageBuilderService {
     const preset = this.sectionPresetRepository.create({
       ...presetData,
       societeId,
-      usageCount: 0
+      usageCount: 0,
     })
 
     return this.sectionPresetRepository.save(preset)
@@ -234,15 +224,11 @@ export class PageBuilderService {
 
     return this.sectionPresetRepository.find({
       where,
-      order: { usageCount: 'DESC', createdAt: 'DESC' }
+      order: { usageCount: 'DESC', createdAt: 'DESC' },
     })
   }
 
   async incrementPresetUsage(presetId: string): Promise<void> {
-    await this.sectionPresetRepository.increment(
-      { id: presetId },
-      'usageCount',
-      1
-    )
+    await this.sectionPresetRepository.increment({ id: presetId }, 'usageCount', 1)
   }
 }

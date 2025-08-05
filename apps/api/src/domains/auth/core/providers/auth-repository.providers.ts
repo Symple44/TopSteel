@@ -1,7 +1,13 @@
 import type { Provider } from '@nestjs/common'
-import { SocieteAuthRepositoryService, SocieteUserAuthRepositoryService } from '../../../../features/societes/services/societe-auth-repository.service'
+import {
+  SocieteAuthRepositoryService,
+  SocieteUserAuthRepositoryService,
+} from '../../../../features/societes/services/societe-auth-repository.service'
 import { UserAuthRepositoryService } from '../../../users/services/user-auth-repository.service'
-import type { ISocieteRepository, ISocieteUserRepository } from '../interfaces/societe-repository.interface'
+import type {
+  ISocieteRepository,
+  ISocieteUserRepository,
+} from '../interfaces/societe-repository.interface'
 import type { IUserRepository } from '../interfaces/user-repository.interface'
 
 // Tokens pour l'injection de dépendance
@@ -29,5 +35,5 @@ export const AuthRepositoryProviders: Provider[] = [
 
 // Types pour l'injection
 export type UserRepositoryToken = IUserRepository
-export type SocieteRepositoryToken = ISocieteRepository 
+export type SocieteRepositoryToken = ISocieteRepository
 export type SocieteUserRepositoryToken = ISocieteUserRepository

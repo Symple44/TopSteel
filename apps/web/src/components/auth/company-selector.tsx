@@ -439,7 +439,7 @@ export default function CompanySelector({
       // Sélectionner automatiquement la société par défaut s'il y en a une
       const defaultCompany = companiesArray.find((c) => c.isDefault === true)
       console.log('🔍 CompanySelector: Default company found:', defaultCompany)
-      
+
       if (defaultCompany) {
         console.log('🔍 CompanySelector: Auto-selecting default company:', defaultCompany.id)
         setSelectedCompanyId(defaultCompany.id)
@@ -513,7 +513,7 @@ export default function CompanySelector({
       const maxAttempts = 15 // Augmenter le nombre de tentatives
       const checkTokensAndRedirect = () => {
         const storedTokens = localStorage.getItem('topsteel-tokens')
-        
+
         if (storedTokens) {
           try {
             const tokens = JSON.parse(storedTokens)
@@ -527,10 +527,10 @@ export default function CompanySelector({
             console.warn('🔍 CompanySelector: Error parsing tokens:', error)
           }
         }
-        
+
         attempts++
         console.log(`🔍 CompanySelector: Token check attempt ${attempts}/${maxAttempts}`)
-        
+
         if (attempts < maxAttempts) {
           setTimeout(checkTokensAndRedirect, 300) // Augmenter le délai entre les tentatives
         } else {
@@ -544,7 +544,7 @@ export default function CompanySelector({
           }
         }
       }
-      
+
       setTimeout(checkTokensAndRedirect, 300)
     } catch (_error) {
       toast.error(t('companies.cannotConnect'))
@@ -569,9 +569,7 @@ export default function CompanySelector({
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-foreground text-sm">{t('companies.none')}</h3>
-            <p className="text-muted-foreground text-xs">
-              {t('companies.contactAdmin')}
-            </p>
+            <p className="text-muted-foreground text-xs">{t('companies.contactAdmin')}</p>
           </div>
           <Button
             variant="outline"

@@ -1,1 +1,5 @@
-export { TranslationField, type TranslationFieldProps, type TranslationLanguage } from './TranslationField'
+export {
+  TranslationField,
+  type TranslationFieldProps,
+  type TranslationLanguage,
+} from './TranslationField'

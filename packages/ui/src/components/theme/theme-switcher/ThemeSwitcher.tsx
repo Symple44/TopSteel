@@ -8,7 +8,12 @@ import { ChevronDownIcon, MoonIcon, SunIcon, SparklesIcon, MonitorIcon } from 'l
 import * as React from 'react'
 import { cn } from '../../../lib/utils'
 import { Button } from '../../primitives/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../primitives/dropdown'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../../primitives/dropdown'
 import { useTheme, type Theme } from '../theme-provider'
 
 // ===== TYPES =====
@@ -46,40 +51,43 @@ export interface ThemeSwitcherProps extends React.ButtonHTMLAttributes<HTMLButto
 // ===== ICÔNES ET LABELS =====
 
 const themeData: Record<Theme, { icon: React.ElementType; label: string; description?: string }> = {
-  light: { 
-    icon: SunIcon, 
+  light: {
+    icon: SunIcon,
     label: 'Clair',
-    description: 'Thème clair classique'
+    description: 'Thème clair classique',
   },
-  dark: { 
-    icon: MoonIcon, 
+  dark: {
+    icon: MoonIcon,
     label: 'Sombre',
-    description: 'Thème sombre moderne'
+    description: 'Thème sombre moderne',
   },
-  vibrant: { 
-    icon: SparklesIcon, 
+  vibrant: {
+    icon: SparklesIcon,
     label: 'Vibrant',
-    description: 'Thème vibrant TopSteel'
+    description: 'Thème vibrant TopSteel',
   },
-  system: { 
-    icon: MonitorIcon, 
+  system: {
+    icon: MonitorIcon,
     label: 'Système',
-    description: 'Suivre les préférences système'
+    description: 'Suivre les préférences système',
   },
 }
 
 // ===== COMPONENT =====
- 
+
 const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
-  ({ 
-    variant = 'ghost', 
-    size = 'default', 
-    mode = 'dropdown',
-    showLabels,
-    showIcons = true,
-    className, 
-    ...props 
-  }, ref) => {
+  (
+    {
+      variant = 'ghost',
+      size = 'default',
+      mode = 'dropdown',
+      showLabels,
+      showIcons = true,
+      className,
+      ...props
+    },
+    ref
+  ) => {
     const { theme, setTheme, themes, resolvedTheme } = useTheme()
     const [mounted, setMounted] = React.useState(false)
 
@@ -89,11 +97,11 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
     }, [])
 
     // Défaut showLabels basé sur le mode
-    const shouldShowLabels = showLabels ?? (mode === 'dropdown')
+    const shouldShowLabels = showLabels ?? mode === 'dropdown'
 
     // Fonction pour le mode toggle
     const toggleTheme = () => {
-      const availableThemes = themes.filter(t => t !== 'system')
+      const availableThemes = themes.filter((t) => t !== 'system')
       const currentIndex = availableThemes.indexOf(theme === 'system' ? resolvedTheme : theme)
       const nextIndex = (currentIndex + 1) % availableThemes.length
       setTheme(availableThemes[nextIndex])
@@ -106,14 +114,7 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
     // Placeholder pendant hydration
     if (!mounted) {
       return (
-        <Button
-          ref={ref}
-          variant={variant}
-          size={size}
-          className={className}
-          disabled
-          {...props}
-        >
+        <Button ref={ref} variant={variant} size={size} className={className} disabled {...props}>
           {showIcons && <MoonIcon className="h-4 w-4" />}
           {shouldShowLabels && <span className="ml-2">Thème</span>}
         </Button>
@@ -133,9 +134,7 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
           {...props}
         >
           {showIcons && <CurrentIcon className="h-4 w-4" />}
-          {shouldShowLabels && (
-            <span className="ml-2">{currentThemeData.label}</span>
-          )}
+          {shouldShowLabels && <span className="ml-2">{currentThemeData.label}</span>}
         </Button>
       )
     }
@@ -152,9 +151,7 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
             {...props}
           >
             {showIcons && <CurrentIcon className="h-4 w-4" />}
-            {shouldShowLabels && (
-              <span>{currentThemeData.label}</span>
-            )}
+            {shouldShowLabels && <span>{currentThemeData.label}</span>}
             <ChevronDownIcon className="h-4 w-4 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
@@ -162,7 +159,7 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
           {themes.map((themeOption) => {
             const ThemeIcon = themeData[themeOption].icon
             const isActive = theme === themeOption
-            
+
             return (
               <DropdownMenuItem
                 key={themeOption}
@@ -181,9 +178,7 @@ const ThemeSwitcher = React.forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
                     </span>
                   )}
                 </div>
-                {isActive && (
-                  <div className="ml-auto h-2 w-2 rounded-full bg-primary" />
-                )}
+                {isActive && <div className="ml-auto h-2 w-2 rounded-full bg-primary" />}
               </DropdownMenuItem>
             )
           })}

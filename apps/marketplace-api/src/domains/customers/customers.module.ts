@@ -6,17 +6,9 @@ import { MarketplaceCustomersService } from './services/marketplace-customers.se
 import { CustomersController } from './controllers/customers.controller'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([MarketplaceCustomer], 'marketplace'),
-  ],
-  providers: [
-    MarketplaceCustomersService,
-  ],
-  controllers: [
-    CustomersController,
-  ],
-  exports: [
-    MarketplaceCustomersService,
-  ],
+  imports: [TypeOrmModule.forFeature([MarketplaceCustomer], 'marketplace')],
+  providers: [MarketplaceCustomersService],
+  controllers: [CustomersController],
+  exports: [MarketplaceCustomersService],
 })
 export class CustomersModule {}

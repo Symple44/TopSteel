@@ -375,8 +375,12 @@ export function NotificationCenter() {
 
                     <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
                       <div>
-                        <span className="font-medium">{tn('descriptions.browserNotifications')}</span>
-                        <p className="text-sm text-gray-600">{tn('descriptions.browserNotifications')}</p>
+                        <span className="font-medium">
+                          {tn('descriptions.browserNotifications')}
+                        </span>
+                        <p className="text-sm text-gray-600">
+                          {tn('descriptions.browserNotifications')}
+                        </p>
                       </div>
                       <input
                         type="checkbox"

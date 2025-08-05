@@ -33,11 +33,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     apiClient.setTenant(newTenant)
   }
 
-  return (
-    <TenantContext.Provider value={{ tenant, setTenant }}>
-      {children}
-    </TenantContext.Provider>
-  )
+  return <TenantContext.Provider value={{ tenant, setTenant }}>{children}</TenantContext.Provider>
 }
 
 export const useTenantContext = () => {

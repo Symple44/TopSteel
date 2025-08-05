@@ -1,11 +1,11 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
   Index,
-  OneToMany
+  OneToMany,
 } from 'typeorm'
 import { MarketplacePriceRule } from './marketplace-price-rule.entity'
 
@@ -97,21 +97,27 @@ export class MarketplaceProduct {
   lastSyncAt?: Date
 
   // Relations
-  @OneToMany(() => MarketplacePriceRule, rule => rule.product)
+  @OneToMany(
+    () => MarketplacePriceRule,
+    (rule) => rule.product
+  )
   priceRules!: MarketplacePriceRule[]
 
   // Méthodes utilitaires
   getMainImage(): ProductImages | undefined {
-    return this.marketplaceData.images?.find(img => img.isMain) ||
-           this.marketplaceData.images?.[0]
+    return (
+      this.marketplaceData.images?.find((img) => img.isMain) || this.marketplaceData.images?.[0]
+    )
   }
 
   getAllImages(): ProductImages[] {
-    return this.marketplaceData.images?.sort((a, b) => {
-      if (a.isMain) return -1
-      if (b.isMain) return 1
-      return a.order - b.order
-    }) || []
+    return (
+      this.marketplaceData.images?.sort((a, b) => {
+        if (a.isMain) return -1
+        if (b.isMain) return 1
+        return a.order - b.order
+      }) || []
+    )
   }
 
   getSeoTitle(): string {
@@ -119,13 +125,13 @@ export class MarketplaceProduct {
   }
 
   getSeoDescription(): string {
-    return this.marketplaceData.seo?.description || 
-           this.marketplaceData.shortDescription || ''
+    return this.marketplaceData.seo?.description || this.marketplaceData.shortDescription || ''
   }
 
   getSlug(): string {
-    return this.marketplaceData.seo?.slug || 
-           this.erpArticleId.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    return (
+      this.marketplaceData.seo?.slug || this.erpArticleId.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    )
   }
 
   isInCategory(category: string): boolean {

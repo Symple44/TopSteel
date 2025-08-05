@@ -17,7 +17,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, tenant, className, variant = 'grid' }: ProductCardProps) {
-  const mainImage = product.images.find(img => img.isMain) || product.images[0]
+  const mainImage = product.images.find((img) => img.isMain) || product.images[0]
   const hasDiscount = product.calculatedPrice && product.calculatedPrice < product.basePrice
   const { addItem } = useCart()
 
@@ -28,7 +28,7 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
         description: product.designation,
       })
     } catch (error) {
-      toast.error('Erreur lors de l\'ajout au panier')
+      toast.error("Erreur lors de l'ajout au panier")
     }
   }
 
@@ -79,11 +79,8 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
                 <div className="text-xs text-muted-foreground font-mono">
                   Réf: {product.reference}
                 </div>
-                
-                <Link
-                  href={`/${tenant}/products/${product.id}`}
-                  className="block group/title"
-                >
+
+                <Link href={`/${tenant}/products/${product.id}`} className="block group/title">
                   <h3 className="font-semibold text-base group-hover/title:text-primary transition-colors line-clamp-2">
                     {product.designation}
                   </h3>
@@ -132,13 +129,15 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
 
                 {/* Stock Status */}
                 <div className="text-xs text-right">
-                  <div className={cn(
-                    'font-medium',
-                    product.inStock ? 'text-green-600' : 'text-destructive'
-                  )}>
+                  <div
+                    className={cn(
+                      'font-medium',
+                      product.inStock ? 'text-green-600' : 'text-destructive'
+                    )}
+                  >
                     {product.inStock ? 'En stock' : 'Rupture de stock'}
                   </div>
-                  
+
                   {product.stockDisponible !== undefined && product.inStock && (
                     <div className="text-muted-foreground">
                       {product.stockDisponible} disponible(s)
@@ -155,7 +154,7 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
                     <Eye className="w-3 h-3" />
                     Voir
                   </Link>
-                  
+
                   {product.inStock && (
                     <button
                       onClick={handleAddToCart}
@@ -221,7 +220,7 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
             >
               <Eye className="w-4 h-4" />
             </Link>
-            
+
             {product.inStock && (
               <button
                 className="w-10 h-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -238,15 +237,10 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
       {/* Content */}
       <div className="p-4 space-y-3">
         {/* Product Reference */}
-        <div className="text-xs text-muted-foreground font-mono">
-          Réf: {product.reference}
-        </div>
+        <div className="text-xs text-muted-foreground font-mono">Réf: {product.reference}</div>
 
         {/* Title */}
-        <Link
-          href={`/${tenant}/products/${product.id}`}
-          className="block group/title"
-        >
+        <Link href={`/${tenant}/products/${product.id}`} className="block group/title">
           <h3 className="font-semibold text-sm group-hover/title:text-primary transition-colors line-clamp-2">
             {product.designation}
           </h3>
@@ -302,27 +296,21 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
 
           {/* Stock Status */}
           <div className="flex items-center justify-between text-xs">
-            <span className={cn(
-              'font-medium',
-              product.inStock ? 'text-green-600' : 'text-destructive'
-            )}>
+            <span
+              className={cn('font-medium', product.inStock ? 'text-green-600' : 'text-destructive')}
+            >
               {product.inStock ? 'En stock' : 'Rupture de stock'}
             </span>
-            
+
             {product.stockDisponible !== undefined && product.inStock && (
-              <span className="text-muted-foreground">
-                {product.stockDisponible} disponible(s)
-              </span>
+              <span className="text-muted-foreground">{product.stockDisponible} disponible(s)</span>
             )}
           </div>
         </div>
 
         {/* Add to Cart Button (Mobile) */}
         {product.inStock && (
-          <button
-            className="w-full btn-primary py-2 text-sm md:hidden"
-            onClick={handleAddToCart}
-          >
+          <button className="w-full btn-primary py-2 text-sm md:hidden" onClick={handleAddToCart}>
             <ShoppingCart className="w-4 h-4 mr-2" />
             Ajouter au panier
           </button>

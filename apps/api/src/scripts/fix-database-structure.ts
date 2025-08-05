@@ -29,7 +29,7 @@ async function fixDatabaseStructure() {
     host: tenantDbConfig.host,
     port: tenantDbConfig.port,
     username: tenantDbConfig.username,
-    database: tenantDbConfig.database
+    database: tenantDbConfig.database,
   })
 
   let connection: DataSource | null = null
@@ -42,7 +42,7 @@ async function fixDatabaseStructure() {
 
     // Vérifier si la table articles existe et sa structure
     console.log('\n🔍 Vérification de la structure de la table articles...')
-    
+
     const articlesTableExists = await connection.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
@@ -53,7 +53,7 @@ async function fixDatabaseStructure() {
 
     if (!articlesTableExists[0].exists) {
       console.log('❌ Table articles introuvable. Exécution de la migration...')
-      
+
       // Créer la table articles avec la structure correcte
       await connection.query(`
         -- Créer les enums s'ils n'existent pas
@@ -160,7 +160,7 @@ async function fixDatabaseStructure() {
       console.log('✅ Table articles créée avec succès')
     } else {
       console.log('✅ Table articles trouvée')
-      
+
       // Vérifier si la colonne societe_id existe
       const societeIdColumnExists = await connection.query(`
         SELECT EXISTS (
@@ -206,7 +206,7 @@ async function fixDatabaseStructure() {
 
     // Vérifier la table societes dans la base auth
     console.log('\n🔍 Vérification de la table societes...')
-    
+
     const societeTableExists = await connection.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
@@ -297,7 +297,6 @@ async function fixDatabaseStructure() {
     }
 
     console.log('\n🎉 Correction de la structure de base de données terminée avec succès !')
-
   } catch (error) {
     console.error('❌ Erreur lors de la correction:', error)
     throw error

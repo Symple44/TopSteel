@@ -31,8 +31,7 @@ export interface TooltipProviderProps
   disableHoverableContent?: boolean
 }
 
-export interface TooltipProps
-  extends React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root> {
+export interface TooltipProps extends React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root> {
   /**
    * Contenu du tooltip
    */
@@ -105,12 +104,12 @@ export interface TooltipContentProps
  * Provider global pour la configuration des tooltips
  * À placer à la racine de l'application
  */
-const TooltipProvider: React.FC<TooltipProviderProps> = ({ 
+const TooltipProvider: React.FC<TooltipProviderProps> = ({
   delayDuration = 700,
   skipDelayDuration = 300,
   disableHoverableContent = false,
   children,
-  ...props 
+  ...props
 }) => (
   <TooltipPrimitive.Provider
     delayDuration={delayDuration}
@@ -128,13 +127,13 @@ TooltipProvider.displayName = 'TooltipProvider'
 /**
  * Racine du Tooltip - Support state controlled/uncontrolled
  */
-const TooltipRoot: React.FC<TooltipProps> = ({ 
+const TooltipRoot: React.FC<TooltipProps> = ({
   delayDuration,
   open,
   onOpenChange,
   disabled = false,
   children,
-  ...props 
+  ...props
 }) => {
   if (disabled) {
     // Si désactivé, retourner juste les enfants sans tooltip
@@ -180,52 +179,52 @@ TooltipTrigger.displayName = TooltipPrimitive.Trigger.displayName
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
   TooltipContentProps
->(({ 
-  className,
-  variant = 'default',
-  size = 'default',
-  side = 'top',
-  sideOffset = 4,
-  alignOffset = 0,
-  avoidCollisions = true,
-  collisionPadding = 8,
-  sticky = 'partial',
-  arrow = false,
-  arrowClassName,
-  children,
-  ...props 
-}, ref) => (
-  <TooltipPrimitive.Portal>
-    <TooltipPrimitive.Content
-      ref={ref}
-      side={side}
-      sideOffset={sideOffset}
-      alignOffset={alignOffset}
-      avoidCollisions={avoidCollisions}
-      collisionPadding={collisionPadding}
-      sticky={sticky}
-      className={cn(
-        tooltipVariants({ variant, size }),
-        'data-[side=bottom]:slide-in-from-top-2',
-        'data-[side=left]:slide-in-from-right-2', 
-        'data-[side=right]:slide-in-from-left-2',
-        'data-[side=top]:slide-in-from-bottom-2',
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {arrow && (
-        <TooltipPrimitive.Arrow
-          className={cn(
-            'fill-popover stroke-border',
-            arrowClassName
-          )}
-        />
-      )}
-    </TooltipPrimitive.Content>
-  </TooltipPrimitive.Portal>
-))
+>(
+  (
+    {
+      className,
+      variant = 'default',
+      size = 'default',
+      side = 'top',
+      sideOffset = 4,
+      alignOffset = 0,
+      avoidCollisions = true,
+      collisionPadding = 8,
+      sticky = 'partial',
+      arrow = false,
+      arrowClassName,
+      children,
+      ...props
+    },
+    ref
+  ) => (
+    <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Content
+        ref={ref}
+        side={side}
+        sideOffset={sideOffset}
+        alignOffset={alignOffset}
+        avoidCollisions={avoidCollisions}
+        collisionPadding={collisionPadding}
+        sticky={sticky}
+        className={cn(
+          tooltipVariants({ variant, size }),
+          'data-[side=bottom]:slide-in-from-top-2',
+          'data-[side=left]:slide-in-from-right-2',
+          'data-[side=right]:slide-in-from-left-2',
+          'data-[side=top]:slide-in-from-bottom-2',
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {arrow && (
+          <TooltipPrimitive.Arrow className={cn('fill-popover stroke-border', arrowClassName)} />
+        )}
+      </TooltipPrimitive.Content>
+    </TooltipPrimitive.Portal>
+  )
+)
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
 // ===== COMPOSANT COMPOSITE SIMPLE =====
@@ -241,13 +240,13 @@ export interface SimpleTooltipProps {
   onOpenChange?: (open: boolean) => void
   delayDuration?: number
   disabled?: boolean
-  
+
   // Props du trigger - accepte soit trigger soit children
   trigger?: React.ReactNode
   children?: React.ReactNode
   triggerClassName?: string
   triggerAsChild?: boolean
-  
+
   // Props du content
   variant?: TooltipVariants['variant']
   size?: TooltipVariants['size']
@@ -262,76 +261,82 @@ export interface SimpleTooltipProps {
   className?: string
 }
 
-const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(({
-  // Props du tooltip root
-  content,
-  open,
-  onOpenChange,
-  delayDuration,
-  disabled,
-  
-  // Props du trigger
-  trigger,
-  children,
-  triggerClassName,
-  triggerAsChild = false,
-  
-  // Props du content
-  variant,
-  size,
-  side,
-  sideOffset,
-  alignOffset,
-  avoidCollisions,
-  collisionPadding,
-  sticky,
-  arrow,
-  arrowClassName,
-  className,
-  
-  ...props
-}, ref) => {
-  // Utiliser children si fourni, sinon trigger
-  const triggerContent = children || trigger
+const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
+  (
+    {
+      // Props du tooltip root
+      content,
+      open,
+      onOpenChange,
+      delayDuration,
+      disabled,
 
-  if (!content || disabled) {
-    // Si pas de contenu ou désactivé, retourner juste le trigger
-    return <div ref={ref} className={triggerClassName}>{triggerContent}</div>
+      // Props du trigger
+      trigger,
+      children,
+      triggerClassName,
+      triggerAsChild = false,
+
+      // Props du content
+      variant,
+      size,
+      side,
+      sideOffset,
+      alignOffset,
+      avoidCollisions,
+      collisionPadding,
+      sticky,
+      arrow,
+      arrowClassName,
+      className,
+
+      ...props
+    },
+    ref
+  ) => {
+    // Utiliser children si fourni, sinon trigger
+    const triggerContent = children || trigger
+
+    if (!content || disabled) {
+      // Si pas de contenu ou désactivé, retourner juste le trigger
+      return (
+        <div ref={ref} className={triggerClassName}>
+          {triggerContent}
+        </div>
+      )
+    }
+
+    return (
+      <TooltipRoot
+        open={open}
+        onOpenChange={onOpenChange}
+        delayDuration={delayDuration}
+        disabled={disabled}
+      >
+        <TooltipTrigger asChild={triggerAsChild} className={triggerClassName}>
+          {triggerAsChild ? triggerContent : <div>{triggerContent}</div>}
+        </TooltipTrigger>
+        <TooltipContent
+          ref={ref}
+          variant={variant}
+          size={size}
+          side={side}
+          sideOffset={sideOffset}
+          alignOffset={alignOffset}
+          avoidCollisions={avoidCollisions}
+          collisionPadding={collisionPadding}
+          sticky={sticky}
+          arrow={arrow}
+          arrowClassName={arrowClassName}
+          className={className}
+          {...props}
+        >
+          {content}
+        </TooltipContent>
+      </TooltipRoot>
+    )
   }
-
-  return (
-    <TooltipRoot
-      open={open}
-      onOpenChange={onOpenChange}
-      delayDuration={delayDuration}
-      disabled={disabled}
-    >
-      <TooltipTrigger 
-        asChild={triggerAsChild}
-        className={triggerClassName}
-      >
-        {triggerAsChild ? triggerContent : <div>{triggerContent}</div>}
-      </TooltipTrigger>
-      <TooltipContent
-        ref={ref}
-        variant={variant}
-        size={size}
-        side={side}
-        sideOffset={sideOffset}
-        alignOffset={alignOffset}
-        avoidCollisions={avoidCollisions}
-        collisionPadding={collisionPadding}
-        sticky={sticky}
-        arrow={arrow}
-        arrowClassName={arrowClassName}
-        className={className}
-        {...props}
-      >
-        {content}
-      </TooltipContent>
-    </TooltipRoot>
-  )
-})
+)
 SimpleTooltip.displayName = 'SimpleTooltip'
 
 // ===== ALIAS POUR COMPATIBILITÉ =====
@@ -343,13 +348,6 @@ const Tooltip = TooltipRoot
 
 // ===== EXPORTS =====
 
-export {
-  TooltipProvider,
-  Tooltip,
-  TooltipRoot,
-  TooltipTrigger,
-  TooltipContent,
-  SimpleTooltip,
-}
+export { TooltipProvider, Tooltip, TooltipRoot, TooltipTrigger, TooltipContent, SimpleTooltip }
 
 // Types déjà exportés avec les interfaces ci-dessus

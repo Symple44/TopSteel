@@ -1,12 +1,11 @@
-import {
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common'
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { SocieteStatus } from '../../../../features/societes/entities/societe.entity'
 import type { LoginDto } from '../../external/dto/login.dto'
-import { ISocieteRepository, ISocieteUserRepository } from '../interfaces/societe-repository.interface'
+import {
+  ISocieteRepository,
+  ISocieteUserRepository,
+} from '../interfaces/societe-repository.interface'
 import { IUserRepository } from '../interfaces/user-repository.interface'
 import {
   SOCIETE_REPOSITORY_TOKEN,
@@ -52,10 +51,10 @@ export class AuthCoreService {
    */
   async getUserSocietes(userId: string) {
     const societeUsers = await this.societeUserRepository.findByUserId(userId)
-    
+
     return societeUsers
-      .filter(su => su.societe?.status === SocieteStatus.ACTIVE)
-      .map(su => ({
+      .filter((su) => su.societe?.status === SocieteStatus.ACTIVE)
+      .map((su) => ({
         id: su.societe.id,
         nom: su.societe.nom,
         code: su.societe.code,

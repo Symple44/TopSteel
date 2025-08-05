@@ -66,17 +66,20 @@ import { LocalStrategy } from './security/strategies/local.strategy'
       inject: [ConfigService],
     }),
     // Repositories pour les entités auth avec connexion 'auth'
-    TypeOrmModule.forFeature([
-      UserSession, 
-      UserMFA, 
-      MFASession, 
-      UserSocieteRole, 
-      Role, 
-      Permission, 
-      RolePermission, 
-      Societe, 
-      SocieteUser
-    ], 'auth'),
+    TypeOrmModule.forFeature(
+      [
+        UserSession,
+        UserMFA,
+        MFASession,
+        UserSocieteRole,
+        Role,
+        Permission,
+        RolePermission,
+        Societe,
+        SocieteUser,
+      ],
+      'auth'
+    ),
     UsersModule,
     SocietesModule,
   ],

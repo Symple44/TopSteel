@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import type { ISocieteRepository, ISocieteUserRepository } from '../../../domains/auth/core/interfaces/societe-repository.interface'
+import type {
+  ISocieteRepository,
+  ISocieteUserRepository,
+} from '../../../domains/auth/core/interfaces/societe-repository.interface'
 import { Societe, SocieteStatus } from '../entities/societe.entity'
 import { SocieteUser } from '../entities/societe-user.entity'
 
@@ -18,14 +21,14 @@ export class SocieteAuthRepositoryService implements ISocieteRepository {
   async findById(id: string): Promise<Societe | null> {
     return await this.societeRepository.findOne({
       where: { id },
-      select: ['id', 'nom', 'code', 'status']
+      select: ['id', 'nom', 'code', 'status'],
     })
   }
 
   async findByCode(code: string): Promise<Societe | null> {
     return await this.societeRepository.findOne({
       where: { code },
-      select: ['id', 'nom', 'code', 'status']
+      select: ['id', 'nom', 'code', 'status'],
     })
   }
 
@@ -33,7 +36,7 @@ export class SocieteAuthRepositoryService implements ISocieteRepository {
     return await this.societeRepository.find({
       where: { status: SocieteStatus.ACTIVE },
       select: ['id', 'nom', 'code', 'status'],
-      order: { nom: 'ASC' }
+      order: { nom: 'ASC' },
     })
   }
 }
@@ -62,9 +65,9 @@ export class SocieteUserAuthRepositoryService implements ISocieteUserRepository 
           id: true,
           nom: true,
           code: true,
-          status: true
-        }
-      }
+          status: true,
+        },
+      },
     })
   }
 
@@ -82,30 +85,24 @@ export class SocieteUserAuthRepositoryService implements ISocieteUserRepository 
           id: true,
           nom: true,
           code: true,
-          status: true
-        }
-      }
+          status: true,
+        },
+      },
     })
   }
 
   async userBelongsToSociete(userId: string, societeId: string): Promise<boolean> {
     const count = await this.societeUserRepository.count({
-      where: { userId, societeId }
+      where: { userId, societeId },
     })
     return count > 0
   }
 
   async updateDefaultSociete(userId: string, societeId: string): Promise<void> {
     // Retirer le défaut de toutes les sociétés de l'utilisateur
-    await this.societeUserRepository.update(
-      { userId },
-      { isDefault: false }
-    )
+    await this.societeUserRepository.update({ userId }, { isDefault: false })
 
     // Définir la nouvelle société par défaut
-    await this.societeUserRepository.update(
-      { userId, societeId },
-      { isDefault: true }
-    )
+    await this.societeUserRepository.update({ userId, societeId }, { isDefault: true })
   }
 }

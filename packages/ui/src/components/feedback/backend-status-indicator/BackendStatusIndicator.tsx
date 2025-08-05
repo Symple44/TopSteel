@@ -150,9 +150,11 @@ export function BackendConnectionGuard({
 
   const t = {
     connecting: translations.connecting || 'Connexion au serveur...',
-    checkingAvailability: translations.checkingAvailability || 'Vérification de la disponibilité du backend',
+    checkingAvailability:
+      translations.checkingAvailability || 'Vérification de la disponibilité du backend',
     serverUnavailable: translations.serverUnavailable || 'Serveur non accessible',
-    serverUnavailableDesc: translations.serverUnavailableDesc || "Le serveur backend n'est pas disponible actuellement.",
+    serverUnavailableDesc:
+      translations.serverUnavailableDesc || "Le serveur backend n'est pas disponible actuellement.",
     toStartServer: translations.toStartServer || 'Pour démarrer le serveur :',
     attemptedUrl: translations.attemptedUrl || 'URL tentée :',
     lastCheck: translations.lastCheck || 'Dernière vérification :',
@@ -208,14 +210,15 @@ export function BackendConnectionGuard({
         </div>
 
         <div className="text-xs text-gray-500 space-y-1">
-          <div>{t.attemptedUrl} {apiUrl}</div>
-          <div>{t.lastCheck} {health.lastCheck?.toLocaleTimeString() || t.never}</div>
+          <div>
+            {t.attemptedUrl} {apiUrl}
+          </div>
+          <div>
+            {t.lastCheck} {health.lastCheck?.toLocaleTimeString() || t.never}
+          </div>
         </div>
 
-        <BackendStatusIndicator 
-          showDetails={true} 
-          health={health} 
-        />
+        <BackendStatusIndicator showDetails={true} health={health} />
       </div>
     </div>
   )

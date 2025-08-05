@@ -82,39 +82,43 @@ export class ArticleRepositoryImpl implements IArticleRepository {
 
   async searchByCriteria(criteria: ArticleSearchCriteria): Promise<Article[]> {
     const query = this.repository.createQueryBuilder('article')
-    
+
     if (criteria.type?.length) {
       query.andWhere('article.type IN (:...types)', { types: criteria.type })
     }
-    
+
     if (criteria.status?.length) {
       query.andWhere('article.status IN (:...statuses)', { statuses: criteria.status })
     }
-    
+
     if (criteria.famille?.length) {
       query.andWhere('article.famille IN (:...familles)', { familles: criteria.famille })
     }
-    
+
     if (criteria.designation) {
-      query.andWhere('article.designation ILIKE :designation', { designation: `%${criteria.designation}%` })
+      query.andWhere('article.designation ILIKE :designation', {
+        designation: `%${criteria.designation}%`,
+      })
     }
-    
+
     if (criteria.reference) {
       query.andWhere('article.reference ILIKE :reference', { reference: `%${criteria.reference}%` })
     }
-    
+
     if (criteria.marque) {
       query.andWhere('article.marque ILIKE :marque', { marque: `%${criteria.marque}%` })
     }
-    
+
     if (criteria.fournisseurId) {
-      query.andWhere('article.fournisseurPrincipalId = :fournisseurId', { fournisseurId: criteria.fournisseurId })
+      query.andWhere('article.fournisseurPrincipalId = :fournisseurId', {
+        fournisseurId: criteria.fournisseurId,
+      })
     }
-    
+
     if (criteria.gereEnStock !== undefined) {
       query.andWhere('article.gereEnStock = :gereEnStock', { gereEnStock: criteria.gereEnStock })
     }
-    
+
     if (criteria.stockCondition) {
       switch (criteria.stockCondition) {
         case 'rupture':
@@ -124,36 +128,39 @@ export class ArticleRepositoryImpl implements IArticleRepository {
           query.andWhere('article.stockDisponible < article.stockMini')
           break
         case 'normal':
-          query.andWhere('article.stockDisponible >= article.stockMini AND article.stockDisponible <= article.stockMaxi')
+          query.andWhere(
+            'article.stockDisponible >= article.stockMini AND article.stockDisponible <= article.stockMaxi'
+          )
           break
         case 'surstock':
           query.andWhere('article.stockDisponible > article.stockMaxi')
           break
       }
     }
-    
+
     // Pagination
     if (criteria.limit) {
       query.limit(criteria.limit)
     }
-    
+
     if (criteria.page && criteria.limit) {
       query.offset((criteria.page - 1) * criteria.limit)
     }
-    
+
     // Tri
     if (criteria.sortBy) {
       const order = criteria.sortOrder || 'ASC'
       query.orderBy(`article.${criteria.sortBy}`, order)
     }
-    
+
     return await query.getMany()
   }
 
-  async findByStockCondition(condition: 'rupture' | 'sous_mini' | 'normal' | 'surstock'): Promise<Article[]> {
-    const query = this.repository.createQueryBuilder('article')
-      .where('article.gereEnStock = true')
-    
+  async findByStockCondition(
+    condition: 'rupture' | 'sous_mini' | 'normal' | 'surstock'
+  ): Promise<Article[]> {
+    const query = this.repository.createQueryBuilder('article').where('article.gereEnStock = true')
+
     switch (condition) {
       case 'rupture':
         query.andWhere('article.stockDisponible <= 0')
@@ -169,7 +176,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
         query.andWhere('article.stockDisponible > article.stockMaxi')
         break
     }
-    
+
     return await query.getMany()
   }
 
@@ -190,49 +197,71 @@ export class ArticleRepositoryImpl implements IArticleRepository {
       items,
       total: items.length,
       page: 1,
-      limit: 10
+      limit: 10,
     }
   }
 
   async searchByText(searchText: string, limit?: number): Promise<Article[]> {
     const query = this.repository
       .createQueryBuilder('article')
-      .where('(article.designation ILIKE :text OR article.reference ILIKE :text OR article.description ILIKE :text)', 
-             { text: `%${searchText}%` })
-    
+      .where(
+        '(article.designation ILIKE :text OR article.reference ILIKE :text OR article.description ILIKE :text)',
+        { text: `%${searchText}%` }
+      )
+
     if (limit) {
       query.limit(limit)
     }
-    
+
     return await query.getMany()
   }
 
   async getArticleStats(): Promise<ArticleStatistics> {
     const totalArticles = await this.repository.count()
-    
+
     // Implementation basique - peut être améliorée avec des requêtes optimisées
     return {
       totalArticles,
       repartitionParType: {
-        [ArticleType.MATIERE_PREMIERE]: await this.repository.count({ where: { type: ArticleType.MATIERE_PREMIERE } }),
-        [ArticleType.PRODUIT_FINI]: await this.repository.count({ where: { type: ArticleType.PRODUIT_FINI } }),
-        [ArticleType.PRODUIT_SEMI_FINI]: await this.repository.count({ where: { type: ArticleType.PRODUIT_SEMI_FINI } }),
-        [ArticleType.FOURNITURE]: await this.repository.count({ where: { type: ArticleType.FOURNITURE } }),
-        [ArticleType.CONSOMMABLE]: await this.repository.count({ where: { type: ArticleType.CONSOMMABLE } }),
-        [ArticleType.SERVICE]: await this.repository.count({ where: { type: ArticleType.SERVICE } })
+        [ArticleType.MATIERE_PREMIERE]: await this.repository.count({
+          where: { type: ArticleType.MATIERE_PREMIERE },
+        }),
+        [ArticleType.PRODUIT_FINI]: await this.repository.count({
+          where: { type: ArticleType.PRODUIT_FINI },
+        }),
+        [ArticleType.PRODUIT_SEMI_FINI]: await this.repository.count({
+          where: { type: ArticleType.PRODUIT_SEMI_FINI },
+        }),
+        [ArticleType.FOURNITURE]: await this.repository.count({
+          where: { type: ArticleType.FOURNITURE },
+        }),
+        [ArticleType.CONSOMMABLE]: await this.repository.count({
+          where: { type: ArticleType.CONSOMMABLE },
+        }),
+        [ArticleType.SERVICE]: await this.repository.count({
+          where: { type: ArticleType.SERVICE },
+        }),
       },
       repartitionParStatus: {
-        [ArticleStatus.ACTIF]: await this.repository.count({ where: { status: ArticleStatus.ACTIF } }),
-        [ArticleStatus.INACTIF]: await this.repository.count({ where: { status: ArticleStatus.INACTIF } }),
-        [ArticleStatus.OBSOLETE]: await this.repository.count({ where: { status: ArticleStatus.OBSOLETE } }),
-        [ArticleStatus.EN_COURS_CREATION]: await this.repository.count({ where: { status: ArticleStatus.EN_COURS_CREATION } })
+        [ArticleStatus.ACTIF]: await this.repository.count({
+          where: { status: ArticleStatus.ACTIF },
+        }),
+        [ArticleStatus.INACTIF]: await this.repository.count({
+          where: { status: ArticleStatus.INACTIF },
+        }),
+        [ArticleStatus.OBSOLETE]: await this.repository.count({
+          where: { status: ArticleStatus.OBSOLETE },
+        }),
+        [ArticleStatus.EN_COURS_CREATION]: await this.repository.count({
+          where: { status: ArticleStatus.EN_COURS_CREATION },
+        }),
       },
       repartitionParFamille: {}, // TODO: Implémenter si nécessaire
       articlesGeresEnStock: await this.repository.count({ where: { gereEnStock: true } }),
       valeurTotaleStock: 0, // TODO: Calculer la valeur totale
       articlesEnRupture: 0, // TODO: Calculer
       articlesSousStockMini: 0, // TODO: Calculer
-      articlesObsoletes: await this.repository.count({ where: { status: ArticleStatus.OBSOLETE } })
+      articlesObsoletes: await this.repository.count({ where: { status: ArticleStatus.OBSOLETE } }),
     }
   }
 
@@ -246,16 +275,21 @@ export class ArticleRepositoryImpl implements IArticleRepository {
   async findRecentlyModified(nbJours: number): Promise<Article[]> {
     const date = new Date()
     date.setDate(date.getDate() - nbJours)
-    
+
     return await this.repository
       .createQueryBuilder('article')
       .where('article.dateDerniereModification > :date', { date })
       .getMany()
   }
 
-  async findByDimensions(longueurMin?: number, longueurMax?: number, largeurMin?: number, largeurMax?: number): Promise<Article[]> {
+  async findByDimensions(
+    longueurMin?: number,
+    longueurMax?: number,
+    largeurMin?: number,
+    largeurMax?: number
+  ): Promise<Article[]> {
     const query = this.repository.createQueryBuilder('article')
-    
+
     if (longueurMin !== undefined) {
       query.andWhere('article.longueur >= :longueurMin', { longueurMin })
     }
@@ -268,22 +302,26 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     if (largeurMax !== undefined) {
       query.andWhere('article.largeur <= :largeurMax', { largeurMax })
     }
-    
+
     return await query.getMany()
   }
 
-  async findByPriceRange(prixMin?: number, prixMax?: number, typePrix?: 'achat' | 'vente'): Promise<Article[]> {
+  async findByPriceRange(
+    prixMin?: number,
+    prixMax?: number,
+    typePrix?: 'achat' | 'vente'
+  ): Promise<Article[]> {
     const query = this.repository.createQueryBuilder('article')
-    
+
     const priceField = typePrix === 'achat' ? 'prixAchatMoyen' : 'prixVenteHT'
-    
+
     if (prixMin !== undefined) {
       query.andWhere(`article.${priceField} >= :prixMin`, { prixMin })
     }
     if (prixMax !== undefined) {
       query.andWhere(`article.${priceField} <= :prixMax`, { prixMax })
     }
-    
+
     return await query.getMany()
   }
 
@@ -304,7 +342,9 @@ export class ArticleRepositoryImpl implements IArticleRepository {
   async findByCertifications(certifications: string[]): Promise<Article[]> {
     return await this.repository
       .createQueryBuilder('article')
-      .where("article.caracteristiquesTechniques->>'certifications' ?| ARRAY[:...certs]", { certs: certifications })
+      .where("article.caracteristiquesTechniques->>'certifications' ?| ARRAY[:...certs]", {
+        certs: certifications,
+      })
       .getMany()
   }
 
@@ -315,7 +355,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
       .getMany()
   }
 
-  async getStockValuationByFamily(): Promise<Record<string, { quantite: number, valeur: number }>> {
+  async getStockValuationByFamily(): Promise<Record<string, { quantite: number; valeur: number }>> {
     // TODO: Implémenter avec une requête optimisée
     return {}
   }
@@ -325,10 +365,13 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return []
   }
 
-  async getBestSellers(limit: number, periode?: { debut: Date, fin: Date }): Promise<Array<Article & { quantiteVendue: number }>> {
+  async getBestSellers(
+    limit: number,
+    periode?: { debut: Date; fin: Date }
+  ): Promise<Array<Article & { quantiteVendue: number }>> {
     // TODO: Implémenter avec les données de vente
     const articles = await this.repository.find({ take: limit })
-    return articles.map(article => {
+    return articles.map((article) => {
       const result = Object.assign(article, { quantiteVendue: 0 })
       return result as Article & { quantiteVendue: number }
     })
@@ -337,7 +380,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
   async getSlowMovingArticles(nbJoursSansVente: number): Promise<Article[]> {
     const date = new Date()
     date.setDate(date.getDate() - nbJoursSansVente)
-    
+
     // TODO: Implémenter avec les données de mouvement
     return await this.repository.find()
   }

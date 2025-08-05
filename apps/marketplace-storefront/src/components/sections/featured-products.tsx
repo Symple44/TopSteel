@@ -12,7 +12,11 @@ interface FeaturedProductsProps {
 }
 
 export function FeaturedProducts({ tenant }: FeaturedProductsProps) {
-  const { data: products, isLoading, error } = useQuery({
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['featured-products', tenant],
     queryFn: () => getFeaturedProducts(tenant, 8),
   })
@@ -22,9 +26,7 @@ export function FeaturedProducts({ tenant }: FeaturedProductsProps) {
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-3xl font-bold">Produits vedettes</h2>
-          <p className="text-muted-foreground mt-2">
-            Découvrez notre sélection de produits phares
-          </p>
+          <p className="text-muted-foreground mt-2">Découvrez notre sélection de produits phares</p>
         </div>
         <LoadingSpinner size="lg" />
       </div>
@@ -39,23 +41,17 @@ export function FeaturedProducts({ tenant }: FeaturedProductsProps) {
     <section className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-4xl font-bold">
-          Produits vedettes
-        </h2>
+        <h2 className="text-3xl md:text-4xl font-bold">Produits vedettes</h2>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Découvrez notre sélection de produits phares, choisis pour leur qualité 
-          exceptionnelle et leur popularité auprès de nos clients
+          Découvrez notre sélection de produits phares, choisis pour leur qualité exceptionnelle et
+          leur popularité auprès de nos clients
         </p>
       </div>
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            tenant={tenant}
-          />
+          <ProductCard key={product.id} product={product} tenant={tenant} />
         ))}
       </div>
 

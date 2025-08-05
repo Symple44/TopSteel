@@ -9,7 +9,7 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../../core/common/decorators/current-user.decorator'
@@ -20,8 +20,15 @@ import { CreateMaterialDto } from '../dto/create-material.dto'
 import { MaterialFiltersDto, InventoryFiltersDto } from '../dto/material-filters.dto'
 import { UpdateMaterialDto } from '../dto/update-material.dto'
 import type { Material } from '../entities/material.entity'
-import { MaterialService, type MaterialStatistics, type MaterialStockValorisation } from '../services/material.service'
-import type { MaterialStockAlert, MaterialCompatibilityAnalysis } from '../repositories/material.repository'
+import {
+  MaterialService,
+  type MaterialStatistics,
+  type MaterialStockValorisation,
+} from '../services/material.service'
+import type {
+  MaterialStockAlert,
+  MaterialCompatibilityAnalysis,
+} from '../repositories/material.repository'
 
 /**
  * Contrôleur REST pour la gestion des matériaux industriels
@@ -31,9 +38,7 @@ import type { MaterialStockAlert, MaterialCompatibilityAnalysis } from '../repos
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class MaterialController {
-  constructor(
-    private readonly materialService: MaterialService
-  ) {}
+  constructor(private readonly materialService: MaterialService) {}
 
   /**
    * Créer un nouveau matériau
@@ -42,11 +47,11 @@ export class MaterialController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Créer un matériau',
-    description: 'Créer un nouveau matériau avec toutes ses propriétés techniques'
+    description: 'Créer un nouveau matériau avec toutes ses propriétés techniques',
   })
   @ApiResponse({
     status: 201,
-    description: 'Matériau créé avec succès'
+    description: 'Matériau créé avec succès',
   })
   async createMaterial(
     @Body() createDto: CreateMaterialDto,
@@ -56,7 +61,7 @@ export class MaterialController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.materialService.create(createDto, context)
@@ -68,7 +73,7 @@ export class MaterialController {
   @Get()
   @ApiOperation({
     summary: 'Lister les matériaux',
-    description: 'Récupérer les matériaux avec filtres avancés et pagination'
+    description: 'Récupérer les matériaux avec filtres avancés et pagination',
   })
   async getMaterials(
     @Query() filters: MaterialFiltersDto,
@@ -83,17 +88,14 @@ export class MaterialController {
   @Get(':id')
   @ApiOperation({
     summary: 'Récupérer un matériau',
-    description: 'Récupérer les détails complets d\'un matériau'
+    description: "Récupérer les détails complets d'un matériau",
   })
-  async getMaterial(
-    @Param('id') id: string,
-    @CurrentUser() user: User
-  ): Promise<Material | null> {
+  async getMaterial(@Param('id') id: string, @CurrentUser() user: User): Promise<Material | null> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.materialService.findById(id, context)
@@ -105,7 +107,7 @@ export class MaterialController {
   @Patch(':id')
   @ApiOperation({
     summary: 'Mettre à jour un matériau',
-    description: 'Modifier les propriétés d\'un matériau existant'
+    description: "Modifier les propriétés d'un matériau existant",
   })
   async updateMaterial(
     @Param('id') id: string,
@@ -116,7 +118,7 @@ export class MaterialController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.materialService.update(id, updateDto, context)
@@ -129,17 +131,14 @@ export class MaterialController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Supprimer un matériau',
-    description: 'Supprimer un matériau (soft delete)'
+    description: 'Supprimer un matériau (soft delete)',
   })
-  async deleteMaterial(
-    @Param('id') id: string,
-    @CurrentUser() user: User
-  ): Promise<void> {
+  async deleteMaterial(@Param('id') id: string, @CurrentUser() user: User): Promise<void> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     await this.materialService.delete(id, context)
@@ -153,7 +152,7 @@ export class MaterialController {
   @Get('stock/rupture')
   @ApiOperation({
     summary: 'Matériaux en rupture',
-    description: 'Récupérer tous les matériaux en rupture de stock'
+    description: 'Récupérer tous les matériaux en rupture de stock',
   })
   async getMaterialsEnRupture(): Promise<Material[]> {
     return await this.materialService.getMaterialsEnRupture()
@@ -165,7 +164,7 @@ export class MaterialController {
   @Get('stock/sous-mini')
   @ApiOperation({
     summary: 'Matériaux sous stock minimum',
-    description: 'Récupérer tous les matériaux sous le seuil minimum'
+    description: 'Récupérer tous les matériaux sous le seuil minimum',
   })
   async getMaterialsSousStockMini(): Promise<Material[]> {
     return await this.materialService.getMaterialsSousStockMini()
@@ -177,7 +176,7 @@ export class MaterialController {
   @Get('stock/reapprovisionner')
   @ApiOperation({
     summary: 'Matériaux à réapprovisionner',
-    description: 'Récupérer les matériaux nécessitant un réapprovisionnement avec quantités'
+    description: 'Récupérer les matériaux nécessitant un réapprovisionnement avec quantités',
   })
   async getMaterialsAReapprovisionner(): Promise<Array<Material & { quantiteACommander: number }>> {
     return await this.materialService.getMaterialsAReapprovisionner()
@@ -189,7 +188,7 @@ export class MaterialController {
   @Get('categories/dangereux')
   @ApiOperation({
     summary: 'Matériaux dangereux',
-    description: 'Récupérer tous les matériaux classés comme dangereux'
+    description: 'Récupérer tous les matériaux classés comme dangereux',
   })
   async getMaterialsDangereux(): Promise<Material[]> {
     return await this.materialService.getMaterialsDangereux()
@@ -201,7 +200,7 @@ export class MaterialController {
   @Get('categories/stockage-special')
   @ApiOperation({
     summary: 'Matériaux à stockage spécial',
-    description: 'Récupérer les matériaux nécessitant des conditions de stockage particulières'
+    description: 'Récupérer les matériaux nécessitant des conditions de stockage particulières',
   })
   async getMaterialsStockageSpecial(): Promise<Material[]> {
     return await this.materialService.getMaterialsStockageSpecial()
@@ -213,7 +212,7 @@ export class MaterialController {
   @Get('categories/obsoletes')
   @ApiOperation({
     summary: 'Matériaux obsolètes',
-    description: 'Récupérer tous les matériaux marqués comme obsolètes'
+    description: 'Récupérer tous les matériaux marqués comme obsolètes',
   })
   async getMaterialsObsoletes(): Promise<Material[]> {
     return await this.materialService.getMaterialsObsoletes()
@@ -228,7 +227,7 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Effectuer un inventaire',
-    description: 'Mettre à jour le stock physique suite à un inventaire'
+    description: 'Mettre à jour le stock physique suite à un inventaire',
   })
   async effectuerInventaire(
     @Param('id') id: string,
@@ -239,7 +238,7 @@ export class MaterialController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.materialService.effectuerInventaire(
@@ -257,7 +256,7 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Marquer comme obsolète',
-    description: 'Marquer un matériau comme obsolète avec matériau de remplacement'
+    description: 'Marquer un matériau comme obsolète avec matériau de remplacement',
   })
   async marquerObsolete(
     @Param('id') id: string,
@@ -268,15 +267,10 @@ export class MaterialController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
-    return await this.materialService.marquerObsolete(
-      id,
-      body.remplacePar,
-      body.raison,
-      context
-    )
+    return await this.materialService.marquerObsolete(id, body.remplacePar, body.raison, context)
   }
 
   /**
@@ -286,7 +280,7 @@ export class MaterialController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Dupliquer un matériau',
-    description: 'Créer une copie d\'un matériau avec une nouvelle référence'
+    description: "Créer une copie d'un matériau avec une nouvelle référence",
   })
   async dupliquerMaterial(
     @Param('id') id: string,
@@ -297,7 +291,7 @@ export class MaterialController {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.materialService.dupliquerMaterial(
@@ -315,17 +309,17 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Créer commande réapprovisionnement',
-    description: 'Générer automatiquement une commande de réapprovisionnement pour un fournisseur'
+    description: 'Générer automatiquement une commande de réapprovisionnement pour un fournisseur',
   })
   async creerCommandeReapprovisionnement(
     @Param('fournisseurId') fournisseurId: string,
     @CurrentUser() user: User
-  ): Promise<{ materials: Material[], quantitesTotales: number }> {
+  ): Promise<{ materials: Material[]; quantitesTotales: number }> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     return await this.materialService.creerCommandeReapprovisionnement(fournisseurId, context)
@@ -367,7 +361,7 @@ export class MaterialController {
   @Get('analyses/statistiques')
   @ApiOperation({
     summary: 'Statistiques des matériaux',
-    description: 'Récupérer les statistiques globales des matériaux'
+    description: 'Récupérer les statistiques globales des matériaux',
   })
   async getStatistiques(): Promise<MaterialStatistics> {
     return await this.materialService.getStatistiques()
@@ -379,7 +373,7 @@ export class MaterialController {
   @Get('analyses/alertes')
   @ApiOperation({
     summary: 'Alertes de stock',
-    description: 'Récupérer toutes les alertes de stock actives'
+    description: 'Récupérer toutes les alertes de stock actives',
   })
   async getAlertes(): Promise<MaterialStockAlert[]> {
     return await this.materialService.getAlertes()
@@ -394,7 +388,7 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Recherche avancée',
-    description: 'Recherche avec critères multiples et agrégations'
+    description: 'Recherche avec critères multiples et agrégations',
   })
   async searchAdvanced(
     @Body() searchCriteria: any,
@@ -489,16 +483,16 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Exporter les matériaux',
-    description: 'Exporter la liste des matériaux selon des critères'
+    description: 'Exporter la liste des matériaux selon des critères',
   })
   async exportMaterials(
     @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF', filters?: any },
     @CurrentUser() user: User
-  ): Promise<{ url: string, filename: string }> {
+  ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
     return {
       url: '/exports/materials/export-2024-01-15.csv',
-      filename: `materials-export-${new Date().toISOString().split('T')[0]}.${exportCriteria.format.toLowerCase()}`
+      filename: `materials-export-${new Date().toISOString().split('T')[0]}.${exportCriteria.format.toLowerCase()}`,
     }
   }
 
@@ -509,29 +503,29 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Importer des matériaux',
-    description: 'Importer une liste de matériaux depuis un fichier'
+    description: 'Importer une liste de matériaux depuis un fichier',
   })
   async importMaterials(
     @Body() importData: { data: any[], options?: { skipErrors?: boolean, dryRun?: boolean } },
     @CurrentUser() user: User
-  ): Promise<{ 
-    imported: number,
-    errors: number,
-    warnings: string[],
+  ): Promise<{
+    imported: number
+    errors: number
+    warnings: string[]
     details: any[]
   }> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
     const results = {
       imported: 0,
       errors: 0,
       warnings: [] as string[],
-      details: [] as any[]
+      details: [] as any[],
     }
 
     for (const materialData of importData.data) {
@@ -543,10 +537,10 @@ export class MaterialController {
         results.details.push({ status: 'success', data: materialData })
       } catch (error) {
         results.errors++
-        results.details.push({ 
-          status: 'error', 
-          data: materialData, 
-          error: (error as Error).message 
+        results.details.push({
+          status: 'error',
+          data: materialData,
+          error: (error as Error).message,
         })
         if (!importData.options?.skipErrors) {
           break
@@ -564,43 +558,46 @@ export class MaterialController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Validation en lot',
-    description: 'Valider plusieurs matériaux selon les règles métier'
+    description: 'Valider plusieurs matériaux selon les règles métier',
   })
   async validateBatch(
     @Body() materialIds: string[],
     @CurrentUser() user: User
-  ): Promise<Array<{ id: string, valid: boolean, errors: string[] }>> {
+  ): Promise<Array<{ id: string; valid: boolean; errors: string[] }>> {
     const context: BusinessContext = {
       userId: user.id,
       tenantId: 'current-tenant',
       userRoles: [user.role],
-      permissions: []
+      permissions: [],
     }
 
-    const results: Array<{ id: string, valid: boolean, errors: string[] }> = []
-    
+    const results: Array<{ id: string; valid: boolean; errors: string[] }> = []
+
     for (const materialId of materialIds) {
       try {
         const material = await this.materialService.findById(materialId, context)
         if (material) {
-          const validation = await this.materialService.validateBusinessRules(material, 'VALIDATE' as any)
+          const validation = await this.materialService.validateBusinessRules(
+            material,
+            'VALIDATE' as any
+          )
           results.push({
             id: materialId,
             valid: validation.isValid,
-            errors: validation.errors.map(e => e.message)
+            errors: validation.errors.map((e) => e.message),
           })
         } else {
           results.push({
             id: materialId,
             valid: false,
-            errors: ['Matériau introuvable']
+            errors: ['Matériau introuvable'],
           })
         }
       } catch (error) {
         results.push({
           id: materialId,
           valid: false,
-          errors: [(error as Error).message]
+          errors: [(error as Error).message],
         })
       }
     }

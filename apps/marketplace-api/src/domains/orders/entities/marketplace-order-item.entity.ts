@@ -1,11 +1,4 @@
-import { 
-  Column, 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  Index,
-  ManyToOne,
-  JoinColumn
-} from 'typeorm'
+import { Column, Entity, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn } from 'typeorm'
 import { MarketplaceOrder } from './marketplace-order.entity'
 
 @Entity('marketplace_order_items')
@@ -88,7 +81,10 @@ export class MarketplaceOrderItem {
   }
 
   // Relations
-  @ManyToOne(() => MarketplaceOrder, order => order.items)
+  @ManyToOne(
+    () => MarketplaceOrder,
+    (order) => order.items
+  )
   @JoinColumn({ name: 'orderId' })
   order!: MarketplaceOrder
 

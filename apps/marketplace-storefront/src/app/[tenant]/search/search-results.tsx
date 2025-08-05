@@ -16,7 +16,13 @@ interface SearchResultsProps {
   page?: string
 }
 
-export function SearchResults({ tenant, query, category, sort = 'relevance', page = '1' }: SearchResultsProps) {
+export function SearchResults({
+  tenant,
+  query,
+  category,
+  sort = 'relevance',
+  page = '1',
+}: SearchResultsProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
@@ -49,23 +55,22 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
           reference: 'PROD-001',
           designation: 'Profilé acier inoxydable 304L',
           shortDescription: 'Profilé haute qualité pour applications industrielles',
-          description: 'Profilé en acier inoxydable 304L de haute qualité, idéal pour les applications industrielles nécessitant une résistance à la corrosion.',
-          basePrice: 125.00,
-          calculatedPrice: 115.00,
+          description:
+            'Profilé en acier inoxydable 304L de haute qualité, idéal pour les applications industrielles nécessitant une résistance à la corrosion.',
+          basePrice: 125.0,
+          calculatedPrice: 115.0,
           inStock: true,
           stockDisponible: 50,
           categories: ['Acier inoxydable', 'Profilés'],
           tags: ['304L', 'industriel', 'résistant'],
-          images: [
-            { url: '/placeholder-product.jpg', alt: 'Profilé acier', isMain: true }
-          ],
+          images: [{ url: '/placeholder-product.jpg', alt: 'Profilé acier', isMain: true }],
           isActive: true,
           isFeatured: true,
           seo: {
             title: 'Profilé acier inoxydable 304L',
             description: 'Profilé haute qualité pour applications industrielles',
-            slug: 'profile-acier-inoxydable-304l'
-          }
+            slug: 'profile-acier-inoxydable-304l',
+          },
         },
         // Add more mock products...
       ]
@@ -74,48 +79,49 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
       let filteredProducts = mockProducts
       if (query) {
         const searchTerm = query.toLowerCase()
-        filteredProducts = mockProducts.filter(product =>
-          product.designation.toLowerCase().includes(searchTerm) ||
-          product.shortDescription?.toLowerCase().includes(searchTerm) ||
-          product.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
-          product.categories.some(cat => cat.toLowerCase().includes(searchTerm))
+        filteredProducts = mockProducts.filter(
+          (product) =>
+            product.designation.toLowerCase().includes(searchTerm) ||
+            product.shortDescription?.toLowerCase().includes(searchTerm) ||
+            product.tags.some((tag) => tag.toLowerCase().includes(searchTerm)) ||
+            product.categories.some((cat) => cat.toLowerCase().includes(searchTerm))
         )
       }
 
       if (filters.category) {
-        filteredProducts = filteredProducts.filter(product =>
+        filteredProducts = filteredProducts.filter((product) =>
           product.categories.includes(filters.category)
         )
       }
 
       if (filters.inStock) {
-        filteredProducts = filteredProducts.filter(product => product.inStock)
+        filteredProducts = filteredProducts.filter((product) => product.inStock)
       }
 
       if (filters.minPrice) {
         const minPrice = parseFloat(filters.minPrice)
-        filteredProducts = filteredProducts.filter(product =>
-          (product.calculatedPrice || product.basePrice) >= minPrice
+        filteredProducts = filteredProducts.filter(
+          (product) => (product.calculatedPrice || product.basePrice) >= minPrice
         )
       }
 
       if (filters.maxPrice) {
         const maxPrice = parseFloat(filters.maxPrice)
-        filteredProducts = filteredProducts.filter(product =>
-          (product.calculatedPrice || product.basePrice) <= maxPrice
+        filteredProducts = filteredProducts.filter(
+          (product) => (product.calculatedPrice || product.basePrice) <= maxPrice
         )
       }
 
       // Sort products
       switch (sortBy) {
         case 'price_asc':
-          filteredProducts.sort((a, b) => 
-            (a.calculatedPrice || a.basePrice) - (b.calculatedPrice || b.basePrice)
+          filteredProducts.sort(
+            (a, b) => (a.calculatedPrice || a.basePrice) - (b.calculatedPrice || b.basePrice)
           )
           break
         case 'price_desc':
-          filteredProducts.sort((a, b) => 
-            (b.calculatedPrice || b.basePrice) - (a.calculatedPrice || a.basePrice)
+          filteredProducts.sort(
+            (a, b) => (b.calculatedPrice || b.basePrice) - (a.calculatedPrice || a.basePrice)
           )
           break
         case 'name_asc':
@@ -138,11 +144,10 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
       setTotalPages(Math.ceil(filteredProducts.length / 12))
 
       // Extract unique categories
-      const allCategories = Array.from(new Set(
-        mockProducts.flatMap(product => product.categories)
-      ))
+      const allCategories = Array.from(
+        new Set(mockProducts.flatMap((product) => product.categories))
+      )
       setCategories(allCategories)
-
     } catch (error) {
       console.error('Error loading search results:', error)
     } finally {
@@ -177,7 +182,8 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
               {query ? `Résultats pour "${query}"` : 'Recherche'}
             </h1>
             <p className="text-muted-foreground">
-              {totalResults} produit{totalResults > 1 ? 's' : ''} trouvé{totalResults > 1 ? 's' : ''}
+              {totalResults} produit{totalResults > 1 ? 's' : ''} trouvé
+              {totalResults > 1 ? 's' : ''}
               {category && ` dans "${category}"`}
             </p>
           </div>
@@ -213,10 +219,9 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
           >
             <Filter className="w-4 h-4" />
             Filtres
-            <ChevronDown className={cn(
-              'w-4 h-4 transition-transform',
-              showFilters && 'rotate-180'
-            )} />
+            <ChevronDown
+              className={cn('w-4 h-4 transition-transform', showFilters && 'rotate-180')}
+            />
           </button>
 
           <div className="flex items-center gap-2">
@@ -244,12 +249,14 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
                 <label className="block text-sm font-medium mb-1">Catégorie</label>
                 <select
                   value={filters.category}
-                  onChange={(e) => handleFilterChange({...filters, category: e.target.value})}
+                  onChange={(e) => handleFilterChange({ ...filters, category: e.target.value })}
                   className="input-marketplace w-full text-sm"
                 >
                   <option value="">Toutes les catégories</option>
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -259,7 +266,7 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
                 <input
                   type="number"
                   value={filters.minPrice}
-                  onChange={(e) => handleFilterChange({...filters, minPrice: e.target.value})}
+                  onChange={(e) => handleFilterChange({ ...filters, minPrice: e.target.value })}
                   className="input-marketplace w-full text-sm"
                   placeholder="0"
                 />
@@ -270,7 +277,7 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
                 <input
                   type="number"
                   value={filters.maxPrice}
-                  onChange={(e) => handleFilterChange({...filters, maxPrice: e.target.value})}
+                  onChange={(e) => handleFilterChange({ ...filters, maxPrice: e.target.value })}
                   className="input-marketplace w-full text-sm"
                   placeholder="1000"
                 />
@@ -281,7 +288,7 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
                   <input
                     type="checkbox"
                     checked={filters.inStock}
-                    onChange={(e) => handleFilterChange({...filters, inStock: e.target.checked})}
+                    onChange={(e) => handleFilterChange({ ...filters, inStock: e.target.checked })}
                     className="rounded border-input"
                   />
                   <span className="text-sm">En stock uniquement</span>
@@ -302,20 +309,19 @@ export function SearchResults({ tenant, query, category, sort = 'relevance', pag
               Essayez de modifier vos critères de recherche ou parcourez nos catégories.
             </p>
           </div>
-          <Link
-            href={`/${tenant}/products`}
-            className="btn-primary inline-flex items-center gap-2"
-          >
+          <Link href={`/${tenant}/products`} className="btn-primary inline-flex items-center gap-2">
             Voir tous les produits
           </Link>
         </div>
       ) : (
-        <div className={cn(
-          'grid gap-6',
-          viewMode === 'grid' 
-            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-            : 'grid-cols-1'
-        )}>
+        <div
+          className={cn(
+            'grid gap-6',
+            viewMode === 'grid'
+              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+              : 'grid-cols-1'
+          )}
+        >
           {products.map((product) => (
             <ProductCard
               key={product.id}

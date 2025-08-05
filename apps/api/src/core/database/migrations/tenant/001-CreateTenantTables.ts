@@ -10,7 +10,7 @@ export class CreateTenantTables1737000003000 implements MigrationInterface {
     // Tables métier supprimées pour optimiser le debug
     // Les tables suivantes ont été commentées:
     // - clients, fournisseurs, materiaux, stocks, produits, commandes
-    
+
     /*
     // 1. Table clients
     await queryRunner.createTable(

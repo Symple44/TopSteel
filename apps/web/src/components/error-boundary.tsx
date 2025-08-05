@@ -213,16 +213,16 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
       }
 
       const t = this.props.translations || {
-        title: 'Oups ! Une erreur s\'est produite',
-        description: 'Quelque chose s\'est mal passé dans l\'application.',
+        title: "Oups ! Une erreur s'est produite",
+        description: "Quelque chose s'est mal passé dans l'application.",
         technicalDetails: 'Détails techniques',
         errorLabel: 'Erreur :',
         componentLabel: 'Composant :',
-        errorId: 'ID d\'erreur :',
+        errorId: "ID d'erreur :",
         retry: 'Réessayer',
         home: 'Accueil',
         report: 'Signaler',
-        automaticRetries: 'Tentatives automatiques :'
+        automaticRetries: 'Tentatives automatiques :',
       }
 
       // Interface d'erreur par défaut
@@ -233,12 +233,8 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
               <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="w-8 h-8 text-destructive" />
               </div>
-              <h1 className="text-xl font-semibold text-foreground mb-2">
-                {t.title}
-              </h1>
-              <p className="text-muted-foreground text-sm">
-                {t.description}
-              </p>
+              <h1 className="text-xl font-semibold text-foreground mb-2">{t.title}</h1>
+              <p className="text-muted-foreground text-sm">{t.description}</p>
             </div>
 
             {/* Détails de l'erreur en mode développement */}
@@ -337,16 +333,16 @@ export function withErrorBoundary<T extends object>(
 export function ErrorBoundaryWithTranslations({ children, ...props }: Omit<Props, 'translations'>) {
   // Default translations (French) - in a real component this would come from useTranslation
   const translations = {
-    title: 'Oups ! Une erreur s\'est produite',
-    description: 'Quelque chose s\'est mal passé dans l\'application.',
+    title: "Oups ! Une erreur s'est produite",
+    description: "Quelque chose s'est mal passé dans l'application.",
     technicalDetails: 'Détails techniques',
     errorLabel: 'Erreur :',
     componentLabel: 'Composant :',
-    errorId: 'ID d\'erreur :',
+    errorId: "ID d'erreur :",
     retry: 'Réessayer',
     home: 'Accueil',
     report: 'Signaler',
-    automaticRetries: 'Tentatives automatiques :'
+    automaticRetries: 'Tentatives automatiques :',
   }
 
   return (

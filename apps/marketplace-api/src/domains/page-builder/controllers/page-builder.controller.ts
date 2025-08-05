@@ -8,7 +8,7 @@ import {
   Param,
   Query,
   UseGuards,
-  Request
+  Request,
 } from '@nestjs/common'
 import { PageBuilderService } from '../services/page-builder.service'
 import { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
@@ -20,14 +20,8 @@ export class PageBuilderController {
   constructor(private readonly pageBuilderService: PageBuilderService) {}
 
   @Post('templates')
-  async createTemplate(
-    @Request() req: any,
-    @Body() createDto: CreatePageTemplateDto
-  ) {
-    return this.pageBuilderService.createTemplate(
-      req.tenant.societeId,
-      createDto
-    )
+  async createTemplate(@Request() req: any, @Body() createDto: CreatePageTemplateDto) {
+    return this.pageBuilderService.createTemplate(req.tenant.societeId, createDto)
   }
 
   @Get('templates')
@@ -41,21 +35,12 @@ export class PageBuilderController {
   }
 
   @Get('templates/by-slug/:slug')
-  async findTemplateBySlug(
-    @Request() req: any,
-    @Param('slug') slug: string
-  ) {
-    return this.pageBuilderService.findTemplateBySlug(
-      req.tenant.societeId,
-      slug
-    )
+  async findTemplateBySlug(@Request() req: any, @Param('slug') slug: string) {
+    return this.pageBuilderService.findTemplateBySlug(req.tenant.societeId, slug)
   }
 
   @Put('templates/:id')
-  async updateTemplate(
-    @Param('id') id: string,
-    @Body() updateDto: UpdatePageTemplateDto
-  ) {
+  async updateTemplate(@Param('id') id: string, @Body() updateDto: UpdatePageTemplateDto) {
     return this.pageBuilderService.updateTemplate(id, updateDto)
   }
 
@@ -71,15 +56,8 @@ export class PageBuilderController {
   }
 
   @Post('templates/:id/duplicate')
-  async duplicateTemplate(
-    @Param('id') id: string,
-    @Body() body: { name: string; slug: string }
-  ) {
-    return this.pageBuilderService.duplicateTemplate(
-      id,
-      body.name,
-      body.slug
-    )
+  async duplicateTemplate(@Param('id') id: string, @Body() body: { name: string; slug: string }) {
+    return this.pageBuilderService.duplicateTemplate(id, body.name, body.slug)
   }
 
   @Get('section-presets')
@@ -94,14 +72,8 @@ export class PageBuilderController {
   }
 
   @Post('section-presets')
-  async createSectionPreset(
-    @Request() req: any,
-    @Body() presetData: any
-  ) {
-    return this.pageBuilderService.createSectionPreset(
-      req.tenant.societeId,
-      presetData
-    )
+  async createSectionPreset(@Request() req: any, @Body() presetData: any) {
+    return this.pageBuilderService.createSectionPreset(req.tenant.societeId, presetData)
   }
 
   @Post('section-presets/:id/use')

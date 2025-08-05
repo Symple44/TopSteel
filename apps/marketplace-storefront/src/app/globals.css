@@ -21,18 +21,18 @@
   --color-border: 214.3 31.8% 91.4%;
   --color-input: 214.3 31.8% 91.4%;
   --color-ring: 221.2 83.2% 53.3%;
-  
+
   /* Blue color palette for components */
   --color-blue-50: 239 246 255;
   --color-blue-100: 219 234 254;
   --color-blue-500: 59 130 246;
   --color-blue-600: 37 99 235;
   --color-blue-700: 29 78 216;
-  
+
   /* Green color palette for components */
   --color-green-600: 22 163 74;
   --color-green-700: 21 128 61;
-  
+
   /* Dark mode colors */
   --color-*-dark: {
     --color-background: 222.2 84% 4.9%;
@@ -55,12 +55,12 @@
     --color-input: 217.2 32.6% 17.5%;
     --color-ring: 224.3 76.3% 94.1%;
   }
-  
+
   /* Radius */
   --radius-lg: 0.5rem;
   --radius-md: calc(0.5rem - 2px);
   --radius-sm: calc(0.5rem - 4px);
-  
+
   /* Custom marketplace colors */
   --color-marketplace-primary: 221.2 83.2% 53.3%;
   --color-marketplace-secondary: 210 40% 96%;
@@ -123,27 +123,29 @@
   * {
     border-color: hsl(var(--border));
   }
-  
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
-  
+
   /* Scrollbar styling */
   ::-webkit-scrollbar {
     width: 8px;
   }
-  
+
   ::-webkit-scrollbar-track {
     background-color: hsl(var(--muted));
   }
-  
+
   ::-webkit-scrollbar-thumb {
     background-color: hsl(var(--muted-foreground) / 0.2);
     border-radius: 9999px;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     background-color: hsl(var(--muted-foreground) / 0.3);
   }
@@ -154,12 +156,14 @@
   .product-card {
     transition: all 0.3s ease;
   }
-  
+
   .product-card:hover {
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1);
     transform: translateY(-0.25rem);
   }
-  
+
   /* Button variants */
   .btn-marketplace {
     display: inline-flex;
@@ -174,17 +178,17 @@
     ring-color: hsl(var(--ring));
     ring-offset-width: 2px;
   }
-  
+
   .btn-marketplace:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px hsl(var(--ring));
   }
-  
+
   .btn-marketplace:disabled {
     pointer-events: none;
     opacity: 0.5;
   }
-  
+
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -200,21 +204,21 @@
     ring-color: hsl(var(--ring));
     ring-offset-width: 2px;
   }
-  
+
   .btn-primary:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px hsl(var(--ring));
   }
-  
+
   .btn-primary:disabled {
     pointer-events: none;
     opacity: 0.5;
   }
-  
+
   .btn-primary:hover {
     background-color: hsl(var(--primary) / 0.9);
   }
-  
+
   .btn-secondary {
     display: inline-flex;
     align-items: center;
@@ -230,21 +234,21 @@
     ring-color: hsl(var(--ring));
     ring-offset-width: 2px;
   }
-  
+
   .btn-secondary:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px hsl(var(--ring));
   }
-  
+
   .btn-secondary:disabled {
     pointer-events: none;
     opacity: 0.5;
   }
-  
+
   .btn-secondary:hover {
     background-color: hsl(var(--secondary) / 0.8);
   }
-  
+
   .btn-outline {
     display: inline-flex;
     align-items: center;
@@ -261,22 +265,22 @@
     ring-color: hsl(var(--ring));
     ring-offset-width: 2px;
   }
-  
+
   .btn-outline:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px hsl(var(--ring));
   }
-  
+
   .btn-outline:disabled {
     pointer-events: none;
     opacity: 0.5;
   }
-  
+
   .btn-outline:hover {
     background-color: hsl(var(--accent));
     color: hsl(var(--accent-foreground));
   }
-  
+
   /* Input styling */
   .input-marketplace {
     display: flex;
@@ -296,28 +300,28 @@
     ring-color: hsl(var(--ring));
     ring-offset-width: 2px;
   }
-  
+
   .input-marketplace:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px hsl(var(--ring));
   }
-  
+
   .input-marketplace:disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }
-  
+
   .input-marketplace::placeholder {
     color: hsl(var(--muted-foreground));
   }
-  
+
   .input-marketplace::-webkit-file-upload-button {
     border: 0;
     background: transparent;
     font-size: 0.875rem;
     font-weight: 500;
   }
-  
+
   /* Card styling */
   .card-marketplace {
     border-radius: 0.5rem;
@@ -326,7 +330,7 @@
     background-color: hsl(var(--card));
     color: hsl(var(--card-foreground));
   }
-  
+
   /* Loading spinner */
   .spinner {
     animation: spin 1s linear infinite;
@@ -335,12 +339,12 @@
     border-color: hsl(var(--muted));
     border-top-color: hsl(var(--primary));
   }
-  
+
   /* Gradient backgrounds */
   .gradient-primary {
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
   }
-  
+
   .gradient-secondary {
     background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--muted)) 100%);
   }
@@ -351,7 +355,7 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   /* Layout utilities */
   .container-marketplace {
     width: 100%;
@@ -360,82 +364,85 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   @media (min-width: 640px) {
     .container-marketplace {
       padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
   }
-  
+
   @media (min-width: 1024px) {
     .container-marketplace {
       padding-left: 2rem;
       padding-right: 2rem;
     }
   }
-  
+
   /* Animation utilities */
   .animate-fade-in {
     animation: fade-in 0.5s ease-out;
   }
-  
+
   .animate-slide-in {
     animation: slide-in 0.3s ease-out;
   }
-  
+
   /* Typography utilities */
   .prose {
     color: hsl(var(--foreground));
     max-width: 65ch;
   }
-  
+
   .prose-lg {
     font-size: 1.125rem;
     line-height: 1.7;
   }
-  
-  .prose h1, .prose h2, .prose h3, .prose h4 {
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
     color: hsl(var(--foreground));
     font-weight: 600;
     margin-top: 2em;
     margin-bottom: 1em;
   }
-  
+
   .prose p {
     margin-top: 1.25em;
     margin-bottom: 1.25em;
   }
-  
+
   .prose strong {
     color: hsl(var(--foreground));
     font-weight: 600;
   }
-  
+
   /* Columns utilities */
   .columns-2 {
     columns: 2;
   }
-  
+
   .columns-3 {
     columns: 3;
   }
-  
+
   @media (max-width: 768px) {
     .md\:columns-2 {
       columns: 1;
     }
-    
+
     .md\:columns-3 {
       columns: 1;
     }
   }
-  
+
   @media (min-width: 768px) {
     .md\:columns-2 {
       columns: 2;
     }
-    
+
     .md\:columns-3 {
       columns: 3;
     }

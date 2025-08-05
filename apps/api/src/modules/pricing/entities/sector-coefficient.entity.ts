@@ -1,15 +1,9 @@
-import { 
-  Column, 
-  Entity, 
-  Index,
-  ManyToOne,
-  JoinColumn
-} from 'typeorm'
+import { Column, Entity, Index, ManyToOne, JoinColumn } from 'typeorm'
 import { TenantEntity } from '../../../core/database/entities/base/multi-tenant.entity'
 
 export enum SectorType {
   BTP = 'BTP',
-  INDUSTRIE = 'INDUSTRIE', 
+  INDUSTRIE = 'INDUSTRIE',
   AUTOMOBILE = 'AUTOMOBILE',
   NAVAL = 'NAVAL',
   AERONAUTIQUE = 'AERONAUTIQUE',
@@ -20,15 +14,15 @@ export enum SectorType {
   PHARMACEUTIQUE = 'PHARMACEUTIQUE',
   DEFENSE = 'DEFENSE',
   TRANSPORT = 'TRANSPORT',
-  PARTICULIER = 'PARTICULIER'
+  PARTICULIER = 'PARTICULIER',
 }
 
 export enum CoefficientType {
-  BASE_PRICE = 'BASE_PRICE',        // Coefficient sur prix de base
-  MARGIN = 'MARGIN',                // Coefficient sur marge
-  DISCOUNT = 'DISCOUNT',            // Remise secteur
-  TRANSPORT = 'TRANSPORT',          // Frais transport spécifiques
-  HANDLING = 'HANDLING'             // Frais manutention
+  BASE_PRICE = 'BASE_PRICE', // Coefficient sur prix de base
+  MARGIN = 'MARGIN', // Coefficient sur marge
+  DISCOUNT = 'DISCOUNT', // Remise secteur
+  TRANSPORT = 'TRANSPORT', // Frais transport spécifiques
+  HANDLING = 'HANDLING', // Frais manutention
 }
 
 @Entity('sector_coefficients')
@@ -79,21 +73,21 @@ export class SectorCoefficient extends TenantEntity {
     // Pour BASE_PRICE
     applyToBasePrice?: boolean
     applyToMargin?: boolean
-    
+
     // Pour MARGIN
     marginType?: 'percentage' | 'fixed_amount'
-    
+
     // Pour DISCOUNT
     discountType?: 'percentage' | 'fixed_amount' | 'progressive'
     progressiveRates?: Array<{
       minQuantity: number
       rate: number
     }>
-    
-    // Pour TRANSPORT/HANDLING  
+
+    // Pour TRANSPORT/HANDLING
     calculationMethod?: 'per_unit' | 'per_weight' | 'per_volume' | 'fixed'
     freeThreshold?: number // Seuil de gratuité
-    
+
     // Spécifique BTP
     btpSpecific?: {
       applyCOFRAC?: boolean // Application normes COFRAC
@@ -130,36 +124,57 @@ export class SectorCoefficient extends TenantEntity {
     if (!this.isActive) return false
 
     // Vérification des quantités
-    if (this.conditions.minQuantity && (!context.quantity || context.quantity < this.conditions.minQuantity)) {
+    if (
+      this.conditions.minQuantity &&
+      (!context.quantity || context.quantity < this.conditions.minQuantity)
+    ) {
       return false
     }
-    if (this.conditions.maxQuantity && (!context.quantity || context.quantity > this.conditions.maxQuantity)) {
+    if (
+      this.conditions.maxQuantity &&
+      (!context.quantity || context.quantity > this.conditions.maxQuantity)
+    ) {
       return false
     }
 
     // Vérification des montants
-    if (this.conditions.minAmount && (!context.amount || context.amount < this.conditions.minAmount)) {
+    if (
+      this.conditions.minAmount &&
+      (!context.amount || context.amount < this.conditions.minAmount)
+    ) {
       return false
     }
-    if (this.conditions.maxAmount && (!context.amount || context.amount > this.conditions.maxAmount)) {
+    if (
+      this.conditions.maxAmount &&
+      (!context.amount || context.amount > this.conditions.maxAmount)
+    ) {
       return false
     }
 
     // Vérification des types de clients
-    if (this.conditions.customerTypes?.length && context.customerType && 
-        !this.conditions.customerTypes.includes(context.customerType)) {
+    if (
+      this.conditions.customerTypes?.length &&
+      context.customerType &&
+      !this.conditions.customerTypes.includes(context.customerType)
+    ) {
       return false
     }
 
     // Vérification des catégories produits
-    if (this.conditions.productCategories?.length && context.productCategory && 
-        !this.conditions.productCategories.includes(context.productCategory)) {
+    if (
+      this.conditions.productCategories?.length &&
+      context.productCategory &&
+      !this.conditions.productCategories.includes(context.productCategory)
+    ) {
       return false
     }
 
     // Vérification des familles d'articles
-    if (this.conditions.articleFamilies?.length && context.articleFamily && 
-        !this.conditions.articleFamilies.includes(context.articleFamily)) {
+    if (
+      this.conditions.articleFamilies?.length &&
+      context.articleFamily &&
+      !this.conditions.articleFamilies.includes(context.articleFamily)
+    ) {
       return false
     }
 
@@ -181,8 +196,11 @@ export class SectorCoefficient extends TenantEntity {
     }
 
     // Vérification des régions
-    if (this.conditions.regions?.length && context.region && 
-        !this.conditions.regions.includes(context.region)) {
+    if (
+      this.conditions.regions?.length &&
+      context.region &&
+      !this.conditions.regions.includes(context.region)
+    ) {
       return false
     }
 
@@ -204,18 +222,18 @@ export class SectorCoefficient extends TenantEntity {
         if (this.parameters.discountType === 'progressive' && this.parameters.progressiveRates) {
           // Remise progressive selon quantité
           const applicableRate = this.parameters.progressiveRates
-            .filter(rate => quantity >= rate.minQuantity)
+            .filter((rate) => quantity >= rate.minQuantity)
             .sort((a, b) => b.minQuantity - a.minQuantity)[0]
-          
+
           if (applicableRate) {
             return basePrice * (1 - applicableRate.rate / 100)
           }
         }
-        
+
         if (this.parameters.discountType === 'fixed_amount') {
           return Math.max(0, basePrice - this.coefficient)
         }
-        
+
         // Remise en pourcentage par défaut
         return basePrice * (1 - this.coefficient / 100)
 
@@ -224,7 +242,7 @@ export class SectorCoefficient extends TenantEntity {
         // Ces coûts s'ajoutent au prix
         switch (this.parameters.calculationMethod) {
           case 'per_unit':
-            return basePrice + (this.coefficient * quantity)
+            return basePrice + this.coefficient * quantity
           case 'fixed':
             // Coût fixe réparti ou seuil de gratuité
             if (this.parameters.freeThreshold && basePrice >= this.parameters.freeThreshold) {

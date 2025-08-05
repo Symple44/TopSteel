@@ -61,13 +61,13 @@ export interface ErpInfoModalProps {
   }
 }
 
-export function ErpInfoModal({ 
-  isOpen, 
-  onClose, 
-  health, 
-  onCheckHealth, 
+export function ErpInfoModal({
+  isOpen,
+  onClose,
+  health,
+  onCheckHealth,
   isChecking,
-  translations = {}
+  translations = {},
 }: ErpInfoModalProps) {
   // Default translations with fallbacks
   const t = (key: string) => {
@@ -93,10 +93,14 @@ export function ErpInfoModal({
       lastCheck: 'Last check',
       errorLabel: 'Error:',
       trademark: 'TopSteel© ERP',
-      tagline: 'Solid as your expertise'
+      tagline: 'Solid as your expertise',
     }
-    
-    return translations[key as keyof typeof translations] || defaultTranslations[key as keyof typeof defaultTranslations] || key
+
+    return (
+      translations[key as keyof typeof translations] ||
+      defaultTranslations[key as keyof typeof defaultTranslations] ||
+      key
+    )
   }
 
   // Définir les fonctions utilitaires en premier
@@ -314,7 +318,9 @@ export function ErpInfoModal({
           {/* Message d'erreur */}
           {health.error && (
             <div className="p-3 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-700 dark:text-red-300 font-medium">{t('errorLabel')}</p>
+              <p className="text-sm text-red-700 dark:text-red-300 font-medium">
+                {t('errorLabel')}
+              </p>
               <p className="text-sm text-red-600 dark:text-red-400 mt-1">{health.error}</p>
             </div>
           )}

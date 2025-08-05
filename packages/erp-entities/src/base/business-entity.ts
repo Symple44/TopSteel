@@ -37,7 +37,7 @@ export abstract class BusinessEntity extends TenantEntity {
       this.businessMetadata = {
         ...this.businessMetadata,
         lastModifiedBy: userId,
-        lastModifiedAt: new Date().toISOString()
+        lastModifiedAt: new Date().toISOString(),
       }
     }
   }

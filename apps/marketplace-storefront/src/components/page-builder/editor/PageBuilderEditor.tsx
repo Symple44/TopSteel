@@ -16,7 +16,7 @@ interface PageBuilderEditorProps {
 export function PageBuilderEditor({
   initialSections = [],
   onSave,
-  templateId
+  templateId,
 }: PageBuilderEditorProps) {
   const [sections, setSections] = useState<BaseSection[]>(initialSections)
   const [selectedSection, setSelectedSection] = useState<string | null>(null)
@@ -57,7 +57,7 @@ export function PageBuilderEditor({
       content: {},
       styles: {},
       responsive: {},
-      settings: {}
+      settings: {},
     }
 
     const newSections = [...sections]
@@ -77,7 +77,7 @@ export function PageBuilderEditor({
   }
 
   const updateSection = (sectionId: string, updates: Partial<BaseSection>) => {
-    const newSections = sections.map(section =>
+    const newSections = sections.map((section) =>
       section.id === sectionId ? { ...section, ...updates } : section
     )
     setSections(newSections)
@@ -85,7 +85,7 @@ export function PageBuilderEditor({
   }
 
   const deleteSection = (sectionId: string) => {
-    const newSections = sections.filter(s => s.id !== sectionId)
+    const newSections = sections.filter((s) => s.id !== sectionId)
     setSections(newSections)
     addToHistory(newSections)
     setSelectedSection(null)
@@ -95,12 +95,12 @@ export function PageBuilderEditor({
     const newSections = [...sections]
     const [movedSection] = newSections.splice(fromIndex, 1)
     newSections.splice(toIndex, 0, movedSection)
-    
+
     // Réorganiser les ordres
     newSections.forEach((section, i) => {
       section.order = i
     })
-    
+
     setSections(newSections)
     addToHistory(newSections)
   }
@@ -161,18 +161,18 @@ export function PageBuilderEditor({
                 <Plus className="w-4 h-4" />
                 Ajouter une section
               </button>
-              
+
               <button
                 onClick={() => setIsPreview(!isPreview)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-md",
-                  isPreview ? "bg-gray-600 text-white" : "bg-gray-200 hover:bg-gray-300"
+                  'flex items-center gap-2 px-4 py-2 rounded-md',
+                  isPreview ? 'bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
                 )}
               >
                 <Eye className="w-4 h-4" />
                 {isPreview ? 'Éditer' : 'Prévisualiser'}
               </button>
-              
+
               <button
                 onClick={handleSave}
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
@@ -201,7 +201,7 @@ export function PageBuilderEditor({
               </button>
             </div>
           ) : (
-            <div className={cn("pb-20", isPreview && "pointer-events-none")}>
+            <div className={cn('pb-20', isPreview && 'pointer-events-none')}>
               {sections.map((section, index) => (
                 <div
                   key={section.id}
@@ -210,9 +210,9 @@ export function PageBuilderEditor({
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, index)}
                   className={cn(
-                    "relative group",
-                    !isPreview && "cursor-move",
-                    selectedSection === section.id && "ring-2 ring-blue-500"
+                    'relative group',
+                    !isPreview && 'cursor-move',
+                    selectedSection === section.id && 'ring-2 ring-blue-500'
                   )}
                   onClick={() => !isPreview && setSelectedSection(section.id)}
                 >
@@ -243,7 +243,7 @@ export function PageBuilderEditor({
                       </div>
                     </div>
                   )}
-                  
+
                   <SectionRenderer
                     section={section}
                     isEditing={!isPreview && selectedSection === section.id}
@@ -259,7 +259,7 @@ export function PageBuilderEditor({
         {/* Panneau latéral pour les paramètres */}
         {showSettings && selectedSection && (
           <SectionSettings
-            section={sections.find(s => s.id === selectedSection)!}
+            section={sections.find((s) => s.id === selectedSection)!}
             onUpdate={(updates) => updateSection(selectedSection, updates)}
             onClose={() => setShowSettings(false)}
           />

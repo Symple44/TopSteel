@@ -159,9 +159,7 @@ export function Header({
                       ? `${user.prenom} ${user.nom}`.trim()
                       : user?.nom || user?.email?.split('@')[0] || t('user')}
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {user?.email || t('email')}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{user?.email || t('email')}</p>
                 </div>
 
                 {/* Actions */}

@@ -17,18 +17,15 @@ export class UserAuthRepositoryService implements IUserRepository {
 
   async findByEmailOrAcronym(emailOrAcronym: string): Promise<User | null> {
     return await this.userRepository.findOne({
-      where: [
-        { email: emailOrAcronym },
-        { acronyme: emailOrAcronym }
-      ],
-      select: ['id', 'email', 'nom', 'prenom', 'acronyme', 'password', 'role']
+      where: [{ email: emailOrAcronym }, { acronyme: emailOrAcronym }],
+      select: ['id', 'email', 'nom', 'prenom', 'acronyme', 'password', 'role'],
     })
   }
 
   async findById(id: string): Promise<User | null> {
     return await this.userRepository.findOne({
       where: { id },
-      select: ['id', 'email', 'nom', 'prenom', 'acronyme', 'role']
+      select: ['id', 'email', 'nom', 'prenom', 'acronyme', 'role'],
     })
   }
 

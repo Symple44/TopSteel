@@ -43,11 +43,11 @@ export class MarketplacePricingEngine {
   ): Promise<PriceCalculationResult> {
     // Récupérer toutes les règles actives pour ce produit
     const rules = await this.priceRuleRepo.find({
-      where: { 
-        productId, 
-        isActive: true 
+      where: {
+        productId,
+        isActive: true,
       },
-      order: { priority: 'DESC' } // Plus haute priorité en premier
+      order: { priority: 'DESC' }, // Plus haute priorité en premier
     })
 
     const result: PriceCalculationResult = {
@@ -55,7 +55,7 @@ export class MarketplacePricingEngine {
       finalPrice: basePrice,
       appliedRules: [],
       totalDiscount: 0,
-      totalDiscountPercentage: 0
+      totalDiscountPercentage: 0,
     }
 
     if (rules.length === 0) {
@@ -66,7 +66,7 @@ export class MarketplacePricingEngine {
     const enrichedContext = {
       ...context,
       customerId,
-      productId
+      productId,
     }
 
     let currentPrice = basePrice
@@ -82,7 +82,7 @@ export class MarketplacePricingEngine {
           ruleName: rule.ruleName,
           adjustment: rule.adjustmentValue,
           adjustmentType: rule.adjustmentType,
-          discountAmount
+          discountAmount,
         })
 
         // Incrémenter l'usage de la règle
@@ -124,7 +124,7 @@ export class MarketplacePricingEngine {
 
         return {
           ...priceResult,
-          productId: product.productId
+          productId: product.productId,
         }
       })
     )
@@ -137,14 +137,14 @@ export class MarketplacePricingEngine {
     context: PriceCalculationContext = {}
   ): Promise<MarketplacePriceRule[]> {
     const rules = await this.priceRuleRepo.find({
-      where: { 
-        productId, 
-        isActive: true 
+      where: {
+        productId,
+        isActive: true,
       },
-      order: { priority: 'DESC' }
+      order: { priority: 'DESC' },
     })
 
-    return rules.filter(rule => rule.canBeApplied(context))
+    return rules.filter((rule) => rule.canBeApplied(context))
   }
 
   async previewPriceWithRule(
@@ -154,7 +154,7 @@ export class MarketplacePricingEngine {
     context: PriceCalculationContext = {}
   ): Promise<PriceCalculationResult> {
     const rule = await this.priceRuleRepo.findOne({
-      where: { id: ruleId, productId, isActive: true }
+      where: { id: ruleId, productId, isActive: true },
     })
 
     if (!rule || !rule.canBeApplied(context)) {
@@ -163,7 +163,7 @@ export class MarketplacePricingEngine {
         finalPrice: basePrice,
         appliedRules: [],
         totalDiscount: 0,
-        totalDiscountPercentage: 0
+        totalDiscountPercentage: 0,
       }
     }
 
@@ -173,15 +173,17 @@ export class MarketplacePricingEngine {
     return {
       basePrice,
       finalPrice: Math.max(0, finalPrice),
-      appliedRules: [{
-        ruleId: rule.id,
-        ruleName: rule.ruleName,
-        adjustment: rule.adjustmentValue,
-        adjustmentType: rule.adjustmentType,
-        discountAmount
-      }],
+      appliedRules: [
+        {
+          ruleId: rule.id,
+          ruleName: rule.ruleName,
+          adjustment: rule.adjustmentValue,
+          adjustmentType: rule.adjustmentType,
+          discountAmount,
+        },
+      ],
       totalDiscount: discountAmount,
-      totalDiscountPercentage: basePrice > 0 ? (discountAmount / basePrice) * 100 : 0
+      totalDiscountPercentage: basePrice > 0 ? (discountAmount / basePrice) * 100 : 0,
     }
   }
 
@@ -197,13 +199,15 @@ export class MarketplacePricingEngine {
       ruleName: ruleName || `Group discount for ${customerGroup}`,
       adjustmentType,
       adjustmentValue,
-      conditions: [{
-        type: 'customer_group',
-        operator: 'equals',
-        value: customerGroup
-      }],
+      conditions: [
+        {
+          type: 'customer_group',
+          operator: 'equals',
+          value: customerGroup,
+        },
+      ],
       priority: 10,
-      isActive: true
+      isActive: true,
     })
 
     return await this.priceRuleRepo.save(rule)
@@ -221,14 +225,16 @@ export class MarketplacePricingEngine {
       ruleName: ruleName || `Quantity discount (${minQuantity}+)`,
       adjustmentType,
       adjustmentValue,
-      conditions: [{
-        type: 'quantity',
-        operator: 'greater_than',
-        value: minQuantity - 1
-      }],
+      conditions: [
+        {
+          type: 'quantity',
+          operator: 'greater_than',
+          value: minQuantity - 1,
+        },
+      ],
       priority: 5,
       isActive: true,
-      combinable: false // Les règles de quantité ne se combinent généralement pas
+      combinable: false, // Les règles de quantité ne se combinent généralement pas
     })
 
     return await this.priceRuleRepo.save(rule)
@@ -247,15 +253,17 @@ export class MarketplacePricingEngine {
       ruleName: ruleName || 'Timed promotion',
       adjustmentType,
       adjustmentValue,
-      conditions: [{
-        type: 'date_range',
-        operator: 'between',
-        value: [startDate.toISOString(), endDate.toISOString()]
-      }],
+      conditions: [
+        {
+          type: 'date_range',
+          operator: 'between',
+          value: [startDate.toISOString(), endDate.toISOString()],
+        },
+      ],
       validFrom: startDate,
       validUntil: endDate,
       priority: 15,
-      isActive: true
+      isActive: true,
     })
 
     return await this.priceRuleRepo.save(rule)
@@ -276,7 +284,10 @@ export class MarketplacePricingEngine {
       errors.push('Adjustment value is required')
     }
 
-    if (rule.adjustmentType === AdjustmentType.PERCENTAGE && Math.abs(rule.adjustmentValue!) > 100) {
+    if (
+      rule.adjustmentType === AdjustmentType.PERCENTAGE &&
+      Math.abs(rule.adjustmentValue!) > 100
+    ) {
       errors.push('Percentage adjustment cannot exceed 100%')
     }
 

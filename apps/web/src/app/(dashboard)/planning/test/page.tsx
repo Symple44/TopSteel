@@ -378,7 +378,10 @@ export default function TestPlanningPage() {
                 </div>
               ))}
               {Array.from({ length: 35 }, (_, i) => (
-                <div key={`calendar-day-${i + 1}`} className="aspect-square border rounded p-1 text-xs">
+                <div
+                  key={`calendar-day-${i + 1}`}
+                  className="aspect-square border rounded p-1 text-xs"
+                >
                   {i + 1 <= 31 && (
                     <>
                       <div className="font-medium">{i + 1}</div>

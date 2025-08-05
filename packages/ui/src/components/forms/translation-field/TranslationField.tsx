@@ -75,18 +75,21 @@ export function TranslationField({
       current: 'Current',
       translateTo: 'Translate to',
       cancel: 'Cancel',
-      save: 'Save'
+      save: 'Save',
     }
-    
-    let translation = fieldTranslations[key as keyof typeof fieldTranslations] || defaultTranslations[key as keyof typeof defaultTranslations] || key
-    
+
+    let translation =
+      fieldTranslations[key as keyof typeof fieldTranslations] ||
+      defaultTranslations[key as keyof typeof defaultTranslations] ||
+      key
+
     // Simple parameter replacement
     if (params && typeof translation === 'string') {
       Object.entries(params).forEach(([paramKey, value]) => {
         translation = translation.replace(`{{${paramKey}}}`, String(value))
       })
     }
-    
+
     return translation
   }
 

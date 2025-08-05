@@ -8,9 +8,7 @@ import { MarketplaceTheme } from './entities/marketplace-theme.entity'
 // import { ThemesController } from './controllers/themes.controller'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([MarketplaceTheme], 'marketplace'),
-  ],
+  imports: [TypeOrmModule.forFeature([MarketplaceTheme], 'marketplace')],
   providers: [
     // MarketplaceThemesService,
   ],

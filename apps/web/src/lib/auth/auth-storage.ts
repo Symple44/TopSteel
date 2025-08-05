@@ -98,7 +98,7 @@ export class AuthStorage {
       localStorage.removeItem(this.config.tokenStorageKey)
       sessionStorage.removeItem(this.config.tokenStorageKey)
       localStorage.removeItem(this.config.rememberMeStorageKey)
-      
+
       // Effacer également le cookie
       document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     } catch (_error) {}

@@ -86,7 +86,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             type: 'uuid',
             isNullable: true,
           },
-          
+
           // Colonnes tenant
           {
             name: 'societe_id',
@@ -97,7 +97,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             type: 'uuid',
             isNullable: true,
           },
-          
+
           // Colonnes métier principales
           {
             name: 'reference',
@@ -118,7 +118,14 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
           {
             name: 'type',
             type: 'enum',
-            enum: ['MATIERE_PREMIERE', 'PRODUIT_FINI', 'PRODUIT_SEMI_FINI', 'FOURNITURE', 'CONSOMMABLE', 'SERVICE'],
+            enum: [
+              'MATIERE_PREMIERE',
+              'PRODUIT_FINI',
+              'PRODUIT_SEMI_FINI',
+              'FOURNITURE',
+              'CONSOMMABLE',
+              'SERVICE',
+            ],
             enumName: 'article_type',
           },
           {
@@ -128,7 +135,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             enumName: 'article_status',
             default: "'ACTIF'",
           },
-          
+
           // Classification
           {
             name: 'famille',
@@ -154,7 +161,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             length: '50',
             isNullable: true,
           },
-          
+
           // Unités et gestion stock
           {
             name: 'unite_stock',
@@ -191,7 +198,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             scale: 4,
             default: 1,
           },
-          
+
           // Gestion des stocks
           {
             name: 'gere_en_stock',
@@ -240,7 +247,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             scale: 4,
             isNullable: true,
           },
-          
+
           // Valorisation
           {
             name: 'methode_valorisation',
@@ -284,7 +291,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             scale: 2,
             isNullable: true,
           },
-          
+
           // Informations fournisseur principal
           {
             name: 'fournisseur_principal_id',
@@ -317,7 +324,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             scale: 4,
             isNullable: true,
           },
-          
+
           // Caractéristiques physiques
           {
             name: 'poids',
@@ -360,7 +367,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             length: '50',
             isNullable: true,
           },
-          
+
           // Informations comptables et fiscales
           {
             name: 'compte_comptable_achat',
@@ -392,7 +399,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             length: '30',
             isNullable: true,
           },
-          
+
           // Métadonnées et informations techniques
           {
             name: 'caracteristiques_techniques',
@@ -409,7 +416,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             type: 'jsonb',
             default: "'{}'",
           },
-          
+
           // Dates importantes
           {
             name: 'date_creation_fiche',
@@ -437,53 +444,39 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             name: 'CHK_articles_prix_positifs',
             expression: `(prix_achat_standard IS NULL OR prix_achat_standard >= 0) AND
                         (prix_achat_moyen IS NULL OR prix_achat_moyen >= 0) AND
-                        (prix_vente_ht IS NULL OR prix_vente_ht >= 0)`
+                        (prix_vente_ht IS NULL OR prix_vente_ht >= 0)`,
           },
           {
             name: 'CHK_articles_stock_coherent',
-            expression: `(stock_mini IS NULL OR stock_maxi IS NULL OR stock_mini <= stock_maxi)`
+            expression: `(stock_mini IS NULL OR stock_maxi IS NULL OR stock_mini <= stock_maxi)`,
           },
           {
             name: 'CHK_articles_taux_valides',
             expression: `(taux_tva IS NULL OR (taux_tva >= 0 AND taux_tva <= 100)) AND
-                        (taux_marge IS NULL OR taux_marge >= 0)`
-          }
+                        (taux_marge IS NULL OR taux_marge >= 0)`,
+          },
         ],
       }),
       true
     )
 
     // Créer les index pour les performances
-    await queryRunner.query(
-      `CREATE INDEX "IDX_articles_reference" ON "articles" ("reference")`
-    )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_articles_designation" ON "articles" ("designation")`
-    )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_articles_type" ON "articles" ("type")`
-    )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_articles_status" ON "articles" ("status")`
-    )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_articles_famille" ON "articles" ("famille")`
-    )
+    await queryRunner.query(`CREATE INDEX "IDX_articles_reference" ON "articles" ("reference")`)
+    await queryRunner.query(`CREATE INDEX "IDX_articles_designation" ON "articles" ("designation")`)
+    await queryRunner.query(`CREATE INDEX "IDX_articles_type" ON "articles" ("type")`)
+    await queryRunner.query(`CREATE INDEX "IDX_articles_status" ON "articles" ("status")`)
+    await queryRunner.query(`CREATE INDEX "IDX_articles_famille" ON "articles" ("famille")`)
     await queryRunner.query(
       `CREATE INDEX "IDX_articles_sous_famille" ON "articles" ("sous_famille")`
     )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_articles_societe_id" ON "articles" ("societe_id")`
-    )
+    await queryRunner.query(`CREATE INDEX "IDX_articles_societe_id" ON "articles" ("societe_id")`)
     await queryRunner.query(
       `CREATE INDEX "IDX_articles_gere_en_stock" ON "articles" ("gere_en_stock")`
     )
     await queryRunner.query(
       `CREATE INDEX "IDX_articles_fournisseur_principal_id" ON "articles" ("fournisseur_principal_id")`
     )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_articles_code_ean" ON "articles" ("code_ean")`
-    )
+    await queryRunner.query(`CREATE INDEX "IDX_articles_code_ean" ON "articles" ("code_ean")`)
 
     // Créer la table system_settings si elle n'existe pas
     const systemSettingsExists = await queryRunner.hasTable('system_settings')
@@ -556,7 +549,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
             {
               name: 'UQ_system_settings_category_key',
               columnNames: ['category', 'key'],
-            }
+            },
           ],
         }),
         true
@@ -565,9 +558,7 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
       await queryRunner.query(
         `CREATE INDEX "IDX_system_settings_category" ON "system_settings" ("category")`
       )
-      await queryRunner.query(
-        `CREATE INDEX "IDX_system_settings_key" ON "system_settings" ("key")`
-      )
+      await queryRunner.query(`CREATE INDEX "IDX_system_settings_key" ON "system_settings" ("key")`)
       await queryRunner.query(
         `CREATE INDEX "IDX_system_settings_active" ON "system_settings" ("is_active")`
       )
@@ -597,7 +588,9 @@ export class CreateArticlesTable1738000000000 implements MigrationInterface {
     await queryRunner.query('DROP TYPE IF EXISTS "article_type"')
 
     // Supprimer system_settings si créée par cette migration
-    const systemSettingsHasData = await queryRunner.query('SELECT COUNT(*) as count FROM system_settings')
+    const systemSettingsHasData = await queryRunner.query(
+      'SELECT COUNT(*) as count FROM system_settings'
+    )
     if (systemSettingsHasData[0].count === '0') {
       await queryRunner.dropIndex('system_settings', 'IDX_system_settings_active')
       await queryRunner.dropIndex('system_settings', 'IDX_system_settings_key')

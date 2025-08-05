@@ -11,26 +11,11 @@ import { BTPIndexController } from './controllers/btp-index.controller'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      SectorCoefficient,
-      CustomerSectorAssignment,
-      BTPIndex
-    ], 'tenant'),
-    TypeOrmModule.forFeature([
-      SocieteUser
-    ], 'auth')
+    TypeOrmModule.forFeature([SectorCoefficient, CustomerSectorAssignment, BTPIndex], 'tenant'),
+    TypeOrmModule.forFeature([SocieteUser], 'auth'),
   ],
-  controllers: [
-    SectorPricingController,
-    BTPIndexController
-  ],
-  providers: [
-    SectorPricingService,
-    BTPIndexService
-  ],
-  exports: [
-    SectorPricingService,
-    BTPIndexService
-  ]
+  controllers: [SectorPricingController, BTPIndexController],
+  providers: [SectorPricingService, BTPIndexService],
+  exports: [SectorPricingService, BTPIndexService],
 })
 export class PricingModule {}
