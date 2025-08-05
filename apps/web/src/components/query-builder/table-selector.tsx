@@ -596,7 +596,7 @@ export function TableSelector({
 
                       return (
                         <div
-                          key={index}
+                          key={`join-${join.fromTable}-${join.toTable}-${join.fromColumn}-${join.toColumn}`}
                           className={`p-3 rounded-lg border ${
                             hasSelectedColumns
                               ? 'bg-amber-50 border-amber-200'
@@ -739,7 +739,7 @@ export function TableSelector({
                     <div className="flex flex-wrap gap-1">
                       {pendingRemoveJoin.columnsFromTable.map((col, index) => (
                         <span
-                          key={index}
+                          key={col.name || col.columnName || `col-${index}`}
                           className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-medium"
                         >
                           {col.name || col.columnName}

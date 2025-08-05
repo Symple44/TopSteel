@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, type Repository } from 'typeorm'
-import { SocieteUser, type UserSocieteRole } from '../entities/societe-user.entity'
+import { SocieteUser, UserSocieteRole } from '../entities/societe-user.entity'
 
 @Injectable()
 export class SocieteUsersService {
@@ -18,13 +18,25 @@ export class SocieteUsersService {
   }
 
   async findByUser(userId: string): Promise<SocieteUser[]> {
-    return this._societeUserRepository.find({
-      where: {
-        userId,
-        deletedAt: IsNull(),
-      },
-      relations: ['user', 'societe', 'societe.sites'],
-    })
+    return this._societeUserRepository
+      .createQueryBuilder('su')
+      .leftJoinAndSelect('su.societe', 'societe')
+      .select([
+        'su.id',
+        'su.userId',
+        'su.societeId', 
+        'su.role',
+        'su.actif',
+        'su.isDefault',
+        'su.permissions',
+        'su.restrictedPermissions',
+        'societe.id',
+        'societe.nom',
+        'societe.code'
+      ])
+      .where('su.userId = :userId', { userId })
+      .andWhere('su.deletedAt IS NULL')
+      .getMany()
   }
 
   async findBySociete(societeId: string): Promise<SocieteUser[]> {

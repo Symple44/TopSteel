@@ -123,7 +123,7 @@ export function UnitsAndListsSettings() {
           <div className="space-y-2">
             {getListItems(list.key).map((item, index) => (
               <div
-                key={index}
+                key={`${list.key}-${item}-${index}`}
                 className="flex items-center gap-2 rounded-lg border bg-background p-2"
               >
                 <GripVertical className="h-4 w-4 cursor-move text-muted-foreground" />

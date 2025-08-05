@@ -222,7 +222,7 @@ export function CalculatedFieldsEditor({
           </Card>
         ) : (
           fields.map((field, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
+            <Card key={field.name} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">

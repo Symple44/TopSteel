@@ -7,7 +7,6 @@ export async function GET(
 ) {
   try {
     const { tenantCode } = await params
-    const _apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/health/tenant/${tenantCode}`
 
     // Récupérer les headers d'authentification
     const authHeader = request.headers.get('authorization')

@@ -3,7 +3,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function POST(request: NextRequest) {
-  const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')?.value

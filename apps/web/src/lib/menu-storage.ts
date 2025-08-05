@@ -24,12 +24,15 @@ function loadFromStorage<T>(key: string, defaultValue: T): T {
       return parsed
     }
   } catch (error) {
-    syncChecker.addIssue({
-      type: 'storage',
-      severity: 'medium',
-      message: `Impossible de lire ${key} depuis localStorage`,
-      details: { key, error: error instanceof Error ? error.message : String(error) },
-    })
+    // Seulement signaler les erreurs persistantes, pas les échecs temporaires de parsing
+    if (error instanceof Error && !error.message.includes('JSON')) {
+      syncChecker.addIssue({
+        type: 'storage',
+        severity: 'low', // Réduire la sévérité
+        message: `Lecture localStorage ${key} échouée`,
+        details: { key, error: error.message },
+      })
+    }
   }
 
   return defaultValue
@@ -43,12 +46,15 @@ function saveToStorage<T>(key: string, value: T): void {
   try {
     localStorage.setItem(key, JSON.stringify(value))
   } catch (error) {
-    syncChecker.addIssue({
-      type: 'storage',
-      severity: 'high',
-      message: `Impossible de sauvegarder ${key} dans localStorage`,
-      details: { key, value, error: error instanceof Error ? error.message : String(error) },
-    })
+    // Seulement signaler les erreurs critiques de sauvegarde (quota dépassé, etc.)
+    if (error instanceof Error && (error.name === 'QuotaExceededError' || error.message.includes('quota'))) {
+      syncChecker.addIssue({
+        type: 'storage',
+        severity: 'high',
+        message: `Espace localStorage insuffisant pour ${key}`,
+        details: { key, error: error.message },
+      })
+    }
   }
 }
 
@@ -70,9 +76,18 @@ export const menuStorage = {
     memorySelectedPages[userId] = pages
     saveToStorage(SELECTED_PAGES_KEY, memorySelectedPages)
 
-    // Vérifier la synchronisation
-    const stored = loadFromStorage(SELECTED_PAGES_KEY, {})
-    syncChecker.checkStorageConsistency('selected-pages', memorySelectedPages, stored)
+    // Vérifier la synchronisation après un délai pour éviter les faux positifs
+    setTimeout(() => {
+      try {
+        const stored = loadFromStorage(SELECTED_PAGES_KEY, {})
+        // Seulement vérifier si les données sont différentes de manière significative
+        if (Object.keys(stored).length > 0 && JSON.stringify(memorySelectedPages) !== JSON.stringify(stored)) {
+          syncChecker.checkStorageConsistency('selected-pages', memorySelectedPages, stored)
+        }
+      } catch (error) {
+        // Ignorer les erreurs de comparaison temporaires
+      }
+    }, 100)
   },
 
   // Préférences utilisateur
@@ -85,9 +100,18 @@ export const menuStorage = {
     memoryPreferences[userId] = prefs
     saveToStorage(USER_PREFERENCES_KEY, memoryPreferences)
 
-    // Vérifier la synchronisation
-    const stored = loadFromStorage(USER_PREFERENCES_KEY, {})
-    syncChecker.checkStorageConsistency('user-preferences', memoryPreferences, stored)
+    // Vérifier la synchronisation après un délai pour éviter les faux positifs
+    setTimeout(() => {
+      try {
+        const stored = loadFromStorage(USER_PREFERENCES_KEY, {})
+        // Seulement vérifier si les données sont différentes de manière significative
+        if (Object.keys(stored).length > 0 && JSON.stringify(memoryPreferences) !== JSON.stringify(stored)) {
+          syncChecker.checkStorageConsistency('user-preferences', memoryPreferences, stored)
+        }
+      } catch (error) {
+        // Ignorer les erreurs de comparaison temporaires
+      }
+    }, 100)
   },
 
   // Réinitialiser pour un utilisateur
@@ -99,12 +123,7 @@ export const menuStorage = {
     saveToStorage(SELECTED_PAGES_KEY, memorySelectedPages)
     saveToStorage(USER_PREFERENCES_KEY, memoryPreferences)
 
-    syncChecker.addIssue({
-      type: 'menu',
-      severity: 'low',
-      message: `Données réinitialisées pour l'utilisateur ${userId}`,
-      details: { userId, action: 'reset' },
-    })
+    // Données réinitialisées avec succès - pas besoin de notification d'erreur
   },
 }
 

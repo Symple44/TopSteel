@@ -15,8 +15,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Appeler l'API backend pour récupérer les rôles depuis la base de données
-    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-
     const response = await callBackendFromApi(
       req,
       `parameters/system/user_roles?language=${language}`,

@@ -35,9 +35,6 @@ function getAuthHeaders(request: NextRequest): Record<string, string> {
 // Route de développement qui appelle directement le backend SANS vérification stricte du company_id
 export async function POST(request: NextRequest) {
   try {
-    const _apiUrl =
-      process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
-
     const _headers = getAuthHeaders(request)
     const body = await request.json()
     const { sql, limit = 100 } = body

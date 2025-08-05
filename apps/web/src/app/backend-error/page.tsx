@@ -76,7 +76,7 @@ export default function BackendErrorPage() {
           {/* Message de statut */}
           <p className={`text-lg mb-6 ${getStatusColor()}`}>
             {health.error ||
-              (health.status === 'online' ? 'Backend connecté' : 'Backend non disponible')}
+              (health.status === 'online' ? t('backend.connected') : t('backend.unavailable'))}
           </p>
 
           {/* Informations détaillées */}
@@ -89,7 +89,7 @@ export default function BackendErrorPage() {
               </div>
               <div>
                 <span className="font-medium">{t('backend.lastCheck')}</span>{' '}
-                {health.lastCheck?.toLocaleTimeString() || 'Jamais'}
+                {health.lastCheck?.toLocaleTimeString() || t('backend.never')}
               </div>
               {health.responseTime && (
                 <div>
@@ -98,7 +98,7 @@ export default function BackendErrorPage() {
                 </div>
               )}
               <div>
-                <span className="font-medium">URL de l'API :</span>{' '}
+                <span className="font-medium">{t('backend.attemptedUrl')} :</span>{' '}
                 {process.env.NEXT_PUBLIC_API_URL || t('backend.notConfigured')}
               </div>
             </div>

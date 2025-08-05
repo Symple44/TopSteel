@@ -109,14 +109,14 @@ export function Header({
               title={
                 company
                   ? tabCount > 1
-                    ? `Changement affectera ${tabCount} onglets`
-                    : 'Changer de société'
-                  : 'Sélectionner une société'
+                    ? t('companies.changeAffects', { count: tabCount })
+                    : t('companies.changeCompany')
+                  : t('companies.select')
               }
             >
               <Building className="h-4 w-4" />
               <span className="text-sm font-medium">
-                {company ? company.code : 'Sélectionner société'}
+                {company ? company.code : t('companies.select')}
               </span>
               {tabCount > 1 && (
                 <span className="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full font-medium">
@@ -144,7 +144,7 @@ export function Header({
               <span className="hidden md:block text-sm font-medium">
                 {user?.prenom && user?.nom
                   ? `${user.prenom} ${user.nom}`.trim()
-                  : user?.nom || user?.email?.split('@')[0] || t('user') || 'Utilisateur'}
+                  : user?.nom || user?.email?.split('@')[0] || t('user')}
               </span>
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -157,10 +157,10 @@ export function Header({
                   <p className="text-sm font-medium text-foreground">
                     {user?.prenom && user?.nom
                       ? `${user.prenom} ${user.nom}`.trim()
-                      : user?.nom || user?.email?.split('@')[0] || t('user') || 'Utilisateur'}
+                      : user?.nom || user?.email?.split('@')[0] || t('user')}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {user?.email || 'utilisateur@topsteel.tech'}
+                    {user?.email || t('email')}
                   </p>
                 </div>
 

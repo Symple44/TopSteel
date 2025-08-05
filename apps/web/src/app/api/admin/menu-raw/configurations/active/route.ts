@@ -12,8 +12,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Appeler l'API backend pour récupérer la configuration de menu active
-    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-
     const response = await callBackendFromApi(req, 'admin/menu-raw/configurations/active', {
       method: 'GET',
     })

@@ -4,8 +4,6 @@ import { callBackendFromApi } from '@/utils/backend-api'
 export async function GET(request: NextRequest) {
   try {
     // Proxy vers l'API backend
-    const _apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/stats`
-
     const response = await callBackendFromApi(request, 'admin/database/stats', {
       method: 'GET',
     })

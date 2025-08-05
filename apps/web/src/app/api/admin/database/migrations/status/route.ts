@@ -3,7 +3,6 @@ import { callBackendFromApi } from '@/utils/backend-api'
 
 export async function GET(request: NextRequest) {
   try {
-    const _apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/status`
 
     // Récupérer les headers d'authentification
     const authHeader = request.headers.get('authorization')

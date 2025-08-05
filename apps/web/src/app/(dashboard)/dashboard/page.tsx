@@ -195,9 +195,9 @@ export default function Dashboard() {
             </h1>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[...Array(4)].map((_, i) => (
+            {Array.from({ length: 4 }, () => ({ id: Math.random().toString(36) })).map((item) => (
               <Card
-                key={`loading-card-${i}`}
+                key={item.id}
                 className="animate-pulse border-0 bg-white/80 backdrop-blur-sm shadow-xl"
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -385,7 +385,7 @@ export default function Dashboard() {
                 <div className="flex items-end space-x-3 h-full relative z-10">
                   {[45, 65, 52, 78, 88, 67, 92, 85, 72, 68, 89, 95].map((height, i) => (
                     <div
-                      key={`chart-bar-${i}`}
+                      key={`chart-bar-month-${i}-h${height}`}
                       className="rounded-t-lg transition-all duration-700 hover:scale-110 cursor-pointer"
                       style={{
                         height: `${height}%`,

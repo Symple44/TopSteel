@@ -9,7 +9,6 @@ export async function GET(
     const { database, migrationName } = await params
 
     // Proxy vers l'API backend
-    const _apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/${database}/${migrationName}/details`
 
     const response = await callBackendFromApi(
       request,

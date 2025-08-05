@@ -9,7 +9,6 @@ export async function POST(
     const { tenantCode } = await params
 
     // Proxy vers l'API backend
-    const _apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/migrations/tenant/${tenantCode}/run`
 
     const response = await callBackendFromApi(
       request,

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@erp/ui/primitives'
 import { useAuth } from '@/hooks/use-auth'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { getTabId } from '@/lib/tab-id'
 
 interface TabSyncNotificationProps {
@@ -15,6 +16,7 @@ interface TabSyncNotificationProps {
 
 export default function TabSyncNotification({ enabled = true }: TabSyncNotificationProps) {
   const { company, user, isAuthenticated } = useAuth()
+  const { t } = useTranslation()
   const router = useRouter()
   const [_lastCompanyId, setLastCompanyId] = useState<string | null>(null)
   const [_lastUserId, setLastUserId] = useState<string | null>(null)
@@ -43,12 +45,12 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
               <div className="flex items-center space-x-3">
                 <Building className="h-5 w-5 text-blue-500" />
                 <div className="flex-1">
-                  <p className="font-medium">Société changée dans un autre onglet</p>
+                  <p className="font-medium">{t('tabSync.societyChanged')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Maintenant connecté à <strong>{data.company.nom}</strong>
+                    {t('tabSync.nowConnectedTo')} <strong>{data.company.nom}</strong>
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    💡 Actualisez pour synchroniser cet onglet
+                    {t('tabSync.refreshToSync')}
                   </p>
                 </div>
                 <Button
@@ -58,7 +60,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
                   className="ml-2"
                 >
                   <RefreshCw className="h-3 w-3 mr-1" />
-                  Actualiser
+                  {t('actions.refresh')}
                 </Button>
               </div>,
               {
@@ -75,9 +77,9 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
               <div className="flex items-center space-x-3">
                 <LogOut className="h-5 w-5 text-red-500" />
                 <div className="flex-1">
-                  <p className="font-medium">Déconnecté</p>
+                  <p className="font-medium">{t('tabSync.disconnected')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Déconnexion effectuée dans un autre onglet
+                    {t('tabSync.logoutInOtherTab')}
                   </p>
                 </div>
                 <Button
@@ -86,7 +88,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
                   onClick={() => router.push('/login')}
                   className="ml-2"
                 >
-                  Reconnexion
+                  {t('tabSync.reconnection')}
                 </Button>
               </div>,
               {
@@ -103,9 +105,9 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
               <div className="flex items-center space-x-3">
                 <AlertCircle className="h-5 w-5 text-green-500" />
                 <div className="flex-1">
-                  <p className="font-medium">Connexion détectée</p>
+                  <p className="font-medium">{t('tabSync.connectionDetected')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Connexion effectuée dans un autre onglet
+                    {t('tabSync.loginInOtherTab')}
                   </p>
                 </div>
                 <Button
@@ -115,7 +117,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
                   className="ml-2"
                 >
                   <RefreshCw className="h-3 w-3 mr-1" />
-                  Actualiser
+                  {t('actions.refresh')}
                 </Button>
               </div>,
               {

@@ -22,6 +22,7 @@ import { NotificationDashboardV2 } from './notification-dashboard-v2'
 
 export function NotificationCenter() {
   const { t } = useTranslation('common')
+  const { t: tn } = useTranslation('notifications')
   const { state, actions } = useNotifications()
   const [showSettings, setShowSettings] = useState(false)
   const [_isExpanded, _setIsExpanded] = useState(false)
@@ -48,11 +49,11 @@ export function NotificationCenter() {
     const hours = Math.floor(minutes / 60)
     const days = Math.floor(hours / 24)
 
-    if (minutes < 1) return "À l'instant"
-    if (minutes < 60) return `Il y a ${minutes}min`
-    if (hours < 24) return `Il y a ${hours}h`
+    if (minutes < 1) return tn('time.now')
+    if (minutes < 60) return tn('time.minutesAgo', { count: minutes })
+    if (hours < 24) return tn('time.hoursAgo', { count: hours })
 
-    return `Il y a ${days}j`
+    return tn('time.daysAgo', { count: days })
   }
 
   // Filtrage simple par terme de recherche
@@ -111,7 +112,7 @@ export function NotificationCenter() {
                         setShowDashboard(true)
                         setIsOpen(false)
                       }}
-                      title="Ouvrir le dashboard"
+                      title={tn('actions.openDashboard')}
                     >
                       <Maximize2 className="h-4 w-4" />
                     </Button>
@@ -123,7 +124,7 @@ export function NotificationCenter() {
                           e.stopPropagation()
                           actions.markAllAsRead()
                         }}
-                        title={t('markAllAsRead')}
+                        title={tn('actions.markAsRead')}
                       >
                         <CheckCheck className="h-4 w-4" />
                       </Button>
@@ -147,7 +148,7 @@ export function NotificationCenter() {
                         e.stopPropagation()
                         setIsOpen(false)
                       }}
-                      title="Fermer"
+                      title={t('close')}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -162,7 +163,7 @@ export function NotificationCenter() {
                       state.connected ? 'bg-green-500' : 'bg-orange-500'
                     )}
                   />
-                  {state.connected ? 'Temps réel' : 'Déconnecté'}
+                  {state.connected ? tn('states.realTime') : tn('states.disconnected')}
                   <span className="ml-2">
                     {filteredNotifications.length} / {state.notifications.length}
                   </span>
@@ -174,7 +175,7 @@ export function NotificationCenter() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <Input
-                    placeholder="Rechercher..."
+                    placeholder={tn('states.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setSearchTerm(e.target.value)
@@ -188,7 +189,7 @@ export function NotificationCenter() {
               <ScrollArea className="max-h-64">
                 {filteredNotifications.length === 0 ? (
                   <div className="p-4 text-center text-sm text-gray-500">
-                    {searchTerm ? 'Aucune notification trouvée' : 'Aucune notification'}
+                    {searchTerm ? tn('states.noResults') : tn('states.empty')}
                   </div>
                 ) : (
                   <div className="p-2 space-y-1">
@@ -272,7 +273,7 @@ export function NotificationCenter() {
                             actions.deleteNotification(notification.id)
                           }}
                           className="flex-shrink-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-gray-400 hover:text-gray-600 transition-opacity"
-                          title="Supprimer"
+                          title={tn('actions.delete')}
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -307,7 +308,7 @@ export function NotificationCenter() {
                       }}
                       className="flex-1"
                     >
-                      Actualiser
+                      {tn('actions.refresh')}
                     </Button>
                   </div>
                 </div>
@@ -346,7 +347,7 @@ export function NotificationCenter() {
                       <div>
                         <span className="font-medium">{t('soundNotifications')}</span>
                         <p className="text-sm text-gray-600">
-                          Jouer un son lors des nouvelles notifications
+                          {tn('descriptions.soundNotifications')}
                         </p>
                       </div>
                       <input
@@ -359,9 +360,9 @@ export function NotificationCenter() {
 
                     <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
                       <div>
-                        <span className="font-medium">Notifications toast</span>
+                        <span className="font-medium">{tn('descriptions.toastNotifications')}</span>
                         <p className="text-sm text-gray-600">
-                          Afficher des notifications dans l'application
+                          {tn('descriptions.toastNotifications')}
                         </p>
                       </div>
                       <input
@@ -374,8 +375,8 @@ export function NotificationCenter() {
 
                     <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
                       <div>
-                        <span className="font-medium">Notifications navigateur</span>
-                        <p className="text-sm text-gray-600">Recevoir des notifications système</p>
+                        <span className="font-medium">{tn('descriptions.browserNotifications')}</span>
+                        <p className="text-sm text-gray-600">{tn('descriptions.browserNotifications')}</p>
                       </div>
                       <input
                         type="checkbox"
@@ -389,9 +390,9 @@ export function NotificationCenter() {
 
                     <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
                       <div>
-                        <span className="font-medium">Notifications email</span>
+                        <span className="font-medium">{tn('descriptions.emailNotifications')}</span>
                         <p className="text-sm text-gray-600">
-                          Recevoir des notifications par email
+                          {tn('descriptions.emailNotifications')}
                         </p>
                       </div>
                       <input
@@ -408,18 +409,18 @@ export function NotificationCenter() {
 
                 {/* Catégories */}
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-4">Catégories de notifications</h3>
+                  <h3 className="font-medium text-gray-900 mb-4">{tn('sections.categories')}</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {Object.entries({
-                      system: '🖥️ Système',
-                      stock: '📦 Stock',
-                      projet: '📁 Projets',
-                      production: '🏭 Production',
-                      maintenance: '🔧 Maintenance',
-                      qualite: '✅ Qualité',
-                      facturation: '💰 Facturation',
-                      sauvegarde: '💾 Sauvegarde',
-                      utilisateur: '👥 Utilisateurs',
+                      system: `🖥️ ${tn('categories.system')}`,
+                      stock: `📦 ${tn('categories.stock')}`,
+                      projet: `📁 ${tn('categories.projet')}`,
+                      production: `🏭 Production`,
+                      maintenance: `🔧 ${tn('categories.maintenance')}`,
+                      qualite: `✅ Qualité`,
+                      facturation: `💰 ${tn('categories.facture')}`,
+                      sauvegarde: `💾 Sauvegarde`,
+                      utilisateur: `👥 ${tn('categories.client')}`,
                     }).map(([key, label]) => (
                       <label
                         key={key}
@@ -448,7 +449,7 @@ export function NotificationCenter() {
 
                 {/* Priorités */}
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-4">Filtrer par priorité</h3>
+                  <h3 className="font-medium text-gray-900 mb-4">{tn('sections.priority')}</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {Object.entries({
                       low: '🟢 Faible',
@@ -491,14 +492,14 @@ export function NotificationCenter() {
                   }}
                   className="text-sm text-blue-600 hover:text-blue-700"
                 >
-                  Demander la permission navigateur
+                  {tn('actions.requestPermission')}
                 </button>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowSettings(false)}
                     className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                   >
-                    Annuler
+                    {t('cancel')}
                   </button>
                   <button
                     onClick={() => {
@@ -507,7 +508,7 @@ export function NotificationCenter() {
                     }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                   >
-                    Enregistrer
+                    {t('save')}
                   </button>
                 </div>
               </div>

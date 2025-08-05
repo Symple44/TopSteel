@@ -27,6 +27,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@erp/entities": "workspace:*",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.3",

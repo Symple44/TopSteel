@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { AccessLevel, Role, RolePermission } from '@/types/permissions'
 import { callClientApi } from '@/utils/backend-api'
 import { useAuth } from './use-auth'
@@ -21,17 +21,7 @@ export function usePermissions() {
   const [userPermissions, setUserPermissions] = useState<UserPermissions | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Charger les permissions utilisateur
-  useEffect(() => {
-    if (user && tokens?.accessToken) {
-      loadUserPermissions()
-    } else {
-      setUserPermissions(null)
-      setLoading(false)
-    }
-  }, [user, tokens?.accessToken, loadUserPermissions])
-
-  const loadUserPermissions = async () => {
+  const loadUserPermissions = useCallback(async () => {
     if (!user || !tokens?.accessToken) return
 
     try {
@@ -48,7 +38,11 @@ export function usePermissions() {
       }
 
       // Charger depuis l'API backend
-      const response = await callClientApi(`admin/roles/${user.role}/permissions`)
+      const response = await callClientApi(`admin/roles/${user.role}/permissions`, {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      })
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -82,7 +76,17 @@ export function usePermissions() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, tokens?.accessToken])
+
+  // Charger les permissions utilisateur
+  useEffect(() => {
+    if (user && tokens?.accessToken) {
+      loadUserPermissions()
+    } else {
+      setUserPermissions(null)
+      setLoading(false)
+    }
+  }, [user, tokens?.accessToken, loadUserPermissions])
 
   /**
    * Vérifier si l'utilisateur a une permission spécifique

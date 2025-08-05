@@ -42,7 +42,7 @@ export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
           ) : (
             <div className="space-y-4">
               {operations.map((operation: Operation, index: number) => (
-                <div key={operation.id || index} className="border rounded-lg p-4">
+                <div key={operation.id || `operation-${operation.nom || 'unnamed'}-${index}`} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium">{operation?.nom || `Opération ${index + 1}`}</h4>
                     <span

@@ -5,10 +5,10 @@
 import type { AuthTokens, Company, MFAState, User } from '@/types/auth'
 import { callClientApi } from '@/utils/backend-api'
 
-// Clés de stockage
+// Clés de stockage - doivent correspondre à auth-storage.ts
 export const STORAGE_KEYS = {
-  AUTH: 'topsteel-auth',
-  TOKENS: 'topsteel-tokens',
+  AUTH: 'topsteel_auth_tokens',  // Même clé que tokenStorageKey dans auth-storage.ts
+  TOKENS: 'topsteel_auth_tokens',
   COMPANY: 'topsteel-company',
 } as const
 
@@ -192,13 +192,14 @@ export class AuthService {
 
     const responseData = await response.json()
     const { user, tokens: responseTokens } = responseData.data
-    const { accessToken: newAccessToken, refreshToken } = responseTokens
+    const { accessToken: newAccessToken, refreshToken, expiresIn } = responseTokens
     const company = user.societe
 
     const tokens: AuthTokens = {
       accessToken: newAccessToken,
       refreshToken,
-      expiresAt: Date.now() + 3600 * 1000, // Default 1 hour
+      expiresIn,
+      expiresAt: Date.now() + (expiresIn || 24 * 60 * 60) * 1000, // Use backend expiresIn or default to 24h
       tokenType: 'Bearer',
     }
 
@@ -237,12 +238,17 @@ export class AuthService {
   static async validateTokens(tokens: AuthTokens): Promise<boolean> {
     try {
       // Vérifier d'abord l'expiration locale
-      if (tokens.expiresIn) {
-        const tokenAge = Date.now() - tokens.expiresIn * 1000
-        if (tokenAge > 0) return false
+      if (tokens.expiresAt) {
+        const now = Date.now()
+        const buffer = 5 * 60 * 1000 // 5 minutes buffer
+        if (now >= tokens.expiresAt - buffer) return false
       }
 
-      const response = await callClientApi('auth/verify')
+      const response = await callClientApi('auth/verify', {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      })
       return response.ok
     } catch {
       return false
@@ -316,12 +322,15 @@ export class AuthService {
    */
   async getUserCompanies(): Promise<Company[]> {
     try {
-      // Récupérer le token d'accès depuis le stockage
-      const tokens = storage.get<AuthTokens>(STORAGE_KEYS.TOKENS)
-      if (!tokens?.accessToken) {
-        console.warn('No access token available for getUserCompanies')
+      // Utiliser authStorage pour récupérer la session (comme fait par auth-provider)
+      const { authStorage } = await import('@/lib/auth/auth-storage')
+      const session = authStorage.getStoredSession()
+      
+      if (!session?.tokens?.accessToken) {
         return []
       }
+      
+      const tokens = session.tokens
 
       const response = await callClientApi('auth/societes', {
         headers: {
@@ -330,16 +339,13 @@ export class AuthService {
       })
 
       if (!response.ok) {
-        console.error('Failed to get companies:', response.status, response.statusText)
         return []
       }
 
       const data = await response.json()
-      console.log('Companies response:', data)
       // L'API backend retourne {data: [...], statusCode: 200, message: "Success"}
       return data.data || data // Si data.data existe, l'utiliser, sinon utiliser data directement
     } catch (error) {
-      console.error('Error in getUserCompanies:', error)
       return []
     }
   }

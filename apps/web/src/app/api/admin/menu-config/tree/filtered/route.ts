@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function GET(_request: NextRequest) {
-  const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   try {
     // Route stub pour éviter les erreurs 500 sur menu-config filtré
     const standardMenuTree = [

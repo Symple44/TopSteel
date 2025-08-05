@@ -37,8 +37,6 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-
     try {
       // Appeler le vrai backend NestJS
       const response = await callBackendFromApi(request, 'users/appearance/me', {
@@ -134,8 +132,6 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       )
     }
-
-    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
     try {
       // Appeler le vrai backend NestJS

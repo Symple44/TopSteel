@@ -422,7 +422,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                       <div className="space-y-2">
                         {selectedColumns.map((col, index) => (
                           <div
-                            key={index}
+                            key={`${col.table}-${col.column}`}
                             className="flex items-center gap-2 p-2 bg-accent rounded"
                           >
                             <Badge variant="outline">{col.table}</Badge>
@@ -463,7 +463,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                     ) : (
                       <div className="space-y-3">
                         {filters.map((filter, index) => (
-                          <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                          <div key={`filter-${filter.column}-${filter.operator}-${index}`} className="flex items-center gap-2 p-2 border rounded">
                             <select
                               value={filter.column}
                               onChange={(e) => updateFilter(index, 'column', e.target.value)}

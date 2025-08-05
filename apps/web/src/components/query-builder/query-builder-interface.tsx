@@ -4,6 +4,7 @@ import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@erp/ui'
 import { Play, Save, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
+import { useTranslation } from '@/lib/i18n/hooks'
 import { cn } from '@/lib/utils'
 import { callClientApi } from '@/utils/backend-api'
 import { CalculatedFieldsEditor } from './calculated-fields-editor'
@@ -21,12 +22,13 @@ interface QueryBuilderInterfaceProps {
 
 export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuilderInterfaceProps) {
   const { toast } = useToast()
+  const { t } = useTranslation('queryBuilder')
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('design')
 
   // Query Builder State
   const [queryBuilder, setQueryBuilder] = useState({
-    name: initialData?.name || 'New Query Builder',
+    name: initialData?.name || t('title'),
     description: initialData?.description || '',
     database: initialData?.database || 'default',
     mainTable: initialData?.mainTable || '',
@@ -84,8 +86,8 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
       if (response.ok) {
         const saved = await response.json()
         toast({
-          title: 'Success',
-          description: 'Query Builder saved successfully',
+          title: t('save'),
+          description: t('saveSuccess'),
         })
 
         if (queryBuilderId === 'new') {
@@ -101,8 +103,8 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
       }
     } catch (_error) {
       toast({
-        title: 'Error',
-        description: 'Failed to save Query Builder',
+        title: t('error'),
+        description: t('saveError'),
         variant: 'destructive',
       })
     } finally {
@@ -113,8 +115,8 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
   const handleExecute = async () => {
     if (queryBuilderId === 'new') {
       toast({
-        title: 'Save Required',
-        description: 'Please save the Query Builder before executing',
+        title: t('saveRequired'),
+        description: t('saveBeforeExecute'),
         variant: 'destructive',
       })
       return
@@ -140,8 +142,8 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
       }
     } catch (_error) {
       toast({
-        title: 'Error',
-        description: 'Failed to execute query',
+        title: t('error'),
+        description: t('executeError'),
         variant: 'destructive',
       })
     } finally {
@@ -184,7 +186,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
             <ImportDialog onImport={handleImport} />
             <Button variant="outline" size="sm" onClick={() => setActiveTab('settings')}>
               <Settings className="h-4 w-4 mr-2" />
-              Settings
+              {t('settings')}
             </Button>
             <Button
               variant="outline"
@@ -193,11 +195,11 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
               disabled={loading || !queryBuilder.mainTable}
             >
               <Play className="h-4 w-4 mr-2" />
-              Execute
+              {t('execute')}
             </Button>
             <Button onClick={handleSave} disabled={loading}>
               <Save className="h-4 w-4 mr-2" />
-              Save
+              {t('save')}
             </Button>
           </div>
         </div>
@@ -210,10 +212,10 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
         className={cn('flex flex-col', previewData ? 'flex-1' : 'flex-1')}
       >
         <TabsList className="mx-4 mt-4">
-          <TabsTrigger value="design">Design</TabsTrigger>
-          <TabsTrigger value="calculated">Calculated Fields</TabsTrigger>
-          <TabsTrigger value="preview">SQL Query</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="design">{t('visual')}</TabsTrigger>
+          <TabsTrigger value="calculated">{t('calculatedFields')}</TabsTrigger>
+          <TabsTrigger value="preview">{t('raw')}</TabsTrigger>
+          <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="design" className="flex-1 overflow-hidden">
@@ -265,11 +267,11 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
               <QueryPreview queryBuilder={queryBuilder} />
               <div className="mt-8 text-center">
                 <p className="text-muted-foreground mb-4">
-                  Cliquez sur "Execute" pour voir les résultats
+                  {t('clickExecuteToSeeResults')}
                 </p>
                 <Button onClick={handleExecute} disabled={loading || !queryBuilder.mainTable}>
                   <Play className="h-4 w-4 mr-2" />
-                  Exécuter la requête
+                  {t('execute')}
                 </Button>
               </div>
             </div>
@@ -285,19 +287,19 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
       <div className="border-t">
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Aperçu des données</h2>
+            <h2 className="text-lg font-semibold">{t('preview')}</h2>
             <div className="flex items-center gap-2">
               {previewData && (
                 <span className="text-sm text-muted-foreground">
                   {Array.isArray(previewData)
                     ? (previewData as any).length
                     : (previewData as any)?.data?.length || 0}{' '}
-                  résultats
+                  {t('results')}
                 </span>
               )}
               {!previewData && queryBuilder.mainTable && (
                 <span className="text-sm text-muted-foreground">
-                  Cliquez sur "Execute" pour charger les données
+                  {t('clickExecuteToLoadData')}
                 </span>
               )}
             </div>
@@ -314,7 +316,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">
                 <div className="text-center">
-                  <p>Sélectionnez une table principale pour commencer</p>
+                  <p>{t('selectTableToStart')}</p>
                 </div>
               </div>
             )}

@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Proxy vers l'API backend
-    const _apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/v1/admin/database/backup`
 
     const response = await callBackendFromApi(request, 'admin/database/backup', {
       method: 'POST',

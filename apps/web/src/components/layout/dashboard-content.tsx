@@ -5,7 +5,7 @@ import { useState } from 'react'
 import CompanySelector from '@/components/auth/company-selector'
 import { Header } from '@/components/layout/header'
 import { Sidebar } from '@/components/layout/sidebar'
-import { AutoBreadcrumbWrapper as AutoBreadcrumb } from '@/components/wrappers'
+import { AutoBreadcrumbWrapper } from '@/components/wrappers'
 import { useApiConnection } from '@/hooks/use-api-connection'
 import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
 
@@ -62,7 +62,7 @@ export function DashboardContent({
           {/* Zone de contenu */}
           <main className="flex-1 overflow-auto bg-muted/30 p-6">
             <div className={getContainerClass()}>
-              <AutoBreadcrumbWrapper as AutoBreadcrumb />
+              <AutoBreadcrumbWrapper />
               {children}
             </div>
           </main>

@@ -122,7 +122,7 @@ export class DatabaseBackupService {
           id: filename.replace(/\.(sql|sql\.gz)$/, ''),
           filename,
           size: this.formatBytes(stats.size),
-          downloadUrl: `/api/v1/admin/database/backups/${filename.replace(/\.(sql|sql\.gz)$/, '')}/download`,
+          downloadUrl: `/api/admin/database/backups/${filename.replace(/\.(sql|sql\.gz)$/, '')}/download`,
         },
       }
     } catch (error) {

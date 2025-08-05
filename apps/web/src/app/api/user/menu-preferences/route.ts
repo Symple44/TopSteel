@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { AuthHelper } from '@/lib/auth-helper'
+import { callBackendFromApi } from '@/utils/backend-api'
 
-export async function GET(_request: NextRequest) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+export async function GET(request: NextRequest) {
   const _defaultPreferences = [
     { menuId: 'dashboard', isVisible: true, order: 1, customLabel: 'Tableau de bord' },
     { menuId: 'clients', isVisible: true, order: 2, customLabel: 'Clients' },
@@ -13,7 +12,7 @@ export async function GET(_request: NextRequest) {
 
   try {
     // Essayer de faire la requête avec authentification
-    const response = await AuthHelper.fetchWithAuth(`${apiUrl}/api/v1/user/menu-preferences`)
+    const response = await callBackendFromApi(request, 'user/menu-preferences')
 
     if (response.ok) {
       const data = await response.json()
@@ -27,7 +26,10 @@ export async function GET(_request: NextRequest) {
       error instanceof Error &&
       (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN')
     ) {
-      return AuthHelper.unauthorizedResponse('Authentification requise')
+      return NextResponse.json(
+        { success: false, message: 'Authentification requise' },
+        { status: 401 }
+      )
     }
 
     // Pour toute autre erreur, retourner une erreur 500
@@ -43,12 +45,11 @@ export async function GET(_request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   try {
     const body = await request.json()
 
     // Essayer de faire la requête avec authentification
-    const response = await AuthHelper.fetchWithAuth(`${apiUrl}/api/v1/user/menu-preferences`, {
+    const response = await callBackendFromApi(request, 'user/menu-preferences', {
       method: 'PUT',
       body: JSON.stringify(body),
     })
@@ -65,8 +66,9 @@ export async function PUT(request: NextRequest) {
       error instanceof Error &&
       (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN')
     ) {
-      return AuthHelper.unauthorizedResponse(
-        'Authentification requise pour modifier les préférences'
+      return NextResponse.json(
+        { success: false, message: 'Authentification requise pour modifier les préférences' },
+        { status: 401 }
       )
     }
 

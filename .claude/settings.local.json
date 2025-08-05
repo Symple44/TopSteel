@@ -152,7 +152,11 @@
       "Bash(set NODE_ENV=development)",
       "Bash(set NODE_OPTIONS=--max-old-space-size=8192 --require ./src/utils/next-runtime-override.js)",
       "WebFetch(domain:github.com)",
-      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"\\dt\")"
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"\\dt\")",
+      "Bash(NODE_ENV=development timeout 30s pnpm dev)",
+      "Bash(START /B pnpm dev)",
+      "Bash(gh pr list:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": []
   }

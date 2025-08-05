@@ -259,10 +259,10 @@ export class ArticleService extends BusinessService<Article> {
 
     // Ajouter à l'historique
     article.ajouterModificationHistorique(
+      context?.userId || 'SYSTEM',
       'inventaire',
       ancienStock,
-      stockPhysiqueReel,
-      context?.userId || 'SYSTEM'
+      stockPhysiqueReel
     )
 
     if (commentaire) {

@@ -99,17 +99,17 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Mail className="h-6 w-6 mr-3 text-blue-600" />
-                Notifications par email
+                {t('settingsEnhanced.notifications.sections.email')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries({
-                newMessages: 'Nouveaux messages',
-                systemAlerts: 'Alertes système',
-                taskReminders: 'Rappels de tâches',
+                newMessages: t('settingsEnhanced.notifications.emailTypes.newMessages'),
+                systemAlerts: t('settingsEnhanced.notifications.emailTypes.systemAlerts'),
+                taskReminders: t('settingsEnhanced.notifications.emailTypes.taskReminders'),
                 weeklyReports: 'Rapports hebdomadaires',
                 securityAlerts: 'Alertes de sécurité',
-                maintenanceNotice: 'Avis de maintenance',
+                maintenanceNotice: t('settingsEnhanced.notifications.emailTypes.maintenanceNotifications'),
               }).map(([key, label]) => (
                 <div key={key} className="flex items-center justify-between py-2">
                   <span className="text-slate-700">{label}</span>
@@ -132,12 +132,12 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Smartphone className="h-6 w-6 mr-3 text-green-600" />
-                Notifications push
+                {t('settingsEnhanced.notifications.sections.push')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between py-2">
-                <span className="text-slate-700">Activer les notifications push</span>
+                <span className="text-slate-700">{t('settingsEnhanced.notifications.descriptions.pushNotifications')}</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -152,7 +152,7 @@ export default function NotificationsSettingsPage() {
               {settings.pushTypes.enabled && (
                 <>
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-slate-700">Sons de notification</span>
+                    <span className="text-slate-700">{t('settingsEnhanced.notifications.descriptions.soundNotifications')}</span>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
@@ -167,7 +167,7 @@ export default function NotificationsSettingsPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <h4 className="font-medium text-slate-700">Types de notifications :</h4>
+                    <h4 className="font-medium text-slate-700">{t('settingsEnhanced.notifications.sections.categories')} :</h4>
                     {Object.entries({
                       urgent: 'Notifications urgentes',
                       normal: 'Notifications normales',
@@ -201,7 +201,7 @@ export default function NotificationsSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-slate-800">
                 <Clock className="h-6 w-6 mr-3 text-purple-600" />
-                Mode silencieux
+                {t('settingsEnhanced.notifications.sections.silent')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -225,7 +225,7 @@ export default function NotificationsSettingsPage() {
                       htmlFor="quiet-hours-start"
                       className="block text-sm text-slate-600 mb-1"
                     >
-                      Début
+                      {tc('common.start')}
                     </label>
                     <input
                       id="quiet-hours-start"
@@ -237,7 +237,7 @@ export default function NotificationsSettingsPage() {
                   </div>
                   <div>
                     <label htmlFor="quiet-hours-end" className="block text-sm text-slate-600 mb-1">
-                      Fin
+                      {tc('common.end')}
                     </label>
                     <input
                       id="quiet-hours-end"

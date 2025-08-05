@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '@/utils/backend-api'
+import { useTranslation } from '@/lib/i18n'
 
 export interface BackendHealthInfo {
   status: 'online' | 'offline' | 'checking' | 'error'
@@ -154,6 +155,7 @@ export function useBackendHealth(): UseBackendHealthReturn {
 // Hook simplifié pour le statut uniquement
 export function useBackendStatus() {
   const [health, setHealth] = useState<BackendHealthInfo>(cachedHealthState)
+  const { t } = useTranslation('common')
 
   useEffect(() => {
     // Ajouter ce hook aux listeners pour recevoir les mises à jour
@@ -192,11 +194,11 @@ export function useBackendStatus() {
             : 'bg-gray-500',
     statusText:
       health.status === 'online'
-        ? 'ERP Actif'
+        ? t('backend.status.online')
         : health.status === 'offline'
-          ? 'ERP Hors ligne'
+          ? t('backend.status.offline')
           : health.status === 'error'
-            ? 'ERP Erreur'
-            : 'Vérification...',
+            ? t('backend.status.error')
+            : t('backend.status.checking'),
   }
 }

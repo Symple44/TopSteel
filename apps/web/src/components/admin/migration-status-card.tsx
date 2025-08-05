@@ -241,7 +241,7 @@ export default function MigrationStatusCard({
                   <div className="space-y-2 max-h-32 overflow-y-auto">
                     {pending.map((migration, index) => (
                       <div
-                        key={index}
+                        key={migration}
                         className="flex items-center justify-between text-xs p-3 bg-yellow-50/80 dark:bg-yellow-950/50 rounded-lg hover:bg-yellow-100/80 dark:hover:bg-yellow-950/70 transition-colors border border-yellow-200/60 dark:border-yellow-800/60"
                       >
                         <div className="flex items-center space-x-2 flex-1 min-w-0">
@@ -274,7 +274,7 @@ export default function MigrationStatusCard({
                   <div className="space-y-2 max-h-32 overflow-y-auto">
                     {executed.slice(-5).map((migration, index) => (
                       <div
-                        key={index}
+                        key={migration}
                         className="flex items-center justify-between text-xs p-3 bg-green-50/80 dark:bg-green-950/50 rounded-lg hover:bg-green-100/80 dark:hover:bg-green-950/70 transition-colors border border-green-200/60 dark:border-green-800/60"
                       >
                         <div className="flex items-center space-x-2 flex-1 min-w-0">

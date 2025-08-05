@@ -325,7 +325,7 @@ export default function SecuritySettingsPage() {
       case 'enhanced':
         return ts('security.enhancedProtection')
       default:
-        return 'Inconnu'
+        return ts('security.unknown')
     }
   }
 
@@ -396,11 +396,11 @@ export default function SecuritySettingsPage() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="totp" className="flex items-center gap-2">
             <Smartphone className="w-4 h-4" />
-            Authenticator (TOTP)
+            {ts('settingsEnhanced.security.mfaTypes.totp')}
           </TabsTrigger>
           <TabsTrigger value="webauthn" className="flex items-center gap-2">
             <Key className="w-4 h-4" />
-            WebAuthn / Biometric
+            {ts('settingsEnhanced.security.mfaTypes.webauthn')}
           </TabsTrigger>
         </TabsList>
 
@@ -410,7 +410,7 @@ export default function SecuritySettingsPage() {
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Smartphone className="w-5 h-5" />
-                  Google Authenticator / TOTP
+                  {ts('settingsEnhanced.security.mfaTypes.totp')}
                 </span>
                 {mfaStats?.methods.totp.enabled && (
                   <Badge variant="outline" className="text-green-600">
@@ -575,7 +575,7 @@ export default function SecuritySettingsPage() {
                 <p className="text-sm font-medium">{ts('security.backupCodesLabel')}</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   {totpSetup.backupCodes.map((code, index) => (
-                    <code key={index} className="block p-1 bg-muted rounded text-center">
+                    <code key={`backup-code-${code}`} className="block p-1 bg-muted rounded text-center">
                       {code}
                     </code>
                   ))}
@@ -647,7 +647,7 @@ export default function SecuritySettingsPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
               {backupCodes.map((code, index) => (
-                <code key={index} className="block p-2 bg-muted rounded text-center font-mono">
+                <code key={`backup-code-${code}`} className="block p-2 bg-muted rounded text-center font-mono">
                   {code}
                 </code>
               ))}

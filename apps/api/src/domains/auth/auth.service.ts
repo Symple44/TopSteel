@@ -90,12 +90,21 @@ export class AuthService {
     // Option 1: Utiliser la nouvelle structure si elle existe
     try {
       if (this.userSocieteRolesService) {
-        return await this.getUserSocietesWithNewStructure(userId)
+        const result = await this.getUserSocietesWithNewStructure(userId)
+        return result
       }
-    } catch (_error) {}
+    } catch (error) {
+      // Continue to fallback
+    }
 
     // Option 2: Fallback sur l'ancienne structure
-    return await this.getUserSocietesLegacy(userId)
+    try {
+      const result = await this.getUserSocietesLegacy(userId)
+      return result
+    } catch (error) {
+      // Retourner un tableau vide si tout échoue
+      return []
+    }
   }
 
   /**
@@ -113,7 +122,7 @@ export class AuthService {
         nom: ur.societe.nom,
         code: ur.societe.code,
         role: displayRole,
-        isDefault: ur.isDefault,
+        isDefault: ur.isDefaultSociete,
         permissions: ur.permissions || [],
         sites: [], // TODO: Adapter si nécessaire pour inclure les sites
       }
@@ -239,6 +248,7 @@ export class AuthService {
       tokens: {
         accessToken,
         refreshToken,
+        expiresIn: 24 * 60 * 60, // 24 heures en secondes
       },
       sessionId,
     }
@@ -848,15 +858,57 @@ export class AuthService {
     societeId: string
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await this.societeUsersService.setDefault(userId, societeId)
+      // Utiliser le nouveau service si disponible
+      if (this.userSocieteRolesService) {
+        await this.userSocieteRolesService.setDefaultSociete(userId, societeId)
+      } else {
+        // Fallback sur l'ancien service
+        await this.societeUsersService.setDefault(userId, societeId)
+      }
       return {
         success: true,
         message: 'Société définie par défaut avec succès',
       }
-    } catch (_error) {
+    } catch (error) {
+      console.error('Error setting default company:', error)
       return {
         success: false,
         message: 'Erreur lors de la définition de la société par défaut',
+      }
+    }
+  }
+
+  /**
+   * Récupérer la société par défaut d'un utilisateur
+   */
+  async getDefaultSociete(userId: string): Promise<{ 
+    success: boolean; 
+    data?: { id: string; nom: string; code: string }; 
+    message?: string 
+  }> {
+    try {
+      const userSocietes = await this.getUserSocietes(userId)
+      const defaultSociete = userSocietes.find(s => s.isDefault)
+      
+      if (!defaultSociete) {
+        return {
+          success: false,
+          message: 'Aucune société par défaut définie',
+        }
+      }
+
+      return {
+        success: true,
+        data: {
+          id: defaultSociete.id,
+          nom: defaultSociete.nom,
+          code: defaultSociete.code,
+        },
+      }
+    } catch (_error) {
+      return {
+        success: false,
+        message: 'Erreur lors de la récupération de la société par défaut',
       }
     }
   }

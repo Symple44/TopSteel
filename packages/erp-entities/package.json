@@ -1,0 +1,26 @@
+{
+  "name": "@erp/entities",
+  "version": "1.0.0",
+  "description": "Entités TypeORM partagées pour l'ERP TopSteel",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.25"
+  },
+  "devDependencies": {
+    "@erp/config": "workspace:*",
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.3"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

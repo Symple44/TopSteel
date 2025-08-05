@@ -19,7 +19,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { id: roleId } = await params
-    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
     try {
       // Appeler le vrai backend NestJS

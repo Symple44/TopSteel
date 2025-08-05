@@ -46,7 +46,7 @@ export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
           ) : (
             <div className="space-y-4">
               {controles.map((controle: ControleQualite, index: number) => (
-                <div key={controle.id || index} className="border rounded-lg p-4">
+                <div key={controle.id || `controle-${controle.type}-${index}`} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium">{controle?.type || 'Contrôle qualité'}</h4>
                     <span

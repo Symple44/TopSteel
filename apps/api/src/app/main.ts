@@ -129,7 +129,7 @@ async function bootstrap() {
 
   // Configuration CORS
   app.enableCors({
-    origin: corsOrigin,
+    origin: env === 'development' ? [corsOrigin, 'null'] : corsOrigin, // Permettre 'null' en développement pour les fichiers locaux
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

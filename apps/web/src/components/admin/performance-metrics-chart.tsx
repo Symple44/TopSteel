@@ -199,7 +199,7 @@ export default function PerformanceMetricsChart({
                 const height = maxValue > 0 ? (value / maxValue) * 100 : 0
 
                 return (
-                  <div key={index} className="flex-1 flex flex-col items-center">
+                  <div key={point.timestamp} className="flex-1 flex flex-col items-center">
                     <div
                       className="w-full bg-blue-500 hover:bg-blue-600 transition-colors rounded-t cursor-pointer"
                       style={{ height: `${Math.max(height, 2)}%` }}

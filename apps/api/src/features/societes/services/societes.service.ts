@@ -20,7 +20,6 @@ export class SocietesService {
   async findById(id: string): Promise<Societe | null> {
     return this._societeRepository.findOne({
       where: { id, deletedAt: IsNull() },
-      relations: ['sites'],
     })
   }
 

@@ -39,6 +39,11 @@ export class AuthStorage {
       // Sauvegarder la session
       storage.setItem(this.config.tokenStorageKey, JSON.stringify(sessionData))
 
+      // Sauvegarder également le token d'accès dans les cookies pour les routes API Next.js
+      if (tokens.accessToken) {
+        document.cookie = `accessToken=${tokens.accessToken}; path=/; secure; samesite=strict; max-age=${rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60}`
+      }
+
       // Sauvegarder le flag remember me
       if (rememberMe) {
         localStorage.setItem(this.config.rememberMeStorageKey, 'true')
@@ -76,7 +81,7 @@ export class AuthStorage {
       }
 
       return sessionData
-    } catch (_error) {
+    } catch (error) {
       this.clearSession()
       return { user: null, tokens: null, company: null }
     }
@@ -93,6 +98,9 @@ export class AuthStorage {
       localStorage.removeItem(this.config.tokenStorageKey)
       sessionStorage.removeItem(this.config.tokenStorageKey)
       localStorage.removeItem(this.config.rememberMeStorageKey)
+      
+      // Effacer également le cookie
+      document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     } catch (_error) {}
   }
 
@@ -166,13 +174,16 @@ export class AuthStorage {
    * Vérifie si les tokens sont expirés
    */
   areTokensExpired(tokens: AuthTokens): boolean {
-    if (!tokens.expiresAt) return true
+    if (!tokens.expiresAt) {
+      return true
+    }
 
     // Ajouter une marge de 5 minutes
     const now = Date.now()
     const buffer = 5 * 60 * 1000 // 5 minutes en millisecondes
+    const isExpired = now >= tokens.expiresAt - buffer
 
-    return now >= tokens.expiresAt - buffer
+    return isExpired
   }
 
   /**

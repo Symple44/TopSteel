@@ -201,7 +201,7 @@ export class AuthController {
     return this.authService.loginWithSociete(user.id, societeId, body.siteId, request)
   }
 
-  @Post('societe-default/:societeId')
+  @Post('societe-default/:societeId') 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
@@ -211,6 +211,29 @@ export class AuthController {
   })
   async setDefaultSociete(@CurrentUser() user: User, @Param('societeId') societeId: string) {
     return this.authService.setDefaultSociete(user.id, societeId)
+  }
+
+  @Post('user/default-company')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Définir une société par défaut (nouvelle API)',
+    description: "Définir une société comme société par défaut pour l'utilisateur connecté",
+  })
+  async setUserDefaultCompany(@CurrentUser() user: User, @Body() body: { companyId: string }) {
+    return this.authService.setDefaultSociete(user.id, body.companyId)
+  }
+
+  @Get('user/default-company')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Récupérer la société par défaut',
+    description: "Récupérer la société par défaut de l'utilisateur connecté",
+  })
+  async getUserDefaultCompany(@CurrentUser() user: User) {
+    return this.authService.getDefaultSociete(user.id)
   }
 
   @Post('admin/invalidate-all-sessions')

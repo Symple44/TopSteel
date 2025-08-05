@@ -134,7 +134,7 @@ const getNavigation = (t: any): NavItem[] => [
     gradient: 'from-blue-500 to-purple-600',
   },
   {
-    title: 'Query Builder',
+    title: t('queryBuilder'),
     href: '/query-builder',
     icon: Search,
     gradient: 'from-emerald-500 to-teal-600',
@@ -147,21 +147,21 @@ const getNavigation = (t: any): NavItem[] => [
     roles: ['ADMIN'],
     children: [
       {
-        title: 'sessionsManagement',
+        title: t('sessionsManagement'),
         href: '/admin/sessions',
         icon: Monitor,
         gradient: 'from-cyan-500 to-teal-600',
         roles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
-        title: 'translationsManagement',
+        title: t('translationsManagement'),
         href: '/admin/translations',
         icon: Languages,
         gradient: 'from-emerald-500 to-green-600',
         roles: ['SUPER_ADMIN', 'ADMIN'],
       },
       {
-        title: 'dataTableTest',
+        title: t('dataTableTest'),
         href: '/admin/datatable-test',
         icon: Table,
         gradient: 'from-violet-500 to-purple-600',
@@ -175,7 +175,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { t } = useTranslation('navigation')
-  const [expandedItems, setExpandedItems] = useState<string[]>([t('administration')])
+  const [expandedItems, setExpandedItems] = useState<string[]>([t('configuration')])
   const [showErpInfo, setShowErpInfo] = useState(false)
 
   // Hook pour le statut du backend
@@ -568,6 +568,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               <TooltipFixed
                 side="right"
                 sideOffset={15}
+                triggerAsChild={true}
                 content={
                   <div>
                     <p className="font-medium">{t('customizeMenu')}</p>
@@ -575,14 +576,13 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
                   </div>
                 }
               >
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
+                  type="button"
                   onClick={() => router.push('/settings/menu')}
-                  className="w-10 h-8 p-0 ml-0.5 bg-gradient-to-br from-accent/10 to-accent/20 hover:from-accent/20 hover:to-accent/30 border border-accent/20 hover:border-accent/30 transition-all duration-300 flex-shrink-0"
+                  className="inline-flex items-center justify-center w-10 h-8 p-0 ml-0.5 bg-gradient-to-br from-accent/10 to-accent/20 hover:from-accent/20 hover:to-accent/30 border border-accent/20 hover:border-accent/30 transition-all duration-300 flex-shrink-0 rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Settings2 className="h-3 w-3" />
-                </Button>
+                </button>
               </TooltipFixed>
             )}
           </div>
@@ -666,9 +666,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
       {/* Modal d'information ERP - Portal pour centre de l'écran */}
       {typeof window !== 'undefined' && (
-        <ErpInfoModalWrapper
-          as
-          ErpInfoModal
+        <ErpInfoModal
           isOpen={showErpInfo}
           onClose={() => setShowErpInfo(false)}
         />

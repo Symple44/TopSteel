@@ -4,7 +4,9 @@ import { QueryClient } from '@tanstack/react-query'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import dynamic from 'next/dynamic'
 import { Toaster } from 'sonner'
+import { TooltipProvider } from '@erp/ui'
 import { I18nProvider } from '@/lib/i18n'
+import { NotificationsProvider } from '@/components/providers/notifications-provider'
 
 const ThemeProvider = dynamic(() => import('next-themes').then((mod) => mod.ThemeProvider), {
   ssr: false,
@@ -38,8 +40,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
           enableSystem={true}
           disableTransitionOnChange={false}
           storageKey="topsteel-theme"
+          themes={['light', 'dark', 'vibrant', 'system']}
         >
-          <AuthProvider>{children}</AuthProvider>
+          <TooltipProvider>
+            <AuthProvider>
+              <NotificationsProvider>
+                {children}
+              </NotificationsProvider>
+            </AuthProvider>
+          </TooltipProvider>
           <Toaster position="top-right" />
           {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </ThemeProvider>

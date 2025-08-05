@@ -22,6 +22,17 @@
   --color-input: 214.3 31.8% 91.4%;
   --color-ring: 221.2 83.2% 53.3%;
   
+  /* Blue color palette for components */
+  --color-blue-50: 239 246 255;
+  --color-blue-100: 219 234 254;
+  --color-blue-500: 59 130 246;
+  --color-blue-600: 37 99 235;
+  --color-blue-700: 29 78 216;
+  
+  /* Green color palette for components */
+  --color-green-600: 22 163 74;
+  --color-green-700: 21 128 61;
+  
   /* Dark mode colors */
   --color-*-dark: {
     --color-background: 222.2 84% 4.9%;
@@ -371,6 +382,63 @@
   
   .animate-slide-in {
     animation: slide-in 0.3s ease-out;
+  }
+  
+  /* Typography utilities */
+  .prose {
+    color: hsl(var(--foreground));
+    max-width: 65ch;
+  }
+  
+  .prose-lg {
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+  
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    color: hsl(var(--foreground));
+    font-weight: 600;
+    margin-top: 2em;
+    margin-bottom: 1em;
+  }
+  
+  .prose p {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+  }
+  
+  .prose strong {
+    color: hsl(var(--foreground));
+    font-weight: 600;
+  }
+  
+  /* Columns utilities */
+  .columns-2 {
+    columns: 2;
+  }
+  
+  .columns-3 {
+    columns: 3;
+  }
+  
+  @media (max-width: 768px) {
+    .md\:columns-2 {
+      columns: 1;
+    }
+    
+    .md\:columns-3 {
+      columns: 1;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .md\:columns-2 {
+      columns: 2;
+    }
+    
+    .md\:columns-3 {
+      columns: 3;
+    }
   }
 }
 

@@ -35,8 +35,6 @@ function getAuthHeaders(request: NextRequest): Record<string, string> {
 // Route de développement qui appelle directement le backend sans vérification stricte
 export async function GET(request: NextRequest) {
   try {
-    const _apiUrl =
-      process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
     const headers = getAuthHeaders(request)
     const { searchParams } = new URL(request.url)
     const schema = searchParams.get('schema') || 'public'

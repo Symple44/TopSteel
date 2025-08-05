@@ -54,6 +54,63 @@ export const es = {
     reset: 'Restablecer',
     resetToDefaults: 'Restablecer a valores predeterminados',
 
+    // Auth related
+    unauthorizedTitle: 'Acceso no autorizado',
+    unauthorizedMessage: 'Debes iniciar sesión para acceder a esta página.',
+    loginButton: 'Iniciar sesión',
+    
+    // Notifications
+    soundNotifications: 'Notificaciones de sonido',
+
+    // Backend status
+    backend: {
+      status: {
+        online: 'En línea',
+        offline: 'Desconectado', 
+        error: 'Error',
+        checking: 'Verificando...',
+        retry: 'Reintentar',
+        available: 'Disponible',
+      },
+      connecting: 'Conectando...',
+      checkingAvailability: 'Verificando disponibilidad...',
+      serverUnavailable: 'Servidor no disponible',
+      serverUnavailableDesc: 'El servidor backend no responde',
+      toStartServer: 'Para iniciar el servidor',
+      attemptedUrl: 'URL intentada',
+      lastCheck: 'Última verificación',
+      never: 'Nunca',
+      connected: 'Conectado',
+      unavailable: 'No disponible',
+      connectionInfo: 'Información de conexión',
+      responseTime: 'Tiempo de respuesta',
+      notConfigured: 'No configurado',
+      accessDashboard: 'Acceder al panel',
+      verifying: 'Verificando...',
+      autoCheck: 'Verificación automática en progreso',
+      troubleshooting: 'Solución de problemas',
+      checkServer: 'Verifique que el servidor backend esté iniciado',
+      checkPort: 'Verifique que el puerto {port} sea accesible',
+      checkNetwork: 'Verifique su conexión de red',
+      checkLogs: 'Consulte los logs del servidor para más detalles',
+    },
+
+    // Connection lost messages
+    connection: {
+      lost: {
+        title: 'Conexión perdida',
+        connectionInterrupted: 'La conexión con el servidor se ha interrumpido',
+        possibleReasons: 'Posibles causas:',
+        serverRestart: 'Reinicio del servidor',
+        networkLoss: 'Pérdida de conexión de red',
+        sessionExpired: 'Sesión expirada',
+        retry: 'Reintentar conexión',
+        retrying: 'Reconectando...',
+        backToLogin: 'Volver al inicio de sesión',
+        contactAdmin: 'Contactar administrador',
+      },
+    },
+
     // Páginas del sistema
     pageNotFound: 'Página no encontrada',
     pageNotFoundMessage: 'La página que buscas no existe o ha sido movida.',
@@ -62,6 +119,8 @@ export const es = {
 
   auth: {
     login: 'Iniciar sesión',
+    loading: 'Cargando inicio de sesión...',
+    verifyingAuthentication: 'Verificando autenticación...',
     register: 'Registrarse',
     email: 'Dirección de email',
     password: 'Contraseña',
@@ -239,6 +298,20 @@ export const es = {
     showSidebar: 'Mostrar sidebar',
     connected: 'Conectado',
     erpActive: 'ERP Activo',
+    queryBuilder: 'Constructor de Consultas',
+    sessionsManagement: 'Sesiones de Usuario',
+    translationsManagement: 'Gestión de Traducciones',
+    dataTableTest: 'Prueba DataTable',
+    customMenu: 'Menú Personalizado',
+    standardMenu: 'Menú Estándar',
+    customPreferencesApplied: 'Tus preferencias están aplicadas',
+    standardAdminMenu: 'Menú estándar de administrador',
+    clickToSwitch: 'Haz clic para cambiar',
+    customizeMenu: 'Personalizar menú',
+    openCustomizationDashboard: 'Abrir panel de personalización',
+    emptyCustomMenu: 'Menú personalizado vacío',
+    customizeMenuDescription: 'Personaliza tu menú agregando los elementos deseados',
+    customize: 'Personalizar',
   },
 
   errors: {
@@ -395,5 +468,374 @@ export const es = {
       'Haz clic en los números de línea para seleccionar • Ctrl+Clic para multi-selección • Shift+Clic para rango',
     lineTooltip:
       'Línea {number} - Clic: seleccionar, Ctrl+Clic: multi-selección, Shift+Clic: rango',
+  },
+
+  // === NUEVAS TRADUCCIONES AÑADIDAS ===
+  
+  // Company & Multi-tab management
+  companies: {
+    select: 'Seleccionar una empresa',
+    loading: 'Cargando empresas...',
+    loadingError: 'No se pueden cargar las empresas disponibles',
+    none: 'No hay empresas disponibles',
+    notFound: 'Empresa no encontrada',
+    contactAdmin: 'Contacte a su administrador para obtener los accesos necesarios.',
+    connectedTo: 'Conectado a {{name}}',
+    cannotConnect: 'No se puede conectar a esta empresa',
+    syncError: 'Error de sincronización, por favor reconéctese',
+    changeAffects: 'Cambio en {{count}} pestaña{{count, plural, one {} other {s}}}',
+    changeAffectsMultiple: 'Afectará todas las pestañas abiertas ({{count}} detectada{{count, plural, one {} other {s}}}).',
+    setAsDefault: 'Establecer como empresa predeterminada',
+    chooseSociety: 'Elija la empresa con la que desea trabajar.',
+    code: 'Código',
+    role: 'Rol',
+    active: '✓ ACTIVO',
+  },
+
+  // Multi-tab synchronization
+  tabSync: {
+    societyChanged: 'Empresa cambiada en otra pestaña',
+    nowConnectedTo: 'Ahora conectado a',
+    refreshToSync: '💡 Actualice para sincronizar esta pestaña',
+    disconnected: 'Desconectado',
+    logoutInOtherTab: 'Cierre de sesión realizado en otra pestaña',
+    reconnection: 'Reconexión',
+    connectionDetected: 'Conexión detectada',
+    loginInOtherTab: 'Inicio de sesión realizado en otra pestaña',
+  },
+
+  // Query Builder
+  queryBuilder: {
+    title: 'Constructor de Consultas',
+    docs: 'Documentación',
+    help: 'Ayuda',
+    selectTable: 'Seleccionar una tabla',
+    addCondition: 'Agregar condición',
+    noTablesFound: 'No se encontraron tablas',
+    loadingTables: 'Cargando tablas...',
+    preview: 'Vista previa',
+    execute: 'Ejecutar',
+    save: 'Guardar',
+    reset: 'Restablecer',
+    export: 'Exportar',
+    import: 'Importar',
+    columns: 'Columnas',
+    conditions: 'Condiciones',
+    orderBy: 'Ordenar por',
+    groupBy: 'Agrupar por',
+    limit: 'Límite',
+    results: 'Resultados',
+    noResults: 'Sin resultados',
+    error: 'Error durante la ejecución',
+    syntax: 'Sintaxis',
+    visual: 'Visual',
+    raw: 'Raw',
+  },
+
+  // Settings enhancements
+  settingsEnhanced: {
+    appearance: {
+      themes: {
+        vibrant: 'Vibrante',
+        light: 'Claro',
+        dark: 'Oscuro',
+        system: 'Sistema',
+        vibrantDesc: 'Tema colorido moderno',
+        lightDesc: 'Interfaz clara',
+        darkDesc: 'Interfaz oscura',
+        systemDesc: 'Seguir configuración del sistema',
+      },
+      languages: {
+        fr: 'Français',
+        en: 'English',
+        es: 'Español',
+      },
+      accentColors: {
+        blue: 'Azul',
+        green: 'Verde',
+        purple: 'Violeta',
+        orange: 'Naranja',
+        red: 'Rojo',
+        pink: 'Rosa',
+        yellow: 'Amarillo',
+        indigo: 'Índigo',
+      },
+      fontSizes: {
+        small: 'Pequeña',
+        medium: 'Mediana',
+        large: 'Grande',
+      },
+      densities: {
+        compact: 'Compacta',
+        comfortable: 'Cómoda',
+        spacious: 'Espaciosa',
+      },
+      contentWidths: {
+        narrow: 'Estrecha',
+        wide: 'Ancha',
+        full: 'Anchura completa',
+      },
+      sections: {
+        theme: 'Tema',
+        language: 'Idioma',
+        accentColor: 'Color de acento',
+        fontSize: 'Tamaño de fuente',
+        density: 'Densidad de visualización',
+        contentWidth: 'Anchura del contenido',
+      },
+      messages: {
+        saveSuccess: 'Configuración guardada',
+        saveSuccessDesc: 'Sus preferencias de apariencia se han actualizado exitosamente',
+        saveError: 'Error al guardar',
+        saveErrorDesc: 'No se pudieron guardar sus preferencias de apariencia',
+      },
+    },
+    notifications: {
+      sections: {
+        email: 'Notificaciones por email',
+        push: 'Notificaciones push',
+        silent: 'Modo silencioso',
+        toast: 'Notificaciones toast',
+        browser: 'Notificaciones del navegador',
+        categories: 'Categorías',
+        general: 'Configuración general',
+      },
+      emailTypes: {
+        newMessages: 'Nuevos mensajes',
+        systemAlerts: 'Alertas del sistema',
+        taskReminders: 'Recordatorios de tareas',
+        projectUpdates: 'Actualizaciones de proyectos',
+        inventoryAlerts: 'Alertas de inventario',
+        maintenanceNotifications: 'Notificaciones de mantenimiento',
+      },
+      categories: {
+        system: 'Sistema',
+        stock: 'Gestión de stock',
+        projet: 'Proyectos',
+        maintenance: 'Mantenimiento',
+        client: 'Clientes',
+        facture: 'Facturación',
+      },
+      descriptions: {
+        soundNotifications: 'Reproducir un sonido para nuevas notificaciones',
+        toastNotifications: 'Mostrar notificaciones temporales',
+        browserNotifications: 'Notificaciones del navegador',
+        emailNotifications: 'Recibir notificaciones por email',
+      },
+    },
+    security: {
+      sections: {
+        mfa: 'Autenticación de dos factores',
+        sessions: 'Sesiones activas',
+        devices: 'Dispositivos de confianza',
+        logs: 'Registro de seguridad',
+      },
+      mfaTypes: {
+        totp: 'Authenticator (TOTP)',
+        webauthn: 'WebAuthn / Biométrico',
+        sms: 'SMS',
+      },
+      deviceInfo: {
+        unknown: 'Desconocido',
+        current: 'Sesión actual',
+        lastActivity: 'Última actividad',
+        location: 'Ubicación',
+        browser: 'Navegador',
+        os: 'Sistema Operativo',
+      },
+    },
+  },
+
+  // Profile enhancements
+  profileEnhanced: {
+    sections: {
+      personal: 'Información personal',
+      contact: 'Detalles de contacto',
+      security: 'Seguridad',
+      preferences: 'Preferencias',
+    },
+    placeholders: {
+      acronym: 'JDO',
+      position: 'Director Técnico',
+      department: 'Producción',
+      address: '123 Calle de la Industria',
+      city: 'Lyon',
+      postalCode: '69000',
+      country: 'Francia',
+      currentPassword: '••••••••',
+      newPassword: '••••••••',
+      confirmPassword: '••••••••',
+    },
+    actions: {
+      enable2FA: 'Activar 2FA',
+      disable2FA: 'Desactivar 2FA',
+      changePhoto: 'Cambiar foto',
+      resetPhoto: 'Restablecer foto',
+      updateProfile: 'Actualizar perfil',
+      changePassword: 'Cambiar contraseña',
+    },
+    messages: {
+      updateSuccess: 'Perfil actualizado exitosamente',
+      updateError: 'Error al actualizar el perfil',
+      passwordChangeSuccess: 'Contraseña cambiada exitosamente',
+      passwordChangeError: 'Error al cambiar la contraseña',
+    },
+  },
+
+  // Notifications
+  notifications: {
+    sections: {
+      all: 'Todas',
+      unread: 'No leídas',
+      read: 'Leídas',
+      settings: 'Configuración',
+    },
+    actions: {
+      markAsRead: 'Marcar como leída',
+      markAsUnread: 'Marcar como no leída',
+      delete: 'Eliminar',
+      clear: 'Limpiar todo',
+      refresh: 'Actualizar',
+      openDashboard: 'Abrir tablero',
+    },
+    states: {
+      loading: 'Cargando notificaciones...',
+      empty: 'Sin notificaciones',
+      noResults: 'No se encontraron notificaciones',
+      realTime: 'Tiempo real',
+      disconnected: 'Desconectado',
+      searchPlaceholder: 'Buscar...',
+    },
+    time: {
+      now: 'Ahora mismo',
+      minutesAgo: 'Hace {{count}} min',
+      hoursAgo: 'Hace {{count}}h',
+      daysAgo: 'Hace {{count}}d',
+    },
+  },
+
+  // Role Management
+  roleManagement: {
+    title: 'Gestión de Roles',
+    sections: {
+      roles: 'Roles',
+      permissions: 'Permisos',
+      users: 'Usuarios',
+    },
+    actions: {
+      createRole: 'Crear rol',
+      editRole: 'Editar rol',
+      deleteRole: 'Eliminar rol',
+      assignRole: 'Asignar rol',
+      unassignRole: 'Quitar rol',
+      viewPermissions: 'Ver permisos',
+      managePermissions: 'Gestionar permisos',
+    },
+    fields: {
+      roleName: 'Nombre del rol',
+      roleDescription: 'Descripción del rol',
+      permissions: 'Permisos',
+      users: 'Usuarios',
+      createdAt: 'Creado el',
+      updatedAt: 'Actualizado el',
+    },
+    messages: {
+      roleCreated: 'Rol creado exitosamente',
+      roleUpdated: 'Rol actualizado exitosamente',
+      roleDeleted: 'Rol eliminado exitosamente',
+      permissionGranted: 'Permiso otorgado',
+      permissionRevoked: 'Permiso revocado',
+      assignmentSuccess: 'Rol asignado exitosamente',
+      unassignmentSuccess: 'Rol quitado exitosamente',
+    },
+  },
+
+  // Error messages and boundaries
+  errorsEnhanced: {
+    boundary: {
+      title: 'Ocurrió un error',
+      description: 'Por favor actualice la página',
+      refresh: 'Actualizar',
+      retry: 'Reintentar',
+      details: 'Detalles técnicos',
+      reportIssue: 'Reportar problema',
+    },
+    monitoring: {
+      title: '¡Ups! Ocurrió un error',
+      description: 'Ocurrió un error inesperado en la aplicación. Nuestros equipos han sido notificados.',
+      reloadPage: 'Recargar página',
+    },
+    connection: {
+      lost: 'Conexión perdida',
+      restored: 'Conexión restablecida',
+      offline: 'Modo sin conexión',
+      reconnecting: 'Reconectando...',
+    },
+  },
+
+  // Global actions and states
+  actions: {
+    refresh: 'Actualizar',
+    connect: 'Conectar',
+    disconnect: 'Desconectar',
+    reconnect: 'Reconectar',
+    connecting: 'Conectando...',
+    synchronizing: 'Sincronizando...',
+    redirecting: 'Redirigiendo...',
+    processing: 'Procesando...',
+    validating: 'Validando...',
+    authenticating: 'Autenticando...',
+  },
+
+  // Status indicators
+  statusIndicator: {
+    online: 'En línea',
+    offline: 'Sin conexión',
+    connected: 'Conectado',
+    disconnected: 'Desconectado',
+    syncing: 'Sincronizando...',
+    lastSync: 'Última sincronización: {{time}}',
+    reconnecting: 'Reconectando...',
+    failed: 'Falló',
+    success: 'Éxito',
+  },
+
+  // Templates
+  templates: {
+    title: 'Plantillas de Interfaz',
+    description: 'Elija una plantilla predefinida',
+    categories: {
+      all: 'Todas',
+      business: 'Empresarial',
+      modern: 'Moderno',
+      classic: 'Clásico',
+    },
+    states: {
+      noTemplates: 'No se encontraron plantillas',
+      loading: 'Cargando plantillas...',
+      applying: 'Aplicando...',
+      applied: 'Aplicado',
+    },
+    actions: {
+      preview: 'Vista previa',
+      apply: 'Aplicar',
+      customize: 'Personalizar',
+      reset: 'Restablecer',
+    },
+  },
+
+  // Application metadata
+  app: {
+    name: 'TopSteel ERP',
+    tagline: 'Gestión Metalúrgica',
+    description: 'Sistema ERP especializado para metalurgia',
+  },
+
+  // Navigation enhancements
+  navigationEnhanced: {
+    customizeMenu: 'Personalizar menú',
+    openCustomizationDashboard: 'Abrir tablero de personalización',
+    menuMode: 'Modo menú',
+    searchPlaceholder: 'Buscar en el menú...',
   },
 }

@@ -253,7 +253,7 @@ export default function ConnectionManagementPanel({
         <div className="space-y-3">
           {filteredConnections.map((connection, index) => (
             <Card
-              key={index}
+              key={connection.tenant}
               className={`hover:shadow-md transition-shadow ${
                 selectedConnection === connection.tenant ? 'ring-2 ring-blue-500' : ''
               }`}

@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
+import { useTranslation } from '@/lib/i18n'
+import { CompanyLogoWrapper } from '@/components/wrappers/company-logo-wrapper'
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -12,6 +14,7 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children, requireAuth = true, redirectTo = '/login' }: AuthGuardProps) {
   const { isAuthenticated, isLoading } = useAuth()
+  const { t } = useTranslation()
   const router = useRouter()
 
   useEffect(() => {
@@ -21,7 +24,28 @@ export function AuthGuard({ children, requireAuth = true, redirectTo = '/login' 
   }, [isAuthenticated, isLoading, requireAuth, redirectTo, router])
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-6">
+          {/* Logo de l'entreprise */}
+          <div className="flex justify-center">
+            <CompanyLogoWrapper 
+              size="lg"
+              showCompanyName={true}
+              className="mb-4"
+            />
+          </div>
+          
+          {/* Spinner et texte de chargement */}
+          <div className="space-y-3">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto" />
+            <p className="text-muted-foreground text-lg font-medium">
+              {t('auth.verifyingAuthentication', 'Vérification de l\'authentification...')}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (requireAuth && !isAuthenticated) {

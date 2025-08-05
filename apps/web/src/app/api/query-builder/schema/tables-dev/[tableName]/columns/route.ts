@@ -39,8 +39,6 @@ export async function GET(
   const { tableName } = await params
 
   try {
-    const _apiUrl =
-      process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
     const _headers = getAuthHeaders(request)
     const { searchParams } = new URL(request.url)
     const schema = searchParams.get('schema') || 'public'

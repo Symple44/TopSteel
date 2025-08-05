@@ -83,6 +83,19 @@ export class TokenVersionMiddleware implements NestMiddleware {
       }
 
       const tokenIssuedAt = payload.iat * 1000 // Convertir en millisecondes
+      const timeSinceServerStart = Date.now() - TokenVersionMiddleware.serverStartTimestamp
+      
+      // En développement, permettre une période de grâce de 10 minutes après le redémarrage du serveur
+      const isDevelopment = process.env.NODE_ENV !== 'production'
+      const gracePeriod = isDevelopment ? 10 * 60 * 1000 : 0 // 10 minutes en développement, 0 en production
+      
+      // Si le serveur vient de démarrer (moins de la période de grâce), 
+      // accepter les tokens même s'ils sont antérieurs au redémarrage
+      if (timeSinceServerStart < gracePeriod) {
+        this.logger.debug(`Token accepté pendant la période de grâce (serveur redémarré il y a ${timeSinceServerStart}ms)`)
+        return false
+      }
+      
       return tokenIssuedAt < TokenVersionMiddleware.serverStartTimestamp
     } catch (error) {
       // Si on ne peut pas décoder, laisser passer - la validation JWT se fera ailleurs

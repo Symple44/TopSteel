@@ -19,11 +19,14 @@
     "declarationMap": false,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "incremental": true,
     "removeComments": false,
     "importHelpers": true,
     "baseUrl": "./",
+    "paths": {
+      "@erp/entities": ["../../packages/erp-entities/src"],
+      "@erp/entities/*": ["../../packages/erp-entities/src/*"]
+    },
     "typeRoots": ["node_modules/@types", "../../node_modules/@types"],
     "types": ["node"]
   },

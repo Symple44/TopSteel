@@ -1,13 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { AuthHelper } from '@/lib/auth-helper'
+import { callBackendFromApi } from '@/utils/backend-api'
 
-export async function GET(_request: NextRequest) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+export async function GET(request: NextRequest) {
   const _defaultPages = ['dashboard', 'clients', 'projets', 'stocks', 'production']
 
   try {
     // Utiliser l'endpoint standard et filtrer les pages visibles
-    const response = await AuthHelper.fetchWithAuth(`${apiUrl}/api/v1/user/menu-preferences`)
+    const response = await callBackendFromApi(request, 'user/menu-preferences')
 
     if (response.ok) {
       const data = await response.json()
@@ -44,7 +43,10 @@ export async function GET(_request: NextRequest) {
     // Gérer les différents types d'erreurs
     if (error instanceof Error) {
       if (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN') {
-        return AuthHelper.unauthorizedResponse('Authentification requise')
+        return NextResponse.json(
+          { success: false, message: 'Authentification requise' },
+          { status: 401 }
+        )
       }
     }
 
@@ -61,14 +63,14 @@ export async function GET(_request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
   try {
     const body = await request.json()
     const { selectedPages = [] } = body
 
     // Utiliser directement l'endpoint backend qui gère tout
-    const response = await AuthHelper.fetchWithAuth(
-      `${apiUrl}/api/v1/user/menu-preferences/selected-pages`,
+    const response = await callBackendFromApi(
+      request,
+      'user/menu-preferences/selected-pages',
       {
         method: 'POST',
         body: JSON.stringify({ selectedPages }),
@@ -98,8 +100,9 @@ export async function POST(request: NextRequest) {
     // Gérer les différents types d'erreurs
     if (error instanceof Error) {
       if (error.message === 'NO_AUTH' || error.message === 'INVALID_TOKEN') {
-        return AuthHelper.unauthorizedResponse(
-          'Authentification requise pour sauvegarder les préférences'
+        return NextResponse.json(
+          { success: false, message: 'Authentification requise pour sauvegarder les préférences' },
+          { status: 401 }
         )
       }
     }

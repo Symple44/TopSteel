@@ -19,6 +19,18 @@ interface Props {
   fallback?: ReactNode
   onError?: (error: Error, errorInfo: ErrorInfo) => void
   isolate?: boolean
+  translations?: {
+    title: string
+    description: string
+    technicalDetails: string
+    errorLabel: string
+    componentLabel: string
+    errorId: string
+    retry: string
+    home: string
+    report: string
+    automaticRetries: string
+  }
 }
 
 interface State {
@@ -200,6 +212,19 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
         return this.props.fallback
       }
 
+      const t = this.props.translations || {
+        title: 'Oups ! Une erreur s\'est produite',
+        description: 'Quelque chose s\'est mal passé dans l\'application.',
+        technicalDetails: 'Détails techniques',
+        errorLabel: 'Erreur :',
+        componentLabel: 'Composant :',
+        errorId: 'ID d\'erreur :',
+        retry: 'Réessayer',
+        home: 'Accueil',
+        report: 'Signaler',
+        automaticRetries: 'Tentatives automatiques :'
+      }
+
       // Interface d'erreur par défaut
       return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -209,10 +234,10 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                 <AlertTriangle className="w-8 h-8 text-destructive" />
               </div>
               <h1 className="text-xl font-semibold text-foreground mb-2">
-                Oups ! Une erreur s'est produite
+                {t.title}
               </h1>
               <p className="text-muted-foreground text-sm">
-                Quelque chose s'est mal passé dans l'application.
+                {t.description}
               </p>
             </div>
 
@@ -221,18 +246,18 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
               <div className="mb-6 p-3 bg-muted rounded-md text-left">
                 <details className="text-xs">
                   <summary className="cursor-pointer font-medium text-foreground mb-2">
-                    Détails techniques
+                    {t.technicalDetails}
                   </summary>
                   <div className="space-y-2">
                     <div>
-                      <strong>Erreur :</strong>
+                      <strong>{t.errorLabel}</strong>
                       <code className="block mt-1 p-2 bg-background rounded text-destructive text-xs">
                         {this.state.error.message}
                       </code>
                     </div>
                     {this.state.errorInfo?.componentStack && (
                       <div>
-                        <strong>Composant :</strong>
+                        <strong>{t.componentLabel}</strong>
                         <pre className="mt-1 p-2 bg-background rounded text-xs overflow-auto max-h-32">
                           {this.state.errorInfo.componentStack}
                         </pre>
@@ -245,7 +270,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
 
             {/* ID d'erreur pour le support */}
             <div className="mb-6 text-xs text-muted-foreground">
-              ID d'erreur : <code className="bg-muted px-1 rounded">{this.state.errorId}</code>
+              {t.errorId} <code className="bg-muted px-1 rounded">{this.state.errorId}</code>
             </div>
 
             {/* Actions */}
@@ -255,7 +280,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
-                Réessayer
+                {t.retry}
               </Button>
 
               <div className="grid grid-cols-2 gap-2">
@@ -264,7 +289,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                   className="flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-3 py-2 rounded-md hover:bg-secondary/80 transition-colors text-sm"
                 >
                   <Home className="w-4 h-4" />
-                  Accueil
+                  {t.home}
                 </Button>
 
                 <Button
@@ -272,7 +297,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
                   className="flex items-center justify-center gap-2 bg-muted text-muted-foreground px-3 py-2 rounded-md hover:bg-muted/80 transition-colors text-sm"
                 >
                   <Bug className="w-4 h-4" />
-                  Signaler
+                  {t.report}
                 </Button>
               </div>
             </div>
@@ -280,7 +305,7 @@ ${this.state.errorInfo?.componentStack || 'No component stack available'}
             {/* Information de retry automatique */}
             {this.state.retryCount > 0 && (
               <div className="mt-4 text-xs text-muted-foreground">
-                Tentatives automatiques : {this.state.retryCount}/{this.maxRetries}
+                {t.automaticRetries} {this.state.retryCount}/{this.maxRetries}
               </div>
             )}
           </div>
@@ -306,6 +331,29 @@ export function withErrorBoundary<T extends object>(
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`
 
   return WrappedComponent
+}
+
+// Wrapper with translations
+export function ErrorBoundaryWithTranslations({ children, ...props }: Omit<Props, 'translations'>) {
+  // Default translations (French) - in a real component this would come from useTranslation
+  const translations = {
+    title: 'Oups ! Une erreur s\'est produite',
+    description: 'Quelque chose s\'est mal passé dans l\'application.',
+    technicalDetails: 'Détails techniques',
+    errorLabel: 'Erreur :',
+    componentLabel: 'Composant :',
+    errorId: 'ID d\'erreur :',
+    retry: 'Réessayer',
+    home: 'Accueil',
+    report: 'Signaler',
+    automaticRetries: 'Tentatives automatiques :'
+  }
+
+  return (
+    <ErrorBoundary {...props} translations={translations}>
+      {children}
+    </ErrorBoundary>
+  )
 }
 
 // Hook pour déclencher des erreurs en développement

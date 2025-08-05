@@ -1,4 +1,4 @@
-import type { BusinessEntity } from '../base/business-entity'
+import type { BusinessEntity } from '@erp/entities'
 
 /**
  * Interface de base pour tous les services métier

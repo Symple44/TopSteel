@@ -17,8 +17,6 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-
     try {
       // Appeler le vrai backend NestJS
       const response = await callBackendFromApi(request, 'user/menu-preferences/menu', {
@@ -193,7 +191,6 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
     try {
       // Appeler le vrai backend NestJS pour la sauvegarde

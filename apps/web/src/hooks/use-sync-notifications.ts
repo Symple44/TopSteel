@@ -10,14 +10,18 @@ export function useSyncNotifications() {
   useEffect(() => {
     // Configurer le callback pour les notifications de sync
     syncChecker.setToastCallback((issue) => {
+      // Ignorer les notifications de faible priorité
+      if (issue.severity === 'low') {
+        return
+      }
+
       const severityToType = {
-        low: 'default' as const,
-        medium: 'warning' as const,
+        medium: 'default' as const,
         high: 'destructive' as const,
       }
 
       toast({
-        title: 'Problème de synchronisation',
+        title: 'Erreur de synchronisation',
         description: issue.message,
         variant: severityToType[issue.severity],
         duration: issue.severity === 'high' ? 8000 : 5000, // Plus long pour les erreurs critiques
