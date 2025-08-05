@@ -21,7 +21,7 @@ updates:
           - "jest*"
           - "*test*"
     reviewers:
-      - "your-github-username"
+      - "Symple44"
     labels:
       - "dependencies"
       - "automated"
@@ -44,7 +44,7 @@ updates:
       day: "monday"
       time: "04:00"
     reviewers:
-      - "your-github-username"
+      - "Symple44"
     labels:
       - "ci/cd"
       - "automated"

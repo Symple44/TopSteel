@@ -227,18 +227,21 @@ export default function TestMultiTenantPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {results.data.slice(0, 10).map((row: any, idx: number) => (
-                        <tr key={idx}>
-                          {Object.values(row).map((value: any, i: number) => (
-                            <td
-                              key={i}
-                              className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                            >
-                              {String(value)}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
+                      {results.data.slice(0, 10).map((row: any, idx: number) => {
+                        const rowId = row.id || Object.values(row).slice(0, 3).join('-') || `row-${idx}`;
+                        return (
+                          <tr key={rowId}>
+                            {Object.entries(row).map(([columnName, value]) => (
+                              <td
+                                key={`${rowId}-${columnName}`}
+                                className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                              >
+                                {String(value)}
+                              </td>
+                            ))}
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -261,7 +264,7 @@ export default function TestMultiTenantPage() {
             <CardContent>
               <div className="space-y-4">
                 {testQueries.map((test, idx) => (
-                  <div key={idx} className="border rounded-lg p-4">
+                  <div key={test.name || `test-${idx}`} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <h3 className="font-semibold">{test.name}</h3>
@@ -318,7 +321,7 @@ export default function TestMultiTenantPage() {
                   </div>
                   {tables.map((table, idx) => (
                     <div
-                      key={idx}
+                      key={table.name || table.tableName || `table-${idx}`}
                       className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
                     >
                       <div className="flex items-center justify-between mb-2">
