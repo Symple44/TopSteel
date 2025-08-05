@@ -32,6 +32,12 @@ async function _runBiome() {
 const nextConfig = {
   // Transpile workspace packages for Next.js 15 (excluding server external ones)
   transpilePackages: ['@erp/domains', '@erp/api-client'],
+  
+  // Production optimizations
+  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+  experimental: {
+    outputFileTracingRoot: path.join(process.cwd(), '../../'),
+  },
 
   // API rewrites - proxy vers le backend NestJS
   async rewrites() {

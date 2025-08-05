@@ -1,7 +1,12 @@
+import path from 'node:path'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Retirer output: 'standalone' en mode dev pour éviter les problèmes de ressources statiques
-  // output: 'standalone',
+  // Production optimizations
+  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+  experimental: {
+    outputFileTracingRoot: path.join(process.cwd(), '../../'),
+  },
   
   // Origines autorisées pour les ressources cross-origin en développement
   allowedDevOrigins: [

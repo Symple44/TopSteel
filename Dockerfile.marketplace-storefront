@@ -1,0 +1,62 @@
+# Dockerfile.marketplace-storefront - Marketplace Frontend
+FROM node:22-alpine AS base
+
+# Configuration pnpm
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
+
+# Copier les fichiers de configuration
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/marketplace-storefront/package.json ./apps/marketplace-storefront/
+COPY packages/*/package.json ./packages/*/
+
+# Installation des dépendances
+FROM base AS deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+# Construction
+FROM base AS build
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Build des packages UI nécessaires
+RUN pnpm --filter @erp/ui build
+RUN pnpm --filter @erp/types build
+
+# Build du storefront
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+RUN pnpm --filter @erp/marketplace-storefront build
+
+# Production
+FROM node:22-alpine AS production
+WORKDIR /app
+
+# Installer curl pour health checks
+RUN apk add --no-cache curl
+
+# Créer un utilisateur non-root
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+# Copier les fichiers Next.js
+COPY --from=build --chown=nextjs:nodejs /app/apps/marketplace-storefront/.next/standalone ./
+COPY --from=build --chown=nextjs:nodejs /app/apps/marketplace-storefront/.next/static ./apps/marketplace-storefront/.next/static
+COPY --from=build --chown=nextjs:nodejs /app/apps/marketplace-storefront/public ./apps/marketplace-storefront/public
+
+# Variables d'environnement
+ENV NODE_ENV=production
+ENV PORT=3007
+ENV HOSTNAME="0.0.0.0"
+
+# Santé check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3007 || exit 1
+
+USER nextjs
+EXPOSE 3007
+
+CMD ["node", "apps/marketplace-storefront/server.js"]

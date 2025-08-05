@@ -1,0 +1,57 @@
+# Dockerfile.api - NestJS API Backend
+FROM node:22-alpine AS base
+
+# Configuration pnpm
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
+
+# Copier les fichiers de configuration
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/*/package.json ./packages/*/
+
+# Installation des dépendances
+FROM base AS deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+# Construction des packages
+FROM base AS build
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Build des packages nécessaires
+RUN pnpm --filter @erp/types build
+RUN pnpm --filter @erp/domains build
+RUN pnpm --filter @erp/entities build
+
+# Build de l'API
+RUN pnpm --filter @erp/api build
+
+# Production
+FROM node:22-alpine AS production
+WORKDIR /app
+
+# Créer un utilisateur non-root
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
+# Copier les fichiers buildés
+COPY --from=build --chown=nestjs:nodejs /app/apps/api/dist ./dist
+COPY --from=build --chown=nestjs:nodejs /app/apps/api/package.json ./
+COPY --from=build --chown=nestjs:nodejs /app/node_modules ./node_modules
+
+# Variables d'environnement
+ENV NODE_ENV=production
+ENV PORT=3002
+
+# Santé check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3002/health || exit 1
+
+USER nestjs
+EXPOSE 3002
+
+CMD ["node", "dist/main.js"]

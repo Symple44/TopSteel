@@ -341,7 +341,23 @@ jobs:
         id: deploy
         run: |
           echo "🚀 Deploying to staging environment..."
-          echo "url=https://staging.topsteel.tech" >> $GITHUB_OUTPUT
+          
+          # Configuration SSH
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.STAGING_HOST }} >> ~/.ssh/known_hosts
+          
+          # Déploiement via SSH
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} << 'EOF'
+            cd /home/topsteel/app
+            git pull origin develop
+            cp .env.staging .env.production
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh --no-backup
+          EOF
+          
+          echo "url=https://${{ secrets.STAGING_DOMAIN }}" >> $GITHUB_OUTPUT
           echo "✅ Staging deployment completed!"
 
       - name: 🔍 Post-deployment health check
@@ -373,7 +389,23 @@ jobs:
         id: deploy
         run: |
           echo "🚀 Deploying to production environment..."
-          echo "url=https://topsteel.tech" >> $GITHUB_OUTPUT
+          
+          # Configuration SSH
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
+          
+          # Déploiement via SSH avec sauvegarde
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.PRODUCTION_USER }}@${{ secrets.PRODUCTION_HOST }} << 'EOF'
+            cd /home/topsteel/app
+            git pull origin main
+            cp .env.production.example .env.production
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh
+          EOF
+          
+          echo "url=https://${{ secrets.PRODUCTION_DOMAIN }}" >> $GITHUB_OUTPUT
           echo "✅ Production deployment completed!"
 
       - name: 🔍 Post-deployment verification
