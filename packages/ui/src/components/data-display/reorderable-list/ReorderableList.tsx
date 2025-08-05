@@ -233,8 +233,9 @@ function useDragAndDrop<T extends ReorderableItem>(
                 const newItems = [...currentItems.slice(0, i), ...currentItems.slice(i + 1)]
                 return { newItems, removedItem: removed }
               }
-              if (currentItems[i].children && currentItems[i].children.length > 0) {
-                const result = processItems(currentItems[i].children! as T[])
+              const children = currentItems[i].children;
+              if (children && children.length > 0) {
+                const result = processItems(children as T[])
                 if (result.removedItem) {
                   const newItems = [...currentItems]
                   newItems[i] = { ...newItems[i], children: result.newItems }
@@ -288,8 +289,9 @@ function useDragAndDrop<T extends ReorderableItem>(
               }
 
               // Rechercher récursivement dans les enfants
-              if (currentItems[i].children && currentItems[i].children.length > 0) {
-                const result = processLevel(currentItems[i].children! as T[])
+              const children = currentItems[i].children;
+              if (children && children.length > 0) {
+                const result = processLevel(children as T[])
                 if (result.found) {
                   const newItems = [...currentItems]
                   newItems[i] = { ...newItems[i], children: result.items }

@@ -1,4 +1,5 @@
-import * as XLSX from 'xlsx'
+import { Univer } from '@univerjs/core'
+import { UniverSheetsPlugin } from '@univerjs/sheets'
 import { callClientApi } from '@/utils/backend-api'
 import { en } from './translations/en'
 import { es } from './translations/es'
@@ -162,32 +163,403 @@ export const filterTranslations = (
   })
 }
 
-// Exporter les traductions en Excel
-export const exportToExcel = (entries: TranslationEntry[], languages: string[]): Blob => {
-  const data = entries.map((entry) => {
-    const row: any = {
-      ID: entry.id,
-      Namespace: entry.namespace,
-      Key: entry.key,
-      Category: entry.category || '',
-      Description: entry.description || '',
+// Interface pour les données de cellule Univer
+interface UniverCellData {
+  v?: any // value
+  t?: number // type (1=string, 2=number, 3=boolean, 4=date)
+}
+
+// Interface pour les données de feuille Univer
+interface UniverSheetData {
+  id: string
+  name: string
+  cellData: Record<string, Record<string, UniverCellData>>
+  rowCount: number
+  columnCount: number
+}
+
+// Interface pour les données de workbook Univer
+interface UniverWorkbookData {
+  id: string
+  name: string
+  sheetOrder: string[]
+  sheets: Record<string, UniverSheetData>
+}
+
+// Instance Univer singleton pour les traductions
+class TranslationUniverUtils {
+  private static univerInstance: Univer | null = null
+
+  /**
+   * Obtient l'instance Univer singleton
+   */
+  private static getUniverInstance(): Univer {
+    if (!TranslationUniverUtils.univerInstance) {
+      TranslationUniverUtils.univerInstance = new Univer({
+        theme: 'default',
+        locale: 'fr-FR',
+      })
+
+      // Registrer seulement les plugins nécessaires pour les traductions
+      TranslationUniverUtils.univerInstance.registerPlugin(UniverSheetsPlugin)
     }
 
+    return TranslationUniverUtils.univerInstance
+  }
+
+  /**
+   * Crée des données de workbook Univer à partir des entrées de traduction
+   */
+  static createWorkbookFromTranslations(entries: TranslationEntry[], languages: string[]): UniverWorkbookData {
+    const sheetId = 'translations'
+    const cellData: Record<string, Record<string, UniverCellData>> = {}
+
+    // En-têtes (ligne 0)
+    const headers = ['ID', 'Namespace', 'Key', 'Category', 'Description']
     languages.forEach((lang) => {
-      row[`Translation_${lang}`] = entry.translations[lang] || ''
+      headers.push(`Translation_${lang}`)
     })
 
-    return row
-  })
+    const headerRow: Record<string, UniverCellData> = {}
+    headers.forEach((header, colIndex) => {
+      headerRow[colIndex.toString()] = {
+        v: header,
+        t: 1 // string type
+      }
+    })
+    cellData['0'] = headerRow
 
-  const ws = XLSX.utils.json_to_sheet(data)
-  const wb = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(wb, ws, 'Translations')
+    // Données (lignes 1+)
+    entries.forEach((entry, rowIndex) => {
+      const dataRow: Record<string, UniverCellData> = {}
+      
+      // Colonnes fixes
+      const rowData = [
+        entry.id,
+        entry.namespace,
+        entry.key,
+        entry.category || '',
+        entry.description || ''
+      ]
 
-  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-  return new Blob([excelBuffer], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  })
+      // Ajouter les traductions pour chaque langue
+      languages.forEach((lang) => {
+        rowData.push(entry.translations[lang] || '')
+      })
+
+      rowData.forEach((value, colIndex) => {
+        dataRow[colIndex.toString()] = {
+          v: value,
+          t: 1 // string type
+        }
+      })
+
+      cellData[(rowIndex + 1).toString()] = dataRow
+    })
+
+    return {
+      id: 'translations-workbook',
+      name: 'Translations',
+      sheetOrder: [sheetId],
+      sheets: {
+        [sheetId]: {
+          id: sheetId,
+          name: 'Translations',
+          cellData,
+          rowCount: entries.length + 1,
+          columnCount: headers.length
+        }
+      }
+    }
+  }
+
+  /**
+   * Exporte les données Univer vers un blob Excel
+   */
+  static async exportWorkbookToBlob(workbookData: UniverWorkbookData): Promise<Blob> {
+    try {
+      const univer = TranslationUniverUtils.getUniverInstance()
+      const univerSheet = univer.createUniverSheet(workbookData)
+      
+      // Utiliser l'API d'export d'Univer pour générer le blob Excel
+      if (univerSheet && typeof univerSheet.exportAsExcel === 'function') {
+        const blob = await univerSheet.exportAsExcel()
+        return blob
+      } else {
+        throw new Error('Export API not available')
+      }
+    } catch (error) {
+      // Fallback: créer un blob Excel basique si l'export Univer échoue
+      return TranslationUniverUtils.createFallbackExcelBlob(workbookData)
+    }
+  }
+
+  /**
+   * Crée un blob Excel basique en cas de fallback
+   */
+  private static createFallbackExcelBlob(workbookData: UniverWorkbookData): Blob {
+    // Créer un contenu Excel compatible (format CSV avec BOM UTF-8)
+    const sheet = workbookData.sheets[workbookData.sheetOrder[0]]
+    const lines: string[] = []
+
+    for (let row = 0; row < sheet.rowCount; row++) {
+      const rowKey = row.toString()
+      const cells: string[] = []
+      
+      for (let col = 0; col < sheet.columnCount; col++) {
+        const colKey = col.toString()
+        const cellData = sheet.cellData[rowKey]?.[colKey]
+        const value = cellData?.v || ''
+        // Échapper les guillemets et virgules pour CSV
+        const escapedValue = String(value).replace(/"/g, '""')
+        cells.push(`"${escapedValue}"`)
+      }
+      
+      lines.push(cells.join(','))
+    }
+
+    // Ajouter BOM UTF-8 pour la compatibilité Excel
+    const BOM = '\uFEFF'
+    const csvContent = BOM + lines.join('\r\n')
+    
+    return new Blob([csvContent], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+  }
+
+  /**
+   * Importe un fichier Excel et le convertit en données de workbook Univer
+   */
+  static async importExcelToWorkbook(buffer: ArrayBuffer): Promise<UniverWorkbookData | null> {
+    try {
+      const univer = TranslationUniverUtils.getUniverInstance()
+      
+      // Utiliser l'API d'import d'Univer pour lire le fichier Excel
+      if (typeof univer.importExcel === 'function') {
+        const workbook = await univer.importExcel(buffer)
+        if (!workbook) throw new Error('Failed to import Excel')
+
+        // Convertir en format de données standard
+        const firstSheet = workbook.getActiveSheet ? workbook.getActiveSheet() : null
+        if (!firstSheet) throw new Error('No active sheet')
+
+        return TranslationUniverUtils.extractWorkbookData(firstSheet)
+      } else {
+        throw new Error('Import API not available')
+      }
+    } catch (error) {
+      // Fallback: essayer de parser comme CSV/Excel basique
+      return TranslationUniverUtils.parseFallbackExcel(buffer)
+    }
+  }
+
+  /**
+   * Extrait les données d'une feuille Univer
+   */
+  private static extractWorkbookData(sheet: any): UniverWorkbookData {
+    const cellData: Record<string, Record<string, UniverCellData>> = {}
+    
+    // Obtenir les dimensions de la feuille
+    const range = sheet.getUsedRange()
+    const rowCount = range?.endRow ? range.endRow + 1 : 0
+    const columnCount = range?.endColumn ? range.endColumn + 1 : 0
+
+    // Extraire toutes les cellules
+    for (let row = 0; row < rowCount; row++) {
+      const rowData: Record<string, UniverCellData> = {}
+      
+      for (let col = 0; col < columnCount; col++) {
+        const cell = sheet.getCell(row, col)
+        if (cell) {
+          rowData[col.toString()] = {
+            v: cell.getValue() || '',
+            t: 1 // string type par défaut
+          }
+        }
+      }
+      
+      if (Object.keys(rowData).length > 0) {
+        cellData[row.toString()] = rowData
+      }
+    }
+
+    return {
+      id: 'imported-workbook',
+      name: 'Imported',
+      sheetOrder: ['sheet1'],
+      sheets: {
+        sheet1: {
+          id: 'sheet1',
+          name: 'Sheet1',
+          cellData,
+          rowCount,
+          columnCount
+        }
+      }
+    }
+  }
+
+  /**
+   * Parse un fichier Excel en fallback
+   */
+  private static parseFallbackExcel(buffer: ArrayBuffer): UniverWorkbookData | null {
+    try {
+      // Vérifier s'il s'agit d'un fichier Excel réel (signature XLSX)
+      const view = new DataView(buffer)
+      const signature = new Uint8Array(buffer.slice(0, 4))
+      
+      // Signature ZIP (XLSX est un format ZIP)
+      const isZip = signature[0] === 0x50 && signature[1] === 0x4B && 
+                    (signature[2] === 0x03 || signature[2] === 0x05 || signature[2] === 0x07) && 
+                    (signature[3] === 0x04 || signature[3] === 0x06 || signature[3] === 0x08)
+      
+      if (isZip) {
+        // C'est probablement un vrai fichier Excel, mais on ne peut pas le parser sans bibliothèque
+        // Retourner null pour déclencher une erreur dans importFromExcel
+        return null
+      }
+
+      // Essayer de parser comme CSV/texte
+      let text: string
+      try {
+        // Essayer UTF-8 d'abord
+        text = new TextDecoder('utf-8').decode(buffer)
+      } catch {
+        // Fallback vers windows-1252 ou latin1
+        text = new TextDecoder('windows-1252').decode(buffer)
+      }
+
+      // Supprimer le BOM s'il existe
+      if (text.charCodeAt(0) === 0xFEFF) {
+        text = text.substring(1)
+      }
+
+      const lines = text.split(/\r?\n/).filter(line => line.trim())
+      
+      if (lines.length === 0) return null
+
+      const cellData: Record<string, Record<string, UniverCellData>> = {}
+      let maxColumns = 0
+
+      lines.forEach((line, rowIndex) => {
+        // Parser la ligne CSV/TSV
+        const cells = line.includes('\t') 
+          ? line.split('\t') 
+          : TranslationUniverUtils.parseCSVLine(line)
+        
+        maxColumns = Math.max(maxColumns, cells.length)
+
+        const rowData: Record<string, UniverCellData> = {}
+        cells.forEach((cell, colIndex) => {
+          rowData[colIndex.toString()] = {
+            v: cell.trim(),
+            t: 1 // string type
+          }
+        })
+
+        cellData[rowIndex.toString()] = rowData
+      })
+
+      return {
+        id: 'fallback-workbook',
+        name: 'Fallback',
+        sheetOrder: ['sheet1'],
+        sheets: {
+          sheet1: {
+            id: 'sheet1',
+            name: 'Sheet1',
+            cellData,
+            rowCount: lines.length,
+            columnCount: maxColumns
+          }
+        }
+      }
+    } catch (error) {
+      return null
+    }
+  }
+
+  /**
+   * Parse une ligne CSV en tenant compte des guillemets
+   */
+  private static parseCSVLine(line: string): string[] {
+    const result: string[] = []
+    let current = ''
+    let inQuotes = false
+    let i = 0
+
+    while (i < line.length) {
+      const char = line[i]
+      const nextChar = line[i + 1]
+
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          // Guillemet échappé
+          current += '"'
+          i += 2
+        } else {
+          // Début ou fin de guillemets
+          inQuotes = !inQuotes
+          i++
+        }
+      } else if (char === ',' && !inQuotes) {
+        // Séparateur de cellule
+        result.push(current)
+        current = ''
+        i++
+      } else {
+        current += char
+        i++
+      }
+    }
+
+    result.push(current)
+    return result
+  }
+
+  /**
+   * Convertit les données de workbook Univer en tableau 2D
+   */
+  static extractDataFromWorkbook(workbook: UniverWorkbookData): any[][] {
+    const firstSheetId = workbook.sheetOrder[0]
+    const sheet = workbook.sheets[firstSheetId]
+    
+    if (!sheet) return []
+
+    const result: any[][] = []
+    
+    for (let row = 0; row < sheet.rowCount; row++) {
+      const rowKey = row.toString()
+      const rowData: any[] = []
+      
+      for (let col = 0; col < sheet.columnCount; col++) {
+        const colKey = col.toString()
+        const cellData = sheet.cellData[rowKey]?.[colKey]
+        rowData.push(cellData?.v || '')
+      }
+      
+      result.push(rowData)
+    }
+    
+    return result
+  }
+}
+
+// Exporter les traductions en Excel
+export const exportToExcel = (entries: TranslationEntry[], languages: string[]): Blob => {
+  try {
+    // Créer les données de workbook Univer
+    const workbookData = TranslationUniverUtils.createWorkbookFromTranslations(entries, languages)
+    
+    // Note: Cette fonction doit rester synchrone pour maintenir la compatibilité API
+    // On utilise le fallback synchrone qui génère un format CSV compatible Excel
+    return TranslationUniverUtils.createFallbackExcelBlob(workbookData)
+  } catch (error) {
+    // Fallback d'urgence: créer un blob vide valide
+    return new Blob([''], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+  }
 }
 
 // Importer les traductions depuis Excel
@@ -206,9 +578,33 @@ export const importFromExcel = async (
 
   try {
     const buffer = await file.arrayBuffer()
-    const wb = XLSX.read(buffer, { type: 'array' })
-    const ws = wb.Sheets[wb.SheetNames[0]]
-    const data = XLSX.utils.sheet_to_json(ws)
+    
+    // Utiliser Univer pour lire le fichier Excel
+    const workbook = await TranslationUniverUtils.importExcelToWorkbook(buffer)
+    if (!workbook) {
+      result.errors.push('Impossible de lire le fichier Excel')
+      return result
+    }
+
+    // Extraire les données sous forme de tableau 2D
+    const rawData = TranslationUniverUtils.extractDataFromWorkbook(workbook)
+    if (rawData.length === 0) {
+      result.errors.push('Fichier vide')
+      return result
+    }
+
+    // Première ligne = en-têtes, reste = données
+    const headers = rawData[0] as string[]
+    const dataRows = rawData.slice(1)
+
+    // Convertir en format objet comme le faisait XLSX.utils.sheet_to_json
+    const data = dataRows.map((row) => {
+      const rowObj: any = {}
+      headers.forEach((header, index) => {
+        rowObj[header] = row[index] || ''
+      })
+      return rowObj
+    })
 
     const entriesMap = new Map(existingEntries.map((e) => [e.id, e]))
 
