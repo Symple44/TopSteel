@@ -1425,7 +1425,7 @@ export function DataTable<T = any>({
 
           {/* Actions */}
           {actions?.create && (
-            <SimpleTooltip content="Ajouter un élément">
+            <SimpleTooltip content="Ajouter un élément" triggerAsChild>
               <Button onClick={actions.create} size="sm" className="h-7 w-7 p-0">
                 <Plus className="h-3 w-3" />
               </Button>
@@ -1438,7 +1438,7 @@ export function DataTable<T = any>({
               const column = orderedColumns.find((c) => c.id === focusedCell.column)
               if (column?.type === 'richtext' && editable && column.editable) {
                 return (
-                  <SimpleTooltip content="Ouvrir l'éditeur Rich Text">
+                  <SimpleTooltip content="Ouvrir l'éditeur Rich Text" triggerAsChild>
                     <Button
                       onClick={() => {
                         const row = dataWithFormulas[focusedCell.row]
@@ -1467,6 +1467,7 @@ export function DataTable<T = any>({
             <>
               <SimpleTooltip
                 content={`Copier ${selection.selectedRows.size} élément(s) sélectionné(s)`}
+                triggerAsChild
               >
                 <Button
                   onClick={handleCopySelection}
@@ -1481,6 +1482,7 @@ export function DataTable<T = any>({
               {actions?.delete && (
                 <SimpleTooltip
                   content={`Supprimer ${selection.selectedRows.size} élément(s) sélectionné(s)`}
+                  triggerAsChild
                 >
                   <Button
                     onClick={() => {
@@ -1501,7 +1503,7 @@ export function DataTable<T = any>({
           )}
 
           {editable && (
-            <SimpleTooltip content="Coller depuis le presse-papiers">
+            <SimpleTooltip content="Coller depuis le presse-papiers" triggerAsChild>
               <Button
                 onClick={() => handlePaste()}
                 variant="outline"
@@ -1518,6 +1520,7 @@ export function DataTable<T = any>({
           {/* Règles de couleurs */}
           <SimpleTooltip
             content={`Gestion des règles de couleurs ${colorRuleSystem.activeRules > 0 ? `(${colorRuleSystem.activeRules} actives)` : ''}`}
+            triggerAsChild
           >
             <Button
               variant="outline"
@@ -1536,6 +1539,7 @@ export function DataTable<T = any>({
 
           <SimpleTooltip
             content={`Groupement en arbre ${treeGrouping.isGrouped ? `(${treeGrouping.groupingColumns.length} colonnes groupées)` : ''}`}
+            triggerAsChild
           >
             <Button
               variant="outline"
@@ -1566,7 +1570,7 @@ export function DataTable<T = any>({
           <DropdownPortal
             align="end"
             trigger={
-              <SimpleTooltip content="Options d'export">
+              <SimpleTooltip content="Options d'export" triggerAsChild>
                 <Button variant="outline" size="sm" className="h-7 w-7 p-0">
                   <Download className="h-3 w-3" />
                 </Button>
