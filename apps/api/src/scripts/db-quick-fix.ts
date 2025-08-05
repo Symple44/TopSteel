@@ -7,9 +7,9 @@
  * de cohérence les plus courants détectés
  */
 
+import * as readline from 'node:readline'
 import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
-import * as readline from 'readline'
 import { DataSource, type QueryRunner } from 'typeorm'
 import { authDataSourceOptions } from '../core/database/data-source-auth'
 import { tenantDataSourceOptions } from '../core/database/data-source-tenant'
@@ -47,41 +47,26 @@ class DatabaseQuickFixer {
   }
 
   async runQuickFixes(): Promise<void> {
-    console.log('🔧 Script de correction rapide des incohérences de base de données\n')
-    console.log('⚠️  ATTENTION: Ce script peut modifier la structure de votre base de données!')
-    console.log('📋 Il est fortement recommandé de faire une sauvegarde avant de continuer.\n')
-
     const proceed = await this.askUser('Continuer avec les corrections? (y/N): ')
     if (proceed.toLowerCase() !== 'y' && proceed.toLowerCase() !== 'yes') {
-      console.log('❌ Opération annulée.')
       this.rl.close()
       return
     }
 
     try {
-      // Analyser la base AUTH
-      console.log('\n🔍 Analyse de la base AUTH...')
       const authFixes = await this.findQuickFixes('AUTH', this.authDataSource)
 
       if (authFixes.length > 0) {
-        console.log(`\n📋 ${authFixes.length} correction(s) proposée(s) pour AUTH:`)
         await this.presentAndApplyFixes(authFixes, this.authDataSource)
       } else {
-        console.log('✅ Aucune correction rapide nécessaire pour AUTH')
       }
-
-      // Analyser la base TENANT
-      console.log('\n🔍 Analyse de la base TENANT...')
       const tenantFixes = await this.findQuickFixes('TENANT', this.tenantDataSource)
 
       if (tenantFixes.length > 0) {
-        console.log(`\n📋 ${tenantFixes.length} correction(s) proposée(s) pour TENANT:`)
         await this.presentAndApplyFixes(tenantFixes, this.tenantDataSource)
       } else {
-        console.log('✅ Aucune correction rapide nécessaire pour TENANT')
       }
-    } catch (error) {
-      console.error('💥 Erreur lors des corrections:', error)
+    } catch (_error) {
     } finally {
       this.rl.close()
     }
@@ -184,9 +169,7 @@ class DatabaseQuickFixer {
       // Vérifier les contraintes de clés étrangères manquantes
       const missingForeignKeys = await this.findMissingForeignKeys(queryRunner)
       fixes.push(...missingForeignKeys)
-    } catch (error) {
-      console.warn("Erreur lors de l'analyse AUTH:", error)
-    }
+    } catch (_error) {}
 
     return fixes
   }
@@ -215,9 +198,7 @@ class DatabaseQuickFixer {
           backupRequired: false,
         })
       }
-    } catch (error) {
-      console.warn("Erreur lors de l'analyse commune:", error)
-    }
+    } catch (_error) {}
 
     return fixes
   }
@@ -258,7 +239,7 @@ class DatabaseQuickFixer {
             backupRequired: false,
           })
         }
-      } catch (error) {
+      } catch (_error) {
         // Ignorer si la table n'existe pas
       }
     }
@@ -316,7 +297,7 @@ class DatabaseQuickFixer {
             backupRequired: true,
           })
         }
-      } catch (error) {
+      } catch (_error) {
         // Ignorer si les tables n'existent pas
       }
     }
@@ -327,30 +308,19 @@ class DatabaseQuickFixer {
   private async presentAndApplyFixes(fixes: QuickFix[], dataSource: DataSource): Promise<void> {
     for (let i = 0; i < fixes.length; i++) {
       const fix = fixes[i]
-      console.log(`\n--- Correction ${i + 1}/${fixes.length} ---`)
-      console.log(`🔧 ${fix.description}`)
-      console.log(
-        `📊 Sévérité: ${this.getSeverityEmoji(fix.severity)} ${fix.severity.toUpperCase()}`
-      )
-      console.log(`🔄 Réversible: ${fix.reversible ? '✅' : '❌'}`)
-      console.log(`💾 Sauvegarde requise: ${fix.backupRequired ? '✅' : '❌'}`)
-      console.log(`📝 SQL: ${fix.sql}`)
 
       if (fix.backupRequired) {
-        console.log('\n⚠️  ATTENTION: Cette correction nécessite une sauvegarde préalable!')
       }
 
       const apply = await this.askUser('\nAppliquer cette correction? (y/N/s=skip all): ')
 
       if (apply.toLowerCase() === 's') {
-        console.log('⏭️  Toutes les corrections restantes ont été ignorées.')
         break
       }
 
       if (apply.toLowerCase() === 'y' || apply.toLowerCase() === 'yes') {
         await this.applyFix(fix, dataSource)
       } else {
-        console.log('⏭️  Correction ignorée.')
       }
     }
   }
@@ -360,40 +330,20 @@ class DatabaseQuickFixer {
       await dataSource.initialize()
       const queryRunner = dataSource.createQueryRunner()
 
-      console.log('🔄 Application de la correction...')
-
       // Exécuter la correction
       if (fix.sql.startsWith('--')) {
-        console.log('ℹ️  Correction informative uniquement, aucune modification appliquée.')
       } else {
         await queryRunner.query(fix.sql)
-        console.log('✅ Correction appliquée avec succès!')
       }
 
       await queryRunner.release()
-    } catch (error) {
-      console.error("❌ Erreur lors de l'application de la correction:", error)
-
+    } catch (_error) {
       if (fix.reversible) {
-        console.log('ℹ️  Cette correction est réversible si nécessaire.')
       }
     } finally {
       if (dataSource.isInitialized) {
         await dataSource.destroy()
       }
-    }
-  }
-
-  private getSeverityEmoji(severity: string): string {
-    switch (severity) {
-      case 'safe':
-        return '✅'
-      case 'caution':
-        return '⚠️'
-      case 'dangerous':
-        return '🚨'
-      default:
-        return 'ℹ️'
     }
   }
 
@@ -413,8 +363,7 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch((error) => {
-    console.error('💥 Erreur fatale:', error)
+  main().catch((_error) => {
     process.exit(1)
   })
 }

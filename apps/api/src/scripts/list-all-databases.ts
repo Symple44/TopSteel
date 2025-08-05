@@ -6,8 +6,6 @@ import { DataSource } from 'typeorm'
 config()
 
 async function listAllDatabases() {
-  console.log('🔍 Recherche de toutes les bases de données TopSteel...\n')
-
   const dataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
@@ -35,11 +33,7 @@ async function listAllDatabases() {
       ORDER BY datname
     `)
 
-    console.log(`📋 Bases de données trouvées: ${databases.length}\n`)
-
     for (const db of databases) {
-      console.log(`📁 ${db.datname}`)
-
       // Tester la connexion et compter les tables
       const testDataSource = new DataSource({
         type: 'postgres',
@@ -54,7 +48,7 @@ async function listAllDatabases() {
       try {
         await testDataSource.initialize()
 
-        const tableCount = await testDataSource.query(`
+        const _tableCount = await testDataSource.query(`
           SELECT COUNT(*) as count 
           FROM information_schema.tables 
           WHERE table_schema = 'public'
@@ -67,26 +61,15 @@ async function listAllDatabases() {
           AND table_name IN ('articles', 'societes', 'system_settings', 'products', 'produits')
           ORDER BY table_name
         `)
-
-        console.log(`   Tables: ${tableCount[0].count}`)
         if (importantTables.length > 0) {
-          console.log(
-            `   Tables importantes: ${importantTables.map((t: any) => t.table_name).join(', ')}`
-          )
         }
 
         await testDataSource.destroy()
-      } catch (error) {
-        console.log(`   ❌ Erreur connexion`)
-      }
-
-      console.log('')
+      } catch (_error) {}
     }
 
     await dataSource.destroy()
-  } catch (error) {
-    console.error('❌ Erreur:', error)
-  }
+  } catch (_error) {}
 }
 
 listAllDatabases().catch(console.error)

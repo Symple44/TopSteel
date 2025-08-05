@@ -318,7 +318,7 @@ export class PartnerService extends BusinessService<Partner> {
 
   private async validateUpdateRules(
     entity: Partner,
-    errors: Array<{ field: string; message: string; code: string }>,
+    _errors: Array<{ field: string; message: string; code: string }>,
     warnings: Array<{ field: string; message: string; code: string }>
   ): Promise<void> {
     // Un partenaire avec des commandes ne peut pas changer de type
@@ -335,7 +335,7 @@ export class PartnerService extends BusinessService<Partner> {
   private async validateDeletionRules(
     entity: Partner,
     errors: Array<{ field: string; message: string; code: string }>,
-    warnings: Array<{ field: string; message: string; code: string }>
+    _warnings: Array<{ field: string; message: string; code: string }>
   ): Promise<void> {
     // Interdire la suppression si le partenaire a des commandes
     const hasOrders = await this.partnerRepository.hasActiveOrders(entity.id)

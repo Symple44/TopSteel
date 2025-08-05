@@ -132,24 +132,24 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(spec: any): Promise<Partner[]> {
+  async findBySpecification(_spec: any): Promise<Partner[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }
 
   // Méthodes manquantes de IPartnerRepository
-  async hasActiveOrders(partnerId: string): Promise<boolean> {
+  async hasActiveOrders(_partnerId: string): Promise<boolean> {
     // TODO: Implémenter la logique selon vos besoins métier
     return false
   }
 
-  async hasUnpaidInvoices(partnerId: string): Promise<boolean> {
+  async hasUnpaidInvoices(_partnerId: string): Promise<boolean> {
     // TODO: Implémenter la logique selon vos besoins métier
     return false
   }
 
   async findWithFilters(
-    filters: any
+    _filters: any
   ): Promise<{ items: Partner[]; total: number; page: number; limit: number }> {
     // TODO: Implémenter la pagination avancée
     const items = await this.repository.find()

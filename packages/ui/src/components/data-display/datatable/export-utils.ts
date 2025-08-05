@@ -5,9 +5,9 @@ let LocaleType: any = null
 let UniverSheetsPlugin: any = null
 let UniverFormulaEnginePlugin: any = null
 let UniverRenderEnginePlugin: any = null
-const UniverUIPlugin: any = null
-let IWorkbookData: any = null
-let IWorksheetData: any = null
+const _UniverUIPlugin: any = null
+let _IWorkbookData: any = null
+let _IWorksheetData: any = null
 
 // Flag to track if we're running on the client side
 const isClient = typeof window !== 'undefined'
@@ -32,8 +32,8 @@ const loadUniverComponents = async (): Promise<boolean> => {
       UniverInstanceType = univerCore.UniverInstanceType
       LocaleType = univerCore.LocaleType
       // Note: IWorkbookData and IWorksheetData might not be available in all versions
-      IWorkbookData = (univerCore as any).IWorkbookData || null
-      IWorksheetData = (univerCore as any).IWorksheetData || null
+      _IWorkbookData = (univerCore as any).IWorkbookData || null
+      _IWorksheetData = (univerCore as any).IWorksheetData || null
     }
 
     if (univerSheets) {
@@ -49,8 +49,7 @@ const loadUniverComponents = async (): Promise<boolean> => {
     }
 
     return Univer !== null && UniverSheetsPlugin !== null
-  } catch (error) {
-    console.warn('Univer not available, using fallback implementations:', error)
+  } catch (_error) {
     return false
   }
 }
@@ -192,8 +191,7 @@ export class ExportUtils {
         }
 
         ExportUtils.univerAvailable = true
-      } catch (error) {
-        console.warn('Failed to initialize Univer:', error)
+      } catch (_error) {
         ExportUtils.univerInstance = null
         ExportUtils.univerAvailable = false
         return null
@@ -255,16 +253,14 @@ export class ExportUtils {
         try {
           await ExportUtils.exportWithUniver(exportData, exportColumns, options)
           return
-        } catch (error) {
-          console.warn('Univer export failed, falling back to CSV:', error)
+        } catch (_error) {
           ExportUtils.univerAvailable = false
         }
       }
 
       // Fallback: Export en CSV avec formatage compatible Excel
       ExportUtils.exportToExcelCompatibleCSV(exportData, exportColumns, options)
-    } catch (error) {
-      console.error('Export failed:', error)
+    } catch (_error) {
       throw new Error("Impossible d'exporter les données")
     }
   }
@@ -519,8 +515,7 @@ export class ExportUtils {
                   rawData = ExportUtils.extractDataFromUniverSheet(firstSheet)
                 }
               }
-            } catch (error) {
-              console.warn('Univer import failed, trying fallback:', error)
+            } catch (_error) {
               ExportUtils.univerAvailable = false
             }
           }
@@ -551,8 +546,7 @@ export class ExportUtils {
           // Traiter les données
           const result = ExportUtils.processImportData(rawData, columns)
           resolve(result)
-        } catch (error) {
-          console.error('Import error:', error)
+        } catch (_error) {
           reject(new Error('Erreur lors de la lecture du fichier'))
         }
       }
@@ -611,8 +605,7 @@ export class ExportUtils {
           return ExportUtils.parseCSVLine(line, separator)
         }
       })
-    } catch (error) {
-      console.error('CSV parsing failed:', error)
+    } catch (_error) {
       return []
     }
   }
@@ -678,7 +671,7 @@ export class ExportUtils {
   private static async parseExcelBuffer(buffer: ArrayBuffer): Promise<UniverWorkbookData | null> {
     try {
       // Vérifier la signature du fichier Excel
-      const view = new DataView(buffer)
+      const _view = new DataView(buffer)
       if (buffer.byteLength < 8) return null
 
       // Vérifier la signature ZIP (XLSX est un format ZIP)
@@ -699,9 +692,7 @@ export class ExportUtils {
         try {
           const workbookData = await Univer.importFromBuffer(buffer)
           return workbookData
-        } catch (error) {
-          console.warn('Univer import failed:', error)
-        }
+        } catch (_error) {}
       }
 
       // Fallback: structure de données vide mais valide
@@ -722,8 +713,7 @@ export class ExportUtils {
           },
         },
       }
-    } catch (error) {
-      console.error('Excel parsing failed:', error)
+    } catch (_error) {
       return null
     }
   }
@@ -1084,13 +1074,13 @@ export class ExportUtils {
    * Applique un formatage conditionnel pour Univer
    */
   private static applyConditionalFormattingUniver(
-    workbook: any,
+    _workbook: any,
     columns: ColumnConfig[],
     data: any[]
   ): void {
     try {
       // Exemple de formatage conditionnel pour les colonnes numériques
-      columns.forEach((column, colIndex) => {
+      columns.forEach((column, _colIndex) => {
         if (column.type !== 'number') return
 
         const values: number[] = []
@@ -1107,17 +1097,17 @@ export class ExportUtils {
         const max = Math.max(...values)
 
         // Appliquer des couleurs basées sur les percentiles
-        data.forEach((row, rowIndex) => {
+        data.forEach((row, _rowIndex) => {
           const value = row[column.title]
           if (typeof value !== 'number') return
 
           const percentile = (value - min) / (max - min)
-          let bgColor = '#FFFFFF'
+          let _bgColor = '#FFFFFF'
 
           if (percentile <= 0.33) {
-            bgColor = '#FFEBEE' // 33% inférieur - rouge clair
+            _bgColor = '#FFEBEE' // 33% inférieur - rouge clair
           } else if (percentile >= 0.67) {
-            bgColor = '#E8F5E8' // 33% supérieur - vert clair
+            _bgColor = '#E8F5E8' // 33% supérieur - vert clair
           }
 
           // Simulation d'application de style
@@ -1127,23 +1117,6 @@ export class ExportUtils {
     } catch {
       // Ignorer les erreurs de formatage conditionnel
     }
-  }
-
-  /**
-   * Génère le format numérique Excel
-   */
-  private static getNumberFormat(format: any): string {
-    if (format.currency) {
-      return format.decimals !== undefined
-        ? `"${format.currency}"#,##0.${'0'.repeat(format.decimals)}`
-        : `"${format.currency}"#,##0`
-    }
-
-    if (format.decimals !== undefined) {
-      return `#,##0.${'0'.repeat(format.decimals)}`
-    }
-
-    return '#,##0'
   }
 
   /**
@@ -1163,19 +1136,19 @@ export class ExportUtils {
    * Définit la largeur des colonnes dans Univer
    */
   private static setColumnWidths<T>(
-    workbook: any,
+    _workbook: any,
     exportColumns: ColumnConfig<T>[],
     exportData: any[]
   ): void {
     try {
       // Simulation de définition de largeur de colonnes
       // Dans une vraie implémentation, ceci utiliserait l'API Univer
-      exportColumns.forEach((col, index) => {
+      exportColumns.forEach((col, _index) => {
         const maxLength = Math.max(
           col.title.length,
           ...exportData.slice(0, 100).map((row) => String(row[col.title] || '').length)
         )
-        const width = Math.min(Math.max(maxLength * 8, 80), 400)
+        const _width = Math.min(Math.max(maxLength * 8, 80), 400)
         // workbook.setColumnWidth(index, width)
       })
     } catch {
@@ -1186,7 +1159,7 @@ export class ExportUtils {
   /**
    * Définit le gel d'en-tête dans Univer
    */
-  private static setFreezeHeader(workbook: any): void {
+  private static setFreezeHeader(_workbook: any): void {
     try {
       // Simulation du gel de la première ligne
       // Dans une vraie implémentation, ceci utiliserait l'API Univer
@@ -1199,7 +1172,7 @@ export class ExportUtils {
   /**
    * Définit l'autofilter dans Univer
    */
-  private static setAutoFilter(workbook: any, dataRowCount: number, columnCount: number): void {
+  private static setAutoFilter(_workbook: any, _dataRowCount: number, _columnCount: number): void {
     try {
       // Simulation de l'autofilter
       // Dans une vraie implémentation, ceci utiliserait l'API Univer
@@ -1218,7 +1191,7 @@ export class ExportUtils {
    * Ajoute une feuille de statistiques dans Univer
    */
   private static addStatisticsSheet<T>(
-    workbook: any,
+    _workbook: any,
     data: any[],
     columns: ColumnConfig<T>[]
   ): void {
@@ -1284,8 +1257,7 @@ export class ExportUtils {
             document.body.removeChild(link)
             URL.revokeObjectURL(url)
           })
-          .catch((error: any) => {
-            console.error('Univer export failed:', error)
+          .catch((_error: any) => {
             throw new Error("Impossible d'exporter le fichier avec Univer")
           })
       } else if (workbook && typeof workbook.save === 'function') {
@@ -1293,8 +1265,7 @@ export class ExportUtils {
       } else {
         throw new Error('No export method available')
       }
-    } catch (error) {
-      console.error('Export failed:', error)
+    } catch (_error) {
       throw new Error("Impossible d'exporter le fichier")
     }
   }
@@ -1521,7 +1492,7 @@ export class ExportUtils {
       return text
         .replace(/\n\s*\n/g, '\n') // Supprimer les lignes vides multiples
         .replace(/^\s+|\s+$/g, '') // Trim
-    } catch (error) {
+    } catch (_error) {
       // Fallback to regex-based stripping if DOM manipulation fails
       return html
         .replace(/<br\s*\/?>/gi, '\n')

@@ -83,11 +83,11 @@ export class GracefulShutdownService implements OnApplicationShutdown {
             if (connections.length > 0) {
               this.logger.log('✅ Connexions base de données fermées')
             }
-          } catch (legacyError) {
+          } catch (_legacyError) {
             // Fallback pour les versions plus récentes de TypeORM
             this.logger.warn('⚠️  Méthode legacy TypeORM non disponible')
           }
-        } catch (dbError) {
+        } catch (_dbError) {
           // Essayer une approche alternative avec le service de l'app
           try {
             const dataSource =
@@ -97,7 +97,7 @@ export class GracefulShutdownService implements OnApplicationShutdown {
               await dataSource.destroy()
               this.logger.log('✅ Connexions base de données fermées (alternative)')
             }
-          } catch (altError) {
+          } catch (_altError) {
             this.logger.warn('⚠️  Impossible de fermer les connexions BDD automatiquement')
           }
         }

@@ -206,11 +206,9 @@ export class InjectionLoggerService implements InjectionLogger {
     this.logs.push(logEntry)
 
     // Console output avec couleurs
-    const coloredMessage = this.colorizeMessage(level, message)
-    console.log(coloredMessage)
+    const _coloredMessage = this.colorizeMessage(level, message)
 
     if (meta && this.config.logLevel === 'debug') {
-      console.log('  Meta:', JSON.stringify(meta, null, 2))
     }
 
     // Limite le nombre de logs en mémoire

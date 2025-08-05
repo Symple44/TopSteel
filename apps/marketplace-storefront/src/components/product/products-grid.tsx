@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { ChevronDown, Grid, List, SortAsc } from 'lucide-react'
+import { Grid, List } from 'lucide-react'
 import { useState } from 'react'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { getProducts, type ProductFilters } from '@/lib/api/storefront'

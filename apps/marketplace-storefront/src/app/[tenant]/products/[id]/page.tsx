@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         images: product.images.length > 0 ? [product.images[0].url] : [],
       },
     }
-  } catch (error) {
+  } catch (_error) {
     return {
       title: 'Produit non trouvé - Marketplace',
       description: "Le produit demandé n'a pas été trouvé.",
@@ -42,7 +42,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <ProductDetail product={product} tenant={resolvedParams.tenant} />
       </div>
     )
-  } catch (error) {
+  } catch (_error) {
     notFound()
   }
 }

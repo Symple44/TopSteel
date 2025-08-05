@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 // Liste des fichiers critiques qui causent des erreurs au démarrage
 const criticalFiles = [
@@ -48,18 +48,10 @@ function fixTypeImports(filePath: string) {
 
     if (content !== originalContent) {
       writeFileSync(fullPath, content)
-      console.log(`✅ Fixed: ${filePath}`)
     }
-  } catch (error) {
-    console.error(`❌ Error processing ${filePath}:`, error)
-  }
+  } catch (_error) {}
 }
-
-console.log('Fixing critical type imports...\n')
 
 criticalFiles.forEach((file) => {
   fixTypeImports(file)
 })
-
-console.log('\n✅ Critical imports fixed!')
-console.log('Note: There may be more type imports to fix, but these are the most critical ones.')

@@ -193,7 +193,7 @@ export function CodeViewerDialog({
     if (!isOpen) {
       clearSelection()
     }
-  }, [isOpen, onLoadDetails, fileDetails])
+  }, [isOpen, onLoadDetails, fileDetails, clearSelection, loadDetails])
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

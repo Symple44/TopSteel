@@ -1,5 +1,5 @@
+import { join } from 'node:path'
 import { config } from 'dotenv'
-import { join } from 'path'
 import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
@@ -18,7 +18,6 @@ async function fixTopSteelCompany() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connexion à la base de données établie')
 
     // Chercher l'utilisateur admin
     const adminUser = await dataSource.query(`
@@ -27,18 +26,13 @@ async function fixTopSteelCompany() {
     `)
 
     if (adminUser.length === 0) {
-      console.error('❌ Utilisateur admin@topsteel.tech non trouvé')
       return
     }
-
-    console.log('👤 Utilisateur admin trouvé:', adminUser[0])
 
     // Vérifier les sociétés existantes
     const societes = await dataSource.query(`
       SELECT id, nom, code FROM societes
     `)
-
-    console.log('🏢 Sociétés existantes:', societes)
 
     // Chercher la société TopSteel ou la première société
     let topsteelSociete = societes.find(
@@ -48,8 +42,6 @@ async function fixTopSteelCompany() {
     if (!topsteelSociete && societes.length > 0) {
       // Si pas de société TopSteel, mettre à jour la première société
       topsteelSociete = societes[0]
-
-      console.log('📝 Mise à jour de la société:', topsteelSociete.id)
       await dataSource.query(
         `
         UPDATE societes 
@@ -60,8 +52,6 @@ async function fixTopSteelCompany() {
       `,
         [topsteelSociete.id]
       )
-
-      console.log('✅ Société mise à jour avec le nom TopSteel SAS')
     }
 
     // Vérifier la relation user_societe_roles
@@ -73,8 +63,6 @@ async function fixTopSteelCompany() {
       [adminUser[0].id]
     )
 
-    console.log('👥 Rôles utilisateur-société:', userRoles)
-
     if (userRoles.length === 0 && topsteelSociete) {
       // Créer la relation si elle n'existe pas
       await dataSource.query(
@@ -84,12 +72,10 @@ async function fixTopSteelCompany() {
       `,
         [adminUser[0].id, topsteelSociete.id]
       )
-
-      console.log('✅ Relation utilisateur-société créée')
     }
 
     // Vérifier le résultat final
-    const finalCheck = await dataSource.query(
+    const _finalCheck = await dataSource.query(
       `
       SELECT 
         s.id,
@@ -103,11 +89,7 @@ async function fixTopSteelCompany() {
     `,
       [adminUser[0].id]
     )
-
-    console.log('\n✅ Configuration finale:')
-    console.log(finalCheck)
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }

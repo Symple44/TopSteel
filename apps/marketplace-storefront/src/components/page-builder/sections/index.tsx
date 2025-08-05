@@ -32,7 +32,6 @@ export function SectionRenderer({
   const Component = sectionComponents[section.type as keyof typeof sectionComponents]
 
   if (!Component) {
-    console.warn(`Section type "${section.type}" not implemented`)
     return (
       <div className="p-8 bg-gray-100 text-center">
         <p className="text-gray-600">Section "{section.type}" non implémentée</p>

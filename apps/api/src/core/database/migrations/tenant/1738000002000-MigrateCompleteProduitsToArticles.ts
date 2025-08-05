@@ -15,14 +15,11 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
   ]
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    console.log('=== MIGRATION COMPLÈTE PRODUITS VERS ARTICLES ===')
-
     // 1. Vérifier les prérequis
     const produitsExists = await queryRunner.hasTable('produits')
     const articlesExists = await queryRunner.hasTable('articles')
 
     if (!produitsExists) {
-      console.log("Table produits n'existe pas, migration ignorée")
       return
     }
 
@@ -38,7 +35,6 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
     )
 
     if (parseInt(existingMigration[0].count) === 0) {
-      console.log('Migration des données produits vers articles...')
       await this.migrateProduitsData(queryRunner)
     }
 
@@ -46,17 +42,13 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
     for (const tableInfo of this.tablesWithProduitId) {
       const tableExists = await queryRunner.hasTable(tableInfo.table)
       if (!tableExists) {
-        console.log(`Table ${tableInfo.table} n'existe pas, ignorée`)
         continue
       }
 
       const hasColumn = await queryRunner.hasColumn(tableInfo.table, tableInfo.columnName)
       if (!hasColumn) {
-        console.log(`Colonne ${tableInfo.columnName} n'existe pas dans ${tableInfo.table}, ignorée`)
         continue
       }
-
-      console.log(`\nMigration de la table ${tableInfo.table}...`)
 
       // Ajouter la colonne article_id si elle n'existe pas
       const hasArticleId = await queryRunner.hasColumn(tableInfo.table, 'article_id')
@@ -82,21 +74,17 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       `)
 
       // Compter les références migrées
-      const migratedRefs = await queryRunner.query(`
+      const _migratedRefs = await queryRunner.query(`
         SELECT COUNT(*) as count 
         FROM ${tableInfo.table} 
         WHERE article_id IS NOT NULL 
           AND ${tableInfo.columnName} IS NOT NULL
       `)
-      console.log(`  - ${migratedRefs[0].count} références migrées`)
 
       // Supprimer l'ancienne contrainte de clé étrangère
       try {
         await queryRunner.dropForeignKey(tableInfo.table, tableInfo.fkName)
-        console.log(`  - Contrainte ${tableInfo.fkName} supprimée`)
-      } catch (error) {
-        console.log(`  - Contrainte ${tableInfo.fkName} n'existe pas ou déjà supprimée`)
-      }
+      } catch (_error) {}
 
       // Créer la nouvelle contrainte sur article_id
       await queryRunner.createForeignKey(
@@ -133,7 +121,6 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
 
       // Supprimer l'ancienne colonne produit_id
       await queryRunner.dropColumn(tableInfo.table, tableInfo.columnName)
-      console.log(`  - Colonne ${tableInfo.columnName} supprimée`)
     }
 
     // 4. Créer des vues pour la compatibilité
@@ -141,7 +128,6 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
 
     // 5. Renommer la table produits en produits_legacy
     await queryRunner.renameTable('produits', 'produits_legacy')
-    console.log('\nTable produits renommée en produits_legacy')
 
     // 6. Créer une vue produits pour la compatibilité totale
     await queryRunner.query(`
@@ -177,14 +163,9 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
         a.updated_by_id
       FROM articles a
     `)
-
-    console.log('Vue produits créée pour la compatibilité')
-    console.log('\n=== MIGRATION COMPLÈTE TERMINÉE ===')
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    console.log('=== ROLLBACK MIGRATION PRODUITS VERS ARTICLES ===')
-
     // 1. Supprimer la vue produits
     await queryRunner.query('DROP VIEW IF EXISTS produits')
 
@@ -201,8 +182,6 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
 
       const hasArticleId = await queryRunner.hasColumn(tableInfo.table, 'article_id')
       if (!hasArticleId) continue
-
-      console.log(`\nRestauration de la table ${tableInfo.table}...`)
 
       // Ajouter la colonne produit_id
       await queryRunner.addColumn(
@@ -227,9 +206,7 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       const fkName = tableInfo.fkName.replace('produit', 'article')
       try {
         await queryRunner.dropForeignKey(tableInfo.table, fkName)
-      } catch (error) {
-        console.log(`  - Contrainte ${fkName} n'existe pas`)
-      }
+      } catch (_error) {}
 
       // Recréer la contrainte sur produit_id
       await queryRunner.createForeignKey(
@@ -258,8 +235,6 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       DELETE FROM articles 
       WHERE metadonnees->>'origine_migration' = 'produits'
     `)
-
-    console.log('\n=== ROLLBACK TERMINÉ ===')
   }
 
   private async migrateProduitsData(queryRunner: QueryRunner): Promise<void> {
@@ -322,10 +297,9 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       ON CONFLICT (reference) DO NOTHING
     `)
 
-    const count = await queryRunner.query(
+    const _count = await queryRunner.query(
       `SELECT COUNT(*) as count FROM articles WHERE metadonnees->>'origine_migration' = 'produits'`
     )
-    console.log(`${count[0].count} produits migrés vers articles`)
   }
 
   private async createCompatibilityViews(queryRunner: QueryRunner): Promise<void> {
@@ -368,7 +342,5 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       FROM ordre_fabrication of
       LEFT JOIN articles a ON of.article_id = a.id
     `)
-
-    console.log('Vues de compatibilité créées')
   }
 }

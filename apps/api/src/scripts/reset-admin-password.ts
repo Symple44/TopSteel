@@ -17,12 +17,9 @@ async function resetAdminPassword() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connecté à la base de données\n')
 
     const newPassword = 'TopSteel44!'
     const hashedPassword = await bcrypt.hash(newPassword, 10)
-
-    console.log('🔐 Réinitialisation du mot de passe admin...')
 
     const result = await dataSource.query(
       `
@@ -35,9 +32,6 @@ async function resetAdminPassword() {
     )
 
     if (result.length > 0) {
-      console.log(`✅ Mot de passe réinitialisé pour ${result[0].email}`)
-      console.log(`   - Nouveau mot de passe: ${newPassword}`)
-
       // Vérifier que ça fonctionne
       const checkResult = await dataSource.query(
         `
@@ -46,23 +40,14 @@ async function resetAdminPassword() {
         ['admin@topsteel.tech']
       )
 
-      const isValid = await bcrypt.compare(newPassword, checkResult[0].password)
-      console.log(`   - Vérification: ${isValid ? '✅ OK' : '❌ Erreur'}`)
+      const _isValid = await bcrypt.compare(newPassword, checkResult[0].password)
     } else {
-      console.log('❌ Aucun utilisateur trouvé avec cet email')
     }
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }
 }
-
-// Demander confirmation
-console.log('⚠️  ATTENTION: Ce script va réinitialiser le mot de passe admin!')
-console.log('   Email: admin@topsteel.tech')
-console.log('   Nouveau mot de passe: TopSteel44!')
-console.log('\nAppuyez sur Ctrl+C pour annuler, ou attendez 5 secondes pour continuer...')
 
 setTimeout(() => {
   resetAdminPassword().catch(console.error)

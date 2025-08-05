@@ -1,7 +1,6 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { SocieteStatus } from '../../../../features/societes/entities/societe.entity'
-import type { LoginDto } from '../../external/dto/login.dto'
 import type {
   ISocieteRepository,
   ISocieteUserRepository,

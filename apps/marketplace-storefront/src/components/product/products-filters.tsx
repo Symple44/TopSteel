@@ -3,9 +3,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, Filter, Search, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { getCategories } from '@/lib/api/storefront'
-import { cn, formatPrice } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 interface ProductsFiltersProps {
   tenant: string

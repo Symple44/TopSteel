@@ -1,6 +1,6 @@
+import { resolve } from 'node:path'
 import * as bcrypt from 'bcrypt'
 import { config } from 'dotenv'
-import { resolve } from 'path'
 import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
@@ -15,11 +15,6 @@ const testUser = {
 }
 
 async function createTestUser() {
-  console.log('🚀 Creating test user...')
-  console.log(`📧 Email: ${testUser.email}`)
-  console.log(`🔑 Password: ${testUser.password}`)
-  console.log('')
-
   // Créer une connexion directe à la base de données AUTH
   const dataSource = new DataSource({
     type: 'postgres',
@@ -34,7 +29,6 @@ async function createTestUser() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Database connected')
 
     // Vérifier la structure de la table users
     const columns = await dataSource.query(`
@@ -43,8 +37,6 @@ async function createTestUser() {
       WHERE table_name = 'users' 
       ORDER BY ordinal_position
     `)
-    console.log('\n📊 Users table structure:')
-    console.table(columns)
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await dataSource.query('SELECT id, email FROM users WHERE email = $1', [
@@ -52,15 +44,12 @@ async function createTestUser() {
     ])
 
     if (existingUser.length > 0) {
-      console.log('⚠️  User already exists:', existingUser[0])
-
       // Mettre à jour le mot de passe
       const hashedPassword = await bcrypt.hash(testUser.password, 10)
       await dataSource.query('UPDATE users SET password = $1 WHERE email = $2', [
         hashedPassword,
         testUser.email,
       ])
-      console.log('✅ Password updated')
 
       // Vérifier les sociétés associées
       const userCompanies = await dataSource.query(
@@ -80,16 +69,9 @@ async function createTestUser() {
         [existingUser[0].id]
       )
 
-      console.log('\n📊 User companies:')
-      console.table(userCompanies)
-
       // Si l'utilisateur n'a pas de société, en attribuer une
       if (userCompanies.length === 0) {
-        console.log('\n⚠️  User has no companies. Looking for available companies...')
-
         const companies = await dataSource.query('SELECT id, nom, code FROM societes LIMIT 5')
-        console.log('\n🏢 Available companies:')
-        console.table(companies)
 
         if (companies.length > 0) {
           // Attribuer la première société
@@ -101,8 +83,6 @@ async function createTestUser() {
           `,
             [existingUser[0].id, companyId, 'ADMIN', true, true]
           )
-
-          console.log(`✅ Assigned company "${companies[0].nom}" to user`)
         }
       }
     } else {
@@ -160,8 +140,6 @@ async function createTestUser() {
 
       const newUser = await dataSource.query(insertQuery, insertParams)
 
-      console.log('✅ User created:', newUser[0])
-
       // Attribuer une société
       const companies = await dataSource.query('SELECT id, nom, code FROM societes LIMIT 1')
       if (companies.length > 0) {
@@ -172,13 +150,8 @@ async function createTestUser() {
         `,
           [newUser[0].id, companies[0].id, 'ADMIN', true, true]
         )
-
-        console.log(`✅ Assigned company "${companies[0].nom}" to user`)
       }
     }
-
-    // Lister tous les utilisateurs existants
-    console.log('\n📋 All users in database:')
     const hasIsActive = columns.some((col: any) => col.column_name === 'isActive')
     const hasActif = columns.some((col: any) => col.column_name === 'actif')
 
@@ -230,13 +203,10 @@ async function createTestUser() {
       `
     }
 
-    const allUsers = await dataSource.query(selectQuery)
-    console.table(allUsers)
-  } catch (error) {
-    console.error('❌ Error:', error)
+    const _allUsers = await dataSource.query(selectQuery)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
-    console.log('\n✅ Database connection closed')
   }
 }
 

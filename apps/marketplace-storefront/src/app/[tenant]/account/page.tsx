@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import AccountClient from './account-client'
 
 interface AccountPageProps {

@@ -28,18 +28,13 @@ const TenantDataSource = new DataSource({
 
 async function initSectorPricingData() {
   try {
-    console.log('🔧 Initialisation de la connexion à la database...')
-
     await TenantDataSource.initialize()
-    console.log('✅ Connexion établie')
 
     const coefficientRepo = TenantDataSource.getRepository(SectorCoefficient)
     const btpIndexRepo = TenantDataSource.getRepository(BTPIndex)
 
     // Tenant ID par défaut (à adapter selon votre système)
     const defaultTenantId = '00000000-0000-0000-0000-000000000001'
-
-    console.log('🏗️  Création des coefficients BTP par défaut...')
 
     // 1. Coefficient de base BTP (+10%)
     const btpBaseCoeff = coefficientRepo.create({
@@ -195,19 +190,11 @@ async function initSectorPricingData() {
       industrieCoeff,
       particulierDiscount,
     ]
-
-    console.log('💾 Sauvegarde des coefficients...')
     for (const coeff of coefficients) {
       // Assigner le tenantId avant la sauvegarde
       ;(coeff as any).tenantId = defaultTenantId
       await coefficientRepo.save(coeff)
-      console.log(`   ✅ ${coeff.sector} - ${coeff.coefficientType} (${coeff.coefficient})`)
     }
-
-    console.log(`\n🎉 ${coefficients.length} coefficients sectoriels créés avec succès !`)
-
-    // === CRÉATION DES INDICES BTP ===
-    console.log('\n🏗️  Création des indices BTP standards...')
 
     const currentDate = new Date()
     const currentYear = currentDate.getFullYear()
@@ -361,8 +348,6 @@ async function initSectorPricingData() {
         },
       },
     ]
-
-    console.log('💾 Sauvegarde des indices BTP...')
     for (const indexData of btpIndices) {
       const indexToSave = {
         ...indexData,
@@ -379,36 +364,13 @@ async function initSectorPricingData() {
         },
       }
 
-      const savedIndex = await btpIndexRepo.save(indexToSave)
-      console.log(`   ✅ ${savedIndex.indexType} - ${savedIndex.indexValue}`)
+      const _savedIndex = await btpIndexRepo.save(indexToSave)
     }
-
-    console.log(`\n🎉 ${btpIndices.length} indices BTP créés avec succès !`)
-
-    console.log('\n📊 Résumé du système de pricing créé :')
-    console.log('   🏗️  BTP : Coefficient +10%, remises volume, transport')
-    console.log('   🏭 Industrie : Coefficient +5%')
-    console.log('   👤 Particuliers : Remise -2% sur petites quantités')
-    console.log('   📈 Indices BTP : ACIER_BTP, BT01, TP01A, composites, etc.')
-
-    console.log('\n💡 Pour utiliser le système :')
-    console.log('   1. Assignez des clients aux secteurs via /pricing/sectors/customer-assignments')
-    console.log('   2. Calculez des prix sectoriels via /pricing/sectors/calculate')
-    console.log("   3. Utilisez l'indexation BTP via /pricing/btp-indices/calculate-indexed-price")
-    console.log('   4. Consultez les indices via /pricing/btp-indices/dashboard/:indexType')
-
-    console.log("\n🔧 Exemples d'usage :")
-    console.log('   - Prix BTP avec coefficient : 1000€ → 1100€ (+10%)')
-    console.log('   - Remise volume BTP : 1100€ → 1045€ (-5% si >100 pièces)')
-    console.log('   - Indexation acier : Si indice 128.45 → 130.00 (+1.2%)')
-    console.log('   - Transport BTP : +150€ (gratuit si >2000€)')
-  } catch (error) {
-    console.error("❌ Erreur lors de l'initialisation des données:", error)
+  } catch (_error) {
     process.exit(1)
   } finally {
     if (TenantDataSource.isInitialized) {
       await TenantDataSource.destroy()
-      console.log('🔒 Connexion fermée')
     }
   }
 }

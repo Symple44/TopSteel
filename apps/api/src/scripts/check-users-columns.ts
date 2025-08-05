@@ -11,7 +11,6 @@ async function checkUsersColumns() {
 
   try {
     await authDataSource.initialize()
-    console.log('✅ Connexion établie\n')
 
     // Récupérer toutes les colonnes de la table users
     const columns = await authDataSource.query(`
@@ -22,34 +21,19 @@ async function checkUsersColumns() {
       ORDER BY ordinal_position
     `)
 
-    console.log('📋 Colonnes de la table users:')
-    console.log('='.repeat(50))
-
-    columns.forEach((col: any) => {
-      console.log(
-        `${col.column_name.padEnd(20)} | ${col.data_type.padEnd(20)} | ${col.is_nullable}`
-      )
-    })
+    columns.forEach((_col: any) => {})
 
     // Vérifier spécifiquement refreshToken
     const refreshTokenColumn = columns.find(
       (col: any) => col.column_name.toLowerCase() === 'refreshtoken'
     )
-
-    console.log('\n' + '='.repeat(50))
     if (refreshTokenColumn) {
-      console.log(`✅ Colonne refreshToken trouvée: ${refreshTokenColumn.column_name}`)
     } else {
-      console.log('❌ Colonne refreshToken NON trouvée')
-      console.log('\nColonnes contenant "refresh":')
       columns
         .filter((col: any) => col.column_name.toLowerCase().includes('refresh'))
-        .forEach((col: any) => {
-          console.log(`  - ${col.column_name}`)
-        })
+        .forEach((_col: any) => {})
     }
-  } catch (error) {
-    console.error('Erreur:', error)
+  } catch (_error) {
   } finally {
     if (authDataSource.isInitialized) {
       await authDataSource.destroy()

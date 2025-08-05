@@ -12,8 +12,6 @@ import { DataSource } from 'typeorm'
 config()
 
 async function fixDatabaseStructure() {
-  console.log('🔧 Démarrage de la correction de la structure de base de données...')
-
   // Configuration de connexion pour la base tenant
   const tenantDbConfig = {
     type: 'postgres' as const,
@@ -25,23 +23,12 @@ async function fixDatabaseStructure() {
     logging: true,
   }
 
-  console.log('📂 Configuration de connexion:', {
-    host: tenantDbConfig.host,
-    port: tenantDbConfig.port,
-    username: tenantDbConfig.username,
-    database: tenantDbConfig.database,
-  })
-
   let connection: DataSource | null = null
 
   try {
     // Créer la connexion
     connection = new DataSource(tenantDbConfig)
     await connection.initialize()
-    console.log('✅ Connexion à la base de données établie')
-
-    // Vérifier si la table articles existe et sa structure
-    console.log('\n🔍 Vérification de la structure de la table articles...')
 
     const articlesTableExists = await connection.query(`
       SELECT EXISTS (
@@ -52,8 +39,6 @@ async function fixDatabaseStructure() {
     `)
 
     if (articlesTableExists[0].exists) {
-      console.log('✅ Table articles trouvée')
-
       // Vérifier si la colonne societe_id existe
       const societeIdColumnExists = await connection.query(`
         SELECT EXISTS (
@@ -65,14 +50,11 @@ async function fixDatabaseStructure() {
       `)
 
       if (societeIdColumnExists[0].exists) {
-        console.log('✅ Colonne societe_id présente')
       } else {
-        console.log('❌ Colonne societe_id manquante. Ajout...')
         await connection.query(`
           ALTER TABLE articles ADD COLUMN IF NOT EXISTS societe_id UUID NOT NULL DEFAULT uuid_generate_v4();
           CREATE INDEX IF NOT EXISTS idx_articles_societe_id ON articles (societe_id);
         `)
-        console.log('✅ Colonne societe_id ajoutée')
       }
 
       // Vérifier si les colonnes marketplace existent
@@ -86,18 +68,13 @@ async function fixDatabaseStructure() {
       `)
 
       if (marketplaceColumnExists[0].exists) {
-        console.log('✅ Colonnes marketplace présentes')
       } else {
-        console.log('❌ Colonnes marketplace manquantes. Ajout...')
         await connection.query(`
           ALTER TABLE articles ADD COLUMN IF NOT EXISTS is_marketplace_enabled BOOLEAN DEFAULT false;
           ALTER TABLE articles ADD COLUMN IF NOT EXISTS marketplace_settings JSONB NULL;
         `)
-        console.log('✅ Colonnes marketplace ajoutées')
       }
     } else {
-      console.log('❌ Table articles introuvable. Exécution de la migration...')
-
       // Créer la table articles avec la structure correcte
       await connection.query(`
         -- Créer les enums s'ils n'existent pas
@@ -200,12 +177,7 @@ async function fixDatabaseStructure() {
         CREATE INDEX IF NOT EXISTS idx_articles_gere_en_stock ON articles (gere_en_stock);
         CREATE INDEX IF NOT EXISTS idx_articles_code_ean ON articles (code_ean);
       `)
-
-      console.log('✅ Table articles créée avec succès')
     }
-
-    // Vérifier la table societes dans la base auth
-    console.log('\n🔍 Vérification de la table societes...')
 
     const societeTableExists = await connection.query(`
       SELECT EXISTS (
@@ -216,9 +188,7 @@ async function fixDatabaseStructure() {
     `)
 
     if (societeTableExists[0].exists) {
-      console.log('✅ Table societes trouvée')
     } else {
-      console.log('❌ Table societes introuvable. Création...')
       await connection.query(`
         DO $$
         BEGIN
@@ -264,7 +234,6 @@ async function fixDatabaseStructure() {
         CREATE INDEX IF NOT EXISTS idx_societes_code ON societes (code);
         CREATE INDEX IF NOT EXISTS idx_societes_status ON societes (status);
       `)
-      console.log('✅ Table societes créée')
     }
 
     // Insérer une société de test TopSteel si elle n'existe pas
@@ -276,9 +245,7 @@ async function fixDatabaseStructure() {
     `)
 
     if (topsteelExists[0].exists) {
-      console.log('✅ Société TopSteel existe')
     } else {
-      console.log('❌ Société TopSteel manquante. Création...')
       await connection.query(`
         INSERT INTO societes (
           nom, code, status, database_name,
@@ -293,17 +260,12 @@ async function fixDatabaseStructure() {
           CURRENT_TIMESTAMP
         );
       `)
-      console.log('✅ Société TopSteel créée')
     }
-
-    console.log('\n🎉 Correction de la structure de base de données terminée avec succès !')
   } catch (error) {
-    console.error('❌ Erreur lors de la correction:', error)
     throw error
   } finally {
-    if (connection && connection.isInitialized) {
+    if (connection?.isInitialized) {
       await connection.destroy()
-      console.log('🔌 Connexion fermée')
     }
   }
 }
@@ -312,11 +274,9 @@ async function fixDatabaseStructure() {
 if (require.main === module) {
   fixDatabaseStructure()
     .then(() => {
-      console.log('Script terminé avec succès')
       process.exit(0)
     })
-    .catch((error) => {
-      console.error('Échec du script:', error)
+    .catch((_error) => {
       process.exit(1)
     })
 }

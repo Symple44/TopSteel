@@ -27,8 +27,7 @@ const loadUniverComponents = async (): Promise<boolean> => {
     }
 
     return Univer !== null && UniverSheetsPlugin !== null
-  } catch (error) {
-    console.warn('Univer not available for translations, using fallback implementations:', error)
+  } catch (_error) {
     return false
   }
 }
@@ -269,8 +268,7 @@ class TranslationUniverUtils {
         }
 
         TranslationUniverUtils.univerAvailable = true
-      } catch (error) {
-        console.warn('Failed to initialize Univer for translations:', error)
+      } catch (_error) {
         TranslationUniverUtils.univerInstance = null
         TranslationUniverUtils.univerAvailable = false
         return null
@@ -373,8 +371,7 @@ class TranslationUniverUtils {
           const blob = await univerSheet.save()
           return blob
         }
-      } catch (error) {
-        console.warn('Univer export failed, using fallback:', error)
+      } catch (_error) {
         TranslationUniverUtils.univerAvailable = false
       }
     }
@@ -419,8 +416,7 @@ class TranslationUniverUtils {
       return new Blob([csvContent], {
         type: 'application/vnd.ms-excel;charset=utf-8;',
       })
-    } catch (error) {
-      console.error('Fallback Excel export failed:', error)
+    } catch (_error) {
       // Retourner un blob vide mais valide en cas d'échec complet
       return new Blob([''], {
         type: 'application/vnd.ms-excel;charset=utf-8;',
@@ -458,8 +454,7 @@ class TranslationUniverUtils {
             return workbookData
           }
         }
-      } catch (error) {
-        console.warn('Univer import failed, using fallback:', error)
+      } catch (_error) {
         TranslationUniverUtils.univerAvailable = false
       }
     }
@@ -532,9 +527,6 @@ class TranslationUniverUtils {
         (signature[3] === 0x04 || signature[3] === 0x06 || signature[3] === 0x08)
 
       if (isZip) {
-        // C'est probablement un vrai fichier Excel
-        // Sans bibliothèque de parsing Excel, on ne peut pas le lire
-        console.warn('Detected Excel file but no Excel parser available')
         return null
       }
 
@@ -611,8 +603,7 @@ class TranslationUniverUtils {
           },
         },
       }
-    } catch (error) {
-      console.error('Fallback Excel parsing failed:', error)
+    } catch (_error) {
       return null
     }
   }
@@ -693,9 +684,7 @@ export const exportToExcel = (entries: TranslationEntry[], languages: string[]):
     // On utilise toujours le fallback synchrone qui génère un format CSV compatible Excel
     // car l'export async Univer nécessiterait un changement d'API
     return TranslationUniverUtils.createFallbackExcelBlob(workbookData)
-  } catch (error) {
-    console.error('Translation export failed:', error)
-
+  } catch (_error) {
     // Fallback d'urgence: créer un CSV minimal mais valide
     const headers = ['ID', 'Namespace', 'Key', 'Category', 'Description']
     languages.forEach((lang) => headers.push(`Translation_${lang}`))
@@ -851,7 +840,6 @@ export const importFromExcel = async (
 
     result.success = result.errors.length === 0
   } catch (error) {
-    console.error('Translation import error:', error)
     result.errors.push(`Erreur d'import: ${error}`)
   }
 

@@ -3,18 +3,13 @@
  * TopSteel ERP - Clean Architecture
  */
 
-import type { DataSource } from 'typeorm'
 import { BaseArticleInjector } from '../core/base-article-injector'
 import {
   ArticleFamille,
   type ArticleMetallurgie,
   ArticleStatus,
   ArticleType,
-  type ArticleValidator,
   type CaracteristiquesTechniques,
-  type GlobalInjectionConfig,
-  type InjectionLogger,
-  type PricingCalculator,
   UniteStock,
 } from '../types/article-injection.types'
 
@@ -597,16 +592,6 @@ export class AnglesInjector extends BaseArticleInjector {
       rayonY: 1.76,
     },
   ]
-
-  constructor(
-    dataSource: DataSource,
-    config: GlobalInjectionConfig,
-    logger: InjectionLogger,
-    validator: ArticleValidator,
-    pricingCalculator: PricingCalculator
-  ) {
-    super(dataSource, config, logger, validator, pricingCalculator)
-  }
 
   getFamilleInfo(): { famille: ArticleFamille; sousFamille: string } {
     return {

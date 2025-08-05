@@ -102,7 +102,7 @@ export default function TranslationAdmin() {
     return () => {
       cancelled = true
     }
-  }, []) // Pas de dépendances pour éviter les boucles infinies
+  }, [loadTranslations]) // Pas de dépendances pour éviter les boucles infinies
 
   // Fermer le dropdown de catégorie quand on clique ailleurs
   useEffect(() => {

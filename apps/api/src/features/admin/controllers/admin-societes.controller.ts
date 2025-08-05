@@ -169,7 +169,7 @@ export class AdminSocietesController {
           includeUsers: query.includeUsers || false,
         },
       }
-    } catch (error: any) {
+    } catch (_error: any) {
       throw new BadRequestException('Erreur lors de la récupération des sociétés')
     }
   }
@@ -313,7 +313,7 @@ export class AdminSocietesController {
         message: 'Utilisateur ajouté à la société avec succès',
         statusCode: 201,
       }
-    } catch (error: any) {
+    } catch (_error: any) {
       throw new BadRequestException("Erreur lors de l'ajout de l'utilisateur à la société")
     }
   }
@@ -408,7 +408,7 @@ export class AdminSocietesController {
         message: "Rôle de l'utilisateur modifié avec succès",
         statusCode: 200,
       }
-    } catch (error: any) {
+    } catch (_error: any) {
       throw new BadRequestException('Erreur lors de la modification du rôle')
     }
   }

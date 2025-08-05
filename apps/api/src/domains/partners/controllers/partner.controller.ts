@@ -69,7 +69,7 @@ export class PartnerController {
   })
   async getPartners(
     @Query() filters: PartnerFiltersDto,
-    @CurrentUser() user: User
+    @CurrentUser() _user: User
   ): Promise<Partner[]> {
     return await this.partnerService.searchPartners(filters)
   }
@@ -241,7 +241,10 @@ export class PartnerController {
     summary: 'Recherche avancée de partenaires',
     description: 'Recherche avec critères multiples et filtres avancés',
   })
-  async searchAdvanced(@Body() searchCriteria: any, @CurrentUser() user: User): Promise<Partner[]> {
+  async searchAdvanced(
+    @Body() searchCriteria: any,
+    @CurrentUser() _user: User
+  ): Promise<Partner[]> {
     return await this.partnerService.searchPartners(searchCriteria)
   }
 
@@ -268,7 +271,7 @@ export class PartnerController {
   })
   async exportPartners(
     @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: any },
-    @CurrentUser() user: User
+    @CurrentUser() _user: User
   ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
     // Pour l'exemple, on retourne une URL fictive

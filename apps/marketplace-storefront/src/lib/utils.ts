@@ -31,7 +31,7 @@ export function slugify(text: string): string {
 
 export function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text
-  return text.slice(0, maxLength).replace(/\s+\S*$/, '') + '...'
+  return `${text.slice(0, maxLength).replace(/\s+\S*$/, '')}...`
 }
 
 export function getInitials(name: string): string {

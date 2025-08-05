@@ -2,11 +2,6 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Between, type Repository } from 'typeorm'
 import { BTPIndex, BTPIndexType } from '../entities/btp-index.entity'
-import {
-  CoefficientType,
-  SectorCoefficient,
-  SectorType,
-} from '../entities/sector-coefficient.entity'
 
 export interface IndexedPricingContext {
   basePrice: number
@@ -51,10 +46,7 @@ export interface IndexedPricingResult {
 export class BTPIndexService {
   constructor(
     @InjectRepository(BTPIndex, 'tenant')
-    private btpIndexRepository: Repository<BTPIndex>,
-
-    @InjectRepository(SectorCoefficient, 'tenant')
-    private sectorCoefficientRepository: Repository<SectorCoefficient>
+    private btpIndexRepository: Repository<BTPIndex>
   ) {}
 
   /**

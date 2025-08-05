@@ -126,7 +126,7 @@ export class OptimizedCacheService {
       if (!this.invalidationGroups.has(groupKey)) {
         this.invalidationGroups.set(groupKey, new Set())
       }
-      this.invalidationGroups.get(groupKey)!.add(key)
+      this.invalidationGroups.get(groupKey)?.add(key)
     } catch (error) {
       this.logger.error(`Cache SET with group error for key ${key}:`, error)
     }

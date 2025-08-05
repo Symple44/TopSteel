@@ -9,7 +9,6 @@ import { PageSection, PageTemplate, SectionPreset } from '../../domains/page-bui
 import { MarketplacePriceRule } from '../../domains/products/entities/marketplace-price-rule.entity'
 import { MarketplaceProduct } from '../../domains/products/entities/marketplace-product.entity'
 import { MarketplaceTheme } from '../../domains/themes/entities/marketplace-theme.entity'
-import { Article } from '../../shared/entities/erp/article.entity'
 // Entités ERP (lecture seule)
 import { Societe } from '../../shared/entities/erp/societe.entity'
 

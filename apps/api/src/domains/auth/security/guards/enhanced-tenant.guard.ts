@@ -143,9 +143,6 @@ export class EnhancedTenantGuard implements CanActivate {
       if (error instanceof UnauthorizedException || error instanceof ForbiddenException) {
         throw error
       }
-
-      // Log de sécurité pour les erreurs inattendues
-      console.error('Erreur dans EnhancedTenantGuard:', error)
       throw new UnauthorizedException('Token invalide ou corrompu')
     }
   }

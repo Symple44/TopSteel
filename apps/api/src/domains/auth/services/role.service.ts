@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
-import { Permission } from '../core/entities/permission.entity'
 import { Role } from '../core/entities/role.entity'
 import { RolePermission } from '../core/entities/role-permission.entity'
 import { UserRole } from '../core/entities/user-role.entity'
@@ -48,9 +47,7 @@ export class RoleService {
     @InjectRepository(RolePermission, 'auth')
     private readonly _rolePermissionRepository: Repository<RolePermission>,
     @InjectRepository(UserRole, 'auth')
-    private readonly _userRoleRepository: Repository<UserRole>,
-    @InjectRepository(Permission, 'auth')
-    private readonly _permissionRepository: Repository<Permission>
+    private readonly _userRoleRepository: Repository<UserRole>
   ) {}
 
   // ===== GESTION DES RÔLES =====

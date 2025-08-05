@@ -68,9 +68,6 @@ async function bootstrap() {
 
   const port = configService.get('MARKETPLACE_API_PORT') || configService.get('PORT') || 3004
   await app.listen(port)
-
-  console.log(`🚀 Marketplace API running on: http://localhost:${port}`)
-  console.log(`📚 API Documentation: http://localhost:${port}/api/docs`)
 }
 
 bootstrap()

@@ -11,10 +11,9 @@ import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
-import { SocieteUser, UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
+import { UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
 import type { SocieteUsersService } from '../../features/societes/services/societe-users.service'
 import type { SocietesService } from '../../features/societes/services/societes.service'
-import { User } from '../users/entities/user.entity'
 import type { UsersService } from '../users/users.service'
 import { GlobalUserRole, SocieteRoleType } from './core/constants/roles.constants'
 import { UserSession } from './core/entities/user-session.entity'
@@ -63,11 +62,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto, request?: any) {
     let user: any
-    try {
-      user = await this.validateUser(loginDto.login, loginDto.password)
-    } catch (error: any) {
-      throw error
-    }
+    user = await this.validateUser(loginDto.login, loginDto.password)
 
     // Vérifier si l'utilisateur a MFA activé
     const hasMFA = await this.mfaService.hasMFAEnabled(user.id)
@@ -119,8 +114,7 @@ export class AuthService {
                 code: site.code,
               })) || [],
           }))
-        } catch (error) {
-          console.error('Erreur lors de la récupération des sociétés:', error)
+        } catch (_error) {
           // Fallback sur l'ancienne méthode si nécessaire
           return await this.getUserSocietesLegacy(userId)
         }
@@ -132,7 +126,7 @@ export class AuthService {
   /**
    * Récupérer toutes les sociétés pour un SUPER_ADMIN
    */
-  private async getSuperAdminAllSocietes(userId: string) {
+  private async getSuperAdminAllSocietes(_userId: string) {
     const allSocietes = await this.societesService.findActive()
     return allSocietes.map((societe) => ({
       id: societe.id,
@@ -148,28 +142,6 @@ export class AuthService {
           code: site.code,
         })) || [],
     }))
-  }
-
-  /**
-   * Récupérer les sociétés avec la nouvelle structure de rôles
-   */
-  private async getUserSocietesWithNewStructure(userId: string) {
-    const userRoles = await this.userSocieteRolesService.findUserRolesInSocietes(userId)
-
-    return userRoles.map((ur) => {
-      // Utiliser directement le roleType stocké dans UserSocieteRole
-      const displayRole = ur.roleType || 'USER'
-
-      return {
-        id: ur.societe.id,
-        nom: ur.societe.nom,
-        code: ur.societe.code,
-        role: displayRole,
-        isDefault: ur.isDefaultSociete,
-        permissions: ur.permissions || [],
-        sites: [], // TODO: Adapter si nécessaire pour inclure les sites
-      }
-    })
   }
 
   /**
@@ -984,8 +956,7 @@ export class AuthService {
         success: true,
         message: 'Société définie par défaut avec succès',
       }
-    } catch (error) {
-      console.error('Error setting default company:', error)
+    } catch (_error) {
       return {
         success: false,
         message: 'Erreur lors de la définition de la société par défaut',

@@ -23,8 +23,6 @@ export class TenantResolver {
     // Extraire le sous-domaine ou identifier tenant depuis le domaine
     const tenantCode = this.extractTenantFromDomain(domain)
 
-    console.log(`TenantResolver: Résolution pour tenantCode="${tenantCode}", domaine="${domain}"`)
-
     // Essayer d'abord de charger la vraie société depuis la base
     try {
       const societe = await this.societeRepository.findOne({
@@ -32,8 +30,6 @@ export class TenantResolver {
       })
 
       if (societe) {
-        console.log(`TenantResolver: Société trouvée: ${societe.nom}, DB: ${societe.databaseName}`)
-
         if (!societe.configuration?.marketplace?.enabled) {
           throw new NotFoundException(`Marketplace non activée pour cette société`)
         }
@@ -47,19 +43,12 @@ export class TenantResolver {
           marketplaceEnabled: societe.configuration?.marketplace?.enabled || false,
         }
       } else {
-        console.log(`TenantResolver: Aucune société trouvée pour "${tenantCode}"`)
       }
-    } catch (error) {
-      console.error(
-        `TenantResolver: Erreur lors de la résolution de "${tenantCode}":`,
-        error.message
-      )
-    }
+    } catch (_error) {}
 
     // Mode démo pour le développement si la vraie société n'est pas trouvée
     const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
     if ((tenantCode === 'demo' || tenantCode === 'topsteel') && isDev) {
-      console.log(`TenantResolver: Fallback vers le mode démo pour "${tenantCode}"`)
       return this.createDemoTenant(tenantCode)
     }
 
@@ -110,8 +99,6 @@ export class TenantResolver {
   }
 
   private async getERPTenantConnection(databaseName: string): Promise<DataSource> {
-    console.log(`TenantResolver: Tentative de connexion à la base "${databaseName}"`)
-
     if (!this.tenantConnections.has(databaseName)) {
       try {
         const connectionConfig = {
@@ -129,25 +116,11 @@ export class TenantResolver {
           logging: process.env.NODE_ENV === 'development',
         }
 
-        console.log(`TenantResolver: Configuration DB:`, {
-          host: connectionConfig.host,
-          port: connectionConfig.port,
-          username: connectionConfig.username,
-          database: connectionConfig.database,
-        })
-
         const connection = new DataSource(connectionConfig)
-
-        console.log(`TenantResolver: Initialisation de la connexion...`)
         await connection.initialize()
-        console.log(`TenantResolver: Connexion initialisée avec succès pour "${databaseName}"`)
 
         this.tenantConnections.set(databaseName, connection)
       } catch (error) {
-        console.error(
-          `TenantResolver: Erreur lors de la connexion à "${databaseName}":`,
-          error.message
-        )
         throw new Error(`Impossible de se connecter à la base de données ERP: ${error.message}`)
       }
     }
@@ -156,10 +129,6 @@ export class TenantResolver {
     if (!connection) {
       throw new Error(`Connexion non trouvée pour la base "${databaseName}"`)
     }
-
-    console.log(
-      `TenantResolver: Connexion récupérée pour "${databaseName}", isInitialized=${connection.isInitialized}`
-    )
     return connection
   }
 
@@ -184,8 +153,6 @@ export class TenantResolver {
   }
 
   private async createDemoTenant(tenantCode: string = 'demo'): Promise<TenantContext> {
-    console.log(`TenantResolver: Création du tenant démo "${tenantCode}"...`)
-
     // Configuration par tenant - nom de DB basé sur le code tenant
     const tenantConfigs = {
       demo: {
@@ -234,26 +201,18 @@ export class TenantResolver {
         tenantCode, // Nom simple
       ]
       let erpTenantConnection = null
-      let lastError = null
+      let _lastError = null
 
       for (const dbName of dbNames) {
         try {
-          console.log(
-            `TenantResolver: Tentative de connexion à la DB "${dbName}" pour le tenant "${tenantCode}"`
-          )
           erpTenantConnection = await this.getERPTenantConnection(dbName)
-          console.log(`TenantResolver: Connexion réussie à "${dbName}"`)
           break
         } catch (error) {
-          console.log(`TenantResolver: Échec de connexion à "${dbName}": ${error.message}`)
-          lastError = error
+          _lastError = error
         }
       }
 
       if (!erpTenantConnection) {
-        console.warn(
-          "TenantResolver: Aucune base de données disponible, création d'un tenant sans connexion ERP"
-        )
         // Créer un tenant de démonstration sans connexion ERP pour les tests
         return {
           societeId: demoSociete.id,
@@ -270,18 +229,8 @@ export class TenantResolver {
         marketplaceEnabled: true,
       }
 
-      console.log('TenantResolver: TenantContext créé:', {
-        societeId: tenantContext.societeId,
-        hasConnection: !!tenantContext.erpTenantConnection,
-        isInitialized: tenantContext.erpTenantConnection?.isInitialized,
-      })
-
       return tenantContext
-    } catch (error) {
-      console.error('TenantResolver: Erreur lors de la création du tenant démo:', error.message)
-
-      // En cas d'erreur complète, retourner un tenant minimal
-      console.warn("TenantResolver: Création d'un tenant minimal sans connexion ERP")
+    } catch (_error) {
       return {
         societeId: demoSociete.id,
         societe: demoSociete,

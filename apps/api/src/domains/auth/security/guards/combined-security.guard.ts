@@ -42,34 +42,28 @@ export class CombinedSecurityGuard implements CanActivate {
     if (isPublic) {
       return true
     }
-
-    try {
-      // 1. Vérification et enrichissement du contexte tenant (authentification + tenant)
-      const tenantResult = await this.tenantGuard.canActivate(context)
-      if (!tenantResult) {
-        throw new UnauthorizedException('Échec de la vérification du contexte tenant')
-      }
-
-      // 2. Vérification des rôles et permissions (autorisation)
-      const rolesResult = await this.rolesGuard.canActivate(context)
-      if (!rolesResult) {
-        return false
-      }
-
-      // 3. Vérification de la propriété des ressources (autorisation fine)
-      const ownershipResult = await this.ownershipGuard.canActivate(context)
-      if (!ownershipResult) {
-        return false
-      }
-
-      // 4. Enregistrer l'accès pour audit (optionnel)
-      await this.logAccess(context)
-
-      return true
-    } catch (error) {
-      // Les erreurs spécifiques sont déjà gérées par les guards individuels
-      throw error
+    // 1. Vérification et enrichissement du contexte tenant (authentification + tenant)
+    const tenantResult = await this.tenantGuard.canActivate(context)
+    if (!tenantResult) {
+      throw new UnauthorizedException('Échec de la vérification du contexte tenant')
     }
+
+    // 2. Vérification des rôles et permissions (autorisation)
+    const rolesResult = await this.rolesGuard.canActivate(context)
+    if (!rolesResult) {
+      return false
+    }
+
+    // 3. Vérification de la propriété des ressources (autorisation fine)
+    const ownershipResult = await this.ownershipGuard.canActivate(context)
+    if (!ownershipResult) {
+      return false
+    }
+
+    // 4. Enregistrer l'accès pour audit (optionnel)
+    await this.logAccess(context)
+
+    return true
   }
 
   /**
@@ -77,14 +71,11 @@ export class CombinedSecurityGuard implements CanActivate {
    */
   private async logAccess(context: ExecutionContext): Promise<void> {
     const request = context.switchToHttp().getRequest()
-    const user = request.user
-    const tenant = request.tenant
+    const _user = request.user
+    const _tenant = request.tenant
 
     // Log basique pour l'audit (peut être étendu selon les besoins)
     if (process.env.NODE_ENV === 'development') {
-      console.log(
-        `[SECURITY] Accès autorisé - User: ${user?.id}, Société: ${tenant?.societeId}, Route: ${request.route?.path}`
-      )
     }
 
     // TODO: Implémenter un système d'audit plus complet si nécessaire

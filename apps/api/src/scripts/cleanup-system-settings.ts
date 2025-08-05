@@ -14,9 +14,6 @@ import { DataSource } from 'typeorm'
 config()
 
 async function cleanupSystemSettings() {
-  console.log('🧹 NETTOYAGE DE LA TABLE SYSTEM_SETTINGS')
-  console.log('=======================================\n')
-
   // Connexion base tenant
   const dataSource = new DataSource({
     type: 'postgres',
@@ -29,9 +26,7 @@ async function cleanupSystemSettings() {
   })
 
   try {
-    console.log('🔌 Connexion à la base tenant...')
     await dataSource.initialize()
-    console.log('✅ Connexion établie\n')
 
     // Vérifier si la table existe
     const tableExists = await dataSource.query(`
@@ -42,34 +37,21 @@ async function cleanupSystemSettings() {
     `)
 
     if (!tableExists[0].exists) {
-      console.log("ℹ️  La table system_settings n'existe déjà plus.")
       return
     }
 
     // Vérifier le contenu
     const count = await dataSource.query('SELECT COUNT(*) FROM system_settings')
-    console.log(`📊 Enregistrements dans system_settings: ${count[0].count}`)
 
     if (count[0].count > 0) {
       // Afficher le contenu avant suppression
       const content = await dataSource.query(
         'SELECT category, key FROM system_settings ORDER BY category, key'
       )
-      console.log('\n📋 Contenu à supprimer:')
-      content.forEach((row: any, index: number) => {
-        console.log(`   ${index + 1}. ${row.category}.${row.key}`)
-      })
+      content.forEach((_row: any, _index: number) => {})
     }
-
-    // Supprimer le contenu
-    console.log('\n🗑️  Suppression du contenu...')
     await dataSource.query('DELETE FROM system_settings')
-    console.log('✅ Contenu supprimé')
-
-    // Supprimer la table
-    console.log('\n🗑️  Suppression de la table system_settings...')
     await dataSource.query('DROP TABLE IF EXISTS system_settings CASCADE')
-    console.log('✅ Table system_settings supprimée')
 
     // Vérification finale
     const finalCheck = await dataSource.query(`
@@ -80,20 +62,13 @@ async function cleanupSystemSettings() {
     `)
 
     if (finalCheck[0].exists) {
-      console.log('\n❌ Erreur: La table existe encore après suppression')
     } else {
-      console.log('\n🎉 NETTOYAGE TERMINÉ AVEC SUCCÈS!')
-      console.log('   ✅ Table system_settings complètement supprimée')
-      console.log('   ✅ Architecture des paramètres maintenant cohérente')
-      console.log('   📍 Paramètres système dans parameters_system (base auth)')
     }
   } catch (error) {
-    console.error('\n💥 ERREUR lors du nettoyage:', error)
     throw error
   } finally {
     if (dataSource.isInitialized) {
       await dataSource.destroy()
-      console.log('\n🔌 Connexion fermée')
     }
   }
 }
@@ -102,9 +77,7 @@ async function cleanupSystemSettings() {
 async function main() {
   try {
     await cleanupSystemSettings()
-    console.log('\n✨ Script terminé avec succès')
-  } catch (error) {
-    console.error('\n💥 ERREUR FATALE:', error)
+  } catch (_error) {
     process.exit(1)
   }
 }

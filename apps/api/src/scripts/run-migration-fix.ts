@@ -15,12 +15,6 @@ async function runMigration() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connecté à la base de données\n')
-
-    console.log('🔧 Exécution de la migration de correction MFA et Sessions...\n')
-
-    // 1. Correction de la table user_mfa
-    console.log('📝 Étape 1: Correction de la table user_mfa')
     try {
       await dataSource.query(`DROP TABLE IF EXISTS user_mfa CASCADE`)
       await dataSource.query(`
@@ -48,26 +42,14 @@ async function runMigration() {
       await dataSource.query(
         `CREATE INDEX idx_user_mfa_enabled_verified ON user_mfa(is_enabled, is_verified)`
       )
-      console.log('   ✅ Table user_mfa créée avec la colonne type')
-    } catch (error: any) {
-      console.error('   ❌ Erreur lors de la création de user_mfa:', error.message)
-    }
-
-    // 2. Correction des colonnes JWT
-    console.log('\n📝 Étape 2: Correction des colonnes JWT dans user_sessions')
+    } catch (_error: any) {}
     try {
       await dataSource.query(`
         ALTER TABLE user_sessions 
           ALTER COLUMN "accessToken" TYPE TEXT,
           ALTER COLUMN "refreshToken" TYPE TEXT
       `)
-      console.log('   ✅ Colonnes accessToken et refreshToken converties en TEXT')
-    } catch (error: any) {
-      console.error('   ❌ Erreur lors de la modification des colonnes:', error.message)
-    }
-
-    // 3. Création de mfa_session
-    console.log('\n📝 Étape 3: Création de la table mfa_session')
+    } catch (_error: any) {}
     try {
       await dataSource.query(`
         CREATE TABLE IF NOT EXISTS mfa_session (
@@ -93,22 +75,13 @@ async function runMigration() {
       await dataSource.query(
         `CREATE INDEX IF NOT EXISTS idx_mfa_session_token ON mfa_session(session_token)`
       )
-      console.log('   ✅ Table mfa_session créée')
-    } catch (error: any) {
-      console.error('   ❌ Erreur lors de la création de mfa_session:', error.message)
-    }
-
-    // 4. Vérification finale
-    console.log('\n🔍 Vérification de la structure finale:')
+    } catch (_error: any) {}
 
     // Vérifier user_mfa
-    const mfaCheck = await dataSource.query(`
+    const _mfaCheck = await dataSource.query(`
       SELECT column_name FROM information_schema.columns 
       WHERE table_name = 'user_mfa' AND column_name = 'type'
     `)
-    console.log(
-      `   - Colonne 'type' dans user_mfa: ${mfaCheck.length > 0 ? '✅ Présente' : '❌ Manquante'}`
-    )
 
     // Vérifier user_sessions
     const tokenCheck = await dataSource.query(`
@@ -117,15 +90,8 @@ async function runMigration() {
       WHERE table_name = 'user_sessions' 
       AND column_name IN ('accessToken', 'refreshToken')
     `)
-    tokenCheck.forEach((col: any) => {
-      console.log(
-        `   - ${col.column_name}: ${col.data_type === 'text' ? '✅ TEXT' : '❌ ' + col.data_type}`
-      )
-    })
-
-    console.log('\n✅ Migration terminée avec succès!')
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+    tokenCheck.forEach((_col: any) => {})
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }

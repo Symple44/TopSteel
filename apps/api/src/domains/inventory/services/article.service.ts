@@ -142,7 +142,7 @@ export class ArticleService extends BusinessService<Article> {
    */
   protected async applyUpdates(existing: Article, updates: Partial<Article>): Promise<Article> {
     // Conserver l'ancienne valeur pour l'historique
-    const oldValues = { ...existing }
+    const _oldValues = { ...existing }
 
     // Appliquer les mises à jour (sauf référence qui ne peut pas changer)
     Object.keys(updates).forEach((key) => {
@@ -217,7 +217,7 @@ export class ArticleService extends BusinessService<Article> {
    */
   async creerCommandeReapprovisionnement(
     fournisseurId: string,
-    context?: BusinessContext
+    _context?: BusinessContext
   ): Promise<{ articles: Article[]; quantitesTotales: number }> {
     const articlesAReapprovisionner = await this.getArticlesAReapprovisionner()
 
@@ -394,7 +394,7 @@ export class ArticleService extends BusinessService<Article> {
   private async validateCreationRules(
     entity: Article,
     errors: Array<{ field: string; message: string; code: string }>,
-    warnings: Array<{ field: string; message: string; code: string }>
+    _warnings: Array<{ field: string; message: string; code: string }>
   ): Promise<void> {
     // Vérifier l'unicité de la référence
     const existingByRef = await this.articleRepository.findByReference(entity.reference)
@@ -426,7 +426,7 @@ export class ArticleService extends BusinessService<Article> {
 
   private async validateUpdateRules(
     entity: Article,
-    errors: Array<{ field: string; message: string; code: string }>,
+    _errors: Array<{ field: string; message: string; code: string }>,
     warnings: Array<{ field: string; message: string; code: string }>
   ): Promise<void> {
     // Un article avec des mouvements de stock ne peut pas changer d'unité
@@ -443,7 +443,7 @@ export class ArticleService extends BusinessService<Article> {
   private async validateDeletionRules(
     entity: Article,
     errors: Array<{ field: string; message: string; code: string }>,
-    warnings: Array<{ field: string; message: string; code: string }>
+    _warnings: Array<{ field: string; message: string; code: string }>
   ): Promise<void> {
     // Interdire la suppression si l'article a du stock
     if (entity.gereEnStock && (entity.stockPhysique || 0) > 0) {

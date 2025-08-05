@@ -15,9 +15,6 @@ async function runFinalMigration() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connecté à la base de données\n')
-
-    console.log('🔧 Ajout de toutes les colonnes deleted_at manquantes...\n')
 
     const tables = [
       'roles',
@@ -38,8 +35,8 @@ async function runFinalMigration() {
       'webauthn_credential',
     ]
 
-    let addedCount = 0
-    let existingCount = 0
+    let _addedCount = 0
+    let _existingCount = 0
 
     for (const table of tables) {
       try {
@@ -69,30 +66,19 @@ async function runFinalMigration() {
           )
 
           if (columnExists[0].exists) {
-            console.log(`   ℹ️  ${table}: deleted_at existe déjà`)
-            existingCount++
+            _existingCount++
           } else {
             await dataSource.query(`
               ALTER TABLE ${table} 
               ADD COLUMN deleted_at TIMESTAMP NULL
             `)
-            console.log(`   ✅ ${table}: deleted_at ajoutée`)
-            addedCount++
+            _addedCount++
           }
         } else {
-          console.log(`   ⚠️  ${table}: table n'existe pas`)
         }
-      } catch (error: any) {
-        console.error(`   ❌ ${table}: ${error.message}`)
-      }
+      } catch (_error: any) {}
     }
-
-    console.log(`\n📊 Résumé:`)
-    console.log(`   - ${addedCount} colonnes ajoutées`)
-    console.log(`   - ${existingCount} colonnes existantes`)
-    console.log(`\n✅ Migration terminée!`)
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }

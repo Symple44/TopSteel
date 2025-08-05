@@ -6,8 +6,6 @@ import { DataSource } from 'typeorm'
 config()
 
 async function testTenantDatabases() {
-  console.log('🔍 Test des bases de données tenant...\n')
-
   const authDataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
@@ -29,12 +27,7 @@ async function testTenantDatabases() {
       ORDER BY code
     `)
 
-    console.log(`📋 Sociétés trouvées: ${societes.length}\n`)
-
     for (const societe of societes) {
-      console.log(`🏢 Société: ${societe.code} (${societe.nom})`)
-      console.log(`   Database: ${societe.databaseName}`)
-
       // Tester la connexion à la base tenant
       const tenantDataSource = new DataSource({
         type: 'postgres',
@@ -58,34 +51,24 @@ async function testTenantDatabases() {
           ORDER BY table_name
         `)
 
-        console.log(`   ✅ Connexion réussie (${tables.length} tables importantes)`)
-
         if (tables.find((t: any) => t.table_name === 'articles')) {
-          const articleCount = await tenantDataSource.query(
+          const _articleCount = await tenantDataSource.query(
             'SELECT COUNT(*) as count FROM articles'
           )
-          console.log(`   📄 Articles: ${articleCount[0].count}`)
         }
 
         if (tables.find((t: any) => t.table_name === 'system_settings')) {
-          const settingsCount = await tenantDataSource.query(
+          const _settingsCount = await tenantDataSource.query(
             'SELECT COUNT(*) as count FROM system_settings'
           )
-          console.log(`   ⚙️  Paramètres: ${settingsCount[0].count}`)
         }
 
         await tenantDataSource.destroy()
-      } catch (error) {
-        console.log(`   ❌ Erreur: ${error instanceof Error ? error.message : String(error)}`)
-      }
-
-      console.log('')
+      } catch (_error) {}
     }
 
     await authDataSource.destroy()
-  } catch (error) {
-    console.error('❌ Erreur:', error)
-  }
+  } catch (_error) {}
 }
 
 testTenantDatabases().catch(console.error)

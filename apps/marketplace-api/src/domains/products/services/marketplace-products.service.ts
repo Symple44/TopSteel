@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Cache } from 'cache-manager'
-import { Between, type DataSource, In, Like, type Repository } from 'typeorm'
+import { type DataSource, In, type Repository } from 'typeorm'
 import { Article, ArticleStatus } from '../../../shared/entities/erp/article.entity'
 import { MarketplaceProduct } from '../entities/marketplace-product.entity'
 import type { MarketplacePricingEngine } from './marketplace-pricing-engine.service'
@@ -69,9 +69,6 @@ export class MarketplaceProductsService {
   ): Promise<ProductListResult> {
     // Si pas de connexion ERP, retourner des données de démonstration
     if (!erpConnection) {
-      console.log(
-        'MarketplaceProductsService: Pas de connexion ERP, retour de données de démonstration pour getProducts'
-      )
       const demoProducts = this.getDemoFeaturedProducts(filters.limit || 20)
       return {
         products: demoProducts,
@@ -164,12 +161,8 @@ export class MarketplaceProductsService {
 
       return result
     } catch (error) {
-      console.error('MarketplaceProductsService: Erreur dans getProducts:', error.message)
       // Si les tables n'existent pas ou toute autre erreur, retourner des données de démo
       if (error.message?.includes("n'existe pas") || error.code === '42P01') {
-        console.log(
-          'MarketplaceProductsService: Tables inexistantes dans getProducts, retour de données de démonstration'
-        )
       }
       const demoProducts = this.getDemoFeaturedProducts(filters.limit || 20)
       return {
@@ -226,9 +219,6 @@ export class MarketplaceProductsService {
     try {
       // Si pas de connexion ERP, retourner des données de démonstration
       if (!erpConnection) {
-        console.log(
-          'MarketplaceProductsService: Pas de connexion ERP, retour de données de démonstration'
-        )
         return this.getDemoFeaturedProducts(limit)
       }
 
@@ -245,10 +235,6 @@ export class MarketplaceProductsService {
       })
 
       if (marketplaceProducts.length === 0) {
-        // Pas de produits marketplace configurés, retourner des données de démo
-        console.log(
-          'MarketplaceProductsService: Aucun produit marketplace configuré, retour de données de démonstration'
-        )
         return this.getDemoFeaturedProducts(limit)
       }
 
@@ -267,12 +253,8 @@ export class MarketplaceProductsService {
         articles.map((article) => this.enrichArticleWithMarketplaceData(article, customerId))
       )
     } catch (error) {
-      console.error('MarketplaceProductsService: Erreur dans getFeaturedProducts:', error.message)
       // Si les tables n'existent pas ou toute autre erreur, retourner des données de démo
       if (error.message?.includes("n'existe pas") || error.code === '42P01') {
-        console.log(
-          'MarketplaceProductsService: Tables inexistantes, retour de données de démonstration'
-        )
       }
       return this.getDemoFeaturedProducts(limit)
     }
@@ -387,7 +369,7 @@ export class MarketplaceProductsService {
   }
 
   async invalidateProductCache(productId: string): Promise<void> {
-    const pattern = `product:${productId}:*`
+    const _pattern = `product:${productId}:*`
     // Implementation dépend du cache manager utilisé
     // await this.cacheManager.reset() // Method 'reset' not available in cache-manager v7
     // Instead, we would need to implement pattern-based deletion
@@ -401,9 +383,6 @@ export class MarketplaceProductsService {
   async getCategories(erpConnection: DataSource | null, societeId: string): Promise<string[]> {
     // Si pas de connexion ERP, retourner des catégories de démonstration
     if (!erpConnection) {
-      console.log(
-        'MarketplaceProductsService: Pas de connexion ERP, retour de catégories de démonstration'
-      )
       return ['Poutrelles', 'Tôles', 'Tubes', 'Barres', 'Cornières', 'Profilés']
     }
 
@@ -430,15 +409,8 @@ export class MarketplaceProductsService {
 
       return categories
     } catch (error) {
-      console.error(
-        'MarketplaceProductsService: Erreur lors de la récupération des catégories:',
-        error.message
-      )
       // Si les tables ERP n'existent pas, retourner des données de démo
       if (error.message?.includes("n'existe pas") || error.code === '42P01') {
-        console.log(
-          'MarketplaceProductsService: Tables ERP inexistantes, retour de catégories de démonstration'
-        )
         return ['Poutrelles', 'Tôles', 'Tubes', 'Barres', 'Cornières', 'Profilés']
       }
       throw error

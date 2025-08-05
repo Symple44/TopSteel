@@ -82,7 +82,7 @@ interface CategoryCardProps {
 }
 
 function CategoryCard({ category, tenant }: CategoryCardProps) {
-  const categorySlug = slugify(category)
+  const _categorySlug = slugify(category)
 
   return (
     <Link
@@ -116,7 +116,7 @@ function CategoryCard({ category, tenant }: CategoryCardProps) {
 }
 
 // Fonction pour obtenir une icône spécifique par catégorie
-function getCategoryIcon(category: string) {
+function _getCategoryIcon(category: string) {
   const iconMap: Record<string, React.ComponentType<any>> = {
     métaux: Package,
     acier: Package,

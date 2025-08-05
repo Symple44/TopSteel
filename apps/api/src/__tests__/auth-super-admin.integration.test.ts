@@ -1,5 +1,5 @@
 // apps/api/src/__tests__/auth-super-admin.integration.test.ts
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * Test d'intégration spécialisé pour l'authentification SUPER_ADMIN
@@ -46,7 +46,6 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
   beforeAll(async () => {
     // Vérifier que le serveur API est accessible
     try {
-      console.log(`🔍 Testing API server at: ${API_URL}`)
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,24 +54,18 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
 
       if (response.status === 401 || response.status === 400 || response.ok) {
         serverReachable = true
-        console.log('✅ API Server is reachable')
       } else {
         throw new Error(`Server responded with status: ${response.status}`)
       }
-    } catch (error) {
-      console.warn(`⚠️ API Server not reachable at ${API_URL}:`, error.message)
-      console.warn('Skipping SUPER_ADMIN integration tests.')
+    } catch (_error) {
       serverReachable = false
     }
   })
 
   it('should authenticate SUPER_ADMIN successfully', async () => {
     if (!serverReachable) {
-      console.log('🔄 Skipping test - API server not available')
       return
     }
-
-    console.log('👑 Testing SUPER_ADMIN authentication...')
 
     try {
       const loginData = await fetchAPI('/api/auth/login', {
@@ -91,24 +84,19 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       expect(loginData.data.user.role).toBe('SUPER_ADMIN')
 
       superAdminToken = loginData.data.accessToken
-      console.log('✅ SUPER_ADMIN authentication successful')
 
       // Vérifier les propriétés spécifiques du token SUPER_ADMIN
       expect(loginData.data).toHaveProperty('permissions')
       expect(loginData.data.user).toHaveProperty('globalRole')
     } catch (error) {
-      console.error('❌ SUPER_ADMIN authentication failed:', error.message)
       throw error
     }
   })
 
   it('should allow SUPER_ADMIN to access all companies', async () => {
     if (!serverReachable || !superAdminToken) {
-      console.log('🔄 Skipping test - prerequisites not met')
       return
     }
-
-    console.log('🏢 Testing SUPER_ADMIN company access...')
 
     try {
       const companiesData = await fetchAPI('/api/auth/societes', {
@@ -119,7 +107,6 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       expect(Array.isArray(companiesData.data)).toBe(true)
 
       availableCompanies = companiesData.data
-      console.log(`📊 SUPER_ADMIN has access to ${availableCompanies.length} companies`)
 
       // SUPER_ADMIN should have access to ALL active companies
       expect(availableCompanies.length).toBeGreaterThan(0)
@@ -133,21 +120,15 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
         expect(firstCompany).toHaveProperty('role')
         expect(firstCompany).toHaveProperty('sites')
       }
-
-      console.log('✅ SUPER_ADMIN company access verified')
     } catch (error) {
-      console.error('❌ SUPER_ADMIN company access failed:', error.message)
       throw error
     }
   })
 
   it('should allow SUPER_ADMIN to select any company', async () => {
     if (!serverReachable || !superAdminToken || availableCompanies.length === 0) {
-      console.log('🔄 Skipping test - prerequisites not met')
       return
     }
-
-    console.log('⚡ Testing SUPER_ADMIN company selection...')
 
     try {
       // Test selecting the first available company
@@ -182,23 +163,15 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       expect(verifyData).toHaveProperty('data')
       expect(verifyData.data).toHaveProperty('email', SUPER_ADMIN_USER.email)
       expect(verifyData.data).toHaveProperty('role', 'SUPER_ADMIN')
-
-      console.log(
-        `✅ SUPER_ADMIN successfully selected company: ${selectData.data.user.societe.nom}`
-      )
     } catch (error) {
-      console.error('❌ SUPER_ADMIN company selection failed:', error.message)
       throw error
     }
   })
 
   it('should provide enhanced admin endpoints access', async () => {
     if (!serverReachable || !superAdminToken) {
-      console.log('🔄 Skipping test - prerequisites not met')
       return
     }
-
-    console.log('🔧 Testing SUPER_ADMIN admin endpoints access...')
 
     try {
       // Test access to performance metrics (SUPER_ADMIN only)
@@ -229,21 +202,15 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       expect(societesData).toHaveProperty('success', true)
       expect(societesData).toHaveProperty('data')
       expect(Array.isArray(societesData.data)).toBe(true)
-
-      console.log('✅ SUPER_ADMIN admin endpoints access verified')
     } catch (error) {
-      console.error('❌ SUPER_ADMIN admin endpoints access failed:', error.message)
       throw error
     }
   })
 
   it('should handle MFA bypass logic for SUPER_ADMIN', async () => {
     if (!serverReachable || !superAdminToken) {
-      console.log('🔄 Skipping test - prerequisites not met')
       return
     }
-
-    console.log('🔐 Testing SUPER_ADMIN MFA bypass logic...')
 
     try {
       // Test MFA status for SUPER_ADMIN (should be optional)
@@ -263,21 +230,13 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
         expect(mfaCheckData.data).toHaveProperty('canBypass')
         expect(mfaCheckData.data.canBypass).toBe(true)
       }
-
-      console.log('✅ SUPER_ADMIN MFA bypass logic verified')
-    } catch (error) {
-      // MFA endpoint might not exist yet, that's acceptable
-      console.log('ℹ️ MFA endpoint not available or not implemented yet')
-    }
+    } catch (_error) {}
   })
 
   it('should validate role hierarchy and permissions', async () => {
     if (!serverReachable || !superAdminToken) {
-      console.log('🔄 Skipping test - prerequisites not met')
       return
     }
-
-    console.log('👑 Testing SUPER_ADMIN role hierarchy...')
 
     try {
       // Test role formatting endpoint
@@ -303,21 +262,15 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       // SUPER_ADMIN should have the highest hierarchy level
       const maxHierarchy = Math.max(...globalRoles.map((role: any) => role.hierarchy))
       expect(superAdminRole.hierarchy).toBe(maxHierarchy)
-
-      console.log(`✅ SUPER_ADMIN role hierarchy verified (level: ${superAdminRole.hierarchy})`)
     } catch (error) {
-      console.error('❌ SUPER_ADMIN role hierarchy validation failed:', error.message)
       throw error
     }
   })
 
   it('should handle performance tracking for SUPER_ADMIN operations', async () => {
     if (!serverReachable || !superAdminToken) {
-      console.log('🔄 Skipping test - prerequisites not met')
       return
     }
-
-    console.log('📊 Testing SUPER_ADMIN performance tracking...')
 
     try {
       // Perform several operations to generate performance data
@@ -341,21 +294,15 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       expect(checks).toHaveProperty('responseTime')
       expect(checks).toHaveProperty('successRate')
       expect(checks).toHaveProperty('memoryUsage')
-
-      console.log(`✅ Performance tracking verified (status: ${healthData.data.overall})`)
     } catch (error) {
-      console.error('❌ SUPER_ADMIN performance tracking failed:', error.message)
       throw error
     }
   })
 
   it('should complete comprehensive SUPER_ADMIN flow validation', async () => {
     if (!serverReachable || !superAdminToken) {
-      console.log('🔄 Skipping comprehensive test - prerequisites not met')
       return
     }
-
-    console.log('🎯 Running comprehensive SUPER_ADMIN validation...')
 
     const testResults: Array<{ test: string; success: boolean; details?: string }> = []
 
@@ -417,34 +364,20 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       // Summary
       const successCount = testResults.filter((r) => r.success).length
       const totalCount = testResults.length
-
-      console.log('\n📊 SUPER_ADMIN VALIDATION RESULTS:')
       testResults.forEach((result) => {
-        const icon = result.success ? '✅' : '❌'
-        console.log(`${icon} ${result.test}: ${result.success ? 'PASSED' : 'FAILED'}`)
+        const _icon = result.success ? '✅' : '❌'
         if (result.details) {
-          console.log(`   └─ ${result.details}`)
         }
       })
-
-      console.log(
-        `\n🎯 Score: ${successCount}/${totalCount} tests passed (${Math.round((successCount / totalCount) * 100)}%)`
-      )
 
       // All tests should pass for SUPER_ADMIN
       expect(successCount).toBe(totalCount)
       expect(successCount).toBe(4)
-
-      console.log('🎉 SUPER_ADMIN FUNCTIONALITY FULLY VALIDATED!')
     } catch (error) {
-      console.error('❌ Critical error in SUPER_ADMIN validation:', error.message)
-
       // Log partial results if available
       if (testResults.length > 0) {
-        console.log('\n📊 PARTIAL RESULTS:')
         testResults.forEach((result) => {
-          const icon = result.success ? '✅' : '❌'
-          console.log(`${icon} ${result.test}: ${result.success ? 'PASSED' : 'FAILED'}`)
+          const _icon = result.success ? '✅' : '❌'
         })
       }
 

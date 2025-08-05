@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, CreditCard, Lock, Mail, MapPin, Phone, ShoppingBag, User } from 'lucide-react'
+import { ArrowLeft, CreditCard, Lock, MapPin, ShoppingBag, User } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -97,7 +97,7 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
       toast.success('Commande confirmée !', {
         description: 'Vous recevrez un email de confirmation sous peu.',
       })
-    } catch (error) {
+    } catch (_error) {
       toast.error('Erreur lors du paiement')
     } finally {
       setIsProcessing(false)

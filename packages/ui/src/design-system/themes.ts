@@ -4,8 +4,6 @@
  * Compatible avec CSS variables et providers multi-app
  */
 
-import type { DesignTokens } from './tokens'
-
 // ===== TYPES DE THÈMES =====
 
 export type ThemeName = 'light' | 'dark' | 'vibrant' | 'system'

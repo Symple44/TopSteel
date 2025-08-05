@@ -9,8 +9,6 @@
  */
 
 import { config } from 'dotenv'
-import { existsSync, readFileSync } from 'fs'
-import { join } from 'path'
 import { DataSource } from 'typeorm'
 import { AnglesInjector } from './injectors/angles-injector'
 import { BarsInjector } from './injectors/bars-injector'
@@ -538,7 +536,7 @@ export class CleanMetallurgyInjector {
           this.config.societeId = uuidResult[0].id
           this.logger.warn(`⚠️ UUID société généré par défaut: ${this.config.societeId}`)
         }
-      } catch (error) {
+      } catch (_error) {
         // Utiliser un UUID fixe valide en cas d'erreur
         this.config.societeId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
         this.logger.warn(`⚠️ Utilisation UUID société fixe: ${this.config.societeId}`)
@@ -581,10 +579,7 @@ async function main() {
   try {
     await orchestrator.initialize()
     await orchestrator.injectAllArticles()
-
-    console.log('\n' + InjectionLoggerService.createBanner('INJECTION TERMINÉE AVEC SUCCÈS'))
-  } catch (error) {
-    console.error('\n💥 ERREUR FATALE:', error)
+  } catch (_error) {
     process.exit(1)
   } finally {
     await orchestrator.cleanup()

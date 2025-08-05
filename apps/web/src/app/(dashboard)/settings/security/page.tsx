@@ -574,7 +574,7 @@ export default function SecuritySettingsPage() {
               <div className="space-y-2">
                 <p className="text-sm font-medium">{ts('security.backupCodesLabel')}</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  {totpSetup.backupCodes.map((code, index) => (
+                  {totpSetup.backupCodes.map((code, _index) => (
                     <code
                       key={`backup-code-${code}`}
                       className="block p-1 bg-muted rounded text-center"
@@ -649,7 +649,7 @@ export default function SecuritySettingsPage() {
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
-              {backupCodes.map((code, index) => (
+              {backupCodes.map((code, _index) => (
                 <code
                   key={`backup-code-${code}`}
                   className="block p-2 bg-muted rounded text-center font-mono"

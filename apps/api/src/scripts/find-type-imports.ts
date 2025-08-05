@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync, statSync } from 'fs'
-import { join } from 'path'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { join } from 'node:path'
 
 function findTypeImports(dir: string, results: string[] = []): string[] {
   const files = readdirSync(dir)
@@ -31,6 +31,4 @@ function findTypeImports(dir: string, results: string[] = []): string[] {
 
 const srcDir = join(__dirname, '..')
 const typeImports = findTypeImports(srcDir)
-
-console.log(`Found ${typeImports.length} problematic type imports:\n`)
-typeImports.forEach((imp) => console.log(imp))
+typeImports.forEach((_imp) => {})

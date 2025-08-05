@@ -145,7 +145,7 @@ export class MaterialService extends BusinessService<Material> {
    */
   protected async applyUpdates(existing: Material, updates: Partial<Material>): Promise<Material> {
     // Conserver l'ancienne valeur pour l'historique
-    const oldValues = { ...existing }
+    const _oldValues = { ...existing }
 
     // Appliquer les mises à jour (sauf référence qui ne peut pas changer)
     Object.keys(updates).forEach((key) => {
@@ -235,7 +235,7 @@ export class MaterialService extends BusinessService<Material> {
    */
   async creerCommandeReapprovisionnement(
     fournisseurId: string,
-    context?: BusinessContext
+    _context?: BusinessContext
   ): Promise<{ materials: Material[]; quantitesTotales: number }> {
     const materialsAReapprovisionner = await this.getMaterialsAReapprovisionner()
 
@@ -587,7 +587,7 @@ export class MaterialService extends BusinessService<Material> {
 
   private async validateUpdateRules(
     entity: Material,
-    errors: Array<{ field: string; message: string; code: string }>,
+    _errors: Array<{ field: string; message: string; code: string }>,
     warnings: Array<{ field: string; message: string; code: string }>
   ): Promise<void> {
     // Un matériau avec des mouvements de stock ne peut pas changer d'unité
@@ -607,7 +607,7 @@ export class MaterialService extends BusinessService<Material> {
   private async validateDeletionRules(
     entity: Material,
     errors: Array<{ field: string; message: string; code: string }>,
-    warnings: Array<{ field: string; message: string; code: string }>
+    _warnings: Array<{ field: string; message: string; code: string }>
   ): Promise<void> {
     // Interdire la suppression si le matériau a du stock
     if ((entity.stockPhysique || 0) > 0) {

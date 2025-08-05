@@ -108,7 +108,7 @@ export abstract class BusinessService<T extends BusinessEntity> implements IBusi
   /**
    * Récupérer par ID
    */
-  async findById(id: string, context?: BusinessContext): Promise<T | null> {
+  async findById(id: string, _context?: BusinessContext): Promise<T | null> {
     return await this.repository.findById(id)
   }
 
@@ -133,12 +133,20 @@ export abstract class BusinessService<T extends BusinessEntity> implements IBusi
   protected abstract getEntityName(): string
 
   // Hooks - peuvent être surchargés dans les classes filles
-  protected async beforeCreate(entity: T, context?: BusinessContext): Promise<void> {}
-  protected async afterCreate(entity: T, context?: BusinessContext): Promise<void> {}
-  protected async beforeUpdate(entity: T, original: T, context?: BusinessContext): Promise<void> {}
-  protected async afterUpdate(entity: T, original: T, context?: BusinessContext): Promise<void> {}
-  protected async beforeDelete(entity: T, context?: BusinessContext): Promise<void> {}
-  protected async afterDelete(entity: T, context?: BusinessContext): Promise<void> {}
+  protected async beforeCreate(_entity: T, _context?: BusinessContext): Promise<void> {}
+  protected async afterCreate(_entity: T, _context?: BusinessContext): Promise<void> {}
+  protected async beforeUpdate(
+    _entity: T,
+    _original: T,
+    _context?: BusinessContext
+  ): Promise<void> {}
+  protected async afterUpdate(
+    _entity: T,
+    _original: T,
+    _context?: BusinessContext
+  ): Promise<void> {}
+  protected async beforeDelete(_entity: T, _context?: BusinessContext): Promise<void> {}
+  protected async afterDelete(_entity: T, _context?: BusinessContext): Promise<void> {}
 }
 
 /**

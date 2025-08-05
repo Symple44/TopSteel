@@ -31,7 +31,7 @@ try {
   rootDir = rootDir.replace(/\\/g, '/')
   const envLocalPath = join(rootDir, '.env.local')
 
-  const result = config({ path: envLocalPath })
+  const _result = config({ path: envLocalPath })
   config({ path: join(rootDir, '.env'), quiet: true })
 } catch (_error) {
   config({ path: '.env.local', quiet: true })
@@ -209,7 +209,6 @@ async function bootstrap() {
   logger.log('')
 }
 
-bootstrap().catch((error) => {
-  console.error('Failed to start application:', error)
+bootstrap().catch((_error) => {
   process.exit(1)
 })

@@ -33,9 +33,7 @@ export default function PageBuilderListPage() {
       try {
         await marketplaceApi.delete(`/page-builder/templates/${id}`)
         refetch()
-      } catch (error) {
-        console.error('Erreur lors de la suppression:', error)
-      }
+      } catch (_error) {}
     }
   }
 
@@ -50,9 +48,7 @@ export default function PageBuilderListPage() {
           slug: newSlug,
         })
         refetch()
-      } catch (error) {
-        console.error('Erreur lors de la duplication:', error)
-      }
+      } catch (_error) {}
     }
   }
 
@@ -60,9 +56,7 @@ export default function PageBuilderListPage() {
     try {
       await marketplaceApi.post(`/page-builder/templates/${id}/publish`)
       refetch()
-    } catch (error) {
-      console.error('Erreur lors de la publication:', error)
-    }
+    } catch (_error) {}
   }
 
   if (isLoading) {

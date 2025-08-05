@@ -1,8 +1,5 @@
 'use client'
 
-import { Badge } from '../badge'
-// import { useDataTable } from '@/hooks/use-datatable' // TODO: Abstract this dependency
-import { DataTable } from './DataTable'
 import type { ColumnConfig } from './types'
 
 // Interface des données d'exemple
@@ -22,7 +19,7 @@ const sampleData: SimpleEmployee[] = [
 ]
 
 // Configuration simple des colonnes
-const simpleColumns: ColumnConfig<SimpleEmployee>[] = [
+const _simpleColumns: ColumnConfig<SimpleEmployee>[] = [
   {
     id: 'nom',
     key: 'nom',
@@ -96,8 +93,8 @@ export function SimpleDataTableExample() {
   // )
 
   // Action pour ajouter un nouvel employé
-  const handleAddEmployee = () => {
-    const newEmployee: SimpleEmployee = {
+  const _handleAddEmployee = () => {
+    const _newEmployee: SimpleEmployee = {
       id: Math.max(...sampleData.map((e: SimpleEmployee) => e.id)) + 1,
       nom: 'Nouvel Employé',
       poste: 'Développeur',

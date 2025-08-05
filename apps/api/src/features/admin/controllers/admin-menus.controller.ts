@@ -117,7 +117,7 @@ export class AdminMenusController {
   // ===== TEMPLATES ET UTILITAIRES =====
 
   @Post('configurations/default')
-  async createDefaultConfiguration(@Request() req: any): Promise<MenuConfiguration> {
+  async createDefaultConfiguration(@Request() _req: any): Promise<MenuConfiguration> {
     return await this.menuConfigService.createDefaultConfiguration()
   }
 

@@ -97,7 +97,7 @@ export class AdminMFAController {
           },
         },
       }
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException('Utilisateur non trouvé ou erreur lors de la récupération')
     }
   }
@@ -135,11 +135,11 @@ export class AdminMFAController {
         data: sessions.map((session) => ({
           id: session.id,
           userId: session.userId,
-          sessionToken: session.sessionToken.substring(0, 8) + '***', // Masked for security
+          sessionToken: `${session.sessionToken.substring(0, 8)}***`, // Masked for security
           status: session.status,
           mfaType: session.mfaType,
           ipAddress: session.ipAddress,
-          userAgent: session.userAgent?.substring(0, 100) + '...',
+          userAgent: `${session.userAgent?.substring(0, 100)}...`,
           createdAt: session.createdAt,
           expiresAt: session.expiresAt,
           isExpired: session.isExpired(),
@@ -151,7 +151,7 @@ export class AdminMFAController {
           filters: { status, userId },
         },
       }
-    } catch (error) {
+    } catch (_error) {
       throw new BadRequestException('Erreur lors de la récupération des sessions MFA')
     }
   }
@@ -227,7 +227,7 @@ export class AdminMFAController {
         },
         message: `${resetCount} méthode(s) MFA ${body.disableOnly ? 'désactivée(s)' : 'supprimée(s)'}`,
       }
-    } catch (error) {
+    } catch (_error) {
       throw new BadRequestException('Erreur lors de la réinitialisation MFA')
     }
   }
@@ -282,7 +282,7 @@ export class AdminMFAController {
         success: true,
         data: analytics,
       }
-    } catch (error) {
+    } catch (_error) {
       throw new BadRequestException('Erreur lors de la récupération des analyses MFA')
     }
   }
@@ -324,7 +324,7 @@ export class AdminMFAController {
         success: true,
         data: health,
       }
-    } catch (error) {
+    } catch (_error) {
       throw new BadRequestException('Erreur lors de la vérification de santé MFA')
     }
   }

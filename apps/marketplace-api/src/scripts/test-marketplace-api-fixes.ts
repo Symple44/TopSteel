@@ -13,8 +13,6 @@ import { Societe } from '../shared/entities/erp/societe.entity'
 config()
 
 async function testMarketplaceApiFixes() {
-  console.log('🧪 Test des corrections du marketplace-api...')
-
   // Configuration de connexion pour la base tenant (même config que TenantResolver)
   const tenantDbConfig = {
     type: 'postgres' as const,
@@ -46,31 +44,18 @@ async function testMarketplaceApiFixes() {
     // Créer la connexion tenant
     tenantConnection = new DataSource(tenantDbConfig)
     await tenantConnection.initialize()
-    console.log('✅ Connexion tenant établie')
 
     // Créer la connexion auth
     authConnection = new DataSource(authDbConfig)
     await authConnection.initialize()
-    console.log('✅ Connexion auth établie')
-
-    // Test 1: Vérifier que la requête Societe avec createdAt fonctionne
-    console.log('\n🔍 Test 1: Requête societes avec createdAt...')
 
     const societeRepo = authConnection.getRepository(Societe)
     const societes = await societeRepo.find({
       where: { code: 'topsteel' },
       take: 1,
     })
-
-    console.log(`✅ Requête societes réussie, ${societes.length} société(s) trouvée(s)`)
     if (societes.length > 0) {
-      console.log(`   - Nom: ${societes[0].nom}`)
-      console.log(`   - CreatedAt: ${societes[0].createdAt}`)
-      console.log(`   - Marketplace enabled: ${societes[0].configuration?.marketplace?.enabled}`)
     }
-
-    // Test 2: Vérifier que la requête Article avec societeId fonctionne
-    console.log('\n🔍 Test 2: Requête articles avec societeId...')
 
     const articlesRepo = tenantConnection.getRepository(Article)
 
@@ -84,11 +69,7 @@ async function testMarketplaceApiFixes() {
       .andWhere('article.isMarketplaceEnabled = true')
       .limit(5)
 
-    const articles = await articlesQuery.getMany()
-    console.log(`✅ Requête articles avec societeId réussie, ${articles.length} articles trouvés`)
-
-    // Test 3: Vérifier les catégories (requête qui échouait)
-    console.log('\n🔍 Test 3: Requête catégories...')
+    const _articles = await articlesQuery.getMany()
 
     const categoriesQuery = articlesRepo
       .createQueryBuilder('article')
@@ -101,11 +82,7 @@ async function testMarketplaceApiFixes() {
       .andWhere('article.famille IS NOT NULL')
       .orderBy('article.famille', 'ASC')
 
-    const categories = await categoriesQuery.getRawMany()
-    console.log(`✅ Requête catégories réussie, ${categories.length} catégories trouvées`)
-
-    // Test 4: Simulation du MarketplaceProductsService.getProducts()
-    console.log('\n🔍 Test 4: Simulation de getProducts...')
+    const _categories = await categoriesQuery.getRawMany()
 
     try {
       const testQuery = articlesRepo
@@ -118,31 +95,21 @@ async function testMarketplaceApiFixes() {
         .limit(10)
 
       const testArticles = await testQuery.getMany()
-      console.log(`✅ Simulation getProducts réussie, ${testArticles.length} articles récupérés`)
 
       // Test des méthodes utilitaires
       if (testArticles.length > 0) {
-        const article = testArticles[0]
-        console.log(`   - Article test: ${article.reference} - ${article.designation}`)
-        console.log(`   - En rupture: ${article.estEnRupture()}`)
-        console.log(`   - Stock disponible: ${article.calculerStockDisponible()}`)
+        const _article = testArticles[0]
       }
-    } catch (error: any) {
-      console.log('❌ Erreur simulation getProducts:', error.message)
-    }
-
-    console.log('\n🎉 Tous les tests du marketplace-api sont passés !')
+    } catch (_error: any) {}
   } catch (error: any) {
-    console.error('❌ Erreur lors des tests marketplace-api:', error.message)
     throw error
   } finally {
-    if (tenantConnection && tenantConnection.isInitialized) {
+    if (tenantConnection?.isInitialized) {
       await tenantConnection.destroy()
     }
-    if (authConnection && authConnection.isInitialized) {
+    if (authConnection?.isInitialized) {
       await authConnection.destroy()
     }
-    console.log('🔌 Connexions fermées')
   }
 }
 
@@ -150,11 +117,9 @@ async function testMarketplaceApiFixes() {
 if (require.main === module) {
   testMarketplaceApiFixes()
     .then(() => {
-      console.log('Tests marketplace-api terminés avec succès')
       process.exit(0)
     })
-    .catch((error) => {
-      console.error('Échec des tests marketplace-api:', error)
+    .catch((_error) => {
       process.exit(1)
     })
 }

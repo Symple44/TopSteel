@@ -90,7 +90,7 @@ export const menuStorage = {
         ) {
           syncChecker.checkStorageConsistency('selected-pages', memorySelectedPages, stored)
         }
-      } catch (error) {
+      } catch (_error) {
         // Ignorer les erreurs de comparaison temporaires
       }
     }, 100)
@@ -117,7 +117,7 @@ export const menuStorage = {
         ) {
           syncChecker.checkStorageConsistency('user-preferences', memoryPreferences, stored)
         }
-      } catch (error) {
+      } catch (_error) {
         // Ignorer les erreurs de comparaison temporaires
       }
     }, 100)

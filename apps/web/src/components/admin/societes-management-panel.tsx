@@ -13,14 +13,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  Input,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Table,
   TableBody,
   TableCell,
@@ -32,18 +25,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@erp/ui'
-import {
-  Building,
-  Database,
-  Edit,
-  Eye,
-  MapPin,
-  Plus,
-  Settings,
-  Shield,
-  Trash2,
-  Users,
-} from 'lucide-react'
+import { Building, Database, Edit, Eye, MapPin, Plus, Shield, Users } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'

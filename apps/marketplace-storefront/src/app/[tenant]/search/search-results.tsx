@@ -4,7 +4,7 @@ import { ChevronDown, Filter, Grid, List, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { ProductCard } from '@/components/product/product-card'
-import { api, type Product } from '@/lib/api/storefront'
+import type { Product } from '@/lib/api/storefront'
 import { cn } from '@/lib/utils'
 
 interface SearchResultsProps {
@@ -41,7 +41,7 @@ export function SearchResults({
 
   useEffect(() => {
     loadResults()
-  }, [tenant, query, category, sortBy, currentPage])
+  }, [loadResults])
 
   const loadResults = async () => {
     setLoading(true)
@@ -147,8 +147,7 @@ export function SearchResults({
         new Set(mockProducts.flatMap((product) => product.categories))
       )
       setCategories(allCategories)
-    } catch (error) {
-      console.error('Error loading search results:', error)
+    } catch (_error) {
     } finally {
       setLoading(false)
     }

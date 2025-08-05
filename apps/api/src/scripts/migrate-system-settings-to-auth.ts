@@ -11,8 +11,8 @@
  * Usage: npm run migrate:settings-to-auth
  */
 
+import * as readline from 'node:readline'
 import { config } from 'dotenv'
-import * as readline from 'readline'
 import { DataSource } from 'typeorm'
 
 config()
@@ -61,9 +61,6 @@ async function askConfirmation(question: string): Promise<boolean> {
 }
 
 async function migrateSystemSettingsToAuth() {
-  console.log('🔄 MIGRATION DES PARAMÈTRES SYSTÈME VERS AUTH')
-  console.log('=============================================\n')
-
   // Connexion base tenant (source)
   const tenantDataSource = new DataSource({
     type: 'postgres',
@@ -87,11 +84,8 @@ async function migrateSystemSettingsToAuth() {
   })
 
   try {
-    // Connexions
-    console.log('🔌 Connexion aux bases de données...')
     await tenantDataSource.initialize()
     await authDataSource.initialize()
-    console.log('✅ Connexions établies\n')
 
     // Vérifier l'existence de system_settings dans tenant
     const settingsExist = await tenantDataSource.query(`
@@ -102,7 +96,6 @@ async function migrateSystemSettingsToAuth() {
     `)
 
     if (!settingsExist[0].exists) {
-      console.log('ℹ️  Aucune table system_settings trouvée dans la base tenant.')
       return
     }
 
@@ -111,22 +104,14 @@ async function migrateSystemSettingsToAuth() {
       SELECT * FROM system_settings ORDER BY category, key
     `)
 
-    console.log(`📊 Paramètres trouvés dans system_settings: ${systemSettings.length}`)
-
     if (systemSettings.length === 0) {
-      console.log('ℹ️  Aucun paramètre à migrer.')
       return
     }
-
-    // Afficher les paramètres à migrer
-    console.log('\n📋 Paramètres à migrer:')
-    systemSettings.forEach((setting, index) => {
-      console.log(`   ${index + 1}. ${setting.category}.${setting.key} (${setting.type})`)
-    })
+    systemSettings.forEach((_setting, _index) => {})
 
     // Vérifier les conflits potentiels
     const conflictChecks = systemSettings
-      .map((s, i) => `("group" = $${i * 2 + 1} AND key = $${i * 2 + 2})`)
+      .map((_s, i) => `("group" = $${i * 2 + 1} AND key = $${i * 2 + 2})`)
       .join(' OR ')
 
     const existingParams =
@@ -141,16 +126,12 @@ async function migrateSystemSettingsToAuth() {
         : []
 
     if (existingParams.length > 0) {
-      console.log('\n⚠️  CONFLITS DÉTECTÉS:')
-      existingParams.forEach((param: any) => {
-        console.log(`   - ${param.group}.${param.key} existe déjà dans parameters_system`)
-      })
+      existingParams.forEach((_param: any) => {})
 
       const continueWithConflicts = await askConfirmation(
         '\n❓ Continuer malgré les conflits? Les paramètres existants seront mis à jour (y/N): '
       )
       if (!continueWithConflicts) {
-        console.log("\n❌ Migration annulée par l'utilisateur.")
         return
       }
     }
@@ -160,14 +141,10 @@ async function migrateSystemSettingsToAuth() {
       '\n❓ Confirmer la migration des paramètres vers la base auth? (y/N): '
     )
     if (!confirmed) {
-      console.log("\n❌ Migration annulée par l'utilisateur.")
       return
     }
-
-    // Migration
-    console.log('\n🔄 Migration en cours...')
     let migratedCount = 0
-    let errorCount = 0
+    let _errorCount = 0
 
     for (const setting of systemSettings) {
       try {
@@ -272,28 +249,18 @@ async function migrateSystemSettingsToAuth() {
         }
 
         migratedCount++
-        console.log(`   ✅ ${setting.category}.${setting.key}`)
-      } catch (error) {
-        errorCount++
-        console.log(`   ❌ Erreur ${setting.category}.${setting.key}: ${error}`)
+      } catch (_error) {
+        _errorCount++
       }
     }
 
-    console.log(`\n📊 RÉSULTATS DE LA MIGRATION:`)
-    console.log(`   ✅ Paramètres migrés: ${migratedCount}`)
-    console.log(`   ❌ Erreurs: ${errorCount}`)
-
     if (migratedCount > 0) {
-      console.log(`\n🎉 Migration réussie !`)
-      console.log(`   📍 Les paramètres sont maintenant dans parameters_system (base auth)`)
-
       // Proposer de nettoyer system_settings
       const cleanupConfirmed = await askConfirmation(
         '\n❓ Supprimer les paramètres de system_settings (base tenant)? (y/N): '
       )
       if (cleanupConfirmed) {
         await tenantDataSource.query('DELETE FROM system_settings')
-        console.log('   🗑️  Paramètres supprimés de system_settings')
 
         // Optionnel: supprimer la table si elle est vide
         const dropTableConfirmed = await askConfirmation(
@@ -301,12 +268,10 @@ async function migrateSystemSettingsToAuth() {
         )
         if (dropTableConfirmed) {
           await tenantDataSource.query('DROP TABLE IF EXISTS system_settings CASCADE')
-          console.log('   🗑️  Table system_settings supprimée')
         }
       }
     }
   } catch (error) {
-    console.error('\n💥 ERREUR lors de la migration:', error)
     throw error
   } finally {
     if (tenantDataSource.isInitialized) {
@@ -315,7 +280,6 @@ async function migrateSystemSettingsToAuth() {
     if (authDataSource.isInitialized) {
       await authDataSource.destroy()
     }
-    console.log('\n🔌 Connexions fermées')
   }
 }
 
@@ -323,9 +287,7 @@ async function migrateSystemSettingsToAuth() {
 async function main() {
   try {
     await migrateSystemSettingsToAuth()
-    console.log('\n✨ Script terminé avec succès')
-  } catch (error) {
-    console.error('\n💥 ERREUR FATALE:', error)
+  } catch (_error) {
     process.exit(1)
   }
 }

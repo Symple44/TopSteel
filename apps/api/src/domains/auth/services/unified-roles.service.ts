@@ -8,7 +8,6 @@ import {
   GLOBAL_TO_SOCIETE_ROLE_MAPPING,
   GlobalUserRole,
   getEffectiveSocieteRole,
-  isGlobalRoleHigherOrEqual,
   isSocieteRoleHigherOrEqual,
   READ_ONLY_ROLES,
   SOCIETE_ADMIN_ROLES,

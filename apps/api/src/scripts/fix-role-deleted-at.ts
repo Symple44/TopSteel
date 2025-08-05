@@ -15,10 +15,6 @@ async function fixRoleDeletedAt() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connecté à la base de données\n')
-
-    // 1. Vérifier la structure de la table role
-    console.log('📊 Vérification de la table role:')
     const roleColumns = await dataSource.query(`
       SELECT column_name, data_type
       FROM information_schema.columns
@@ -27,8 +23,6 @@ async function fixRoleDeletedAt() {
     `)
 
     if (roleColumns.length === 0) {
-      console.log("   ❌ La table role n'existe pas!")
-
       // Vérifier si c'est plutôt "roles"
       const rolesColumns = await dataSource.query(`
         SELECT column_name, data_type
@@ -38,19 +32,11 @@ async function fixRoleDeletedAt() {
       `)
 
       if (rolesColumns.length > 0) {
-        console.log('   ℹ️  La table s\'appelle "roles" (avec un s)')
-        rolesColumns.forEach((col: any) => {
-          console.log(`   - ${col.column_name}: ${col.data_type}`)
-        })
+        rolesColumns.forEach((_col: any) => {})
       }
     } else {
-      roleColumns.forEach((col: any) => {
-        console.log(`   - ${col.column_name}: ${col.data_type}`)
-      })
+      roleColumns.forEach((_col: any) => {})
     }
-
-    // 2. Ajouter la colonne deleted_at si elle n'existe pas
-    console.log('\n🔧 Ajout de la colonne deleted_at...')
 
     // Essayer sur "role" d'abord
     try {
@@ -58,24 +44,15 @@ async function fixRoleDeletedAt() {
         ALTER TABLE role 
         ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP
       `)
-      console.log('   ✅ Colonne deleted_at ajoutée à la table role')
-    } catch (error: any) {
-      console.log('   ❌ Erreur sur table role:', error.message)
-
+    } catch (_error: any) {
       // Essayer sur "roles"
       try {
         await dataSource.query(`
           ALTER TABLE roles 
           ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP
         `)
-        console.log('   ✅ Colonne deleted_at ajoutée à la table roles')
-      } catch (error2: any) {
-        console.log('   ❌ Erreur sur table roles:', error2.message)
-      }
+      } catch (_error2: any) {}
     }
-
-    // 3. Vérifier toutes les tables qui pourraient avoir besoin de deleted_at
-    console.log('\n🔍 Vérification des autres tables pour soft delete:')
     const tables = [
       'users',
       'user_sessions',
@@ -100,18 +77,11 @@ async function fixRoleDeletedAt() {
             ALTER TABLE ${table} 
             ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP
           `)
-          console.log(`   ✅ Colonne deleted_at ajoutée à ${table}`)
         } else {
-          console.log(`   ℹ️  ${table} a déjà deleted_at`)
         }
-      } catch (error: any) {
-        console.log(`   ⚠️  ${table}: ${error.message}`)
-      }
+      } catch (_error: any) {}
     }
-
-    console.log('\n✅ Correction terminée!')
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }

@@ -15,10 +15,6 @@ async function checkAllAdmins() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connecté à la base de données\n')
-
-    // Rechercher tous les admins
-    console.log('🔍 Recherche de tous les comptes administrateurs...\n')
 
     const admins = await dataSource.query(`
       SELECT id, email, role, actif, nom, prenom, created_at, updated_at
@@ -30,24 +26,9 @@ async function checkAllAdmins() {
     `)
 
     if (admins.length === 0) {
-      console.log('❌ Aucun compte administrateur trouvé')
     } else {
-      console.log(`📊 ${admins.length} compte(s) trouvé(s):\n`)
-
-      admins.forEach((admin: any, index: number) => {
-        console.log(`${index + 1}. ${admin.email}`)
-        console.log(`   - ID: ${admin.id}`)
-        console.log(`   - Nom: ${admin.nom} ${admin.prenom}`)
-        console.log(`   - Role: ${admin.role}`)
-        console.log(`   - Actif: ${admin.actif}`)
-        console.log(`   - Créé le: ${new Date(admin.created_at).toLocaleDateString('fr-FR')}`)
-        console.log(`   - Modifié le: ${new Date(admin.updated_at).toLocaleDateString('fr-FR')}`)
-        console.log('')
-      })
+      admins.forEach((_admin: any, _index: number) => {})
     }
-
-    // Vérifier s'il y a des variations de l'email admin
-    console.log("🔍 Recherche de variations possibles de l'email admin@topsteel.tech:\n")
 
     const variations = await dataSource.query(
       `
@@ -59,14 +40,10 @@ async function checkAllAdmins() {
     )
 
     if (variations.length > 0) {
-      variations.forEach((v: any) => {
-        console.log(`   - "${v.email}" (${v.role})`)
-      })
+      variations.forEach((_v: any) => {})
     } else {
-      console.log('   Aucune variation trouvée')
     }
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }

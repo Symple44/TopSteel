@@ -7,7 +7,6 @@ import {
   IsObject,
   IsOptional,
   IsString,
-  Max,
   Min,
 } from 'class-validator'
 import {

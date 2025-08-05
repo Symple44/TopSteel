@@ -310,7 +310,7 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
     if (!content || disabled) {
       // Si pas de contenu ou désactivé, retourner juste le trigger
       return shouldUseAsChild ? (
-        <>{triggerContent}</>
+        triggerContent
       ) : (
         <div ref={ref} className={triggerClassName}>
           {triggerContent}

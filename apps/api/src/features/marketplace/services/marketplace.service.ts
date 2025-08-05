@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { In, type Repository } from 'typeorm'
-import type { MenuRawService } from '../../admin/services/menu-raw.service'
 import {
   type MarketplaceCategory,
   MarketplaceModule as MarketplaceModuleEntity,
@@ -79,8 +78,7 @@ export class MarketplaceService {
     @InjectRepository(ModuleInstallation, 'tenant')
     private readonly _installationRepository: Repository<ModuleInstallation>,
     @InjectRepository(ModuleRating, 'tenant')
-    private readonly _ratingRepository: Repository<ModuleRating>,
-    private readonly menuRawService: MenuRawService
+    private readonly _ratingRepository: Repository<ModuleRating>
   ) {}
 
   // ===== GESTION DES MODULES =====

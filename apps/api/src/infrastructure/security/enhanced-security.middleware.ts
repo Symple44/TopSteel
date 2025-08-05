@@ -38,7 +38,7 @@ export class ConsolidatedSecurityMiddleware implements NestMiddleware {
     this.continueWithSecurityChecks(req, res, next)
   }
 
-  private continueWithSecurityChecks(req: Request, res: Response, next: NextFunction) {
+  private continueWithSecurityChecks(req: Request, _res: Response, next: NextFunction) {
     // Log des requêtes suspectes
     if (this.isSuspiciousRequest(req)) {
       this.logger.warn('Requête suspecte détectée', {

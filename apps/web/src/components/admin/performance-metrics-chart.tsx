@@ -194,7 +194,7 @@ export default function PerformanceMetricsChart({
             </div>
 
             <div className="h-32 flex items-end space-x-1 border-b border-l pl-2 pb-2">
-              {currentData.slice(-20).map((point, index) => {
+              {currentData.slice(-20).map((point, _index) => {
                 const value = getMetricValue(point)
                 const height = maxValue > 0 ? (value / maxValue) * 100 : 0
 

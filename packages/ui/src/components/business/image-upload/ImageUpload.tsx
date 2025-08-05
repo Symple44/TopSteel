@@ -123,6 +123,7 @@ export function ImageUpload({
       disabled,
       onUploadSuccess,
       onUploadError,
+      uploadApi,
     ]
   )
 

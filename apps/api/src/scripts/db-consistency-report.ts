@@ -7,10 +7,10 @@
  * de cohérence entre TypeORM et la base de données PostgreSQL
  */
 
+import { writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
-import { writeFileSync } from 'fs'
-import { join } from 'path'
 import { DataSource } from 'typeorm'
 import { authDataSourceOptions } from '../core/database/data-source-auth'
 import { tenantDataSourceOptions } from '../core/database/data-source-tenant'
@@ -119,8 +119,6 @@ class DetailedConsistencyReporter {
   }
 
   async generateDetailedReport(): Promise<DetailedReport> {
-    console.log('📊 Génération du rapport détaillé de cohérence...\n')
-
     const report: DetailedReport = {
       timestamp: new Date().toISOString(),
       databases: {
@@ -153,11 +151,8 @@ class DetailedConsistencyReporter {
     dbType: string,
     dataSource: DataSource
   ): Promise<DatabaseReport> {
-    console.log(`🔍 Analyse détaillée de la base ${dbType.toUpperCase()}...`)
-
     try {
       await dataSource.initialize()
-      console.log(`✅ Connexion établie`)
 
       const report: DatabaseReport = {
         name: dbType,
@@ -346,7 +341,7 @@ class DetailedConsistencyReporter {
 
       const constraint = constraintMap.get(row.constraint_name)!
       if (row.column_name) constraint.columns.push(row.column_name)
-      if (row.referenced_column) constraint.referencedColumns!.push(row.referenced_column)
+      if (row.referenced_column) constraint.referencedColumns?.push(row.referenced_column)
     })
 
     return Array.from(constraintMap.values())
@@ -383,7 +378,7 @@ class DetailedConsistencyReporter {
         })
       }
 
-      indexMap.get(row.index_name)!.columns.push(row.column_name)
+      indexMap.get(row.index_name)?.columns.push(row.column_name)
     })
 
     return Array.from(indexMap.values())
@@ -416,8 +411,7 @@ class DetailedConsistencyReporter {
         timestamp: parseInt(m.timestamp),
         executed: true,
       }))
-    } catch (error) {
-      console.warn('Impossible de récupérer les informations de migration:', error)
+    } catch (_error) {
       return []
     } finally {
       await queryRunner.release()
@@ -527,7 +521,7 @@ class DetailedConsistencyReporter {
 
   private async findAuthSpecificIssues(
     dbReport: DatabaseReport,
-    dataSource: DataSource,
+    _dataSource: DataSource,
     startId: number
   ): Promise<ConsistencyIssue[]> {
     const issues: ConsistencyIssue[] = []
@@ -677,8 +671,6 @@ class DetailedConsistencyReporter {
       join(process.cwd(), `db-consistency-report-${new Date().toISOString().split('T')[0]}.json`)
 
     writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8')
-
-    console.log(`\n📄 Rapport détaillé sauvegardé: ${reportPath}`)
     return reportPath
   }
 }
@@ -689,25 +681,9 @@ async function main() {
 
   try {
     const report = await reporter.generateDetailedReport()
-    const reportPath = await reporter.saveReport(report)
-
-    console.log('\n' + '='.repeat(80))
-    console.log('📋 RÉSUMÉ DU RAPPORT DÉTAILLÉ')
-    console.log('='.repeat(80))
-    console.log(`📊 Total des problèmes: ${report.summary.totalIssues}`)
-    console.log(`❌ Critiques: ${report.summary.criticalIssues}`)
-    console.log(`⚠️  Avertissements: ${report.summary.warnings}`)
-    console.log(`ℹ️  Informations: ${report.summary.infos}`)
-
-    console.log('\n📋 RECOMMANDATIONS:')
-    report.recommendations.forEach((rec, index) => {
-      console.log(`${index + 1}. ${rec}`)
-    })
-
-    console.log(`\n📄 Rapport complet disponible: ${reportPath}`)
-    console.log('='.repeat(80))
-  } catch (error) {
-    console.error('💥 Erreur lors de la génération du rapport:', error)
+    const _reportPath = await reporter.saveReport(report)
+    report.recommendations.forEach((_rec, _index) => {})
+  } catch (_error) {
     process.exit(1)
   }
 }

@@ -1,6 +1,4 @@
-import { Repository } from 'typeorm'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { OptimizedCacheService } from '../../../../infrastructure/cache/redis-optimized.service'
 import type { User } from '../../../users/entities/user.entity'
 import { GlobalUserRole, SocieteRoleType } from '../../core/constants/roles.constants'
 import { UserSocieteRole } from '../../core/entities/user-societe-role.entity'
@@ -451,7 +449,7 @@ describe('UnifiedRolesService', () => {
       userSocieteRoleRepository.findOne.mockResolvedValue(existingRole)
       userSocieteRoleRepository.save.mockResolvedValue(existingRole as any)
 
-      const result = await service.assignUserToSociete(
+      const _result = await service.assignUserToSociete(
         'user-123',
         'societe-123',
         SocieteRoleType.ADMIN,

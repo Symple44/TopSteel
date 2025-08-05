@@ -4,8 +4,6 @@ export class FixMfaAndSessions1754419500000 implements MigrationInterface {
   name = 'FixMfaAndSessions1754419500000'
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    console.log('🔧 Correction de la structure MFA et Sessions...')
-
     // 1. Créer la table user_mfa correcte si elle n'existe pas dans le bon format
     await queryRunner.query(`
       -- Supprimer l'ancienne table user_mfa si elle existe
@@ -94,8 +92,6 @@ export class FixMfaAndSessions1754419500000 implements MigrationInterface {
       CREATE INDEX IF NOT EXISTS idx_webauthn_credential_id ON webauthn_credential(credential_id);
       CREATE INDEX IF NOT EXISTS idx_webauthn_user_mfa_id ON webauthn_credential(user_mfa_id);
     `)
-
-    console.log('✅ Structure MFA et Sessions corrigée')
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

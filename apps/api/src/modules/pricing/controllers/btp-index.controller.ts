@@ -13,11 +13,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
 import { BTPIndex, type BTPIndexType } from '../entities/btp-index.entity'
-import {
-  type BTPIndexService,
-  IndexedPricingContext,
-  type IndexedPricingResult,
-} from '../services/btp-index.service'
+import type { BTPIndexService, IndexedPricingResult } from '../services/btp-index.service'
 
 // DTOs
 export class CreateBTPIndexDto {
@@ -166,9 +162,9 @@ export class BTPIndexController {
   @ApiOperation({ summary: 'Mettre à jour un indice BTP' })
   @ApiResponse({ status: 200, description: 'Indice mis à jour', type: BTPIndex })
   async updateIndex(
-    @CurrentTenant() tenantId: string,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateDto: UpdateBTPIndexDto
+    @CurrentTenant() _tenantId: string,
+    @Param('id', ParseUUIDPipe) _id: string,
+    @Body() _updateDto: UpdateBTPIndexDto
   ): Promise<BTPIndex> {
     // Implementation à compléter selon besoins
     throw new Error('Not implemented yet')

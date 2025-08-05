@@ -82,7 +82,7 @@ function isPublicApiRoute(pathname: string): boolean {
 /**
  * Vérifie si une route API est protégée
  */
-function isProtectedApiRoute(pathname: string): boolean {
+function _isProtectedApiRoute(pathname: string): boolean {
   if (!pathname.startsWith('/api')) return false
   if (isPublicApiRoute(pathname)) return false
 
@@ -134,7 +134,7 @@ function validateJWTStructure(token: string): {
     }
 
     return { valid: true, payload }
-  } catch (error) {
+  } catch (_error) {
     return { valid: false, error: 'Erreur de décodage JWT' }
   }
 }

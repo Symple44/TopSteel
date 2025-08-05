@@ -81,7 +81,7 @@ export class AuthStorage {
       }
 
       return sessionData
-    } catch (error) {
+    } catch (_error) {
       this.clearSession()
       return { user: null, tokens: null, company: null }
     }

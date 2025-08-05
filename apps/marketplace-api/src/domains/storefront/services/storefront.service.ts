@@ -278,7 +278,7 @@ export class StorefrontService {
     return await this.themeRepo.save(defaultTheme)
   }
 
-  async getNavigationMenu(societeId: string): Promise<NavigationMenu> {
+  async getNavigationMenu(_societeId: string): Promise<NavigationMenu> {
     // Pour l'instant, retourner un menu par défaut
     // Plus tard, ceci sera configurable via l'interface admin
     return {
@@ -329,7 +329,7 @@ export class StorefrontService {
     }
   }
 
-  async getPage(societeId: string, slug: string): Promise<StaticPage | null> {
+  async getPage(_societeId: string, slug: string): Promise<StaticPage | null> {
     // Pour l'instant, retourner des pages statiques par défaut
     const defaultPages: Record<string, StaticPage> = {
       about: {
@@ -379,8 +379,8 @@ export class StorefrontService {
   }
 
   async subscribeNewsletter(
-    societeId: string,
-    email: string
+    _societeId: string,
+    _email: string
   ): Promise<{ success: boolean; message: string }> {
     // TODO: Implémenter l'inscription newsletter
     // Pour l'instant, simuler le succès
@@ -391,8 +391,8 @@ export class StorefrontService {
   }
 
   async sendContactMessage(
-    societeId: string,
-    message: {
+    _societeId: string,
+    _message: {
       name: string
       email: string
       subject: string
@@ -400,10 +400,6 @@ export class StorefrontService {
       phone?: string
     }
   ): Promise<{ success: boolean; message: string }> {
-    // TODO: Implémenter l'envoi de message de contact
-    // Pour l'instant, simuler le succès
-    console.log(`Contact message from ${message.name} (${message.email}): ${message.subject}`)
-
     return {
       success: true,
       message: 'Message envoyé avec succès',

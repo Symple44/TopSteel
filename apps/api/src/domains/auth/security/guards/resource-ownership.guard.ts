@@ -129,8 +129,6 @@ export class ResourceOwnershipGuard implements CanActivate {
       ) {
         throw error
       }
-
-      console.error('Erreur dans ResourceOwnershipGuard:', error)
       throw new ForbiddenException('Erreur lors de la vérification de propriété')
     }
   }

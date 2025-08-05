@@ -40,8 +40,7 @@ export default async function TenantLayout({ children, params }: TenantLayoutPro
         <CartSidebar tenant={resolvedParams.tenant} />
       </div>
     )
-  } catch (error) {
-    console.error('Error loading tenant:', error)
+  } catch (_error) {
     notFound()
   }
 }
@@ -58,7 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant: s
         config?.seo?.description || `Boutique en ligne ${config?.storeName || 'Marketplace'}`,
       keywords: config?.seo?.keywords || [],
     }
-  } catch (error) {
+  } catch (_error) {
     return {
       title: 'Marketplace',
       description: 'Boutique en ligne',

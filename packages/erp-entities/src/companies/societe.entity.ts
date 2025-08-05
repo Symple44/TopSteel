@@ -1,4 +1,4 @@
-import { Column, Entity, Index, OneToMany } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 import { CommonEntity } from '../base/multi-tenant.entity'
 
 export enum SocieteStatus {

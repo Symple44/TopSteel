@@ -201,21 +201,17 @@ export class DatabaseBackupService {
   }
 
   async downloadBackup(backupId: string): Promise<any> {
-    try {
-      const backups = await this.listBackups()
-      const backup = backups.find((b) => b.id === backupId)
+    const backups = await this.listBackups()
+    const backup = backups.find((b) => b.id === backupId)
 
-      if (!backup || !backup.filePath) {
-        throw new Error('Sauvegarde non trouvée')
-      }
+    if (!backup || !backup.filePath) {
+      throw new Error('Sauvegarde non trouvée')
+    }
 
-      return {
-        filePath: backup.filePath,
-        filename: backup.filename,
-        mimeType: backup.filename.endsWith('.gz') ? 'application/gzip' : 'application/sql',
-      }
-    } catch (error) {
-      throw error
+    return {
+      filePath: backup.filePath,
+      filename: backup.filename,
+      mimeType: backup.filename.endsWith('.gz') ? 'application/gzip' : 'application/sql',
     }
   }
 

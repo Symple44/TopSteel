@@ -1,7 +1,7 @@
 'use client'
 
 import { Eye, Plus, Redo, Save, Settings, Undo } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { type BaseSection, SectionRenderer, type SectionType } from '../sections'
 import { SectionLibrary } from './SectionLibrary'

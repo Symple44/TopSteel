@@ -26,7 +26,7 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
       toast.success('Produit ajouté au panier', {
         description: product.designation,
       })
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erreur lors de l'ajout au panier")
     }
   }

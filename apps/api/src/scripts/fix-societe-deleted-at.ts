@@ -15,10 +15,6 @@ async function fixSocieteDeletedAt() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connecté à la base de données SHARED\n')
-
-    // 1. Vérifier la structure de la table societe
-    console.log('📊 Vérification de la table societe dans SHARED:')
     const societeColumns = await dataSource.query(`
       SELECT column_name, data_type
       FROM information_schema.columns
@@ -27,8 +23,6 @@ async function fixSocieteDeletedAt() {
     `)
 
     if (societeColumns.length === 0) {
-      console.log("   ❌ La table societe n'existe pas dans SHARED!")
-
       // Essayer avec 's'
       const societesColumns = await dataSource.query(`
         SELECT column_name, data_type
@@ -38,19 +32,11 @@ async function fixSocieteDeletedAt() {
       `)
 
       if (societesColumns.length > 0) {
-        console.log('   ℹ️  La table s\'appelle "societes"')
-        societesColumns.forEach((col: any) => {
-          console.log(`   - ${col.column_name}: ${col.data_type}`)
-        })
+        societesColumns.forEach((_col: any) => {})
       }
     } else {
-      societeColumns.forEach((col: any) => {
-        console.log(`   - ${col.column_name}: ${col.data_type}`)
-      })
+      societeColumns.forEach((_col: any) => {})
     }
-
-    // 2. Ajouter deleted_at si nécessaire
-    console.log('\n🔧 Ajout de deleted_at...')
 
     const tables = ['societe', 'societes', 'sites', 'contacts', 'fournisseurs', 'clients']
 
@@ -78,25 +64,17 @@ async function fixSocieteDeletedAt() {
 
         if (tableExists[0].exists) {
           if (hasDeletedAt[0].exists) {
-            console.log(`   ℹ️  ${table} a déjà deleted_at`)
           } else {
             await dataSource.query(`
               ALTER TABLE ${table} 
               ADD COLUMN deleted_at TIMESTAMP NULL
             `)
-            console.log(`   ✅ Colonne deleted_at ajoutée à ${table}`)
           }
         } else {
-          console.log(`   ⚠️  Table ${table} n'existe pas`)
         }
-      } catch (error: any) {
-        console.log(`   ❌ ${table}: ${error.message}`)
-      }
+      } catch (_error: any) {}
     }
-
-    console.log('\n✅ Correction terminée!')
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }
@@ -115,7 +93,6 @@ async function fixAuthTables() {
 
   try {
     await dataSource.initialize()
-    console.log('\n✅ Connecté à la base de données AUTH\n')
 
     // Corriger les tables qui pourraient référencer societe
     const tables = ['user_societe_roles', 'societe', 'societes']
@@ -144,21 +121,16 @@ async function fixAuthTables() {
           )
 
           if (hasDeletedAt[0].exists) {
-            console.log(`   ℹ️  ${table} a déjà deleted_at (AUTH)`)
           } else {
             await dataSource.query(`
               ALTER TABLE ${table} 
               ADD COLUMN deleted_at TIMESTAMP NULL
             `)
-            console.log(`   ✅ Colonne deleted_at ajoutée à ${table} (AUTH)`)
           }
         }
-      } catch (error: any) {
-        console.log(`   ⚠️  ${table}: ${error.message}`)
-      }
+      } catch (_error: any) {}
     }
-  } catch (error) {
-    console.error('❌ Erreur AUTH:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }
@@ -166,10 +138,8 @@ async function fixAuthTables() {
 
 // Exécuter les deux corrections
 async function runFix() {
-  console.log('🔧 Correction des colonnes deleted_at pour societe...\n')
   await fixSocieteDeletedAt()
   await fixAuthTables()
-  console.log('\n✅ Toutes les corrections sont terminées!')
 }
 
 runFix().catch(console.error)

@@ -5,16 +5,16 @@
  * Comparaison entre la structure actuelle en BD et celle définie dans l'entité TypeORM
  */
 
+import { join } from 'node:path'
 import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
-import { join } from 'path'
 import { DataSource } from 'typeorm'
 import { authDataSourceOptions } from '../core/database/data-source-auth'
 
 // Charger le .env depuis la racine du projet
 config({ path: join(__dirname, '../../../../.env') })
 
-const configService = new ConfigService()
+const _configService = new ConfigService()
 
 interface ColumnInfo {
   column_name: string
@@ -39,12 +39,9 @@ class UserSessionsTableAnalyzer {
   }
 
   async analyzeUserSessionsTable(): Promise<void> {
-    console.log('🔍 Analyse de la table user_sessions...\n')
-
     try {
       // Connexion à la base de données d'authentification
       await this.dataSource.initialize()
-      console.log('✅ Connexion à la base de données auth établie\n')
 
       // 1. Vérifier l'existence de la table
       const tableExists = await this.dataSource.query(`
@@ -56,11 +53,8 @@ class UserSessionsTableAnalyzer {
       `)
 
       if (!tableExists[0].exists) {
-        console.log("❌ La table user_sessions n'existe pas dans la base de données auth")
         return
       }
-
-      console.log('✅ La table user_sessions existe\n')
 
       // 2. Analyser la structure des colonnes
       const columns: ColumnInfo[] = await this.dataSource.query(`
@@ -78,28 +72,13 @@ class UserSessionsTableAnalyzer {
         ORDER BY ordinal_position;
       `)
 
-      console.log('===== STRUCTURE ACTUELLE DES COLONNES =====')
-      console.log(
-        'Colonne'.padEnd(25) +
-          'Type'.padEnd(20) +
-          'Nullable'.padEnd(10) +
-          'Défaut'.padEnd(20) +
-          'Longueur'
-      )
-      console.log('-'.repeat(90))
-
       columns.forEach((col) => {
-        const name = col.column_name.padEnd(25)
-        const type = col.data_type.padEnd(20)
-        const nullable = col.is_nullable.padEnd(10)
-        const defaultVal = (col.column_default || 'NULL').padEnd(20)
-        const length = col.character_maximum_length ? col.character_maximum_length.toString() : ''
-
-        console.log(`${name}${type}${nullable}${defaultVal}${length}`)
+        const _name = col.column_name.padEnd(25)
+        const _type = col.data_type.padEnd(20)
+        const _nullable = col.is_nullable.padEnd(10)
+        const _defaultVal = (col.column_default || 'NULL').padEnd(20)
+        const _length = col.character_maximum_length ? col.character_maximum_length.toString() : ''
       })
-
-      // 3. Comparer avec la structure attendue (basée sur l'entité TypeORM)
-      console.log('\n===== COMPARAISON AVEC LA STRUCTURE ATTENDUE =====')
 
       const expectedColumns = [
         { name: 'id', type: 'uuid', nullable: false, description: 'Clé primaire UUID' },
@@ -222,10 +201,7 @@ class UserSessionsTableAnalyzer {
       )
 
       if (missingColumns.length > 0) {
-        console.log('\n❌ COLONNES MANQUANTES:')
-        missingColumns.forEach((col) => {
-          console.log(`   • ${col.name} (${col.type}) - ${col.description}`)
-        })
+        missingColumns.forEach((_col) => {})
       }
 
       // Vérifier les colonnes supplémentaires (qui ne sont pas dans l'entité)
@@ -235,14 +211,8 @@ class UserSessionsTableAnalyzer {
       )
 
       if (extraColumns.length > 0) {
-        console.log("\n⚠️  COLONNES SUPPLÉMENTAIRES (non définies dans l'entité):")
-        extraColumns.forEach((col) => {
-          console.log(`   • ${col.column_name} (${col.data_type})`)
-        })
+        extraColumns.forEach((_col) => {})
       }
-
-      // Vérifier les différences de types/contraintes
-      console.log('\n===== VÉRIFICATION DES TYPES ET CONTRAINTES =====')
       let typeMismatches = 0
 
       expectedColumns.forEach((expected) => {
@@ -257,20 +227,13 @@ class UserSessionsTableAnalyzer {
             !(actualType === 'character varying' && expectedType === 'varchar') &&
             !(actualType === 'timestamp without time zone' && expectedType === 'timestamp')
           ) {
-            console.log(
-              `   ⚠️  ${expected.name}: type attendu '${expected.type}', trouvé '${actualType}'`
-            )
             typeMismatches++
           }
         }
       })
 
       if (typeMismatches === 0) {
-        console.log('✅ Tous les types de colonnes correspondent')
       }
-
-      // 4. Analyser les index
-      console.log('\n===== INDEX EXISTANTS =====')
       const indexes: IndexInfo[] = await this.dataSource.query(`
         SELECT indexname, indexdef
         FROM pg_indexes 
@@ -278,10 +241,7 @@ class UserSessionsTableAnalyzer {
         ORDER BY indexname;
       `)
 
-      indexes.forEach((idx) => {
-        console.log(`• ${idx.indexname}`)
-        console.log(`  ${idx.indexdef}`)
-      })
+      indexes.forEach((_idx) => {})
 
       // Vérifier les index manquants attendus
       const expectedIndexes = [
@@ -292,18 +252,11 @@ class UserSessionsTableAnalyzer {
         'isActive (index)',
         'status (index)',
       ]
-
-      console.log('\n===== INDEX ATTENDUS =====')
-      expectedIndexes.forEach((idx) => {
-        console.log(`• ${idx}`)
-      })
+      expectedIndexes.forEach((_idx) => {})
 
       // 5. Compter les enregistrements
       const countResult = await this.dataSource.query('SELECT COUNT(*) as count FROM user_sessions')
       const recordCount = parseInt(countResult[0].count)
-
-      console.log(`\n===== STATISTIQUES =====`)
-      console.log(`Nombre d'enregistrements: ${recordCount}`)
 
       if (recordCount > 0) {
         // Analyser quelques exemples de données
@@ -321,47 +274,16 @@ class UserSessionsTableAnalyzer {
           ORDER BY created_at DESC 
           LIMIT 3
         `)
-
-        console.log('\n===== ÉCHANTILLON DE DONNÉES =====')
-        sampleData.forEach((row: any, index: number) => {
-          console.log(`\nEnregistrement ${index + 1}:`)
-          console.log(`  ID: ${row.id}`)
-          console.log(`  User ID: ${row.userId || 'N/A'}`)
-          console.log(
-            `  Session Token: ${row.session_token ? row.session_token.substring(0, 20) + '...' : 'N/A'}`
-          )
-          console.log(`  Expires At: ${row.expires_at || 'N/A'}`)
-          console.log(`  IP: ${row.ip_address || 'N/A'}`)
-          console.log(
-            `  User Agent: ${row.user_agent ? row.user_agent.substring(0, 50) + '...' : 'N/A'}`
-          )
-          console.log(`  Created: ${row.created_at}`)
-          console.log(`  Status: ${row.status || 'N/A'}`)
-        })
+        sampleData.forEach((_row: any, _index: number) => {})
       }
-
-      // 6. Résumé final
-      console.log("\n===== RÉSUMÉ DE L'ANALYSE =====")
-      console.log(`✅ Table existe: Oui`)
-      console.log(`📊 Colonnes trouvées: ${columns.length}`)
-      console.log(`📊 Colonnes attendues: ${expectedColumns.length}`)
-      console.log(`❌ Colonnes manquantes: ${missingColumns.length}`)
-      console.log(`⚠️  Colonnes supplémentaires: ${extraColumns.length}`)
-      console.log(`🔍 Index trouvés: ${indexes.length}`)
-      console.log(`📝 Enregistrements: ${recordCount}`)
 
       if (missingColumns.length > 0 || extraColumns.length > 0) {
-        console.log("\n⚠️  La structure de la table ne correspond pas exactement à l'entité TypeORM")
-        console.log('   Une migration pourrait être nécessaire pour synchroniser la structure.')
       } else {
-        console.log("\n✅ La structure de la table correspond à l'entité TypeORM")
       }
-    } catch (error) {
-      console.error("❌ Erreur lors de l'analyse:", error)
+    } catch (_error) {
     } finally {
       if (this.dataSource?.isInitialized) {
         await this.dataSource.destroy()
-        console.log('\n🔌 Connexion fermée')
       }
     }
   }
@@ -376,11 +298,9 @@ async function main() {
 if (require.main === module) {
   main()
     .then(() => {
-      console.log('\n✅ Analyse terminée')
       process.exit(0)
     })
-    .catch((error) => {
-      console.error('❌ Erreur fatale:', error)
+    .catch((_error) => {
       process.exit(1)
     })
 }

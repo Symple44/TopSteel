@@ -70,7 +70,7 @@ export class PricingCalculatorService implements PricingCalculator {
       const materialInfo = this.materialPrices[material]
       if (!materialInfo) {
         this.logger.warn(`Matériau inconnu pour le pricing: ${material}, utilisation S235JR`)
-        return this.materialPrices['S235JR'].basePrice * (caracteristiques.poids || 1)
+        return this.materialPrices.S235JR.basePrice * (caracteristiques.poids || 1)
       }
 
       // Prix de base = prix matériau × poids
@@ -253,7 +253,7 @@ export class PricingCalculatorService implements PricingCalculator {
     famille: ArticleFamille,
     material: string
   ): { min: number; max: number; average: number } {
-    const materialInfo = this.materialPrices[material] || this.materialPrices['S235JR']
+    const materialInfo = this.materialPrices[material] || this.materialPrices.S235JR
     const margins = this.familyMargins[famille]
 
     const baseMin = materialInfo.basePrice * 0.5 // Poids minimum 0.5kg/ml

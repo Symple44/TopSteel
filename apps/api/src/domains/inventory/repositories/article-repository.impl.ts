@@ -179,12 +179,12 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return await query.getMany()
   }
 
-  async hasStockMovements(articleId: string): Promise<boolean> {
+  async hasStockMovements(_articleId: string): Promise<boolean> {
     // TODO: Implémenter selon votre logique de mouvements de stock
     return false
   }
 
-  async findWithFilters(filters: ArticleAdvancedFilters): Promise<{
+  async findWithFilters(_filters: ArticleAdvancedFilters): Promise<{
     items: Article[]
     total: number
     page: number
@@ -359,14 +359,14 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return {}
   }
 
-  async getRecentStockMovements(articleId: string, limit: number): Promise<any[]> {
+  async getRecentStockMovements(_articleId: string, _limit: number): Promise<any[]> {
     // TODO: Implémenter selon votre système de mouvements
     return []
   }
 
   async getBestSellers(
     limit: number,
-    periode?: { debut: Date; fin: Date }
+    _periode?: { debut: Date; fin: Date }
   ): Promise<Array<Article & { quantiteVendue: number }>> {
     // TODO: Implémenter avec les données de vente
     const articles = await this.repository.find({ take: limit })
@@ -389,7 +389,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(spec: any): Promise<Article[]> {
+  async findBySpecification(_spec: any): Promise<Article[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }

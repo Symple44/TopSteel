@@ -98,7 +98,7 @@ export class TokenVersionMiddleware implements NestMiddleware {
       }
 
       return tokenIssuedAt < TokenVersionMiddleware.serverStartTimestamp
-    } catch (error) {
+    } catch (_error) {
       // Si on ne peut pas décoder, laisser passer - la validation JWT se fera ailleurs
       return false
     }
@@ -111,7 +111,7 @@ export class TokenVersionMiddleware implements NestMiddleware {
         return 0
       }
       return Date.now() - payload.iat * 1000
-    } catch (error) {
+    } catch (_error) {
       return 0
     }
   }

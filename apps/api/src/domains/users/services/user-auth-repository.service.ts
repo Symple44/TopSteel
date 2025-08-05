@@ -29,7 +29,7 @@ export class UserAuthRepositoryService implements IUserRepository {
     })
   }
 
-  async updateLastLogin(userId: string, lastLogin: Date): Promise<void> {
+  async updateLastLogin(_userId: string, _lastLogin: Date): Promise<void> {
     // L'entité User ne contient pas de champ lastLogin - peut être ajouté plus tard
     // Pour l'instant, on ne fait rien ou on peut enregistrer dans une table séparée
     // await this.userRepository.update(userId, { /* lastLogin field doesn't exist */ })

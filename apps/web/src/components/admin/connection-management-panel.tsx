@@ -251,7 +251,7 @@ export default function ConnectionManagementPanel({
       {/* Liste des connexions */}
       {filteredConnections.length > 0 ? (
         <div className="space-y-3">
-          {filteredConnections.map((connection, index) => (
+          {filteredConnections.map((connection, _index) => (
             <Card
               key={connection.tenant}
               className={`hover:shadow-md transition-shadow ${

@@ -75,7 +75,7 @@ export default function AppearanceSettingsPage() {
 
       return () => clearTimeout(timeoutId)
     }
-  }, [hasUnsavedChanges, saveSettings, success, error, settingsLoading])
+  }, [hasUnsavedChanges, saveSettings, success, error, settingsLoading, t])
 
   // Afficher un loader si pas encore authentifié ou si les paramètres chargent
   if (authLoading || !isAuthenticated || settingsLoading) {

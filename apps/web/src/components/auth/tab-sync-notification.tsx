@@ -130,7 +130,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
       channel.removeEventListener('message', handleMessage)
       channel.close()
     }
-  }, [enabled, company, isAuthenticated, router])
+  }, [enabled, company, isAuthenticated, router, t])
 
   // Tracker les changements locaux pour éviter les notifications inutiles
   useEffect(() => {

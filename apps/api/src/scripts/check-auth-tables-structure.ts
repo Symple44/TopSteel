@@ -15,7 +15,6 @@ async function checkAuthTablesStructure() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connecté à la base de données AUTH\n')
 
     // Tables à vérifier
     const tablesToCheck = [
@@ -28,8 +27,6 @@ async function checkAuthTablesStructure() {
       'permissions',
       'role_permissions',
     ]
-
-    console.log('📊 Vérification de la présence de deleted_at dans les tables:\n')
 
     for (const table of tablesToCheck) {
       try {
@@ -60,27 +57,13 @@ async function checkAuthTablesStructure() {
           const hasDeletedAt = columns.some((col: any) => col.column_name === 'deleted_at')
 
           if (hasDeletedAt) {
-            console.log(`✅ ${table}: deleted_at existe`)
           } else {
-            console.log(`❌ ${table}: deleted_at MANQUANTE`)
-
-            // Afficher la structure actuelle
-            console.log(`   Structure actuelle:`)
-            columns.slice(0, 5).forEach((col: any) => {
-              console.log(`   - ${col.column_name}: ${col.data_type}`)
-            })
-            console.log(`   ... (${columns.length} colonnes au total)`)
+            columns.slice(0, 5).forEach((_col: any) => {})
           }
         } else {
-          console.log(`⚠️  ${table}: table n'existe pas`)
         }
-      } catch (error: any) {
-        console.error(`❌ Erreur pour ${table}: ${error.message}`)
-      }
+      } catch (_error: any) {}
     }
-
-    // Ajouter deleted_at aux tables qui n'en ont pas
-    console.log('\n🔧 Ajout de deleted_at aux tables manquantes...\n')
 
     for (const table of tablesToCheck) {
       try {
@@ -112,17 +95,11 @@ async function checkAuthTablesStructure() {
               ALTER TABLE ${table} 
               ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP NULL
             `)
-            console.log(`   ✅ Colonne deleted_at ajoutée à ${table}`)
           }
         }
-      } catch (error: any) {
-        console.error(`   ❌ Erreur pour ${table}: ${error.message}`)
-      }
+      } catch (_error: any) {}
     }
-
-    console.log('\n✅ Vérification et correction terminées!')
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }

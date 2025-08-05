@@ -20,9 +20,6 @@ import { databaseConfig } from '../core/config/database.config'
 import { jwtConfig } from '../core/config/jwt.config'
 import { redisConfig } from '../core/config/redis.config'
 import { throttlerAsyncConfig } from '../core/config/throttler.config'
-// Modules système
-// import { DatabaseProductionModule } from '../core/database/database-production.module'
-import { DatabaseModule } from '../core/database/database.module'
 import { DatabaseMultiTenantModule } from '../core/database/database-multi-tenant.module'
 import { HealthController } from '../core/health/health.controller'
 import { IntegrityService } from '../core/health/integrity.service'
@@ -42,7 +39,6 @@ import { UsersModule } from '../domains/users/users.module'
 import { AdminModule } from '../features/admin/admin.module'
 // Module Database Core
 import { DatabaseCoreModule } from '../features/database-core/database-core.module'
-import { MarketplaceAppModule } from '../features/marketplace/marketplace.module'
 import { MenuModule } from '../features/menu/menu.module'
 // Module de paramètres
 import { ParametersModule } from '../features/parameters/parameters.module'

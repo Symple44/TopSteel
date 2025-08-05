@@ -3,18 +3,13 @@
  * TopSteel ERP - Clean Architecture
  */
 
-import type { DataSource } from 'typeorm'
 import { BaseArticleInjector } from '../core/base-article-injector'
 import {
   ArticleFamille,
   type ArticleMetallurgie,
   ArticleStatus,
   ArticleType,
-  type ArticleValidator,
   type CaracteristiquesTechniques,
-  type GlobalInjectionConfig,
-  type InjectionLogger,
-  type PricingCalculator,
   UniteStock,
 } from '../types/article-injection.types'
 
@@ -38,7 +33,7 @@ export class BarsInjector extends BaseArticleInjector {
     { type: 'ROND', dimensions: 'Ø14', diametre: 14, poids: 1.208, section: 1.539 },
     { type: 'ROND', dimensions: 'Ø16', diametre: 16, poids: 1.578, section: 2.011 },
     { type: 'ROND', dimensions: 'Ø18', diametre: 18, poids: 1.998, section: 2.545 },
-    { type: 'ROND', dimensions: 'Ø20', diametre: 20, poids: 2.466, section: 3.142 },
+    { type: 'ROND', dimensions: 'Ø20', diametre: 20, poids: 2.466, section: Math.PI },
     { type: 'ROND', dimensions: 'Ø22', diametre: 22, poids: 2.984, section: 3.801 },
     { type: 'ROND', dimensions: 'Ø25', diametre: 25, poids: 3.853, section: 4.909 },
     { type: 'ROND', dimensions: 'Ø28', diametre: 28, poids: 4.834, section: 6.158 },
@@ -124,16 +119,6 @@ export class BarsInjector extends BaseArticleInjector {
     },
     { type: 'PLAT', dimensions: '200x20', largeur: 200, epaisseur: 20, poids: 31.4, section: 40.0 },
   ]
-
-  constructor(
-    dataSource: DataSource,
-    config: GlobalInjectionConfig,
-    logger: InjectionLogger,
-    validator: ArticleValidator,
-    pricingCalculator: PricingCalculator
-  ) {
-    super(dataSource, config, logger, validator, pricingCalculator)
-  }
 
   getFamilleInfo(): { famille: ArticleFamille; sousFamille: string } {
     return {

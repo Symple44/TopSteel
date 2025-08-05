@@ -15,10 +15,6 @@ async function checkUserSocieteRolesStructure() {
 
   try {
     await dataSource.initialize()
-    console.log('✅ Connecté à la base de données AUTH\n')
-
-    // 1. Vérifier toutes les colonnes de user_societe_roles
-    console.log('📊 Structure complète de user_societe_roles:')
     const columns = await dataSource.query(`
       SELECT column_name, data_type, is_nullable, column_default
       FROM information_schema.columns
@@ -26,29 +22,15 @@ async function checkUserSocieteRolesStructure() {
       ORDER BY ordinal_position
     `)
 
-    columns.forEach((col: any) => {
-      console.log(
-        `   - ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'} ${col.column_default ? `DEFAULT ${col.column_default}` : ''}`
-      )
-    })
-
-    // 2. Vérifier le contenu de la table
-    console.log('\n📋 Contenu de user_societe_roles:')
+    columns.forEach((_col: any) => {})
     const data = await dataSource.query(`
       SELECT * FROM user_societe_roles LIMIT 5
     `)
 
     if (data.length === 0) {
-      console.log('   Table vide')
     } else {
-      console.log(`   ${data.length} enregistrement(s):`)
-      data.forEach((row: any) => {
-        console.log('   ', JSON.stringify(row, null, 2))
-      })
+      data.forEach((_row: any) => {})
     }
-
-    // 3. Vérifier les contraintes et index
-    console.log('\n🔗 Contraintes et index:')
     const constraints = await dataSource.query(`
       SELECT 
         conname as constraint_name,
@@ -58,48 +40,31 @@ async function checkUserSocieteRolesStructure() {
       WHERE conrelid = 'user_societe_roles'::regclass
     `)
 
-    constraints.forEach((c: any) => {
-      console.log(`   - ${c.constraint_name} (${c.constraint_type}): ${c.definition}`)
-    })
-
-    // 4. Essayer de joindre avec roles en utilisant différents noms de colonnes
-    console.log('\n🧪 Test de jointures:')
+    constraints.forEach((_c: any) => {})
 
     // Test 1: roleId
     try {
-      const test1 = await dataSource.query(`
+      const _test1 = await dataSource.query(`
         SELECT COUNT(*) FROM user_societe_roles usr
         LEFT JOIN roles r ON usr."roleId" = r.id
       `)
-      console.log('   ✅ Jointure avec "roleId" (camelCase avec quotes) fonctionne')
-    } catch (e: any) {
-      console.log('   ❌ Jointure avec "roleId" échoue:', e.message)
-    }
+    } catch (_e: any) {}
 
     // Test 2: role_id
     try {
-      const test2 = await dataSource.query(`
+      const _test2 = await dataSource.query(`
         SELECT COUNT(*) FROM user_societe_roles usr
         LEFT JOIN roles r ON usr.role_id = r.id
       `)
-      console.log('   ✅ Jointure avec role_id (snake_case) fonctionne')
-    } catch (e: any) {
-      console.log('   ❌ Jointure avec role_id échoue:', e.message)
-    }
+    } catch (_e: any) {}
 
     // Test 3: roleType
     try {
-      const test3 = await dataSource.query(`
+      const _test3 = await dataSource.query(`
         SELECT COUNT(*) FROM user_societe_roles 
         WHERE role_type IS NOT NULL
       `)
-      console.log('   ✅ Colonne role_type existe')
-    } catch (e: any) {
-      console.log("   ❌ Colonne role_type n'existe pas")
-    }
-
-    // 5. Afficher la requête correcte pour récupérer les rôles
-    console.log('\n✨ Requête correcte pour user_societe_roles:')
+    } catch (_e: any) {}
     const correctQuery = await dataSource.query(`
       SELECT 
         usr.*,
@@ -112,12 +77,9 @@ async function checkUserSocieteRolesStructure() {
     `)
 
     if (correctQuery.length > 0) {
-      console.log('   Résultat trouvé:', correctQuery[0])
     } else {
-      console.log("   Aucun résultat trouvé pour l'utilisateur admin dans TopSteel")
     }
-  } catch (error) {
-    console.error('❌ Erreur:', error)
+  } catch (_error) {
   } finally {
     await dataSource.destroy()
   }

@@ -345,7 +345,7 @@ export class AuthService {
       const data = await response.json()
       // L'API backend retourne {data: [...], statusCode: 200, message: "Success"}
       return data.data || data // Si data.data existe, l'utiliser, sinon utiliser data directement
-    } catch (error) {
+    } catch (_error) {
       return []
     }
   }

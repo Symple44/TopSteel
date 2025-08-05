@@ -26,7 +26,7 @@ const fallbackSVG = `
 </svg>
 `
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   // Convertir le SVG en Buffer
   const buffer = Buffer.from(fallbackSVG)
 

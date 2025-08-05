@@ -202,12 +202,12 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return await query.getMany()
   }
 
-  async hasStockMovements(materialId: string): Promise<boolean> {
+  async hasStockMovements(_materialId: string): Promise<boolean> {
     // TODO: Implémenter selon votre logique de mouvements de stock
     return false
   }
 
-  async findWithFilters(filters: MaterialAdvancedFilters): Promise<{
+  async findWithFilters(_filters: MaterialAdvancedFilters): Promise<{
     items: Material[]
     total: number
     page: number
@@ -504,14 +504,14 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return {} as Record<MaterialShape, { quantite: number; valeur: number }>
   }
 
-  async getRecentStockMovements(materialId: string, limit: number): Promise<any[]> {
+  async getRecentStockMovements(_materialId: string, _limit: number): Promise<any[]> {
     // TODO: Implémenter selon votre système de mouvements
     return []
   }
 
   async getMostUsedMaterials(
     limit: number,
-    periode?: { debut: Date; fin: Date }
+    _periode?: { debut: Date; fin: Date }
   ): Promise<Array<Material & { quantiteUtilisee: number }>> {
     // TODO: Implémenter avec les données d'utilisation
     const materials = await this.repository.find({ take: limit })
@@ -533,7 +533,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return await this.repository.find({ where: { emplacement } })
   }
 
-  async findCompatibleMaterials(materialId: string): Promise<Material[]> {
+  async findCompatibleMaterials(_materialId: string): Promise<Material[]> {
     // TODO: Implémenter la logique de compatibilité
     return await this.repository.find()
   }
@@ -581,8 +581,8 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
   }
 
   async getUsageStatsByPeriod(
-    debut: Date,
-    fin: Date
+    _debut: Date,
+    _fin: Date
   ): Promise<
     Array<{
       materialId: string
@@ -603,7 +603,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(spec: any): Promise<Material[]> {
+  async findBySpecification(_spec: any): Promise<Material[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }

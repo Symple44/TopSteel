@@ -55,7 +55,10 @@ function generateGenericProductSVG(filename: string): string {
   `
 }
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ filename: string }> }) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ filename: string }> }
+) {
   const { filename } = await params
 
   // Générer l'image SVG générique avec la désignation

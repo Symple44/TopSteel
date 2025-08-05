@@ -66,12 +66,8 @@ export class DatabaseAdminController {
   @Post('migrations/run')
   @ApiOperation({ summary: 'Exécuter toutes les migrations' })
   async runMigrations() {
-    try {
-      const results = await this.migrationManagerService.runAllMigrations()
-      return results
-    } catch (error) {
-      throw error
-    }
+    const results = await this.migrationManagerService.runAllMigrations()
+    return results
   }
 
   @Post('migrations/tenant/:tenantCode/run')

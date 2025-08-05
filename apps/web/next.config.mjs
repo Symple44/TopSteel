@@ -32,12 +32,6 @@ const nextConfig = {
   // Transpile workspace packages for Next.js 15 (excluding server external ones)
   transpilePackages: ['@erp/domains', '@erp/api-client'],
 
-  // Production optimizations
-  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
-  experimental: {
-    outputFileTracingRoot: path.join(process.cwd(), '../../'),
-  },
-
   // API rewrites - proxy vers le backend NestJS
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
@@ -103,6 +97,8 @@ const nextConfig = {
     // Disable optimistic hydration
     // optimizePackageImports: false, // Should be an array, not boolean
   },
+
+  // Production optimizations
 
   // Disable static generation completely
   output: undefined,

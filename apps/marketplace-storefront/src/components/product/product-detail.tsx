@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  Check,
   ChevronLeft,
   ChevronRight,
   Heart,
@@ -48,7 +47,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
       toast.success('Produit ajouté au panier', {
         description: `${quantity} × ${product.designation}`,
       })
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erreur lors de l'ajout au panier")
     } finally {
       setIsAddingToCart(false)
@@ -63,7 +62,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
           text: product.shortDescription,
           url: window.location.href,
         })
-      } catch (error) {
+      } catch (_error) {
         // User cancelled sharing
       }
     } else {

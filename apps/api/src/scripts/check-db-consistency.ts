@@ -85,21 +85,13 @@ class DatabaseConsistencyChecker {
   }
 
   async checkConsistency(): Promise<void> {
-    console.log('🔍 Démarrage de la vérification de cohérence de la base de données...\n')
-
     try {
-      // Vérifier la base AUTH
-      console.log('📊 Analyse de la base AUTH...')
       await this.checkDatabase('AUTH', this.authDataSource)
-
-      // Vérifier une base TENANT
-      console.log('\n📊 Analyse de la base TENANT...')
       await this.checkDatabase('TENANT', this.tenantDataSource)
 
       // Générer le rapport
       this.generateReport()
-    } catch (error) {
-      console.error('❌ Erreur lors de la vérification:', error)
+    } catch (_error) {
       process.exit(1)
     }
   }
@@ -107,16 +99,12 @@ class DatabaseConsistencyChecker {
   private async checkDatabase(dbType: string, dataSource: DataSource): Promise<void> {
     try {
       await dataSource.initialize()
-      console.log(`✅ Connexion établie à la base ${dbType}: ${dataSource.options.database}`)
 
       // Récupérer les informations de la base
       const dbInfo = await this.getDatabaseInfo(dataSource, dbType)
 
       // Récupérer les métadonnées des entités
       const entityMetadata = dataSource.entityMetadatas
-
-      console.log(`📋 Tables trouvées en base: ${dbInfo.tables.size}`)
-      console.log(`📋 Entités TypeORM définies: ${entityMetadata.length}`)
 
       // Vérifier les tables et colonnes
       await this.checkTablesAndColumns(dbInfo, entityMetadata, dbType)
@@ -134,7 +122,6 @@ class DatabaseConsistencyChecker {
     } finally {
       if (dataSource.isInitialized) {
         await dataSource.destroy()
-        console.log(`🔐 Déconnexion de la base ${dbType}`)
       }
     }
   }
@@ -233,8 +220,6 @@ class DatabaseConsistencyChecker {
     entityMetadata: any[],
     dbType: string
   ): Promise<void> {
-    console.log(`\n🔍 Vérification des tables et colonnes pour ${dbType}...`)
-
     // Vérifier que chaque entité a une table correspondante
     for (const entity of entityMetadata) {
       const tableName = entity.tableName
@@ -355,39 +340,29 @@ class DatabaseConsistencyChecker {
 
   private async checkConstraints(
     dbInfo: DatabaseInfo,
-    entityMetadata: any[],
-    dbType: string
+    _entityMetadata: any[],
+    _dbType: string
   ): Promise<void> {
-    console.log(`\n🔗 Vérification des contraintes pour ${dbType}...`)
-
     // Ici on peut ajouter des vérifications spécifiques des foreign keys
     // Pour le moment, on fait juste un résumé
-    let totalConstraints = 0
-    for (const [tableName, constraints] of dbInfo.constraints) {
-      totalConstraints += constraints.length
+    let _totalConstraints = 0
+    for (const [_tableName, constraints] of dbInfo.constraints) {
+      _totalConstraints += constraints.length
     }
-
-    console.log(`📊 Total des contraintes trouvées: ${totalConstraints}`)
   }
 
   private async checkIndexes(
     dbInfo: DatabaseInfo,
-    entityMetadata: any[],
-    dbType: string
+    _entityMetadata: any[],
+    _dbType: string
   ): Promise<void> {
-    console.log(`\n📑 Vérification des index pour ${dbType}...`)
-
-    let totalIndexes = 0
-    for (const [tableName, indexes] of dbInfo.indexes) {
-      totalIndexes += indexes.length
+    let _totalIndexes = 0
+    for (const [_tableName, indexes] of dbInfo.indexes) {
+      _totalIndexes += indexes.length
     }
-
-    console.log(`📊 Total des index trouvés: ${totalIndexes}`)
   }
 
   private async checkAuthSpecificIssues(dataSource: DataSource): Promise<void> {
-    console.log(`\n🔍 Vérifications spécifiques AUTH...`)
-
     const queryRunner = dataSource.createQueryRunner()
 
     try {
@@ -476,8 +451,7 @@ class DatabaseConsistencyChecker {
           })
         }
       }
-    } catch (error) {
-      console.error('Erreur lors des vérifications AUTH spécifiques:', error)
+    } catch (_error) {
     } finally {
       await queryRunner.release()
     }
@@ -499,12 +473,7 @@ class DatabaseConsistencyChecker {
   }
 
   private generateReport(): void {
-    console.log('\n' + '='.repeat(80))
-    console.log('📋 RAPPORT DE COHÉRENCE DE LA BASE DE DONNÉES')
-    console.log('='.repeat(80))
-
     if (this.issues.length === 0) {
-      console.log('✅ Aucun problème de cohérence détecté!')
       return
     }
 
@@ -513,67 +482,38 @@ class DatabaseConsistencyChecker {
     const warnings = this.issues.filter((issue) => issue.severity === 'warning')
     const infos = this.issues.filter((issue) => issue.severity === 'info')
 
-    console.log(`\nRésumé: ${this.issues.length} problème(s) détecté(s)`)
-    console.log(`  - ❌ Erreurs: ${errors.length}`)
-    console.log(`  - ⚠️  Avertissements: ${warnings.length}`)
-    console.log(`  - ℹ️  Informations: ${infos.length}`)
-
     // Afficher les erreurs
     if (errors.length > 0) {
-      console.log('\n❌ ERREURS CRITIQUES:')
-      console.log('-'.repeat(50))
-      errors.forEach((issue, index) => {
-        console.log(`${index + 1}. [${issue.type}] ${issue.description}`)
-        if (issue.table) console.log(`   Table: ${issue.table}`)
-        if (issue.column) console.log(`   Colonne: ${issue.column}`)
-        if (issue.entity) console.log(`   Entité: ${issue.entity}`)
-        if (issue.expected && issue.actual) {
-          console.log(`   Attendu: ${issue.expected}, Trouvé: ${issue.actual}`)
-        }
-        console.log('')
+      errors.forEach((issue, _index) => {
+        if (issue.table)
+          if (issue.column)
+            if (issue.entity)
+              if (issue.expected && issue.actual) {
+              }
       })
     }
 
     // Afficher les avertissements
     if (warnings.length > 0) {
-      console.log('\n⚠️  AVERTISSEMENTS:')
-      console.log('-'.repeat(50))
-      warnings.forEach((issue, index) => {
-        console.log(`${index + 1}. [${issue.type}] ${issue.description}`)
-        if (issue.table) console.log(`   Table: ${issue.table}`)
-        if (issue.column) console.log(`   Colonne: ${issue.column}`)
-        if (issue.entity) console.log(`   Entité: ${issue.entity}`)
-        console.log('')
+      warnings.forEach((issue, _index) => {
+        if (issue.table) 
+        if (issue.column) 
+        if (issue.entity)
       })
     }
 
     // Afficher les informations
     if (infos.length > 0) {
-      console.log('\nℹ️  INFORMATIONS:')
-      console.log('-'.repeat(50))
-      infos.forEach((issue, index) => {
-        console.log(`${index + 1}. [${issue.type}] ${issue.description}`)
-        if (issue.table) console.log(`   Table: ${issue.table}`)
-        console.log('')
+      infos.forEach((issue, _index) => {
+        if (issue.table)
       })
     }
 
-    // Recommandations
-    console.log('\n📋 RECOMMANDATIONS:')
-    console.log('-'.repeat(50))
-
     if (errors.length > 0) {
-      console.log('1. Corriger les erreurs critiques en priorité')
-      console.log('2. Exécuter les migrations manquantes si nécessaire')
-      console.log('3. Synchroniser les entités TypeORM avec la structure de base')
     }
 
     if (warnings.length > 0) {
-      console.log('4. Examiner les avertissements pour détecter les incohérences')
-      console.log('5. Standardiser la nomenclature des colonnes (français vs anglais)')
     }
-
-    console.log('\n' + '='.repeat(80))
   }
 }
 
@@ -584,8 +524,7 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch((error) => {
-    console.error('💥 Erreur fatale:', error)
+  main().catch((_error) => {
     process.exit(1)
   })
 }

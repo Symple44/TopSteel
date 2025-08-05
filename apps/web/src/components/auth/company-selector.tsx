@@ -455,30 +455,22 @@ export default function CompanySelector({
 
       setCompanies(companiesArray)
 
-      console.log('🔍 CompanySelector: Companies loaded:', companiesArray)
-      console.log('🔍 CompanySelector: Looking for default company with isDefault=true')
-
       // Sélectionner automatiquement la société par défaut s'il y en a une
       const defaultCompany = companiesArray.find((c) => c.isDefault === true)
-      console.log('🔍 CompanySelector: Default company found:', defaultCompany)
 
       if (defaultCompany) {
-        console.log('🔍 CompanySelector: Auto-selecting default company:', defaultCompany.id)
         setSelectedCompanyId(defaultCompany.id)
         setSaveAsDefault(true)
       } else if (companiesArray.length === 1) {
-        // Si une seule société, la sélectionner automatiquement
-        console.log('🔍 CompanySelector: Only one company, auto-selecting:', companiesArray[0].id)
         setSelectedCompanyId(companiesArray[0].id)
       } else {
-        console.log('🔍 CompanySelector: No default company found, user must select manually')
       }
     } catch (_error) {
       toast.error(t('companies.loadingError'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadCompanies()
@@ -490,7 +482,7 @@ export default function CompanySelector({
     // Précharger les rôles depuis l'API des paramètres
     // Ne plus vider le cache systématiquement, utiliser le cache persistant
     loadRolesFromParameters('fr', false).catch((_error) => {})
-  }, [])
+  }, [loadCompanies])
 
   const handleSelectCompany = async () => {
     if (!selectedCompanyId) {
@@ -542,32 +534,22 @@ export default function CompanySelector({
           try {
             const session = JSON.parse(storedTokens)
             // Vérifier que la session contient des tokens et qu'ils ne sont pas expirés
-            if (
-              session.tokens &&
-              session.tokens.expiresAt &&
-              session.tokens.expiresAt > Date.now()
-            ) {
-              console.log('🔍 CompanySelector: Valid session found, redirecting to dashboard')
+            if (session.tokens?.expiresAt && session.tokens.expiresAt > Date.now()) {
               window.location.href = '/dashboard'
               return
             }
-          } catch (error) {
-            console.warn('🔍 CompanySelector: Error parsing session:', error)
-          }
+          } catch (_error) {}
         }
 
         attempts++
-        console.log(`🔍 CompanySelector: Token check attempt ${attempts}/${maxAttempts}`)
 
         if (attempts < maxAttempts) {
           setTimeout(checkTokensAndRedirect, 300) // Augmenter le délai entre les tentatives
         } else {
           // Vérifier une dernière fois si l'utilisateur est toujours connecté avant d'afficher l'erreur
-          if (user && user.id) {
-            console.log('🔍 CompanySelector: User is still authenticated, redirecting anyway')
+          if (user?.id) {
             window.location.href = '/dashboard'
           } else {
-            console.warn('🔍 CompanySelector: Tokens non trouvés après', maxAttempts, 'tentatives')
             toast.error(t('companies.syncError'))
           }
         }

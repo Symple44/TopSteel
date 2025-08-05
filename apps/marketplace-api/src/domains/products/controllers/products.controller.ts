@@ -90,14 +90,14 @@ export class ProductsController {
 
   @Get(':productId/pricing/rules')
   @ApiOperation({ summary: 'Get pricing rules for product' })
-  async getPricingRules(@Req() req: Request, @Param('productId') productId: string) {
+  async getPricingRules(@Req() _req: Request, @Param('productId') productId: string) {
     return await this.pricingEngine.getApplicableRules(productId)
   }
 
   @Post(':productId/pricing/rules')
   @ApiOperation({ summary: 'Create pricing rule for product' })
   async createPricingRule(
-    @Req() req: Request,
+    @Req() _req: Request,
     @Param('productId') productId: string,
     @Body() body: any
   ) {
@@ -108,7 +108,7 @@ export class ProductsController {
   @Put(':productId/pricing/rules/:ruleId')
   @ApiOperation({ summary: 'Update pricing rule' })
   async updatePricingRule(
-    @Req() req: Request,
+    @Req() _req: Request,
     @Param('productId') productId: string,
     @Param('ruleId') ruleId: string,
     @Body() body: any
@@ -120,7 +120,7 @@ export class ProductsController {
   @Delete(':productId/pricing/rules/:ruleId')
   @ApiOperation({ summary: 'Delete pricing rule' })
   async deletePricingRule(
-    @Req() req: Request,
+    @Req() _req: Request,
     @Param('productId') productId: string,
     @Param('ruleId') ruleId: string
   ) {
@@ -140,7 +140,7 @@ export class ProductsController {
   @Put(':productId/marketplace-settings')
   @ApiOperation({ summary: 'Update marketplace-specific settings for product' })
   async updateMarketplaceSettings(
-    @Req() req: Request,
+    @Req() _req: Request,
     @Param('productId') productId: string,
     @Body() settings: {
       images?: string[]

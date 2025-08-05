@@ -339,19 +339,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
                 return
               } else {
-                console.log('🔍 AuthProvider: No default company found in response data')
               }
             } else {
-              console.log('🔍 AuthProvider: Default company response not ok:', response.status)
             }
-          } catch (error) {
-            // Si la récupération de la société par défaut échoue (ex: 401 car pas encore de société), continuer normalement
-            // C'est un comportement attendu lors du premier login
-            console.debug(
-              'Default company retrieval failed (expected during initial login):',
-              error
-            )
-          }
+          } catch (_error) {}
 
           // Pas de société par défaut ou erreur - forcer la sélection (tokens déjà sauvegardés)
 

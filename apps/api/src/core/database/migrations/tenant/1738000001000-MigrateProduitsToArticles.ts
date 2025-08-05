@@ -7,7 +7,6 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
     // Vérifier que la table produits existe et contient des données
     const produitsExists = await queryRunner.hasTable('produits')
     if (!produitsExists) {
-      console.log("Table produits n'existe pas, migration ignorée")
       return
     }
 
@@ -24,7 +23,6 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
     )
 
     if (parseInt(produitCount[0].count) === 0) {
-      console.log('Aucun produit à migrer')
       return
     }
 
@@ -32,13 +30,7 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
     const articleCount = await queryRunner.query('SELECT COUNT(*) as count FROM articles')
 
     if (parseInt(articleCount[0].count) > 0) {
-      console.warn(
-        `ATTENTION: La table articles contient déjà ${articleCount[0].count} enregistrements`
-      )
-      console.warn('Migration des produits continuée, mais risque de doublons sur les références')
     }
-
-    console.log(`Migration de ${produitCount[0].count} produits vers la table articles...`)
 
     // Migration des données
     await queryRunner.query(`
@@ -189,12 +181,8 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
     `)
 
     // Compter les articles migrés
-    const migratedCount = await queryRunner.query(
+    const _migratedCount = await queryRunner.query(
       `SELECT COUNT(*) as count FROM articles WHERE metadonnees->>'origine_migration' = 'produits'`
-    )
-
-    console.log(
-      `Migration terminée: ${migratedCount[0].count} articles migrés depuis la table produits`
     )
 
     // Créer une vue pour la compatibilité ascendante
@@ -250,13 +238,7 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
       GROUP BY a.type, a.famille
       ORDER BY nombre DESC
     `)
-
-    console.log('Statistiques de migration par type/famille:')
-    stats.forEach((stat: any) => {
-      console.log(
-        `  ${stat.type}/${stat.famille}: ${stat.nombre} articles (prix moyen: ${stat.prix_moyen}€)`
-      )
-    })
+    stats.forEach((_stat: any) => {})
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -271,7 +253,5 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
       DELETE FROM articles 
       WHERE metadonnees->>'origine_migration' = 'produits'
     `)
-
-    console.log('Migration inversée: articles migrés depuis produits ont été supprimés')
   }
 }

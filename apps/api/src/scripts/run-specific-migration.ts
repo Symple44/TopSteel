@@ -7,7 +7,6 @@ async function runSpecificMigration() {
 
   try {
     await dataSource.initialize()
-    console.log('\n=== EXÉCUTION DE LA MIGRATION ADDCOMMERCIALPERMISSIONS ===\n')
 
     const migration = new AddCommercialPermissions1753820000016()
 
@@ -20,11 +19,8 @@ async function runSpecificMigration() {
     )
 
     if (existing.length > 0) {
-      console.log('✅ Cette migration a déjà été exécutée.')
       return
     }
-
-    console.log('🚀 Exécution de la migration...')
 
     // Exécuter la migration
     const queryRunner = dataSource.createQueryRunner()
@@ -48,15 +44,9 @@ async function runSpecificMigration() {
     } finally {
       await queryRunner.release()
     }
-
-    console.log('✅ Migration exécutée avec succès!')
   } catch (error) {
-    console.error("❌ Erreur lors de l'exécution de la migration:", error)
-
     // Afficher plus de détails sur l'erreur
     if (error instanceof Error) {
-      console.error('Message:', error.message)
-      console.error('Stack:', error.stack)
     }
   } finally {
     await dataSource.destroy()

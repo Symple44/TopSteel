@@ -179,16 +179,12 @@ export class ElasticsearchClient {
   }
 
   async search(indexName: string, query: any): Promise<any> {
-    try {
-      const client = this.getClient()
-      const response = await client.search({
-        index: indexName,
-        body: query,
-      })
-      return response
-    } catch (error) {
-      throw error
-    }
+    const client = this.getClient()
+    const response = await client.search({
+      index: indexName,
+      body: query,
+    })
+    return response
   }
 
   async bulk(operations: any[]): Promise<boolean> {

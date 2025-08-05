@@ -18,13 +18,7 @@ async function listDatabases() {
   })
 
   try {
-    console.log('🔌 Connexion à PostgreSQL...')
-    console.log(`   Host: ${process.env.DB_HOST || '127.0.0.1'}`)
-    console.log(`   Port: ${process.env.DB_PORT || '5432'}`)
-    console.log(`   User: ${process.env.DB_USERNAME || 'postgres'}`)
-
     await adminDataSource.initialize()
-    console.log('✅ Connecté avec succès!\n')
 
     // Lister toutes les bases de données
     const result = await adminDataSource.query(`
@@ -34,36 +28,24 @@ async function listDatabases() {
       ORDER BY datname
     `)
 
-    console.log('📋 Bases de données disponibles:')
-    console.log('================================')
-
     result.forEach((db: any) => {
       const dbName = db.datname
       // Mettre en évidence les bases TopSteel
       if (dbName.includes('topsteel')) {
-        console.log(`   ✅ ${dbName}`)
       } else {
-        console.log(`   • ${dbName}`)
       }
     })
-
-    console.log('\n🔍 Bases TopSteel trouvées:')
     const topsteelDbs = result
       .filter((db: any) => db.datname.includes('topsteel'))
       .map((db: any) => db.datname)
 
-    topsteelDbs.forEach((db: string) => {
-      console.log(`   - ${db}`)
-    })
+    topsteelDbs.forEach((_db: string) => {})
 
     // Vérifier spécifiquement la base attendue
     const expectedDb = `erp_topsteel_${process.env.DEFAULT_TENANT_CODE?.toLowerCase() || 'default'}`
-    console.log(`\n🎯 Base attendue: ${expectedDb}`)
 
-    const exists = topsteelDbs.includes(expectedDb)
-    console.log(`   Statut: ${exists ? '✅ EXISTE' : '❌ MANQUANTE'}`)
-  } catch (error) {
-    console.error('❌ Erreur de connexion:', error)
+    const _exists = topsteelDbs.includes(expectedDb)
+  } catch (_error) {
   } finally {
     if (adminDataSource.isInitialized) {
       await adminDataSource.destroy()

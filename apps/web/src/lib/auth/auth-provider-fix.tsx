@@ -285,18 +285,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
               method: 'GET',
             })
 
-            console.log('🔍 AuthProvider: Default company response status:', response.status)
-
             if (response.ok) {
               const defaultCompanyData = await response.json()
-              console.log('🔍 AuthProvider: Default company data:', defaultCompanyData)
 
               if (defaultCompanyData.success && defaultCompanyData.data) {
-                console.log(
-                  '🔍 AuthProvider: Found default company, auto-selecting:',
-                  defaultCompanyData.data.id
-                )
-
                 // L'utilisateur a une société par défaut - se connecter automatiquement
                 const companyId = defaultCompanyData.data.id
 
@@ -307,8 +299,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                   companyId,
                   tokens.accessToken
                 )
-
-                console.log('🔍 AuthProvider: Company selection result:', companySelectResult)
 
                 const adaptedUser = AuthAdapter.toAuthUser(
                   AuthAdapter.toExtendedUser(companySelectResult.user as any)
@@ -328,8 +318,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                   requiresCompanySelection: false,
                   mounted: true,
                 }
-
-                console.log('🔍 AuthProvider: Setting auth state with default company:', newState)
                 setAuthState(newState)
                 broadcastAuthEvent('USER_LOGIN', {
                   user: adaptedUser,
@@ -339,25 +327,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
                 // IMPORTANT: Rediriger immédiatement vers le dashboard
                 if (typeof window !== 'undefined') {
-                  console.log('🔍 AuthProvider: Redirecting to dashboard...')
                   window.location.href = '/dashboard'
                 }
 
                 return
               } else {
-                console.log('🔍 AuthProvider: No default company found in response data')
               }
             } else {
-              console.log('🔍 AuthProvider: Default company response not ok:', response.status)
             }
-          } catch (error) {
-            // Si la récupération de la société par défaut échoue (ex: 401 car pas encore de société), continuer normalement
-            // C'est un comportement attendu lors du premier login
-            console.debug(
-              'Default company retrieval failed (expected during initial login):',
-              error
-            )
-          }
+          } catch (_error) {}
 
           // Pas de société par défaut ou erreur - forcer la sélection (tokens déjà sauvegardés)
 

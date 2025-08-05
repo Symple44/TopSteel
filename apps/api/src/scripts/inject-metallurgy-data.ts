@@ -8,9 +8,9 @@
  * ou: npx ts-node src/scripts/inject-metallurgy-data.ts
  */
 
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { config } from 'dotenv'
-import { existsSync, readFileSync } from 'fs'
-import { join } from 'path'
 import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
@@ -52,47 +52,16 @@ class MetallurgyDataInjector {
   async initialize(): Promise<void> {
     try {
       await this.dataSource.initialize()
-      console.log('✅ Connexion base de données établie')
-
-      // Pour une base tenant, nous assumons que l'ID société sera fourni dans les scripts
-      // La table societes est dans la base auth, pas dans la base tenant
-      console.log('ℹ️  Utilisation de la base tenant - les sociétés sont gérées dans la base auth')
     } catch (error) {
-      console.error('❌ Erreur connexion base de données:', error)
       throw error
     }
   }
 
   /**
-   * Création d'une société par défaut si nécessaire
-   */
-  private async createDefaultSociety(): Promise<void> {
-    const societySQL = `
-      INSERT INTO societes (
-        id, code, raison_sociale, siret, tva_numero, 
-        status, created_at, updated_at
-      ) VALUES (
-        gen_random_uuid(),
-        'TOPSTEEL',
-        'TopSteel Métallurgie',
-        '12345678901234',
-        'FR12345678901',
-        'ACTIF',
-        NOW(),
-        NOW()
-      ) ON CONFLICT (code) DO NOTHING;
-    `
-
-    await this.dataSource.query(societySQL)
-    console.log('✅ Société "topsteel" créée')
-  }
-
-  /**
    * Exécution d'un script SQL
    */
-  private async executeScript(scriptName: string, description: string): Promise<ScriptResult> {
+  private async executeScript(scriptName: string, _description: string): Promise<ScriptResult> {
     const startTime = Date.now()
-    console.log(`\n🔄 ${description}...`)
 
     try {
       const scriptPath = join(this.scriptsPath, scriptName)
@@ -115,8 +84,6 @@ class MetallurgyDataInjector {
 
       const duration = Date.now() - startTime
 
-      console.log(`✅ ${description} terminé (${articlesCreated} articles créés en ${duration}ms)`)
-
       return {
         name: scriptName,
         success: true,
@@ -125,7 +92,6 @@ class MetallurgyDataInjector {
       }
     } catch (error) {
       const duration = Date.now() - startTime
-      console.error(`❌ Erreur lors de ${description}:`, error)
 
       return {
         name: scriptName,
@@ -152,9 +118,6 @@ class MetallurgyDataInjector {
    * Injection complète de toutes les données
    */
   async injectAllData(): Promise<void> {
-    console.log("🚀 DÉBUT DE L'INJECTION DES DONNÉES MÉTALLURGIE")
-    console.log('================================================\n')
-
     const scripts = [
       {
         file: 'seed-system-settings.sql',
@@ -192,7 +155,6 @@ class MetallurgyDataInjector {
       this.results.push(result)
 
       if (!result.success) {
-        console.log('\n⚠️  Script échoué mais continuation...')
       }
     }
 
@@ -203,38 +165,21 @@ class MetallurgyDataInjector {
    * Génération du rapport final
    */
   private async generateReport(): Promise<void> {
-    console.log('\n================================================')
-    console.log("📊 RAPPORT D'INJECTION FINAL")
-    console.log('================================================')
-
     const successful = this.results.filter((r) => r.success)
-    const failed = this.results.filter((r) => !r.success)
+    const _failed = this.results.filter((r) => !r.success)
 
-    console.log(`✅ Scripts réussis: ${successful.length}/${this.results.length}`)
-    console.log(`❌ Scripts échoués: ${failed.length}/${this.results.length}`)
-
-    const totalArticles = successful.reduce((sum, r) => sum + (r.articlesCreated || 0), 0)
-    const totalDuration = this.results.reduce((sum, r) => sum + r.duration, 0)
-
-    console.log(`📦 Total articles créés: ${totalArticles}`)
-    console.log(`⏱️  Durée totale: ${totalDuration}ms`)
-
-    // Détail par script
-    console.log('\n📋 Détail par script:')
+    const _totalArticles = successful.reduce((sum, r) => sum + (r.articlesCreated || 0), 0)
+    const _totalDuration = this.results.reduce((sum, r) => sum + r.duration, 0)
     this.results.forEach((result) => {
-      const status = result.success ? '✅' : '❌'
-      const articles = result.articlesCreated ? ` (${result.articlesCreated} articles)` : ''
-      console.log(`${status} ${result.name}${articles}`)
+      const _status = result.success ? '✅' : '❌'
+      const _articles = result.articlesCreated ? ` (${result.articlesCreated} articles)` : ''
 
       if (result.error) {
-        console.log(`   🔍 Erreur: ${result.error}`)
       }
     })
 
     // Statistiques base de données
     try {
-      console.log('\n📈 Statistiques base de données:')
-
       const familyStats = await this.dataSource.query(`
         SELECT 
           famille,
@@ -246,11 +191,7 @@ class MetallurgyDataInjector {
         ORDER BY famille
       `)
 
-      familyStats.forEach((stat: any) => {
-        console.log(
-          `   📁 ${stat.famille}: ${stat.nombre_articles} articles (prix moyen: ${stat.prix_moyen}€)`
-        )
-      })
+      familyStats.forEach((_stat: any) => {})
 
       const totalStats = await this.dataSource.query(`
         SELECT 
@@ -262,18 +203,9 @@ class MetallurgyDataInjector {
       `)
 
       if (totalStats.length > 0) {
-        const stats = totalStats[0]
-        console.log(`\n💰 TOTAUX:`)
-        console.log(`   📦 Articles métallurgie: ${stats.total}`)
-        console.log(`   💶 Prix moyen: ${stats.prix_moyen}€`)
-        console.log(`   💎 Valeur catalogue: ${stats.valeur_totale}€`)
+        const _stats = totalStats[0]
       }
-    } catch (error) {
-      console.log('⚠️  Impossible de récupérer les statistiques:', error)
-    }
-
-    console.log('\n🎉 INJECTION TERMINÉE !')
-    console.log('================================================')
+    } catch (_error) {}
   }
 
   /**
@@ -282,7 +214,6 @@ class MetallurgyDataInjector {
   async cleanup(): Promise<void> {
     if (this.dataSource.isInitialized) {
       await this.dataSource.destroy()
-      console.log('🔌 Connexion base de données fermée')
     }
   }
 }
@@ -294,8 +225,7 @@ async function main() {
   try {
     await injector.initialize()
     await injector.injectAllData()
-  } catch (error) {
-    console.error('💥 Erreur fatale:', error)
+  } catch (_error) {
     process.exit(1)
   } finally {
     await injector.cleanup()

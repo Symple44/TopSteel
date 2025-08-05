@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 import { TenantEntity } from '../../../core/database/entities/base/multi-tenant.entity'
 
 export enum BTPIndexType {

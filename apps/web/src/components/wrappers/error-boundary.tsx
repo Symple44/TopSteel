@@ -21,7 +21,6 @@ export class ErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): State {
     // Vérifie si c'est l'erreur params readonly
     if (error.message.includes("Cannot assign to read only property 'params'")) {
-      console.warn('Erreur params readonly interceptée:', error.message)
       // Force un refresh pour résoudre le problème
       if (typeof window !== 'undefined') {
         setTimeout(() => {
@@ -33,9 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error boundary caught an error:', error, errorInfo)
-  }
+  componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {}
 
   render() {
     if (this.state.hasError) {

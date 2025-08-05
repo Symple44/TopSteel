@@ -85,7 +85,6 @@ import {
   Wrench,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { TranslationFieldWrapper as TranslationField } from '@/components/wrappers'
 import { apiClient } from '@/lib/api-client-instance'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { translator } from '@/lib/i18n/translator'

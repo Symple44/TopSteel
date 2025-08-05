@@ -77,7 +77,7 @@ export class MaterialController {
   })
   async getMaterials(
     @Query() filters: MaterialFiltersDto,
-    @CurrentUser() user: User
+    @CurrentUser() _user: User
   ): Promise<Material[]> {
     return await this.materialService.searchMaterials(filters)
   }
@@ -390,7 +390,7 @@ export class MaterialController {
   })
   async searchAdvanced(
     @Body() searchCriteria: any,
-    @CurrentUser() user: User
+    @CurrentUser() _user: User
   ): Promise<Material[]> {
     return await this.materialService.searchMaterials(searchCriteria)
   }
@@ -481,7 +481,7 @@ export class MaterialController {
   })
   async exportMaterials(
     @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: any },
-    @CurrentUser() user: User
+    @CurrentUser() _user: User
   ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
     return {

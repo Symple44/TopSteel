@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -19,11 +18,7 @@ import {
   SectorCoefficient,
   SectorType,
 } from '../entities/sector-coefficient.entity'
-import {
-  PricingContext,
-  type PricingResult,
-  type SectorPricingService,
-} from '../services/sector-pricing.service'
+import type { PricingResult, SectorPricingService } from '../services/sector-pricing.service'
 
 // DTOs
 export class CreateSectorCoefficientDto {

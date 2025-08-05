@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { PageTemplate } from './page-template.entity'
-import { type SectionContent, type SectionStyles, SectionType } from './types'
+import type { SectionContent, SectionStyles } from './types'
 
 @Entity('marketplace_page_sections')
 export class PageSection {

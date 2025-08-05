@@ -24,10 +24,7 @@ import {
   SocieteRoleType,
 } from '../../../domains/auth/core/constants/roles.constants'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
-import {
-  RequireSystemAdmin,
-  RequireUserManagement,
-} from '../../../domains/auth/security/guards/enhanced-roles.guard'
+import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { RequireSocieteContext } from '../../../domains/auth/security/guards/enhanced-tenant.guard'
 import type { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
 import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
@@ -370,7 +367,7 @@ export class AdminUsersController {
         message: 'Utilisateur supprimé avec succès',
         statusCode: 200,
       }
-    } catch (error: any) {
+    } catch (_error: any) {
       throw new BadRequestException("Erreur lors de la suppression de l'utilisateur")
     }
   }
@@ -446,7 +443,7 @@ export class AdminUsersController {
         message: 'Rôle société assigné avec succès',
         statusCode: 201,
       }
-    } catch (error: any) {
+    } catch (_error: any) {
       throw new BadRequestException("Erreur lors de l'assignation du rôle")
     }
   }
@@ -517,9 +514,6 @@ export class AdminUsersController {
       for (const key of commonKeys) {
         await this.cacheService.delete(key)
       }
-    } catch (error) {
-      // Log l'erreur mais ne pas faire échouer l'opération
-      console.error("Erreur lors de l'invalidation du cache:", error)
-    }
+    } catch (_error) {}
   }
 }

@@ -8,8 +8,8 @@
  * ou: npx ts-node src/scripts/cleanup-legacy-produits.ts
  */
 
+import * as readline from 'node:readline'
 import { config } from 'dotenv'
-import * as readline from 'readline'
 import { DataSource } from 'typeorm'
 
 // Charger les variables d'environnement
@@ -30,9 +30,6 @@ async function askConfirmation(question: string): Promise<boolean> {
 }
 
 async function cleanupLegacyProduits() {
-  console.log('🧹 NETTOYAGE DE LA TABLE LEGACY "produits"')
-  console.log('==========================================\n')
-
   // Configuration base de données
   const dbName = process.env.TENANT_DB_NAME || 'erp_topsteel_topsteel'
 
@@ -47,10 +44,7 @@ async function cleanupLegacyProduits() {
   })
 
   try {
-    // Connexion base de données
-    console.log('🔌 Connexion à la base de données...')
     await dataSource.initialize()
-    console.log('✅ Connexion établie\n')
 
     // Vérifier si la table existe
     const tableExists = await dataSource.query(`
@@ -61,17 +55,12 @@ async function cleanupLegacyProduits() {
     `)
 
     if (!tableExists[0].exists) {
-      console.log('ℹ️  La table "produits" n\'existe pas. Nettoyage non nécessaire.')
       return
     }
 
     // Vérifier le contenu de la table
     const countResult = await dataSource.query('SELECT COUNT(*) FROM produits')
     const count = parseInt(countResult[0].count)
-
-    console.log(`📊 État de la table "produits":`)
-    console.log(`   - Existe: ✅`)
-    console.log(`   - Nombre d'enregistrements: ${count}`)
 
     // Vérifier les contraintes de clé étrangère
     const fkConstraints = await dataSource.query(`
@@ -91,51 +80,30 @@ async function cleanupLegacyProduits() {
     `)
 
     if (fkConstraints.length > 0) {
-      console.log(
-        `\n⚠️  ATTENTION: ${fkConstraints.length} contrainte(s) de clé étrangère référencent cette table:`
-      )
-      fkConstraints.forEach((fk: any) => {
-        console.log(`   - ${fk.table_name}.${fk.column_name} → produits.${fk.foreign_column_name}`)
-      })
-      console.log("\n🛑 Suppression annulée pour préserver l'intégrité des données.")
+      fkConstraints.forEach((_fk: any) => {})
       return
     }
-
-    // Demander confirmation
-    console.log(`\n⚠️  Vous êtes sur le point de supprimer définitivement:`)
-    console.log(`   - La table "produits"`)
-    console.log(`   - Ses ${count} enregistrement(s)`)
-    console.log(`   - Ses index et contraintes`)
-    console.log(`\n⚠️  CETTE ACTION EST IRRÉVERSIBLE!`)
 
     const confirmed = await askConfirmation('\n❓ Confirmez-vous la suppression? (y/N): ')
 
     if (!confirmed) {
-      console.log("\n❌ Suppression annulée par l'utilisateur.")
       return
     }
 
     // Sauvegarder les données si il y en a
     if (count > 0) {
-      console.log('\n💾 Sauvegarde des données existantes...')
-      const data = await dataSource.query('SELECT * FROM produits')
+      const _data = await dataSource.query('SELECT * FROM produits')
 
       // Créer une table de sauvegarde
       await dataSource.query(`
         CREATE TABLE IF NOT EXISTS produits_backup_${Date.now()} AS 
         SELECT * FROM produits
       `)
-      console.log('✅ Sauvegarde créée')
     }
-
-    // Supprimer la table
-    console.log('\n🗑️  Suppression de la table "produits"...')
     await dataSource.query('DROP TABLE IF EXISTS produits CASCADE')
-    console.log('✅ Table "produits" supprimée avec succès')
 
     // Supprimer la séquence associée si elle existe
     await dataSource.query('DROP SEQUENCE IF EXISTS produits_id_seq CASCADE')
-    console.log('✅ Séquence "produits_id_seq" supprimée')
 
     // Vérification finale
     const finalCheck = await dataSource.query(`
@@ -146,20 +114,13 @@ async function cleanupLegacyProduits() {
     `)
 
     if (finalCheck[0].exists) {
-      console.log('\n❌ Erreur: La table existe encore après suppression')
     } else {
-      console.log('\n🎉 NETTOYAGE TERMINÉ AVEC SUCCÈS!')
-      console.log('   ✅ Table "produits" complètement supprimée')
-      console.log('   ✅ Base de données nettoyée')
-      console.log('   ✅ Migration vers "articles" complète')
     }
   } catch (error) {
-    console.error('\n💥 ERREUR lors du nettoyage:', error)
     throw error
   } finally {
     if (dataSource.isInitialized) {
       await dataSource.destroy()
-      console.log('\n🔌 Connexion fermée')
     }
   }
 }
@@ -168,9 +129,7 @@ async function cleanupLegacyProduits() {
 async function main() {
   try {
     await cleanupLegacyProduits()
-    console.log('\n✨ Script terminé avec succès')
-  } catch (error) {
-    console.error('\n💥 ERREUR FATALE:', error)
+  } catch (_error) {
     process.exit(1)
   }
 }

@@ -219,7 +219,7 @@ export class SessionsController {
    */
   @Post('cleanup')
   @Roles('SUPER_ADMIN', 'ADMIN')
-  async cleanupExpiredSessions(@Request() req: any) {
+  async cleanupExpiredSessions(@Request() _req: any) {
     try {
       const result = await this.authService.cleanupExpiredSessions()
 
