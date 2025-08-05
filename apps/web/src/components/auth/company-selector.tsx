@@ -443,7 +443,7 @@ export default function CompanySelector({
         setSelectedCompanyId(companiesArray[0].id)
       }
     } catch (_error) {
-      toast.error('Impossible de charger les sociétés disponibles')
+      toast.error(t('companies.loadingError'))
     } finally {
       setLoading(false)
     }
@@ -459,11 +459,11 @@ export default function CompanySelector({
     // Précharger les rôles depuis l'API des paramètres
     // Ne plus vider le cache systématiquement, utiliser le cache persistant
     loadRolesFromParameters('fr', false).catch((_error) => {})
-  }, [loadCompanies])
+  }, [])
 
   const handleSelectCompany = async () => {
     if (!selectedCompanyId) {
-      toast.error('Veuillez sélectionner une société')
+      toast.error(t('companies.select'))
       return
     }
 
@@ -473,7 +473,7 @@ export default function CompanySelector({
       // Trouver la société sélectionnée
       const selectedCompany = companies.find((c) => c.id === selectedCompanyId)
       if (!selectedCompany) {
-        throw new Error('Société non trouvée')
+        throw new Error(t('companies.notFound'))
       }
 
       // Utiliser la fonction selectCompany du hook qui met à jour l'état correctement
@@ -497,20 +497,40 @@ export default function CompanySelector({
         } catch (_error) {}
       }
 
-      toast.success(`Connecté à ${selectedCompany.nom}`)
+      toast.success(t('companies.connectedTo', { name: selectedCompany.nom }))
 
       // Attendre un peu pour s'assurer que les tokens sont stockés avant de rediriger
-      setTimeout(() => {
+      let attempts = 0
+      const maxAttempts = 10
+      const checkTokensAndRedirect = () => {
         const storedTokens = localStorage.getItem('topsteel-tokens')
-
+        
         if (storedTokens) {
-          window.location.href = '/dashboard'
-        } else {
-          toast.error('Erreur de synchronisation, veuillez vous reconnecter')
+          try {
+            const tokens = JSON.parse(storedTokens)
+            // Vérifier que les tokens ne sont pas expirés
+            if (tokens.expiresAt && tokens.expiresAt > Date.now()) {
+              window.location.href = '/dashboard'
+              return
+            }
+          } catch (_error) {
+            // Tokens corrompus, continuer les tentatives
+          }
         }
-      }, 500)
+        
+        attempts++
+        if (attempts < maxAttempts) {
+          setTimeout(checkTokensAndRedirect, 200)
+        } else {
+          // Seulement afficher l'erreur après plusieurs tentatives échouées
+          console.warn('Tokens non trouvés après', maxAttempts, 'tentatives')
+          toast.error(t('companies.syncError'))
+        }
+      }
+      
+      setTimeout(checkTokensAndRedirect, 200)
     } catch (_error) {
-      toast.error('Impossible de se connecter à cette société')
+      toast.error(t('companies.cannotConnect'))
     } finally {
       setSubmitting(false)
     }
@@ -523,7 +543,7 @@ export default function CompanySelector({
           <div className="bg-primary/10 p-3 rounded-full">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
-          <p className="text-muted-foreground font-medium text-sm">Chargement des sociétés...</p>
+          <p className="text-muted-foreground font-medium text-sm">{t('companies.loading')}</p>
         </div>
       ) : companies.length === 0 ? (
         <div className="text-center py-8 space-y-4">
@@ -531,9 +551,9 @@ export default function CompanySelector({
             <Building2 className="h-8 w-8 text-muted-foreground" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-semibold text-foreground text-sm">Aucune société disponible</h3>
+            <h3 className="font-semibold text-foreground text-sm">{t('companies.none')}</h3>
             <p className="text-muted-foreground text-xs">
-              Contactez votre administrateur pour obtenir les accès nécessaires.
+              {t('companies.contactAdmin')}
             </p>
           </div>
           <Button
@@ -542,7 +562,7 @@ export default function CompanySelector({
             onClick={() => logout()}
             className="mx-auto hover:bg-destructive/10 hover:text-destructive transition-colors"
           >
-            🚪 Se déconnecter
+            {t('actions.disconnect')}
           </Button>
         </div>
       ) : (
@@ -588,11 +608,11 @@ export default function CompanySelector({
                       </div>
                       <div className="text-xs text-muted-foreground group-hover:text-foreground transition-colors mb-2">
                         <div className="flex items-center gap-1 mb-1">
-                          <span className="font-medium">Code:</span>
+                          <span className="font-medium">{t('companies.code')}:</span>
                           <span className="truncate">{company.code}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="font-medium">Rôle:</span>
+                          <span className="font-medium">{t('companies.role')}:</span>
                           <span className="truncate">{company.role || 'N/A'}</span>
                         </div>
                       </div>
@@ -604,7 +624,7 @@ export default function CompanySelector({
                               : 'bg-green-50 text-green-600 border-green-100 group-hover:bg-green-100 group-hover:text-green-700 group-hover:border-green-200'
                           }`}
                         >
-                          ✓ ACTIF
+                          {t('companies.active')}
                         </span>
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs transition-all flex-shrink-0 border max-w-[150px] ${getRoleStyleSync(
@@ -642,11 +662,10 @@ export default function CompanySelector({
                 </div>
                 <div className="text-xs flex-1">
                   <p className="font-medium text-amber-900">
-                    🔄 Changement sur {tabCount} onglet{tabCount > 1 ? 's' : ''}
+                    {t('companies.changeAffects', { count: tabCount })}
                   </p>
                   <p className="text-amber-700 mt-0.5">
-                    Affectera tous les onglets ouverts ({tabCount} détecté{tabCount > 1 ? 's' : ''}
-                    ).
+                    {t('companies.changeAffectsMultiple', { count: tabCount })}
                   </p>
                 </div>
               </div>
@@ -661,7 +680,7 @@ export default function CompanySelector({
               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
             <label className="text-xs font-medium text-foreground cursor-pointer select-none">
-              💾 Définir comme société par défaut
+              {t('companies.setAsDefault')}
             </label>
           </div>
 
@@ -675,7 +694,7 @@ export default function CompanySelector({
                 disabled={loading || submitting}
                 className="hover:bg-muted transition-colors text-xs h-8"
               >
-                🔄 Actualiser
+                {t('actions.refresh')}
               </Button>
               <Button
                 variant="ghost"
@@ -684,7 +703,7 @@ export default function CompanySelector({
                 disabled={submitting}
                 className="hover:bg-destructive/10 hover:text-destructive transition-colors text-xs h-8"
               >
-                🚪 Se déconnecter
+                {t('actions.disconnect')}
               </Button>
             </div>
             <div className="flex space-x-2">
@@ -696,7 +715,7 @@ export default function CompanySelector({
                   disabled={submitting}
                   className="hover:bg-muted transition-colors text-xs h-8"
                 >
-                  Annuler
+                  {t('common.cancel')}
                 </Button>
               )}
               <Button
@@ -708,12 +727,12 @@ export default function CompanySelector({
                 {submitting ? (
                   <>
                     <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                    <span className="text-xs">Connexion...</span>
+                    <span className="text-xs">{t('actions.connecting')}</span>
                   </>
                 ) : (
                   <>
                     <Building2 className="mr-1 h-3 w-3" />
-                    <span className="text-xs">Se connecter</span>
+                    <span className="text-xs">{t('actions.connect')}</span>
                   </>
                 )}
               </Button>
@@ -736,10 +755,10 @@ export default function CompanySelector({
             <div className="bg-primary/10 p-1.5 rounded-lg">
               <Building2 className="h-4 w-4 text-primary" />
             </div>
-            <span>Sélectionner une société</span>
+            <span>{t('companies.select')}</span>
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-sm mt-1">
-            Choisissez la société sur laquelle vous souhaitez travailler.
+            {t('companies.chooseSociety')}
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto py-3 px-1">{content}</div>
