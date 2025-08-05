@@ -275,7 +275,7 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
       trigger,
       children,
       triggerClassName,
-      triggerAsChild = false,
+      triggerAsChild,
 
       // Props du content
       variant,
@@ -297,9 +297,19 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
     // Utiliser children si fourni, sinon trigger
     const triggerContent = children || trigger
 
+    // Auto-detect si on doit utiliser asChild
+    // Si triggerAsChild n'est pas explicitement défini, on détecte automatiquement
+    const shouldUseAsChild = triggerAsChild !== undefined ? triggerAsChild : 
+      React.isValidElement(triggerContent) && 
+      (triggerContent.type === 'button' || 
+       (typeof triggerContent.type === 'function' && 
+        (triggerContent.type as any).displayName?.includes('Button')))
+
     if (!content || disabled) {
       // Si pas de contenu ou désactivé, retourner juste le trigger
-      return (
+      return shouldUseAsChild ? (
+        <>{triggerContent}</>
+      ) : (
         <div ref={ref} className={triggerClassName}>
           {triggerContent}
         </div>
@@ -313,8 +323,8 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
         delayDuration={delayDuration}
         disabled={disabled}
       >
-        <TooltipTrigger asChild={triggerAsChild} className={triggerClassName}>
-          {triggerAsChild ? triggerContent : <div>{triggerContent}</div>}
+        <TooltipTrigger asChild={shouldUseAsChild} className={triggerClassName}>
+          {shouldUseAsChild ? triggerContent : <div>{triggerContent}</div>}
         </TooltipTrigger>
         <TooltipContent
           ref={ref}

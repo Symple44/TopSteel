@@ -86,11 +86,23 @@ export default function TranslationAdmin() {
     }
   }, [t])
 
-  // Charger les traductions au montage
+  // Charger les traductions au montage - une seule fois
   useEffect(() => {
-    setMounted(true)
-    loadTranslations()
-  }, [loadTranslations])
+    let cancelled = false
+    
+    const init = async () => {
+      setMounted(true)
+      if (!cancelled) {
+        await loadTranslations()
+      }
+    }
+    
+    init()
+    
+    return () => {
+      cancelled = true
+    }
+  }, []) // Pas de dépendances pour éviter les boucles infinies
 
   // Fermer le dropdown de catégorie quand on clique ailleurs
   useEffect(() => {
