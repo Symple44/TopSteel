@@ -107,7 +107,7 @@
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/addon-interactions": "^8.6.14",
     "@storybook/addon-links": "^9.0.18",
-    "@storybook/addon-onboarding": "^9.0.18",
+    "@storybook/addon-onboarding": "^9.1.1",
     "@storybook/blocks": "^8.6.14",
     "@storybook/nextjs": "^9.0.18",
     "@storybook/react": "^9.0.18",
