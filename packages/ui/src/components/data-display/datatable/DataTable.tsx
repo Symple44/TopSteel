@@ -230,10 +230,10 @@ export function DataTable<T = any>({
   }, [columns, settings])
 
   // Fonctions utilitaires de filtrage (définies avant processedData)
-  const applyFilter = (value: any, filter: FilterConfig): boolean => {
+  const applyFilter = (value: unknown, filter: FilterConfig): boolean => {
     // Nouveau format de filtre depuis ColumnFilterAdvanced
     if (filter.value && typeof filter.value === 'object') {
-      const filterValue = filter.value as any
+      const filterValue = filter.value as unknown as Record<string, unknown>
 
       // Filtre par valeurs multiples (checkbox)
       if (filterValue.type === 'values' && Array.isArray(filterValue.values)) {
@@ -272,18 +272,18 @@ export function DataTable<T = any>({
         const numValue = Number(value)
         if (Number.isNaN(numValue)) return false
 
-        if (filterValue.min !== null && numValue < filterValue.min) return false
-        if (filterValue.max !== null && numValue > filterValue.max) return false
+        if (filterValue.min != null && numValue < (filterValue.min as number)) return false
+        if (filterValue.max != null && numValue > (filterValue.max as number)) return false
         return true
       }
 
       // Filtre par plage de dates
       if (filterValue.type === 'dateRange') {
-        const dateValue = new Date(value)
+        const dateValue = new Date(value as string | number | Date)
         if (Number.isNaN(dateValue.getTime())) return false
 
-        if (filterValue.start && dateValue < new Date(filterValue.start)) return false
-        if (filterValue.end && dateValue > new Date(filterValue.end)) return false
+        if (filterValue.start && dateValue < new Date(filterValue.start as string | number | Date)) return false
+        if (filterValue.end && dateValue > new Date(filterValue.end as string | number | Date)) return false
         return true
       }
     }
@@ -1098,7 +1098,7 @@ export function DataTable<T = any>({
         // S'assurer que le rendu personnalisé est sécurisé pour React
         return RenderUtils.isReactSafe(rendered)
           ? rendered
-          : RenderUtils.safeRender(rendered, column)
+          : RenderUtils.safeRender(rendered, column as ColumnConfig<Record<string, unknown>>)
       }
 
       // Formatage par défaut selon le type
@@ -1201,7 +1201,7 @@ export function DataTable<T = any>({
       }
 
       // Utiliser le rendu sécurisé par défaut
-      return RenderUtils.makeReactSafe(cellValue, column)
+      return RenderUtils.makeReactSafe(cellValue, column as ColumnConfig<Record<string, unknown>>)
     },
     [
       editingCell,
@@ -2298,7 +2298,7 @@ export function DataTable<T = any>({
         onClose={handleKanbanEditorClose}
         onSave={handleKanbanCardSave}
         columns={dataViews.kanbanData}
-        tableColumns={orderedColumns}
+        tableColumns={orderedColumns as ColumnConfig<Record<string, unknown>>[]}
         kanbanSettings={dataViews.viewConfigs.kanban.settings.kanban || {}}
         keyField={String(keyField)}
       />
@@ -2309,7 +2309,7 @@ export function DataTable<T = any>({
         isOpen={showGenericEditor}
         onClose={handleGenericEditorClose}
         onSave={handleGenericItemSave}
-        tableColumns={orderedColumns}
+        tableColumns={orderedColumns as ColumnConfig<Record<string, unknown>>[]}
         keyField={String(keyField)}
         title={
           editingViewType === 'cards'

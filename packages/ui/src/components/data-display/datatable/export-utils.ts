@@ -1,13 +1,13 @@
 // SSR-compatible Univer imports with client-side detection
-let Univer: any = null
-let UniverInstanceType: any = null
-let LocaleType: any = null
-let UniverSheetsPlugin: any = null
-let UniverFormulaEnginePlugin: any = null
-let UniverRenderEnginePlugin: any = null
-const _UniverUIPlugin: any = null
-let _IWorkbookData: any = null
-let _IWorksheetData: any = null
+let Univer: UniverClass | null = null
+let UniverInstanceType: UniverInstanceTypeEnum | null = null
+let LocaleType: UniverLocaleType | null = null
+let UniverSheetsPlugin: UniverPluginConstructor | null = null
+let UniverFormulaEnginePlugin: UniverPluginConstructor | null = null
+let UniverRenderEnginePlugin: UniverPluginConstructor | null = null
+const _UniverUIPlugin: UniverPluginConstructor | null = null
+let _IWorkbookData: unknown = null
+let _IWorksheetData: unknown = null
 
 // Flag to track if we're running on the client side
 const isClient = typeof window !== 'undefined'
@@ -28,24 +28,24 @@ const loadUniverComponents = async (): Promise<boolean> => {
     ])
 
     if (univerCore) {
-      Univer = univerCore.Univer
-      UniverInstanceType = univerCore.UniverInstanceType
-      LocaleType = univerCore.LocaleType
+      Univer = univerCore.Univer as UniverClass
+      UniverInstanceType = univerCore.UniverInstanceType as unknown as UniverInstanceTypeEnum
+      LocaleType = univerCore.LocaleType as UniverLocaleType
       // Note: IWorkbookData and IWorksheetData might not be available in all versions
-      _IWorkbookData = (univerCore as any).IWorkbookData || null
-      _IWorksheetData = (univerCore as any).IWorksheetData || null
+      _IWorkbookData = (univerCore as Record<string, unknown>).IWorkbookData || null
+      _IWorksheetData = (univerCore as Record<string, unknown>).IWorksheetData || null
     }
 
     if (univerSheets) {
-      UniverSheetsPlugin = univerSheets.UniverSheetsPlugin
+      UniverSheetsPlugin = univerSheets.UniverSheetsPlugin as UniverPluginConstructor
     }
 
     if (univerFormula) {
-      UniverFormulaEnginePlugin = univerFormula.UniverFormulaEnginePlugin
+      UniverFormulaEnginePlugin = univerFormula.UniverFormulaEnginePlugin as UniverPluginConstructor
     }
 
     if (univerRender) {
-      UniverRenderEnginePlugin = univerRender.UniverRenderEnginePlugin
+      UniverRenderEnginePlugin = univerRender.UniverRenderEnginePlugin as UniverPluginConstructor
     }
 
     return Univer !== null && UniverSheetsPlugin !== null
@@ -58,6 +58,54 @@ const loadUniverComponents = async (): Promise<boolean> => {
 let univerLoadingPromise: Promise<boolean> | null = null
 
 import type { ColumnConfig, ExportOptions, ImportResult } from './types'
+
+// Types pour Univer
+interface UniverConfig {
+  theme?: unknown
+  locale: string
+}
+
+interface UniverInstance {
+  createUnit(type: number, data: UniverWorkbookData): UniverWorkbook
+  registerPlugin(plugin: UniverPlugin): void
+}
+
+interface UniverWorkbook {
+  getSnapshot(): { sheets: Record<string, UniverSheetData> } | null
+  exportAsExcel?(): Promise<Blob>
+  save?(filename: string): void
+}
+
+interface UniverPlugin {}
+
+interface UniverMergeData {
+  startRow: number
+  endRow: number
+  startColumn: number
+  endColumn: number
+}
+
+interface UniverCellStyle {
+  bg?: { rgb: string }
+  ff?: string
+  fs?: number
+  bl?: number
+  fc?: { rgb: string }
+  ht?: number
+  vt?: number
+  bd?: {
+    t?: { s: number; cl: { rgb: string } }
+    b?: { s: number; cl: { rgb: string } }
+    l?: { s: number; cl: { rgb: string } }
+    r?: { s: number; cl: { rgb: string } }
+  }
+}
+
+// Types pour l'import dynamique d'Univer
+type UniverClass = new (config?: Partial<UniverConfig>) => UniverInstance
+type UniverPluginConstructor = new (...args: any[]) => UniverPlugin
+type UniverLocaleType = Record<string, string>
+type UniverInstanceTypeEnum = Record<string, number>
 
 // Interface pour les styles Excel avancés
 interface ExcelCellStyle {
@@ -110,7 +158,7 @@ interface UniverSheetData {
   cellData: Record<string, Record<string, UniverCellData>>
   rowData: Record<string, { h: number }>
   columnData: Record<string, { w: number }>
-  mergeData: any[]
+  mergeData: UniverMergeData[]
   rowCount: number
   columnCount: number
   freeze?: {
@@ -130,9 +178,9 @@ interface UniverSheetData {
 }
 
 interface UniverCellData {
-  v?: any // value
+  v?: string | number | boolean | Date // value
   t?: number // type (1=string, 2=number, 3=boolean, 4=date)
-  s?: any // style
+  s?: UniverCellStyle // style
   f?: string // formula
 }
 
@@ -140,7 +188,7 @@ interface UniverCellData {
  * Utilitaires pour l'export/import Excel avec fallback robuste
  */
 export class ExportUtils {
-  private static univerInstance: any = null
+  private static univerInstance: UniverInstance | null = null
   private static univerAvailable = false
 
   /**
@@ -162,7 +210,7 @@ export class ExportUtils {
   /**
    * Initialise l'instance Univer (singleton) avec gestion d'erreur (client-side seulement)
    */
-  private static async getUniverInstance(): Promise<any> {
+  private static async getUniverInstance(): Promise<UniverInstance | null> {
     if (!isClient) {
       return null // Server-side: always return null
     }
@@ -174,20 +222,22 @@ export class ExportUtils {
 
     if (!ExportUtils.univerInstance) {
       try {
-        ExportUtils.univerInstance = new Univer({
-          theme: undefined,
-          locale: LocaleType?.FR_FR || 'fr-FR',
-        })
+        if (Univer) {
+          ExportUtils.univerInstance = new Univer({
+            theme: undefined,
+            locale: (LocaleType as Record<string, string>)?.FR_FR || 'fr-FR',
+          })
+        }
 
         // Registrer seulement les plugins disponibles
-        if (UniverRenderEnginePlugin) {
-          ExportUtils.univerInstance.registerPlugin(UniverRenderEnginePlugin)
+        if (UniverRenderEnginePlugin && ExportUtils.univerInstance) {
+          ExportUtils.univerInstance.registerPlugin(new UniverRenderEnginePlugin())
         }
-        if (UniverFormulaEnginePlugin) {
-          ExportUtils.univerInstance.registerPlugin(UniverFormulaEnginePlugin)
+        if (UniverFormulaEnginePlugin && ExportUtils.univerInstance) {
+          ExportUtils.univerInstance.registerPlugin(new UniverFormulaEnginePlugin())
         }
-        if (UniverSheetsPlugin) {
-          ExportUtils.univerInstance.registerPlugin(UniverSheetsPlugin)
+        if (UniverSheetsPlugin && ExportUtils.univerInstance) {
+          ExportUtils.univerInstance.registerPlugin(new UniverSheetsPlugin())
         }
 
         ExportUtils.univerAvailable = true
@@ -222,16 +272,16 @@ export class ExportUtils {
 
       // Préparer les données
       const exportData = data.map((row) => {
-        const exportRow: any = {}
+        const exportRow: Record<string, unknown> = {}
 
         exportColumns.forEach((col) => {
           const key = col.key as string
-          let value = (row as any)[key]
+          let value = (row as Record<string, unknown>)[key]
 
           // Traitement spécial pour rich text
           if (col.type === 'richtext' && value) {
             // Nettoyer le HTML et garder seulement le texte pour l'export
-            value = ExportUtils.stripHtmlTags(value)
+            value = ExportUtils.stripHtmlTags(String(value))
           }
 
           // Appliquer le formatage si défini
@@ -269,7 +319,7 @@ export class ExportUtils {
    * Export Univer (méthode privée)
    */
   private static async exportWithUniver<T>(
-    exportData: any[],
+    exportData: Record<string, unknown>[],
     exportColumns: ColumnConfig<T>[],
     options: AdvancedExportOptions
   ): Promise<void> {
@@ -282,7 +332,7 @@ export class ExportUtils {
       throw new Error('Univer not properly initialized')
     }
 
-    const workbook = univer.createUnit(UniverInstanceType.UNIVER_SHEET, workbookData)
+    const workbook = univer.createUnit((UniverInstanceType as Record<string, number>).UNIVER_SHEET, workbookData)
     if (!workbook) {
       throw new Error('Failed to create workbook')
     }
@@ -316,7 +366,7 @@ export class ExportUtils {
    * Export en CSV compatible Excel avec BOM UTF-8
    */
   private static exportToExcelCompatibleCSV<T>(
-    exportData: any[],
+    exportData: Record<string, unknown>[],
     exportColumns: ColumnConfig<T>[],
     options: AdvancedExportOptions
   ): void {
@@ -362,7 +412,7 @@ export class ExportUtils {
    * Crée les données de workbook Univer à partir des données exportées
    */
   private static createUniverWorkbookData<T>(
-    exportData: any[],
+    exportData: Record<string, unknown>[],
     exportColumns: ColumnConfig<T>[],
     _options: AdvancedExportOptions
   ): UniverWorkbookData {
@@ -424,7 +474,7 @@ export class ExportUtils {
    * Convertit une valeur en cellule Univer
    */
   private static convertValueToUniverCell<T>(
-    value: any,
+    value: unknown,
     column: ColumnConfig<T>,
     row: number
   ): UniverCellData {
@@ -445,7 +495,7 @@ export class ExportUtils {
           break
         case 'date':
         case 'datetime':
-          cellData.v = value instanceof Date ? value : new Date(value)
+          cellData.v = value instanceof Date ? value : new Date(value as string | number | Date)
           cellData.t = 4
           break
         default:
@@ -463,7 +513,7 @@ export class ExportUtils {
   /**
    * Obtient le style d'en-tête
    */
-  private static getHeaderStyle(): any {
+  private static getHeaderStyle(): UniverCellStyle {
     return {
       bg: { rgb: '#366092' },
       ff: 'Arial',
@@ -502,7 +552,7 @@ export class ExportUtils {
       reader.onload = async (e) => {
         try {
           const buffer = e.target?.result as ArrayBuffer
-          let rawData: any[][] = []
+          let rawData: unknown[][] = []
 
           // Essayer Univer d'abord si disponible (client-side seulement)
           const univer = await ExportUtils.getUniverInstance()
@@ -562,7 +612,7 @@ export class ExportUtils {
   /**
    * Parse un fichier comme CSV/TSV (fallback)
    */
-  private static async parseAsCSV(buffer: ArrayBuffer): Promise<any[][]> {
+  private static async parseAsCSV(buffer: ArrayBuffer): Promise<unknown[][]> {
     try {
       // Essayer différents encodages
       let text: string
@@ -651,13 +701,13 @@ export class ExportUtils {
   /**
    * Importe un fichier Excel dans Univer
    */
-  private static async importExcelToUniver(univer: any, buffer: ArrayBuffer): Promise<any | null> {
+  private static async importExcelToUniver(univer: UniverInstance, buffer: ArrayBuffer): Promise<UniverWorkbook | null> {
     try {
       // Dans un environnement réel, Univer fournirait une méthode pour importer Excel
       // Pour l'instant, on simule la conversion depuis le buffer
       const workbookData = await ExportUtils.parseExcelBuffer(buffer)
       if (workbookData) {
-        return univer.createUnit(UniverInstanceType.UNIVER_SHEET, workbookData)
+        return univer.createUnit((UniverInstanceType as Record<string, number>).UNIVER_SHEET, workbookData)
       }
       return null
     } catch {
@@ -688,7 +738,7 @@ export class ExportUtils {
       }
 
       // Essayer d'utiliser l'API d'import Univer si disponible
-      if (Univer && typeof Univer.importFromBuffer === 'function') {
+      if (Univer && 'importFromBuffer' in Univer && typeof Univer.importFromBuffer === 'function') {
         try {
           const workbookData = await Univer.importFromBuffer(buffer)
           return workbookData
@@ -721,7 +771,7 @@ export class ExportUtils {
   /**
    * Obtient la première feuille d'un workbook Univer
    */
-  private static getFirstSheet(workbook: any): UniverSheetData | null {
+  private static getFirstSheet(workbook: UniverWorkbook): UniverSheetData | null {
     try {
       // Récupérer les données de la première feuille
       const sheets = workbook.getSnapshot()?.sheets
@@ -738,15 +788,15 @@ export class ExportUtils {
   /**
    * Extrait les données d'une feuille Univer
    */
-  private static extractDataFromUniverSheet(sheet: UniverSheetData): any[][] {
-    const result: any[][] = []
+  private static extractDataFromUniverSheet(sheet: UniverSheetData): unknown[][] {
+    const result: unknown[][] = []
 
     // Parcourir les données de cellules pour reconstruire le tableau
     const maxRow = sheet.rowCount || 0
     const maxCol = sheet.columnCount || 0
 
     for (let row = 0; row < maxRow; row++) {
-      const rowData: any[] = []
+      const rowData: unknown[] = []
       const rowKey = row.toString()
 
       for (let col = 0; col < maxCol; col++) {
@@ -765,7 +815,7 @@ export class ExportUtils {
    * Traite les données importées et les valide
    */
   private static processImportData<T>(
-    rawData: any[][],
+    rawData: unknown[][],
     columns: ColumnConfig<T>[]
   ): ImportResult<T> {
     const result: ImportResult<T> = {
@@ -791,7 +841,7 @@ export class ExportUtils {
     // Traiter chaque ligne
     dataRows.forEach((row, index) => {
       const rowNumber = index + 2 // +2 car index commence à 0 et on skip les headers
-      const processedRow: any = {}
+      const processedRow: Record<string, unknown> = {}
       let hasErrors = false
 
       columns.forEach((column) => {
@@ -864,9 +914,9 @@ export class ExportUtils {
    * Valide et convertit une valeur selon le type de colonne
    */
   private static validateAndConvertValue<T>(
-    rawValue: any,
+    rawValue: unknown,
     column: ColumnConfig<T>
-  ): { value: any; error?: string; warning?: string } {
+  ): { value: unknown; error?: string; warning?: string } {
     // Valeur vide
     if (rawValue === undefined || rawValue === null || rawValue === '') {
       if (column.required) {
@@ -907,7 +957,7 @@ export class ExportUtils {
 
         case 'date':
         case 'datetime': {
-          const date = new Date(rawValue)
+          const date = new Date(rawValue as string | number | Date)
           if (Number.isNaN(date.getTime())) {
             return { value: null, error: 'Format de date invalide' }
           }
@@ -940,7 +990,7 @@ export class ExportUtils {
   /**
    * Formate une valeur selon la configuration
    */
-  private static formatValue(value: any, format: any): string {
+  private static formatValue(value: unknown, format: NonNullable<ColumnConfig['format']>): string {
     if (value === null || value === undefined) return ''
 
     if (format.transform) {
@@ -981,9 +1031,9 @@ export class ExportUtils {
    * Applique un formatage avancé à la feuille Univer
    */
   private static applyAdvancedFormatting<T>(
-    workbook: any,
+    workbook: UniverWorkbook,
     columns: ColumnConfig<T>[],
-    data: any[],
+    data: Record<string, unknown>[],
     options: AdvancedExportOptions
   ): void {
     if (!options.includeStyles) return
@@ -992,7 +1042,7 @@ export class ExportUtils {
       // Appliquer les styles avancés via l'API Univer
       // Formatage conditionnel pour les nombres
       if (options.conditionalFormatting) {
-        ExportUtils.applyConditionalFormattingUniver(workbook, columns, data)
+        ExportUtils.applyConditionalFormattingUniver(workbook, columns as ColumnConfig<Record<string, unknown>>[], data)
       }
     } catch {
       // Ignorer les erreurs de formatage
@@ -1002,8 +1052,8 @@ export class ExportUtils {
   /**
    * Détermine le style d'une cellule selon sa valeur et sa colonne (version Univer)
    */
-  private static getCellStyle<T>(value: any, column: ColumnConfig<T>, row: number): any {
-    const baseStyle: any = {
+  private static getCellStyle<T>(value: unknown, column: ColumnConfig<T>, row: number): UniverCellStyle {
+    const baseStyle: UniverCellStyle = {
       vt: 2, // vertical middle
       bd: {
         t: { s: 1, cl: { rgb: '#E0E0E0' } },
@@ -1074,9 +1124,9 @@ export class ExportUtils {
    * Applique un formatage conditionnel pour Univer
    */
   private static applyConditionalFormattingUniver(
-    _workbook: any,
+    _workbook: UniverWorkbook,
     columns: ColumnConfig[],
-    data: any[]
+    data: Record<string, unknown>[]
   ): void {
     try {
       // Exemple de formatage conditionnel pour les colonnes numériques
@@ -1136,9 +1186,9 @@ export class ExportUtils {
    * Définit la largeur des colonnes dans Univer
    */
   private static setColumnWidths<T>(
-    _workbook: any,
+    _workbook: UniverWorkbook,
     exportColumns: ColumnConfig<T>[],
-    exportData: any[]
+    exportData: Record<string, unknown>[]
   ): void {
     try {
       // Simulation de définition de largeur de colonnes
@@ -1159,7 +1209,7 @@ export class ExportUtils {
   /**
    * Définit le gel d'en-tête dans Univer
    */
-  private static setFreezeHeader(_workbook: any): void {
+  private static setFreezeHeader(_workbook: UniverWorkbook): void {
     try {
       // Simulation du gel de la première ligne
       // Dans une vraie implémentation, ceci utiliserait l'API Univer
@@ -1172,7 +1222,7 @@ export class ExportUtils {
   /**
    * Définit l'autofilter dans Univer
    */
-  private static setAutoFilter(_workbook: any, _dataRowCount: number, _columnCount: number): void {
+  private static setAutoFilter(_workbook: UniverWorkbook, _dataRowCount: number, _columnCount: number): void {
     try {
       // Simulation de l'autofilter
       // Dans une vraie implémentation, ceci utiliserait l'API Univer
@@ -1191,12 +1241,12 @@ export class ExportUtils {
    * Ajoute une feuille de statistiques dans Univer
    */
   private static addStatisticsSheet<T>(
-    _workbook: any,
-    data: any[],
+    _workbook: UniverWorkbook,
+    data: Record<string, unknown>[],
     columns: ColumnConfig<T>[]
   ): void {
     try {
-      const stats: any[] = []
+      const stats: unknown[][] = []
 
       // En-tête
       stats.push(['Statistiques des données', '', '', ''])
@@ -1241,7 +1291,7 @@ export class ExportUtils {
   /**
    * Exporte un workbook Univer vers un fichier
    */
-  private static exportUniverToFile(workbook: any, filename: string): void {
+  private static exportUniverToFile(workbook: UniverWorkbook, filename: string): void {
     try {
       // Essayer d'utiliser l'API d'export Univer si disponible
       if (workbook && typeof workbook.exportAsExcel === 'function') {
@@ -1300,11 +1350,11 @@ export class ExportUtils {
       data.forEach((row) => {
         const csvRow = exportColumns.map((col) => {
           const key = col.key as string
-          let value = (row as any)[key]
+          let value = (row as Record<string, unknown>)[key]
 
           // Traitement spécial pour rich text
           if (col.type === 'richtext' && value) {
-            value = ExportUtils.stripHtmlTags(value)
+            value = ExportUtils.stripHtmlTags(String(value))
           }
 
           // Appliquer le formatage si défini
@@ -1402,12 +1452,12 @@ export class ExportUtils {
 
         exportColumns.forEach((col) => {
           const key = col.key as string
-          let value = (row as any)[key]
+          let value = (row as Record<string, unknown>)[key]
 
           // Traitement spécial pour rich text - garder le HTML pour PDF
           if (col.type === 'richtext' && value) {
             // Pour PDF, on garde le HTML mais on le nettoie un peu
-            value = value
+            value = String(value || '')
               .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
               .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
           }

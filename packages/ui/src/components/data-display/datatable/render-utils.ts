@@ -8,7 +8,7 @@ export class RenderUtils {
   /**
    * Convertit de manière sécurisée une valeur en string pour l'affichage React
    */
-  static safeRender(value: any, column: ColumnConfig<any>): string {
+  static safeRender(value: unknown, column: ColumnConfig): string {
     // Valeurs nulles/undefined
     if (value === null || value === undefined) {
       return ''
@@ -60,13 +60,13 @@ export class RenderUtils {
       try {
         // Cas spécial pour les traductions (objet avec des codes de langue)
         if (value && typeof value === 'object' && !Array.isArray(value)) {
-          const keys = Object.keys(value)
+          const keys = Object.keys(value as Record<string, unknown>)
           // Si c'est un objet de traductions avec des codes de langue
           if (
             keys.length <= 3 &&
             keys.every((key) => key.length === 2 || key === 'fr' || key === 'en' || key === 'es')
           ) {
-            const translations = keys.map((key) => `${key}: "${value[key]}"`).join(', ')
+            const translations = keys.map((key) => `${key}: "${(value as Record<string, unknown>)[key]}"`).join(', ')
             return `{${translations}}`
           }
           // Pour d'autres objets simples
@@ -87,7 +87,7 @@ export class RenderUtils {
   /**
    * Formate un nombre selon la configuration de la colonne
    */
-  private static formatNumber(value: number, format: any): string {
+  private static formatNumber(value: number, format: NonNullable<ColumnConfig['format']>): string {
     let result = value.toString()
 
     // Décimales
@@ -113,7 +113,7 @@ export class RenderUtils {
   /**
    * Vérifie si une valeur peut être rendue de manière sécurisée par React
    */
-  static isReactSafe(value: any): boolean {
+  static isReactSafe(value: unknown): boolean {
     return (
       value === null ||
       value === undefined ||
@@ -139,13 +139,13 @@ export class RenderUtils {
   /**
    * Convertit une valeur pour qu'elle soit sécurisée pour React
    */
-  static makeReactSafe(value: any, column: ColumnConfig<any>): React.ReactNode {
+  static makeReactSafe(value: unknown, column: ColumnConfig): React.ReactNode {
     if (RenderUtils.isReactSafe(value)) {
       // Si c'est une Date ou un Object, on les convertit
       if (value instanceof Date || (typeof value === 'object' && value !== null)) {
         return RenderUtils.safeRender(value, column)
       }
-      return value
+      return value as React.ReactNode
     }
 
     return RenderUtils.safeRender(value, column)
@@ -155,11 +155,11 @@ export class RenderUtils {
    * Rend la valeur d'une cellule avec support pour l'édition
    */
   static renderCellValue(
-    value: any,
-    column: ColumnConfig<any>,
-    item: any,
+    value: unknown,
+    column: ColumnConfig,
+    item: unknown,
     readonly: boolean = false,
-    onValueChange?: (newValue: any) => void
+    onValueChange?: (newValue: unknown) => void
   ): React.ReactNode {
     // Si readonly ou pas d'édition possible, rendu simple
     if (readonly || !column.editable || !onValueChange) {
@@ -174,18 +174,18 @@ export class RenderUtils {
    * Rend une cellule éditable selon son type
    */
   private static renderEditableCell(
-    value: any,
-    column: ColumnConfig<any>,
-    _item: any,
-    onValueChange: (newValue: any) => void
+    value: unknown,
+    column: ColumnConfig,
+    _item: unknown,
+    onValueChange: (newValue: unknown) => void
   ): React.ReactNode {
-    const handleChange = (newValue: any) => {
+    const handleChange = (newValue: unknown) => {
       // Validation basique selon le type
       let validatedValue = newValue
 
       switch (column.type) {
         case 'number':
-          validatedValue = parseFloat(newValue) || 0
+          validatedValue = parseFloat(String(newValue)) || 0
           break
         case 'boolean':
           validatedValue = Boolean(newValue)
@@ -193,7 +193,7 @@ export class RenderUtils {
         case 'date':
         case 'datetime':
           if (newValue && !(newValue instanceof Date)) {
-            validatedValue = new Date(newValue)
+            validatedValue = new Date(newValue as string | number | Date)
           }
           break
         default:
@@ -226,12 +226,12 @@ export class RenderUtils {
             },
             [
               React.createElement('option', { key: '', value: '' }, ''),
-              ...column.options.map((option: any) =>
+              ...column.options.map((option) =>
                 React.createElement(
                   'option',
                   {
-                    key: typeof option === 'object' ? option.value : option,
-                    value: typeof option === 'object' ? option.value : option,
+                    key: typeof option === 'object' ? String(option.value) : String(option),
+                    value: typeof option === 'object' ? String(option.value) : String(option),
                   },
                   typeof option === 'object' ? option.label : option
                 )
@@ -250,7 +250,7 @@ export class RenderUtils {
               className:
                 'flex flex-wrap gap-1 p-1 min-h-8 border border-input bg-transparent rounded-md',
             },
-            column.options.map((option: any) => {
+            column.options.map((option) => {
               const optionValue = typeof option === 'object' ? option.value : option
               const optionLabel = typeof option === 'object' ? option.label : option
               const isSelected = currentValues.includes(optionValue)
@@ -258,7 +258,7 @@ export class RenderUtils {
               return React.createElement(
                 'label',
                 {
-                  key: optionValue,
+                  key: String(optionValue),
                   className:
                     'inline-flex items-center space-x-1 text-xs cursor-pointer hover:bg-accent/50 rounded px-1 transition-colors',
                 },
@@ -269,7 +269,7 @@ export class RenderUtils {
                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                       const newValues = e.target.checked
                         ? [...currentValues, optionValue]
-                        : currentValues.filter((v: any) => v !== optionValue)
+                        : currentValues.filter((v) => v !== optionValue)
                       handleChange(newValues)
                     },
                     className:

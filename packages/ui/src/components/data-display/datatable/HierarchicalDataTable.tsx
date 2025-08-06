@@ -271,7 +271,7 @@ function HierarchicalNode<T extends HierarchicalItem>({
                   >
                     {RenderUtils.renderCellValue(
                       column.getValue ? column.getValue(item) : (item as any)[column.key],
-                      column,
+                      column as ColumnConfig<Record<string, unknown>>,
                       item,
                       !column.editable, // readonly si la colonne n'est pas éditable
                       (value) => onCellEdit?.(item, column.id, value)

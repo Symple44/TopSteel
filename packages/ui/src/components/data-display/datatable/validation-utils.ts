@@ -8,10 +8,10 @@ export class ValidationUtils {
    * Valide une valeur selon la configuration de colonne
    */
   static validateValue<T>(
-    value: any,
+    value: unknown,
     column: ColumnConfig<T>,
     row?: T
-  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: any } {
+  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown } {
     // Validation vide/requis
     if (value === null || value === undefined || value === '') {
       if (column.required) {
@@ -53,9 +53,9 @@ export class ValidationUtils {
    * Validation selon le type de colonne
    */
   private static validateByType<T>(
-    value: any,
+    value: unknown,
     column: ColumnConfig<T>
-  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: any } {
+  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown } {
     switch (column.type) {
       case 'text':
         return ValidationUtils.validateText(value, column)
@@ -85,9 +85,9 @@ export class ValidationUtils {
    * Validation du type text
    */
   private static validateText<T>(
-    value: any,
+    value: unknown,
     column: ColumnConfig<T>
-  ): { isValid: boolean; error?: string; convertedValue?: any } {
+  ): { isValid: boolean; error?: string; convertedValue?: string } {
     const strValue = String(value).trim()
 
     // Validation pattern regex
@@ -111,9 +111,9 @@ export class ValidationUtils {
    * Validation du type number
    */
   private static validateNumber<T>(
-    value: any,
+    value: unknown,
     column: ColumnConfig<T>
-  ): { isValid: boolean; error?: string; convertedValue?: any } {
+  ): { isValid: boolean; error?: string; convertedValue?: number } {
     let numValue: number
 
     if (typeof value === 'string') {
@@ -144,9 +144,9 @@ export class ValidationUtils {
    * Validation du type boolean
    */
   private static validateBoolean<T>(
-    value: any,
+    value: unknown,
     _column: ColumnConfig<T>
-  ): { isValid: boolean; error?: string; convertedValue?: any } {
+  ): { isValid: boolean; error?: string; convertedValue?: boolean } {
     if (typeof value === 'boolean') {
       return { isValid: true, convertedValue: value }
     }
@@ -168,9 +168,9 @@ export class ValidationUtils {
    * Validation du type date
    */
   private static validateDate<T>(
-    value: any,
+    value: unknown,
     _column: ColumnConfig<T>
-  ): { isValid: boolean; error?: string; convertedValue?: any } {
+  ): { isValid: boolean; error?: string; convertedValue?: Date } {
     if (value instanceof Date) {
       if (Number.isNaN(value.getTime())) {
         return { isValid: false, error: 'Date invalide' }
@@ -178,7 +178,7 @@ export class ValidationUtils {
       return { isValid: true, convertedValue: value }
     }
 
-    const dateValue = new Date(value)
+    const dateValue = new Date(value as string | number | Date)
     if (Number.isNaN(dateValue.getTime())) {
       return { isValid: false, error: 'Format de date invalide' }
     }
@@ -190,9 +190,9 @@ export class ValidationUtils {
    * Validation du type select
    */
   private static validateSelect<T>(
-    value: any,
+    value: unknown,
     column: ColumnConfig<T>
-  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: any } {
+  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown } {
     if (!column.options || column.options.length === 0) {
       return { isValid: true, convertedValue: value }
     }
@@ -221,9 +221,9 @@ export class ValidationUtils {
    * Validation du type multiselect
    */
   private static validateMultiSelect<T>(
-    value: any,
+    value: unknown,
     column: ColumnConfig<T>
-  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: any } {
+  ): { isValid: boolean; error?: string; warning?: string; convertedValue?: unknown[] } {
     if (!Array.isArray(value)) {
       // Tenter de parser si c'est une string
       if (typeof value === 'string') {
@@ -240,8 +240,8 @@ export class ValidationUtils {
       return { isValid: true, convertedValue: value }
     }
 
-    const validValues = []
-    const warnings = []
+    const validValues: unknown[] = []
+    const warnings: string[] = []
 
     for (const val of value) {
       const option = column.options.find(
@@ -269,7 +269,7 @@ export class ValidationUtils {
   /**
    * Formate une valeur pour l'affichage selon le type
    */
-  static formatValueForDisplay<T>(value: any, column: ColumnConfig<T>): string {
+  static formatValueForDisplay<T>(value: unknown, column: ColumnConfig<T>): string {
     if (value === null || value === undefined) return ''
 
     // Formatage personnalisé

@@ -17,9 +17,9 @@ export type ColumnType =
   | 'formula'
 
 // Configuration d'une colonne
-export interface ColumnConfig<T = any> {
+export interface ColumnConfig<T = Record<string, unknown>> {
   id: string
-  key: keyof T | string
+  key: string
   title: string
   description?: string // Description pour les tooltips
   type: ColumnType
@@ -39,7 +39,7 @@ export interface ColumnConfig<T = any> {
     min?: number
     max?: number
     pattern?: RegExp
-    custom?: (value: any) => string | null
+    custom?: (value: unknown) => string | null
     required?: boolean
     minLength?: number
     maxLength?: number
@@ -47,7 +47,7 @@ export interface ColumnConfig<T = any> {
 
   // Options pour select/multiselect
   options?: Array<{
-    value: any
+    value: DataValue
     label: string
     color?: string
   }>
@@ -59,7 +59,7 @@ export interface ColumnConfig<T = any> {
     dateFormat?: string
     prefix?: string
     suffix?: string
-    transform?: (value: any) => string
+    transform?: (value: unknown) => string
   }
 
   // Formule (pour colonnes calculées)
@@ -69,14 +69,14 @@ export interface ColumnConfig<T = any> {
   }
 
   // Rendu personnalisé
-  render?: (value: any, row: T, column: ColumnConfig<T>) => ReactNode
+  render?: (value: unknown, row: T, column: ColumnConfig<T>) => ReactNode
 
   // Fonction pour obtenir la valeur personnalisée (utile pour des propriétés imbriquées)
-  getValue?: (row: T) => any
+  getValue?: (row: T) => unknown
 
   // Actions
-  onEdit?: (value: any, row: T, column: ColumnConfig<T>) => void
-  onValidate?: (value: any, row: T, column: ColumnConfig<T>) => string | null
+  onEdit?: (value: unknown, row: T, column: ColumnConfig<T>) => void
+  onValidate?: (value: unknown, row: T, column: ColumnConfig<T>) => string | null
 }
 
 // Configuration du tri
@@ -88,7 +88,7 @@ export interface SortConfig {
 // Configuration des filtres
 export interface FilterConfig {
   column: string
-  value: any
+  value: DataValue
   operator:
     | 'equals'
     | 'contains'
@@ -136,11 +136,11 @@ export interface TableSettings {
 }
 
 // Configuration globale de la table
-export interface DataTableConfig<T = any> {
+export interface DataTableConfig<T = Record<string, unknown>> {
   // Données
   data: T[]
   columns: ColumnConfig<T>[]
-  keyField: keyof T | string
+  keyField: string
 
   // Identifiants
   tableId?: string // Pour la sauvegarde des paramètres
@@ -160,7 +160,7 @@ export interface DataTableConfig<T = any> {
     edit?: (row: T) => void
     delete?: (rows: T[]) => void
     export?: (data: T[], format: 'xlsx' | 'csv' | 'pdf') => void
-    import?: (data: any[]) => void
+    import?: (data: unknown[]) => void
   }
 
   // Paramètres
@@ -170,7 +170,7 @@ export interface DataTableConfig<T = any> {
   // Événements
   onRowClick?: (row: T) => void
   onRowDoubleClick?: (row: T) => void
-  onCellEdit?: (value: any, row: T, column: ColumnConfig<T>) => void
+  onCellEdit?: (value: unknown, row: T, column: ColumnConfig<T>) => void
   onSelectionChange?: (selection: SelectionState) => void
   onPaginationChange?: (pagination: { page: number; pageSize: number; total: number }) => void
 
@@ -183,15 +183,15 @@ export interface DataTableConfig<T = any> {
 }
 
 // Props du composant DataTable (alias de DataTableConfig)
-export interface DataTableProps<T = any> extends DataTableConfig<T> {}
+export interface DataTableProps<T = Record<string, unknown>> extends DataTableConfig<T> {}
 
 // Context pour les formules
-export interface FormulaContext<T = any> {
+export interface FormulaContext<T = Record<string, unknown>> {
   row: T
   rowIndex: number
   data: T[]
   columns: ColumnConfig<T>[]
-  getValue: (columnId: string, rowIndex?: number) => any
+  getValue: (columnId: string, rowIndex?: number) => unknown
 }
 
 // Types pour l'export
@@ -204,7 +204,7 @@ export interface ExportOptions {
 }
 
 // Types pour l'import
-export interface ImportResult<T = any> {
+export interface ImportResult<T = Record<string, unknown>> {
   success: boolean
   data: T[]
   errors: Array<{

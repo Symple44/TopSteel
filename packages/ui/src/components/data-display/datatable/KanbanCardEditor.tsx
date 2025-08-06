@@ -167,7 +167,7 @@ export function KanbanCardEditor({
               onValueChange={(value) => handleFieldChange(column.id, value)}
               placeholder={`Sélectionner ${column.title.toLowerCase()}`}
               options={column.options.map((opt) => ({
-                value: opt.value,
+                value: String(opt.value || ''),
                 label: opt.label,
               }))}
               disabled={!isEditable}
