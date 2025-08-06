@@ -11,27 +11,29 @@ export async function testClientError() {
     try {
       // Test direct avec fetch patché
       const directFetch = globalThis.fetch
-      const _response = await directFetch(url, {
+      await directFetch(url, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       })
-    } catch (error: any) {
-      if (error?.message?.includes('CLIENT')) {
+    } catch (error: unknown) {
+      if ((error as Error)?.message?.includes('CLIENT')) {
       }
     }
 
     try {
       // Test avec fetch original si disponible
-      const patchedFetch = globalThis.fetch as any
+      const patchedFetch = globalThis.fetch as unknown
       const originalFetch = patchedFetch._nextOriginalFetch
 
       if (originalFetch) {
-        const _response = await originalFetch(url, {
+        await originalFetch(url, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         })
       }
-    } catch (_error: any) {}
+    } catch {
+      // Ignore original fetch errors
+    }
   }
 }
 

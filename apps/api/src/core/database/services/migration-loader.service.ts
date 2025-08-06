@@ -64,7 +64,11 @@ export class MigrationLoaderService {
 
       await this.dataSource.transaction(async (manager) => {
         this.logger.log('🔄 Exécution de CreateInitialTables...')
-        await initialMigration.up(manager.queryRunner!)
+        if (manager.queryRunner) {
+          await initialMigration.up(manager.queryRunner)
+        } else {
+          throw new Error('QueryRunner is not available')
+        }
 
         // Marquer comme exécutée
         await manager.query(

@@ -22,7 +22,7 @@ interface StandardUser {
   role: string
   actif: boolean
   password: string
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 }
 
 class AdminTestUsersResetter {
@@ -69,8 +69,6 @@ class AdminTestUsersResetter {
       for (const userData of this.standardUsers) {
         await this.resetUser(userData)
       }
-    } catch (error) {
-      throw error
     } finally {
       if (this.authDataSource.isInitialized) {
         await this.authDataSource.destroy()
@@ -165,53 +163,61 @@ class AdminTestUsersResetter {
           await this.ensureSuperAdminAccess(queryRunner, userId)
         }
       }
-    } catch (error) {
-      throw error
     } finally {
       await queryRunner.release()
     }
   }
 
-  private async ensureSuperAdminAccess(queryRunner: any, userId: string): Promise<void> {
+  private async ensureSuperAdminAccess(queryRunner: unknown, userId: string): Promise<void> {
     // Récupérer toutes les sociétés actives
-    const societes = await queryRunner.query(`
+    const societes = await (
+      queryRunner as { query: (sql: string, params?: unknown[]) => Promise<unknown[]> }
+    ).query(`
       SELECT id, nom FROM societes WHERE status = 'ACTIVE'
     `)
 
     if (societes.length > 0) {
       // Récupérer le rôle ADMIN par défaut (ou créer si nécessaire)
-      let adminRole = await queryRunner.query(`
+      let adminRole = await (
+        queryRunner as { query: (sql: string, params?: unknown[]) => Promise<unknown[]> }
+      ).query(`
         SELECT id FROM roles WHERE name = 'Administrateur' LIMIT 1
       `)
 
       if (adminRole.length === 0) {
         // Créer le rôle admin par défaut
-        const roleResult = await queryRunner.query(`
+        const roleResult = await (
+          queryRunner as { query: (sql: string, params?: unknown[]) => Promise<unknown[]> }
+        ).query(`
           INSERT INTO roles (name, description, actif, "isSystemRole", created_at, updated_at)
           VALUES ('Administrateur', 'Rôle administrateur système', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
           RETURNING id
         `)
-        adminRole = [{ id: roleResult[0].id }]
+        adminRole = [{ id: (roleResult[0] as { id: unknown }).id }]
       }
 
-      for (const societe of societes) {
+      for (const societe of societes as { id: unknown; nom: unknown }[]) {
         // Vérifier si l'association existe déjà
-        const existing = await queryRunner.query(
+        const existing = await (
+          queryRunner as { query: (sql: string, params?: unknown[]) => Promise<unknown[]> }
+        ).query(
           `
           SELECT id FROM user_societe_roles 
           WHERE "userId" = $1 AND "societeId" = $2
         `,
-          [userId, societe.id]
+          [userId, (societe as { id: unknown }).id]
         )
 
         if (existing.length === 0) {
           // Créer l'association
-          await queryRunner.query(
+          await (
+            queryRunner as { query: (sql: string, params?: unknown[]) => Promise<unknown[]> }
+          ).query(
             `
             INSERT INTO user_societe_roles ("userId", "societeId", "roleId", "isActive", "roleType", "isDefaultSociete", "additionalPermissions", "restrictedPermissions", "grantedAt", "metadata", "createdAt", "updatedAt")
             VALUES ($1, $2, $3, true, 'SUPER_ADMIN', true, '{}', '{}', CURRENT_TIMESTAMP, '{}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
           `,
-            [userId, societe.id, adminRole[0].id]
+            [userId, (societe as { id: unknown }).id, (adminRole[0] as { id: unknown }).id]
           )
         }
       }
@@ -220,7 +226,10 @@ class AdminTestUsersResetter {
 }
 
 // Script d'aide pour afficher l'utilisation
-function showUsage(): void {}
+function showUsage(): void {
+  console.log('Usage: npx ts-node reset-admin-test-users.ts [--help]')
+  console.log('Resets admin@topsteel.tech and test@topsteel.com users')
+}
 
 // Exécution du script
 async function main() {
@@ -236,7 +245,8 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch((_error) => {
+  main().catch((error) => {
+    console.error('Failed to reset admin test users:', error)
     process.exit(1)
   })
 }

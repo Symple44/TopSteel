@@ -24,7 +24,7 @@ export class NotificationEvent extends BaseAuditEntity {
   source?: string
 
   @Column({ type: 'jsonb' })
-  data!: Record<string, any>
+  data!: Record<string, unknown>
 
   @Column({ type: 'enum', enum: EventStatus, default: EventStatus.PENDING })
   @Index()
@@ -47,7 +47,7 @@ export class NotificationEvent extends BaseAuditEntity {
   processingError?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  processingDetails?: Record<string, any>
+  processingDetails?: Record<string, unknown>
 
   @Column({ type: 'uuid', nullable: true })
   @Index()
@@ -65,7 +65,7 @@ export class NotificationEvent extends BaseAuditEntity {
   static create(
     type: TriggerType,
     event: string,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     source?: string,
     userId?: string,
     entityType?: string,
@@ -97,7 +97,7 @@ export class NotificationEvent extends BaseAuditEntity {
     this.notificationsCreated = notificationsCreated
   }
 
-  markAsFailed(error: string, details?: Record<string, any>): void {
+  markAsFailed(error: string, details?: Record<string, unknown>): void {
     this.status = EventStatus.FAILED
     this.processedAt = new Date()
     this.processingError = error

@@ -437,9 +437,10 @@ export function FormulaEditor<T>({
             <div className="flex-1 overflow-y-auto border rounded-md">
               <div className="p-2 space-y-1">
                 {filteredFunctions.map((func) => (
-                  <div
+                  <button
+                    type="button"
                     key={func.name}
-                    className="border rounded-md p-3 hover:bg-muted cursor-pointer transition-colors"
+                    className="border rounded-md p-3 hover:bg-muted cursor-pointer transition-colors w-full text-left"
                     onClick={() => insertFunction(func)}
                   >
                     <div className="flex items-center justify-between">
@@ -453,7 +454,7 @@ export function FormulaEditor<T>({
                       {func.syntax}
                     </div>
                     <div className="text-xs text-green-600 mt-1">Ex: {func.example}</div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>

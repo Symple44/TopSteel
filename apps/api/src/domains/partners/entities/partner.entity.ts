@@ -149,7 +149,7 @@ export class Partner extends BusinessEntity {
     effectif?: string
     chiffreAffaires?: number
     certifications?: string[]
-    specifications?: Record<string, any>
+    specifications?: Record<string, unknown>
   }
 
   // Relations (à définir selon vos besoins)

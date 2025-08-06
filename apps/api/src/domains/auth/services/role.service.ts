@@ -65,13 +65,13 @@ export class RoleService {
     const rolesWithStats = await Promise.all(
       roles.map(async (role) => {
         const [userCount, permissionCount] = await Promise.all([
-          this._userRoleRepository.count({ where: { roleId: (role as any).id } }),
-          this._rolePermissionRepository.count({ where: { roleId: (role as any).id } }),
+          this._userRoleRepository.count({ where: { roleId: (role as { id: string }).id } }),
+          this._rolePermissionRepository.count({ where: { roleId: (role as { id: string }).id } }),
         ])
         const moduleCount = 0 // Modules table doesn't exist in auth DB
 
         return {
-          id: (role as any).id,
+          id: (role as { id: string }).id,
           name: role.name,
           description: role.description || '',
           isSystemRole: role.isSystemRole,
@@ -79,8 +79,8 @@ export class RoleService {
           userCount,
           moduleCount,
           permissionCount,
-          createdAt: (role as any).createdAt,
-          updatedAt: (role as any).updatedAt,
+          createdAt: (role as { createdAt: Date }).createdAt,
+          updatedAt: (role as { updatedAt: Date }).updatedAt,
         }
       })
     )
@@ -137,7 +137,11 @@ export class RoleService {
 
     // Ajouter les permissions si spécifiées
     if (createRoleDto.permissions && createRoleDto.permissions.length > 0) {
-      await this.updateRolePermissions((savedRole as any).id, createRoleDto.permissions, createdBy)
+      await this.updateRolePermissions(
+        (savedRole as { id: string }).id,
+        createRoleDto.permissions,
+        createdBy
+      )
     }
 
     return savedRole
@@ -196,22 +200,22 @@ export class RoleService {
 
   async getRolePermissions(roleId: string): Promise<{
     roleId: string
-    modules: any[]
+    modules: unknown[]
     rolePermissions: RolePermission[]
   }> {
     const role = await this.findRoleById(roleId)
 
     // Modules table doesn't exist in auth DB
-    const modules: any[] = []
+    const modules: unknown[] = []
 
     // Récupérer les permissions actuelles du rôle - utiliser l'ID réel du rôle trouvé
     const rolePermissions = await this._rolePermissionRepository.find({
-      where: { roleId: (role as any).id },
+      where: { roleId: (role as { id: string }).id },
       relations: ['permission'],
     })
 
     return {
-      roleId: (role as any).id,
+      roleId: (role as { id: string }).id,
       modules,
       rolePermissions,
     }
@@ -227,11 +231,11 @@ export class RoleService {
     const role = await this.findRoleById(roleId)
 
     // Supprimer les permissions existantes - utiliser l'ID réel du rôle
-    await this._rolePermissionRepository.delete({ roleId: (role as any).id })
+    await this._rolePermissionRepository.delete({ roleId: (role as { id: string }).id })
 
     // Ajouter les nouvelles permissions - utiliser l'ID réel du rôle
     const rolePermissions = permissions.map((p) =>
-      RolePermission.create((role as any).id, p.permissionId)
+      RolePermission.create((role as { id: string }).id, p.permissionId)
     )
 
     await this._rolePermissionRepository.save(rolePermissions)
@@ -249,14 +253,14 @@ export class RoleService {
 
     // Vérifier s'il n'y a pas déjà une assignation active - utiliser l'ID réel du rôle
     const existingUserRole = await this._userRoleRepository.findOne({
-      where: { userId, roleId: (role as any).id },
+      where: { userId, roleId: (role as { id: string }).id },
     })
 
     if (existingUserRole) {
       throw new ConflictException("L'utilisateur a déjà ce rôle")
     }
 
-    const userRole = UserRole.assign(userId, (role as any).id)
+    const userRole = UserRole.assign(userId, (role as { id: string }).id)
     return await this._userRoleRepository.save(userRole)
   }
 
@@ -264,7 +268,7 @@ export class RoleService {
     const role = await this.findRoleById(roleId)
 
     const userRole = await this._userRoleRepository.findOne({
-      where: { userId, roleId: (role as any).id },
+      where: { userId, roleId: (role as { id: string }).id },
     })
 
     if (!userRole) {
@@ -285,7 +289,7 @@ export class RoleService {
 
   async getUserPermissions(userId: string): Promise<RolePermission[]> {
     const userRoles = await this.getUserRoles(userId)
-    const roleIds = userRoles.map((role) => (role as any).id)
+    const roleIds = userRoles.map((role) => (role as { id: string }).id)
 
     if (roleIds.length === 0) {
       return []

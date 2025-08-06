@@ -47,6 +47,7 @@ async function runSpecificMigration() {
   } catch (error) {
     // Afficher plus de détails sur l'erreur
     if (error instanceof Error) {
+      console.error('Migration error:', error.message)
     }
   } finally {
     await dataSource.destroy()

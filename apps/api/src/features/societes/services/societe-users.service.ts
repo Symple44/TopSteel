@@ -249,7 +249,7 @@ export class SocieteUsersService {
       isActive?: boolean
     }
   ): Promise<SocieteUser> {
-    const updateData: any = {}
+    const updateData: Partial<SocieteUser> = {}
     if (updates.role !== undefined) updateData.role = updates.role as UserSocieteRole
     if (updates.permissions !== undefined) updateData.permissions = updates.permissions
     if (updates.isActive !== undefined) updateData.actif = updates.isActive

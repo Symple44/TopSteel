@@ -97,7 +97,7 @@ export function getApproximateTabCount(): number {
     localStorage.setItem('topsteel-active-tabs', JSON.stringify(cleanedTabs))
 
     return Object.keys(cleanedTabs).length
-  } catch (_error) {
+  } catch {
     return 1
   }
 }
@@ -118,7 +118,7 @@ export function cleanupTabDetection(): void {
         localStorage.setItem('topsteel-active-tabs', JSON.stringify(activeTabs))
       }
     }
-  } catch (_error) {}
+  } catch {}
 }
 
 /**

@@ -30,10 +30,10 @@ async function checkAdmin() {
     )
 
     if (result.length === 0) {
-      const allEmails = await dataSource.query(`
+      await dataSource.query(`
         SELECT email, role, actif FROM users ORDER BY email
       `)
-      allEmails.forEach((_u: any) => {})
+      // Available emails found
     } else {
       const user = result[0]
       const passwords = ['TopSteel44!', 'admin123', 'Admin123!', 'admin', 'password']
@@ -41,12 +41,15 @@ async function checkAdmin() {
       for (const pwd of passwords) {
         try {
           if (user.password) {
-            const _isValid = await bcrypt.compare(pwd, user.password)
+            await bcrypt.compare(pwd, user.password)
           }
-        } catch (_err: any) {}
+        } catch {
+          // Ignore password comparison errors
+        }
       }
     }
-  } catch (_error) {
+  } catch {
+    // Ignore database connection errors
   } finally {
     await dataSource.destroy()
   }

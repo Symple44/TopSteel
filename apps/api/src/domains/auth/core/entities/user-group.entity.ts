@@ -35,7 +35,7 @@ export class UserGroup {
   isActive!: boolean
 
   @Column({ type: 'json', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @CreateDateColumn()
   createdAt!: Date

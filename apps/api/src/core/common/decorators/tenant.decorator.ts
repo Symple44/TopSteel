@@ -1,4 +1,5 @@
 import { createParamDecorator, type ExecutionContext, SetMetadata } from '@nestjs/common'
+import type { DataSource } from 'typeorm'
 
 /**
  * Décorateur pour récupérer le contexte de société depuis la requête
@@ -33,5 +34,5 @@ export interface ITenantContext {
   userId: string
   userRole: string
   permissions: string[]
-  dataSource?: any // DataSource TypeORM de la société
+  dataSource?: DataSource // DataSource TypeORM de la société
 }

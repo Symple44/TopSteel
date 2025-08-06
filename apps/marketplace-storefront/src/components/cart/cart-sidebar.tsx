@@ -31,7 +31,15 @@ export function CartSidebar({ tenant }: CartSidebarProps) {
   return (
     <>
       {/* Overlay */}
-      {isOpen && <div className="fixed inset-0 bg-black/50 z-40" onClick={toggleCart} />}
+      {isOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={toggleCart}
+          onKeyDown={(e) => e.key === 'Escape' && toggleCart()}
+          aria-label="Fermer le panier"
+        />
+      )}
 
       {/* Sidebar */}
       <div
@@ -46,7 +54,11 @@ export function CartSidebar({ tenant }: CartSidebarProps) {
             <ShoppingBag className="w-5 h-5" />
             Panier ({totalItems})
           </h2>
-          <button onClick={toggleCart} className="p-2 hover:bg-muted rounded-lg transition-colors">
+          <button
+            type="button"
+            onClick={toggleCart}
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -127,7 +139,21 @@ function EmptyCart() {
 }
 
 interface CartItemProps {
-  item: any
+  item: {
+    id: string
+    product: {
+      id: string
+      designation: string
+      reference: string
+      basePrice?: number
+      calculatedPrice?: number
+      stockDisponible?: number
+      images: Array<{ url: string; isMain?: boolean }>
+    }
+    quantity: number
+    unitPrice: number
+    totalPrice: number
+  }
   onUpdateQuantity: (quantity: number) => void
   onRemove: () => void
   tenant: string
@@ -135,7 +161,7 @@ interface CartItemProps {
 
 function CartItem({ item, onUpdateQuantity, onRemove, tenant }: CartItemProps) {
   const { product, quantity, unitPrice, totalPrice } = item
-  const mainImage = product.images.find((img: any) => img.isMain) || product.images[0]
+  const mainImage = product.images.find((img) => img.isMain) || product.images[0]
 
   return (
     <div className="flex gap-3 p-3 border rounded-lg">
@@ -178,6 +204,7 @@ function CartItem({ item, onUpdateQuantity, onRemove, tenant }: CartItemProps) {
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center border rounded">
             <button
+              type="button"
               onClick={() => onUpdateQuantity(quantity - 1)}
               className="p-1 hover:bg-muted transition-colors"
               disabled={quantity <= 1}
@@ -186,6 +213,7 @@ function CartItem({ item, onUpdateQuantity, onRemove, tenant }: CartItemProps) {
             </button>
             <span className="px-2 py-1 text-sm min-w-[2rem] text-center">{quantity}</span>
             <button
+              type="button"
               onClick={() => onUpdateQuantity(quantity + 1)}
               className="p-1 hover:bg-muted transition-colors"
               disabled={quantity >= (product.stockDisponible || 999)}
@@ -195,6 +223,7 @@ function CartItem({ item, onUpdateQuantity, onRemove, tenant }: CartItemProps) {
           </div>
 
           <button
+            type="button"
             onClick={onRemove}
             className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors"
             title="Supprimer"

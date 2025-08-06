@@ -60,7 +60,7 @@ export interface BusinessContext {
   tenantId: string
   userRoles: string[]
   permissions: string[]
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 /**

@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useTranslation } from '@/lib/i18n/hooks'
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {

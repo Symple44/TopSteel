@@ -76,13 +76,22 @@ export class MaterialService extends BusinessService<Material> {
     if (data.reference) {
       material.reference = data.reference
     } else {
-      material.reference = await this.generateReference(data.type!, data.forme!)
+      if (!data.type || !data.forme) {
+        throw new Error('Type et forme du matériau requis pour générer une référence')
+      }
+      material.reference = await this.generateReference(data.type, data.forme)
     }
 
     // Informations de base obligatoires
     material.nom = data.nom || ''
-    material.type = data.type!
-    material.forme = data.forme!
+    if (!data.type) {
+      throw new Error('Type de matériau requis')
+    }
+    material.type = data.type
+    if (!data.forme) {
+      throw new Error('Forme du matériau requise')
+    }
+    material.forme = data.forme
     material.status = data.status || MaterialStatus.ACTIF
     material.description = data.description
 
@@ -96,7 +105,10 @@ export class MaterialService extends BusinessService<Material> {
     material.dimensions = data.dimensions || {}
     material.poidsUnitaire = data.poidsUnitaire
     material.densite = data.densite
-    material.unite = data.unite!
+    if (!data.unite) {
+      throw new Error('Unité du matériau requise')
+    }
+    material.unite = data.unite
 
     // Informations économiques
     material.prixUnitaire = data.prixUnitaire
@@ -454,9 +466,9 @@ export class MaterialService extends BusinessService<Material> {
 
     // Créer une copie
     const materialCopie = { ...materialOriginal }
-    delete (materialCopie as any).id
-    delete (materialCopie as any).createdAt
-    delete (materialCopie as any).updatedAt
+    delete (materialCopie as Record<string, unknown>).id
+    delete (materialCopie as Record<string, unknown>).createdAt
+    delete (materialCopie as Record<string, unknown>).updatedAt
 
     // Appliquer les modifications
     materialCopie.reference = nouvelleReference
@@ -629,7 +641,7 @@ export class MaterialService extends BusinessService<Material> {
     }
   }
 
-  private validateDimensionsConsistency(entity: Material, warnings: any[]): void {
+  private validateDimensionsConsistency(entity: Material, warnings: string[]): void {
     const dim = entity.dimensions
     if (!dim) return
 

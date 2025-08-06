@@ -8,7 +8,7 @@ export interface MenuConfigurationData {
   description?: string
   isActive: boolean
   isSystem: boolean
-  metadata?: any
+  metadata?: Record<string, unknown>
   createdAt: Date
   updatedAt: Date
   createdBy?: string
@@ -26,7 +26,7 @@ export interface MenuItemData {
   queryBuilderId?: string
   orderIndex: number
   isVisible: boolean
-  metadata?: any
+  metadata?: Record<string, unknown>
   createdAt: Date
   updatedAt: Date
   createdBy?: string

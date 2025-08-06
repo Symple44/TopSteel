@@ -212,7 +212,7 @@ export class GroupService {
     return userGroups.filter((ug) => ug.isValid()).map((ug) => ug.group)
   }
 
-  async getGroupUsers(groupId: string): Promise<any[]> {
+  async getGroupUsers(groupId: string): Promise<unknown[]> {
     const userGroups = await this._userGroupRepository.find({
       where: { groupId, isActive: true },
     })
@@ -238,7 +238,7 @@ export class GroupService {
 
   // ===== PERMISSIONS HÉRITÉES =====
 
-  async getUserPermissionsFromGroups(userId: string): Promise<any[]> {
+  async getUserPermissionsFromGroups(userId: string): Promise<unknown[]> {
     const userGroups = await this.getUserGroups(userId)
 
     // Collecter tous les rôles des groupes de l'utilisateur
@@ -247,7 +247,7 @@ export class GroupService {
     for (const group of userGroups) {
       if (group.roles) {
         for (const role of group.roles) {
-          allRoles.set((role as any).id, role)
+          allRoles.set((role as { id: string }).id, role)
         }
       }
     }

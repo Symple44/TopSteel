@@ -123,7 +123,7 @@ export interface Operation extends BaseEntity {
 
   // Techniques
   readonly instructions?: string
-  readonly parametres: Record<string, any>
+  readonly parametres: Record<string, unknown>
   readonly qualite: QualityRequirements
 
   // Suivi
@@ -241,7 +241,7 @@ export interface MaterialOrder extends BaseEntity {
   readonly montantTotal?: number
 
   // Caractéristiques
-  readonly specifications?: Record<string, any>
+  readonly specifications?: Record<string, unknown>
   readonly certification?: string
   readonly numeroLot?: string
 

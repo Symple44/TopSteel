@@ -32,10 +32,10 @@ async function fixRoleDeletedAt() {
       `)
 
       if (rolesColumns.length > 0) {
-        rolesColumns.forEach((_col: any) => {})
+        rolesColumns.forEach((_col: unknown) => {})
       }
     } else {
-      roleColumns.forEach((_col: any) => {})
+      roleColumns.forEach((_col: unknown) => {})
     }
 
     // Essayer sur "role" d'abord
@@ -44,14 +44,14 @@ async function fixRoleDeletedAt() {
         ALTER TABLE role 
         ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP
       `)
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       // Essayer sur "roles"
       try {
         await dataSource.query(`
           ALTER TABLE roles 
           ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP
         `)
-      } catch (_error2: any) {}
+      } catch (_error2: unknown) {}
     }
     const tables = [
       'users',
@@ -79,9 +79,9 @@ async function fixRoleDeletedAt() {
           `)
         } else {
         }
-      } catch (_error: any) {}
+      } catch (_error: unknown) {}
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

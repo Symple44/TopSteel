@@ -94,7 +94,10 @@ export const DashboardOverview = () => (
               badge: 'bg-blue-500',
             },
           ].map((projet, index) => (
-            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+            <div
+              key={`dashboard-projet-${projet.nom}-${index}`}
+              className="flex items-center justify-between p-3 border rounded-lg"
+            >
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
                   <h4 className="font-medium">{projet.nom}</h4>

@@ -39,7 +39,7 @@ interface MFASession {
 }
 
 export default function MFAVerification({
-  userId,
+  userId: _userId,
   email,
   availableMethods,
   onSuccess,
@@ -71,14 +71,6 @@ export default function MFAVerification({
     return () => clearInterval(timer)
   }, [onBack, t])
 
-  useEffect(() => {
-    // Initiate MFA session when method changes
-    initiateMFASession()
-  }, [
-    // Initiate MFA session when method changes
-    initiateMFASession,
-  ])
-
   const initiateMFASession = async () => {
     try {
       setLoading(true)
@@ -101,12 +93,20 @@ export default function MFAVerification({
       } else {
         toast.error(t('mfaSessionError'))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('mfaSessionError'))
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    // Initiate MFA session when method changes
+    initiateMFASession()
+  }, [
+    // Initiate MFA session when method changes
+    initiateMFASession,
+  ])
 
   const startWebAuthnAuthentication = async (options: any) => {
     try {
@@ -165,7 +165,7 @@ export default function MFAVerification({
 
       // Verify authentication
       await verifyMFA(undefined, response)
-    } catch (_error) {
+    } catch {
       toast.error(t('webauthnError'))
       setAttempts((prev) => prev + 1)
     }
@@ -207,7 +207,7 @@ export default function MFAVerification({
         setAttempts((prev) => prev + 1)
         setVerificationCode('')
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('mfaVerificationFailed'))
       setAttempts((prev) => prev + 1)
     } finally {

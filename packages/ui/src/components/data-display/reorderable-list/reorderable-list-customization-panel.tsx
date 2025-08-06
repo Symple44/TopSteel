@@ -97,9 +97,7 @@ export function ReorderableListCustomizationPanel({
           {/* Onglet Thèmes */}
           <TabsContent value="theme" className="space-y-3 mt-4">
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">
-                Sélection du thème
-              </label>
+              <h4 className="text-xs font-medium text-muted-foreground">Sélection du thème</h4>
               <div className="grid grid-cols-1 gap-2">
                 {Object.values(defaultThemes).map((theme) => (
                   <button
@@ -136,11 +134,15 @@ export function ReorderableListCustomizationPanel({
           <TabsContent value="layout" className="space-y-4 mt-4">
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                <label
+                  htmlFor="maxDepth"
+                  className="text-xs font-medium text-muted-foreground mb-2 block"
+                >
                   Profondeur maximale: {config.layout.maxDepth}
                 </label>
                 <input
                   type="range"
+                  id="maxDepth"
                   value={config.layout.maxDepth}
                   onChange={(e) => handleLayoutChange('maxDepth', parseInt(e.target.value))}
                   min={1}
@@ -151,10 +153,11 @@ export function ReorderableListCustomizationPanel({
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-muted-foreground">
+                <label htmlFor="allowNesting" className="text-xs font-medium text-muted-foreground">
                   Imbrication autorisée
                 </label>
                 <Switch
+                  id="allowNesting"
                   checked={config.layout.allowNesting}
                   onCheckedChange={(checked: boolean) =>
                     handleLayoutChange('allowNesting', checked)
@@ -163,9 +166,9 @@ export function ReorderableListCustomizationPanel({
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground">
+                <div className="text-xs font-medium text-muted-foreground">
                   Position de la poignée
-                </label>
+                </div>
                 <div className="flex gap-2">
                   <Button
                     variant={config.layout.dragHandlePosition === 'left' ? 'default' : 'outline'}
@@ -194,9 +197,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="h-3 w-3" />
-                  <label className="text-xs font-medium">Indicateurs de niveau</label>
+                  <label htmlFor="level-indicators" className="text-xs font-medium">
+                    Indicateurs de niveau
+                  </label>
                 </div>
                 <Switch
+                  id="level-indicators"
                   checked={config.preferences.showLevelIndicators}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('showLevelIndicators', checked)
@@ -207,9 +213,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="h-3 w-3" />
-                  <label className="text-xs font-medium">Lignes de connexion</label>
+                  <label htmlFor="connection-lines" className="text-xs font-medium">
+                    Lignes de connexion
+                  </label>
                 </div>
                 <Switch
+                  id="connection-lines"
                   checked={config.preferences.showConnectionLines}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('showConnectionLines', checked)
@@ -220,9 +229,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Zap className="h-3 w-3" />
-                  <label className="text-xs font-medium">Animations</label>
+                  <label htmlFor="animations" className="text-xs font-medium">
+                    Animations
+                  </label>
                 </div>
                 <Switch
+                  id="animations"
                   checked={config.preferences.enableAnimations}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('enableAnimations', checked)
@@ -233,9 +245,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Layout className="h-3 w-3" />
-                  <label className="text-xs font-medium">Mode compact</label>
+                  <label htmlFor="compact-mode" className="text-xs font-medium">
+                    Mode compact
+                  </label>
                 </div>
                 <Switch
+                  id="compact-mode"
                   checked={config.preferences.compactMode}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('compactMode', checked)
@@ -246,9 +261,12 @@ export function ReorderableListCustomizationPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Eye className="h-3 w-3" />
-                  <label className="text-xs font-medium">Expansion par défaut</label>
+                  <label htmlFor="default-expanded" className="text-xs font-medium">
+                    Expansion par défaut
+                  </label>
                 </div>
                 <Switch
+                  id="default-expanded"
                   checked={config.preferences.defaultExpanded}
                   onCheckedChange={(checked: boolean) =>
                     handlePreferenceChange('defaultExpanded', checked)

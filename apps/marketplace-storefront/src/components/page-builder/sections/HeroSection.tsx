@@ -21,7 +21,7 @@ export interface HeroContent {
   height?: 'small' | 'medium' | 'large' | 'full'
 }
 
-export function HeroSection({ section, isEditing, onUpdate }: SectionProps<HeroContent>) {
+export function HeroSection({ section, isEditing }: SectionProps<HeroContent>) {
   const { content, styles, settings } = section
 
   const heightClasses = {
@@ -82,9 +82,9 @@ export function HeroSection({ section, isEditing, onUpdate }: SectionProps<HeroC
 
           {content.buttons && content.buttons.length > 0 && (
             <div className="flex flex-wrap gap-4">
-              {content.buttons.map((button: any, index: number) => (
+              {content.buttons.map((button, index: number) => (
                 <Link
-                  key={index}
+                  key={`hero-button-${button.text}-${index}`}
                   href={button.url}
                   target={button.target}
                   className={`

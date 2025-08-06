@@ -46,7 +46,9 @@ export abstract class BusinessService<T extends BusinessEntity> implements IBusi
     // 5. Appliquer les hooks après création
     await this.afterCreate(savedEntity, context)
 
-    this.logger.log(`${this.getEntityName()} created with ID: ${(savedEntity as any).id}`)
+    this.logger.log(
+      `${this.getEntityName()} created with ID: ${(savedEntity as Record<string, unknown>).id}`
+    )
     return savedEntity
   }
 
@@ -165,7 +167,7 @@ export class BusinessError extends Error {
 export class BusinessValidationError extends BusinessError {
   constructor(
     message: string,
-    public errors: any[]
+    public errors: Record<string, unknown>[]
   ) {
     super(message)
     this.name = 'BusinessValidationError'

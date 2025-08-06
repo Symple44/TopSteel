@@ -1,5 +1,7 @@
 // apps/api/src/config/port-helper.ts - Helper gestion ports intelligente
 import { createServer } from 'node:net'
+import type { INestApplication, Logger } from '@nestjs/common'
+import type { ConfigService } from '@nestjs/config'
 
 export interface PortConfig {
   preferred: number
@@ -50,9 +52,9 @@ export async function findAvailablePort(config: PortConfig = defaultPortConfig):
  * Wrapper pour app.listen avec gestion ports intelligente
  */
 export async function listenWithPortFallback(
-  app: any,
-  configService: any,
-  logger: any
+  app: INestApplication,
+  configService: ConfigService,
+  logger: Logger
 ): Promise<number> {
   const preferredPort = configService.get('app.port') || 3001
   const host = configService.get('app.host') || '127.0.0.1'

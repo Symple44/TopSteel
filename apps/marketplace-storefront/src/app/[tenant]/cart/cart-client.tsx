@@ -121,15 +121,30 @@ export default function CartClient({ tenant }: CartClientProps) {
 }
 
 interface CartItemCardProps {
-  item: any
+  item: unknown
   tenant: string
   onUpdateQuantity: (quantity: number) => void
   onRemove: () => void
 }
 
 function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCardProps) {
-  const { product, quantity, unitPrice, totalPrice } = item
-  const mainImage = product.images.find((img: any) => img.isMain) || product.images[0]
+  const cartItem = item as {
+    product: {
+      id: string
+      designation: string
+      reference: string
+      categories: string[]
+      images: Array<{ url: string; isMain?: boolean }>
+      stockDisponible?: number
+    }
+    quantity: number
+    unitPrice: number
+    totalPrice: number
+  }
+  const { product, quantity, unitPrice, totalPrice } = cartItem
+  const mainImage =
+    product.images.find((img: { url: string; alt?: string; isMain: boolean }) => img.isMain) ||
+    product.images[0]
 
   return (
     <div className="flex gap-6 p-6 border rounded-lg bg-background">
@@ -163,6 +178,7 @@ function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCard
           </div>
 
           <button
+            type="button"
             onClick={onRemove}
             className="p-2 text-destructive hover:bg-destructive/10 rounded transition-colors"
             title="Supprimer du panier"
@@ -175,6 +191,7 @@ function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCard
           <div className="flex items-center gap-4">
             <div className="flex items-center border rounded">
               <button
+                type="button"
                 onClick={() => onUpdateQuantity(quantity - 1)}
                 className="p-2 hover:bg-muted transition-colors"
                 disabled={quantity <= 1}
@@ -183,6 +200,7 @@ function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCard
               </button>
               <span className="px-4 py-2 min-w-[3rem] text-center">{quantity}</span>
               <button
+                type="button"
                 onClick={() => onUpdateQuantity(quantity + 1)}
                 className="p-2 hover:bg-muted transition-colors"
                 disabled={quantity >= (product.stockDisponible || 999)}

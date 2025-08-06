@@ -79,8 +79,7 @@ export class Notifications extends CommonEntity {
   entityId?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data?: Record<string, any>
+  data?: Record<string, unknown>
 
   @Column({
     type: 'enum',

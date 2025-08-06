@@ -44,14 +44,20 @@ function SearchSkeleton() {
       {/* Filters Skeleton */}
       <div className="flex gap-4 overflow-x-auto pb-2">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-10 bg-muted rounded w-24 flex-shrink-0 animate-pulse" />
+          <div
+            key={`search-page-filter-skeleton-${Date.now()}-${i}`}
+            className="h-10 bg-muted rounded w-24 flex-shrink-0 animate-pulse"
+          />
         ))}
       </div>
 
       {/* Products Grid Skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="border rounded-lg p-4 space-y-4">
+          <div
+            key={`search-page-product-skeleton-${Date.now()}-${i}`}
+            className="border rounded-lg p-4 space-y-4"
+          >
             <div className="aspect-square bg-muted rounded animate-pulse" />
             <div className="space-y-2">
               <div className="h-4 bg-muted rounded animate-pulse" />

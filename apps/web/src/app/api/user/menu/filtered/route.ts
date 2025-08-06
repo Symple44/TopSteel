@@ -45,15 +45,15 @@ export async function GET(req: NextRequest) {
       success: true,
       data: menuData.data || [],
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       {
         success: false,
-        message: error.message || 'Erreur serveur',
+        message: (error as Error).message || 'Erreur serveur',
         data: [],
       },
       {
-        status: error.response?.status || 500,
+        status: (error as any).response?.status || 500,
       }
     )
   }

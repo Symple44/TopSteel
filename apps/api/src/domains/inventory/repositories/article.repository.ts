@@ -140,7 +140,7 @@ export interface IArticleRepository extends IBusinessRepository<Article> {
   /**
    * Obtenir les mouvements de stock récents pour un article
    */
-  getRecentStockMovements(articleId: string, limit: number): Promise<any[]>
+  getRecentStockMovements(articleId: string, limit: number): Promise<Record<string, unknown>[]>
 
   /**
    * Obtenir les articles les plus vendus

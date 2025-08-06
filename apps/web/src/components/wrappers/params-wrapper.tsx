@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { createContext, type ReactNode, useContext } from 'react'
 
 interface ParamsContextType {
-  params: Record<string, string | string[]>
+  params: Record<string, string | string[] | undefined>
 }
 
 const ParamsContext = createContext<ParamsContextType | null>(null)

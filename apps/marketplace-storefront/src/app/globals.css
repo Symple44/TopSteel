@@ -34,27 +34,25 @@
   --color-green-700: 21 128 61;
 
   /* Dark mode colors */
-  --color-*-dark: {
-    --color-background: 222.2 84% 4.9%;
-    --color-foreground: 210 40% 98%;
-    --color-card: 222.2 84% 4.9%;
-    --color-card-foreground: 210 40% 98%;
-    --color-popover: 222.2 84% 4.9%;
-    --color-popover-foreground: 210 40% 98%;
-    --color-primary: 217.2 91.2% 59.8%;
-    --color-primary-foreground: 222.2 84% 4.9%;
-    --color-secondary: 217.2 32.6% 17.5%;
-    --color-secondary-foreground: 210 40% 98%;
-    --color-muted: 217.2 32.6% 17.5%;
-    --color-muted-foreground: 215 20.2% 65.1%;
-    --color-accent: 217.2 32.6% 17.5%;
-    --color-accent-foreground: 210 40% 98%;
-    --color-destructive: 0 62.8% 30.6%;
-    --color-destructive-foreground: 210 40% 98%;
-    --color-border: 217.2 32.6% 17.5%;
-    --color-input: 217.2 32.6% 17.5%;
-    --color-ring: 224.3 76.3% 94.1%;
-  }
+  --color-background-dark: 222.2 84% 4.9%;
+  --color-foreground-dark: 210 40% 98%;
+  --color-card-dark: 222.2 84% 4.9%;
+  --color-card-foreground-dark: 210 40% 98%;
+  --color-popover-dark: 222.2 84% 4.9%;
+  --color-popover-foreground-dark: 210 40% 98%;
+  --color-primary-dark: 217.2 91.2% 59.8%;
+  --color-primary-foreground-dark: 222.2 84% 4.9%;
+  --color-secondary-dark: 217.2 32.6% 17.5%;
+  --color-secondary-foreground-dark: 210 40% 98%;
+  --color-muted-dark: 217.2 32.6% 17.5%;
+  --color-muted-foreground-dark: 215 20.2% 65.1%;
+  --color-accent-dark: 217.2 32.6% 17.5%;
+  --color-accent-foreground-dark: 210 40% 98%;
+  --color-destructive-dark: 0 62.8% 30.6%;
+  --color-destructive-foreground-dark: 210 40% 98%;
+  --color-border-dark: 217.2 32.6% 17.5%;
+  --color-input-dark: 217.2 32.6% 17.5%;
+  --color-ring-dark: 224.3 76.3% 94.1%;
 
   /* Radius */
   --radius-lg: 0.5rem;

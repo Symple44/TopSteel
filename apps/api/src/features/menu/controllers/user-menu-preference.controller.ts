@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/co
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
 import type { UserMenuPreference } from '../entities/user-menu-preference.entity'
 import type { UserMenuPreferenceService } from '../services/user-menu-preference.service'
 
@@ -134,7 +135,7 @@ export class UserMenuPreferenceController {
 
   @Get('menu')
   @ApiOperation({ summary: 'Récupérer le menu personnalisé (legacy)' })
-  async getCustomMenuLegacy(@Request() req): Promise<{ success: boolean; data: any[] }> {
+  async getCustomMenuLegacy(@Request() req): Promise<{ success: boolean; data: MenuItemDto[] }> {
     const userId = req.user.id
     const preferences = await this.userMenuPreferenceService.findOrCreateByUserId(userId)
 
@@ -362,7 +363,7 @@ export class UserMenuPreferenceController {
       })
 
     // Construire la hiérarchie parent/enfant
-    const rootItems: any[] = []
+    const rootItems: MenuItemDto[] = []
     const itemsArray = Array.from(allMenuItems.values())
 
     // Trier par order d'abord
@@ -409,8 +410,12 @@ export class UserMenuPreferenceController {
   @ApiOperation({ summary: 'Sauvegarder le menu personnalisé complet' })
   async saveCustomMenu(
     @Request() req,
-    @Body() body: { menuItems: any[] }
-  ): Promise<{ success: boolean; data: any; error?: string }> {
+    @Body() body: { menuItems: MenuItemDto[] }
+  ): Promise<{
+    success: boolean
+    data: { success: boolean; itemCount: number; savedAt: string }
+    error?: string
+  }> {
     const userId = req.user.id
     const { menuItems } = body
 
@@ -437,14 +442,16 @@ export class UserMenuPreferenceController {
 
   @Get('custom-menu')
   @ApiOperation({ summary: 'Récupérer le menu personnalisé complet' })
-  async getCustomMenu(@Request() req): Promise<{ success: boolean; data: any[]; error?: string }> {
+  async getCustomMenu(
+    @Request() req
+  ): Promise<{ success: boolean; data: MenuItemDto[]; error?: string }> {
     const userId = req.user.id
     const cacheKey = `user:custom-menu:${userId}`
 
     try {
       const cachedResult = await this.cacheService.get<{
         success: boolean
-        data: any[]
+        data: MenuItemDto[]
         error?: string
       }>(cacheKey)
       if (cachedResult) {

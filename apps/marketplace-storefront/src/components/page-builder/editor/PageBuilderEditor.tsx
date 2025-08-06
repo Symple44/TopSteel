@@ -13,11 +13,7 @@ interface PageBuilderEditorProps {
   templateId?: string
 }
 
-export function PageBuilderEditor({
-  initialSections = [],
-  onSave,
-  templateId,
-}: PageBuilderEditorProps) {
+export function PageBuilderEditor({ initialSections = [], onSave }: PageBuilderEditorProps) {
   const [sections, setSections] = useState<BaseSection[]>(initialSections)
   const [selectedSection, setSelectedSection] = useState<string | null>(null)
   const [isPreview, setIsPreview] = useState(false)
@@ -135,6 +131,7 @@ export function PageBuilderEditor({
               <h1 className="text-xl font-semibold">Éditeur de page</h1>
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={undo}
                   disabled={historyIndex === 0}
                   className="p-2 rounded hover:bg-gray-100 disabled:opacity-50"
@@ -143,6 +140,7 @@ export function PageBuilderEditor({
                   <Undo className="w-4 h-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={redo}
                   disabled={historyIndex === history.length - 1}
                   className="p-2 rounded hover:bg-gray-100 disabled:opacity-50"
@@ -155,6 +153,7 @@ export function PageBuilderEditor({
 
             <div className="flex items-center gap-3">
               <button
+                type="button"
                 onClick={() => setShowLibrary(!showLibrary)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
@@ -163,6 +162,7 @@ export function PageBuilderEditor({
               </button>
 
               <button
+                type="button"
                 onClick={() => setIsPreview(!isPreview)}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-md',
@@ -174,6 +174,7 @@ export function PageBuilderEditor({
               </button>
 
               <button
+                type="button"
                 onClick={handleSave}
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
               >
@@ -193,6 +194,7 @@ export function PageBuilderEditor({
             <div className="flex flex-col items-center justify-center min-h-[400px] m-8 border-2 border-dashed border-gray-300 rounded-lg">
               <p className="text-gray-500 mb-4">Aucune section ajoutée</p>
               <button
+                type="button"
                 onClick={() => setShowLibrary(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
@@ -205,21 +207,33 @@ export function PageBuilderEditor({
               {sections.map((section, index) => (
                 <div
                   key={section.id}
-                  draggable={!isPreview}
-                  onDragStart={(e) => handleDragStart(e, index)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, index)}
                   className={cn(
                     'relative group',
                     !isPreview && 'cursor-move',
                     selectedSection === section.id && 'ring-2 ring-blue-500'
                   )}
-                  onClick={() => !isPreview && setSelectedSection(section.id)}
+                  {...(!isPreview && {
+                    draggable: true,
+                    onDragStart: (e: React.DragEvent) => handleDragStart(e, index),
+                    onDragOver: handleDragOver,
+                    onDrop: (e: React.DragEvent) => handleDrop(e, index),
+                    onClick: () => setSelectedSection(section.id),
+                    onKeyDown: (e: React.KeyboardEvent) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setSelectedSection(section.id)
+                      }
+                    },
+                    tabIndex: 0,
+                    role: 'button',
+                    'aria-label': `Select section ${index + 1}`,
+                  })}
                 >
                   {!isPreview && (
                     <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="bg-white rounded shadow-lg p-1 flex gap-1">
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation()
                             setSelectedSection(section.id)
@@ -231,6 +245,7 @@ export function PageBuilderEditor({
                           <Settings className="w-4 h-4" />
                         </button>
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation()
                             deleteSection(section.id)
@@ -259,7 +274,7 @@ export function PageBuilderEditor({
         {/* Panneau latéral pour les paramètres */}
         {showSettings && selectedSection && (
           <SectionSettings
-            section={sections.find((s) => s.id === selectedSection)!}
+            section={sections.find((s) => s.id === selectedSection) || sections[0]}
             onUpdate={(updates) => updateSection(selectedSection, updates)}
             onClose={() => setShowSettings(false)}
           />

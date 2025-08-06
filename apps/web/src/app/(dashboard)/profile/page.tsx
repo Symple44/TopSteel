@@ -253,12 +253,16 @@ export default function ProfilePage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="acronym-input"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       <User className="h-4 w-4 inline mr-1" />
                       {t('acronym')}
                     </label>
                     <div className="flex space-x-2">
                       <Input
+                        id="acronym-input"
                         value={profileData.acronyme}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setProfileData((prev) => ({
@@ -288,10 +292,14 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="firstName-input"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       {t('firstName')}
                     </label>
                     <Input
+                      id="firstName-input"
                       value={profileData.prenom}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setProfileData((prev) => ({ ...prev, prenom: e.target.value }))
@@ -301,10 +309,14 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="lastName-input"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       {t('lastName')}
                     </label>
                     <Input
+                      id="lastName-input"
                       value={profileData.nom}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setProfileData((prev) => ({ ...prev, nom: e.target.value }))
@@ -316,11 +328,15 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="email-input"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       <Mail className="h-4 w-4 inline mr-1" />
                       {t('email')}
                     </label>
                     <Input
+                      id="email-input"
                       type="email"
                       value={profileData.email}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -331,11 +347,15 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="phone-input"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       <Phone className="h-4 w-4 inline mr-1" />
                       {t('phone')}
                     </label>
                     <Input
+                      id="phone-input"
                       type="tel"
                       value={profileData.telephone}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -348,11 +368,15 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="position-input"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       <Building2 className="h-4 w-4 inline mr-1" />
                       {t('position')}
                     </label>
                     <Input
+                      id="position-input"
                       value={profileData.poste}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setProfileData((prev) => ({ ...prev, poste: e.target.value }))
@@ -362,10 +386,14 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="department-input"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       {t('department')}
                     </label>
                     <Input
+                      id="department-input"
                       value={profileData.departement}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setProfileData((prev) => ({ ...prev, departement: e.target.value }))
@@ -376,11 +404,15 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label
+                    htmlFor="address-input"
+                    className="block text-sm font-medium text-foreground mb-2"
+                  >
                     <MapPin className="h-4 w-4 inline mr-1" />
                     {t('address')}
                   </label>
                   <Input
+                    id="address-input"
                     value={profileData.adresse}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setProfileData((prev) => ({ ...prev, adresse: e.target.value }))
@@ -391,10 +423,14 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="city-input"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       {t('city')}
                     </label>
                     <Input
+                      id="city-input"
                       value={profileData.ville}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setProfileData((prev) => ({ ...prev, ville: e.target.value }))
@@ -404,10 +440,14 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="postalCode"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       {t('postalCode')}
                     </label>
                     <Input
+                      id="postalCode"
                       value={profileData.codePostal}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setProfileData((prev) => ({ ...prev, codePostal: e.target.value }))
@@ -417,10 +457,14 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label
+                      htmlFor="country"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       {t('country')}
                     </label>
                     <Input
+                      id="country"
                       value={profileData.pays}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setProfileData((prev) => ({ ...prev, pays: e.target.value }))
@@ -433,17 +477,20 @@ export default function ProfilePage() {
                 <div className="border-t pt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label
+                        htmlFor="role"
+                        className="block text-sm font-medium text-foreground mb-2"
+                      >
                         {t('role')}
                       </label>
-                      <Input value={profileData.role} disabled className="bg-muted" />
+                      <Input id="role" value={profileData.role} disabled className="bg-muted" />
                       <p className="text-sm text-muted-foreground mt-1">{t('roleChangeContact')}</p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <div className="block text-sm font-medium text-foreground mb-2">
                         {t('permissions')}
-                      </label>
+                      </div>
                       <div className="flex flex-wrap gap-2">
                         {profileData.permissions.map((permission) => (
                           <Badge key={permission} variant="secondary">
@@ -468,9 +515,9 @@ export default function ProfilePage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <div className="block text-sm font-medium text-foreground mb-2">
                       {t('lastLogin')}
-                    </label>
+                    </div>
                     <div className="text-sm text-foreground">
                       {new Date().toLocaleDateString('fr-FR', {
                         year: 'numeric',
@@ -482,9 +529,9 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <div className="block text-sm font-medium text-foreground mb-2">
                       {t('status')}
-                    </label>
+                    </div>
                     <Badge variant="default" className="bg-green-100 text-green-800">
                       {t('connected')}
                     </Badge>
@@ -504,11 +551,15 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label
+                    htmlFor="currentPassword"
+                    className="block text-sm font-medium text-foreground mb-2"
+                  >
                     {t('currentPassword')}
                   </label>
                   <div className="relative">
                     <Input
+                      id="currentPassword"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={passwordData.currentPassword}
@@ -526,10 +577,14 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label
+                    htmlFor="newPassword"
+                    className="block text-sm font-medium text-foreground mb-2"
+                  >
                     {t('newPassword')}
                   </label>
                   <Input
+                    id="newPassword"
                     type="password"
                     placeholder="••••••••"
                     value={passwordData.newPassword}
@@ -539,10 +594,14 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label
+                    htmlFor="confirmNewPassword"
+                    className="block text-sm font-medium text-foreground mb-2"
+                  >
                     {t('confirmNewPassword')}
                   </label>
                   <Input
+                    id="confirmNewPassword"
                     type="password"
                     placeholder="••••••••"
                     value={passwordData.confirmPassword}
@@ -650,6 +709,7 @@ export default function ProfilePage() {
             const Icon = tab.icon
             return (
               <button
+                type="button"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${

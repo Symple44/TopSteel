@@ -143,7 +143,7 @@ export class SchemaIntrospectionService {
     `
 
     const results = await this._dataSource.query(query)
-    return results.map((r: any) => r.database)
+    return results.map((r: unknown) => (r as { database: string }).database)
   }
 
   async getSchemas(): Promise<string[]> {
@@ -156,6 +156,6 @@ export class SchemaIntrospectionService {
     `
 
     const results = await this._dataSource.query(query)
-    return results.map((r: any) => r.schema_name)
+    return results.map((r: unknown) => (r as { schema_name: string }).schema_name)
   }
 }

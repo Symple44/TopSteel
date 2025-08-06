@@ -57,7 +57,7 @@ export class MarketplaceProduct {
     images?: ProductImages[]
     description?: string
     shortDescription?: string
-    specifications?: Record<string, any>
+    specifications?: Record<string, unknown>
     seo?: SEOData
     categories?: string[]
     tags?: string[]
@@ -65,7 +65,7 @@ export class MarketplaceProduct {
       name: string
       values: string[]
     }>
-    customFields?: Record<string, any>
+    customFields?: Record<string, unknown>
   }
 
   @Column({ type: 'jsonb', default: {} })

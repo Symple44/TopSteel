@@ -25,7 +25,6 @@ export function NotificationCenter() {
   const { t: tn } = useTranslation('notifications')
   const { state, actions } = useNotifications()
   const [showSettings, setShowSettings] = useState(false)
-  const [_isExpanded, _setIsExpanded] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [showDashboard, setShowDashboard] = useState(false)
@@ -89,7 +88,12 @@ export function NotificationCenter() {
         {isOpen && (
           <>
             {/* Overlay pour fermer en cliquant à l'extérieur */}
-            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+            <button
+              type="button"
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close notification panel"
+            />
 
             {/* Panel principal */}
             <div
@@ -194,10 +198,11 @@ export function NotificationCenter() {
                 ) : (
                   <div className="p-2 space-y-1">
                     {filteredNotifications.map((notification: Notification) => (
-                      <div
+                      <button
                         key={notification.id}
+                        type="button"
                         className={cn(
-                          'group flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors',
+                          'group flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors w-full text-left',
                           !notification.isRead && 'bg-blue-50 border-l-2 border-l-blue-500'
                         )}
                         onClick={() => {
@@ -277,7 +282,7 @@ export function NotificationCenter() {
                         >
                           <X className="h-4 w-4" />
                         </Button>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 )}
@@ -331,6 +336,7 @@ export function NotificationCenter() {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">{t('notificationSettings')}</h2>
                 <button
+                  type="button"
                   onClick={() => setShowSettings(false)}
                   className="text-gray-500 hover:text-gray-700"
                 >
@@ -489,6 +495,7 @@ export function NotificationCenter() {
 
               <div className="mt-6 flex justify-between items-center border-t pt-4">
                 <button
+                  type="button"
                   onClick={() => {
                     if ('Notification' in window && Notification.permission === 'default') {
                       Notification.requestPermission()
@@ -500,12 +507,14 @@ export function NotificationCenter() {
                 </button>
                 <div className="flex gap-3">
                   <button
+                    type="button"
                     onClick={() => setShowSettings(false)}
                     className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                   >
                     {t('cancel')}
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       // Les paramètres sont sauvegardés automatiquement via updateSettings
                       setShowSettings(false)

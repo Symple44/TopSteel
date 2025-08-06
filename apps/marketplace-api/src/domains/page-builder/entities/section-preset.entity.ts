@@ -43,7 +43,7 @@ export class SectionPreset {
   @Column({ type: 'jsonb', default: {} })
   defaultSettings!: {
     container?: 'full-width' | 'boxed' | 'custom'
-    responsive?: any
+    responsive?: unknown
   }
 
   @Column({ type: 'text', array: true, nullable: true })

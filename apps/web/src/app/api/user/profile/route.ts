@@ -23,11 +23,11 @@ const mockProfile: UserProfile = {
 // Stockage temporaire
 let userProfile = { ...mockProfile }
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     await new Promise((resolve) => setTimeout(resolve, 100))
     return NextResponse.json(userProfile)
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 })
   }
 }
@@ -44,7 +44,7 @@ export async function PATCH(request: NextRequest) {
     await new Promise((resolve) => setTimeout(resolve, 200))
 
     return NextResponse.json(userProfile)
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update user profile' }, { status: 500 })
   }
 }

@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     })
 
     // Vérifier si la réponse est JSON
-    let data
+    let data: unknown
     const contentType = response.headers.get('content-type')
 
     if (contentType?.includes('application/json')) {

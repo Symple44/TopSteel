@@ -212,8 +212,8 @@ export class BTPIndexService {
     applicationDate: Date
     isOfficial?: boolean
     isProvisional?: boolean
-    indexMetadata?: any
-    metadata?: any
+    indexMetadata?: unknown
+    metadata?: unknown
   }): Promise<BTPIndex> {
     // Vérifier si l'indice existe déjà
     const existing = await this.btpIndexRepository.findOne({

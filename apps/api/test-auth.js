@@ -56,9 +56,9 @@ async function testAuthFlow() {
         throw new Error(`Verify token failed: ${verifyResponse.status} - ${error}`)
       }
 
-      const _verifyData = await verifyResponse.json()
+      await verifyResponse.json()
     }
-  } catch (_error) {
+  } catch {
     process.exit(1)
   }
 }
@@ -70,6 +70,6 @@ fetch(`${API_URL}/api/health`)
       throw new Error(`Server returned ${response.status}`)
     }
   })
-  .catch((_error) => {
+  .catch(() => {
     process.exit(1)
   })

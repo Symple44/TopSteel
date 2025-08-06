@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         ...(request.headers.get('authorization') && {
-          Authorization: request.headers.get('authorization')!,
+          Authorization: request.headers.get('authorization'),
         }),
       },
     })
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(data)
-  } catch (_error) {
+  } catch {
     // Simulation de synchronisation réussie en mode mock
     const mockResult = {
       success: true,

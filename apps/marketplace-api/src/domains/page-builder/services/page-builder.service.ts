@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import type { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
 import { PageSection, PageTemplate, SectionPreset } from '../entities'
+import { PageStatus } from '../entities/page-template.entity'
+import type { SectionType } from '../entities/types'
 
 @Injectable()
 export class PageBuilderService {
@@ -45,7 +47,7 @@ export class PageBuilderService {
     if (createDto.sections && createDto.sections.length > 0) {
       const sections = createDto.sections.map((sectionDto, index) =>
         this.pageSectionRepository.create({
-          type: sectionDto.type as any,
+          type: sectionDto.type as SectionType,
           name: sectionDto.name,
           content: sectionDto.content,
           styles: sectionDto.styles,
@@ -116,7 +118,7 @@ export class PageBuilderService {
       // Créer les nouvelles sections
       const sections = updateDto.sections.map((sectionDto, index) =>
         this.pageSectionRepository.create({
-          type: sectionDto.type as any,
+          type: sectionDto.type as SectionType,
           name: sectionDto.name,
           content: sectionDto.content,
           styles: sectionDto.styles,
@@ -141,7 +143,7 @@ export class PageBuilderService {
 
   async publishTemplate(id: string): Promise<PageTemplate> {
     const template = await this.findTemplateById(id)
-    template.status = 'published' as any
+    template.status = PageStatus.PUBLISHED
     template.publishedAt = new Date()
 
     return this.pageTemplateRepository.save(template)
@@ -154,7 +156,7 @@ export class PageBuilderService {
       name: newName,
       slug: newSlug,
       pageType: originalTemplate.pageType,
-      status: 'draft' as any,
+      status: PageStatus.DRAFT,
       description: originalTemplate.description,
       metadata: originalTemplate.metadata,
       settings: originalTemplate.settings,
@@ -206,7 +208,7 @@ export class PageBuilderService {
     type?: string,
     category?: string
   ): Promise<SectionPreset[]> {
-    const where: any = {}
+    const where: Record<string, unknown> = {}
 
     if (societeId) {
       where.societeId = societeId

@@ -15,7 +15,7 @@ export function PageRenderer({
   templateId,
   slug,
   sections: providedSections,
-  isPreview = false,
+  isPreview: _isPreview = false,
 }: PageRendererProps) {
   const { data: template, isLoading } = useQuery({
     queryKey: ['pageTemplate', templateId, slug],
@@ -24,10 +24,10 @@ export function PageRenderer({
 
       if (templateId) {
         const response = await marketplaceApi.get(`/page-templates/${templateId}`)
-        return (response as any).data
+        return (response as { data: unknown }).data
       } else if (slug) {
         const response = await marketplaceApi.get(`/page-templates/by-slug/${slug}`)
-        return (response as any).data
+        return (response as { data: unknown }).data
       }
 
       throw new Error('Template ID or slug required')

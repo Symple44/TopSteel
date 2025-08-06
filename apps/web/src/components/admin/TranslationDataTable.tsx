@@ -17,7 +17,11 @@ interface TranslationDataTableProps {
   entries: TranslationEntry[]
   loading: boolean
   onEdit: (entry: TranslationEntry) => void
-  onCellEdit?: (value: any, row: TranslationEntry, column: ColumnConfig<TranslationEntry>) => void
+  onCellEdit?: (
+    value: unknown,
+    row: TranslationEntry,
+    column: ColumnConfig<TranslationEntry>
+  ) => void
   onCreate?: () => void
   onDelete?: (entries: TranslationEntry[]) => void
   onExport?: (entries: TranslationEntry[]) => void
@@ -75,7 +79,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         sortable: true,
         searchable: true,
         locked: true, // Empêcher le déplacement de cette colonne importante
-        render: (_value, row) => <FullKeyCell entry={row} />,
+        render: (_value: unknown, row: TranslationEntry) => <FullKeyCell entry={row} />,
       },
       {
         id: 'namespace',
@@ -91,7 +95,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
           label: ns,
           color: '#3b82f6',
         })),
-        render: (value) => <NamespaceCell value={value} />,
+        render: (value: unknown) => <NamespaceCell value={value} />,
       },
       {
         id: 'category',
@@ -115,7 +119,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
           ]
           return opts
         })(),
-        render: (value) => <CategoryCell value={value} />,
+        render: (value: unknown) => <CategoryCell value={value} />,
       },
       {
         id: 'description',
@@ -127,7 +131,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         sortable: true,
         searchable: true,
         editable: true,
-        render: (value) => <DescriptionCell value={value} />,
+        render: (value: unknown) => <DescriptionCell value={value} />,
         validation: {
           maxLength: 200,
         },
@@ -140,7 +144,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         type: 'boolean',
         width: 100,
         sortable: true,
-        render: (value) => <StatusCell value={value} />,
+        render: (value: unknown) => <StatusCell value={value} />,
       },
     ]
 
@@ -155,12 +159,12 @@ export const TranslationDataTable = memo(function TranslationDataTable({
       sortable: true,
       editable: true,
       searchable: true,
-      render: (_value, row) => {
+      render: (_value: unknown, row: TranslationEntry) => {
         const translation = row.translations[lang.code] || ''
         return <TranslationCell translation={translation} />
       },
       validation: {
-        custom: (value) => {
+        custom: (value: unknown) => {
           if (typeof value === 'string' && value.length > 1000) {
             return 'La traduction ne peut pas dépasser 1000 caractères'
           }
@@ -169,14 +173,14 @@ export const TranslationDataTable = memo(function TranslationDataTable({
         required: lang.code === 'fr', // Le français est obligatoire
       },
       // Fonction personnalisée pour obtenir la valeur à éditer
-      getValue: (row) => row.translations[lang.code] || '',
+      getValue: (row: TranslationEntry) => row.translations[lang.code] || '',
     }))
 
     return [...baseColumns, ...languageColumns]
   }, [namespaces, categories])
 
   const handleCellEdit = useCallback(
-    (value: any, row: TranslationEntry, column: ColumnConfig<TranslationEntry>) => {
+    (value: unknown, row: TranslationEntry, column: ColumnConfig<TranslationEntry>) => {
       if (column.id.startsWith('translation_')) {
         // Éditer une traduction spécifique
         const languageCode = column.id.replace('translation_', '')
@@ -237,7 +241,7 @@ export const TranslationDataTable = memo(function TranslationDataTable({
   )
 
   const handlePaginationChange = useCallback(
-    ({ page, pageSize: newPageSize }: { page: number; pageSize: number; total: number }) => {
+    ({ page, pageSize: _newPageSize }: { page: number; pageSize: number; total: number }) => {
       setCurrentPage(page)
     },
     []

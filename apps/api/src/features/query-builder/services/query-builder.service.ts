@@ -120,7 +120,12 @@ export class QueryBuilderService {
     }
 
     // Update main query builder
-    const { columns, joins, calculatedFields, ...mainUpdate } = updateDto
+    const {
+      columns: _columns,
+      joins: _joins,
+      calculatedFields: _calculatedFields,
+      ...mainUpdate
+    } = updateDto
     await this._queryBuilderRepository.update(id, mainUpdate)
 
     return this.findOne(id, userId)

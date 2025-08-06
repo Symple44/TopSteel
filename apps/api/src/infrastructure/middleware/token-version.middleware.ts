@@ -6,7 +6,7 @@ interface JwtPayload {
   sub: string
   iat: number
   exp: number
-  [key: string]: any
+  [key: string]: unknown
 }
 
 @Injectable()
@@ -47,7 +47,7 @@ export class TokenVersionMiddleware implements NestMiddleware {
         // Token valide, ajouter des informations dans la requête
         const payload = this.jwtService.decode(token) as JwtPayload
         if (payload) {
-          ;(req as any).tokenInfo = {
+          ;(req as Request & { tokenInfo?: unknown }).tokenInfo = {
             issuedAt: payload.iat * 1000, // Convertir en millisecondes
             expiresAt: payload.exp * 1000,
             age: Date.now() - payload.iat * 1000,

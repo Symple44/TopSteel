@@ -84,12 +84,7 @@ export class XHR {}
 
 export class NodeWebSocket {}
 
-export class WebSocket {
-  constructor(url, protocols) {
-    // Utiliser le WebSocket natif du navigateur
-    return new globalThis.WebSocket(url, protocols)
-  }
-}
+export class WebSocket extends globalThis.WebSocket {}
 
 export class WebTransport {}
 

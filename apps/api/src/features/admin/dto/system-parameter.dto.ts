@@ -31,7 +31,7 @@ export class CreateSystemParameterDto {
 
   @IsObject()
   @IsOptional()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export class UpdateSystemParameterDto {
@@ -57,7 +57,7 @@ export class UpdateSystemParameterDto {
 
   @IsObject()
   @IsOptional()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export class SystemParameterQueryDto {

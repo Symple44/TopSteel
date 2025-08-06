@@ -101,7 +101,7 @@ export class MigrationManagerService {
       let executedMigrations: string[] = []
       try {
         const result = await dataSource.query('SELECT name FROM migrations ORDER BY timestamp DESC')
-        executedMigrations = result.map((row: any) => row.name)
+        executedMigrations = result.map((row: { name: string }) => row.name)
       } catch (_error) {
         // La table migrations n'existe peut-être pas encore
         this.logger.debug(`Table migrations non trouvée pour ${databaseName}`)
@@ -256,7 +256,10 @@ export class MigrationManagerService {
   /**
    * Obtenir les détails d'une migration spécifique
    */
-  async getMigrationDetails(database: string, migrationName: string): Promise<any> {
+  async getMigrationDetails(
+    database: string,
+    migrationName: string
+  ): Promise<Record<string, unknown>> {
     try {
       const fs = require('node:fs')
       const path = require('node:path')

@@ -20,6 +20,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       onBlur,
       id,
       role,
+      ...props
     },
     ref
   ) => {
@@ -39,14 +40,28 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       lg: 'p-8',
     }
 
+    // Add cursor pointer and proper accessibility attributes when interactive
+    const isInteractive = Boolean(onClick)
+    const interactiveClasses = isInteractive
+      ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+      : ''
+
     const finalClassName = [
       baseClasses,
       variantClasses[variant],
       paddingClasses[padding],
+      interactiveClasses,
       className,
     ]
       .filter(Boolean)
       .join(' ')
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        onClick(e as any)
+      }
+    }
 
     return (
       <div
@@ -58,8 +73,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         onMouseLeave={onMouseLeave}
         onFocus={onFocus}
         onBlur={onBlur}
+        onKeyDown={isInteractive ? handleKeyDown : undefined}
         id={id}
-        role={role}
+        role={role || (isInteractive ? 'button' : undefined)}
+        tabIndex={isInteractive ? 0 : undefined}
+        {...props}
       >
         {children}
       </div>
@@ -70,11 +88,33 @@ Card.displayName = 'Card'
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   (
-    { className, children, onClick, onMouseEnter, onMouseLeave, onFocus, onBlur, id, role },
+    {
+      className,
+      children,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      id,
+      role,
+      ...props
+    },
     ref
   ) => {
+    const isInteractive = Boolean(onClick)
     const baseClassName = 'flex flex-col space-y-1.5 px-6 py-6'
-    const finalClassName = [baseClassName, className].filter(Boolean).join(' ')
+    const interactiveClasses = isInteractive
+      ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+      : ''
+    const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        onClick(e as any)
+      }
+    }
 
     return (
       <div
@@ -85,8 +125,11 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
         onMouseLeave={onMouseLeave}
         onFocus={onFocus}
         onBlur={onBlur}
+        onKeyDown={isInteractive ? handleKeyDown : undefined}
         id={id}
-        role={role}
+        role={role || (isInteractive ? 'button' : undefined)}
+        tabIndex={isInteractive ? 0 : undefined}
+        {...props}
       >
         {children}
       </div>
@@ -154,11 +197,33 @@ CardDescription.displayName = 'CardDescription'
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   (
-    { className, children, onClick, onMouseEnter, onMouseLeave, onFocus, onBlur, id, role },
+    {
+      className,
+      children,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      id,
+      role,
+      ...props
+    },
     ref
   ) => {
+    const isInteractive = Boolean(onClick)
     const baseClassName = 'px-6 pb-6'
-    const finalClassName = [baseClassName, className].filter(Boolean).join(' ')
+    const interactiveClasses = isInteractive
+      ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+      : ''
+    const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        onClick(e as any)
+      }
+    }
 
     return (
       <div
@@ -169,8 +234,11 @@ const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
         onMouseLeave={onMouseLeave}
         onFocus={onFocus}
         onBlur={onBlur}
+        onKeyDown={isInteractive ? handleKeyDown : undefined}
         id={id}
-        role={role}
+        role={role || (isInteractive ? 'button' : undefined)}
+        tabIndex={isInteractive ? 0 : undefined}
+        {...props}
       >
         {children}
       </div>
@@ -181,11 +249,33 @@ CardContent.displayName = 'CardContent'
 
 const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   (
-    { className, children, onClick, onMouseEnter, onMouseLeave, onFocus, onBlur, id, role },
+    {
+      className,
+      children,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      id,
+      role,
+      ...props
+    },
     ref
   ) => {
+    const isInteractive = Boolean(onClick)
     const baseClassName = 'flex items-center px-6 pb-6'
-    const finalClassName = [baseClassName, className].filter(Boolean).join(' ')
+    const interactiveClasses = isInteractive
+      ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+      : ''
+    const finalClassName = [baseClassName, interactiveClasses, className].filter(Boolean).join(' ')
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        onClick(e as any)
+      }
+    }
 
     return (
       <div
@@ -196,8 +286,11 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
         onMouseLeave={onMouseLeave}
         onFocus={onFocus}
         onBlur={onBlur}
+        onKeyDown={isInteractive ? handleKeyDown : undefined}
         id={id}
-        role={role}
+        role={role || (isInteractive ? 'button' : undefined)}
+        tabIndex={isInteractive ? 0 : undefined}
+        {...props}
       >
         {children}
       </div>

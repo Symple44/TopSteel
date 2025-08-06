@@ -78,7 +78,9 @@ export class DatabaseAdminController {
 
   @Get('connections')
   @ApiOperation({ summary: 'Lister les connexions actives' })
-  async getActiveConnections(@Request() req: any): Promise<ConnectionsResponse> {
+  async getActiveConnections(
+    @Request() req: Record<string, unknown>
+  ): Promise<ConnectionsResponse> {
     const connections = this.tenantConnectionService.getActiveConnections()
 
     // Ajouter la connexion du tenant actuel si l'utilisateur est connecté à une société

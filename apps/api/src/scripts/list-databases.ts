@@ -28,16 +28,16 @@ async function listDatabases() {
       ORDER BY datname
     `)
 
-    result.forEach((db: any) => {
-      const dbName = db.datname
+    result.forEach((db: unknown) => {
+      const dbName = (db as { datname: string }).datname
       // Mettre en évidence les bases TopSteel
       if (dbName.includes('topsteel')) {
       } else {
       }
     })
     const topsteelDbs = result
-      .filter((db: any) => db.datname.includes('topsteel'))
-      .map((db: any) => db.datname)
+      .filter((db: unknown) => (db as { datname: string }).datname.includes('topsteel'))
+      .map((db: unknown) => (db as { datname: string }).datname)
 
     topsteelDbs.forEach((_db: string) => {})
 
@@ -45,7 +45,7 @@ async function listDatabases() {
     const expectedDb = `erp_topsteel_${process.env.DEFAULT_TENANT_CODE?.toLowerCase() || 'default'}`
 
     const _exists = topsteelDbs.includes(expectedDb)
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     if (adminDataSource.isInitialized) {
       await adminDataSource.destroy()

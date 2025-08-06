@@ -77,7 +77,7 @@ export class MigrationManagerSimpleService {
     }
   }
 
-  async runAllMigrations(): Promise<any> {
+  async runAllMigrations(): Promise<Record<string, unknown>> {
     return {
       message: 'Migrations exécutées avec succès (simulé)',
       results: [
@@ -89,7 +89,7 @@ export class MigrationManagerSimpleService {
     }
   }
 
-  async runTenantMigrations(tenantCode: string): Promise<any> {
+  async runTenantMigrations(tenantCode: string): Promise<Record<string, unknown>> {
     this.logger.log(`Exécution des migrations pour le tenant: ${tenantCode}`)
 
     return {
@@ -112,7 +112,10 @@ export class MigrationManagerSimpleService {
     }
   }
 
-  async getMigrationDetails(database: string, migrationName: string): Promise<any> {
+  async getMigrationDetails(
+    database: string,
+    migrationName: string
+  ): Promise<Record<string, unknown>> {
     // Générer un contenu réaliste selon le type de migration
     let mockContent = ''
 

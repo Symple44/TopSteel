@@ -104,7 +104,7 @@ export function useKeyboardShortcuts(
     (event: KeyboardEvent) => {
       if (!enabled) return
 
-      const { key, ctrlKey, shiftKey, altKey, metaKey } = event
+      const { key, ctrlKey, shiftKey, metaKey } = event
       const isModifierPressed = ctrlKey || metaKey
 
       // Empêcher les raccourcis si l'utilisateur tape dans un input
@@ -125,10 +125,13 @@ export function useKeyboardShortcuts(
               break
             case 'c':
               if (finalConfig.copy) return // Laisser le copy natif
+              break
             case 'v':
               if (finalConfig.paste) return // Laisser le paste natif
+              break
             case 'x':
               if (finalConfig.cut) return // Laisser le cut natif
+              break
           }
         }
         return

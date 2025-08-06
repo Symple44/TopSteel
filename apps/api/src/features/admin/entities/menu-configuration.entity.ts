@@ -30,7 +30,7 @@ export class MenuConfiguration {
   isSystem!: boolean
 
   @Column({ type: 'json', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @CreateDateColumn({ name: 'createdat' })
   createdAt!: Date

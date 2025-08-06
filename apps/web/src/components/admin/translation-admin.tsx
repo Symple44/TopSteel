@@ -414,10 +414,25 @@ export default function TranslationAdmin() {
             setEditingEntry(null)
             setCategoryDropdownOpen(false)
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setEditingEntry(null)
+              setCategoryDropdownOpen(false)
+            }
+          }}
+          role="dialog"
+          aria-modal="true"
         >
           <div
             className="fixed left-[50%] top-[50%] z-[10000] grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setEditingEntry(null)
+                setCategoryDropdownOpen(false)
+              }
+            }}
+            role="document"
           >
             {/* Header */}
             <div className="flex flex-col space-y-1.5 text-center sm:text-left">

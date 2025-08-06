@@ -11,7 +11,7 @@ export abstract class BusinessEntity extends CommonEntity {
   /**
    * Métadonnées métier extensibles
    */
-  businessMetadata?: Record<string, any>
+  businessMetadata?: Record<string, unknown>
 
   /**
    * Règles de validation métier

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
+import type { MenuItemDto } from '../../admin/services/menu-configuration.service'
 import { UserMenuPreference } from '../entities/user-menu-preference.entity'
 
 @Injectable()
@@ -230,7 +231,14 @@ export class UserMenuPreferenceService {
   /**
    * Sauvegarde le menu personnalisé complet
    */
-  async saveCustomMenu(userId: string, menuItems: any[]): Promise<any> {
+  async saveCustomMenu(
+    userId: string,
+    menuItems: MenuItemDto[]
+  ): Promise<{
+    success: boolean
+    itemCount: number
+    savedAt: string
+  }> {
     try {
       // Trouver ou créer une préférence spéciale pour stocker le menu complet
       let customMenuPreference = await this._userMenuPreferenceRepository.findOne({
@@ -259,11 +267,18 @@ export class UserMenuPreferenceService {
         const translationsMap: Record<string, string> = {}
 
         // Parcourir récursivement les éléments pour extraire les traductions
-        const extractTranslations = (items: any[]) => {
+        const extractTranslations = (items: MenuItemDto[]) => {
           items.forEach((item) => {
-            if (item.id && item.titleTranslations && typeof item.titleTranslations === 'object') {
-              Object.entries(item.titleTranslations).forEach(([lang, title]) => {
-                translationsMap[`${item.id}_${lang}`] = title as string
+            const itemWithTranslations = item as MenuItemDto & {
+              titleTranslations?: Record<string, string>
+            }
+            if (
+              itemWithTranslations.id &&
+              itemWithTranslations.titleTranslations &&
+              typeof itemWithTranslations.titleTranslations === 'object'
+            ) {
+              Object.entries(itemWithTranslations.titleTranslations).forEach(([lang, title]) => {
+                translationsMap[`${itemWithTranslations.id}_${lang}`] = title as string
               })
             }
             if (item.children && Array.isArray(item.children)) {
@@ -306,7 +321,7 @@ export class UserMenuPreferenceService {
   /**
    * Récupère le menu personnalisé complet
    */
-  async getCustomMenu(userId: string): Promise<any[]> {
+  async getCustomMenu(userId: string): Promise<MenuItemDto[]> {
     try {
       this.logger.log(`🔍 Début récupération menu personnalisé pour utilisateur ${userId}`)
 
@@ -345,7 +360,7 @@ export class UserMenuPreferenceService {
 
           // Réappliquer les traductions si elles existent
           if (customMenuPreference.titleTranslations) {
-            const applyTranslations = (items: any[]) => {
+            const applyTranslations = (items: MenuItemDto[]): MenuItemDto[] => {
               return items.map((item) => {
                 if (item.id) {
                   // Reconstituer les traductions pour cet élément
@@ -360,7 +375,9 @@ export class UserMenuPreferenceService {
                   )
 
                   if (Object.keys(itemTranslations).length > 0) {
-                    item.titleTranslations = itemTranslations
+                    ;(
+                      item as MenuItemDto & { titleTranslations?: Record<string, string> }
+                    ).titleTranslations = itemTranslations
                   }
                 }
 

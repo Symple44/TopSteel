@@ -7,7 +7,7 @@ export interface LogContext {
   sessionId?: string
   action?: string
   resource?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface SecurityLogContext extends LogContext {

@@ -21,19 +21,22 @@ async function checkUsersColumns() {
       ORDER BY ordinal_position
     `)
 
-    columns.forEach((_col: any) => {})
+    columns.forEach((_col: unknown) => {})
 
     // Vérifier spécifiquement refreshToken
     const refreshTokenColumn = columns.find(
-      (col: any) => col.column_name.toLowerCase() === 'refreshtoken'
+      (col: unknown) =>
+        (col as { column_name: string }).column_name.toLowerCase() === 'refreshtoken'
     )
     if (refreshTokenColumn) {
     } else {
       columns
-        .filter((col: any) => col.column_name.toLowerCase().includes('refresh'))
-        .forEach((_col: any) => {})
+        .filter((col: unknown) =>
+          (col as { column_name: string }).column_name.toLowerCase().includes('refresh')
+        )
+        .forEach((_col: unknown) => {})
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     if (authDataSource.isInitialized) {
       await authDataSource.destroy()

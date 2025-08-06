@@ -9,11 +9,11 @@ export interface QueryExecutionParams {
   pageSize?: number
   sortBy?: string
   sortOrder?: 'ASC' | 'DESC'
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
 }
 
 export interface QueryExecutionResult {
-  data: any[]
+  data: unknown[]
   total: number
   page: number
   pageSize: number
@@ -131,11 +131,11 @@ export class QueryBuilderExecutorService {
   }
 
   private buildWhereClause(
-    filters: Record<string, any>,
+    filters: Record<string, unknown>,
     queryBuilder: QueryBuilder
-  ): { whereClause: string; whereParams: any[] } {
+  ): { whereClause: string; whereParams: unknown[] } {
     const conditions: string[] = []
-    const params: any[] = []
+    const params: unknown[] = []
     let paramIndex = 1
 
     Object.entries(filters).forEach(([columnAlias, filterValue]) => {
@@ -184,9 +184,9 @@ export class QueryBuilderExecutorService {
   }
 
   private processCalculatedFields(
-    data: any[],
+    data: unknown[],
     calculatedFields: QueryBuilderCalculatedField[]
-  ): any[] {
+  ): unknown[] {
     if (!calculatedFields || calculatedFields.length === 0) {
       return data
     }
@@ -210,7 +210,7 @@ export class QueryBuilderExecutorService {
     })
   }
 
-  private evaluateExpression(expression: string, row: any): any {
+  private evaluateExpression(expression: string, row: unknown): unknown {
     // This is a simplified implementation
     // In production, use a proper expression evaluator like math.js
 
@@ -232,7 +232,7 @@ export class QueryBuilderExecutorService {
     }
   }
 
-  async getAvailableColumns(_queryBuilderId: string, _userId: string): Promise<any[]> {
+  async getAvailableColumns(_queryBuilderId: string, _userId: string): Promise<unknown[]> {
     // This method would return available columns based on the configured tables
     // Implementation depends on specific requirements
     return []

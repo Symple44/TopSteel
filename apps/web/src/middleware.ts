@@ -134,7 +134,7 @@ function validateJWTStructure(token: string): {
     }
 
     return { valid: true, payload }
-  } catch (_error) {
+  } catch {
     return { valid: false, error: 'Erreur de décodage JWT' }
   }
 }

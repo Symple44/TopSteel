@@ -9,7 +9,9 @@ export type { DeepPartial, DeepRequired } from './types'
 
 // Fonction de debug sécurisée
 export function safeLog(..._args: unknown[]) {
-  if (typeof console !== 'undefined' && console.log) {
+  // biome-ignore lint/suspicious/noConsole: Debug function that safely checks for console availability
+  if (typeof console !== 'undefined' && typeof console.log === 'function') {
+    // console.log(...args) // Uncomment if needed for debugging
   }
 }
 
@@ -25,9 +27,11 @@ export function generateId(): string {
   }
 
   // Tentative Node.js crypto
-  if (typeof globalThis !== 'undefined' && (globalThis as any).crypto) {
+  if (typeof globalThis !== 'undefined' && (globalThis as Record<string, unknown>).crypto) {
     try {
-      return (globalThis as any).crypto.randomUUID().slice(0, 12)
+      return ((globalThis as Record<string, unknown>).crypto as { randomUUID: () => string })
+        .randomUUID()
+        .slice(0, 12)
     } catch {
       // Fallback si Node crypto échoue
     }
@@ -48,16 +52,19 @@ export function isServer(): boolean {
 
 // Fonction pour obtenir une valeur de window de manière sûre
 export function getWindowProperty<T = unknown>(key: string): T | undefined {
-  if (isBrowser() && window && typeof (window as any)[key] !== 'undefined') {
-    return (window as any)[key] as T
+  if (isBrowser() && window && typeof (window as Record<string, unknown>)[key] !== 'undefined') {
+    return (window as Record<string, unknown>)[key] as T
   }
   return undefined
 }
 
 // Fonction pour obtenir une valeur de globalThis de manière sûre
 export function getGlobalProperty<T = unknown>(key: string): T | undefined {
-  if (typeof globalThis !== 'undefined' && typeof (globalThis as any)[key] !== 'undefined') {
-    return (globalThis as any)[key] as T
+  if (
+    typeof globalThis !== 'undefined' &&
+    typeof (globalThis as Record<string, unknown>)[key] !== 'undefined'
+  ) {
+    return (globalThis as Record<string, unknown>)[key] as T
   }
   return undefined
 }

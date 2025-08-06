@@ -9,11 +9,13 @@ import type { ConfigService } from '@nestjs/config'
 import type { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
+import type { Request } from 'express'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
 import type { SocieteUsersService } from '../../features/societes/services/societe-users.service'
 import type { SocietesService } from '../../features/societes/services/societes.service'
+import type { User } from '../users/entities/user.entity'
 import type { UsersService } from '../users/users.service'
 import { GlobalUserRole, SocieteRoleType } from './core/constants/roles.constants'
 import { UserSession } from './core/entities/user-session.entity'
@@ -45,7 +47,7 @@ export class AuthService {
     private readonly _userSessionRepository: Repository<UserSession>
   ) {}
 
-  async validateUser(emailOrAcronym: string, password: string): Promise<any> {
+  async validateUser(emailOrAcronym: string, password: string): Promise<Omit<User, 'password'>> {
     const user = await this.usersService.findByEmailOrAcronym(emailOrAcronym)
     if (!user) {
       throw new UnauthorizedException('Invalid credentials')
@@ -60,8 +62,8 @@ export class AuthService {
     return result
   }
 
-  async login(loginDto: LoginDto, request?: any) {
-    let user: any
+  async login(loginDto: LoginDto, request?: Request) {
+    let user: Omit<User, 'password'>
     user = await this.validateUser(loginDto.login, loginDto.password)
 
     // Vérifier si l'utilisateur a MFA activé
@@ -114,7 +116,7 @@ export class AuthService {
                 code: site.code,
               })) || [],
           }))
-        } catch (_error) {
+        } catch {
           // Fallback sur l'ancienne méthode si nécessaire
           return await this.getUserSocietesLegacy(userId)
         }
@@ -188,7 +190,7 @@ export class AuthService {
   /**
    * Login avec sélection de société (version unifiée)
    */
-  async loginWithSociete(userId: string, societeId: string, siteId?: string, request?: any) {
+  async loginWithSociete(userId: string, societeId: string, siteId?: string, request?: Request) {
     // Récupérer les informations complètes de l'utilisateur
     const user = await this.usersService.findById(userId)
     if (!user) {
@@ -255,8 +257,8 @@ export class AuthService {
     // Extraire les informations de la requête pour le tracking
     let ipAddress = '0.0.0.0'
     let userAgent = 'Unknown'
-    let location: any = null
-    let deviceInfo: any = null
+    let location: Record<string, unknown> | null = null
+    let deviceInfo: Record<string, unknown> | null = null
 
     if (request) {
       ipAddress = this.geolocationService.extractRealIP(request)
@@ -321,7 +323,7 @@ export class AuthService {
   /**
    * Compléter la connexion après validation MFA ou directement si pas de MFA
    */
-  async completeLogin(user: any, request?: any) {
+  async completeLogin(user: Omit<User, 'password'>, request?: Request) {
     // Générer un ID de session unique
     const sessionId = uuidv4()
 
@@ -342,8 +344,8 @@ export class AuthService {
     // Extraire les informations de la requête pour le tracking
     let ipAddress = '0.0.0.0'
     let userAgent = 'Unknown'
-    let location: any = null
-    let deviceInfo: any = null
+    let location: Record<string, unknown> | null = null
+    let deviceInfo: Record<string, unknown> | null = null
 
     if (request) {
       ipAddress = this.geolocationService.extractRealIP(request)
@@ -454,9 +456,9 @@ export class AuthService {
 
     try {
       const user = await this.usersService.create(registerDto)
-      const { password, ...result } = user
+      const { password: _password, ...result } = user
       return result
-    } catch (_error) {
+    } catch {
       throw new InternalServerErrorException('Failed to create user')
     }
   }
@@ -521,7 +523,7 @@ export class AuthService {
         refreshToken: newRefreshToken,
         expiresIn: 24 * 60 * 60, // 24 heures en secondes
       }
-    } catch (_error) {
+    } catch {
       throw new UnauthorizedException('Invalid refresh token')
     }
   }
@@ -565,7 +567,7 @@ export class AuthService {
       throw new UnauthorizedException('User not found')
     }
 
-    const { password, refreshToken, ...profile } = user
+    const { password: _password, refreshToken: _refreshToken, ...profile } = user
     return profile
   }
 
@@ -631,7 +633,7 @@ export class AuthService {
   /**
    * Obtenir toutes les sessions actives
    */
-  async getAllActiveSessions(): Promise<any[]> {
+  async getAllActiveSessions(): Promise<unknown[]> {
     return await this.sessionRedisService.getAllActiveSessions()
   }
 
@@ -823,7 +825,7 @@ export class AuthService {
   /**
    * Connexion avec MFA - après vérification du code MFA
    */
-  async loginWithMFA(userId: string, mfaSessionToken: string, request?: any): Promise<any> {
+  async loginWithMFA(userId: string, mfaSessionToken: string, request?: Request): Promise<unknown> {
     try {
       // Vérifier que la session MFA est valide et vérifiée
       const mfaSession = await this.mfaService.mfaSessionRepository.findOne({
@@ -851,7 +853,7 @@ export class AuthService {
       // On peut garder la session pour des vérifications futures ou la supprimer
 
       return loginResult
-    } catch (_error) {
+    } catch {
       throw new UnauthorizedException('Erreur lors de la connexion avec MFA')
     }
   }
@@ -895,14 +897,14 @@ export class AuthService {
       const mfaMethods = await this.mfaService.getUserMFAMethods(userId)
 
       for (const method of mfaMethods) {
-        await this.mfaService.disableMFA(userId, method.type as any)
+        await this.mfaService.disableMFA(userId, method.type as string)
       }
 
       return {
         success: true,
         message: 'MFA réinitialisé avec succès',
       }
-    } catch (_error) {
+    } catch {
       return {
         success: false,
         message: 'Erreur lors de la réinitialisation MFA',
@@ -913,7 +915,7 @@ export class AuthService {
   /**
    * Obtenir les statistiques MFA pour un utilisateur
    */
-  async getUserMFAStats(userId: string): Promise<any> {
+  async getUserMFAStats(userId: string): Promise<unknown> {
     return await this.mfaService.getMFAStats(userId)
   }
 
@@ -956,7 +958,7 @@ export class AuthService {
         success: true,
         message: 'Société définie par défaut avec succès',
       }
-    } catch (_error) {
+    } catch {
       return {
         success: false,
         message: 'Erreur lors de la définition de la société par défaut',
@@ -991,7 +993,7 @@ export class AuthService {
           code: defaultSociete.code,
         },
       }
-    } catch (_error) {
+    } catch {
       return {
         success: false,
         message: 'Erreur lors de la récupération de la société par défaut',

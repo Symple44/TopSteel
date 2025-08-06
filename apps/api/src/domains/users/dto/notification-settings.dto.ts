@@ -172,7 +172,7 @@ export class GetNotificationSettingsResponseDto {
     end: string
   }
 
-  constructor(data: any) {
+  constructor(data: Record<string, unknown>) {
     this.email = data.email
     this.push = data.push
     this.sms = data.sms

@@ -31,4 +31,4 @@ function findTypeImports(dir: string, results: string[] = []): string[] {
 
 const srcDir = join(__dirname, '..')
 const typeImports = findTypeImports(srcDir)
-typeImports.forEach((_imp) => {})
+typeImports.forEach(() => {})

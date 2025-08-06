@@ -56,9 +56,9 @@ export class MarketplaceOrderItem {
   @Column({ type: 'jsonb', nullable: true })
   productSnapshot?: {
     images?: string[]
-    specifications?: Record<string, any>
+    specifications?: Record<string, unknown>
     categories?: string[]
-    erpData?: Record<string, any>
+    erpData?: Record<string, unknown>
   }
 
   @Column({ type: 'jsonb', nullable: true })
@@ -75,7 +75,7 @@ export class MarketplaceOrderItem {
 
   @Column({ type: 'jsonb', nullable: true })
   customizations?: {
-    options?: Record<string, any>
+    options?: Record<string, unknown>
     instructions?: string
     deliveryDate?: string
   }

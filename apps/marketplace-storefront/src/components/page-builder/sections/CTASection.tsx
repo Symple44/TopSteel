@@ -69,9 +69,9 @@ export function CTASection({ section, isEditing }: SectionProps<CTAContent>) {
         <div
           className={`flex flex-wrap gap-4 ${content.layout === 'centered' ? 'justify-center mt-8' : ''}`}
         >
-          {content.buttons.map((button: any, index: number) => (
+          {content.buttons.map((button, index: number) => (
             <Link
-              key={index}
+              key={`cta-button-${button.text}-${index}`}
               href={button.url}
               className={`
                 ${buttonSizes[(button.size as keyof typeof buttonSizes) || 'md']}

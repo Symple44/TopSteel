@@ -1,5 +1,5 @@
 // packages/utils/src/lib/functions.ts - Version corrigée sans 'this'
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -27,7 +27,7 @@ export function debounce<T extends (...args: any[]) => any>(
   }
 }
 
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -39,7 +39,9 @@ export function throttle<T extends (...args: any[]) => any>(
       func(...args)
       inThrottle = true
       if (typeof setTimeout !== 'undefined') {
-        setTimeout(() => (inThrottle = false), limit)
+        setTimeout(() => {
+          inThrottle = false
+        }, limit)
       }
     }
   }
@@ -56,7 +58,7 @@ export function delay(ms: number): Promise<void> {
   })
 }
 
-export function once<T extends (...args: any[]) => any>(func: T): T {
+export function once<T extends (...args: unknown[]) => unknown>(func: T): T {
   let called = false
   let result: ReturnType<T>
 

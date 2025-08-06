@@ -106,7 +106,7 @@ export class DatabaseIntegrityService {
       `
 
       const result = await this._dataSource.query(query)
-      return result.map((row: any) => row.table_name)
+      return result.map((row: Record<string, unknown>) => row.table_name)
     } catch (error) {
       this.logger.error('Erreur lors de la récupération des tables:', error)
       return []
@@ -127,7 +127,7 @@ export class DatabaseIntegrityService {
       `
 
       const result = await this._dataSource.query(query, [tableName])
-      return result.map((row: any) => row.column_name)
+      return result.map((row: Record<string, unknown>) => row.column_name)
     } catch (error) {
       this.logger.error(`Erreur lors de la récupération des colonnes pour ${tableName}:`, error)
       return []
@@ -202,7 +202,11 @@ export class DatabaseIntegrityService {
   /**
    * Force la synchronisation de la base de données
    */
-  async synchronizeDatabase(): Promise<{ success: boolean; message: string; details?: any }> {
+  async synchronizeDatabase(): Promise<{
+    success: boolean
+    message: string
+    details?: Record<string, unknown>
+  }> {
     try {
       this.logger.log('Début de la synchronisation de la base de données...')
 
@@ -329,7 +333,7 @@ export class DatabaseIntegrityService {
           )
         `)
 
-        const hasInfo = enumValues.some((row: any) => row.enumlabel === 'info')
+        const hasInfo = enumValues.some((row: Record<string, unknown>) => row.enumlabel === 'info')
         if (!hasInfo) {
           await this._dataSource.query(`ALTER TYPE notifications_type_enum ADD VALUE 'info'`)
           this.logger.log('Valeur "info" ajoutée à l\'enum notifications_type_enum')

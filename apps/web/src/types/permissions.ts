@@ -39,7 +39,7 @@ export interface RolePermission {
   permissionId: string
   accessLevel: AccessLevel
   isGranted: boolean
-  conditions?: Record<string, any>
+  conditions?: Record<string, unknown>
 }
 
 export interface UserRole {

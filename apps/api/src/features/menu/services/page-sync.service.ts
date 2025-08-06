@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
-import { pageDiscoveryService } from '../../../core/services/page-discovery.service'
+import {
+  type DiscoveredPage as DiscoveredPageInterface,
+  pageDiscoveryService,
+} from '../../../core/services/page-discovery.service'
 import { DiscoveredPage } from '../entities/discovered-page.entity'
 
 export interface PageSyncResult {
@@ -56,7 +59,7 @@ export class PageSyncService {
   /**
    * Synchronise une seule page avec la base de données
    */
-  private async syncSinglePage(page: any): Promise<void> {
+  private async syncSinglePage(page: DiscoveredPageInterface): Promise<void> {
     // Vérifier si la page existe déjà
     const existingPage = await this._discoveredPageRepository.findOne({
       where: { pageId: page.id },
@@ -108,7 +111,7 @@ export class PageSyncService {
     _userId: string,
     userRole: string,
     userPermissions: string[]
-  ): Promise<any[]> {
+  ): Promise<DiscoveredPage[]> {
     const allPages = await this._discoveredPageRepository.find({
       where: { isEnabled: true },
     })
@@ -146,11 +149,54 @@ export class PageSyncService {
     userId: string,
     userRole: string,
     userPermissions: string[]
-  ): Promise<any[]> {
+  ): Promise<
+    {
+      id: string
+      title: string
+      description: string
+      icon: string
+      pages: {
+        id: string
+        title: string
+        href: string
+        description: string | null
+        icon: string | null
+        category: string | null
+        subcategory: string | null
+        permissions: string[]
+        roles: string[]
+        moduleId: string | null
+        isEnabled: boolean
+        isVisible: boolean
+      }[]
+    }[]
+  > {
     const authorizedPages = await this.getAuthorizedPages(userId, userRole, userPermissions)
 
     // Organiser par catégorie
-    const categoryMap = new Map<string, any>()
+    const categoryMap = new Map<
+      string,
+      {
+        id: string
+        title: string
+        description: string
+        icon: string
+        pages: {
+          id: string
+          title: string
+          href: string
+          description: string | null
+          icon: string | null
+          category: string | null
+          subcategory: string | null
+          permissions: string[]
+          roles: string[]
+          moduleId: string | null
+          isEnabled: boolean
+          isVisible: boolean
+        }[]
+      }
+    >()
 
     for (const page of authorizedPages) {
       const categoryId = page.category || 'other'
@@ -165,7 +211,8 @@ export class PageSyncService {
         })
       }
 
-      const category = categoryMap.get(categoryId)!
+      const category = categoryMap.get(categoryId)
+      if (!category) continue
       category.pages.push({
         id: page.pageId,
         title: page.title,

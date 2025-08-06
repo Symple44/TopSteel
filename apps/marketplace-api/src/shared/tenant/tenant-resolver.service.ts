@@ -44,7 +44,9 @@ export class TenantResolver {
         }
       } else {
       }
-    } catch (_error) {}
+    } catch {
+      // Ignore errors when loading real société
+    }
 
     // Mode démo pour le développement si la vraie société n'est pas trouvée
     const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
@@ -230,11 +232,11 @@ export class TenantResolver {
       }
 
       return tenantContext
-    } catch (_error) {
+    } catch {
       return {
         societeId: demoSociete.id,
         societe: demoSociete,
-        erpTenantConnection: null,
+        erpTenantConnection: null as any,
         marketplaceEnabled: true,
       }
     }

@@ -88,7 +88,7 @@ export class MenuRawController {
         message: 'Service fonctionnel!',
         configCount: configs.length,
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error.message,

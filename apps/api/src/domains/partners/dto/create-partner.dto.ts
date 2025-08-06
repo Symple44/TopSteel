@@ -308,5 +308,5 @@ export class CreatePartnerDto {
   })
   @IsOptional()
   @IsObject()
-  metadonnees?: Record<string, any>
+  metadonnees?: Record<string, unknown>
 }

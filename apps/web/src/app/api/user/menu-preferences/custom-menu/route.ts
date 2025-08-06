@@ -5,7 +5,7 @@ import { callBackendFromApi } from '@/utils/backend-api'
 // Force dynamic pour éviter les problèmes de cache
 export const dynamic = 'force-dynamic'
 
-interface UserMenuItem {
+interface _UserMenuItem {
   id: string
   parentId?: string
   title: string

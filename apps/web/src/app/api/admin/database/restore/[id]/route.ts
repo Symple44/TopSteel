@@ -9,7 +9,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       method: 'POST',
       headers: {
         ...(request.headers.get('authorization') && {
-          Authorization: request.headers.get('authorization')!,
+          Authorization: request.headers.get('authorization'),
         }),
       },
     })
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const responseData = await response.json()
     return NextResponse.json(responseData.data || responseData)
-  } catch (_error) {
+  } catch {
     // Simuler une restauration pour le mock
     const mockResponse = {
       success: true,

@@ -34,7 +34,7 @@ import {
   TabsTrigger,
 } from '@erp/ui'
 import { ArrowRight, Building, Calendar, Check, Filter, Mail, Search, UserPlus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '@/utils/backend-api'
 
 interface User {
@@ -83,6 +83,26 @@ export default function BulkUserAssignment({
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('select-users')
 
+  const loadUsers = useCallback(async () => {
+    try {
+      const response = await callClientApi('admin/users?includeGroups=true')
+      const data = await response.json()
+      if (data.success) {
+        setUsers(data.data)
+      }
+    } catch (_error) {}
+  }, [])
+
+  const loadGroups = useCallback(async () => {
+    try {
+      const response = await callClientApi('admin/groups')
+      const data = await response.json()
+      if (data.success) {
+        setGroups(data.data)
+      }
+    } catch (_error) {}
+  }, [])
+
   useEffect(() => {
     if (isOpen) {
       loadUsers()
@@ -95,26 +115,6 @@ export default function BulkUserAssignment({
       setSelectedGroups([targetGroup.id])
     }
   }, [targetGroup])
-
-  const loadUsers = async () => {
-    try {
-      const response = await callClientApi('admin/users?includeGroups=true')
-      const data = await response.json()
-      if (data.success) {
-        setUsers(data.data)
-      }
-    } catch (_error) {}
-  }
-
-  const loadGroups = async () => {
-    try {
-      const response = await callClientApi('admin/groups')
-      const data = await response.json()
-      if (data.success) {
-        setGroups(data.data)
-      }
-    } catch (_error) {}
-  }
 
   // Filtrage des utilisateurs
   const filteredUsers = users.filter((user) => {

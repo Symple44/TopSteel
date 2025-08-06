@@ -20,7 +20,7 @@ export class CircuitBreakerInterceptor implements NestInterceptor {
     private readonly reflector: Reflector
   ) {}
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
     const circuitBreakerConfig = this.reflector.get<CircuitBreakerMetadata>(
       CIRCUIT_BREAKER_KEY,
       context.getHandler()

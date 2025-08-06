@@ -21,7 +21,7 @@ export class CircuitBreakerService {
   /**
    * Crée ou récupère un circuit breaker existant
    */
-  getCircuitBreaker<T extends any[], R>(
+  getCircuitBreaker<T extends unknown[], R>(
     name: string,
     fn: (...args: T) => Promise<R>,
     options: CircuitBreakerOptions = {}
@@ -82,7 +82,7 @@ export class CircuitBreakerService {
   /**
    * Exécute une fonction avec protection circuit breaker
    */
-  async execute<T extends any[], R>(
+  async execute<T extends unknown[], R>(
     name: string,
     fn: (...args: T) => Promise<R>,
     args: T,
@@ -95,7 +95,10 @@ export class CircuitBreakerService {
   /**
    * Ajoute un fallback à un circuit breaker
    */
-  withFallback<T extends any[], R>(name: string, fallback: (...args: T) => Promise<R> | R): void {
+  withFallback<T extends unknown[], R>(
+    name: string,
+    fallback: (...args: T) => Promise<R> | R
+  ): void {
     const circuitBreaker = this.circuitBreakers.get(name)
     if (circuitBreaker) {
       circuitBreaker.fallback(fallback)
@@ -107,7 +110,7 @@ export class CircuitBreakerService {
    */
   getStatus(name: string): {
     state: string
-    stats: any
+    stats: unknown
   } | null {
     const circuitBreaker = this.circuitBreakers.get(name)
     if (!circuitBreaker) return null
@@ -121,8 +124,8 @@ export class CircuitBreakerService {
   /**
    * Obtient tous les circuit breakers et leurs statuts
    */
-  getAllStatuses(): Record<string, any> {
-    const statuses: Record<string, any> = {}
+  getAllStatuses(): Record<string, unknown> {
+    const statuses: Record<string, unknown> = {}
 
     for (const [name, _cb] of this.circuitBreakers) {
       statuses[name] = this.getStatus(name)

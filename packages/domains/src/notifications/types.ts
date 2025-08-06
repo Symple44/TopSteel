@@ -29,7 +29,7 @@ export interface NotificationMetadata {
   entityType?: string
   entityId?: string
   userId?: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface Notification {
@@ -44,7 +44,7 @@ export interface Notification {
   source?: string
   entityType?: string
   entityId?: string
-  data?: Record<string, any>
+  data?: Record<string, unknown>
   metadata?: NotificationMetadata
 
   // Destinataires
@@ -161,7 +161,7 @@ export interface CreateNotificationRequest {
   source?: string
   entityType?: string
   entityId?: string
-  data?: Record<string, any>
+  data?: Record<string, unknown>
 
   // Destinataires
   recipientType?: RecipientType
@@ -214,7 +214,7 @@ export interface NotificationListResponse {
 // Types pour les templates
 export interface CreateNotificationFromTemplateRequest {
   templateName: string
-  variables: Record<string, any>
+  variables: Record<string, unknown>
   recipientType: RecipientType
   recipientId?: string
 }
@@ -224,14 +224,14 @@ export interface TemplateVariable {
   type: 'string' | 'number' | 'boolean' | 'datetime' | 'array' | 'object'
   required: boolean
   description?: string
-  defaultValue?: any
+  defaultValue?: unknown
 }
 
 // Types pour les événements temps réel
 export interface NotificationEvent {
   type: 'new_notification' | 'notification_read' | 'notification_deleted' | 'settings_updated'
   userId: string
-  data: any
+  data: unknown
 }
 
 // Types pour les paramètres de connexion WebSocket
@@ -246,7 +246,7 @@ export interface WebSocketConnectionOptions {
 export interface NotificationError {
   code: string
   message: string
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 }
 
 // Types pour les services

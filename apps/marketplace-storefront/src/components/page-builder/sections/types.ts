@@ -76,17 +76,17 @@ export interface SectionSettings {
 export interface ResponsiveConfig {
   mobile?: {
     isVisible?: boolean
-    content?: any
+    content?: Record<string, unknown>
     styles?: Partial<SectionStyles>
   }
   tablet?: {
     isVisible?: boolean
-    content?: any
+    content?: Record<string, unknown>
     styles?: Partial<SectionStyles>
   }
   desktop?: {
     isVisible?: boolean
-    content?: any
+    content?: Record<string, unknown>
     styles?: Partial<SectionStyles>
   }
 }
@@ -97,13 +97,13 @@ export interface BaseSection {
   name: string
   order: number
   isVisible: boolean
-  content: any
+  content: Record<string, unknown>
   styles: SectionStyles
   responsive: ResponsiveConfig
   settings: SectionSettings
 }
 
-export interface SectionProps<T = any> {
+export interface SectionProps<T = Record<string, unknown>> {
   section: BaseSection & { content: T }
   isEditing?: boolean
   onUpdate?: (content: T) => void

@@ -50,9 +50,9 @@ export function useWebVitals(options: MetricOptions = {}): WebVitalsMetrics {
             method: 'POST',
             body: JSON.stringify(metric),
             keepalive: true,
-          }).catch((_err) => {})
+          }).catch(() => {})
         }
-      } catch (_err) {}
+      } catch {}
     },
     [enableAnalytics, sampleRate]
   )

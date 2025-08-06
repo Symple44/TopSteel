@@ -174,9 +174,10 @@ export function ImageUpload({
   }, [])
 
   const renderDefault = () => (
-    <div
+    <button
+      type="button"
       className={cn(
-        'relative border-2 border-dashed rounded-lg p-6 transition-colors',
+        'relative border-2 border-dashed rounded-lg p-6 transition-colors w-full text-left',
         dragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25',
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-primary',
         className
@@ -185,6 +186,10 @@ export function ImageUpload({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onClick={handleClick}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && !disabled && handleClick()}
+      tabIndex={disabled ? -1 : 0}
+      aria-label="Upload image"
+      disabled={disabled}
     >
       <input
         ref={fileInputRef}
@@ -232,7 +237,7 @@ export function ImageUpload({
           </div>
         )}
       </div>
-    </div>
+    </button>
   )
 
   const renderAvatar = () => (

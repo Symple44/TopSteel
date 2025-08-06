@@ -50,7 +50,7 @@ export class DatabaseInitBaseService {
             [enumDef.name]
           )
 
-          const existingValues = enumValues.map((row: any) => row.enumlabel)
+          const existingValues = enumValues.map((row: { enumlabel: string }) => row.enumlabel)
 
           for (const value of enumDef.values) {
             if (!existingValues.includes(value)) {

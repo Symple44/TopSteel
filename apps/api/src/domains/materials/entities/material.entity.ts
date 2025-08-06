@@ -318,7 +318,7 @@ export class Material extends BusinessEntity {
   dateCreationFiche!: Date
 
   @Column({ type: 'jsonb', nullable: true })
-  metadonnees?: Record<string, any>
+  metadonnees?: Record<string, unknown>
 
   /**
    * Validation métier
@@ -520,8 +520,8 @@ export class Material extends BusinessEntity {
    */
   ajouterModificationHistorique(
     champ: string,
-    ancienneValeur: any,
-    nouvelleValeur: any,
+    ancienneValeur: unknown,
+    nouvelleValeur: unknown,
     utilisateur: string
   ): void {
     if (!this.metadonnees) this.metadonnees = {}

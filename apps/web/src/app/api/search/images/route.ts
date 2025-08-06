@@ -6,10 +6,6 @@ export const runtime = 'nodejs'
 export async function GET(request: NextRequest) {
   try {
     // TODO: Add authentication when implemented
-    // const session = await auth()
-    // if (!session?.user?.id) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
 
     const elasticsearchClient = await getElasticsearchClient()
     const imageElasticsearchService = await getImageElasticsearchService()
@@ -79,16 +75,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // TODO: Add authentication when implemented
-    // const session = await auth()
-    // if (!session?.user?.id) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
 
     const elasticsearchClient = await getElasticsearchClient()
     const _imageElasticsearchService = await getImageElasticsearchService()
 
     const body = await request.json()
-    const { action, ...params } = body
+    const { action, ..._ } = body
 
     const isConnected = await elasticsearchClient.isConnected()
     if (!isConnected) {

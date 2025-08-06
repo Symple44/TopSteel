@@ -7,12 +7,23 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { In, type Repository } from 'typeorm'
+import type {
+  ApiRouteDefinition,
+  MenuItemDto,
+  ModuleMetadata,
+  ModulePricing,
+  PermissionDefinition,
+} from '../entities/marketplace-module.entity'
 import {
   type MarketplaceCategory,
   MarketplaceModule as MarketplaceModuleEntity,
   ModuleStatus,
 } from '../entities/marketplace-module.entity'
-import { InstallationStatus, ModuleInstallation } from '../entities/module-installation.entity'
+import {
+  type InstallationConfig,
+  InstallationStatus,
+  ModuleInstallation,
+} from '../entities/module-installation.entity'
 import { ModuleRating } from '../entities/module-rating.entity'
 
 export interface CreateModuleDto {
@@ -22,13 +33,13 @@ export interface CreateModuleDto {
   shortDescription?: string
   category: MarketplaceCategory
   publisher: string
-  pricing: any
+  pricing: ModulePricing
   dependencies?: string[]
-  menuConfiguration?: any[]
-  permissions?: any[]
-  apiRoutes?: any[]
+  menuConfiguration?: MenuItemDto[]
+  permissions?: PermissionDefinition[]
+  apiRoutes?: ApiRouteDefinition[]
   icon?: string
-  metadata?: any
+  metadata?: ModuleMetadata
 }
 
 export interface UpdateModuleDto {
@@ -36,20 +47,20 @@ export interface UpdateModuleDto {
   description?: string
   shortDescription?: string
   category?: MarketplaceCategory
-  pricing?: any
+  pricing?: ModulePricing
   dependencies?: string[]
-  menuConfiguration?: any[]
-  permissions?: any[]
-  apiRoutes?: any[]
+  menuConfiguration?: MenuItemDto[]
+  permissions?: PermissionDefinition[]
+  apiRoutes?: ApiRouteDefinition[]
   icon?: string
-  metadata?: any
+  metadata?: ModuleMetadata
   status?: ModuleStatus
 }
 
 export interface InstallModuleDto {
   tenantId: string
   moduleId: string
-  configuration?: any
+  configuration?: InstallationConfig
 }
 
 export interface ModuleSearchFilters {
@@ -287,8 +298,13 @@ export class MarketplaceService {
     return installations
       .filter((inst) => moduleMap.has(inst.moduleId))
       .map((inst) => {
-        ;(inst as any).module = moduleMap.get(inst.moduleId)!
-        return inst as ModuleInstallation & { module: MarketplaceModuleEntity }
+        const module = moduleMap.get(inst.moduleId)
+        if (!module) {
+          throw new Error(`Module not found for installation ${inst.moduleId}`)
+        }
+        return Object.assign(inst, { module }) as ModuleInstallation & {
+          module: MarketplaceModuleEntity
+        }
       })
   }
 
@@ -590,7 +606,10 @@ export class MarketplaceService {
     }
   }
 
-  private async integrateMenuConfiguration(_menuConfig: any[], _tenantId: string): Promise<void> {}
+  private async integrateMenuConfiguration(
+    _menuConfig: MenuItemDto[],
+    _tenantId: string
+  ): Promise<void> {}
 
   private async recalculateModuleRating(
     moduleId: string,

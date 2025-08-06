@@ -48,7 +48,7 @@ export default function ConnectionManagementPanel({
   isLoading = false,
 }: ConnectionManagementPanelProps) {
   const [selectedConnection, setSelectedConnection] = useState<string>('')
-  const [_viewMode, _setViewMode] = useState<'list' | 'grid'>('list')
+  const [,] = useState<'list' | 'grid'>('list')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'idle' | 'error'>('all')
 
   const getStatusIcon = (connection: ConnectionInfo) => {
@@ -251,7 +251,7 @@ export default function ConnectionManagementPanel({
       {/* Liste des connexions */}
       {filteredConnections.length > 0 ? (
         <div className="space-y-3">
-          {filteredConnections.map((connection, _index) => (
+          {filteredConnections.map((connection) => (
             <Card
               key={connection.tenant}
               className={`hover:shadow-md transition-shadow ${

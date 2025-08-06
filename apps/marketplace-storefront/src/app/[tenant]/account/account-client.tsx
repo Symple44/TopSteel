@@ -99,6 +99,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
             <div className="bg-background border rounded-lg p-4 sticky top-24">
               <div className="space-y-2">
                 <button
+                  type="button"
                   onClick={() => setActiveTab('profile')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeTab === 'profile'
@@ -111,6 +112,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setActiveTab('orders')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeTab === 'orders' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
@@ -121,6 +123,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setActiveTab('favorites')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeTab === 'favorites'
@@ -133,6 +136,7 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setActiveTab('settings')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeTab === 'settings'
@@ -145,7 +149,10 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                 </button>
 
                 <div className="border-t pt-2 mt-4">
-                  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left hover:bg-destructive/10 text-destructive transition-colors">
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left hover:bg-destructive/10 text-destructive transition-colors"
+                  >
                     <LogOut className="w-5 h-5" />
                     Se déconnecter
                   </button>
@@ -161,15 +168,17 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                 <div className="bg-background border rounded-lg p-6">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold">Informations personnelles</h2>
-                    <button className="btn-outline text-sm">Modifier</button>
+                    <button type="button" className="btn-outline text-sm">
+                      Modifier
+                    </button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-1">
+                        <span className="block text-sm font-medium text-muted-foreground mb-1">
                           Email
-                        </label>
+                        </span>
                         <div className="flex items-center gap-2">
                           <Mail className="w-4 h-4 text-muted-foreground" />
                           <span>{user.email}</span>
@@ -177,9 +186,9 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-1">
+                        <span className="block text-sm font-medium text-muted-foreground mb-1">
                           Téléphone
-                        </label>
+                        </span>
                         <div className="flex items-center gap-2">
                           <Phone className="w-4 h-4 text-muted-foreground" />
                           <span>{user.phone}</span>
@@ -187,9 +196,9 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-1">
+                        <span className="block text-sm font-medium text-muted-foreground mb-1">
                           Nom complet
-                        </label>
+                        </span>
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4 text-muted-foreground" />
                           <span>
@@ -201,16 +210,16 @@ export default function AccountClient({ tenant }: AccountClientProps) {
 
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-1">
+                        <span className="block text-sm font-medium text-muted-foreground mb-1">
                           Entreprise
-                        </label>
+                        </span>
                         <span>{user.company || 'Non renseignée'}</span>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-1">
+                        <span className="block text-sm font-medium text-muted-foreground mb-1">
                           Adresse
-                        </label>
+                        </span>
                         <div className="flex items-start gap-2">
                           <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
                           <div>
@@ -224,9 +233,9 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-muted-foreground mb-1">
+                        <span className="block text-sm font-medium text-muted-foreground mb-1">
                           Membre depuis
-                        </label>
+                        </span>
                         <span>
                           {user.createdAt.toLocaleDateString('fr-FR', {
                             year: 'numeric',
@@ -273,9 +282,13 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                         </div>
 
                         <div className="flex gap-2">
-                          <button className="btn-outline text-sm">Voir les détails</button>
+                          <button type="button" className="btn-outline text-sm">
+                            Voir les détails
+                          </button>
                           {order.status === 'delivered' && (
-                            <button className="btn-outline text-sm">Commander à nouveau</button>
+                            <button type="button" className="btn-outline text-sm">
+                              Commander à nouveau
+                            </button>
                           )}
                         </div>
                       </div>
@@ -341,14 +354,19 @@ export default function AccountClient({ tenant }: AccountClientProps) {
                     <div className="border-t pt-6">
                       <h3 className="font-semibold mb-3">Sécurité</h3>
                       <div className="space-y-3">
-                        <button className="btn-outline text-sm">Changer mon mot de passe</button>
+                        <button type="button" className="btn-outline text-sm">
+                          Changer mon mot de passe
+                        </button>
                       </div>
                     </div>
 
                     <div className="border-t pt-6">
                       <h3 className="font-semibold mb-3 text-destructive">Zone de danger</h3>
                       <div className="space-y-3">
-                        <button className="btn-outline border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground text-sm">
+                        <button
+                          type="button"
+                          className="btn-outline border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground text-sm"
+                        >
                           Supprimer mon compte
                         </button>
                       </div>

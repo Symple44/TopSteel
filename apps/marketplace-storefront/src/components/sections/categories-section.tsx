@@ -5,7 +5,6 @@ import { ArrowRight, Package } from 'lucide-react'
 import Link from 'next/link'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { getCategories } from '@/lib/api/storefront'
-import { slugify } from '@/lib/utils'
 
 interface CategoriesSectionProps {
   tenant: string
@@ -82,7 +81,7 @@ interface CategoryCardProps {
 }
 
 function CategoryCard({ category, tenant }: CategoryCardProps) {
-  const _categorySlug = slugify(category)
+  // Category slug would be used for additional functionality
 
   return (
     <Link
@@ -117,7 +116,7 @@ function CategoryCard({ category, tenant }: CategoryCardProps) {
 
 // Fonction pour obtenir une icône spécifique par catégorie
 function _getCategoryIcon(category: string) {
-  const iconMap: Record<string, React.ComponentType<any>> = {
+  const iconMap: Record<string, React.ComponentType<object>> = {
     métaux: Package,
     acier: Package,
     aluminium: Package,

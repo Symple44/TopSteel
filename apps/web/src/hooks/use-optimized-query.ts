@@ -46,7 +46,7 @@ export function useOptimizedMutation<TData, TVariables>(
         }
       }
     },
-    onError: (_error) => {},
+    onError: () => {},
   })
 }
 

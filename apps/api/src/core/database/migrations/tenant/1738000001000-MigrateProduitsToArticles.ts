@@ -227,7 +227,7 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
     )
 
     // Log des statistiques de migration
-    const stats = await queryRunner.query(`
+    const _stats = await queryRunner.query(`
       SELECT 
         a.type,
         a.famille,
@@ -238,7 +238,7 @@ export class MigrateProduitsToArticles1738000001000 implements MigrationInterfac
       GROUP BY a.type, a.famille
       ORDER BY nombre DESC
     `)
-    stats.forEach((_stat: any) => {})
+    // Stats are logged but not processed in this migration
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

@@ -5,9 +5,40 @@ import { MarketplaceModule as MarketplaceModuleEntity } from '../entities/market
 // Import des modules réels - Supprimés pour optimiser le debug
 import type { MarketplaceService } from './marketplace.service'
 
+export interface ModuleInfo {
+  moduleKey: string
+  displayName: string
+  description: string
+  shortDescription?: string
+  category: string
+  version: string
+  publisher: string
+  pricing: {
+    type: string
+    amount?: number
+    currency?: string
+    period?: 'MONTH' | 'YEAR'
+    setupFee?: number
+    commissionRate?: number
+    usageUnit?: string
+    description?: string
+  }
+  dependencies?: string[]
+  menuConfiguration?: unknown[]
+  permissions?: string[]
+  apiRoutes?: unknown[]
+  icon?: string
+  metadata?: Record<string, unknown>
+}
+
+export interface ModuleClass {
+  name: string
+  getModuleInfo: () => ModuleInfo
+}
+
 export interface ModuleRegistration {
-  moduleClass: any
-  moduleInfo: any
+  moduleClass: ModuleClass
+  moduleInfo: ModuleInfo
 }
 
 @Injectable()
@@ -57,7 +88,7 @@ export class ModuleRegistryService implements OnModuleInit {
   /**
    * Enregistre un module dans le registre et la base de données
    */
-  async registerModule(moduleClass: any): Promise<void> {
+  async registerModule(moduleClass: ModuleClass): Promise<void> {
     try {
       // Vérifier que le module a une méthode getModuleInfo
       if (!moduleClass.getModuleInfo || typeof moduleClass.getModuleInfo !== 'function') {
@@ -110,7 +141,7 @@ export class ModuleRegistryService implements OnModuleInit {
   /**
    * Valide les informations d'un module
    */
-  private validateModuleInfo(moduleInfo: any): void {
+  private validateModuleInfo(moduleInfo: ModuleInfo): void {
     const requiredFields = [
       'moduleKey',
       'displayName',
@@ -141,7 +172,7 @@ export class ModuleRegistryService implements OnModuleInit {
   /**
    * Vérifie si un module a changé depuis sa dernière version
    */
-  private hasModuleChanged(existingModule: MarketplaceModuleEntity, newInfo: any): boolean {
+  private hasModuleChanged(existingModule: MarketplaceModuleEntity, newInfo: ModuleInfo): boolean {
     return (
       existingModule.version !== newInfo.version ||
       existingModule.displayName !== newInfo.displayName ||
@@ -155,7 +186,7 @@ export class ModuleRegistryService implements OnModuleInit {
    */
   private async updateModuleInDatabase(
     existingModule: MarketplaceModuleEntity,
-    moduleInfo: any
+    moduleInfo: ModuleInfo
   ): Promise<void> {
     await this.marketplaceService.updateModule(
       existingModule.id,
@@ -178,7 +209,7 @@ export class ModuleRegistryService implements OnModuleInit {
   /**
    * Crée un nouveau module en base de données
    */
-  private async createModuleInDatabase(moduleInfo: any): Promise<void> {
+  private async createModuleInDatabase(moduleInfo: ModuleInfo): Promise<void> {
     await this.marketplaceService.createModule(
       {
         moduleKey: moduleInfo.moduleKey,
@@ -346,7 +377,12 @@ export class ModuleRegistryService implements OnModuleInit {
   /**
    * Récupère les statistiques du registre
    */
-  getRegistryStats(): any {
+  getRegistryStats(): {
+    totalModules: number
+    categoryCounts: Record<string, number>
+    publisherCounts: Record<string, number>
+    pricingTypes: Record<string, number>
+  } {
     const modules = Array.from(this.registeredModules.values())
 
     const categoryCounts = modules.reduce(
@@ -367,11 +403,20 @@ export class ModuleRegistryService implements OnModuleInit {
       {} as Record<string, number>
     )
 
+    const publisherCounts = modules.reduce(
+      (acc, module) => {
+        const publisher = module.moduleInfo.publisher
+        acc[publisher] = (acc[publisher] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>
+    )
+
     return {
       totalModules: modules.length,
       categoryCounts,
+      publisherCounts,
       pricingTypes,
-      publishers: [...new Set(modules.map((m) => m.moduleInfo.publisher))],
     }
   }
 }

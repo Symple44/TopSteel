@@ -1,10 +1,28 @@
 'use client'
 
-import { CodeViewerDialog, type CodeViewerDialogProps } from '@erp/ui/primitives'
+import { CodeViewerDialog } from '@erp/ui/primitives'
 import { useTranslation } from '@/lib/i18n/hooks'
 
-interface CodeViewerDialogWrapperProps extends Omit<CodeViewerDialogProps, 'translations'> {
-  // Override props that we'll handle internally
+interface CodeViewerDialogWrapperProps {
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  subtitle?: string
+  fileDetails?: {
+    name: string
+    content: string
+    size: number
+    lastModified: string
+    path: string
+  }
+  loadingMessage?: string
+  onLoadDetails?: () => Promise<{
+    name: string
+    content: string
+    size: number
+    lastModified: string
+    path: string
+  }>
 }
 
 export function CodeViewerDialogWrapper(props: CodeViewerDialogWrapperProps) {
@@ -27,7 +45,18 @@ export function CodeViewerDialogWrapper(props: CodeViewerDialogWrapperProps) {
     lineTooltip: t('lineTooltip'),
   }
 
-  return <CodeViewerDialog {...props} translations={translations} />
+  return (
+    <CodeViewerDialog
+      isOpen={props.isOpen}
+      onClose={props.onClose}
+      title={props.title}
+      subtitle={props.subtitle}
+      fileDetails={props.fileDetails}
+      loadingMessage={props.loadingMessage}
+      onLoadDetails={props.onLoadDetails}
+      translations={translations}
+    />
+  )
 }
 
 export default CodeViewerDialogWrapper

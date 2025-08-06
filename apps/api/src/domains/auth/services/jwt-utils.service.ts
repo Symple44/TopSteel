@@ -7,7 +7,7 @@ export interface TokenInfo {
   isExpired: boolean
   expiresAt?: Date
   issuedAt?: Date
-  payload?: any
+  payload?: Record<string, unknown>
   error?: string
 }
 
@@ -59,7 +59,7 @@ export class JwtUtilsService {
     }
   }
 
-  extractPayload(token: string): any {
+  extractPayload(token: string): Record<string, unknown> | null {
     try {
       const base64Payload = token.split('.')[1]
       if (!base64Payload) {
@@ -84,7 +84,7 @@ export class JwtUtilsService {
     }
   }
 
-  private handleTokenError(error: any): TokenInfo {
+  private handleTokenError(error: unknown): TokenInfo {
     const payload = error.payload as ExtendedJwtPayload
     const expiresAt = payload?.exp ? new Date(payload.exp * 1000) : undefined
     const issuedAt = payload?.iat ? new Date(payload.iat * 1000) : undefined

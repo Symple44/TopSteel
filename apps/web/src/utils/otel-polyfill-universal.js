@@ -1,5 +1,4 @@
 // Universal OpenTelemetry polyfill - handles any property access
-const _noop = () => {}
 
 // Create a universal mock that handles any method call
 const createUniversalMock = () => {

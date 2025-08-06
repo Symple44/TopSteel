@@ -113,7 +113,7 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
                   {hasDiscount ? (
                     <>
                       <div className="text-lg font-bold text-primary">
-                        {formatPrice(product.calculatedPrice!)}
+                        {formatPrice(product.calculatedPrice ?? product.basePrice)}
                       </div>
                       <div className="text-sm text-muted-foreground line-through">
                         {formatPrice(product.basePrice)}
@@ -156,6 +156,7 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
 
                   {product.inStock && (
                     <button
+                      type="button"
                       onClick={handleAddToCart}
                       className="btn-primary px-3 py-1 text-xs flex items-center gap-1"
                     >
@@ -222,6 +223,7 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
 
             {product.inStock && (
               <button
+                type="button"
                 className="w-10 h-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 title="Ajouter au panier"
                 onClick={handleAddToCart}
@@ -279,7 +281,7 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
               {hasDiscount ? (
                 <>
                   <span className="text-lg font-bold text-primary">
-                    {formatPrice(product.calculatedPrice!)}
+                    {formatPrice(product.calculatedPrice ?? product.basePrice)}
                   </span>
                   <span className="text-sm text-muted-foreground line-through">
                     {formatPrice(product.basePrice)}
@@ -309,7 +311,11 @@ export function ProductCard({ product, tenant, className, variant = 'grid' }: Pr
 
         {/* Add to Cart Button (Mobile) */}
         {product.inStock && (
-          <button className="w-full btn-primary py-2 text-sm md:hidden" onClick={handleAddToCart}>
+          <button
+            type="button"
+            className="w-full btn-primary py-2 text-sm md:hidden"
+            onClick={handleAddToCart}
+          >
             <ShoppingCart className="w-4 h-4 mr-2" />
             Ajouter au panier
           </button>

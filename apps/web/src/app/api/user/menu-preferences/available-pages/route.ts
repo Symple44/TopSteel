@@ -1,30 +1,26 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { pageDiscoveryService } from '@/services/page-discovery.service'
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // Découvrir les pages disponibles depuis le système de fichiers
     const categories = pageDiscoveryService.discoverPages()
 
     // Filtrer les pages selon les permissions de l'utilisateur
-    const filteredCategories = filterPagesByPermissions(categories, null)
+    const filteredCategories = filterPagesByPermissions(categories)
 
     return NextResponse.json({
       success: true,
       data: filteredCategories,
     })
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ success: false, error: 'Erreur interne' }, { status: 500 })
   }
 }
 
-function filterPagesByPermissions(categories: any[], _user: any) {
+function filterPagesByPermissions(categories: any[]) {
   // TODO: Implémenter la logique de filtrage basée sur les permissions
   // Pour l'instant, retourner toutes les pages
-
-  // Exemple de logique de filtrage:
-  // const userPermissions = await getUserPermissions(user.id)
-  // const userRole = user.role
 
   const filteredCategories = categories
     .map((category) => ({

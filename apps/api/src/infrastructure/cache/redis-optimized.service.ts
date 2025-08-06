@@ -43,7 +43,7 @@ export class OptimizedCacheService {
     }
   }
 
-  async set(key: string, value: any, ttl = 3600): Promise<void> {
+  async set(key: string, value: unknown, ttl = 3600): Promise<void> {
     try {
       await this.redis.setex(key, ttl, JSON.stringify(value))
     } catch (error) {
@@ -97,7 +97,7 @@ export class OptimizedCacheService {
   }
 
   // OPTIMIZED: Bulk set operations with pipeline
-  async mset(keyValuePairs: Record<string, any>, ttl = 3600): Promise<void> {
+  async mset(keyValuePairs: Record<string, unknown>, ttl = 3600): Promise<void> {
     try {
       const entries = Object.entries(keyValuePairs)
       if (entries.length === 0) return
@@ -117,7 +117,7 @@ export class OptimizedCacheService {
   // OPTIMIZED: Cache with invalidation groups
   private invalidationGroups = new Map<string, Set<string>>()
 
-  async setWithGroup(key: string, value: any, groupKey: string, ttl = 3600): Promise<void> {
+  async setWithGroup(key: string, value: unknown, groupKey: string, ttl = 3600): Promise<void> {
     try {
       // Set the cache entry
       await this.set(key, value, ttl)
@@ -160,11 +160,11 @@ export class OptimizedCacheService {
   }
 
   // OPTIMIZED: Pipeline operations for atomic cache updates
-  async pipeline(): Promise<any> {
+  async pipeline(): Promise<unknown> {
     return this.redis.pipeline()
   }
 
-  async executePipeline(pipeline: any): Promise<any> {
+  async executePipeline(pipeline: unknown): Promise<unknown> {
     try {
       return await pipeline.exec()
     } catch (error) {

@@ -42,7 +42,7 @@ interface Condition {
   logic?: 'AND' | 'OR'
 }
 
-interface ConditionGroup {
+interface _ConditionGroup {
   id: string
   conditions: Condition[]
   logic: 'AND' | 'OR'

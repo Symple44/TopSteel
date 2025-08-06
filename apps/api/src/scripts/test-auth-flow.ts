@@ -20,9 +20,9 @@ async function testAuthFlow() {
       throw new Error(`Login failed: ${loginResponse.status} - ${error}`)
     }
 
-    const loginData: any = await loginResponse.json()
+    const loginData: unknown = await loginResponse.json()
 
-    const accessToken = loginData.data.accessToken
+    const accessToken = (loginData as { data: { accessToken: string } }).data.accessToken
     const societesResponse = await fetch(`${API_URL}/api/auth/societes`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
@@ -32,10 +32,11 @@ async function testAuthFlow() {
       throw new Error(`Get societes failed: ${societesResponse.status} - ${error}`)
     }
 
-    const societesData: any = await societesResponse.json()
+    const societesData: unknown = await societesResponse.json()
 
-    if (societesData.data.length > 0) {
-      const firstSociete = societesData.data[0]
+    const societesDataTyped = societesData as { data: { id: string }[] }
+    if (societesDataTyped.data.length > 0) {
+      const firstSociete = societesDataTyped.data[0]
       const selectResponse = await fetch(`${API_URL}/api/auth/login-societe/${firstSociete.id}`, {
         method: 'POST',
         headers: {
@@ -50,9 +51,11 @@ async function testAuthFlow() {
         throw new Error(`Select societe failed: ${selectResponse.status} - ${error}`)
       }
 
-      const selectData: any = await selectResponse.json()
+      const selectData: unknown = await selectResponse.json()
       const verifyResponse = await fetch(`${API_URL}/api/auth/verify`, {
-        headers: { Authorization: `Bearer ${selectData.data.tokens.accessToken}` },
+        headers: {
+          Authorization: `Bearer ${(selectData as { data: { tokens: { accessToken: string } } }).data.tokens.accessToken}`,
+        },
       })
 
       if (!verifyResponse.ok) {
@@ -60,9 +63,9 @@ async function testAuthFlow() {
         throw new Error(`Verify token failed: ${verifyResponse.status} - ${error}`)
       }
 
-      const _verifyData: any = await verifyResponse.json()
+      await verifyResponse.json()
     }
-  } catch (_error: any) {
+  } catch {
     process.exit(1)
   }
 }
@@ -74,6 +77,6 @@ fetch(`${API_URL}/api/health`)
       throw new Error(`Server returned ${response.status}`)
     }
   })
-  .catch((_error) => {
+  .catch(() => {
     process.exit(1)
   })

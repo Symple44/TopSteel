@@ -29,7 +29,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
-  const { addItem, hasItem, getItemCount } = useCart()
+  const { addItem } = useCart()
 
   const images =
     product.images.length > 0
@@ -134,6 +134,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
             {images.length > 1 && (
               <>
                 <button
+                  type="button"
                   onClick={() => setSelectedImageIndex(Math.max(0, selectedImageIndex - 1))}
                   className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 hover:bg-background rounded-full flex items-center justify-center transition-colors"
                   disabled={selectedImageIndex === 0}
@@ -141,6 +142,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
+                  type="button"
                   onClick={() =>
                     setSelectedImageIndex(Math.min(images.length - 1, selectedImageIndex + 1))
                   }
@@ -158,7 +160,8 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
             <div className="grid grid-cols-4 gap-2">
               {images.map((image, index) => (
                 <button
-                  key={index}
+                  type="button"
+                  key={image.url || index}
                   onClick={() => setSelectedImageIndex(index)}
                   className={cn(
                     'relative aspect-square overflow-hidden rounded border-2 transition-colors',
@@ -186,6 +189,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground font-mono">Réf: {product.reference}</p>
               <button
+                type="button"
                 onClick={handleShare}
                 className="p-2 hover:bg-muted rounded-lg transition-colors"
                 title="Partager"
@@ -218,7 +222,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
               {hasDiscount ? (
                 <>
                   <span className="text-3xl font-bold text-primary">
-                    {formatPrice(product.calculatedPrice!)}
+                    {formatPrice(product.calculatedPrice ?? product.basePrice)}
                   </span>
                   <span className="text-xl text-muted-foreground line-through">
                     {formatPrice(product.basePrice)}
@@ -226,7 +230,9 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                   <span className="bg-destructive text-destructive-foreground px-2 py-1 text-sm font-medium rounded">
                     -
                     {Math.round(
-                      ((product.basePrice - product.calculatedPrice!) / product.basePrice) * 100
+                      ((product.basePrice - (product.calculatedPrice ?? product.basePrice)) /
+                        product.basePrice) *
+                        100
                     )}
                     %
                   </span>
@@ -267,6 +273,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
               <div className="flex items-center gap-4">
                 <div className="flex items-center border rounded">
                   <button
+                    type="button"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="p-2 hover:bg-muted transition-colors"
                     disabled={quantity <= 1}
@@ -282,6 +289,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                     className="w-16 text-center py-2 border-0 focus:outline-none"
                   />
                   <button
+                    type="button"
                     onClick={() =>
                       setQuantity(Math.min(product.stockDisponible || 999, quantity + 1))
                     }
@@ -293,6 +301,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                 </div>
 
                 <button
+                  type="button"
                   onClick={handleAddToCart}
                   disabled={isAddingToCart}
                   className="flex-1 btn-primary py-3 flex items-center justify-center gap-2 disabled:opacity-50"
@@ -311,6 +320,7 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                 </button>
 
                 <button
+                  type="button"
                   className="p-3 border hover:bg-muted rounded transition-colors"
                   title="Ajouter aux favoris"
                 >

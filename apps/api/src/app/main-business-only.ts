@@ -31,9 +31,9 @@ try {
   rootDir = rootDir.replace(/\\/g, '/')
   const envLocalPath = join(rootDir, '.env.local')
 
-  const _result = config({ path: envLocalPath })
+  config({ path: envLocalPath })
   config({ path: join(rootDir, '.env'), quiet: true })
-} catch (_error) {
+} catch {
   config({ path: '.env.local', quiet: true })
   config({ path: '.env', quiet: true })
 }
@@ -209,6 +209,6 @@ async function bootstrap() {
   logger.log('')
 }
 
-bootstrap().catch((_error) => {
+bootstrap().catch(() => {
   process.exit(1)
 })

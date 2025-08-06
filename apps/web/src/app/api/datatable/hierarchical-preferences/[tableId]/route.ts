@@ -189,7 +189,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
-    const { tableId } = await params
+    const { tableId: _tableId } = await params
 
     return NextResponse.json({ success: true })
   } catch (_error) {

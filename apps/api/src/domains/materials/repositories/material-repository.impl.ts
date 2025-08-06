@@ -504,7 +504,10 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return {} as Record<MaterialShape, { quantite: number; valeur: number }>
   }
 
-  async getRecentStockMovements(_materialId: string, _limit: number): Promise<any[]> {
+  async getRecentStockMovements(
+    _materialId: string,
+    _limit: number
+  ): Promise<Record<string, unknown>[]> {
     // TODO: Implémenter selon votre système de mouvements
     return []
   }
@@ -603,7 +606,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(_spec: any): Promise<Material[]> {
+  async findBySpecification(_spec: Record<string, unknown>): Promise<Material[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }

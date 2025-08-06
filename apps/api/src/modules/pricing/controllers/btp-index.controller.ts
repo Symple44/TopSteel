@@ -27,8 +27,8 @@ export class CreateBTPIndexDto {
   applicationDate!: Date
   isOfficial?: boolean
   isProvisional?: boolean
-  indexMetadata?: any
-  metadata?: any
+  indexMetadata?: unknown
+  metadata?: unknown
 }
 
 export class UpdateBTPIndexDto {
@@ -37,8 +37,8 @@ export class UpdateBTPIndexDto {
   applicationDate?: Date
   isOfficial?: boolean
   isProvisional?: boolean
-  indexMetadata?: any
-  metadata?: any
+  indexMetadata?: unknown
+  metadata?: unknown
 }
 
 export class IndexedPricingDto {
@@ -86,7 +86,7 @@ export class BTPIndexController {
     @Query('month') month?: number
   ): Promise<BTPIndex[]> {
     // Implementation basique - à améliorer selon besoins
-    const query: any = { tenantId }
+    const query: Record<string, unknown> = { tenantId }
 
     if (indexType) query.indexType = indexType
     if (year) query.year = year
@@ -183,7 +183,7 @@ export class BTPIndexController {
     trend: 'up' | 'down' | 'stable'
     monthlyVariation: number
     yearlyVariation: number
-    alerts: any[]
+    alerts: unknown[]
   }> {
     const current = await this.btpIndexService.getLatestIndex(tenantId, indexType)
 

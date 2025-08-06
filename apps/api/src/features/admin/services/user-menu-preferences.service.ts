@@ -22,7 +22,7 @@ export interface UpdateUserPreferencesDto {
 export interface MenuItemAction {
   action: 'favorite' | 'unfavorite' | 'hide' | 'show' | 'pin' | 'unpin' | 'reorder'
   menuItemId: string
-  value?: any // Pour reorder, contient le nouvel ordre
+  value?: number // Pour reorder, contient le nouvel ordre
 }
 
 export interface CustomMenuItemDto {
@@ -97,7 +97,7 @@ export class UserMenuPreferencesService {
     // Réinitialiser les préférences générales
     const defaultPrefs = UserMenuPreferences.createDefault(userId, activeConfig?.id)
     Object.assign(preferences, defaultPrefs)
-    preferences.id = preferences.id // Garder l'ID existant
+    // L'ID existant est préservé par Object.assign
 
     return await this._preferencesRepository.save(preferences)
   }
@@ -247,7 +247,10 @@ export class UserMenuPreferencesService {
     const processItems = (items: MenuTreeNode[]): UserMenuWithPreferences[] => {
       return items
         .map((item) => {
-          const itemPref = itemPreferencesMap.get(item.id!)
+          if (!item.id) {
+            throw new Error('MenuItem doit avoir un ID')
+          }
+          const itemPref = itemPreferencesMap.get(item.id)
 
           // Appliquer les préférences de l'item
           const customizedItem: UserMenuWithPreferences = {
@@ -268,9 +271,9 @@ export class UserMenuPreferencesService {
                   customOrder: itemPref.customOrder,
                 }
               : {
-                  isVisible: !preferences.isItemHidden(item.id!),
-                  isFavorite: preferences.isItemFavorite(item.id!),
-                  isPinned: preferences.isItemPinned(item.id!),
+                  isVisible: item.id ? !preferences.isItemHidden(item.id) : true,
+                  isFavorite: item.id ? preferences.isItemFavorite(item.id) : false,
+                  isPinned: item.id ? preferences.isItemPinned(item.id) : false,
                 },
           }
 
@@ -286,9 +289,13 @@ export class UserMenuPreferencesService {
         .sort((a, b) => {
           // Trier selon les préférences utilisateur
           const aOrder =
-            a.userPreferences?.customOrder ?? preferences.getItemOrder(a.id!) ?? a.orderIndex
+            a.userPreferences?.customOrder ??
+            (a.id ? preferences.getItemOrder(a.id) : null) ??
+            a.orderIndex
           const bOrder =
-            b.userPreferences?.customOrder ?? preferences.getItemOrder(b.id!) ?? b.orderIndex
+            b.userPreferences?.customOrder ??
+            (b.id ? preferences.getItemOrder(b.id) : null) ??
+            b.orderIndex
 
           // Les items épinglés en premier
           if (a.userPreferences?.isPinned && !b.userPreferences?.isPinned) return -1
@@ -341,7 +348,7 @@ export class UserMenuPreferencesService {
     return await this._preferencesRepository.save(preferences)
   }
 
-  async exportUserPreferences(userId: string): Promise<any> {
+  async exportUserPreferences(userId: string): Promise<Record<string, unknown>> {
     const preferences = await this.getUserPreferences(userId)
 
     return {
@@ -375,7 +382,10 @@ export class UserMenuPreferencesService {
     }
   }
 
-  async importUserPreferences(userId: string, importData: any): Promise<UserMenuPreferences> {
+  async importUserPreferences(
+    userId: string,
+    importData: Record<string, unknown>
+  ): Promise<UserMenuPreferences> {
     // Supprimer les préférences existantes
     await this.resetUserPreferences(userId)
 
@@ -387,8 +397,9 @@ export class UserMenuPreferencesService {
 
     // Créer les préférences d'items
     if (importData.itemPreferences) {
-      const itemPreferences = importData.itemPreferences.map((pref: any) =>
-        UserMenuItemPreference.create(preferences.id, pref.menuItemId, pref)
+      const itemPreferences = (importData.itemPreferences as Record<string, unknown>[]).map(
+        (pref: Record<string, unknown>) =>
+          UserMenuItemPreference.create(preferences.id, pref.menuItemId, pref)
       )
       await this._itemPreferencesRepository.save(itemPreferences)
     }

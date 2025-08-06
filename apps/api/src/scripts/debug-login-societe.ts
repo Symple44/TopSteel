@@ -20,7 +20,7 @@ async function debugLoginSociete() {
       throw new Error(`Login failed: ${loginResponse.status} - ${error}`)
     }
 
-    const loginData: any = await loginResponse.json()
+    const loginData: unknown = (await loginResponse.json()) as unknown
     const accessToken = loginData.data.accessToken
     const societesResponse = await fetch(`${API_URL}/api/auth/societes`, {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -31,7 +31,7 @@ async function debugLoginSociete() {
       throw new Error(`Get societes failed: ${societesResponse.status} - ${error}`)
     }
 
-    const societesData: any = await societesResponse.json()
+    const societesData: unknown = (await societesResponse.json()) as unknown
 
     if (societesData.data.length > 0) {
       const firstSociete = societesData.data[0]
@@ -40,8 +40,8 @@ async function debugLoginSociete() {
       const tokenParts = accessToken.split('.')
       if (tokenParts.length === 3) {
         try {
-          const _payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString())
-        } catch (_e) {}
+          JSON.parse(Buffer.from(tokenParts[1], 'base64').toString())
+        } catch {}
       }
       const selectResponse = await fetch(`${API_URL}/api/auth/login-societe/${firstSociete.id}`, {
         method: 'POST',
@@ -52,19 +52,19 @@ async function debugLoginSociete() {
         body: JSON.stringify({}),
       })
 
-      const _responseText = await selectResponse.text()
+      await selectResponse.text()
 
       if (!selectResponse.ok) {
-        selectResponse.headers.forEach((_value, _key) => {})
+        selectResponse.headers.forEach(() => {})
 
-        const _healthResponse = await fetch(`${API_URL}/api/health`)
+        await fetch(`${API_URL}/api/health`)
 
-        const _verifyResponse = await fetch(`${API_URL}/api/auth/verify`, {
+        await fetch(`${API_URL}/api/auth/verify`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         })
       }
     }
-  } catch (_error: any) {
+  } catch (_error: unknown) {
     process.exit(1)
   }
 }
@@ -76,6 +76,6 @@ fetch(`${API_URL}/api/health`)
       throw new Error(`Server returned ${response.status}`)
     }
   })
-  .catch((_error) => {
+  .catch(() => {
     process.exit(1)
   })

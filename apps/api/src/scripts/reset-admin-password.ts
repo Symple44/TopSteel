@@ -40,10 +40,10 @@ async function resetAdminPassword() {
         ['admin@topsteel.tech']
       )
 
-      const _isValid = await bcrypt.compare(newPassword, checkResult[0].password)
+      await bcrypt.compare(newPassword, checkResult[0].password)
     } else {
     }
-  } catch (_error) {
+  } catch {
   } finally {
     await dataSource.destroy()
   }

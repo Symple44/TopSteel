@@ -1,12 +1,17 @@
 'use client'
 
-import { TranslationField, type TranslationFieldProps } from '@erp/ui/forms'
+import { TranslationField } from '@erp/ui/forms'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { translator } from '@/lib/i18n/translator'
 
-interface TranslationFieldWrapperProps
-  extends Omit<TranslationFieldProps, 'currentLanguage' | 'fieldTranslations'> {
-  // Override props that we'll handle internally
+interface TranslationFieldWrapperProps {
+  value: any
+  onChange: (value: any) => void
+  onTranslationsChange: (translations: any) => void
+  placeholder?: string
+  className?: string
+  disabled?: boolean
+  label?: string
 }
 
 export function TranslationFieldWrapper(props: TranslationFieldWrapperProps) {
@@ -26,7 +31,13 @@ export function TranslationFieldWrapper(props: TranslationFieldWrapperProps) {
 
   return (
     <TranslationField
-      {...props}
+      value={props.value}
+      onChange={props.onChange}
+      onTranslationsChange={props.onTranslationsChange}
+      placeholder={props.placeholder}
+      className={props.className}
+      disabled={props.disabled}
+      label={props.label}
       currentLanguage={currentLanguage}
       fieldTranslations={fieldTranslations}
     />

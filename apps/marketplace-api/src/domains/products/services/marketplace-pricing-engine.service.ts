@@ -286,12 +286,17 @@ export class MarketplacePricingEngine {
 
     if (
       rule.adjustmentType === AdjustmentType.PERCENTAGE &&
-      Math.abs(rule.adjustmentValue!) > 100
+      rule.adjustmentValue !== undefined &&
+      Math.abs(rule.adjustmentValue) > 100
     ) {
       errors.push('Percentage adjustment cannot exceed 100%')
     }
 
-    if (rule.adjustmentType === AdjustmentType.FIXED_PRICE && rule.adjustmentValue! < 0) {
+    if (
+      rule.adjustmentType === AdjustmentType.FIXED_PRICE &&
+      rule.adjustmentValue !== undefined &&
+      rule.adjustmentValue < 0
+    ) {
       errors.push('Fixed price cannot be negative')
     }
 

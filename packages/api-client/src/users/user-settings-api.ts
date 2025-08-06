@@ -36,7 +36,7 @@ export interface UserSettings {
   profile?: UserProfile
   company?: CompanyInfo
   preferences: UserPreferences
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   createdAt: Date
   updatedAt: Date
 }
@@ -45,7 +45,7 @@ export interface UpdateUserSettingsDto {
   profile?: Partial<UserProfile>
   company?: Partial<CompanyInfo>
   preferences?: Partial<UserPreferences>
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export class UserSettingsApiClient extends BaseApiClient {
@@ -112,7 +112,7 @@ export class UserSettingsApiClient extends BaseApiClient {
    */
   async updateNotifications(notifications: Partial<NotificationSettings>): Promise<UserSettings> {
     return this.updateMySettings({
-      preferences: { notifications: notifications as any },
+      preferences: { notifications: notifications as unknown as NotificationSettings },
     })
   }
 }

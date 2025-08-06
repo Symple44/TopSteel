@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import type { ConfigService } from '@nestjs/config'
-import type { DataSource } from 'typeorm'
+import type { DataSource, EntityManager } from 'typeorm'
 
 @Injectable()
 export class SeederService {
@@ -84,7 +84,7 @@ export class SeederService {
   /**
    * Marque les seeds comme complétés
    */
-  private async markSeedsAsCompleted(manager: any): Promise<void> {
+  private async markSeedsAsCompleted(manager: EntityManager): Promise<void> {
     await manager.query(`
       INSERT INTO seeds_status (name, executed_at) 
       VALUES ('initial_seed', CURRENT_TIMESTAMP)
@@ -95,7 +95,7 @@ export class SeederService {
   /**
    * Seed des paramètres système
    */
-  private async seedSystemParameters(manager: any): Promise<void> {
+  private async seedSystemParameters(manager: EntityManager): Promise<void> {
     this.logger.log('📋 Initialisation des paramètres système...')
 
     const systemParameters = [
@@ -144,7 +144,7 @@ export class SeederService {
   /**
    * Seed des utilisateurs par défaut
    */
-  private async seedDefaultUsers(manager: any): Promise<void> {
+  private async seedDefaultUsers(manager: EntityManager): Promise<void> {
     this.logger.log('👥 Initialisation des utilisateurs par défaut...')
 
     // Vérifier si des utilisateurs existent déjà
@@ -176,7 +176,7 @@ export class SeederService {
   /**
    * Seed de la configuration des menus (temporairement désactivé)
    */
-  private async seedMenuConfiguration(_manager: any): Promise<void> {
+  private async seedMenuConfiguration(_manager: unknown): Promise<void> {
     this.logger.log('🎛️  Initialisation de la configuration des menus...')
 
     // Temporairement désactivé - les tables menu_configurations et menu_items

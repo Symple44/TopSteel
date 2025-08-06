@@ -70,14 +70,17 @@ export class UsersController {
   @Get('settings/me')
   @ApiOperation({ summary: 'Récupérer mes paramètres utilisateur' })
   @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
-  async getMySettings(@CurrentUser() user: any) {
+  async getMySettings(@CurrentUser() user: Record<string, unknown>) {
     return this.usersService.getUserSettings(user.id)
   }
 
   @Patch('settings/me')
   @ApiOperation({ summary: 'Mettre à jour mes paramètres utilisateur' })
   @ApiResponse({ status: 200, description: 'Paramètres utilisateur mis à jour avec succès' })
-  async updateMySettings(@CurrentUser() user: any, @Body() updateDto: UpdateUserSettingsDto) {
+  async updateMySettings(
+    @CurrentUser() user: Record<string, unknown>,
+    @Body() updateDto: UpdateUserSettingsDto
+  ) {
     return this.usersService.updateUserSettings(user.id, updateDto)
   }
 
@@ -90,7 +93,7 @@ export class UsersController {
     type: GetAppearanceSettingsResponseDto,
   })
   async getMyAppearanceSettings(
-    @CurrentUser() user: any
+    @CurrentUser() user: Record<string, unknown>
   ): Promise<GetAppearanceSettingsResponseDto> {
     const cacheKey = `user:appearance:${user.id}`
 
@@ -121,7 +124,7 @@ export class UsersController {
     type: GetAppearanceSettingsResponseDto,
   })
   async updateMyAppearanceSettings(
-    @CurrentUser() user: any,
+    @CurrentUser() user: Record<string, unknown>,
     @Body() updateDto: UpdateAppearanceSettingsDto
   ): Promise<GetAppearanceSettingsResponseDto> {
     const updatedSettings = await this.usersService.updateUserSettings(user.id, {
@@ -149,7 +152,7 @@ export class UsersController {
     type: GetNotificationSettingsResponseDto,
   })
   async getMyNotificationSettings(
-    @CurrentUser() user: any
+    @CurrentUser() user: Record<string, unknown>
   ): Promise<GetNotificationSettingsResponseDto> {
     const settings = await this.usersService.getUserSettings(user.id)
     return new GetNotificationSettingsResponseDto(settings.preferences.notifications)
@@ -163,7 +166,7 @@ export class UsersController {
     type: GetNotificationSettingsResponseDto,
   })
   async updateMyNotificationSettings(
-    @CurrentUser() user: any,
+    @CurrentUser() user: Record<string, unknown>,
     @Body() updateDto: UpdateNotificationSettingsDto
   ): Promise<GetNotificationSettingsResponseDto> {
     const updatedSettings = await this.usersService.updateUserSettings(user.id, {

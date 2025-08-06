@@ -377,7 +377,7 @@ export class UnifiedRolesService {
       SELECT id, nom, code FROM societes WHERE status = 'ACTIVE'
     `)
 
-    return allSocietes.map((societe: any) => ({
+    return allSocietes.map((societe: Record<string, unknown>) => ({
       userId,
       societeId: societe.id,
       globalRole: GlobalUserRole.SUPER_ADMIN,

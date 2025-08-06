@@ -41,9 +41,9 @@ export function ClientsTable({ data = [], loading = false, onEdit, onDelete }: C
             </TableRow>
           ) : (
             data.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>TODO: clients name</TableCell>
-                <TableCell>TODO: Status</TableCell>
+              <TableRow key={`client-${index}-${(item as any)?.name || 'unnamed'}`}>
+                <TableCell>{item.name || 'TODO: clients name'}</TableCell>
+                <TableCell>{item.status || 'TODO: Status'}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button

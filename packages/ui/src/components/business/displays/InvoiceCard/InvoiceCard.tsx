@@ -12,7 +12,7 @@ interface InvoiceCardProps {
 }
 
 export function InvoiceCard({
-  data,
+  data: _data,
   showActions = false,
   onEdit,
   onDelete,

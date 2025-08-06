@@ -275,7 +275,10 @@ export class PageDiscoveryService {
         })
       }
 
-      const category = categoryMap.get(categoryId)!
+      const category = categoryMap.get(categoryId)
+      if (!category) {
+        throw new Error(`Category with id ${categoryId} not found`)
+      }
       category.pages.push(page)
     }
 

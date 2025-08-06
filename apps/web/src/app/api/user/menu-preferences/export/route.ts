@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 const samplePreferences = {
   id: '1',
@@ -16,7 +16,7 @@ const samplePreferences = {
   shortcuts: [],
 }
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // Pour le moment, exporter les préférences par défaut
     const exportData = {

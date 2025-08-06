@@ -183,14 +183,6 @@ export default function BulkProfileManagement({
   const [sendNotification, setSendNotification] = useState(true)
   const [operationReason, setOperationReason] = useState('')
 
-  useEffect(() => {
-    if (isOpen) {
-      loadUsers()
-      loadRoles()
-      loadGroups()
-    }
-  }, [isOpen, loadGroups, loadRoles, loadUsers])
-
   const loadUsers = async () => {
     try {
       const response = await callClientApi('admin/users?includeGroups=true&includeRoles=true')
@@ -198,7 +190,7 @@ export default function BulkProfileManagement({
       if (data.success) {
         setUsers(data.data)
       }
-    } catch (_error) {}
+    } catch {}
   }
 
   const loadRoles = async () => {
@@ -208,7 +200,7 @@ export default function BulkProfileManagement({
       if (data.success) {
         setRoles(data.data)
       }
-    } catch (_error) {}
+    } catch {}
   }
 
   const loadGroups = async () => {
@@ -218,8 +210,16 @@ export default function BulkProfileManagement({
       if (data.success) {
         setGroups(data.data)
       }
-    } catch (_error) {}
+    } catch {}
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      loadUsers()
+      loadRoles()
+      loadGroups()
+    }
+  }, [isOpen, loadGroups, loadRoles, loadUsers])
 
   // Filtrage des utilisateurs
   const filteredUsers = users.filter((user) => {
@@ -296,7 +296,7 @@ export default function BulkProfileManagement({
         onClose()
         resetState()
       }
-    } catch (_error) {
+    } catch {
     } finally {
       setLoading(false)
     }
@@ -551,9 +551,10 @@ export default function BulkProfileManagement({
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {BULK_OPERATIONS.map((operation) => (
-                      <div
+                      <button
+                        type="button"
                         key={operation.type}
-                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                        className={`p-4 border rounded-lg cursor-pointer transition-colors text-left w-full ${
                           selectedOperation?.type === operation.type
                             ? 'border-primary bg-primary/5'
                             : 'border-gray-200 hover:border-gray-300'
@@ -567,7 +568,7 @@ export default function BulkProfileManagement({
                             <p className="text-sm text-muted-foreground">{operation.description}</p>
                           </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </CardContent>

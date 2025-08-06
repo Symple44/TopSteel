@@ -1,10 +1,11 @@
 import { ConfigService } from '@nestjs/config'
 import * as dotenv from 'dotenv'
-import { DataSource } from 'typeorm'
+import { DataSource, type DataSourceOptions } from 'typeorm'
 import { MultiTenantDatabaseConfig } from '../core/database/config/multi-tenant-database.config'
 import { UserSocieteRole } from '../domains/auth/core/entities/user-societe-role.entity'
 import { UnifiedRolesService } from '../domains/auth/services/unified-roles.service'
 import { User } from '../domains/users/entities/user.entity'
+import type { RedisOptimizedService } from '../infrastructure/cache/redis-optimized.service'
 
 dotenv.config({ path: '.env' })
 
@@ -17,7 +18,7 @@ async function testUnifiedRolesService() {
   const dataSource = new DataSource({
     ...authConfig,
     logging: true, // Enable logging to see SQL queries
-  } as any)
+  } as DataSourceOptions)
 
   try {
     await dataSource.initialize()
@@ -32,7 +33,7 @@ async function testUnifiedRolesService() {
       set: async () => {},
       invalidateGroup: async () => {},
       invalidatePattern: async () => {},
-    } as any
+    } as RedisOptimizedService
 
     const unifiedRolesService = new UnifiedRolesService(
       userSocieteRoleRepository,
@@ -44,13 +45,17 @@ async function testUnifiedRolesService() {
     const societeId = '73416fa9-f693-42f6-99d3-7c919cefe4d5'
 
     try {
-      const _result = await unifiedRolesService.getUserSocieteRole(userId, societeId)
-    } catch (_error: any) {}
+      await unifiedRolesService.getUserSocieteRole(userId, societeId)
+    } catch {
+      // Ignore errors during testing
+    }
     try {
-      const roles = await unifiedRolesService.getUserSocieteRoles(userId)
-      roles.forEach((_role) => {})
-    } catch (_error: any) {}
-  } catch (_error) {
+      await unifiedRolesService.getUserSocieteRoles(userId)
+    } catch {
+      // Ignore errors during testing
+    }
+  } catch {
+    // Ignore errors during testing
   } finally {
     await dataSource.destroy()
   }

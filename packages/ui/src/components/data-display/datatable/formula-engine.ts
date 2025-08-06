@@ -353,7 +353,7 @@ export class FormulaEngine<T = any> {
   static getDependencies(formula: string): string[] {
     const dependencies = new Set<string>()
     const cellRefRegex = /([A-Z]+)(\d+)/g
-    let match
+    let match: RegExpExecArray | null
 
     while ((match = cellRefRegex.exec(formula)) !== null) {
       dependencies.add(match[1])

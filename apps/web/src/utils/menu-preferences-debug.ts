@@ -34,7 +34,9 @@ export async function debugMenuPreferences() {
           }
         }
       }
-    } catch (_error: unknown) {}
+    } catch {
+      // Ignore endpoint errors during debug
+    }
   }
 }
 

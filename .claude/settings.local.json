@@ -157,7 +157,11 @@
       "Bash(START /B pnpm dev)",
       "Bash(gh pr list:*)",
       "Bash(git fetch:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(npx:*)",
+      "Bash(if exist \".next\" rmdir /s /q \".next\")",
+      "Bash(if exist \"node_modules\\.cache\" rmdir /s /q \"node_modules\\.cache\")",
+      "Bash(if exist \"tsconfig.tsbuildinfo\" del \"tsconfig.tsbuildinfo\")"
     ],
     "deny": []
   }

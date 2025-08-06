@@ -32,7 +32,7 @@ import { useToastShortcuts } from '@/hooks/use-toast'
 import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function AppearanceSettingsPage() {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
   const { t } = useTranslation('settings')
   const { t: tc } = useTranslation('common')
@@ -320,7 +320,7 @@ export default function AppearanceSettingsPage() {
                       name="fontSize"
                       value={size.id}
                       checked={settings.fontSize === size.id}
-                      onChange={(e) => updateSetting('fontSize', e.target.value as any)}
+                      onChange={(e) => updateSetting('fontSize', e.target.value as unknown)}
                       className="text-green-600"
                     />
                     <span className={`${size.sample} text-slate-800`}>
@@ -368,7 +368,7 @@ export default function AppearanceSettingsPage() {
                       name="density"
                       value={densityOption.id}
                       checked={settings.density === densityOption.id}
-                      onChange={(e) => updateSetting('density', e.target.value as any)}
+                      onChange={(e) => updateSetting('density', e.target.value as unknown)}
                       className="text-orange-600"
                     />
                     <div>
@@ -412,7 +412,7 @@ export default function AppearanceSettingsPage() {
                       name="contentWidth"
                       value={widthOption.id}
                       checked={settings.contentWidth === widthOption.id}
-                      onChange={(e) => updateSetting('contentWidth', e.target.value as any)}
+                      onChange={(e) => updateSetting('contentWidth', e.target.value as unknown)}
                       className="text-purple-600"
                     />
                     <div>

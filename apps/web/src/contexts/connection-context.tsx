@@ -76,13 +76,11 @@ export function ConnectionProvider({ children, checkInterval = 60000 }: Connecti
 
   // Vérification périodique de la connexion
   useEffect(() => {
-    let intervalId: NodeJS.Timeout
-
     // Vérifier immédiatement au montage
     checkConnection()
 
     // Configurer la vérification périodique
-    intervalId = setInterval(() => {
+    const intervalId = setInterval(() => {
       if (!showConnectionLostDialog) {
         // Ne pas vérifier si le dialog est déjà affiché
         checkConnection()

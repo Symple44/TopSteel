@@ -17,11 +17,11 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(data, { status: response.status })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       {
         success: false,
-        message: error.message || 'Erreur serveur',
+        message: (error as Error).message || 'Erreur serveur',
         data: [],
       },
       {

@@ -32,7 +32,7 @@ export function ProductsGridSection({
   const { data: products, isLoading } = useQuery({
     queryKey: ['products', content.source, content.categoryId, content.limit],
     queryFn: async () => {
-      const params: any = {
+      const params: Record<string, unknown> = {
         limit: content.limit || 12,
       }
 
@@ -47,7 +47,7 @@ export function ProductsGridSection({
       }
 
       const response = await marketplaceApi.get('/products', { params })
-      return (response as any).data.data
+      return (response as { data: { data: unknown[] } }).data.data
     },
   })
 
@@ -75,17 +75,21 @@ export function ProductsGridSection({
 
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[...Array(content.limit || 12)].map((_, i) => (
-            <div key={i} className="bg-muted animate-pulse rounded-lg h-64" />
+          {Array.from({ length: content.limit || 12 }, (_, i) => (
+            <div
+              key={`product-skeleton-${Math.random()}-${i}`}
+              className="bg-muted animate-pulse rounded-lg h-64"
+            />
           ))}
         </div>
       ) : (
         <div
           className={`grid ${gridColumns.mobile} ${gridColumns.tablet} ${gridColumns.desktop} gap-6`}
         >
-          {products?.map((product: any) => (
-            <ProductCard key={product.id} product={product} tenant={tenant || 'demo'} />
-          ))}
+          {products?.map((product: unknown) => {
+            const p = product as { id: string }
+            return <ProductCard key={p.id} product={product} tenant={tenant || 'demo'} />
+          })}
         </div>
       )}
     </SectionWrapper>

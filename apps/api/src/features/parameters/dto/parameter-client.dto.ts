@@ -42,7 +42,7 @@ export class CreateParameterClientDto {
     allowedValues?: string[]
     fileTypes?: string[]
     maxFileSize?: number
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @IsObject()
@@ -54,7 +54,7 @@ export class CreateParameterClientDto {
     helpText?: string
     placeholder?: string
     section?: string
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @IsArray()
@@ -63,7 +63,7 @@ export class CreateParameterClientDto {
 
   @IsObject()
   @IsOptional()
-  objectValues?: Record<string, any> // Pour stocker des objets de configuration client
+  objectValues?: Record<string, unknown> // Pour stocker des objets de configuration client
 
   @IsString()
   @IsOptional()
@@ -105,11 +105,11 @@ export class UpdateParameterClientDto {
 
   @IsObject()
   @IsOptional()
-  constraints?: Record<string, any>
+  constraints?: Record<string, unknown>
 
   @IsObject()
   @IsOptional()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @IsArray()
   @IsOptional()
@@ -117,7 +117,7 @@ export class UpdateParameterClientDto {
 
   @IsObject()
   @IsOptional()
-  objectValues?: Record<string, any>
+  objectValues?: Record<string, unknown>
 
   @IsString()
   @IsOptional()
@@ -207,7 +207,7 @@ export class CreateUserPreferencesDto {
     type: string
     position: { x: number; y: number }
     size: { width: number; height: number }
-    config: Record<string, any>
+    config: Record<string, unknown>
   }> // Widgets du tableau de bord
 
   @IsObject()
@@ -217,7 +217,7 @@ export class CreateUserPreferencesDto {
     sidebarCollapsed?: boolean
     defaultView?: string
     itemsPerPage?: number
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @IsObject()

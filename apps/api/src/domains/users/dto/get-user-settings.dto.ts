@@ -10,7 +10,7 @@ export class GetUserSettingsResponseDto {
   profile?: UserProfile
   company?: CompanyInfo
   preferences: UserPreferences
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   createdAt: Date
   updatedAt: Date
 

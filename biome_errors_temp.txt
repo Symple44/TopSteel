@@ -1,0 +1,915 @@
+apps\marketplace-api\src\shared\tenant\tenant-resolver.service.ts:239:38 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    237 │         societeId: demoSociete.id,
+    238 │         societe: demoSociete,
+  > 239 │         erpTenantConnection: null as any,
+        │                                      ^^^
+    240 │         marketplaceEnabled: true,
+    241 │       }
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\marketplace-storefront\src\components\page-builder\sections\TextBlockSection.tsx:51:11 lint/security/noDangerouslySetInnerHtml ━━━━━━━━━━
+
+  ! Avoid passing content using the dangerouslySetInnerHTML prop.
+  
+    49 │         <div
+    50 │           className="prose prose-lg max-w-none"
+  > 51 │           dangerouslySetInnerHTML={{ __html: content.content }}
+       │           ^^^^^^^^^^^^^^^^^^^^^^^
+    52 │         />
+    53 │       </div>
+  
+  ! Setting content using code can expose users to cross-site scripting (XSS) attacks
+  
+
+apps\marketplace-storefront\src\components\product\product-detail.tsx:383:21 lint/security/noDangerouslySetInnerHtml ━━━━━━━━━━
+
+  ! Avoid passing content using the dangerouslySetInnerHTML prop.
+  
+    381 │                   <div
+    382 │                     className="prose prose-sm max-w-none"
+  > 383 │                     dangerouslySetInnerHTML={{ __html: product.description }}
+        │                     ^^^^^^^^^^^^^^^^^^^^^^^
+    384 │                   />
+    385 │                 ) : (
+  
+  ! Setting content using code can expose users to cross-site scripting (XSS) attacks
+  
+
+apps\web\jest.setup.js:61:25 lint/suspicious/noConsole ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Don't use console.
+  
+    59 │ // ✅ CONSOLE SILENCING POUR TESTS
+    60 │ if (process.env.NODE_ENV === 'test') {
+  > 61 │   const originalError = console.error
+       │                         ^^^^^^^^^^^^^
+    62 │   console.error = (...args) => {
+    63 │     if (
+  
+  i The use of console is often reserved for debugging.
+  
+
+apps\web\src\app\(dashboard)\settings\security\page.tsx:124:7 lint/correctness/useExhaustiveDependencies ━━━━━━━━━━
+
+  ! loadMFAData changes on every re-render and should not be used as a hook dependency.
+  
+    122 │   useEffect(() => {
+    123 │     loadMFAData()
+  > 124 │   }, [loadMFAData])
+        │       ^^^^^^^^^^^
+    125 │ 
+    126 │   const handleSetupTOTP = async () => {
+  
+  i To fix this, wrap the definition of loadMFAData in its own useCallback() hook.
+  
+
+apps\web\src\app\(dashboard)\test-multi-tenant\page.tsx:27:67 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    25 │ export default function TestMultiTenantPage() {
+    26 │   const [sqlQuery, setSqlQuery] = useState('SELECT * FROM clients LIMIT 10')
+  > 27 │   const [results, setResults] = useState<{ status: string; data?: any[]; error?: string } | null>(null)
+       │                                                                   ^^^
+    28 │   const [error, setError] = useState<string | null>(null)
+    29 │   const [loading, setLoading] = useState(false)
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\(dashboard)\test-multi-tenant\page.tsx:30:66 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    28 │   const [error, setError] = useState<string | null>(null)
+    29 │   const [loading, setLoading] = useState(false)
+  > 30 │   const [tables, setTables] = useState<{ name: string; columns?: any[] }[]>([])
+       │                                                                  ^^^
+    31 │   const [loadingColumns, setLoadingColumns] = useState<string | null>(null) // Table en cours de chargement des colonnes
+    32 │ 
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\(dashboard)\test-multi-tenant\page.tsx:388:40 lint/suspicious/noArrayIndexKey ━━━━━━━━━━
+
+  ! Avoid using the index of an array as key property in an element.
+  
+    386 │                               return (
+    387 │                                 <div
+  > 388 │                                   key={colIdx}
+        │                                        ^^^^^^
+    389 │                                   className={`
+    390 │                                     inline-flex items-center gap-1 px-2 py-1 rounded text-xs border
+  
+  i This is the source of the key value.
+  
+    378 │                           </div>
+    379 │                           <div className="flex flex-wrap gap-2">
+  > 380 │                             {table.columns.map((col: { columnName?: string; name?: string; dataType?: string; type?: string; isPrimaryKey?: boolean; primary?: boolean; isForeignKey?: boolean; foreign?: boolean }, colIdx: number) => {
+        │                                                                                                                                                                                                                      ^^^^^^
+    381 │                               const isPrimaryKey = col.isPrimaryKey || col.primary
+    382 │                               const isForeignKey = col.isForeignKey || col.foreign
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+apps\web\src\app\api\admin\menus\user-data-view\route.ts:36:28 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    34 │       {
+    35 │         success: false,
+  > 36 │         message: (error as any)?.response?.data?.message || 'Erreur serveur',
+       │                            ^^^
+    37 │       },
+    38 │       {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\menus\user-data-view\route.ts:39:27 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    37 │       },
+    38 │       {
+  > 39 │         status: (error as any)?.response?.status || 500,
+       │                           ^^^
+    40 │       }
+    41 │     )
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\permissions\route.ts:27:24 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    25 │     // Extraire toutes les permissions de tous les modules
+    26 │     const modules = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []
+  > 27 │     const permissions: any[] = []
+       │                        ^^^
+    28 │ 
+    29 │     if (Array.isArray(modules) && modules.length > 0) {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\permissions\route.ts:30:32 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    29 │     if (Array.isArray(modules) && modules.length > 0) {
+  > 30 │       modules.forEach((module: any) => {
+       │                                ^^^
+    31 │         if (module.permissions && Array.isArray(module.permissions)) {
+    32 │           module.permissions.forEach((permission: any) => {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\permissions\route.ts:32:51 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    30 │       modules.forEach((module: any) => {
+    31 │         if (module.permissions && Array.isArray(module.permissions)) {
+  > 32 │           module.permissions.forEach((permission: any) => {
+       │                                                   ^^^
+    33 │             permissions.push({
+    34 │               ...permission,
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\system-parameters\by-category\route.ts:23:29 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    21 │   isEditable: boolean
+    22 │   isSecret: boolean
+  > 23 │   metadata?: Record<string, any>
+       │                             ^^^
+    24 │   createdAt: string
+    25 │   updatedAt: string
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\system-parameters\by-category\route.ts:47:63 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    45 │     } else {
+    46 │       // Grouper par catégorie
+  > 47 │       const parametersByCategory = allParameters.reduce((acc: any, param: SystemParameter) => {
+       │                                                               ^^^
+    48 │         if (!acc[param.category]) {
+    49 │           acc[param.category] = []
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\system-parameters\route.ts:23:29 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    21 │   isEditable: boolean
+    22 │   isSecret: boolean
+  > 23 │   metadata?: Record<string, any>
+       │                             ^^^
+    24 │   createdAt: string
+    25 │   updatedAt: string
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\translations\route.ts:9:71 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+     8 │ // Fonction pour vérifier l'authentification basique
+   > 9 │ function verifyAuth(request: NextRequest): { isValid: boolean; user?: any } {
+       │                                                                       ^^^
+    10 │   try {
+    11 │     // Récupérer le token depuis les cookies ou l'header
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\translations\route.ts:67:40 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    66 │     // Charger les traductions directement depuis les imports
+  > 67 │     const translations: Record<string, any> = {
+       │                                        ^^^
+    68 │       fr,
+    69 │       en,
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\translations\route.ts:75:35 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    73 │     // Lire les modifications depuis la base de données ou fichier de configuration
+    74 │     const overridesPath = path.join(process.cwd(), 'data/translation-overrides.json')
+  > 75 │     let overrides: Record<string, any> = {}
+       │                                   ^^^
+    76 │ 
+    77 │     try {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\translations\route.ts:128:35 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    126 │     // Lire les modifications existantes
+    127 │     const overridesPath = path.join(dataDir, 'translation-overrides.json')
+  > 128 │     let overrides: Record<string, any> = {}
+        │                                   ^^^
+    129 │ 
+    130 │     try {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\translations\route.ts:187:35 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    185 │     // Lire les modifications existantes
+    186 │     const overridesPath = path.join(dataDir, 'translation-overrides.json')
+  > 187 │     let overrides: Record<string, any> = {}
+        │                                   ^^^
+    188 │ 
+    189 │     try {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\translations\route.ts:200:34 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    199 │     // Traiter chaque traduction
+  > 200 │     translations.forEach((entry: any) => {
+        │                                  ^^^
+    201 │       if (entry.id) {
+    202 │         const isNew = !overrides[entry.id]
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\admin\users\bulk-operations\route.ts:34:30 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    32 │           let endpoint = ''
+    33 │           let method = 'POST'
+  > 34 │           const requestBody: any = {
+       │                              ^^^
+    35 │             reason,
+    36 │             sendNotification,
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\web\src\app\api\images\upload\image-service.ts:2:19 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    1 │ // Fichier serveur uniquement pour l'upload d'images
+  > 2 │ let imageService: any = null
+      │                   ^^^
+    3 │ 
+    4 │ export async function getImageService() {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+packages\ui\src\components\primitives\tooltip\Tooltip.tsx:308:39 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    306 │           (triggerContent.type === 'button' ||
+    307 │             (typeof triggerContent.type === 'function' &&
+  > 308 │               (triggerContent.type as any).displayName?.includes('Button')))
+        │                                       ^^^
+    309 │ 
+    310 │     if (!content || disabled) {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+apps\api\src\scripts\inject-metallurgy-data.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+    197 197 │         `)
+    198 198 │   
+    199     │ - ······familyStats.forEach((stat:·{·famille:·string;·nombre_articles:·string;·prix_moyen:·string·})·=>·{
+    200     │ - ········console.log(
+    201     │ - ··········`${stat.famille}:·${stat.nombre_articles}·articles,·avg·price:·${stat.prix_moyen}€`
+    202     │ - ········)
+    203     │ - ······})
+        199 │ + ······familyStats.forEach(
+        200 │ + ········(stat:·{·famille:·string;·nombre_articles:·string;·prix_moyen:·string·})·=>·{
+        201 │ + ··········console.log(
+        202 │ + ············`${stat.famille}:·${stat.nombre_articles}·articles,·avg·price:·${stat.prix_moyen}€`
+        203 │ + ··········)
+        204 │ + ········}
+        205 │ + ······)
+    204 206 │   
+    205 207 │         const totalStats = await this.dataSource.query(`
+  
+
+apps\marketplace-storefront\src\app\globals-compiled.css:372:9 lint/correctness/noUnknownPseudoClass ━━━━━━━━━━
+
+  × Unexpected unknown pseudo-class grid-cols-2 
+  
+    371 │ @media (min-width: 768px) {
+  > 372 │   .md\\:grid-cols-2 {
+        │         ^^^^^^^^^^^
+    373 │     grid-template-columns: repeat(2, minmax(0, 1fr));
+    374 │   }
+  
+  i See MDN web docs for more details.
+  
+
+apps\marketplace-storefront\src\app\globals-compiled.css:395:10 lint/correctness/noUnknownPseudoClass ━━━━━━━━━━
+
+  × Unexpected unknown pseudo-class shadow-lg 
+  
+    393 │ }
+    394 │ 
+  > 395 │ .hover\\:shadow-lg:hover {
+        │          ^^^^^^^^^
+    396 │   --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    397 │   --tw-shadow-colored:
+  
+  i See MDN web docs for more details.
+  
+
+apps\marketplace-storefront\src\app\globals.css:202:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    200 │     color: hsl(var(--primary-foreground));
+    201 │     ring-offset-color: hsl(var(--background));
+  > 202 │     ring-color: hsl(var(--ring));
+        │     ^^^^^^^^^^
+    203 │     ring-offset-width: 2px;
+    204 │   }
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:203:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    201 │     ring-offset-color: hsl(var(--background));
+    202 │     ring-color: hsl(var(--ring));
+  > 203 │     ring-offset-width: 2px;
+        │     ^^^^^^^^^^^^^^^^^
+    204 │   }
+    205 │ 
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:231:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    229 │     background-color: hsl(var(--secondary));
+    230 │     color: hsl(var(--secondary-foreground));
+  > 231 │     ring-offset-color: hsl(var(--background));
+        │     ^^^^^^^^^^^^^^^^^
+    232 │     ring-color: hsl(var(--ring));
+    233 │     ring-offset-width: 2px;
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:232:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    230 │     color: hsl(var(--secondary-foreground));
+    231 │     ring-offset-color: hsl(var(--background));
+  > 232 │     ring-color: hsl(var(--ring));
+        │     ^^^^^^^^^^
+    233 │     ring-offset-width: 2px;
+    234 │   }
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:233:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    231 │     ring-offset-color: hsl(var(--background));
+    232 │     ring-color: hsl(var(--ring));
+  > 233 │     ring-offset-width: 2px;
+        │     ^^^^^^^^^^^^^^^^^
+    234 │   }
+    235 │ 
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:262:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    260 │     border-color: hsl(var(--input));
+    261 │     background-color: hsl(var(--background));
+  > 262 │     ring-offset-color: hsl(var(--background));
+        │     ^^^^^^^^^^^^^^^^^
+    263 │     ring-color: hsl(var(--ring));
+    264 │     ring-offset-width: 2px;
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:263:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    261 │     background-color: hsl(var(--background));
+    262 │     ring-offset-color: hsl(var(--background));
+  > 263 │     ring-color: hsl(var(--ring));
+        │     ^^^^^^^^^^
+    264 │     ring-offset-width: 2px;
+    265 │   }
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:264:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    262 │     ring-offset-color: hsl(var(--background));
+    263 │     ring-color: hsl(var(--ring));
+  > 264 │     ring-offset-width: 2px;
+        │     ^^^^^^^^^^^^^^^^^
+    265 │   }
+    266 │ 
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:297:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    295 │     border-color: hsl(var(--input));
+    296 │     background-color: hsl(var(--background));
+  > 297 │     ring-offset-color: hsl(var(--background));
+        │     ^^^^^^^^^^^^^^^^^
+    298 │     ring-color: hsl(var(--ring));
+    299 │     ring-offset-width: 2px;
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:298:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    296 │     background-color: hsl(var(--background));
+    297 │     ring-offset-color: hsl(var(--background));
+  > 298 │     ring-color: hsl(var(--ring));
+        │     ^^^^^^^^^^
+    299 │     ring-offset-width: 2px;
+    300 │   }
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:299:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    297 │     ring-offset-color: hsl(var(--background));
+    298 │     ring-color: hsl(var(--ring));
+  > 299 │     ring-offset-width: 2px;
+        │     ^^^^^^^^^^^^^^^^^
+    300 │   }
+    301 │ 
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:175:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    173 │     font-weight: 500;
+    174 │     transition: color 0.15s ease-in-out;
+  > 175 │     ring-offset-color: hsl(var(--background));
+        │     ^^^^^^^^^^^^^^^^^
+    176 │     ring-color: hsl(var(--ring));
+    177 │     ring-offset-width: 2px;
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:176:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    174 │     transition: color 0.15s ease-in-out;
+    175 │     ring-offset-color: hsl(var(--background));
+  > 176 │     ring-color: hsl(var(--ring));
+        │     ^^^^^^^^^^
+    177 │     ring-offset-width: 2px;
+    178 │   }
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:177:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    175 │     ring-offset-color: hsl(var(--background));
+    176 │     ring-color: hsl(var(--ring));
+  > 177 │     ring-offset-width: 2px;
+        │     ^^^^^^^^^^^^^^^^^
+    178 │   }
+    179 │ 
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\app\globals.css:201:5 lint/correctness/noUnknownProperty ━━━━━━━━━━━
+
+  × Unknown property is not allowed.
+  
+    199 │     background-color: hsl(var(--primary));
+    200 │     color: hsl(var(--primary-foreground));
+  > 201 │     ring-offset-color: hsl(var(--background));
+        │     ^^^^^^^^^^^^^^^^^
+    202 │     ring-color: hsl(var(--ring));
+    203 │     ring-offset-width: 2px;
+  
+  i See CSS Specifications and browser specific properties for more details.
+  
+  i To resolve this issue, replace the unknown property with a valid CSS property.
+  
+
+apps\marketplace-storefront\src\components\sections\newsletter-section.tsx format ━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     28  28 │       onError: (error: unknown) => {
+     29  29 │         toast.error("Erreur lors de l'inscription", {
+     30     │ - ········description:·(error·as·{·response?:·{·data?:·{·message?:·string·}·}·})?.response?.data?.message·||·'Veuillez·réessayer·plus·tard.',
+         30 │ + ········description:
+         31 │ + ··········(error·as·{·response?:·{·data?:·{·message?:·string·}·}·})?.response?.data?.message·||
+         32 │ + ··········'Veuillez·réessayer·plus·tard.',
+     31  33 │         })
+     32  34 │       },
+  
+
+apps\web\src\app\(dashboard)\profile\page.tsx:532:21 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    530 │                   </div>
+    531 │                   <div>
+  > 532 │                     <label className="block text-sm font-medium text-foreground mb-2">
+        │                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 533 │                       {t('status')}
+  > 534 │                     </label>
+        │                     ^^^^^^^^
+    535 │                     <Badge variant="default" className="bg-green-100 text-green-800">
+    536 │                       {t('connected')}
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+apps\web\src\app\(dashboard)\profile\page.tsx:491:23 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    490 │                     <div>
+  > 491 │                       <label className="block text-sm font-medium text-foreground mb-2">
+        │                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 492 │                         {t('permissions')}
+  > 493 │                       </label>
+        │                       ^^^^^^^^
+    494 │                       <div className="flex flex-wrap gap-2">
+    495 │                         {profileData.permissions.map((permission) => (
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+apps\web\src\app\(dashboard)\profile\page.tsx:518:21 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    516 │                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    517 │                   <div>
+  > 518 │                     <label className="block text-sm font-medium text-foreground mb-2">
+        │                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 519 │                       {t('lastLogin')}
+  > 520 │                     </label>
+        │                     ^^^^^^^^
+    521 │                     <div className="text-sm text-foreground">
+    522 │                       {new Date().toLocaleDateString('fr-FR', {
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+apps\web\src\app\(dashboard)\settings\security\page.tsx:568:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    567 │               <div className="space-y-2">
+  > 568 │                 <label className="text-sm font-medium">
+        │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 569 │                   {ts('security.verificationCodeLabel')}
+  > 570 │                 </label>
+        │                 ^^^^^^^^
+    571 │                 <input
+    572 │                   type="text"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+apps\web\src\app\(dashboard)\test-multi-tenant\page.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     25  25 │   export default function TestMultiTenantPage() {
+     26  26 │     const [sqlQuery, setSqlQuery] = useState('SELECT * FROM clients LIMIT 10')
+     27     │ - ··const·[results,·setResults]·=·useState<{·status:·string;·data?:·any[];·error?:·string·}·|·null>(null)
+         27 │ + ··const·[results,·setResults]·=·useState<{·status:·string;·data?:·any[];·error?:·string·}·|·null>(
+         28 │ + ····null
+         29 │ + ··)
+     28  30 │     const [error, setError] = useState<string | null>(null)
+     29  31 │     const [loading, setLoading] = useState(false)
+    ······· │ 
+     78  80 │             tables = responseData
+     79  81 │           } else if (responseData.data && Array.isArray(responseData.data)) {
+     80     │ - ··········tables·=·responseData.data.map((table:·{·tableName:·string;·schemaName?:·string;·comment?:·string·})·=>·({
+     81     │ - ············name:·table.tableName,
+     82     │ - ············schema:·table.schemaName,
+     83     │ - ············type:·'table',
+     84     │ - ············description:·table.comment·||·`Table·${table.tableName}`,
+     85     │ - ············columns:·[],
+     86     │ - ··········}))
+         82 │ + ··········tables·=·responseData.data.map(
+         83 │ + ············(table:·{·tableName:·string;·schemaName?:·string;·comment?:·string·})·=>·({
+         84 │ + ··············name:·table.tableName,
+         85 │ + ··············schema:·table.schemaName,
+         86 │ + ··············type:·'table',
+         87 │ + ··············description:·table.comment·||·`Table·${table.tableName}`,
+         88 │ + ··············columns:·[],
+         89 │ + ············})
+         90 │ + ··········)
+     87  91 │           } else {
+     88  92 │             setError('Format de données inattendu')
+    ······· │ 
+    238 242 │                       </thead>
+    239 243 │                       <tbody className="bg-white divide-y divide-gray-200">
+    240     │ - ······················{results.data.slice(0,·10).map((row:·Record<string,·unknown>,·idx:·number)·=>·{
+    241     │ - ························const·rowId·=
+    242     │ - ··························row.id·||·Object.values(row).slice(0,·3).join('-')·||·`row-${idx}`
+    243     │ - ························return·(
+    244     │ - ··························<tr·key={rowId}>
+    245     │ - ····························{Object.entries(row).map(([columnName,·value])·=>·(
+    246     │ - ······························<td
+    247     │ - ································key={`${rowId}-${columnName}`}
+    248     │ - ································className="px-6·py-4·whitespace-nowrap·text-sm·text-gray-900"
+    249     │ - ······························>
+    250     │ - ································{String(value)}
+    251     │ - ······························</td>
+    252     │ - ····························))}
+    253     │ - ··························</tr>
+    254     │ - ························)
+    255     │ - ······················})}
+        244 │ + ······················{results.data
+        245 │ + ························.slice(0,·10)
+        246 │ + ························.map((row:·Record<string,·unknown>,·idx:·number)·=>·{
+        247 │ + ··························const·rowId·=
+        248 │ + ····························row.id·||·Object.values(row).slice(0,·3).join('-')·||·`row-${idx}`
+        249 │ + ··························return·(
+        250 │ + ····························<tr·key={rowId}>
+        251 │ + ······························{Object.entries(row).map(([columnName,·value])·=>·(
+        252 │ + ································<td
+        253 │ + ··································key={`${rowId}-${columnName}`}
+        254 │ + ··································className="px-6·py-4·whitespace-nowrap·text-sm·text-gray-900"
+        255 │ + ································>
+        256 │ + ··································{String(value)}
+        257 │ + ································</td>
+        258 │ + ······························))}
+        259 │ + ····························</tr>
+        260 │ + ··························)
+        261 │ + ························})}
+    256 262 │                       </tbody>
+    257 263 │                     </table>
+    ······· │ 
+    378 384 │                             </div>
+    379 385 │                             <div className="flex flex-wrap gap-2">
+    380     │ - ····························{table.columns.map((col:·{·columnName?:·string;·name?:·string;·dataType?:·string;·type?:·string;·isPrimaryKey?:·boolean;·primary?:·boolean;·isForeignKey?:·boolean;·foreign?:·boolean·},·colIdx:·number)·=>·{
+    381     │ - ······························const·isPrimaryKey·=·col.isPrimaryKey·||·col.primary
+    382     │ - ······························const·isForeignKey·=·col.isForeignKey·||·col.foreign
+    383     │ - ······························const·isCompanyId·=
+    384     │ - ································col.columnName·===·'company_id'·||·col.name·===·'company_id'
+        386 │ + ····························{table.columns.map(
+        387 │ + ······························(
+        388 │ + ································col:·{
+        389 │ + ··································columnName?:·string
+        390 │ + ··································name?:·string
+        391 │ + ··································dataType?:·string
+        392 │ + ··································type?:·string
+        393 │ + ··································isPrimaryKey?:·boolean
+        394 │ + ··································primary?:·boolean
+        395 │ + ··································isForeignKey?:·boolean
+        396 │ + ··································foreign?:·boolean
+        397 │ + ································},
+        398 │ + ································colIdx:·number
+        399 │ + ······························)·=>·{
+        400 │ + ································const·isPrimaryKey·=·col.isPrimaryKey·||·col.primary
+        401 │ + ································const·isForeignKey·=·col.isForeignKey·||·col.foreign
+        402 │ + ································const·isCompanyId·=
+        403 │ + ··································col.columnName·===·'company_id'·||·col.name·===·'company_id'
+    385 404 │   
+    386     │ - ······························return·(
+    387     │ - ································<div
+    388     │ - ··································key={colIdx}
+    389     │ - ··································className={`
+        405 │ + ································return·(
+        406 │ + ··································<div
+        407 │ + ····································key={colIdx}
+        408 │ + ····································className={`
+    390 409 │                                       inline-flex items-center gap-1 px-2 py-1 rounded text-xs border
+    391 410 │                                       ${
+    ······· │ 
+    399 418 │                                       }
+    400 419 │                                     `}
+    401     │ - ································>
+    402     │ - ··································<span·className="font-mono·font-medium">
+    403     │ - ····································{col.columnName·||·col.name}
+    404     │ - ··································</span>
+    405     │ - ··································<span·className="text-xs·opacity-75">
+    406     │ - ····································({col.dataType·||·col.type})
+    407     │ - ··································</span>
+    408     │ - ··································{isPrimaryKey·&&·(
+    409     │ - ····································<span
+    410     │ - ······································className="ml-1·text-blue-600·font-bold"
+    411     │ - ······································title="Clé·primaire"
+    412     │ - ····································>
+    413     │ - ······································🔑
+    414     │ - ····································</span>
+    415     │ - ··································)}
+    416     │ - ··································{isForeignKey·&&·(
+    417     │ - ····································<span
+    418     │ - ······································className="ml-1·text-purple-600·font-bold"
+    419     │ - ······································title="Clé·étrangère"
+    420     │ - ····································>
+    421     │ - ······································🔗
+    422     │ - ····································</span>
+    423     │ - ··································)}
+    424     │ - ··································{isCompanyId·&&·(
+    425     │ - ····································<span
+    426     │ - ······································className="ml-1·text-green-600·font-bold"
+    427     │ - ······································title="Isolation·multi-tenant"
+    428     │ - ····································>
+    429     │ - ······································🛡�
+    430     │ - ····································</span>
+    431     │ - ··································)}
+    432     │ - ··································{col.nullable·===·false·&&·!isPrimaryKey·&&·(
+    433     │ - ····································<span·className="ml-1·text-red-500·text-xs"·title="Non-null">
+    434     │ - ······································*
+    435     │ - ····································</span>
+    436     │ - ··································)}
+    437     │ - ································</div>
+    438     │ - ······························)
+    439     │ - ····························})}
+        420 │ + ··································>
+        421 │ + ····································<span·className="font-mono·font-medium">
+        422 │ + ······································{col.columnName·||·col.name}
+        423 │ + ····································</span>
+        424 │ + ····································<span·className="text-xs·opacity-75">
+        425 │ + ······································({col.dataType·||·col.type})
+        426 │ + ····································</span>
+  35 more lines truncated
+  
+
+packages\ui\src\components\primitives\switch\switch.tsx:62:7 lint/a11y/noLabelWithoutControl ━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    60 │   ) => {
+    61 │     return (
+  > 62 │       <label
+       │       ^^^^^^
+  > 63 │         className={cn(
+        ...
+  > 87 │         </div>
+  > 88 │       </label>
+       │       ^^^^^^^^
+    89 │     )
+    90 │   }
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 897.
+Checked 1633 files in 985ms. No fixes applied.
+Found 135 errors.
+Found 812 warnings.
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+

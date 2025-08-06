@@ -48,28 +48,17 @@ async function listAllDatabases() {
       try {
         await testDataSource.initialize()
 
-        const _tableCount = await testDataSource.query(`
-          SELECT COUNT(*) as count 
-          FROM information_schema.tables 
-          WHERE table_schema = 'public'
-        `)
+        // Query table count (result unused)
 
-        const importantTables = await testDataSource.query(`
-          SELECT table_name 
-          FROM information_schema.tables 
-          WHERE table_schema = 'public' 
-          AND table_name IN ('articles', 'societes', 'system_settings', 'products', 'produits')
-          ORDER BY table_name
-        `)
-        if (importantTables.length > 0) {
-        }
+        // Query important tables (result unused)
+        // Check important tables (unused branch)
 
         await testDataSource.destroy()
-      } catch (_error) {}
+      } catch {}
     }
 
     await dataSource.destroy()
-  } catch (_error) {}
+  } catch {}
 }
 
 listAllDatabases().catch(console.error)

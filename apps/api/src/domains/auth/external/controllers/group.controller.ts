@@ -10,6 +10,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common'
+import type { Request as ExpressRequest } from 'express'
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
@@ -36,7 +37,10 @@ export class GroupController {
 
   @Post()
   @Roles('SUPER_ADMIN', 'ADMIN')
-  async create(@Body() createGroupDto: CreateGroupDto, @Request() req: any) {
+  async create(
+    @Body() createGroupDto: CreateGroupDto,
+    @Request() req: ExpressRequest & { user: { id: string } }
+  ) {
     const group = await this.groupService.createGroup(createGroupDto, req.user.id)
     return { success: true, data: group }
   }
@@ -46,7 +50,7 @@ export class GroupController {
   async update(
     @Param('id') id: string,
     @Body() updateGroupDto: UpdateGroupDto,
-    @Request() req: any
+    @Request() req: ExpressRequest & { user: { id: string } }
   ) {
     const group = await this.groupService.updateGroup(id, updateGroupDto, req.user.id)
     return { success: true, data: group }
@@ -72,7 +76,7 @@ export class GroupController {
   async addUser(
     @Param('id') id: string,
     @Body() body: { userId: string; expiresAt?: Date },
-    @Request() req: any
+    @Request() req: ExpressRequest & { user: { id: string } }
   ) {
     const userGroup = await this.groupService.addUserToGroup(
       body.userId,

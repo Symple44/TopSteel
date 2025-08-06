@@ -33,26 +33,36 @@ export class TenantGuard implements CanActivate {
     }
   }
 
-  private extractTenantFromRequest(request: any): string | null {
+  private extractTenantFromRequest(request: unknown): string | null {
+    // Type guard to ensure request has the expected structure
+    if (!request || typeof request !== 'object') {
+      return null
+    }
+
+    const req = request as Record<string, unknown>
+
     // 1. Depuis les headers
-    if (request.headers['x-tenant']) {
-      return request.headers['x-tenant']
+    const headers = req.headers as Record<string, unknown> | undefined
+    if (headers && typeof headers['x-tenant'] === 'string') {
+      return headers['x-tenant']
     }
 
     // 2. Depuis les paramètres de route
-    if (request.params?.tenant) {
-      return request.params.tenant
+    const params = req.params as Record<string, unknown> | undefined
+    if (params && typeof params.tenant === 'string') {
+      return params.tenant
     }
 
     // 3. Depuis le domaine (Host header)
-    const host = request.headers.host
-    if (host) {
+    const host = headers?.host
+    if (typeof host === 'string') {
       return this.extractTenantFromHost(host)
     }
 
     // 4. Depuis les query params
-    if (request.query?.tenant) {
-      return request.query.tenant
+    const query = req.query as Record<string, unknown> | undefined
+    if (query && typeof query.tenant === 'string') {
+      return query.tenant
     }
 
     return null

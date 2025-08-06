@@ -52,10 +52,6 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
   const [availableTables, setAvailableTables] = useState([])
   const [selectedTables, setSelectedTables] = useState([queryBuilder.mainTable].filter(Boolean))
 
-  useEffect(() => {
-    fetchAvailableTables()
-  }, [fetchAvailableTables])
-
   const fetchAvailableTables = async () => {
     try {
       const response = await callClientApi('query-builder/schema/tables')
@@ -65,10 +61,14 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
         const tables = Array.isArray(result) ? result : result.data || result.tables || []
         setAvailableTables(tables)
       }
-    } catch (_error) {
+    } catch {
       setAvailableTables([]) // Fallback vers tableau vide en cas d'erreur
     }
   }
+
+  useEffect(() => {
+    fetchAvailableTables()
+  }, [fetchAvailableTables])
 
   const handleSave = async () => {
     setLoading(true)
@@ -101,7 +101,7 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
       } else {
         throw new Error('Failed to save')
       }
-    } catch (_error) {
+    } catch {
       toast({
         title: t('error'),
         description: t('saveError'),
@@ -137,10 +137,10 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
         setPreviewData(result)
         // Ne pas changer d'onglet automatiquement
       } else {
-        const _errorText = await response.text()
+        await response.text()
         throw new Error(`Failed to execute query: ${response.status}`)
       }
-    } catch (_error) {
+    } catch {
       toast({
         title: t('error'),
         description: t('executeError'),

@@ -88,16 +88,16 @@ export class ArticleValidatorService implements ArticleValidator {
       caracteristiques.longueur,
       caracteristiques.diametre,
       caracteristiques.epaisseur,
-    ].filter((d) => d !== undefined)
+    ].filter((d) => d !== undefined) as number[]
 
     for (const dimension of dimensions) {
-      if (dimension! <= 0) {
+      if (dimension <= 0) {
         this.logger.warn(`Dimension négative ou nulle: ${dimension}`)
         return false
       }
 
       // Valeurs raisonnables (max 10m = 10000mm)
-      if (dimension! > 10000) {
+      if (dimension > 10000) {
         this.logger.warn(`Dimension excessive: ${dimension}mm`)
         return false
       }

@@ -96,7 +96,7 @@ export class ParameterClient {
     allowedValues?: string[] // Valeurs autorisées
     fileTypes?: string[] // Types de fichiers autorisés
     maxFileSize?: number // Taille max de fichier
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @Column({ type: 'jsonb', nullable: true })
@@ -107,14 +107,14 @@ export class ParameterClient {
     helpText?: string // Texte d'aide
     placeholder?: string // Placeholder pour les champs
     section?: string // Section dans l'interface
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @Column({ type: 'jsonb', nullable: true })
   arrayValues?: string[] // Pour les paramètres de type ARRAY
 
   @Column({ type: 'jsonb', nullable: true })
-  objectValues?: Record<string, any> // Pour les paramètres de type OBJECT
+  objectValues?: Record<string, unknown> // Pour les paramètres de type OBJECT
 
   @Column({ type: 'text', nullable: true })
   defaultValue?: string // Valeur par défaut
@@ -151,11 +151,11 @@ export class ParameterClient {
 
   // Index composé pour recherche efficace
   @Index('idx_param_client_tenant_group_key', ['tenantId', 'group', 'key'])
-  static tenantGroupKeyIndex: any
+  static tenantGroupKeyIndex: unknown
 
   @Index('idx_param_client_user', ['userId'])
-  static userIndex: any
+  static userIndex: unknown
 
   @Index('idx_param_client_scope', ['scope'])
-  static scopeIndex: any
+  static scopeIndex: unknown
 }

@@ -36,11 +36,11 @@ export async function GET(req: NextRequest) {
         menuTree: responseData.data.menuTree || [],
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       {
         success: false,
-        message: error.message || 'Erreur serveur',
+        message: (error as Error).message || 'Erreur serveur',
       },
       {
         status: error.response?.status || 500,

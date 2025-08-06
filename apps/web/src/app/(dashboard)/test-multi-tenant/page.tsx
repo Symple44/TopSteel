@@ -24,10 +24,12 @@ import { callClientApi } from '@/utils/backend-api'
 
 export default function TestMultiTenantPage() {
   const [sqlQuery, setSqlQuery] = useState('SELECT * FROM clients LIMIT 10')
-  const [results, setResults] = useState<any>(null)
+  const [results, setResults] = useState<{ status: string; data?: any[]; error?: string } | null>(
+    null
+  )
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [tables, setTables] = useState<any[]>([])
+  const [tables, setTables] = useState<{ name: string; columns?: any[] }[]>([])
   const [loadingColumns, setLoadingColumns] = useState<string | null>(null) // Table en cours de chargement des colonnes
 
   const testQueries = [
@@ -77,13 +79,15 @@ export default function TestMultiTenantPage() {
         if (Array.isArray(responseData)) {
           tables = responseData
         } else if (responseData.data && Array.isArray(responseData.data)) {
-          tables = responseData.data.map((table: any) => ({
-            name: table.tableName,
-            schema: table.schemaName,
-            type: 'table',
-            description: table.comment || `Table ${table.tableName}`,
-            columns: [],
-          }))
+          tables = responseData.data.map(
+            (table: { tableName: string; schemaName?: string; comment?: string }) => ({
+              name: table.tableName,
+              schema: table.schemaName,
+              type: 'table',
+              description: table.comment || `Table ${table.tableName}`,
+              columns: [],
+            })
+          )
         } else {
           setError('Format de données inattendu')
           return
@@ -237,22 +241,24 @@ export default function TestMultiTenantPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {results.data.slice(0, 10).map((row: any, idx: number) => {
-                        const rowId =
-                          row.id || Object.values(row).slice(0, 3).join('-') || `row-${idx}`
-                        return (
-                          <tr key={rowId}>
-                            {Object.entries(row).map(([columnName, value]) => (
-                              <td
-                                key={`${rowId}-${columnName}`}
-                                className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                              >
-                                {String(value)}
-                              </td>
-                            ))}
-                          </tr>
-                        )
-                      })}
+                      {results.data
+                        .slice(0, 10)
+                        .map((row: Record<string, unknown>, idx: number) => {
+                          const rowId =
+                            row.id || Object.values(row).slice(0, 3).join('-') || `row-${idx}`
+                          return (
+                            <tr key={rowId}>
+                              {Object.entries(row).map(([columnName, value]) => (
+                                <td
+                                  key={`${rowId}-${columnName}`}
+                                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                >
+                                  {String(value)}
+                                </td>
+                              ))}
+                            </tr>
+                          )
+                        })}
                     </tbody>
                   </table>
                 </div>
@@ -342,6 +348,7 @@ export default function TestMultiTenantPage() {
                             {table.schema}
                           </span>
                           <button
+                            type="button"
                             className="px-2 py-1 text-xs border rounded hover:bg-gray-50"
                             onClick={() => loadTableColumns(table.name)}
                             disabled={loadingColumns === table.name}
@@ -376,16 +383,29 @@ export default function TestMultiTenantPage() {
                             Colonnes ({table.columns.length})
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {table.columns.map((col: any, colIdx: number) => {
-                              const isPrimaryKey = col.isPrimaryKey || col.primary
-                              const isForeignKey = col.isForeignKey || col.foreign
-                              const isCompanyId =
-                                col.columnName === 'company_id' || col.name === 'company_id'
+                            {table.columns.map(
+                              (
+                                col: {
+                                  columnName?: string
+                                  name?: string
+                                  dataType?: string
+                                  type?: string
+                                  isPrimaryKey?: boolean
+                                  primary?: boolean
+                                  isForeignKey?: boolean
+                                  foreign?: boolean
+                                },
+                                colIdx: number
+                              ) => {
+                                const isPrimaryKey = col.isPrimaryKey || col.primary
+                                const isForeignKey = col.isForeignKey || col.foreign
+                                const isCompanyId =
+                                  col.columnName === 'company_id' || col.name === 'company_id'
 
-                              return (
-                                <div
-                                  key={colIdx}
-                                  className={`
+                                return (
+                                  <div
+                                    key={col.columnName || col.name || colIdx}
+                                    className={`
                                     inline-flex items-center gap-1 px-2 py-1 rounded text-xs border
                                     ${
                                       isPrimaryKey
@@ -397,45 +417,46 @@ export default function TestMultiTenantPage() {
                                             : 'bg-white border-gray-200 text-gray-700'
                                     }
                                   `}
-                                >
-                                  <span className="font-mono font-medium">
-                                    {col.columnName || col.name}
-                                  </span>
-                                  <span className="text-xs opacity-75">
-                                    ({col.dataType || col.type})
-                                  </span>
-                                  {isPrimaryKey && (
-                                    <span
-                                      className="ml-1 text-blue-600 font-bold"
-                                      title="Clé primaire"
-                                    >
-                                      🔑
+                                  >
+                                    <span className="font-mono font-medium">
+                                      {col.columnName || col.name}
                                     </span>
-                                  )}
-                                  {isForeignKey && (
-                                    <span
-                                      className="ml-1 text-purple-600 font-bold"
-                                      title="Clé étrangère"
-                                    >
-                                      🔗
+                                    <span className="text-xs opacity-75">
+                                      ({col.dataType || col.type})
                                     </span>
-                                  )}
-                                  {isCompanyId && (
-                                    <span
-                                      className="ml-1 text-green-600 font-bold"
-                                      title="Isolation multi-tenant"
-                                    >
-                                      🛡️
-                                    </span>
-                                  )}
-                                  {col.nullable === false && !isPrimaryKey && (
-                                    <span className="ml-1 text-red-500 text-xs" title="Non-null">
-                                      *
-                                    </span>
-                                  )}
-                                </div>
-                              )
-                            })}
+                                    {isPrimaryKey && (
+                                      <span
+                                        className="ml-1 text-blue-600 font-bold"
+                                        title="Clé primaire"
+                                      >
+                                        🔑
+                                      </span>
+                                    )}
+                                    {isForeignKey && (
+                                      <span
+                                        className="ml-1 text-purple-600 font-bold"
+                                        title="Clé étrangère"
+                                      >
+                                        🔗
+                                      </span>
+                                    )}
+                                    {isCompanyId && (
+                                      <span
+                                        className="ml-1 text-green-600 font-bold"
+                                        title="Isolation multi-tenant"
+                                      >
+                                        🛡️
+                                      </span>
+                                    )}
+                                    {col.nullable === false && !isPrimaryKey && (
+                                      <span className="ml-1 text-red-500 text-xs" title="Non-null">
+                                        *
+                                      </span>
+                                    )}
+                                  </div>
+                                )
+                              }
+                            )}
                           </div>
                           <div className="mt-2 text-xs text-gray-500">
                             <span className="font-medium">Légende:</span>

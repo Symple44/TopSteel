@@ -86,7 +86,7 @@ export interface Notification extends BaseEntity {
   // Contenu
   readonly content?: {
     html?: string
-    data?: Record<string, any>
+    data?: Record<string, unknown>
     attachments?: string[]
   }
 

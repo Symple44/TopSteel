@@ -27,9 +27,9 @@ export class CreateSectorCoefficientDto {
   coefficientType!: CoefficientType
   coefficient!: number
   description?: string
-  conditions?: any
-  parameters?: any
-  metadata?: any
+  conditions?: unknown
+  parameters?: unknown
+  metadata?: unknown
   priority?: number
 }
 
@@ -37,9 +37,9 @@ export class UpdateSectorCoefficientDto {
   coefficient?: number
   description?: string
   isActive?: boolean
-  conditions?: any
-  parameters?: any
-  metadata?: any
+  conditions?: unknown
+  parameters?: unknown
+  metadata?: unknown
   priority?: number
 }
 
@@ -51,8 +51,8 @@ export class AssignCustomerSectorDto {
   reason?: string
   validFrom?: Date
   validUntil?: Date
-  sectorMetadata?: any
-  metadata?: any
+  sectorMetadata?: unknown
+  metadata?: unknown
 }
 
 export class BulkPricingItemDto {

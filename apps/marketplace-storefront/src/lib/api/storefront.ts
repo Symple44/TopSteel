@@ -134,8 +134,8 @@ export async function getTenantConfig(tenant: string): Promise<StorefrontConfig 
     // Code original commenté temporairement
     // apiClient.setTenant(tenant)
     // return await apiClient.storefront.getConfig()
-  } catch (error: any) {
-    if (error.message === 'TENANT_NOT_FOUND') {
+  } catch (error: unknown) {
+    if ((error as { message?: string })?.message === 'TENANT_NOT_FOUND') {
       return null
     }
     throw error
@@ -147,7 +147,9 @@ export async function getProducts(
   filters: ProductFilters = {}
 ): Promise<ProductListResult> {
   apiClient.setTenant(tenant)
-  return (await apiClient.storefront.getProducts(filters)) as ProductListResult
+  return (await apiClient.storefront.getProducts(
+    filters as Record<string, unknown>
+  )) as ProductListResult
 }
 
 export async function getProduct(tenant: string, productId: string): Promise<Product> {
@@ -189,7 +191,7 @@ export async function searchProducts(
 
 export async function getCurrentTheme(tenant: string) {
   apiClient.setTenant(tenant)
-  return (await apiClient.storefront.getTheme()) as any
+  return (await apiClient.storefront.getTheme()) as unknown
 }
 
 export async function getNavigationMenu(tenant: string): Promise<NavigationMenu> {
@@ -201,8 +203,8 @@ export async function getStaticPage(tenant: string, slug: string): Promise<Stati
   try {
     apiClient.setTenant(tenant)
     return (await apiClient.storefront.getPage(slug)) as StaticPage
-  } catch (error: any) {
-    if (error.response?.status === 404) {
+  } catch (error: unknown) {
+    if ((error as { response?: { status?: number } })?.response?.status === 404) {
       return null
     }
     throw error
@@ -211,7 +213,7 @@ export async function getStaticPage(tenant: string, slug: string): Promise<Stati
 
 export async function subscribeToNewsletter(tenant: string, email: string) {
   apiClient.setTenant(tenant)
-  return (await apiClient.storefront.subscribeNewsletter(email)) as any
+  return (await apiClient.storefront.subscribeNewsletter(email)) as unknown
 }
 
 export async function sendContactMessage(
@@ -225,7 +227,7 @@ export async function sendContactMessage(
   }
 ) {
   apiClient.setTenant(tenant)
-  return (await apiClient.storefront.sendContactMessage(data)) as any
+  return (await apiClient.storefront.sendContactMessage(data)) as unknown
 }
 
 // Export des fonctions API pour compatibilité

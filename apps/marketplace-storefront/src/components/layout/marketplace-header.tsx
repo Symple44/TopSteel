@@ -1,6 +1,7 @@
 'use client'
 
 import { Menu, Search, ShoppingCart, User, X } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import type { StorefrontConfig } from '@/lib/api/storefront'
@@ -32,7 +33,13 @@ export function MarketplaceHeader({ tenant, config }: MarketplaceHeaderProps) {
           <div className="flex items-center">
             <Link href={`/${tenant}`} className="flex items-center space-x-2">
               {config.logo ? (
-                <img src={config.logo} alt={config.storeName} className="h-8 w-auto" />
+                <Image
+                  src={config.logo}
+                  alt={config.storeName}
+                  width={32}
+                  height={32}
+                  className="h-8 w-auto"
+                />
               ) : (
                 <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-sm">
@@ -67,6 +74,7 @@ export function MarketplaceHeader({ tenant, config }: MarketplaceHeaderProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="input-marketplace pl-10 w-full"
+                aria-label="Rechercher des produits"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && searchQuery.trim()) {
                     window.location.href = `/${tenant}/search?q=${encodeURIComponent(searchQuery)}`
@@ -80,6 +88,7 @@ export function MarketplaceHeader({ tenant, config }: MarketplaceHeaderProps) {
           <div className="flex items-center space-x-4">
             {/* Cart */}
             <button
+              type="button"
               onClick={toggleCart}
               className="p-2 hover:bg-muted rounded-lg transition-colors relative"
             >
@@ -101,6 +110,7 @@ export function MarketplaceHeader({ tenant, config }: MarketplaceHeaderProps) {
 
             {/* Mobile Menu Button */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
             >
@@ -126,6 +136,7 @@ export function MarketplaceHeader({ tenant, config }: MarketplaceHeaderProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="input-marketplace pl-10 w-full"
+                aria-label="Rechercher des produits"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && searchQuery.trim()) {
                     setMobileMenuOpen(false)

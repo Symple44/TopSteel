@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { action, menuItemId, value } = body
+    const { action, menuItemId, value: _ } = body
 
     // Pour le moment, simuler l'action
     switch (action) {

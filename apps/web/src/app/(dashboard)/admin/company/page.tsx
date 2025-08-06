@@ -39,13 +39,12 @@ export default function CompanySettingsPage() {
     }
   }
 
-  const handleLogoUpload = (_result: { url?: string; error?: string }) => {
+  const handleLogoUpload = (_imageUrl: string) => {
     toast.success(t('company.logoUpdated'))
-    // Ici vous pourriez mettre à jour le logo dans les données de l'entreprise
   }
 
-  const handleLogoError = (error: string) => {
-    toast.error(`${t('company.logoError')}: ${error}`)
+  const handleLogoError = (error: Error) => {
+    toast.error(`${t('company.logoError')}: ${error.message}`)
   }
 
   return (

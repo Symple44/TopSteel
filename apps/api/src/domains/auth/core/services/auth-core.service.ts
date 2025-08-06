@@ -30,7 +30,16 @@ export class AuthCoreService {
   /**
    * Valide les identifiants d'un utilisateur
    */
-  async validateUser(emailOrAcronym: string, password: string): Promise<any> {
+  async validateUser(
+    emailOrAcronym: string,
+    password: string
+  ): Promise<{
+    id: string
+    email: string
+    firstName: string
+    lastName: string
+    isActive: boolean
+  } | null> {
     const user = await this.userRepository.findByEmailOrAcronym(emailOrAcronym)
     if (!user) {
       throw new UnauthorizedException('Invalid credentials')

@@ -134,7 +134,7 @@ export class AuthPerformanceService {
     const cacheHits = cacheHitMetrics.filter((m) => m.cacheHit).length
     const queryCounts = recentMetrics
       .filter((m) => m.queryCount !== undefined)
-      .map((m) => m.queryCount!)
+      .map((m) => m.queryCount ?? 0)
     const totalQueries = queryCounts.reduce((sum, count) => sum + count, 0)
 
     return {
@@ -167,7 +167,7 @@ export class AuthPerformanceService {
       const cacheHits = cacheHitMetrics.filter((m) => m.cacheHit).length
       const queryCounts = operationMetrics
         .filter((m) => m.queryCount !== undefined)
-        .map((m) => m.queryCount!)
+        .map((m) => m.queryCount ?? 0)
       const totalQueries = queryCounts.reduce((sum, count) => sum + count, 0)
 
       result[operation] = {

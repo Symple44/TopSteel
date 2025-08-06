@@ -77,7 +77,10 @@ export class RoleController {
   @ApiOperation({ summary: 'Créer un nouveau rôle' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Rôle créé avec succès' })
   @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Un rôle avec ce nom existe déjà' })
-  async createRole(@Body() createRoleDto: CreateRoleDto, @Request() req: any) {
+  async createRole(
+    @Body() createRoleDto: CreateRoleDto,
+    @Request() req: { user?: { id: string } }
+  ) {
     try {
       const userId = req.user?.id || 'system'
       const role = await this.roleService.createRole(createRoleDto, userId)
@@ -107,7 +110,7 @@ export class RoleController {
   async updateRole(
     @Param('id') id: string,
     @Body() updateRoleDto: UpdateRoleDto,
-    @Request() req: any
+    @Request() req: { user?: { id: string } }
   ) {
     try {
       const userId = req.user?.id || 'system'
@@ -185,7 +188,7 @@ export class RoleController {
         isGranted: boolean
       }[]
     },
-    @Request() req: any
+    @Request() req: { user?: { id: string } }
   ) {
     try {
       const userId = req.user?.id || 'system'
@@ -212,7 +215,7 @@ export class RoleController {
     @Param('id') roleId: string,
     @Param('userId') userId: string,
     @Body() body: { expiresAt?: string },
-    @Request() req: any
+    @Request() req: { user?: { id: string } }
   ) {
     try {
       const assignedBy = req.user?.id || 'system'

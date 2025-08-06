@@ -60,6 +60,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
       {/* Mobile Filter Toggle */}
       <div className="lg:hidden">
         <button
+          type="button"
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center justify-between p-3 border rounded-lg"
         >
@@ -85,10 +86,13 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
       >
         {/* Search */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Recherche</label>
+          <label htmlFor="search-input" className="text-sm font-medium">
+            Recherche
+          </label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <input
+              id="search-input"
               type="text"
               placeholder="Rechercher des produits..."
               value={searchQuery}
@@ -103,6 +107,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
           </div>
           {searchQuery && (
             <button
+              type="button"
               onClick={() => {
                 setSearchQuery('')
                 updateFilters({ search: null })
@@ -117,9 +122,10 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
 
         {/* Categories */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Catégories</label>
+          <span className="text-sm font-medium">Catégories</span>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             <button
+              type="button"
               onClick={() => {
                 setSelectedCategory('')
                 updateFilters({ category: null })
@@ -135,6 +141,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
             {categories?.map((category) => (
               <button
                 key={category}
+                type="button"
                 onClick={() => {
                   setSelectedCategory(category)
                   updateFilters({ category })
@@ -154,10 +161,14 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
 
         {/* Price Range */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Fourchette de prix</label>
+          <span className="text-sm font-medium">Fourchette de prix</span>
           <div className="grid grid-cols-2 gap-2">
             <div>
+              <label htmlFor="min-price" className="sr-only">
+                Prix minimum
+              </label>
               <input
+                id="min-price"
                 type="number"
                 placeholder="Prix min"
                 value={minPrice}
@@ -167,7 +178,11 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               />
             </div>
             <div>
+              <label htmlFor="max-price" className="sr-only">
+                Prix maximum
+              </label>
               <input
+                id="max-price"
                 type="number"
                 placeholder="Prix max"
                 value={maxPrice}
@@ -181,6 +196,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
           {/* Quick Price Filters */}
           <div className="grid grid-cols-2 gap-2 pt-2">
             <button
+              type="button"
               onClick={() => {
                 setMinPrice('0')
                 setMaxPrice('100')
@@ -191,6 +207,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               Moins de 100€
             </button>
             <button
+              type="button"
               onClick={() => {
                 setMinPrice('100')
                 setMaxPrice('500')
@@ -201,6 +218,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               100€ - 500€
             </button>
             <button
+              type="button"
               onClick={() => {
                 setMinPrice('500')
                 setMaxPrice('')
@@ -211,6 +229,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
               Plus de 500€
             </button>
             <button
+              type="button"
               onClick={() => {
                 setMinPrice('')
                 setMaxPrice('')
@@ -225,7 +244,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
 
         {/* Availability */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Disponibilité</label>
+          <span className="text-sm font-medium">Disponibilité</span>
           <div className="space-y-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -244,7 +263,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
 
         {/* Featured */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Sélection</label>
+          <span className="text-sm font-medium">Sélection</span>
           <div className="space-y-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -265,6 +284,7 @@ export function ProductsFilters({ tenant }: ProductsFiltersProps) {
         {hasActiveFilters && (
           <div className="pt-4 border-t">
             <button
+              type="button"
               onClick={clearAllFilters}
               className="w-full btn-outline py-2 text-sm flex items-center justify-center gap-2"
             >

@@ -89,7 +89,12 @@ export class SocietesService {
     return societe
   }
 
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<{
+    total: number
+    active: number
+    trial: number
+    inactive: number
+  }> {
     const total = await this._societeRepository.count({
       where: { deletedAt: IsNull() },
     })

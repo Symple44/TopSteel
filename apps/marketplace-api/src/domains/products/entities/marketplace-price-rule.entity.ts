@@ -19,7 +19,7 @@ export enum AdjustmentType {
 export interface PricingCondition {
   type: 'customer_group' | 'customer_email' | 'customer_code' | 'quantity' | 'date_range' | 'custom'
   operator: 'equals' | 'in' | 'between' | 'greater_than' | 'less_than' | 'contains'
-  value: any
+  value: unknown
   field?: string // Pour conditions custom
 }
 
@@ -105,13 +105,13 @@ export class MarketplacePriceRule {
     return true
   }
 
-  canBeApplied(context: any): boolean {
+  canBeApplied(context: unknown): boolean {
     if (!this.isValid()) return false
 
     return this.conditions.every((condition) => this.evaluateCondition(condition, context))
   }
 
-  private evaluateCondition(condition: PricingCondition, context: any): boolean {
+  private evaluateCondition(condition: PricingCondition, context: unknown): boolean {
     const contextValue = condition.field ? context[condition.field] : context[condition.type]
 
     switch (condition.operator) {

@@ -48,7 +48,7 @@ export class ElasticsearchClient {
         requestTimeout: timeout,
       })
       return response === true
-    } catch (_error) {
+    } catch {
       // Ne pas logger l'erreur complète pour éviter le spam dans les logs
       // Juste indiquer qu'Elasticsearch n'est pas disponible
       return false
@@ -87,7 +87,7 @@ export class ElasticsearchClient {
           version: infoResponse.version?.number,
           clusterName: infoResponse.cluster_name,
         }
-      } catch (_infoError) {
+      } catch {
         // Connexion OK mais impossible de récupérer les infos
         return {
           connected: true,
@@ -103,7 +103,7 @@ export class ElasticsearchClient {
     }
   }
 
-  async createIndex(indexName: string, mapping: any): Promise<boolean> {
+  async createIndex(indexName: string, mapping: unknown): Promise<boolean> {
     try {
       const client = this.getClient()
 
@@ -120,7 +120,7 @@ export class ElasticsearchClient {
         body: mapping,
       })
       return true
-    } catch (_error) {
+    } catch {
       return false
     }
   }
@@ -130,12 +130,12 @@ export class ElasticsearchClient {
       const client = this.getClient()
       await client.indices.delete({ index: indexName })
       return true
-    } catch (_error) {
+    } catch {
       return false
     }
   }
 
-  async indexDocument(indexName: string, id: string, document: any): Promise<boolean> {
+  async indexDocument(indexName: string, id: string, document: unknown): Promise<boolean> {
     try {
       const client = this.getClient()
       await client.index({
@@ -144,12 +144,12 @@ export class ElasticsearchClient {
         body: document,
       })
       return true
-    } catch (_error) {
+    } catch {
       return false
     }
   }
 
-  async updateDocument(indexName: string, id: string, document: any): Promise<boolean> {
+  async updateDocument(indexName: string, id: string, document: unknown): Promise<boolean> {
     try {
       const client = this.getClient()
       await client.update({
@@ -160,7 +160,7 @@ export class ElasticsearchClient {
         },
       })
       return true
-    } catch (_error) {
+    } catch {
       return false
     }
   }
@@ -173,12 +173,12 @@ export class ElasticsearchClient {
         id,
       })
       return true
-    } catch (_error) {
+    } catch {
       return false
     }
   }
 
-  async search(indexName: string, query: any): Promise<any> {
+  async search(indexName: string, query: unknown): Promise<unknown> {
     const client = this.getClient()
     const response = await client.search({
       index: indexName,
@@ -187,7 +187,7 @@ export class ElasticsearchClient {
     return response
   }
 
-  async bulk(operations: any[]): Promise<boolean> {
+  async bulk(operations: unknown[]): Promise<boolean> {
     try {
       const client = this.getClient()
       const response = await client.bulk({
@@ -199,7 +199,7 @@ export class ElasticsearchClient {
       }
 
       return true
-    } catch (_error) {
+    } catch {
       return false
     }
   }

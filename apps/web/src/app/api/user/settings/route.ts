@@ -59,13 +59,13 @@ const mockUserSettings: UserSettings = {
 // Stockage temporaire (en production, utiliser une base de données)
 let userSettings = { ...mockUserSettings }
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // Simuler une récupération depuis la base de données
     await new Promise((resolve) => setTimeout(resolve, 100))
 
     return NextResponse.json(userSettings)
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch user settings' }, { status: 500 })
   }
 }
@@ -84,7 +84,7 @@ export async function PATCH(request: NextRequest) {
     await new Promise((resolve) => setTimeout(resolve, 200))
 
     return NextResponse.json(userSettings)
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update user settings' }, { status: 500 })
   }
 }

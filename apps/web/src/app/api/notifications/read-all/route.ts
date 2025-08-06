@@ -1,9 +1,9 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 // Stockage temporaire - en production, utiliser une base de données
-let notifications: any[] = []
+let notifications: { id: string; isRead?: boolean; readAt?: string }[] = []
 
-export async function PATCH(_request: NextRequest) {
+export async function PATCH() {
   try {
     const readAt = new Date().toISOString()
 

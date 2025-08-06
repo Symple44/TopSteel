@@ -21,12 +21,12 @@ interface SystemSetting {
   id: string
   category: string
   key: string
-  value: any
+  value: unknown
   label?: string
   description?: string
   type: string
   is_active: boolean
-  metadata?: any
+  metadata?: unknown
   created_at: Date
   updated_at: Date
 }
@@ -38,9 +38,9 @@ interface ParameterSystem {
   type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'ARRAY' | 'OBJECT' | 'ENUM'
   scope: 'SYSTEM' | 'TENANT' | 'USER'
   description?: string
-  metadata?: any
-  arrayValues?: any
-  objectValues?: any
+  metadata?: unknown
+  arrayValues?: unknown
+  objectValues?: unknown
   isActive: boolean
   isReadonly: boolean
   defaultLanguage: string
@@ -107,7 +107,7 @@ async function migrateSystemSettingsToAuth() {
     if (systemSettings.length === 0) {
       return
     }
-    systemSettings.forEach((_setting, _index) => {})
+    systemSettings.forEach(() => {})
 
     // Vérifier les conflits potentiels
     const conflictChecks = systemSettings
@@ -126,7 +126,7 @@ async function migrateSystemSettingsToAuth() {
         : []
 
     if (existingParams.length > 0) {
-      existingParams.forEach((_param: any) => {})
+      // Existing parameters found
 
       const continueWithConflicts = await askConfirmation(
         '\n❓ Continuer malgré les conflits? Les paramètres existants seront mis à jour (y/N): '
@@ -249,7 +249,7 @@ async function migrateSystemSettingsToAuth() {
         }
 
         migratedCount++
-      } catch (_error) {
+      } catch (_error: unknown) {
         _errorCount++
       }
     }
@@ -271,8 +271,6 @@ async function migrateSystemSettingsToAuth() {
         }
       }
     }
-  } catch (error) {
-    throw error
   } finally {
     if (tenantDataSource.isInitialized) {
       await tenantDataSource.destroy()
@@ -287,7 +285,7 @@ async function migrateSystemSettingsToAuth() {
 async function main() {
   try {
     await migrateSystemSettingsToAuth()
-  } catch (_error) {
+  } catch (_error: unknown) {
     process.exit(1)
   }
 }

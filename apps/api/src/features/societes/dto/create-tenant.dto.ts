@@ -113,7 +113,7 @@ export class CreateTenantDto {
   configuration?: {
     modules?: string[]
     features?: string[]
-    theme?: Record<string, any>
+    theme?: Record<string, unknown>
     locale?: string
     timezone?: string
   }

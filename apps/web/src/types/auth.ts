@@ -26,7 +26,7 @@ export interface Company {
   role?: string // Add role property for user's role in this company
   isDefault?: boolean // Add isDefault property
   permissions?: string[] // Add permissions property
-  sites?: any[] // Add sites property
+  sites?: unknown[] // Add sites property
 }
 
 export interface AuthTokens {
@@ -75,7 +75,7 @@ export interface AuthContextType extends AuthState {
   logout: () => Promise<void>
 
   // Actions MFA
-  verifyMFA: (mfaType: string, code?: string, webauthnResponse?: any) => Promise<void>
+  verifyMFA: (mfaType: string, code?: string, webauthnResponse?: unknown) => Promise<void>
   resetMFA: () => void
 
   // Actions utilisateur

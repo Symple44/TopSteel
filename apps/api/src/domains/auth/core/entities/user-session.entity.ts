@@ -85,7 +85,7 @@ export class UserSession {
   forcedLogoutReason?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @CreateDateColumn()
   createdAt!: Date

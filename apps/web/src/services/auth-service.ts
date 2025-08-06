@@ -28,14 +28,14 @@ export const storage = {
     if (typeof window === 'undefined') return
     try {
       localStorage.setItem(key, JSON.stringify(value))
-    } catch (_error) {}
+    } catch {}
   },
 
   remove: (key: string): void => {
     if (typeof window === 'undefined') return
     try {
       localStorage.removeItem(key)
-    } catch (_error) {}
+    } catch {}
   },
 }
 
@@ -48,14 +48,14 @@ export const cookies = {
       date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000)
       const expires = `expires=${date.toUTCString()}`
       document.cookie = `${name}=${value};${expires};path=/;secure;samesite=lax`
-    } catch (_error) {}
+    } catch {}
   },
 
   remove: (name: string): void => {
     if (typeof document === 'undefined') return
     try {
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`
-    } catch (_error) {}
+    } catch {}
   },
 }
 
@@ -266,7 +266,7 @@ export class AuthService {
           headers: { Authorization: `Bearer ${accessToken}` },
         })
       }
-    } catch (_error) {}
+    } catch {}
   }
 
   /**

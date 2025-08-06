@@ -1,14 +1,10 @@
 'use client'
 
-import { LanguageSelector, type LanguageSelectorProps } from '@erp/ui/navigation'
+import { LanguageSelector } from '@erp/ui/navigation'
 import { useLanguage } from '@/lib/i18n'
 
-interface LanguageSelectorWrapperProps
-  extends Omit<
-    LanguageSelectorProps,
-    'currentLanguage' | 'supportedLanguages' | 'onLanguageChange'
-  > {
-  // Override props that we'll handle internally
+interface LanguageSelectorWrapperProps {
+  className: string
 }
 
 export function LanguageSelectorWrapper(props: LanguageSelectorWrapperProps) {
@@ -20,7 +16,7 @@ export function LanguageSelectorWrapper(props: LanguageSelectorWrapperProps) {
 
   return (
     <LanguageSelector
-      {...props}
+      className={props.className}
       currentLanguage={currentLanguage}
       supportedLanguages={supportedLanguages}
       onLanguageChange={changeLanguage}

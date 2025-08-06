@@ -13,8 +13,8 @@ import type {
 
 // Interface pour la connexion à la base de données
 interface DatabaseConnection {
-  query<T = any>(sql: string, params?: any[]): Promise<T[]>
-  execute(sql: string, params?: any[]): Promise<{ insertId?: number; affectedRows: number }>
+  query<T = unknown>(sql: string, params?: unknown[]): Promise<T[]>
+  execute(sql: string, params?: unknown[]): Promise<{ insertId?: number; affectedRows: number }>
 }
 
 export class NotificationDatabaseService implements NotificationService {
@@ -76,7 +76,7 @@ export class NotificationDatabaseService implements NotificationService {
       WHERE (n.expires_at IS NULL OR n.expires_at > NOW())
     `
 
-    const params: any[] = [userId || '']
+    const params: unknown[] = [userId || '']
 
     // Appliquer les filtres
     if (filters?.category && filters.category.length > 0) {
@@ -183,7 +183,7 @@ export class NotificationDatabaseService implements NotificationService {
 
   async updateNotification(id: string, request: UpdateNotificationRequest): Promise<Notification> {
     const updates: string[] = []
-    const params: any[] = []
+    const params: unknown[] = []
 
     if (request.title !== undefined) {
       updates.push('title = ?')
@@ -279,7 +279,7 @@ export class NotificationDatabaseService implements NotificationService {
     settings: Partial<NotificationSettings>
   ): Promise<NotificationSettings> {
     const updates: string[] = []
-    const params: any[] = []
+    const params: unknown[] = []
 
     if (settings.enableSound !== undefined) {
       updates.push('enable_sound = ?')
@@ -416,98 +416,169 @@ export class NotificationDatabaseService implements NotificationService {
     })
   }
 
-  private mapRowToNotification(row: any): Notification {
+  private mapRowToNotification(row: unknown): Notification {
+    const typedRow = row as {
+      id: string
+      type: string
+      category: string
+      title: string
+      message: string
+      priority: string
+      source?: string
+      entity_type?: string
+      entity_id?: string
+      data?: string
+      recipient_type: string
+      recipient_id?: string
+      action_url?: string
+      action_label?: string
+      action_type?: string
+      created_at: string
+      expires_at?: string
+      persistent: boolean
+      auto_read: boolean
+      is_read: boolean
+      read_at?: string
+    }
+
     return {
-      id: row.id,
-      type: row.type,
-      category: row.category,
-      title: row.title,
-      message: row.message,
-      priority: row.priority,
-      source: row.source,
-      entityType: row.entity_type,
-      entityId: row.entity_id,
-      data: row.data ? JSON.parse(row.data) : undefined,
-      recipientType: row.recipient_type,
-      recipientId: row.recipient_id,
-      actionUrl: row.action_url,
-      actionLabel: row.action_label,
-      actionType: row.action_type || 'primary',
-      createdAt: row.created_at,
-      expiresAt: row.expires_at,
-      persistent: row.persistent,
-      autoRead: row.auto_read,
-      isRead: row.is_read,
-      readAt: row.read_at,
+      id: typedRow.id,
+      type: typedRow.type,
+      category: typedRow.category,
+      title: typedRow.title,
+      message: typedRow.message,
+      priority: typedRow.priority,
+      source: typedRow.source,
+      entityType: typedRow.entity_type,
+      entityId: typedRow.entity_id,
+      data: typedRow.data ? JSON.parse(typedRow.data) : undefined,
+      recipientType: typedRow.recipient_type,
+      recipientId: typedRow.recipient_id,
+      actionUrl: typedRow.action_url,
+      actionLabel: typedRow.action_label,
+      actionType: typedRow.action_type || 'primary',
+      createdAt: typedRow.created_at,
+      expiresAt: typedRow.expires_at,
+      persistent: typedRow.persistent,
+      autoRead: typedRow.auto_read,
+      isRead: typedRow.is_read,
+      readAt: typedRow.read_at,
       metadata: {
-        category: row.category,
-        source: row.source,
-        entityType: row.entity_type,
-        entityId: row.entity_id,
-        userId: row.recipient_type === 'user' ? row.recipient_id : undefined,
+        category: typedRow.category,
+        source: typedRow.source,
+        entityType: typedRow.entity_type,
+        entityId: typedRow.entity_id,
+        userId: typedRow.recipient_type === 'user' ? typedRow.recipient_id : undefined,
       },
-      actions: row.action_url
+      actions: typedRow.action_url
         ? [
             {
-              url: row.action_url,
-              label: row.action_label || 'Voir',
-              type: row.action_type || 'primary',
+              url: typedRow.action_url,
+              label: typedRow.action_label || 'Voir',
+              type: typedRow.action_type || 'primary',
             },
           ]
         : undefined,
     }
   }
 
-  private mapRowToSettings(row: any): NotificationSettings {
+  private mapRowToSettings(row: unknown): NotificationSettings {
+    const typedRow = row as {
+      id: string
+      user_id: string
+      enable_sound: boolean
+      enable_toast: boolean
+      enable_browser: boolean
+      enable_email: boolean
+      categories?: string
+      priorities?: string
+      schedules?: string
+      created_at: string
+      updated_at: string
+    }
+
     return {
-      id: row.id,
-      userId: row.user_id,
-      enableSound: row.enable_sound,
-      enableToast: row.enable_toast,
-      enableBrowser: row.enable_browser,
-      enableEmail: row.enable_email,
-      categories: row.categories ? JSON.parse(row.categories) : {},
-      priorities: row.priorities ? JSON.parse(row.priorities) : {},
-      schedules: row.schedules ? JSON.parse(row.schedules) : {},
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
+      id: typedRow.id,
+      userId: typedRow.user_id,
+      enableSound: typedRow.enable_sound,
+      enableToast: typedRow.enable_toast,
+      enableBrowser: typedRow.enable_browser,
+      enableEmail: typedRow.enable_email,
+      categories: typedRow.categories ? JSON.parse(typedRow.categories) : {},
+      priorities: typedRow.priorities ? JSON.parse(typedRow.priorities) : {},
+      schedules: typedRow.schedules ? JSON.parse(typedRow.schedules) : {},
+      createdAt: typedRow.created_at,
+      updatedAt: typedRow.updated_at,
     }
   }
 
-  private mapRowToTemplate(row: any): NotificationTemplate {
+  private mapRowToTemplate(row: unknown): NotificationTemplate {
+    const typedRow = row as {
+      id: string
+      name: string
+      type: string
+      category: string
+      title_template: string
+      message_template: string
+      priority: string
+      persistent: boolean
+      action_url_template?: string
+      action_label?: string
+      variables?: string
+      description?: string
+      created_at: string
+      updated_at: string
+    }
+
     return {
-      id: row.id,
-      name: row.name,
-      type: row.type,
-      category: row.category,
-      titleTemplate: row.title_template,
-      messageTemplate: row.message_template,
-      priority: row.priority,
-      persistent: row.persistent,
-      actionUrlTemplate: row.action_url_template,
-      actionLabel: row.action_label,
-      variables: row.variables ? JSON.parse(row.variables) : {},
-      description: row.description,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
+      id: typedRow.id,
+      name: typedRow.name,
+      type: typedRow.type,
+      category: typedRow.category,
+      titleTemplate: typedRow.title_template,
+      messageTemplate: typedRow.message_template,
+      priority: typedRow.priority,
+      persistent: typedRow.persistent,
+      actionUrlTemplate: typedRow.action_url_template,
+      actionLabel: typedRow.action_label,
+      variables: typedRow.variables ? JSON.parse(typedRow.variables) : {},
+      description: typedRow.description,
+      createdAt: typedRow.created_at,
+      updatedAt: typedRow.updated_at,
     }
   }
 
-  private mapRowToStats(row: any): NotificationStats {
+  private mapRowToStats(row: unknown): NotificationStats {
+    const typedRow = row as {
+      user_id: string
+      total_notifications?: number
+      unread_count?: number
+      system_count?: number
+      stock_count?: number
+      projet_count?: number
+      production_count?: number
+      maintenance_count?: number
+      qualite_count?: number
+      facturation_count?: number
+      sauvegarde_count?: number
+      utilisateur_count?: number
+      urgent_unread_count?: number
+    }
+
     return {
-      userId: row.user_id,
-      totalNotifications: row.total_notifications || 0,
-      unreadCount: row.unread_count || 0,
-      systemCount: row.system_count || 0,
-      stockCount: row.stock_count || 0,
-      projetCount: row.projet_count || 0,
-      productionCount: row.production_count || 0,
-      maintenanceCount: row.maintenance_count || 0,
-      qualiteCount: row.qualite_count || 0,
-      facturationCount: row.facturation_count || 0,
-      sauvegardeCount: row.sauvegarde_count || 0,
-      utilisateurCount: row.utilisateur_count || 0,
-      urgentUnreadCount: row.urgent_unread_count || 0,
+      userId: typedRow.user_id,
+      totalNotifications: typedRow.total_notifications || 0,
+      unreadCount: typedRow.unread_count || 0,
+      systemCount: typedRow.system_count || 0,
+      stockCount: typedRow.stock_count || 0,
+      projetCount: typedRow.projet_count || 0,
+      productionCount: typedRow.production_count || 0,
+      maintenanceCount: typedRow.maintenance_count || 0,
+      qualiteCount: typedRow.qualite_count || 0,
+      facturationCount: typedRow.facturation_count || 0,
+      sauvegardeCount: typedRow.sauvegarde_count || 0,
+      utilisateurCount: typedRow.utilisateur_count || 0,
+      urgentUnreadCount: typedRow.urgent_unread_count || 0,
     }
   }
 
@@ -578,7 +649,7 @@ export class NotificationDatabaseService implements NotificationService {
     return defaultSettings
   }
 
-  private replaceVariables(template: string, variables: Record<string, any>): string {
+  private replaceVariables(template: string, variables: Record<string, unknown>): string {
     return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       return variables[key]?.toString() || match
     })

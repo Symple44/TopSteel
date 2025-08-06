@@ -11,14 +11,12 @@ import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
 import { ArrowLeft, Bell, Check, Clock, Mail, Smartphone } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
-import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
 import { useAuth } from '@/hooks/use-auth'
 import { useNotificationSettings } from '@/hooks/use-notification-settings'
 import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function NotificationsSettingsPage() {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
-  const { settings: appearanceSettings } = useAppearanceSettings()
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
   const { t } = useTranslation('settings')
   const { t: tc } = useTranslation('common')
@@ -26,7 +24,6 @@ export default function NotificationsSettingsPage() {
   // Hook pour gérer les paramètres de notification
   const {
     settings,
-    updateSetting,
     updateNestedSetting,
     saveSettings,
     resetSettings,

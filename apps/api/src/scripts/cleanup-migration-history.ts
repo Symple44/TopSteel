@@ -34,7 +34,7 @@ async function cleanupMigrationHistory() {
     `)
     if (migrations.length === 0) {
     } else {
-      migrations.forEach((_migration: any) => {})
+      // Migrations found
     }
 
     // Vérifier les tables de sauvegarde créées
@@ -45,16 +45,16 @@ async function cleanupMigrationHistory() {
     `)
     if (backupTables.length === 0) {
     } else {
-      backupTables.forEach((_table: any) => {})
+      // Backup tables found
     }
-    const articlesTables = await dataSource.query(`
+    const _articlesTables = await dataSource.query(`
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_name LIKE '%article%'
     `)
 
-    articlesTables.forEach((_table: any) => {})
-  } catch (_error) {
+    // Articles tables found
+  } catch (_error: unknown) {
   } finally {
     if (dataSource.isInitialized) {
       await dataSource.destroy()

@@ -12,7 +12,7 @@ export class AlignRolesTableColumns1738702000000 implements MigrationInterface {
       AND table_schema = 'public'
     `)
 
-    const columnNames = columns.map((col: any) => col.column_name)
+    const columnNames = columns.map((col: { column_name: string }) => col.column_name)
 
     if (columnNames.includes('nom') && !columnNames.includes('name')) {
       // Renommer la colonne 'nom' en 'name'
@@ -29,7 +29,7 @@ export class AlignRolesTableColumns1738702000000 implements MigrationInterface {
       AND table_schema = 'public'
     `)
 
-    const columnNames = columns.map((col: any) => col.column_name)
+    const columnNames = columns.map((col: { column_name: string }) => col.column_name)
 
     if (columnNames.includes('name') && !columnNames.includes('nom')) {
       // Renommer la colonne 'name' en 'nom'

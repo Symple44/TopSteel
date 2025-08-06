@@ -33,9 +33,12 @@ export function useDataTable<T = any>({
   })
 
   // Paramètres persistés
-  const persistedSettings = tableId
-    ? usePersistedTableSettings(tableId, columns, userId, autoSave)
-    : null
+  const persistedSettings = usePersistedTableSettings(
+    tableId || '',
+    columns,
+    userId,
+    autoSave && Boolean(tableId)
+  )
 
   // Données sélectionnées
   const selectedData = useMemo(() => {
@@ -66,7 +69,7 @@ export function useDataTable<T = any>({
       setData((prev) => prev.filter((item) => !idsToDelete.includes((item as any)[keyField])))
 
       // Nettoyer la sélection
-      setSelection((_prev) => ({
+      setSelection((_prev: SelectionState) => ({
         selectedRows: new Set(),
         selectAll: false,
       }))
@@ -111,7 +114,7 @@ export function useDataTable<T = any>({
 
   const toggleRowSelection = useCallback(
     (rowId: string | number) => {
-      setSelection((prev) => {
+      setSelection((prev: SelectionState) => {
         const newSelected = new Set(prev.selectedRows)
         if (newSelected.has(rowId)) {
           newSelected.delete(rowId)

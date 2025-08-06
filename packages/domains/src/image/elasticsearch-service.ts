@@ -174,8 +174,8 @@ export class ImageElasticsearchService {
       sortOrder = 'desc',
     } = params
 
-    const must: any[] = []
-    const filter: any[] = []
+    const must: Array<Record<string, unknown>> = []
+    const filter: Array<Record<string, unknown>> = []
 
     // Recherche textuelle
     if (query) {
@@ -212,21 +212,21 @@ export class ImageElasticsearchService {
 
     // Filtres de plage
     if (sizeRange) {
-      const range: any = {}
+      const range: Record<string, unknown> = {}
       if (sizeRange.min !== undefined) range.gte = sizeRange.min
       if (sizeRange.max !== undefined) range.lte = sizeRange.max
       filter.push({ range: { size: range } })
     }
 
     if (dateRange) {
-      const range: any = {}
+      const range: Record<string, unknown> = {}
       if (dateRange.from) range.gte = dateRange.from.toISOString()
       if (dateRange.to) range.lte = dateRange.to.toISOString()
       filter.push({ range: { uploadedAt: range } })
     }
 
     // Construction de la query
-    const esQuery: any = {
+    const esQuery: Record<string, unknown> = {
       from: offset,
       size: limit,
       query: {

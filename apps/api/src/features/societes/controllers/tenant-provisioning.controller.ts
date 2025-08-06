@@ -10,7 +10,7 @@ export class TenantProvisioningController {
   @Post('tenant')
   @ApiOperation({ summary: 'Créer une nouvelle société avec tenant' })
   @ApiResponse({ status: 201, description: 'Société créée avec succès' })
-  async createTenant(@Body() data: any) {
+  async createTenant(@Body() data: unknown) {
     try {
       const result = await this.tenantProvisioningService.createTenantWithDatabase(data)
       return {
@@ -18,7 +18,7 @@ export class TenantProvisioningController {
         message: 'Société créée avec succès',
         data: result,
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw new HttpException(
         {
           success: false,

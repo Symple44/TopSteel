@@ -240,8 +240,8 @@ export class Article extends BusinessEntity {
       date: string
       utilisateur: string
       champ: string
-      ancienneValeur: any
-      nouvelleValeur: any
+      ancienneValeur: unknown
+      nouvelleValeur: unknown
     }>
   }
 
@@ -395,8 +395,8 @@ export class Article extends BusinessEntity {
   ajouterModificationHistorique(
     utilisateur: string,
     champ: string,
-    ancienneValeur: any,
-    nouvelleValeur: any
+    ancienneValeur: unknown,
+    nouvelleValeur: unknown
   ): void {
     if (!this.metadonnees) {
       this.metadonnees = {}

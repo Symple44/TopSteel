@@ -2,7 +2,7 @@
 
 import { ChevronDown, Filter, Grid, List, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ProductCard } from '@/components/product/product-card'
 import type { Product } from '@/lib/api/storefront'
 import { cn } from '@/lib/utils'
@@ -39,11 +39,7 @@ export function SearchResults({
   const [totalPages, setTotalPages] = useState(1)
   const [totalResults, setTotalResults] = useState(0)
 
-  useEffect(() => {
-    loadResults()
-  }, [loadResults])
-
-  const loadResults = async () => {
+  const loadResults = useCallback(async () => {
     setLoading(true)
     try {
       // Simulate API call
@@ -151,7 +147,11 @@ export function SearchResults({
     } finally {
       setLoading(false)
     }
-  }
+  }, [query, filters, sortBy])
+
+  useEffect(() => {
+    loadResults()
+  }, [loadResults])
 
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters)
@@ -189,6 +189,7 @@ export function SearchResults({
           {/* View Toggle */}
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setViewMode('grid')}
               className={cn(
                 'p-2 rounded border',
@@ -198,6 +199,7 @@ export function SearchResults({
               <Grid className="w-4 h-4" />
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('list')}
               className={cn(
                 'p-2 rounded border',
@@ -212,6 +214,7 @@ export function SearchResults({
         {/* Filters and Sort */}
         <div className="flex items-center justify-between gap-4">
           <button
+            type="button"
             onClick={() => setShowFilters(!showFilters)}
             className="btn-outline flex items-center gap-2"
           >
@@ -244,8 +247,11 @@ export function SearchResults({
           <div className="bg-muted/30 p-4 rounded-lg space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Catégorie</label>
+                <label htmlFor="search-category" className="block text-sm font-medium mb-1">
+                  Catégorie
+                </label>
                 <select
+                  id="search-category"
                   value={filters.category}
                   onChange={(e) => handleFilterChange({ ...filters, category: e.target.value })}
                   className="input-marketplace w-full text-sm"
@@ -260,8 +266,11 @@ export function SearchResults({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Prix min.</label>
+                <label htmlFor="search-min-price" className="block text-sm font-medium mb-1">
+                  Prix min.
+                </label>
                 <input
+                  id="search-min-price"
                   type="number"
                   value={filters.minPrice}
                   onChange={(e) => handleFilterChange({ ...filters, minPrice: e.target.value })}
@@ -271,8 +280,11 @@ export function SearchResults({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Prix max.</label>
+                <label htmlFor="search-max-price" className="block text-sm font-medium mb-1">
+                  Prix max.
+                </label>
                 <input
+                  id="search-max-price"
                   type="number"
                   value={filters.maxPrice}
                   onChange={(e) => handleFilterChange({ ...filters, maxPrice: e.target.value })}
@@ -370,15 +382,15 @@ function SearchSkeleton() {
 
       {/* Filters Skeleton */}
       <div className="flex gap-4 overflow-x-auto pb-2">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-10 bg-muted rounded w-24 flex-shrink-0 animate-pulse" />
+        {Array.from({ length: 5 }, (_, i) => `filter-skeleton-${i}`).map((id) => (
+          <div key={id} className="h-10 bg-muted rounded w-24 flex-shrink-0 animate-pulse" />
         ))}
       </div>
 
       {/* Products Grid Skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="border rounded-lg p-4 space-y-4">
+        {Array.from({ length: 12 }, (_, i) => `product-skeleton-${i}`).map((id) => (
+          <div key={id} className="border rounded-lg p-4 space-y-4">
             <div className="aspect-square bg-muted rounded animate-pulse" />
             <div className="space-y-2">
               <div className="h-4 bg-muted rounded animate-pulse" />

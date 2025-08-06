@@ -80,6 +80,6 @@ async function bootstrap() {
   logger.log(`📚 Documentation: http://127.0.0.1:${port}/api/docs`)
 }
 
-bootstrap().catch((_error) => {
+bootstrap().catch(() => {
   process.exit(1)
 })

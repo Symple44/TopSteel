@@ -184,7 +184,10 @@ export class MarketplaceCustomersService {
       throw new BadRequestException('Compte non activé ou email non vérifié')
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, customer.passwordHash!)
+    if (!customer.passwordHash) {
+      throw new BadRequestException('Compte non configuré')
+    }
+    const isPasswordValid = await bcrypt.compare(loginDto.password, customer.passwordHash)
     if (!isPasswordValid) {
       throw new BadRequestException('Identifiants invalides')
     }
@@ -357,7 +360,7 @@ export class MarketplaceCustomersService {
     const customer = await this.customerRepo.findOne({
       where: {
         resetPasswordToken: token,
-        resetPasswordExpires: { $gt: new Date() } as any,
+        resetPasswordExpires: { $gt: new Date() } as unknown,
       },
     })
 

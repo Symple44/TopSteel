@@ -32,8 +32,8 @@ export class TenantConnectionService implements OnModuleDestroy {
 
     // Vérifier si la connexion existe déjà
     if (this.connections.has(key)) {
-      const connection = this.connections.get(key)!
-      if (connection.isInitialized) {
+      const connection = this.connections.get(key)
+      if (connection?.isInitialized) {
         return connection
       }
     }

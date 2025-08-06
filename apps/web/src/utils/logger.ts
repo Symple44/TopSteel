@@ -22,33 +22,33 @@ class Logger {
     return LOG_LEVELS[level] >= currentLogLevel
   }
 
-  debug(..._args: any[]) {
+  debug(..._args: unknown[]) {
     if (this.shouldLog('debug')) {
     }
   }
 
-  info(..._args: any[]) {
+  info(..._args: unknown[]) {
     if (this.shouldLog('info')) {
     }
   }
 
-  warn(..._args: any[]) {
+  warn(..._args: unknown[]) {
     if (this.shouldLog('warn')) {
     }
   }
 
-  error(..._args: any[]) {
+  error(..._args: unknown[]) {
     if (this.shouldLog('error')) {
     }
   }
 
   // Helpers spécialisés
-  auth(..._args: any[]) {
+  auth(..._args: unknown[]) {
     if (this.shouldLog('debug')) {
     }
   }
 
-  api(..._args: any[]) {
+  api(..._args: unknown[]) {
     if (this.shouldLog('debug')) {
     }
   }

@@ -25,5 +25,5 @@ export class ExecuteQueryDto {
 
   @IsOptional()
   @IsObject()
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
 }

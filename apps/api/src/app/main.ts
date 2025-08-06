@@ -42,7 +42,7 @@ try {
   // Chargement silencieux des variables d'environnement
   config({ path: envLocalPath, quiet: true })
   config({ path: join(rootDir, '.env'), quiet: true })
-} catch (_error) {
+} catch {
   // Fallback: essayer de charger depuis le répertoire courant
   config({ path: '.env.local', quiet: true })
   config({ path: '.env', quiet: true })
@@ -300,6 +300,6 @@ async function bootstrap() {
   logger.log('')
 }
 
-bootstrap().catch((_error) => {
+bootstrap().catch(() => {
   process.exit(1)
 })

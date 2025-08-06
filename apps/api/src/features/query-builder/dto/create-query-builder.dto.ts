@@ -60,11 +60,11 @@ export class CreateQueryBuilderColumnDto {
 
   @IsOptional()
   @IsObject()
-  format?: any
+  format?: unknown
 
   @IsOptional()
   @IsObject()
-  aggregation?: any
+  aggregation?: unknown
 }
 
 export class CreateQueryBuilderJoinDto {
@@ -116,7 +116,7 @@ export class CreateQueryBuilderCalculatedFieldDto {
 
   @IsOptional()
   @IsObject()
-  format?: any
+  format?: unknown
 
   @IsOptional()
   @IsArray()
@@ -159,7 +159,7 @@ export class CreateQueryBuilderDto {
 
   @IsOptional()
   @IsObject()
-  layout?: any
+  layout?: unknown
 
   @IsOptional()
   @IsArray()

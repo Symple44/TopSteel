@@ -34,7 +34,7 @@ export class DatabaseIntegrityController {
 
   @Get('connection-status')
   @ApiOperation({ summary: 'Vérifier la connectivité de la base de données' })
-  async getConnectionStatus(): Promise<{ success: boolean; data: any }> {
+  async getConnectionStatus(): Promise<{ success: boolean; data: Record<string, unknown> }> {
     const status = await this.databaseIntegrityService.checkDatabaseConnection()
 
     return {
@@ -46,7 +46,11 @@ export class DatabaseIntegrityController {
   @Post('synchronize')
   @ApiOperation({ summary: 'Synchroniser la base de données (créer les tables manquantes)' })
   @ApiResponse({ status: 200, description: 'Synchronisation réussie' })
-  async synchronizeDatabase(): Promise<{ success: boolean; message: string; details?: any }> {
+  async synchronizeDatabase(): Promise<{
+    success: boolean
+    message: string
+    details?: Record<string, unknown>
+  }> {
     return await this.databaseIntegrityService.synchronizeDatabase()
   }
 
@@ -70,7 +74,7 @@ export class DatabaseIntegrityController {
 
   @Get('stats')
   @ApiOperation({ summary: 'Obtenir les statistiques de la base de données' })
-  async getStats(): Promise<{ success: boolean; data: any }> {
+  async getStats(): Promise<{ success: boolean; data: Record<string, unknown> }> {
     const stats = await this.databaseStatsService.getStats()
 
     return {
@@ -81,13 +85,17 @@ export class DatabaseIntegrityController {
 
   @Post('optimize')
   @ApiOperation({ summary: 'Optimiser la base de données' })
-  async optimizeDatabase(): Promise<{ success: boolean; message: string; details?: any }> {
+  async optimizeDatabase(): Promise<{
+    success: boolean
+    message: string
+    details?: Record<string, unknown>
+  }> {
     return await this.databaseStatsService.optimizeDatabase()
   }
 
   @Get('backups')
   @ApiOperation({ summary: 'Lister les sauvegardes disponibles' })
-  async listBackups(): Promise<{ success: boolean; data: any[] }> {
+  async listBackups(): Promise<{ success: boolean; data: Record<string, unknown>[] }> {
     const backups = await this.databaseBackupService.listBackups()
 
     return {
@@ -100,7 +108,7 @@ export class DatabaseIntegrityController {
   @ApiOperation({ summary: 'Créer une sauvegarde de la base de données' })
   async createBackup(
     @Body() options: { type?: string; compress?: boolean; includeMedia?: boolean }
-  ): Promise<{ success: boolean; message: string; data?: any }> {
+  ): Promise<{ success: boolean; message: string; data?: Record<string, unknown> }> {
     return await this.databaseBackupService.createBackup(options)
   }
 
@@ -122,13 +130,17 @@ export class DatabaseIntegrityController {
 
   @Get('backups/:id/download')
   @ApiOperation({ summary: 'Télécharger une sauvegarde' })
-  async downloadBackup(@Param('id') backupId: string): Promise<any> {
+  async downloadBackup(@Param('id') backupId: string): Promise<Record<string, unknown>> {
     return await this.databaseBackupService.downloadBackup(backupId)
   }
 
   @Post('fix-enum')
   @ApiOperation({ summary: "Corriger l'enum notifications_type_enum" })
-  async fixNotificationTypeEnum(): Promise<{ success: boolean; message: string; data?: any }> {
+  async fixNotificationTypeEnum(): Promise<{
+    success: boolean
+    message: string
+    data?: Record<string, unknown>
+  }> {
     return await this.databaseEnumFixService.fixNotificationTypeEnum()
   }
 }

@@ -77,10 +77,11 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
               {group.items
                 .sort((a, b) => b.date.getTime() - a.date.getTime())
                 .map((item, _index) => (
-                  <div
+                  <button
                     key={item.id}
-                    className="relative flex items-start gap-4 cursor-pointer hover:bg-muted/30 rounded-lg p-2 -ml-2"
+                    className="relative flex items-start gap-4 cursor-pointer hover:bg-muted/30 rounded-lg p-2 -ml-2 w-full text-left"
                     onClick={() => onItemClick?.(item)}
+                    type="button"
                   >
                     {/* Point de timeline */}
                     <div className="relative z-10 flex-shrink-0">
@@ -126,7 +127,7 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={(e: any) => {
+                              onClick={(e: React.MouseEvent) => {
                                 e.stopPropagation()
                               }}
                             >
@@ -154,7 +155,7 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
                         </p>
                       )}
                     </div>
-                  </div>
+                  </button>
                 ))}
             </div>
           </div>

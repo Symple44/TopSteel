@@ -81,7 +81,7 @@ export class MenuItem {
   queryBuilderId?: string
 
   @Column({ type: 'json', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @CreateDateColumn({ name: 'createdAt' })
   createdAt!: Date

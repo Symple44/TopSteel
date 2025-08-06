@@ -13,7 +13,7 @@ async function diagnosePermissionsTable() {
       AND table_schema = 'public'
       ORDER BY ordinal_position
     `)
-    const _constraints = await dataSource.query(`
+    await dataSource.query(`
       SELECT column_name, is_nullable
       FROM information_schema.columns 
       WHERE table_name = 'permissions' 
@@ -21,28 +21,24 @@ async function diagnosePermissionsTable() {
       AND is_nullable = 'NO'
     `)
 
-    const columnNames = columns.map((col: any) => col.column_name)
+    const columnNames = columns.map((col: unknown) => (col as { column_name: string }).column_name)
 
     if (columnNames.includes('nom')) {
-      const _nullNom = await dataSource.query(
-        `SELECT COUNT(*) as count FROM permissions WHERE nom IS NULL`
-      )
+      await dataSource.query(`SELECT COUNT(*) as count FROM permissions WHERE nom IS NULL`)
     }
 
     if (columnNames.includes('name')) {
-      const _nullName = await dataSource.query(
-        `SELECT COUNT(*) as count FROM permissions WHERE name IS NULL`
-      )
+      await dataSource.query(`SELECT COUNT(*) as count FROM permissions WHERE name IS NULL`)
     }
-    const _sampleData = await dataSource.query(`SELECT * FROM permissions LIMIT 5`)
-    const _recentMigrations = await dataSource.query(`
+    await dataSource.query(`SELECT * FROM permissions LIMIT 5`)
+    await dataSource.query(`
       SELECT name, timestamp 
       FROM migrations 
       WHERE name LIKE '%Permission%' OR name LIKE '%permissions%'
       ORDER BY timestamp DESC 
       LIMIT 10
     `)
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

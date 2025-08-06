@@ -41,7 +41,7 @@ async function testConnection() {
       await dataSource.initialize()
 
       // Test simple: compter les tables
-      const _tables = await dataSource.query(`
+      await dataSource.query(`
         SELECT table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public' 
@@ -65,16 +65,16 @@ async function testConnection() {
           )
           if (societes.length > 0) {
           }
-        } catch (_e) {}
+        } catch {}
 
         // Vérifier les articles existants
         try {
-          const _articleCount = await dataSource.query('SELECT COUNT(*) as count FROM articles')
-        } catch (_e) {}
+          await dataSource.query('SELECT COUNT(*) as count FROM articles')
+        } catch {}
       }
 
       await dataSource.destroy()
-    } catch (_error) {}
+    } catch {}
   }
 }
 

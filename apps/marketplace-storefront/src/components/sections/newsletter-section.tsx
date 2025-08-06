@@ -25,9 +25,11 @@ export function NewsletterSection({ tenant }: NewsletterSectionProps) {
         description: 'Vous recevrez bientôt nos dernières actualités.',
       })
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast.error("Erreur lors de l'inscription", {
-        description: error.response?.data?.message || 'Veuillez réessayer plus tard.',
+        description:
+          (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          'Veuillez réessayer plus tard.',
       })
     },
   })
@@ -93,6 +95,7 @@ export function NewsletterSection({ tenant }: NewsletterSectionProps) {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
               disabled={subscribeMutation.isPending}
+              aria-label="Adresse email pour l'inscription à la newsletter"
             />
           </div>
 
@@ -130,7 +133,9 @@ export function NewsletterSection({ tenant }: NewsletterSectionProps) {
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-label="Information"
             >
+              <title>Icône d'information</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -152,7 +157,9 @@ export function NewsletterSection({ tenant }: NewsletterSectionProps) {
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-label="Argent"
             >
+              <title>Icône d'offres exclusives</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -174,7 +181,9 @@ export function NewsletterSection({ tenant }: NewsletterSectionProps) {
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-label="Ampoule"
             >
+              <title>Icône de conseils d'experts</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

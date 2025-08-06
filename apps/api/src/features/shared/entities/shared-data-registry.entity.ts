@@ -90,6 +90,6 @@ export class SharedDataRegistry extends BaseAuditEntity {
     code?: string
     reference?: string
     tags?: string[]
-    attributes?: Record<string, any>
+    attributes?: Record<string, unknown>
   }
 }

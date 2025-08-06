@@ -35,7 +35,7 @@ export class SessionsController {
         data: sessions,
         total: sessions.length,
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         'Erreur lors de la récupération des sessions actives',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -65,7 +65,7 @@ export class SessionsController {
           hasMore: offset + limit < total,
         },
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         "Erreur lors de la récupération de l'historique",
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -105,7 +105,7 @@ export class SessionsController {
           lastLogin: sessions[0]?.loginTime || null,
         },
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         "Erreur lors de la récupération de l'historique utilisateur",
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -118,7 +118,10 @@ export class SessionsController {
    */
   @Post('disconnect-user')
   @Roles('SUPER_ADMIN', 'ADMIN')
-  async forceLogoutUser(@Body() body: { userId: string; reason?: string }, @Request() req: any) {
+  async forceLogoutUser(
+    @Body() body: { userId: string; reason?: string },
+    @Request() req: Express.Request
+  ) {
     try {
       const { userId, reason = 'Déconnexion administrative' } = body
       const adminUserId = req.user.sub
@@ -157,7 +160,7 @@ export class SessionsController {
   @Roles('SUPER_ADMIN', 'ADMIN')
   async forceLogoutSession(
     @Body() body: { sessionId: string; reason?: string },
-    @Request() req: any
+    @Request() req: Express.Request
   ) {
     try {
       const { sessionId, reason = 'Déconnexion administrative' } = body
@@ -206,7 +209,7 @@ export class SessionsController {
         success: true,
         data: stats,
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         'Erreur lors de la récupération des statistiques',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -219,7 +222,7 @@ export class SessionsController {
    */
   @Post('cleanup')
   @Roles('SUPER_ADMIN', 'ADMIN')
-  async cleanupExpiredSessions(@Request() _req: any) {
+  async cleanupExpiredSessions(@Request() _req: Express.Request) {
     try {
       const result = await this.authService.cleanupExpiredSessions()
 
@@ -232,7 +235,7 @@ export class SessionsController {
           totalCleaned: result.redisCleanedCount + result.databaseCleanedCount,
         },
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         'Erreur lors du nettoyage des sessions',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -244,7 +247,7 @@ export class SessionsController {
    * Mettre à jour l'activité de la session courante
    */
   @Post('heartbeat')
-  async updateActivity(@Request() req: any) {
+  async updateActivity(@Request() req: { user: { sessionId: string } }) {
     try {
       const sessionId = req.user.sessionId
 
@@ -273,7 +276,7 @@ export class SessionsController {
    * Obtenir les sessions de l'utilisateur connecté
    */
   @Get('my-sessions')
-  async getMyActiveSessions(@Request() req: any) {
+  async getMyActiveSessions(@Request() req: { user: { sub: string } }) {
     try {
       const userId = req.user.sub
       const sessions = await this.authService.getUserConnectionHistory(userId, 10)
@@ -283,7 +286,7 @@ export class SessionsController {
         data: sessions.filter((s) => s.status === 'active'),
         total: sessions.filter((s) => s.status === 'active').length,
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         'Erreur lors de la récupération des sessions',
         HttpStatus.INTERNAL_SERVER_ERROR

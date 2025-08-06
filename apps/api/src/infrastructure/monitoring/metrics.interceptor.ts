@@ -21,11 +21,11 @@ export class MetricsInterceptor implements NestInterceptor {
     private readonly _httpRequestDuration: Histogram<string>
   ) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<Request>()
     const response = context.switchToHttp().getResponse<Response>()
 
-    const startTime = Date.now()
+    const _startTime = Date.now()
     const route = this.getRoute(request)
     const method = request.method
 
@@ -38,7 +38,7 @@ export class MetricsInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         // Succès
-        const _duration = (Date.now() - startTime) / 1000
+        // Duration calculation: (Date.now() - startTime) / 1000
         endTimer()
 
         this._httpRequestsCounter.inc({
@@ -49,7 +49,7 @@ export class MetricsInterceptor implements NestInterceptor {
       }),
       catchError((error) => {
         // Erreur
-        const _duration = (Date.now() - startTime) / 1000
+        // Duration calculation: (Date.now() - startTime) / 1000
         endTimer()
 
         const statusCode = error.status || 500

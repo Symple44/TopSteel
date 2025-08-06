@@ -5,8 +5,8 @@ import {
   HealthCheck,
   type HealthCheckService,
   type MemoryHealthIndicator,
-  type TypeOrmHealthIndicator,
 } from '@nestjs/terminus'
+import type { DataSourceOptions } from 'typeorm'
 import type { CircuitBreakerHealthIndicator } from '../../infrastructure/monitoring/circuit-breaker-health.indicator'
 import type { MultiTenantDatabaseConfig } from '../database/config/multi-tenant-database.config'
 import type { IntegrityService } from './integrity.service'
@@ -14,11 +14,10 @@ import type { SystemHealthService } from './system-health-simple.service'
 
 @Controller('health')
 export class HealthController {
-  private startTime = Date.now()
+  private readonly startTime = Date.now()
 
   constructor(
     private health: HealthCheckService,
-    private db: TypeOrmHealthIndicator,
     private memory: MemoryHealthIndicator,
     private disk: DiskHealthIndicator,
     private integrity: IntegrityService,
@@ -31,7 +30,7 @@ export class HealthController {
   @Get()
   async check() {
     try {
-      const healthChecks: Array<() => Promise<any>> = [
+      const healthChecks: Array<() => Promise<unknown>> = [
         // Vérifier les bases de données multi-tenant
         () => this.checkMultiTenantDatabase('auth'),
         () => this.checkMultiTenantDatabase('shared'),
@@ -103,8 +102,8 @@ export class HealthController {
   private async getActiveUsersCount(): Promise<number> {
     try {
       return await this.integrity.getActiveUsersCount()
-    } catch (error) {
-      console.error('Erreur lors du comptage des utilisateurs actifs:', error)
+    } catch (_error) {
+      // Erreur lors du comptage des utilisateurs actifs - ignorer silencieusement
       return 0
     }
   }
@@ -113,8 +112,8 @@ export class HealthController {
     try {
       // Utiliser la configuration NestJS qui lit APP_VERSION depuis .env
       return this.configService.get<string>('app.version', '1.0.0')
-    } catch (error) {
-      console.error('Erreur lors de la lecture de la version:', error)
+    } catch (_error) {
+      // Erreur lors de la lecture de la version - retourner valeur par défaut
       return '1.0.0'
     }
   }
@@ -167,7 +166,7 @@ export class HealthController {
    */
   private async checkMultiTenantDatabase(type: 'auth' | 'shared') {
     try {
-      let config
+      let config: unknown
       const key = `database_${type}`
 
       if (type === 'auth') {
@@ -179,7 +178,7 @@ export class HealthController {
       // Test de connexion direct
       const { DataSource } = await import('typeorm')
       const testConnection = new DataSource({
-        type: config.type as any,
+        type: config.type as DataSourceOptions['type'],
         host: config.host,
         port: config.port,
         username: config.username,

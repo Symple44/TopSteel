@@ -205,7 +205,10 @@ export class RoleFormattingService {
   /**
    * Formate les informations complètes d'un utilisateur avec ses rôles
    */
-  formatUserWithRoles(user: any, userSocieteRoles: any[] = []): FormattedUserRole {
+  formatUserWithRoles(
+    user: { role: string; [key: string]: unknown },
+    userSocieteRoles: Array<{ role: string; societe: { nom: string; id: string } }> = []
+  ): FormattedUserRole {
     const globalRole = this.formatGlobalRole(user.role as GlobalUserRole)
 
     const societeRoles = userSocieteRoles.map((usr) => {

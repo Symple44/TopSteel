@@ -21,8 +21,24 @@ const TEST_USER = {
   password: 'test123',
 }
 
+// Types pour les requêtes HTTP
+interface FetchAPIOptions {
+  method?: string
+  headers?: Record<string, string>
+  body?: string
+}
+
+interface Company {
+  id: string
+  nom: string
+  code: string
+  isDefault: boolean
+  role?: string
+  sites?: unknown[]
+}
+
 // Fonction helper pour les requêtes HTTP
-async function fetchAPI(endpoint: string, options: any = {}) {
+async function fetchAPI(endpoint: string, options: FetchAPIOptions = {}) {
   const url = `${API_URL}${endpoint}`
 
   const response = await fetch(url, {
@@ -58,7 +74,7 @@ describe('Complete Authentication Flow (Critical Integration)', () => {
       } else {
         throw new Error(`Server responded with status: ${response.status}`)
       }
-    } catch (_error) {
+    } catch {
       serverReachable = false
     }
   })
@@ -68,90 +84,83 @@ describe('Complete Authentication Flow (Critical Integration)', () => {
       return
     }
 
-    let accessToken: string
-    let companyId: string
     const testResults: Array<{ test: string; success: boolean }> = []
+    const loginData = await fetchAPI('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        login: TEST_USER.email,
+        password: TEST_USER.password,
+      }),
+    })
 
-    try {
-      const loginData = await fetchAPI('/api/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({
-          login: TEST_USER.email,
-          password: TEST_USER.password,
-        }),
-      })
+    expect(loginData).toHaveProperty('data')
+    expect(loginData.data).toHaveProperty('accessToken')
+    expect(loginData.data).toHaveProperty('user')
+    expect(loginData.data.user.email).toBe(TEST_USER.email)
 
-      expect(loginData).toHaveProperty('data')
-      expect(loginData.data).toHaveProperty('accessToken')
-      expect(loginData.data).toHaveProperty('user')
-      expect(loginData.data.user.email).toBe(TEST_USER.email)
+    const accessToken = loginData.data.accessToken
+    testResults.push({ test: 'User Login', success: true })
+    const companiesData = await fetchAPI('/api/auth/societes', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
 
-      accessToken = loginData.data.accessToken
-      testResults.push({ test: 'User Login', success: true })
-      const companiesData = await fetchAPI('/api/auth/societes', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+    expect(companiesData).toHaveProperty('data')
+    expect(Array.isArray(companiesData.data)).toBe(true)
+    expect(companiesData.data.length).toBeGreaterThan(0)
 
-      expect(companiesData).toHaveProperty('data')
-      expect(Array.isArray(companiesData.data)).toBe(true)
-      expect(companiesData.data.length).toBeGreaterThan(0)
+    const companies = companiesData.data
+    const defaultCompany = companies.find((c: Company) => c.isDefault === true)
+    expect(defaultCompany).toBeDefined()
+    expect(defaultCompany).toHaveProperty('id')
+    expect(defaultCompany).toHaveProperty('nom')
 
-      const companies = companiesData.data
-      const defaultCompany = companies.find((c: any) => c.isDefault === true)
-      expect(defaultCompany).toBeDefined()
-      expect(defaultCompany).toHaveProperty('id')
-      expect(defaultCompany).toHaveProperty('nom')
+    const companyId = defaultCompany.id
+    testResults.push({ test: 'Get Companies', success: true })
+    const defaultCompanyData = await fetchAPI('/api/auth/user/default-company', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
 
-      companyId = defaultCompany.id
-      testResults.push({ test: 'Get Companies', success: true })
-      const defaultCompanyData = await fetchAPI('/api/auth/user/default-company', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+    expect(defaultCompanyData).toHaveProperty('data')
+    expect(defaultCompanyData.data).toHaveProperty('success', true)
+    expect(defaultCompanyData.data).toHaveProperty('data')
+    expect(defaultCompanyData.data.data).toHaveProperty('nom')
 
-      expect(defaultCompanyData).toHaveProperty('data')
-      expect(defaultCompanyData.data).toHaveProperty('success', true)
-      expect(defaultCompanyData.data).toHaveProperty('data')
-      expect(defaultCompanyData.data.data).toHaveProperty('nom')
+    testResults.push({ test: 'Default Company API', success: true })
+    const selectData = await fetchAPI(`/api/auth/login-societe/${companyId}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({}),
+    })
 
-      testResults.push({ test: 'Default Company API', success: true })
-      const selectData = await fetchAPI(`/api/auth/login-societe/${companyId}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({}),
-      })
+    expect(selectData).toHaveProperty('data')
+    expect(selectData.data).toHaveProperty('tokens')
+    expect(selectData.data.tokens).toHaveProperty('accessToken')
+    expect(selectData.data).toHaveProperty('user')
+    expect(selectData.data.user).toHaveProperty('societe')
+    expect(selectData.data.user.societe).toHaveProperty('nom')
 
-      expect(selectData).toHaveProperty('data')
-      expect(selectData.data).toHaveProperty('tokens')
-      expect(selectData.data.tokens).toHaveProperty('accessToken')
-      expect(selectData.data).toHaveProperty('user')
-      expect(selectData.data.user).toHaveProperty('societe')
-      expect(selectData.data.user.societe).toHaveProperty('nom')
+    const multiTenantToken = selectData.data.tokens.accessToken
+    testResults.push({ test: 'Auto-Select Company', success: true })
+    const verifyData = await fetchAPI('/api/auth/verify', {
+      headers: { Authorization: `Bearer ${multiTenantToken}` },
+    })
 
-      const multiTenantToken = selectData.data.tokens.accessToken
-      testResults.push({ test: 'Auto-Select Company', success: true })
-      const verifyData = await fetchAPI('/api/auth/verify', {
-        headers: { Authorization: `Bearer ${multiTenantToken}` },
-      })
+    expect(verifyData).toHaveProperty('data')
+    expect(verifyData.data).toHaveProperty('email', TEST_USER.email)
+    expect(verifyData.data).toHaveProperty('id')
 
-      expect(verifyData).toHaveProperty('data')
-      expect(verifyData.data).toHaveProperty('email', TEST_USER.email)
-      expect(verifyData.data).toHaveProperty('id')
+    testResults.push({ test: 'Multi-Tenant Token', success: true })
 
-      testResults.push({ test: 'Multi-Tenant Token', success: true })
+    // Vérification finale
+    const successCount = testResults.filter((r) => r.success).length
+    const totalCount = testResults.length
+    testResults.forEach(() => {
+      // Log test result status
+    })
 
-      // Vérification finale
-      const successCount = testResults.filter((r) => r.success).length
-      const totalCount = testResults.length
-      testResults.forEach((result) => {
-        const _icon = result.success ? '✅' : '❌'
-      })
-
-      // Le test échoue si tous les tests ne passent pas
-      expect(successCount).toBe(totalCount)
-      expect(successCount).toBe(5) // Exactement 5 tests doivent réussir
-    } catch (error) {
-      throw error
-    }
+    // Le test échoue si tous les tests ne passent pas
+    expect(successCount).toBe(totalCount)
+    expect(successCount).toBe(5) // Exactement 5 tests doivent réussir
   }, 30000) // Timeout de 30 secondes
 
   it('should handle authentication errors gracefully', async () => {
@@ -173,7 +182,7 @@ describe('Complete Authentication Flow (Critical Integration)', () => {
       expect(false).toBe(true)
     } catch (error) {
       // Erreur attendue
-      expect(error.message).toContain('401')
+      expect((error as Error).message).toContain('401')
     }
   })
 
@@ -192,7 +201,7 @@ describe('Complete Authentication Flow (Critical Integration)', () => {
       expect(false).toBe(true)
     } catch (error) {
       // Erreur attendue
-      expect(error.message).toContain('401')
+      expect((error as Error).message).toContain('401')
     }
   })
 })

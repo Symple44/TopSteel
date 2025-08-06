@@ -175,7 +175,7 @@ export class MigrationService {
       // Vérifier si la table migrations existe
       const migrationTableExists = await this.checkMigrationTableExists()
 
-      let executedMigrations: any[] = []
+      let executedMigrations: Array<{ name: string; timestamp: number }> = []
       if (migrationTableExists) {
         executedMigrations = await this.dataSource.query(`
           SELECT name, timestamp FROM migrations ORDER BY timestamp DESC
@@ -185,7 +185,7 @@ export class MigrationService {
       const pendingMigrations = await this.dataSource.showMigrations()
 
       return {
-        executed: executedMigrations.map((m: any) => m.name),
+        executed: executedMigrations.map((m) => m.name),
         pending: Array.isArray(pendingMigrations) ? pendingMigrations : [],
         lastExecuted: executedMigrations[0]?.name,
       }

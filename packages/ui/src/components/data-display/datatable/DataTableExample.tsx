@@ -112,7 +112,7 @@ const columns: ColumnConfig<ExampleData>[] = [
     validation: {
       pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
       custom: (value) => {
-        if (value && !value.includes('@')) {
+        if (value && typeof value === 'string' && !value.includes('@')) {
           return 'Adresse email invalide'
         }
         return null

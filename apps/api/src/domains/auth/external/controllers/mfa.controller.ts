@@ -28,7 +28,7 @@ interface SetupWebAuthnDto {
 
 interface VerifyWebAuthnDto {
   mfaId: string
-  response: any
+  response: unknown
   deviceName?: string
 }
 
@@ -39,7 +39,7 @@ interface InitiateMFADto {
 interface VerifyMFADto {
   sessionToken: string
   code?: string
-  webauthnResponse?: any
+  webauthnResponse?: unknown
 }
 
 interface DisableMFADto {
@@ -56,7 +56,7 @@ export class MFAController {
    * Obtenir le statut MFA de l'utilisateur connecté
    */
   @Get('status')
-  async getMFAStatus(@Request() req: any) {
+  async getMFAStatus(@Request() req: { user: { sub: string } }) {
     try {
       const userId = req.user.sub
       const stats = await this.mfaService.getMFAStats(userId)
@@ -65,7 +65,7 @@ export class MFAController {
         success: true,
         data: stats,
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         'Erreur lors de la récupération du statut MFA',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -77,7 +77,7 @@ export class MFAController {
    * Obtenir les méthodes MFA configurées
    */
   @Get('methods')
-  async getMFAMethods(@Request() req: any) {
+  async getMFAMethods(@Request() req: { user: { sub: string } }) {
     try {
       const userId = req.user.sub
       const methods = await this.mfaService.getUserMFAMethods(userId)
@@ -112,7 +112,7 @@ export class MFAController {
         success: true,
         data: safeMethods,
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         'Erreur lors de la récupération des méthodes MFA',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -124,7 +124,7 @@ export class MFAController {
    * Configurer TOTP (Google Authenticator)
    */
   @Post('setup/totp')
-  async setupTOTP(@Request() req: any, @Body() body: SetupTOTPDto) {
+  async setupTOTP(@Request() req: { user: { sub: string } }, @Body() body: SetupTOTPDto) {
     try {
       const userId = req.user.sub
       const userEmail = req.user.email
@@ -132,7 +132,7 @@ export class MFAController {
       const result = await this.mfaService.setupTOTP(userId, userEmail, body.phoneNumber)
 
       if (!result.success) {
-        throw new HttpException(result.error!, HttpStatus.BAD_REQUEST)
+        throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
       }
 
       return {
@@ -160,14 +160,14 @@ export class MFAController {
    * Vérifier et activer TOTP
    */
   @Post('verify/totp')
-  async verifyTOTP(@Request() req: any, @Body() body: VerifyTOTPDto) {
+  async verifyTOTP(@Request() req: { user: { sub: string } }, @Body() body: VerifyTOTPDto) {
     try {
       const userId = req.user.sub
 
       const result = await this.mfaService.verifyAndEnableTOTP(userId, body.mfaId, body.token)
 
       if (!result.success) {
-        throw new HttpException(result.error!, HttpStatus.BAD_REQUEST)
+        throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
       }
 
       return {
@@ -189,7 +189,10 @@ export class MFAController {
    * Configurer WebAuthn
    */
   @Post('setup/webauthn')
-  async setupWebAuthn(@Request() req: any, @Body() body: SetupWebAuthnDto) {
+  async setupWebAuthn(
+    @Request() req: { user: { sub: string; email: string } },
+    @Body() body: SetupWebAuthnDto
+  ) {
     try {
       const userId = req.user.sub
       const userEmail = req.user.email
@@ -197,7 +200,7 @@ export class MFAController {
       const result = await this.mfaService.setupWebAuthn(userId, userEmail, body.userName)
 
       if (!result.success) {
-        throw new HttpException(result.error!, HttpStatus.BAD_REQUEST)
+        throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
       }
 
       return {
@@ -222,7 +225,7 @@ export class MFAController {
    * Vérifier et ajouter une clé WebAuthn
    */
   @Post('verify/webauthn')
-  async verifyWebAuthn(@Request() req: any, @Body() body: VerifyWebAuthnDto) {
+  async verifyWebAuthn(@Request() req: { user: { sub: string } }, @Body() body: VerifyWebAuthnDto) {
     try {
       const userId = req.user.sub
       const userAgent = req.headers['user-agent']
@@ -236,7 +239,7 @@ export class MFAController {
       )
 
       if (!result.success) {
-        throw new HttpException(result.error!, HttpStatus.BAD_REQUEST)
+        throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
       }
 
       return {
@@ -258,14 +261,14 @@ export class MFAController {
    * Initier une session MFA (pour l'authentification)
    */
   @Post('initiate')
-  async initiateMFA(@Request() req: any, @Body() body: InitiateMFADto) {
+  async initiateMFA(@Request() req: { user: { sub: string } }, @Body() body: InitiateMFADto) {
     try {
       const userId = req.user.sub
 
       const result = await this.mfaService.initiateMFASession(userId, body.mfaType, req)
 
       if (!result.success) {
-        throw new HttpException(result.error!, HttpStatus.BAD_REQUEST)
+        throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
       }
 
       return {
@@ -296,7 +299,7 @@ export class MFAController {
       )
 
       if (!result.success) {
-        throw new HttpException(result.error!, HttpStatus.BAD_REQUEST)
+        throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
       }
 
       return {
@@ -322,14 +325,14 @@ export class MFAController {
    * Désactiver une méthode MFA
    */
   @Delete('disable')
-  async disableMFA(@Request() req: any, @Body() body: DisableMFADto) {
+  async disableMFA(@Request() req: { user: { sub: string } }, @Body() body: DisableMFADto) {
     try {
       const userId = req.user.sub
 
       const result = await this.mfaService.disableMFA(userId, body.mfaType, body.verificationCode)
 
       if (!result.success) {
-        throw new HttpException(result.error!, HttpStatus.BAD_REQUEST)
+        throw new HttpException(result.error || 'Verification failed', HttpStatus.BAD_REQUEST)
       }
 
       return {
@@ -351,7 +354,10 @@ export class MFAController {
    * Supprimer un credential WebAuthn spécifique
    */
   @Delete('webauthn/credential/:credentialId')
-  async removeWebAuthnCredential(@Request() req: any, @Param('credentialId') credentialId: string) {
+  async removeWebAuthnCredential(
+    @Request() req: { user: { sub: string } },
+    @Param('credentialId') credentialId: string
+  ) {
     try {
       const userId = req.user.sub
 
@@ -391,7 +397,7 @@ export class MFAController {
    * Obtenir les codes de récupération TOTP
    */
   @Get('totp/backup-codes')
-  async getBackupCodes(@Request() req: any) {
+  async getBackupCodes(@Request() req: { user: { sub: string } }) {
     try {
       const userId = req.user.sub
 
@@ -426,7 +432,7 @@ export class MFAController {
    * Regénérer les codes de récupération TOTP
    */
   @Post('totp/regenerate-backup-codes')
-  async regenerateBackupCodes(@Request() req: any) {
+  async regenerateBackupCodes(@Request() req: { user: { sub: string } }) {
     try {
       const userId = req.user.sub
 
@@ -477,7 +483,7 @@ export class MFAController {
         },
         message: `${cleanedCount} sessions MFA expirées nettoyées`,
       }
-    } catch (_error) {
+    } catch {
       throw new HttpException(
         'Erreur lors du nettoyage des sessions',
         HttpStatus.INTERNAL_SERVER_ERROR

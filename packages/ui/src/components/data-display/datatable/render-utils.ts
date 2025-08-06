@@ -66,7 +66,9 @@ export class RenderUtils {
             keys.length <= 3 &&
             keys.every((key) => key.length === 2 || key === 'fr' || key === 'en' || key === 'es')
           ) {
-            const translations = keys.map((key) => `${key}: "${(value as Record<string, unknown>)[key]}"`).join(', ')
+            const translations = keys
+              .map((key) => `${key}: "${(value as Record<string, unknown>)[key]}"`)
+              .join(', ')
             return `{${translations}}`
           }
           // Pour d'autres objets simples

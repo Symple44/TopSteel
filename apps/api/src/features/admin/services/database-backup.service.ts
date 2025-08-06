@@ -64,7 +64,7 @@ export class DatabaseBackupService {
 
   async createBackup(
     options: { type?: string; compress?: boolean; includeMedia?: boolean } = {}
-  ): Promise<{ success: boolean; message: string; data?: any }> {
+  ): Promise<{ success: boolean; message: string; data?: Record<string, unknown> }> {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
       const backupType = options.type || 'manual'
@@ -78,7 +78,7 @@ export class DatabaseBackupService {
         throw new Error('Ce service ne supporte que PostgreSQL')
       }
 
-      const pgOptions = connectionOptions as any
+      const pgOptions = connectionOptions as Record<string, unknown>
       const pgDumpCommand = [
         'pg_dump',
         `-h ${pgOptions.host}`,
@@ -145,7 +145,7 @@ export class DatabaseBackupService {
         }
       }
 
-      const connectionOptions = this._dataSource.options as any
+      const connectionOptions = this._dataSource.options as Record<string, unknown>
       const isCompressed = backup.filename.endsWith('.gz')
 
       let command: string
@@ -200,7 +200,7 @@ export class DatabaseBackupService {
     }
   }
 
-  async downloadBackup(backupId: string): Promise<any> {
+  async downloadBackup(backupId: string): Promise<Record<string, unknown>> {
     const backups = await this.listBackups()
     const backup = backups.find((b) => b.id === backupId)
 

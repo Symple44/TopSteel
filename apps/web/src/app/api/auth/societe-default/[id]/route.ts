@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     })
 
     // Vérifier si la réponse est JSON
-    let data
+    let data: unknown
     const contentType = response.headers.get('content-type')
 
     if (contentType?.includes('application/json')) {

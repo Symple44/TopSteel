@@ -16,7 +16,7 @@ async function testCompleteFlow() {
     })
 
     if (!loginResponse.ok) {
-      const _error = await loginResponse.text()
+      await loginResponse.text() // Error text consumed but not logged
       return
     }
 
@@ -30,13 +30,14 @@ async function testCompleteFlow() {
     })
 
     if (!societesResponse.ok) {
-      const _error = await societesResponse.text()
+      await societesResponse.text() // Error text consumed but not logged
       return
     }
 
     const societesData = await societesResponse.json()
 
-    societesData.data.forEach((_societe, _index) => {})
+    // Process societes data without storing unused variables
+    societesData.data.length > 0
 
     if (societesData.data.length === 0) {
       return
@@ -55,7 +56,7 @@ async function testCompleteFlow() {
     })
 
     if (!selectResponse.ok) {
-      const _error = await selectResponse.text()
+      await selectResponse.text() // Error text consumed but not logged
       return
     }
 
@@ -69,12 +70,14 @@ async function testCompleteFlow() {
     })
 
     if (!verifyResponse.ok) {
-      const _error = await verifyResponse.text()
+      await verifyResponse.text() // Error text consumed but not logged
       return
     }
 
-    const _verifyData = await verifyResponse.json()
-  } catch (_error) {}
+    await verifyResponse.json() // Verify data consumed but not used
+  } catch {
+    // Error caught but not logged
+  }
 }
 fetch(`${API_URL}/api/health`)
   .then((response) => {
@@ -84,4 +87,6 @@ fetch(`${API_URL}/api/health`)
       throw new Error(`Serveur retourne ${response.status}`)
     }
   })
-  .catch((_error) => {})
+  .catch(() => {
+    // Error caught but not logged
+  })

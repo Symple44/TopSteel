@@ -1,4 +1,3 @@
-// packages/config/typescript/node.json
 {
   "extends": "./base.json",
   "compilerOptions": {

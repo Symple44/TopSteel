@@ -8,7 +8,7 @@ async function checkCreatedPermissions() {
     await dataSource.initialize()
 
     // Chercher les permissions commerciales
-    const _commercialPermissions = await dataSource.query(`
+    await dataSource.query(`
       SELECT name, description, resource, action, category
       FROM permissions 
       WHERE category = 'commercial'
@@ -16,7 +16,7 @@ async function checkCreatedPermissions() {
     `)
 
     // Vérifier les permissions dans les rôles COMMERCIAL
-    const _rolePermissions = await dataSource.query(`
+    await dataSource.query(`
       SELECT r.name as role_name, p.name as permission_name, p.description
       FROM roles r
       JOIN role_permissions rp ON r.id = rp.role_id
@@ -24,7 +24,7 @@ async function checkCreatedPermissions() {
       WHERE r.parent_role_type = 'COMMERCIAL'
       ORDER BY r.name, p.name
     `)
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

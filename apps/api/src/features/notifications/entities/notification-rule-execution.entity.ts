@@ -36,19 +36,19 @@ export class NotificationRuleExecution extends BaseAuditEntity {
   result!: ExecutionResult
 
   @Column({ type: 'jsonb' })
-  eventData!: Record<string, any>
+  eventData!: Record<string, unknown>
 
   @Column({ type: 'jsonb', nullable: true })
-  conditionResults?: Record<string, any>
+  conditionResults?: Record<string, unknown>
 
   @Column({ type: 'jsonb', nullable: true })
-  templateVariables?: Record<string, any>
+  templateVariables?: Record<string, unknown>
 
   @Column({ type: 'text', nullable: true })
   errorMessage?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  errorDetails?: Record<string, any>
+  errorDetails?: Record<string, unknown>
 
   @Column({ type: 'integer', default: 0 })
   executionTimeMs!: number
@@ -73,8 +73,8 @@ export class NotificationRuleExecution extends BaseAuditEntity {
   static createSuccess(
     ruleId: string,
     notificationId: string,
-    eventData: Record<string, any>,
-    templateVariables: Record<string, any>,
+    eventData: Record<string, unknown>,
+    templateVariables: Record<string, unknown>,
     executionTimeMs: number
   ): NotificationRuleExecution {
     const execution = new NotificationRuleExecution()
@@ -91,10 +91,10 @@ export class NotificationRuleExecution extends BaseAuditEntity {
 
   static createFailed(
     ruleId: string,
-    eventData: Record<string, any>,
+    eventData: Record<string, unknown>,
     result: ExecutionResult,
     errorMessage: string,
-    errorDetails?: Record<string, any>,
+    errorDetails?: Record<string, unknown>,
     executionTimeMs: number = 0
   ): NotificationRuleExecution {
     const execution = new NotificationRuleExecution()
@@ -111,9 +111,9 @@ export class NotificationRuleExecution extends BaseAuditEntity {
 
   static createSkipped(
     ruleId: string,
-    eventData: Record<string, any>,
+    eventData: Record<string, unknown>,
     result: ExecutionResult,
-    conditionResults: Record<string, any>,
+    conditionResults: Record<string, unknown>,
     executionTimeMs: number = 0
   ): NotificationRuleExecution {
     const execution = new NotificationRuleExecution()

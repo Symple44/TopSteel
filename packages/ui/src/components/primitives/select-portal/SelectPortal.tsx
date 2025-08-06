@@ -208,11 +208,12 @@ export function SelectPortal({
       >
         {options.map((option) => {
           return (
-            <div
+            <button
               key={option.value}
               onClick={() => handleSelect(option.value)}
+              type="button"
               className={cn(
-                'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors',
+                'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors w-full text-left',
                 'hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700',
                 value === option.value && 'bg-accent text-accent-foreground'
               )}
@@ -224,7 +225,7 @@ export function SelectPortal({
                 <span>{option.label}</span>
               </div>
               {value === option.value && <Check className="h-4 w-4" />}
-            </div>
+            </button>
           )
         })}
       </div>,

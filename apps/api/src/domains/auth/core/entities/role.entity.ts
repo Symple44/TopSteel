@@ -38,7 +38,7 @@ export class Role extends CommonEntity {
   isActive!: boolean
 
   @Column({ type: 'jsonb', default: {} })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @OneToMany(
     () => RolePermission,

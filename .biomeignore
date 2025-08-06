@@ -1,0 +1,24 @@
+# Biome ignore file
+
+# Node modules
+**/node_modules/**
+
+# Build directories
+**/dist/**
+**/.next/**
+**/coverage/**
+
+# Problematic files with parsing errors
+**/*.css
+**/globals.css
+**/globals-compiled.css
+packages/config/typescript/*.json
+packages/ui/.storybook/preview.js
+# Exclude file with internal error
+2
+
+# Legacy files
+apps/api/test-*.js
+scripts/check-turbo.js
+scripts/verify-package-consistency.js
+scripts/set-version.mjs

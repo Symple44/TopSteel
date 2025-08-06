@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { type BaseSection, SectionType } from './types'
+import { type BaseSection, type SectionStyles, SectionType } from './types'
 
 // Import dynamique des composants de sections
 const sectionComponents = {
@@ -19,8 +19,8 @@ const sectionComponents = {
 interface SectionRendererProps {
   section: BaseSection
   isEditing?: boolean
-  onUpdate?: (content: any) => void
-  onStyleUpdate?: (styles: any) => void
+  onUpdate?: (content: Record<string, unknown>) => void
+  onStyleUpdate?: (styles: SectionStyles) => void
 }
 
 export function SectionRenderer({

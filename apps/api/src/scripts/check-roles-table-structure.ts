@@ -22,13 +22,15 @@ async function checkRolesTableStructure() {
       ORDER BY ordinal_position
     `)
 
-    columns.forEach((_col: any) => {})
+    columns.forEach(() => {})
     const expectedColumns = ['version', 'created_by_id', 'updated_by_id', 'deleted_by_id']
     expectedColumns.forEach((colName) => {
-      const _exists = columns.some((col: any) => col.column_name === colName)
+      columns.some((col: unknown) => (col as { column_name: string }).column_name === colName)
     })
     for (const colName of expectedColumns) {
-      const exists = columns.some((col: any) => col.column_name === colName)
+      const exists = columns.some(
+        (col: unknown) => (col as { column_name: string }).column_name === colName
+      )
       if (!exists) {
         try {
           if (colName === 'version') {
@@ -36,7 +38,7 @@ async function checkRolesTableStructure() {
           } else {
             await dataSource.query(`ALTER TABLE roles ADD COLUMN "${colName}" UUID NULL`)
           }
-        } catch (_error: any) {}
+        } catch (_error: unknown) {}
       }
     }
     const societesColumns = await dataSource.query(`
@@ -47,10 +49,14 @@ async function checkRolesTableStructure() {
     `)
 
     expectedColumns.forEach((colName) => {
-      const _exists = societesColumns.some((col: any) => col.column_name === colName)
+      societesColumns.some(
+        (col: unknown) => (col as { column_name: string }).column_name === colName
+      )
     })
     for (const colName of expectedColumns) {
-      const exists = societesColumns.some((col: any) => col.column_name === colName)
+      const exists = societesColumns.some(
+        (col: unknown) => (col as { column_name: string }).column_name === colName
+      )
       if (!exists) {
         try {
           if (colName === 'version') {
@@ -58,10 +64,10 @@ async function checkRolesTableStructure() {
           } else {
             await dataSource.query(`ALTER TABLE societes ADD COLUMN "${colName}" UUID NULL`)
           }
-        } catch (_error: any) {}
+        } catch (_error: unknown) {}
       }
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

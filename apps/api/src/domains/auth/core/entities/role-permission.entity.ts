@@ -37,7 +37,7 @@ export class RolePermission extends CommonEntity {
   accessLevel!: 'BLOCKED' | 'READ' | 'WRITE' | 'DELETE' | 'ADMIN'
 
   @Column({ type: 'jsonb', default: {} })
-  conditions?: Record<string, any> // Conditions spécifiques (ex: horaires, IP, etc.)
+  conditions?: Record<string, unknown> // Conditions spécifiques (ex: horaires, IP, etc.)
 
   @Column({ type: 'boolean', default: true })
   @Index()

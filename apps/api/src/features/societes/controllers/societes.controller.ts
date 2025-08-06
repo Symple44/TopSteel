@@ -41,7 +41,7 @@ export class SocietesController {
   @Get('statistics')
   @ApiOperation({ summary: 'Récupérer les statistiques des sociétés' })
   @ApiResponse({ status: 200, description: 'Statistiques des sociétés' })
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<unknown> {
     return this.societesService.getStatistics()
   }
 

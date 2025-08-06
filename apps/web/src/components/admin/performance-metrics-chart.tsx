@@ -27,7 +27,7 @@ export default function PerformanceMetricsChart({
   const [selectedMetric, setSelectedMetric] = useState<
     'responseTime' | 'queryCount' | 'activeConnections'
   >('responseTime')
-  const [_timeRange, _setTimeRange] = useState<'5m' | '30m' | '1h' | '24h'>('30m')
+  const [,] = useState<'5m' | '30m' | '1h' | '24h'>('30m')
 
   useEffect(() => {
     setCurrentData(data)

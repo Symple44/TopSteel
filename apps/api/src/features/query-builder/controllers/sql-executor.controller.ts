@@ -155,7 +155,7 @@ export class SqlExecutorController {
       return result
     } catch (error) {
       // Type guard pour les erreurs PostgreSQL
-      const pgError = error as any
+      const pgError = error as { code?: string; message?: string }
 
       if (pgError.code === '42P01') {
         throw new BadRequestException('Table not found')

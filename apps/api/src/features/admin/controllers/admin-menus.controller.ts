@@ -60,7 +60,7 @@ export class AdminMenusController {
   @Post('configurations')
   async createConfiguration(
     @Body() createDto: CreateMenuConfigDto,
-    @Request() req: any
+    @Request() req: Record<string, unknown>
   ): Promise<MenuConfiguration> {
     const userId = req.user?.sub || req.user?.id
     return await this.menuConfigService.createConfiguration(createDto, userId)
@@ -70,7 +70,7 @@ export class AdminMenusController {
   async updateConfiguration(
     @Param('id') id: string,
     @Body() updateDto: UpdateMenuConfigDto,
-    @Request() req: any
+    @Request() req: Record<string, unknown>
   ): Promise<MenuConfiguration> {
     const userId = req.user?.sub || req.user?.id
     return await this.menuConfigService.updateConfiguration(id, updateDto, userId)
@@ -117,7 +117,9 @@ export class AdminMenusController {
   // ===== TEMPLATES ET UTILITAIRES =====
 
   @Post('configurations/default')
-  async createDefaultConfiguration(@Request() _req: any): Promise<MenuConfiguration> {
+  async createDefaultConfiguration(
+    @Request() _req: Record<string, unknown>
+  ): Promise<MenuConfiguration> {
     return await this.menuConfigService.createDefaultConfiguration()
   }
 
@@ -127,7 +129,10 @@ export class AdminMenusController {
   }
 
   @Post('configurations/import')
-  async importConfiguration(@Body() data: any, @Request() req: any): Promise<MenuConfiguration> {
+  async importConfiguration(
+    @Body() data: Record<string, unknown>,
+    @Request() req: Record<string, unknown>
+  ): Promise<MenuConfiguration> {
     const userId = req.user?.sub || req.user?.id
     return await this.menuConfigService.importConfiguration(data, userId)
   }
@@ -254,7 +259,7 @@ export class AdminMenusController {
       title: string
       icon?: string
     },
-    @Request() req: any
+    @Request() req: Record<string, unknown>
   ) {
     const userId = req.user?.sub || req.user?.id
     return await this.menuConfigService.addUserDataViewToMenu(

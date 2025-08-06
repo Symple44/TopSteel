@@ -16,35 +16,48 @@ export class TenantGuard implements CanActivate {
     }
 
     try {
-      const tenantContext = await this.resolveTenant(request, tenantId)
+      const tenantContext = await this.resolveTenant(tenantId)
       request.tenant = tenantContext
       return true
-    } catch (_error) {
+    } catch {
       return false
     }
   }
 
-  private extractTenant(request: any): string | null {
-    // 1. Header X-Tenant
-    const headerTenant = request.headers['x-tenant']
-    if (headerTenant) return headerTenant
+  private extractTenant(request: unknown): string | null {
+    // Type guard to check if request has expected structure
+    if (!request || typeof request !== 'object') {
+      return null
+    }
 
-    // 2. Domaine/Host
-    const host = request.headers.host
-    if (host) return host
+    const req = request as Record<string, unknown>
+
+    // 1. Header X-Tenant
+    if (req.headers && typeof req.headers === 'object') {
+      const headerTenant = req.headers['x-tenant']
+      if (typeof headerTenant === 'string') return headerTenant
+
+      // 2. Domaine/Host
+      const host = req.headers.host
+      if (typeof host === 'string') return host
+    }
 
     // 3. Paramètre de requête
-    const queryTenant = request.query.tenant
-    if (queryTenant) return queryTenant
+    if (req.query && typeof req.query === 'object') {
+      const queryTenant = req.query.tenant
+      if (typeof queryTenant === 'string') return queryTenant
+    }
 
     // 4. Paramètre de route
-    const paramTenant = request.params.tenant
-    if (paramTenant) return paramTenant
+    if (req.params && typeof req.params === 'object') {
+      const paramTenant = req.params.tenant
+      if (typeof paramTenant === 'string') return paramTenant
+    }
 
     return null
   }
 
-  private async resolveTenant(_request: any, identifier: string) {
+  private async resolveTenant(identifier: string) {
     // Si c'est un UUID, résoudre par ID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

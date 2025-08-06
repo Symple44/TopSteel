@@ -127,7 +127,7 @@ export class MarketplaceOrder {
   paymentData?: {
     transactionId?: string
     paymentProvider?: string
-    paymentMethodDetails?: Record<string, any>
+    paymentMethodDetails?: Record<string, unknown>
     refunds?: Array<{
       id: string
       amount: number

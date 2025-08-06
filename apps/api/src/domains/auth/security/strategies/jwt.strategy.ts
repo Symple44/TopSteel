@@ -8,7 +8,7 @@ import type { JwtPayload, MultiTenantJwtPayload } from '../../interfaces/jwt-pay
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly configService: ConfigService,
+    configService: ConfigService,
     private readonly usersService: UsersService
   ) {
     const jwtSecret = configService?.get<string>('jwt.secret') || 'fallback-secret'
@@ -32,7 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     // Retourner l'utilisateur sans le mot de passe
-    const { password, ...result } = user
+    const { password: _password, ...result } = user
 
     // Si c'est un token multi-tenant, ajouter les informations de société
     if ('societeId' in payload) {

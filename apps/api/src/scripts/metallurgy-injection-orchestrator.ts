@@ -51,12 +51,12 @@ export class CleanMetallurgyInjector {
     // Configuration d'injection
     this.config = {
       societeId: process.env.DEFAULT_SOCIETE_ID || 'default-societe-id',
-      environment: (process.env.NODE_ENV as any) || 'development',
+      environment: (process.env.NODE_ENV as 'development' | 'production' | 'test') || 'development',
       cleanupExisting: process.env.CLEANUP_EXISTING === 'true',
       validateReferences: process.env.VALIDATE_REFERENCES !== 'false',
       skipOnError: process.env.SKIP_ON_ERROR === 'true',
       batchSize: parseInt(process.env.BATCH_SIZE || '50'),
-      logLevel: (process.env.LOG_LEVEL as any) || 'info',
+      logLevel: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
     }
 
     // Services
@@ -379,9 +379,15 @@ export class CleanMetallurgyInjector {
         [this.config.societeId]
       )
 
-      familyResult.forEach((stat: any) => {
+      familyResult.forEach((stat: unknown) => {
+        const statTyped = stat as {
+          famille: string
+          count: number
+          prix_moyen: number
+          valeur_totale: number
+        }
         this.logger.info(
-          `   📁 ${stat.famille}: ${stat.count} articles (moy: ${stat.prix_moyen}€, total: ${stat.valeur_totale}€)`
+          `   📁 ${statTyped.famille}: ${statTyped.count} articles (moy: ${statTyped.prix_moyen}€, total: ${statTyped.valeur_totale}€)`
         )
       })
 
@@ -395,8 +401,9 @@ export class CleanMetallurgyInjector {
 
       if (paramsResult.length > 0) {
         this.logger.info(`   ⚙️  Paramètres système:`)
-        paramsResult.forEach((param: any) => {
-          this.logger.info(`      - ${param.category}: ${param.count}`)
+        paramsResult.forEach((param: unknown) => {
+          const paramTyped = param as { category: string; count: number }
+          this.logger.info(`      - ${paramTyped.category}: ${paramTyped.count}`)
         })
       }
     } catch (error) {
@@ -445,7 +452,9 @@ export class CleanMetallurgyInjector {
       WHERE table_name = 'articles'
     `)
 
-    const existingColumns = result.map((row: any) => row.column_name)
+    const existingColumns = result.map(
+      (row: unknown) => (row as { column_name: string }).column_name
+    )
     const missingColumns = requiredColumns.filter((col) => !existingColumns.includes(col))
 
     if (missingColumns.length > 0) {
@@ -536,7 +545,7 @@ export class CleanMetallurgyInjector {
           this.config.societeId = uuidResult[0].id
           this.logger.warn(`⚠️ UUID société généré par défaut: ${this.config.societeId}`)
         }
-      } catch (_error) {
+      } catch {
         // Utiliser un UUID fixe valide en cas d'erreur
         this.config.societeId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
         this.logger.warn(`⚠️ Utilisation UUID société fixe: ${this.config.societeId}`)
@@ -579,7 +588,7 @@ async function main() {
   try {
     await orchestrator.initialize()
     await orchestrator.injectAllArticles()
-  } catch (_error) {
+  } catch {
     process.exit(1)
   } finally {
     await orchestrator.cleanup()

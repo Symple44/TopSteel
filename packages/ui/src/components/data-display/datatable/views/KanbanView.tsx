@@ -45,10 +45,13 @@ export function KanbanView({
           {/* Liste des cartes */}
           <div className="space-y-3">
             {column.items.map((card) => (
-              <div
+              <button
                 key={card.id}
-                className="bg-background border rounded-lg p-4 cursor-pointer hover:shadow-lg hover:border-accent transition-all duration-200 group"
+                className="bg-background border rounded-lg p-4 cursor-pointer hover:shadow-lg hover:border-accent transition-all duration-200 group w-full text-left"
                 onClick={() => onCardClick?.(card)}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCardClick?.(card)}
+                tabIndex={0}
+                aria-label={`View details for ${card.title}`}
               >
                 {/* Image de la carte */}
                 {card.image && (
@@ -152,7 +155,7 @@ export function KanbanView({
                     )}
                   </DropdownPortal>
                 </div>
-              </div>
+              </button>
             ))}
 
             {/* Zone de drop pour ajouter une carte */}

@@ -4,315 +4,405 @@ import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import { Logger } from '@nestjs/common'
 
+interface ProcessInfo {
+  pid: string
+  protocol: string
+  localAddress: string
+  localPort: string
+  foreignAddress: string
+  foreignPort: string
+  state: string
+}
+
+interface DiagnosticResult {
+  port: number
+  processes?: ProcessInfo[]
+  lsof?: string
+  available: boolean
+  error?: string
+}
+
 const execAsync = promisify(exec)
+const logger = new Logger('EnhancedServerManager')
 
-export class EnhancedServerManager {
-  private static readonly logger = new Logger('EnhancedServerManager')
-
-  /**
-   * Vérifie et nettoie complètement un port
-   */
-  static async cleanupPort(port: number, retries: number = 3): Promise<boolean> {
-    // Vérifier d'abord si le port est déjà libre
-    const initialCheck = await EnhancedServerManager.isPortAvailable(port)
-    if (initialCheck) {
-      EnhancedServerManager.logger.debug(`Port ${port} déjà disponible`)
-      return true
-    }
-
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      EnhancedServerManager.logger.debug(
-        `🔍 Tentative ${attempt}/${retries} - Nettoyage du port ${port}`
-      )
-
-      try {
-        const killedPids = await EnhancedServerManager.killProcessOnPort(port)
-
-        if (killedPids.length > 0) {
-          EnhancedServerManager.logger.log(
-            `🔧 ${killedPids.length} processus arrêté(s) sur le port ${port}`
-          )
-
-          // Attendre que le port se libère
-          await EnhancedServerManager.waitForPortRelease(port, 5000)
-        }
-
-        const isAvailable = await EnhancedServerManager.isPortAvailable(port)
-        if (isAvailable) {
-          if (killedPids.length > 0) {
-            EnhancedServerManager.logger.log(`✅ Port ${port} libéré avec succès`)
-          }
-          return true
-        }
-
-        if (attempt < retries) {
-          EnhancedServerManager.logger.warn(
-            `⚠️  Port ${port} encore occupé, nouvelle tentative dans 2s...`
-          )
-          await EnhancedServerManager.sleep(2000)
-        }
-      } catch (error) {
-        EnhancedServerManager.logger.error(`❌ Erreur lors du nettoyage du port ${port}:`, error)
-      }
-    }
-
-    EnhancedServerManager.logger.error(
-      `❌ Impossible de libérer le port ${port} après ${retries} tentatives`
-    )
-    return false
+/**
+ * Vérifie et nettoie complètement un port
+ */
+export async function cleanupPort(port: number, retries: number = 3): Promise<boolean> {
+  // Vérifier d'abord si le port est déjà libre
+  const initialCheck = await isPortAvailable(port)
+  if (initialCheck) {
+    logger.debug(`Port ${port} déjà disponible`)
+    return true
   }
 
-  /**
-   * Tue tous les processus sur un port avec vérification
-   */
-  static async killProcessOnPort(port: number): Promise<string[]> {
-    const isWindows = process.platform === 'win32'
-    const killedPids: string[] = []
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    logger.debug(`🔍 Tentative ${attempt}/${retries} - Nettoyage du port ${port}`)
 
     try {
+      const killedPids = await killProcessOnPort(port)
+
+      if (killedPids.length > 0) {
+        logger.log(`⚡ Port ${port} libéré - Processus tués: ${killedPids.join(', ')}`)
+
+        // Attendre un peu pour que le port soit vraiment libéré
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }
+
+      // Vérifier si le port est maintenant disponible
+      const isAvailable = await isPortAvailable(port)
+      if (isAvailable) {
+        logger.log(`✅ Port ${port} maintenant disponible`)
+        return true
+      }
+
+      if (attempt < retries) {
+        logger.warn(`⚠️ Port ${port} toujours occupé, nouvelle tentative...`)
+        await new Promise((resolve) => setTimeout(resolve, 2000 * attempt))
+      }
+    } catch (error) {
+      logger.error(`Erreur lors du nettoyage du port ${port}:`, error)
+      if (attempt === retries) {
+        return false
+      }
+    }
+  }
+
+  logger.error(`❌ Impossible de libérer le port ${port} après ${retries} tentatives`)
+  return false
+}
+
+/**
+ * Tue les processus utilisant un port spécifique
+ */
+export async function killProcessOnPort(port: number): Promise<string[]> {
+  const isWindows = process.platform === 'win32'
+  const killedPids: string[] = []
+
+  try {
+    if (isWindows) {
+      // Windows
+      const { stdout } = await execAsync(`netstat -ano | findstr :${port}`)
+      const lines = stdout.trim().split('\n')
+
+      const pids = new Set<string>()
+      for (const line of lines) {
+        const parts = line.trim().split(/\s+/)
+        const pid = parts[parts.length - 1]
+        if (pid && !Number.isNaN(parseInt(pid)) && pid !== '0') {
+          pids.add(pid)
+        }
+      }
+
+      // Tuer chaque processus
+      for (const pid of pids) {
+        try {
+          await execAsync(`taskkill /PID ${pid} /F`)
+          killedPids.push(pid)
+          logger.debug(`PID ${pid} tué`)
+        } catch (error) {
+          logger.warn(`Impossible de tuer le PID ${pid}: ${error}`)
+        }
+      }
+    } else {
+      // Unix/Linux/Mac
+      const { stdout } = await execAsync(`lsof -ti :${port}`)
+      const pids = stdout.trim().split('\n').filter(Boolean)
+
+      for (const pid of pids) {
+        try {
+          await execAsync(`kill -9 ${pid}`)
+          killedPids.push(pid)
+          logger.debug(`PID ${pid} tué`)
+        } catch (error) {
+          logger.warn(`Impossible de tuer le PID ${pid}: ${error}`)
+        }
+      }
+    }
+  } catch (_error) {
+    // Aucun processus trouvé - c'est normal
+    logger.debug(`Aucun processus trouvé sur le port ${port}`)
+  }
+
+  return killedPids
+}
+
+/**
+ * Vérifie si un port est disponible
+ */
+export async function isPortAvailable(port: number, host: string = 'localhost'): Promise<boolean> {
+  return new Promise((resolve) => {
+    const net = require('node:net')
+    const server = net.createServer()
+
+    const cleanup = () => {
+      try {
+        server.close()
+      } catch (_error) {
+        // Ignore error
+      }
+    }
+
+    const timeout = setTimeout(() => {
+      cleanup()
+      resolve(false)
+    }, 5000)
+
+    server.once('error', (_error) => {
+      clearTimeout(timeout)
+      cleanup()
+      resolve(false)
+    })
+
+    server.once('listening', () => {
+      clearTimeout(timeout)
+      cleanup()
+      resolve(true)
+    })
+
+    try {
+      server.listen(port, host)
+    } catch (_error) {
+      clearTimeout(timeout)
+      resolve(false)
+    }
+  })
+}
+
+/**
+ * Diagnostic complet d'un port
+ */
+export async function diagnosePort(port: number): Promise<DiagnosticResult> {
+  const result: DiagnosticResult = {
+    port,
+    available: false,
+  }
+
+  try {
+    // Test de disponibilité
+    result.available = await isPortAvailable(port)
+
+    if (!result.available) {
+      const isWindows = process.platform === 'win32'
+
       if (isWindows) {
-        // Windows - Méthode améliorée
+        // Diagnostic Windows
         try {
           const { stdout } = await execAsync(`netstat -ano | findstr :${port}`)
-          const lines = stdout.trim().split('\n').filter(Boolean)
+          const lines = stdout.trim().split('\n')
+          result.processes = []
 
-          if (lines.length === 0) {
-            EnhancedServerManager.logger.debug(`Aucun processus trouvé sur le port ${port}`)
-            return killedPids
-          }
-
-          const pids = new Set<string>()
-          lines.forEach((line) => {
+          for (const line of lines) {
             const parts = line.trim().split(/\s+/)
-            const pid = parts[parts.length - 1]
-            if (pid && !Number.isNaN(parseInt(pid)) && pid !== '0') {
-              pids.add(pid)
-            }
-          })
+            if (parts.length >= 5) {
+              const [protocol, localAddress, foreignAddress, state, pid] = parts
+              const [localHost, localPort] = localAddress.split(':')
+              const [foreignHost, foreignPort] = foreignAddress.split(':')
 
-          // Tuer chaque processus avec vérification
-          for (const pid of pids) {
-            try {
-              // Vérifier que le processus existe encore
-              await execAsync(`tasklist /FI "PID eq ${pid}" | findstr ${pid}`)
-
-              // Essayer d'abord un arrêt gracieux
-              try {
-                await execAsync(`taskkill /PID ${pid} /T`)
-                await EnhancedServerManager.sleep(1000)
-              } catch {}
-
-              // Vérifier si le processus est encore là, sinon forcer
-              try {
-                await execAsync(`tasklist /FI "PID eq ${pid}" | findstr ${pid}`)
-                await execAsync(`taskkill /PID ${pid} /F /T`)
-                EnhancedServerManager.logger.log(`✅ Processus PID ${pid} forcé à s'arrêter`)
-              } catch {
-                // Le processus s'est arrêté gracieusement
-                EnhancedServerManager.logger.log(`✅ Processus PID ${pid} arrêté gracieusement`)
-              }
-
-              killedPids.push(pid)
-            } catch (_error) {
-              EnhancedServerManager.logger.warn(`⚠️  Processus ${pid} déjà terminé ou inaccessible`)
+              result.processes.push({
+                pid,
+                protocol,
+                localAddress: localHost || '',
+                localPort: localPort || '',
+                foreignAddress: foreignHost || '',
+                foreignPort: foreignPort || '',
+                state: state || '',
+              })
             }
           }
-        } catch (netstatError: any) {
-          // netstat ne trouve rien (normal si port libre)
-          if (netstatError.code === 1 && netstatError.stdout === '') {
-            EnhancedServerManager.logger.debug(`Port ${port} libre, aucun processus à arrêter`)
-            return killedPids
-          }
-          throw netstatError
+        } catch (error) {
+          result.error = `Erreur diagnostic Windows: ${error}`
         }
       } else {
-        // Unix/Linux/Mac - Méthode améliorée
+        // Diagnostic Unix/Linux/Mac
         try {
-          const { stdout } = await execAsync(`lsof -ti:${port}`)
-          const pids = stdout.trim().split('\n').filter(Boolean)
-
-          for (const pid of pids) {
-            try {
-              // Essayer SIGTERM d'abord
-              await execAsync(`kill -TERM ${pid}`)
-              await EnhancedServerManager.sleep(2000)
-
-              // Vérifier si le processus existe encore
-              try {
-                await execAsync(`kill -0 ${pid}`)
-                // Le processus existe encore, forcer avec SIGKILL
-                await execAsync(`kill -KILL ${pid}`)
-                EnhancedServerManager.logger.log(`✅ Processus PID ${pid} forcé à s'arrêter`)
-              } catch {
-                // Le processus s'est arrêté gracieusement
-                EnhancedServerManager.logger.log(`✅ Processus PID ${pid} arrêté gracieusement`)
-              }
-
-              killedPids.push(pid)
-            } catch (_error) {
-              EnhancedServerManager.logger.warn(`⚠️  Impossible de tuer le processus ${pid}`)
-            }
-          }
-        } catch (lsofError: any) {
-          // lsof ne trouve rien (normal si port libre)
-          if (lsofError.code === 1) {
-            EnhancedServerManager.logger.debug(`Port ${port} libre, aucun processus à arrêter`)
-            return killedPids
-          }
-          throw lsofError
+          const { stdout } = await execAsync(`lsof -i :${port}`)
+          result.lsof = stdout
+        } catch (error) {
+          result.error = `Erreur diagnostic Unix: ${error}`
         }
       }
-    } catch (error: any) {
-      // Seulement logger les vraies erreurs, pas les "port libre"
-      if (error.code !== 1) {
-        EnhancedServerManager.logger.error(
-          `Erreur lors de la recherche de processus sur le port ${port}:`,
-          error
-        )
-      }
     }
-
-    return killedPids
+  } catch (error) {
+    result.error = `Erreur diagnostic: ${error}`
   }
 
-  /**
-   * Attend qu'un port se libère
-   */
-  static async waitForPortRelease(port: number, timeout: number = 10000): Promise<void> {
-    const startTime = Date.now()
+  return result
+}
 
-    while (Date.now() - startTime < timeout) {
-      const isAvailable = await EnhancedServerManager.isPortAvailable(port)
-      if (isAvailable) {
-        return
-      }
-      await EnhancedServerManager.sleep(500)
+/**
+ * Trouve le prochain port disponible
+ */
+export async function findNextAvailablePort(
+  startPort: number,
+  maxAttempts: number = 100
+): Promise<number> {
+  for (let i = 0; i < maxAttempts; i++) {
+    const port = startPort + i
+    if (await isPortAvailable(port)) {
+      return port
     }
+  }
+  throw new Error(`Aucun port disponible trouvé à partir de ${startPort}`)
+}
 
-    throw new Error(`Timeout: Port ${port} non libéré après ${timeout}ms`)
+/**
+ * Prépare un port pour utilisation (avec nettoyage si nécessaire)
+ */
+export async function preparePort(port: number): Promise<boolean> {
+  logger.debug(`🔧 Préparation du port ${port}...`)
+
+  const diagnostic = await diagnosePort(port)
+
+  if (diagnostic.available) {
+    logger.debug(`✅ Port ${port} déjà disponible`)
+    return true
   }
 
-  /**
-   * Vérifie si un port est disponible
-   */
-  static async isPortAvailable(port: number, host: string = 'localhost'): Promise<boolean> {
+  logger.debug(`🧹 Port ${port} occupé, nettoyage en cours...`)
+
+  if (diagnostic.processes && diagnostic.processes.length > 0) {
+    logger.debug(
+      `📊 Processus trouvés: ${diagnostic.processes
+        .map((p) => `PID ${p.pid} (${p.state})`)
+        .join(', ')}`
+    )
+  }
+
+  return await cleanupPort(port, 3)
+}
+
+/**
+ * Configuration de port avec gestion d'erreur avancée
+ */
+export async function setupPort(
+  preferredPort: number,
+  fallbackRange: number = 10
+): Promise<{ port: number; wasPreferred: boolean }> {
+  logger.debug(`🎯 Configuration du port: préféré=${preferredPort}`)
+
+  // Essayer le port préféré
+  if (await preparePort(preferredPort)) {
+    return { port: preferredPort, wasPreferred: true }
+  }
+
+  logger.warn(`⚠️ Port préféré ${preferredPort} non disponible, recherche d'alternative...`)
+
+  // Chercher un port alternatif
+  try {
+    const alternativePort = await findNextAvailablePort(preferredPort + 1, fallbackRange)
+    logger.log(`🔄 Port alternatif trouvé: ${alternativePort}`)
+    return { port: alternativePort, wasPreferred: false }
+  } catch (_error) {
+    throw new Error(
+      `Impossible de trouver un port disponible entre ${preferredPort} et ${
+        preferredPort + fallbackRange
+      }`
+    )
+  }
+}
+
+/**
+ * Nettoie plusieurs ports en parallèle
+ */
+export async function cleanupPorts(ports: number[]): Promise<boolean[]> {
+  logger.debug(`🧹 Nettoyage de ${ports.length} ports: ${ports.join(', ')}`)
+
+  const cleanupPromises = ports.map((port) => cleanupPort(port))
+  const results = await Promise.all(cleanupPromises)
+
+  const successful = results.filter(Boolean).length
+  logger.log(`📊 Nettoyage terminé: ${successful}/${ports.length} ports libérés`)
+
+  return results
+}
+
+/**
+ * Monitore l'état d'un port pendant une durée donnée
+ */
+export async function monitorPort(
+  port: number,
+  duration: number = 30000
+): Promise<{ samples: boolean[]; availability: number }> {
+  logger.debug(`👀 Surveillance du port ${port} pendant ${duration}ms`)
+
+  const samples: boolean[] = []
+  const interval = 1000 // Échantillonnage chaque seconde
+  const totalSamples = Math.floor(duration / interval)
+
+  for (let i = 0; i < totalSamples; i++) {
+    const isAvailable = await isPortAvailable(port)
+    samples.push(isAvailable)
+
+    if (i < totalSamples - 1) {
+      await new Promise((resolve) => setTimeout(resolve, interval))
+    }
+  }
+
+  const availability = samples.filter(Boolean).length / samples.length
+  logger.debug(`📈 Disponibilité du port ${port}: ${(availability * 100).toFixed(1)}%`)
+
+  return { samples, availability }
+}
+
+/**
+ * Test de stress pour un port
+ */
+export async function stressTestPort(
+  port: number,
+  connections: number = 10
+): Promise<{ success: number; failed: number; avgTime: number }> {
+  logger.debug(`💪 Test de stress du port ${port} avec ${connections} connexions`)
+
+  const results: { success: boolean; time: number }[] = []
+
+  const testConnection = (): Promise<{ success: boolean; time: number }> => {
     return new Promise((resolve) => {
+      const startTime = Date.now()
       const net = require('node:net')
-      const server = net.createServer()
+      const socket = net.createConnection(port, 'localhost')
 
-      server.once('error', (_err: any) => {
-        resolve(false)
+      const cleanup = () => {
+        try {
+          socket.destroy()
+        } catch (_error) {
+          // Ignore
+        }
+      }
+
+      const timeout = setTimeout(() => {
+        cleanup()
+        resolve({ success: false, time: Date.now() - startTime })
+      }, 5000)
+
+      socket.once('connect', () => {
+        clearTimeout(timeout)
+        cleanup()
+        resolve({ success: true, time: Date.now() - startTime })
       })
 
-      server.once('listening', () => {
-        server.close()
-        resolve(true)
+      socket.once('error', () => {
+        clearTimeout(timeout)
+        cleanup()
+        resolve({ success: false, time: Date.now() - startTime })
       })
-
-      server.listen(port, host)
     })
   }
 
-  /**
-   * Trouve un port disponible à partir d'un port de base
-   */
-  static async findAvailablePort(basePort: number, maxAttempts: number = 10): Promise<number> {
-    for (let i = 0; i < maxAttempts; i++) {
-      const port = basePort + i
-      if (await EnhancedServerManager.isPortAvailable(port)) {
-        return port
-      }
-    }
-    throw new Error(`Aucun port disponible trouvé entre ${basePort} et ${basePort + maxAttempts}`)
-  }
+  // Lancer les tests en parallèle
+  const promises = Array(connections)
+    .fill(null)
+    .map(() => testConnection())
+  const testResults = await Promise.all(promises)
+  results.push(...testResults)
 
-  /**
-   * Nettoie tous les processus Node.js qui pourraient rester
-   */
-  static async cleanupOrphanedProcesses(): Promise<void> {
-    const isWindows = process.platform === 'win32'
+  const success = results.filter((r) => r.success).length
+  const failed = results.length - success
+  const avgTime = results.reduce((sum, r) => sum + r.time, 0) / results.length
 
-    try {
-      if (isWindows) {
-        // Chercher les processus node.exe qui écoutent sur des ports
-        const { stdout } = await execAsync('netstat -ano | findstr LISTENING | findstr node')
-        EnhancedServerManager.logger.log('Processus Node.js en écoute nettoyés')
-      } else {
-        // Unix - chercher les processus node orphelins
-        await execAsync('pkill -f "node.*nest"')
-        EnhancedServerManager.logger.log('Processus Nest.js orphelins nettoyés')
-      }
-    } catch (_error) {
-      // Pas de processus orphelins trouvés
-      EnhancedServerManager.logger.debug('Aucun processus orphelin trouvé')
-    }
-  }
+  logger.debug(
+    `📊 Test terminé: ${success} succès, ${failed} échecs, temps moyen: ${avgTime.toFixed(0)}ms`
+  )
 
-  /**
-   * Utilitaire de sleep
-   */
-  private static sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-  }
-
-  /**
-   * Diagnostic complet des ports
-   */
-  static async diagnosePort(port: number): Promise<any> {
-    const isWindows = process.platform === 'win32'
-
-    try {
-      if (isWindows) {
-        try {
-          const { stdout } = await execAsync(`netstat -ano | findstr :${port}`)
-          const lines = stdout.trim().split('\n').filter(Boolean)
-
-          if (lines.length === 0) {
-            return { port, processes: [], available: true }
-          }
-
-          const processes: any[] = []
-          for (const line of lines) {
-            const parts = line.trim().split(/\s+/)
-            const pid = parts[parts.length - 1]
-
-            if (pid && !Number.isNaN(parseInt(pid))) {
-              try {
-                const { stdout: processInfo } = await execAsync(
-                  `tasklist /FI "PID eq ${pid}" /FO CSV`
-                )
-                processes.push({
-                  pid,
-                  line: line.trim(),
-                  processInfo: processInfo.split('\n')[1],
-                })
-              } catch {}
-            }
-          }
-
-          return { port, processes, available: processes.length === 0 }
-        } catch (netstatError: any) {
-          // Port libre (netstat ne trouve rien)
-          if (netstatError.code === 1 && netstatError.stdout === '') {
-            return { port, processes: [], available: true }
-          }
-          throw netstatError
-        }
-      } else {
-        try {
-          const { stdout } = await execAsync(`lsof -i:${port}`)
-          return { port, lsof: stdout, available: false }
-        } catch (lsofError: any) {
-          // Port libre (lsof ne trouve rien)
-          if (lsofError.code === 1) {
-            return { port, available: true, error: null }
-          }
-          throw lsofError
-        }
-      }
-    } catch (error: any) {
-      // Vraie erreur
-      return { port, available: false, error: error.message }
-    }
-  }
+  return { success, failed, avgTime }
 }

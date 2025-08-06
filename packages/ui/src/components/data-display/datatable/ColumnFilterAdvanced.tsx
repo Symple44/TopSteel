@@ -109,7 +109,7 @@ export function ColumnFilterAdvanced<T = any>({
 
     data.forEach((item) => {
       // Utiliser getValue si défini, sinon utiliser la clé de la colonne
-      let value
+      let value: unknown
       if (typeof column.getValue === 'function') {
         value = column.getValue(item)
       } else {
@@ -446,14 +446,13 @@ export function ColumnFilterAdvanced<T = any>({
                 columnType === 'richtext') && (
                 <>
                   {/* Barre de recherche */}
-                  <div className="relative mb-3" onClick={(e: any) => e.stopPropagation()}>
+                  <div className="relative mb-3" role="presentation">
                     <Search className="absolute left-2 top-2.5 h-3 w-3 text-muted-foreground" />
                     <Input
                       type="text"
                       placeholder="Rechercher..."
                       value={searchTerm}
                       onChange={(e: any) => setSearchTerm(e.target.value)}
-                      onClick={(e: any) => e.stopPropagation()}
                       onFocus={(e: any) => e.stopPropagation()}
                       className="pl-7 h-8 text-sm"
                     />
@@ -519,16 +518,13 @@ export function ColumnFilterAdvanced<T = any>({
                       <label
                         key={value}
                         className="flex items-center gap-2 p-1 hover:bg-muted/50 rounded cursor-pointer"
-                        onClick={(e: any) => e.stopPropagation()}
                       >
                         <Checkbox
                           checked={selectedValues.has(value)}
                           onCheckedChange={() => toggleValue(value)}
-                          onClick={(e: any) => e.stopPropagation()}
                         />
                         <span
                           className={`text-sm truncate flex-1 ${value === '(Vide)' ? 'italic text-muted-foreground' : ''}`}
-                          onClick={(e: any) => e.stopPropagation()}
                         >
                           {value === '(Vide)' ? '(Vide - Non traduit)' : value}
                         </span>
@@ -546,7 +542,7 @@ export function ColumnFilterAdvanced<T = any>({
                   </div>
 
                   <div className="space-y-2">
-                    <div onClick={(e: any) => e.stopPropagation()}>
+                    <div role="presentation">
                       <Label className="text-xs">Minimum</Label>
                       <Input
                         type="number"
@@ -555,13 +551,12 @@ export function ColumnFilterAdvanced<T = any>({
                         onChange={(e: any) =>
                           setNumberRange((prev) => ({ ...prev, min: e.target.value }))
                         }
-                        onClick={(e: any) => e.stopPropagation()}
                         onFocus={(e: any) => e.stopPropagation()}
                         className="h-8"
                       />
                     </div>
 
-                    <div onClick={(e: any) => e.stopPropagation()}>
+                    <div role="presentation">
                       <Label className="text-xs">Maximum</Label>
                       <Input
                         type="number"
@@ -570,7 +565,6 @@ export function ColumnFilterAdvanced<T = any>({
                         onChange={(e: any) =>
                           setNumberRange((prev) => ({ ...prev, max: e.target.value }))
                         }
-                        onClick={(e: any) => e.stopPropagation()}
                         onFocus={(e: any) => e.stopPropagation()}
                         className="h-8"
                       />
@@ -587,7 +581,7 @@ export function ColumnFilterAdvanced<T = any>({
                   </div>
 
                   <div className="space-y-2">
-                    <div onClick={(e: any) => e.stopPropagation()}>
+                    <div role="presentation">
                       <Label className="text-xs">Date de début</Label>
                       <Input
                         type="date"
@@ -595,13 +589,12 @@ export function ColumnFilterAdvanced<T = any>({
                         onChange={(e: any) =>
                           setDateRange((prev) => ({ ...prev, start: e.target.value }))
                         }
-                        onClick={(e: any) => e.stopPropagation()}
                         onFocus={(e: any) => e.stopPropagation()}
                         className="h-8"
                       />
                     </div>
 
-                    <div onClick={(e: any) => e.stopPropagation()}>
+                    <div role="presentation">
                       <Label className="text-xs">Date de fin</Label>
                       <Input
                         type="date"
@@ -609,7 +602,6 @@ export function ColumnFilterAdvanced<T = any>({
                         onChange={(e: any) =>
                           setDateRange((prev) => ({ ...prev, end: e.target.value }))
                         }
-                        onClick={(e: any) => e.stopPropagation()}
                         onFocus={(e: any) => e.stopPropagation()}
                         className="h-8"
                       />

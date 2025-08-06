@@ -45,7 +45,7 @@ export class PageDiscoveryService {
       const pagesWithCorrectTitles = this.applyStaticMetadata(pages)
       const categorizedPages = this.categorizePages(pagesWithCorrectTitles)
       return categorizedPages
-    } catch (_error) {
+    } catch {
       return []
     }
   }
@@ -59,7 +59,7 @@ export class PageDiscoveryService {
 
     try {
       this.scanDirectory(fullPath, '', pages)
-    } catch (_error) {}
+    } catch {}
 
     return pages
   }
@@ -91,7 +91,7 @@ export class PageDiscoveryService {
           }
         }
       }
-    } catch (_error) {}
+    } catch {}
   }
 
   /**
@@ -131,7 +131,7 @@ export class PageDiscoveryService {
         isEnabled: true,
         isVisible: true,
       }
-    } catch (_error) {
+    } catch {
       return null
     }
   }
@@ -181,7 +181,7 @@ export class PageDiscoveryService {
             }
           }
         }
-      } catch (_error) {}
+      } catch {}
     }
 
     // Chercher le titre dans les composants

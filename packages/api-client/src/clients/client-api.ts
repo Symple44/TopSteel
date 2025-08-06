@@ -23,7 +23,7 @@ interface ClientStats {
 }
 
 interface ClientWithProjects extends Client {
-  projets: any[]
+  projets: unknown[]
   stats: ClientStats
 }
 
@@ -51,8 +51,8 @@ interface CreateClientCommand {
   nom: string
   email: string
   type: string
-  adresse?: any
-  contact?: any
+  adresse?: unknown
+  contact?: unknown
 }
 
 interface UpdateClientCommand extends Partial<CreateClientCommand> {
@@ -99,8 +99,8 @@ export class ClientApiClient extends BaseApiClient {
     try {
       const response = await this.http.get<Client>(`${this.endpoint}/${this.normalizeId(id)}`)
       return response.data
-    } catch (error: any) {
-      if (error.statusCode === 404) {
+    } catch (error: unknown) {
+      if ((error as { statusCode?: number }).statusCode === 404) {
         return null
       }
       throw error
@@ -113,8 +113,8 @@ export class ClientApiClient extends BaseApiClient {
         `${this.endpoint}/${this.normalizeId(id)}/with-projects`
       )
       return response.data
-    } catch (error: any) {
-      if (error.statusCode === 404) {
+    } catch (error: unknown) {
+      if ((error as { statusCode?: number }).statusCode === 404) {
         return null
       }
       throw error
@@ -158,7 +158,7 @@ export class ClientApiClient extends BaseApiClient {
   async deleteClient(id: string): Promise<OperationResult<boolean>> {
     return this.http.executeOperation(async () => {
       await this.http.delete(`${this.endpoint}/${this.normalizeId(id)}`)
-      return { data: true } as any
+      return { data: true } as { data: boolean }
     })
   }
 

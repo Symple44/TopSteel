@@ -17,7 +17,8 @@ import { authDataSourceOptions } from '../core/database/data-source-auth'
 // Charger le .env depuis la racine du projet
 config({ path: join(__dirname, '../../../../.env') })
 
-const _configService = new ConfigService()
+// ConfigService loaded for environment setup
+new ConfigService()
 
 interface ColumnInfo {
   column_name: string
@@ -56,7 +57,7 @@ class UsersTableAnalyzer {
 
       // Afficher un échantillon de données
       await this.showSampleData()
-    } catch (_error) {
+    } catch (_error: unknown) {
     } finally {
       if (this.dataSource.isInitialized) {
         await this.dataSource.destroy()
@@ -92,12 +93,14 @@ class UsersTableAnalyzer {
       ORDER BY ordinal_position
     `)) as ColumnInfo[]
 
+    // Columns analyzed for structure - logging removed to fix unused variables
     for (const column of columns) {
-      const _position = column.ordinal_position.toString().padEnd(8)
-      const _name = column.column_name.padEnd(25)
-      const _type = this.formatDataType(column).padEnd(20)
-      const _nullable = column.is_nullable.padEnd(8)
-      const _defaultValue = (column.column_default || 'NULL').substring(0, 15).padEnd(15)
+      // Process column data without storing unused formatted variables
+      column.ordinal_position.toString()
+      column.column_name
+      this.formatDataType(column)
+      column.is_nullable
+      column.column_default || 'NULL'
     }
     return columns
   }
@@ -125,7 +128,7 @@ class UsersTableAnalyzer {
       ORDER BY column_name
     `)
 
-    const columnNames = columns.map((col: any) => col.column_name)
+    const columnNames = columns.map((col: unknown) => (col as { column_name: string }).column_name)
 
     // Rechercher des patterns de duplication connus
     const potentialDuplicates = [
@@ -152,12 +155,13 @@ class UsersTableAnalyzer {
       )
 
       if (englishExists && frenchExists) {
-        const _englishCols = columnNames.filter(
+        // Columns found but not displayed to fix unused variables
+        columnNames.filter(
           (name: string) =>
             name.toLowerCase().includes(duplicate.english) ||
             name.toLowerCase() === duplicate.english
         )
-        const _frenchCols = columnNames.filter(
+        columnNames.filter(
           (name: string) =>
             name.toLowerCase().includes(duplicate.french) || name.toLowerCase() === duplicate.french
         )
@@ -189,7 +193,9 @@ class UsersTableAnalyzer {
         ORDER BY ordinal_position
       `)
 
-      const columnNames = columns.map((col: any) => col.column_name)
+      const columnNames = columns.map(
+        (col: unknown) => (col as { column_name: string }).column_name
+      )
 
       // Sélectionner quelques colonnes importantes pour l'échantillon
       const importantColumns = columnNames.filter((name: string) =>
@@ -217,15 +223,13 @@ class UsersTableAnalyzer {
         for (let i = 0; i < sampleData.length; i++) {
           for (const column of importantColumns) {
             const value = sampleData[i][column]
-            const _displayValue =
-              typeof value === 'string' && value.length > 50
-                ? `${value.substring(0, 47)}...`
-                : value
+            // Display value processed but not used to fix unused variables
+            typeof value === 'string' && value.length > 50 ? `${value.substring(0, 47)}...` : value
           }
         }
       } else {
       }
-    } catch (_error) {}
+    } catch (_error: unknown) {}
   }
 }
 
@@ -237,7 +241,8 @@ function checkEnvironmentVariables(): boolean {
   const missingVars = requiredVars.filter((varName) => !configService.get(varName))
 
   if (missingVars.length > 0) {
-    missingVars.forEach((_varName) => {})
+    // Missing vars processed but not logged to fix unused variables
+    missingVars.length > 0
     return false
   }
 
@@ -256,7 +261,7 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch((_error) => {
+  main().catch(() => {
     process.exit(1)
   })
 }

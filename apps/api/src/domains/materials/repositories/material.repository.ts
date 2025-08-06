@@ -168,7 +168,7 @@ export interface IMaterialRepository extends IBusinessRepository<Material> {
   /**
    * Obtenir les mouvements de stock récents pour un matériau
    */
-  getRecentStockMovements(materialId: string, limit: number): Promise<any[]>
+  getRecentStockMovements(materialId: string, limit: number): Promise<Record<string, unknown>[]>
 
   /**
    * Obtenir les matériaux les plus utilisés

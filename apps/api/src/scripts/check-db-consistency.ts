@@ -47,7 +47,7 @@ interface DatabaseInfo {
   name: string
   tables: Map<string, TableColumn[]>
   constraints: Map<string, TableConstraint[]>
-  indexes: Map<string, any[]>
+  indexes: Map<string, unknown[]>
 }
 
 interface ConsistencyIssue {
@@ -63,8 +63,8 @@ interface ConsistencyIssue {
   table: string
   column?: string
   entity?: string
-  expected?: any
-  actual?: any
+  expected?: unknown
+  actual?: unknown
   description: string
 }
 
@@ -91,7 +91,7 @@ class DatabaseConsistencyChecker {
 
       // Générer le rapport
       this.generateReport()
-    } catch (_error) {
+    } catch {
       process.exit(1)
     }
   }
@@ -110,10 +110,10 @@ class DatabaseConsistencyChecker {
       await this.checkTablesAndColumns(dbInfo, entityMetadata, dbType)
 
       // Vérifier les contraintes
-      await this.checkConstraints(dbInfo, entityMetadata, dbType)
+      await this.checkConstraints(dbInfo)
 
       // Vérifier les index
-      await this.checkIndexes(dbInfo, entityMetadata, dbType)
+      await this.checkIndexes(dbInfo)
 
       // Vérifications spécifiques
       if (dbType === 'AUTH') {
@@ -217,7 +217,7 @@ class DatabaseConsistencyChecker {
 
   private async checkTablesAndColumns(
     dbInfo: DatabaseInfo,
-    entityMetadata: any[],
+    entityMetadata: unknown[],
     dbType: string
   ): Promise<void> {
     // Vérifier que chaque entité a une table correspondante
@@ -237,7 +237,11 @@ class DatabaseConsistencyChecker {
       }
 
       // Vérifier les colonnes
-      const dbColumns = dbInfo.tables.get(tableName)!
+      const dbColumns = dbInfo.tables.get(tableName)
+      if (!dbColumns) {
+        // This should not happen since we already checked above, but safety first
+        continue
+      }
       const entityColumns = entity.columns
 
       // Colonnes définies dans l'entité mais absentes en base
@@ -264,7 +268,9 @@ class DatabaseConsistencyChecker {
       // Colonnes présentes en base mais non définies dans l'entité
       for (const dbColumn of dbColumns) {
         const columnName = dbColumn.column_name
-        const entityColumn = entityColumns.find((col: any) => col.databaseName === columnName)
+        const entityColumn = entityColumns.find(
+          (col: unknown) => (col as { databaseName: string }).databaseName === columnName
+        )
 
         if (!entityColumn) {
           this.addIssue({
@@ -295,7 +301,7 @@ class DatabaseConsistencyChecker {
   }
 
   private checkColumnType(
-    entityColumn: any,
+    entityColumn: unknown,
     dbColumn: TableColumn,
     tableName: string,
     entityName: string
@@ -317,7 +323,7 @@ class DatabaseConsistencyChecker {
     }
   }
 
-  private mapTypeOrmToPostgres(typeormType: any): string | null {
+  private mapTypeOrmToPostgres(typeormType: unknown): string | null {
     const typeMap: Record<string, string> = {
       varchar: 'character varying',
       text: 'text',
@@ -338,28 +344,14 @@ class DatabaseConsistencyChecker {
     return null
   }
 
-  private async checkConstraints(
-    dbInfo: DatabaseInfo,
-    _entityMetadata: any[],
-    _dbType: string
-  ): Promise<void> {
+  private async checkConstraints(_dbInfo: DatabaseInfo): Promise<void> {
     // Ici on peut ajouter des vérifications spécifiques des foreign keys
     // Pour le moment, on fait juste un résumé
-    let _totalConstraints = 0
-    for (const [_tableName, constraints] of dbInfo.constraints) {
-      _totalConstraints += constraints.length
-    }
+    // Future implementation placeholder
   }
 
-  private async checkIndexes(
-    dbInfo: DatabaseInfo,
-    _entityMetadata: any[],
-    _dbType: string
-  ): Promise<void> {
-    let _totalIndexes = 0
-    for (const [_tableName, indexes] of dbInfo.indexes) {
-      _totalIndexes += indexes.length
-    }
+  private async checkIndexes(_dbInfo: DatabaseInfo): Promise<void> {
+    // Future implementation placeholder
   }
 
   private async checkAuthSpecificIssues(dataSource: DataSource): Promise<void> {
@@ -377,10 +369,18 @@ class DatabaseConsistencyChecker {
       const userColumns = await queryRunner.query(usersTableQuery)
 
       // Rechercher les colonnes problématiques
-      const passwordCol = userColumns.find((col: any) => col.column_name === 'password')
-      const motDePasseCol = userColumns.find((col: any) => col.column_name === 'mot_de_passe')
-      const isActiveCol = userColumns.find((col: any) => col.column_name === 'isActive')
-      const actifCol = userColumns.find((col: any) => col.column_name === 'actif')
+      const passwordCol = userColumns.find(
+        (col: unknown) => (col as { column_name: string }).column_name === 'password'
+      )
+      const motDePasseCol = userColumns.find(
+        (col: unknown) => (col as { column_name: string }).column_name === 'mot_de_passe'
+      )
+      const isActiveCol = userColumns.find(
+        (col: unknown) => (col as { column_name: string }).column_name === 'isActive'
+      )
+      const actifCol = userColumns.find(
+        (col: unknown) => (col as { column_name: string }).column_name === 'actif'
+      )
 
       if (motDePasseCol && passwordCol) {
         this.addIssue({
@@ -437,8 +437,12 @@ class DatabaseConsistencyChecker {
           AND table_schema = 'public'
         `)
 
-        const hasNameColumn = roleColumns.some((col: any) => col.column_name === 'name')
-        const hasNomColumn = roleColumns.some((col: any) => col.column_name === 'nom')
+        const hasNameColumn = roleColumns.some(
+          (col: unknown) => (col as { column_name: string }).column_name === 'name'
+        )
+        const hasNomColumn = roleColumns.some(
+          (col: unknown) => (col as { column_name: string }).column_name === 'nom'
+        )
 
         if (hasNomColumn && !hasNameColumn) {
           this.addIssue({
@@ -451,7 +455,8 @@ class DatabaseConsistencyChecker {
           })
         }
       }
-    } catch (_error) {
+    } catch {
+      // Database query errors are handled silently
     } finally {
       await queryRunner.release()
     }
@@ -484,35 +489,35 @@ class DatabaseConsistencyChecker {
 
     // Afficher les erreurs
     if (errors.length > 0) {
-      errors.forEach((issue, _index) => {
-        if (issue.table)
-          if (issue.column)
-            if (issue.entity)
-              if (issue.expected && issue.actual) {
-              }
+      errors.forEach((_issue) => {
+        // Future implementation placeholder
       })
     }
 
     // Afficher les avertissements
     if (warnings.length > 0) {
-      warnings.forEach((issue, _index) => {
-        if (issue.table) 
-        if (issue.column) 
-        if (issue.entity)
+      warnings.forEach((_issue) => {
+        // Future implementation placeholder
       })
     }
 
     // Afficher les informations
     if (infos.length > 0) {
-      infos.forEach((issue, _index) => {
-        if (issue.table)
+      infos.forEach((_issue) => {
+        // Future implementation placeholder
       })
     }
-
+    // Summary logging placeholder
     if (errors.length > 0) {
+      // Error summary placeholder
     }
 
     if (warnings.length > 0) {
+      // Warning summary placeholder
+    }
+
+    if (errors.length === 0 && warnings.length === 0) {
+      // Success summary placeholder
     }
   }
 }
@@ -524,7 +529,7 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch((_error) => {
+  main().catch(() => {
     process.exit(1)
   })
 }

@@ -17,12 +17,12 @@ export interface ResourceOwnershipRequirement {
   // Nom du paramètre contenant l'ID du propriétaire
   ownerIdParam?: string
   // Fonction personnalisée pour extraire l'ID du propriétaire
-  ownerExtractor?: (request: any) => string | Promise<string>
+  ownerExtractor?: (request: unknown) => string | Promise<string>
   // Fonction personnalisée pour vérifier la propriété
   ownershipValidator?: (
     userId: string,
     resourceId: string,
-    request: any
+    request: unknown
   ) => boolean | Promise<boolean>
   // Rôles qui peuvent bypasser la vérification de propriété
   bypassRoles?: {
@@ -134,7 +134,7 @@ export class ResourceOwnershipGuard implements CanActivate {
   }
 
   private async extractOwnerId(
-    request: any,
+    request: unknown,
     requirement: ResourceOwnershipRequirement
   ): Promise<string | null> {
     // Utiliser l'extracteur personnalisé si fourni
@@ -165,7 +165,7 @@ export class ResourceOwnershipGuard implements CanActivate {
     return null
   }
 
-  private extractResourceId(request: any, requirement: ResourceOwnershipRequirement): string {
+  private extractResourceId(request: unknown, requirement: ResourceOwnershipRequirement): string {
     if (requirement.resourceIdParam) {
       return (
         request.params[requirement.resourceIdParam] ||

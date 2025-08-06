@@ -12,7 +12,7 @@ export class ModernizePermissionsTable1738703000000 implements MigrationInterfac
       AND table_schema = 'public'
     `)
 
-    const columnNames = columns.map((col: any) => col.column_name)
+    const columnNames = columns.map((col: { column_name: string }) => col.column_name)
 
     // Ajouter la colonne 'name' si elle n'existe pas
     if (!columnNames.includes('name')) {

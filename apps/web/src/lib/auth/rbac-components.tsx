@@ -277,6 +277,7 @@ export function AccessDenied({
         <p className="text-gray-600 mb-4 max-w-md">{message}</p>
         {showReturnButton && (
           <button
+            type="button"
             onClick={handleReturn}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >

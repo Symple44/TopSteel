@@ -11,7 +11,13 @@ interface KpiCardProps {
   className?: string
 }
 
-export function KpiCard({ data, showActions = false, onEdit, onDelete, className }: KpiCardProps) {
+export function KpiCard({
+  data: _data,
+  showActions = false,
+  onEdit,
+  onDelete,
+  className,
+}: KpiCardProps) {
   return (
     <Card className={className}>
       <CardHeader>

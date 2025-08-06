@@ -1,17 +1,30 @@
 'use client'
 
-import { ErpInfoModal, type ErpInfoModalProps } from '@erp/ui/business'
+import { ErpInfoModal } from '@erp/ui/business'
 import { useBackendHealth } from '@/hooks/use-backend-health'
 import { useTranslation } from '@/lib/i18n'
 
-interface ErpInfoModalWrapperProps
-  extends Omit<ErpInfoModalProps, 'health' | 'onCheckHealth' | 'isChecking' | 'translations'> {
-  // Override props that we'll handle internally
+interface ErpInfoModalWrapperProps {
+  isOpen: boolean
+  onClose: () => void
 }
 
 export function ErpInfoModalWrapper(props: ErpInfoModalWrapperProps) {
   const { health, checkHealth, isChecking } = useBackendHealth()
-  const { t } = useTranslation('common')
+  const { t: _ } = useTranslation('common')
+
+  // Convert null values to undefined for UI component compatibility
+  const mappedHealth = {
+    status: health.status,
+    responseTime: health.responseTime ?? undefined,
+    version: health.version ?? undefined,
+    environment: health.environment ?? undefined,
+    database: health.database === 'unknown' ? undefined : health.database,
+    activeUsers: health.activeUsers,
+    uptime: health.uptime ?? undefined,
+    lastCheck: health.lastCheck ?? undefined,
+    error: health.error,
+  }
 
   const translations = {
     title: 'TopSteel ERP',
@@ -40,8 +53,9 @@ export function ErpInfoModalWrapper(props: ErpInfoModalWrapperProps) {
 
   return (
     <ErpInfoModal
-      {...props}
-      health={health}
+      isOpen={props.isOpen}
+      onClose={props.onClose}
+      health={mappedHealth}
       onCheckHealth={checkHealth}
       isChecking={isChecking}
       translations={translations}

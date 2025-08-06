@@ -39,7 +39,7 @@ export async function testOpenTelemetry() {
         return `test-${i}-ok`
       })
 
-      const _results = await Promise.all(promises)
+      await Promise.all(promises)
     } catch (error) {
       if (error instanceof Error && error.message?.includes('CLIENT')) {
         throw new Error('OpenTelemetry cause encore une erreur CLIENT')

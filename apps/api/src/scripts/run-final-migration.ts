@@ -76,9 +76,9 @@ async function runFinalMigration() {
           }
         } else {
         }
-      } catch (_error: any) {}
+      } catch (_error: unknown) {}
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

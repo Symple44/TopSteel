@@ -53,7 +53,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
   }
 
   async update(id: string, entity: Partial<Article>): Promise<Article> {
-    await this.repository.update(id, entity)
+    await this.repository.update(id, entity as Record<string, unknown>)
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Article with id ${id} not found after update`)
@@ -359,7 +359,10 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return {}
   }
 
-  async getRecentStockMovements(_articleId: string, _limit: number): Promise<any[]> {
+  async getRecentStockMovements(
+    _articleId: string,
+    _limit: number
+  ): Promise<Record<string, unknown>[]> {
     // TODO: Implémenter selon votre système de mouvements
     return []
   }
@@ -389,7 +392,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(_spec: any): Promise<Article[]> {
+  async findBySpecification(_spec: Record<string, unknown>): Promise<Article[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }

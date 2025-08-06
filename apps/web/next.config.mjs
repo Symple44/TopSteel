@@ -10,7 +10,7 @@ const require = createRequire(import.meta.url)
 function _safeResolve(moduleName) {
   try {
     return require.resolve(moduleName)
-  } catch (_error) {
+  } catch {
     return false
   }
 }
@@ -18,11 +18,11 @@ function _safeResolve(moduleName) {
 // Fonction pour exécuter Biome
 async function _runBiome() {
   try {
-    const { stdout, stderr } = await execAsync('npx biome check src/ --reporter=summary')
+    const { stderr } = await execAsync('npx biome check src/ --reporter=summary')
     if (stderr && !stderr.includes('warnings')) {
       process.exit(1)
     }
-  } catch (_error) {
+  } catch {
     process.exit(1)
   }
 }

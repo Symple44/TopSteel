@@ -25,7 +25,7 @@ import { useTranslation } from '@/lib/i18n'
 
 export function NotificationSettings() {
   const { state, actions } = useNotifications()
-  const { t } = useTranslation('settings')
+  const { t: _t } = useTranslation('settings')
   const [activeTab, setActiveTab] = useState<'general' | 'categories' | 'priority' | 'schedule'>(
     'general'
   )

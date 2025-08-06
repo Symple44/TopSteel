@@ -9,7 +9,7 @@ interface LogContext {
   requestId?: string
   sessionId?: string
   action?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 @Injectable()

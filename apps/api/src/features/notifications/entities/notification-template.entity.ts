@@ -50,8 +50,7 @@ export class NotificationTemplate extends BaseAuditEntity {
   actionLabel?: string
 
   @Column({ type: 'jsonb', nullable: true })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  variables?: Record<string, any>
+  variables?: Record<string, unknown>
 
   @Column({ type: 'text', nullable: true })
   description?: string

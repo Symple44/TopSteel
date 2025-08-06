@@ -66,12 +66,18 @@ export class ArticleService extends BusinessService<Article> {
     if (data.reference) {
       article.reference = data.reference
     } else {
-      article.reference = await this.generateReference(data.type!)
+      if (!data.type) {
+        throw new Error("Type d'article requis pour générer une référence")
+      }
+      article.reference = await this.generateReference(data.type)
     }
 
     // Informations de base obligatoires
     article.designation = data.designation || ''
-    article.type = data.type!
+    if (!data.type) {
+      throw new Error("Type d'article requis")
+    }
+    article.type = data.type
     article.status = data.status || ArticleStatus.ACTIF
     article.description = data.description
 
@@ -82,7 +88,10 @@ export class ArticleService extends BusinessService<Article> {
     article.modele = data.modele
 
     // Unités
-    article.uniteStock = data.uniteStock!
+    if (!data.uniteStock) {
+      throw new Error('Unité de stock requise')
+    }
+    article.uniteStock = data.uniteStock
     article.uniteAchat = data.uniteAchat
     article.uniteVente = data.uniteVente
     article.coefficientAchat = data.coefficientAchat || 1
@@ -95,7 +104,10 @@ export class ArticleService extends BusinessService<Article> {
     article.stockMini = data.stockMini
     article.stockMaxi = data.stockMaxi
     article.stockSecurite = data.stockSecurite
-    article.methodeValorisation = data.methodeValorisation!
+    if (!data.methodeValorisation) {
+      throw new Error('Méthode de valorisation requise')
+    }
+    article.methodeValorisation = data.methodeValorisation
 
     // Prix
     article.prixAchatStandard = data.prixAchatStandard
@@ -367,9 +379,9 @@ export class ArticleService extends BusinessService<Article> {
 
     // Créer une copie
     const articleCopie = { ...articleOriginal }
-    delete (articleCopie as any).id
-    delete (articleCopie as any).createdAt
-    delete (articleCopie as any).updatedAt
+    delete (articleCopie as Record<string, unknown>).id
+    delete (articleCopie as Record<string, unknown>).createdAt
+    delete (articleCopie as Record<string, unknown>).updatedAt
 
     // Appliquer les modifications
     articleCopie.reference = nouvelleReference

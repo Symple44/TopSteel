@@ -42,14 +42,14 @@ async function runMigration() {
       await dataSource.query(
         `CREATE INDEX idx_user_mfa_enabled_verified ON user_mfa(is_enabled, is_verified)`
       )
-    } catch (_error: any) {}
+    } catch {}
     try {
       await dataSource.query(`
         ALTER TABLE user_sessions 
           ALTER COLUMN "accessToken" TYPE TEXT,
           ALTER COLUMN "refreshToken" TYPE TEXT
       `)
-    } catch (_error: any) {}
+    } catch {}
     try {
       await dataSource.query(`
         CREATE TABLE IF NOT EXISTS mfa_session (
@@ -75,23 +75,23 @@ async function runMigration() {
       await dataSource.query(
         `CREATE INDEX IF NOT EXISTS idx_mfa_session_token ON mfa_session(session_token)`
       )
-    } catch (_error: any) {}
+    } catch {}
 
     // Vérifier user_mfa
-    const _mfaCheck = await dataSource.query(`
+    await dataSource.query(`
       SELECT column_name FROM information_schema.columns 
       WHERE table_name = 'user_mfa' AND column_name = 'type'
     `)
 
     // Vérifier user_sessions
-    const tokenCheck = await dataSource.query(`
+    const _tokenCheck = await dataSource.query(`
       SELECT column_name, data_type 
       FROM information_schema.columns 
       WHERE table_name = 'user_sessions' 
       AND column_name IN ('accessToken', 'refreshToken')
     `)
-    tokenCheck.forEach((_col: any) => {})
-  } catch (_error) {
+    // Token columns checked
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

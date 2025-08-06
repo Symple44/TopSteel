@@ -33,6 +33,7 @@ import {
   Smartphone,
   Trash2,
 } from 'lucide-react'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/hooks'
@@ -89,16 +90,12 @@ export default function SecuritySettingsPage() {
   } | null>(null)
   const [webauthnSetup, setWebauthnSetup] = useState<{
     mfaId: string
-    options: any
+    options: unknown
   } | null>(null)
   const [verificationCode, setVerificationCode] = useState('')
   const [deviceName, setDeviceName] = useState('')
   const [showBackupCodes, setShowBackupCodes] = useState(false)
   const [backupCodes, setBackupCodes] = useState<string[]>([])
-
-  useEffect(() => {
-    loadMFAData()
-  }, [loadMFAData])
 
   const loadMFAData = async () => {
     try {
@@ -115,12 +112,16 @@ export default function SecuritySettingsPage() {
         setMFAStats(statsData.data)
         setMFAMethods(methodsData.data)
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('security.mfa.loadError'))
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadMFAData()
+  }, [loadMFAData])
 
   const handleSetupTOTP = async () => {
     try {
@@ -136,7 +137,7 @@ export default function SecuritySettingsPage() {
       } else {
         toast.error(t('security.mfa.totp.configError'))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('security.mfa.configError'))
     }
   }
@@ -163,7 +164,7 @@ export default function SecuritySettingsPage() {
       } else {
         toast.error(t('security.mfa.totp.invalidCode'))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('security.mfa.verificationError'))
     }
   }
@@ -187,12 +188,12 @@ export default function SecuritySettingsPage() {
       } else {
         toast.error(t('security.mfa.webauthn.configError'))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('security.mfa.webauthn.notSupportedError'))
     }
   }
 
-  const startWebAuthnRegistration = async (options: any) => {
+  const startWebAuthnRegistration = async (options: unknown) => {
     try {
       // Check WebAuthn support
       if (!window.navigator.credentials || !window.PublicKeyCredential) {
@@ -235,12 +236,12 @@ export default function SecuritySettingsPage() {
 
       // Verify registration
       await verifyWebAuthnRegistration(response)
-    } catch (_error) {
+    } catch {
       toast.error(t('security.mfa.webauthn.registrationError'))
     }
   }
 
-  const verifyWebAuthnRegistration = async (response: any) => {
+  const verifyWebAuthnRegistration = async (response: unknown) => {
     if (!webauthnSetup) return
 
     try {
@@ -263,7 +264,7 @@ export default function SecuritySettingsPage() {
       } else {
         toast.error(t('security.mfa.webauthn.verificationError'))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('security.mfa.verificationError'))
     }
   }
@@ -282,7 +283,7 @@ export default function SecuritySettingsPage() {
       } else {
         toast.error(t('security.mfa.disableError'))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('security.mfa.configError'))
     }
   }
@@ -298,7 +299,7 @@ export default function SecuritySettingsPage() {
       } else {
         toast.error(t('security.mfa.codesNotAvailable'))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('security.mfa.codesError'))
     }
   }
@@ -547,7 +548,13 @@ export default function SecuritySettingsPage() {
           {totpSetup && (
             <div className="space-y-4">
               <div className="flex justify-center">
-                <img src={totpSetup.qrCode} alt="QR Code TOTP" className="border rounded-lg" />
+                <Image
+                  src={totpSetup.qrCode}
+                  alt="QR Code TOTP"
+                  className="border rounded-lg"
+                  width={200}
+                  height={200}
+                />
               </div>
 
               <div className="space-y-2">
@@ -558,10 +565,11 @@ export default function SecuritySettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">
+                <label className="text-sm font-medium" htmlFor="verification-code">
                   {ts('security.verificationCodeLabel')}
                 </label>
                 <input
+                  id="verification-code"
                   type="text"
                   placeholder={ts('security.verificationCodePlaceholder')}
                   value={verificationCode}
@@ -574,7 +582,7 @@ export default function SecuritySettingsPage() {
               <div className="space-y-2">
                 <p className="text-sm font-medium">{ts('security.backupCodesLabel')}</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  {totpSetup.backupCodes.map((code, _index) => (
+                  {totpSetup.backupCodes.map((code) => (
                     <code
                       key={`backup-code-${code}`}
                       className="block p-1 bg-muted rounded text-center"
@@ -615,8 +623,11 @@ export default function SecuritySettingsPage() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">{ts('security.deviceNameLabel')}</label>
+              <label htmlFor="device-name" className="text-sm font-medium">
+                {ts('security.deviceNameLabel')}
+              </label>
               <input
+                id="device-name"
                 type="text"
                 placeholder={ts('security.deviceNamePlaceholder')}
                 value={deviceName}
@@ -649,7 +660,7 @@ export default function SecuritySettingsPage() {
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
-              {backupCodes.map((code, _index) => (
+              {backupCodes.map((code) => (
                 <code
                   key={`backup-code-${code}`}
                   className="block p-2 bg-muted rounded text-center font-mono"

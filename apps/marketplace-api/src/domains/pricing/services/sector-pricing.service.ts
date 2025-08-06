@@ -145,7 +145,7 @@ export class SectorPricingService {
       reason?: string
       customerName?: string
       customerCode?: string
-      metadata?: any
+      metadata?: unknown
     } = {}
   ): Promise<CustomerSectorAssignment> {
     // Désactiver l'assignation précédente s'il y en a une
@@ -217,9 +217,9 @@ export class SectorPricingService {
     coefficientType: CoefficientType
     coefficient: number
     description?: string
-    conditions?: any
-    parameters?: any
-    metadata?: any
+    conditions?: unknown
+    parameters?: unknown
+    metadata?: unknown
   }): Promise<SectorCoefficient> {
     const coefficient = this.sectorCoefficientRepository.create({
       ...data,

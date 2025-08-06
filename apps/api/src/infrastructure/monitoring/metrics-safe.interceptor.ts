@@ -14,7 +14,7 @@ import { catchError, tap } from 'rxjs/operators'
 export class MetricsSafeInterceptor implements NestInterceptor {
   private readonly logger = new Logger(MetricsSafeInterceptor.name)
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<Request>()
     const response = context.switchToHttp().getResponse<Response>()
 

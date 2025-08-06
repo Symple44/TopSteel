@@ -233,16 +233,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
           {/* Loading spinner */}
           {loading && (
-            <div
-              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            <output
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 animate-spin h-4 w-4 border-2 border-muted-foreground border-t-transparent rounded-full block"
               aria-label="Chargement en cours"
-            >
-              <div
-                className="animate-spin h-4 w-4 border-2 border-muted-foreground border-t-transparent rounded-full"
-                role="status"
-                aria-hidden="true"
-              />
-            </div>
+            />
           )}
 
           {/* Input principal */}

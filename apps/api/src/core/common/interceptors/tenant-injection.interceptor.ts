@@ -13,7 +13,7 @@ import { Repository } from 'typeorm'
  */
 @Injectable()
 export class TenantInjectionInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest()
     const tenantContext = request.tenantContext
 
@@ -53,10 +53,10 @@ export class TenantInjectionInterceptor implements NestInterceptor {
  * Décorateur pour les repositories tenant-aware
  */
 export function InjectTenantContext() {
-  return (_target: any, _propertyName: string, descriptor: PropertyDescriptor) => {
+  return (_target: unknown, _propertyName: string, descriptor: PropertyDescriptor) => {
     const method = descriptor.value
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       // Récupérer le contexte depuis le premier argument si c'est un objet
       const context = args[0]?.tenantContext
 

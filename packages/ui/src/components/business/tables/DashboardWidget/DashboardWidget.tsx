@@ -12,7 +12,7 @@ interface DashboardWidgetProps {
 }
 
 export function DashboardWidget({
-  data,
+  data: _data,
   showActions = false,
   onEdit,
   onDelete,

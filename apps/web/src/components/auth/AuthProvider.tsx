@@ -26,7 +26,7 @@ const PROTECTED_ROUTES = ['/admin', '/dashboard', '/profile', '/settings']
 const AUTH_ROUTES = ['/login', '/register']
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { user, tokens, isAuthenticated, isLoading, setUser, logout } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
 
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     (url: string) => {
       try {
         router.replace(url)
-      } catch (_error) {
+      } catch {
         // Fallback: utiliser window.location si router.replace échoue
         if (typeof window !== 'undefined') {
           window.location.href = url
@@ -112,7 +112,7 @@ export function useRequireAuth() {
     if (!isAuthenticated && !isPublicRoute) {
       try {
         router.replace('/login')
-      } catch (_error) {
+      } catch {
         if (typeof window !== 'undefined') {
           window.location.href = '/login'
         }
@@ -181,7 +181,7 @@ export function RouteGuard({
     if (!isAuthenticated) {
       try {
         router.replace('/login')
-      } catch (_error) {
+      } catch {
         if (typeof window !== 'undefined') {
           window.location.href = '/login'
         }
@@ -197,7 +197,7 @@ export function RouteGuard({
       if (!hasPermission) {
         try {
           router.replace(fallbackUrl)
-        } catch (_error) {
+        } catch {
           if (typeof window !== 'undefined') {
             window.location.href = fallbackUrl
           }

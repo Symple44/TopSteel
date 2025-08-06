@@ -80,6 +80,7 @@ export function SectionWrapper({
       {isEditing && (
         <div className="absolute top-2 right-2 z-10 flex gap-2">
           <button
+            type="button"
             onClick={onEdit}
             className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600"
           >

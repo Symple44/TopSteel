@@ -9,11 +9,24 @@ import {
 import type { Observable } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
 
+interface AuthenticatedRequest {
+  user?: {
+    id?: string
+    sub?: string
+    userId?: string
+  }
+  headers: Record<string, string>
+  cookies?: Record<string, string>
+  method: string
+  url: string
+  ip: string
+}
+
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInterceptor.name)
 
-  private extractUserId(request: any): string | undefined {
+  private extractUserId(request: AuthenticatedRequest): string | undefined {
     // Méthode 1: request.user.id (après JwtAuthGuard)
     if (request.user?.id) {
       return request.user.id
@@ -57,9 +70,9 @@ export class LoggingInterceptor implements NestInterceptor {
     return undefined
   }
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest()
-    const { method, url, headers, body } = request
+    const { method, url, headers, body: _body } = request
     const startTime = Date.now()
     const requestId = headers['x-request-id'] || `req_${Date.now()}`
 

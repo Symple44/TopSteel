@@ -171,7 +171,7 @@ export class DatabasePreSyncService {
 
     if (problematicIndexes.length > 0) {
       this.logger.error(`❌ ${problematicIndexes.length} index problématiques persistent:`)
-      problematicIndexes.forEach((idx: any) => {
+      problematicIndexes.forEach((idx: { indexname: string; tablename: string }) => {
         this.logger.error(`   - ${idx.indexname} sur ${idx.tablename}`)
       })
       throw new Error('Des index problématiques persistent après le nettoyage')

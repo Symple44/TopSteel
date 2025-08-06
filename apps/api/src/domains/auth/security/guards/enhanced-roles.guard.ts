@@ -156,7 +156,11 @@ export class EnhancedRolesGuard implements CanActivate {
   /**
    * Extrait l'ID du propriétaire de la ressource depuis la requête
    */
-  private extractResourceOwnerId(request: any): string | null {
+  private extractResourceOwnerId(request: {
+    params?: { userId?: string; id?: string }
+    body?: { userId?: string; ownerId?: string }
+    user?: { sub?: string }
+  }): string | null {
     // Vérifier les paramètres de route
     if (request.params?.userId) {
       return request.params.userId

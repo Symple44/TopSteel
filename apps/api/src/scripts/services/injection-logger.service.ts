@@ -23,7 +23,7 @@ export class InjectionLoggerService implements InjectionLogger {
     timestamp: Date
     level: string
     message: string
-    meta?: any
+    meta?: unknown
   }> = []
 
   constructor(config: GlobalInjectionConfig) {
@@ -31,25 +31,25 @@ export class InjectionLoggerService implements InjectionLogger {
     this.startTime = Date.now()
   }
 
-  debug(message: string, meta?: any): void {
+  debug(message: string, meta?: unknown): void {
     if (this.shouldLog('debug')) {
       this.log('DEBUG', message, meta)
     }
   }
 
-  info(message: string, meta?: any): void {
+  info(message: string, meta?: unknown): void {
     if (this.shouldLog('info')) {
       this.log('INFO', message, meta)
     }
   }
 
-  warn(message: string, meta?: any): void {
+  warn(message: string, meta?: unknown): void {
     if (this.shouldLog('warn')) {
       this.log('WARN', message, meta)
     }
   }
 
-  error(message: string, error?: Error, meta?: any): void {
+  error(message: string, error?: Error, meta?: unknown): void {
     if (this.shouldLog('error')) {
       const errorMeta = {
         ...meta,
@@ -195,7 +195,7 @@ export class InjectionLoggerService implements InjectionLogger {
     return messageLevel >= configLevel
   }
 
-  private log(level: string, message: string, meta?: any): void {
+  private log(level: string, message: string, meta?: unknown): void {
     const logEntry = {
       timestamp: new Date(),
       level,
@@ -206,7 +206,7 @@ export class InjectionLoggerService implements InjectionLogger {
     this.logs.push(logEntry)
 
     // Console output avec couleurs
-    const _coloredMessage = this.colorizeMessage(level, message)
+    this.colorizeMessage(level, message)
 
     if (meta && this.config.logLevel === 'debug') {
     }

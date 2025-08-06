@@ -24,7 +24,7 @@ export class SharedMaterialService {
 
   async findByType(type: string): Promise<SharedMaterial[]> {
     return this._sharedMaterialRepository.find({
-      where: { type: type as any, deletedAt: IsNull() },
+      where: { type: type as unknown, deletedAt: IsNull() },
     })
   }
 

@@ -242,7 +242,7 @@ export class PartnerController {
     description: 'Recherche avec critères multiples et filtres avancés',
   })
   async searchAdvanced(
-    @Body() searchCriteria: any,
+    @Body() searchCriteria: Record<string, unknown>,
     @CurrentUser() _user: User
   ): Promise<Partner[]> {
     return await this.partnerService.searchPartners(searchCriteria)
@@ -270,7 +270,7 @@ export class PartnerController {
     description: 'Exporter la liste des partenaires selon des critères',
   })
   async exportPartners(
-    @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: any },
+    @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: Record<string, unknown> },
     @CurrentUser() _user: User
   ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
@@ -291,13 +291,16 @@ export class PartnerController {
     description: 'Importer une liste de partenaires depuis un fichier',
   })
   async importPartners(
-    @Body() importData: { data: any[]; options?: { skipErrors?: boolean; dryRun?: boolean } },
+    @Body() importData: {
+      data: Record<string, unknown>[]
+      options?: { skipErrors?: boolean; dryRun?: boolean }
+    },
     @CurrentUser() user: User
   ): Promise<{
     imported: number
     errors: number
     warnings: string[]
-    details: any[]
+    details: Record<string, unknown>[]
   }> {
     const context: BusinessContext = {
       userId: user.id,
@@ -311,7 +314,7 @@ export class PartnerController {
       imported: 0,
       errors: 0,
       warnings: [] as string[],
-      details: [] as Array<{ status: string; data: any; error?: string }>,
+      details: [] as Array<{ status: string; data: Record<string, unknown>; error?: string }>,
     }
 
     for (const partnerData of importData.data) {
@@ -365,7 +368,7 @@ export class PartnerController {
         if (partner) {
           const validation = await this.partnerService.validateBusinessRules(
             partner,
-            'VALIDATE' as any
+            'VALIDATE' as string
           )
           results.push({
             id: partnerId,

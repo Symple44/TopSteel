@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class RequestContextInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest()
 
     // Génération ID de requête unique si absent

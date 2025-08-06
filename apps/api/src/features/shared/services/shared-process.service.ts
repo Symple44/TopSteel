@@ -24,7 +24,7 @@ export class SharedProcessService {
 
   async findByType(type: string): Promise<SharedProcess[]> {
     return this._sharedProcessRepository.find({
-      where: { type: type as any, deletedAt: IsNull() },
+      where: { type: type as unknown, deletedAt: IsNull() },
     })
   }
 

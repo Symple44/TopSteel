@@ -91,7 +91,7 @@ export function ElasticsearchAdmin() {
       const data = await response.json()
       setStatus(data)
       setLastStatusCheck(now)
-    } catch (_error) {
+    } catch {
       toast.error(t('elasticsearch.statusError'))
     } finally {
       setLoading(false)
@@ -157,7 +157,7 @@ export function ElasticsearchAdmin() {
         // Si aucune configuration n'est trouvée, utiliser les valeurs par défaut
         setConfig((prev) => ({ ...prev, ...defaultConfig }))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('elasticsearch.configurationError'))
     }
   }
@@ -183,7 +183,7 @@ export function ElasticsearchAdmin() {
 
       if (!response.ok) {
       }
-    } catch (_error) {}
+    } catch {}
   }
 
   const saveConfig = async () => {
@@ -207,17 +207,17 @@ export function ElasticsearchAdmin() {
       })
 
       if (response.ok) {
-        const _result = await response.json()
+        await response.json()
         toast.success(t('elasticsearch.configurationSaved'))
         setHasConfigChanges(false)
         // Rafraîchir la configuration et le statut pour voir les changements
         await fetchConfig()
         await fetchStatus(true)
       } else {
-        const _errorData = await response.json()
+        await response.json()
         throw new Error(`Erreur lors de la sauvegarde: ${response.status}`)
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('elasticsearch.configurationError'))
     } finally {
       setConfigLoading(false)
@@ -266,7 +266,7 @@ export function ElasticsearchAdmin() {
         } else {
           throw new Error(`Erreur lors de la réinitialisation: ${response.status}`)
         }
-      } catch (_error) {
+      } catch {
         toast.error(t('resetError'))
       } finally {
         setConfigLoading(false)
@@ -295,7 +295,7 @@ export function ElasticsearchAdmin() {
       } else {
         toast.error(t('elasticsearch.migrationsError'))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('elasticsearch.migrationsError'))
     } finally {
       setOperationLoading(null)
@@ -322,7 +322,7 @@ export function ElasticsearchAdmin() {
       } else {
         toast.error(t('elasticsearch.resetError').replace('{indexName}', indexName))
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('elasticsearch.resetError').replace('{indexName}', indexName))
     } finally {
       setOperationLoading(null)

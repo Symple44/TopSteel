@@ -90,10 +90,10 @@ export class Site extends CommonEntity {
       dimanche?: { debut: string; fin: string }
     }
     joursFerier?: string[]
-    capaciteProduction?: Record<string, any>
+    capaciteProduction?: Record<string, unknown>
   }
 
   // Métadonnées
   @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }

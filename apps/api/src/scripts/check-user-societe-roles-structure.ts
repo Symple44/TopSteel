@@ -22,14 +22,14 @@ async function checkUserSocieteRolesStructure() {
       ORDER BY ordinal_position
     `)
 
-    columns.forEach((_col: any) => {})
+    columns.forEach((_col: unknown) => {})
     const data = await dataSource.query(`
       SELECT * FROM user_societe_roles LIMIT 5
     `)
 
     if (data.length === 0) {
     } else {
-      data.forEach((_row: any) => {})
+      data.forEach((_row: unknown) => {})
     }
     const constraints = await dataSource.query(`
       SELECT 
@@ -40,31 +40,31 @@ async function checkUserSocieteRolesStructure() {
       WHERE conrelid = 'user_societe_roles'::regclass
     `)
 
-    constraints.forEach((_c: any) => {})
+    constraints.forEach((_c: unknown) => {})
 
     // Test 1: roleId
     try {
-      const _test1 = await dataSource.query(`
+      await dataSource.query(`
         SELECT COUNT(*) FROM user_societe_roles usr
         LEFT JOIN roles r ON usr."roleId" = r.id
       `)
-    } catch (_e: any) {}
+    } catch {}
 
     // Test 2: role_id
     try {
-      const _test2 = await dataSource.query(`
+      await dataSource.query(`
         SELECT COUNT(*) FROM user_societe_roles usr
         LEFT JOIN roles r ON usr.role_id = r.id
       `)
-    } catch (_e: any) {}
+    } catch {}
 
     // Test 3: roleType
     try {
-      const _test3 = await dataSource.query(`
+      await dataSource.query(`
         SELECT COUNT(*) FROM user_societe_roles 
         WHERE role_type IS NOT NULL
       `)
-    } catch (_e: any) {}
+    } catch {}
     const correctQuery = await dataSource.query(`
       SELECT 
         usr.*,
@@ -79,7 +79,7 @@ async function checkUserSocieteRolesStructure() {
     if (correctQuery.length > 0) {
     } else {
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

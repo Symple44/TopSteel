@@ -32,10 +32,10 @@ async function fixSocieteDeletedAt() {
       `)
 
       if (societesColumns.length > 0) {
-        societesColumns.forEach((_col: any) => {})
+        // Societes columns found
       }
     } else {
-      societeColumns.forEach((_col: any) => {})
+      // Societe columns found
     }
 
     const tables = ['societe', 'societes', 'sites', 'contacts', 'fournisseurs', 'clients']
@@ -62,19 +62,15 @@ async function fixSocieteDeletedAt() {
           [table]
         )
 
-        if (tableExists[0].exists) {
-          if (hasDeletedAt[0].exists) {
-          } else {
-            await dataSource.query(`
-              ALTER TABLE ${table} 
-              ADD COLUMN deleted_at TIMESTAMP NULL
-            `)
-          }
-        } else {
+        if (tableExists[0].exists && !hasDeletedAt[0].exists) {
+          await dataSource.query(`
+            ALTER TABLE ${table} 
+            ADD COLUMN deleted_at TIMESTAMP NULL
+          `)
         }
-      } catch (_error: any) {}
+      } catch (_error: unknown) {}
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }
@@ -128,9 +124,9 @@ async function fixAuthTables() {
             `)
           }
         }
-      } catch (_error: any) {}
+      } catch (_error: unknown) {}
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

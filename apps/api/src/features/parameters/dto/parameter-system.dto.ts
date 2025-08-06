@@ -29,7 +29,7 @@ export class CreateParameterSystemDto {
     order?: number
     category?: string
     permissions?: string[]
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @IsArray()
@@ -38,7 +38,7 @@ export class CreateParameterSystemDto {
 
   @IsObject()
   @IsOptional()
-  objectValues?: Record<string, any> // Pour stocker des objets complexes
+  objectValues?: Record<string, unknown> // Pour stocker des objets complexes
 
   @IsBoolean()
   @IsOptional()
@@ -68,7 +68,7 @@ export class UpdateParameterSystemDto {
 
   @IsObject()
   @IsOptional()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @IsArray()
   @IsOptional()
@@ -76,7 +76,7 @@ export class UpdateParameterSystemDto {
 
   @IsObject()
   @IsOptional()
-  objectValues?: Record<string, any>
+  objectValues?: Record<string, unknown>
 
   @IsBoolean()
   @IsOptional()
@@ -155,7 +155,7 @@ export class CreateEnumParameterDto {
     icon?: string
     color?: string
     order?: number
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   }>
 
   @IsObject()

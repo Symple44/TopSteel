@@ -141,36 +141,40 @@ export default function HomePage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {quickActions.map((action) => (
-              <Card
+              <button
                 key={action.href}
-                className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative"
+                type="button"
                 onClick={() => router.push(action.href)}
+                aria-label={`Navigate to ${action.title}`}
+                className="block w-full text-left"
               >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${action.color}/10 opacity-0 group-hover:opacity-100 transition-opacity`}
-                />
+                <Card className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative">
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${action.color}/10 opacity-0 group-hover:opacity-100 transition-opacity`}
+                  />
 
-                <CardHeader className="pb-3 relative z-10">
-                  <CardTitle className="text-lg flex items-center text-slate-800 group-hover:text-slate-900 transition-colors">
-                    <div
-                      className={`p-3 bg-gradient-to-r ${action.color} rounded-lg mr-3 group-hover:scale-110 transition-transform`}
-                    >
-                      <action.icon className="h-6 w-6 text-white" />
+                  <CardHeader className="pb-3 relative z-10">
+                    <CardTitle className="text-lg flex items-center text-slate-800 group-hover:text-slate-900 transition-colors">
+                      <div
+                        className={`p-3 bg-gradient-to-r ${action.color} rounded-lg mr-3 group-hover:scale-110 transition-transform`}
+                      >
+                        <action.icon className="h-6 w-6 text-white" />
+                      </div>
+                      {action.title}
+                    </CardTitle>
+                  </CardHeader>
+
+                  <CardContent className="relative z-10">
+                    <p className="text-slate-600 group-hover:text-slate-700 mb-4">
+                      {action.description}
+                    </p>
+                    <div className="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                      {t('actions.access')}
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </div>
-                    {action.title}
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="relative z-10">
-                  <p className="text-slate-600 group-hover:text-slate-700 mb-4">
-                    {action.description}
-                  </p>
-                  <div className="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
-                    {t('actions.access')}
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </button>
             ))}
           </div>
         </div>

@@ -261,8 +261,6 @@ async function fixDatabaseStructure() {
         );
       `)
     }
-  } catch (error) {
-    throw error
   } finally {
     if (connection?.isInitialized) {
       await connection.destroy()
@@ -276,7 +274,7 @@ if (require.main === module) {
     .then(() => {
       process.exit(0)
     })
-    .catch((_error) => {
+    .catch(() => {
       process.exit(1)
     })
 }

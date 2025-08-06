@@ -33,7 +33,7 @@ export abstract class BaseApiClient {
     return path.startsWith('/') ? path : `/${path}`
   }
 
-  protected buildQueryParams(params: Record<string, any>): Record<string, string> {
+  protected buildQueryParams(params: Record<string, unknown>): Record<string, string> {
     const cleanParams: Record<string, string> = {}
 
     for (const [key, value] of Object.entries(params)) {

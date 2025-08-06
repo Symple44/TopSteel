@@ -11,19 +11,19 @@ export class CreatePageSectionDto {
 
   @IsObject()
   @IsOptional()
-  content?: any
+  content?: unknown
 
   @IsObject()
   @IsOptional()
-  styles?: any
+  styles?: unknown
 
   @IsObject()
   @IsOptional()
-  responsive?: any
+  responsive?: unknown
 
   @IsObject()
   @IsOptional()
-  settings?: any
+  settings?: unknown
 }
 
 export class CreatePageTemplateDto {
@@ -47,11 +47,11 @@ export class CreatePageTemplateDto {
 
   @IsObject()
   @IsOptional()
-  metadata?: any
+  metadata?: unknown
 
   @IsObject()
   @IsOptional()
-  settings?: any
+  settings?: unknown
 
   @IsArray()
   @ValidateNested({ each: true })

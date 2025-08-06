@@ -110,7 +110,7 @@ export interface CaracteristiquesTechniques {
 
   // Métadonnées
   applications?: string[]
-  specifications?: Record<string, any>
+  specifications?: Record<string, unknown>
 }
 
 /**
@@ -193,7 +193,7 @@ export interface GlobalInjectionConfig {
 export interface SystemParameter {
   category: string
   key: string
-  value: Record<string, any>
+  value: Record<string, unknown>
   label?: string
   description?: string
   type?: string
@@ -234,9 +234,9 @@ export interface PricingCalculator {
  * Logger interface pour l'injection
  */
 export interface InjectionLogger {
-  debug(message: string, meta?: any): void
-  info(message: string, meta?: any): void
-  warn(message: string, meta?: any): void
-  error(message: string, error?: Error, meta?: any): void
+  debug(message: string, meta?: unknown): void
+  info(message: string, meta?: unknown): void
+  warn(message: string, meta?: unknown): void
+  error(message: string, error?: Error, meta?: unknown): void
   logResult(result: InjectionResult): void
 }

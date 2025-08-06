@@ -1,6 +1,27 @@
 import { Injectable, Logger } from '@nestjs/common'
 import type { DataSource } from 'typeorm'
 
+interface DatabaseStats {
+  schemaname: string
+  tablename: string
+  inserts: number
+  updates: number
+  deletes: number
+  live_tuples: number
+  dead_tuples: number
+  seq_scan: number
+  seq_tup_read: number
+  idx_scan: number
+  idx_tup_fetch: number
+  n_tup_ins: number
+  n_tup_upd: number
+  n_tup_del: number
+  vacuum_count: number
+  autovacuum_count: number
+  analyze_count: number
+  autoanalyze_count: number
+}
+
 export interface DatabaseHealth {
   status: 'healthy' | 'degraded' | 'unhealthy'
   checks: {
@@ -266,7 +287,7 @@ export class DatabaseHealthService {
   /**
    * Obtient les statistiques détaillées
    */
-  async getDetailedStats(): Promise<any> {
+  async getDetailedStats(): Promise<DatabaseStats[]> {
     try {
       const stats = await this.dataSource.query(`
         SELECT 

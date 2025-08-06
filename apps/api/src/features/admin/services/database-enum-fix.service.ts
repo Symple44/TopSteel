@@ -22,13 +22,13 @@ export class DatabaseEnumFixService {
         )
       `)
 
-      const hasInfo = enumValues.some((row: any) => row.enumlabel === 'info')
+      const hasInfo = enumValues.some((row: Record<string, unknown>) => row.enumlabel === 'info')
 
       if (hasInfo) {
         return {
           success: true,
           message: 'La valeur "info" existe déjà dans l\'enum',
-          enumValues: enumValues.map((row: any) => row.enumlabel),
+          enumValues: enumValues.map((row: Record<string, unknown>) => row.enumlabel),
         }
       } else {
         // Ajouter 'info' à l'enum
@@ -36,7 +36,7 @@ export class DatabaseEnumFixService {
         return {
           success: true,
           message: 'Valeur "info" ajoutée à l\'enum notifications_type_enum',
-          enumValues: [...enumValues.map((row: any) => row.enumlabel), 'info'],
+          enumValues: [...enumValues.map((row: Record<string, unknown>) => row.enumlabel), 'info'],
         }
       }
     } catch (error) {

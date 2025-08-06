@@ -156,7 +156,7 @@ class DetailedConsistencyReporter {
 
       const report: DatabaseReport = {
         name: dbType,
-        connectionString: `${(dataSource.options as any).host}:${(dataSource.options as any).port}/${(dataSource.options as any).database}`,
+        connectionString: `${(dataSource.options as { host: string }).host}:${(dataSource.options as { port: number }).port}/${(dataSource.options as { database: string }).database}`,
         tables: [],
         migrations: await this.getMigrationInfo(dataSource),
         issues: [],
@@ -215,7 +215,7 @@ class DetailedConsistencyReporter {
         ORDER BY table_name
       `)
 
-      return result.map((row: any) => row.table_name)
+      return result.map((row: unknown) => (row as { table_name: string }).table_name)
     } finally {
       await queryRunner.release()
     }
@@ -224,13 +224,15 @@ class DetailedConsistencyReporter {
   private async analyzeTable(
     tableName: string,
     dataSource: DataSource,
-    entityMetadata: any[]
+    entityMetadata: unknown[]
   ): Promise<TableReport> {
     const queryRunner = dataSource.createQueryRunner()
 
     try {
       // Trouver l'entité correspondante
-      const entity = entityMetadata.find((e) => e.tableName === tableName)
+      const entity = entityMetadata.find(
+        (e: unknown) => (e as { tableName: string }).tableName === tableName
+      )
 
       // Analyser les colonnes
       const columns = await this.analyzeTableColumns(tableName, entity, queryRunner)
@@ -267,10 +269,12 @@ class DetailedConsistencyReporter {
 
   private async analyzeTableColumns(
     tableName: string,
-    entity: any,
-    queryRunner: any
+    entity: unknown,
+    queryRunner: unknown
   ): Promise<ColumnReport[]> {
-    const dbColumns = await queryRunner.query(
+    const dbColumns = await (
+      queryRunner as { query: (sql: string, params?: unknown[]) => Promise<unknown[]> }
+    ).query(
       `
       SELECT 
         column_name,
@@ -288,16 +292,20 @@ class DetailedConsistencyReporter {
       [tableName]
     )
 
-    return dbColumns.map((col: any) => {
-      const entityColumn = entity?.columns.find((ec: any) => ec.databaseName === col.column_name)
+    return dbColumns.map((col: unknown) => {
+      const entityColumn = (entity as { columns?: { databaseName: string }[] })?.columns?.find(
+        (ec: unknown) =>
+          (ec as { databaseName: string }).databaseName ===
+          (col as { column_name: string }).column_name
+      )
 
       return {
-        name: col.column_name,
-        type: col.data_type,
-        nullable: col.is_nullable === 'YES',
-        default: col.column_default,
+        name: (col as { column_name: string }).column_name,
+        type: (col as { data_type: string }).data_type,
+        nullable: (col as { is_nullable: string }).is_nullable === 'YES',
+        default: (col as { column_default: string | null }).column_default,
         inEntity: !!entityColumn,
-        entityType: entityColumn?.type,
+        entityType: (entityColumn as { type?: string })?.type,
         consistent: this.isColumnConsistent(col, entityColumn),
       }
     })
@@ -305,9 +313,11 @@ class DetailedConsistencyReporter {
 
   private async analyzeTableConstraints(
     tableName: string,
-    queryRunner: any
+    queryRunner: unknown
   ): Promise<ConstraintReport[]> {
-    const constraints = await queryRunner.query(
+    const constraints = await (
+      queryRunner as { query: (sql: string, params?: unknown[]) => Promise<unknown[]> }
+    ).query(
       `
       SELECT 
         tc.constraint_name,
@@ -328,27 +338,43 @@ class DetailedConsistencyReporter {
 
     const constraintMap = new Map<string, ConstraintReport>()
 
-    constraints.forEach((row: any) => {
-      if (!constraintMap.has(row.constraint_name)) {
-        constraintMap.set(row.constraint_name, {
-          name: row.constraint_name,
-          type: row.constraint_type,
+    constraints.forEach((row: unknown) => {
+      const rowTyped = row as {
+        constraint_name: string
+        constraint_type: string
+        referenced_table?: string
+        column_name?: string
+        referenced_column?: string
+      }
+      if (!constraintMap.has(rowTyped.constraint_name)) {
+        constraintMap.set(rowTyped.constraint_name, {
+          name: rowTyped.constraint_name,
+          type: rowTyped.constraint_type,
           columns: [],
-          referencedTable: row.referenced_table,
+          referencedTable: rowTyped.referenced_table,
           referencedColumns: [],
         })
       }
 
-      const constraint = constraintMap.get(row.constraint_name)!
-      if (row.column_name) constraint.columns.push(row.column_name)
-      if (row.referenced_column) constraint.referencedColumns?.push(row.referenced_column)
+      const constraint = constraintMap.get(rowTyped.constraint_name)
+      if (!constraint) {
+        // This should not happen since we already created it above, but safety first
+        return
+      }
+      if (rowTyped.column_name) constraint.columns.push(rowTyped.column_name)
+      if (rowTyped.referenced_column) constraint.referencedColumns?.push(rowTyped.referenced_column)
     })
 
     return Array.from(constraintMap.values())
   }
 
-  private async analyzeTableIndexes(tableName: string, queryRunner: any): Promise<IndexReport[]> {
-    const indexes = await queryRunner.query(
+  private async analyzeTableIndexes(
+    tableName: string,
+    queryRunner: unknown
+  ): Promise<IndexReport[]> {
+    const indexes = await (
+      queryRunner as { query: (sql: string, params?: unknown[]) => Promise<unknown[]> }
+    ).query(
       `
       SELECT 
         i.relname as index_name,
@@ -368,17 +394,23 @@ class DetailedConsistencyReporter {
 
     const indexMap = new Map<string, IndexReport>()
 
-    indexes.forEach((row: any) => {
-      if (!indexMap.has(row.index_name)) {
-        indexMap.set(row.index_name, {
-          name: row.index_name,
+    indexes.forEach((row: unknown) => {
+      const rowTyped = row as {
+        index_name: string
+        column_name: string
+        is_unique: boolean
+        is_primary: boolean
+      }
+      if (!indexMap.has(rowTyped.index_name)) {
+        indexMap.set(rowTyped.index_name, {
+          name: rowTyped.index_name,
           columns: [],
-          unique: row.is_unique,
-          primary: row.is_primary,
+          unique: rowTyped.is_unique,
+          primary: rowTyped.is_primary,
         })
       }
 
-      indexMap.get(row.index_name)?.columns.push(row.column_name)
+      indexMap.get(rowTyped.index_name)?.columns.push(rowTyped.column_name)
     })
 
     return Array.from(indexMap.values())
@@ -406,12 +438,12 @@ class DetailedConsistencyReporter {
         ORDER BY timestamp
       `)
 
-      return migrations.map((m: any) => ({
-        name: m.name,
-        timestamp: parseInt(m.timestamp),
+      return migrations.map((m: unknown) => ({
+        name: (m as { name: string }).name,
+        timestamp: parseInt((m as { timestamp: string }).timestamp),
         executed: true,
       }))
-    } catch (_error) {
+    } catch (_error: unknown) {
       return []
     } finally {
       await queryRunner.release()
@@ -420,7 +452,7 @@ class DetailedConsistencyReporter {
 
   private async findConsistencyIssues(
     dbReport: DatabaseReport,
-    entityMetadata: any[],
+    entityMetadata: unknown[],
     dataSource: DataSource
   ): Promise<ConsistencyIssue[]> {
     const issues: ConsistencyIssue[] = []
@@ -428,15 +460,20 @@ class DetailedConsistencyReporter {
 
     // Problèmes de tables manquantes
     for (const entity of entityMetadata) {
-      const table = dbReport.tables.find((t) => t.name === entity.tableName)
+      const entityTyped = entity as {
+        tableName: string
+        name: string
+        columns: { databaseName: string }[]
+      }
+      const table = dbReport.tables.find((t) => t.name === entityTyped.tableName)
       if (!table) {
         issues.push({
           id: `${dbReport.name.toUpperCase()}-${issueId++}`,
           type: 'missing_table',
           severity: 'critical',
-          table: entity.tableName,
-          entity: entity.name,
-          description: `Table '${entity.tableName}' définie dans l'entité '${entity.name}' mais absente de la base`,
+          table: entityTyped.tableName,
+          entity: entityTyped.name,
+          description: `Table '${entityTyped.tableName}' définie dans l'entité '${entityTyped.name}' mais absente de la base`,
           recommendation: 'Exécuter les migrations ou créer manuellement la table',
           sqlFix: `-- Voir les migrations dans src/core/database/migrations/`,
         })
@@ -446,10 +483,14 @@ class DetailedConsistencyReporter {
     // Problèmes de colonnes
     for (const table of dbReport.tables) {
       if (table.hasEntity) {
-        const entity = entityMetadata.find((e) => e.tableName === table.name)
+        const entity = entityMetadata.find(
+          (e: unknown) => (e as { tableName: string }).tableName === table.name
+        ) as
+          | { tableName: string; name: string; columns: { databaseName: string; type: string }[] }
+          | undefined
 
         // Colonnes manquantes
-        for (const entityColumn of entity.columns) {
+        for (const entityColumn of entity?.columns || []) {
           const dbColumn = table.columns.find((c) => c.name === entityColumn.databaseName)
           if (!dbColumn) {
             issues.push({
@@ -586,16 +627,16 @@ class DetailedConsistencyReporter {
     return issues
   }
 
-  private isColumnConsistent(dbColumn: any, entityColumn: any): boolean {
+  private isColumnConsistent(dbColumn: unknown, entityColumn: unknown): boolean {
     if (!entityColumn) return false
 
-    const dbType = dbColumn.data_type
-    const entityType = this.getPostgreSQLType(entityColumn.type)
+    const dbType = (dbColumn as { data_type: string }).data_type
+    const entityType = this.getPostgreSQLType((entityColumn as { type: string }).type)
 
     return dbType === entityType
   }
 
-  private getPostgreSQLType(typeormType: any): string {
+  private getPostgreSQLType(typeormType: unknown): string {
     const typeMap: Record<string, string> = {
       varchar: 'character varying',
       text: 'text',
@@ -608,7 +649,7 @@ class DetailedConsistencyReporter {
       jsonb: 'jsonb',
     }
 
-    return typeMap[typeormType] || typeormType
+    return typeMap[typeormType as string] || (typeormType as string)
   }
 
   private isSystemTable(tableName: string): boolean {
@@ -681,9 +722,9 @@ async function main() {
 
   try {
     const report = await reporter.generateDetailedReport()
-    const _reportPath = await reporter.saveReport(report)
-    report.recommendations.forEach((_rec, _index) => {})
-  } catch (_error) {
+    await reporter.saveReport(report)
+    report.recommendations.forEach(() => {})
+  } catch {
     process.exit(1)
   }
 }

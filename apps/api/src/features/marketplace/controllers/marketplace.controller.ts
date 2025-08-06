@@ -260,15 +260,17 @@ export class MarketplaceController {
       categoryBreakdown: {} as Record<MarketplaceCategory, number>,
       oldestInstallation:
         installations.length > 0
-          ? installations.reduce((oldest, current) =>
-              current.installedAt! < oldest.installedAt! ? current : oldest
-            ).installedAt
+          ? installations.reduce((oldest, current) => {
+              if (!current.installedAt || !oldest.installedAt) return oldest
+              return current.installedAt < oldest.installedAt ? current : oldest
+            }).installedAt
           : null,
       newestInstallation:
         installations.length > 0
-          ? installations.reduce((newest, current) =>
-              current.installedAt! > newest.installedAt! ? current : newest
-            ).installedAt
+          ? installations.reduce((newest, current) => {
+              if (!current.installedAt || !newest.installedAt) return newest
+              return current.installedAt > newest.installedAt ? current : newest
+            }).installedAt
           : null,
     }
 

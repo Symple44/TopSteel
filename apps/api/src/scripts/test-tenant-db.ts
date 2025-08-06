@@ -51,24 +51,20 @@ async function testTenantDatabases() {
           ORDER BY table_name
         `)
 
-        if (tables.find((t: any) => t.table_name === 'articles')) {
-          const _articleCount = await tenantDataSource.query(
-            'SELECT COUNT(*) as count FROM articles'
-          )
+        if (tables.find((t: { table_name: string }) => t.table_name === 'articles')) {
+          await tenantDataSource.query('SELECT COUNT(*) as count FROM articles')
         }
 
-        if (tables.find((t: any) => t.table_name === 'system_settings')) {
-          const _settingsCount = await tenantDataSource.query(
-            'SELECT COUNT(*) as count FROM system_settings'
-          )
+        if (tables.find((t: { table_name: string }) => t.table_name === 'system_settings')) {
+          await tenantDataSource.query('SELECT COUNT(*) as count FROM system_settings')
         }
 
         await tenantDataSource.destroy()
-      } catch (_error) {}
+      } catch {}
     }
 
     await authDataSource.destroy()
-  } catch (_error) {}
+  } catch {}
 }
 
 testTenantDatabases().catch(console.error)

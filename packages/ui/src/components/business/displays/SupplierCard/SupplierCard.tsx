@@ -12,7 +12,7 @@ interface SupplierCardProps {
 }
 
 export function SupplierCard({
-  data,
+  data: _data,
   showActions = false,
   onEdit,
   onDelete,

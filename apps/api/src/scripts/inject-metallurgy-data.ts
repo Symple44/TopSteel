@@ -50,17 +50,13 @@ class MetallurgyDataInjector {
    * Initialisation de la connexion base de données
    */
   async initialize(): Promise<void> {
-    try {
-      await this.dataSource.initialize()
-    } catch (error) {
-      throw error
-    }
+    await this.dataSource.initialize()
   }
 
   /**
    * Exécution d'un script SQL
    */
-  private async executeScript(scriptName: string, _description: string): Promise<ScriptResult> {
+  private async executeScript(scriptName: string): Promise<ScriptResult> {
     const startTime = Date.now()
 
     try {
@@ -151,7 +147,7 @@ class MetallurgyDataInjector {
 
     // Exécution séquentielle des scripts
     for (const script of scripts) {
-      const result = await this.executeScript(script.file, script.description)
+      const result = await this.executeScript(script.file)
       this.results.push(result)
 
       if (!result.success) {
@@ -166,17 +162,26 @@ class MetallurgyDataInjector {
    */
   private async generateReport(): Promise<void> {
     const successful = this.results.filter((r) => r.success)
-    const _failed = this.results.filter((r) => !r.success)
+    const failed = this.results.filter((r) => !r.success)
 
-    const _totalArticles = successful.reduce((sum, r) => sum + (r.articlesCreated || 0), 0)
-    const _totalDuration = this.results.reduce((sum, r) => sum + r.duration, 0)
+    const totalArticles = successful.reduce((sum, r) => sum + (r.articlesCreated || 0), 0)
+    const totalDuration = this.results.reduce((sum, r) => sum + r.duration, 0)
+
+    // Process results for reporting
     this.results.forEach((result) => {
-      const _status = result.success ? '✅' : '❌'
-      const _articles = result.articlesCreated ? ` (${result.articlesCreated} articles)` : ''
+      const status = result.success ? '✅' : '❌'
+      const articlesInfo = result.articlesCreated ? ` (${result.articlesCreated} articles)` : ''
+
+      // Log result status
+      console.log(`${status} ${result.name}${articlesInfo}`)
 
       if (result.error) {
+        console.error(`  Error: ${result.error}`)
       }
     })
+
+    console.log(`\nSummary: ${successful.length} successful, ${failed.length} failed`)
+    console.log(`Total articles created: ${totalArticles}, Duration: ${totalDuration}ms`)
 
     // Statistiques base de données
     try {
@@ -191,7 +196,13 @@ class MetallurgyDataInjector {
         ORDER BY famille
       `)
 
-      familyStats.forEach((_stat: any) => {})
+      familyStats.forEach(
+        (stat: { famille: string; nombre_articles: string; prix_moyen: string }) => {
+          console.log(
+            `${stat.famille}: ${stat.nombre_articles} articles, avg price: ${stat.prix_moyen}€`
+          )
+        }
+      )
 
       const totalStats = await this.dataSource.query(`
         SELECT 
@@ -203,9 +214,14 @@ class MetallurgyDataInjector {
       `)
 
       if (totalStats.length > 0) {
-        const _stats = totalStats[0]
+        const stats = totalStats[0]
+        console.log(
+          `Total: ${stats.total} articles, avg: ${stats.prix_moyen}€, total value: ${stats.valeur_totale}€`
+        )
       }
-    } catch (_error) {}
+    } catch {
+      console.warn('Could not fetch database statistics')
+    }
   }
 
   /**
@@ -225,7 +241,8 @@ async function main() {
   try {
     await injector.initialize()
     await injector.injectAllData()
-  } catch (_error) {
+  } catch (error) {
+    console.error('Failed to inject metallurgy data:', error)
     process.exit(1)
   } finally {
     await injector.cleanup()

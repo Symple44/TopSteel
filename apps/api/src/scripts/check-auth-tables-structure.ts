@@ -54,15 +54,17 @@ async function checkAuthTablesStructure() {
             [table]
           )
 
-          const hasDeletedAt = columns.some((col: any) => col.column_name === 'deleted_at')
+          const hasDeletedAt = columns.some(
+            (col: unknown) => (col as { column_name: string }).column_name === 'deleted_at'
+          )
 
           if (hasDeletedAt) {
           } else {
-            columns.slice(0, 5).forEach((_col: any) => {})
+            columns.slice(0, 5).forEach((_col: unknown) => {})
           }
         } else {
         }
-      } catch (_error: any) {}
+      } catch (_error: unknown) {}
     }
 
     for (const table of tablesToCheck) {
@@ -97,9 +99,9 @@ async function checkAuthTablesStructure() {
             `)
           }
         }
-      } catch (_error: any) {}
+      } catch (_error: unknown) {}
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

@@ -16,10 +16,10 @@ export interface ProjetStats {
 }
 
 export interface ProjetWithDetails extends Projet {
-  client?: any
-  responsable?: any
-  commercial?: any
-  equipe?: any[]
+  client?: unknown
+  responsable?: unknown
+  commercial?: unknown
+  equipe?: unknown[]
 }
 
 export interface ProjetSortOptions {
@@ -48,8 +48,8 @@ export interface CreateProjetCommand {
     dateDebut: Date
     dateFin: Date
   }
-  adresseLivraison?: any
-  contact?: any
+  adresseLivraison?: unknown
+  contact?: unknown
 }
 
 export interface UpdateProjetCommand extends Partial<CreateProjetCommand> {
@@ -93,8 +93,8 @@ export class ProjectApiClient extends BaseApiClient {
     try {
       const response = await this.http.get<Projet>(`${this.endpoint}/${this.normalizeId(id)}`)
       return response.data
-    } catch (error: any) {
-      if (error.statusCode === 404) {
+    } catch (error: unknown) {
+      if ((error as unknown as { statusCode?: number }).statusCode === 404) {
         return null
       }
       throw error
@@ -107,8 +107,8 @@ export class ProjectApiClient extends BaseApiClient {
         `${this.endpoint}/${this.normalizeId(id)}/details`
       )
       return response.data
-    } catch (error: any) {
-      if (error.statusCode === 404) {
+    } catch (error: unknown) {
+      if ((error as unknown as { statusCode?: number }).statusCode === 404) {
         return null
       }
       throw error
@@ -152,7 +152,7 @@ export class ProjectApiClient extends BaseApiClient {
   async deleteProjet(id: string): Promise<OperationResult<boolean>> {
     return this.http.executeOperation(async () => {
       await this.http.delete(`${this.endpoint}/${this.normalizeId(id)}`)
-      return { data: true } as any
+      return { data: true } as { data: boolean }
     })
   }
 

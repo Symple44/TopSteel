@@ -10,7 +10,7 @@ export class GracefulShutdownService implements OnApplicationShutdown {
   private actualPort: number
   private shutdownInProgress = false
 
-  setApp(app: any, port: number) {
+  setApp(app: NestApplication, port: number) {
     this.app = app
     this.actualPort = port
   }
@@ -201,7 +201,7 @@ export class GracefulShutdownService implements OnApplicationShutdown {
     })
 
     // Promesses rejetées non gérées
-    process.on('unhandledRejection', (reason, _promise) => {
+    process.on('unhandledRejection', (reason) => {
       this.logger.error('❌ Promesse rejetée non gérée:', reason)
       this.onApplicationShutdown('unhandledRejection')
     })

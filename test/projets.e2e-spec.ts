@@ -4,6 +4,14 @@ import { Test, type TestingModule } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../src/app.module'
 
+interface Projet {
+  id: string
+  reference: string
+  description: string
+  statut: string
+  clientId: string
+}
+
 describe('ProjetsController (e2e)', () => {
   let app: INestApplication
   let accessToken: string
@@ -95,7 +103,7 @@ describe('ProjetsController (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200)
 
-      expect(response.body.data.every((p: any) => p.statut === 'EN_COURS')).toBe(true)
+      expect(response.body.data.every((p: Projet) => p.statut === 'EN_COURS')).toBe(true)
     })
   })
 })

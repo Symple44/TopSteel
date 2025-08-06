@@ -1,6 +1,5 @@
 'use client'
 
-import { Card } from '@erp/ui'
 import {
   Button,
   Checkbox,
@@ -50,7 +49,7 @@ const loadCacheFromStorage = (): RoleData[] | null => {
     if (cached && expiry && Date.now() < parseInt(expiry)) {
       return JSON.parse(cached)
     }
-  } catch (_error) {}
+  } catch {}
 
   return null
 }
@@ -62,7 +61,7 @@ const saveCacheToStorage = (roles: RoleData[]) => {
   try {
     sessionStorage.setItem(ROLES_CACHE_KEY, JSON.stringify(roles))
     sessionStorage.setItem(ROLES_CACHE_EXPIRY_KEY, (Date.now() + CACHE_TTL).toString())
-  } catch (_error) {}
+  } catch {}
 }
 
 // Fonction pour charger les rôles depuis l'API des paramètres
@@ -95,9 +94,6 @@ const loadRolesFromParameters = async (
         rolesList = data
       } else if (data.data && Array.isArray(data.data)) {
         // Réponse avec data wrapper (cas de l'API backend)
-        rolesList = data.data
-      } else if (data.success && data.data && Array.isArray(data.data)) {
-        // Réponse avec success + data wrapper
         rolesList = data.data
       } else if (data.success && Array.isArray(data.roles)) {
         // Autre format possible
@@ -146,7 +142,7 @@ const loadRolesFromParameters = async (
       saveCacheToStorage(rolesCache)
       return rolesCache
     }
-  } catch (_error) {}
+  } catch {}
 
   // Fallback sur les rôles hardcodés si l'API échoue
   return getFallbackRoles(language)
@@ -429,7 +425,7 @@ export default function CompanySelector({
   showInDialog = true,
 }: CompanySelectorProps) {
   const _router = useRouter()
-  const { user, refreshAuth, logout, selectCompany } = useAuth()
+  const { user, logout, selectCompany } = useAuth()
   const { t } = useTranslation()
   const [companies, setCompanies] = useState<Company[]>([])
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('')
@@ -465,7 +461,7 @@ export default function CompanySelector({
         setSelectedCompanyId(companiesArray[0].id)
       } else {
       }
-    } catch (_error) {
+    } catch {
       toast.error(t('companies.loadingError'))
     } finally {
       setLoading(false)
@@ -517,7 +513,7 @@ export default function CompanySelector({
       if (saveAsDefault) {
         try {
           await authService.setDefaultCompany(selectedCompanyId)
-        } catch (_error) {}
+        } catch {}
       }
 
       toast.success(t('companies.connectedTo', { name: selectedCompany.nom }))
@@ -538,7 +534,7 @@ export default function CompanySelector({
               window.location.href = '/dashboard'
               return
             }
-          } catch (_error) {}
+          } catch {}
         }
 
         attempts++
@@ -556,7 +552,7 @@ export default function CompanySelector({
       }
 
       setTimeout(checkTokensAndRedirect, 300)
-    } catch (_error) {
+    } catch {
       toast.error(t('companies.cannotConnect'))
     } finally {
       setSubmitting(false)
@@ -594,14 +590,19 @@ export default function CompanySelector({
         <>
           <div className="grid gap-3">
             {companies.map((company) => (
-              <Card
+              <button
                 key={company.id}
-                className={`group relative p-3 cursor-pointer transition-all duration-200 border-2 ${
+                className={`group relative p-3 cursor-pointer transition-all duration-200 border-2 rounded-lg text-left w-full ${
                   selectedCompanyId === company.id
                     ? 'border-primary bg-primary/5 shadow-md'
                     : 'border-border hover:border-primary/50 hover:shadow-lg hover:bg-accent/50'
                 }`}
                 onClick={() => setSelectedCompanyId(company.id)}
+                onKeyDown={(e) =>
+                  (e.key === 'Enter' || e.key === ' ') && setSelectedCompanyId(company.id)
+                }
+                tabIndex={0}
+                aria-label={`Select company ${company.name}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3 flex-1">
@@ -674,7 +675,7 @@ export default function CompanySelector({
                       : 'bg-gradient-to-r from-transparent to-transparent group-hover:from-primary/5 group-hover:to-transparent'
                   }`}
                 />
-              </Card>
+              </button>
             ))}
           </div>
 
@@ -700,11 +701,15 @@ export default function CompanySelector({
           {/* Checkbox optimisé */}
           <div className="flex items-center space-x-2 py-2 px-3 bg-muted/30 rounded-lg border">
             <Checkbox
+              id="save-as-default"
               checked={saveAsDefault}
               onCheckedChange={(checked) => setSaveAsDefault(checked as boolean)}
               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
-            <label className="text-xs font-medium text-foreground cursor-pointer select-none">
+            <label
+              htmlFor="save-as-default"
+              className="text-xs font-medium text-foreground cursor-pointer select-none"
+            >
               {t('companies.setAsDefault')}
             </label>
           </div>

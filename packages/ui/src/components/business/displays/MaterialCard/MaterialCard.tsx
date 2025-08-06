@@ -12,7 +12,7 @@ interface MaterialCardProps {
 }
 
 export function MaterialCard({
-  data,
+  data: _data,
   showActions = false,
   onEdit,
   onDelete,

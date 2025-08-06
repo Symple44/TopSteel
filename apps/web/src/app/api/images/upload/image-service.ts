@@ -1,5 +1,5 @@
 // Fichier serveur uniquement pour l'upload d'images
-let imageService: any = null
+let imageService: unknown = null
 
 export async function getImageService() {
   if (!imageService) {

@@ -52,7 +52,7 @@ export class SystemParametersController {
   @ApiResponse({ status: 200, description: 'Paramètres groupés par catégorie' })
   async getByCategory(@Query('category') category?: string) {
     if (category) {
-      return this.systemParametersService.findByCategory(category as any)
+      return this.systemParametersService.findByCategory(category as string)
     }
     return this.systemParametersService.getParametersByCategory()
   }

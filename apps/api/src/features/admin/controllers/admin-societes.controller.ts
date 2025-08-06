@@ -60,7 +60,7 @@ export class AdminSocietesController {
   async findAllSocietes(@Query() query: SocieteQueryDto) {
     try {
       // Récupérer les sociétés selon les filtres
-      let societes
+      let societes: unknown[]
       if (query.status === 'ALL') {
         societes = await this.societesService.findAll()
       } else {
@@ -87,13 +87,13 @@ export class AdminSocietesController {
       // Formatter les données avec les utilisateurs si demandé
       const formattedSocietes = await Promise.all(
         paginatedSocietes.map(async (societe) => {
-          let users: any[] = []
+          let users: Record<string, unknown>[] = []
           let userCount = 0
 
           if (query.includeUsers) {
             // Récupérer tous les utilisateurs ayant accès à cette société
             const allUsers = await this.usersService.findAll({})
-            const usersWithAccess: any[] = []
+            const usersWithAccess: Record<string, unknown>[] = []
 
             for (const user of allUsers) {
               const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
@@ -169,7 +169,7 @@ export class AdminSocietesController {
           includeUsers: query.includeUsers || false,
         },
       }
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       throw new BadRequestException('Erreur lors de la récupération des sociétés')
     }
   }
@@ -187,7 +187,7 @@ export class AdminSocietesController {
 
     // Récupérer tous les utilisateurs ayant accès à cette société
     const allUsers = await this.usersService.findAll({})
-    const usersWithAccess: any[] = []
+    const usersWithAccess: Record<string, unknown>[] = []
 
     for (const user of allUsers) {
       const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
@@ -264,7 +264,7 @@ export class AdminSocietesController {
       restrictedPermissions?: string[]
       expiresAt?: Date
     },
-    @Req() request: any
+    @Req() request: Record<string, unknown>
   ) {
     // Vérifier que la société existe
     const societe = await this.societesService.findById(societeId)
@@ -313,7 +313,7 @@ export class AdminSocietesController {
         message: 'Utilisateur ajouté à la société avec succès',
         statusCode: 201,
       }
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       throw new BadRequestException("Erreur lors de l'ajout de l'utilisateur à la société")
     }
   }
@@ -366,7 +366,7 @@ export class AdminSocietesController {
       restrictedPermissions?: string[]
       expiresAt?: Date
     },
-    @Req() request: any
+    @Req() request: Record<string, unknown>
   ) {
     // Vérifier que l'utilisateur a déjà un rôle dans cette société
     const existingRole = await this.unifiedRolesService.getUserSocieteRole(userId, societeId)
@@ -408,7 +408,7 @@ export class AdminSocietesController {
         message: "Rôle de l'utilisateur modifié avec succès",
         statusCode: 200,
       }
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       throw new BadRequestException('Erreur lors de la modification du rôle')
     }
   }

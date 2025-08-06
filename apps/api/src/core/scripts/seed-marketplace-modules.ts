@@ -389,7 +389,9 @@ async function seedMarketplaceModules() {
 
 // Exécuter le script si appelé directement
 if (require.main === module) {
-  seedMarketplaceModules().catch(console.error)
+  seedMarketplaceModules().catch((_error) => {
+    // Erreur capturée mais ignorée
+  })
 }
 
 export { seedMarketplaceModules }

@@ -30,21 +30,25 @@ async function checkTableColumns() {
         continue
       }
 
-      columns.forEach((_col: any) => {})
+      columns.forEach((_col: unknown) => {})
 
       // Identifier les colonnes qui pourraient être camelCase vs snake_case
-      const camelCaseColumns = columns.filter((col: any) => /[A-Z]/.test(col.column_name))
-      const snakeCaseColumns = columns.filter((col: any) => col.column_name.includes('_'))
+      const camelCaseColumns = columns.filter((col: unknown) =>
+        /[A-Z]/.test((col as { column_name: string }).column_name)
+      )
+      const snakeCaseColumns = columns.filter((col: unknown) =>
+        (col as { column_name: string }).column_name.includes('_')
+      )
 
       if (camelCaseColumns.length > 0) {
-        camelCaseColumns.forEach((_col: any) => {})
+        camelCaseColumns.forEach((_col: unknown) => {})
       }
 
       if (snakeCaseColumns.length > 0) {
-        snakeCaseColumns.forEach((_col: any) => {})
+        snakeCaseColumns.forEach((_col: unknown) => {})
       }
     }
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     if (authDataSource.isInitialized) {
       await authDataSource.destroy()

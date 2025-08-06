@@ -69,11 +69,11 @@ export class ParameterApplication {
 
   @Column({ type: 'jsonb', nullable: true })
   businessRules?: {
-    validation?: Record<string, any> // Règles de validation
-    automation?: Record<string, any> // Règles d'automatisation
+    validation?: Record<string, unknown> // Règles de validation
+    automation?: Record<string, unknown> // Règles d'automatisation
     dependencies?: string[] // Dépendances avec d'autres paramètres
-    conditions?: Record<string, any> // Conditions d'application
-    [key: string]: any
+    conditions?: Record<string, unknown> // Conditions d'application
+    [key: string]: unknown
   }
 
   @Column({ type: 'jsonb', nullable: true })
@@ -84,14 +84,14 @@ export class ParameterApplication {
     category?: string // Catégorie métier
     department?: string // Département concerné
     priority?: number // Priorité
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @Column({ type: 'jsonb', nullable: true })
   arrayValues?: string[] // Pour les paramètres de type ARRAY
 
   @Column({ type: 'jsonb', nullable: true })
-  objectValues?: Record<string, any> // Pour les paramètres de type OBJECT
+  objectValues?: Record<string, unknown> // Pour les paramètres de type OBJECT
 
   @Column({ type: 'text', nullable: true })
   formula?: string // Pour les paramètres de type FORMULA
@@ -128,8 +128,8 @@ export class ParameterApplication {
 
   // Index composé pour recherche efficace
   @Index('idx_param_app_group_key', ['group', 'key'])
-  static groupKeyIndex: any
+  static groupKeyIndex: unknown
 
   @Index('idx_param_app_scope', ['scope'])
-  static scopeIndex: any
+  static scopeIndex: unknown
 }

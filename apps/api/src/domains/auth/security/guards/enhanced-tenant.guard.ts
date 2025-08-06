@@ -32,7 +32,7 @@ export interface TenantContext {
   siteId?: string
   permissions: string[]
   tenantDatabase?: string
-  userSocieteInfo?: any
+  userSocieteInfo?: unknown
 }
 
 export interface UserContext {
@@ -188,7 +188,9 @@ export class EnhancedTenantGuard implements CanActivate {
     }
   }
 
-  private extractTokenFromHeader(request: any): string | undefined {
+  private extractTokenFromHeader(request: {
+    headers: { authorization?: string }
+  }): string | undefined {
     const authHeader = request.headers.authorization
     if (!authHeader) {
       return undefined

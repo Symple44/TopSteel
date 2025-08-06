@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
@@ -44,7 +43,6 @@ export class MFAService {
     public readonly totpService: TOTPService,
     private readonly webauthnService: WebAuthnService,
     private readonly geolocationService: GeolocationService,
-    private readonly configService: ConfigService,
     private readonly cacheService: OptimizedCacheService
   ) {}
 
@@ -170,7 +168,7 @@ export class MFAService {
 
     try {
       // Check geolocation trust
-      const location = await this.geolocationService.getLocationFromIP(ipAddress)
+      const _location = await this.geolocationService.getLocationFromIP(ipAddress)
 
       // For now, consider local networks as trusted
       const isLocalNetwork =
@@ -224,7 +222,7 @@ export class MFAService {
    */
   private hashDevice(ipAddress: string, userAgent: string): string {
     // Simple hash - in production, use proper crypto hashing
-    const crypto = require('crypto')
+    const crypto = require('node:crypto')
     return crypto
       .createHash('sha256')
       .update(`${ipAddress}:${userAgent}`)
@@ -486,7 +484,7 @@ export class MFAService {
   async initiateMFASession(
     userId: string,
     mfaType: 'totp' | 'webauthn' | 'sms',
-    request?: any
+    request?: Record<string, unknown>
   ): Promise<{
     success: boolean
     sessionToken?: string
@@ -601,7 +599,10 @@ export class MFAService {
 
         // Vérifier le code TOTP ou un code de récupération
         if (this.totpService.isValidTokenFormat(code)) {
-          const secret = this.totpService.decryptSecret(mfaRecord.secret!)
+          if (!mfaRecord.secret) {
+            return { success: false, error: 'Secret TOTP non trouvé' }
+          }
+          const secret = this.totpService.decryptSecret(mfaRecord.secret)
           isValid = this.totpService.verifyToken(code, secret)
         } else if (mfaRecord.backupCodes) {
           // Vérifier si c'est un code de récupération
@@ -630,9 +631,13 @@ export class MFAService {
           return { success: false, error: 'Credential WebAuthn non trouvé' }
         }
 
+        if (!mfaSession.challenge) {
+          return { success: false, error: 'Challenge de session non trouvé' }
+        }
+
         const verification = await this.webauthnService.verifyAuthenticationResponse(
           webauthnResponse,
-          mfaSession.challenge!,
+          mfaSession.challenge,
           credential
         )
 

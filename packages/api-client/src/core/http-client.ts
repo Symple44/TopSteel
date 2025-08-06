@@ -85,13 +85,13 @@ export class HttpClient {
         }
         return config
       },
-      (error: any) => Promise.reject(this.transformError(error))
+      (error: unknown) => Promise.reject(this.transformError(error))
     )
 
     // Response interceptor - handle errors and token refresh
     this.client.interceptors.response.use(
       (response: AxiosResponse) => response,
-      async (error: any) => {
+      async (error: unknown) => {
         const originalRequest = error.config
 
         // Handle 401 - try to refresh token
@@ -159,27 +159,37 @@ export class HttpClient {
 
   // ===== ERROR TRANSFORMATION =====
 
-  private transformError(error: any): ApiError {
-    if (error.response) {
+  private transformError(error: unknown): ApiError {
+    const axiosError = error as {
+      response?: {
+        data?: { code?: string; message?: string; details?: unknown }
+        status?: number
+      }
+      request?: unknown
+      message?: string
+    }
+
+    if (axiosError.response) {
       // Server responded with error status
       return {
-        code: error.response.data?.code || 'API_ERROR',
-        message: error.response.data?.message || error.message || 'Une erreur est survenue',
-        details: error.response.data?.details,
-        statusCode: error.response.status,
+        code: axiosError.response.data?.code || 'API_ERROR',
+        message:
+          axiosError.response.data?.message || axiosError.message || 'Une erreur est survenue',
+        details: axiosError.response.data?.details,
+        statusCode: axiosError.response.status,
       }
-    } else if (error.request) {
+    } else if (axiosError.request) {
       // Network error
       return {
         code: 'NETWORK_ERROR',
         message: 'Erreur de connexion au serveur',
-        details: { originalError: error.message },
+        details: { originalError: axiosError.message },
       }
     } else {
       // Other error
       return {
         code: 'UNKNOWN_ERROR',
-        message: error.message || 'Erreur inconnue',
+        message: axiosError.message || 'Erreur inconnue',
         details: { originalError: error },
       }
     }
@@ -211,7 +221,7 @@ export class HttpClient {
 
   async getWithPagination<T>(
     url: string,
-    params?: Record<string, any>
+    params?: Record<string, unknown>
   ): Promise<PaginatedResponse<T>> {
     const response = await this.get<PaginatedResponse<T>>(url, { params } as RequestOptions)
     return response.data

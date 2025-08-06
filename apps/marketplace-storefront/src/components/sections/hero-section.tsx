@@ -78,7 +78,10 @@ export function HeroSection({ tenant }: HeroSectionProps) {
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  role="img"
+                  aria-label="Livraison rapide"
                 >
+                  <title>Livraison rapide</title>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -100,7 +103,10 @@ export function HeroSection({ tenant }: HeroSectionProps) {
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  role="img"
+                  aria-label="Support expert"
                 >
+                  <title>Support expert</title>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"

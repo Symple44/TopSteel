@@ -481,7 +481,13 @@ export class MenuConfigurationService {
     )
   }
 
-  async exportConfiguration(id: string): Promise<any> {
+  async exportConfiguration(id: string): Promise<{
+    name: string
+    description: string | null
+    version: string
+    exportedAt: string
+    items: MenuTreeNode[]
+  }> {
     const config = await this.findConfigurationById(id)
     const menuTree = await this.getMenuTree(id)
 
@@ -494,7 +500,10 @@ export class MenuConfigurationService {
     }
   }
 
-  async importConfiguration(data: any, createdBy: string): Promise<MenuConfiguration> {
+  async importConfiguration(
+    data: Record<string, unknown>,
+    createdBy: string
+  ): Promise<MenuConfiguration> {
     return await this.createConfiguration(
       {
         name: data.name,

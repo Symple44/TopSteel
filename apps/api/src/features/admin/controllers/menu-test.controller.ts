@@ -20,7 +20,7 @@ export class MenuTestController {
         configCount: configs.length,
         data: configs[0] || null,
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error.message,
@@ -42,7 +42,7 @@ export class MenuTestController {
         message: 'Raw query working!',
         data: result[0] || null,
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error.message,

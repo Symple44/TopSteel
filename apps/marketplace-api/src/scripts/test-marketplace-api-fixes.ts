@@ -69,7 +69,7 @@ async function testMarketplaceApiFixes() {
       .andWhere('article.isMarketplaceEnabled = true')
       .limit(5)
 
-    const _articles = await articlesQuery.getMany()
+    await articlesQuery.getMany()
 
     const categoriesQuery = articlesRepo
       .createQueryBuilder('article')
@@ -82,7 +82,7 @@ async function testMarketplaceApiFixes() {
       .andWhere('article.famille IS NOT NULL')
       .orderBy('article.famille', 'ASC')
 
-    const _categories = await categoriesQuery.getRawMany()
+    await categoriesQuery.getRawMany()
 
     try {
       const testQuery = articlesRepo
@@ -98,11 +98,11 @@ async function testMarketplaceApiFixes() {
 
       // Test des méthodes utilitaires
       if (testArticles.length > 0) {
-        const _article = testArticles[0]
+        // Article found for testing
       }
-    } catch (_error: any) {}
-  } catch (error: any) {
-    throw error
+    } catch {
+      // Ignore query errors during test
+    }
   } finally {
     if (tenantConnection?.isInitialized) {
       await tenantConnection.destroy()
@@ -119,7 +119,7 @@ if (require.main === module) {
     .then(() => {
       process.exit(0)
     })
-    .catch((_error) => {
+    .catch(() => {
       process.exit(1)
     })
 }

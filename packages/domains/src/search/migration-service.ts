@@ -3,7 +3,7 @@ import { imageElasticsearchMapping } from './mappings/images'
 
 export interface MigrationConfig {
   indexName: string
-  mapping: any
+  mapping: unknown
   version: string
   description: string
 }
@@ -38,14 +38,14 @@ export class ElasticsearchMigrationService {
 
     let allSuccess = true
 
-    for (const [_indexName, config] of this.migrations) {
+    for (const [, config] of this.migrations) {
       try {
         const success = await this.runMigration(config)
         if (success) {
         } else {
           allSuccess = false
         }
-      } catch (_error) {
+      } catch {
         allSuccess = false
       }
     }
@@ -68,7 +68,7 @@ export class ElasticsearchMigrationService {
       }
 
       return success
-    } catch (_error) {
+    } catch {
       return false
     }
   }
@@ -87,7 +87,9 @@ export class ElasticsearchMigrationService {
         `${config.indexName}_${config.version}`,
         migrationDoc
       )
-    } catch (_error) {}
+    } catch {
+      // Migration record failed but continue
+    }
   }
 
   async resetIndex(indexName: string): Promise<boolean> {
@@ -103,8 +105,8 @@ export class ElasticsearchMigrationService {
     return await this.runMigration(config)
   }
 
-  async checkIndexHealth(): Promise<Record<string, any>> {
-    const health: Record<string, any> = {}
+  async checkIndexHealth(): Promise<Record<string, unknown>> {
+    const health: Record<string, unknown> = {}
 
     for (const [indexName] of this.migrations) {
       try {

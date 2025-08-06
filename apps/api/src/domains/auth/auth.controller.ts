@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import type { Request } from 'express'
 import { CurrentUser } from '../../core/common/decorators/current-user.decorator'
 import { Public } from '../../core/common/decorators/public.decorator'
 import { ThrottleAuth } from '../../core/common/decorators/throttle-config.decorator'
@@ -45,7 +46,7 @@ export class AuthController {
     status: 200,
     description: 'Connexion réussie ou MFA requis',
   })
-  async login(@Body() loginDto: LoginDto, @Req() request: any) {
+  async login(@Body() loginDto: LoginDto, @Req() request: Request) {
     // Utiliser les données brutes si le DTO est vide mais que request.body a des données
     const actualData = loginDto?.login || loginDto?.password ? loginDto : request.body
 
@@ -196,7 +197,7 @@ export class AuthController {
     @CurrentUser() user: User,
     @Param('societeId') societeId: string,
     @Body() body: { siteId?: string },
-    @Req() request: any
+    @Req() request: Request
   ) {
     return this.authService.loginWithSociete(user.id, societeId, body.siteId, request)
   }

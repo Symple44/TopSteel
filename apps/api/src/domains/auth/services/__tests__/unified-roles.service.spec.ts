@@ -15,9 +15,9 @@ import { UnifiedRolesService, type UserSocieteInfo } from '../unified-roles.serv
  */
 describe('UnifiedRolesService', () => {
   let service: UnifiedRolesService
-  let userSocieteRoleRepository: any
-  let userRepository: any
-  let cacheService: any
+  let userSocieteRoleRepository: Record<string, unknown>
+  let userRepository: Record<string, unknown>
+  let cacheService: Record<string, unknown>
 
   const mockUser = {
     id: 'user-123',
@@ -61,7 +61,7 @@ describe('UnifiedRolesService', () => {
       ],
     },
     isEffectivelyActive: vi.fn().mockReturnValue(true),
-  } as any
+  } as UserSocieteRole
 
   beforeEach(() => {
     // Create mocks
@@ -104,9 +104,9 @@ describe('UnifiedRolesService', () => {
 
     // Create service instance with direct dependency injection
     service = new UnifiedRolesService(
-      userSocieteRoleRepository as any,
-      userRepository as any,
-      cacheService as any
+      userSocieteRoleRepository as Record<string, unknown>,
+      userRepository as Record<string, unknown>,
+      cacheService as Record<string, unknown>
     )
   })
 
@@ -420,7 +420,7 @@ describe('UnifiedRolesService', () => {
       userSocieteRoleRepository.findOne.mockResolvedValue(null)
       const mockCreate = vi.fn().mockReturnValue(mockUserSocieteRole)
       UserSocieteRole.create = mockCreate
-      userSocieteRoleRepository.save.mockResolvedValue(mockUserSocieteRole as any)
+      userSocieteRoleRepository.save.mockResolvedValue(mockUserSocieteRole as UserSocieteRole)
 
       const result = await service.assignUserToSociete(
         'user-123',
@@ -447,9 +447,9 @@ describe('UnifiedRolesService', () => {
     it('should update existing role assignment', async () => {
       const existingRole = { ...mockUserSocieteRole }
       userSocieteRoleRepository.findOne.mockResolvedValue(existingRole)
-      userSocieteRoleRepository.save.mockResolvedValue(existingRole as any)
+      userSocieteRoleRepository.save.mockResolvedValue(existingRole as UserSocieteRole)
 
-      const _result = await service.assignUserToSociete(
+      await service.assignUserToSociete(
         'user-123',
         'societe-123',
         SocieteRoleType.ADMIN,

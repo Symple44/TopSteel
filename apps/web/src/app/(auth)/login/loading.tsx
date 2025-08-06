@@ -25,7 +25,7 @@ export default function LoginLoading() {
         </div>
 
         <p className="text-muted-foreground mb-4">
-          {t('auth.loading', 'Chargement de la connexion...')}
+          {t('auth.loading') || 'Chargement de la connexion...'}
         </p>
 
         <div className="inline-flex space-x-1">

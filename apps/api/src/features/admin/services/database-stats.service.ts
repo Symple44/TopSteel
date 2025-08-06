@@ -70,7 +70,11 @@ export class DatabaseStatsService {
     }
   }
 
-  async optimizeDatabase(): Promise<{ success: boolean; message: string; details?: any }> {
+  async optimizeDatabase(): Promise<{
+    success: boolean
+    message: string
+    details?: Record<string, unknown>
+  }> {
     try {
       const results: Array<{
         table?: string

@@ -22,8 +22,10 @@ async function checkAdminUser() {
 
       for (const pwd of passwords) {
         try {
-          const _isValid = await bcrypt.compare(pwd, user.password)
-        } catch (_err) {}
+          await bcrypt.compare(pwd, user.password)
+        } catch {
+          // Ignore comparison errors
+        }
       }
     }
     const superAdmins = await dataSource.query(`
@@ -34,9 +36,10 @@ async function checkAdminUser() {
 
     if (superAdmins.length === 0) {
     } else {
-      superAdmins.forEach((_admin: any) => {})
+      // Super admins found - just count them
     }
-  } catch (_error) {
+  } catch {
+    // Ignore query errors
   } finally {
     await app.close()
   }

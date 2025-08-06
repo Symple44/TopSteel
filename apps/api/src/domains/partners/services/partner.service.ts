@@ -66,13 +66,22 @@ export class PartnerService extends BusinessService<Partner> {
     if (data.code) {
       partner.code = data.code
     } else {
-      partner.code = await this.generatePartnerCode(data.type!)
+      if (!data.type) {
+        throw new Error('Type de partenaire requis pour générer un code')
+      }
+      partner.code = await this.generatePartnerCode(data.type)
     }
 
     // Informations de base obligatoires
-    partner.type = data.type!
+    if (!data.type) {
+      throw new Error('Type de partenaire requis')
+    }
+    partner.type = data.type
     partner.denomination = data.denomination || ''
-    partner.category = data.category!
+    if (!data.category) {
+      throw new Error('Catégorie de partenaire requise')
+    }
+    partner.category = data.category
     partner.status = data.status || PartnerStatus.ACTIF
 
     // Informations optionnelles

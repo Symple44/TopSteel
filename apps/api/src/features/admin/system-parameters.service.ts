@@ -175,7 +175,7 @@ export class SystemParametersService {
   }
 
   // Méthode utilitaire pour déterminer la catégorie à partir de la clé
-  private getCategoryFromKey(key: string): any {
+  private getCategoryFromKey(key: string): string {
     if (key.startsWith('elasticsearch.')) return 'ELASTICSEARCH'
     if (key.startsWith('COMPANY_')) return 'GENERAL'
     if (key.startsWith('PROJECT_')) return 'PROJETS'
@@ -209,7 +209,7 @@ export class SystemParametersService {
   }
 
   // Méthode utilitaire pour déterminer le type à partir de la clé
-  private getTypeFromKey(key: string): any {
+  private getTypeFromKey(key: string): string {
     if (key.includes('enable') || key.includes('Enable')) return 'BOOLEAN'
     if (
       key.includes('retries') ||

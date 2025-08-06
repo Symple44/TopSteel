@@ -451,7 +451,7 @@ const createAppStoreActions: StoreCreator<AppState, AppStoreActions> = (set, get
     }
   },
 
-  resolveConflict: (_conflictId, _resolution) => {
+  resolveConflict: () => {
     set((state) => {
       if (state.sync) {
         state.sync.conflictsCount = Math.max(0, state.sync.conflictsCount - 1)

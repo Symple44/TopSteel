@@ -12,7 +12,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({
-  data,
+  data: _data,
   showActions = false,
   onEdit,
   onDelete,

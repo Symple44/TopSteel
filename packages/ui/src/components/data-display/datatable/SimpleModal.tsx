@@ -37,17 +37,19 @@ export function SimpleModal({
   return (
     <>
       {/* Overlay */}
-      <div
+      <button
+        type="button"
         className="fixed inset-0 bg-black/50 z-[9998] backdrop-blur-sm"
         onClick={() => onOpenChange(false)}
+        aria-label="Close modal"
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
         <div
           className={`simple-modal-container bg-background border border-border rounded-lg shadow-lg w-full ${maxWidth} max-h-[90vh] overflow-hidden flex flex-col relative`}
-          onClick={(e) => e.stopPropagation()}
           style={{ zIndex: 9999, position: 'relative' }}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">

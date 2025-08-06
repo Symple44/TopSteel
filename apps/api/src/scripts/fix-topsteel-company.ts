@@ -35,9 +35,10 @@ async function fixTopSteelCompany() {
     `)
 
     // Chercher la société TopSteel ou la première société
-    let topsteelSociete = societes.find(
-      (s: any) => s.nom.toLowerCase().includes('topsteel') || s.code === 'TOPSTEEL'
-    )
+    let topsteelSociete = societes.find((s: unknown) => {
+      const sTyped = s as { nom: string; code: string }
+      return sTyped.nom.toLowerCase().includes('topsteel') || sTyped.code === 'TOPSTEEL'
+    })
 
     if (!topsteelSociete && societes.length > 0) {
       // Si pas de société TopSteel, mettre à jour la première société
@@ -50,7 +51,7 @@ async function fixTopSteelCompany() {
             updated_at = NOW()
         WHERE id = $1
       `,
-        [topsteelSociete.id]
+        [(topsteelSociete as { id: string }).id]
       )
     }
 
@@ -70,12 +71,12 @@ async function fixTopSteelCompany() {
         INSERT INTO user_societe_roles ("userId", "societeId", role, "isDefault", "isActive")
         VALUES ($1, $2, 'SUPER_ADMIN', true, true)
       `,
-        [adminUser[0].id, topsteelSociete.id]
+        [adminUser[0].id, (topsteelSociete as { id: string }).id]
       )
     }
 
     // Vérifier le résultat final
-    const _finalCheck = await dataSource.query(
+    await dataSource.query(
       `
       SELECT 
         s.id,
@@ -89,7 +90,7 @@ async function fixTopSteelCompany() {
     `,
       [adminUser[0].id]
     )
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

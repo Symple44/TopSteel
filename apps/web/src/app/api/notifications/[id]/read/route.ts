@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
 // Stockage temporaire - en production, utiliser une base de données
-const notifications: any[] = []
+const notifications: { id: string; isRead?: boolean; readAt?: string }[] = []
 
 export async function PATCH(
   _request: NextRequest,

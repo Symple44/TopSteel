@@ -29,14 +29,14 @@ export async function POST(req: NextRequest) {
       success: true,
       data: responseData.data,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       {
         success: false,
-        message: error.response?.data?.message || 'Erreur serveur',
+        message: (error as any)?.response?.data?.message || 'Erreur serveur',
       },
       {
-        status: error.response?.status || 500,
+        status: (error as any)?.response?.status || 500,
       }
     )
   }

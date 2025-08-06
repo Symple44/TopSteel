@@ -80,13 +80,6 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
   const [queryName, setQueryName] = useState(initialData?.name || 'New Query')
   const [queryDescription, setQueryDescription] = useState(initialData?.description || '')
 
-  useEffect(() => {
-    fetchTables()
-    if (initialData) {
-      loadInitialData()
-    }
-  }, [fetchTables, initialData, loadInitialData])
-
   const fetchTables = async () => {
     try {
       const response = await callClientApi('query-builder/schema/tables')
@@ -95,7 +88,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
         setAvailableTables(tables)
       } else {
       }
-    } catch (_error) {}
+    } catch {}
   }
 
   const loadInitialData = () => {
@@ -110,6 +103,13 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
       setSelectedColumns(initialData.columns)
     }
   }
+
+  useEffect(() => {
+    fetchTables()
+    if (initialData) {
+      loadInitialData()
+    }
+  }, [fetchTables, initialData, loadInitialData])
 
   const generateSQL = () => {
     if (!selectedTable || selectedColumns.length === 0) {
@@ -203,7 +203,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
         toast.error(`Erreur lors de l'exécution: ${errorData.error || 'Erreur inconnue'}`)
       }
-    } catch (_error) {
+    } catch {
       toast.error("Erreur lors de l'exécution de la requête")
     } finally {
       setLoading(false)
@@ -281,7 +281,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
       } else {
         throw new Error('Save failed')
       }
-    } catch (_error) {
+    } catch {
       toast.error('Erreur lors de la sauvegarde')
     } finally {
       setLoading(false)
@@ -342,10 +342,12 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {availableTables.map((table) => (
-                    <div
+                    <button
                       key={table.name}
+                      type="button"
                       onClick={() => setSelectedTable(table)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                      aria-label={`Select table ${table.name}`}
+                      className={`w-full text-left p-3 rounded-lg cursor-pointer transition-colors ${
                         selectedTable?.name === table.name
                           ? 'bg-primary text-primary-foreground'
                           : 'hover:bg-accent'
@@ -361,7 +363,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                       <Badge variant="outline" className="text-xs mt-1">
                         {table.schema}
                       </Badge>
-                    </div>
+                    </button>
                   ))}
                 </CardContent>
               </Card>
@@ -377,10 +379,12 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {selectedTable.columns.map((column) => (
-                      <div
+                      <button
                         key={column.name}
+                        type="button"
                         onClick={() => addColumn(selectedTable, column)}
-                        className="p-2 rounded cursor-pointer hover:bg-accent flex items-center justify-between"
+                        aria-label={`Add column ${column.name} to query`}
+                        className="w-full text-left p-2 rounded cursor-pointer hover:bg-accent flex items-center justify-between"
                       >
                         <div>
                           <span className="font-mono text-sm">{column.name}</span>
@@ -394,7 +398,7 @@ export function VisualQueryBuilder({ queryBuilderId, initialData }: VisualQueryB
                           )}
                         </div>
                         <Plus className="h-4 w-4 opacity-50" />
-                      </div>
+                      </button>
                     ))}
                   </CardContent>
                 </Card>

@@ -95,7 +95,9 @@ describe('ProjetsController (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200)
 
-      expect(response.body.data.every((p: any) => p.statut === 'EN_COURS')).toBe(true)
+      expect(
+        response.body.data.every((p: unknown) => (p as { statut: string }).statut === 'EN_COURS')
+      ).toBe(true)
     })
   })
 })

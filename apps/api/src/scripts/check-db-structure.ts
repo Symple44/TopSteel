@@ -24,7 +24,7 @@ async function checkDatabaseStructure() {
 
     if (mfaColumns.length === 0) {
     } else {
-      mfaColumns.forEach((_col: any) => {})
+      mfaColumns.forEach((_col: unknown) => {})
     }
     const sessionColumns = await dataSource.query(`
       SELECT column_name, data_type, character_maximum_length, is_nullable
@@ -33,8 +33,11 @@ async function checkDatabaseStructure() {
       ORDER BY ordinal_position
     `)
 
-    sessionColumns.forEach((col: any) => {
-      if (col.column_name === 'accessToken' || col.column_name === 'refreshToken') {
+    sessionColumns.forEach((col: unknown) => {
+      if (
+        (col as { column_name: string }).column_name === 'accessToken' ||
+        (col as { column_name: string }).column_name === 'refreshToken'
+      ) {
       } else {
       }
     })
@@ -45,8 +48,8 @@ async function checkDatabaseStructure() {
       ORDER BY table_name
     `)
 
-    mfaTables.forEach((_table: any) => {})
-  } catch (_error) {
+    mfaTables.forEach((_table: unknown) => {})
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

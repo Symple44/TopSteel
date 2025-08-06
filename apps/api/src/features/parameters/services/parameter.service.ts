@@ -380,7 +380,7 @@ export class ParameterService {
     language: string = 'fr',
     scope: 'system' | 'application' | 'client' = 'system'
   ) {
-    let repository
+    let repository: Repository<ParameterSystem | ParameterApplication | ParameterClient>
     switch (scope) {
       case 'system':
         repository = this._systemRepo
@@ -505,14 +505,14 @@ export class ParameterService {
     updates: {
       value?: string
       arrayValues?: string[]
-      objectValues?: Record<string, any>
+      objectValues?: Record<string, unknown>
       translations?: Record<string, string>
-      metadata?: Record<string, any>
+      metadata?: Record<string, unknown>
     },
     scope: 'system' | 'application' | 'client' = 'system',
     tenantId?: string
   ) {
-    let repository
+    let repository: Repository<ParameterSystem | ParameterApplication | ParameterClient>
     const whereClause: Record<string, unknown> = { group, key }
 
     switch (scope) {
@@ -562,14 +562,14 @@ export class ParameterService {
       value: string
       type: string
       arrayValues?: string[]
-      objectValues?: Record<string, any>
+      objectValues?: Record<string, unknown>
       translations?: Record<string, string>
-      metadata?: Record<string, any>
-      [key: string]: any
+      metadata?: Record<string, unknown>
+      [key: string]: unknown
     },
     scope: 'system' | 'application' | 'client' = 'system'
   ) {
-    let repository
+    let repository: Repository<ParameterSystem | ParameterApplication | ParameterClient>
     switch (scope) {
       case 'system':
         repository = this._systemRepo

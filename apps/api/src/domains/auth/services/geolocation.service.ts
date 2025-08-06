@@ -58,7 +58,16 @@ export class GeolocationService {
         throw new Error(`Erreur API géolocalisation: ${response.status}`)
       }
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as {
+        status: string
+        message?: string
+        country?: string
+        regionName?: string
+        city?: string
+        lat?: number
+        lon?: number
+        timezone?: string
+      }
 
       if (data.status !== 'success') {
         this.logger.warn(`Géolocalisation échouée pour IP ${ipAddress}:`, data.message)
@@ -196,7 +205,12 @@ export class GeolocationService {
   /**
    * Extraire l'adresse IP réelle de la requête
    */
-  extractRealIP(request: any): string {
+  extractRealIP(request: {
+    headers: Record<string, string | undefined>
+    connection?: { remoteAddress?: string }
+    socket?: { remoteAddress?: string }
+    ip?: string
+  }): string {
     // Vérifier les headers de proxy
     const forwarded = request.headers['x-forwarded-for']
     const realIP = request.headers['x-real-ip']
@@ -240,7 +254,7 @@ export class GeolocationService {
   async detectSuspiciousActivity(
     _userId: string,
     newLocation: LocationData | null,
-    previousSessions: any[]
+    previousSessions: unknown[]
   ): Promise<{
     isSuspicious: boolean
     reasons: string[]

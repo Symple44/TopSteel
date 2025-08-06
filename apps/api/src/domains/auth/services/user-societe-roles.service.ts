@@ -1,10 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
-import type { ParameterService } from '../../../features/parameters/services/parameter.service'
-import { Permission } from '../core/entities/permission.entity'
-import { Role } from '../core/entities/role.entity'
-import { RolePermission } from '../core/entities/role-permission.entity'
 import { UserSocieteRole } from '../core/entities/user-societe-role.entity'
 
 export interface UserSocieteRoleWithPermissions {
@@ -41,14 +37,7 @@ export interface UserSocieteRoleWithPermissions {
 export class UserSocieteRolesService {
   constructor(
     @InjectRepository(UserSocieteRole, 'auth')
-    private _userSocieteRoleRepository: Repository<UserSocieteRole>,
-    @InjectRepository(Role, 'auth')
-    private _roleRepository: Repository<Role>,
-    @InjectRepository(Permission, 'auth')
-    private _permissionRepository: Repository<Permission>,
-    @InjectRepository(RolePermission, 'auth')
-    private _rolePermissionRepository: Repository<RolePermission>,
-    private parameterService: ParameterService
+    private _userSocieteRoleRepository: Repository<UserSocieteRole>
   ) {}
 
   /**
@@ -66,7 +55,6 @@ export class UserSocieteRolesService {
     `
 
     const rawResult = await this._userSocieteRoleRepository.query(rawQuery, [userId])
-    console.log('🔍 UserSocieteRolesService: Raw SQL result:', rawResult)
 
     const userRoles = await this._userSocieteRoleRepository
       .createQueryBuilder('usr')
@@ -88,31 +76,27 @@ export class UserSocieteRolesService {
       .andWhere('usr.isActive = :isActive', { isActive: true })
       .getMany()
 
-    console.log('🔍 UserSocieteRolesService: Found user roles:', userRoles.length)
-    console.log('🔍 UserSocieteRolesService: Raw data:', userRoles)
-
     // Si la relation TypeORM ne fonctionne pas, utilisons la requête SQL directe
     if (rawResult && rawResult.length > 0 && userRoles.length === 0) {
-      console.log('🔍 UserSocieteRolesService: Using raw SQL result as TypeORM relations failed')
+      const result: UserSocieteRoleWithPermissions[] = rawResult.map(
+        (row: Record<string, unknown>) => ({
+          userId: row.userId,
+          societeId: row.societeId,
+          societe: {
+            id: row.societe_id || row.societeId,
+            nom: row.societe_nom || `Société ${row.societeId.substring(0, 8)}...`,
+            code: row.societe_code || 'N/A',
+          },
+          roleType: row.roleType || 'USER',
+          isDefaultSociete: row.isDefaultSociete || false,
+          role: undefined,
+          permissions: [],
+          additionalPermissions: [],
+          restrictedPermissions: [],
+          isActive: row.isActive,
+        })
+      )
 
-      const result: UserSocieteRoleWithPermissions[] = rawResult.map((row: any) => ({
-        userId: row.userId,
-        societeId: row.societeId,
-        societe: {
-          id: row.societe_id || row.societeId,
-          nom: row.societe_nom || `Société ${row.societeId.substring(0, 8)}...`,
-          code: row.societe_code || 'N/A',
-        },
-        roleType: row.roleType || 'USER',
-        isDefaultSociete: row.isDefaultSociete || false,
-        role: undefined,
-        permissions: [],
-        additionalPermissions: [],
-        restrictedPermissions: [],
-        isActive: row.isActive,
-      }))
-
-      console.log('🔍 UserSocieteRolesService: Returning raw result:', result)
       return result
     }
 
@@ -167,7 +151,7 @@ export class UserSocieteRolesService {
         // Ajout des propriétés supplémentaires
         additionalPermissions: userRole.additionalPermissions || [],
         restrictedPermissions: userRole.restrictedPermissions || [],
-      } as any)
+      } as UserSocieteRoleWithPermissions)
     }
 
     return result

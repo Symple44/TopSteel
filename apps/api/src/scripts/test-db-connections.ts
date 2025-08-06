@@ -57,9 +57,9 @@ class DatabaseConnectionTester {
   private async testConnection(name: string, dataSource: DataSource): Promise<void> {
     const connectionInfo: DatabaseConnectionInfo = {
       name,
-      host: (dataSource.options as any).host as string,
-      port: (dataSource.options as any).port as number,
-      database: (dataSource.options as any).database as string,
+      host: (dataSource.options as { host: string }).host,
+      port: (dataSource.options as { port: number }).port,
+      database: (dataSource.options as { database: string }).database,
       connected: false,
     }
 
@@ -133,7 +133,7 @@ class DatabaseConnectionTester {
       if (existingTables.length > 0) {
       } else {
       }
-    } catch (_error) {}
+    } catch {}
   }
 
   private displayResults(): void {
@@ -141,7 +141,7 @@ class DatabaseConnectionTester {
     const totalCount = this.results.length
 
     for (const result of this.results) {
-      const _status = result.connected ? '✅' : '❌'
+      result.connected ? '✅' : '❌'
 
       if (result.connected) {
       } else {
@@ -164,7 +164,7 @@ function checkEnvironmentVariables(): void {
   const missingVars = requiredVars.filter((varName) => !configService.get(varName))
 
   if (missingVars.length > 0) {
-    missingVars.forEach((_varName) => {})
+    // Missing variables found
   }
 }
 
@@ -178,7 +178,7 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch((_error) => {
+  main().catch(() => {
     process.exit(1)
   })
 }

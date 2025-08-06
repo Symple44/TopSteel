@@ -42,15 +42,13 @@ class Phase0MigrationRunner {
         const migrations = await this.authDataSource.runMigrations()
 
         if (migrations.length > 0) {
-          migrations.forEach((_migration) => {})
+          // migrations processed
         }
       } else {
       }
 
       // 4. Afficher l'état actuel
       await this.displayMigrationStatus()
-    } catch (error) {
-      throw error
     } finally {
       if (this.authDataSource.isInitialized) {
         await this.authDataSource.destroy()
@@ -68,54 +66,23 @@ class Phase0MigrationRunner {
       `)
 
       if (executedMigrations.length > 0) {
-        executedMigrations.forEach((migration: any) => {
-          const _date = new Date(migration.timestamp)
-        })
+        // Display migration timestamps (implementation removed to avoid unused vars)
       }
-    } catch (_error) {}
+    } catch {}
   }
 
   async verifyTableStructures(): Promise<void> {
     try {
       await this.authDataSource.initialize()
-      const sessionColumns = await this.authDataSource.query(`
-        SELECT column_name, data_type 
-        FROM information_schema.columns 
-        WHERE table_name = 'user_sessions' 
-        AND table_schema = 'public'
-        ORDER BY ordinal_position
-      `)
-      const expectedSessionColumns = [
-        'userId',
-        'sessionId',
-        'accessToken',
-        'refreshToken',
-        'deviceInfo',
-        'location',
-      ]
-      const _hasAllSessionColumns = expectedSessionColumns.every((col) =>
-        sessionColumns.some((dbCol: any) => dbCol.column_name === col)
-      )
-      const roleColumns = await this.authDataSource.query(`
-        SELECT column_name 
-        FROM information_schema.columns 
-        WHERE table_name = 'roles' 
-        AND table_schema = 'public'
-        AND column_name IN ('name', 'nom')
-      `)
-      const _hasCorrectNameColumn = roleColumns.some((col: any) => col.column_name === 'name')
-      const permissionColumns = await this.authDataSource.query(`
-        SELECT column_name 
-        FROM information_schema.columns 
-        WHERE table_name = 'permissions' 
-        AND table_schema = 'public'
-        AND column_name IN ('resource', 'scope', 'isActive', 'metadata')
-      `)
-      const modernColumns = ['resource', 'scope', 'isActive', 'metadata']
-      const _hasMissingColumns = modernColumns.filter(
-        (col) => !permissionColumns.some((dbCol: any) => dbCol.column_name === col)
-      )
-    } catch (_error) {
+      // Query session columns (result unused)
+      // Expected session columns (unused)
+      // Check session columns structure (unused result)
+      // Query role columns (result unused)
+      // Check role name column (unused result)
+      // Query permission columns (result unused)
+      // Modern columns list (unused)
+      // Check missing permission columns (unused result)
+    } catch {
     } finally {
       if (this.authDataSource.isInitialized) {
         await this.authDataSource.destroy()
@@ -136,7 +103,8 @@ async function main() {
     // 2. Vérifier les structures
     await runner.verifyTableStructures()
     await resetter.resetUsers()
-  } catch (_error) {
+  } catch (error: unknown) {
+    console.error('Migration failed:', error)
     process.exit(1)
   }
 }

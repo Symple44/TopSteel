@@ -60,7 +60,7 @@ export class AddAllDeletedAt1754421000000 implements MigrationInterface {
           }
         } else {
         }
-      } catch (_error: any) {}
+      } catch (_error: unknown) {}
     }
   }
 

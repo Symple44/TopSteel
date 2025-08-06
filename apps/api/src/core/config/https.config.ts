@@ -13,7 +13,7 @@ export function getHttpsOptions(): HttpsOptions | null {
     const cert = readFileSync(certPath)
 
     // CA certificate est optionnel
-    let ca
+    let ca: Buffer | undefined
     try {
       ca = readFileSync(caPath)
     } catch {

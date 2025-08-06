@@ -26,7 +26,7 @@ export interface SystemParameter {
   defaultValue?: string
   isEditable: boolean
   isSecret: boolean
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   createdAt: string
   updatedAt: string
 }
@@ -40,7 +40,7 @@ export interface CreateSystemParameterDto {
   defaultValue?: string
   isEditable?: boolean
   isSecret?: boolean
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface UpdateSystemParameterDto {
@@ -49,7 +49,7 @@ export interface UpdateSystemParameterDto {
   defaultValue?: string
   isEditable?: boolean
   isSecret?: boolean
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface SystemParameterQueryDto {

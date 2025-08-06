@@ -66,7 +66,7 @@ class DatabaseQuickFixer {
         await this.presentAndApplyFixes(tenantFixes, this.tenantDataSource)
       } else {
       }
-    } catch (_error) {
+    } catch (_error: unknown) {
     } finally {
       this.rl.close()
     }
@@ -106,7 +106,9 @@ class DatabaseQuickFixer {
         AND table_schema = 'public'
       `)
 
-      const columnNames = userColumns.map((col: any) => col.column_name)
+      const columnNames = userColumns.map(
+        (col: unknown) => (col as { column_name: string }).column_name
+      )
 
       // Problème password/mot_de_passe
       if (columnNames.includes('password') && columnNames.includes('mot_de_passe')) {
@@ -148,7 +150,9 @@ class DatabaseQuickFixer {
           AND table_schema = 'public'
         `)
 
-        const roleColumnNames = roleColumns.map((col: any) => col.column_name)
+        const roleColumnNames = roleColumns.map(
+          (col: unknown) => (col as { column_name: string }).column_name
+        )
 
         if (roleColumnNames.includes('nom') && !roleColumnNames.includes('name')) {
           fixes.push({
@@ -169,7 +173,7 @@ class DatabaseQuickFixer {
       // Vérifier les contraintes de clés étrangères manquantes
       const missingForeignKeys = await this.findMissingForeignKeys(queryRunner)
       fixes.push(...missingForeignKeys)
-    } catch (_error) {}
+    } catch (_error: unknown) {}
 
     return fixes
   }
@@ -198,7 +202,7 @@ class DatabaseQuickFixer {
           backupRequired: false,
         })
       }
-    } catch (_error) {}
+    } catch (_error: unknown) {}
 
     return fixes
   }
@@ -239,7 +243,7 @@ class DatabaseQuickFixer {
             backupRequired: false,
           })
         }
-      } catch (_error) {
+      } catch (_error: unknown) {
         // Ignorer si la table n'existe pas
       }
     }
@@ -281,8 +285,8 @@ class DatabaseQuickFixer {
         )
 
         // Vérification simplifiée - dans un vrai projet, il faudrait vérifier plus précisément
-        const hasFkToUsers = existingFk.some((constraint: any) =>
-          constraint.constraint_name.includes('user')
+        const hasFkToUsers = existingFk.some((constraint: unknown) =>
+          (constraint as { constraint_name: string }).constraint_name.includes('user')
         )
 
         if (!hasFkToUsers) {
@@ -297,7 +301,7 @@ class DatabaseQuickFixer {
             backupRequired: true,
           })
         }
-      } catch (_error) {
+      } catch (_error: unknown) {
         // Ignorer si les tables n'existent pas
       }
     }
@@ -337,7 +341,7 @@ class DatabaseQuickFixer {
       }
 
       await queryRunner.release()
-    } catch (_error) {
+    } catch (_error: unknown) {
       if (fix.reversible) {
       }
     } finally {

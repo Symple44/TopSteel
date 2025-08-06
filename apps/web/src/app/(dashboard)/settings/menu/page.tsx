@@ -84,7 +84,8 @@ import {
   Users,
   Wrench,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { TranslationFieldWrapper } from '@/components/wrappers/translation-field-wrapper'
 import { apiClient } from '@/lib/api-client-instance'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { translator } from '@/lib/i18n/translator'
@@ -126,7 +127,7 @@ interface UserMenuItem {
   isUserCreated?: boolean // Indique si l'élément a été créé par l'utilisateur (éditable)
 }
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, unknown> = {
   // Navigation & Structure
   Home,
   LayoutDashboard,
@@ -188,7 +189,7 @@ const _getAvailableIcons = () => {
   return Object.keys(iconMap).sort()
 }
 
-const getIconsByCategory = (t: any) => {
+const getIconsByCategory = (t: unknown) => {
   return {
     [t('settings.menu.iconCategories.navigation')]: [
       'Home',
@@ -231,7 +232,7 @@ const getIconComponent = (iconName: string) => {
   return iconMap[iconName] || Settings
 }
 
-const getAvailableColors = (t: any) => {
+const getAvailableColors = (t: unknown) => {
   return {
     [t('settings.menu.colors.blue')]: '#3b82f6',
     [t('settings.menu.colors.green')]: '#10b981',
@@ -269,7 +270,7 @@ function FolderMenuItem({
   item: UserMenuItem
   onRemove: (id: string) => void
   level?: number
-  onDropInFolder?: (parentId: string, droppedItem: any) => void
+  onDropInFolder?: (parentId: string, droppedItem: unknown) => void
   onEdit?: (item: UserMenuItem) => void
   expandedItems?: string[]
   onToggleExpanded?: (id: string) => void
@@ -298,10 +299,10 @@ function FolderMenuItem({
 
       // Essayer aussi de récupérer depuis un état global
       if (!draggedData) {
-        const globalDragData = (window as any).currentDragData
+        const globalDragData = (window as unknown as { currentDragData?: unknown }).currentDragData
         if (globalDragData) {
           draggedData = JSON.stringify(globalDragData)
-          ;(window as any).currentDragData = null
+          ;(window as unknown as { currentDragData?: unknown }).currentDragData = null
         }
       }
 
@@ -309,7 +310,7 @@ function FolderMenuItem({
         try {
           const droppedItem = JSON.parse(draggedData)
           onDropInFolder(item.id, droppedItem)
-        } catch (_error) {
+        } catch {
           // Erreur lors du parsing des données de drag
         }
       } else {
@@ -339,7 +340,7 @@ function FolderMenuItem({
 
   return (
     <div style={{ marginLeft: `${level * 20}px` }}>
-      <div
+      <section
         className={`p-3 mb-2 bg-card border rounded-lg transition-colors border-purple-200 ${
           isDragOver ? 'bg-purple-200 border-purple-400' : 'bg-purple-50'
         }`}
@@ -347,6 +348,7 @@ function FolderMenuItem({
         onDragOver={handleDragOver}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
+        aria-label="Zone de dépôt pour réorganiser les éléments"
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
@@ -355,6 +357,7 @@ function FolderMenuItem({
             </div>
             {hasChildren && onToggleExpanded && (
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation()
                   onToggleExpanded(item.id)
@@ -420,7 +423,7 @@ function FolderMenuItem({
             </Button>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Afficher les enfants du dossier seulement si étendu */}
       {hasChildren && isExpanded && (
@@ -464,13 +467,13 @@ function SortableUserMenuItem({
   item,
   onRemove,
   level = 0,
-  onDropInFolder,
+  _onDropInFolder,
   onEdit,
 }: {
   item: UserMenuItem
   onRemove: (id: string) => void
   level?: number
-  onDropInFolder?: (parentId: string, droppedItem: any) => void
+  onDropInFolder?: (parentId: string, droppedItem: unknown) => void
   onEdit?: (item: UserMenuItem) => void
 }) {
   const { t } = useTranslation('settings')
@@ -556,8 +559,8 @@ function StandardMenuItemDisplay({
   item,
   level = 0,
   onDragStart,
-  expanded,
-  onToggleExpanded,
+  _expanded,
+  _onToggleExpanded,
   expandedItems = [],
   onToggleExpandedItem,
   t,
@@ -569,7 +572,7 @@ function StandardMenuItemDisplay({
   onToggleExpanded?: () => void
   expandedItems?: string[]
   onToggleExpandedItem?: (id: string) => void
-  t: any
+  t: unknown
 }) {
   const Icon = getTypeIcon(item.type)
   const hasChildren = item.children && item.children.length > 0
@@ -584,7 +587,7 @@ function StandardMenuItemDisplay({
 
   return (
     <>
-      <div
+      <li
         className={`p-3 mb-2 bg-card border rounded-lg transition-colors ${
           hasChildren
             ? 'cursor-pointer hover:bg-blue-50 border-blue-200'
@@ -592,23 +595,40 @@ function StandardMenuItemDisplay({
         }`}
         style={{ marginLeft: `${level * 20}px` }}
         onClick={hasChildren ? handleItemClick : undefined}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            hasChildren && handleItemClick()
+          }
+        }}
         draggable={true}
         onDragStart={(e) => {
           // Empêcher la propagation pour éviter les conflits avec le clic
           e.stopPropagation()
 
           // Fonction récursive pour mapper les enfants lors du drag
-          const mapChildrenForDrag = (children: any[], newParentId: string): any[] => {
-            return children.map((child) => ({
-              ...child,
-              id: `user-child-${child.id}-${Date.now()}`,
-              parentId: newParentId,
-              orderIndex: child.orderIndex || 0,
-              isVisible: child.isVisible !== false,
-              children: Array.isArray(child.children)
-                ? mapChildrenForDrag(child.children, `user-child-${child.id}-${Date.now()}`)
-                : [],
-            }))
+          const mapChildrenForDrag = (children: unknown[], newParentId: string): unknown[] => {
+            return children.map((child) => {
+              const childTyped = child as {
+                id?: string
+                orderIndex?: number
+                isVisible?: boolean
+                children?: unknown[]
+              }
+              return {
+                ...child,
+                id: `user-child-${childTyped.id}-${Date.now()}`,
+                parentId: newParentId,
+                orderIndex: childTyped.orderIndex || 0,
+                isVisible: childTyped.isVisible !== false,
+                children: Array.isArray(childTyped.children)
+                  ? mapChildrenForDrag(
+                      childTyped.children,
+                      `user-child-${childTyped.id}-${Date.now()}`
+                    )
+                  : [],
+              }
+            })
           }
 
           // Stocker les données de l'élément dans le dataTransfer
@@ -627,7 +647,7 @@ function StandardMenuItemDisplay({
           sessionStorage.setItem('draggedStandardItem', JSON.stringify(dragData))
 
           // Stocker aussi dans une variable globale pour les dossiers
-          ;(window as any).currentDragData = dragData
+          ;(window as unknown as { currentDragData?: unknown }).currentDragData = dragData
 
           onDragStart(item)
         }}
@@ -677,7 +697,7 @@ function StandardMenuItemDisplay({
             )}
           </div>
         </div>
-      </div>
+      </li>
 
       {/* Afficher les enfants si déplié */}
       {hasChildren && isExpanded && (
@@ -700,7 +720,7 @@ function StandardMenuItemDisplay({
 }
 
 // Fonctions utilitaires
-const getTypeLabel = (type: string, t: any) => {
+const getTypeLabel = (type: string, t: unknown) => {
   switch (type) {
     case 'M':
       return t('menu.elementTypes.folder')
@@ -792,13 +812,19 @@ export default function MenuDragDropPage() {
   const loadStandardMenu = useCallback(async () => {
     try {
       const response = await apiClient.get('/admin/menu-raw/configurations/active')
-      if ((response as any).data?.success && (response as any).data?.data) {
-        const menuItems = Array.isArray((response as any).data.data.menuTree)
-          ? (response as any).data.data.menuTree
+      if (
+        (response as unknown as { data?: { success?: boolean; data?: { menuTree?: unknown[] } } })
+          .data?.success &&
+        (response as unknown as { data?: { data?: unknown } }).data?.data
+      ) {
+        const menuItems = Array.isArray(
+          (response as unknown as { data: { data: { menuTree?: unknown[] } } }).data.data.menuTree
+        )
+          ? (response as unknown as { data: { data: { menuTree: unknown[] } } }).data.data.menuTree
           : []
         setStandardMenu(menuItems)
       }
-    } catch (_error) {
+    } catch {
       // Erreur lors du chargement du menu standard
     } finally {
       setLoading(false)
@@ -806,26 +832,45 @@ export default function MenuDragDropPage() {
   }, [])
 
   // Fonction récursive pour mapper les éléments de menu
-  const mapMenuItemRecursively = (item: any, index: number, parentId?: string): UserMenuItem => {
+  const mapMenuItemRecursively = (
+    item: unknown,
+    index: number,
+    parentId?: string
+  ): UserMenuItem => {
+    const itemTyped = item as {
+      id?: string
+      parentId?: string
+      type?: 'M' | 'P' | 'L' | 'D'
+      programId?: string
+      externalUrl?: string
+      queryBuilderId?: string
+      orderIndex?: number
+      isVisible?: boolean
+      children?: unknown[]
+      customIcon?: string
+      icon?: string
+      customTitle?: string
+      customIconColor?: string
+    }
     return {
-      id: item.id || `item-${Date.now()}-${index}`,
-      parentId: parentId || item.parentId,
+      id: itemTyped.id || `item-${Date.now()}-${index}`,
+      parentId: parentId || itemTyped.parentId,
       title: getTranslatedTitle(item) || 'Sans titre',
-      type: item.type || 'P',
-      programId: item.programId,
-      externalUrl: item.externalUrl,
-      queryBuilderId: item.queryBuilderId,
-      orderIndex: typeof item.orderIndex === 'number' ? item.orderIndex : index,
-      isVisible: typeof item.isVisible === 'boolean' ? item.isVisible : true,
-      children: Array.isArray(item.children)
-        ? item.children.map((child: any, childIndex: number) =>
-            mapMenuItemRecursively(child, childIndex, item.id)
+      type: itemTyped.type || 'P',
+      programId: itemTyped.programId,
+      externalUrl: itemTyped.externalUrl,
+      queryBuilderId: itemTyped.queryBuilderId,
+      orderIndex: typeof itemTyped.orderIndex === 'number' ? itemTyped.orderIndex : index,
+      isVisible: typeof itemTyped.isVisible === 'boolean' ? itemTyped.isVisible : true,
+      children: Array.isArray(itemTyped.children)
+        ? itemTyped.children.map((child: unknown, childIndex: number) =>
+            mapMenuItemRecursively(child, childIndex, itemTyped.id)
           )
         : [],
-      icon: item.customIcon || item.icon,
-      customTitle: item.customTitle,
-      customIcon: item.customIcon,
-      customIconColor: item.customIconColor,
+      icon: itemTyped.customIcon || itemTyped.icon,
+      customTitle: itemTyped.customTitle,
+      customIcon: itemTyped.customIcon,
+      customIconColor: itemTyped.customIconColor,
     }
   }
 
@@ -833,21 +878,24 @@ export default function MenuDragDropPage() {
     try {
       const response = await apiClient.get('/user/menu-preferences/custom-menu')
 
-      if ((response as any).data?.success && Array.isArray((response as any).data.data)) {
+      if (
+        (response as unknown as { data?: { success?: boolean; data?: unknown[] } }).data?.success &&
+        Array.isArray((response as unknown as { data: { data: unknown[] } }).data.data)
+      ) {
         // Convertir les données API vers le format UserMenuItem requis avec mapping récursif
-        const menuItems = (response as any).data.data.map((item: any, index: number) =>
-          mapMenuItemRecursively(item, index)
+        const menuItems = (response as unknown as { data: { data: unknown[] } }).data.data.map(
+          (item: unknown, index: number) => mapMenuItemRecursively(item, index)
         )
 
         setUserMenu(menuItems)
       } else {
         setUserMenu([])
       }
-    } catch (_error) {
+    } catch {
       // Erreur lors du chargement du menu utilisateur
       setUserMenu([])
     }
-  }, [])
+  }, [mapMenuItemRecursively])
 
   useEffect(() => {
     loadStandardMenu()
@@ -861,7 +909,7 @@ export default function MenuDragDropPage() {
         menuItems: userMenu,
       })
 
-      if ((response as any).data?.success) {
+      if ((response as unknown as { data?: { success?: boolean } }).data?.success) {
         // Envoyer un événement personnalisé pour notifier la sidebar
         const event = new CustomEvent('menuPreferencesChanged', {
           detail: {
@@ -878,7 +926,7 @@ export default function MenuDragDropPage() {
       } else {
         // Erreur lors de la sauvegarde
       }
-    } catch (_error) {
+    } catch {
       // Erreur lors de la sauvegarde
     } finally {
       setSaving(false)
@@ -999,13 +1047,18 @@ export default function MenuDragDropPage() {
     setIsDraggingFromExternal(true)
   }
 
-  const handleDropInFolder = (parentId: string, droppedItem: any) => {
+  const handleDropInFolder = (parentId: string, droppedItem: unknown) => {
+    const droppedItemTyped = droppedItem as { id?: string; title?: string; children?: unknown[] }
     const newUserItem: UserMenuItem = {
-      ...droppedItem,
-      id: droppedItem.id || `user-${droppedItem.id || droppedItem.title}-${Date.now()}`,
+      ...(droppedItem as UserMenuItem),
+      id:
+        droppedItemTyped.id ||
+        `user-${droppedItemTyped.id || droppedItemTyped.title}-${Date.now()}`,
       parentId: parentId,
       orderIndex: 0,
-      children: Array.isArray(droppedItem.children) ? droppedItem.children : [],
+      children: Array.isArray(droppedItemTyped.children)
+        ? (droppedItemTyped.children as UserMenuItem[])
+        : [],
     }
 
     // Ajouter l'élément au dossier parent
@@ -1055,7 +1108,7 @@ export default function MenuDragDropPage() {
         }
 
         setUserMenu([...userMenu, newUserItem])
-      } catch (_error) {
+      } catch {
         // Erreur lors du parsing des données de drop
       }
     }
@@ -1168,7 +1221,7 @@ export default function MenuDragDropPage() {
           menuItems: updatedMenu,
         })
 
-        if ((response as any).data?.success) {
+        if ((response as unknown as { data?: { success?: boolean } }).data?.success) {
           // Envoyer un événement pour notifier la sidebar
           const event = new CustomEvent('menuPreferencesChanged', {
             detail: {
@@ -1200,7 +1253,7 @@ export default function MenuDragDropPage() {
         setShowIconSelector(false)
         setIsSaving(false)
       }, 300)
-    } catch (_error) {
+    } catch {
       // Erreur lors de la sauvegarde
       setIsSaving(false)
     }
@@ -1417,12 +1470,13 @@ export default function MenuDragDropPage() {
             </div>
           </CardHeader>
           <CardContent className="flex-1 min-h-0">
-            <div
+            <section
               onDrop={handleUserMenuDrop}
               onDragOver={handleUserMenuDragOver}
               className={`h-full p-4 border-2 border-dashed rounded-lg transition-colors ${
                 draggedStandardItem ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
               }`}
+              aria-label="Zone de dépôt pour le menu personnalisé"
             >
               {userMenu.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
@@ -1468,7 +1522,7 @@ export default function MenuDragDropPage() {
                   </DndContext>
                 </div>
               )}
-            </div>
+            </section>
           </CardContent>
         </Card>
 

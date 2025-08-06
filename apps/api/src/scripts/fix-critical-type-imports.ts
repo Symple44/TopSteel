@@ -49,7 +49,7 @@ function fixTypeImports(filePath: string) {
     if (content !== originalContent) {
       writeFileSync(fullPath, content)
     }
-  } catch (_error) {}
+  } catch (_error: unknown) {}
 }
 
 criticalFiles.forEach((file) => {

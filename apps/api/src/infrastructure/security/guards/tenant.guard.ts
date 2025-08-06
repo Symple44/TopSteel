@@ -99,9 +99,9 @@ export class TenantGuard implements CanActivate {
     return true
   }
 
-  private calculatePermissions(user: any, societeUser: SocieteUser): string[] {
+  private calculatePermissions(user: unknown, societeUser: SocieteUser): string[] {
     // Commencer avec les permissions globales de l'utilisateur
-    let permissions = [...(user.permissions || [])]
+    let permissions = [...((user as { permissions?: string[] }).permissions || [])]
 
     // Ajouter les permissions spécifiques à la société
     permissions = permissions.concat(societeUser.permissions || [])

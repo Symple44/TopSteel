@@ -80,7 +80,7 @@ async function cleanupLegacyProduits() {
     `)
 
     if (fkConstraints.length > 0) {
-      fkConstraints.forEach((_fk: any) => {})
+      // Foreign key constraints found
       return
     }
 
@@ -92,7 +92,7 @@ async function cleanupLegacyProduits() {
 
     // Sauvegarder les données si il y en a
     if (count > 0) {
-      const _data = await dataSource.query('SELECT * FROM produits')
+      await dataSource.query('SELECT * FROM produits')
 
       // Créer une table de sauvegarde
       await dataSource.query(`
@@ -116,8 +116,6 @@ async function cleanupLegacyProduits() {
     if (finalCheck[0].exists) {
     } else {
     }
-  } catch (error) {
-    throw error
   } finally {
     if (dataSource.isInitialized) {
       await dataSource.destroy()
@@ -129,7 +127,7 @@ async function cleanupLegacyProduits() {
 async function main() {
   try {
     await cleanupLegacyProduits()
-  } catch (_error) {
+  } catch (_error: unknown) {
     process.exit(1)
   }
 }

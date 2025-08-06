@@ -8,7 +8,7 @@ import { User } from '../src/modules/users/entities/user.entity'
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication
-  let _userRepository
+  let _userRepository: unknown
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -157,9 +157,6 @@ describe('AuthController (e2e)', () => {
     })
 
     it('should complete full authentication flow 5/5 tests', async () => {
-      let accessToken: string
-      let companyId: string
-
       // Test 1/5: User Login
       const loginResponse = await request(app.getHttpServer())
         .post('/api/auth/login')
@@ -174,7 +171,7 @@ describe('AuthController (e2e)', () => {
       expect(loginResponse.body.data).toHaveProperty('user')
       expect(loginResponse.body.data.user.email).toBe(testUser.email)
 
-      accessToken = loginResponse.body.data.accessToken
+      const accessToken = loginResponse.body.data.accessToken
 
       // Test 2/5: Get User Companies
       const companiesResponse = await request(app.getHttpServer())
@@ -187,10 +184,10 @@ describe('AuthController (e2e)', () => {
       expect(companiesResponse.body.data.length).toBeGreaterThan(0)
 
       const companies = companiesResponse.body.data
-      const defaultCompany = companies.find((c: any) => c.isDefault === true)
+      const defaultCompany = companies.find((c: { isDefault: boolean }) => c.isDefault === true)
       expect(defaultCompany).toBeDefined()
 
-      companyId = defaultCompany.id
+      const companyId = defaultCompany.id
 
       // Test 3/5: Check Default Company API
       const defaultCompanyResponse = await request(app.getHttpServer())

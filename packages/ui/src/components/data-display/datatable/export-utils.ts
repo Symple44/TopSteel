@@ -5,9 +5,6 @@ let LocaleType: UniverLocaleType | null = null
 let UniverSheetsPlugin: UniverPluginConstructor | null = null
 let UniverFormulaEnginePlugin: UniverPluginConstructor | null = null
 let UniverRenderEnginePlugin: UniverPluginConstructor | null = null
-const _UniverUIPlugin: UniverPluginConstructor | null = null
-let _IWorkbookData: unknown = null
-let _IWorksheetData: unknown = null
 
 // Flag to track if we're running on the client side
 const isClient = typeof window !== 'undefined'
@@ -32,8 +29,6 @@ const loadUniverComponents = async (): Promise<boolean> => {
       UniverInstanceType = univerCore.UniverInstanceType as unknown as UniverInstanceTypeEnum
       LocaleType = univerCore.LocaleType as UniverLocaleType
       // Note: IWorkbookData and IWorksheetData might not be available in all versions
-      _IWorkbookData = (univerCore as Record<string, unknown>).IWorkbookData || null
-      _IWorksheetData = (univerCore as Record<string, unknown>).IWorksheetData || null
     }
 
     if (univerSheets) {
@@ -49,7 +44,7 @@ const loadUniverComponents = async (): Promise<boolean> => {
     }
 
     return Univer !== null && UniverSheetsPlugin !== null
-  } catch (_error) {
+  } catch {
     return false
   }
 }
@@ -76,7 +71,7 @@ interface UniverWorkbook {
   save?(filename: string): void
 }
 
-interface UniverPlugin {}
+type UniverPlugin = {}
 
 interface UniverMergeData {
   startRow: number
@@ -103,7 +98,7 @@ interface UniverCellStyle {
 
 // Types pour l'import dynamique d'Univer
 type UniverClass = new (config?: Partial<UniverConfig>) => UniverInstance
-type UniverPluginConstructor = new (...args: any[]) => UniverPlugin
+type UniverPluginConstructor = new (...args: unknown[]) => UniverPlugin
 type UniverLocaleType = Record<string, string>
 type UniverInstanceTypeEnum = Record<string, number>
 
@@ -332,7 +327,10 @@ export class ExportUtils {
       throw new Error('Univer not properly initialized')
     }
 
-    const workbook = univer.createUnit((UniverInstanceType as Record<string, number>).UNIVER_SHEET, workbookData)
+    const workbook = univer.createUnit(
+      (UniverInstanceType as Record<string, number>).UNIVER_SHEET,
+      workbookData
+    )
     if (!workbook) {
       throw new Error('Failed to create workbook')
     }
@@ -701,13 +699,19 @@ export class ExportUtils {
   /**
    * Importe un fichier Excel dans Univer
    */
-  private static async importExcelToUniver(univer: UniverInstance, buffer: ArrayBuffer): Promise<UniverWorkbook | null> {
+  private static async importExcelToUniver(
+    univer: UniverInstance,
+    buffer: ArrayBuffer
+  ): Promise<UniverWorkbook | null> {
     try {
       // Dans un environnement réel, Univer fournirait une méthode pour importer Excel
       // Pour l'instant, on simule la conversion depuis le buffer
       const workbookData = await ExportUtils.parseExcelBuffer(buffer)
       if (workbookData) {
-        return univer.createUnit((UniverInstanceType as Record<string, number>).UNIVER_SHEET, workbookData)
+        return univer.createUnit(
+          (UniverInstanceType as Record<string, number>).UNIVER_SHEET,
+          workbookData
+        )
       }
       return null
     } catch {
@@ -1042,7 +1046,11 @@ export class ExportUtils {
       // Appliquer les styles avancés via l'API Univer
       // Formatage conditionnel pour les nombres
       if (options.conditionalFormatting) {
-        ExportUtils.applyConditionalFormattingUniver(workbook, columns as ColumnConfig<Record<string, unknown>>[], data)
+        ExportUtils.applyConditionalFormattingUniver(
+          workbook,
+          columns as ColumnConfig<Record<string, unknown>>[],
+          data
+        )
       }
     } catch {
       // Ignorer les erreurs de formatage
@@ -1052,7 +1060,11 @@ export class ExportUtils {
   /**
    * Détermine le style d'une cellule selon sa valeur et sa colonne (version Univer)
    */
-  private static getCellStyle<T>(value: unknown, column: ColumnConfig<T>, row: number): UniverCellStyle {
+  private static getCellStyle<T>(
+    value: unknown,
+    column: ColumnConfig<T>,
+    row: number
+  ): UniverCellStyle {
     const baseStyle: UniverCellStyle = {
       vt: 2, // vertical middle
       bd: {
@@ -1222,7 +1234,11 @@ export class ExportUtils {
   /**
    * Définit l'autofilter dans Univer
    */
-  private static setAutoFilter(_workbook: UniverWorkbook, _dataRowCount: number, _columnCount: number): void {
+  private static setAutoFilter(
+    _workbook: UniverWorkbook,
+    _dataRowCount: number,
+    _columnCount: number
+  ): void {
     try {
       // Simulation de l'autofilter
       // Dans une vraie implémentation, ceci utiliserait l'API Univer
@@ -1307,7 +1323,7 @@ export class ExportUtils {
             document.body.removeChild(link)
             URL.revokeObjectURL(url)
           })
-          .catch((_error: any) => {
+          .catch((_error: unknown) => {
             throw new Error("Impossible d'exporter le fichier avec Univer")
           })
       } else if (workbook && typeof workbook.save === 'function') {

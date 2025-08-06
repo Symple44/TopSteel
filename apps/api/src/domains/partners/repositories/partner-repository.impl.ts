@@ -132,7 +132,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(_spec: any): Promise<Partner[]> {
+  async findBySpecification(_spec: Record<string, unknown>): Promise<Partner[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }
@@ -149,7 +149,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   }
 
   async findWithFilters(
-    _filters: any
+    _filters: Record<string, unknown>
   ): Promise<{ items: Partner[]; total: number; page: number; limit: number }> {
     // TODO: Implémenter la pagination avancée
     const items = await this.repository.find()

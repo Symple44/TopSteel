@@ -12,7 +12,7 @@ interface ClientCardProps {
 }
 
 export function ClientCard({
-  data,
+  data: _data,
   showActions = false,
   onEdit,
   onDelete,

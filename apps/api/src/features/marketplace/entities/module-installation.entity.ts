@@ -19,7 +19,7 @@ export enum InstallationStatus {
 export interface InstallationConfig {
   menuConfigurationId?: string
   customPermissions?: string[]
-  settings?: Record<string, any>
+  settings?: Record<string, unknown>
   enabledFeatures?: string[]
 }
 
@@ -27,7 +27,7 @@ export interface InstallationLog {
   timestamp: Date
   level: 'INFO' | 'WARN' | 'ERROR'
   message: string
-  details?: any
+  details?: unknown
 }
 
 @Entity('module_installations')
@@ -139,7 +139,7 @@ export class ModuleInstallation {
     this.lastUsedAt = new Date()
   }
 
-  addLog(level: 'INFO' | 'WARN' | 'ERROR', message: string, details?: any): void {
+  addLog(level: 'INFO' | 'WARN' | 'ERROR', message: string, details?: unknown): void {
     if (!this.installationLogs) {
       this.installationLogs = []
     }

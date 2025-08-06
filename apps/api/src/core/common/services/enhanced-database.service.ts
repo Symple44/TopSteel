@@ -1,7 +1,19 @@
 // apps/api/src/common/services/enhanced-database.service.ts
 import { Injectable, Logger } from '@nestjs/common'
+import type { QueryRunner } from 'typeorm'
 import type { CircuitBreakerService } from '../../../infrastructure/monitoring/circuit-breaker.service'
 import type { MetricsService } from '../../../infrastructure/monitoring/metrics.service'
+
+interface DatabaseResult<T = unknown> {
+  success: boolean
+  data: T
+  cached?: boolean
+}
+
+interface HealthCheckDetails {
+  connection: string
+  error?: string
+}
 
 @Injectable()
 export class EnhancedDatabaseService {
@@ -17,8 +29,8 @@ export class EnhancedDatabaseService {
    */
   async executeWithCircuitBreaker<T>(
     query: string,
-    params: any[] = [],
-    queryRunner?: any
+    params: unknown[] = [],
+    queryRunner?: QueryRunner
   ): Promise<T> {
     const circuitBreakerName = 'database-primary'
 
@@ -37,7 +49,7 @@ export class EnhancedDatabaseService {
         }
 
         // Mock pour l'exemple
-        return { success: true, data: 'mock-data' } as any
+        return { success: true, data: 'mock-data' } as DatabaseResult<T>
       },
       [],
       {
@@ -73,7 +85,7 @@ export class EnhancedDatabaseService {
       async () => {
         this.logger.debug(`Read query: ${primaryQuery}`)
         // Exécuter la requête principale
-        return { data: 'from-database' } as any
+        return { data: 'from-database' } as DatabaseResult<T>
       },
       [],
       {
@@ -87,16 +99,16 @@ export class EnhancedDatabaseService {
   /**
    * Méthode fallback pour récupérer les données du cache
    */
-  private async getCachedData(key: string): Promise<any> {
+  private async getCachedData<T>(key: string): Promise<DatabaseResult<T>> {
     // Implémentation cache (Redis, MemoryCache, etc.)
     this.logger.log(`Fallback: Getting cached data for key: ${key}`)
-    return { data: 'from-cache', cached: true }
+    return { success: true, data: 'from-cache' as T, cached: true }
   }
 
   /**
    * Health check avec circuit breaker pour la base de données
    */
-  async healthCheck(): Promise<{ status: string; details: any }> {
+  async healthCheck(): Promise<{ status: string; details: HealthCheckDetails }> {
     try {
       await this.executeWithCircuitBreaker('SELECT 1', [])
       return {

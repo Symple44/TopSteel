@@ -79,7 +79,7 @@ export class AdminUsersController {
           : null
 
         // Récupérer les rôles société si demandé
-        let societeRoles: any[] = []
+        let societeRoles: Record<string, unknown>[] = []
         if (query.includePermissions) {
           const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
           societeRoles = userSocieteRoles.map((roleInfo) => ({
@@ -273,7 +273,7 @@ export class AdminUsersController {
         message: 'Utilisateur créé avec succès',
         statusCode: 201,
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error.code === '23505') {
         // Violation de contrainte unique PostgreSQL
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
@@ -328,7 +328,7 @@ export class AdminUsersController {
         message: 'Utilisateur mis à jour avec succès',
         statusCode: 200,
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error.code === '23505') {
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
@@ -367,7 +367,7 @@ export class AdminUsersController {
         message: 'Utilisateur supprimé avec succès',
         statusCode: 200,
       }
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       throw new BadRequestException("Erreur lors de la suppression de l'utilisateur")
     }
   }
@@ -399,7 +399,7 @@ export class AdminUsersController {
       restrictedPermissions?: string[]
       expiresAt?: Date
     },
-    request: any
+    request: Record<string, unknown>
   ) {
     const tenant = request.tenant
     const currentUser = request.user
@@ -443,7 +443,7 @@ export class AdminUsersController {
         message: 'Rôle société assigné avec succès',
         statusCode: 201,
       }
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       throw new BadRequestException("Erreur lors de l'assignation du rôle")
     }
   }

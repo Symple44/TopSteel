@@ -16,13 +16,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     })
 
     // Vérifier si la réponse est JSON
-    let data
+    let data: unknown
     const contentType = response.headers.get('content-type')
 
     if (contentType?.includes('application/json')) {
       try {
         data = await response.json()
-      } catch (_e) {
+      } catch {
         data = { error: 'Invalid JSON response from API' }
       }
     } else {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     return NextResponse.json(data)
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

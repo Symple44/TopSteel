@@ -330,18 +330,20 @@ export function DropdownItem({
   }
 
   return (
-    <div
+    <button
       onClick={handleClick}
       data-dropdown-item
+      type="button"
+      disabled={disabled}
       className={cn(
-        'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors',
+        'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors w-full text-left',
         'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
         disabled && 'pointer-events-none opacity-50',
         className
       )}
     >
       {children}
-    </div>
+    </button>
   )
 }
 

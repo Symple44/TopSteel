@@ -1,4 +1,3 @@
-// packages/config/typescript/react.json
 {
   "extends": "./base.json",
   "compilerOptions": {
@@ -18,7 +17,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

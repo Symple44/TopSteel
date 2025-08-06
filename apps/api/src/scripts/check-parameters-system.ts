@@ -1,0 +1,53 @@
+import { createConnection } from 'typeorm'
+
+async function checkParametersSystem() {
+  const connection = await createConnection({
+    type: 'postgres',
+    host: 'localhost',
+    port: 5432,
+    username: 'postgres',
+    password: 'postgres',
+    database: 'erp_topsteel_auth',
+    entities: ['src/**/*.entity.ts'],
+    synchronize: false,
+  })
+
+  try {
+    const roles = await connection.query(
+      `SELECT key, value, metadata->>'icon' as icon, metadata->>'order' as order_num, "translationKey" 
+       FROM parameters_system 
+       WHERE "group" = 'user_roles' 
+       ORDER BY (metadata->>'order')::int`
+    )
+    roles.forEach((_role: unknown) => {})
+
+    // Vérifier si OWNER existe
+    const hasOwner = roles.some((r: unknown) => (r as { key: string }).key === 'OWNER')
+    if (hasOwner) {
+    } else {
+    }
+
+    // Afficher les rôles manquants
+    const expectedRoles = [
+      'OWNER',
+      'SUPER_ADMIN',
+      'ADMIN',
+      'MANAGER',
+      'COMMERCIAL',
+      'TECHNICIEN',
+      'COMPTABLE',
+      'OPERATEUR',
+      'USER',
+      'VIEWER',
+    ]
+    const existingKeys = roles.map((r: unknown) => (r as { key: string }).key)
+    const missingRoles = expectedRoles.filter((role) => !existingKeys.includes(role))
+
+    if (missingRoles.length > 0) {
+    }
+  } finally {
+    await connection.close()
+  }
+}
+
+checkParametersSystem().catch(console.error)

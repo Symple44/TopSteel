@@ -27,7 +27,7 @@ async function checkAllAdmins() {
 
     if (admins.length === 0) {
     } else {
-      admins.forEach((_admin: any, _index: number) => {})
+      // Admins found
     }
 
     const variations = await dataSource.query(
@@ -40,10 +40,11 @@ async function checkAllAdmins() {
     )
 
     if (variations.length > 0) {
-      variations.forEach((_v: any) => {})
+      // Variations found
     } else {
+      // No variations found
     }
-  } catch (_error) {
+  } catch {
   } finally {
     await dataSource.destroy()
   }

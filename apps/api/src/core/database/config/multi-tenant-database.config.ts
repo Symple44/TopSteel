@@ -148,7 +148,10 @@ export class MultiTenantDatabaseConfig {
    */
   async getTenantConnection(societeCode: string): Promise<DataSource> {
     if (this.dataSources.has(societeCode)) {
-      const dataSource = this.dataSources.get(societeCode)!
+      const dataSource = this.dataSources.get(societeCode)
+      if (!dataSource) {
+        throw new Error(`DataSource not found for society: ${societeCode}`)
+      }
       if (!dataSource.isInitialized) {
         await dataSource.initialize()
       }
@@ -193,7 +196,10 @@ export class MultiTenantDatabaseConfig {
     const sharedKey = 'shared'
 
     if (this.dataSources.has(sharedKey)) {
-      const dataSource = this.dataSources.get(sharedKey)!
+      const dataSource = this.dataSources.get(sharedKey)
+      if (!dataSource) {
+        throw new Error('Shared DataSource not found')
+      }
       if (!dataSource.isInitialized) {
         await dataSource.initialize()
       }

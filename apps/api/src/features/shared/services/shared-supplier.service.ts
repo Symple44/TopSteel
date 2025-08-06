@@ -24,7 +24,7 @@ export class SharedSupplierService {
 
   async findByType(type: string): Promise<SharedSupplier[]> {
     return this._sharedSupplierRepository.find({
-      where: { type: type as any, deletedAt: IsNull() },
+      where: { type: type as unknown, deletedAt: IsNull() },
     })
   }
 

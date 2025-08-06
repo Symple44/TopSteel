@@ -68,7 +68,7 @@ export function SectionLibrary({ onSelect, onClose }: SectionLibraryProps) {
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-semibold">Bibliothèque de sections</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button type="button" onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -80,6 +80,7 @@ export function SectionLibrary({ onSelect, onClose }: SectionLibraryProps) {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {category.sections.map((section) => (
                   <button
+                    type="button"
                     key={section.type}
                     onClick={() => onSelect(section.type)}
                     className="p-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-center group"

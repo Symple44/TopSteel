@@ -27,11 +27,11 @@ export class CreateParameterApplicationDto {
   @IsObject()
   @IsOptional()
   businessRules?: {
-    validation?: Record<string, any>
-    automation?: Record<string, any>
+    validation?: Record<string, unknown>
+    automation?: Record<string, unknown>
     dependencies?: string[]
-    conditions?: Record<string, any>
-    [key: string]: any
+    conditions?: Record<string, unknown>
+    [key: string]: unknown
   }
 
   @IsObject()
@@ -43,7 +43,7 @@ export class CreateParameterApplicationDto {
     category?: string
     department?: string
     priority?: number
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @IsArray()
@@ -52,7 +52,7 @@ export class CreateParameterApplicationDto {
 
   @IsObject()
   @IsOptional()
-  objectValues?: Record<string, any> // Pour stocker des objets métier complexes
+  objectValues?: Record<string, unknown> // Pour stocker des objets métier complexes
 
   @IsString()
   @IsOptional()
@@ -94,11 +94,11 @@ export class UpdateParameterApplicationDto {
 
   @IsObject()
   @IsOptional()
-  businessRules?: Record<string, any>
+  businessRules?: Record<string, unknown>
 
   @IsObject()
   @IsOptional()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @IsArray()
   @IsOptional()
@@ -106,7 +106,7 @@ export class UpdateParameterApplicationDto {
 
   @IsObject()
   @IsOptional()
-  objectValues?: Record<string, any>
+  objectValues?: Record<string, unknown>
 
   @IsString()
   @IsOptional()
@@ -175,12 +175,12 @@ export class CreateBusinessConfigDto {
     order: number
     requiredRole?: string
     autoApprove?: boolean
-    conditions?: Record<string, any>
+    conditions?: Record<string, unknown>
   }>
 
   @IsObject()
   @IsOptional()
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 
   @IsObject()
   @IsOptional()
@@ -202,7 +202,7 @@ export class CreateCategoryParameterDto {
     color?: string
     order?: number
     isActive?: boolean
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   }>
 
   @IsObject()

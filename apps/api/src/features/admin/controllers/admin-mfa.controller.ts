@@ -330,7 +330,7 @@ export class AdminMFAController {
   }
 
   // Helper methods
-  private generateMFARecommendations(status: any): string[] {
+  private generateMFARecommendations(status: Record<string, unknown>): string[] {
     const recommendations: string[] = []
 
     const adoptionRate = status.totalUsers > 0 ? (status.usersWithMFA / status.totalUsers) * 100 : 0
@@ -357,14 +357,18 @@ export class AdminMFAController {
     return 'not_applicable'
   }
 
-  private getMFARecommendation(hasMFA: boolean, isRequired: boolean, stats: any): string {
+  private getMFARecommendation(
+    hasMFA: boolean,
+    isRequired: boolean,
+    stats: Record<string, unknown>
+  ): string {
     if (isRequired && !hasMFA) return 'MFA requis pour ce rôle - configuration nécessaire'
     if (!hasMFA) return 'MFA recommandé pour améliorer la sécurité'
     if (stats.securityLevel === 'basic') return "Considérer l'ajout d'une seconde méthode MFA"
     return 'Configuration MFA optimale'
   }
 
-  private calculateMethodPopularity(records: any[]): Record<string, number> {
+  private calculateMethodPopularity(records: Record<string, unknown>[]): Record<string, number> {
     const popularity: Record<string, number> = {}
     for (const record of records) {
       popularity[record.type] = (popularity[record.type] || 0) + 1
@@ -372,7 +376,7 @@ export class AdminMFAController {
     return popularity
   }
 
-  private calculateAverageAttempts(sessions: any[]): number {
+  private calculateAverageAttempts(sessions: Record<string, unknown>[]): number {
     if (sessions.length === 0) return 0
     const totalAttempts = sessions.reduce(
       (sum, session) => sum + (session.getAttemptsCount() || 1),
@@ -381,7 +385,7 @@ export class AdminMFAController {
     return totalAttempts / sessions.length
   }
 
-  private calculateActiveHours(sessions: any[]): number[] {
+  private calculateActiveHours(sessions: Record<string, unknown>[]): number[] {
     const hourCounts = new Array(24).fill(0)
     for (const session of sessions) {
       const hour = new Date(session.createdAt).getHours()
@@ -390,7 +394,7 @@ export class AdminMFAController {
     return hourCounts
   }
 
-  private calculateFailureReasons(sessions: any[]): Record<string, number> {
+  private calculateFailureReasons(sessions: Record<string, unknown>[]): Record<string, number> {
     const reasons: Record<string, number> = {}
     const failedSessions = sessions.filter((s) => s.status === 'failed')
 
@@ -419,7 +423,7 @@ export class AdminMFAController {
     return newCount - oldCount
   }
 
-  private calculateUsageGrowth(sessions: any[]): number {
+  private calculateUsageGrowth(sessions: Record<string, unknown>[]): number {
     if (sessions.length === 0) return 0
 
     const midpoint = Math.floor(sessions.length / 2)
@@ -430,7 +434,10 @@ export class AdminMFAController {
     return ((secondHalf - firstHalf) / firstHalf) * 100
   }
 
-  private generateHealthRecommendations(status: any, recentActivity: number): string[] {
+  private generateHealthRecommendations(
+    status: Record<string, unknown>,
+    recentActivity: number
+  ): string[] {
     const recommendations: string[] = []
 
     const adoptionRate = status.totalUsers > 0 ? (status.usersWithMFA / status.totalUsers) * 100 : 0

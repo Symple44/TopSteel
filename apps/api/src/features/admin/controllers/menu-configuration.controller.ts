@@ -140,7 +140,7 @@ export class MenuConfigurationController {
   @Post('import')
   @ApiOperation({ summary: 'Importer une configuration de menu' })
   @ApiResponse({ status: 201, description: 'Configuration importée avec succès' })
-  async importConfiguration(@Body() importData: any) {
+  async importConfiguration(@Body() importData: Record<string, unknown>) {
     const config = await this.menuConfigService.importConfiguration(importData, 'debug-user')
     return {
       success: true,

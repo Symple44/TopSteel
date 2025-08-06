@@ -164,9 +164,9 @@ export class NotificationRuleEngineService {
   }
 
   private prepareTemplateVariables(
-    eventData: Record<string, any>,
+    eventData: Record<string, unknown>,
     rule: NotificationRule
-  ): Record<string, any> {
+  ): Record<string, unknown> {
     // Commencer avec les données de l'événement
     const variables = { ...eventData }
 
@@ -210,7 +210,7 @@ export class NotificationRuleEngineService {
 
   private async createNotificationFromRule(
     rule: NotificationRule,
-    variables: Record<string, any>
+    variables: Record<string, unknown>
   ): Promise<Notifications> {
     const config = rule.notification
 
@@ -281,7 +281,7 @@ export class NotificationRuleEngineService {
     const failedEvents = await this.ruleService._eventRepository.find({
       where: {
         status: EventStatus.FAILED,
-        occurredAt: { $gte: maxAgeDate } as any,
+        occurredAt: { $gte: maxAgeDate } as unknown,
       },
       order: { occurredAt: 'ASC' },
       take: 50,
@@ -335,7 +335,7 @@ export class NotificationRuleEngineService {
   async triggerEvent(
     type: TriggerType,
     event: string,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     source: string = 'manual',
     userId?: string
   ): Promise<NotificationEvent> {
@@ -349,11 +349,11 @@ export class NotificationRuleEngineService {
 
   async testRule(
     ruleId: string,
-    testData: Record<string, any>
+    testData: Record<string, unknown>
   ): Promise<{
     success: boolean
-    conditionResult: { result: boolean; details: Record<string, any> }
-    templateVariables?: Record<string, any>
+    conditionResult: { result: boolean; details: Record<string, unknown> }
+    templateVariables?: Record<string, unknown>
     notificationPreview?: {
       title: string
       message: string

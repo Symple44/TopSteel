@@ -14,7 +14,7 @@ export class FixUserSocieteRoleColumns1753814054666 implements MigrationInterfac
                 AND table_name = 'user_societe_roles'
             `)
 
-      const columnNames = columns.map((col: any) => col.column_name)
+      const columnNames = columns.map((col: { column_name: string }) => col.column_name)
 
       // Vérifier si userId existe (pas user_id)
       if (!columnNames.includes('userId') && columnNames.includes('user_id')) {

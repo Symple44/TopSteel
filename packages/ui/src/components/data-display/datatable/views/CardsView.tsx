@@ -37,10 +37,13 @@ export function CardsView({
   return (
     <div className={`grid ${gridClass} gap-6`}>
       {cards.map((card) => (
-        <div
+        <button
           key={card.id}
-          className="bg-background border rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+          className="bg-background border rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow w-full text-left"
           onClick={() => onCardClick?.(card)}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCardClick?.(card)}
+          tabIndex={0}
+          aria-label={`View details for ${card.title}`}
         >
           {/* Image de la carte */}
           {card.image && (
@@ -139,7 +142,7 @@ export function CardsView({
               {/* Placeholder pour d'autres infos comme la date, assignee, etc. */}
             </div>
           </div>
-        </div>
+        </button>
       ))}
 
       {/* Carte vide si aucune donnée */}

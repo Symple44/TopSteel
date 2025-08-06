@@ -342,9 +342,9 @@ export function CodeViewerDialog({
                             const isSelected = selectedLines.has(lineNumber)
 
                             return (
-                              <div
+                              <button
                                 key={index}
-                                className={`text-right text-sm font-mono select-none cursor-pointer transition-colors hover:bg-muted/50 px-1 rounded ${
+                                className={`text-right text-sm font-mono select-none cursor-pointer transition-colors hover:bg-muted/50 px-1 rounded w-full ${
                                   isSelected
                                     ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 font-semibold'
                                     : 'text-muted-foreground hover:text-foreground'
@@ -357,10 +357,16 @@ export function CodeViewerDialog({
                                   justifyContent: 'flex-end',
                                 }}
                                 onClick={(e) => handleLineClick(lineNumber, e)}
+                                onKeyDown={(e) =>
+                                  (e.key === 'Enter' || e.key === ' ') &&
+                                  handleLineClick(lineNumber, e)
+                                }
+                                tabIndex={0}
+                                aria-label={`Toggle selection for line ${lineNumber}`}
                                 title={t('lineTooltip', { number: lineNumber })}
                               >
                                 {lineNumber.toString().padStart(3, ' ')}
-                              </div>
+                              </button>
                             )
                           })}
                         </div>

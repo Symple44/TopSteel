@@ -369,7 +369,7 @@ export class MarketplaceProductsService {
   }
 
   async invalidateProductCache(productId: string): Promise<void> {
-    const _pattern = `product:${productId}:*`
+    // Pattern would be used for advanced cache invalidation: `product:${productId}:*`
     // Implementation dépend du cache manager utilisé
     // await this.cacheManager.reset() // Method 'reset' not available in cache-manager v7
     // Instead, we would need to implement pattern-based deletion

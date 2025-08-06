@@ -395,5 +395,5 @@ export class CreateMaterialDto {
   })
   @IsOptional()
   @IsObject()
-  metadonnees?: Record<string, any>
+  metadonnees?: Record<string, unknown>
 }

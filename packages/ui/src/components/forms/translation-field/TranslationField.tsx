@@ -1,7 +1,7 @@
 'use client'
 
 import { Globe, Languages } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Label } from '../../forms'
 import {
   Button,
@@ -96,6 +96,9 @@ export function TranslationField({
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [tempTranslations, setTempTranslations] = useState<Record<string, string>>(translations)
 
+  // Generate unique ID for accessibility
+  const inputId = useMemo(() => `translation-field-${Math.random().toString(36).substr(2, 9)}`, [])
+
   const hasTranslations = Object.keys(translations).length > 0
 
   const handleSave = () => {
@@ -119,10 +122,15 @@ export function TranslationField({
 
   return (
     <div className={`relative ${className || ''}`}>
-      {label && <Label className="text-sm font-medium mb-2 block">{label}</Label>}
+      {label && (
+        <Label htmlFor={inputId} className="text-sm font-medium mb-2 block">
+          {label}
+        </Label>
+      )}
 
       <div className="flex items-center gap-2">
         <Input
+          id={inputId}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}

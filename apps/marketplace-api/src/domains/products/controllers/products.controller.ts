@@ -14,6 +14,30 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import type { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
+
+interface TenantRequest extends Request {
+  tenant: {
+    societeId: string
+    erpTenantConnection: unknown
+  }
+}
+
+interface ProductQuery {
+  search?: string
+  categories?: string
+  limit?: string
+  offset?: string
+  sortBy?: string
+  sortOrder?: string
+}
+
+interface PricingQuery {
+  customerId?: string
+  customerGroup?: string
+  quantity?: string
+  promotionCode?: string
+}
+
 import type { MarketplacePricingEngine } from '../services/marketplace-pricing-engine.service'
 import type { MarketplaceProductsService } from '../services/marketplace-products.service'
 
@@ -30,8 +54,8 @@ export class ProductsController {
   @Get()
   @ApiOperation({ summary: 'Get all marketplace products (admin)' })
   @ApiResponse({ status: 200, description: 'List of marketplace products' })
-  async getMarketplaceProducts(@Req() req: Request, @Query() query: any) {
-    const { tenant } = req as any
+  async getMarketplaceProducts(@Req() req: TenantRequest, @Query() query: ProductQuery) {
+    const { tenant } = req
 
     return await this.productsService.getProducts(tenant.erpTenantConnection, tenant.societeId, {
       search: query.search,
@@ -45,8 +69,8 @@ export class ProductsController {
 
   @Get('categories')
   @ApiOperation({ summary: 'Get product categories' })
-  async getCategories(@Req() req: Request) {
-    const { tenant } = req as any
+  async getCategories(@Req() req: TenantRequest) {
+    const { tenant } = req
 
     return await this.productsService.getCategories(tenant.erpTenantConnection, tenant.societeId)
   }
@@ -55,8 +79,8 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get product details (admin)' })
   @ApiResponse({ status: 200, description: 'Product details' })
   @ApiResponse({ status: 404, description: 'Product not found' })
-  async getProduct(@Req() req: Request, @Param('productId') productId: string) {
-    const { tenant } = req as any
+  async getProduct(@Req() req: TenantRequest, @Param('productId') productId: string) {
+    const { tenant } = req
 
     return await this.productsService.getProductById(
       tenant.erpTenantConnection,
@@ -68,11 +92,11 @@ export class ProductsController {
   @Get(':productId/pricing/preview')
   @ApiOperation({ summary: 'Preview product pricing with rules' })
   async previewPricing(
-    @Req() req: Request,
+    @Req() req: TenantRequest,
     @Param('productId') productId: string,
-    @Query() query: any
+    @Query() query: PricingQuery
   ) {
-    const { tenant } = req as any
+    const { tenant } = req
 
     // Récupérer le produit pour avoir le prix de base
     const product = await this.productsService.getProductById(
@@ -97,9 +121,9 @@ export class ProductsController {
   @Post(':productId/pricing/rules')
   @ApiOperation({ summary: 'Create pricing rule for product' })
   async createPricingRule(
-    @Req() _req: Request,
+    @Req() _req: TenantRequest,
     @Param('productId') productId: string,
-    @Body() body: any
+    @Body() body: unknown
   ) {
     // TODO: Implémenter création de règle de prix
     return { message: 'Pricing rule created', productId, rule: body }
@@ -108,10 +132,10 @@ export class ProductsController {
   @Put(':productId/pricing/rules/:ruleId')
   @ApiOperation({ summary: 'Update pricing rule' })
   async updatePricingRule(
-    @Req() _req: Request,
+    @Req() _req: TenantRequest,
     @Param('productId') productId: string,
     @Param('ruleId') ruleId: string,
-    @Body() body: any
+    @Body() body: unknown
   ) {
     // TODO: Implémenter mise à jour de règle de prix
     return { message: 'Pricing rule updated', productId, ruleId, rule: body }
@@ -120,7 +144,7 @@ export class ProductsController {
   @Delete(':productId/pricing/rules/:ruleId')
   @ApiOperation({ summary: 'Delete pricing rule' })
   async deletePricingRule(
-    @Req() _req: Request,
+    @Req() _req: TenantRequest,
     @Param('productId') productId: string,
     @Param('ruleId') ruleId: string
   ) {
@@ -130,8 +154,8 @@ export class ProductsController {
 
   @Post('sync')
   @ApiOperation({ summary: 'Sync products from ERP' })
-  async syncProducts(@Req() req: Request) {
-    const { tenant } = req as any
+  async syncProducts(@Req() req: TenantRequest) {
+    const { tenant } = req
 
     // TODO: Implémenter synchronisation des produits depuis l'ERP
     return { message: 'Product sync started', societeId: tenant.societeId }
@@ -140,7 +164,7 @@ export class ProductsController {
   @Put(':productId/marketplace-settings')
   @ApiOperation({ summary: 'Update marketplace-specific settings for product' })
   async updateMarketplaceSettings(
-    @Req() _req: Request,
+    @Req() _req: TenantRequest,
     @Param('productId') productId: string,
     @Body() settings: {
       images?: string[]

@@ -282,8 +282,10 @@ export function DataTable<T = any>({
         const dateValue = new Date(value as string | number | Date)
         if (Number.isNaN(dateValue.getTime())) return false
 
-        if (filterValue.start && dateValue < new Date(filterValue.start as string | number | Date)) return false
-        if (filterValue.end && dateValue > new Date(filterValue.end as string | number | Date)) return false
+        if (filterValue.start && dateValue < new Date(filterValue.start as string | number | Date))
+          return false
+        if (filterValue.end && dateValue > new Date(filterValue.end as string | number | Date))
+          return false
         return true
       }
     }
@@ -458,7 +460,7 @@ export function DataTable<T = any>({
         // Trouver la colonne correspondante pour utiliser getValue si défini
         const column = orderedColumns.find((col) => col.id === sort.column)
 
-        let aVal, bVal
+        let aVal: unknown, bVal: unknown
         if (column?.getValue) {
           aVal = column.getValue(a)
           bVal = column.getValue(b)

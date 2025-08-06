@@ -50,12 +50,12 @@ class MarketplaceApiClient {
     return response.data
   }
 
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.post(url, data, config)
     return response.data
   }
 
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.put(url, data, config)
     return response.data
   }
@@ -68,40 +68,40 @@ class MarketplaceApiClient {
   // Méthodes spécifiques storefront
   storefront = {
     getConfig: () => this.get('/storefront/config'),
-    getProducts: (params?: any) => this.get('/storefront/products', { params }),
+    getProducts: (params?: Record<string, unknown>) => this.get('/storefront/products', { params }),
     getProduct: (id: string) => this.get(`/storefront/products/${id}`),
     getFeaturedProducts: (limit?: number) =>
       this.get('/storefront/products/featured', { params: { limit } }),
     getCategories: () => this.get('/storefront/products/categories'),
-    getProductsByCategory: (category: string, params?: any) =>
+    getProductsByCategory: (category: string, params?: Record<string, unknown>) =>
       this.get(`/storefront/products/category/${category}`, { params }),
-    searchProducts: (query: string, params?: any) =>
+    searchProducts: (query: string, params?: Record<string, unknown>) =>
       this.get('/storefront/search', { params: { q: query, ...params } }),
     getTheme: () => this.get('/storefront/theme'),
     getMenu: () => this.get('/storefront/menu'),
     getPage: (slug: string) => this.get(`/storefront/pages/${slug}`),
     subscribeNewsletter: (email: string) =>
       this.post('/storefront/newsletter/subscribe', { email }),
-    sendContactMessage: (data: any) => this.post('/storefront/contact', data),
+    sendContactMessage: (data: Record<string, unknown>) => this.post('/storefront/contact', data),
   }
 
   // Méthodes customers
   customers = {
-    register: (data: any) => this.post('/customers/register', data),
-    login: (data: any) => this.post('/customers/login', data),
-    createGuest: (data: any) => this.post('/customers/guest', data),
+    register: (data: Record<string, unknown>) => this.post('/customers/register', data),
+    login: (data: Record<string, unknown>) => this.post('/customers/login', data),
+    createGuest: (data: Record<string, unknown>) => this.post('/customers/guest', data),
     getProfile: (customerId: string) => this.get(`/customers/profile/${customerId}`),
-    updateProfile: (customerId: string, data: any) =>
+    updateProfile: (customerId: string, data: Record<string, unknown>) =>
       this.put(`/customers/profile/${customerId}`, data),
-    addAddress: (customerId: string, address: any) =>
+    addAddress: (customerId: string, address: Record<string, unknown>) =>
       this.post(`/customers/profile/${customerId}/addresses`, address),
-    updateAddress: (customerId: string, addressId: string, data: any) =>
+    updateAddress: (customerId: string, addressId: string, data: Record<string, unknown>) =>
       this.put(`/customers/profile/${customerId}/addresses/${addressId}`, data),
     removeAddress: (customerId: string, addressId: string) =>
       this.delete(`/customers/profile/${customerId}/addresses/${addressId}`),
-    convertToAccount: (customerId: string, data: any) =>
+    convertToAccount: (customerId: string, data: Record<string, unknown>) =>
       this.post(`/customers/profile/${customerId}/convert-to-account`, data),
-    updatePassword: (customerId: string, data: any) =>
+    updatePassword: (customerId: string, data: Record<string, unknown>) =>
       this.put(`/customers/profile/${customerId}/password`, data),
     requestPasswordReset: (email: string) =>
       this.post('/customers/password/reset-request', { email }),

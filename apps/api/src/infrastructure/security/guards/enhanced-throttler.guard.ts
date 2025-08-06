@@ -7,7 +7,7 @@ import type { Request } from 'express'
 export class EnhancedThrottlerGuard extends ThrottlerGuard {
   protected async getTracker(req: Request): Promise<string> {
     // Utiliser l'ID utilisateur si disponible, sinon l'IP
-    const user = (req as any).user
+    const user = (req as Request & { user?: { id?: string } }).user
     if (user?.id) {
       return `user:${user.id}`
     }

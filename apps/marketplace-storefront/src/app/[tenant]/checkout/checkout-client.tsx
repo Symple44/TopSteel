@@ -113,7 +113,14 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
       <div className="container-marketplace py-12">
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-label="Order confirmation success"
+            >
+              <title>Order confirmation success</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -204,10 +211,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1">
+                      <label htmlFor="email" className="block text-sm font-medium mb-1">
                         Email <span className="text-destructive">*</span>
                       </label>
                       <input
+                        id="email"
                         type="email"
                         required
                         value={customerInfo.email}
@@ -220,10 +228,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1">
+                      <label htmlFor="phone" className="block text-sm font-medium mb-1">
                         Téléphone <span className="text-destructive">*</span>
                       </label>
                       <input
+                        id="phone"
                         type="tel"
                         required
                         value={customerInfo.phone}
@@ -236,10 +245,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1">
+                      <label htmlFor="firstName" className="block text-sm font-medium mb-1">
                         Prénom <span className="text-destructive">*</span>
                       </label>
                       <input
+                        id="firstName"
                         type="text"
                         required
                         value={customerInfo.firstName}
@@ -252,10 +262,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1">
+                      <label htmlFor="lastName" className="block text-sm font-medium mb-1">
                         Nom <span className="text-destructive">*</span>
                       </label>
                       <input
+                        id="lastName"
                         type="text"
                         required
                         value={customerInfo.lastName}
@@ -268,10 +279,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium mb-1">
+                      <label htmlFor="company" className="block text-sm font-medium mb-1">
                         Entreprise (optionnel)
                       </label>
                       <input
+                        id="company"
                         type="text"
                         value={customerInfo.company}
                         onChange={(e) =>
@@ -292,10 +304,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1">
+                      <label htmlFor="address" className="block text-sm font-medium mb-1">
                         Adresse <span className="text-destructive">*</span>
                       </label>
                       <input
+                        id="address"
                         type="text"
                         required
                         value={customerInfo.address}
@@ -309,10 +322,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label htmlFor="postalCode" className="block text-sm font-medium mb-1">
                           Code postal <span className="text-destructive">*</span>
                         </label>
                         <input
+                          id="postalCode"
                           type="text"
                           required
                           value={customerInfo.postalCode}
@@ -325,10 +339,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label htmlFor="city" className="block text-sm font-medium mb-1">
                           Ville <span className="text-destructive">*</span>
                         </label>
                         <input
+                          id="city"
                           type="text"
                           required
                           value={customerInfo.city}
@@ -341,10 +356,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label htmlFor="country" className="block text-sm font-medium mb-1">
                           Pays <span className="text-destructive">*</span>
                         </label>
                         <select
+                          id="country"
                           required
                           value={customerInfo.country}
                           onChange={(e) =>
@@ -380,8 +396,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                     {customerInfo.createAccount && (
                       <div className="ml-6">
-                        <label className="block text-sm font-medium mb-1">Mot de passe</label>
+                        <label htmlFor="password" className="block text-sm font-medium mb-1">
+                          Mot de passe
+                        </label>
                         <input
+                          id="password"
                           type="password"
                           value={customerInfo.password}
                           onChange={(e) =>
@@ -479,7 +498,9 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
+                          aria-label="Bank transfer payment method"
                         >
+                          <title>Bank transfer payment method</title>
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -494,8 +515,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                     {paymentInfo.method === 'card' && (
                       <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
                         <div>
-                          <label className="block text-sm font-medium mb-1">Numéro de carte</label>
+                          <label htmlFor="cardNumber" className="block text-sm font-medium mb-1">
+                            Numéro de carte
+                          </label>
                           <input
+                            id="cardNumber"
                             type="text"
                             required
                             value={paymentInfo.cardNumber}
@@ -510,8 +534,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
 
                         <div className="grid grid-cols-3 gap-4">
                           <div>
-                            <label className="block text-sm font-medium mb-1">MM/AA</label>
+                            <label htmlFor="expiryDate" className="block text-sm font-medium mb-1">
+                              MM/AA
+                            </label>
                             <input
+                              id="expiryDate"
                               type="text"
                               required
                               value={paymentInfo.expiryDate}
@@ -525,8 +552,11 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium mb-1">CVV</label>
+                            <label htmlFor="cvv" className="block text-sm font-medium mb-1">
+                              CVV
+                            </label>
                             <input
+                              id="cvv"
                               type="text"
                               required
                               value={paymentInfo.cvv}
@@ -541,8 +571,14 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-1">Nom du porteur</label>
+                          <label
+                            htmlFor="cardholderName"
+                            className="block text-sm font-medium mb-1"
+                          >
+                            Nom du porteur
+                          </label>
                           <input
+                            id="cardholderName"
                             type="text"
                             required
                             value={paymentInfo.cardholderName}
@@ -615,7 +651,9 @@ export default function CheckoutClient({ tenant }: CheckoutClientProps) {
               <div className="space-y-3 mb-6">
                 {items.map((item) => {
                   const mainImage =
-                    item.product.images.find((img: any) => img.isMain) || item.product.images[0]
+                    item.product.images.find(
+                      (img: { url: string; alt?: string; isMain: boolean }) => img.isMain
+                    ) || item.product.images[0]
                   return (
                     <div key={item.id} className="flex gap-3">
                       <div className="relative w-12 h-12 bg-muted rounded overflow-hidden flex-shrink-0">

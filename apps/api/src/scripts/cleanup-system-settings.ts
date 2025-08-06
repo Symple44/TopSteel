@@ -45,10 +45,10 @@ async function cleanupSystemSettings() {
 
     if (count[0].count > 0) {
       // Afficher le contenu avant suppression
-      const content = await dataSource.query(
+      const _content = await dataSource.query(
         'SELECT category, key FROM system_settings ORDER BY category, key'
       )
-      content.forEach((_row: any, _index: number) => {})
+      // Content rows found
     }
     await dataSource.query('DELETE FROM system_settings')
     await dataSource.query('DROP TABLE IF EXISTS system_settings CASCADE')
@@ -64,8 +64,6 @@ async function cleanupSystemSettings() {
     if (finalCheck[0].exists) {
     } else {
     }
-  } catch (error) {
-    throw error
   } finally {
     if (dataSource.isInitialized) {
       await dataSource.destroy()
@@ -77,7 +75,7 @@ async function cleanupSystemSettings() {
 async function main() {
   try {
     await cleanupSystemSettings()
-  } catch (_error) {
+  } catch (_error: unknown) {
     process.exit(1)
   }
 }

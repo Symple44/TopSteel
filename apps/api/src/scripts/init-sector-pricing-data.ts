@@ -192,7 +192,7 @@ async function initSectorPricingData() {
     ]
     for (const coeff of coefficients) {
       // Assigner le tenantId avant la sauvegarde
-      ;(coeff as any).tenantId = defaultTenantId
+      ;(coeff as unknown as { tenantId: string }).tenantId = defaultTenantId
       await coefficientRepo.save(coeff)
     }
 
@@ -364,9 +364,9 @@ async function initSectorPricingData() {
         },
       }
 
-      const _savedIndex = await btpIndexRepo.save(indexToSave)
+      await btpIndexRepo.save(indexToSave)
     }
-  } catch (_error) {
+  } catch {
     process.exit(1)
   } finally {
     if (TenantDataSource.isInitialized) {

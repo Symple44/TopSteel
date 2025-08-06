@@ -33,9 +33,9 @@ async function runMigrations() {
 
     if (migrations.length === 0) {
     } else {
-      migrations.forEach((_migration) => {})
+      migrations.forEach(() => {})
     }
-  } catch (_error) {
+  } catch {
     process.exit(1)
   } finally {
     // Fermer la connexion

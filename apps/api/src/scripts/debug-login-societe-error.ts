@@ -31,7 +31,7 @@ async function debugLoginSocieteError() {
       FROM societes
       WHERE deleted_at IS NULL
     `)
-    societes.forEach((_s: any) => {})
+    societes.forEach((_s: unknown) => {})
 
     if (societes.length === 0) {
       return
@@ -53,7 +53,7 @@ async function debugLoginSocieteError() {
       if (adminUser.role === 'SUPER_ADMIN') {
       }
     } else {
-      userSocieteRoles.forEach((_r: any) => {})
+      userSocieteRoles.forEach((_r: unknown) => {})
     }
 
     // Vérifier les colonnes de user_societe_roles
@@ -65,7 +65,9 @@ async function debugLoginSocieteError() {
     `)
     const requiredColumns = ['user_id', 'societe_id', 'role_type', 'is_active', 'deleted_at']
     requiredColumns.forEach((col) => {
-      const found = usrColumns.find((c: any) => c.column_name === col)
+      const found = usrColumns.find(
+        (c: unknown) => (c as { column_name: string }).column_name === col
+      )
       if (found) {
       } else {
       }
@@ -96,14 +98,14 @@ async function debugLoginSocieteError() {
       if (testQuery.length === 0) {
       } else {
       }
-    } catch (_error: any) {}
+    } catch (_error: unknown) {}
     const roles = await authDataSource.query(`
       SELECT id, name, type, deleted_at
       FROM roles
       WHERE deleted_at IS NULL
     `)
-    roles.forEach((_r: any) => {})
-  } catch (_error) {
+    roles.forEach((_r: unknown) => {})
+  } catch (_error: unknown) {
   } finally {
     await authDataSource.destroy()
   }

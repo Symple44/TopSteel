@@ -226,7 +226,7 @@ export function TableSelector({
   const handleConfirmRemoveJoin = () => {
     if (!pendingRemoveJoin) return
 
-    const { index, join: removedJoin, columnsFromTable } = pendingRemoveJoin
+    const { index, join: removedJoin, columnsFromTable: _ } = pendingRemoveJoin
     const newJoins = joins.filter((_, i) => i !== index)
 
     // Remove columns from the removed table

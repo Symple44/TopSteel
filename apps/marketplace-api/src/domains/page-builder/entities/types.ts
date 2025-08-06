@@ -29,7 +29,7 @@ export enum SectionType {
 }
 
 export interface SectionContent {
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface SectionStyles {

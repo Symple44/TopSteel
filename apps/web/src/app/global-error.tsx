@@ -15,10 +15,10 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const { t } = useTranslation('errors')
+  const { t, language } = useTranslation('errors')
 
   return (
-    <html lang="fr">
+    <html lang={language || 'fr'}>
       <body>
         <div className="min-h-screen flex items-center justify-center bg-background">
           <div className="text-center space-y-6 p-8">
@@ -30,6 +30,7 @@ export default function GlobalError({
 
             <div className="space-y-4">
               <button
+                type="button"
                 onClick={reset}
                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
               >

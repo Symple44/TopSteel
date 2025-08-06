@@ -1,11 +1,22 @@
 'use client'
 
-import { ImageUpload, type ImageUploadProps } from '@erp/ui/business'
+import { ImageUpload } from '@erp/ui/business'
 import { useTranslation } from '@/lib/i18n'
 import { callClientApi } from '@/utils/backend-api'
 
-interface ImageUploadWrapperProps extends Omit<ImageUploadProps, 'uploadApi' | 'translations'> {
-  // Override props that we'll handle internally
+interface ImageUploadWrapperProps {
+  category: 'avatar' | 'logo' | 'document'
+  entityType: 'user' | 'company' | 'project'
+  entityId: string
+  currentImageUrl?: string
+  onUploadSuccess: (imageUrl: string) => void
+  onUploadError: (error: string) => void
+  maxSize?: number
+  allowedTypes?: string[]
+  className?: string
+  disabled?: boolean
+  showPreview?: boolean
+  variant?: 'default' | 'avatar' | 'compact'
 }
 
 export function ImageUploadWrapper(props: ImageUploadWrapperProps) {
@@ -25,7 +36,24 @@ export function ImageUploadWrapper(props: ImageUploadWrapperProps) {
     upload: t('upload'),
   }
 
-  return <ImageUpload {...props} uploadApi={uploadApi} translations={translations} />
+  return (
+    <ImageUpload
+      category={props.category}
+      entityType={props.entityType}
+      entityId={props.entityId}
+      currentImageUrl={props.currentImageUrl}
+      onUploadSuccess={props.onUploadSuccess}
+      onUploadError={props.onUploadError}
+      maxSize={props.maxSize}
+      allowedTypes={props.allowedTypes}
+      className={props.className}
+      disabled={props.disabled}
+      showPreview={props.showPreview}
+      variant={props.variant}
+      uploadApi={uploadApi}
+      translations={translations}
+    />
+  )
 }
 
 export default ImageUploadWrapper

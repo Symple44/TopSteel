@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Production optimizations
-  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+  // Production optimizations - disable standalone mode on Windows to avoid symlink issues
+  output: undefined, // Disabled to prevent symlink errors on Windows
 
   // Origines autorisées pour les ressources cross-origin en développement
   allowedDevOrigins: [

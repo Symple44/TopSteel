@@ -58,7 +58,7 @@ export default function UserDetailsPage() {
 
   const [user, setUser] = useState<UserDetails | null>(null)
   const [loading, setLoading] = useState(true)
-  const [_saving, _setSaving] = useState(false)
+  const [,] = useState(false)
   const [activeTab, setActiveTab] = useState('general')
 
   const loadUserDetails = useCallback(async () => {
@@ -66,7 +66,7 @@ export default function UserDetailsPage() {
       setLoading(true)
       const response = await apiClient.get<UserDetails>(`/admin/users/${userId}`)
       setUser(response)
-    } catch (_error) {
+    } catch {
       toast({
         title: t('common.error'),
         description: t('users.loadingError'),

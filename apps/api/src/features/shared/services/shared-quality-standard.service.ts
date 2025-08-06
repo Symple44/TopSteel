@@ -24,7 +24,7 @@ export class SharedQualityStandardService {
 
   async findByType(type: string): Promise<SharedQualityStandard[]> {
     return this._sharedQualityStandardRepository.find({
-      where: { type: type as any, deletedAt: IsNull() },
+      where: { type: type as unknown, deletedAt: IsNull() },
     })
   }
 

@@ -2,6 +2,12 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 
+interface DatabaseIndex {
+  indexname: string
+  tablename: string
+  indexdef: string
+}
+
 @Injectable()
 export class DatabaseCleanupService {
   private readonly logger = new Logger(DatabaseCleanupService.name)
@@ -29,7 +35,7 @@ export class DatabaseCleanupService {
 
       // Trouver les index qui semblent être des doublons TypeORM
       const typeormIndexes = indexes.filter(
-        (idx: any) =>
+        (idx: DatabaseIndex) =>
           idx.indexname.startsWith('IDX_') ||
           idx.indexname.startsWith('UQ_') ||
           idx.indexname.startsWith('REL_')
@@ -38,7 +44,7 @@ export class DatabaseCleanupService {
       this.logger.log(`Trouvé ${typeormIndexes.length} index TypeORM`)
 
       // Grouper par table pour identifier les potentiels doublons
-      const indexByTable = new Map<string, any[]>()
+      const indexByTable = new Map<string, DatabaseIndex[]>()
 
       for (const idx of typeormIndexes) {
         if (!indexByTable.has(idx.tablename)) {

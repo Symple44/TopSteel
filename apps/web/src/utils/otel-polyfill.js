@@ -71,6 +71,6 @@ export const getActiveSpan = mockApi.trace.getActiveSpan
 
 // Context and baggage exports
 export const active = mockApi.context.active
-export const setValue = (_key, _value, _context) => mockContext
-export const getValue = (_key, _context) => undefined
-export const deleteValue = (_key, _context) => mockContext
+export const setValue = () => mockContext
+export const getValue = () => undefined
+export const deleteValue = () => mockContext

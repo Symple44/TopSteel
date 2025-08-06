@@ -76,23 +76,23 @@ export interface LayoutConfig {
 
 export interface ComponentStyles {
   buttons: {
-    primary: Record<string, any>
-    secondary: Record<string, any>
-    outline: Record<string, any>
+    primary: Record<string, unknown>
+    secondary: Record<string, unknown>
+    outline: Record<string, unknown>
   }
   cards: {
-    default: Record<string, any>
-    product: Record<string, any>
+    default: Record<string, unknown>
+    product: Record<string, unknown>
   }
   forms: {
-    input: Record<string, any>
-    select: Record<string, any>
-    checkbox: Record<string, any>
+    input: Record<string, unknown>
+    select: Record<string, unknown>
+    checkbox: Record<string, unknown>
   }
   navigation: {
-    header: Record<string, any>
-    menu: Record<string, any>
-    breadcrumb: Record<string, any>
+    header: Record<string, unknown>
+    menu: Record<string, unknown>
+    breadcrumb: Record<string, unknown>
   }
 }
 
@@ -169,8 +169,8 @@ export class MarketplaceTheme {
       lg: string
       xl: string
     }
-    mobileLayout?: Record<string, any>
-    tabletLayout?: Record<string, any>
+    mobileLayout?: Record<string, unknown>
+    tabletLayout?: Record<string, unknown>
   }
 
   @Column({ type: 'jsonb', nullable: true })

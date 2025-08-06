@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
 import type { Repository } from 'typeorm'
@@ -23,7 +22,6 @@ export class TenantInitializationService {
   private readonly logger = new Logger(TenantInitializationService.name)
 
   constructor(
-    private readonly configService: ConfigService,
     private readonly multiTenantConfig: MultiTenantDatabaseConfig,
     @InjectRepository(User, 'auth')
     private readonly _userRepository: Repository<User>,

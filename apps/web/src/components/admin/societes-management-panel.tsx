@@ -27,7 +27,6 @@ import {
 } from '@erp/ui'
 import { Building, Database, Edit, Eye, MapPin, Plus, Shield, Users } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
 
 interface Societe {
@@ -87,7 +86,6 @@ interface SocieteStats {
 }
 
 export default function SocietesManagementPanel() {
-  const { t } = useTranslation('admin')
   const [societes, setSocietes] = useState<Societe[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -117,7 +115,7 @@ export default function SocietesManagementPanel() {
       } else {
         setError('Impossible de charger les sociétés')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setError(error.message || 'Erreur de connexion')
     } finally {
       setLoading(false)
@@ -140,7 +138,7 @@ export default function SocietesManagementPanel() {
         setSelectedSociete(data.data)
         setIsDetailsOpen(true)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setError(error.message || 'Erreur de connexion')
     }
   }, [])
@@ -161,7 +159,7 @@ export default function SocietesManagementPanel() {
         setSelectedSocieteStats(data.data)
         setIsStatsOpen(true)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setError(error.message || 'Erreur de connexion')
     }
   }, [])

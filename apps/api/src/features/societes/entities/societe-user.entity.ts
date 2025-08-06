@@ -71,7 +71,7 @@ export class SocieteUser extends CommonEntity {
   @Column({ type: 'jsonb', default: {} })
   preferences!: {
     defaultSiteId?: string
-    dashboard?: Record<string, any>
+    dashboard?: Record<string, unknown>
     notifications?: Record<string, boolean>
   }
 

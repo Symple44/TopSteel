@@ -198,9 +198,9 @@ export class AuthPerformanceController {
 
   private generateRecommendations(
     isHealthy: Record<string, boolean>,
-    _metrics: any,
-    _cacheStats: any,
-    _memoryUsage: any
+    _metrics: Record<string, unknown>,
+    _cacheStats: Record<string, unknown>,
+    _memoryUsage: Record<string, unknown>
   ): string[] {
     const recommendations: string[] = []
 

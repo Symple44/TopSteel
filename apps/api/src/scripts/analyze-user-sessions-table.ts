@@ -6,7 +6,6 @@
  */
 
 import { join } from 'node:path'
-import { ConfigService } from '@nestjs/config'
 import { config } from 'dotenv'
 import { DataSource } from 'typeorm'
 import { authDataSourceOptions } from '../core/database/data-source-auth'
@@ -14,7 +13,7 @@ import { authDataSourceOptions } from '../core/database/data-source-auth'
 // Charger le .env depuis la racine du projet
 config({ path: join(__dirname, '../../../../.env') })
 
-const _configService = new ConfigService()
+// Configuration service would be used for advanced settings
 
 interface ColumnInfo {
   column_name: string
@@ -72,12 +71,8 @@ class UserSessionsTableAnalyzer {
         ORDER BY ordinal_position;
       `)
 
-      columns.forEach((col) => {
-        const _name = col.column_name.padEnd(25)
-        const _type = col.data_type.padEnd(20)
-        const _nullable = col.is_nullable.padEnd(10)
-        const _defaultVal = (col.column_default || 'NULL').padEnd(20)
-        const _length = col.character_maximum_length ? col.character_maximum_length.toString() : ''
+      columns.forEach(() => {
+        // Column details would be formatted for display here
       })
 
       const expectedColumns = [
@@ -201,7 +196,7 @@ class UserSessionsTableAnalyzer {
       )
 
       if (missingColumns.length > 0) {
-        missingColumns.forEach((_col) => {})
+        missingColumns.forEach(() => {})
       }
 
       // Vérifier les colonnes supplémentaires (qui ne sont pas dans l'entité)
@@ -211,7 +206,7 @@ class UserSessionsTableAnalyzer {
       )
 
       if (extraColumns.length > 0) {
-        extraColumns.forEach((_col) => {})
+        extraColumns.forEach(() => {})
       }
       let typeMismatches = 0
 
@@ -241,7 +236,7 @@ class UserSessionsTableAnalyzer {
         ORDER BY indexname;
       `)
 
-      indexes.forEach((_idx) => {})
+      indexes.forEach(() => {})
 
       // Vérifier les index manquants attendus
       const expectedIndexes = [
@@ -252,7 +247,7 @@ class UserSessionsTableAnalyzer {
         'isActive (index)',
         'status (index)',
       ]
-      expectedIndexes.forEach((_idx) => {})
+      expectedIndexes.forEach(() => {})
 
       // 5. Compter les enregistrements
       const countResult = await this.dataSource.query('SELECT COUNT(*) as count FROM user_sessions')
@@ -274,13 +269,13 @@ class UserSessionsTableAnalyzer {
           ORDER BY created_at DESC 
           LIMIT 3
         `)
-        sampleData.forEach((_row: any, _index: number) => {})
+        sampleData.forEach((_row: unknown, _index: number) => {})
       }
 
       if (missingColumns.length > 0 || extraColumns.length > 0) {
       } else {
       }
-    } catch (_error) {
+    } catch (_error: unknown) {
     } finally {
       if (this.dataSource?.isInitialized) {
         await this.dataSource.destroy()
@@ -300,7 +295,7 @@ if (require.main === module) {
     .then(() => {
       process.exit(0)
     })
-    .catch((_error) => {
+    .catch(() => {
       process.exit(1)
     })
 }

@@ -24,7 +24,7 @@ import { UsersDataTable } from './users-datatable'
 export default function UsersManagementPage() {
   const router = useRouter()
   const { t } = useTranslation('admin')
-  const [selectedUser, _setSelectedUser] = useState<{
+  const [selectedUser] = useState<{
     id: string
     roles?: { id: string; name: string; description?: string }[]
     groups?: { id: string; name: string; description?: string }[]

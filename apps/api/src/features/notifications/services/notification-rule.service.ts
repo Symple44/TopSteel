@@ -129,7 +129,7 @@ export class NotificationRuleService {
   async createEvent(
     type: TriggerType,
     event: string,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     source?: string,
     userId?: string,
     entityType?: string,
@@ -243,25 +243,32 @@ export class NotificationRuleService {
   // ===== ÉVALUATION DES CONDITIONS =====
 
   evaluateConditions(
-    conditions: any[],
-    eventData: Record<string, any>
-  ): { result: boolean; details: Record<string, any> } {
+    conditions: unknown[],
+    eventData: Record<string, unknown>
+  ): { result: boolean; details: Record<string, unknown> } {
     if (!conditions || conditions.length === 0) {
       return { result: true, details: {} }
     }
 
-    const results: Record<string, any> = {}
+    const results: Record<string, unknown> = {}
     let finalResult = true
 
     for (let i = 0; i < conditions.length; i++) {
       const condition = conditions[i]
+      const cond = condition as {
+        field: string
+        value: unknown
+        operator: string
+        logic?: string
+        id?: string
+      }
       const conditionResult = this.evaluateCondition(condition, eventData)
-      results[condition.id] = conditionResult
+      results[cond.id || `condition_${i}`] = conditionResult
 
       if (i === 0) {
         finalResult = conditionResult
       } else {
-        const logic = condition.logic || 'AND'
+        const logic = cond.logic || 'AND'
         if (logic === 'AND') {
           finalResult = finalResult && conditionResult
         } else if (logic === 'OR') {
@@ -273,11 +280,18 @@ export class NotificationRuleService {
     return { result: finalResult, details: results }
   }
 
-  private evaluateCondition(condition: any, eventData: Record<string, any>): boolean {
-    const fieldValue = this.getFieldValue(condition.field, eventData)
-    const conditionValue = condition.value
+  private evaluateCondition(condition: unknown, eventData: Record<string, unknown>): boolean {
+    const cond = condition as {
+      field: string
+      value: unknown
+      operator: string
+      logic?: string
+      id?: string
+    }
+    const fieldValue = this.getFieldValue(cond.field, eventData)
+    const conditionValue = cond.value
 
-    switch (condition.operator) {
+    switch (cond.operator) {
       case ConditionOperator.EQUALS:
         return fieldValue === conditionValue
 
@@ -333,14 +347,19 @@ export class NotificationRuleService {
     }
   }
 
-  private getFieldValue(field: string, data: Record<string, any>): any {
+  private getFieldValue(field: string, data: Record<string, unknown>): unknown {
     // Support pour les champs imbriqués (ex: "user.profile.name")
     const fieldParts = field.split('.')
     let value = data
 
     for (const part of fieldParts) {
-      if (value && typeof value === 'object' && part in value) {
-        value = value[part]
+      if (
+        value &&
+        typeof value === 'object' &&
+        value !== null &&
+        part in (value as Record<string, unknown>)
+      ) {
+        value = (value as Record<string, unknown>)[part]
       } else {
         return undefined
       }
@@ -351,7 +370,7 @@ export class NotificationRuleService {
 
   // ===== SUBSTITUTION DE VARIABLES =====
 
-  substituteVariables(template: string, variables: Record<string, any>): string {
+  substituteVariables(template: string, variables: Record<string, unknown>): string {
     return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       return variables[key] !== undefined ? String(variables[key]) : match
     })
@@ -366,7 +385,7 @@ export class NotificationRuleService {
     pendingEvents: number
     totalExecutions: number
     successRate: number
-    recentActivity: any[]
+    recentActivity: unknown[]
   }> {
     const [totalRules, activeRules] = await Promise.all([
       this._ruleRepository.count(),
@@ -386,7 +405,7 @@ export class NotificationRuleService {
 
     const recentActivity = await this._eventRepository.find({
       where: {
-        occurredAt: { $gte: yesterday } as any,
+        occurredAt: { $gte: yesterday } as unknown,
       },
       order: { occurredAt: 'DESC' },
       take: 10,

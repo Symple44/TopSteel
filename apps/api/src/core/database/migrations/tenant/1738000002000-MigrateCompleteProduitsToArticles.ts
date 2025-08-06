@@ -84,7 +84,7 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       // Supprimer l'ancienne contrainte de clé étrangère
       try {
         await queryRunner.dropForeignKey(tableInfo.table, tableInfo.fkName)
-      } catch (_error) {}
+      } catch {}
 
       // Créer la nouvelle contrainte sur article_id
       await queryRunner.createForeignKey(
@@ -206,7 +206,7 @@ export class MigrateCompleteProduitsToArticles1738000002000 implements Migration
       const fkName = tableInfo.fkName.replace('produit', 'article')
       try {
         await queryRunner.dropForeignKey(tableInfo.table, fkName)
-      } catch (_error) {}
+      } catch {}
 
       // Recréer la contrainte sur produit_id
       await queryRunner.createForeignKey(

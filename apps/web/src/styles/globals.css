@@ -611,8 +611,6 @@ button.menu-item-parent-with-active-child,
 .menu-item-parent-with-active-child {
   color: hsl(var(--foreground) / 0.8) !important;
   font-weight: 500 !important;
-  background-color: transparent !important;
-  background-image: none !important;
   background: transparent !important;
   /* JAMAIS de fond coloré pour le parent */
 }
@@ -798,8 +796,6 @@ button:hover .menu-chevron,
 .dark button.menu-item-parent-with-active-child,
 .dark .menu-item-parent-with-active-child {
   color: hsl(var(--foreground) / 0.85) !important;
-  background-color: transparent !important;
-  background-image: none !important;
   background: transparent !important;
   /* JAMAIS de fond pour le parent en mode sombre */
 }
@@ -882,8 +878,6 @@ button:hover .menu-chevron,
 .vibrant button.menu-item-parent-with-active-child,
 .vibrant .menu-item-parent-with-active-child {
   color: hsl(var(--foreground) / 0.82) !important;
-  background-color: transparent !important;
-  background-image: none !important;
   background: transparent !important;
   /* JAMAIS de fond pour le parent en mode vibrant */
 }
@@ -910,8 +904,6 @@ button.menu-item-parent-with-active-child:active,
 .menu-item-parent-with-active-child:hover,
 .menu-item-parent-with-active-child:focus,
 .menu-item-parent-with-active-child:active {
-  background-color: transparent !important;
-  background-image: none !important;
   background: transparent !important;
 }
 
@@ -925,8 +917,6 @@ button.menu-item-parent-with-active-child:active,
 .dark .menu-item-parent-with-active-child:hover,
 .dark .menu-item-parent-with-active-child:focus,
 .dark .menu-item-parent-with-active-child:active {
-  background-color: transparent !important;
-  background-image: none !important;
   background: transparent !important;
 }
 
@@ -940,8 +930,6 @@ button.menu-item-parent-with-active-child:active,
 .vibrant .menu-item-parent-with-active-child:hover,
 .vibrant .menu-item-parent-with-active-child:focus,
 .vibrant .menu-item-parent-with-active-child:active {
-  background-color: transparent !important;
-  background-image: none !important;
   background: transparent !important;
 }
 

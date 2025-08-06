@@ -89,11 +89,15 @@ async function createTestUser() {
       // Créer un nouvel utilisateur
       const hashedPassword = await bcrypt.hash(testUser.password, 10)
       // Vérifier quelles colonnes existent réellement
-      const hasIsActive = columns.some((col: any) => col.column_name === 'isActive')
-      const hasActif = columns.some((col: any) => col.column_name === 'actif')
+      const hasIsActive = columns.some(
+        (col: unknown) => (col as { column_name: string }).column_name === 'isActive'
+      )
+      const hasActif = columns.some(
+        (col: unknown) => (col as { column_name: string }).column_name === 'actif'
+      )
 
       let insertQuery = ''
-      let insertParams: any[] = []
+      let insertParams: unknown[] = []
 
       if (hasIsActive) {
         insertQuery = `
@@ -152,8 +156,12 @@ async function createTestUser() {
         )
       }
     }
-    const hasIsActive = columns.some((col: any) => col.column_name === 'isActive')
-    const hasActif = columns.some((col: any) => col.column_name === 'actif')
+    const hasIsActive = columns.some(
+      (col: unknown) => (col as { column_name: string }).column_name === 'isActive'
+    )
+    const hasActif = columns.some(
+      (col: unknown) => (col as { column_name: string }).column_name === 'actif'
+    )
 
     let selectQuery = ''
     if (hasIsActive) {
@@ -204,7 +212,7 @@ async function createTestUser() {
     }
 
     const _allUsers = await dataSource.query(selectQuery)
-  } catch (_error) {
+  } catch (_error: unknown) {
   } finally {
     await dataSource.destroy()
   }

@@ -510,35 +510,18 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                       Transférer à un utilisateur
                     </Button>
 
-                    {true ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => {
-                          actions.deleteNotification(selectedNotification.id)
-                          setSelectedNotification(null)
-                        }}
-                      >
-                        <Archive className="h-4 w-4 mr-2" />
-                        Archiver
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => {
-                          // TODO: Implement unarchive functionality
-                          if (selectedNotification) {
-                          }
-                          setSelectedNotification(null)
-                        }}
-                      >
-                        <Archive className="h-4 w-4 mr-2" />
-                        Désarchiver
-                      </Button>
-                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => {
+                        actions.deleteNotification(selectedNotification.id)
+                        setSelectedNotification(null)
+                      }}
+                    >
+                      <Archive className="h-4 w-4 mr-2" />
+                      Archiver
+                    </Button>
 
                     <Button
                       variant="outline"

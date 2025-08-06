@@ -35,7 +35,7 @@ export class WebAuthnService {
     userName: string,
     _existingCredentials: WebAuthnCredential[] = []
   ): Promise<{
-    options: any
+    options: Record<string, unknown>
     challenge: string
   }> {
     try {
@@ -78,7 +78,7 @@ export class WebAuthnService {
    * Vérifier la réponse d'enregistrement WebAuthn
    */
   async verifyRegistrationResponse(
-    response: any,
+    response: Record<string, unknown>,
     _expectedChallenge: string,
     _expectedOrigin: string = this.origin,
     _expectedRPID: string = this.rpID
@@ -127,7 +127,7 @@ export class WebAuthnService {
    * Générer les options d'authentification WebAuthn
    */
   async generateAuthenticationOptions(credentials: WebAuthnCredential[]): Promise<{
-    options: any
+    options: Record<string, unknown>
     challenge: string
   }> {
     try {
@@ -161,7 +161,7 @@ export class WebAuthnService {
    * Vérifier la réponse d'authentification WebAuthn
    */
   async verifyAuthenticationResponse(
-    response: any,
+    response: Record<string, unknown>,
     _expectedChallenge: string,
     credential: WebAuthnCredential,
     _expectedOrigin: string = this.origin,
@@ -208,19 +208,27 @@ export class WebAuthnService {
   extractDeviceName(userAgent: string): string {
     try {
       // Détection basique du navigateur et de l'OS
-      let browser = 'Navigateur inconnu'
-      let os = 'OS inconnu'
+      const browser = userAgent.includes('Chrome')
+        ? 'Chrome'
+        : userAgent.includes('Firefox')
+          ? 'Firefox'
+          : userAgent.includes('Safari')
+            ? 'Safari'
+            : userAgent.includes('Edge')
+              ? 'Edge'
+              : 'Navigateur inconnu'
 
-      if (userAgent.includes('Chrome')) browser = 'Chrome'
-      else if (userAgent.includes('Firefox')) browser = 'Firefox'
-      else if (userAgent.includes('Safari')) browser = 'Safari'
-      else if (userAgent.includes('Edge')) browser = 'Edge'
-
-      if (userAgent.includes('Windows')) os = 'Windows'
-      else if (userAgent.includes('Mac')) os = 'macOS'
-      else if (userAgent.includes('Linux')) os = 'Linux'
-      else if (userAgent.includes('Android')) os = 'Android'
-      else if (userAgent.includes('iOS')) os = 'iOS'
+      const os = userAgent.includes('Windows')
+        ? 'Windows'
+        : userAgent.includes('Mac')
+          ? 'macOS'
+          : userAgent.includes('Linux')
+            ? 'Linux'
+            : userAgent.includes('Android')
+              ? 'Android'
+              : userAgent.includes('iOS')
+                ? 'iOS'
+                : 'OS inconnu'
 
       return `${browser} sur ${os}`
     } catch (error) {

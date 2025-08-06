@@ -18,8 +18,32 @@ const SUPER_ADMIN_USER = {
   password: 'TopSteel44!',
 }
 
+// Types pour les requêtes HTTP
+interface FetchAPIOptions {
+  method?: string
+  headers?: Record<string, string>
+  body?: string
+}
+
+interface Company {
+  id: string
+  nom: string
+  code: string
+  isDefault?: boolean
+  role?: string
+  sites?: unknown[]
+}
+
+interface Role {
+  id: string
+  displayName: string
+  hierarchy: number
+  color: string
+  icon: string
+}
+
 // Fonction helper pour les requêtes HTTP
-async function fetchAPI(endpoint: string, options: any = {}) {
+async function fetchAPI(endpoint: string, options: FetchAPIOptions = {}) {
   const url = `${API_URL}${endpoint}`
 
   const response = await fetch(url, {
@@ -41,7 +65,7 @@ async function fetchAPI(endpoint: string, options: any = {}) {
 describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
   let serverReachable = false
   let superAdminToken: string
-  let availableCompanies: any[] = []
+  let availableCompanies: Company[] = []
 
   beforeAll(async () => {
     // Vérifier que le serveur API est accessible
@@ -57,7 +81,7 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       } else {
         throw new Error(`Server responded with status: ${response.status}`)
       }
-    } catch (_error) {
+    } catch {
       serverReachable = false
     }
   })
@@ -66,62 +90,52 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
     if (!serverReachable) {
       return
     }
+    const loginData = await fetchAPI('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        login: SUPER_ADMIN_USER.email,
+        password: SUPER_ADMIN_USER.password,
+      }),
+    })
 
-    try {
-      const loginData = await fetchAPI('/api/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({
-          login: SUPER_ADMIN_USER.email,
-          password: SUPER_ADMIN_USER.password,
-        }),
-      })
+    expect(loginData).toHaveProperty('data')
+    expect(loginData.data).toHaveProperty('accessToken')
+    expect(loginData.data).toHaveProperty('user')
+    expect(loginData.data.user.email).toBe(SUPER_ADMIN_USER.email)
+    expect(loginData.data.user).toHaveProperty('role')
+    expect(loginData.data.user.role).toBe('SUPER_ADMIN')
 
-      expect(loginData).toHaveProperty('data')
-      expect(loginData.data).toHaveProperty('accessToken')
-      expect(loginData.data).toHaveProperty('user')
-      expect(loginData.data.user.email).toBe(SUPER_ADMIN_USER.email)
-      expect(loginData.data.user).toHaveProperty('role')
-      expect(loginData.data.user.role).toBe('SUPER_ADMIN')
+    superAdminToken = loginData.data.accessToken
 
-      superAdminToken = loginData.data.accessToken
-
-      // Vérifier les propriétés spécifiques du token SUPER_ADMIN
-      expect(loginData.data).toHaveProperty('permissions')
-      expect(loginData.data.user).toHaveProperty('globalRole')
-    } catch (error) {
-      throw error
-    }
+    // Vérifier les propriétés spécifiques du token SUPER_ADMIN
+    expect(loginData.data).toHaveProperty('permissions')
+    expect(loginData.data.user).toHaveProperty('globalRole')
   })
 
   it('should allow SUPER_ADMIN to access all companies', async () => {
     if (!serverReachable || !superAdminToken) {
       return
     }
+    const companiesData = await fetchAPI('/api/auth/societes', {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    })
 
-    try {
-      const companiesData = await fetchAPI('/api/auth/societes', {
-        headers: { Authorization: `Bearer ${superAdminToken}` },
-      })
+    expect(companiesData).toHaveProperty('data')
+    expect(Array.isArray(companiesData.data)).toBe(true)
 
-      expect(companiesData).toHaveProperty('data')
-      expect(Array.isArray(companiesData.data)).toBe(true)
+    availableCompanies = companiesData.data
 
-      availableCompanies = companiesData.data
+    // SUPER_ADMIN should have access to ALL active companies
+    expect(availableCompanies.length).toBeGreaterThan(0)
 
-      // SUPER_ADMIN should have access to ALL active companies
-      expect(availableCompanies.length).toBeGreaterThan(0)
-
-      // Verify company structure includes necessary fields
-      if (availableCompanies.length > 0) {
-        const firstCompany = availableCompanies[0]
-        expect(firstCompany).toHaveProperty('id')
-        expect(firstCompany).toHaveProperty('nom')
-        expect(firstCompany).toHaveProperty('code')
-        expect(firstCompany).toHaveProperty('role')
-        expect(firstCompany).toHaveProperty('sites')
-      }
-    } catch (error) {
-      throw error
+    // Verify company structure includes necessary fields
+    if (availableCompanies.length > 0) {
+      const firstCompany = availableCompanies[0]
+      expect(firstCompany).toHaveProperty('id')
+      expect(firstCompany).toHaveProperty('nom')
+      expect(firstCompany).toHaveProperty('code')
+      expect(firstCompany).toHaveProperty('role')
+      expect(firstCompany).toHaveProperty('sites')
     }
   })
 
@@ -129,82 +143,72 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
     if (!serverReachable || !superAdminToken || availableCompanies.length === 0) {
       return
     }
+    // Test selecting the first available company
+    const companyToSelect = availableCompanies[0]
 
-    try {
-      // Test selecting the first available company
-      const companyToSelect = availableCompanies[0]
+    const selectData = await fetchAPI(`/api/auth/login-societe/${companyToSelect.id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+      body: JSON.stringify({}),
+    })
 
-      const selectData = await fetchAPI(`/api/auth/login-societe/${companyToSelect.id}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${superAdminToken}` },
-        body: JSON.stringify({}),
-      })
+    expect(selectData).toHaveProperty('data')
+    expect(selectData.data).toHaveProperty('tokens')
+    expect(selectData.data.tokens).toHaveProperty('accessToken')
+    expect(selectData.data).toHaveProperty('user')
+    expect(selectData.data.user).toHaveProperty('societe')
 
-      expect(selectData).toHaveProperty('data')
-      expect(selectData.data).toHaveProperty('tokens')
-      expect(selectData.data.tokens).toHaveProperty('accessToken')
-      expect(selectData.data).toHaveProperty('user')
-      expect(selectData.data.user).toHaveProperty('societe')
+    // Verify the selected company details
+    expect(selectData.data.user.societe.id).toBe(companyToSelect.id)
+    expect(selectData.data.user.societe).toHaveProperty('nom')
 
-      // Verify the selected company details
-      expect(selectData.data.user.societe.id).toBe(companyToSelect.id)
-      expect(selectData.data.user.societe).toHaveProperty('nom')
+    // Verify SUPER_ADMIN maintains elevated permissions
+    expect(selectData.data.user).toHaveProperty('role', 'SUPER_ADMIN')
 
-      // Verify SUPER_ADMIN maintains elevated permissions
-      expect(selectData.data.user).toHaveProperty('role', 'SUPER_ADMIN')
+    const multiTenantToken = selectData.data.tokens.accessToken
 
-      const multiTenantToken = selectData.data.tokens.accessToken
+    // Test that the new token works
+    const verifyData = await fetchAPI('/api/auth/verify', {
+      headers: { Authorization: `Bearer ${multiTenantToken}` },
+    })
 
-      // Test that the new token works
-      const verifyData = await fetchAPI('/api/auth/verify', {
-        headers: { Authorization: `Bearer ${multiTenantToken}` },
-      })
-
-      expect(verifyData).toHaveProperty('data')
-      expect(verifyData.data).toHaveProperty('email', SUPER_ADMIN_USER.email)
-      expect(verifyData.data).toHaveProperty('role', 'SUPER_ADMIN')
-    } catch (error) {
-      throw error
-    }
+    expect(verifyData).toHaveProperty('data')
+    expect(verifyData.data).toHaveProperty('email', SUPER_ADMIN_USER.email)
+    expect(verifyData.data).toHaveProperty('role', 'SUPER_ADMIN')
   })
 
   it('should provide enhanced admin endpoints access', async () => {
     if (!serverReachable || !superAdminToken) {
       return
     }
+    // Test access to performance metrics (SUPER_ADMIN only)
+    const performanceData = await fetchAPI('/api/admin/auth-performance/metrics', {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    })
 
-    try {
-      // Test access to performance metrics (SUPER_ADMIN only)
-      const performanceData = await fetchAPI('/api/admin/auth-performance/metrics', {
-        headers: { Authorization: `Bearer ${superAdminToken}` },
-      })
+    expect(performanceData).toHaveProperty('success', true)
+    expect(performanceData).toHaveProperty('data')
+    expect(performanceData.data).toHaveProperty('aggregated')
+    expect(performanceData.data).toHaveProperty('byOperation')
 
-      expect(performanceData).toHaveProperty('success', true)
-      expect(performanceData).toHaveProperty('data')
-      expect(performanceData.data).toHaveProperty('aggregated')
-      expect(performanceData.data).toHaveProperty('byOperation')
+    // Test access to MFA management (SUPER_ADMIN only)
+    const mfaStatusData = await fetchAPI('/api/admin/mfa/status', {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    })
 
-      // Test access to MFA management (SUPER_ADMIN only)
-      const mfaStatusData = await fetchAPI('/api/admin/mfa/status', {
-        headers: { Authorization: `Bearer ${superAdminToken}` },
-      })
+    expect(mfaStatusData).toHaveProperty('success', true)
+    expect(mfaStatusData).toHaveProperty('data')
+    expect(mfaStatusData.data).toHaveProperty('totalUsers')
+    expect(mfaStatusData.data).toHaveProperty('usersWithMFA')
 
-      expect(mfaStatusData).toHaveProperty('success', true)
-      expect(mfaStatusData).toHaveProperty('data')
-      expect(mfaStatusData.data).toHaveProperty('totalUsers')
-      expect(mfaStatusData.data).toHaveProperty('usersWithMFA')
+    // Test access to societes management (SUPER_ADMIN only)
+    const societesData = await fetchAPI('/api/admin/societes', {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    })
 
-      // Test access to societes management (SUPER_ADMIN only)
-      const societesData = await fetchAPI('/api/admin/societes', {
-        headers: { Authorization: `Bearer ${superAdminToken}` },
-      })
-
-      expect(societesData).toHaveProperty('success', true)
-      expect(societesData).toHaveProperty('data')
-      expect(Array.isArray(societesData.data)).toBe(true)
-    } catch (error) {
-      throw error
-    }
+    expect(societesData).toHaveProperty('success', true)
+    expect(societesData).toHaveProperty('data')
+    expect(Array.isArray(societesData.data)).toBe(true)
   })
 
   it('should handle MFA bypass logic for SUPER_ADMIN', async () => {
@@ -230,73 +234,63 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
         expect(mfaCheckData.data).toHaveProperty('canBypass')
         expect(mfaCheckData.data.canBypass).toBe(true)
       }
-    } catch (_error) {}
+    } catch {}
   })
 
   it('should validate role hierarchy and permissions', async () => {
     if (!serverReachable || !superAdminToken) {
       return
     }
+    // Test role formatting endpoint
+    const rolesData = await fetchAPI('/api/admin/users/roles', {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    })
 
-    try {
-      // Test role formatting endpoint
-      const rolesData = await fetchAPI('/api/admin/users/roles', {
-        headers: { Authorization: `Bearer ${superAdminToken}` },
-      })
+    expect(rolesData).toHaveProperty('success', true)
+    expect(rolesData).toHaveProperty('data')
+    expect(rolesData.data).toHaveProperty('globalRoles')
+    expect(rolesData.data).toHaveProperty('societeRoles')
 
-      expect(rolesData).toHaveProperty('success', true)
-      expect(rolesData).toHaveProperty('data')
-      expect(rolesData.data).toHaveProperty('globalRoles')
-      expect(rolesData.data).toHaveProperty('societeRoles')
+    // Find SUPER_ADMIN role in the hierarchy
+    const globalRoles = rolesData.data.globalRoles
+    const superAdminRole = globalRoles.find((role: Role) => role.id === 'SUPER_ADMIN')
 
-      // Find SUPER_ADMIN role in the hierarchy
-      const globalRoles = rolesData.data.globalRoles
-      const superAdminRole = globalRoles.find((role: any) => role.id === 'SUPER_ADMIN')
+    expect(superAdminRole).toBeDefined()
+    expect(superAdminRole).toHaveProperty('displayName')
+    expect(superAdminRole).toHaveProperty('hierarchy')
+    expect(superAdminRole).toHaveProperty('color')
+    expect(superAdminRole).toHaveProperty('icon')
 
-      expect(superAdminRole).toBeDefined()
-      expect(superAdminRole).toHaveProperty('displayName')
-      expect(superAdminRole).toHaveProperty('hierarchy')
-      expect(superAdminRole).toHaveProperty('color')
-      expect(superAdminRole).toHaveProperty('icon')
-
-      // SUPER_ADMIN should have the highest hierarchy level
-      const maxHierarchy = Math.max(...globalRoles.map((role: any) => role.hierarchy))
-      expect(superAdminRole.hierarchy).toBe(maxHierarchy)
-    } catch (error) {
-      throw error
-    }
+    // SUPER_ADMIN should have the highest hierarchy level
+    const maxHierarchy = Math.max(...globalRoles.map((role: Role) => role.hierarchy))
+    expect(superAdminRole.hierarchy).toBe(maxHierarchy)
   })
 
   it('should handle performance tracking for SUPER_ADMIN operations', async () => {
     if (!serverReachable || !superAdminToken) {
       return
     }
+    // Perform several operations to generate performance data
+    await fetchAPI('/api/auth/societes', {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    })
 
-    try {
-      // Perform several operations to generate performance data
-      await fetchAPI('/api/auth/societes', {
-        headers: { Authorization: `Bearer ${superAdminToken}` },
-      })
+    // Check performance health
+    const healthData = await fetchAPI('/api/admin/auth-performance/health-check', {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    })
 
-      // Check performance health
-      const healthData = await fetchAPI('/api/admin/auth-performance/health-check', {
-        headers: { Authorization: `Bearer ${superAdminToken}` },
-      })
+    expect(healthData).toHaveProperty('success', true)
+    expect(healthData).toHaveProperty('data')
+    expect(healthData.data).toHaveProperty('overall')
+    expect(healthData.data).toHaveProperty('checks')
+    expect(healthData.data).toHaveProperty('recommendations')
 
-      expect(healthData).toHaveProperty('success', true)
-      expect(healthData).toHaveProperty('data')
-      expect(healthData.data).toHaveProperty('overall')
-      expect(healthData.data).toHaveProperty('checks')
-      expect(healthData.data).toHaveProperty('recommendations')
-
-      // Verify that performance checks are working
-      const checks = healthData.data.checks
-      expect(checks).toHaveProperty('responseTime')
-      expect(checks).toHaveProperty('successRate')
-      expect(checks).toHaveProperty('memoryUsage')
-    } catch (error) {
-      throw error
-    }
+    // Verify that performance checks are working
+    const checks = healthData.data.checks
+    expect(checks).toHaveProperty('responseTime')
+    expect(checks).toHaveProperty('successRate')
+    expect(checks).toHaveProperty('memoryUsage')
   })
 
   it('should complete comprehensive SUPER_ADMIN flow validation', async () => {
@@ -364,11 +358,7 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
       // Summary
       const successCount = testResults.filter((r) => r.success).length
       const totalCount = testResults.length
-      testResults.forEach((result) => {
-        const _icon = result.success ? '✅' : '❌'
-        if (result.details) {
-        }
-      })
+      // Test results processed
 
       // All tests should pass for SUPER_ADMIN
       expect(successCount).toBe(totalCount)
@@ -376,9 +366,7 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
     } catch (error) {
       // Log partial results if available
       if (testResults.length > 0) {
-        testResults.forEach((result) => {
-          const _icon = result.success ? '✅' : '❌'
-        })
+        // Partial results logged
       }
 
       throw error

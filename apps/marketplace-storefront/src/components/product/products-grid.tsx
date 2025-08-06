@@ -33,7 +33,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
     featured: searchParams.featured === 'true',
     page: currentPage,
     limit: itemsPerPage,
-    sortBy: sortBy as any,
+    sortBy: sortBy as string,
     sortOrder,
   }
 
@@ -100,6 +100,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
             <span className="text-sm text-muted-foreground">Trier par:</span>
             <div className="flex gap-1">
               <button
+                type="button"
                 onClick={() => handleSortChange('name')}
                 className={cn(
                   'px-3 py-1 text-sm rounded transition-colors',
@@ -111,6 +112,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
                 Nom {sortBy === 'name' && (sortOrder === 'ASC' ? '↑' : '↓')}
               </button>
               <button
+                type="button"
                 onClick={() => handleSortChange('price')}
                 className={cn(
                   'px-3 py-1 text-sm rounded transition-colors',
@@ -127,6 +129,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
           {/* View Mode Toggle */}
           <div className="flex border rounded">
             <button
+              type="button"
               onClick={() => setViewMode('grid')}
               className={cn(
                 'p-2 transition-colors',
@@ -136,6 +139,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
               <Grid className="w-4 h-4" />
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('list')}
               className={cn(
                 'p-2 transition-colors',
@@ -169,6 +173,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 pt-8">
           <button
+            type="button"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             className="px-3 py-2 text-sm border rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
@@ -182,6 +187,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
               return (
                 <button
                   key={page}
+                  type="button"
                   onClick={() => setCurrentPage(page)}
                   className={cn(
                     'px-3 py-2 text-sm rounded transition-colors',
@@ -197,6 +203,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
               <>
                 <span className="px-2 py-2 text-sm">...</span>
                 <button
+                  type="button"
                   onClick={() => setCurrentPage(totalPages)}
                   className={cn(
                     'px-3 py-2 text-sm rounded transition-colors',
@@ -212,6 +219,7 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
           </div>
 
           <button
+            type="button"
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             className="px-3 py-2 text-sm border rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
@@ -224,7 +232,11 @@ export function ProductsGrid({ tenant, searchParams }: ProductsGridProps) {
       {/* Load More Button (Alternative to pagination) */}
       {data.hasMore && (
         <div className="text-center pt-8">
-          <button onClick={() => setCurrentPage(currentPage + 1)} className="btn-outline px-6 py-2">
+          <button
+            type="button"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            className="btn-outline px-6 py-2"
+          >
             Voir plus de produits
           </button>
         </div>

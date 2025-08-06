@@ -61,11 +61,11 @@ export class SharedProcess extends BaseAuditEntity {
     dureeEstimee?: number // minutes
     competencesRequises?: string[]
     outilsNecessaires?: string[]
-    parametres?: Record<string, any>
+    parametres?: Record<string, unknown>
     controleQualite?: {
       type: string
       criteres: string[]
-      tolerances?: Record<string, any>
+      tolerances?: Record<string, unknown>
     }
   }>
 
@@ -159,5 +159,5 @@ export class SharedProcess extends BaseAuditEntity {
   tags?: string[]
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }

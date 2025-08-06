@@ -336,15 +336,19 @@ export abstract class BaseArticleInjector {
 
     return {
       totalArticles: parseInt(totalResult[0].count),
-      articlesByFamily: familyResult.reduce((acc: Record<string, number>, row: any) => {
-        acc[row.famille] = parseInt(row.count)
+      articlesByFamily: familyResult.reduce((acc: Record<string, number>, row: unknown) => {
+        const rowTyped = row as { famille: string; count: string }
+        acc[rowTyped.famille] = parseInt(rowTyped.count)
         return acc
       }, {}),
-      recentInjections: recentResult.map((row: any) => ({
-        famille: row.famille,
-        count: parseInt(row.count),
-        date: new Date(row.date),
-      })),
+      recentInjections: recentResult.map((row: unknown) => {
+        const rowTyped = row as { famille: string; count: string; date: string }
+        return {
+          famille: rowTyped.famille,
+          count: parseInt(rowTyped.count),
+          date: new Date(rowTyped.date),
+        }
+      }),
     }
   }
 }

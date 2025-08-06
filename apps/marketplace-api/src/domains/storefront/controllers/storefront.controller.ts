@@ -14,12 +14,52 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
-import type { MarketplaceCustomersService } from '../../customers/services/marketplace-customers.service'
+
+// Interface for tenant request with proper typing
+interface TenantRequest extends Request {
+  tenant: {
+    societeId: string
+    societe?: {
+      nom?: string
+    }
+    marketplaceEnabled?: boolean
+    erpTenantConnection?: unknown
+  }
+}
+
+// Interface for category query parameters
+interface CategoryQueryDto {
+  page?: string
+  limit?: string
+}
+
+// Interface for search query parameters
+interface SearchQueryDto {
+  q: string
+  page?: string
+  limit?: string
+}
+
 import type {
   MarketplaceProductsService,
   ProductFilters,
 } from '../../products/services/marketplace-products.service'
 import type { StorefrontService } from '../services/storefront.service'
+
+// DTO for product query parameters
+class ProductQueryDto {
+  search?: string
+  category?: string
+  tags?: string
+  minPrice?: string
+  maxPrice?: string
+  inStock?: string
+  featured?: string
+  page?: string
+  limit?: string
+  sortBy?: 'name' | 'price' | 'date' | 'popularity'
+  sortOrder?: 'ASC' | 'DESC'
+}
 
 @ApiTags('storefront')
 @Controller('storefront')
@@ -27,7 +67,6 @@ import type { StorefrontService } from '../services/storefront.service'
 export class StorefrontController {
   constructor(
     private productsService: MarketplaceProductsService,
-    private customersService: MarketplaceCustomersService,
     private storefrontService: StorefrontService
   ) {}
 
@@ -67,8 +106,8 @@ export class StorefrontController {
 
   @Get('health')
   @ApiOperation({ summary: 'Health check for this tenant' })
-  async health(@Req() req: Request) {
-    const { tenant } = req as any
+  async health(@Req() req: TenantRequest) {
+    const { tenant } = req
 
     if (!tenant) {
       return {
@@ -94,7 +133,7 @@ export class StorefrontController {
   @Get('config')
   @ApiOperation({ summary: 'Get storefront configuration' })
   @ApiResponse({ status: 200, description: 'Storefront configuration' })
-  async getStorefrontConfig(@Req() req: Request) {
+  async getStorefrontConfig(@Req() _req: TenantRequest) {
     // Temporarily return static config for testing
     return {
       storeName: 'TopSteel',
@@ -144,8 +183,8 @@ export class StorefrontController {
   })
   @ApiQuery({ name: 'sortBy', required: false, enum: ['name', 'price', 'date', 'popularity'] })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'] })
-  async getProducts(@Req() req: Request, @Query() query: any) {
-    const { tenant } = req as any
+  async getProducts(@Req() req: TenantRequest, @Query() query: ProductQueryDto) {
+    const { tenant } = req
     const customerId = req.headers['x-customer-id'] as string
 
     if (!tenant) {
@@ -187,8 +226,8 @@ export class StorefrontController {
     type: Number,
     description: 'Number of products (default: 8)',
   })
-  async getFeaturedProducts(@Req() req: Request, @Query('limit') limit?: string) {
-    const { tenant } = req as any
+  async getFeaturedProducts(@Req() req: TenantRequest, @Query('limit') limit?: string) {
+    const { tenant } = req
     const customerId = req.headers['x-customer-id'] as string
 
     if (!tenant) {
@@ -202,8 +241,7 @@ export class StorefrontController {
         parseInt(limit) || 8,
         customerId
       )
-    } catch (error) {
-      console.error('StorefrontController: Erreur dans getFeaturedProducts:', error.message)
+    } catch (_error) {
       // Retourner une réponse de secours
       return [
         {
@@ -232,8 +270,8 @@ export class StorefrontController {
 
   @Get('products/categories')
   @ApiOperation({ summary: 'Get product categories' })
-  async getCategories(@Req() req: Request) {
-    const { tenant } = req as any
+  async getCategories(@Req() req: TenantRequest) {
+    const { tenant } = req
 
     if (!tenant) {
       throw new Error('Tenant non disponible')
@@ -249,8 +287,8 @@ export class StorefrontController {
   @ApiOperation({ summary: 'Get product details' })
   @ApiResponse({ status: 200, description: 'Product details' })
   @ApiResponse({ status: 404, description: 'Product not found' })
-  async getProductDetails(@Req() req: Request, @Param('productId') productId: string) {
-    const { tenant } = req as any
+  async getProductDetails(@Req() req: TenantRequest, @Param('productId') productId: string) {
+    const { tenant } = req
     const customerId = req.headers['x-customer-id'] as string
 
     if (!tenant?.erpTenantConnection) {
@@ -270,11 +308,11 @@ export class StorefrontController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getProductsByCategory(
-    @Req() req: Request,
+    @Req() req: TenantRequest,
     @Param('category') category: string,
-    @Query() query: any
+    @Query() query: CategoryQueryDto
   ) {
-    const { tenant } = req as any
+    const { tenant } = req
     const customerId = req.headers['x-customer-id'] as string
 
     if (!tenant?.erpTenantConnection) {
@@ -299,8 +337,8 @@ export class StorefrontController {
   @ApiQuery({ name: 'q', required: true, description: 'Search query' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async searchProducts(@Req() req: Request, @Query() query: any) {
-    const { tenant } = req as any
+  async searchProducts(@Req() req: TenantRequest, @Query() query: SearchQueryDto) {
+    const { tenant } = req
     const customerId = req.headers['x-customer-id'] as string
 
     if (!tenant?.erpTenantConnection) {
@@ -327,8 +365,8 @@ export class StorefrontController {
   @Post('newsletter/subscribe')
   @ApiOperation({ summary: 'Subscribe to newsletter' })
   @HttpCode(HttpStatus.OK)
-  async subscribeNewsletter(@Req() req: Request, @Body() body: { email: string }) {
-    const { tenant } = req as any
+  async subscribeNewsletter(@Req() req: TenantRequest, @Body() body: { email: string }) {
+    const { tenant } = req
 
     return await this.storefrontService.subscribeNewsletter(tenant.societeId, body.email)
   }
@@ -337,7 +375,7 @@ export class StorefrontController {
   @ApiOperation({ summary: 'Send contact message' })
   @HttpCode(HttpStatus.OK)
   async sendContactMessage(
-    @Req() req: Request,
+    @Req() req: TenantRequest,
     @Body() body: {
       name: string
       email: string
@@ -346,31 +384,31 @@ export class StorefrontController {
       phone?: string
     }
   ) {
-    const { tenant } = req as any
+    const { tenant } = req
 
     return await this.storefrontService.sendContactMessage(tenant.societeId, body)
   }
 
   @Get('theme')
   @ApiOperation({ summary: 'Get current theme configuration' })
-  async getTheme(@Req() req: Request) {
-    const { tenant } = req as any
+  async getTheme(@Req() req: TenantRequest) {
+    const { tenant } = req
 
     return await this.storefrontService.getCurrentTheme(tenant.societeId)
   }
 
   @Get('menu')
   @ApiOperation({ summary: 'Get navigation menu' })
-  async getMenu(@Req() req: Request) {
-    const { tenant } = req as any
+  async getMenu(@Req() req: TenantRequest) {
+    const { tenant } = req
 
     return await this.storefrontService.getNavigationMenu(tenant.societeId)
   }
 
   @Get('pages/:slug')
   @ApiOperation({ summary: 'Get static page content' })
-  async getPage(@Req() req: Request, @Param('slug') slug: string) {
-    const { tenant } = req as any
+  async getPage(@Req() req: TenantRequest, @Param('slug') slug: string) {
+    const { tenant } = req
 
     return await this.storefrontService.getPage(tenant.societeId, slug)
   }

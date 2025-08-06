@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         ...(request.headers.get('authorization') && {
-          Authorization: request.headers.get('authorization')!,
+          Authorization: request.headers.get('authorization'),
         }),
       },
     })
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     const responseData = await response.json()
     return NextResponse.json(responseData.data || responseData)
-  } catch (_error) {
+  } catch {
     // Simuler une optimisation pour le mock
     const mockResponse = {
       success: true,

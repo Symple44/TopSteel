@@ -350,7 +350,7 @@ export class MaterialController {
   async calculerValorisationStock(
     @Query('type') type?: string
   ): Promise<MaterialStockValorisation> {
-    return await this.materialService.calculerValorisationStock(type as any)
+    return await this.materialService.calculerValorisationStock(type as string)
   }
 
   /**
@@ -389,7 +389,7 @@ export class MaterialController {
     description: 'Recherche avec critères multiples et agrégations',
   })
   async searchAdvanced(
-    @Body() searchCriteria: any,
+    @Body() searchCriteria: Record<string, unknown>,
     @CurrentUser() _user: User
   ): Promise<Material[]> {
     return await this.materialService.searchMaterials(searchCriteria)
@@ -414,7 +414,7 @@ export class MaterialController {
       dureteMax?: number
     }
   ): Promise<Material[]> {
-    return await this.materialService.searchMaterials(criteria as any)
+    return await this.materialService.searchMaterials(criteria as Record<string, unknown>)
   }
 
   /**
@@ -438,7 +438,7 @@ export class MaterialController {
       diametreMax?: number
     }
   ): Promise<Material[]> {
-    return await this.materialService.searchMaterials(criteria as any)
+    return await this.materialService.searchMaterials(criteria as Record<string, unknown>)
   }
 
   // === OUTILS D'INVENTAIRE ===
@@ -452,7 +452,7 @@ export class MaterialController {
     description: "Récupérer les matériaux d'un emplacement pour inventaire",
   })
   async getMaterialsParEmplacement(@Query('emplacement') emplacement: string): Promise<Material[]> {
-    return await this.materialService.searchMaterials({ emplacement } as any)
+    return await this.materialService.searchMaterials({ emplacement } as Record<string, unknown>)
   }
 
   /**
@@ -465,7 +465,7 @@ export class MaterialController {
   })
   async getMaterialsSansMouvement(@Query() filters: InventoryFiltersDto): Promise<Material[]> {
     // Cette méthode nécessiterait une implémentation spécifique dans le service
-    return await this.materialService.searchMaterials(filters as any)
+    return await this.materialService.searchMaterials(filters as Record<string, unknown>)
   }
 
   // === EXPORT ET REPORTING ===
@@ -480,7 +480,7 @@ export class MaterialController {
     description: 'Exporter la liste des matériaux selon des critères',
   })
   async exportMaterials(
-    @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: any },
+    @Body() exportCriteria: { format: 'CSV' | 'EXCEL' | 'PDF'; filters?: Record<string, unknown> },
     @CurrentUser() _user: User
   ): Promise<{ url: string; filename: string }> {
     // Implémentation de l'export selon le format demandé
@@ -500,13 +500,16 @@ export class MaterialController {
     description: 'Importer une liste de matériaux depuis un fichier',
   })
   async importMaterials(
-    @Body() importData: { data: any[]; options?: { skipErrors?: boolean; dryRun?: boolean } },
+    @Body() importData: {
+      data: Record<string, unknown>[]
+      options?: { skipErrors?: boolean; dryRun?: boolean }
+    },
     @CurrentUser() user: User
   ): Promise<{
     imported: number
     errors: number
     warnings: string[]
-    details: any[]
+    details: Record<string, unknown>[]
   }> {
     const context: BusinessContext = {
       userId: user.id,
@@ -519,7 +522,7 @@ export class MaterialController {
       imported: 0,
       errors: 0,
       warnings: [] as string[],
-      details: [] as any[],
+      details: [] as Record<string, unknown>[],
     }
 
     for (const materialData of importData.data) {
@@ -573,7 +576,7 @@ export class MaterialController {
         if (material) {
           const validation = await this.materialService.validateBusinessRules(
             material,
-            'VALIDATE' as any
+            'VALIDATE' as string
           )
           results.push({
             id: materialId,

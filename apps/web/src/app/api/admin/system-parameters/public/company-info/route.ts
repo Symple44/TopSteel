@@ -1,6 +1,6 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // Informations de la société (données mock)
     const companyInfo = {
@@ -13,7 +13,7 @@ export async function GET(_request: NextRequest) {
     }
 
     return NextResponse.json(companyInfo)
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch company info' }, { status: 500 })
   }
 }

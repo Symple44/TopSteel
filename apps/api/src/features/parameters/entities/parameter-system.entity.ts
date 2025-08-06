@@ -73,14 +73,14 @@ export class ParameterSystem {
     order?: number // Ordre d'affichage
     category?: string // Catégorie supplémentaire
     permissions?: string[] // Permissions associées
-    [key: string]: any
+    [key: string]: unknown
   }
 
   @Column({ type: 'jsonb', nullable: true })
   arrayValues?: string[] // Pour les paramètres de type ARRAY
 
   @Column({ type: 'jsonb', nullable: true })
-  objectValues?: Record<string, any> // Pour les paramètres de type OBJECT
+  objectValues?: Record<string, unknown> // Pour les paramètres de type OBJECT
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean
@@ -102,5 +102,5 @@ export class ParameterSystem {
 
   // Index composé pour recherche efficace
   @Index('idx_param_system_group_key', ['group', 'key'])
-  static groupKeyIndex: any
+  static groupKeyIndex: unknown
 }

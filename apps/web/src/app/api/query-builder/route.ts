@@ -34,7 +34,7 @@ function getAuthHeaders(request: NextRequest): Record<string, string> {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const { searchParams: _ } = new URL(request.url)
 
     // Pour l'instant, retournons des données mock en attendant l'implémentation backend
     const mockQueryBuilders = [

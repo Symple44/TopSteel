@@ -42,14 +42,11 @@ interface ColumnSelectorProps {
   selectedTables: string[]
   columns: Column[]
   onColumnsChange: (columns: Column[]) => void
-  layout: any
-  onLayoutChange: (layout: any) => void
 }
 
 const DraggableColumn = ({
   column,
   index,
-  moveColumn,
   toggleVisibility,
   onRemove,
   selected,
@@ -133,29 +130,11 @@ const DraggableColumn = ({
   )
 }
 
-export function ColumnSelector({
-  selectedTables,
-  columns,
-  onColumnsChange,
-  layout,
-  onLayoutChange,
-}: ColumnSelectorProps) {
+export function ColumnSelector({ selectedTables, columns, onColumnsChange }: ColumnSelectorProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [availableColumns, setAvailableColumns] = useState<any[]>([])
   const [selectedColumns, setSelectedColumns] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (selectedTables.length > 0) {
-      fetchColumnsForTables(selectedTables)
-    }
-  }, [selectedTables, fetchColumnsForTables])
-
-  // Synchroniser selectedColumns avec les colonnes importées
-  useEffect(() => {
-    const importedColumnIds = new Set(columns.map((col) => `${col.tableName}.${col.columnName}`))
-    setSelectedColumns(importedColumnIds)
-  }, [columns])
 
   const fetchColumnsForTables = async (tables: string[]) => {
     setLoading(true)
@@ -173,11 +152,23 @@ export function ColumnSelector({
       }
 
       setAvailableColumns(allColumns)
-    } catch (_error) {
+    } catch {
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (selectedTables.length > 0) {
+      fetchColumnsForTables(selectedTables)
+    }
+  }, [selectedTables, fetchColumnsForTables])
+
+  // Synchroniser selectedColumns avec les colonnes importées
+  useEffect(() => {
+    const importedColumnIds = new Set(columns.map((col) => `${col.tableName}.${col.columnName}`))
+    setSelectedColumns(importedColumnIds)
+  }, [columns])
 
   const handleAddColumns = () => {
     const newColumns: Column[] = []

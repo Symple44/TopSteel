@@ -128,7 +128,7 @@ export async function POST(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
-    const { tableId } = await params
+    const { tableId: _tableId } = await params
     const newItem: Omit<HierarchyOrderItem, 'path'> = await request.json()
 
     // Valider les données
@@ -172,7 +172,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     }
 
-    const { tableId } = await params
+    const { tableId: _tableId } = await params
     const { searchParams } = new URL(request.url)
     const itemId = searchParams.get('itemId')
 

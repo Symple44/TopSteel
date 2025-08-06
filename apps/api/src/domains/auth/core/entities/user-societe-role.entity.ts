@@ -63,7 +63,7 @@ export class UserSocieteRole {
   isActive: boolean
 
   @Column('jsonb', { default: {}, comment: 'Métadonnées additionnelles' })
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 
   @CreateDateColumn()
   createdAt: Date
@@ -245,7 +245,7 @@ export class UserSocieteRole {
   /**
    * Ajoute des métadonnées
    */
-  addMetadata(key: string, value: any): void {
+  addMetadata(key: string, value: unknown): void {
     this.metadata[key] = value
     this.updatedAt = new Date()
   }
@@ -253,7 +253,7 @@ export class UserSocieteRole {
   /**
    * Récupère une métadonnée
    */
-  getMetadata(key: string): any {
+  getMetadata(key: string): unknown {
     return this.metadata[key]
   }
 

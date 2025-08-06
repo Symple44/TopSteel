@@ -255,7 +255,7 @@ export function getTemplateById(id: string): Template | undefined {
  * Obtient les templates recommandés pour un utilisateur
  * (peut être étendu avec de la logique basée sur le rôle/usage)
  */
-export function getRecommendedTemplates(_userRole?: string): Template[] {
+export function getRecommendedTemplates(): Template[] {
   // Pour l'instant, retourne les templates les plus populaires
   // Peut être étendu avec de l'analyse d'usage
   return [

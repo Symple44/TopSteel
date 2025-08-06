@@ -56,7 +56,7 @@ export class MFASession {
       os: string
       device: string
     }
-    webauthnOptions?: any // Options pour WebAuthn
+    webauthnOptions?: Record<string, unknown> // Options pour WebAuthn
     smsCode?: string // Code SMS crypté
     emailCode?: string // Code email crypté
   }
@@ -115,7 +115,7 @@ export class MFASession {
     return this.getAttemptsCount() >= maxAttempts
   }
 
-  setWebAuthnOptions(options: any): void {
+  setWebAuthnOptions(options: Record<string, unknown>): void {
     if (!this.metadata) {
       this.metadata = {}
     }
@@ -124,7 +124,7 @@ export class MFASession {
     this.updatedAt = new Date()
   }
 
-  getWebAuthnOptions(): any {
+  getWebAuthnOptions(): Record<string, unknown> | undefined {
     return this.metadata?.webauthnOptions
   }
 
@@ -181,7 +181,7 @@ export class MFASession {
     sessionToken: string,
     challengeId: string,
     challenge: string,
-    options: any,
+    options: Record<string, unknown>,
     ipAddress?: string,
     userAgent?: string
   ): MFASession {
