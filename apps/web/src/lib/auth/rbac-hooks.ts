@@ -181,7 +181,7 @@ export function useResourceActions(resource: string): {
  * Hook pour vérifier si l'utilisateur est admin
  */
 export function useIsAdmin(): boolean {
-  const { level, hasMinimumLevel } = useRoleLevel()
+  const { hasMinimumLevel } = useRoleLevel()
   return hasMinimumLevel(2) // Niveau admin ou supérieur
 }
 
@@ -189,7 +189,7 @@ export function useIsAdmin(): boolean {
  * Hook pour vérifier si l'utilisateur est super admin
  */
 export function useIsSuperAdmin(): boolean {
-  const { level, hasMinimumLevel } = useRoleLevel()
+  const { hasMinimumLevel } = useRoleLevel()
   return hasMinimumLevel(1) // Niveau super admin
 }
 

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         try {
           let endpoint = ''
           let method = 'POST'
-          const requestBody: any = {
+          const requestBody: Record<string, unknown> = {
             reason,
             sendNotification,
           }

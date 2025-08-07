@@ -267,6 +267,8 @@ export function DropdownFixed({
         'data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
         contentClassName
       )}
+      role="menu"
+      aria-label="Dropdown menu"
       style={{
         left: position.x,
         top: position.y,

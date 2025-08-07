@@ -58,6 +58,7 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
 
 // ✅ CONSOLE SILENCING POUR TESTS
 if (process.env.NODE_ENV === 'test') {
+  // biome-ignore lint/suspicious/noConsole: legitimate usage in test setup
   const originalError = console.error
   console.error = (...args) => {
     if (

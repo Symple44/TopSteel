@@ -239,6 +239,7 @@ export function RouteGuard({
               Vous n'avez pas les permissions nécessaires pour accéder à cette page.
             </p>
             <button
+              type="button"
               onClick={() => router.back()}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >

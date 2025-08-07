@@ -59,8 +59,8 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
           <Table>
             <TableHeader>
               <TableRow>
-                {columns.map((_column, index) => (
-                  <TableHead key={index}>
+                {columns.map((column, index) => (
+                  <TableHead key={`header-${column.accessorKey || index}`}>
                     <div className="h-4 bg-muted animate-pulse rounded" />
                   </TableHead>
                 ))}
@@ -68,9 +68,9 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
             </TableHeader>
             <TableBody>
               {[...Array(5)].map((_, index) => (
-                <TableRow key={index}>
-                  {columns.map((_, colIndex) => (
-                    <TableCell key={colIndex}>
+                <TableRow key={`skeleton-row-${index}`}>
+                  {columns.map((column, colIndex) => (
+                    <TableCell key={`skeleton-cell-${column.accessorKey || colIndex}`}>
                       <div className="h-4 bg-muted animate-pulse rounded" />
                     </TableCell>
                   ))}
@@ -89,7 +89,7 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
             <TableRow>
               {columns.map((column, index) => (
                 <TableHead
-                  key={index}
+                  key={`column-${column.accessorKey || index}`}
                   className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
                   onClick={() => column.sortable && handleSort(column.accessorKey)}
                 >
@@ -116,9 +116,9 @@ const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
               </TableRow>
             ) : (
               sortedData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
+                <TableRow key={`row-${rowIndex}-${JSON.stringify(row).slice(0, 10)}`}>
                   {columns.map((column, colIndex) => (
-                    <TableCell key={colIndex}>
+                    <TableCell key={`cell-${column.accessorKey || colIndex}`}>
                       {column.cell
                         ? column.cell(row[column.accessorKey], row)
                         : row[column.accessorKey] || '-'}

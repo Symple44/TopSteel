@@ -137,13 +137,14 @@ export function TreeGroupingPanel<T = any>({
             ) : (
               <div className="space-y-2">
                 {groupingColumns.map((column, index) => (
-                  <div
+                  <button
                     key={column.id}
+                    type="button"
                     draggable
                     onDragStart={() => handleDragStart(index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
-                    className={`flex items-center gap-3 p-3 border rounded-lg cursor-move hover:bg-muted/50 transition-colors ${
+                    className={`flex items-center gap-3 p-3 border rounded-lg cursor-move hover:bg-muted/50 transition-colors w-full text-left ${
                       draggedItem === index ? 'opacity-50' : ''
                     }`}
                   >
@@ -189,7 +190,7 @@ export function TreeGroupingPanel<T = any>({
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}

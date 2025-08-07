@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useTranslation } from '@/lib/i18n/hooks'
 
 export default function ErrorPage({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string }
@@ -23,6 +23,7 @@ export default function ErrorPage({
 
         <div className="space-y-4">
           <button
+            type="button"
             onClick={reset}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >

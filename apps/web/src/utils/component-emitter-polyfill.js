@@ -7,7 +7,8 @@ export class Emitter {
   }
 
   on(event, fn) {
-    ;(this.callbacks[event] = this.callbacks[event] || []).push(fn)
+    this.callbacks[event] = this.callbacks[event] || []
+    this.callbacks[event].push(fn)
     return this
   }
 

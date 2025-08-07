@@ -41,7 +41,7 @@ export function ClientsTable({ data = [], loading = false, onEdit, onDelete }: C
             </TableRow>
           ) : (
             data.map((item, index) => (
-              <TableRow key={`client-${index}-${(item as any)?.name || 'unnamed'}`}>
+              <TableRow key={`client-${item.id || item.name || index}`}>
                 <TableCell>{item.name || 'TODO: clients name'}</TableCell>
                 <TableCell>{item.status || 'TODO: Status'}</TableCell>
                 <TableCell>

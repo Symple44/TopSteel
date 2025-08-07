@@ -274,6 +274,8 @@ function ThemedSortableItem<T extends ReorderableItem>({
         onDragOver={(e) => onDragOver(e, item.id)}
         onDragLeave={onDragLeave}
         onDrop={(e) => onDrop(e, item.id)}
+        role="listitem"
+        aria-label={`Themed reorderable item ${item.id} at level ${level}`}
       >
         <div
           className="group rounded-lg relative overflow-hidden"
@@ -287,6 +289,14 @@ function ThemedSortableItem<T extends ReorderableItem>({
                 onDragStart={(e) => onDragStart(e, item)}
                 onDragEnd={onDragEnd}
                 className="flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none rounded-l-lg flex-shrink-0 transition-all duration-200"
+                role="button"
+                tabIndex={0}
+                aria-label={`Drag handle for themed item ${item.id}`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                  }
+                }}
                 style={styles.dragHandle(isHover, false)}
               >
                 <GripVertical className="h-4 w-4 transition-all duration-200" />
@@ -373,6 +383,14 @@ function ThemedSortableItem<T extends ReorderableItem>({
                 onDragEnd={onDragEnd}
                 className="flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none rounded-r-lg flex-shrink-0 transition-all duration-200"
                 style={styles.dragHandle(isHover, false)}
+                role="button"
+                tabIndex={0}
+                aria-label={`Right drag handle for themed item ${item.id}`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                  }
+                }}
               >
                 <GripVertical className="h-4 w-4 transition-all duration-200" />
               </div>

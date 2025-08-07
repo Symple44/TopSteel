@@ -384,14 +384,21 @@ export default function Dashboard() {
                 <div className="absolute inset-0 bg-grid-pattern opacity-5" />
                 <div className="flex items-end space-x-3 h-full relative z-10">
                   {[45, 65, 52, 78, 88, 67, 92, 85, 72, 68, 89, 95].map((height, i) => (
-                    <div
+                    <button
+                      type="button"
                       key={`chart-bar-month-${i}-h${height}`}
-                      className="rounded-t-lg transition-all duration-700 hover:scale-110 cursor-pointer"
+                      className="rounded-t-lg transition-all duration-700 hover:scale-110 cursor-pointer border-0 p-0"
                       style={{
                         height: `${height}%`,
                         width: '20px',
                         background: `linear-gradient(to top, hsl(${220 + i * 15}, 70%, ${50 + height * 0.3}%), hsl(${240 + i * 10}, 80%, ${60 + height * 0.2}%))`,
                       }}
+                      onClick={() => router.push(`/reports/monthly?month=${i + 1}`)}
+                      onKeyDown={(e) =>
+                        (e.key === 'Enter' || e.key === ' ') &&
+                        router.push(`/reports/monthly?month=${i + 1}`)
+                      }
+                      aria-label={`Voir les détails du mois ${i + 1}`}
                     />
                   ))}
                 </div>
@@ -462,7 +469,13 @@ export default function Dashboard() {
 
         {/* Actions rapides */}
         <div className="grid gap-6 md:grid-cols-3">
-          <Card className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative">
+          <button
+            type="button"
+            className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative rounded-lg p-0 w-full text-left"
+            onClick={() => router.push('/projects/new')}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push('/projects/new')}
+            aria-label={t('newProject')}
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="pb-3 relative z-10">
               <CardTitle className="text-base flex items-center text-slate-800 group-hover:text-emerald-600 transition-colors">
@@ -477,9 +490,17 @@ export default function Dashboard() {
                 {t('createNewProject')}
               </p>
             </CardContent>
-          </Card>
+          </button>
 
-          <Card className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative">
+          <button
+            type="button"
+            className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative rounded-lg p-0 w-full text-left"
+            onClick={() => router.push('/production/orders/new')}
+            onKeyDown={(e) =>
+              (e.key === 'Enter' || e.key === ' ') && router.push('/production/orders/new')
+            }
+            aria-label={t('productionOrder')}
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="pb-3 relative z-10">
               <CardTitle className="text-base flex items-center text-slate-800 group-hover:text-orange-600 transition-colors">
@@ -494,9 +515,15 @@ export default function Dashboard() {
                 {t('launchProductionOrder')}
               </p>
             </CardContent>
-          </Card>
+          </button>
 
-          <Card className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative">
+          <button
+            type="button"
+            className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative rounded-lg p-0 w-full text-left"
+            onClick={() => router.push('/quotes/new')}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && router.push('/quotes/new')}
+            aria-label={t('newQuote')}
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="pb-3 relative z-10">
               <CardTitle className="text-base flex items-center text-slate-800 group-hover:text-blue-600 transition-colors">
@@ -511,7 +538,7 @@ export default function Dashboard() {
                 {t('createQuoteForClient')}
               </p>
             </CardContent>
-          </Card>
+          </button>
         </div>
       </div>
     </div>

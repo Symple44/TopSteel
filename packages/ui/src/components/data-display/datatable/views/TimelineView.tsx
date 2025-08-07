@@ -82,6 +82,9 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
                     className="relative flex items-start gap-4 cursor-pointer hover:bg-muted/30 rounded-lg p-2 -ml-2 w-full text-left"
                     onClick={() => onItemClick?.(item)}
                     type="button"
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onItemClick?.(item)}
+                    tabIndex={0}
+                    aria-label={`View details for ${item.title}`}
                   >
                     {/* Point de timeline */}
                     <div className="relative z-10 flex-shrink-0">

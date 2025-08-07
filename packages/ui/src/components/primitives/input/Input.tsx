@@ -405,7 +405,14 @@ export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type
             title={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
           >
             {showPassword ? (
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                role="img"
+                aria-label="Masquer le mot de passe"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -414,7 +421,14 @@ export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type
                 />
               </svg>
             ) : (
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                role="img"
+                aria-label="Afficher le mot de passe"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

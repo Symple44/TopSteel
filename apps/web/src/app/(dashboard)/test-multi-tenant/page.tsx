@@ -24,12 +24,16 @@ import { callClientApi } from '@/utils/backend-api'
 
 export default function TestMultiTenantPage() {
   const [sqlQuery, setSqlQuery] = useState('SELECT * FROM clients LIMIT 10')
-  const [results, setResults] = useState<{ status: string; data?: any[]; error?: string } | null>(
-    null
-  )
+  const [results, setResults] = useState<{
+    status: string
+    data?: Record<string, unknown>[]
+    error?: string
+  } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [tables, setTables] = useState<{ name: string; columns?: any[] }[]>([])
+  const [tables, setTables] = useState<
+    { name: string; columns?: { name: string; type: string }[] }[]
+  >([])
   const [loadingColumns, setLoadingColumns] = useState<string | null>(null) // Table en cours de chargement des colonnes
 
   const testQueries = [

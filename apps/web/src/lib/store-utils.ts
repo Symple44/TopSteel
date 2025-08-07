@@ -106,7 +106,12 @@ export function createRobustStore<
       },
       partialize: (state: unknown) => {
         // Ne persister que les données importantes
-        const { loading, error, lastUpdate, ...persistedState } = state as Record<string, unknown>
+        const {
+          loading: _loading,
+          error: _error,
+          lastUpdate: _lastUpdate,
+          ...persistedState
+        } = state as Record<string, unknown>
 
         return persistedState
       },

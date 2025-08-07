@@ -426,7 +426,7 @@ export class APIClient {
 
     // Supprimer Content-Type pour les uploads
     if (uploadConfig.headers && 'Content-Type' in uploadConfig.headers) {
-      const { 'Content-Type': removed, ...restHeaders } = uploadConfig.headers
+      const { 'Content-Type': _removed, ...restHeaders } = uploadConfig.headers
       uploadConfig.headers = restHeaders
     }
 

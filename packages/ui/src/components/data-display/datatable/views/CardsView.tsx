@@ -39,6 +39,7 @@ export function CardsView({
       {cards.map((card) => (
         <button
           key={card.id}
+          type="button"
           className="bg-background border rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow w-full text-left"
           onClick={() => onCardClick?.(card)}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCardClick?.(card)}
@@ -68,7 +69,7 @@ export function CardsView({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={(e: any) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.stopPropagation()
                     }}
                   >

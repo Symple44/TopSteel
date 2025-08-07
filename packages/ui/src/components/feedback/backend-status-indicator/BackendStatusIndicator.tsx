@@ -113,6 +113,7 @@ export function BackendStatusIndicator({
 
       {showRetryButton && onRetry && (health.status === 'offline' || health.status === 'error') && (
         <button
+          type="button"
           onClick={handleRetry}
           className="text-xs px-2 py-1 bg-white rounded border hover:bg-gray-50"
         >

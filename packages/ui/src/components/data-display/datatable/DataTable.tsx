@@ -167,19 +167,23 @@ export function DataTable<T = any>({
   const [editingViewType, setEditingViewType] = useState<'cards' | 'timeline' | 'calendar'>('cards')
 
   // Utiliser les paramètres persistés si tableId est fourni
-  const persistedSettings = tableId
-    ? usePersistedTableSettings(tableId, initialColumns, userId)
-    : null
+  // Always call the hook, but pass null values when not needed
+  const persistedSettings = usePersistedTableSettings(
+    tableId || '',
+    tableId ? initialColumns : [],
+    tableId ? userId : undefined
+  )
+  const effectivePersistedSettings = tableId ? persistedSettings : null
 
   const [localSettings, setLocalSettings] = useState<TableSettings>(
-    initialSettings || persistedSettings?.settings || { columns: {} }
+    initialSettings || effectivePersistedSettings?.settings || { columns: {} }
   )
 
-  const settings = persistedSettings?.settings || localSettings
+  const settings = effectivePersistedSettings?.settings || localSettings
 
   const setSettings = (newSettings: TableSettings) => {
-    if (persistedSettings) {
-      persistedSettings.setSettings(newSettings)
+    if (effectivePersistedSettings) {
+      effectivePersistedSettings.setSettings(newSettings)
     } else {
       setLocalSettings(newSettings)
     }
@@ -1173,6 +1177,7 @@ export function DataTable<T = any>({
           >
             <div dangerouslySetInnerHTML={{ __html: sanitizedValue }} />
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation()
                 const rowIndex = dataWithFormulas.findIndex((r) => r === row)
@@ -1810,8 +1815,9 @@ export function DataTable<T = any>({
                             }
                             className="p-3"
                           >
-                            <div
-                              className="flex items-center gap-2 cursor-pointer hover:bg-muted/30 rounded p-1"
+                            <button
+                              type="button"
+                              className="flex items-center gap-2 cursor-pointer hover:bg-muted/30 rounded p-1 w-full text-left"
                               onClick={() => treeGrouping.toggleNodeExpansion(groupNode.id)}
                               style={{ paddingLeft: `${groupNode.level * 20}px` }}
                             >
@@ -1832,7 +1838,7 @@ export function DataTable<T = any>({
                                   )}{' '}
                                 éléments
                               </Badge>
-                            </div>
+                            </button>
                           </td>
                         </tr>
                       )
@@ -1870,9 +1876,27 @@ export function DataTable<T = any>({
                           setFocusedCell({ row: rowIndex, column: orderedColumns[0]?.id || '' })
                         }}
                         onDoubleClick={() => onRowDoubleClick?.(row)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            onRowClick?.(row)
+                            setFocusedCell({ row: rowIndex, column: orderedColumns[0]?.id || '' })
+                          }
+                        }}
+                        aria-label={`Select row ${rowIndex + 1}`}
                       >
                         {selectable && (
-                          <td className="p-2" onClick={(e) => e.stopPropagation()}>
+                          <td
+                            className="p-2"
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation()
+                              }
+                            }}
+                          >
                             <Checkbox
                               checked={selection.selectedRows.has((row as any)[keyField])}
                               onCheckedChange={(checked: any) => {
@@ -1895,6 +1919,7 @@ export function DataTable<T = any>({
                         )}
 
                         {orderedColumns.map((column, _columnIndex) => (
+                          // biome-ignore lint/a11y/noNoninteractiveTabindex: This td is highly interactive with click and keyboard handlers
                           <td
                             key={column.id}
                             className={cn(
@@ -1949,6 +1974,19 @@ export function DataTable<T = any>({
                                 setEditingCell({ row: rowIndex, column: column.id })
                               }
                             }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                const cellPosition = { row: rowIndex, column: column.id }
+                                setFocusedCell(cellPosition)
+                                rangeSelection.startSelection(cellPosition)
+
+                                if (editable && column.editable && e.key === 'Enter') {
+                                  setEditingCell({ row: rowIndex, column: column.id })
+                                }
+                              }
+                            }}
+                            tabIndex={0}
                             onMouseDown={(e) => {
                               const cellPosition = { row: rowIndex, column: column.id }
                               if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
@@ -1979,6 +2017,11 @@ export function DataTable<T = any>({
                             className="p-2 border-t"
                             onClick={(e) => {
                               e.stopPropagation()
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation()
+                              }
                             }}
                           >
                             <DropdownPortal

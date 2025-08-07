@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Charger les traductions directement depuis les imports
-    const translations: Record<string, any> = {
+    const translations: Record<string, Record<string, unknown>> = {
       fr,
       en,
       es,

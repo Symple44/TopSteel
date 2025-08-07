@@ -276,10 +276,11 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
                   const isAdded = columns.some((c) => c.alias === colId)
 
                   return (
-                    <div
+                    <button
                       key={colId}
+                      type="button"
                       className={cn(
-                        'flex items-center gap-2 p-2 rounded-md hover:bg-accent cursor-pointer',
+                        'flex items-center gap-2 p-2 rounded-md hover:bg-accent cursor-pointer w-full text-left',
                         isAdded && 'opacity-50 cursor-not-allowed'
                       )}
                       onClick={() => {
@@ -295,6 +296,7 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
                           })
                         }
                       }}
+                      disabled={isAdded}
                     >
                       <Checkbox checked={isSelected} disabled={isAdded} />
                       <div className="flex-1">
@@ -309,7 +311,7 @@ export function ColumnSelector({ selectedTables, columns, onColumnsChange }: Col
                           Added
                         </Badge>
                       )}
-                    </div>
+                    </button>
                   )
                 })}
               </div>

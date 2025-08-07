@@ -101,6 +101,7 @@ export function ReorderableListCustomizationPanel({
               <div className="grid grid-cols-1 gap-2">
                 {Object.values(defaultThemes).map((theme) => (
                   <button
+                    type="button"
                     key={theme.id}
                     onClick={() => handleThemeChange(theme.id)}
                     className={cn(

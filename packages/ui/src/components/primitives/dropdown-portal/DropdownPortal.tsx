@@ -267,6 +267,8 @@ export function DropdownPortal({
     createPortal(
       <div
         ref={contentRef}
+        role="menu"
+        tabIndex={-1}
         className={cn(
           'fixed z-[99999] min-w-[8rem] overflow-hidden rounded-md border shadow-lg',
           'bg-popover text-popover-foreground',
@@ -283,6 +285,12 @@ export function DropdownPortal({
           transition: 'opacity 150ms ease-in-out',
         }}
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.stopPropagation()
+            closeDropdown()
+          }
+        }}
       >
         {/* Context provider pour que les enfants puissent fermer le dropdown */}
         <DropdownContext.Provider value={{ closeDropdown }}>{children}</DropdownContext.Provider>

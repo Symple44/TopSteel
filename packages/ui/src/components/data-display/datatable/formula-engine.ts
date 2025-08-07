@@ -355,18 +355,22 @@ export class FormulaEngine<T = any> {
     const cellRefRegex = /([A-Z]+)(\d+)/g
     let match: RegExpExecArray | null
 
-    while ((match = cellRefRegex.exec(formula)) !== null) {
+    match = cellRefRegex.exec(formula)
+    while (match !== null) {
       dependencies.add(match[1])
+      match = cellRefRegex.exec(formula)
     }
 
     // Ajouter les plages de colonnes (A:Z)
     const rangeRegex = /([A-Z]+):([A-Z]+)/g
-    while ((match = rangeRegex.exec(formula)) !== null) {
+    match = rangeRegex.exec(formula)
+    while (match !== null) {
       const start = match[1]
       const end = match[2]
       // Ajouter toutes les colonnes dans la plage
       dependencies.add(start)
       dependencies.add(end)
+      match = rangeRegex.exec(formula)
     }
 
     return Array.from(dependencies)

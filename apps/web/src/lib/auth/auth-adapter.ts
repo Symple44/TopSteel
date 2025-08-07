@@ -8,8 +8,6 @@ import type {
 import type { MFAState as AuthMFAState, AuthTokens, User } from './auth-types'
 import type { Company, ExtendedUser, Permission, UserSocieteRole } from './rbac-types'
 
-type MFAMethod = 'totp' | 'sms' | 'email'
-
 /**
  * Adaptateur pour convertir les types existants vers les nouveaux types RBAC
  */

@@ -174,6 +174,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
               <div className="p-4 space-y-2">
                 {/* Toutes les notifications */}
                 <button
+                  type="button"
                   onClick={() => setSelectedCategory('all')}
                   className={cn(
                     'w-full flex items-center justify-between p-3 rounded-lg text-left hover:bg-white transition-colors',
@@ -200,6 +201,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
 
                   return (
                     <button
+                      type="button"
                       key={key}
                       onClick={() => setSelectedCategory(key)}
                       className={cn(
@@ -303,10 +305,11 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
               ) : (
                 <div className="p-4 space-y-2">
                   {filteredNotifications.map((notification) => (
-                    <div
+                    <button
                       key={notification.id}
+                      type="button"
                       className={cn(
-                        'group p-4 rounded-lg border hover:shadow-sm transition-all cursor-pointer',
+                        'group p-4 rounded-lg border hover:shadow-sm transition-all cursor-pointer w-full text-left',
                         !notification.isRead && 'bg-blue-50 border-blue-200'
                       )}
                       onClick={() => actions.markAsRead(notification.id)}
@@ -365,7 +368,7 @@ export function NotificationDashboard({ isOpen, onClose }: NotificationDashboard
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}

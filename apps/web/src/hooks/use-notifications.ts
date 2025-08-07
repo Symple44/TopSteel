@@ -5,9 +5,6 @@ import {
   useNotifications,
 } from '@/components/providers/notifications-provider'
 
-// Type temporaire si non exporté
-type CreateNotificationRequest = any
-
 // Ré-exporter le hook depuis le provider
 export { useNotifications }
 

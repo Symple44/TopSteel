@@ -1,0 +1,764 @@
+
+
+::warning title=lint/security/noDangerouslySetInnerHtml,file=apps\marketplace-storefront\src\components\page-builder\sections\TextBlockSection.tsx,line=51,endLine=51,col=11,endColumn=34::Avoid passing content using the dangerouslySetInnerHTML prop.
+::warning title=lint/security/noDangerouslySetInnerHtml,file=apps\marketplace-storefront\src\components\product\product-detail.tsx,line=383,endLine=383,col=21,endColumn=44::Avoid passing content using the dangerouslySetInnerHTML prop.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\app\(dashboard)\settings\menu\page.tsx,line=898,endLine=898,col=7,endColumn=29::mapMenuItemRecursively changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\app\(dashboard)\settings\menu\page.tsx,line=1301,endLine=1301,col=50,endColumn=63::resetItemEdit changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\app\(dashboard)\settings\menu\page.tsx,line=1301,endLine=1301,col=65,endColumn=77::saveItemEdit changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\app\(dashboard)\settings\security\page.tsx,line=124,endLine=124,col=7,endColumn=18::loadMFAData changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\menus\user-data-view\route.ts,line=39,endLine=39,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\menus\user-data-view\route.ts,line=36,endLine=36,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\system-parameters\by-category\route.ts,line=23,endLine=23,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\system-parameters\by-category\route.ts,line=47,endLine=47,col=63,endColumn=66::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\translations\route.ts,line=75,endLine=75,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\translations\route.ts,line=9,endLine=9,col=71,endColumn=74::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\translations\route.ts,line=128,endLine=128,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\translations\route.ts,line=187,endLine=187,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\admin\translations\route.ts,line=200,endLine=200,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\images\upload\route.ts,line=45,endLine=45,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\images\upload\route.ts,line=42,endLine=42,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\route.ts,line=91,endLine=91,col=59,endColumn=62::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\route.ts,line=105,endLine=105,col=70,endColumn=73::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\route.ts,line=13,endLine=13,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\route.ts,line=14,endLine=14,col=21,endColumn=24::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\route.ts,line=15,endLine=15,col=18,endColumn=21::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\route.ts,line=17,endLine=17,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\route.ts,line=17,endLine=17,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\route.ts,line=31,endLine=31,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=13,endLine=13,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=40,endLine=40,col=40,endColumn=43::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=40,endLine=40,col=70,endColumn=73::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=100,endLine=100,col=61,endColumn=64::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=100,endLine=100,col=68,endColumn=71::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=115,endLine=115,col=67,endColumn=70::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=122,endLine=122,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=124,endLine=124,col=21,endColumn=24::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=170,endLine=170,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=295,endLine=295,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=6,endLine=6,col=17,endColumn=20::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=7,endLine=7,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\[id]\test\route.ts,line=8,endLine=8,col=49,endColumn=52::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\notifications\rules\route.ts,line=18,endLine=18,col=12,endColumn=15::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\query-builder\schema\tables-dev\[tableName]\columns\route.ts,line=65,endLine=65,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\search\images\route.ts,line=15,endLine=15,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\search\images\route.ts,line=24,endLine=24,col=46,endColumn=49::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\search\images\route.ts,line=25,endLine=25,col=52,endColumn=55::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\search\images\route.ts,line=59,endLine=59,col=57,endColumn=60::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\translations\overrides\route.ts,line=10,endLine=10,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\user\menu-preferences\available-pages\route.ts,line=21,endLine=21,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\user\menu-preferences\available-pages\route.ts,line=28,endLine=28,col=43,endColumn=46::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\user\menu-preferences\selected-pages\route.ts,line=32,endLine=32,col=18,endColumn=21::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\user\menu-preferences\selected-pages\route.ts,line=31,endLine=31,col=21,endColumn=24::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\user\menu\filtered\route.ts,line=56,endLine=56,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\app\api\users\appearance\me\route.ts,line=32,endLine=32,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/security/noDangerouslySetInnerHtml,file=apps\web\src\components\admin\TranslationCellComponents.tsx,line=79,endLine=79,col=9,endColumn=32::Avoid passing content using the dangerouslySetInnerHTML prop.
+::warning title=lint/suspicious/noArrayIndexKey,file=apps\web\src\components\admin\bulk-operations-history.tsx,line=158,endLine=158,col=45,endColumn=46::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\bulk-operations-history.tsx,line=47,endLine=47,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\admin\bulk-profile-management.tsx,line=222,endLine=222,col=27,endColumn=36::loadRoles changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\bulk-profile-management.tsx,line=267,endLine=267,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\admin\bulk-profile-management.tsx,line=222,endLine=222,col=15,endColumn=25::loadGroups changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\admin\bulk-profile-management.tsx,line=222,endLine=222,col=38,endColumn=47::loadUsers changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/performance/noImgElement,file=apps\web\src\components\admin\company-settings.tsx,line=133,endLine=133,col=13,endColumn=55::Don't use <img> element.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\database-monitoring-card.tsx,line=138,endLine=138,col=68,endColumn=71::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\admin\elasticsearch-admin.tsx,line=280,endLine=280,col=7,endColumn=18::fetchConfig changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\elasticsearch-admin.tsx,line=122,endLine=122,col=52,endColumn=55::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\elasticsearch-admin.tsx,line=122,endLine=122,col=64,endColumn=67::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\elasticsearch-admin.tsx,line=350,endLine=350,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\admin\elasticsearch-admin.tsx,line=280,endLine=280,col=20,endColumn=31::fetchStatus changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\migration-status-card.tsx,line=143,endLine=143,col=58,endColumn=61::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\role-management-panel.tsx,line=461,endLine=461,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\system-alerts-panel.tsx,line=212,endLine=212,col=72,endColumn=75::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\admin\translation-admin.tsx,line=155,endLine=155,col=41,endColumn=44::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\auth\AuthProvider-simple.tsx,line=30,endLine=30,col=3,endColumn=14::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\auth\AuthProvider-simple.tsx,line=29,endLine=29,col=3,endColumn=22::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\admin-guard.tsx,line=49,endLine=49,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\admin-guard.tsx,line=104,endLine=104,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\company-selector.tsx,line=105,endLine=105,col=44,endColumn=47::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\company-selector.tsx,line=112,endLine=112,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\company-selector.tsx,line=130,endLine=130,col=41,endColumn=44::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\company-selector.tsx,line=411,endLine=411,col=11,endColumn=14::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\company-selector.tsx,line=448,endLine=448,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\auth\company-selector.tsx,line=424,endLine=424,col=3,endColumn=20::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\mfa-verification.tsx,line=38,endLine=38,col=15,endColumn=18::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\mfa-verification.tsx,line=111,endLine=111,col=55,endColumn=58::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\components\auth\mfa-verification.tsx,line=158,endLine=158,col=21,endColumn=88::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\mfa-verification.tsx,line=174,endLine=174,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\auth\mfa-verification.tsx,line=108,endLine=108,col=5,endColumn=23::%0A    // Initiate MFA session when method changes%0A    initiateMFASession changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\permission-guard.tsx,line=59,endLine=59,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\permission-guard.tsx,line=85,endLine=85,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\permission-guard.tsx,line=87,endLine=87,col=55,endColumn=58::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\permission-guard.tsx,line=89,endLine=89,col=16,endColumn=19::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\auth\permission-guard.tsx,line=217,endLine=217,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\facturation\devis-filters.tsx,line=21,endLine=21,col=32,endColumn=47::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\facturation\factures-filters.tsx,line=20,endLine=20,col=35,endColumn=50::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\layout\dashboard-content.tsx,line=15,endLine=15,col=12,endColumn=15::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\layout\header.tsx,line=20,endLine=20,col=3,endColumn=18::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\layout\header.tsx,line=21,endLine=21,col=3,endColumn=21::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\layout\sidebar.tsx,line=129,endLine=129,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\layout\sidebar.tsx,line=210,endLine=210,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\condition-builder.tsx,line=396,endLine=396,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\condition-builder.tsx,line=195,endLine=195,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\condition-builder.tsx,line=356,endLine=356,col=71,endColumn=74::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\notification-dashboard-v2.tsx,line=202,endLine=202,col=72,endColumn=75::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\notification-rules-panel.tsx,line=567,endLine=567,col=75,endColumn=78::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\notification-rules-panel.tsx,line=631,endLine=631,col=80,endColumn=83::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\notification-rules-panel.tsx,line=650,endLine=650,col=72,endColumn=75::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\notification-settings.tsx,line=266,endLine=266,col=55,endColumn=58::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\rule-test-dialog.tsx,line=31,endLine=31,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\rule-test-dialog.tsx,line=33,endLine=33,col=40,endColumn=43::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\rule-test-dialog.tsx,line=57,endLine=57,col=48,endColumn=51::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\notifications\rule-test-dialog.tsx,line=280,endLine=280,col=61,endColumn=64::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\production\ordre-operations-tab.tsx,line=29,endLine=29,col=38,endColumn=43::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\production\ordre-qualite-tab.tsx,line=25,endLine=25,col=35,endColumn=40::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\production\planning-gantt.tsx,line=34,endLine=34,col=53,endColumn=65::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\production\production-table.tsx,line=61,endLine=61,col=59,endColumn=73::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\projets\projet-documents-tab.tsx,line=81,endLine=81,col=38,endColumn=44::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\projets\projet-documents-tab.tsx,line=81,endLine=81,col=46,endColumn=54::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\projets\projet-production-tab.tsx,line=258,endLine=258,col=39,endColumn=45::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\providers\notifications-provider.tsx,line=73,endLine=73,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\providers\notifications-provider.tsx,line=320,endLine=320,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\providers\notifications-provider.tsx,line=328,endLine=328,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=suppressions/unused,file=apps\web\src\components\providers\notifications-provider.tsx,line=198,endLine=198,col=3,endColumn=124::Suppression comment has no effect. Remove the suppression or make sure you are suppressing the correct rule.
+::warning title=suppressions/unused,file=apps\web\src\components\providers\notifications-provider.tsx,line=207,endLine=207,col=3,endColumn=124::Suppression comment has no effect. Remove the suppression or make sure you are suppressing the correct rule.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\providers\theme-provider.tsx,line=288,endLine=288,col=3,endColumn=20::This parameter is unused.
+::warning title=lint/suspicious/noConsole,file=apps\web\src\components\providers\translation-override-provider.tsx,line=43,endLine=43,col=43,endColumn=56::Don't use console.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\add-to-menu-button.tsx,line=73,endLine=73,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\add-to-menu-button.tsx,line=90,endLine=90,col=21,endColumn=24::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\calculated-fields-editor.tsx,line=30,endLine=30,col=12,endColumn=15::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\calculated-fields-editor.tsx,line=36,endLine=36,col=12,endColumn=15::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\query-builder\column-selector.tsx,line=165,endLine=165,col=23,endColumn=44::fetchColumnsForTables changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\column-selector.tsx,line=54,endLine=54,col=4,endColumn=7::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\column-selector.tsx,line=135,endLine=135,col=60,endColumn=63::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=80,endLine=80,col=40,endColumn=43::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=22,endLine=22,col=9,endColumn=12::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=23,endLine=23,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=57,endLine=57,col=3,endColumn=9::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=89,endLine=89,col=25,endColumn=28::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=82,endLine=82,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=62,endLine=62,col=53,endColumn=56::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=77,endLine=77,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=24,endLine=24,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=25,endLine=25,col=12,endColumn=15::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=26,endLine=26,col=14,endColumn=17::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\datatable-preview.tsx,line=30,endLine=30,col=59,endColumn=62::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\import-dialog.tsx,line=18,endLine=18,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-builder-interface.tsx,line=164,endLine=164,col=41,endColumn=44::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-builder-interface.tsx,line=20,endLine=20,col=17,endColumn=20::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-builder-interface.tsx,line=158,endLine=158,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-builder-interface.tsx,line=293,endLine=293,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-builder-interface.tsx,line=294,endLine=294,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-builder-interface.tsx,line=307,endLine=307,col=60,endColumn=63::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\query-builder\query-builder-interface.tsx,line=71,endLine=71,col=7,endColumn=27::fetchAvailableTables changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-preview.tsx,line=16,endLine=16,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-preview.tsx,line=23,endLine=23,col=52,endColumn=55::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-preview.tsx,line=30,endLine=30,col=23,endColumn=26::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-preview.tsx,line=31,endLine=31,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-preview.tsx,line=34,endLine=34,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-preview.tsx,line=46,endLine=46,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-preview.tsx,line=68,endLine=68,col=56,endColumn=59::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-preview.tsx,line=7,endLine=7,col=17,endColumn=20::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-settings.tsx,line=22,endLine=22,col=52,endColumn=55::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-settings.tsx,line=227,endLine=227,col=55,endColumn=58::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-settings.tsx,line=17,endLine=17,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\query-settings.tsx,line=18,endLine=18,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=21,endLine=21,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=24,endLine=24,col=10,endColumn=13::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=25,endLine=25,col=12,endColumn=15::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=27,endLine=27,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=29,endLine=29,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=50,endLine=50,col=11,endColumn=14::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=51,endLine=51,col=23,endColumn=26::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=58,endLine=58,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\table-selector.tsx,line=438,endLine=438,col=73,endColumn=76::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\query-builder\table-selector.tsx,line=92,endLine=92,col=26,endColumn=41::getTableColumns changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\query-builder\table-selector.tsx,line=101,endLine=101,col=24,endColumn=39::getTableColumns changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\query-builder\visual-query-builder.tsx,line=112,endLine=112,col=33,endColumn=48::loadInitialData changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\visual-query-builder.tsx,line=66,endLine=66,col=17,endColumn=20::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\query-builder\visual-query-builder.tsx,line=78,endLine=78,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\query-builder\visual-query-builder.tsx,line=112,endLine=112,col=7,endColumn=18::fetchTables changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\components\query-builder\visual-query-builder.tsx,line=295,endLine=295,col=24,endColumn=35::generateSQL changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\settings\template-selector.tsx,line=107,endLine=107,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\settings\template-selector.tsx,line=318,endLine=318,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\settings\template-selector.tsx,line=329,endLine=329,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=50,endLine=50,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=52,endLine=52,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=54,endLine=54,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=56,endLine=56,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=58,endLine=58,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=67,endLine=67,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=69,endLine=69,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=71,endLine=71,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=73,endLine=73,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/suspicious/noTemplateCurlyInString,file=apps\web\src\components\stocks\chutes-table.tsx,line=75,endLine=75,col=34,endColumn=48::Unexpected template string placeholder.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=apps\web\src\components\stocks\mouvements-table.tsx,line=35,endLine=35,col=3,endColumn=11::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\wrappers\translation-field-wrapper.tsx,line=8,endLine=8,col=10,endColumn=13::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\wrappers\translation-field-wrapper.tsx,line=9,endLine=9,col=21,endColumn=24::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\components\wrappers\translation-field-wrapper.tsx,line=10,endLine=10,col=40,endColumn=43::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-appearance-settings.ts,line=454,endLine=454,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=53,endLine=53,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=53,endLine=53,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=68,endLine=68,col=61,endColumn=64::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=69,endLine=69,col=78,endColumn=81::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=84,endLine=84,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=84,endLine=84,col=54,endColumn=57::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=96,endLine=96,col=41,endColumn=44::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=108,endLine=108,col=46,endColumn=49::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=17,endLine=17,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=45,endLine=45,col=68,endColumn=71::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-datatable.ts,line=50,endLine=50,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-debounced-value.ts,line=34,endLine=34,col=58,endColumn=61::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-debounced-value.ts,line=34,endLine=34,col=68,endColumn=71::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=10,endLine=10,col=45,endColumn=48::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=28,endLine=28,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=97,endLine=97,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=97,endLine=97,col=75,endColumn=78::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=99,endLine=99,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=99,endLine=99,col=68,endColumn=71::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=127,endLine=127,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=127,endLine=127,col=59,endColumn=62::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=129,endLine=129,col=54,endColumn=57::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=130,endLine=130,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=133,endLine=133,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=242,endLine=242,col=69,endColumn=72::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-dynamic-menu.ts,line=327,endLine=327,col=65,endColumn=68::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-image-upload.ts,line=6,endLine=6,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-notification-settings.ts,line=37,endLine=37,col=59,endColumn=62::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-notification-settings.ts,line=38,endLine=38,col=83,endColumn=86::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-notification-settings.ts,line=125,endLine=125,col=78,endColumn=81::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-notification-settings.ts,line=131,endLine=131,col=64,endColumn=67::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-notification-settings.ts,line=135,endLine=135,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\hooks\use-optimized-component.ts,line=45,endLine=45,col=32,endColumn=36::This dependencies list is not an array literal.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\hooks\use-optimized-component.ts,line=51,endLine=51,col=27,endColumn=31::This dependencies list is not an array literal.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-sync-notifications.ts,line=33,endLine=33,col=49,endColumn=52::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-system-parameters.ts,line=37,endLine=37,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-system-parameters.ts,line=86,endLine=86,col=23,endColumn=26::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-system-parameters.ts,line=87,endLine=87,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-tab-sync.ts,line=86,endLine=86,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-tab-sync.ts,line=9,endLine=9,col=10,endColumn=13::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-tab-sync.ts,line=76,endLine=76,col=15,endColumn=18::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-tab-sync.ts,line=75,endLine=75,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-tab-sync.ts,line=74,endLine=74,col=11,endColumn=14::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-tab-sync.ts,line=69,endLine=69,col=49,endColumn=52::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-tab-sync.ts,line=69,endLine=69,col=60,endColumn=63::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-tab-sync.ts,line=69,endLine=69,col=73,endColumn=76::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-user-menu-preferences.ts,line=35,endLine=35,col=11,endColumn=14::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\hooks\use-user-menu-preferences.ts,line=287,endLine=287,col=60,endColumn=63::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noDocumentCookie,file=apps\web\src\lib\api-client-enhanced.ts,line=59,endLine=59,col=5,endColumn=85::Direct assigning to document.cookie is not recommended.
+::warning title=lint/suspicious/noDocumentCookie,file=apps\web\src\lib\api-client-enhanced.ts,line=60,endLine=60,col=5,endColumn=86::Direct assigning to document.cookie is not recommended.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth-helper.ts,line=9,endLine=9,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noStaticOnlyClass,file=apps\web\src\lib\auth-helper.ts,line=13,endLine=29,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth-server.ts,line=9,endLine=9,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth-server.ts,line=21,endLine=21,col=69,endColumn=72::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-adapter.ts,line=160,endLine=160,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-adapter.ts,line=140,endLine=140,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-adapter.ts,line=143,endLine=143,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noStaticOnlyClass,file=apps\web\src\lib\auth\auth-adapter.ts,line=14,endLine=310,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-adapter.ts,line=18,endLine=18,col=71,endColumn=74::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=145,endLine=145,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=146,endLine=146,col=67,endColumn=70::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=151,endLine=151,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=152,endLine=152,col=57,endColumn=60::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=238,endLine=238,col=83,endColumn=86::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=268,endLine=268,col=18,endColumn=29::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=275,endLine=275,col=74,endColumn=77::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=277,endLine=277,col=71,endColumn=74::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=304,endLine=304,col=74,endColumn=77::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=306,endLine=306,col=97,endColumn=100::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=307,endLine=307,col=96,endColumn=99::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=365,endLine=365,col=63,endColumn=66::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=374,endLine=374,col=11,endColumn=32::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=381,endLine=381,col=68,endColumn=71::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=383,endLine=383,col=65,endColumn=68::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=422,endLine=422,col=72,endColumn=75::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=424,endLine=424,col=69,endColumn=72::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider-fix.tsx,line=425,endLine=425,col=75,endColumn=78::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=388,endLine=388,col=68,endColumn=71::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=278,endLine=278,col=74,endColumn=77::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=280,endLine=280,col=71,endColumn=74::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=304,endLine=304,col=49,endColumn=52::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=305,endLine=305,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=306,endLine=306,col=52,endColumn=55::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=310,endLine=310,col=97,endColumn=100::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=311,endLine=311,col=96,endColumn=99::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=372,endLine=372,col=63,endColumn=66::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\lib\auth\auth-provider.tsx,line=381,endLine=381,col=11,endColumn=32::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=390,endLine=390,col=65,endColumn=68::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=429,endLine=429,col=72,endColumn=75::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=431,endLine=431,col=69,endColumn=72::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=432,endLine=432,col=75,endColumn=78::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=241,endLine=241,col=83,endColumn=86::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=145,endLine=145,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=147,endLine=147,col=21,endColumn=24::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=148,endLine=148,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=148,endLine=148,col=56,endColumn=59::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=154,endLine=154,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-provider.tsx,line=155,endLine=155,col=57,endColumn=60::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\lib\auth\auth-provider.tsx,line=271,endLine=271,col=18,endColumn=29::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-storage.ts,line=136,endLine=136,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noDocumentCookie,file=apps\web\src\lib\auth\auth-storage.ts,line=44,endLine=44,col=9,endColumn=152::Direct assigning to document.cookie is not recommended.
+::warning title=lint/suspicious/noDocumentCookie,file=apps\web\src\lib\auth\auth-storage.ts,line=103,endLine=103,col=7,endColumn=86::Direct assigning to document.cookie is not recommended.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-types.ts,line=126,endLine=126,col=9,endColumn=12::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\auth-types.ts,line=73,endLine=73,col=66,endColumn=69::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noStaticOnlyClass,file=apps\web\src\lib\auth\rbac-api.ts,line=8,endLine=375,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\rbac-api.ts,line=331,endLine=331,col=63,endColumn=66::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\lib\auth\rbac-hooks.ts,line=138,endLine=138,col=9,endColumn=34::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\rbac-hooks.ts,line=23,endLine=23,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\rbac-service.ts,line=237,endLine=237,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\lib\auth\rbac-service.ts,line=31,endLine=31,col=14,endColumn=49::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\rbac-service.ts,line=170,endLine=170,col=63,endColumn=66::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\rbac-types.ts,line=156,endLine=156,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\rbac-types.ts,line=115,endLine=115,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\auth\rbac-types.ts,line=145,endLine=145,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=2,endLine=2,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=3,endLine=3,col=25,endColumn=28::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=45,endLine=45,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=50,endLine=50,col=54,endColumn=57::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=58,endLine=58,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=103,endLine=103,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=115,endLine=115,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=115,endLine=115,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=203,endLine=203,col=7,endColumn=10::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noStaticOnlyClass,file=apps\web\src\lib\i18n\translation-utils.ts,line=225,endLine=675,col=1,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=226,endLine=226,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=248,endLine=248,col=53,endColumn=56::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=469,endLine=469,col=45,endColumn=48::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=652,endLine=652,col=65,endColumn=68::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=658,endLine=658,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=662,endLine=662,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=769,endLine=769,col=21,endColumn=24::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translation-utils.ts,line=778,endLine=778,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\lib\i18n\translation-utils.ts,line=800,endLine=800,col=28,endColumn=47::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\translator.ts,line=127,endLine=127,col=16,endColumn=19::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\i18n\types.ts,line=36,endLine=36,col=56,endColumn=59::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\menu-storage.ts,line=12,endLine=12,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\menu-storage.ts,line=100,endLine=100,col=41,endColumn=44::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\menu-storage.ts,line=105,endLine=105,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=apps\web\src\lib\ssr-utils.ts,line=276,endLine=276,col=5,endColumn=94::This dependencies list is not an array literal.
+::warning title=suppressions/unused,file=apps\web\src\lib\ssr-utils.ts,line=265,endLine=265,col=3,endColumn=112::Suppression comment has no effect. Remove the suppression or make sure you are suppressing the correct rule.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\sync-checker.ts,line=8,endLine=8,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\sync-checker.ts,line=60,endLine=60,col=79,endColumn=82::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\sync-checker.ts,line=60,endLine=60,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\lib\tab-detection.ts,line=93,endLine=93,col=26,endColumn=59::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\telemetry.ts,line=7,endLine=7,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\telemetry.ts,line=8,endLine=8,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\telemetry.ts,line=13,endLine=13,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\telemetry.ts,line=30,endLine=30,col=53,endColumn=56::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\telemetry.ts,line=30,endLine=30,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\telemetry.ts,line=51,endLine=51,col=44,endColumn=47::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\lib\telemetry.ts,line=6,endLine=6,col=23,endColumn=26::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\middleware.ts,line=147,endLine=147,col=44,endColumn=47::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\middleware.ts,line=153,endLine=153,col=70,endColumn=73::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\middleware.ts,line=258,endLine=258,col=48,endColumn=56::Forbidden non-null assertion.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\middleware.ts,line=262,endLine=262,col=56,endColumn=64::Forbidden non-null assertion.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\middleware.ts,line=269,endLine=269,col=46,endColumn=54::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\services\auth-service.ts,line=17,endLine=17,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\services\auth-service.ts,line=27,endLine=27,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\services\auth-service.ts,line=121,endLine=121,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noDocumentCookie,file=apps\web\src\services\auth-service.ts,line=50,endLine=50,col=7,endColumn=81::Direct assigning to document.cookie is not recommended.
+::warning title=lint/suspicious/noDocumentCookie,file=apps\web\src\services\auth-service.ts,line=57,endLine=57,col=7,endColumn=81::Direct assigning to document.cookie is not recommended.
+::warning title=lint/style/noNonNullAssertion,file=apps\web\src\services\page-discovery.service.ts,line=322,endLine=322,col=24,endColumn=52::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\stores\projet.store.ts,line=372,endLine=372,col=40,endColumn=43::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=apps\web\src\stores\projet.store.ts,line=398,endLine=398,col=15,endColumn=18::Unexpected any. Specify a different type.
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1572,endLine=1572,col=1,endColumn=28::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=610,endLine=610,col=1,endColumn=42::Descending specificity selector found. This selector specificity is (0, 1, 1)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=661,endLine=661,col=1,endColumn=32::Descending specificity selector found. This selector specificity is (0, 2, 1)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=673,endLine=673,col=1,endColumn=36::Descending specificity selector found. This selector specificity is (0, 2, 1)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=901,endLine=901,col=1,endColumn=48::Descending specificity selector found. This selector specificity is (0, 2, 1)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=902,endLine=902,col=1,endColumn=48::Descending specificity selector found. This selector specificity is (0, 2, 1)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=903,endLine=903,col=1,endColumn=49::Descending specificity selector found. This selector specificity is (0, 2, 1)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=938,endLine=938,col=1,endColumn=42::Descending specificity selector found. This selector specificity is (0, 1, 1)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1329,endLine=1329,col=1,endColumn=17::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1334,endLine=1334,col=1,endColumn=23::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1344,endLine=1344,col=1,endColumn=11::Descending specificity selector found. This selector specificity is (0, 0, 2)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1390,endLine=1390,col=1,endColumn=7::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1407,endLine=1407,col=1,endColumn=19::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1498,endLine=1498,col=1,endColumn=16::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1502,endLine=1502,col=1,endColumn=16::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1511,endLine=1511,col=1,endColumn=15::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1517,endLine=1517,col=1,endColumn=22::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1523,endLine=1523,col=1,endColumn=22::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1538,endLine=1538,col=1,endColumn=30::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1539,endLine=1539,col=1,endColumn=30::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1559,endLine=1559,col=1,endColumn=12::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1571,endLine=1571,col=1,endColumn=28::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1587,endLine=1587,col=1,endColumn=14::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1598,endLine=1598,col=1,endColumn=30::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1599,endLine=1599,col=1,endColumn=30::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1614,endLine=1614,col=1,endColumn=13::Descending specificity selector found. This selector specificity is (0, 1, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1625,endLine=1625,col=1,endColumn=29::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/style/noDescendingSpecificity,file=apps\web\src\styles\globals.css,line=1626,endLine=1626,col=1,endColumn=29::Descending specificity selector found. This selector specificity is (0, 2, 0)
+::warning title=lint/suspicious/noConsole,file=apps\web\src\test\setup.ts,line=70,endLine=70,col=23,endColumn=36::Don't use console.
+::warning title=lint/style/noNonNullAssertion,file=packages\config\src\index.ts,line=74,endLine=74,col=15,endColumn=30::Forbidden non-null assertion.
+::warning title=lint/style/noNonNullAssertion,file=packages\config\src\index.ts,line=76,endLine=76,col=22,endColumn=45::Forbidden non-null assertion.
+::warning title=lint/complexity/noStaticOnlyClass,file=packages\domains\src\core\client\domain\services.ts,line=11,endLine=110,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/suspicious/noExplicitAny,file=packages\erp-entities\src\base\business-entity.ts,line=10,endLine=10,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\erp-entities\src\companies\societe.entity.ts,line=127,endLine=127,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\erp-entities\src\companies\societe.entity.ts,line=102,endLine=102,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\erp-entities\src\companies\societe.entity.ts,line=121,endLine=121,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\erp-entities\src\inventory\article.entity.ts,line=216,endLine=216,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\__tests__\types.test.ts,line=10,endLine=10,col=23,endColumn=26::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\core\base.ts,line=58,endLine=58,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\core\utilities.ts,line=50,endLine=50,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\core\utilities.ts,line=55,endLine=55,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\core\utilities.ts,line=55,endLine=55,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\core\utilities.ts,line=60,endLine=60,col=49,endColumn=52::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noBannedTypes,file=packages\types\src\core\utilities.ts,line=60,endLine=60,col=29,endColumn=31::Don't use '{}' as a type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\cross-cutting\audit.ts,line=55,endLine=55,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\cross-cutting\audit.ts,line=69,endLine=69,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\cross-cutting\audit.ts,line=70,endLine=70,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\cross-cutting\notifications.ts,line=119,endLine=119,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\cross-cutting\notifications.ts,line=67,endLine=67,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\cross-cutting\permissions.ts,line=125,endLine=125,col=10,endColumn=13::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\cross-cutting\permissions.ts,line=103,endLine=103,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\cross-cutting\permissions.ts,line=92,endLine=92,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\api\filters.ts,line=27,endLine=27,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\api\filters.ts,line=76,endLine=76,col=43,endColumn=46::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\api\requests.ts,line=50,endLine=50,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\api\responses.ts,line=43,endLine=43,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\stores\app.ts,line=52,endLine=52,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\stores\app.ts,line=53,endLine=53,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\stores\app.ts,line=54,endLine=54,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\stores\app.ts,line=141,endLine=141,col=67,endColumn=70::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\stores\app.ts,line=153,endLine=153,col=53,endColumn=56::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noBannedTypes,file=packages\types\src\infrastructure\stores\base.ts,line=43,endLine=43,col=68,endColumn=70::Don't use '{}' as a type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\stores\entities.ts,line=165,endLine=165,col=23,endColumn=26::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\infrastructure\stores\entities.ts,line=165,endLine=165,col=15,endColumn=18::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\ui\forms.ts,line=12,endLine=12,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\ui\tables.ts,line=2,endLine=2,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\ui\tables.ts,line=8,endLine=8,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\types\src\ui\tables.ts,line=11,endLine=11,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\business\image-upload\ImageUpload.tsx,line=13,endLine=13,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\data-table\DataTable.tsx,line=8,endLine=8,col=18,endColumn=21::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\data-table\DataTable.tsx,line=8,endLine=8,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\data-table\DataTable.tsx,line=13,endLine=13,col=10,endColumn=13::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\data-table\DataTable.tsx,line=71,endLine=71,col=48,endColumn=53::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\AdvancedFilters.tsx,line=45,endLine=45,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\AdvancedFilters.tsx,line=34,endLine=34,col=10,endColumn=13::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\AdvancedFilters.tsx,line=35,endLine=35,col=12,endColumn=15::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\AdvancedFilters.tsx,line=246,endLine=246,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\AdvancedFilters.tsx,line=254,endLine=254,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\AdvancedFilters.tsx,line=268,endLine=268,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\AdvancedFilters.tsx,line=275,endLine=275,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\AdvancedFilters.tsx,line=286,endLine=286,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\ColorRuleManager.tsx,line=306,endLine=306,col=28,endColumn=33::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColorRuleManager.tsx,line=27,endLine=27,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColorRuleManager.tsx,line=56,endLine=56,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColorRuleManager.tsx,line=230,endLine=230,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColorRuleManager.tsx,line=256,endLine=256,col=44,endColumn=47::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColorRuleManager.tsx,line=274,endLine=274,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColorRuleManager.tsx,line=286,endLine=286,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColorRuleManager.tsx,line=333,endLine=333,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=23,endLine=23,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=633,endLine=633,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=11,endLine=11,col=41,endColumn=44::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=17,endLine=17,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=21,endLine=21,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=26,endLine=26,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=83,endLine=83,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=116,endLine=116,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=159,endLine=159,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=353,endLine=353,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=405,endLine=405,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=417,endLine=417,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=455,endLine=455,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=456,endLine=456,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=467,endLine=467,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=478,endLine=478,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=498,endLine=498,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=553,endLine=553,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=556,endLine=556,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=567,endLine=567,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=570,endLine=570,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=591,endLine=591,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=594,endLine=594,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=604,endLine=604,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=607,endLine=607,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=621,endLine=621,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterAdvanced.tsx,line=429,endLine=429,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterDropdown.tsx,line=8,endLine=8,col=41,endColumn=44::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterDropdown.tsx,line=27,endLine=27,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterDropdown.tsx,line=47,endLine=47,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterDropdownSimple.tsx,line=8,endLine=8,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\datatable\ColumnFilterDropdownSimple.tsx,line=23,endLine=23,col=3,endColumn=7::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\datatable\ColumnFilterDropdownSimple.tsx,line=27,endLine=27,col=3,endColumn=11::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ColumnFilterDropdownSimple.tsx,line=21,endLine=21,col=48,endColumn=51::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1027,endLine=1027,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=2261,endLine=2261,col=34,endColumn=43::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=89,endLine=89,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=94,endLine=94,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=162,endLine=162,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=166,endLine=166,col=64,endColumn=67::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=326,endLine=326,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=326,endLine=326,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=391,endLine=391,col=68,endColumn=71::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=431,endLine=431,col=21,endColumn=24::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=448,endLine=448,col=78,endColumn=81::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=472,endLine=472,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=473,endLine=473,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=suppressions/unused,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1922,endLine=1922,col=27,endColumn=141::Suppression comment has no effect. Remove the suppression or make sure you are suppressing the correct rule.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=534,endLine=534,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=699,endLine=699,col=52,endColumn=55::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=748,endLine=748,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=844,endLine=844,col=73,endColumn=76::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=986,endLine=986,col=63,endColumn=66::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=989,endLine=989,col=51,endColumn=54::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=995,endLine=995,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=998,endLine=998,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=998,endLine=998,col=74,endColumn=77::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1018,endLine=1018,col=12,endColumn=15::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1030,endLine=1030,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1030,endLine=1030,col=74,endColumn=77::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1070,endLine=1070,col=13,endColumn=16::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1420,endLine=1420,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1456,endLine=1456,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1499,endLine=1499,col=80,endColumn=83::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1695,endLine=1695,col=52,endColumn=55::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1698,endLine=1698,col=79,endColumn=82::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1764,endLine=1764,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1854,endLine=1854,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1857,endLine=1857,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1901,endLine=1901,col=75,endColumn=78::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1902,endLine=1902,col=58,endColumn=61::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1905,endLine=1905,col=59,endColumn=62::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1907,endLine=1907,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=2007,endLine=2007,col=80,endColumn=83::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=2193,endLine=2193,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=2238,endLine=2238,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=102,endLine=102,col=3,endColumn=13::This parameter is unused.
+::warning title=lint/correctness/useExhaustiveDependencies,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=507,endLine=507,col=5,endColumn=24::%0A    applyAdvancedFilter changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=508,endLine=508,col=5,endColumn=16::%0A    applyFilter changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=740,endLine=740,col=16,endColumn=27::setSettings changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/security/noDangerouslySetInnerHtml,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1178,endLine=1178,col=18,endColumn=41::Avoid passing content using the dangerouslySetInnerHTML prop.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=2251,endLine=2251,col=32,endColumn=37::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=2259,endLine=2259,col=30,endColumn=38::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=528,endLine=528,col=51,endColumn=54::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\DataTableExample.tsx,line=258,endLine=258,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\DataTableExample.tsx,line=205,endLine=205,col=26,endColumn=31::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\DataTableSkeleton.tsx,line=37,endLine=37,col=41,endColumn=49::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\DataTableSkeleton.tsx,line=48,endLine=48,col=37,endColumn=45::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\DataTableSkeleton.tsx,line=51,endLine=51,col=51,endColumn=59::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=25,endLine=25,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=209,endLine=209,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=231,endLine=231,col=46,endColumn=49::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=242,endLine=242,col=46,endColumn=49::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=253,endLine=253,col=46,endColumn=49::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=274,endLine=274,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=285,endLine=285,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=296,endLine=296,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=307,endLine=307,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ExportDialog.tsx,line=318,endLine=318,col=50,endColumn=53::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\FormulaEditor.tsx,line=23,endLine=23,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\FormulaEditor.tsx,line=235,endLine=235,col=91,endColumn=94::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\FormulaEditor.tsx,line=264,endLine=264,col=49,endColumn=52::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\FormulaEditor.tsx,line=369,endLine=369,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=36,endLine=36,col=44,endColumn=47::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=44,endLine=44,col=54,endColumn=57::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=45,endLine=45,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=59,endLine=59,col=69,endColumn=72::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=74,endLine=74,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=88,endLine=88,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=113,endLine=113,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=132,endLine=132,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=145,endLine=145,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=177,endLine=177,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=180,endLine=180,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=197,endLine=197,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\GenericCardEditor.tsx,line=212,endLine=212,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=293,endLine=293,col=74,endColumn=77::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=79,endLine=79,col=3,endColumn=14::This parameter is unused.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=80,endLine=80,col=3,endColumn=13::This parameter is unused.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=269,endLine=269,col=24,endColumn=25::Avoid using the index of an array as key property in an element.
+::warning title=suppressions/unused,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=202,endLine=202,col=13,endColumn=127::Suppression comment has no effect. Remove the suppression or make sure you are suppressing the correct rule.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=26,endLine=26,col=51,endColumn=54::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=144,endLine=144,col=51,endColumn=54::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=239,endLine=239,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTableExample.tsx,line=265,endLine=265,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTableExample.tsx,line=278,endLine=278,col=73,endColumn=76::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=204,endLine=204,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=188,endLine=188,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=323,endLine=323,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=38,endLine=38,col=3,endColumn=23::This parameter is unused.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=247,endLine=247,col=31,endColumn=36::Avoid using the index of an array as key property in an element.
+::warning title=lint/security/noDangerouslySetInnerHtml,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=295,endLine=295,col=13,endColumn=36::Avoid passing content using the dangerouslySetInnerHTML prop.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=264,endLine=264,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=15,endLine=15,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=16,endLine=16,col=10,endColumn=13::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=19,endLine=19,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=28,endLine=28,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=55,endLine=55,col=11,endColumn=14::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=133,endLine=133,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=151,endLine=151,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\InlineEditor.tsx,line=171,endLine=171,col=27,endColumn=30::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=51,endLine=51,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=223,endLine=223,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=98,endLine=98,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=123,endLine=123,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=142,endLine=142,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=155,endLine=155,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=22,endLine=22,col=19,endColumn=22::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=36,endLine=36,col=44,endColumn=47::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=50,endLine=50,col=54,endColumn=57::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=188,endLine=188,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=68,endLine=68,col=69,endColumn=72::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=191,endLine=191,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=208,endLine=208,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\KanbanCardEditor.tsx,line=84,endLine=84,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=750,endLine=750,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=751,endLine=751,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=753,endLine=753,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=365,endLine=365,col=36,endColumn=41::Avoid using the index of an array as key property in an element.
+::warning title=lint/security/noDangerouslySetInnerHtml,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=434,endLine=434,col=11,endColumn=34::Avoid passing content using the dangerouslySetInnerHTML prop.
+::warning title=lint/security/noDangerouslySetInnerHtml,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=688,endLine=688,col=21,endColumn=44::Avoid passing content using the dangerouslySetInnerHTML prop.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=321,endLine=321,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=344,endLine=344,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=629,endLine=629,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=725,endLine=725,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=726,endLine=726,col=42,endColumn=45::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\RichTextEditor.tsx,line=728,endLine=728,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\TreeGroupingPanel.tsx,line=25,endLine=25,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\TreeGroupingPanel.tsx,line=39,endLine=39,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\datatable\TreeGroupingPanel.tsx,line=44,endLine=44,col=3,endColumn=17::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=169,endLine=169,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=177,endLine=177,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=186,endLine=186,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=23,endLine=23,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=32,endLine=32,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=134,endLine=134,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=142,endLine=142,col=31,endColumn=34::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=151,endLine=151,col=47,endColumn=50::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=153,endLine=153,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\ViewSelector.tsx,line=161,endLine=161,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\clipboard-utils.ts,line=72,endLine=72,col=51,endColumn=54::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\clipboard-utils.ts,line=214,endLine=214,col=15,endColumn=18::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noStaticOnlyClass,file=packages\ui\src\components\data-display\datatable\clipboard-utils.ts,line=6,endLine=390,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\clipboard-utils.ts,line=60,endLine=60,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\clipboard-utils.ts,line=152,endLine=152,col=29,endColumn=32::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noStaticOnlyClass,file=packages\ui\src\components\data-display\datatable\drag-drop-utils.ts,line=6,endLine=222,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/complexity/noStaticOnlyClass,file=packages\ui\src\components\data-display\datatable\export-utils.ts,line=160,endLine=1548,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/complexity/noBannedTypes,file=packages\ui\src\components\data-display\datatable\export-utils.ts,line=74,endLine=74,col=21,endColumn=23::Don't use '{}' as a type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\formula-engine.ts,line=7,endLine=7,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\formula-engine.ts,line=17,endLine=17,col=33,endColumn=36::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\formula-engine.ts,line=49,endLine=49,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\formula-engine.ts,line=75,endLine=75,col=43,endColumn=46::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\formula-engine.ts,line=87,endLine=87,col=51,endColumn=54::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\formula-engine.ts,line=302,endLine=302,col=41,endColumn=44::Unexpected any. Specify a different type.
+::warning title=lint/correctness/useExhaustiveDependencies,file=packages\ui\src\components\data-display\datatable\keyboard-shortcuts.ts,line=322,endLine=322,col=6,endColumn=17::finalConfig changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=packages\ui\src\components\data-display\datatable\keyboard-shortcuts.ts,line=438,endLine=438,col=7,endColumn=18::finalConfig changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\range-selection.ts,line=351,endLine=351,col=63,endColumn=66::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\range-selection.ts,line=308,endLine=308,col=63,endColumn=66::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\range-selection.ts,line=332,endLine=332,col=49,endColumn=52::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\range-selection.ts,line=380,endLine=380,col=43,endColumn=46::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\range-selection.ts,line=256,endLine=256,col=80,endColumn=83::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\range-selection.ts,line=288,endLine=288,col=36,endColumn=39::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noStaticOnlyClass,file=packages\ui\src\components\data-display\datatable\render-utils.ts,line=7,endLine=343,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/security/noDangerouslySetInnerHtml,file=packages\ui\src\components\data-display\datatable\render-utils.ts,line=323,endLine=323,col=11,endColumn=34::Avoid passing content using the dangerouslySetInnerHTML prop.
+::warning title=lint/complexity/noStaticOnlyClass,file=packages\ui\src\components\data-display\datatable\settings-manager.ts,line=7,endLine=266,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\settings-manager.ts,line=133,endLine=133,col=38,endColumn=41::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\settings-manager.ts,line=160,endLine=160,col=54,endColumn=57::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\settings-manager.ts,line=314,endLine=314,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-color-rules.ts,line=11,endLine=11,col=35,endColumn=38::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-color-rules.ts,line=174,endLine=174,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-color-rules.ts,line=26,endLine=26,col=76,endColumn=79::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-color-rules.ts,line=112,endLine=112,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=451,endLine=451,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=300,endLine=300,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=367,endLine=367,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=374,endLine=374,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=374,endLine=374,col=35,endColumn=60::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=381,endLine=381,col=30,endColumn=33::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=381,endLine=381,col=35,endColumn=57::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=389,endLine=389,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=389,endLine=389,col=37,endColumn=59::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=413,endLine=413,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=416,endLine=416,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=433,endLine=433,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=443,endLine=443,col=24,endColumn=27::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=68,endLine=68,col=17,endColumn=20::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=451,endLine=451,col=35,endColumn=57::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=459,endLine=459,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/style/noNonNullAssertion,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=459,endLine=459,col=37,endColumn=59::Forbidden non-null assertion.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=78,endLine=78,col=17,endColumn=20::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=88,endLine=88,col=17,endColumn=20::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=91,endLine=91,col=34,endColumn=37::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=157,endLine=157,col=23,endColumn=26::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=317,endLine=317,col=20,endColumn=23::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=352,endLine=352,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=355,endLine=355,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=175,endLine=175,col=75,endColumn=78::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=184,endLine=184,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=192,endLine=192,col=26,endColumn=29::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=198,endLine=198,col=75,endColumn=78::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=56,endLine=56,col=10,endColumn=13::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=211,endLine=211,col=80,endColumn=83::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=246,endLine=246,col=80,endColumn=83::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-data-views.ts,line=274,endLine=274,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-preferences.ts,line=18,endLine=18,col=89,endColumn=92::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-preferences.ts,line=16,endLine=16,col=52,endColumn=55::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-preferences.ts,line=17,endLine=17,col=55,endColumn=58::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-preferences.ts,line=19,endLine=19,col=84,endColumn=87::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-reorder.ts,line=9,endLine=9,col=18,endColumn=21::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-reorder.ts,line=327,endLine=327,col=65,endColumn=68::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-reorder.ts,line=328,endLine=328,col=57,endColumn=60::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-reorder.ts,line=341,endLine=341,col=71,endColumn=74::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-reorder.ts,line=345,endLine=345,col=86,endColumn=89::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-reorder.ts,line=347,endLine=347,col=75,endColumn=78::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-reorder.ts,line=360,endLine=360,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-hierarchical-reorder.ts,line=362,endLine=362,col=62,endColumn=65::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-range-selection.ts,line=62,endLine=62,col=65,endColumn=68::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-range-selection.ts,line=73,endLine=73,col=65,endColumn=68::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-range-selection.ts,line=83,endLine=83,col=82,endColumn=85::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-tree-grouping.ts,line=4,endLine=4,col=32,endColumn=35::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-tree-grouping.ts,line=7,endLine=7,col=15,endColumn=18::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-tree-grouping.ts,line=21,endLine=21,col=37,endColumn=40::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-tree-grouping.ts,line=47,endLine=47,col=54,endColumn=57::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-tree-grouping.ts,line=52,endLine=52,col=61,endColumn=64::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-tree-grouping.ts,line=65,endLine=65,col=74,endColumn=77::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\datatable\use-tree-grouping.ts,line=209,endLine=209,col=25,endColumn=28::Unexpected any. Specify a different type.
+::warning title=lint/complexity/noStaticOnlyClass,file=packages\ui\src\components\data-display\datatable\validation-utils.ts,line=6,endLine=369,col=8,endColumn=2::Avoid classes that contain only static members.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\views\CalendarView.tsx,line=152,endLine=152,col=20,endColumn=25::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\views\CardsView.tsx,line=101,endLine=101,col=26,endColumn=31::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\views\CardsView.tsx,line=125,endLine=125,col=29,endColumn=34::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\views\KanbanView.tsx,line=102,endLine=102,col=30,endColumn=35::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\datatable\views\KanbanView.tsx,line=123,endLine=123,col=35,endColumn=40::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\reorderable-list\ReorderableList.tsx,line=611,endLine=611,col=30,endColumn=31::Avoid using the index of an array as key property in an element.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\reorderable-list\ReorderableList.tsx,line=734,endLine=734,col=3,endColumn=22::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\reorderable-list\ReorderableList.tsx,line=12,endLine=12,col=18,endColumn=21::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\reorderable-list\reorderable-list-customization-panel.tsx,line=49,endLine=49,col=82,endColumn=85::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\reorderable-list\reorderable-list-customization-panel.tsx,line=40,endLine=40,col=91,endColumn=94::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\reorderable-list\reorderable-list-theme.ts,line=7,endLine=7,col=18,endColumn=21::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\reorderable-list\reorderable-list-theme.ts,line=181,endLine=181,col=23,endColumn=26::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\reorderable-list\themed-reorderable-list.tsx,line=228,endLine=228,col=11,endColumn=14::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\data-display\reorderable-list\themed-reorderable-list.tsx,line=507,endLine=507,col=17,endColumn=20::Unexpected any. Specify a different type.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\reorderable-list\themed-reorderable-list.tsx,line=246,endLine=246,col=3,endColumn=16::This parameter is unused.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\data-display\reorderable-list\themed-reorderable-list.tsx,line=349,endLine=349,col=30,endColumn=31::Avoid using the index of an array as key property in an element.
+::warning title=lint/correctness/noUnusedFunctionParameters,file=packages\ui\src\components\data-display\reorderable-list\themed-reorderable-list.tsx,line=445,endLine=445,col=6,endColumn=16::This parameter is unused.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\forms\translation-field\TranslationField.tsx,line=70,endLine=70,col=53,endColumn=56::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\layout\card\Card.tsx,line=62,endLine=62,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\layout\card\Card.tsx,line=158,endLine=158,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\layout\card\Card.tsx,line=236,endLine=236,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\layout\card\Card.tsx,line=289,endLine=289,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\layout\card\Card.tsx,line=116,endLine=116,col=22,endColumn=25::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\layout\card\Card.tsx,line=193,endLine=193,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\primitives\code-viewer-dialog\CodeViewerDialog.tsx,line=385,endLine=385,col=38,endColumn=43::Avoid using the index of an array as key property in an element.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\primitives\code-viewer-dialog\CodeViewerDialog.tsx,line=58,endLine=58,col=53,endColumn=56::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noArrayIndexKey,file=packages\ui\src\components\primitives\code-viewer-dialog\CodeViewerDialog.tsx,line=347,endLine=347,col=38,endColumn=43::Avoid using the index of an array as key property in an element.
+::warning title=lint/correctness/useExhaustiveDependencies,file=packages\ui\src\components\primitives\code-viewer-dialog\CodeViewerDialog.tsx,line=196,endLine=196,col=43,endColumn=57::clearSelection changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/correctness/useExhaustiveDependencies,file=packages\ui\src\components\primitives\code-viewer-dialog\CodeViewerDialog.tsx,line=196,endLine=196,col=59,endColumn=70::loadDetails changes on every re-render and should not be used as a hook dependency.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\primitives\dropdown-portal\DropdownPortal.tsx,line=244,endLine=244,col=39,endColumn=42::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\primitives\dropdown-portal\DropdownPortal.tsx,line=244,endLine=244,col=69,endColumn=72::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\primitives\dropdown-portal\DropdownPortal.tsx,line=257,endLine=257,col=53,endColumn=56::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\primitives\dropdown-portal\DropdownPortal.tsx,line=258,endLine=258,col=28,endColumn=31::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\primitives\dropdown-portal\DropdownPortal.tsx,line=261,endLine=261,col=8,endColumn=11::Unexpected any. Specify a different type.
+::warning title=lint/suspicious/noExplicitAny,file=packages\ui\src\components\primitives\tooltip\Tooltip.tsx,line=308,endLine=308,col=39,endColumn=42::Unexpected any. Specify a different type.
+::error title=lint/a11y/noStaticElementInteractions,file=apps\web\src\app\backend-error\page.tsx,line=141,endLine=150,col=15,endColumn=16::Static Elements should not be interactive.
+::error title=lint/a11y/noStaticElementInteractions,file=apps\web\src\components\error-boundary.tsx,line=244,endLine=253,col=19,endColumn=20::Static Elements should not be interactive.
+::error title=lint/a11y/noStaticElementInteractions,file=apps\web\src\components\providers\monitoring-provider.tsx,line=58,endLine=67,col=11,endColumn=12::Static Elements should not be interactive.
+::error title=lint/correctness/useHookAtTopLevel,file=apps\web\src\components\providers\notifications-provider.tsx,line=210,endLine=210,col=14,endColumn=22::This hook is being called conditionally, but all hooks must be called in the exact same order in every component render.
+::error title=lint/correctness/useHookAtTopLevel,file=apps\web\src\components\providers\notifications-provider.tsx,line=201,endLine=201,col=14,endColumn=21::This hook is being called conditionally, but all hooks must be called in the exact same order in every component render.
+::error title=lint/a11y/noNoninteractiveTabindex,file=packages\ui\src\components\data-display\datatable\DataTable.tsx,line=1989,endLine=1989,col=29,endColumn=41::The HTML element td is non-interactive. Do not use tabIndex.
+::error title=lint/a11y/useAriaPropsSupportedByRole,file=packages\ui\src\components\data-display\datatable\HierarchicalDataTable.tsx,line=172,endLine=198,col=7,endColumn=8::The ARIA attribute 'aria-label' is not supported by this element.
+lint ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+

@@ -3,30 +3,6 @@ import { useState } from 'react'
 import { apiClient } from '@/lib/api-client'
 import { callClientApi } from '@/utils/backend-api'
 
-interface SystemParameter {
-  id: string
-  key: string
-  value: string
-  type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON' | 'ENUM'
-  category:
-    | 'GENERAL'
-    | 'COMPTABILITE'
-    | 'PROJETS'
-    | 'PRODUCTION'
-    | 'ACHATS'
-    | 'STOCKS'
-    | 'NOTIFICATION'
-    | 'SECURITY'
-    | 'ELASTICSEARCH'
-  description: string
-  defaultValue?: string
-  isEditable: boolean
-  isSecret: boolean
-  metadata?: Record<string, any>
-  createdAt: string
-  updatedAt: string
-}
-
 interface UseSystemParametersReturn {
   parameters: Record<string, string> | undefined
   isLoading: boolean

@@ -48,11 +48,6 @@ interface RichTextEditorProps {
   compact?: boolean
 }
 
-interface EditorCommand {
-  command: string
-  value?: string
-}
-
 const TEXT_COLORS = [
   '#000000',
   '#FFFFFF',
@@ -437,6 +432,10 @@ export function RichTextEditor({
           onInput={updateContent}
           onBlur={updateContent}
           dangerouslySetInnerHTML={{ __html: initialContent }}
+          role="textbox"
+          aria-label={placeholder || 'Rich text editor'}
+          aria-multiline="true"
+          tabIndex={0}
         />
       </div>
     )
@@ -453,7 +452,11 @@ export function RichTextEditor({
                 <Type className="h-5 w-5" />
                 Éditeur de texte riche
               </h2>
-              <button onClick={() => onOpenChange(false)} className="p-2 hover:bg-gray-100 rounded">
+              <button
+                type="button"
+                onClick={() => onOpenChange(false)}
+                className="p-2 hover:bg-gray-100 rounded"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -666,6 +669,10 @@ export function RichTextEditor({
                   onPaste={handlePaste}
                   onKeyDown={handleKeyDown}
                   suppressContentEditableWarning
+                  role="textbox"
+                  aria-label={placeholder || 'Advanced rich text editor'}
+                  aria-multiline="true"
+                  tabIndex={0}
                 />
               </div>
 

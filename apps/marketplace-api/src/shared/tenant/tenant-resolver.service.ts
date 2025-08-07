@@ -236,7 +236,7 @@ export class TenantResolver {
       return {
         societeId: demoSociete.id,
         societe: demoSociete,
-        erpTenantConnection: null as any,
+        erpTenantConnection: null as unknown,
         marketplaceEnabled: true,
       }
     }

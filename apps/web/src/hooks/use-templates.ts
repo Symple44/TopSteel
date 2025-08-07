@@ -122,7 +122,7 @@ export function useTemplates(): UseTemplatesReturn {
  * Hook pour obtenir des recommandations de templates basées sur l'usage
  */
 export function useTemplateRecommendations() {
-  const { settings } = useAppearanceSettings()
+  const { settings: _settings } = useAppearanceSettings()
   const { getTemplateScore } = useTemplates()
 
   /**

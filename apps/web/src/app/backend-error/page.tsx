@@ -138,7 +138,15 @@ export default function BackendErrorPage() {
           {/* Conseils de dépannage */}
           {health.status !== 'online' && (
             <details className="mt-6 text-left">
-              <summary className="cursor-pointer font-medium text-gray-700 hover:text-gray-900">
+              <summary
+                className="cursor-pointer font-medium text-gray-700 hover:text-gray-900"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    e.currentTarget.click()
+                  }
+                }}
+              >
                 {t('backend.troubleshooting')}
               </summary>
               <div className="mt-3 text-sm text-gray-600 space-y-2">

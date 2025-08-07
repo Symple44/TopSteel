@@ -46,7 +46,7 @@ export function ProjectsTable({
             </TableRow>
           ) : (
             data.map((item, index) => (
-              <TableRow key={index}>
+              <TableRow key={`project-${item.id || item.name || index}`}>
                 <TableCell>TODO: projets name</TableCell>
                 <TableCell>TODO: Status</TableCell>
                 <TableCell>

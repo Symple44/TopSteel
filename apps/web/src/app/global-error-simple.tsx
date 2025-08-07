@@ -13,7 +13,18 @@ export default function GlobalError({
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2>Something went wrong!</h2>
           <p>{error.message}</p>
-          <button onClick={reset}>Try again</button>
+          <button
+            type="button"
+            onClick={reset}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                reset()
+              }
+            }}
+          >
+            Try again
+          </button>
         </div>
       </body>
     </html>

@@ -174,7 +174,7 @@ export function createOptimizedSelectors<T>(useStore: TypedZustandStore<T>) {
         debugLabel?: string
       } = {}
     ) => {
-      const { equalityFn = shallow as EqualityFn<U>, debugLabel } = options
+      const { equalityFn = shallow as EqualityFn<U>, debugLabel: _debugLabel } = options
 
       const transformedSelector = useMemo(
         () => (state: T) => {

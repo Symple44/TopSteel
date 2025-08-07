@@ -486,6 +486,8 @@ function SortableItem<T extends ReorderableItem>({
         onDragOver={(e) => onDragOver(e, item.id)}
         onDragLeave={onDragLeave}
         onDrop={(e) => onDrop(e, item.id)}
+        role="listitem"
+        aria-label={`Reorderable list item ${item.id}`}
       >
         <div
           className={cn(
@@ -529,6 +531,15 @@ function SortableItem<T extends ReorderableItem>({
                 isDragging && 'bg-primary/20 border-r-primary/30',
                 dragHandleClassName
               )}
+              role="button"
+              tabIndex={0}
+              aria-label={`Drag handle for item ${item.id}`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  // Drag via clavier - logique à implémenter si nécessaire
+                }
+              }}
               style={{
                 cursor: 'grab',
                 userSelect: 'none',

@@ -65,7 +65,7 @@ export function once<T extends (...args: unknown[]) => unknown>(func: T): T {
   return ((...args: Parameters<T>) => {
     if (!called) {
       called = true
-      result = func(...args)
+      result = func(...args) as ReturnType<T>
     }
     return result
   }) as T

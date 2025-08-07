@@ -69,7 +69,7 @@ function buildHierarchicalTree<T extends HierarchicalItem>(
   config: HierarchicalConfig,
   expandedNodes: Set<string>
 ): HierarchicalTreeNode<T>[] {
-  const { parentField, levelField, orderField } = config
+  const { parentField, levelField: _levelField, orderField } = config
 
   // Créer une map pour un accès rapide
   const itemMap = new Map<string, T>()

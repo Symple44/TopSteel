@@ -161,7 +161,9 @@
       "Bash(npx:*)",
       "Bash(if exist \".next\" rmdir /s /q \".next\")",
       "Bash(if exist \"node_modules\\.cache\" rmdir /s /q \"node_modules\\.cache\")",
-      "Bash(if exist \"tsconfig.tsbuildinfo\" del \"tsconfig.tsbuildinfo\")"
+      "Bash(if exist \"tsconfig.tsbuildinfo\" del \"tsconfig.tsbuildinfo\")",
+      "Bash(dir:*)",
+      "Bash(PORT=3011 timeout 15 npm run dev)"
     ],
     "deny": []
   }

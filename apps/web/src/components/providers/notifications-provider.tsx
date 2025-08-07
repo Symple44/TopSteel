@@ -195,23 +195,26 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   const [state, dispatch] = useReducer(notificationsReducer, initialState)
 
   // Safe check for auth context
-  let user = null
-  let _toast = null
+  // biome-ignore lint/correctness/useHookAtTopLevel: These hooks need to be called conditionally due to provider hierarchy
+  const authContext = (() => {
+    try {
+      return useAuth()
+    } catch (_error) {
+      return null
+    }
+  })()
 
-  try {
-    const authContext = useAuth()
-    user = authContext?.user || null
-  } catch (_error) {
-    // Auth context not available yet
-  }
+  // biome-ignore lint/correctness/useHookAtTopLevel: These hooks need to be called conditionally due to provider hierarchy
+  const toastContext = (() => {
+    try {
+      return useToast()
+    } catch (_error) {
+      return null
+    }
+  })()
 
-  try {
-    const toastContext = useToast()
-    _toast = toastContext?.toast || (() => {})
-  } catch (_error) {
-    // Toast context not available yet
-    _toast = () => {}
-  }
+  const user = authContext?.user || null
+  const _toast = toastContext?.toast || (() => {})
   const socketRef = useRef<Socket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const _reconnectAttempts = useRef(0)

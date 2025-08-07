@@ -55,17 +55,21 @@ export interface SwitchProps extends VariantProps<typeof switchVariants> {
 
 const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
   (
-    { className, size, variant, checked, defaultChecked, onCheckedChange, disabled, ...props },
+    { className, size, variant, checked, defaultChecked, onCheckedChange, disabled, id, ...props },
     ref
   ) => {
+    const uniqueId = id || `switch-${Math.random().toString(36).slice(2, 9)}`
+
     return (
       <label
         className={cn(
           'relative inline-flex cursor-pointer items-center',
           disabled && 'cursor-not-allowed opacity-50'
         )}
+        htmlFor={uniqueId}
       >
         <Input
+          id={uniqueId}
           type="checkbox"
           checked={checked}
           defaultChecked={defaultChecked}

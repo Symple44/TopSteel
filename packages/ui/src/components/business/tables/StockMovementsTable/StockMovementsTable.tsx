@@ -46,7 +46,7 @@ export function StockMovementsTable({
             </TableRow>
           ) : (
             data.map((item, index) => (
-              <TableRow key={index}>
+              <TableRow key={`stock-movement-${item.id || item.reference || index}`}>
                 <TableCell>TODO: mouvements de stock name</TableCell>
                 <TableCell>TODO: Status</TableCell>
                 <TableCell>

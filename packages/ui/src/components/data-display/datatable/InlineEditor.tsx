@@ -297,6 +297,10 @@ export function InlineEditor<T = any>({
               const target = e.target as HTMLDivElement
               setValue(target.innerHTML)
             }}
+            role="textbox"
+            aria-label="Rich text editor"
+            aria-multiline="true"
+            tabIndex={0}
             onKeyDown={(e) => {
               // Permettre Enter pour les sauts de ligne dans le rich text
               if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {

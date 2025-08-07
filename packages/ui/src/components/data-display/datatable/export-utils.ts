@@ -102,31 +102,6 @@ type UniverPluginConstructor = new (...args: unknown[]) => UniverPlugin
 type UniverLocaleType = Record<string, string>
 type UniverInstanceTypeEnum = Record<string, number>
 
-// Interface pour les styles Excel avancés
-interface ExcelCellStyle {
-  font?: {
-    bold?: boolean
-    italic?: boolean
-    color?: { rgb: string }
-    size?: number
-  }
-  fill?: {
-    fgColor: { rgb: string }
-  }
-  border?: {
-    top?: { style: string; color: { rgb: string } }
-    bottom?: { style: string; color: { rgb: string } }
-    left?: { style: string; color: { rgb: string } }
-    right?: { style: string; color: { rgb: string } }
-  }
-  alignment?: {
-    horizontal?: 'left' | 'center' | 'right'
-    vertical?: 'top' | 'middle' | 'bottom'
-    wrapText?: boolean
-  }
-  numFmt?: string
-}
-
 interface AdvancedExportOptions extends ExportOptions {
   includeStyles?: boolean
   freezeHeader?: boolean

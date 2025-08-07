@@ -261,6 +261,7 @@ export function NotificationSettings() {
             const Icon = tab.icon
             return (
               <button
+                type="button"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${

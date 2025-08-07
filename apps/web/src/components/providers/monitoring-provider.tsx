@@ -55,7 +55,17 @@ function ErrorFallback({
           Une erreur inattendue s'est produite dans l'application. Nos équipes ont été notifiées.
         </p>
         <details className="text-left bg-gray-100 p-4 rounded mb-6 text-sm">
-          <summary className="cursor-pointer font-medium">Détails techniques</summary>
+          <summary
+            className="cursor-pointer font-medium"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                e.currentTarget.click()
+              }
+            }}
+          >
+            Détails techniques
+          </summary>
           <pre className="mt-2 text-red-600 overflow-auto">{error.message}</pre>
         </details>
         <div className="space-x-4">

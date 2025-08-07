@@ -47,6 +47,7 @@ export function KanbanView({
             {column.items.map((card) => (
               <button
                 key={card.id}
+                type="button"
                 className="bg-background border rounded-lg p-4 cursor-pointer hover:shadow-lg hover:border-accent transition-all duration-200 group w-full text-left"
                 onClick={() => onCardClick?.(card)}
                 onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCardClick?.(card)}
@@ -96,7 +97,7 @@ export function KanbanView({
                 {/* Labels */}
                 {card.labels && card.labels.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-3">
-                    {card.labels.map((label: any, index: any) => (
+                    {card.labels.map((label: string, index: number) => (
                       <Badge
                         key={index}
                         variant="outline"
@@ -116,12 +117,14 @@ export function KanbanView({
                 {/* Métadonnées */}
                 {card.meta && card.meta.length > 0 && (
                   <div className="space-y-1 mb-3 border-t pt-2">
-                    {card.meta.slice(0, 3).map((meta: any, index: any) => (
-                      <div key={index} className="flex justify-between text-xs">
-                        <span className="text-muted-foreground font-medium">{meta.label}:</span>
-                        <span className="font-semibold text-foreground">{meta.value}</span>
-                      </div>
-                    ))}
+                    {card.meta
+                      .slice(0, 3)
+                      .map((meta: { label: string; value: string }, index: number) => (
+                        <div key={index} className="flex justify-between text-xs">
+                          <span className="text-muted-foreground font-medium">{meta.label}:</span>
+                          <span className="font-semibold text-foreground">{meta.value}</span>
+                        </div>
+                      ))}
                   </div>
                 )}
 
@@ -137,7 +140,7 @@ export function KanbanView({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e: any) => {
+                        onClick={(e: React.MouseEvent) => {
                           e.stopPropagation()
                         }}
                       >

@@ -197,6 +197,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     { value: 'archived', label: 'Archivées', count: 0 },
                   ].map((status) => (
                     <button
+                      type="button"
                       key={status.value}
                       onClick={() => setSelectedStatus(status.value as any)}
                       className={cn(
@@ -227,6 +228,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
                     return (
                       <button
+                        type="button"
                         key={key}
                         onClick={() => setSelectedCategory(key)}
                         className={cn(
@@ -255,6 +257,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                 <div className="space-y-1">
                   {Object.entries(priorityConfig).map(([key, config]) => (
                     <button
+                      type="button"
                       key={key}
                       onClick={() => setSelectedPriority(key)}
                       className={cn(
@@ -340,10 +343,11 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                       'text-gray-600'
 
                     return (
-                      <div
+                      <button
                         key={notification.id}
+                        type="button"
                         className={cn(
-                          'p-4 hover:bg-gray-50 transition-colors cursor-pointer',
+                          'p-4 hover:bg-gray-50 transition-colors cursor-pointer w-full text-left',
                           !notification.readAt && 'bg-blue-50/50'
                         )}
                         onClick={() => setSelectedNotification(notification)}
@@ -406,7 +410,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
 
                           <ChevronRight className="h-4 w-4 text-gray-400 mt-2" />
                         </div>
-                      </div>
+                      </button>
                     )
                   })}
                 </div>

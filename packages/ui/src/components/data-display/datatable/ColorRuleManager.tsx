@@ -304,6 +304,7 @@ export function ColorRuleManager<T = any>({
                   {PREDEFINED_COLORS.map((color, index) => (
                     <button
                       key={index}
+                      type="button"
                       className="p-3 rounded border text-sm font-medium hover:scale-105 transition-transform"
                       style={{ backgroundColor: color.bg, color: color.text }}
                       onClick={() =>

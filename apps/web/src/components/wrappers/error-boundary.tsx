@@ -54,6 +54,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <h2 className="text-xl font-semibold mb-2">Une erreur s'est produite</h2>
               <p className="text-muted-foreground mb-4">Veuillez rafraîchir la page</p>
               <button
+                type="button"
                 onClick={() => window.location.reload()}
                 className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
               >

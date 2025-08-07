@@ -33,7 +33,10 @@ export function DataTableSkeleton({ rows = 5, columns = 4, className }: DataTabl
           {/* Header skeleton */}
           <div className="flex">
             {Array.from({ length: columns }).map((_, colIndex) => (
-              <div key={colIndex} className="flex-1 p-3 border-r last:border-r-0">
+              <div
+                key={`header-skeleton-${colIndex}`}
+                className="flex-1 p-3 border-r last:border-r-0"
+              >
                 <div className="h-4 bg-gray-300 rounded animate-pulse" />
               </div>
             ))}
@@ -42,9 +45,12 @@ export function DataTableSkeleton({ rows = 5, columns = 4, className }: DataTabl
 
         {/* Rows skeleton */}
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div key={rowIndex} className="flex border-t">
+          <div key={`row-skeleton-${rowIndex}`} className="flex border-t">
             {Array.from({ length: columns }).map((_, colIndex) => (
-              <div key={colIndex} className="flex-1 p-3 border-r last:border-r-0">
+              <div
+                key={`cell-skeleton-${rowIndex}-${colIndex}`}
+                className="flex-1 p-3 border-r last:border-r-0"
+              >
                 <div
                   className="h-4 bg-gray-200 rounded animate-pulse"
                   style={{

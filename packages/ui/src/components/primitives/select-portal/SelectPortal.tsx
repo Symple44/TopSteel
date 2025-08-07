@@ -39,10 +39,6 @@ export function SelectPortal({
     if (!triggerRef.current) return
 
     const triggerRect = triggerRef.current.getBoundingClientRect()
-    const _viewport = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    }
 
     let x = triggerRect.left
     let y = triggerRect.bottom + 4
@@ -240,6 +236,13 @@ export function SelectPortal({
         onClick={(e) => {
           e.stopPropagation()
           toggleOpen()
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            e.stopPropagation()
+            toggleOpen()
+          }
         }}
         disabled={disabled}
         data-select-portal

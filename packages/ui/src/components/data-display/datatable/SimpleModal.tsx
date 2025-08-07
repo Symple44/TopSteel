@@ -50,6 +50,8 @@ export function SimpleModal({
           className={`simple-modal-container bg-background border border-border rounded-lg shadow-lg w-full ${maxWidth} max-h-[90vh] overflow-hidden flex flex-col relative`}
           style={{ zIndex: 9999, position: 'relative' }}
           onMouseDown={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">

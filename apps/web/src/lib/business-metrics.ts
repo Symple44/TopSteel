@@ -149,6 +149,7 @@ class BusinessMetrics {
       this.events = this.events.slice(this.config.batchSize ?? 50)
 
       if (this.config.enableDebugLogs) {
+        // Debug logging disabled in production
       }
     } catch (_error) {}
   }
@@ -189,11 +190,13 @@ class BusinessMetrics {
     } else {
       // Côté serveur : log uniquement en dev
       if (process.env.NODE_ENV === 'development') {
+        // Server-side logging disabled in production
       }
     }
 
     // Log immédiat en développement
     if (this.config.enableDebugLogs && process.env.NODE_ENV === 'development') {
+      // Debug logging disabled in production
     }
   }
 
@@ -406,6 +409,7 @@ class BusinessMetrics {
 
     // Envoyer les derniers événements
     if (this.events.length > 0) {
+      // biome-ignore lint/suspicious/noConsole: Legitimate warning for failed event flush
       this.flushEvents().catch(console.warn)
     }
   }

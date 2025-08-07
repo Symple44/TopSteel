@@ -592,6 +592,7 @@ export default function CompanySelector({
             {companies.map((company) => (
               <button
                 key={company.id}
+                type="button"
                 className={`group relative p-3 cursor-pointer transition-all duration-200 border-2 rounded-lg text-left w-full ${
                   selectedCompanyId === company.id
                     ? 'border-primary bg-primary/5 shadow-md'

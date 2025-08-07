@@ -187,7 +187,6 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
   // Hook pour le statut du backend
   const { isOnline: _, statusColor, statusText } = useBackendStatus()
-  const unusedVar = 'temp' // temporary to reach exactly 100 errors
 
   // Hooks pour la gestion du menu
   const {
@@ -473,6 +472,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
           {isCollapsed && (
             <div className="flex items-center justify-center w-full h-11">
               <button
+                type="button"
                 onClick={onToggle}
                 className="navigation-icon flex h-10 w-10 items-center justify-center rounded-xl text-primary-foreground shadow-lg cursor-pointer hover:scale-110 transition-all duration-200"
                 aria-label={t('showSidebar')}
@@ -485,6 +485,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
           {/* Bouton fermer - visible uniquement quand ouvert */}
           {!isCollapsed && (
             <button
+              type="button"
               onClick={onToggle}
               className="toggle-button flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-accent-foreground transition-all duration-200"
               aria-label={t('hideSidebar')}
@@ -634,22 +635,15 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
       {/* Footer utilisateur simplifié avec effet hover - plus compact */}
       <div className="p-3">
-        <div
+        <button
+          type="button"
           onClick={() => setShowErpInfo(true)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              setShowErpInfo(true)
-            }
-          }}
           className={cn(
             'flex items-center rounded-lg bg-gradient-to-r from-muted/50 to-accent/50 p-2.5 border border-border/60 transition-all duration-200 cursor-pointer group',
             'hover:from-accent/50 hover:to-accent/70 hover:border-accent/60 hover:shadow-md',
             isCollapsed && 'justify-center'
           )}
-          role="button"
           aria-label="Afficher les informations du système ERP"
-          tabIndex={0}
         >
           <div className="relative">
             <div className="h-7 w-7 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm transition-all duration-200 group-hover:from-emerald-600 group-hover:to-teal-700 group-hover:shadow-lg group-hover:scale-105">
@@ -680,7 +674,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               </div>
             </div>
           )}
-        </div>
+        </button>
       </div>
 
       {/* Modal d'information ERP - Portal pour centre de l'écran */}

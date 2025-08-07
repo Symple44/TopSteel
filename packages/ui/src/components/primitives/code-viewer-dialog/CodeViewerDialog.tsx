@@ -343,6 +343,7 @@ export function CodeViewerDialog({
 
                             return (
                               <button
+                                type="button"
                                 key={index}
                                 className={`text-right text-sm font-mono select-none cursor-pointer transition-colors hover:bg-muted/50 px-1 rounded w-full ${
                                   isSelected

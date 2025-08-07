@@ -407,7 +407,19 @@ export function HierarchicalDataTableExample() {
 
       {/* Informations de débogage */}
       <details className="bg-muted/50 rounded-lg p-4">
-        <summary className="cursor-pointer font-medium">Informations de débogage</summary>
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: Summary element has native keyboard support, custom handler for enhanced accessibility */}
+        <summary
+          className="cursor-pointer font-medium"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              e.currentTarget.click()
+            }
+          }}
+        >
+          Informations de débogage
+        </summary>
         <div className="mt-4 space-y-2">
           <div>
             <strong>Éléments sélectionnés:</strong> {selectedItems.length}

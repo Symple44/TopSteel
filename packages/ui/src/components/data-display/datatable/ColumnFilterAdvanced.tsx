@@ -446,7 +446,7 @@ export function ColumnFilterAdvanced<T = any>({
                 columnType === 'richtext') && (
                 <>
                   {/* Barre de recherche */}
-                  <div className="relative mb-3" role="presentation">
+                  <div className="relative mb-3">
                     <Search className="absolute left-2 top-2.5 h-3 w-3 text-muted-foreground" />
                     <Input
                       type="text"
@@ -518,8 +518,10 @@ export function ColumnFilterAdvanced<T = any>({
                       <label
                         key={value}
                         className="flex items-center gap-2 p-1 hover:bg-muted/50 rounded cursor-pointer"
+                        htmlFor={`checkbox-${value.replace(/[^a-zA-Z0-9]/g, '_')}`}
                       >
                         <Checkbox
+                          id={`checkbox-${value.replace(/[^a-zA-Z0-9]/g, '_')}`}
                           checked={selectedValues.has(value)}
                           onCheckedChange={() => toggleValue(value)}
                         />
@@ -542,7 +544,7 @@ export function ColumnFilterAdvanced<T = any>({
                   </div>
 
                   <div className="space-y-2">
-                    <div role="presentation">
+                    <div>
                       <Label className="text-xs">Minimum</Label>
                       <Input
                         type="number"
@@ -556,7 +558,7 @@ export function ColumnFilterAdvanced<T = any>({
                       />
                     </div>
 
-                    <div role="presentation">
+                    <div>
                       <Label className="text-xs">Maximum</Label>
                       <Input
                         type="number"
@@ -581,7 +583,7 @@ export function ColumnFilterAdvanced<T = any>({
                   </div>
 
                   <div className="space-y-2">
-                    <div role="presentation">
+                    <div>
                       <Label className="text-xs">Date de début</Label>
                       <Input
                         type="date"
@@ -594,7 +596,7 @@ export function ColumnFilterAdvanced<T = any>({
                       />
                     </div>
 
-                    <div role="presentation">
+                    <div>
                       <Label className="text-xs">Date de fin</Label>
                       <Input
                         type="date"

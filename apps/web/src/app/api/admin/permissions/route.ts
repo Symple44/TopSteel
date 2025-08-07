@@ -24,12 +24,20 @@ export async function GET(request: NextRequest) {
 
     // Extraire toutes les permissions de tous les modules
     const modules = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []
-    const permissions: any[] = []
+    interface Permission {
+      id?: string | number
+      name?: string
+      action?: string
+      module?: string
+      code?: string
+      description?: string
+    }
+    const permissions: Permission[] = []
 
     if (Array.isArray(modules) && modules.length > 0) {
-      modules.forEach((module: any) => {
+      modules.forEach((module: { name?: string; code?: string; permissions?: Permission[] }) => {
         if (module.permissions && Array.isArray(module.permissions)) {
-          module.permissions.forEach((permission: any) => {
+          module.permissions.forEach((permission: Permission) => {
             permissions.push({
               ...permission,
               module: module.name || module.code,

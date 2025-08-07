@@ -52,8 +52,12 @@ export function isServer(): boolean {
 
 // Fonction pour obtenir une valeur de window de manière sûre
 export function getWindowProperty<T = unknown>(key: string): T | undefined {
-  if (isBrowser() && window && typeof (window as Record<string, unknown>)[key] !== 'undefined') {
-    return (window as Record<string, unknown>)[key] as T
+  if (
+    isBrowser() &&
+    window &&
+    typeof (window as unknown as Record<string, unknown>)[key] !== 'undefined'
+  ) {
+    return (window as unknown as Record<string, unknown>)[key] as T
   }
   return undefined
 }
@@ -62,9 +66,9 @@ export function getWindowProperty<T = unknown>(key: string): T | undefined {
 export function getGlobalProperty<T = unknown>(key: string): T | undefined {
   if (
     typeof globalThis !== 'undefined' &&
-    typeof (globalThis as Record<string, unknown>)[key] !== 'undefined'
+    typeof (globalThis as unknown as Record<string, unknown>)[key] !== 'undefined'
   ) {
-    return (globalThis as Record<string, unknown>)[key] as T
+    return (globalThis as unknown as Record<string, unknown>)[key] as T
   }
   return undefined
 }

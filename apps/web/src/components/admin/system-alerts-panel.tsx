@@ -34,8 +34,8 @@ interface SystemAlertsPanelProps {
 
 export default function SystemAlertsPanel({
   alerts = [],
-  maxAlerts = 10,
-  autoRefresh = true,
+  maxAlerts: _maxAlerts = 10,
+  autoRefresh: _autoRefresh = true,
 }: SystemAlertsPanelProps) {
   const [currentAlerts, setCurrentAlerts] = useState<SystemAlert[]>([])
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true)

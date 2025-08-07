@@ -31,8 +31,8 @@ interface TemplateSelectorProps {
 }
 
 export function TemplateSelector({ className }: TemplateSelectorProps) {
-  const { settings: _ } = useAppearanceSettings()
-  const { currentTemplate: _, isTemplateApplied, applyTemplate } = useTemplates()
+  const { settings: _settings } = useAppearanceSettings()
+  const { currentTemplate: _currentTemplate, isTemplateApplied, applyTemplate } = useTemplates()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [_previewTemplate, setPreviewTemplate] = useState<Template | null>(null)

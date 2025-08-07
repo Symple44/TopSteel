@@ -21,7 +21,7 @@ interface PerformanceMetricsProps {
 export default function PerformanceMetricsChart({
   data = [],
   autoRefresh = true,
-  refreshInterval = 30000,
+  refreshInterval: _refreshInterval = 30000,
 }: PerformanceMetricsProps) {
   const [currentData, setCurrentData] = useState<PerformanceDataPoint[]>(data)
   const [selectedMetric, setSelectedMetric] = useState<
@@ -194,12 +194,15 @@ export default function PerformanceMetricsChart({
             </div>
 
             <div className="h-32 flex items-end space-x-1 border-b border-l pl-2 pb-2">
-              {currentData.slice(-20).map((point, _index) => {
+              {currentData.slice(-20).map((point, index) => {
                 const value = getMetricValue(point)
                 const height = maxValue > 0 ? (value / maxValue) * 100 : 0
 
                 return (
-                  <div key={point.timestamp} className="flex-1 flex flex-col items-center">
+                  <div
+                    key={`${point.timestamp}-${index}`}
+                    className="flex-1 flex flex-col items-center"
+                  >
                     <div
                       className="w-full bg-blue-500 hover:bg-blue-600 transition-colors rounded-t cursor-pointer"
                       style={{ height: `${Math.max(height, 2)}%` }}

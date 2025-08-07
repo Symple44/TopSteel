@@ -183,9 +183,10 @@ export function CalendarView({
               {/* Événements */}
               <div className="space-y-1">
                 {day.events.slice(0, 3).map((event) => (
-                  <div
+                  <button
                     key={event.id}
-                    className="group relative bg-background border border-border rounded px-2 py-1 cursor-pointer hover:shadow-sm transition-shadow"
+                    type="button"
+                    className="group relative bg-background border border-border rounded px-2 py-1 cursor-pointer hover:shadow-sm transition-shadow w-full text-left"
                     onClick={(e) => {
                       e.stopPropagation()
                       onEventClick?.(event)
@@ -205,7 +206,7 @@ export function CalendarView({
                             variant="ghost"
                             size="sm"
                             className="opacity-0 group-hover:opacity-100 h-auto w-auto p-0.5"
-                            onClick={(e: any) => {
+                            onClick={(e: React.MouseEvent) => {
                               e.stopPropagation()
                             }}
                           >
@@ -232,7 +233,7 @@ export function CalendarView({
                         {event.category}
                       </div>
                     )}
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>

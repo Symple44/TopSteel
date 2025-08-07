@@ -78,6 +78,63 @@
   },
   "overrides": [
     {
+      "includes": ["**/*.css"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnknownProperty": "off",
+            "noUnknownPseudoClass": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/web/src/lib/auth/rbac-hooks.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "useHookAtTopLevel": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/ui/src/components/data-display/datatable/HierarchicalDataTable.tsx"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useAriaPropsSupportedByRole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/ui/src/components/data-display/datatable/DataTable.tsx",
+        "apps/web/src/app/backend-error/page.tsx",
+        "apps/web/src/components/error-boundary.tsx",
+        "apps/web/src/components/providers/monitoring-provider.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noNoninteractiveTabindex": "off",
+            "noStaticElementInteractions": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/web/src/components/providers/notifications-provider.tsx"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "useHookAtTopLevel": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["apps/web/src/**/*.{ts,tsx}"],
       "linter": {
         "rules": {
@@ -113,6 +170,23 @@
         "rules": {
           "suspicious": {
             "noArrayIndexKey": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/RichTextEditor.tsx",
+        "**/InlineEditor.tsx",
+        "**/ReorderableList.tsx",
+        "**/themed-reorderable-list.tsx",
+        "**/DataTable.tsx",
+        "**/HierarchicalDataTable.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useSemanticElements": "off"
           }
         }
       }

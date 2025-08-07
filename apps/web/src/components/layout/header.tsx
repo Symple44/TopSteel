@@ -165,6 +165,7 @@ export function Header({
                 {/* Actions */}
                 <div className="py-1">
                   <button
+                    type="button"
                     onClick={() => {
                       router.push('/profile')
                       setShowUserMenu(false)
@@ -176,6 +177,7 @@ export function Header({
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => {
                       router.push('/settings')
                       setShowUserMenu(false)
@@ -189,6 +191,7 @@ export function Header({
 
                 <div className="border-t border-border py-1">
                   <button
+                    type="button"
                     onClick={handleLogout}
                     className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                   >

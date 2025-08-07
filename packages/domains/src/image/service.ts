@@ -132,7 +132,12 @@ export class ImageService {
     }
 
     const variants: ImageVariant[] = []
-    const urls: Record<string, string> = {
+    const urls: {
+      original: string
+      thumbnail?: string
+      medium?: string
+      large?: string
+    } = {
       original: `${this.baseUrl}/${category}/original/${fileName}`,
     }
 
@@ -150,7 +155,7 @@ export class ImageService {
         const variant: ImageVariant = {
           id: randomUUID(),
           imageId,
-          variant: variantName as unknown as string,
+          variant: variantName as 'original' | 'thumbnail' | 'medium' | 'large',
           fileName: variantFileName,
           width: variantResult.width,
           height: variantResult.height,
@@ -159,7 +164,8 @@ export class ImageService {
         }
 
         variants.push(variant)
-        urls[variantName] = `${this.baseUrl}/${category}/${variantName}/${variantFileName}`
+        urls[variantName as 'thumbnail' | 'medium' | 'large'] =
+          `${this.baseUrl}/${category}/${variantName}/${variantFileName}`
       }
     }
 

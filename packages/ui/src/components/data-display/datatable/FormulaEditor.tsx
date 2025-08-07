@@ -400,6 +400,7 @@ export function FormulaEditor<T>({
                     const columnRef = String.fromCharCode(65 + index)
                     return (
                       <button
+                        type="button"
                         key={column.id}
                         onClick={() => insertColumnRef(column)}
                         className="text-left p-2 hover:bg-muted rounded text-sm transition-colors"
