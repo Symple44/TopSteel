@@ -98,7 +98,7 @@ export function CardsView({
               <div className="flex flex-wrap gap-1 mb-3">
                 {card.labels.slice(0, 4).map((label, index) => (
                   <Badge
-                    key={index}
+                    key={`label-${label.text}-${index}`}
                     variant="outline"
                     className="text-xs"
                     style={{
@@ -122,7 +122,7 @@ export function CardsView({
             {card.meta && card.meta.length > 0 && (
               <div className="space-y-2">
                 {card.meta.slice(0, 4).map((meta, index) => (
-                  <div key={index} className="flex justify-between text-sm">
+                  <div key={`meta-${meta.label}-${index}`} className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-medium">{meta.label}:</span>
                     <span className="text-right truncate ml-2">{meta.value}</span>
                   </div>

@@ -70,7 +70,7 @@ interface NotificationsAction {
     | 'SET_CONNECTED'
     | 'SET_LOADING'
     | 'SET_ERROR'
-  payload?: any
+  payload?: unknown
 }
 
 // ===== REDUCER =====
@@ -317,7 +317,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     const mockSocket = {
       connected: true,
       readyState: WebSocket.OPEN,
-      emit: (_event: string, _data?: any) => {
+      emit: (_event: string, _data?: unknown) => {
         // Mock emit (silenced)
       },
       disconnect: () => {
@@ -325,7 +325,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       },
     }
 
-    socketRef.current = mockSocket as any
+    socketRef.current = mockSocket as Socket
 
     // Démarrer le polling pour les notifications
     const pollNotifications = () => {

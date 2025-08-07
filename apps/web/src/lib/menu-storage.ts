@@ -9,7 +9,7 @@ const USER_PREFERENCES_KEY = 'topsteel-user-preferences'
 let memorySelectedPages: Record<string, string[]> = {
   'current-user': ['main-dashboard', 'production-overview'], // Données de test par défaut
 }
-let memoryPreferences: Record<string, any> = {}
+let memoryPreferences: Record<string, Record<string, unknown>> = {}
 
 // Fonctions de stockage hybride (mémoire + localStorage)
 function loadFromStorage<T>(key: string, defaultValue: T): T {
@@ -97,12 +97,12 @@ export const menuStorage = {
   },
 
   // Préférences utilisateur
-  getUserPreferences: (userId: string): any => {
+  getUserPreferences: (userId: string): Record<string, unknown> => {
     const prefs = memoryPreferences[userId] || getDefaultPreferences()
     return prefs
   },
 
-  setUserPreferences: (userId: string, prefs: any): void => {
+  setUserPreferences: (userId: string, prefs: Record<string, unknown>): void => {
     memoryPreferences[userId] = prefs
     saveToStorage(USER_PREFERENCES_KEY, memoryPreferences)
 

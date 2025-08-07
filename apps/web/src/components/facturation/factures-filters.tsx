@@ -17,7 +17,7 @@ interface FacturesFiltersProps {
   onFiltersChange?: (filters: unknown) => void
 }
 
-export function FacturesFilters({ onFiltersChange }: FacturesFiltersProps) {
+export function FacturesFilters({ _onFiltersChange }: FacturesFiltersProps) {
   return (
     <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
       <div className="flex-1">

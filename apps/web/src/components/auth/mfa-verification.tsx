@@ -16,7 +16,7 @@ import {
 } from '@erp/ui'
 import { AlertTriangle, ArrowLeft, Key, Shield, Smartphone, Timer } from 'lucide-react'
 import type React from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
@@ -35,7 +35,7 @@ interface MFAVerificationProps {
 
 interface MFASession {
   sessionToken: string
-  challenge?: any
+  challenge?: unknown
 }
 
 export default function MFAVerification({
@@ -71,7 +71,7 @@ export default function MFAVerification({
     return () => clearInterval(timer)
   }, [onBack, t])
 
-  const initiateMFASession = async () => {
+  const initiateMFASession = useCallback(async () => {
     try {
       setLoading(true)
       const response = await callClientApi('auth/mfa/initiate', {
@@ -86,10 +86,7 @@ export default function MFAVerification({
         const data = await response.json()
         setMFASession(data.data)
 
-        // Si c'est WebAuthn, déclencher automatiquement l'authentification
-        if (selectedMethod === 'webauthn' && data.data.challenge) {
-          await startWebAuthnAuthentication(data.data.challenge)
-        }
+        // WebAuthn challenge sera géré par l'interface utilisateur
       } else {
         toast.error(t('mfaSessionError'))
       }
@@ -98,7 +95,7 @@ export default function MFAVerification({
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedMethod, t])
 
   useEffect(() => {
     // Initiate MFA session when method changes
@@ -108,7 +105,7 @@ export default function MFAVerification({
     initiateMFASession,
   ])
 
-  const startWebAuthnAuthentication = async (options: any) => {
+  const startWebAuthnAuthentication = async (options: unknown) => {
     try {
       // Check WebAuthn support
       if (!window.navigator.credentials || !window.PublicKeyCredential) {
@@ -171,7 +168,7 @@ export default function MFAVerification({
     }
   }
 
-  const verifyMFA = async (code?: string, webauthnResponse?: any) => {
+  const verifyMFA = async (code?: string, webauthnResponse?: unknown) => {
     if (!mfaSession) return
 
     if (attempts >= maxAttempts) {

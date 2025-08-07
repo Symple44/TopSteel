@@ -25,7 +25,7 @@ import {
   Shield,
   XCircle,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
 import { callClientApi } from '@/utils/backend-api'
@@ -78,27 +78,30 @@ export function ElasticsearchAdmin() {
   const [hasConfigChanges, setHasConfigChanges] = useState(false)
   const [lastStatusCheck, setLastStatusCheck] = useState<number>(0)
 
-  const fetchStatus = async (force = false) => {
-    // Cache simple : éviter les appels répétés dans les 30 secondes
-    const now = Date.now()
-    if (!force && now - lastStatusCheck < 30000 && status) {
-      setLoading(false)
-      return
-    }
+  const fetchStatus = useCallback(
+    async (force = false) => {
+      // Cache simple : éviter les appels répétés dans les 30 secondes
+      const now = Date.now()
+      if (!force && now - lastStatusCheck < 30000 && status) {
+        setLoading(false)
+        return
+      }
 
-    try {
-      const response = await callClientApi('admin/elasticsearch?action=status')
-      const data = await response.json()
-      setStatus(data)
-      setLastStatusCheck(now)
-    } catch {
-      toast.error(t('elasticsearch.statusError'))
-    } finally {
-      setLoading(false)
-    }
-  }
+      try {
+        const response = await callClientApi('admin/elasticsearch?action=status')
+        const data = await response.json()
+        setStatus(data)
+        setLastStatusCheck(now)
+      } catch {
+        toast.error(t('elasticsearch.statusError'))
+      } finally {
+        setLoading(false)
+      }
+    },
+    [lastStatusCheck, status, t]
+  )
 
-  const fetchConfig = async () => {
+  const fetchConfig = useCallback(async () => {
     try {
       const response = await callClientApi(
         'admin/system-parameters/by-category?category=ELASTICSEARCH'
@@ -119,38 +122,41 @@ export function ElasticsearchAdmin() {
       }
 
       if (data.length > 0) {
-        const configFromParams = data.reduce((acc: any, param: any) => {
-          switch (param.key) {
-            case 'elasticsearch.url':
-              acc.url = param.value || defaultConfig.url
-              break
-            case 'elasticsearch.username':
-              acc.username = param.value || defaultConfig.username
-              break
-            case 'elasticsearch.password':
-              acc.password = param.value || defaultConfig.password
-              break
-            case 'elasticsearch.enableAuth':
-              acc.enableAuth = param.value === 'true'
-              break
-            case 'elasticsearch.indexPrefix':
-              acc.indexPrefix = param.value || defaultConfig.indexPrefix
-              break
-            case 'elasticsearch.maxRetries':
-              acc.maxRetries = parseInt(param.value) || defaultConfig.maxRetries
-              break
-            case 'elasticsearch.requestTimeout':
-              acc.requestTimeout = parseInt(param.value) || defaultConfig.requestTimeout
-              break
-            case 'elasticsearch.batchSize':
-              acc.batchSize = parseInt(param.value) || defaultConfig.batchSize
-              break
-            case 'elasticsearch.enableLogging':
-              acc.enableLogging = param.value === 'true'
-              break
-          }
-          return acc
-        }, defaultConfig)
+        const configFromParams = data.reduce(
+          (acc: ElasticsearchConfig, param: { key: string; value: string }) => {
+            switch (param.key) {
+              case 'elasticsearch.url':
+                acc.url = param.value || defaultConfig.url
+                break
+              case 'elasticsearch.username':
+                acc.username = param.value || defaultConfig.username
+                break
+              case 'elasticsearch.password':
+                acc.password = param.value || defaultConfig.password
+                break
+              case 'elasticsearch.enableAuth':
+                acc.enableAuth = param.value === 'true'
+                break
+              case 'elasticsearch.indexPrefix':
+                acc.indexPrefix = param.value || defaultConfig.indexPrefix
+                break
+              case 'elasticsearch.maxRetries':
+                acc.maxRetries = parseInt(param.value) || defaultConfig.maxRetries
+                break
+              case 'elasticsearch.requestTimeout':
+                acc.requestTimeout = parseInt(param.value) || defaultConfig.requestTimeout
+                break
+              case 'elasticsearch.batchSize':
+                acc.batchSize = parseInt(param.value) || defaultConfig.batchSize
+                break
+              case 'elasticsearch.enableLogging':
+                acc.enableLogging = param.value === 'true'
+                break
+            }
+            return acc
+          },
+          defaultConfig
+        )
 
         setConfig((prev) => ({ ...prev, ...configFromParams }))
       } else {
@@ -160,7 +166,7 @@ export function ElasticsearchAdmin() {
     } catch {
       toast.error(t('elasticsearch.configurationError'))
     }
-  }
+  }, [t])
 
   const _createDefaultParameters = async (defaultConfig: ElasticsearchConfig) => {
     try {
@@ -347,7 +353,12 @@ export function ElasticsearchAdmin() {
     }
   }
 
-  const getIndexStatusBadge = (index: any) => {
+  const getIndexStatusBadge = (index: {
+    exists: boolean
+    health?: string
+    status?: string
+    docsCount?: number
+  }) => {
     if (!index.exists) {
       return (
         <Badge variant="secondary">

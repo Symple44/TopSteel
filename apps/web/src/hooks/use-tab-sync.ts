@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 
 export interface TabSyncEvent {
   type: 'COMPANY_CHANGED' | 'USER_LOGIN' | 'USER_LOGOUT' | 'TOKEN_REFRESH'
-  data?: any
+  data?: Record<string, unknown>
   timestamp?: number
 }
 
@@ -66,14 +66,18 @@ export function useAuthTabSync(onAuthEvent: (event: TabSyncEvent) => void) {
     onMessage: onAuthEvent,
   })
 
-  const notifyCompanyChange = (data: { company: any; user: any; tokens: any }) => {
+  const notifyCompanyChange = (data: {
+    company: Record<string, unknown>
+    user: Record<string, unknown>
+    tokens: Record<string, unknown>
+  }) => {
     broadcast({ type: 'COMPANY_CHANGED', data })
   }
 
   const notifyLogin = (data: {
-    user: any
-    tokens: any
-    company?: any
+    user: Record<string, unknown>
+    tokens: Record<string, unknown>
+    company?: Record<string, unknown>
     requiresCompanySelection?: boolean
   }) => {
     broadcast({ type: 'USER_LOGIN', data })
@@ -83,7 +87,7 @@ export function useAuthTabSync(onAuthEvent: (event: TabSyncEvent) => void) {
     broadcast({ type: 'USER_LOGOUT', data: {} })
   }
 
-  const notifyTokenRefresh = (data: { tokens: any }) => {
+  const notifyTokenRefresh = (data: { tokens: Record<string, unknown> }) => {
     broadcast({ type: 'TOKEN_REFRESH', data })
   }
 

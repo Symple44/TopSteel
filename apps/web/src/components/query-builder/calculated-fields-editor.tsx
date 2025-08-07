@@ -27,13 +27,13 @@ interface CalculatedField {
   dataType: string
   isVisible: boolean
   displayOrder: number
-  format?: any
+  format?: Record<string, unknown>
   dependencies?: string[]
 }
 
 interface CalculatedFieldsEditorProps {
   fields: CalculatedField[]
-  columns: any[]
+  columns: Array<{ name: string; type: string; label?: string }>
   onFieldsChange: (fields: CalculatedField[]) => void
 }
 

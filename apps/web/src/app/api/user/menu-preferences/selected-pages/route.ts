@@ -28,8 +28,8 @@ export async function GET(request: NextRequest) {
       }
 
       const selectedPages = menuPreferences
-        .filter((p: any) => p.isVisible)
-        .map((p: any) => p.menuId)
+        .filter((p: { isVisible?: boolean }) => p.isVisible)
+        .map((p: { menuId: string }) => p.menuId)
 
       return NextResponse.json({
         success: true,

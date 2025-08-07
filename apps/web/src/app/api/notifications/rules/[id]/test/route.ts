@@ -3,14 +3,14 @@ import { type NextRequest, NextResponse } from 'next/server'
 // Service de test des règles (mockée)
 class RuleTestService {
   evaluateConditions(
-    conditions: any[],
-    testData: Record<string, any>
-  ): { result: boolean; details: Record<string, any> } {
+    conditions: Array<{ field: string; operator: string; value: unknown; logic?: 'AND' | 'OR' }>,
+    testData: Record<string, unknown>
+  ): { result: boolean; details: Record<string, unknown> } {
     if (!conditions || conditions.length === 0) {
       return { result: true, details: {} }
     }
 
-    const results: Record<string, any> = {}
+    const results: Record<string, { result: boolean; value: unknown }> = {}
     let finalResult = true
 
     for (let i = 0; i < conditions.length; i++) {
@@ -37,7 +37,10 @@ class RuleTestService {
     return { result: finalResult, details: results }
   }
 
-  private evaluateCondition(condition: any, testData: Record<string, any>): boolean {
+  private evaluateCondition(
+    condition: { field: string; operator: string; value: unknown },
+    testData: Record<string, unknown>
+  ): boolean {
     const fieldValue = this.getFieldValue(condition.field, testData)
     const conditionValue = condition.value
 
@@ -97,7 +100,7 @@ class RuleTestService {
     }
   }
 
-  private getFieldValue(field: string, data: Record<string, any>): any {
+  private getFieldValue(field: string, data: Record<string, unknown>): unknown {
     const fieldParts = field.split('.')
     let value = data
 
@@ -112,16 +115,16 @@ class RuleTestService {
     return value
   }
 
-  substituteVariables(template: string, variables: Record<string, any>): string {
+  substituteVariables(template: string, variables: Record<string, unknown>): string {
     return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       return variables[key] !== undefined ? String(variables[key]) : match
     })
   }
 
   prepareTemplateVariables(
-    testData: Record<string, any>,
+    testData: Record<string, unknown>,
     triggerType: string
-  ): Record<string, any> {
+  ): Record<string, unknown> {
     const variables = { ...testData }
 
     // Ajouter des variables système
@@ -167,7 +170,20 @@ class RuleTestService {
 const ruleTestService = new RuleTestService()
 
 // Stockage temporaire des règles
-const notificationRules: any[] = [
+interface NotificationRule {
+  id: string
+  name: string
+  conditions: Array<{ field: string; operator: string; value: unknown; logic?: 'AND' | 'OR' }>
+  notification: {
+    type: 'info' | 'success' | 'warning' | 'error'
+    category: string
+    title: string
+    message: string
+    [key: string]: unknown
+  }
+}
+
+const notificationRules: NotificationRule[] = [
   {
     id: '1',
     name: 'Alerte Stock Critique',
@@ -292,7 +308,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
     // Générer des exemples de données selon le type d'événement
     const triggerType = rule.trigger.type
-    let sampleData: Record<string, any> = {}
+    let sampleData: Record<string, unknown> = {}
 
     switch (triggerType) {
       case 'stock':

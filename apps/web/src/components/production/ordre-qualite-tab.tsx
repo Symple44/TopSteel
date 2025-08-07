@@ -22,7 +22,7 @@ interface OrdreQualiteTabProps {
   ordre: OrdreSimple
 }
 
-export function OrdreQualiteTab({ ordre }: OrdreQualiteTabProps) {
+export function OrdreQualiteTab({ _ordre }: OrdreQualiteTabProps) {
   // Simulation de contrôles pour la démo (ordre.controlesIds contiendrait les IDs)
   const controles: ControleQualite[] = []
 

@@ -32,7 +32,7 @@ export interface UserMenuPreferences {
 export interface MenuItemAction {
   action: 'favorite' | 'unfavorite' | 'hide' | 'show' | 'pin' | 'unpin' | 'reorder'
   menuItemId: string
-  value?: any
+  value?: unknown
 }
 
 export interface UpdatePreferencesDto {
@@ -284,7 +284,7 @@ export function useUserMenuPreferences() {
     }
   }, [])
 
-  const importPreferences = useCallback(async (importData: any) => {
+  const importPreferences = useCallback(async (importData: Record<string, unknown>) => {
     try {
       const response = await callClientApi('user/menu-preferences/import', {
         method: 'POST',

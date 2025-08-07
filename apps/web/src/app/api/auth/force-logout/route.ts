@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
             sessionStorage.clear();
             
             // Effacer les cookies côté client
+            // biome-ignore lint/security/noDocumentCookie: Cookie enumeration for logout cleanup
             document.cookie.split(";").forEach(function(c) { 
+              // biome-ignore lint/security/noDocumentCookie: Cookie expiration for logout cleanup
               document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
             });
             

@@ -17,8 +17,8 @@ interface HeaderProps {
 }
 
 export function Header({
-  onToggleSidebar,
-  isSidebarCollapsed = false,
+  _onToggleSidebar,
+  _isSidebarCollapsed = false,
   onShowCompanySelector,
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')

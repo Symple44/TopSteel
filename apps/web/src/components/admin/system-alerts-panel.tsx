@@ -209,7 +209,13 @@ export default function SystemAlertsPanel({
                           {alert.title}
                         </h4>
                         <Badge
-                          variant={getAlertBadgeVariant(alert.type) as any}
+                          variant={
+                            getAlertBadgeVariant(alert.type) as
+                              | 'default'
+                              | 'secondary'
+                              | 'destructive'
+                              | 'outline'
+                          }
                           className="text-xs"
                         >
                           {alert.type}

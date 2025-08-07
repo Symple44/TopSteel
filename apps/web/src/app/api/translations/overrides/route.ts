@@ -7,7 +7,7 @@ export async function GET() {
   try {
     // Lire les overrides depuis le fichier
     const overridesPath = path.join(process.cwd(), 'data/translation-overrides.json')
-    let overrides: Record<string, any> = {}
+    let overrides: Record<string, unknown> = {}
 
     try {
       const overridesContent = await fs.readFile(overridesPath, 'utf-8')

@@ -15,7 +15,7 @@ interface NotificationRule {
     id: string
     field: string
     operator: string
-    value: any
+    value: unknown
     type: string
     logic?: 'AND' | 'OR'
   }>

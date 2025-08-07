@@ -39,10 +39,10 @@ export async function POST(request: NextRequest) {
       buffer,
       file.name,
       file.type,
-      category as any,
+      category as string,
       session.user.id,
       {
-        entityType: entityType as any,
+        entityType: entityType as string,
         entityId,
         alt,
         description,

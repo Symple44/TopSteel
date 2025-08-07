@@ -1,5 +1,6 @@
 'use client'
 
+import DOMPurify from 'dompurify'
 import { AlertTriangle, Calculator, Check, X } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -12,11 +13,11 @@ import { FormulaEditor } from './FormulaEditor'
 import type { ColumnConfig } from './types'
 import { ValidationUtils } from './validation-utils'
 
-interface InlineEditorProps<T = any> {
-  value: any
+interface InlineEditorProps<T = Record<string, unknown>> {
+  value: unknown
   row: T
   column: ColumnConfig<T>
-  onSave: (value: any) => void
+  onSave: (value: unknown) => void
   onCancel: () => void
   autoFocus?: boolean
   allColumns?: ColumnConfig<T>[]
@@ -25,7 +26,7 @@ interface InlineEditorProps<T = any> {
   onOpenRichTextEditor?: () => void
 }
 
-export function InlineEditor<T = any>({
+export function InlineEditor<T = Record<string, unknown>>({
   value: initialValue,
   row,
   column,
@@ -52,7 +53,7 @@ export function InlineEditor<T = any>({
 
   // Valider en temps réel
   const validateValue = useCallback(
-    (val: any) => {
+    (val: unknown) => {
       const result = ValidationUtils.validateValue(val, column, row)
       setValidation(result)
       setShowValidation(!result.isValid || !!result.warning)
@@ -130,7 +131,7 @@ export function InlineEditor<T = any>({
           <Input
             ref={inputRef}
             value={value || ''}
-            onChange={(e: any) => setValue(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
@@ -148,7 +149,7 @@ export function InlineEditor<T = any>({
             ref={inputRef}
             type="number"
             value={value || ''}
-            onChange={(e: any) => setValue(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
@@ -168,7 +169,7 @@ export function InlineEditor<T = any>({
             ref={inputRef}
             type="date"
             value={value instanceof Date ? value.toISOString().split('T')[0] : value || ''}
-            onChange={(e: any) => setValue(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
@@ -185,7 +186,7 @@ export function InlineEditor<T = any>({
             ref={inputRef}
             type="datetime-local"
             value={value instanceof Date ? value.toISOString().slice(0, 16) : value || ''}
-            onChange={(e: any) => setValue(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(
@@ -244,7 +245,7 @@ export function InlineEditor<T = any>({
               value.map((val, index) => {
                 const option = column.options?.find((opt) => opt.value === val)
                 return (
-                  <Badge key={index} variant="outline" className="m-1 text-xs">
+                  <Badge key={`${val}-${index}`} variant="outline" className="m-1 text-xs">
                     {option ? option.label : String(val)}
                   </Badge>
                 )
@@ -261,7 +262,7 @@ export function InlineEditor<T = any>({
             <Input
               ref={inputRef}
               value={value || ''}
-              onChange={(e: any) => setValue(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleSave}
               className={cn(
@@ -292,7 +293,18 @@ export function InlineEditor<T = any>({
               !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
               validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
             )}
-            dangerouslySetInnerHTML={{ __html: value || '' }}
+            dangerouslySetInnerHTML={{
+              __html:
+                typeof window !== 'undefined'
+                  ? DOMPurify.sanitize(value || '', {
+                      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'span', 'div'],
+                      ALLOWED_ATTR: ['class'],
+                    })
+                  : (value || '').replace(
+                      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                      ''
+                    ),
+            }}
             onInput={(e) => {
               const target = e.target as HTMLDivElement
               setValue(target.innerHTML)
@@ -320,7 +332,7 @@ export function InlineEditor<T = any>({
           <Input
             ref={inputRef}
             value={value || ''}
-            onChange={(e: any) => setValue(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
             className={cn(

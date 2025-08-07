@@ -199,7 +199,7 @@ export function NotificationDashboardV2({ isOpen, onClose }: NotificationDashboa
                     <button
                       type="button"
                       key={status.value}
-                      onClick={() => setSelectedStatus(status.value as any)}
+                      onClick={() => setSelectedStatus(status.value as 'all' | 'unread' | 'read')}
                       className={cn(
                         'w-full flex items-center justify-between p-2 rounded-lg text-sm transition-colors',
                         selectedStatus === status.value

@@ -12,7 +12,7 @@ import { useAppearanceSettings } from '@/hooks/use-appearance-settings'
 interface DashboardContentProps {
   children: ReactNode
   requiresCompanySelection: boolean
-  company: any
+  company: { id: string; name: string; logo?: string } | null
 }
 
 export function DashboardContent({

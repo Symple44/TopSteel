@@ -26,8 +26,8 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
 // Composant pour valider les permissions d'accès
 export function RouteGuard({
   children,
-  requiredPermissions = [],
-  fallbackUrl = '/dashboard',
+  _requiredPermissions = [],
+  _fallbackUrl = '/dashboard',
 }: {
   children: React.ReactNode
   requiredPermissions?: string[]

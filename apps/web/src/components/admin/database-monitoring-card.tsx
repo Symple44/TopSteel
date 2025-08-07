@@ -135,7 +135,16 @@ export default function DatabaseMonitoringCard({
               <CardDescription className="text-xs">Base de données {variant}</CardDescription>
             </div>
           </div>
-          <Badge variant={getStatusBadgeVariant(metrics.status) as any} className="text-xs">
+          <Badge
+            variant={
+              getStatusBadgeVariant(metrics.status) as
+                | 'default'
+                | 'secondary'
+                | 'destructive'
+                | 'outline'
+            }
+            className="text-xs"
+          >
             {metrics.status}
           </Badge>
         </div>

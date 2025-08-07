@@ -4,6 +4,7 @@ import { Badge } from '@erp/ui'
 import { Clock, Tag } from 'lucide-react'
 import React from 'react'
 import type { TranslationEntry } from '@/lib/i18n/types'
+import { sanitizeHtml } from '@/lib/security/security-enhanced'
 
 export const NamespaceCell = React.memo(({ value }: { value: string }) => (
   <Badge variant="secondary" className="text-xs">
@@ -76,7 +77,8 @@ export const TranslationCell = React.memo(({ translation }: { translation: strin
     return (
       <div
         className="min-h-[40px] richtext-cell text-sm"
-        dangerouslySetInnerHTML={{ __html: translation }}
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized with sanitizeHtml function for XSS protection
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(translation) }}
       />
     )
   }

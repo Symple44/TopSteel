@@ -18,7 +18,7 @@ interface DevisFiltersProps {
   onFiltersChange?: (filters: unknown) => void
 }
 
-export function DevisFilters({ onFiltersChange }: DevisFiltersProps) {
+export function DevisFilters({ _onFiltersChange }: DevisFiltersProps) {
   return (
     <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
       <div className="flex-1">

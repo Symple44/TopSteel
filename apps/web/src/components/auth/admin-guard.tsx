@@ -46,7 +46,7 @@ export function AdminGuard({
     // Vérifier les permissions requises
     if (requiredPermissions.length > 0) {
       const hasRequiredPermissions = requiredPermissions.every((permission) =>
-        hasPermission(permission as any)
+        hasPermission(permission as string)
       )
 
       if (!hasRequiredPermissions) {
@@ -101,7 +101,7 @@ export function AdminGuard({
   // Vérification des permissions
   if (requiredPermissions.length > 0) {
     const hasRequiredPermissions = requiredPermissions.every((permission) =>
-      hasPermission(permission as any)
+      hasPermission(permission as string)
     )
 
     if (!hasRequiredPermissions) {

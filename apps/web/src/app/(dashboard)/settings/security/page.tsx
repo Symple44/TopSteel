@@ -34,7 +34,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/hooks'
 import { callClientApi } from '@/utils/backend-api'
@@ -97,7 +97,7 @@ export default function SecuritySettingsPage() {
   const [showBackupCodes, setShowBackupCodes] = useState(false)
   const [backupCodes, setBackupCodes] = useState<string[]>([])
 
-  const loadMFAData = async () => {
+  const loadMFAData = useCallback(async () => {
     try {
       setLoading(true)
       const [statsResponse, methodsResponse] = await Promise.all([
@@ -117,7 +117,7 @@ export default function SecuritySettingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [t])
 
   useEffect(() => {
     loadMFAData()

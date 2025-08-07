@@ -19,11 +19,11 @@ import { Download, RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 interface DataTablePreviewProps {
-  data: any[]
-  columns?: any[]
-  calculatedFields?: any[]
-  layout?: any
-  settings?: any
+  data: Record<string, unknown>[]
+  columns?: Array<{ name: string; type: string; label?: string }>
+  calculatedFields?: Array<{ name: string; expression: string; type: string }>
+  layout?: Record<string, unknown>
+  settings?: Record<string, unknown>
 }
 
 // Convert query builder data types to DataTable types

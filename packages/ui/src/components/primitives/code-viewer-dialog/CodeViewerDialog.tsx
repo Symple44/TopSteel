@@ -55,7 +55,7 @@ export function CodeViewerDialog({
   translations = {},
 }: CodeViewerDialogProps) {
   // Default translations with fallbacks
-  const t = (key: string, params?: { [key: string]: any }) => {
+  const t = (key: string, params?: Record<string, string | number>) => {
     const defaultTranslations = {
       title: 'Code Viewer',
       loading: 'Loading...',
@@ -344,7 +344,7 @@ export function CodeViewerDialog({
                             return (
                               <button
                                 type="button"
-                                key={index}
+                                key={`line-${lineNumber}`}
                                 className={`text-right text-sm font-mono select-none cursor-pointer transition-colors hover:bg-muted/50 px-1 rounded w-full ${
                                   isSelected
                                     ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 font-semibold'
@@ -382,7 +382,7 @@ export function CodeViewerDialog({
 
                             return (
                               <div
-                                key={index}
+                                key={`line-${lineNumber}`}
                                 className={`text-sm font-mono transition-colors ${
                                   isSelected
                                     ? 'bg-blue-500/10 text-foreground border-l-2 border-blue-500 pl-2 -ml-2'

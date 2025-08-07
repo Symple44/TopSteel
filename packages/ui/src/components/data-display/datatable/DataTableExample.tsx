@@ -202,7 +202,10 @@ const columns: ColumnConfig<ExampleData>[] = [
         return (
           <div className="flex flex-wrap gap-1">
             {value.slice(0, 2).map((skill, index) => (
-              <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+              <span
+                key={`skill-${skill}-${index}`}
+                className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+              >
                 {skill}
               </span>
             ))}
@@ -255,7 +258,11 @@ export function DataTableExample() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleCellEdit = (newValue: any, row: ExampleData, column: ColumnConfig<ExampleData>) => {
+  const handleCellEdit = (
+    newValue: unknown,
+    row: ExampleData,
+    column: ColumnConfig<ExampleData>
+  ) => {
     setData((prevData) =>
       prevData.map((item) => (item.id === row.id ? { ...item, [column.key]: newValue } : item))
     )

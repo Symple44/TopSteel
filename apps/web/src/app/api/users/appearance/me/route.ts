@@ -29,7 +29,7 @@ export async function PATCH(request: NextRequest) {
       'accentColor',
       'contentWidth',
     ]
-    const cleanedBody: Record<string, any> = {}
+    const cleanedBody: Record<string, unknown> = {}
 
     for (const field of allowedFields) {
       if (body[field] !== undefined) {

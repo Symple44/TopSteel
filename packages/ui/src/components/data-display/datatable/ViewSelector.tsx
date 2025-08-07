@@ -295,7 +295,7 @@ function ViewSettingsForm<T = any>({
                   Sélectionnez jusqu'à 3 colonnes pour afficher des étiquettes colorées
                 </p>
                 {[0, 1, 2].map((index) => (
-                  <div key={index} className="mb-2">
+                  <div key={`kanban-label-column-${index}`} className="mb-2">
                     <CustomSelect
                       value={kanbanSettings.cardLabelsColumns?.[index] || 'none'}
                       onValueChange={(value) => {
@@ -331,7 +331,7 @@ function ViewSettingsForm<T = any>({
                   Sélectionnez jusqu'à 3 colonnes pour afficher des informations en bas de carte
                 </p>
                 {[0, 1, 2].map((index) => (
-                  <div key={index} className="mb-2">
+                  <div key={`kanban-meta-column-${index}`} className="mb-2">
                     <CustomSelect
                       value={kanbanSettings.metaColumns?.[index] || 'none'}
                       onValueChange={(value) => {
@@ -451,7 +451,7 @@ function ViewSettingsForm<T = any>({
                 Sélectionnez jusqu'à 3 colonnes pour afficher des informations supplémentaires
               </p>
               {[0, 1, 2].map((index) => (
-                <div key={index} className="mb-2">
+                <div key={`cards-meta-column-${index}`} className="mb-2">
                   <CustomSelect
                     value={cardsSettings.metaColumns?.[index] || 'none'}
                     onValueChange={(value) => {

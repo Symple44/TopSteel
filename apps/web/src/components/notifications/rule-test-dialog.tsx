@@ -28,9 +28,9 @@ interface TestResult {
     ruleActive: boolean
     conditionResult: {
       result: boolean
-      details: Record<string, any>
+      details: Record<string, { result: boolean; value?: unknown; expected?: unknown }>
     }
-    templateVariables?: Record<string, any>
+    templateVariables?: Record<string, unknown>
     notificationPreview?: {
       title: string
       message: string
@@ -54,7 +54,7 @@ interface RuleTestDialogProps {
 export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTestDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [testData, setTestData] = useState('')
-  const [sampleData, setSampleData] = useState<any>(null)
+  const [sampleData, setSampleData] = useState<Record<string, unknown> | null>(null)
   const [testResult, setTestResult] = useState<TestResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingSample, setLoadingSample] = useState(false)
@@ -277,7 +277,10 @@ export default function RuleTestDialog({ ruleId, ruleName, triggerType }: RuleTe
                       <h4 className="font-medium">Évaluation des conditions:</h4>
                       <div className="space-y-2">
                         {Object.entries(testResult.result.conditionResult.details).map(
-                          ([conditionId, details]: [string, any]) => (
+                          ([conditionId, details]: [
+                            string,
+                            { result: boolean; value?: unknown; expected?: unknown },
+                          ]) => (
                             <div key={conditionId} className="flex items-center space-x-2 text-sm">
                               {details.result ? (
                                 <CheckCircle className="h-4 w-4 text-green-500" />

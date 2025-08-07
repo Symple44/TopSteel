@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { callClientApi } from '@/utils/backend-api'
 
 export interface UseImageUploadOptions {
-  onSuccess?: (result: any) => void
+  onSuccess?: (result: { url: string; filename: string; size: number }) => void
   onError?: (error: string) => void
   category: 'avatar' | 'logo' | 'document'
   entityType?: 'user' | 'company' | 'project'

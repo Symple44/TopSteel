@@ -52,7 +52,7 @@ import {
   Users,
   X,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { callClientApi } from '@/utils/backend-api'
 
 interface User {
@@ -183,7 +183,7 @@ export default function BulkProfileManagement({
   const [sendNotification, setSendNotification] = useState(true)
   const [operationReason, setOperationReason] = useState('')
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       const response = await callClientApi('admin/users?includeGroups=true&includeRoles=true')
       const data = await response.json()
@@ -191,9 +191,9 @@ export default function BulkProfileManagement({
         setUsers(data.data)
       }
     } catch {}
-  }
+  }, [])
 
-  const loadRoles = async () => {
+  const loadRoles = useCallback(async () => {
     try {
       const response = await callClientApi('admin/roles')
       const data = await response.json()
@@ -201,9 +201,9 @@ export default function BulkProfileManagement({
         setRoles(data.data)
       }
     } catch {}
-  }
+  }, [])
 
-  const loadGroups = async () => {
+  const loadGroups = useCallback(async () => {
     try {
       const response = await callClientApi('admin/groups')
       const data = await response.json()
@@ -211,7 +211,7 @@ export default function BulkProfileManagement({
         setGroups(data.data)
       }
     } catch {}
-  }
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -264,7 +264,7 @@ export default function BulkProfileManagement({
 
     setLoading(true)
     try {
-      const operationData: any = {
+      const operationData: Record<string, unknown> = {
         userIds: selectedUsers,
         operation: selectedOperation.type,
         reason: operationReason,

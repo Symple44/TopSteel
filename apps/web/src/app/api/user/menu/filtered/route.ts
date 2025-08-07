@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
         data: [],
       },
       {
-        status: (error as any).response?.status || 500,
+        status: (error as { response?: { status?: number } })?.response?.status || 500,
       }
     )
   }

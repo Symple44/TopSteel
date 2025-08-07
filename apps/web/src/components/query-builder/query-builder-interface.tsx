@@ -290,8 +290,8 @@ export function QueryBuilderInterface({ queryBuilderId, initialData }: QueryBuil
               {previewData && (
                 <span className="text-sm text-muted-foreground">
                   {Array.isArray(previewData)
-                    ? (previewData as any).length
-                    : (previewData as any)?.data?.length || 0}{' '}
+                    ? (previewData as unknown[]).length
+                    : (previewData as { data?: unknown[] })?.data?.length || 0}{' '}
                   {t('results')}
                 </span>
               )}

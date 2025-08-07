@@ -458,7 +458,9 @@ function PermissionEditor({
   modules: Module[]
   onSave: () => void
 }) {
-  const [permissions, setPermissions] = useState<any[]>([])
+  const [permissions, setPermissions] = useState<
+    { id: string; name: string; description: string }[]
+  >([])
   const [loading, setLoading] = useState(true)
 
   const loadPermissions = useCallback(async () => {

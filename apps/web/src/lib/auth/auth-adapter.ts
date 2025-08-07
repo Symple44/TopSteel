@@ -137,10 +137,10 @@ export class AuthAdapter {
 
     // Ajouter les propriétés optionnelles seulement si elles existent sur le type
     if ('methods' in existingMFA && existingMFA.methods) {
-      ;(result as any).methods = existingMFA.methods
+      ;(result as Record<string, unknown>).methods = existingMFA.methods
     }
     if ('backupCodes' in existingMFA && existingMFA.backupCodes !== undefined) {
-      ;(result as any).backupCodes = existingMFA.backupCodes
+      ;(result as Record<string, unknown>).backupCodes = existingMFA.backupCodes
     }
 
     return result
@@ -157,7 +157,7 @@ export class AuthAdapter {
         id: `perm-${permString}`,
         code: permString.toUpperCase(),
         module: module || 'general',
-        action: (action || 'read') as any,
+        action: (action || 'read') as string,
         description: `Permission ${permString}`,
         resource: undefined,
       }

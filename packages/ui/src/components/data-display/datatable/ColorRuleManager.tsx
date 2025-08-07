@@ -227,7 +227,7 @@ export function ColorRuleManager<T = any>({
                 <Input
                   id="rule-name"
                   value={editingRule.name}
-                  onChange={(e: any) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setEditingRule((prev) => (prev ? { ...prev, name: e.target.value } : null))
                   }
                   placeholder="Ex: Valeurs élevées"
@@ -253,7 +253,7 @@ export function ColorRuleManager<T = any>({
                   <Label>Condition</Label>
                   <CustomSelect
                     value={editingRule.condition}
-                    onValueChange={(value: any) =>
+                    onValueChange={(value: string) =>
                       setEditingRule((prev) => (prev ? { ...prev, condition: value } : null))
                     }
                     placeholder="Sélectionner une condition"
@@ -271,7 +271,7 @@ export function ColorRuleManager<T = any>({
                     <Label>Valeur</Label>
                     <Input
                       value={editingRule.value || ''}
-                      onChange={(e: any) =>
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setEditingRule((prev) => (prev ? { ...prev, value: e.target.value } : null))
                       }
                       placeholder="Valeur à comparer"
@@ -283,7 +283,7 @@ export function ColorRuleManager<T = any>({
                       <Label>Valeur 2</Label>
                       <Input
                         value={editingRule.value2 || ''}
-                        onChange={(e: any) =>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setEditingRule((prev) =>
                             prev ? { ...prev, value2: e.target.value } : null
                           )
@@ -301,9 +301,9 @@ export function ColorRuleManager<T = any>({
               <div>
                 <Label className="mb-2 block">Couleurs prédéfinies</Label>
                 <div className="grid grid-cols-4 gap-2">
-                  {PREDEFINED_COLORS.map((color, index) => (
+                  {PREDEFINED_COLORS.map((color, _index) => (
                     <button
-                      key={index}
+                      key={`color-${color.bg}-${color.text}`}
                       type="button"
                       className="p-3 rounded border text-sm font-medium hover:scale-105 transition-transform"
                       style={{ backgroundColor: color.bg, color: color.text }}

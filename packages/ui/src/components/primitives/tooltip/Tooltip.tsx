@@ -305,7 +305,7 @@ const SimpleTooltip = React.forwardRef<HTMLDivElement, SimpleTooltipProps>(
         : React.isValidElement(triggerContent) &&
           (triggerContent.type === 'button' ||
             (typeof triggerContent.type === 'function' &&
-              (triggerContent.type as any).displayName?.includes('Button')))
+              (triggerContent.type as { displayName?: string }).displayName?.includes('Button')))
 
     if (!content || disabled) {
       // Si pas de contenu ou désactivé, retourner juste le trigger

@@ -832,47 +832,46 @@ export default function MenuDragDropPage() {
   }, [])
 
   // Fonction récursive pour mapper les éléments de menu
-  const mapMenuItemRecursively = (
-    item: unknown,
-    index: number,
-    parentId?: string
-  ): UserMenuItem => {
-    const itemTyped = item as {
-      id?: string
-      parentId?: string
-      type?: 'M' | 'P' | 'L' | 'D'
-      programId?: string
-      externalUrl?: string
-      queryBuilderId?: string
-      orderIndex?: number
-      isVisible?: boolean
-      children?: unknown[]
-      customIcon?: string
-      icon?: string
-      customTitle?: string
-      customIconColor?: string
-    }
-    return {
-      id: itemTyped.id || `item-${Date.now()}-${index}`,
-      parentId: parentId || itemTyped.parentId,
-      title: getTranslatedTitle(item) || 'Sans titre',
-      type: itemTyped.type || 'P',
-      programId: itemTyped.programId,
-      externalUrl: itemTyped.externalUrl,
-      queryBuilderId: itemTyped.queryBuilderId,
-      orderIndex: typeof itemTyped.orderIndex === 'number' ? itemTyped.orderIndex : index,
-      isVisible: typeof itemTyped.isVisible === 'boolean' ? itemTyped.isVisible : true,
-      children: Array.isArray(itemTyped.children)
-        ? itemTyped.children.map((child: unknown, childIndex: number) =>
-            mapMenuItemRecursively(child, childIndex, itemTyped.id)
-          )
-        : [],
-      icon: itemTyped.customIcon || itemTyped.icon,
-      customTitle: itemTyped.customTitle,
-      customIcon: itemTyped.customIcon,
-      customIconColor: itemTyped.customIconColor,
-    }
-  }
+  const mapMenuItemRecursively = useCallback(
+    (item: unknown, index: number, parentId?: string): UserMenuItem => {
+      const itemTyped = item as {
+        id?: string
+        parentId?: string
+        type?: 'M' | 'P' | 'L' | 'D'
+        programId?: string
+        externalUrl?: string
+        queryBuilderId?: string
+        orderIndex?: number
+        isVisible?: boolean
+        children?: unknown[]
+        customIcon?: string
+        icon?: string
+        customTitle?: string
+        customIconColor?: string
+      }
+      return {
+        id: itemTyped.id || `item-${Date.now()}-${index}`,
+        parentId: parentId || itemTyped.parentId,
+        title: getTranslatedTitle(item) || 'Sans titre',
+        type: itemTyped.type || 'P',
+        programId: itemTyped.programId,
+        externalUrl: itemTyped.externalUrl,
+        queryBuilderId: itemTyped.queryBuilderId,
+        orderIndex: typeof itemTyped.orderIndex === 'number' ? itemTyped.orderIndex : index,
+        isVisible: typeof itemTyped.isVisible === 'boolean' ? itemTyped.isVisible : true,
+        children: Array.isArray(itemTyped.children)
+          ? itemTyped.children.map((child: unknown, childIndex: number) =>
+              mapMenuItemRecursively(child, childIndex, itemTyped.id)
+            )
+          : [],
+        icon: itemTyped.customIcon || itemTyped.icon,
+        customTitle: itemTyped.customTitle,
+        customIcon: itemTyped.customIcon,
+        customIconColor: itemTyped.customIconColor,
+      }
+    },
+    []
+  )
 
   const loadUserMenu = useCallback(async () => {
     try {
@@ -1160,7 +1159,7 @@ export default function MenuDragDropPage() {
     setShowEditModal(true)
   }
 
-  const resetItemEdit = () => {
+  const resetItemEdit = useCallback(() => {
     if (!editingItem) return
     setEditTitle(getTranslatedTitle(editingItem))
     setEditTitleTranslations(editingItem.titleTranslations || {})
@@ -1168,9 +1167,9 @@ export default function MenuDragDropPage() {
     setEditIconColor(editingItem.customIconColor || '')
     setEditUrl(editingItem.externalUrl || '')
     setEditQueryId(editingItem.queryBuilderId || '')
-  }
+  }, [editingItem])
 
-  const saveItemEdit = async () => {
+  const saveItemEdit = useCallback(async () => {
     if (!editingItem || isSaving) return
 
     setIsSaving(true)
@@ -1257,7 +1256,17 @@ export default function MenuDragDropPage() {
       // Erreur lors de la sauvegarde
       setIsSaving(false)
     }
-  }
+  }, [
+    editingItem,
+    isSaving,
+    editTitleTranslations,
+    editTitle,
+    editIcon,
+    editIconColor,
+    editUrl,
+    editQueryId,
+    userMenu,
+  ])
 
   // Raccourcis clavier optimisés
   useEffect(() => {

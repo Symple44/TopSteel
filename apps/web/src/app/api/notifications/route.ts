@@ -8,13 +8,35 @@ import {
 } from '@erp/domains/notifications'
 import { type NextRequest, NextResponse } from 'next/server'
 
+interface Notification {
+  id: string
+  type: string
+  category: string
+  title: string
+  message: string
+}
+
+interface NotificationSetting {
+  id: string
+  userId: string
+  category: string
+  enabled: boolean
+}
+
+interface NotificationRead {
+  id: string
+  userId: string
+  notificationId: string
+  readAt: Date
+}
+
 // Mock de connexion à la base de données (à remplacer par la vraie connexion)
 class MockDatabaseConnection {
-  private notifications: any[] = []
-  private settings: any[] = []
-  private reads: any[] = []
+  private notifications: Notification[] = []
+  private settings: NotificationSetting[] = []
+  private reads: NotificationRead[] = []
 
-  async query<T = any>(sql: string, _params?: any[]): Promise<T[]> {
+  async query<T = unknown>(sql: string, _params?: unknown[]): Promise<T[]> {
     // Simulation basique pour les tests
     if (sql.includes('notification_settings')) {
       return this.settings as T[]
@@ -28,7 +50,10 @@ class MockDatabaseConnection {
     return [] as T[]
   }
 
-  async execute(sql: string, params?: any[]): Promise<{ insertId?: number; affectedRows: number }> {
+  async execute(
+    sql: string,
+    params?: unknown[]
+  ): Promise<{ insertId?: number; affectedRows: number }> {
     // Simulation basique pour les tests
     if (sql.includes('INSERT INTO notifications')) {
       const notification = {
@@ -88,7 +113,7 @@ export async function GET(request: NextRequest) {
       type: searchParams.get('type')?.split(',') as NotificationType[],
       priority: searchParams.get('priority')?.split(',') as NotificationPriority[],
       unreadOnly: searchParams.get('unread') === 'true',
-      recipientType: searchParams.get('recipientType') as any,
+      recipientType: searchParams.get('recipientType') as string | null,
       recipientId: searchParams.get('recipientId') || undefined,
       source: searchParams.get('source') || undefined,
       entityType: searchParams.get('entityType') || undefined,
@@ -102,7 +127,7 @@ export async function GET(request: NextRequest) {
       const filterKey = key as keyof NotificationFilters
       if (
         filters[filterKey] === undefined ||
-        (Array.isArray(filters[filterKey]) && (filters[filterKey] as any[]).length === 0)
+        (Array.isArray(filters[filterKey]) && (filters[filterKey] as unknown[]).length === 0)
       ) {
         delete filters[filterKey]
       }

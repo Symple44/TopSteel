@@ -564,7 +564,11 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Select
                 value={formData.triggerType}
                 onValueChange={(value: string) =>
-                  setFormData((prev) => ({ ...prev, triggerType: value as any, triggerEvent: '' }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    triggerType: value as FormData['triggerType'],
+                    triggerEvent: '',
+                  }))
                 }
               >
                 <SelectTrigger>
@@ -628,7 +632,10 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Select
                 value={formData.notificationType}
                 onValueChange={(value: string) =>
-                  setFormData((prev) => ({ ...prev, notificationType: value as any }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    notificationType: value as FormData['notificationType'],
+                  }))
                 }
               >
                 <SelectTrigger>
@@ -647,7 +654,7 @@ function RuleForm({ rule, onSave }: { rule?: NotificationRule; onSave: () => voi
               <Select
                 value={formData.priority}
                 onValueChange={(value: string) =>
-                  setFormData((prev) => ({ ...prev, priority: value as any }))
+                  setFormData((prev) => ({ ...prev, priority: value as FormData['priority'] }))
                 }
               >
                 <SelectTrigger>

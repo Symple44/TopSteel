@@ -1,5 +1,6 @@
 'use client'
 
+import DOMPurify from 'dompurify'
 import {
   AlignCenter,
   AlignLeft,
@@ -431,7 +432,31 @@ export function RichTextEditor({
           data-placeholder={placeholder}
           onInput={updateContent}
           onBlur={updateContent}
-          dangerouslySetInnerHTML={{ __html: initialContent }}
+          dangerouslySetInnerHTML={{
+            __html:
+              typeof window !== 'undefined'
+                ? DOMPurify.sanitize(initialContent, {
+                    ALLOWED_TAGS: [
+                      'p',
+                      'br',
+                      'strong',
+                      'em',
+                      'u',
+                      'span',
+                      'div',
+                      'h1',
+                      'h2',
+                      'h3',
+                      'ul',
+                      'ol',
+                      'li',
+                      'a',
+                      'blockquote',
+                    ],
+                    ALLOWED_ATTR: ['class', 'style', 'href', 'target'],
+                  })
+                : initialContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
+          }}
           role="textbox"
           aria-label={placeholder || 'Rich text editor'}
           aria-multiline="true"
@@ -685,7 +710,34 @@ export function RichTextEditor({
                   <div
                     className="flex-1 p-4 overflow-y-auto bg-gray-50 preview-content"
                     style={{ fontSize: '14px', lineHeight: '1.6' }}
-                    dangerouslySetInnerHTML={{ __html: content }}
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        typeof window !== 'undefined'
+                          ? DOMPurify.sanitize(content, {
+                              ALLOWED_TAGS: [
+                                'p',
+                                'br',
+                                'strong',
+                                'em',
+                                'u',
+                                'span',
+                                'div',
+                                'h1',
+                                'h2',
+                                'h3',
+                                'ul',
+                                'ol',
+                                'li',
+                                'a',
+                                'blockquote',
+                              ],
+                              ALLOWED_ATTR: ['class', 'style', 'href', 'target'],
+                            })
+                          : content.replace(
+                              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                              ''
+                            ),
+                    }}
                   />
                 </div>
               )}

@@ -26,7 +26,7 @@ interface OrdreOperationsTabProps {
   ordre: OrdreSimple
 }
 
-export function OrdreOperationsTab({ ordre }: OrdreOperationsTabProps) {
+export function OrdreOperationsTab({ _ordre }: OrdreOperationsTabProps) {
   // Simulation d'opérations pour la démo (ordre.operationsIds contiendrait les IDs)
   const operations: Operation[] = []
 

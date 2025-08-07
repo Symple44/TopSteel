@@ -56,7 +56,7 @@ export function PermissionGuard({
 
     // Vérifier les rôles
     if (roles && roles.length > 0) {
-      if (!hasAnyRole(roles as any)) {
+      if (!hasAnyRole(roles as string[])) {
         return false
       }
     }
@@ -82,11 +82,11 @@ export function PermissionGuard({
         return cloneElement(
           children as ReactElement,
           {
-            disabled: true as any,
+            disabled: true,
             className:
-              `${((children as ReactElement).props as any).className || ''} ${disabledClassName}`.trim(),
+              `${((children as ReactElement).props as { className?: string }).className || ''} ${disabledClassName}`.trim(),
             title: errorMessage || "Vous n'avez pas les permissions nécessaires",
-          } as any
+          } as Partial<React.ComponentProps<any>>
         )
       }
       return <>{children}</>
@@ -214,7 +214,7 @@ export function usePermissionGuard() {
 
     // Vérifier les rôles
     if (roles && roles.length > 0) {
-      if (!hasAnyRole(roles as any)) {
+      if (!hasAnyRole(roles as string[])) {
         return false
       }
     }

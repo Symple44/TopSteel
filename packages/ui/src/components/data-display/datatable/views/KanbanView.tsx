@@ -99,7 +99,7 @@ export function KanbanView({
                   <div className="flex flex-wrap gap-1 mb-3">
                     {card.labels.map((label: string, index: number) => (
                       <Badge
-                        key={index}
+                        key={`label-${label}-${index}`}
                         variant="outline"
                         className="text-xs"
                         style={{
@@ -120,7 +120,10 @@ export function KanbanView({
                     {card.meta
                       .slice(0, 3)
                       .map((meta: { label: string; value: string }, index: number) => (
-                        <div key={index} className="flex justify-between text-xs">
+                        <div
+                          key={`meta-${meta.label}-${index}`}
+                          className="flex justify-between text-xs"
+                        >
                           <span className="text-muted-foreground font-medium">{meta.label}:</span>
                           <span className="font-semibold text-foreground">{meta.value}</span>
                         </div>

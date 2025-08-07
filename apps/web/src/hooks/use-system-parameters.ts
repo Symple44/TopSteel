@@ -3,6 +3,12 @@ import { useState } from 'react'
 import { apiClient } from '@/lib/api-client'
 import { callClientApi } from '@/utils/backend-api'
 
+interface SystemParameter {
+  key: string
+  value: string
+  defaultValue?: string
+}
+
 interface UseSystemParametersReturn {
   parameters: Record<string, string> | undefined
   isLoading: boolean
@@ -34,7 +40,7 @@ export function useSystemParameters(): UseSystemParametersReturn {
 
   // Convert parameters list to key-value object
   const parameters = parametersList?.reduce(
-    (acc: Record<string, string>, param: any) => {
+    (acc: Record<string, string>, param: SystemParameter) => {
       acc[param.key] = pendingUpdates[param.key] ?? param.value
       return acc
     },
@@ -83,8 +89,8 @@ export function useSystemParameters(): UseSystemParametersReturn {
     }
 
     const updates = parametersList
-      .filter((param: any) => param.defaultValue !== undefined)
-      .map((param: any) => ({
+      .filter((param: SystemParameter) => param.defaultValue !== undefined)
+      .map((param: SystemParameter) => ({
         key: param.key,
         value: param.defaultValue || '',
       }))

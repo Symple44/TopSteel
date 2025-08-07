@@ -62,7 +62,16 @@ export async function GET(
     } catch (_backendError) {
       // Fallback sur des données mockées
     }
-    const mockColumns: Record<string, any[]> = {
+    const mockColumns: Record<
+      string,
+      Array<{
+        name: string
+        type: string
+        nullable?: boolean
+        default?: unknown
+        description?: string
+      }>
+    > = {
       clients: [
         {
           columnName: 'id',

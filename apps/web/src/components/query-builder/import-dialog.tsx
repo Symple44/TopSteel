@@ -15,7 +15,7 @@ import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 
 interface ImportDialogProps {
-  onImport: (data: any) => void
+  onImport: (data: Record<string, unknown>) => void
 }
 
 export function ImportDialog({ onImport }: ImportDialogProps) {

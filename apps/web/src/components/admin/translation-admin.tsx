@@ -152,7 +152,7 @@ export default function TranslationAdmin() {
   }
 
   // Gérer l'édition inline depuis le DataTable
-  const handleCellEdit = async (_value: any, row: TranslationEntry) => {
+  const handleCellEdit = async (_value: unknown, row: TranslationEntry) => {
     try {
       const success = await saveTranslation(row)
       if (success) {

@@ -1,5 +1,6 @@
 'use client'
 
+import DOMPurify from 'dompurify'
 import { SectionWrapper } from './SectionWrapper'
 import type { SectionProps } from './types'
 
@@ -48,7 +49,37 @@ export function TextBlockSection({ section, isEditing }: SectionProps<TextBlockC
 
         <div
           className="prose prose-lg max-w-none"
-          dangerouslySetInnerHTML={{ __html: content.content }}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized with DOMPurify for XSS protection
+          dangerouslySetInnerHTML={{
+            __html:
+              typeof window !== 'undefined'
+                ? DOMPurify.sanitize(content.content, {
+                    ALLOWED_TAGS: [
+                      'p',
+                      'br',
+                      'strong',
+                      'em',
+                      'u',
+                      'h1',
+                      'h2',
+                      'h3',
+                      'h4',
+                      'h5',
+                      'h6',
+                      'ul',
+                      'ol',
+                      'li',
+                      'a',
+                      'blockquote',
+                      'img',
+                    ],
+                    ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'src', 'alt', 'title'],
+                  })
+                : content.content.replace(
+                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                    ''
+                  ),
+          }}
         />
       </div>
     </SectionWrapper>

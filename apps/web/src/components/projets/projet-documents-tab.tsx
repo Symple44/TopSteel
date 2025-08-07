@@ -78,7 +78,10 @@ const mockDocuments: Document[] = [
   },
 ]
 
-export function ProjetDocumentsTab({ projet, projetId }: ProjetDocumentsTabProps) {
+export function ProjetDocumentsTab({
+  projet: _projet,
+  projetId: _projetId,
+}: ProjetDocumentsTabProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('tous')
   const [selectedType, setSelectedType] = useState<string>('tous')

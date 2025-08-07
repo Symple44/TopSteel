@@ -18,14 +18,14 @@ export async function GET() {
   }
 }
 
-function filterPagesByPermissions(categories: any[]) {
+function filterPagesByPermissions(categories: Array<{ pages: unknown[] }>) {
   // TODO: Implémenter la logique de filtrage basée sur les permissions
   // Pour l'instant, retourner toutes les pages
 
   const filteredCategories = categories
     .map((category) => ({
       ...category,
-      pages: category.pages.filter((page: any) => {
+      pages: category.pages.filter((page: { permissions?: string[] }) => {
         // Vérifier les permissions si définies
         if (page.permissions && page.permissions.length > 0) {
           // TODO: Vérifier si l'utilisateur a ces permissions

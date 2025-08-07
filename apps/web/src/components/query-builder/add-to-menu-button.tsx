@@ -70,7 +70,9 @@ export function AddToMenuButton({
       })
 
       // Ensuite, ajouter au menu personnel de l'utilisateur
-      const menuResult = menuData as any
+      const menuResult = menuData as {
+        data: { queryBuilderId: string; title: string; icon: string }
+      }
       await apiClient.post('/admin/menus/user-data-view', {
         queryBuilderId: menuResult.data.queryBuilderId,
         title: menuResult.data.title,
@@ -87,7 +89,7 @@ export function AddToMenuButton({
 
       // Déclencher un rafraîchissement du menu
       window.dispatchEvent(new CustomEvent('menuPreferencesChanged'))
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
         description: error.response?.data?.message || "Impossible d'ajouter la vue au menu",

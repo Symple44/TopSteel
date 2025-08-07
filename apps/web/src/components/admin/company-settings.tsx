@@ -2,6 +2,7 @@
 
 import { Avatar, Button, Input, Label } from '@erp/ui'
 import { RotateCcw, Save, Upload } from 'lucide-react'
+import Image from 'next/image'
 import { toast } from 'sonner'
 import { useSystemParameters } from '@/hooks/use-system-parameters'
 import { useTranslation } from '@/lib/i18n'
@@ -130,7 +131,7 @@ export function CompanySettings() {
         <Label>{t('company.logo')}</Label>
         <div className="flex items-center gap-6">
           <Avatar className="h-24 w-24">
-            <img src="/logo.png" alt="Company Logo" />
+            <Image src="/logo.png" alt="Company Logo" width={96} height={96} />
           </Avatar>
           <Button variant="outline">
             <Upload className="mr-2 h-4 w-4" />

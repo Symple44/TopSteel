@@ -6,7 +6,10 @@ import { es } from '@/lib/i18n/translations/es'
 import { fr } from '@/lib/i18n/translations/fr'
 
 // Fonction pour vérifier l'authentification basique
-function verifyAuth(request: NextRequest): { isValid: boolean; user?: any } {
+function verifyAuth(request: NextRequest): {
+  isValid: boolean
+  user?: { id?: string; [key: string]: unknown }
+} {
   try {
     // Récupérer le token depuis les cookies ou l'header
     let token = request.cookies.get('accessToken')?.value
@@ -72,7 +75,7 @@ export async function GET(request: NextRequest) {
 
     // Lire les modifications depuis la base de données ou fichier de configuration
     const overridesPath = path.join(process.cwd(), 'data/translation-overrides.json')
-    let overrides: Record<string, any> = {}
+    let overrides: Record<string, unknown> = {}
 
     try {
       const overridesContent = await fs.readFile(overridesPath, 'utf-8')
@@ -125,7 +128,7 @@ export async function POST(request: NextRequest) {
 
     // Lire les modifications existantes
     const overridesPath = path.join(dataDir, 'translation-overrides.json')
-    let overrides: Record<string, any> = {}
+    let overrides: Record<string, unknown> = {}
 
     try {
       const content = await fs.readFile(overridesPath, 'utf-8')
@@ -184,7 +187,7 @@ export async function PUT(request: NextRequest) {
 
     // Lire les modifications existantes
     const overridesPath = path.join(dataDir, 'translation-overrides.json')
-    let overrides: Record<string, any> = {}
+    let overrides: Record<string, unknown> = {}
 
     try {
       const content = await fs.readFile(overridesPath, 'utf-8')
@@ -197,7 +200,7 @@ export async function PUT(request: NextRequest) {
     let updated = 0
 
     // Traiter chaque traduction
-    translations.forEach((entry: any) => {
+    translations.forEach((entry: { id?: string; [key: string]: unknown }) => {
       if (entry.id) {
         const isNew = !overrides[entry.id]
 

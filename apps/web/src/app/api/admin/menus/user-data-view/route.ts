@@ -33,10 +33,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: (error as any)?.response?.data?.message || 'Erreur serveur',
+        message:
+          (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          'Erreur serveur',
       },
       {
-        status: (error as any)?.response?.status || 500,
+        status: (error as { response?: { status?: number } })?.response?.status || 500,
       }
     )
   }

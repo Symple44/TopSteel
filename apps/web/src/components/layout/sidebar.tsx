@@ -126,7 +126,7 @@ const iconMap: Record<string, LucideIcon> = {
   // Removed duplicates that already exist above
 }
 
-const getNavigation = (t: any): NavItem[] => [
+const getNavigation = (t: (key: string) => string): NavItem[] => [
   {
     title: t('dashboard'),
     href: '/dashboard',
@@ -207,7 +207,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
 
   // Convertir le menu dynamique au format NavItem (mémoïsé pour éviter les re-renders)
   const convertDynamicToNavItem = useCallback(
-    (items: any[]): NavItem[] => {
+    (items: unknown[]): NavItem[] => {
       if (!Array.isArray(items)) {
         return []
       }

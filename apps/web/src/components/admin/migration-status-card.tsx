@@ -140,7 +140,12 @@ export default function MigrationStatusCard({
               {getStatusIcon()}
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant={getStatusBadgeVariant() as any} className="text-xs">
+              <Badge
+                variant={
+                  getStatusBadgeVariant() as 'default' | 'secondary' | 'destructive' | 'outline'
+                }
+                className="text-xs"
+              >
                 {status === 'up-to-date' && 'À jour'}
                 {status === 'pending' && 'En attente'}
                 {status === 'error' && 'Erreur'}

@@ -41,6 +41,7 @@ export class AuthStorage {
 
       // Sauvegarder également le token d'accès dans les cookies pour les routes API Next.js
       if (tokens.accessToken) {
+        // biome-ignore lint/security/noDocumentCookie: Token storage in secure cookie for API routes
         document.cookie = `accessToken=${tokens.accessToken}; path=/; secure; samesite=strict; max-age=${rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60}`
       }
 
@@ -100,6 +101,7 @@ export class AuthStorage {
       localStorage.removeItem(this.config.rememberMeStorageKey)
 
       // Effacer également le cookie
+      // biome-ignore lint/security/noDocumentCookie: Cookie cleanup required for secure logout
       document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     } catch (_error) {}
   }
@@ -133,7 +135,7 @@ export class AuthStorage {
   /**
    * Valide la structure d'une session
    */
-  private isValidSession(session: any): session is StoredSession {
+  private isValidSession(session: unknown): session is StoredSession {
     if (!session || typeof session !== 'object') return false
 
     // Valider l'utilisateur

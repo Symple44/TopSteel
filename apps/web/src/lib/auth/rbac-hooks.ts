@@ -20,7 +20,7 @@ function useExtendedUser(): ExtendedUser | null {
     }
 
     // Sinon, utiliser l'adaptateur pour convertir
-    return AuthAdapter.toExtendedUser(user as any)
+    return AuthAdapter.toExtendedUser(user as User)
   }, [user])
 }
 

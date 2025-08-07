@@ -58,7 +58,7 @@ const PrioriteBadge = ({ priorite }: { priorite: string }) => {
   return <span className={`px-2 py-1 rounded text-xs font-medium ${className}`}>{label}</span>
 }
 
-export function ProductionTable({ ordres, onView, onEdit, onStatusChange }: ProductionTableProps) {
+export function ProductionTable({ ordres, onView, onEdit, _onStatusChange }: ProductionTableProps) {
   return (
     <div className="space-y-4">
       {ordres.map((ordre) => (

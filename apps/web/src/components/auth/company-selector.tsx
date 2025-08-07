@@ -102,14 +102,14 @@ const loadRolesFromParameters = async (
         // Si c'est un objet, vérifier s'il contient des rôles
         const possibleArrays = Object.values(data).filter(Array.isArray)
         if (possibleArrays.length > 0) {
-          rolesList = possibleArrays[0] as any[]
+          rolesList = possibleArrays[0] as { id: string; name: string }[]
         }
       }
 
       if (!Array.isArray(rolesList) || rolesList.length === 0) {
         // Si la réponse semble être des rôles par défaut de la route Next.js (array direct)
         if (Array.isArray(data) && data.some((item) => item.id && item.name)) {
-          rolesList = data.map((role: any) => ({
+          rolesList = data.map((role: { id: string; name: string }) => ({
             key: role.id,
             value: role.name,
             icon: '👤',
@@ -127,16 +127,18 @@ const loadRolesFromParameters = async (
       }
 
       // Mapper les données du backend vers le format attendu
-      rolesCache = rolesList.map((role: any) => ({
-        key: role.key || role.id || 'UNKNOWN',
-        value: role.value || role.name || role.label || 'Rôle',
-        icon: role.icon || '👤',
-        color: role.color || 'blue',
-        order: role.order || 999,
-        permissions: role.permissions || [],
-        category: role.category || 'standard',
-        translationKey: role.translationKey || null,
-      }))
+      rolesCache = rolesList.map(
+        (role: { key?: string; id?: string; value?: string; name?: string; label?: string }) => ({
+          key: role.key || role.id || 'UNKNOWN',
+          value: role.value || role.name || role.label || 'Rôle',
+          icon: role.icon || '👤',
+          color: role.color || 'blue',
+          order: role.order || 999,
+          permissions: role.permissions || [],
+          category: role.category || 'standard',
+          translationKey: role.translationKey || null,
+        })
+      )
 
       // Sauvegarder en cache
       saveCacheToStorage(rolesCache)
@@ -408,7 +410,7 @@ interface Company {
   role?: string
   isDefault?: boolean
   permissions?: string[]
-  sites?: any[]
+  sites?: { id: string; name: string }[]
 }
 
 interface CompanySelectorProps {
@@ -421,7 +423,7 @@ interface CompanySelectorProps {
 export default function CompanySelector({
   open = true,
   onOpenChange,
-  onCompanySelected,
+  _onCompanySelected,
   showInDialog = true,
 }: CompanySelectorProps) {
   const _router = useRouter()
@@ -445,7 +447,7 @@ export default function CompanySelector({
         companiesArray = data
       } else if (data && typeof data === 'object') {
         // Si les données sont dans une propriété (ex: data.data, data.companies, etc.)
-        const dataObj = data as any
+        const dataObj = data as Record<string, unknown>
         companiesArray = dataObj.data || dataObj.companies || dataObj.societes || []
       }
 

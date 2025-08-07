@@ -3,14 +3,14 @@
 
 // Types de remplacement pour quand OpenTelemetry n'est pas disponible
 type MockSpan = {
-  setStatus: (status: any) => void
-  recordException: (error: any) => void
-  setAttributes: (attributes: any) => void
+  setStatus: (status: { code: string; message?: string }) => void
+  recordException: (error: Error | string) => void
+  setAttributes: (attributes: Record<string, string | number | boolean>) => void
   end: () => void
 }
 
 type MockTracer = {
-  startSpan: (name: string, options?: any) => MockSpan
+  startSpan: (name: string, options?: Record<string, unknown>) => MockSpan
 }
 
 // Mock objects pour OpenTelemetry
@@ -27,7 +27,7 @@ const mockTracer: MockTracer = {
 
 // Utiliser les mocks par défaut
 const trace = { getTracer: () => mockTracer }
-const _context = { active: () => ({}), with: (_ctx: any, fn: any) => fn() }
+const _context = { active: () => ({}), with: (_ctx: unknown, fn: () => unknown) => fn() }
 const _propagation = { inject: () => {}, extract: () => ({}) }
 
 // Configuration minimale et sécurisée
@@ -48,7 +48,7 @@ export const safeTracer = telemetryConfig.enabled
         setAttributes: () => {},
         recordException: () => {},
       }),
-      startActiveSpan: (_name: string, fn: any) =>
+      startActiveSpan: (_name: string, fn: (span: MockSpan) => unknown) =>
         fn({
           end: () => {},
           setStatus: () => {},

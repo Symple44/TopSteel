@@ -31,7 +31,11 @@ interface PlanningGanttProps {
   onTaskUpdate: (taskId: string, updates: Partial<GanttTask>) => void
 }
 
-export function PlanningGantt({ tasks, onTaskClick, onTaskUpdate }: PlanningGanttProps) {
+export function PlanningGantt({
+  tasks,
+  onTaskClick,
+  onTaskUpdate: _onTaskUpdate,
+}: PlanningGanttProps) {
   const [zoomLevel, setZoomLevel] = useState(1)
   const [viewMode, setViewMode] = useState<'days' | 'weeks' | 'months'>('weeks')
 

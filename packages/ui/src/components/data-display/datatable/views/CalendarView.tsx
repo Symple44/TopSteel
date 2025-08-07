@@ -149,7 +149,7 @@ export function CalendarView({
         <div className="grid grid-cols-7">
           {calendarDays.map((day, index) => (
             <div
-              key={index}
+              key={`calendar-day-${day.date.getTime()}-${index}`}
               className={`min-h-[100px] p-2 border-r border-b border-border last:border-r-0 ${
                 day.isCurrentMonth
                   ? 'bg-background hover:bg-muted/20'

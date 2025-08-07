@@ -2248,7 +2248,7 @@ export function DataTable<T = any>({
                 <thead className="bg-muted">
                   <tr>
                     {clipboardData[0]?.map((header, index) => (
-                      <th key={index} className="p-2 text-left border-b">
+                      <th key={`header-${header}-${index}`} className="p-2 text-left border-b">
                         {header}
                       </th>
                     ))}

@@ -20,7 +20,7 @@ interface SystemParameter {
   defaultValue?: string
   isEditable: boolean
   isSecret: boolean
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   createdAt: string
   updatedAt: string
 }
@@ -44,13 +44,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(filteredParams)
     } else {
       // Grouper par catégorie
-      const parametersByCategory = allParameters.reduce((acc: any, param: SystemParameter) => {
-        if (!acc[param.category]) {
-          acc[param.category] = []
-        }
-        acc[param.category].push(param)
-        return acc
-      }, {})
+      const parametersByCategory = allParameters.reduce(
+        (acc: Record<string, SystemParameter[]>, param: SystemParameter) => {
+          if (!acc[param.category]) {
+            acc[param.category] = []
+          }
+          acc[param.category].push(param)
+          return acc
+        },
+        {} as Record<string, SystemParameter[]>
+      )
 
       return NextResponse.json(parametersByCategory)
     }

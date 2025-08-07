@@ -1,5 +1,6 @@
 'use client'
 
+import DOMPurify from 'dompurify'
 import {
   ChevronLeft,
   ChevronRight,
@@ -380,7 +381,32 @@ export function ProductDetail({ product, tenant }: ProductDetailProps) {
                 {product.description ? (
                   <div
                     className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized with DOMPurify for XSS protection
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        typeof window !== 'undefined'
+                          ? DOMPurify.sanitize(product.description, {
+                              ALLOWED_TAGS: [
+                                'p',
+                                'br',
+                                'strong',
+                                'em',
+                                'u',
+                                'h1',
+                                'h2',
+                                'h3',
+                                'ul',
+                                'ol',
+                                'li',
+                                'a',
+                              ],
+                              ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+                            })
+                          : product.description.replace(
+                              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                              ''
+                            ),
+                    }}
                   />
                 ) : (
                   <p className="text-muted-foreground">

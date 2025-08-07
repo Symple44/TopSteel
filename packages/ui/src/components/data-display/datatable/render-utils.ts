@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify'
 import React from 'react'
 import type { ColumnConfig } from './types'
 
@@ -318,9 +319,18 @@ export class RenderUtils {
       }
 
       case 'richtext':
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized with DOMPurify for XSS protection
         return React.createElement('div', {
           contentEditable: true,
-          dangerouslySetInnerHTML: { __html: value || '' },
+          dangerouslySetInnerHTML: {
+            __html:
+              typeof window !== 'undefined'
+                ? DOMPurify.sanitize(value || '', {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'span', 'div'],
+                    ALLOWED_ATTR: ['class'],
+                  })
+                : (value || '').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
+          },
           onBlur: (e: React.FocusEvent<HTMLDivElement>) => handleChange(e.target.innerHTML),
           className:
             'w-full px-2 py-1 text-xs border border-input bg-transparent rounded-md shadow-sm min-h-8 transition-colors focus-visible:ring-1 focus-visible:ring-ring',

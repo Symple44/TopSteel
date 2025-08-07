@@ -12,7 +12,15 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
 
-    const searchQuery: any = {
+    const searchQuery: {
+      query?: string
+      category?: string
+      tags?: string[]
+      limit: number
+      offset: number
+      sortBy: string
+      sortOrder: string
+    } = {
       query: searchParams.get('q') || undefined,
       category: searchParams.get('category') || undefined,
       entityType: searchParams.get('entityType') || undefined,
@@ -21,8 +29,8 @@ export async function GET(request: NextRequest) {
       mimeType: searchParams.get('mimeType') || undefined,
       limit: parseInt(searchParams.get('limit') || '20'),
       offset: parseInt(searchParams.get('offset') || '0'),
-      sortBy: (searchParams.get('sortBy') as any) || 'relevance',
-      sortOrder: (searchParams.get('sortOrder') as any) || 'desc',
+      sortBy: searchParams.get('sortBy') || 'relevance',
+      sortOrder: searchParams.get('sortOrder') || 'desc',
     }
 
     // Filtres de taille
@@ -56,7 +64,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Exécuter la recherche
-    const results = await (imageElasticsearchService as any).searchImages(searchQuery)
+    const results = await imageElasticsearchService.searchImages(searchQuery)
 
     return NextResponse.json({
       results,

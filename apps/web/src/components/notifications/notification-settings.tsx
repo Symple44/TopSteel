@@ -263,7 +263,7 @@ export function NotificationSettings() {
               <button
                 type="button"
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as string)}
                 className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
                     ? 'border-primary text-primary'

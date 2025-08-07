@@ -192,7 +192,7 @@ export default function ConditionBuilder({
 
   const getFieldType = (fieldValue: string): 'string' | 'number' | 'boolean' | 'date' => {
     const field = AVAILABLE_FIELDS[triggerType]?.find((f) => f.value === fieldValue)
-    return (field?.type as any) || 'string'
+    return (field?.type as 'string' | 'number' | 'boolean' | 'date') || 'string'
   }
 
   const renderValueInput = (condition: Condition) => {
@@ -353,7 +353,7 @@ export default function ConditionBuilder({
                   <Select
                     value={condition.logic}
                     onValueChange={(value: string) =>
-                      updateCondition(condition.id, { logic: value as any })
+                      updateCondition(condition.id, { logic: value as 'AND' | 'OR' })
                     }
                   >
                     <SelectTrigger className="w-20">
@@ -393,7 +393,7 @@ export default function ConditionBuilder({
                   value={condition.operator}
                   onValueChange={(value: string) =>
                     updateCondition(condition.id, {
-                      operator: value as any,
+                      operator: value as Condition['operator'],
                       value: ['is_null', 'is_not_null'].includes(value) ? '' : condition.value,
                     })
                   }
