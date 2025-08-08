@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, type Repository } from 'typeorm'
-import { SharedProcess } from '../entities/shared-process.entity'
+import { SharedProcess, ProcessType } from '../entities/shared-process.entity'
 
 @Injectable()
 export class SharedProcessService {
@@ -24,7 +24,7 @@ export class SharedProcessService {
 
   async findByType(type: string): Promise<SharedProcess[]> {
     return this._sharedProcessRepository.find({
-      where: { type: type as unknown, deletedAt: IsNull() },
+      where: { type: type as ProcessType, deletedAt: IsNull() },
     })
   }
 
@@ -34,7 +34,7 @@ export class SharedProcessService {
   }
 
   async update(id: string, processData: Partial<SharedProcess>): Promise<SharedProcess> {
-    await this._sharedProcessRepository.update(id, processData)
+    await this._sharedProcessRepository.update(id, processData as any)
     const process = await this._sharedProcessRepository.findOne({ where: { id } })
     if (!process) {
       throw new NotFoundException(`Process with ID ${id} not found`)
