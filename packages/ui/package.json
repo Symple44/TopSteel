@@ -40,7 +40,7 @@
     "@radix-ui/react-visually-hidden": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.525.0",
+    "lucide-react": "^0.539.0",
     "next-themes": "^0.4.6",
     "tailwind-merge": "^3.3.1"
   },
@@ -116,7 +116,7 @@
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/node": "^24.0.10",
-    "@types/react": "^19.1.8",
+    "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.6",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
     "@typescript-eslint/parser": "^8.36.0",
@@ -133,7 +133,7 @@
     "rollup-plugin-visualizer": "^6.0.3",
     "storybook": "^9.0.18",
     "typescript": "^5.8.3",
-    "vite": "^7.0.4",
+    "vite": "^7.1.1",
     "vite-bundle-analyzer": "^1.0.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
