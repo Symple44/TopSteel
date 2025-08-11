@@ -13,7 +13,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { CurrentTenant } from '../../../core/common/decorators/current-tenant.decorator'
 import { TenantGuard } from '../../../infrastructure/security/guards/tenant.guard'
 import { BTPIndex, type BTPIndexType } from '../entities/btp-index.entity'
-import type { BTPIndexService, IndexedPricingResult } from '../services/btp-index.service'
+import { BTPIndexService, IndexedPricingResult } from '../services/btp-index.service'
 
 // DTOs
 export class CreateBTPIndexDto {
@@ -27,8 +27,33 @@ export class CreateBTPIndexDto {
   applicationDate!: Date
   isOfficial?: boolean
   isProvisional?: boolean
-  indexMetadata?: unknown
-  metadata?: unknown
+  indexMetadata?: {
+    source?: string
+    methodology?: string
+    scope?: string
+    frequency?: 'monthly' | 'quarterly' | 'yearly'
+    baseYear?: number
+    weightings?: Record<string, number>
+    components?: string[]
+    seasonalAdjustment?: boolean
+  }
+  metadata?: {
+    notes?: string
+    revisions?: Array<{
+      date: Date
+      oldValue: number
+      newValue: number
+      reason: string
+    }>
+    alerts?: Array<{
+      type: 'high_variation' | 'late_publication' | 'estimation' | 'revision'
+      message: string
+      severity: 'info' | 'warning' | 'error'
+      date: Date
+    }>
+    validationStatus?: 'pending' | 'validated' | 'rejected'
+    dataQuality?: number
+  }
 }
 
 export class UpdateBTPIndexDto {
@@ -37,8 +62,33 @@ export class UpdateBTPIndexDto {
   applicationDate?: Date
   isOfficial?: boolean
   isProvisional?: boolean
-  indexMetadata?: unknown
-  metadata?: unknown
+  indexMetadata?: {
+    source?: string
+    methodology?: string
+    scope?: string
+    frequency?: 'monthly' | 'quarterly' | 'yearly'
+    baseYear?: number
+    weightings?: Record<string, number>
+    components?: string[]
+    seasonalAdjustment?: boolean
+  }
+  metadata?: {
+    notes?: string
+    revisions?: Array<{
+      date: Date
+      oldValue: number
+      newValue: number
+      reason: string
+    }>
+    alerts?: Array<{
+      type: 'high_variation' | 'late_publication' | 'estimation' | 'revision'
+      message: string
+      severity: 'info' | 'warning' | 'error'
+      date: Date
+    }>
+    validationStatus?: 'pending' | 'validated' | 'rejected'
+    dataQuality?: number
+  }
 }
 
 export class IndexedPricingDto {

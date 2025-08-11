@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, type Repository } from 'typeorm'
-import { SharedQualityStandard, QualityStandardType } from '../entities/shared-quality-standard.entity'
+import {
+  type QualityStandardType,
+  SharedQualityStandard,
+} from '../entities/shared-quality-standard.entity'
 
 @Injectable()
 export class SharedQualityStandardService {
@@ -37,7 +40,7 @@ export class SharedQualityStandardService {
     id: string,
     standardData: Partial<SharedQualityStandard>
   ): Promise<SharedQualityStandard> {
-    await this._sharedQualityStandardRepository.update(id, standardData as any)
+    await this._sharedQualityStandardRepository.update(id, standardData as unknown)
     const standard = await this._sharedQualityStandardRepository.findOne({ where: { id } })
     if (!standard) {
       throw new NotFoundException(`Quality standard with ID ${id} not found`)

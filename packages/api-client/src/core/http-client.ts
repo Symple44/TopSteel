@@ -74,6 +74,11 @@ export class HttpClient {
     this.setupInterceptors()
   }
 
+  // Expose axios instance for compatibility
+  get axiosInstance(): AxiosInstance {
+    return this.client
+  }
+
   // ===== SETUP INTERCEPTORS =====
 
   private setupInterceptors(): void {
@@ -91,7 +96,7 @@ export class HttpClient {
     // Response interceptor - handle errors and token refresh
     this.client.interceptors.response.use(
       (response: AxiosResponse) => response,
-      async (error: unknown) => {
+      async (error: any) => {
         const originalRequest = error.config
 
         // Handle 401 - try to refresh token
@@ -175,7 +180,7 @@ export class HttpClient {
         code: axiosError.response.data?.code || 'API_ERROR',
         message:
           axiosError.response.data?.message || axiosError.message || 'Une erreur est survenue',
-        details: axiosError.response.data?.details,
+        details: axiosError.response.data?.details as Record<string, unknown> | undefined,
         statusCode: axiosError.response.status,
       }
     } else if (axiosError.request) {

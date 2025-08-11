@@ -58,7 +58,8 @@ export function InjectTenantContext() {
 
     descriptor.value = async function (...args: unknown[]) {
       // Récupérer le contexte depuis le premier argument si c'est un objet
-      const context = args[0]?.tenantContext
+      const firstArg = args[0] as Record<string, any> | undefined
+      const context = firstArg?.tenantContext
 
       if (context && this instanceof Repository) {
         // Créer un query builder avec les filtres société

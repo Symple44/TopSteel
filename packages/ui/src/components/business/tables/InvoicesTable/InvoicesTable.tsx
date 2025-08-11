@@ -45,7 +45,7 @@ export function InvoicesTable({
               </TableCell>
             </TableRow>
           ) : (
-            data.map((item, index) => (
+            data.map((item: any, index) => (
               <TableRow key={`invoice-${item.id || item.number || index}`}>
                 <TableCell>TODO: factures name</TableCell>
                 <TableCell>TODO: Status</TableCell>

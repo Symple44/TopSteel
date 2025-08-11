@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import type { DataSource } from 'typeorm'
 
-interface DatabaseStats {
+export interface DatabaseStats {
   schemaname: string
   tablename: string
   inserts: number

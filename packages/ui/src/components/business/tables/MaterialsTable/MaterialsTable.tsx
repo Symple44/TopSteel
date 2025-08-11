@@ -45,7 +45,7 @@ export function MaterialsTable({
               </TableCell>
             </TableRow>
           ) : (
-            data.map((item, index) => (
+            data.map((item: any, index) => (
               <TableRow key={`material-${item.id || item.name || index}`}>
                 <TableCell>TODO: matériaux name</TableCell>
                 <TableCell>TODO: Status</TableCell>

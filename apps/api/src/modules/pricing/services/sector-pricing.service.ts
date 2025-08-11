@@ -241,9 +241,49 @@ export class SectorPricingService {
     coefficientType: CoefficientType
     coefficient: number
     description?: string
-    conditions?: unknown
-    parameters?: unknown
-    metadata?: unknown
+    conditions?: {
+      minQuantity?: number
+      maxQuantity?: number
+      minAmount?: number
+      maxAmount?: number
+      customerTypes?: string[]
+      productCategories?: string[]
+      validFrom?: Date
+      validUntil?: Date
+      weekdays?: number[]
+      regions?: string[]
+      articleFamilies?: string[]
+    }
+    parameters?: {
+      applyToBasePrice?: boolean
+      applyToMargin?: boolean
+      marginType?: 'percentage' | 'fixed_amount'
+      discountType?: 'percentage' | 'fixed_amount' | 'progressive'
+      progressiveRates?: Array<{
+        minQuantity: number
+        rate: number
+      }>
+      calculationMethod?: 'per_unit' | 'per_weight' | 'per_volume' | 'fixed'
+      freeThreshold?: number
+      btpSpecific?: {
+        applyCOFRAC?: boolean
+        applyBTPCoeff?: boolean
+        minimumOrder?: number
+        deliveryZones?: string[]
+      }
+    }
+    metadata?: {
+      createdBy?: string
+      approvedBy?: string
+      notes?: string
+      internalCode?: string
+      externalReference?: string
+      lastModification?: {
+        date: Date
+        user: string
+        changes: string[]
+      }
+    }
     priority?: number
   }): Promise<SectorCoefficient> {
     const coefficient = this.sectorCoefficientRepository.create({
@@ -342,7 +382,7 @@ export class SectorPricingService {
           minAmount: 5000,
         },
         parameters: {
-          discountType: 'percentage',
+          discountType: 'percentage' as 'percentage' | 'fixed_amount' | 'progressive',
         },
         priority: 5,
       },
@@ -354,7 +394,7 @@ export class SectorPricingService {
         description: 'Frais de transport BTP',
         conditions: {},
         parameters: {
-          calculationMethod: 'fixed',
+          calculationMethod: 'fixed' as 'per_unit' | 'per_weight' | 'per_volume' | 'fixed',
           freeThreshold: 2000, // Gratuit au-dessus de 2000€
         },
         priority: 1,

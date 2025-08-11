@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Post, Request } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import type { DatabaseHealthSimpleService } from '../services/database-health-simple.service'
-import type { MigrationManagerService } from '../services/migration-manager.service'
-import type {
-  ConnectionsResponse,
+import { DatabaseHealthSimpleService } from '../services/database-health-simple.service'
+import { MigrationManagerService } from '../services/migration-manager.service'
+import {
+  type ConnectionsResponse,
   TenantConnectionSimpleService,
 } from '../services/tenant-connection-simple.service'
 
@@ -85,8 +85,9 @@ export class DatabaseAdminController {
 
     // Ajouter la connexion du tenant actuel si l'utilisateur est connecté à une société
     const currentUser = req.user
-    if (currentUser?.societeCode) {
-      const currentTenantKey = currentUser.societeCode.toLowerCase()
+    if ((currentUser as { societeCode?: string })?.societeCode) {
+      const currentTenantKey =
+        (currentUser as { societeCode?: string }).societeCode?.toLowerCase() || ''
       const isAlreadyListed = connections.some(
         (conn) => conn.tenant.toLowerCase() === currentTenantKey
       )
@@ -100,7 +101,7 @@ export class DatabaseAdminController {
         })
       } else {
         connections.push({
-          tenant: currentUser.societeCode,
+          tenant: (currentUser as { societeCode?: string })?.societeCode || '',
           isInitialized: true,
           isCurrent: true,
         })
@@ -109,7 +110,7 @@ export class DatabaseAdminController {
 
     return {
       connections,
-      currentTenant: currentUser?.societeCode || null,
+      currentTenant: (currentUser as { societeCode?: string })?.societeCode || null,
       timestamp: new Date().toISOString(),
     }
   }

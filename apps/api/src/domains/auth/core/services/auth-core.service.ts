@@ -51,7 +51,12 @@ export class AuthCoreService {
     }
 
     const { password: _, ...result } = user
-    return result
+    return {
+      ...result,
+      firstName: result.prenom || '',
+      lastName: result.nom || '',
+      isActive: result.actif,
+    } as any
   }
 
   /**

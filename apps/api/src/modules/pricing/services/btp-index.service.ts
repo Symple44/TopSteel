@@ -212,8 +212,33 @@ export class BTPIndexService {
     applicationDate: Date
     isOfficial?: boolean
     isProvisional?: boolean
-    indexMetadata?: unknown
-    metadata?: unknown
+    indexMetadata?: {
+      source?: string
+      methodology?: string
+      scope?: string
+      frequency?: 'monthly' | 'quarterly' | 'yearly'
+      baseYear?: number
+      weightings?: Record<string, number>
+      components?: string[]
+      seasonalAdjustment?: boolean
+    }
+    metadata?: {
+      notes?: string
+      revisions?: Array<{
+        date: Date
+        oldValue: number
+        newValue: number
+        reason: string
+      }>
+      alerts?: Array<{
+        type: 'high_variation' | 'late_publication' | 'estimation' | 'revision'
+        message: string
+        severity: 'info' | 'warning' | 'error'
+        date: Date
+      }>
+      validationStatus?: 'pending' | 'validated' | 'rejected'
+      dataQuality?: number
+    }
   }): Promise<BTPIndex> {
     // Vérifier si l'indice existe déjà
     const existing = await this.btpIndexRepository.findOne({

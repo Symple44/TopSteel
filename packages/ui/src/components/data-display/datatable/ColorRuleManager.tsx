@@ -254,7 +254,9 @@ export function ColorRuleManager<T = any>({
                   <CustomSelect
                     value={editingRule.condition}
                     onValueChange={(value: string) =>
-                      setEditingRule((prev) => (prev ? { ...prev, condition: value } : null))
+                      setEditingRule((prev) =>
+                        prev ? { ...prev, condition: value as ColorRule['condition'] } : null
+                      )
                     }
                     placeholder="Sélectionner une condition"
                     options={CONDITIONS.map((cond) => ({ value: cond.value, label: cond.label }))}

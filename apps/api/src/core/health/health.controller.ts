@@ -1,16 +1,16 @@
 import { Controller, Get } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import {
-  type DiskHealthIndicator,
+  DiskHealthIndicator,
   HealthCheck,
-  type HealthCheckService,
-  type MemoryHealthIndicator,
+  HealthCheckService,
+  MemoryHealthIndicator,
 } from '@nestjs/terminus'
 import type { DataSourceOptions } from 'typeorm'
-import type { CircuitBreakerHealthIndicator } from '../../infrastructure/monitoring/circuit-breaker-health.indicator'
-import type { MultiTenantDatabaseConfig } from '../database/config/multi-tenant-database.config'
-import type { IntegrityService } from './integrity.service'
-import type { SystemHealthService } from './system-health-simple.service'
+import { CircuitBreakerHealthIndicator } from '../../infrastructure/monitoring/circuit-breaker-health.indicator'
+import { MultiTenantDatabaseConfig } from '../database/config/multi-tenant-database.config'
+import { IntegrityService } from './integrity.service'
+import { SystemHealthService } from './system-health-simple.service'
 
 @Controller('health')
 export class HealthController {
@@ -49,7 +49,7 @@ export class HealthController {
         )
       }
 
-      const healthResult = await this.health.check(healthChecks)
+      const healthResult = await this.health.check(healthChecks as any)
 
       // Informations additionnelles pour le modal ERP
       const uptime = this.formatUptime(Date.now() - this.startTime)
@@ -177,15 +177,16 @@ export class HealthController {
 
       // Test de connexion direct
       const { DataSource } = await import('typeorm')
+      const configObj = config as any
       const testConnection = new DataSource({
-        type: config.type as DataSourceOptions['type'],
-        host: config.host,
-        port: config.port,
-        username: config.username,
-        password: config.password,
-        database: config.database,
+        type: configObj.type as DataSourceOptions['type'],
+        host: configObj.host,
+        port: configObj.port,
+        username: configObj.username,
+        password: configObj.password,
+        database: configObj.database,
         entities: [],
-      })
+      } as any)
 
       await testConnection.initialize()
       await testConnection.query('SELECT 1')

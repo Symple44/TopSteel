@@ -14,8 +14,8 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 const API_URL = process.env.API_URL || 'http://localhost:3002'
 const SUPER_ADMIN_USER = {
-  email: 'admin@topsteel.tech',
-  password: 'TopSteel44!',
+  email: process.env.TEST_ADMIN_EMAIL || 'admin@topsteel.tech',
+  password: process.env.TEST_ADMIN_PASSWORD || '',
 }
 
 // Types pour les requêtes HTTP
@@ -68,6 +68,13 @@ describe('SUPER_ADMIN Authentication Flow (Enhanced Integration)', () => {
   let availableCompanies: Company[] = []
 
   beforeAll(async () => {
+    // Vérifier que les credentials de test sont configurés
+    if (!SUPER_ADMIN_USER.password) {
+      console.warn('⚠️  TEST_ADMIN_PASSWORD not set in environment variables')
+      console.warn('   Please set TEST_ADMIN_PASSWORD in your .env.test file')
+      return
+    }
+    
     // Vérifier que le serveur API est accessible
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {

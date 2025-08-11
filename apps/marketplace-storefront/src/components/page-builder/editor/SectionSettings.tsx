@@ -46,7 +46,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               <input
                 id="hero-title"
                 type="text"
-                value={section.content.title || ''}
+                value={(section.content as any)?.title || ''}
                 onChange={(e) => updateContent({ title: e.target.value })}
                 className="w-full p-2 border rounded-md"
                 placeholder="Votre titre principal"
@@ -59,7 +59,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               <input
                 id="hero-subtitle"
                 type="text"
-                value={section.content.subtitle || ''}
+                value={(section.content as any)?.subtitle || ''}
                 onChange={(e) => updateContent({ subtitle: e.target.value })}
                 className="w-full p-2 border rounded-md"
                 placeholder="Votre sous-titre"
@@ -71,7 +71,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               </label>
               <textarea
                 id="hero-description"
-                value={section.content.description || ''}
+                value={(section.content as any)?.description || ''}
                 onChange={(e) => updateContent({ description: e.target.value })}
                 className="w-full p-2 border rounded-md h-24"
                 placeholder="Votre description"
@@ -84,7 +84,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               <input
                 id="hero-bg-image"
                 type="url"
-                value={section.content.backgroundImage || ''}
+                value={(section.content as any)?.backgroundImage || ''}
                 onChange={(e) => updateContent({ backgroundImage: e.target.value })}
                 className="w-full p-2 border rounded-md"
                 placeholder="URL de l'image"
@@ -96,7 +96,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               </label>
               <select
                 id="hero-alignment"
-                value={section.content.alignment || 'center'}
+                value={(section.content as any)?.alignment || 'center'}
                 onChange={(e) => updateContent({ alignment: e.target.value })}
                 className="w-full p-2 border rounded-md"
               >
@@ -118,7 +118,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               <input
                 id="text-block-title"
                 type="text"
-                value={section.content.title || ''}
+                value={(section.content as any)?.title || ''}
                 onChange={(e) => updateContent({ title: e.target.value })}
                 className="w-full p-2 border rounded-md"
               />
@@ -129,7 +129,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               </label>
               <textarea
                 id="text-block-content"
-                value={section.content.content || ''}
+                value={(section.content as any)?.content || ''}
                 onChange={(e) => updateContent({ content: e.target.value })}
                 className="w-full p-2 border rounded-md h-32"
                 placeholder="Votre contenu HTML"
@@ -141,7 +141,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               </label>
               <select
                 id="text-block-columns"
-                value={section.content.columns || 1}
+                value={(section.content as any)?.columns || 1}
                 onChange={(e) => updateContent({ columns: parseInt(e.target.value) })}
                 className="w-full p-2 border rounded-md"
               >
@@ -163,7 +163,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               <input
                 id="products-grid-title"
                 type="text"
-                value={section.content.title || ''}
+                value={(section.content as any)?.title || ''}
                 onChange={(e) => updateContent({ title: e.target.value })}
                 className="w-full p-2 border rounded-md"
               />
@@ -174,7 +174,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               </label>
               <select
                 id="products-grid-source"
-                value={section.content.source || 'featured'}
+                value={(section.content as any)?.source || 'featured'}
                 onChange={(e) => updateContent({ source: e.target.value })}
                 className="w-full p-2 border rounded-md"
               >
@@ -191,7 +191,7 @@ export function SectionSettings({ section, onUpdate, onClose }: SectionSettingsP
               <input
                 id="products-grid-limit"
                 type="number"
-                value={section.content.limit || 12}
+                value={(section.content as any)?.limit || 12}
                 onChange={(e) => updateContent({ limit: parseInt(e.target.value) })}
                 className="w-full p-2 border rounded-md"
                 min="1"

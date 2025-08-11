@@ -471,6 +471,7 @@ export default function CompanySelector({
   }, [t])
 
   useEffect(() => {
+    // Charger les sociétés une seule fois au montage
     loadCompanies()
 
     // Détecter le nombre d'onglets ouverts
@@ -480,7 +481,8 @@ export default function CompanySelector({
     // Précharger les rôles depuis l'API des paramètres
     // Ne plus vider le cache systématiquement, utiliser le cache persistant
     loadRolesFromParameters('fr', false).catch((_error) => {})
-  }, [loadCompanies])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Retirer loadCompanies des dépendances pour éviter la boucle
 
   const handleSelectCompany = async () => {
     if (!selectedCompanyId) {

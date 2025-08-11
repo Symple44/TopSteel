@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
-import type { MFAService } from '../../services/mfa.service'
+import { MFAService } from '../../services/mfa.service'
 
 interface SetupTOTPDto {
   phoneNumber?: string
@@ -127,7 +127,7 @@ export class MFAController {
   async setupTOTP(@Request() req: { user: { sub: string } }, @Body() body: SetupTOTPDto) {
     try {
       const userId = req.user.sub
-      const userEmail = req.user.email
+      const userEmail = (req.user as { id?: string; sub?: string; email?: string }).email
 
       const result = await this.mfaService.setupTOTP(userId, userEmail, body.phoneNumber)
 
@@ -195,7 +195,7 @@ export class MFAController {
   ) {
     try {
       const userId = req.user.sub
-      const userEmail = req.user.email
+      const userEmail = (req.user as { id?: string; sub?: string; email?: string }).email
 
       const result = await this.mfaService.setupWebAuthn(userId, userEmail, body.userName)
 
@@ -228,12 +228,12 @@ export class MFAController {
   async verifyWebAuthn(@Request() req: { user: { sub: string } }, @Body() body: VerifyWebAuthnDto) {
     try {
       const userId = req.user.sub
-      const userAgent = req.headers['user-agent']
+      const userAgent = (req as any).headers['user-agent']
 
       const result = await this.mfaService.verifyAndAddWebAuthn(
         userId,
         body.mfaId,
-        body.response,
+        body.response as any,
         body.deviceName,
         userAgent
       )
@@ -295,7 +295,7 @@ export class MFAController {
       const result = await this.mfaService.verifyMFA(
         body.sessionToken,
         body.code,
-        body.webauthnResponse
+        body.webauthnResponse as any
       )
 
       if (!result.success) {

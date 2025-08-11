@@ -41,9 +41,9 @@ export function SectionRenderer({
 
   return (
     <Component
-      section={section}
+      section={section as any}
       isEditing={isEditing}
-      onUpdate={onUpdate}
+      onUpdate={onUpdate as any}
       onStyleUpdate={onStyleUpdate}
     />
   )

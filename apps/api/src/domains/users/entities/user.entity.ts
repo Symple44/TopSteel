@@ -64,6 +64,8 @@ export class User {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, unknown>
 
+  // Note: societeId removed - relation with Societe is handled via societe_users join table
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
 

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { UserMenuItemPreference } from '../entities/user-menu-item-preference.entity'
 import { UserMenuPreferences } from '../entities/user-menu-preferences.entity'
-import type { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
+import { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
 
 export interface UpdateUserPreferencesDto {
   useCustomLayout?: boolean
@@ -146,7 +146,7 @@ export class UserMenuPreferencesService {
       case 'reorder':
         itemPreference.customOrder = action.value
         if (!preferences.customOrder) preferences.customOrder = {}
-        preferences.customOrder[action.menuItemId] = action.value
+        preferences.customOrder[action.menuItemId] = action.value || 0
         break
     }
 
@@ -399,7 +399,7 @@ export class UserMenuPreferencesService {
     if (importData.itemPreferences) {
       const itemPreferences = (importData.itemPreferences as Record<string, unknown>[]).map(
         (pref: Record<string, unknown>) =>
-          UserMenuItemPreference.create(preferences.id, pref.menuItemId, pref)
+          UserMenuItemPreference.create(preferences.id, pref.menuItemId as string, pref)
       )
       await this._itemPreferencesRepository.save(itemPreferences)
     }

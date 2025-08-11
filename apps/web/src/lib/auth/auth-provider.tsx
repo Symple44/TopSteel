@@ -142,17 +142,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
         let { user, tokens, company } = storedSession
 
         // Convertir l'utilisateur existant vers le nouveau format si nécessaire
-        if (user && !(user as any).societeRoles) {
+        if (user && !(user as unknown).societeRoles) {
           const extendedUser = AuthAdapter.toExtendedUser(
             user as any,
-            (user as any).userSocieteRoles || (user as any).societeRoles || []
+            (user as unknown).userSocieteRoles || (user as unknown).societeRoles || []
           )
           user = AuthAdapter.toAuthUser(extendedUser)
         }
 
         // Convertir la société existante si nécessaire
-        if (company && !(company as any).isActive) {
-          company = AuthAdapter.toNewCompany(company as any) as Company
+        if (company && !(company as unknown).isActive) {
+          company = AuthAdapter.toNewCompany(company as unknown) as Company
         }
 
         if (user && tokens) {
@@ -275,9 +275,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         if (result.user && result.tokens) {
           // Login réussi - convertir les données API vers le nouveau format
-          const extendedUser = AuthAdapter.toExtendedUser(result.user as any)
+          const extendedUser = AuthAdapter.toExtendedUser(result.user as unknown)
           const user = AuthAdapter.toAuthUser(extendedUser)
-          const tokens = AuthAdapter.toNewAuthTokens(result.tokens as any)
+          const tokens = AuthAdapter.toNewAuthTokens(result.tokens as unknown)
 
           // Sauvegarder temporairement les tokens pour permettre les appels API
           authStorage.saveSession(user, tokens, null, rememberMe)
@@ -302,13 +302,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 const adaptedUser = AuthAdapter.toAuthUser(
                   AuthAdapter.toExtendedUser(
                     companySelectResult.user as any,
-                    (companySelectResult.user as any).userSocieteRoles ||
-                      (companySelectResult.user as any).societeRoles ||
+                    (companySelectResult.user as unknown).userSocieteRoles ||
+                      (companySelectResult.user as unknown).societeRoles ||
                       []
                   )
                 )
-                const adaptedTokens = AuthAdapter.toNewAuthTokens(companySelectResult.tokens as any)
-                const adaptedCompany = AuthAdapter.toNewCompany(companySelectResult.company as any)
+                const adaptedTokens = AuthAdapter.toNewAuthTokens(
+                  companySelectResult.tokens as unknown
+                )
+                const adaptedCompany = AuthAdapter.toNewCompany(
+                  companySelectResult.company as unknown
+                )
 
                 authStorage.saveSession(adaptedUser, adaptedTokens, adaptedCompany, rememberMe)
 
@@ -385,9 +389,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         )
 
         // Convertir les données vers le format attendu
-        const extendedUser = AuthAdapter.toExtendedUser(rawUser as any)
+        const extendedUser = AuthAdapter.toExtendedUser(rawUser as unknown)
         const user = AuthAdapter.toAuthUser(extendedUser)
-        const tokens = AuthAdapter.toNewAuthTokens(rawTokens as any)
+        const tokens = AuthAdapter.toNewAuthTokens(rawTokens as unknown)
 
         // Forcer la sélection de société après MFA aussi
         authStorage.saveSession(user, tokens, null)
@@ -426,10 +430,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const result = await AuthService.selectCompany(company.id, authState.tokens.accessToken)
 
         // Convertir les données vers le format attendu
-        const extendedUser = AuthAdapter.toExtendedUser(result.user as any)
+        const extendedUser = AuthAdapter.toExtendedUser(result.user as unknown)
         const user = AuthAdapter.toAuthUser(extendedUser)
-        const tokens = AuthAdapter.toNewAuthTokens(result.tokens as any)
-        const adaptedCompany = AuthAdapter.toNewCompany(result.company as any)
+        const tokens = AuthAdapter.toNewAuthTokens(result.tokens as unknown)
+        const adaptedCompany = AuthAdapter.toNewCompany(result.company as unknown)
 
         authStorage.saveSession(user, tokens, adaptedCompany)
 

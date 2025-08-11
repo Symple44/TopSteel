@@ -14,7 +14,10 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             gcTime: 5 * 60 * 1000, // 5 minutes
             retry: (failureCount, error: unknown) => {
               // Ne pas retry si c'est une erreur 404 ou tenant non trouvé
-              if (error?.response?.status === 404 || error?.message === 'TENANT_NOT_FOUND') {
+              if (
+                (error as any)?.response?.status === 404 ||
+                (error as any)?.message === 'TENANT_NOT_FOUND'
+              ) {
                 return false
               }
               return failureCount < 3

@@ -43,7 +43,7 @@ export function PageRenderer({
     )
   }
 
-  const sections = providedSections || template?.sections || []
+  const sections = providedSections || (template as any)?.sections || []
   const visibleSections = sections
     .filter((section: BaseSection) => section.isVisible)
     .sort((a: BaseSection, b: BaseSection) => a.order - b.order)

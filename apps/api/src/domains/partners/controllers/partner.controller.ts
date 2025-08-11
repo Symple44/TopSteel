@@ -19,8 +19,23 @@ import type { User } from '../../users/entities/user.entity'
 import type { CreatePartnerDto } from '../dto/create-partner.dto'
 import type { PartnerFiltersDto } from '../dto/partner-filters.dto'
 import type { UpdatePartnerDto } from '../dto/update-partner.dto'
+import type {
+  CreateContactDto,
+  UpdateContactDto,
+  CreatePartnerSiteDto,
+  UpdatePartnerSiteDto,
+  CreatePartnerAddressDto,
+  UpdatePartnerAddressDto,
+  CreatePartnerGroupDto,
+  UpdatePartnerGroupDto,
+} from '../dto'
 import type { Partner } from '../entities/partner.entity'
-import type { PartnerService, PartnerStatistics } from '../services/partner.service'
+import type { PartnerGroup } from '../entities/partner-group.entity'
+import type { Contact } from '../entities/contact.entity'
+import type { PartnerSite } from '../entities/partner-site.entity'
+import type { PartnerAddress } from '../entities/partner-address.entity'
+import { PartnerService, PartnerStatistics } from '../services/partner.service'
+import { PartnerParametersInitService } from '../services/partner-parameters-init.service'
 
 /**
  * Contrôleur REST pour la gestion des partenaires (clients/fournisseurs)
@@ -30,7 +45,20 @@ import type { PartnerService, PartnerStatistics } from '../services/partner.serv
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class PartnerController {
-  constructor(private readonly partnerService: PartnerService) {}
+  constructor(
+    private readonly partnerService: PartnerService,
+    private readonly partnerParametersService: PartnerParametersInitService
+  ) {}
+
+  private getContext(user: any): BusinessContext {
+    return {
+      userId: user.id,
+      tenantId: 'current-tenant',
+      societeId: user.societeId || user.currentSocieteId || 'default',
+      userRoles: [user.role],
+      permissions: [],
+    }
+  }
 
   /**
    * Créer un nouveau partenaire
@@ -72,6 +100,34 @@ export class PartnerController {
     @CurrentUser() _user: User
   ): Promise<Partner[]> {
     return await this.partnerService.searchPartners(filters)
+  }
+
+  /**
+   * Récupérer les paramètres disponibles pour les partenaires
+   */
+  @Get('parameters')
+  @ApiOperation({
+    summary: 'Obtenir les paramètres',
+    description: 'Récupérer toutes les valeurs possibles pour les champs de type enum',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Paramètres récupérés avec succès',
+    schema: {
+      example: {
+        partner_types: ['CLIENT', 'FOURNISSEUR', 'MIXTE'],
+        partner_status: ['ACTIF', 'INACTIF', 'PROSPECT', 'SUSPENDU', 'ARCHIVE'],
+        partner_categories: ['METALLURGIE', 'BTP', 'INDUSTRIE', 'NEGOCE'],
+        contact_roles: ['COMMERCIAL', 'TECHNIQUE', 'COMPTABILITE'],
+        site_types: ['SIEGE_SOCIAL', 'USINE', 'DEPOT', 'CHANTIER'],
+        payment_terms: ['COMPTANT', '30_JOURS', '60_JOURS'],
+        payment_modes: ['VIREMENT', 'CHEQUE', 'CB'],
+        civilites: ['M.', 'Mme', 'Mlle']
+      }
+    }
+  })
+  async getPartnerParameters(): Promise<Record<string, string[]>> {
+    return await this.partnerParametersService.getAllPartnerParameters()
   }
 
   /**
@@ -174,14 +230,7 @@ export class PartnerController {
     description: "Changer le statut d'un prospect en client actif",
   })
   async convertirProspect(@Param('id') id: string, @CurrentUser() user: User): Promise<Partner> {
-    const context: BusinessContext = {
-      userId: user.id,
-      tenantId: 'current-tenant',
-      userRoles: [user.role],
-      permissions: [],
-    }
-
-    return await this.partnerService.convertirProspect(id, context)
+    return await this.partnerService.convertirProspect(id, this.getContext(user))
   }
 
   /**
@@ -198,14 +247,7 @@ export class PartnerController {
     @Body() body: { raison: string },
     @CurrentUser() user: User
   ): Promise<Partner> {
-    const context: BusinessContext = {
-      userId: user.id,
-      tenantId: 'current-tenant',
-      userRoles: [user.role],
-      permissions: [],
-    }
-
-    return await this.partnerService.suspendrePartenaire(id, body.raison, context)
+    return await this.partnerService.suspendrePartenaire(id, body.raison, this.getContext(user))
   }
 
   /**
@@ -258,6 +300,265 @@ export class PartnerController {
   })
   async getStatistiques(): Promise<PartnerStatistics> {
     return await this.partnerService.getStatistiques()
+  }
+
+  /**
+   * Gestion des groupes de partenaires
+   */
+  @Get('groups')
+  @ApiOperation({
+    summary: 'Lister les groupes de partenaires',
+    description: 'Récupérer tous les groupes tarifaires disponibles',
+  })
+  async getPartnerGroups(@CurrentUser() user: User): Promise<PartnerGroup[]> {
+    return await this.partnerService.getPartnerGroups(this.getContext(user))
+  }
+
+  @Post('groups')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Créer un groupe de partenaires',
+    description: 'Créer un nouveau groupe tarifaire',
+  })
+  async createPartnerGroup(
+    @Body() createDto: CreatePartnerGroupDto,
+    @CurrentUser() user: User
+  ): Promise<PartnerGroup> {
+    return await this.partnerService.createPartnerGroup(createDto, this.getContext(user))
+  }
+
+  @Patch('groups/:groupId')
+  @ApiOperation({
+    summary: 'Mettre à jour un groupe',
+    description: 'Modifier les paramètres d\'un groupe tarifaire',
+  })
+  async updatePartnerGroup(
+    @Param('groupId') groupId: string,
+    @Body() updateDto: UpdatePartnerGroupDto,
+    @CurrentUser() user: User
+  ): Promise<PartnerGroup> {
+    return await this.partnerService.updatePartnerGroup(groupId, updateDto, this.getContext(user))
+  }
+
+  @Post(':partnerId/assign-group/:groupId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Assigner un groupe à un partenaire',
+    description: 'Associer un partenaire à un groupe tarifaire',
+  })
+  async assignPartnerToGroup(
+    @Param('partnerId') partnerId: string,
+    @Param('groupId') groupId: string,
+    @CurrentUser() user: User
+  ): Promise<Partner> {
+    return await this.partnerService.assignPartnerToGroup(partnerId, groupId, this.getContext(user))
+  }
+
+  /**
+   * Gestion des contacts
+   */
+  @Get(':partnerId/contacts')
+  @ApiOperation({
+    summary: 'Lister les contacts d\'un partenaire',
+    description: 'Récupérer tous les interlocuteurs d\'un partenaire',
+  })
+  async getPartnerContacts(
+    @Param('partnerId') partnerId: string,
+    @CurrentUser() user: User
+  ): Promise<Contact[]> {
+    return await this.partnerService.getPartnerContacts(partnerId, this.getContext(user))
+  }
+
+  @Post(':partnerId/contacts')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Ajouter un contact',
+    description: 'Créer un nouvel interlocuteur pour un partenaire',
+  })
+  async createContact(
+    @Param('partnerId') partnerId: string,
+    @Body() createDto: CreateContactDto,
+    @CurrentUser() user: User
+  ): Promise<Contact> {
+    return await this.partnerService.createContact(partnerId, createDto, this.getContext(user))
+  }
+
+  @Patch('contacts/:contactId')
+  @ApiOperation({
+    summary: 'Mettre à jour un contact',
+    description: 'Modifier les informations d\'un interlocuteur',
+  })
+  async updateContact(
+    @Param('contactId') contactId: string,
+    @Body() updateDto: UpdateContactDto,
+    @CurrentUser() user: User
+  ): Promise<Contact> {
+    return await this.partnerService.updateContact(contactId, updateDto, this.getContext(user))
+  }
+
+  @Delete('contacts/:contactId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Supprimer un contact',
+    description: 'Supprimer un interlocuteur',
+  })
+  async deleteContact(
+    @Param('contactId') contactId: string,
+    @CurrentUser() user: User
+  ): Promise<void> {
+    await this.partnerService.deleteContact(contactId, this.getContext(user))
+  }
+
+  /**
+   * Gestion des sites
+   */
+  @Get(':partnerId/sites')
+  @ApiOperation({
+    summary: 'Lister les sites d\'un partenaire',
+    description: 'Récupérer tous les sites (dépôts, usines, chantiers) d\'un partenaire',
+  })
+  async getPartnerSites(
+    @Param('partnerId') partnerId: string,
+    @CurrentUser() user: User
+  ): Promise<PartnerSite[]> {
+    return await this.partnerService.getPartnerSites(partnerId, this.getContext(user))
+  }
+
+  @Post(':partnerId/sites')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Ajouter un site',
+    description: 'Créer un nouveau site pour un partenaire',
+  })
+  async createPartnerSite(
+    @Param('partnerId') partnerId: string,
+    @Body() createDto: CreatePartnerSiteDto,
+    @CurrentUser() user: User
+  ): Promise<PartnerSite> {
+    return await this.partnerService.createPartnerSite(partnerId, createDto, this.getContext(user))
+  }
+
+  @Patch('sites/:siteId')
+  @ApiOperation({
+    summary: 'Mettre à jour un site',
+    description: 'Modifier les informations d\'un site',
+  })
+  async updatePartnerSite(
+    @Param('siteId') siteId: string,
+    @Body() updateDto: UpdatePartnerSiteDto,
+    @CurrentUser() user: User
+  ): Promise<PartnerSite> {
+    return await this.partnerService.updatePartnerSite(siteId, updateDto, this.getContext(user))
+  }
+
+  @Delete('sites/:siteId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Supprimer un site',
+    description: 'Supprimer un site',
+  })
+  async deletePartnerSite(
+    @Param('siteId') siteId: string,
+    @CurrentUser() user: User
+  ): Promise<void> {
+    await this.partnerService.deletePartnerSite(siteId, this.getContext(user))
+  }
+
+  /**
+   * Gestion des adresses
+   */
+  @Get(':partnerId/addresses')
+  @ApiOperation({
+    summary: 'Lister les adresses d\'un partenaire',
+    description: 'Récupérer toutes les adresses d\'un partenaire',
+  })
+  async getPartnerAddresses(
+    @Param('partnerId') partnerId: string,
+    @CurrentUser() user: User
+  ): Promise<PartnerAddress[]> {
+    return await this.partnerService.getPartnerAddresses(partnerId, this.getContext(user))
+  }
+
+  @Post(':partnerId/addresses')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Ajouter une adresse',
+    description: 'Créer une nouvelle adresse pour un partenaire',
+  })
+  async createPartnerAddress(
+    @Param('partnerId') partnerId: string,
+    @Body() createDto: CreatePartnerAddressDto,
+    @CurrentUser() user: User
+  ): Promise<PartnerAddress> {
+    return await this.partnerService.createPartnerAddress(partnerId, createDto, this.getContext(user))
+  }
+
+  @Patch('addresses/:addressId')
+  @ApiOperation({
+    summary: 'Mettre à jour une adresse',
+    description: 'Modifier les informations d\'une adresse',
+  })
+  async updatePartnerAddress(
+    @Param('addressId') addressId: string,
+    @Body() updateDto: UpdatePartnerAddressDto,
+    @CurrentUser() user: User
+  ): Promise<PartnerAddress> {
+    return await this.partnerService.updatePartnerAddress(addressId, updateDto, this.getContext(user))
+  }
+
+  @Delete('addresses/:addressId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Supprimer une adresse',
+    description: 'Supprimer une adresse',
+  })
+  async deletePartnerAddress(
+    @Param('addressId') addressId: string,
+    @CurrentUser() user: User
+  ): Promise<void> {
+    await this.partnerService.deletePartnerAddress(addressId, this.getContext(user))
+  }
+
+  /**
+   * Informations complètes d\'un partenaire
+   */
+  @Get(':partnerId/complete')
+  @ApiOperation({
+    summary: 'Récupérer toutes les données d\'un partenaire',
+    description: 'Obtenir le partenaire avec ses contacts, sites, adresses et groupe',
+  })
+  async getPartnerComplete(
+    @Param('partnerId') partnerId: string,
+    @CurrentUser() user: User
+  ): Promise<{
+    partner: Partner
+    contacts: Contact[]
+    sites: PartnerSite[]
+    addresses: PartnerAddress[]
+    group?: PartnerGroup
+  }> {
+    return await this.partnerService.getPartnerComplete(partnerId, this.getContext(user))
+  }
+
+  /**
+   * Dupliquer un partenaire
+   */
+  @Post(':partnerId/duplicate')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Dupliquer un partenaire',
+    description: 'Créer une copie complète d\'un partenaire avec ses données associées',
+  })
+  async duplicatePartner(
+    @Param('partnerId') partnerId: string,
+    @Body() body: { newCode: string },
+    @CurrentUser() user: User
+  ): Promise<Partner> {
+    return await this.partnerService.duplicatePartner(
+      partnerId,
+      body.newCode,
+      this.getContext(user)
+    )
   }
 
   /**
@@ -368,7 +669,7 @@ export class PartnerController {
         if (partner) {
           const validation = await this.partnerService.validateBusinessRules(
             partner,
-            'VALIDATE' as string
+            'VALIDATE' as any
           )
           results.push({
             id: partnerId,

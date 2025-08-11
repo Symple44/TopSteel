@@ -84,7 +84,7 @@ export class UserSocieteRolesService {
           societeId: row.societeId,
           societe: {
             id: row.societe_id || row.societeId,
-            nom: row.societe_nom || `Société ${row.societeId.substring(0, 8)}...`,
+            nom: row.societe_nom || `Société ${(row as any).societeId.substring(0, 8)}...`,
             code: row.societe_code || 'N/A',
           },
           roleType: row.roleType || 'USER',

@@ -24,10 +24,10 @@ import type {
   MaterialCompatibilityAnalysis,
   MaterialStockAlert,
 } from '../repositories/material.repository'
-import type {
+import {
   MaterialService,
-  MaterialStatistics,
-  MaterialStockValorisation,
+  type MaterialStatistics,
+  type MaterialStockValorisation,
 } from '../services/material.service'
 
 /**
@@ -350,7 +350,7 @@ export class MaterialController {
   async calculerValorisationStock(
     @Query('type') type?: string
   ): Promise<MaterialStockValorisation> {
-    return await this.materialService.calculerValorisationStock(type as string)
+    return await this.materialService.calculerValorisationStock(type as any)
   }
 
   /**
@@ -576,7 +576,7 @@ export class MaterialController {
         if (material) {
           const validation = await this.materialService.validateBusinessRules(
             material,
-            'VALIDATE' as string
+            'VALIDATE' as any
           )
           results.push({
             id: materialId,

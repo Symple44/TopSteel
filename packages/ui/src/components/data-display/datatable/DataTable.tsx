@@ -237,7 +237,7 @@ export function DataTable<T = any>({
   const applyFilter = (value: unknown, filter: FilterConfig): boolean => {
     // Nouveau format de filtre depuis ColumnFilterAdvanced
     if (filter.value && typeof filter.value === 'object') {
-      const filterValue = filter.value as unknown as Record<string, unknown>
+      const filterValue = filter.value as any as Record<string, unknown>
 
       // Filtre par valeurs multiples (checkbox)
       if (filterValue.type === 'values' && Array.isArray(filterValue.values)) {
@@ -489,8 +489,8 @@ export function DataTable<T = any>({
         if (aVal === bVal) return 0
 
         // Logique de tri simple et fiable
-        if (aVal < bVal) return sort.direction === 'desc' ? 1 : -1
-        if (aVal > bVal) return sort.direction === 'desc' ? -1 : 1
+        if ((aVal as any) < (bVal as any)) return sort.direction === 'desc' ? 1 : -1
+        if ((aVal as any) > (bVal as any)) return sort.direction === 'desc' ? -1 : 1
         return 0
       })
     })

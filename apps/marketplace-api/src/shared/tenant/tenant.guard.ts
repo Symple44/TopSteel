@@ -1,9 +1,12 @@
-import { type CanActivate, type ExecutionContext, Injectable } from '@nestjs/common'
-import type { TenantResolver } from './tenant-resolver.service'
+import { type CanActivate, type ExecutionContext, Inject, Injectable } from '@nestjs/common'
+import { TenantResolver } from './tenant-resolver.service'
 
 @Injectable()
 export class TenantGuard implements CanActivate {
-  constructor(private tenantResolver: TenantResolver) {}
+  constructor(
+    @Inject(TenantResolver)
+    private tenantResolver: TenantResolver
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
@@ -33,24 +36,42 @@ export class TenantGuard implements CanActivate {
     const req = request as Record<string, unknown>
 
     // 1. Header X-Tenant
-    if (req.headers && typeof req.headers === 'object') {
-      const headerTenant = req.headers['x-tenant']
+    if (
+      req.headers &&
+      typeof req.headers === 'object' &&
+      req.headers !== null &&
+      !Array.isArray(req.headers)
+    ) {
+      const headers = req.headers as Record<string, unknown>
+      const headerTenant = headers['x-tenant']
       if (typeof headerTenant === 'string') return headerTenant
 
       // 2. Domaine/Host
-      const host = req.headers.host
+      const host = headers.host
       if (typeof host === 'string') return host
     }
 
     // 3. Paramètre de requête
-    if (req.query && typeof req.query === 'object') {
-      const queryTenant = req.query.tenant
+    if (
+      req.query &&
+      typeof req.query === 'object' &&
+      req.query !== null &&
+      !Array.isArray(req.query)
+    ) {
+      const query = req.query as Record<string, unknown>
+      const queryTenant = query.tenant
       if (typeof queryTenant === 'string') return queryTenant
     }
 
     // 4. Paramètre de route
-    if (req.params && typeof req.params === 'object') {
-      const paramTenant = req.params.tenant
+    if (
+      req.params &&
+      typeof req.params === 'object' &&
+      req.params !== null &&
+      !Array.isArray(req.params)
+    ) {
+      const params = req.params as Record<string, unknown>
+      const paramTenant = params.tenant
       if (typeof paramTenant === 'string') return paramTenant
     }
 

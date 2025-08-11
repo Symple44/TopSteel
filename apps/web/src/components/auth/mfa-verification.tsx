@@ -152,7 +152,8 @@ export default function MFAVerification({
             ? btoa(
                 String.fromCharCode(
                   ...new Uint8Array(
-                    (credential.response as AuthenticatorAssertionResponse).userHandle!
+                    (credential.response as AuthenticatorAssertionResponse).userHandle ??
+                      new Uint8Array()
                   )
                 )
               )

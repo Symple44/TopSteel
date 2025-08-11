@@ -23,8 +23,8 @@ export class MenuTestController {
     } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
-        stack: error.stack?.split('\n').slice(0, 3).join('\n'),
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.split('\n').slice(0, 3).join('\n') : undefined,
       }
     }
   }
@@ -45,7 +45,7 @@ export class MenuTestController {
     } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       }
     }
   }

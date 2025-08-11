@@ -128,7 +128,7 @@ export class DatabaseStatsService {
       return {
         success: true,
         message: 'Optimisation terminée',
-        details: results,
+        details: { operations: results },
       }
     } catch (error) {
       return {

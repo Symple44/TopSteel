@@ -51,7 +51,7 @@ export class SocietesService {
   }
 
   async update(id: string, societeData: Partial<Societe>): Promise<Societe> {
-    await this._societeRepository.update(id, societeData)
+    await this._societeRepository.update(id, societeData as unknown)
     const societe = await this._societeRepository.findOne({
       where: { id },
       relations: ['sites'],
@@ -70,7 +70,7 @@ export class SocietesService {
     await this._societeRepository.update(id, {
       status: SocieteStatus.ACTIVE,
       dateActivation: new Date(),
-    })
+    } as unknown)
     const societe = await this.findById(id)
     if (!societe) {
       throw new NotFoundException(`Société avec l'ID ${id} non trouvée`)

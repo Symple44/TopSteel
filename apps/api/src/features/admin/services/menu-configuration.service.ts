@@ -493,7 +493,7 @@ export class MenuConfigurationService {
 
     return {
       name: config.name,
-      description: config.description,
+      description: config.description || null,
       version: '1.0',
       exportedAt: new Date().toISOString(),
       items: menuTree,
@@ -506,9 +506,9 @@ export class MenuConfigurationService {
   ): Promise<MenuConfiguration> {
     return await this.createConfiguration(
       {
-        name: data.name,
-        description: data.description,
-        items: data.items,
+        name: data.name as string,
+        description: typeof data.description === 'string' ? data.description : undefined,
+        items: data.items as any,
       },
       createdBy
     )

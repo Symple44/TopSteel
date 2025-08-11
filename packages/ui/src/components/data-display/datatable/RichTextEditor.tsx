@@ -1,6 +1,6 @@
 'use client'
 
-import DOMPurify from 'dompurify'
+// import DOMPurify from 'dompurify'
 import {
   AlignCenter,
   AlignLeft,
@@ -435,27 +435,14 @@ export function RichTextEditor({
           dangerouslySetInnerHTML={{
             __html:
               typeof window !== 'undefined'
-                ? DOMPurify.sanitize(initialContent, {
-                    ALLOWED_TAGS: [
-                      'p',
-                      'br',
-                      'strong',
-                      'em',
-                      'u',
-                      'span',
-                      'div',
-                      'h1',
-                      'h2',
-                      'h3',
-                      'ul',
-                      'ol',
-                      'li',
-                      'a',
-                      'blockquote',
-                    ],
-                    ALLOWED_ATTR: ['class', 'style', 'href', 'target'],
-                  })
-                : initialContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
+                ? (initialContent || '').replace(
+                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                    ''
+                  )
+                : (initialContent || '').replace(
+                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                    ''
+                  ),
           }}
           role="textbox"
           aria-label={placeholder || 'Rich text editor'}
@@ -713,27 +700,11 @@ export function RichTextEditor({
                     dangerouslySetInnerHTML={{
                       __html:
                         typeof window !== 'undefined'
-                          ? DOMPurify.sanitize(content, {
-                              ALLOWED_TAGS: [
-                                'p',
-                                'br',
-                                'strong',
-                                'em',
-                                'u',
-                                'span',
-                                'div',
-                                'h1',
-                                'h2',
-                                'h3',
-                                'ul',
-                                'ol',
-                                'li',
-                                'a',
-                                'blockquote',
-                              ],
-                              ALLOWED_ATTR: ['class', 'style', 'href', 'target'],
-                            })
-                          : content.replace(
+                          ? (content || '').replace(
+                              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                              ''
+                            )
+                          : (content || '').replace(
                               /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
                               ''
                             ),

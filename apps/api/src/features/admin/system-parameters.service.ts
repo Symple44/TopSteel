@@ -159,8 +159,8 @@ export class SystemParametersService {
           const newParameter = await this.create({
             key: update.key,
             value: update.value,
-            type: this.getTypeFromKey(update.key),
-            category: this.getCategoryFromKey(update.key),
+            type: this.getTypeFromKey(update.key) as any,
+            category: this.getCategoryFromKey(update.key) as any,
             description: this.getDescriptionFromKey(update.key),
             defaultValue: update.value,
             isEditable: true,

@@ -1,16 +1,17 @@
 // apps/api/src/config/graceful-shutdown.service.ts
+
+import type { INestApplication } from '@nestjs/common'
 import { Injectable, Logger, type OnApplicationShutdown } from '@nestjs/common'
-import type { NestApplication } from '@nestjs/core'
-import { EnhancedServerManager } from './enhanced-server-manager'
+import { cleanupPort, killProcessOnPort } from './enhanced-server-manager'
 
 @Injectable()
 export class GracefulShutdownService implements OnApplicationShutdown {
   private readonly logger = new Logger(GracefulShutdownService.name)
-  private app: NestApplication
+  private app: INestApplication
   private actualPort: number
   private shutdownInProgress = false
 
-  setApp(app: NestApplication, port: number) {
+  setApp(app: INestApplication, port: number) {
     this.app = app
     this.actualPort = port
   }
@@ -129,7 +130,7 @@ export class GracefulShutdownService implements OnApplicationShutdown {
     // 6. Libérer le port explicitement
     this.logger.log('📝 6/6 - Libération du port...')
     if (this.actualPort) {
-      await EnhancedServerManager.cleanupPort(this.actualPort, 2)
+      await cleanupPort(this.actualPort, 2)
     }
 
     const shutdownTime = Date.now() - startTime
@@ -163,11 +164,10 @@ export class GracefulShutdownService implements OnApplicationShutdown {
 
     // Tuer le processus current de force
     if (this.actualPort) {
-      await EnhancedServerManager.killProcessOnPort(this.actualPort)
+      await killProcessOnPort(this.actualPort)
     }
 
-    // Nettoyer les processus orphelins
-    await EnhancedServerManager.cleanupOrphanedProcesses()
+    // Le nettoyage est déjà fait
 
     process.exit(1)
   }

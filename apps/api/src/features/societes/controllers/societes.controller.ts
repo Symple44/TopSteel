@@ -2,9 +2,9 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { CreateTenantDto } from '../dto/create-tenant.dto'
 import type { Societe } from '../entities/societe.entity'
-import type { SocietesService } from '../services/societes.service'
-import type {
-  TenantProvisioningResult,
+import { SocietesService } from '../services/societes.service'
+import {
+  type TenantProvisioningResult,
   TenantProvisioningService,
 } from '../services/tenant-provisioning.service'
 

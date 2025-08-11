@@ -20,6 +20,8 @@ export * from './image-upload'
 export * from './metallurgy'
 // Notifications métier
 export * from './notifications'
+// Pricing
+export * from './pricing'
 // Projet
 export * from './projet-card'
 // Tables spécialisées

@@ -380,7 +380,7 @@ export class ParameterService {
     language: string = 'fr',
     scope: 'system' | 'application' | 'client' = 'system'
   ) {
-    let repository: Repository<ParameterSystem | ParameterApplication | ParameterClient>
+    let repository: any
     switch (scope) {
       case 'system':
         repository = this._systemRepo
@@ -398,7 +398,7 @@ export class ParameterService {
       order: { key: 'ASC' },
     })
 
-    return params.map((param) => ({
+    return params.map((param: any) => ({
       key: param.key,
       value: param.customTranslations?.[language] || param.value,
       type: param.type,
@@ -512,7 +512,7 @@ export class ParameterService {
     scope: 'system' | 'application' | 'client' = 'system',
     tenantId?: string
   ) {
-    let repository: Repository<ParameterSystem | ParameterApplication | ParameterClient>
+    let repository: any
     const whereClause: Record<string, unknown> = { group, key }
 
     switch (scope) {
@@ -569,7 +569,7 @@ export class ParameterService {
     },
     scope: 'system' | 'application' | 'client' = 'system'
   ) {
-    let repository: Repository<ParameterSystem | ParameterApplication | ParameterClient>
+    let repository: any
     switch (scope) {
       case 'system':
         repository = this._systemRepo
@@ -582,7 +582,7 @@ export class ParameterService {
         break
     }
 
-    const param = repository.create(data)
+    const param = repository.create(data as unknown)
     const result = await repository.save(param)
 
     // Invalider le cache si c'est un paramètre de rôles

@@ -206,15 +206,26 @@ export class RoleFormattingService {
    * Formate les informations complètes d'un utilisateur avec ses rôles
    */
   formatUserWithRoles(
-    user: { role: string; [key: string]: unknown },
-    userSocieteRoles: Array<{ role: string; societe: { nom: string; id: string } }> = []
+    user: { role: string; id: string; email: string; [key: string]: unknown },
+    userSocieteRoles: Array<{
+      roleType?: string
+      role?: string
+      societeId: string
+      societe?: { nom: string; id: string }
+      isDefaultSociete?: boolean
+      isActive?: boolean
+      grantedAt?: string
+      createdAt?: string
+      expiresAt?: string
+    }> = []
   ): FormattedUserRole {
     const globalRole = this.formatGlobalRole(user.role as GlobalUserRole)
 
     const societeRoles = userSocieteRoles.map((usr) => {
-      const societeRole = this.formatSocieteRole(usr.roleType as SocieteRoleType)
+      const roleType = usr.roleType || usr.role
+      const societeRole = this.formatSocieteRole(roleType as SocieteRoleType)
       const effectiveRole = this.formatSocieteRole(
-        getEffectiveSocieteRole(user.role as GlobalUserRole, usr.roleType as SocieteRoleType)
+        getEffectiveSocieteRole(user.role as GlobalUserRole, roleType as SocieteRoleType)
       )
 
       return {
@@ -224,7 +235,7 @@ export class RoleFormattingService {
         effectiveRole,
         isDefault: usr.isDefaultSociete || false,
         isActive: usr.isActive || false,
-        grantedAt: usr.grantedAt || usr.createdAt,
+        grantedAt: usr.grantedAt || usr.createdAt || new Date().toISOString(),
         expiresAt: usr.expiresAt,
       }
     })

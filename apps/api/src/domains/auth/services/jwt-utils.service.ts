@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
 
 export interface TokenInfo {
   isValid: boolean
@@ -77,14 +77,14 @@ export class JwtUtilsService {
   getTokenExpirationTime(token: string): Date | null {
     try {
       const payload = this.extractPayload(token)
-      return payload?.exp ? new Date(payload.exp * 1000) : null
+      return (payload as any)?.exp ? new Date((payload as any).exp * 1000) : null
     } catch (error) {
       this.logger.warn('Failed to get token expiration time', error)
       return null
     }
   }
 
-  private handleTokenError(error: unknown): TokenInfo {
+  private handleTokenError(error: any): TokenInfo {
     const payload = error.payload as ExtendedJwtPayload
     const expiresAt = payload?.exp ? new Date(payload.exp * 1000) : undefined
     const issuedAt = payload?.iat ? new Date(payload.iat * 1000) : undefined
@@ -95,7 +95,7 @@ export class JwtUtilsService {
         isExpired: true,
         expiresAt,
         issuedAt,
-        payload,
+        payload: payload as any,
         error: 'Token expired',
       }
     }
@@ -105,7 +105,7 @@ export class JwtUtilsService {
       isExpired: false,
       expiresAt,
       issuedAt,
-      payload,
+      payload: payload as any,
       error: error.message || 'Invalid token',
     }
   }

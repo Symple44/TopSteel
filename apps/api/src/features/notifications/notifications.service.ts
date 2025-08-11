@@ -67,7 +67,7 @@ export class NotificationsService {
   }
 
   async update(id: string, updateDto: UpdateNotificationsDto): Promise<Notifications> {
-    await this._repository.update(id, updateDto)
+    await this._repository.update(id, updateDto as unknown)
     return this.findOne(id)
   }
 

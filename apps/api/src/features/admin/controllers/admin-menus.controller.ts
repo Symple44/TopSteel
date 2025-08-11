@@ -62,7 +62,9 @@ export class AdminMenusController {
     @Body() createDto: CreateMenuConfigDto,
     @Request() req: Record<string, unknown>
   ): Promise<MenuConfiguration> {
-    const userId = req.user?.sub || req.user?.id
+    const userId =
+      (req.user as { id?: string; sub?: string; email?: string })?.sub ||
+      (req.user as { id?: string; sub?: string; email?: string })?.id
     return await this.menuConfigService.createConfiguration(createDto, userId)
   }
 
@@ -72,7 +74,9 @@ export class AdminMenusController {
     @Body() updateDto: UpdateMenuConfigDto,
     @Request() req: Record<string, unknown>
   ): Promise<MenuConfiguration> {
-    const userId = req.user?.sub || req.user?.id
+    const userId =
+      (req.user as { id?: string; sub?: string; email?: string })?.sub ||
+      (req.user as { id?: string; sub?: string; email?: string })?.id
     return await this.menuConfigService.updateConfiguration(id, updateDto, userId)
   }
 
@@ -133,7 +137,9 @@ export class AdminMenusController {
     @Body() data: Record<string, unknown>,
     @Request() req: Record<string, unknown>
   ): Promise<MenuConfiguration> {
-    const userId = req.user?.sub || req.user?.id
+    const userId =
+      (req.user as { id?: string; sub?: string; email?: string })?.sub ||
+      (req.user as { id?: string; sub?: string; email?: string })?.id
     return await this.menuConfigService.importConfiguration(data, userId)
   }
 
@@ -261,7 +267,9 @@ export class AdminMenusController {
     },
     @Request() req: Record<string, unknown>
   ) {
-    const userId = req.user?.sub || req.user?.id
+    const userId =
+      (req.user as { id?: string; sub?: string; email?: string })?.sub ||
+      (req.user as { id?: string; sub?: string; email?: string })?.id
     return await this.menuConfigService.addUserDataViewToMenu(
       userId,
       body.queryBuilderId,

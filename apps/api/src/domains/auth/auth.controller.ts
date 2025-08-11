@@ -14,15 +14,15 @@ import type { Request } from 'express'
 import { CurrentUser } from '../../core/common/decorators/current-user.decorator'
 import { Public } from '../../core/common/decorators/public.decorator'
 import { ThrottleAuth } from '../../core/common/decorators/throttle-config.decorator'
-import type { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
+import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import type { User } from '../users/entities/user.entity'
-import type { AuthService } from './auth.service'
+import { AuthService } from './auth.service'
 import { Roles } from './decorators/roles.decorator'
 import type { ChangePasswordDto } from './external/dto/change-password.dto'
 import { type LoginDto, RefreshTokenDto, type RegisterDto } from './external/dto/login.dto'
 import { JwtAuthGuard } from './security/guards/jwt-auth.guard'
 import { RolesGuard } from './security/guards/roles.guard'
-import type { SessionInvalidationService } from './services/session-invalidation.service'
+import { SessionInvalidationService } from './services/session-invalidation.service'
 
 @ApiTags('🔐 Auth')
 @Controller('auth')

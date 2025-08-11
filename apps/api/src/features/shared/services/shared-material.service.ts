@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { IsNull, type Repository } from 'typeorm'
-import { SharedMaterial, MaterialType } from '../entities/shared-material.entity'
+import { type MaterialType, SharedMaterial } from '../entities/shared-material.entity'
 
 @Injectable()
 export class SharedMaterialService {
@@ -34,7 +34,7 @@ export class SharedMaterialService {
   }
 
   async update(id: string, materialData: Partial<SharedMaterial>): Promise<SharedMaterial> {
-    await this._sharedMaterialRepository.update(id, materialData as any)
+    await this._sharedMaterialRepository.update(id, materialData as unknown)
     const material = await this._sharedMaterialRepository.findOne({ where: { id } })
     if (!material) {
       throw new NotFoundException(`Material with ID ${id} not found`)

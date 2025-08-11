@@ -58,8 +58,8 @@ import {
 // Middleware
 import { ConsolidatedSecurityMiddleware } from '../infrastructure/security/enhanced-security.middleware'
 import { EnhancedThrottlerGuard } from '../infrastructure/security/guards/enhanced-throttler.guard'
-// Module de pricing sectoriel
-import { PricingModule } from '../modules/pricing/pricing.module'
+// Module de pricing unifié (remplace les deux modules précédents)
+import { PricingUnifiedModule } from '../features/pricing/pricing-unified.module'
 // Controllers
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -110,7 +110,7 @@ import { AppService } from './app.service'
     // Modules métier essentiels (activés)
     UsersModule,
     MenuModule,
-    PricingModule,
+    PricingUnifiedModule,
 
     // Nouveau module business centralisé (architecture DDD)
     BusinessModule,

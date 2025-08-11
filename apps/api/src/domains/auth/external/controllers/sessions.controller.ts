@@ -12,7 +12,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common'
-import type { AuthService } from '../../auth.service'
+import { AuthService } from '../../auth.service'
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
@@ -124,7 +124,9 @@ export class SessionsController {
   ) {
     try {
       const { userId, reason = 'Déconnexion administrative' } = body
-      const adminUserId = req.user.sub
+      const adminUserId =
+        (req.user as { id?: string; sub?: string; email?: string })?.sub ||
+        (req.user as { id?: string; sub?: string; email?: string })?.id
 
       if (!userId) {
         throw new HttpException('userId requis', HttpStatus.BAD_REQUEST)
@@ -164,7 +166,9 @@ export class SessionsController {
   ) {
     try {
       const { sessionId, reason = 'Déconnexion administrative' } = body
-      const adminUserId = req.user.sub
+      const adminUserId =
+        (req.user as { id?: string; sub?: string; email?: string })?.sub ||
+        (req.user as { id?: string; sub?: string; email?: string })?.id
 
       if (!sessionId) {
         throw new HttpException('sessionId requis', HttpStatus.BAD_REQUEST)

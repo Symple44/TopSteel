@@ -5,9 +5,9 @@ import {
   Injectable,
   type NestInterceptor,
 } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
+import { Reflector } from '@nestjs/core'
 import { Observable } from 'rxjs'
-import type { CircuitBreakerService } from '../../../infrastructure/monitoring/circuit-breaker.service'
+import { CircuitBreakerService } from '../../../infrastructure/monitoring/circuit-breaker.service'
 import {
   CIRCUIT_BREAKER_KEY,
   type CircuitBreakerMetadata,

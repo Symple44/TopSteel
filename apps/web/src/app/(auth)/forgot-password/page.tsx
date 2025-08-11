@@ -5,13 +5,14 @@ import { ArrowLeft, CheckCircle, Mail, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import type { FC } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from '@/lib/i18n/hooks'
 
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic'
 
-export default function ForgotPasswordPage() {
+const ForgotPasswordPage: FC = () => {
   const { t } = useTranslation('auth')
   const _router = useRouter()
   const [email, setEmail] = useState('')
@@ -87,12 +88,12 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div className="space-y-3">
-              <Button onClick={() => setIsEmailSent(false)} variant="outline" className="w-full">
+              <Button onClick={() => setIsEmailSent(false)} variant={'outline' as const} className="w-full">
                 {t('resendEmail')}
               </Button>
 
               <Link href="/login">
-                <Button variant="ghost" className="w-full">
+                <Button variant={'ghost' as const} className="w-full">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   {t('backToLogin')}
                 </Button>
@@ -150,7 +151,7 @@ export default function ForgotPasswordPage() {
           {/* Links */}
           <div className="text-center space-y-2">
             <Link href="/login">
-              <Button variant="ghost" size="sm">
+              <Button variant={'ghost' as const} size={'sm' as const}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {t('backToLogin')}
               </Button>
@@ -168,3 +169,5 @@ export default function ForgotPasswordPage() {
     </div>
   )
 }
+
+export default ForgotPasswordPage

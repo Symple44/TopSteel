@@ -18,7 +18,7 @@ export async function fetchBackend(
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:3002'
 
   // Extract auth headers from request if provided
-  const headers: Record<string, string> = { ...(options?.headers as any) }
+  const headers: Record<string, string> = { ...(options?.headers as unknown) }
   if (request) {
     const authHeader = request.headers.get('authorization')
     const cookieHeader = request.headers.get('cookie')

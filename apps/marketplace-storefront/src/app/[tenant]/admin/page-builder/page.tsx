@@ -22,7 +22,7 @@ export default function PageBuilderListPage() {
   })
 
   const filteredTemplates =
-    templates?.filter((template: unknown) => {
+    (templates as any)?.filter((template: unknown) => {
       const t = template as { name: string; slug: string }
       return (
         t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

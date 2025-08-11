@@ -58,6 +58,7 @@ export interface ISpecification<T> {
 export interface BusinessContext {
   userId: string
   tenantId: string
+  societeId?: string
   userRoles: string[]
   permissions: string[]
   metadata?: Record<string, unknown>

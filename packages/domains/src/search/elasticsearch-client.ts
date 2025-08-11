@@ -103,7 +103,7 @@ export class ElasticsearchClient {
     }
   }
 
-  async createIndex(indexName: string, mapping: unknown): Promise<boolean> {
+  async createIndex(indexName: string, mapping: Record<string, any>): Promise<boolean> {
     try {
       const client = this.getClient()
 
@@ -117,7 +117,7 @@ export class ElasticsearchClient {
       // Créer l'index avec le mapping
       await client.indices.create({
         index: indexName,
-        body: mapping,
+        body: mapping as any,
       })
       return true
     } catch {
@@ -135,13 +135,17 @@ export class ElasticsearchClient {
     }
   }
 
-  async indexDocument(indexName: string, id: string, document: unknown): Promise<boolean> {
+  async indexDocument(
+    indexName: string,
+    id: string,
+    document: Record<string, any>
+  ): Promise<boolean> {
     try {
       const client = this.getClient()
       await client.index({
         index: indexName,
         id,
-        body: document,
+        body: document as any,
       })
       return true
     } catch {
@@ -149,15 +153,17 @@ export class ElasticsearchClient {
     }
   }
 
-  async updateDocument(indexName: string, id: string, document: unknown): Promise<boolean> {
+  async updateDocument(
+    indexName: string,
+    id: string,
+    document: Record<string, any>
+  ): Promise<boolean> {
     try {
       const client = this.getClient()
       await client.update({
         index: indexName,
         id,
-        body: {
-          doc: document,
-        },
+        doc: document,
       })
       return true
     } catch {
@@ -178,11 +184,11 @@ export class ElasticsearchClient {
     }
   }
 
-  async search(indexName: string, query: unknown): Promise<unknown> {
+  async search(indexName: string, query: Record<string, any>): Promise<unknown> {
     const client = this.getClient()
     const response = await client.search({
       index: indexName,
-      body: query,
+      body: query as any,
     })
     return response
   }

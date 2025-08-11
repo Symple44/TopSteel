@@ -21,7 +21,7 @@ import type {
   SystemParameterQueryDto,
   UpdateSystemParameterDto,
 } from './dto/system-parameter.dto'
-import type { SystemParametersService } from './system-parameters.service'
+import { SystemParametersService } from './system-parameters.service'
 
 @Controller('admin/system-parameters')
 @ApiTags('🔧 System Parameters')
@@ -52,7 +52,7 @@ export class SystemParametersController {
   @ApiResponse({ status: 200, description: 'Paramètres groupés par catégorie' })
   async getByCategory(@Query('category') category?: string) {
     if (category) {
-      return this.systemParametersService.findByCategory(category as string)
+      return this.systemParametersService.findByCategory(category as any)
     }
     return this.systemParametersService.getParametersByCategory()
   }

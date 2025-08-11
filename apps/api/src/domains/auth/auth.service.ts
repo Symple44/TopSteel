@@ -5,29 +5,30 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
 import type { Request } from 'express'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { UserSocieteRole } from '../../features/societes/entities/societe-user.entity'
-import type { SocieteUsersService } from '../../features/societes/services/societe-users.service'
-import type { SocietesService } from '../../features/societes/services/societes.service'
+import { SocieteUsersService } from '../../features/societes/services/societe-users.service'
+import { SocietesService } from '../../features/societes/services/societes.service'
+import { LicenseManagementService } from '../../features/societes/services/license-management.service'
 import type { User } from '../users/entities/user.entity'
-import type { UsersService } from '../users/users.service'
+import { UsersService } from '../users/users.service'
 import { GlobalUserRole, SocieteRoleType } from './core/constants/roles.constants'
 import { UserSession } from './core/entities/user-session.entity'
 import type { LoginDto } from './external/dto/login.dto'
 import type { RegisterDto } from './external/dto/register.dto'
 import type { JwtPayload, MultiTenantJwtPayload } from './interfaces/jwt-payload.interface'
-import type { AuthPerformanceService } from './services/auth-performance.service'
-import type { GeolocationService } from './services/geolocation.service'
-import type { MFAService } from './services/mfa.service'
-import type { SessionRedisService } from './services/session-redis.service'
-import type { UnifiedRolesService } from './services/unified-roles.service'
-import type { UserSocieteRolesService } from './services/user-societe-roles.service'
+import { AuthPerformanceService } from './services/auth-performance.service'
+import { GeolocationService } from './services/geolocation.service'
+import { MFAService } from './services/mfa.service'
+import { SessionRedisService } from './services/session-redis.service'
+import { UnifiedRolesService } from './services/unified-roles.service'
+import { UserSocieteRolesService } from './services/user-societe-roles.service'
 
 @Injectable()
 export class AuthService {
@@ -43,23 +44,30 @@ export class AuthService {
     private readonly userSocieteRolesService: UserSocieteRolesService,
     private readonly unifiedRolesService: UnifiedRolesService,
     private readonly performanceService: AuthPerformanceService,
+    private readonly licenseManagementService: LicenseManagementService,
     @InjectRepository(UserSession, 'auth')
     private readonly _userSessionRepository: Repository<UserSession>
   ) {}
 
   async validateUser(emailOrAcronym: string, password: string): Promise<Omit<User, 'password'>> {
     const user = await this.usersService.findByEmailOrAcronym(emailOrAcronym)
+    
+    // Message d'erreur générique pour éviter de révéler si l'utilisateur existe
+    const genericError = 'Invalid credentials'
+    
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials')
+      // Effectuer quand même une comparaison pour éviter les timing attacks
+      await bcrypt.compare(password, '$2b$10$dummyhash')
+      throw new UnauthorizedException(genericError)
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new UnauthorizedException(genericError)
     }
 
     const { password: _, ...result } = user
-    return result
+    return result as any
   }
 
   async login(loginDto: LoginDto, request?: Request) {
@@ -197,12 +205,25 @@ export class AuthService {
       throw new UnauthorizedException('Utilisateur non trouvé')
     }
 
+    // Vérifier la licence de la société AVANT de permettre la connexion
+    const licenseCheck = await this.licenseManagementService.checkLicenseForAuthentication(
+      societeId,
+      userId,
+      true // Permettre les sessions concurrentes selon la configuration de la licence
+    )
+
+    if (!licenseCheck.isValid) {
+      throw new UnauthorizedException(
+        licenseCheck.reason || 'Licence invalide ou limite d\'utilisateurs atteinte'
+      )
+    }
+
     // Utiliser le service unifié pour récupérer ou créer le rôle
     let userSocieteInfo = await this.unifiedRolesService.getUserSocieteRole(userId, societeId)
 
     // Si pas de rôle trouvé et que l'utilisateur n'est pas SUPER_ADMIN, refuser l'accès
     if (!userSocieteInfo && user.role !== GlobalUserRole.SUPER_ADMIN) {
-      throw new UnauthorizedException('Accès non autorisé à cette société')
+      throw new UnauthorizedException('Accès non autorisé')
     }
 
     // Pour SUPER_ADMIN, le service unifié crée automatiquement un rôle virtuel
@@ -223,13 +244,13 @@ export class AuthService {
 
     // Vérifier que le rôle est actif
     if (!userSocieteInfo || !userSocieteInfo.isActive) {
-      throw new UnauthorizedException('Accès non autorisé à cette société')
+      throw new UnauthorizedException('Accès non autorisé')
     }
 
     // Récupérer les informations de la société
     const societe = await this.societesService.findById(societeId)
     if (!societe) {
-      throw new UnauthorizedException('Société non trouvée')
+      throw new UnauthorizedException('Accès non autorisé')
     }
 
     // Générer un ID de session unique
@@ -261,13 +282,13 @@ export class AuthService {
     let deviceInfo: Record<string, unknown> | null = null
 
     if (request) {
-      ipAddress = this.geolocationService.extractRealIP(request)
+      ipAddress = this.geolocationService.extractRealIP(request as any)
       userAgent = request.headers['user-agent'] || 'Unknown'
-      location = await this.geolocationService.getLocationFromIP(ipAddress)
-      deviceInfo = this.geolocationService.parseUserAgent(userAgent)
+      location = (await this.geolocationService.getLocationFromIP(ipAddress)) as any
+      deviceInfo = this.geolocationService.parseUserAgent(userAgent) as any
     }
 
-    // Créer la session en base de données
+    // Créer la session en base de données avec les métadonnées de société
     const dbSession = UserSession.createNew(
       user.id,
       sessionId,
@@ -277,12 +298,21 @@ export class AuthService {
       refreshToken
     )
 
+    // Ajouter les métadonnées de société pour le tracking des licences
+    dbSession.metadata = {
+      societeId,
+      societeCode: societe.code,
+      siteId,
+      licenseId: licenseCheck.license?.id,
+      licenseType: licenseCheck.license?.type,
+    }
+
     if (location) {
-      dbSession.location = location
+      dbSession.location = location as any
     }
 
     if (deviceInfo) {
-      dbSession.deviceInfo = deviceInfo
+      dbSession.deviceInfo = deviceInfo as any
     }
 
     await this._userSessionRepository.save(dbSession)
@@ -348,12 +378,12 @@ export class AuthService {
     let deviceInfo: Record<string, unknown> | null = null
 
     if (request) {
-      ipAddress = this.geolocationService.extractRealIP(request)
+      ipAddress = this.geolocationService.extractRealIP(request as any)
       userAgent = request.headers['user-agent'] || 'Unknown'
 
       // Obtenir la géolocalisation et les infos de l'appareil
-      location = await this.geolocationService.getLocationFromIP(ipAddress)
-      deviceInfo = this.geolocationService.parseUserAgent(userAgent)
+      location = (await this.geolocationService.getLocationFromIP(ipAddress)) as any
+      deviceInfo = this.geolocationService.parseUserAgent(userAgent) as any
     }
 
     // Créer la session en base de données
@@ -367,11 +397,11 @@ export class AuthService {
     )
 
     if (location) {
-      dbSession.location = location
+      dbSession.location = location as any
     }
 
     if (deviceInfo) {
-      dbSession.deviceInfo = deviceInfo
+      dbSession.deviceInfo = deviceInfo as any
     }
 
     await this._userSessionRepository.save(dbSession)
@@ -381,15 +411,15 @@ export class AuthService {
       sessionId,
       userId: user.id,
       email: user.email,
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
+      firstName: (user as any).firstName || user.prenom || '',
+      lastName: (user as any).lastName || user.nom || '',
       role: user.role,
       loginTime: new Date().toISOString(),
       lastActivity: new Date().toISOString(),
       ipAddress,
       userAgent,
-      deviceInfo,
-      location,
+      deviceInfo: deviceInfo as any,
+      location: location as any,
       isIdle: false,
       warningCount: 0,
     })
@@ -403,7 +433,7 @@ export class AuthService {
 
     const suspiciousActivity = await this.geolocationService.detectSuspiciousActivity(
       user.id,
-      location,
+      location: location as any,
       previousSessions
     )
 
@@ -431,12 +461,17 @@ export class AuthService {
     // Créer un objet d'activité suspecte par défaut pour éviter les erreurs
     const suspiciousActivity = { isSuspicious: false, riskLevel: 'none', reasons: [] }
 
+    // Récupérer les sociétés disponibles pour l'utilisateur
+    const societes = await this.getUserSocietes(user.id)
+    
     return {
       user,
       sessionId,
       accessToken: accessToken,
       refreshToken: refreshToken,
       expiresIn: 24 * 60 * 60, // 24 heures en secondes
+      societes, // Ajouter les sociétés disponibles
+      requiresSocieteSelection: societes.length > 0, // Indiquer si une sélection est nécessaire
       location: location ? `${location.city}, ${location.country}` : undefined,
       deviceInfo: deviceInfo ? `${deviceInfo.browser} sur ${deviceInfo.os}` : undefined,
       securityAlert: suspiciousActivity.isSuspicious
@@ -897,7 +932,7 @@ export class AuthService {
       const mfaMethods = await this.mfaService.getUserMFAMethods(userId)
 
       for (const method of mfaMethods) {
-        await this.mfaService.disableMFA(userId, method.type as string)
+        await this.mfaService.disableMFA(userId, method.type as any)
       }
 
       return {

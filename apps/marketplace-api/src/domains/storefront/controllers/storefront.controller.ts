@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
+import type { DataSource } from 'typeorm'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
 
@@ -23,7 +24,7 @@ interface TenantRequest extends Request {
       nom?: string
     }
     marketplaceEnabled?: boolean
-    erpTenantConnection?: unknown
+    erpTenantConnection?: DataSource | null
   }
 }
 
@@ -40,11 +41,11 @@ interface SearchQueryDto {
   limit?: string
 }
 
-import type {
+import {
   MarketplaceProductsService,
-  ProductFilters,
+  type ProductFilters,
 } from '../../products/services/marketplace-products.service'
-import type { StorefrontService } from '../services/storefront.service'
+import { StorefrontService } from '../services/storefront.service'
 
 // DTO for product query parameters
 class ProductQueryDto {

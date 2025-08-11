@@ -163,7 +163,19 @@
       "Bash(if exist \"node_modules\\.cache\" rmdir /s /q \"node_modules\\.cache\")",
       "Bash(if exist \"tsconfig.tsbuildinfo\" del \"tsconfig.tsbuildinfo\")",
       "Bash(dir:*)",
-      "Bash(PORT=3011 timeout 15 npm run dev)"
+      "Bash(PORT=3011 timeout 15 npm run dev)",
+      "Bash(\"C:\\Users\\_\\AppData\\Roaming\\npm\\pnpm.cmd\" build --filter @erp/api)",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"SELECT COUNT(*) FROM articles WHERE \"\"isMarketplaceEnabled\"\" = true;\")",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"\\d articles\")",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"\\dt price_rules\")",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"SELECT id, nom FROM societes LIMIT 5\")",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"SELECT * FROM migrations ORDER BY timestamp\")",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -f D:GitHubTopSteelcreate-partners-tables.sql)",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -f \"D:\\GitHub\\TopSteel\\create-partners-tables.sql\")",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"SELECT * FROM parameters_client LIMIT 5\")",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d erp_topsteel_topsteel -c \"\\dt param*\")",
+      "Bash(PGPASSWORD=postgres psql:*)",
+      "Bash(del:*)"
     ],
     "deny": []
   }

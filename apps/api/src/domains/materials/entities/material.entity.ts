@@ -525,9 +525,9 @@ export class Material extends BusinessEntity {
     utilisateur: string
   ): void {
     if (!this.metadonnees) this.metadonnees = {}
-    if (!this.metadonnees.historique) this.metadonnees.historique = []
-
-    this.metadonnees.historique.push({
+    if (!(this.metadonnees as Record<string, unknown>).historique)
+      (this.metadonnees as Record<string, unknown>).historique = []
+    ;(this.metadonnees as any).historique.push({
       date: new Date(),
       utilisateur,
       champ,
@@ -536,8 +536,8 @@ export class Material extends BusinessEntity {
     })
 
     // Garder seulement les 100 dernières modifications
-    if (this.metadonnees.historique.length > 100) {
-      this.metadonnees.historique = this.metadonnees.historique.slice(-100)
+    if ((this.metadonnees as any).historique.length > 100) {
+      ;(this.metadonnees as any).historique = (this.metadonnees as any).historique.slice(-100)
     }
   }
 
@@ -550,8 +550,8 @@ export class Material extends BusinessEntity {
     if (remplacePar) this.remplacePar = remplacePar
 
     if (!this.metadonnees) this.metadonnees = {}
-    this.metadonnees.dateObsolescence = new Date()
-    if (raison) this.metadonnees.raisonObsolescence = raison
+    ;(this.metadonnees as Record<string, unknown>).dateObsolescence = new Date()
+    if (raison) (this.metadonnees as Record<string, unknown>).raisonObsolescence = raison
   }
 
   /**

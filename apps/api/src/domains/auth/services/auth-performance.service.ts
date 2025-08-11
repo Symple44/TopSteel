@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
 export interface PerformanceMetric {
   operation: string

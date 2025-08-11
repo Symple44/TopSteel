@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common'
-import type { PageSyncService } from '../services/page-sync.service'
+import { PageSyncService } from '../services/page-sync.service'
 
 @Controller('user/available-pages')
 export class AvailablePagesController {

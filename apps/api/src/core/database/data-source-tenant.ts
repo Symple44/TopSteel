@@ -19,8 +19,10 @@ export const tenantDataSourceOptions: DataSourceOptions = {
     // Entités métier supprimées pour optimiser le debug
     'src/modules/notifications/entities/*.entity{.ts,.js}',
     'src/modules/marketplace/entities/*.entity{.ts,.js}',
+    // Entités partners
+    'src/domains/partners/entities/*.entity{.ts,.js}',
   ],
-  migrations: ['src/database/migrations/tenant/*{.ts,.js}'],
+  migrations: ['src/core/database/migrations/tenant/*{.ts,.js}'],
   migrationsRun: false,
   synchronize: false,
   logging: configService.get('NODE_ENV') === 'development',

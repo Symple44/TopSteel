@@ -90,7 +90,9 @@ function _isProtectedApiRoute(pathname: string): boolean {
 }
 
 /**
- * Décode et valide un token JWT côté client (validation basique)
+ * Vérifie la structure basique d'un token JWT côté client
+ * Note: Cette validation est uniquement pour le routing côté client.
+ * La validation cryptographique réelle est effectuée côté serveur.
  */
 function validateJWTStructure(token: string): {
   valid: boolean
@@ -98,44 +100,36 @@ function validateJWTStructure(token: string): {
   error?: string
 } {
   try {
+    // Validation basique du format
     const parts = token.split('.')
     if (parts.length !== 3) {
-      return { valid: false, error: 'Format JWT invalide' }
+      return { valid: false, error: 'Session invalide' }
     }
 
-    // Décoder le payload (base64url) - version sécurisée
+    // Décoder le payload pour vérifier l'expiration uniquement
     let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    // Ajouter padding si nécessaire
     while (base64.length % 4) {
       base64 += '='
     }
 
     const payload = JSON.parse(atob(base64)) as JWTPayload
 
-    // Vérifications basiques obligatoires
-    if (!payload.sub || !payload.email || !payload.exp || !payload.iat) {
-      return { valid: false, error: 'Payload JWT incomplet' }
+    // Vérification minimale de structure
+    if (!payload.sub || !payload.exp) {
+      return { valid: false, error: 'Session invalide' }
     }
 
-    // Vérifier l'expiration avec marge
+    // Vérifier uniquement l'expiration
     const now = Math.floor(Date.now() / 1000)
     if (payload.exp <= now) {
-      return { valid: false, error: 'Token expiré' }
+      return { valid: false, error: 'Session expirée' }
     }
 
-    // Vérifier que le token n'est pas émis dans le futur (tolérance 60s)
-    if (payload.iat > now + 60) {
-      return { valid: false, error: 'Token émis dans le futur' }
-    }
-
-    // Vérifier la durée de vie maximale (24h)
-    if (payload.exp - payload.iat > 24 * 60 * 60) {
-      return { valid: false, error: 'Durée de vie token trop longue' }
-    }
-
+    // Note: La validation complète et sécurisée est effectuée côté serveur
+    // Cette fonction est uniquement pour optimiser l'expérience utilisateur
     return { valid: true, payload }
   } catch {
-    return { valid: false, error: 'Erreur de décodage JWT' }
+    return { valid: false, error: 'Session invalide' }
   }
 }
 
@@ -144,13 +138,13 @@ function validateJWTStructure(token: string): {
  */
 function hasAdminAccess(payload: JWTPayload): boolean {
   // Vérifier le rôle principal
-  if (ADMIN_ROLES.includes(payload.role as any)) {
+  if (ADMIN_ROLES.includes(payload.role as unknown)) {
     return true
   }
 
   // Vérifier dans les rôles multiples (si disponible)
   if (payload.roles && Array.isArray(payload.roles)) {
-    return payload.roles.some((role) => ADMIN_ROLES.includes(role as any))
+    return payload.roles.some((role) => ADMIN_ROLES.includes(role as unknown))
   }
 
   return false

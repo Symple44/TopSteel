@@ -51,7 +51,7 @@ export class SitesService {
   }
 
   async update(id: string, siteData: Partial<Site>): Promise<Site> {
-    await this._siteRepository.update(id, siteData)
+    await this._siteRepository.update(id, siteData as unknown)
     const site = await this._siteRepository.findOne({
       where: { id },
       relations: ['societe'],
@@ -68,10 +68,10 @@ export class SitesService {
 
   async setPrincipal(id: string, societeId: string): Promise<Site> {
     // D'abord, retirer le statut principal des autres sites
-    await this._siteRepository.update({ societeId }, { isPrincipal: false })
+    await this._siteRepository.update({ societeId }, { isPrincipal: false } as unknown)
 
     // Puis définir le nouveau site principal
-    await this._siteRepository.update(id, { isPrincipal: true })
+    await this._siteRepository.update(id, { isPrincipal: true } as unknown)
 
     const site = await this.findById(id)
     if (!site) {

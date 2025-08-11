@@ -94,9 +94,12 @@ export function useDynamicMenu() {
       try {
         const response = await apiClient.get('/user/menu-preferences/custom-menu')
 
-        if ((response as any).data?.success && Array.isArray((response as any).data.data)) {
+        if (
+          (response as Record<string, unknown>).data?.success &&
+          Array.isArray((response as Record<string, unknown>).data.data)
+        ) {
           // Mapper les données pour inclure les préférences personnalisées dans la structure attendue
-          const menuItems = (response as any).data.data.map((item: any) =>
+          const menuItems = (response as Record<string, unknown>).data.data.map((item: any) =>
             mapCustomMenuItemRecursively(item)
           )
           setCustomMenu(menuItems)
@@ -124,13 +127,16 @@ export function useDynamicMenu() {
       // MAIS sans les préférences utilisateur personnalisées
       const response = await apiClient.get('/admin/menu-raw/configurations/active')
 
-      if ((response as any).data?.success && (response as any).data.data) {
+      if (
+        (response as Record<string, unknown>).data?.success &&
+        (response as Record<string, unknown>).data.data
+      ) {
         // Utiliser le menuTree de la configuration active
-        const menuItems = Array.isArray((response as any).data.data.menuTree)
-          ? (response as any).data.data.menuTree
+        const menuItems = Array.isArray((response as Record<string, unknown>).data.data.menuTree)
+          ? (response as Record<string, unknown>).data.data.menuTree
           : []
         setStandardMenu(menuItems)
-        setMenuConfig((response as any).data.data.configuration)
+        setMenuConfig((response as Record<string, unknown>).data.data.configuration)
       } else {
         setStandardMenu([])
       }

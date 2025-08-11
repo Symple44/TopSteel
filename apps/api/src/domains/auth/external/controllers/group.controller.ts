@@ -14,7 +14,7 @@ import type { Request as ExpressRequest } from 'express'
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
-import type { CreateGroupDto, GroupService, UpdateGroupDto } from '../../services/group.service'
+import { CreateGroupDto, GroupService, UpdateGroupDto } from '../../services/group.service'
 
 @Controller('admin/groups')
 @UseGuards(JwtAuthGuard, RolesGuard)

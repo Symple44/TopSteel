@@ -42,7 +42,7 @@ export function useDataTable<T = any>({
 
   // Données sélectionnées
   const selectedData = useMemo(() => {
-    return data.filter((row) => selection.selectedRows.has((row as any)[keyField]))
+    return data.filter((row) => selection.selectedRows.has((row as unknown)[keyField]))
   }, [data, selection, keyField])
 
   // Gestionnaires d'événements
@@ -50,7 +50,7 @@ export function useDataTable<T = any>({
     (value: any, row: T, column: ColumnConfig<T>) => {
       setData((prevData) =>
         prevData.map((item) =>
-          (item as any)[keyField] === (row as any)[keyField]
+          (item as unknown)[keyField] === (row as unknown)[keyField]
             ? { ...item, [column.key]: value }
             : item
         )
@@ -65,8 +65,8 @@ export function useDataTable<T = any>({
 
   const handleRowsDelete = useCallback(
     (rowsToDelete: T[]) => {
-      const idsToDelete = rowsToDelete.map((row) => (row as any)[keyField])
-      setData((prev) => prev.filter((item) => !idsToDelete.includes((item as any)[keyField])))
+      const idsToDelete = rowsToDelete.map((row) => (row as unknown)[keyField])
+      setData((prev) => prev.filter((item) => !idsToDelete.includes((item as unknown)[keyField])))
 
       // Nettoyer la sélection
       setSelection((_prev: SelectionState) => ({
@@ -81,7 +81,7 @@ export function useDataTable<T = any>({
     (updatedRow: T) => {
       setData((prev) =>
         prev.map((item) =>
-          (item as any)[keyField] === (updatedRow as any)[keyField] ? updatedRow : item
+          (item as unknown)[keyField] === (updatedRow as unknown)[keyField] ? updatedRow : item
         )
       )
     },
@@ -93,7 +93,7 @@ export function useDataTable<T = any>({
       const selectedIds = Array.from(selection.selectedRows)
       setData((prev) =>
         prev.map((item) =>
-          selectedIds.includes((item as any)[keyField]) ? { ...item, ...updates } : item
+          selectedIds.includes((item as unknown)[keyField]) ? { ...item, ...updates } : item
         )
       )
     },
@@ -105,7 +105,7 @@ export function useDataTable<T = any>({
   }, [])
 
   const selectAll = useCallback(() => {
-    const allIds = data.map((row) => (row as any)[keyField])
+    const allIds = data.map((row) => (row as unknown)[keyField])
     setSelection({
       selectedRows: new Set(allIds),
       selectAll: true,

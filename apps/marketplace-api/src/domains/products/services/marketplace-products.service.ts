@@ -5,7 +5,9 @@ import type { Cache } from 'cache-manager'
 import { type DataSource, In, type Repository } from 'typeorm'
 import { Article, ArticleStatus } from '../../../shared/entities/erp/article.entity'
 import { MarketplaceProduct } from '../entities/marketplace-product.entity'
-import type { MarketplacePricingEngine } from './marketplace-pricing-engine.service'
+import { HttpService } from '@nestjs/axios'
+import { firstValueFrom } from 'rxjs'
+import { PriceRuleChannel } from '@erp/entities'
 
 export interface ProductFilters {
   search?: string
@@ -58,7 +60,7 @@ export class MarketplaceProductsService {
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
 
-    private pricingEngine: MarketplacePricingEngine
+    private readonly httpService: HttpService
   ) {}
 
   async getProducts(
@@ -67,8 +69,17 @@ export class MarketplaceProductsService {
     filters: ProductFilters = {},
     customerId?: string
   ): Promise<ProductListResult> {
+    console.log('🔍 [MarketplaceProductsService] getProducts called:', {
+      hasConnection: !!erpConnection,
+      connectionInitialized: erpConnection?.isInitialized,
+      societeId,
+      filters,
+      customerId
+    })
+
     // Si pas de connexion ERP, retourner des données de démonstration
     if (!erpConnection) {
+      console.log('⚠️ [MarketplaceProductsService] No ERP connection, returning demo products')
       const demoProducts = this.getDemoFeaturedProducts(filters.limit || 20)
       return {
         products: demoProducts,
@@ -83,13 +94,23 @@ export class MarketplaceProductsService {
     if (cached) return cached
 
     try {
+      console.log('✅ [MarketplaceProductsService] ERP connection available, querying database')
+      
       // Construire requête articles ERP
       const articlesRepo = erpConnection.getRepository(Article)
+      console.log('📊 [MarketplaceProductsService] Repository created for Article entity')
+      
       const articlesQuery = articlesRepo
         .createQueryBuilder('article')
         .where('article.societeId = :societeId', { societeId })
         .andWhere('article.status = :status', { status: ArticleStatus.ACTIF })
         .andWhere('article.isMarketplaceEnabled = true')
+      
+      console.log('🔍 [MarketplaceProductsService] Query built with conditions:', {
+        societeId,
+        status: ArticleStatus.ACTIF,
+        isMarketplaceEnabled: true
+      })
 
       // Appliquer filtres
       if (filters.search) {
@@ -117,7 +138,11 @@ export class MarketplaceProductsService {
       }
 
       // Compter total
+      console.log('🔍 [MarketplaceProductsService] Executing count query...')
+      console.log('🔍 [MarketplaceProductsService] Query SQL:', articlesQuery.getSql())
+      
       const total = await articlesQuery.getCount()
+      console.log('📊 [MarketplaceProductsService] Total articles found:', total)
 
       // Appliquer tri
       switch (filters.sortBy) {
@@ -140,7 +165,9 @@ export class MarketplaceProductsService {
 
       articlesQuery.limit(limit).offset(offset)
 
+      console.log('🔍 [MarketplaceProductsService] Executing main query with limit:', limit, 'offset:', offset)
       const articles = await articlesQuery.getMany()
+      console.log('📊 [MarketplaceProductsService] Articles retrieved:', articles.length)
 
       // Enrichir avec données marketplace
       const products = await Promise.all(
@@ -161,9 +188,10 @@ export class MarketplaceProductsService {
 
       return result
     } catch (error) {
+      console.error('❌ [MarketplaceProductsService] Error executing query:', error.message)
+      console.error('❌ [MarketplaceProductsService] Error details:', error)
+      
       // Si les tables n'existent pas ou toute autre erreur, retourner des données de démo
-      if (error.message?.includes("n'existe pas") || error.code === '42P01') {
-      }
       const demoProducts = this.getDemoFeaturedProducts(filters.limit || 20)
       return {
         products: demoProducts,
@@ -310,12 +338,36 @@ export class MarketplaceProductsService {
       where: { erpArticleId: article.id },
     })
 
-    // Calculer prix avec règles de pricing
-    const calculatedPrice = await this.pricingEngine.calculatePrice(
-      article.id,
-      article.prixVenteHT || 0,
-      customerId
-    )
+    // Calculer prix via l'API centralisée
+    let calculatedPrice = article.prixVenteHT || 0
+    try {
+      const priceResponse = await firstValueFrom(
+        this.httpService.post(`${process.env.API_URL || 'http://localhost:3002'}/pricing/calculate`, {
+          articleId: article.id,
+          article: {
+            id: article.id,
+            reference: article.reference,
+            designation: article.designation,
+            famille: article.famille,
+            prixVenteHT: article.prixVenteHT,
+            poids: article.poids,
+            longueur: article.longueur,
+            largeur: article.largeur,
+            hauteur: article.hauteur,
+            uniteStock: article.uniteStock,
+            uniteVente: article.uniteVente
+          },
+          customerId,
+          channel: PriceRuleChannel.MARKETPLACE,
+          quantity: 1
+        })
+      )
+      calculatedPrice = priceResponse.data.finalPrice
+    } catch (error) {
+      console.error('Erreur calcul prix via API:', error)
+      // Fallback sur le prix de base si l'API échoue
+      calculatedPrice = article.prixVenteHT || 0
+    }
 
     return {
       id: article.id,
@@ -326,7 +378,7 @@ export class MarketplaceProductsService {
       shortDescription: article.marketplaceSettings?.description?.substring(0, 150),
       images: this.formatImages(article.marketplaceSettings?.images || []),
       basePrice: article.prixVenteHT || 0,
-      calculatedPrice: calculatedPrice.finalPrice,
+      calculatedPrice,
       stockDisponible: article.stockDisponible,
       inStock: !article.estEnRupture(),
       categories: article.marketplaceSettings?.categories || [article.famille].filter(Boolean),

@@ -392,7 +392,7 @@ export class ArticleRepositoryImpl implements IArticleRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(_spec: Record<string, unknown>): Promise<Article[]> {
+  async findBySpecification(_spec: any): Promise<Article[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }

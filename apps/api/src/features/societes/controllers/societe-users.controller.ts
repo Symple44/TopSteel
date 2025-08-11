@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import type { SocieteUsersService } from '../services/societe-users.service'
-import type { SocietesService } from '../services/societes.service'
+import { SocieteUsersService } from '../services/societe-users.service'
+import { SocietesService } from '../services/societes.service'
 
 @ApiTags('Societes - Users')
 @ApiBearerAuth()

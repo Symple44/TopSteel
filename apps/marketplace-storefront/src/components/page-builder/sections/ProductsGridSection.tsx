@@ -88,7 +88,7 @@ export function ProductsGridSection({
         >
           {products?.map((product: unknown) => {
             const p = product as { id: string }
-            return <ProductCard key={p.id} product={product} tenant={tenant || 'demo'} />
+            return <ProductCard key={p.id} product={product as any} tenant={tenant || 'demo'} />
           })}
         </div>
       )}

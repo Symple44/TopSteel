@@ -26,13 +26,13 @@ import {
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
 import { RequireSocieteContext } from '../../../domains/auth/security/guards/enhanced-tenant.guard'
-import type { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
-import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
+import { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
+import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
 import { CreateUserDto } from '../../../domains/users/dto/create-user.dto'
 import { UpdateUserDto } from '../../../domains/users/dto/update-user.dto'
 import type { UserQueryDto } from '../../../domains/users/dto/user-query.dto'
-import type { UsersService } from '../../../domains/users/users.service'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { UsersService } from '../../../domains/users/users.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
 @Controller('admin/users')
 @ApiTags('🔧 Admin - Users')
@@ -274,7 +274,7 @@ export class AdminUsersController {
         statusCode: 201,
       }
     } catch (error: unknown) {
-      if (error.code === '23505') {
+      if ((error as any).code === '23505') {
         // Violation de contrainte unique PostgreSQL
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
@@ -329,7 +329,7 @@ export class AdminUsersController {
         statusCode: 200,
       }
     } catch (error: unknown) {
-      if (error.code === '23505') {
+      if ((error as any).code === '23505') {
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
       throw error
@@ -418,9 +418,9 @@ export class AdminUsersController {
     try {
       const userSocieteRole = await this.unifiedRolesService.assignUserToSociete(
         userId,
-        tenant.societeId,
+        (tenant as any).societeId,
         body.roleType,
-        currentUser.id,
+        (currentUser as any).id,
         {
           isDefault: body.isDefault || false,
           additionalPermissions: body.additionalPermissions || [],

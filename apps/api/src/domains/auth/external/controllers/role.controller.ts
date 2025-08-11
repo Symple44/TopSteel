@@ -16,7 +16,7 @@ import type { AccessLevel } from '../../core/entities/permission.entity'
 import { Roles } from '../../decorators/roles.decorator'
 import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../security/guards/roles.guard'
-import type { CreateRoleDto, RoleService, UpdateRoleDto } from '../../services/role.service'
+import { CreateRoleDto, RoleService, UpdateRoleDto } from '../../services/role.service'
 
 @ApiTags('Roles')
 @Controller('admin/roles')

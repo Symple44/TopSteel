@@ -1,7 +1,7 @@
 // apps/api/src/config/port-helper.ts - Helper gestion ports intelligente
 import { createServer } from 'node:net'
 import type { INestApplication, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 
 export interface PortConfig {
   preferred: number

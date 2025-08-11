@@ -299,16 +299,16 @@ export class NotificationRuleService {
         return fieldValue !== conditionValue
 
       case ConditionOperator.CONTAINS:
-        return typeof fieldValue === 'string' && fieldValue.includes(conditionValue)
+        return typeof fieldValue === 'string' && fieldValue.includes(conditionValue as string)
 
       case ConditionOperator.NOT_CONTAINS:
-        return typeof fieldValue === 'string' && !fieldValue.includes(conditionValue)
+        return typeof fieldValue === 'string' && !fieldValue.includes(conditionValue as string)
 
       case ConditionOperator.STARTS_WITH:
-        return typeof fieldValue === 'string' && fieldValue.startsWith(conditionValue)
+        return typeof fieldValue === 'string' && fieldValue.startsWith(conditionValue as string)
 
       case ConditionOperator.ENDS_WITH:
-        return typeof fieldValue === 'string' && fieldValue.endsWith(conditionValue)
+        return typeof fieldValue === 'string' && fieldValue.endsWith(conditionValue as string)
 
       case ConditionOperator.GREATER_THAN:
         return Number(fieldValue) > Number(conditionValue)
@@ -336,7 +336,7 @@ export class NotificationRuleService {
 
       case ConditionOperator.REGEX:
         try {
-          const regex = new RegExp(conditionValue)
+          const regex = new RegExp(conditionValue as string)
           return regex.test(String(fieldValue))
         } catch {
           return false
@@ -359,7 +359,7 @@ export class NotificationRuleService {
         value !== null &&
         part in (value as Record<string, unknown>)
       ) {
-        value = (value as Record<string, unknown>)[part]
+        value = (value as Record<string, unknown>)[part] as any
       } else {
         return undefined
       }
@@ -405,7 +405,7 @@ export class NotificationRuleService {
 
     const recentActivity = await this._eventRepository.find({
       where: {
-        occurredAt: { $gte: yesterday } as unknown,
+        occurredAt: yesterday as any,
       },
       order: { occurredAt: 'DESC' },
       take: 10,

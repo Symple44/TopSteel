@@ -6,7 +6,7 @@ import { Societe, SocieteStatus } from '../entities/erp/societe.entity'
 export interface TenantContext {
   societeId: string
   societe: Societe
-  erpTenantConnection: DataSource
+  erpTenantConnection: DataSource | null
   marketplaceEnabled: boolean
 }
 
@@ -165,7 +165,7 @@ export class TenantResolver {
         databaseName: 'erp_demo_demo',
       },
       topsteel: {
-        id: 'topsteel-tenant-id',
+        id: '73416fa9-f693-42f6-99d3-7c919cefe4d5', // ID réel de la société TopSteel
         nom: 'TopSteel',
         storeName: 'TopSteel',
         description: 'Boutique en ligne TopSteel',
@@ -236,7 +236,7 @@ export class TenantResolver {
       return {
         societeId: demoSociete.id,
         societe: demoSociete,
-        erpTenantConnection: null as unknown,
+        erpTenantConnection: null,
         marketplaceEnabled: true,
       }
     }

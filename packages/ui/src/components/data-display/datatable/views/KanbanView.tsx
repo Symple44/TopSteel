@@ -97,9 +97,9 @@ export function KanbanView({
                 {/* Labels */}
                 {card.labels && card.labels.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-3">
-                    {card.labels.map((label: string, index: number) => (
+                    {card.labels.map((label: { text: string; color?: string }, index: number) => (
                       <Badge
-                        key={`label-${label}-${index}`}
+                        key={`label-${label.text}-${index}`}
                         variant="outline"
                         className="text-xs"
                         style={{

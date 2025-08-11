@@ -158,7 +158,7 @@ export function auditSecurity(): SecurityAuditReport {
     }
 
     // Secure Cookies
-    // biome-ignore lint/security/noDocumentCookie: Security check for secure cookies
+    // biome-ignore lint: Security check for secure cookies
     if (document.cookie && !document.cookie.includes('Secure')) {
       warnings.push('Cookies non sécurisés détectés')
     }

@@ -86,7 +86,7 @@ export function PermissionGuard({
             className:
               `${((children as ReactElement).props as { className?: string }).className || ''} ${disabledClassName}`.trim(),
             title: errorMessage || "Vous n'avez pas les permissions nécessaires",
-          } as Partial<React.ComponentProps<any>>
+          } as Partial<React.ComponentProps<React.ElementType>>
         )
       }
       return <>{children}</>

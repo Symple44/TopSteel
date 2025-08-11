@@ -3,9 +3,23 @@
  * Gestion des appels API pour les projets
  */
 
-import type { Projet, ProjetFilters, ProjetPriorite, ProjetStatut, ProjetType } from '@erp/domains'
+import type { Projet, ProjetPriorite, ProjetStatut, ProjetType } from '@erp/domains'
+import type { AxiosResponse } from 'axios'
 import { BaseApiClient } from '../core/base-api-client'
 import type { RequestOptions } from '../core/http-client'
+
+// Define ProjetFilters locally with index signature
+interface ProjetFilters {
+  statut?: ProjetStatut[]
+  type?: ProjetType[]
+  priorite?: ProjetPriorite[]
+  clientId?: string
+  responsableId?: string
+  commercialId?: string
+  dateDebut?: Date
+  dateFin?: Date
+  [key: string]: unknown // Index signature for compatibility
+}
 
 export interface ProjetStats {
   total: number
@@ -151,8 +165,8 @@ export class ProjectApiClient extends BaseApiClient {
 
   async deleteProjet(id: string): Promise<OperationResult<boolean>> {
     return this.http.executeOperation(async () => {
-      await this.http.delete(`${this.endpoint}/${this.normalizeId(id)}`)
-      return { data: true } as { data: boolean }
+      const response = await this.http.delete(`${this.endpoint}/${this.normalizeId(id)}`)
+      return { ...response, data: true } as AxiosResponse<boolean>
     })
   }
 

@@ -1,6 +1,6 @@
 // apps/api/src/modules/auth/guards/jwt-auth.guard.ts
 import { type ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
+import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 import type { Observable } from 'rxjs'
 import { IS_PUBLIC_KEY } from '../../../../core/common/decorators/public.decorator'
@@ -31,24 +31,24 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   // Signature avec types spécifiques
-  override handleRequest<TUser = unknown>(
+  override handleRequest<TUser = any>(
     err: Error | null,
     user: TUser,
     info: { name?: string; message?: string } | undefined,
     context: ExecutionContext,
-    _status?: unknown
+    _status?: any
   ): TUser {
     const request = context.switchToHttp().getRequest()
 
-    // Log des tentatives d'accès en développement
+    // Log des tentatives d'accès en développement (sans données sensibles)
     if (process.env.NODE_ENV === 'development') {
       this.logger.debug(`Auth attempt: ${request.method} ${request.url}`)
 
-      // Log du token pour debug
+      // Vérification de la présence du header sans logger le token
       const authHeader = request.headers.authorization
       if (authHeader) {
-        const token = authHeader.replace('Bearer ', '')
-        this.logger.debug(`Token (first 50 chars): ${token.substring(0, 50)}...`)
+        // Ne jamais logger le token, même partiellement
+        this.logger.debug('Authorization header present')
       } else {
         this.logger.debug('No authorization header')
       }

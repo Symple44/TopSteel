@@ -2,14 +2,14 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { User } from '../../users/entities/user.entity'
 import { GlobalUserRole } from '../core/constants/roles.constants'
 import { MFASession } from '../core/entities/mfa-session.entity'
 import { UserMFA } from '../core/entities/user-mfa.entity'
-import type { GeolocationService } from './geolocation.service'
-import type { TOTPService } from './totp.service'
-import type { WebAuthnService } from './webauthn.service'
+import { GeolocationService } from './geolocation.service'
+import { TOTPService } from './totp.service'
+import { WebAuthnService } from './webauthn.service'
 
 interface MFASetupResult {
   success: boolean
@@ -509,8 +509,8 @@ export class MFAService {
       let userAgent: string | undefined
 
       if (request) {
-        ipAddress = this.geolocationService.extractRealIP(request)
-        userAgent = request.headers['user-agent']
+        ipAddress = this.geolocationService.extractRealIP(request as any)
+        userAgent = (request as any).headers['user-agent']
       }
 
       let mfaSession: MFASession

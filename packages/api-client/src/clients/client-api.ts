@@ -3,6 +3,8 @@
  * Gestion des appels API pour les clients
  */
 
+import type { AxiosResponse } from 'axios'
+
 // Temporary local types until @erp/domains dependency is resolved
 interface Client {
   id: string
@@ -32,6 +34,7 @@ interface ClientFilters {
   statut?: string[]
   priorite?: string[]
   search?: string
+  [key: string]: unknown // Index signature for compatibility
 }
 
 interface ClientSortOptions {
@@ -157,8 +160,8 @@ export class ClientApiClient extends BaseApiClient {
 
   async deleteClient(id: string): Promise<OperationResult<boolean>> {
     return this.http.executeOperation(async () => {
-      await this.http.delete(`${this.endpoint}/${this.normalizeId(id)}`)
-      return { data: true } as { data: boolean }
+      const response = await this.http.delete(`${this.endpoint}/${this.normalizeId(id)}`)
+      return { ...response, data: true } as AxiosResponse<boolean>
     })
   }
 

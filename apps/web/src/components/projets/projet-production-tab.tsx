@@ -255,7 +255,7 @@ function createOperation(partial: Partial<Operation> & { id: string; nom: string
   }
 }
 
-export function ProjetProductionTab({ projet }: ProjetProductionTabProps) {
+export function ProjetProductionTab(_props: ProjetProductionTabProps) {
   const [selectedOF, setSelectedOF] = useState(mockOrdresFabrication[0])
 
   const getStatutBadge = (statut: StatutProduction) => {

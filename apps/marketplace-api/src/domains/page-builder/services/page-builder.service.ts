@@ -4,7 +4,7 @@ import type { Repository } from 'typeorm'
 import type { CreatePageTemplateDto, UpdatePageTemplateDto } from '../dto'
 import { PageSection, PageTemplate, SectionPreset } from '../entities'
 import { PageStatus } from '../entities/page-template.entity'
-import type { SectionType } from '../entities/types'
+import type { SectionContent, SectionStyles, SectionType } from '../entities/types'
 
 @Injectable()
 export class PageBuilderService {
@@ -49,10 +49,10 @@ export class PageBuilderService {
         this.pageSectionRepository.create({
           type: sectionDto.type as SectionType,
           name: sectionDto.name,
-          content: sectionDto.content,
-          styles: sectionDto.styles,
-          responsive: sectionDto.responsive,
-          settings: sectionDto.settings,
+          content: (sectionDto.content || {}) as SectionContent,
+          styles: (sectionDto.styles || {}) as SectionStyles,
+          responsive: sectionDto.responsive || {},
+          settings: sectionDto.settings || {},
           pageTemplateId: savedTemplate.id,
           order: index,
           isVisible: true,
@@ -120,10 +120,10 @@ export class PageBuilderService {
         this.pageSectionRepository.create({
           type: sectionDto.type as SectionType,
           name: sectionDto.name,
-          content: sectionDto.content,
-          styles: sectionDto.styles,
-          responsive: sectionDto.responsive,
-          settings: sectionDto.settings,
+          content: (sectionDto.content || {}) as SectionContent,
+          styles: (sectionDto.styles || {}) as SectionStyles,
+          responsive: sectionDto.responsive || {},
+          settings: sectionDto.settings || {},
           pageTemplateId: id,
           order: index,
           isVisible: true,

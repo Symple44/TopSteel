@@ -13,7 +13,7 @@ export class SocieteUsersService {
   async findAll(): Promise<SocieteUser[]> {
     return this._societeUserRepository.find({
       where: { deletedAt: IsNull() },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
   }
 
@@ -21,6 +21,7 @@ export class SocieteUsersService {
     return this._societeUserRepository
       .createQueryBuilder('su')
       .leftJoinAndSelect('su.societe', 'societe')
+      .leftJoinAndSelect('societe.sites', 'sites')
       .select([
         'su.id',
         'su.userId',
@@ -33,6 +34,10 @@ export class SocieteUsersService {
         'societe.id',
         'societe.nom',
         'societe.code',
+        'sites.id',
+        'sites.nom',
+        'sites.code',
+        'sites.isPrincipal'
       ])
       .where('su.userId = :userId', { userId })
       .andWhere('su.deletedAt IS NULL')
@@ -45,7 +50,7 @@ export class SocieteUsersService {
         societeId,
         deletedAt: IsNull(),
       },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
   }
 
@@ -56,7 +61,7 @@ export class SocieteUsersService {
         societeId,
         deletedAt: IsNull(),
       },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
   }
 
@@ -68,7 +73,7 @@ export class SocieteUsersService {
         actif: true,
         deletedAt: IsNull(),
       },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
   }
 
@@ -78,10 +83,10 @@ export class SocieteUsersService {
   }
 
   async update(id: string, associationData: Partial<SocieteUser>): Promise<SocieteUser> {
-    await this._societeUserRepository.update(id, associationData)
+    await this._societeUserRepository.update(id, associationData as unknown)
     const association = await this._societeUserRepository.findOne({
       where: { id },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
     if (!association) {
       throw new NotFoundException(`SocieteUser with ID ${id} not found`)
@@ -103,7 +108,7 @@ export class SocieteUsersService {
       await this._societeUserRepository.update(association.id, { isDefault: true })
       const updatedAssociation = await this._societeUserRepository.findOne({
         where: { id: association.id },
-        relations: ['user', 'societe'],
+        relations: ['societe'],
       })
       if (!updatedAssociation) {
         throw new NotFoundException(`SocieteUser with ID ${association.id} not found`)
@@ -118,7 +123,7 @@ export class SocieteUsersService {
     await this._societeUserRepository.update(id, { actif: true })
     const association = await this._societeUserRepository.findOne({
       where: { id },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
     if (!association) {
       throw new NotFoundException(`SocieteUser with ID ${id} not found`)
@@ -130,7 +135,7 @@ export class SocieteUsersService {
     await this._societeUserRepository.update(id, { actif: false })
     const association = await this._societeUserRepository.findOne({
       where: { id },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
     if (!association) {
       throw new NotFoundException(`SocieteUser with ID ${id} not found`)
@@ -160,7 +165,7 @@ export class SocieteUsersService {
 
     const updatedAssociation = await this._societeUserRepository.findOne({
       where: { id },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
     if (!updatedAssociation) {
       throw new NotFoundException(`SocieteUser with ID ${id} not found`)
@@ -181,7 +186,7 @@ export class SocieteUsersService {
 
     const updatedAssociation = await this._societeUserRepository.findOne({
       where: { id },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
     if (!updatedAssociation) {
       throw new NotFoundException(`SocieteUser with ID ${id} not found`)
@@ -222,7 +227,7 @@ export class SocieteUsersService {
       })
       const updated = await this._societeUserRepository.findOne({
         where: { id: existingAccess.id },
-        relations: ['user', 'societe'],
+        relations: ['societe'],
       })
       if (!updated) {
         throw new NotFoundException(`SocieteUser with ID ${existingAccess.id} not found`)
@@ -254,11 +259,11 @@ export class SocieteUsersService {
     if (updates.permissions !== undefined) updateData.permissions = updates.permissions
     if (updates.isActive !== undefined) updateData.actif = updates.isActive
 
-    await this._societeUserRepository.update(societeUserId, updateData)
+    await this._societeUserRepository.update(societeUserId, updateData as unknown)
 
     const updated = await this._societeUserRepository.findOne({
       where: { id: societeUserId },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
 
     if (!updated) {
@@ -273,7 +278,7 @@ export class SocieteUsersService {
 
     const updated = await this._societeUserRepository.findOne({
       where: { id: societeUserId },
-      relations: ['user', 'societe'],
+      relations: ['societe'],
     })
 
     if (!updated) {

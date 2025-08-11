@@ -5,10 +5,10 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
+import { Reflector } from '@nestjs/core'
 import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
-import type { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
+import { MultiTenantDatabaseConfig } from '../../../core/database/config/multi-tenant-database.config'
 import { SocieteUser } from '../../../features/societes/entities/societe-user.entity'
 
 @Injectable()

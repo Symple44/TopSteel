@@ -63,7 +63,7 @@ export class SharedDataRegistryService {
   }
 
   async update(id: string, registryData: Partial<SharedDataRegistry>): Promise<SharedDataRegistry> {
-    await this._sharedDataRegistryRepository.update(id, registryData)
+    await this._sharedDataRegistryRepository.update(id, registryData as unknown)
     const registry = await this._sharedDataRegistryRepository.findOne({ where: { id } })
     if (!registry) {
       throw new NotFoundException(`Registry with ID ${id} not found`)

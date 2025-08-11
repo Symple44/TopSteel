@@ -142,9 +142,7 @@ function CartItemCard({ item, tenant, onUpdateQuantity, onRemove }: CartItemCard
     totalPrice: number
   }
   const { product, quantity, unitPrice, totalPrice } = cartItem
-  const mainImage =
-    product.images.find((img: { url: string; alt?: string; isMain: boolean }) => img.isMain) ||
-    product.images[0]
+  const mainImage = product.images.find((img: any) => img.isMain) || product.images[0]
 
   return (
     <div className="flex gap-6 p-6 border rounded-lg bg-background">

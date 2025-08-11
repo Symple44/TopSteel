@@ -1,5 +1,9 @@
 import { BusinessEntity } from '@erp/entities'
-import { Column, Entity, Index } from 'typeorm'
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
+import { PartnerGroup } from './partner-group.entity'
+import { Contact } from './contact.entity'
+import { PartnerSite } from './partner-site.entity'
+import { PartnerAddress } from './partner-address.entity'
 
 export enum PartnerType {
   CLIENT = 'CLIENT',
@@ -30,6 +34,16 @@ export class Partner extends BusinessEntity {
   @Column({ type: 'varchar', length: 20, unique: true })
   @Index()
   code!: string // Code unique : CLI001, FOU001, etc.
+
+  @Column({ type: 'uuid', nullable: true })
+  @Index()
+  groupId?: string
+
+  @ManyToOne(() => PartnerGroup, group => group.partners, {
+    nullable: true
+  })
+  @JoinColumn({ name: 'groupId' })
+  group?: PartnerGroup
 
   @Column({ type: 'enum', enum: PartnerType })
   @Index()
@@ -152,13 +166,17 @@ export class Partner extends BusinessEntity {
     specifications?: Record<string, unknown>
   }
 
-  // Relations (à définir selon vos besoins)
-  // @OneToMany('Contact', 'partner')
-  // contacts!: Contact[]
+  // Relations
+  @OneToMany(() => Contact, contact => contact.partner)
+  contacts!: Contact[]
 
-  // @OneToMany('Adresse', 'partner')
-  // adresses!: Adresse[]
+  @OneToMany(() => PartnerSite, site => site.partner)
+  sites!: PartnerSite[]
 
+  @OneToMany(() => PartnerAddress, address => address.partner)
+  addresses!: PartnerAddress[]
+
+  // Relations futures
   // @OneToMany('Commande', 'client')
   // commandesClient!: Commande[]
 

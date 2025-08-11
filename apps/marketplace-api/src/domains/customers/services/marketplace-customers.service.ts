@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
-import type { Repository } from 'typeorm'
+import { MoreThan, type Repository } from 'typeorm'
 import { type CustomerAddress, MarketplaceCustomer } from '../entities/marketplace-customer.entity'
 
 export interface CreateCustomerDto {
@@ -360,7 +360,7 @@ export class MarketplaceCustomersService {
     const customer = await this.customerRepo.findOne({
       where: {
         resetPasswordToken: token,
-        resetPasswordExpires: { $gt: new Date() } as unknown,
+        resetPasswordExpires: MoreThan(new Date()),
       },
     })
 

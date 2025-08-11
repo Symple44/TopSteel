@@ -78,7 +78,7 @@ export class DatabaseBackupService {
         throw new Error('Ce service ne supporte que PostgreSQL')
       }
 
-      const pgOptions = connectionOptions as Record<string, unknown>
+      const pgOptions = connectionOptions as any
       const pgDumpCommand = [
         'pg_dump',
         `-h ${pgOptions.host}`,
@@ -103,10 +103,10 @@ export class DatabaseBackupService {
       // Configurer les variables d'environnement
       const env = {
         ...process.env,
-        PGPASSWORD: pgOptions.password,
+        PGPASSWORD: pgOptions.password as string,
       }
 
-      await execAsync(command, { env })
+      await execAsync(command, { env: env as Record<string, string> })
 
       // Vérifier que le fichier a été créé
       if (!fs.existsSync(filePath)) {
@@ -145,7 +145,7 @@ export class DatabaseBackupService {
         }
       }
 
-      const connectionOptions = this._dataSource.options as Record<string, unknown>
+      const connectionOptions = this._dataSource.options as any
       const isCompressed = backup.filename.endsWith('.gz')
 
       let command: string
@@ -157,10 +157,10 @@ export class DatabaseBackupService {
 
       const env = {
         ...process.env,
-        PGPASSWORD: connectionOptions.password,
+        PGPASSWORD: connectionOptions.password as string,
       }
 
-      await execAsync(command, { env })
+      await execAsync(command, { env: env as Record<string, string> })
 
       return {
         success: true,

@@ -1,8 +1,8 @@
 // apps/api/src/common/services/enhanced-database.service.ts
 import { Injectable, Logger } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
-import type { CircuitBreakerService } from '../../../infrastructure/monitoring/circuit-breaker.service'
-import type { MetricsService } from '../../../infrastructure/monitoring/metrics.service'
+import { CircuitBreakerService } from '../../../infrastructure/monitoring/circuit-breaker.service'
+import { MetricsService } from '../../../infrastructure/monitoring/metrics.service'
 
 interface DatabaseResult<T = unknown> {
   success: boolean
@@ -80,7 +80,7 @@ export class EnhancedDatabaseService {
       throw new Error('No fallback available')
     })
 
-    return this.circuitBreakerService.execute(
+    const result = await this.circuitBreakerService.execute(
       circuitBreakerName,
       async () => {
         this.logger.debug(`Read query: ${primaryQuery}`)
@@ -94,6 +94,8 @@ export class EnhancedDatabaseService {
         resetTimeout: 20000,
       }
     )
+
+    return (result as any).data || (result as T)
   }
 
   /**

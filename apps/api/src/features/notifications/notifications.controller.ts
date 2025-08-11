@@ -20,7 +20,7 @@ import { UserRole } from '../../domains/users/entities/user.entity'
 import type { CreateNotificationsDto } from './dto/create-notifications.dto'
 import type { NotificationsQueryDto } from './dto/notifications-query.dto'
 import type { UpdateNotificationsDto } from './dto/update-notifications.dto'
-import type { NotificationsService } from './notifications.service'
+import { NotificationsService } from './notifications.service'
 
 @Controller('notifications')
 @ApiTags('🔔 Notifications')

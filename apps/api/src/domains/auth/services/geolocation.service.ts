@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 
 interface LocationData {
   city: string
@@ -77,7 +77,7 @@ export class GeolocationService {
       return {
         city: data.city || 'Inconnue',
         country: data.country || 'Inconnu',
-        countryCode: data.countryCode || 'XX',
+        countryCode: (data as any).countryCode || data.country || 'XX',
         latitude: data.lat,
         longitude: data.lon,
         timezone: data.timezone,
@@ -269,14 +269,14 @@ export class GeolocationService {
 
     // Vérifier les connexions depuis des pays différents
     const recentSessions = previousSessions.filter((session) => {
-      const sessionTime = new Date(session.loginTime)
+      const sessionTime = new Date((session as any).loginTime)
       const now = new Date()
       const hoursDiff = (now.getTime() - sessionTime.getTime()) / (1000 * 60 * 60)
       return hoursDiff <= 24 // Dernières 24 heures
     })
 
     const recentCountries = new Set(
-      recentSessions.map((session) => session.location?.countryCode).filter(Boolean)
+      recentSessions.map((session) => (session as any).location?.countryCode).filter(Boolean)
     )
 
     if (recentCountries.size > 0 && !recentCountries.has(newLocation.countryCode)) {
@@ -285,7 +285,9 @@ export class GeolocationService {
     }
 
     // Vérifier les connexions multiples simultanées
-    const activeSessions = previousSessions.filter((session) => session.status === 'active')
+    const activeSessions = previousSessions.filter(
+      (session) => (session as any).status === 'active'
+    )
     if (activeSessions.length >= 3) {
       reasons.push(`Multiples sessions actives détectées (${activeSessions.length})`)
       riskLevel = 'high'

@@ -40,7 +40,7 @@ export function TasksTable({ data = [], loading = false, onEdit, onDelete }: Tas
               </TableCell>
             </TableRow>
           ) : (
-            data.map((item, index) => (
+            data.map((item: any, index) => (
               <TableRow key={`task-${item.id || item.title || index}`}>
                 <TableCell>TODO: tâches name</TableCell>
                 <TableCell>TODO: Status</TableCell>

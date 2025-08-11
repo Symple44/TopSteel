@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
-import type { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
-import type { MenuRawService } from '../services/menu-raw.service'
+import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
+import { MenuRawService } from '../services/menu-raw.service'
 
 @Controller('admin/menu-raw')
 @UseGuards(JwtAuthGuard)
@@ -91,7 +91,7 @@ export class MenuRawController {
     } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       }
     }
   }

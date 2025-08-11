@@ -28,11 +28,11 @@ export default function PageEditorPage({ params }: PageProps) {
   const saveMutation = useMutation({
     mutationFn: async (sections: BaseSection[]) => {
       const templateData = {
-        name: template?.name || 'Nouvelle page',
-        slug: template?.slug || 'nouvelle-page',
-        pageType: template?.pageType || 'custom',
-        status: template?.status || 'draft',
-        description: template?.description || '',
+        name: (template as any)?.name || 'Nouvelle page',
+        slug: (template as any)?.slug || 'nouvelle-page',
+        pageType: (template as any)?.pageType || 'custom',
+        status: (template as any)?.status || 'draft',
+        description: (template as any)?.description || '',
         sections: sections.map((section) => ({
           type: section.type,
           name: section.name,
@@ -51,7 +51,7 @@ export default function PageEditorPage({ params }: PageProps) {
         return (response as { data: unknown }).data
       }
     },
-    onSuccess: (savedTemplate) => {
+    onSuccess: (savedTemplate: any) => {
       queryClient.invalidateQueries({ queryKey: ['pageTemplates'] })
       queryClient.invalidateQueries({ queryKey: ['pageTemplate', id] })
 
@@ -75,7 +75,7 @@ export default function PageEditorPage({ params }: PageProps) {
 
   return (
     <PageBuilderEditor
-      initialSections={template?.sections || []}
+      initialSections={(template as any)?.sections || []}
       onSave={handleSave}
       templateId={id === 'new' ? undefined : id}
     />

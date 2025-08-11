@@ -2,9 +2,9 @@ import { Controller, Delete, Get, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import type { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
-import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
-import type { UsersService } from '../../../domains/users/users.service'
+import { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
+import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
+import { UsersService } from '../../../domains/users/users.service'
 
 @Controller('admin/roles')
 @ApiTags('🔧 Admin - Rôles')

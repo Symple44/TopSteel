@@ -40,7 +40,7 @@ export function QuotesTable({ data = [], loading = false, onEdit, onDelete }: Qu
               </TableCell>
             </TableRow>
           ) : (
-            data.map((item, index) => (
+            data.map((item: any, index) => (
               <TableRow key={`quote-${item.id || item.number || index}`}>
                 <TableCell>TODO: devis name</TableCell>
                 <TableCell>TODO: Status</TableCell>

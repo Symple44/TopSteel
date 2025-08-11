@@ -68,7 +68,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
   }
 
   async update(id: string, entity: Partial<Material>): Promise<Material> {
-    await this.repository.update(id, entity)
+    await this.repository.update(id, entity as unknown)
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Material with id ${id} not found after update`)
@@ -606,7 +606,7 @@ export class MaterialRepositoryImpl implements IMaterialRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(_spec: Record<string, unknown>): Promise<Material[]> {
+  async findBySpecification(_spec: any): Promise<Material[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }

@@ -23,10 +23,10 @@ import {
 import { SocieteRoleType } from '../../../domains/auth/core/constants/roles.constants'
 import { CombinedSecurityGuard } from '../../../domains/auth/security/guards/combined-security.guard'
 import { RequireSystemAdmin } from '../../../domains/auth/security/guards/enhanced-roles.guard'
-import type { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
-import type { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
-import type { UsersService } from '../../../domains/users/users.service'
-import type { SocietesService } from '../../../features/societes/services/societes.service'
+import { RoleFormattingService } from '../../../domains/auth/services/role-formatting.service'
+import { UnifiedRolesService } from '../../../domains/auth/services/unified-roles.service'
+import { UsersService } from '../../../domains/users/users.service'
+import { SocietesService } from '../../../features/societes/services/societes.service'
 
 interface SocieteQueryDto {
   page?: number
@@ -71,7 +71,7 @@ export class AdminSocietesController {
       if (query.search) {
         const searchTerm = query.search.toLowerCase()
         societes = societes.filter(
-          (societe) =>
+          (societe: any) =>
             societe.nom.toLowerCase().includes(searchTerm) ||
             societe.code.toLowerCase().includes(searchTerm)
         )
@@ -86,7 +86,7 @@ export class AdminSocietesController {
 
       // Formatter les données avec les utilisateurs si demandé
       const formattedSocietes = await Promise.all(
-        paginatedSocietes.map(async (societe) => {
+        paginatedSocietes.map(async (societe: any) => {
           let users: Record<string, unknown>[] = []
           let userCount = 0
 
@@ -98,12 +98,12 @@ export class AdminSocietesController {
             for (const user of allUsers) {
               const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
               const hasAccessToSociete = userSocieteRoles.some(
-                (role) => role.societeId === societe.id && role.isActive
+                (role: any) => role.societeId === societe.id && role.isActive
               )
 
               if (hasAccessToSociete) {
                 const userRoleInSociete = userSocieteRoles.find(
-                  (role) => role.societeId === societe.id
+                  (role: any) => role.societeId === societe.id
                 )
 
                 usersWithAccess.push({
@@ -129,7 +129,7 @@ export class AdminSocietesController {
             for (const user of allUsers) {
               const userSocieteRoles = await this.unifiedRolesService.getUserSocieteRoles(user.id)
               const hasAccess = userSocieteRoles.some(
-                (role) => role.societeId === societe.id && role.isActive
+                (role: any) => role.societeId === societe.id && role.isActive
               )
               if (hasAccess) {
                 userCount++
@@ -148,7 +148,7 @@ export class AdminSocietesController {
             userCount,
             users: query.includeUsers ? users : undefined,
             sites:
-              societe.sites?.map((site) => ({
+              societe.sites?.map((site: any) => ({
                 id: site.id,
                 nom: site.nom,
                 code: site.code,
@@ -289,7 +289,7 @@ export class AdminSocietesController {
         userId,
         societeId,
         body.roleType,
-        currentUser.id,
+        (currentUser as any).id,
         {
           isDefault: body.isDefault || false,
           additionalPermissions: body.additionalPermissions || [],
@@ -308,7 +308,7 @@ export class AdminSocietesController {
           isDefault: userSocieteRole.isDefaultSociete,
           isActive: userSocieteRole.isActive,
           grantedAt: userSocieteRole.grantedAt,
-          grantedBy: currentUser.id,
+          grantedBy: (currentUser as any).id,
         },
         message: 'Utilisateur ajouté à la société avec succès',
         statusCode: 201,
@@ -385,7 +385,7 @@ export class AdminSocietesController {
         userId,
         societeId,
         body.roleType,
-        currentUser.id,
+        (currentUser as any).id,
         {
           isDefault: body.isDefault !== undefined ? body.isDefault : existingRole.isDefaultSociete,
           additionalPermissions: body.additionalPermissions || existingRole.additionalPermissions,

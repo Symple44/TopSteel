@@ -10,6 +10,8 @@ export * from './clients'
 // ===== CORE =====
 export * from './core'
 export * from './inventory'
+export * from './partners'
+export * from './pricing'
 export * from './projects'
 export * from './quotes'
 export * from './users'
@@ -19,6 +21,9 @@ export * from './users'
 import { SystemParametersApiClient } from './admin'
 import { ClientApiClient } from './clients'
 import type { ApiClientConfig } from './core'
+import { HttpClient } from './core'
+import { PartnerApi } from './partners'
+import { PricingApi } from './pricing'
 import { ProjectApiClient } from './projects'
 import { UserSettingsApiClient } from './users'
 
@@ -27,6 +32,8 @@ export class ERPApiClient {
   public readonly projects: ProjectApiClient
   public readonly userSettings: UserSettingsApiClient
   public readonly systemParameters: SystemParametersApiClient
+  public readonly partners: PartnerApi
+  public readonly pricing: PricingApi
 
   constructor(config: ApiClientConfig) {
     // Initialize domain clients
@@ -34,6 +41,11 @@ export class ERPApiClient {
     this.projects = new ProjectApiClient(config)
     this.userSettings = new UserSettingsApiClient(config)
     this.systemParameters = new SystemParametersApiClient(config)
+    
+    // Initialize APIs with HttpClient
+    const httpClient = new HttpClient(config)
+    this.partners = new PartnerApi(httpClient.axiosInstance)
+    this.pricing = new PricingApi(httpClient)
   }
 
   // ===== GLOBAL AUTH MANAGEMENT =====

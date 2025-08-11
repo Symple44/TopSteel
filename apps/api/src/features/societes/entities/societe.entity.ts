@@ -1,5 +1,6 @@
-import { Entity, OneToMany } from 'typeorm'
+import { Entity, OneToMany, OneToOne } from 'typeorm'
 import { Site } from './site.entity'
+import { SocieteLicense } from './societe-license.entity'
 
 // Re-export shared entities from the @erp/entities package
 export {
@@ -19,4 +20,12 @@ export class Societe extends BaseSociete {
     (site) => site.societe
   )
   sites!: Site[]
+
+  // Relation avec la licence
+  @OneToOne(
+    () => SocieteLicense,
+    (license) => license.societe,
+    { nullable: true }
+  )
+  license?: SocieteLicense
 }

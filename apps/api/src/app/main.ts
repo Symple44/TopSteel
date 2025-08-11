@@ -11,7 +11,7 @@ import helmet from 'helmet'
 import { HttpExceptionFilter } from '../core/common/filters/http-exception.filter'
 import { LoggingInterceptor } from '../core/common/interceptors/logging.interceptor'
 import { TransformInterceptor } from '../core/common/interceptors/transform.interceptor'
-import { EnhancedServerManager } from '../core/config/enhanced-server-manager'
+import { cleanupPort, isPortAvailable } from '../core/config/enhanced-server-manager'
 import { GracefulShutdownService } from '../core/config/graceful-shutdown.service'
 import { listenWithPortFallback } from '../core/config/port-helper'
 import { MetricsSafeInterceptor } from '../infrastructure/monitoring/metrics-safe.interceptor'
@@ -56,16 +56,13 @@ async function bootstrap() {
     const targetPort = parseInt(process.env.PORT || process.env.API_PORT || '3002')
 
     // Vérifier d'abord la disponibilité du port
-    const isPortFree = await EnhancedServerManager.isPortAvailable(targetPort)
+    const isPortFree = await isPortAvailable(targetPort)
 
     if (!isPortFree) {
       logger.log(`🔍 Port ${targetPort} occupé, nettoyage...`)
 
-      // Nettoyer les processus orphelins d'abord
-      await EnhancedServerManager.cleanupOrphanedProcesses()
-
       // Nettoyage complet du port avec retry
-      const success = await EnhancedServerManager.cleanupPort(targetPort, 2)
+      const success = await cleanupPort(targetPort, 2)
       if (!success) {
         logger.warn(`⚠️  Port ${targetPort} occupé, utilisation du fallback automatique`)
       }
@@ -76,6 +73,21 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  })
+  
+  // Désactiver complètement les redirections automatiques d'Express
+  const expressApp = app.getHttpAdapter().getInstance()
+  expressApp.set('strict routing', false)
+  expressApp.set('x-powered-by', false)
+  
+  // Middleware pour gérer les trailing slashes sans redirection
+  expressApp.use((req: any, res: any, next: any) => {
+    // Supprimer le trailing slash si présent (sauf pour la racine)
+    if (req.path !== '/' && req.path.endsWith('/')) {
+      req.url = req.url.slice(0, -1)
+      req.path = req.path.slice(0, -1)
+    }
+    next()
   })
 
   const configService = app.get(ConfigService)

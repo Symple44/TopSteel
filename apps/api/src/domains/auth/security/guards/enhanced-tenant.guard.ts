@@ -6,12 +6,12 @@ import {
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
-import type { JwtService } from '@nestjs/jwt'
+import { Reflector } from '@nestjs/core'
+import { JwtService } from '@nestjs/jwt'
 import { GlobalUserRole } from '../../core/constants/roles.constants'
 import type { MultiTenantJwtPayload } from '../../interfaces/jwt-payload.interface'
-import type { SessionRedisService } from '../../services/session-redis.service'
-import type { UnifiedRolesService } from '../../services/unified-roles.service'
+import { SessionRedisService } from '../../services/session-redis.service'
+import { UnifiedRolesService } from '../../services/unified-roles.service'
 
 export interface TenantRequirement {
   // Si true, la société doit être spécifiée dans le token
@@ -134,7 +134,7 @@ export class EnhancedTenantGuard implements CanActivate {
       request.authMeta = {
         tokenType: payload.societeId ? 'multi-tenant' : 'global',
         hasFullSuperAdminAccess: userContext.globalRole === GlobalUserRole.SUPER_ADMIN,
-        effectiveRole: tenantContext.userSocieteInfo?.effectiveRole || userContext.role,
+        effectiveRole: (tenantContext.userSocieteInfo as any)?.effectiveRole || userContext.role,
         validatedAt: new Date().toISOString(),
       }
 

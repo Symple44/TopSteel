@@ -56,9 +56,9 @@ export class APIClientEnhanced extends APIClient {
     localStorage.removeItem('topsteel-tokens')
 
     // Supprimer les cookies d'authentification
-    // biome-ignore lint/security/noDocumentCookie: Cookie cleanup required for logout
+    // biome-ignore lint: Cookie cleanup required for logout
     document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
-    // biome-ignore lint/security/noDocumentCookie: Cookie cleanup required for logout
+    // biome-ignore lint: Cookie cleanup required for logout
     document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
 
     // Rediriger vers la page de login

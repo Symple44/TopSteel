@@ -29,7 +29,7 @@ export class AdminRolesService {
         roleId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
       ) {
         role = await this._rolesRepository.findOne({
-          where: { id: roleId } as Record<string, unknown>,
+          where: { id: roleId } as any,
         })
       }
 
@@ -38,12 +38,12 @@ export class AdminRolesService {
       }
 
       const rolePermissions = await this._rolePermissionsRepository.find({
-        where: { roleId: (role as Record<string, unknown>).id },
+        where: { roleId: (role as any).id },
         relations: ['permission'],
       })
 
       const permissions = rolePermissions.map((rp) => ({
-        id: (rp.permission as Record<string, unknown>).id,
+        id: (rp.permission as any).id,
         name: rp.permission.name,
         description: rp.permission.description,
         moduleId: rp.permission.module,
@@ -54,7 +54,7 @@ export class AdminRolesService {
         success: true,
         data: {
           role: {
-            id: (role as Record<string, unknown>).id,
+            id: (role as any).id,
             name: role.name,
             description: role.description,
             isActive: role.isActive,
@@ -83,7 +83,7 @@ export class AdminRolesService {
 
     return {
       data: roles.map((role) => ({
-        id: (role as Record<string, unknown>).id,
+        id: (role as any).id,
         name: role.name,
         description: role.description,
         isActive: role.isActive,

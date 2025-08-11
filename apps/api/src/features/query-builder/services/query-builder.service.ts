@@ -9,7 +9,7 @@ import {
   QueryBuilderColumn,
   QueryBuilderJoin,
 } from '../entities'
-import type { QueryBuilderPermissionService } from './query-builder-permission.service'
+import { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 @Injectable()
 export class QueryBuilderService {
@@ -29,19 +29,20 @@ export class QueryBuilderService {
     const queryBuilder = this._queryBuilderRepository.create({
       ...createDto,
       createdById: userId,
-    })
+    } as unknown)
 
     const saved = await this._queryBuilderRepository.save(queryBuilder)
+    const savedEntity = Array.isArray(saved) ? saved[0] : saved
 
     // Add default permission for creator
     await this.permissionService.addPermission({
-      queryBuilderId: saved.id,
+      queryBuilderId: savedEntity.id,
       userId,
       permissionType: 'edit',
       isAllowed: true,
     })
 
-    return saved
+    return savedEntity
   }
 
   async findAll(userId: string): Promise<QueryBuilder[]> {
@@ -95,28 +96,34 @@ export class QueryBuilderService {
     // Update columns if provided
     if (updateDto.columns) {
       await this._columnRepository.delete({ queryBuilderId: id })
-      const columns = updateDto.columns.map((col) =>
-        this._columnRepository.create({ ...col, queryBuilderId: id })
-      )
-      await this._columnRepository.save(columns)
+      if (updateDto.columns.length > 0) {
+        const columns = updateDto.columns.map((col) =>
+          this._columnRepository.create({ ...col, queryBuilderId: id } as unknown)
+        )
+        await this._columnRepository.save(columns as unknown)
+      }
     }
 
     // Update joins if provided
     if (updateDto.joins) {
       await this._joinRepository.delete({ queryBuilderId: id })
-      const joins = updateDto.joins.map((join) =>
-        this._joinRepository.create({ ...join, queryBuilderId: id })
-      )
-      await this._joinRepository.save(joins)
+      if (updateDto.joins.length > 0) {
+        const joins = updateDto.joins.map((join) =>
+          this._joinRepository.create({ ...join, queryBuilderId: id } as unknown)
+        )
+        await this._joinRepository.save(joins as unknown)
+      }
     }
 
     // Update calculated fields if provided
     if (updateDto.calculatedFields) {
       await this._calculatedFieldRepository.delete({ queryBuilderId: id })
-      const fields = updateDto.calculatedFields.map((field) =>
-        this._calculatedFieldRepository.create({ ...field, queryBuilderId: id })
-      )
-      await this._calculatedFieldRepository.save(fields)
+      if (updateDto.calculatedFields.length > 0) {
+        const fields = updateDto.calculatedFields.map((field) =>
+          this._calculatedFieldRepository.create({ ...field, queryBuilderId: id } as unknown)
+        )
+        await this._calculatedFieldRepository.save(fields as unknown)
+      }
     }
 
     // Update main query builder
@@ -126,7 +133,7 @@ export class QueryBuilderService {
       calculatedFields: _calculatedFields,
       ...mainUpdate
     } = updateDto
-    await this._queryBuilderRepository.update(id, mainUpdate)
+    await this._queryBuilderRepository.update(id, mainUpdate as unknown)
 
     return this.findOne(id, userId)
   }
@@ -158,37 +165,44 @@ export class QueryBuilderService {
     })
 
     const saved = await this._queryBuilderRepository.save(duplicate)
+    const savedEntity = Array.isArray(saved) ? saved[0] : saved
 
     // Duplicate columns
-    const columns = original.columns.map((col) =>
-      this._columnRepository.create({
-        ...col,
-        id: undefined,
-        queryBuilderId: saved.id,
-      })
-    )
-    await this._columnRepository.save(columns)
+    if (original.columns && original.columns.length > 0) {
+      const columns = original.columns.map((col) =>
+        this._columnRepository.create({
+          ...col,
+          id: undefined,
+          queryBuilderId: savedEntity.id,
+        })
+      )
+      await this._columnRepository.save(columns)
+    }
 
     // Duplicate joins
-    const joins = original.joins.map((join) =>
-      this._joinRepository.create({
-        ...join,
-        id: undefined,
-        queryBuilderId: saved.id,
-      })
-    )
-    await this._joinRepository.save(joins)
+    if (original.joins && original.joins.length > 0) {
+      const joins = original.joins.map((join) =>
+        this._joinRepository.create({
+          ...join,
+          id: undefined,
+          queryBuilderId: savedEntity.id,
+        })
+      )
+      await this._joinRepository.save(joins)
+    }
 
     // Duplicate calculated fields
-    const fields = original.calculatedFields.map((field) =>
-      this._calculatedFieldRepository.create({
-        ...field,
-        id: undefined,
-        queryBuilderId: saved.id,
-      })
-    )
-    await this._calculatedFieldRepository.save(fields)
+    if (original.calculatedFields && original.calculatedFields.length > 0) {
+      const fields = original.calculatedFields.map((field) =>
+        this._calculatedFieldRepository.create({
+          ...field,
+          id: undefined,
+          queryBuilderId: savedEntity.id,
+        })
+      )
+      await this._calculatedFieldRepository.save(fields)
+    }
 
-    return this.findOne(saved.id, userId)
+    return this.findOne(savedEntity.id, userId)
   }
 }

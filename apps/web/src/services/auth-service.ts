@@ -47,7 +47,7 @@ export const cookies = {
       const date = new Date()
       date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000)
       const expires = `expires=${date.toUTCString()}`
-      // biome-ignore lint/security/noDocumentCookie: Cookie management required for auth
+      // biome-ignore lint: Cookie management required for auth
       document.cookie = `${name}=${value};${expires};path=/;secure;samesite=lax`
     } catch {}
   },
@@ -55,7 +55,7 @@ export const cookies = {
   remove: (name: string): void => {
     if (typeof document === 'undefined') return
     try {
-      // biome-ignore lint/security/noDocumentCookie: Cookie removal required for auth logout
+      // biome-ignore lint: Cookie removal required for auth logout
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`
     } catch {}
   },

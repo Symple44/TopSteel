@@ -132,7 +132,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
       setSettings((prev) => ({
         ...prev,
         [category]: {
-          ...(prev[category] as any),
+          ...(prev[category] as unknown),
           [key]: value,
         },
       }))

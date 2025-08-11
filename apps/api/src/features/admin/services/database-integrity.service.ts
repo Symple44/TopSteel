@@ -257,7 +257,7 @@ export class DatabaseIntegrityService {
       return {
         success: false,
         message: 'Erreur lors de la synchronisation',
-        details: errorMessage,
+        details: { error: errorMessage },
       }
     }
   }

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { Repository } from 'typeorm'
 import { MarketplaceModule as MarketplaceModuleEntity } from '../entities/marketplace-module.entity'
 // Import des modules réels - Supprimés pour optimiser le debug
-import type { MarketplaceService } from './marketplace.service'
+import { MarketplaceService } from './marketplace.service'
 
 export interface ModuleInfo {
   moduleKey: string
@@ -194,13 +194,13 @@ export class ModuleRegistryService implements OnModuleInit {
         displayName: moduleInfo.displayName,
         description: moduleInfo.description,
         shortDescription: moduleInfo.shortDescription,
-        pricing: moduleInfo.pricing,
+        pricing: moduleInfo.pricing as any,
         dependencies: moduleInfo.dependencies,
-        menuConfiguration: moduleInfo.menuConfiguration,
-        permissions: moduleInfo.permissions,
-        apiRoutes: moduleInfo.apiRoutes,
+        menuConfiguration: moduleInfo.menuConfiguration as any,
+        permissions: moduleInfo.permissions as any,
+        apiRoutes: moduleInfo.apiRoutes as any,
         icon: moduleInfo.icon,
-        metadata: moduleInfo.metadata,
+        metadata: moduleInfo.metadata as any,
       },
       '00000000-0000-0000-0000-000000000000'
     )
@@ -216,15 +216,15 @@ export class ModuleRegistryService implements OnModuleInit {
         displayName: moduleInfo.displayName,
         description: moduleInfo.description,
         shortDescription: moduleInfo.shortDescription,
-        category: moduleInfo.category,
+        category: moduleInfo.category as any,
         publisher: moduleInfo.publisher,
-        pricing: moduleInfo.pricing,
+        pricing: moduleInfo.pricing as any,
         dependencies: moduleInfo.dependencies,
-        menuConfiguration: moduleInfo.menuConfiguration,
-        permissions: moduleInfo.permissions,
-        apiRoutes: moduleInfo.apiRoutes,
+        menuConfiguration: moduleInfo.menuConfiguration as any,
+        permissions: moduleInfo.permissions as any,
+        apiRoutes: moduleInfo.apiRoutes as any,
         icon: moduleInfo.icon,
-        metadata: moduleInfo.metadata,
+        metadata: moduleInfo.metadata as any,
       },
       '00000000-0000-0000-0000-000000000000'
     )
@@ -342,6 +342,10 @@ export class ModuleRegistryService implements OnModuleInit {
 
     const registration = this.getModule(moduleKey)
     const moduleInfo = registration?.moduleInfo
+
+    if (!moduleInfo) {
+      return { canInstall: false, reasons: ['Module non trouvé'] }
+    }
 
     // Vérifier les dépendances
     if (moduleInfo.dependencies && moduleInfo.dependencies.length > 0) {

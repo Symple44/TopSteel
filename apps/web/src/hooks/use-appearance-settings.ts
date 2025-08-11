@@ -451,7 +451,7 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
 
             // Valider et corriger les valeurs invalides de l'API
             if (
-              (apiSettings.theme as any) === 'undefined' ||
+              (apiSettings.theme as unknown) === 'undefined' ||
               apiSettings.theme === undefined ||
               !apiSettings.theme
             ) {

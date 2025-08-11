@@ -7,9 +7,9 @@ import {
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common'
-import type { Reflector } from '@nestjs/core'
+import { Reflector } from '@nestjs/core'
 import { GlobalUserRole, SocieteRoleType } from '../../core/constants/roles.constants'
-import type { UnifiedRolesService } from '../../services/unified-roles.service'
+import { UnifiedRolesService } from '../../services/unified-roles.service'
 
 export interface ResourceOwnershipRequirement {
   // Nom du paramètre contenant l'ID de la ressource
@@ -144,21 +144,22 @@ export class ResourceOwnershipGuard implements CanActivate {
 
     // Utiliser le paramètre spécifié
     if (requirement.ownerIdParam) {
-      return (
-        request.params[requirement.ownerIdParam] ||
-        request.body[requirement.ownerIdParam] ||
-        request.query[requirement.ownerIdParam] ||
-        null
-      )
+      return ((request as { params?: Record<string, string> }).params[requirement.ownerIdParam] ||
+        (request as { body?: Record<string, unknown> }).body[requirement.ownerIdParam] ||
+        (request as { query?: Record<string, unknown> }).query[requirement.ownerIdParam] ||
+        null) as string
     }
 
     // Valeurs par défaut à vérifier
     const defaultParams = ['userId', 'ownerId', 'createdBy', 'authorId']
 
     for (const param of defaultParams) {
-      const value = request.params[param] || request.body[param] || request.query[param]
+      const value =
+        (request as { params?: Record<string, string> }).params[param] ||
+        (request as { body?: Record<string, unknown> }).body[param] ||
+        (request as { query?: Record<string, unknown> }).query[param]
       if (value) {
-        return value
+        return value as string
       }
     }
 
@@ -167,21 +168,24 @@ export class ResourceOwnershipGuard implements CanActivate {
 
   private extractResourceId(request: unknown, requirement: ResourceOwnershipRequirement): string {
     if (requirement.resourceIdParam) {
-      return (
-        request.params[requirement.resourceIdParam] ||
-        request.body[requirement.resourceIdParam] ||
-        request.query[requirement.resourceIdParam] ||
-        ''
-      )
+      return ((request as { params?: Record<string, string> }).params[
+        requirement.resourceIdParam
+      ] ||
+        (request as { body?: Record<string, unknown> }).body[requirement.resourceIdParam] ||
+        (request as { query?: Record<string, unknown> }).query[requirement.resourceIdParam] ||
+        '') as string
     }
 
     // Valeurs par défaut pour l'ID de ressource
     const defaultParams = ['id', 'resourceId']
 
     for (const param of defaultParams) {
-      const value = request.params[param] || request.body[param] || request.query[param]
+      const value =
+        (request as { params?: Record<string, string> }).params[param] ||
+        (request as { body?: Record<string, unknown> }).body[param] ||
+        (request as { query?: Record<string, unknown> }).query[param]
       if (value) {
-        return value
+        return value as string
       }
     }
 

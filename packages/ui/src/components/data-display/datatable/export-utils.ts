@@ -26,7 +26,7 @@ const loadUniverComponents = async (): Promise<boolean> => {
 
     if (univerCore) {
       Univer = univerCore.Univer as UniverClass
-      UniverInstanceType = univerCore.UniverInstanceType as unknown as UniverInstanceTypeEnum
+      UniverInstanceType = univerCore.UniverInstanceType as any as UniverInstanceTypeEnum
       LocaleType = univerCore.LocaleType as UniverLocaleType
       // Note: IWorkbookData and IWorksheetData might not be available in all versions
     }

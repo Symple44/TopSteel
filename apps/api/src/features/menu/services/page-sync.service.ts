@@ -74,8 +74,8 @@ export class PageSyncService {
         icon: page.icon,
         category: page.category,
         subcategory: page.subcategory,
-        requiredPermissions: page.permissions ? page.permissions.join(',') : null,
-        requiredRoles: page.roles ? page.roles.join(',') : null,
+        requiredPermissions: page.permissions ? page.permissions.join(',') : undefined,
+        requiredRoles: page.roles ? page.roles.join(',') : undefined,
         moduleId: page.moduleId,
         isEnabled: page.isEnabled,
         isVisible: page.isVisible,
@@ -83,22 +83,22 @@ export class PageSyncService {
     } else {
       // Créer une nouvelle entrée avec les permissions les plus élevées
       const newPage = this._discoveredPageRepository.create({
-        pageId: page.id,
+        id: page.id,
         title: page.title,
         href: page.href,
         description: page.description,
         icon: page.icon,
         category: page.category,
         subcategory: page.subcategory,
-        requiredPermissions: page.permissions ? page.permissions.join(',') : null,
-        requiredRoles: page.roles ? page.roles.join(',') : null,
+        requiredPermissions: page.permissions ? page.permissions.join(',') : undefined,
+        requiredRoles: page.roles ? page.roles.join(',') : undefined,
         moduleId: page.moduleId,
         isVisible: true,
         isEnabled: true,
         defaultOrder: 0,
         // Accorder l'accès au niveau le plus élevé par défaut
         defaultAccessLevel: 'ADMIN',
-      })
+      } as unknown)
 
       await this._discoveredPageRepository.save(newPage)
     }
@@ -217,13 +217,13 @@ export class PageSyncService {
         id: page.pageId,
         title: page.title,
         href: page.href,
-        description: page.description,
-        icon: page.icon,
+        description: page.description || null,
+        icon: page.icon || null,
         category: page.category,
-        subcategory: page.subcategory,
+        subcategory: page.subcategory || null,
         permissions: page.requiredPermissions ? page.requiredPermissions.split(',') : [],
         roles: page.requiredRoles ? page.requiredRoles.split(',') : [],
-        moduleId: page.moduleId,
+        moduleId: page.moduleId || null,
         isEnabled: page.isEnabled,
         isVisible: page.isVisible,
       })

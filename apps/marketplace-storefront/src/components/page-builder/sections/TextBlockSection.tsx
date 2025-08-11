@@ -1,6 +1,6 @@
 'use client'
 
-import DOMPurify from 'dompurify'
+// import DOMPurify from 'dompurify'
 import { SectionWrapper } from './SectionWrapper'
 import type { SectionProps } from './types'
 
@@ -53,29 +53,11 @@ export function TextBlockSection({ section, isEditing }: SectionProps<TextBlockC
           dangerouslySetInnerHTML={{
             __html:
               typeof window !== 'undefined'
-                ? DOMPurify.sanitize(content.content, {
-                    ALLOWED_TAGS: [
-                      'p',
-                      'br',
-                      'strong',
-                      'em',
-                      'u',
-                      'h1',
-                      'h2',
-                      'h3',
-                      'h4',
-                      'h5',
-                      'h6',
-                      'ul',
-                      'ol',
-                      'li',
-                      'a',
-                      'blockquote',
-                      'img',
-                    ],
-                    ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'src', 'alt', 'title'],
-                  })
-                : content.content.replace(
+                ? (content.content || '').replace(
+                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                    ''
+                  )
+                : (content.content || '').replace(
                     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
                     ''
                   ),

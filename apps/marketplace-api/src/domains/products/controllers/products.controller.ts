@@ -12,13 +12,14 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
+import type { DataSource } from 'typeorm'
 
 import { TenantGuard } from '../../../shared/tenant/tenant.guard'
 
 interface TenantRequest extends Request {
   tenant: {
     societeId: string
-    erpTenantConnection: unknown
+    erpTenantConnection: DataSource | null
   }
 }
 
@@ -38,8 +39,10 @@ interface PricingQuery {
   promotionCode?: string
 }
 
-import type { MarketplacePricingEngine } from '../services/marketplace-pricing-engine.service'
-import type { MarketplaceProductsService } from '../services/marketplace-products.service'
+import { MarketplaceProductsService } from '../services/marketplace-products.service'
+import { HttpService } from '@nestjs/axios'
+import { firstValueFrom } from 'rxjs'
+import { PriceRuleChannel } from '@erp/entities'
 
 @ApiTags('admin-products')
 @Controller('admin/products')
@@ -48,7 +51,7 @@ import type { MarketplaceProductsService } from '../services/marketplace-product
 export class ProductsController {
   constructor(
     private productsService: MarketplaceProductsService,
-    private pricingEngine: MarketplacePricingEngine
+    private httpService: HttpService
   ) {}
 
   @Get()
@@ -62,8 +65,8 @@ export class ProductsController {
       categories: query.categories?.split(','),
       limit: parseInt(query.limit) || 50,
       offset: parseInt(query.offset) || 0,
-      sortBy: query.sortBy || 'name',
-      sortOrder: query.sortOrder || 'ASC',
+      sortBy: (query.sortBy as 'name' | 'price' | 'date' | 'popularity') || 'name',
+      sortOrder: (query.sortOrder as 'ASC' | 'DESC') || 'ASC',
     })
   }
 
@@ -82,6 +85,10 @@ export class ProductsController {
   async getProduct(@Req() req: TenantRequest, @Param('productId') productId: string) {
     const { tenant } = req
 
+    if (!tenant.erpTenantConnection) {
+      throw new Error('Connexion ERP non disponible pour ce tenant')
+    }
+
     return await this.productsService.getProductById(
       tenant.erpTenantConnection,
       tenant.societeId,
@@ -98,6 +105,10 @@ export class ProductsController {
   ) {
     const { tenant } = req
 
+    if (!tenant.erpTenantConnection) {
+      throw new Error('Connexion ERP non disponible pour ce tenant')
+    }
+
     // Récupérer le produit pour avoir le prix de base
     const product = await this.productsService.getProductById(
       tenant.erpTenantConnection,
@@ -105,17 +116,49 @@ export class ProductsController {
       productId
     )
 
-    return await this.pricingEngine.calculatePrice(productId, product.basePrice, query.customerId, {
-      customerGroup: query.customerGroup,
-      quantity: parseInt(query.quantity) || 1,
-      promotionCode: query.promotionCode,
-    })
+    // Appeler l'API de pricing centralisée
+    try {
+      const priceResponse = await firstValueFrom(
+        this.httpService.post(`${process.env.API_URL || 'http://localhost:3002'}/pricing/calculate`, {
+          articleId: productId,
+          customerId: query.customerId,
+          customerGroup: query.customerGroup,
+          quantity: parseInt(query.quantity) || 1,
+          promotionCode: query.promotionCode,
+          channel: PriceRuleChannel.MARKETPLACE
+        })
+      )
+      return priceResponse.data
+    } catch (error) {
+      console.error('Erreur calcul prix:', error)
+      return {
+        basePrice: product.basePrice,
+        finalPrice: product.basePrice,
+        appliedRules: [],
+        totalDiscount: 0,
+        totalDiscountPercentage: 0
+      }
+    }
   }
 
   @Get(':productId/pricing/rules')
   @ApiOperation({ summary: 'Get pricing rules for product' })
   async getPricingRules(@Req() _req: Request, @Param('productId') productId: string) {
-    return await this.pricingEngine.getApplicableRules(productId)
+    // Appeler l'API pour récupérer les règles
+    try {
+      const rulesResponse = await firstValueFrom(
+        this.httpService.get(`${process.env.API_URL || 'http://localhost:3002'}/pricing/rules`, {
+          params: {
+            articleId: productId,
+            channel: PriceRuleChannel.MARKETPLACE
+          }
+        })
+      )
+      return rulesResponse.data
+    } catch (error) {
+      console.error('Erreur récupération règles:', error)
+      return { rules: [], total: 0 }
+    }
   }
 
   @Post(':productId/pricing/rules')

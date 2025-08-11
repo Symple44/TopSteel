@@ -14,7 +14,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from '../../core/common/decorators/current-user.decorator'
 import { Roles } from '../../core/common/decorators/roles.decorator'
-import type { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
+import { OptimizedCacheService } from '../../infrastructure/cache/redis-optimized.service'
 import { JwtAuthGuard } from '../auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../auth/security/guards/roles.guard'
 import {
@@ -30,7 +30,7 @@ import type { UpdateUserDto } from './dto/update-user.dto'
 import type { UpdateUserSettingsDto } from './dto/update-user-settings.dto'
 import type { UserQueryDto } from './dto/user-query.dto'
 import { UserRole } from './entities/user.entity'
-import type { UsersService } from './users.service'
+import { UsersService } from './users.service'
 
 @Controller('users')
 @ApiTags('👤 Users')
@@ -71,7 +71,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Récupérer mes paramètres utilisateur' })
   @ApiResponse({ status: 200, description: 'Paramètres utilisateur récupérés avec succès' })
   async getMySettings(@CurrentUser() user: Record<string, unknown>) {
-    return this.usersService.getUserSettings(user.id)
+    return this.usersService.getUserSettings((user as any).id)
   }
 
   @Patch('settings/me')
@@ -81,7 +81,7 @@ export class UsersController {
     @CurrentUser() user: Record<string, unknown>,
     @Body() updateDto: UpdateUserSettingsDto
   ) {
-    return this.usersService.updateUserSettings(user.id, updateDto)
+    return this.usersService.updateUserSettings((user as any).id, updateDto)
   }
 
   // Endpoints spécialisés pour les préférences d'apparence (DOIVENT être avant :id)
@@ -103,7 +103,7 @@ export class UsersController {
       return cachedResult
     }
 
-    const settings = await this.usersService.getUserSettings(user.id)
+    const settings = await this.usersService.getUserSettings((user as any).id)
     if (!settings?.preferences?.appearance) {
       throw new Error("Paramètres d'apparence non trouvés")
     }
@@ -127,7 +127,7 @@ export class UsersController {
     @CurrentUser() user: Record<string, unknown>,
     @Body() updateDto: UpdateAppearanceSettingsDto
   ): Promise<GetAppearanceSettingsResponseDto> {
-    const updatedSettings = await this.usersService.updateUserSettings(user.id, {
+    const updatedSettings = await this.usersService.updateUserSettings((user as any).id, {
       preferences: { appearance: updateDto },
     })
 
@@ -154,8 +154,8 @@ export class UsersController {
   async getMyNotificationSettings(
     @CurrentUser() user: Record<string, unknown>
   ): Promise<GetNotificationSettingsResponseDto> {
-    const settings = await this.usersService.getUserSettings(user.id)
-    return new GetNotificationSettingsResponseDto(settings.preferences.notifications)
+    const settings = await this.usersService.getUserSettings((user as any).id)
+    return new GetNotificationSettingsResponseDto(settings.preferences.notifications as any)
   }
 
   @Patch('notifications/me')
@@ -169,10 +169,10 @@ export class UsersController {
     @CurrentUser() user: Record<string, unknown>,
     @Body() updateDto: UpdateNotificationSettingsDto
   ): Promise<GetNotificationSettingsResponseDto> {
-    const updatedSettings = await this.usersService.updateUserSettings(user.id, {
+    const updatedSettings = await this.usersService.updateUserSettings((user as any).id, {
       preferences: { notifications: updateDto },
     })
-    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications)
+    return new GetNotificationSettingsResponseDto(updatedSettings.preferences.notifications as any)
   }
 
   // Endpoints avec paramètre ID (DOIVENT être APRÈS les endpoints spécifiques)

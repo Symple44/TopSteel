@@ -641,7 +641,10 @@ export class MaterialService extends BusinessService<Material> {
     }
   }
 
-  private validateDimensionsConsistency(entity: Material, warnings: string[]): void {
+  private validateDimensionsConsistency(
+    entity: Material,
+    warnings: Array<{ field: string; message: string; code: string }>
+  ): void {
     const dim = entity.dimensions
     if (!dim) return
 

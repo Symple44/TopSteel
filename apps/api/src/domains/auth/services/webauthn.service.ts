@@ -1,6 +1,6 @@
 import * as crypto from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 
 interface WebAuthnCredential {
   credentialId: string
@@ -78,7 +78,7 @@ export class WebAuthnService {
    * Vérifier la réponse d'enregistrement WebAuthn
    */
   async verifyRegistrationResponse(
-    response: Record<string, unknown>,
+    response: any,
     _expectedChallenge: string,
     _expectedOrigin: string = this.origin,
     _expectedRPID: string = this.rpID
@@ -107,8 +107,8 @@ export class WebAuthnService {
       return {
         verified: true,
         registrationInfo: {
-          credentialId: response.id,
-          publicKey: response.response?.publicKey || 'mock-public-key',
+          credentialId: response.id as string,
+          publicKey: (response.response as any)?.publicKey || 'mock-public-key',
           counter: 0,
           credentialDeviceType: 'platform',
           credentialBackedUp: false,
@@ -161,7 +161,7 @@ export class WebAuthnService {
    * Vérifier la réponse d'authentification WebAuthn
    */
   async verifyAuthenticationResponse(
-    response: Record<string, unknown>,
+    response: any,
     _expectedChallenge: string,
     credential: WebAuthnCredential,
     _expectedOrigin: string = this.origin,

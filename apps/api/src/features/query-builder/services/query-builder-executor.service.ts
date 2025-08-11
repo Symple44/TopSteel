@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import type { DataSource } from 'typeorm'
 import type { QueryBuilder, QueryBuilderCalculatedField } from '../entities'
-import type { QueryBuilderPermissionService } from './query-builder-permission.service'
+import { QueryBuilderPermissionService } from './query-builder-permission.service'
 
 export interface QueryExecutionParams {
   page?: number
@@ -150,13 +150,14 @@ export class QueryBuilderExecutorService {
           params.push(...filterValue)
         } else if (typeof filterValue === 'object' && filterValue !== null) {
           // Handle range filters
-          if (filterValue.min !== undefined) {
+          const rangeFilter = filterValue as Record<string, any>
+          if (rangeFilter.min !== undefined) {
             conditions.push(`${tableAlias}.${column.columnName} >= $${paramIndex++}`)
-            params.push(filterValue.min)
+            params.push(rangeFilter.min)
           }
-          if (filterValue.max !== undefined) {
+          if (rangeFilter.max !== undefined) {
             conditions.push(`${tableAlias}.${column.columnName} <= $${paramIndex++}`)
-            params.push(filterValue.max)
+            params.push(rangeFilter.max)
           }
         } else {
           conditions.push(`${tableAlias}.${column.columnName} = $${paramIndex++}`)
@@ -192,7 +193,7 @@ export class QueryBuilderExecutorService {
     }
 
     return data.map((row) => {
-      const processedRow = { ...row }
+      const processedRow = { ...(row as Record<string, unknown>) }
 
       calculatedFields
         .filter((field) => field.isVisible)
@@ -216,10 +217,12 @@ export class QueryBuilderExecutorService {
 
     // Replace column references with values
     let evaluableExpression = expression
-    Object.entries(row).forEach(([key, value]) => {
-      const regex = new RegExp(`\\b${key}\\b`, 'g')
-      evaluableExpression = evaluableExpression.replace(regex, String(value))
-    })
+    if (row && typeof row === 'object' && row !== null) {
+      Object.entries(row as Record<string, unknown>).forEach(([key, value]) => {
+        const regex = new RegExp(`\\b${key}\\b`, 'g')
+        evaluableExpression = evaluableExpression.replace(regex, String(value))
+      })
+    }
 
     // Basic arithmetic operations only
     try {

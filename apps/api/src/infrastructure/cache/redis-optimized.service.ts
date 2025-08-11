@@ -166,7 +166,7 @@ export class OptimizedCacheService {
 
   async executePipeline(pipeline: unknown): Promise<unknown> {
     try {
-      return await pipeline.exec()
+      return await (pipeline as { exec: () => Promise<unknown> }).exec()
     } catch (error) {
       this.logger.error('Pipeline execution error:', error)
       throw error

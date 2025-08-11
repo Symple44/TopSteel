@@ -119,7 +119,7 @@ user_societe_roles:
 pnpm dev
 
 # Tester l'authentification
-cd apps/api && node test-login-complete.js
+cd apps/api && pnpm test
 
 # Lancer les tests
 cd apps/api && npm test
@@ -296,8 +296,6 @@ Pour toute question ou problème :
 3. **Scripts de maintenance:**
    - `check-auth-tables-structure.ts`
    - `check-roles-table-structure.ts`
-   - `test-auth-flow.ts`
-   - `debug-login-societe-error.ts`
 
 ---
 

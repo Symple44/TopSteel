@@ -1,13 +1,15 @@
-import { Controller, Get, Headers } from '@nestjs/common'
+import { Controller, Get, Headers, Inject } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import type { TenantResolver } from '../shared/tenant/tenant-resolver.service'
-import type { AppService } from './app.service'
+import { TenantResolver } from '../shared/tenant/tenant-resolver.service'
+import { AppService } from './app.service'
 
 @ApiTags('health')
 @Controller()
 export class AppController {
   constructor(
+    @Inject(AppService)
     private readonly appService: AppService,
+    @Inject(TenantResolver)
     private readonly tenantResolver: TenantResolver
   ) {}
 

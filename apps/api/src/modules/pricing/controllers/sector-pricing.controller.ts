@@ -18,7 +18,7 @@ import {
   SectorCoefficient,
   SectorType,
 } from '../entities/sector-coefficient.entity'
-import type { PricingResult, SectorPricingService } from '../services/sector-pricing.service'
+import { PricingResult, SectorPricingService } from '../services/sector-pricing.service'
 
 // DTOs
 export class CreateSectorCoefficientDto {
@@ -27,9 +27,49 @@ export class CreateSectorCoefficientDto {
   coefficientType!: CoefficientType
   coefficient!: number
   description?: string
-  conditions?: unknown
-  parameters?: unknown
-  metadata?: unknown
+  conditions?: {
+    minQuantity?: number
+    maxQuantity?: number
+    minAmount?: number
+    maxAmount?: number
+    customerTypes?: string[]
+    productCategories?: string[]
+    validFrom?: Date
+    validUntil?: Date
+    weekdays?: number[]
+    regions?: string[]
+    articleFamilies?: string[]
+  }
+  parameters?: {
+    applyToBasePrice?: boolean
+    applyToMargin?: boolean
+    marginType?: 'percentage' | 'fixed_amount'
+    discountType?: 'percentage' | 'fixed_amount' | 'progressive'
+    progressiveRates?: Array<{
+      minQuantity: number
+      rate: number
+    }>
+    calculationMethod?: 'per_unit' | 'per_weight' | 'per_volume' | 'fixed'
+    freeThreshold?: number
+    btpSpecific?: {
+      applyCOFRAC?: boolean
+      applyBTPCoeff?: boolean
+      minimumOrder?: number
+      deliveryZones?: string[]
+    }
+  }
+  metadata?: {
+    createdBy?: string
+    approvedBy?: string
+    notes?: string
+    internalCode?: string
+    externalReference?: string
+    lastModification?: {
+      date: Date
+      user: string
+      changes: string[]
+    }
+  }
   priority?: number
 }
 
@@ -37,9 +77,49 @@ export class UpdateSectorCoefficientDto {
   coefficient?: number
   description?: string
   isActive?: boolean
-  conditions?: unknown
-  parameters?: unknown
-  metadata?: unknown
+  conditions?: {
+    minQuantity?: number
+    maxQuantity?: number
+    minAmount?: number
+    maxAmount?: number
+    customerTypes?: string[]
+    productCategories?: string[]
+    validFrom?: Date
+    validUntil?: Date
+    weekdays?: number[]
+    regions?: string[]
+    articleFamilies?: string[]
+  }
+  parameters?: {
+    applyToBasePrice?: boolean
+    applyToMargin?: boolean
+    marginType?: 'percentage' | 'fixed_amount'
+    discountType?: 'percentage' | 'fixed_amount' | 'progressive'
+    progressiveRates?: Array<{
+      minQuantity: number
+      rate: number
+    }>
+    calculationMethod?: 'per_unit' | 'per_weight' | 'per_volume' | 'fixed'
+    freeThreshold?: number
+    btpSpecific?: {
+      applyCOFRAC?: boolean
+      applyBTPCoeff?: boolean
+      minimumOrder?: number
+      deliveryZones?: string[]
+    }
+  }
+  metadata?: {
+    createdBy?: string
+    approvedBy?: string
+    notes?: string
+    internalCode?: string
+    externalReference?: string
+    lastModification?: {
+      date: Date
+      user: string
+      changes: string[]
+    }
+  }
   priority?: number
 }
 

@@ -9,6 +9,7 @@ export * from './cross-cutting'
 export * from './infrastructure'
 // export * from './domains' // DEPRECATED: Types migrés vers @erp/domains
 export * from './ui'
+export * from './partners'
 
 // ===== RE-EXPORTS ESSENTIELS =====
 

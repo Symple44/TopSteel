@@ -376,7 +376,7 @@ async function seedMarketplaceModules() {
 
   try {
     for (const moduleData of modulesToCreate) {
-      const module = await marketplaceService.createModule(moduleData, 'system')
+      const module = await marketplaceService.createModule(moduleData as any, 'system')
 
       // Publier automatiquement le module
       await marketplaceService.publishModule(module.id)

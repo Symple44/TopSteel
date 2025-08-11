@@ -14,7 +14,7 @@ import {
   type RecipientType,
   TriggerType,
 } from '../entities'
-import type { NotificationRuleService } from './notification-rule.service'
+import { NotificationRuleService } from './notification-rule.service'
 
 @Injectable()
 export class NotificationRuleEngineService {
@@ -180,7 +180,7 @@ export class NotificationRuleEngineService {
       case TriggerType.STOCK:
         variables.stock_url = `/stock/materials/${variables.material_id}`
         variables.threshold_percentage = variables.threshold
-          ? Math.round((variables.quantity / variables.threshold) * 100)
+          ? Math.round(((variables.quantity as number) / (variables.threshold as number)) * 100)
           : 0
         break
 
@@ -281,7 +281,7 @@ export class NotificationRuleEngineService {
     const failedEvents = await this.ruleService._eventRepository.find({
       where: {
         status: EventStatus.FAILED,
-        occurredAt: { $gte: maxAgeDate } as unknown,
+        occurredAt: maxAgeDate as any,
       },
       order: { occurredAt: 'ASC' },
       take: 50,

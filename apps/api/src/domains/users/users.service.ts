@@ -120,13 +120,13 @@ export class UsersService {
   async updateRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
     await this._repository.update(userId, {
       refreshToken: refreshToken || undefined,
-    })
+    } as unknown)
   }
 
   async updateLastLogin(userId: string): Promise<void> {
     await this._repository.update(userId, {
       dernier_login: new Date(),
-    })
+    } as unknown)
   }
 
   async activate(id: string): Promise<User> {

@@ -285,7 +285,7 @@ export function ThemeProvider({
   storageKey = DEFAULT_STORAGE_KEY,
   attribute = DEFAULT_ATTRIBUTE,
   enableSystem = true,
-  enableTransitions = true,
+  enableTransitions: _enableTransitions = true,
   enableMetrics = true,
   enableSync = true,
   transitionDuration = DEFAULT_TRANSITION_DURATION,

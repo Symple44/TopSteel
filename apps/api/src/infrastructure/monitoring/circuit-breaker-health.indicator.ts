@@ -1,7 +1,7 @@
 // apps/api/src/health/circuit-breaker-health.indicator.ts
 import { Injectable } from '@nestjs/common'
 import { HealthCheckError, HealthIndicator, type HealthIndicatorResult } from '@nestjs/terminus'
-import type { CircuitBreakerService } from './circuit-breaker.service'
+import { CircuitBreakerService } from './circuit-breaker.service'
 
 @Injectable()
 export class CircuitBreakerHealthIndicator extends HealthIndicator {
@@ -18,14 +18,18 @@ export class CircuitBreakerHealthIndicator extends HealthIndicator {
     }
 
     const openCircuitBreakers = circuitBreakerNames.filter(
-      (name) => statuses[name]?.state === 'OPEN'
+      (name) => (statuses[name] as { state?: string })?.state === 'OPEN'
     )
 
     const healthData = {
       total: circuitBreakerNames.length,
       open: openCircuitBreakers.length,
-      closed: circuitBreakerNames.filter((name) => statuses[name]?.state === 'CLOSED').length,
-      halfOpen: circuitBreakerNames.filter((name) => statuses[name]?.state === 'HALF-OPEN').length,
+      closed: circuitBreakerNames.filter(
+        (name) => (statuses[name] as { state?: string })?.state === 'CLOSED'
+      ).length,
+      halfOpen: circuitBreakerNames.filter(
+        (name) => (statuses[name] as { state?: string })?.state === 'HALF-OPEN'
+      ).length,
       details: statuses,
     }
 

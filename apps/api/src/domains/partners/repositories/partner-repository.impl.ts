@@ -50,7 +50,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
   }
 
   async update(id: string, entity: Partial<Partner>): Promise<Partner> {
-    await this.repository.update(id, entity)
+    await this.repository.update(id, entity as unknown)
     const updated = await this.findById(id)
     if (!updated) {
       throw new Error(`Partner with id ${id} not found after update`)
@@ -132,7 +132,7 @@ export class PartnerRepositoryImpl implements IPartnerRepository {
     return await this.repository.save(entity)
   }
 
-  async findBySpecification(_spec: Record<string, unknown>): Promise<Partner[]> {
+  async findBySpecification(_spec: any): Promise<Partner[]> {
     // Implémentation basique - pourrait être améliorée avec le pattern Specification
     return await this.repository.find()
   }

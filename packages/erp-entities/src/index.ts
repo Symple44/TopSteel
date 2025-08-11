@@ -8,3 +8,6 @@ export * from './companies/societe.entity'
 
 // Inventory entities
 export * from './inventory/article.entity'
+
+// Pricing entities
+export * from './pricing/price-rule.entity'

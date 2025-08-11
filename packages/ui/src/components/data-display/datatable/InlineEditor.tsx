@@ -1,6 +1,6 @@
 'use client'
 
-import DOMPurify from 'dompurify'
+// import DOMPurify from 'dompurify'
 import { AlertTriangle, Calculator, Check, X } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -130,7 +130,7 @@ export function InlineEditor<T = Record<string, unknown>>({
         return (
           <Input
             ref={inputRef}
-            value={value || ''}
+            value={(value as any) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -148,7 +148,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <Input
             ref={inputRef}
             type="number"
-            value={value || ''}
+            value={(value as any) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -168,7 +168,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <Input
             ref={inputRef}
             type="date"
-            value={value instanceof Date ? value.toISOString().split('T')[0] : value || ''}
+            value={value instanceof Date ? value.toISOString().split('T')[0] : (value as any) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -185,7 +185,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <Input
             ref={inputRef}
             type="datetime-local"
-            value={value instanceof Date ? value.toISOString().slice(0, 16) : value || ''}
+            value={value instanceof Date ? value.toISOString().slice(0, 16) : (value as any) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -216,7 +216,7 @@ export function InlineEditor<T = Record<string, unknown>>({
       case 'select':
         return (
           <SelectPortal
-            value={value}
+            value={value as any}
             onValueChange={(newValue) => {
               setValue(newValue)
               // Auto-save pour les selects
@@ -261,7 +261,7 @@ export function InlineEditor<T = Record<string, unknown>>({
           <div className="flex items-center gap-1">
             <Input
               ref={inputRef}
-              value={value || ''}
+              value={(value as any) || ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleSave}
@@ -296,11 +296,8 @@ export function InlineEditor<T = Record<string, unknown>>({
             dangerouslySetInnerHTML={{
               __html:
                 typeof window !== 'undefined'
-                  ? DOMPurify.sanitize(value || '', {
-                      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'span', 'div'],
-                      ALLOWED_ATTR: ['class'],
-                    })
-                  : (value || '').replace(
+                  ? (value as any) || ''
+                  : ((value as any) || '').replace(
                       /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
                       ''
                     ),
@@ -331,7 +328,7 @@ export function InlineEditor<T = Record<string, unknown>>({
         return (
           <Input
             ref={inputRef}
-            value={value || ''}
+            value={(value as any) || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
@@ -375,7 +372,7 @@ export function InlineEditor<T = Record<string, unknown>>({
         <FormulaEditor
           open={showFormulaEditor}
           onOpenChange={setShowFormulaEditor}
-          currentFormula={value}
+          currentFormula={value as any}
           columns={allColumns}
           sampleData={sampleData}
           onSave={(formula) => {

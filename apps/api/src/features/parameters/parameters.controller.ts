@@ -1,7 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../domains/auth/security/guards/jwt-auth.guard'
-import type { ParameterService } from './services/parameter.service'
+import { ParameterService } from './services/parameter.service'
 
 @Controller('parameters')
 @ApiTags('🔧 Parameters')

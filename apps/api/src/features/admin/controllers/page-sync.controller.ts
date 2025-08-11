@@ -2,7 +2,7 @@ import { Controller, Get, Post, UseGuards } from '@nestjs/common'
 import { Roles } from '../../../domains/auth/decorators/roles.decorator'
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { RolesGuard } from '../../../domains/auth/security/guards/roles.guard'
-import type { PageSyncService } from '../../menu/services/page-sync.service'
+import { PageSyncService } from '../../menu/services/page-sync.service'
 
 @Controller('admin/page-sync')
 @UseGuards(JwtAuthGuard, RolesGuard)

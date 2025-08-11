@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { DataSource, type DataSourceOptions } from 'typeorm'
 import { Group } from '../../../domains/auth/core/entities/group.entity'
@@ -16,6 +16,10 @@ import { UserSocieteRole } from '../../../domains/auth/core/entities/user-societ
 import { Article } from '../../../domains/inventory/entities/article.entity'
 import { Material } from '../../../domains/materials/entities/material.entity'
 import { Partner } from '../../../domains/partners/entities/partner.entity'
+import { PartnerGroup } from '../../../domains/partners/entities/partner-group.entity'
+import { Contact } from '../../../domains/partners/entities/contact.entity'
+import { PartnerSite } from '../../../domains/partners/entities/partner-site.entity'
+import { PartnerAddress } from '../../../domains/partners/entities/partner-address.entity'
 import { User } from '../../../domains/users/entities/user.entity'
 import { UserSettings } from '../../../domains/users/entities/user-settings.entity'
 // Entités métier (bases sociétés) - Supprimées pour optimiser
@@ -36,10 +40,13 @@ import { Site } from '../../../features/societes/entities/site.entity'
 // Entités d'authentification (base auth)
 import { Societe } from '../../../features/societes/entities/societe.entity'
 import { SocieteUser } from '../../../features/societes/entities/societe-user.entity'
+import { SocieteLicense } from '../../../features/societes/entities/societe-license.entity'
 import { BTPIndex } from '../../../modules/pricing/entities/btp-index.entity'
 import { CustomerSectorAssignment } from '../../../modules/pricing/entities/customer-sector-assignment.entity'
 // Entités pricing
 import { SectorCoefficient } from '../../../modules/pricing/entities/sector-coefficient.entity'
+import { PriceRule } from '@erp/entities'
+import { PricingLog, WebhookSubscription, WebhookEvent, WebhookDelivery, SalesHistory } from '../../../features/pricing/entities'
 
 @Injectable()
 export class MultiTenantDatabaseConfig {
@@ -61,6 +68,7 @@ export class MultiTenantDatabaseConfig {
       entities: [
         // Entités d'authentification et gestion des sociétés
         Societe,
+        SocieteLicense,
         Site,
         SocieteUser,
         SharedDataRegistry, // Registre des données partagées
@@ -125,6 +133,10 @@ export class MultiTenantDatabaseConfig {
       entities: [
         // Entités métier spécifiques à la société
         Partner,
+        PartnerGroup,
+        Contact,
+        PartnerSite,
+        PartnerAddress,
         Article,
         Material,
         Notifications,
@@ -132,6 +144,12 @@ export class MultiTenantDatabaseConfig {
         ModuleInstallation,
         ModuleRating,
         // Entités pricing
+        PriceRule,
+        PricingLog,
+        WebhookSubscription,
+        WebhookEvent,
+        WebhookDelivery,
+        SalesHistory,
         SectorCoefficient,
         CustomerSectorAssignment,
         BTPIndex,

@@ -1,12 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import type { DatabaseBackupService } from '../services/database-backup.service'
-import type { DatabaseEnumFixService } from '../services/database-enum-fix.service'
-import type {
-  DatabaseIntegrityReport,
+import { DatabaseBackupService } from '../services/database-backup.service'
+import { DatabaseEnumFixService } from '../services/database-enum-fix.service'
+import {
+  type DatabaseIntegrityReport,
   DatabaseIntegrityService,
 } from '../services/database-integrity.service'
-import type { DatabaseStatsService } from '../services/database-stats.service'
+import { DatabaseStatsService } from '../services/database-stats.service'
 
 @ApiTags('Database Management')
 @Controller('admin/database')
@@ -79,7 +79,7 @@ export class DatabaseIntegrityController {
 
     return {
       success: true,
-      data: stats,
+      data: stats as any,
     }
   }
 
@@ -100,7 +100,7 @@ export class DatabaseIntegrityController {
 
     return {
       success: true,
-      data: backups,
+      data: backups as any,
     }
   }
 
