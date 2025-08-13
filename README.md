@@ -1,14 +1,18 @@
 # 🏭 TopSteel ERP
 
-[![CI/CD Pipeline](https://github.com/YOUR_ORG/TopSteel/workflows/🚀%20TopSteel%20CI/CD%20Pipeline/badge.svg)](https://github.com/YOUR_ORG/TopSteel/actions/workflows/ci.yml)
-[![Security Audit](https://github.com/YOUR_ORG/TopSteel/workflows/📦%20Dependencies%20&%20Security%20Monitor/badge.svg)](https://github.com/YOUR_ORG/TopSteel/actions/workflows/dependencies.yml)
-[![CodeQL](https://github.com/YOUR_ORG/TopSteel/workflows/CodeQL%20Analysis/badge.svg)](https://github.com/YOUR_ORG/TopSteel/actions/workflows/codeql.yml)
-[![codecov](https://codecov.io/gh/YOUR_ORG/TopSteel/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_ORG/TopSteel)
+[![CI/CD Pipeline](https://github.com/Symple44/TopSteel/workflows/🚀%20TopSteel%20CI/CD%20Pipeline/badge.svg)](https://github.com/Symple44/TopSteel/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/Symple44/TopSteel/workflows/🛡️%20Security%20Scanning/badge.svg)](https://github.com/Symple44/TopSteel/actions/workflows/security.yml)
+[![Test Suite](https://github.com/Symple44/TopSteel/workflows/🧪%20Test%20Suite/badge.svg)](https://github.com/Symple44/TopSteel/actions/workflows/test-runner.yml)
+[![CodeQL](https://github.com/Symple44/TopSteel/workflows/CodeQL%20Analysis/badge.svg)](https://github.com/Symple44/TopSteel/actions/workflows/codeql.yml)
+[![codecov](https://codecov.io/gh/Symple44/TopSteel/branch/main/graph/badge.svg)](https://codecov.io/gh/Symple44/TopSteel)
 
-[![Node.js Version](https://img.shields.io/badge/node-18.17.0-green)](https://nodejs.org/)
-[![pnpm Version](https://img.shields.io/badge/pnpm-8.15.0-blue)](https://pnpm.io/)
-[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
-[![License](https://img.shields.io/badge/license-UNLICENSED-red)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-22.14.0-green)](https://nodejs.org/)
+[![pnpm Version](https://img.shields.io/badge/pnpm-10.13.1-blue)](https://pnpm.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.4.6-black)](https://nextjs.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-11.1.6-red)](https://nestjs.com/)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/dependabot)
+[![License](https://img.shields.io/badge/license-GPL--3.0-orange)](LICENSE)
 
 > 🔧 **Système de gestion métallurgique moderne et sécurisé**  
 > ERP complet pour les entreprises de construction métallique, développé avec Next.js 14, NestJS et PostgreSQL.

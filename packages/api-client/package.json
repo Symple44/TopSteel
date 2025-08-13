@@ -65,7 +65,7 @@
   "devDependencies": {
     "@erp/config": "workspace:*",
     "@types/node": "^24.2.1",
-    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
     "@typescript-eslint/parser": "^8.39.0",
     "eslint": "^9.33.0",
     "rimraf": "^6.0.1",
