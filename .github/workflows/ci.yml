@@ -46,7 +46,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -84,7 +84,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v3
@@ -132,7 +132,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v3
@@ -187,7 +187,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v3
@@ -240,7 +240,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v3
@@ -280,7 +280,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v3
@@ -329,7 +329,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📥 Download build artifacts
         uses: actions/download-artifact@v5
@@ -377,7 +377,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📥 Download build artifacts
         uses: actions/download-artifact@v5
