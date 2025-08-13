@@ -92,7 +92,7 @@
     "use-callback-ref": "^1.3.3",
     "use-sidecar": "^1.1.3",
     "use-sync-external-store": "^1.5.0",
-    "vite": "7.1.1",
+    "vite": "7.1.2",
     "vite-plugin-dts": "4.5.4",
     "zod": "^4.0.17"
   },
@@ -203,7 +203,7 @@
       "caniuse-lite": "^1.0.30001726",
       "browserslist": "^4.24.0",
       "chokidar": "^4.0.3",
-      "vite": "7.1.1",
+      "vite": "7.1.2",
       "react": "^19.1.0",
       "react-dom": "^19.1.0",
       "scheduler": "^0.26.0"
