@@ -23,7 +23,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v3
@@ -64,7 +64,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: 🔍 Run Semgrep
         uses: returntocorp/semgrep-action@v1
@@ -90,7 +90,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       
@@ -118,7 +118,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: 🏗️ Build image
         run: |
@@ -145,7 +145,7 @@ jobs:
     
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v3
